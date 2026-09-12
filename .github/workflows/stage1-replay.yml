@@ -1,0 +1,361 @@
+# STAGE 1 — replay the exact captured request, with no Instructor.
+#
+# The frozen experiment is D247's; the subject is D255-D259's, selected
+# on request-side evidence alone and published before any response was
+# read. This workflow runs that experiment and nothing else.
+#
+# A LIVE MODEL EXECUTES HERE, AND THAT IS EXPLICITLY AUTHORISED. It is
+# named in the record before the run, not reasoned about afterwards
+# (D251). It writes no capture, so it produces no Q2/Q6/ownership
+# evidence and the sampling campaign stays CLOSED at 1/5.
+#
+# STARTED BY A DELIBERATE ACT, NEVER BY ORDINARY WORK.
+#
+# `workflow_dispatch` alone cannot work here: GitHub registers workflows
+# from the DEFAULT branch, so a dispatch-only file living on a feature
+# branch is never registered and the dispatch API answers 404 — measured,
+# not assumed (the workflow list holds 17 entries and this file is not
+# among them). Pushing to `main` is not authorised.
+#
+# So the trigger is a SENTINEL: this workflow fires only when a commit
+# touches `kai-pm/STAGE1_GO`. Ordinary work on the driver, the analysers
+# or the docs cannot start a live experiment; adding or changing that one
+# file is an explicit, auditable act, and the commit that did it is the
+# record of who started the run and when.
+#
+# ── DO NOT "FIX" THE PATHS FILTER BY ADDING THIS JOB'S INPUTS ─────────
+#
+# Rule 9 says a gate's trigger conditions are part of the gate, and
+# commit 924a600 earned it: a repaired collector was absent from its own
+# workflow's filter and therefore fired nothing. Three workflows in this
+# repository consequently list every input they read — and each of them
+# also lists ITSELF, so editing them EXECUTES them.
+#
+# That is right for a repeatable measurement and WRONG here. This
+# workflow starts a live model as a one-shot pre-registered experiment
+# (D247). If `scripts/security/stage1_replay.py`, or the image-identity
+# collector added below, appeared in this filter, then editing an
+# instrument would dispatch the experiment — the exact "manufactured
+# evidence run" the freeze exists to prevent, and a reduced-denominator
+# rerun nobody authorised.
+#
+# The sentinel IS this job's trigger condition, and it satisfies rule 9
+# by being deliberately narrower than the input set. The compensating
+# control is that no instrument change can reach a model without a
+# separate, auditable commit to `kai-pm/STAGE1_GO`. Recorded here so the
+# next person to run a paths-coverage detector against this file reads
+# the reason before repairing the protection. (D278)
+name: Stage 1 exact-request replay (KAI-GATE-048 C)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - claude/project-rework-plan-pgvp35
+    paths:
+      - kai-pm/STAGE1_GO
+
+permissions:
+  contents: read
+
+jobs:
+  stage1-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      actions: read
+    env:
+      # The capture holding the frozen subject, and the subject's own
+      # request-side identity as published in D259. The replay REFUSES if
+      # re-selection does not reproduce all three.
+      S1_CAPTURE_RUN_ID: "31894868473"
+      S1_CAPTURE_COMMIT: "1d79b145a04f1bc35a9bc9d0a31251153f6e6a10"
+      S1_SEQ: "2"
+      S1_PROMPT_HASH: "d53797298bea"
+      S1_CONTRACT_HASH: "98c57afadeae"
+      OLLAMA_MODEL: qwen2.5:3b
+      # Attempt 1. It executed nothing, but it DID produce a valid freeze
+      # manifest, so attempt 2's request identity can be checked against
+      # a real artifact rather than against a hash somebody transcribed.
+      S1_ATTEMPT1_RUN_ID: "31899571806"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install the JSON Schema validator the classifier needs
+        run: python3 -m pip install --quiet jsonschema
+
+      - name: The replay driver and the classifier must pass calibration
+        run: |
+          python3 scripts/test_stage1_replay.py
+          python3 scripts/test_replay_subject_selection.py
+          python3 scripts/test_llm_contract.py
+          python3 scripts/test_invocation_identity.py
+          python3 scripts/test_model_ready.py
+
+      - name: Mint an ephemeral database password for this run
+        run: |
+          printf 'DB_PASSWORD=ci-ephemeral-%s\n' \
+            "$(head -c 24 /dev/urandom | base64 | tr -dc 'a-zA-Z0-9' | head -c 20)" \
+            >> "$GITHUB_ENV"
+
+      - name: Free up runner disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc || true
+          df -h /
+
+      # ci-toleration: documented-skip
+      - name: Fetch the capture holding the frozen subject
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: memu-graph-llm-contract
+          run-id: ${{ env.S1_CAPTURE_RUN_ID }}
+          github-token: ${{ github.token }}
+          path: s1-evidence
+
+      # BEFORE anything is sent. Re-selects under S1, verifies the frozen
+      # seq/prompt/contract identity, rebuilds response_format with
+      # ast.literal_eval and asserts the typed value. Refuses on any
+      # mismatch, and never reads the original response.
+      - name: Freeze the exact request — refuse if identity fails
+        run: |
+          set -euo pipefail
+          python3 scripts/security/stage1_replay.py --freeze \
+            --capture s1-evidence/llm-contract-logs/capture.jsonl \
+            --manifest stage1-manifest.json \
+            --expect-seq "${S1_SEQ}" \
+            --expect-prompt-hash "${S1_PROMPT_HASH}" \
+            --expect-contract-hash "${S1_CONTRACT_HASH}" \
+            --url "http://ollama:11434/v1/chat/completions" \
+            --timeout 300
+
+      # ci-toleration: documented-skip
+      - name: Fetch attempt 1's freeze manifest
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: stage1-replay
+          run-id: ${{ env.S1_ATTEMPT1_RUN_ID }}
+          github-token: ${{ github.token }}
+          path: s1-attempt1
+
+      # VALUE-level identity, not code identity. Attempt 1 froze a
+      # request; this attempt must freeze the same one, or nothing is
+      # sent. `request_hash` covers the request body alone, so this
+      # opens nothing about the original model response — and
+      # `manifest_hash` is deliberately not compared, because the repair
+      # was authorised to move instrument metadata.
+      - name: Attempt 1 and attempt 2 must send the same request
+        run: |
+          set -euo pipefail
+          python3 scripts/security/stage1_replay.py --verify-request-hash \
+            --manifest stage1-manifest.json \
+            --against s1-attempt1/stage1-manifest.json \
+            --attempt-replies s1-attempt1/stage1-replies.jsonl
+
+      - name: Build the image
+        env:
+          DB_PASSWORD: ${{ env.DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+          docker compose -f docker-compose.full.yml build memu-graph
+
+      # THE IMAGE REFERENCED IMMEDIATELY BEFORE EXECUTION — which is a
+      # SMALLER claim than "the image that executed", and the difference
+      # is deliberate. A tag can be repointed between this lookup and the
+      # container start, and this step cannot see that. The claim is
+      # completed by the post-run container check further down; neither
+      # step is sufficient alone. (Rule 2: present ≠ executed. D280)
+      #
+      # D247 §6 item 10 requires every claim bound to "the exact tested
+      # tree, image and run id"; D277 found the tree carried two of those
+      # three, for the whole of Stage 1. Taken immediately after the
+      # build, so the recorded identity is the one the replay is about to
+      # use — not one re-derived later.
+      #
+      # `--no-deps`-style caveats do not apply: this reads the image and
+      # starts nothing. It is observational, and R11 is enforced INSIDE
+      # the collector — a failed or empty inspect records UNRECORDED
+      # rather than an empty identity field.
+      #
+      # `continue-on-error`, deliberately. This step must not be able to
+      # abort the frozen experiment: the collector's exit 3 means "no
+      # image identity", which is a fact ABOUT THE EVIDENCE, not an
+      # adverse result about the subject (rule 5). The UNRECORDED row is
+      # written and uploaded either way, so the gap is visible in the
+      # artifact instead of being inferred from a workflow that stopped.
+      # ci-toleration: documented-skip
+      - name: Record the image identity that will execute
+        continue-on-error: true
+        env:
+          DB_PASSWORD: ${{ env.DB_PASSWORD }}
+        run: |
+          set -uo pipefail
+          python3 scripts/security/collect_image_identity.py \
+            --compose-file docker-compose.full.yml \
+            --service memu-graph \
+            --out stage1-image-identity.jsonl
+
+      # BEFORE the model service, because attempt 1 (run 31899571806)
+      # discovered a PermissionError on its output file AFTER the stack
+      # was up, and executed 0 of 10 calls. Same image, same `app` user,
+      # same destination, same open() — one container start, no model.
+      - name: Preflight — prove the replay output path is writable
+        env:
+          DB_PASSWORD: ${{ env.DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+          docker compose -f docker-compose.full.yml run --rm --no-deps \
+            -T -v "$PWD:/w" -w /w memu-graph \
+            python3 scripts/security/stage1_replay.py --preflight \
+              --replies /tmp/stage1-replies.jsonl
+
+      # A SERVER, which is not the same claim as A MODEL. Attempt 2
+      # stopped here and called it ready.
+      - name: Start ONLY the model service
+        env:
+          DB_PASSWORD: ${{ env.DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+          docker compose -f docker-compose.full.yml up -d ollama
+          python3 scripts/ci/compose_probe.py \
+            --compose-file docker-compose.full.yml \
+            --services ollama --timeout 300
+
+      # THE PULL IS A GATE, NOT A BACKGROUND HOPE.
+      #
+      # Attempt 2 ran `up -d ollama ollama-pull` and moved on: the pull
+      # container had been alive 0.49 s when the first request went out,
+      # and was killed mid-pull at teardown. Run in the FOREGROUND under
+      # `set -e`, its exit status stops the chain — a failed pull can no
+      # longer be followed by ten requests.
+      #
+      # (docker-compose.full.yml already declares memu-graph ->
+      # ollama-pull `service_completed_successfully`. The replay's
+      # --no-deps, which is right for keeping the rest of the stack
+      # down, told Compose to ignore it. This step is that condition,
+      # restored explicitly.)
+      - name: Pull the model — the pull's exit status is the gate
+        env:
+          DB_PASSWORD: ${{ env.DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+          docker compose -f docker-compose.full.yml run --rm ollama-pull
+
+      # AND PROVE IT INDEPENDENTLY. A completed pull is a claim about a
+      # process; this asks the server what it actually holds, and
+      # requires an EXACT match with runtime.model from the frozen
+      # manifest — the value the replay will really send. `ollama`
+      # publishes no ports and agent-net is internal, so the probe runs
+      # inside the network, in the same image as the replay.
+      - name: The exact model must be present, or nothing is sent
+        env:
+          DB_PASSWORD: ${{ env.DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+          docker compose -f docker-compose.full.yml run --rm --no-deps \
+            -T -v "$PWD:/w" -w /w memu-graph \
+            python3 scripts/security/check_model_ready.py \
+              --manifest stage1-manifest.json \
+              --declared "${OLLAMA_MODEL}" \
+              --url "http://ollama:11434"
+
+      # The replay runs INSIDE the network the capture was taken on, and
+      # posts straight to the endpoint: no Instructor, no validation, no
+      # retry. The sender knows nothing about verdicts.
+      #
+      # It writes to /tmp INSIDE the container — a path the image's own
+      # `app` user owns — rather than into the host-owned bind mount at
+      # /w. The runtime user is unchanged; the destination moved. The
+      # container is named and NOT --rm, so whatever rows exist can be
+      # copied out even if this step fails.
+      - name: Replay the request 10 times, sequentially
+        env:
+          DB_PASSWORD: ${{ env.DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+          docker compose -f docker-compose.full.yml run --no-deps \
+            -T --name stage1-replay-run -v "$PWD:/w" -w /w memu-graph \
+            python3 scripts/security/stage1_replay.py --replay \
+              --manifest stage1-manifest.json \
+              --replies /tmp/stage1-replies.jsonl
+
+      # THE SECOND MEASUREMENT, and the one that actually binds.
+      #
+      # The step after the build records the image Compose resolved
+      # BEFORE any container existed. That establishes "the image
+      # referenced immediately before execution" — it does NOT establish
+      # what ran, because a tag can be repointed in between. Rule 2:
+      # present is not executed.
+      #
+      # This reads the replay container's own `.Image` and requires it to
+      # equal the recorded id. MISMATCH and UNRECORDED are both failures
+      # and both are written to the artifact.
+      #
+      # MUST run BEFORE the export step, which does `docker rm -f
+      # stage1-replay-run`. A container that has been removed cannot be
+      # asked what it ran, and the answer would be UNRECORDED forever.
+      # `if: always()` so a failed replay still gets its binding checked.
+      # ci-toleration: documented-skip
+      - name: Prove the container ran the image we recorded
+        if: always()
+        continue-on-error: true
+        run: |
+          set -uo pipefail
+          python3 scripts/security/collect_image_identity.py \
+            --verify-executed stage1-replay-run \
+            --service memu-graph \
+            --against stage1-image-identity.jsonl \
+            --out stage1-image-executed.jsonl
+
+      # Sizes and row counts only. The replies themselves are an
+      # artifact, never log lines.
+      - name: Export the sealed replies
+        if: always()
+        run: |
+          set -uo pipefail
+          if docker cp stage1-replay-run:/tmp/stage1-replies.jsonl \
+               stage1-replies.jsonl; then
+            echo "exported $(wc -c < stage1-replies.jsonl) byte(s) in" \
+                 "$(wc -l < stage1-replies.jsonl) row(s)"
+          else
+            echo "NO REPLIES EXPORTED: the replay container holds no"
+            echo "/tmp/stage1-replies.jsonl. What that means for the"
+            echo "experiment is the classify step's verdict, not this"
+            echo "step's guess."
+          fi
+          if docker rm -f stage1-replay-run; then
+            echo "replay container removed"
+          else
+            echo "no replay container existed to remove"
+          fi
+
+      - name: Tear down
+        if: always()
+        run: docker compose -f docker-compose.full.yml down -v || true
+
+      # LAST, so the verdicts land inside the Actions log byte window.
+      # Absent or short replay evidence returns STAGE 1 UNMEASURED here
+      # rather than raising FileNotFoundError, which is what attempt 1's
+      # equivalent step did.
+      - name: Stage 1 verdicts — all ten, in order
+        if: always()
+        run: |
+          set -euo pipefail
+          python3 scripts/security/stage1_replay.py --classify \
+            --manifest stage1-manifest.json \
+            --replies stage1-replies.jsonl \
+            --classification stage1-classification.jsonl
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stage1-replay
+          path: |
+            stage1-manifest.json
+            stage1-replies.jsonl
+            stage1-classification.jsonl
+            stage1-image-identity.jsonl
+            stage1-image-executed.jsonl
+          if-no-files-found: warn

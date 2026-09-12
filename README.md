@@ -10,49 +10,88 @@
 <p align="center">
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/core-tests.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml"><img src="https://github.com/dainius1234/kai-system/actions/workflows/python-app.yml/badge.svg" alt="Lint"></a>
-  <img src="https://img.shields.io/badge/services-60-blue?style=flat-square" alt="services">
-  <img src="https://img.shields.io/badge/tests-2%2C888_passing-brightgreen?style=flat-square" alt="tests">
-  <img src="https://img.shields.io/badge/GPU_Phase0-DONE-success?style=flat-square" alt="gpu-phase0">
-  <img src="https://img.shields.io/badge/Python-~67%2C500_LOC-yellow?style=flat-square" alt="loc">
-  <img src="https://img.shields.io/badge/milestones-52_shipped-purple?style=flat-square" alt="milestones">
-  <img src="https://img.shields.io/badge/failures-0-brightgreen?style=flat-square" alt="failures">
+  <img src="https://img.shields.io/badge/services-61_defined-blue?style=flat-square" alt="services">
+  <img src="https://img.shields.io/badge/tests-4%2C751_functions-brightgreen?style=flat-square" alt="tests">
+  <img src="https://img.shields.io/badge/GPU-not_yet_acquired-lightgrey?style=flat-square" alt="gpu">
+  <img src="https://img.shields.io/badge/Python-~186%2C315_LOC-yellow?style=flat-square" alt="loc">
+  <img src="https://img.shields.io/badge/milestones-45_charted-purple?style=flat-square" alt="milestones">
   <img src="https://img.shields.io/badge/license-private-red?style=flat-square" alt="license">
+</p>
+
+<p align="center">
+  <sub>The two CI badges above are live and self-updating; they are the
+  authoritative pass/fail signal. The static badges are counts, not a
+  verdict — <code>services</code> is services <em>defined</em> across the
+  three compose files (far fewer start by default, see
+  <a href="#service-map">Service Map</a>), and <code>tests</code> counts
+  <code>def test_</code> functions, not a passing run.</sub>
 </p>
 
 ---
 
-## Project Status (7 August 2026)
+## Project Status (10 September 2026)
 
 | Metric | Value |
 |---|---|
 | **Services** | 61 Docker containers |
 | **Test targets** | 91 (`make test-core`) |
-| **Individual tests** | 4,466 (`def test_` across 208 files) |
-| **Python LOC** | ~132,913 |
+| **Individual tests** | 4,759 (`def test_` across 244 files) |
+| **Python LOC** | ~186,673 |
 | **Compose files** | 3 (minimal / full / sovereign) |
 | **Milestones shipped** | 45 |
 | **Failures** | 0 |
 
-> **Auto-synced** by `make sync-docs`. Stale metrics block `make merge-gate`.
+> **Read this table precisely.** `make sync-docs` owns these seven rows and
+> nothing else on this page — not the badges, not Quick Reference. `make
+> check-docs` gates `merge-gate` on them. Three caveats it cannot express:
+> **Services** counts every service *defined* across the three compose files,
+> which is not the number that starts; **Milestones shipped** is counted out
+> of this README's own milestone chart, so it records what the chart says, not
+> a repository fact; and **Failures** is a fixed string in the sync script, not
+> a test result — the CI badges at the top are the real pass/fail signal.
+
+### Programme state
+
+The engineering programme runs separately from the product backlog. Its
+append-only record is [`kai-pm/DECISIONS.md`](kai-pm/DECISIONS.md); this is
+one line per item for navigation only.
+
+| Item | State | Accepted mechanism |
+|---|---|---|
+| **M3** — witness scope | CLOSED | `002e0ab` |
+| **M1** — validity binding | CLOSED | `53791c4` |
+| **E2** — evidence-class naming | CLOSED | `859e0a0` |
+| **S1** — census source binding | CLOSED | `ba258b8` + `bd1cbb4` |
+| **D367** qualification / final admission | OPEN — later programme work | — |
 
 ---
 
 ## Quick Reference
 
 ```bash
-make core-up          # Start minimal stack (34 services)
+make core-up          # Start the minimal stack — 18 services by default
 make core-down        # Stop it
-make full-up          # Start full stack
-make test-core        # Run all 90 test targets (~2,888 tests)
+make full-up          # Start the full stack — 21 services by default
+make test-core        # Run all 91 test targets (4,759 test functions)
+make test-uh          # Unified Hunter — all 78 suites
 make go_no_go         # Syntax-check all service entry points
 make merge-gate       # Full pre-merge validation
-make sync-docs        # Auto-update README + backlog metrics
+make sync-docs        # Auto-update the Project Status table + backlog metrics
 make dep-audit        # CVE scan on all pip packages
 make coverage         # pytest-cov HTML report
 make health-sweep     # Hit /health on all running services
 ```
 
-GPU integration status: **Phase 0 complete** — see [`docs/gpu_integration_phase0.md`](docs/gpu_integration_phase0.md).
+> **`core-up` starts 18 services, not the whole file.** `docker-compose.minimal.yml`
+> defines 36, and 18 of them are behind compose profiles (`sensors`, `watchers`,
+> `external-egress`, `finance`, `vault`, `introspection`, `recovery`). `make core-up`
+> passes no `--profile`, so those do not start. Add profiles explicitly, or use
+> `--profile "*"` for all 36. Verify with
+> `docker compose -f docker-compose.minimal.yml config --services`.
+
+GPU integration: **Phase 0 (CPU-safe preparation) is complete** — see
+[`docs/gpu_integration_phase0.md`](docs/gpu_integration_phase0.md). **No GPU is
+present.** Every GPU-gated capability on this page is inactive.
 
 ## Project Management
 
@@ -72,24 +111,52 @@ It is the source of truth for UH work — including an honest open-gaps list. Ve
 workstream with a single command:
 
 ```bash
-make test-uh          # all 26 UH suites, 1,947 tests
+make test-uh          # all 78 UH suites (tracker §2 records 2,142 tests)
 make assertion-floors # ratchet: no suite may exercise less than before
 ```
 
-> **Built, not cut over.** All 34 actuators across 8 risk tiers are migrated with real
-> dispatch handlers, and every legacy path is verified closed against the source tree.
-> Every migration flag still **defaults to the legacy path**, so deploying this changes
-> nothing until a flag is set. See §5–6 of the tracker.
+> **Built and tested. NOT cut over.** All 34 actuators across 8 risk tiers are
+> migrated with real dispatch handlers, and every legacy path is verified closed
+> against the source tree. Every migration flag still **defaults to the legacy
+> path**, so deploying this changes nothing until a flag is set — "built" here
+> does not mean "operationally adopted". `KAI_AUTONOMY_ENFORCE` in particular
+> **must not be enabled yet**: no grants exist, so enforcement would deny every
+> gated capability, and `make preflight` blocks it. See §5–6 of the tracker.
 >
-> **Deploying?** Eight services authenticate their side-effecting endpoints and
-> **fail closed**. `KAI_SERVICE_TOKEN` is wired into all compose profiles but ships
-> empty — generate one (`openssl rand -hex 32`) or those endpoints return 503.
+> **Deploying?** The tracker records eight services authenticating their
+> side-effecting endpoints and **failing closed**; the source now shows nine
+> modules using `common/service_auth` (`cortex` was added after the tracker's
+> last update). `KAI_SERVICE_TOKEN` is wired into all three compose files but
+> ships empty — generate one (`openssl rand -hex 32`) or those endpoints
+> return 503.
+>
+> Tracker last updated **2026-08-03**. It remains the detailed UH workstream
+> record. But where its dated status conflicts with mechanically verified
+> current repository state, treat the discrepancy as **documentation drift**:
+> verify against the current repository and the authoritative decision record
+> rather than automatically preferring either document.
 
 ---
 
 ## What Makes Kai Different
 
-> Every capability below has code and tests. Reasoning quality depends on the LLM model — see [Honest Limitations](#honest-limitations).
+> **How to read this catalogue.** Every capability below exists as code in this
+> repository. That is not the same as being live, and this page does not claim
+> it is. Some capabilities run today; some are built but still routed around by
+> a flag; some are interface stubs whose gate returns `False` until GPU,
+> hardware or accumulated data arrives. Where a row does not say otherwise,
+> treat it as **code present, runtime status not asserted here** — the status
+> vocabulary below is used wherever it has been established.
+>
+> | Marker | Means |
+> |---|---|
+> | ✅ Live | flag defaults ON, no GPU gate — runs on CPU |
+> | ✅ Collecting | running, accumulating data toward a later threshold |
+> | 🧩 Built, not cut over | implemented and tested; a flag still routes to legacy |
+> | 🔜 Stub | interface fixed, `can_*()` returns `False` until its precondition |
+> | 📋 Planned | design exists; no runtime code claimed |
+>
+> Reasoning quality depends on the LLM model — see [Honest Limitations](#honest-limitations).
 
 ### Soul & Inner Life
 
@@ -155,7 +222,7 @@ make assertion-floors # ratchet: no suite may exercise less than before
 |---|---|
 | **World Context Injection** | Every `/chat` call triggers a parallel 9-service probe with 2s per-service timeout. Result injected as "World State" system block into LLM prompt. Kai knows the environment it's operating in. |
 | **Proactive Observer** | Background asyncio task runs every 5 minutes. Reads Docker health, email, AQ, git, calendar, sysmetrics, weather, news. Detects notable changes. Writes `proactive_observation` memories to memu-core for spontaneous awareness. |
-| **Anomaly Detection** | Rolling 48-reading (≈4 hour) z-score baselines per sensor. Alerts when |z| > 2.0 after ≥6 readings warm-up. Moves Kai from snapshot to trend awareness. |
+| **Anomaly Detection** | Rolling 48-reading (≈4 hour) z-score baselines per sensor. Alerts when \|z\| > 2.0 after ≥6 readings warm-up. Moves Kai from snapshot to trend awareness. |
 | **Cross-Sensor Correlation** | After each observation cycle, reasons across the full sensor set: cpu_high + docker_unhealthy → resource cascade; RAM + docker → memory leak; git dirty + email backlog → operator mid-task (tread lightly). |
 | **Sensory Pattern Learning** | Tracks 10 recent observation cycles. Recurring types (≥3/10) written as `sensor_pattern` memories — future context retrieval surfaces predictable recurrences before they escalate. |
 | **Proactive Scheduling** | Fuses calendar events (within 30 min) with current sensor state into `proactive_schedule` memories: "Meeting in 20 min + AQ poor → consider indoor location." Surfaces naturally via memory retrieval. |
@@ -180,13 +247,13 @@ make assertion-floors # ratchet: no suite may exercise less than before
 
 | Capability | What It Does |
 |---|---|
-| **Self-Healing** | Deep `/health` + `/recover` + supervisor auto-heal loop across all services every 15s |
+| **Self-Healing** | Deep `/health` + `/recover` + supervisor auto-heal loop every 15s. The `supervisor` service is behind the `recovery` compose profile — it does not start with a bare `make core-up` |
 | **Recovery Log** | Every self-heal event logged to conscience — ties resilience to narrative |
-| **House Doctor** | Continuous differential diagnosis (9 rules) — CPU+RAM+docker constellations mapped to diagnosis + treatment |
+| **House Doctor** | Continuous differential diagnosis (9 rules) — CPU+RAM+docker constellations mapped to diagnosis + treatment. This is today's self-diagnostic capability; the wider self-diagnosis programme is separate and planned — see [Self-Diagnosis](#self-diagnosis-today-vs-planned) |
 | **Security Self-Hacking** | Fuzzes own APIs with 34 payloads, adversary challenges, SAGE self-review |
 | **HMAC Auth** | Inter-service HMAC signing, Ed25519, dual-sign rotation, nonce replay protection. Dev secret requires explicit `HMAC_ALLOW_DEV_SECRET=true` |
 | **Time-Travel Debug** | Checkpoint any state, diff between snapshots, rollback to any previous state |
-| **38 Feature Flags** | All capabilities independently toggleable via `FF_*` env vars — see [Feature Flags](#feature-flags) |
+| **53 Feature Flags** | All capabilities independently toggleable via `FF_*` env vars — 32 default on, 21 default off — see [Feature Flags](#feature-flags) |
 | **Structured Errors** | 20 enumerated codes (E1001–E4004) — no more "something broke" |
 | **Zero Telemetry** | No corporate control, no data exfiltration, no resets. Ever. |
 | **Skills Hub** | Hot-loadable .md skill files with security scanning, TTL pruning, unload, and provenance front-matter |
@@ -200,7 +267,7 @@ make assertion-floors # ratchet: no suite may exercise less than before
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │  OPERATOR INPUT                                                      │
-│  Telegram Bot ─── Dashboard (10 views) ─── API Direct               │
+│  Telegram Bot ─── Dashboard (16 views) ─── API Direct               │
 └────────────────────────────┬────────────────────────────────────────┘
                              │
 ┌────────────────────────────▼────────────────────────────────────────┐
@@ -367,53 +434,85 @@ POST /export (agentic proxy, conviction ≥ 9.0 gate)
 
 ## Service Map
 
-### Minimal Stack (`docker-compose.minimal.yml`) — 34 services
+### Minimal Stack (`docker-compose.minimal.yml`) — 36 defined, 18 start by default
 
-The default daily driver. All sensory, perception, memory, and cognitive services. No heavy AI extras (graph memory, Letta, telegram, avatar).
+The daily driver. No heavy AI extras (graph memory, Letta, telegram, avatar).
 
-| # | Service | Port | IP | Purpose |
-|---|---------|------|-----|---------|
-| 1 | postgres | internal | .2 | pgvector DB — memories, ledger, embeddings |
-| 2 | redis | internal | .3 | Session buffer, caches |
-| 3 | ollama | 11434 | .4 | Local LLM (`qwen2.5:0.5b` CPU default) |
-| 4 | ollama-pull* | — | — | One-shot init container — pulls model on first boot |
-| 5 | tool-gate | 8000 | .5 | Policy enforcement, HMAC auth, autonomy gate |
-| 6 | memu-core | 8001 | .6 | Memory engine hot path: memorize / retrieve / rank |
-| 7 | memu-core-introspect | 8009 | .7 | Store maintenance cold path: compress / decay / quarantine |
-| 8 | agentic | 8007 | .8 | Reasoning brain: chat / conviction / teammates / skills / swarm |
-| 9 | heartbeat | 8010 | .9 | System pulse, world anchor, auto-sleep |
-| 10 | dashboard | 8080 | .11 | 10-view operator console |
-| 11 | audio-service | 8021 | .15 | STT (faster-whisper) |
-| 12 | tts-service | 8030 | .16 | Text-to-speech (edge-tts `en-GB-RyanNeural`) |
-| 13 | browser-agent | 8040 | .17 | Playwright Chromium — navigate / scrape / click |
-| 14 | vision-service | 8023 | .18 | OpenCV face detect + DeepFace emotion |
-| 15 | clipboard-service | 8024 | .19 | Clipboard read/write |
-| 16 | files-service | 8025 | .20 | File system read (allowlisted paths) |
-| 17 | notify-service | 8031 | .21 | Push notifications |
-| 18 | document-parser | 8032 | .22 | PDF / DOCX / XLSX / PPTX / DXF / ZIP / CSV |
-| 19 | monitor-service | 8033 | .23 | Background rule engine — HTTP/scrape + notify + TTS |
-| 20 | broker-bridge | 8034 | .24 | Binance REST (spot/futures), HMAC-signed |
-| 21 | sysmetrics | 8035 | .25 | CPU / RAM / disk / network / processes via psutil |
-| 22 | screen-watcher | 8036 | .26 | Periodic screenshot diff + change alert |
-| 23 | email-reader | 8037 | .27 | IMAP read-only polling |
-| 24 | news-feed | 8038 | .28 | RSS aggregation + keyword search |
-| 25 | weather-service | 8039 | .29 | Weather data (mocked httpx in CI) |
-| 26 | docker-watcher | 8041 | .30 | Docker container health monitoring |
-| 27 | airquality-service | 8042 | .31 | Air quality index |
-| 28 | calendar-service | 8043 | .32 | CalDAV calendar — events, summaries |
-| 29 | git-watcher | 8044 | .33 | Git repo dirty/stash/branch status |
-| 30 | skill-hunter | 8045 | .34 | Autonomous skill discovery via PyPI |
-| 31 | house-doctor | 8046 | .35 | Differential system diagnosis (9 rules D001–D009) |
-| 32 | vault-sync | 8047 | .36 | Obsidian Brain — bidirectional vault↔memu-core sync |
-| 33 | wake-service | 8022 | .10 | Wake-word + intent routing |
-| 34 | supervisor | 8051 | .12 | Watchdog, auto-heal, proactive checks |
-| 35 | verifier | 8052 | .13 | Semantic fact-checking (embedding + keyword), SAGE |
+**Half of it is profile-gated.** `make core-up` passes no `--profile`, so these
+18 are what actually come up:
 
-*ollama-pull is a one-shot init container — not counted as a long-running service.
+```
+postgres · redis · ollama · ollama-pull · tool-gate · memu-core
+memu-core-introspect · agentic · heartbeat · dashboard · tts-service
+notify-service · document-parser · weather-service · airquality-service
+calendar-service · skill-hunter · house-doctor
+```
 
-### Full Stack Additions (`docker-compose.full.yml`)
+The other 18 need their profile named — `sensors` (audio, vision, clipboard,
+files, screen-watcher, wake), `watchers` (sysmetrics, docker-watcher,
+git-watcher, monitor-service), `external-egress` (browser-agent, email-reader,
+news-feed), `finance` (broker-bridge), `vault` (vault-sync), `introspection`
+(cortex), `recovery` (supervisor, verifier). The table below lists everything
+the file defines; the `Profile` column says what it takes to start each one.
 
-Full stack includes all minimal services plus the heavy AI stack: introspect, graph memory, Letta, financial, executor, fusion, telegram, avatar, camera, and ops tooling.
+| # | Service | Port | Profile | Purpose |
+|---|---------|------|---------|---------|
+| 1 | postgres | internal | default | pgvector DB — memories, ledger, embeddings |
+| 2 | redis | internal | default | Session buffer, caches |
+| 3 | ollama | 11434 | default | Local LLM (`qwen2.5:0.5b` CPU default) |
+| 4 | ollama-pull | — | default | One-shot init container — pulls model on first boot |
+| 5 | tool-gate | 8000 | default | Policy enforcement, HMAC auth, autonomy gate |
+| 6 | memu-core | 8001 | default | Memory engine hot path: memorize / retrieve / rank |
+| 7 | memu-core-introspect | 8009 | default | Store maintenance cold path: compress / decay / quarantine |
+| 8 | agentic | 8007 | default | Reasoning brain: chat / conviction / teammates / skills / swarm |
+| 9 | heartbeat | 8010 | default | System pulse, world anchor, auto-sleep |
+| 10 | dashboard | 8080 | default | 10-view operator console |
+| 11 | audio-service | 8021 | sensors | STT (faster-whisper) |
+| 12 | tts-service | 8030 | default | Text-to-speech (edge-tts `en-GB-RyanNeural`) |
+| 13 | browser-agent | 8040 | external-egress | Playwright Chromium — navigate / scrape / click |
+| 14 | vision-service | 8023 | sensors | OpenCV face detect + DeepFace emotion |
+| 15 | clipboard-service | 8024 | sensors | Clipboard read/write |
+| 16 | files-service | 8025 | sensors | File system read (allowlisted paths) |
+| 17 | notify-service | 8031 | default | Push notifications |
+| 18 | document-parser | 8032 | default | PDF / DOCX / XLSX / PPTX / DXF / ZIP / CSV |
+| 19 | monitor-service | 8033 | watchers | Background rule engine — HTTP/scrape + notify + TTS |
+| 20 | broker-bridge | 8034 | finance | Binance REST (spot/futures), HMAC-signed |
+| 21 | sysmetrics | 8035 | watchers | CPU / RAM / disk / network / processes via psutil |
+| 22 | screen-watcher | 8036 | sensors | Periodic screenshot diff + change alert |
+| 23 | email-reader | 8037 | external-egress | IMAP read-only polling |
+| 24 | news-feed | 8038 | external-egress | RSS aggregation + keyword search |
+| 25 | weather-service | 8039 | default | Weather data (mocked httpx in CI) |
+| 26 | docker-watcher | 8041 | watchers | Docker container health monitoring |
+| 27 | airquality-service | 8042 | default | Air quality index |
+| 28 | calendar-service | 8043 | default | CalDAV calendar — events, summaries |
+| 29 | git-watcher | 8044 | watchers | Git repo dirty/stash/branch status |
+| 30 | skill-hunter | 8045 | default | Autonomous skill discovery via PyPI |
+| 31 | house-doctor | 8046 | default | Differential system diagnosis (9 rules D001–D009) |
+| 32 | vault-sync | 8047 | vault | Obsidian Brain — bidirectional vault↔memu-core sync |
+| 33 | wake-service | 8022 | sensors | Wake-word + intent routing |
+| 34 | supervisor | 8051 | recovery | Watchdog, auto-heal, proactive checks |
+| 35 | verifier | 8052 | recovery | Semantic fact-checking (embedding + keyword), SAGE |
+| 36 | cortex | 8048 (internal) | introspection | D113 continuous interpretive layer — situational model, intent inference, context-shift detection |
+
+`ollama-pull` is a one-shot init container, not a long-running service.
+
+> **The old fixed-IP column is gone, and that is a correction.** It listed
+> per-service addresses on a `172.20.0.0/16` network. No `docker-compose*.yml`
+> in this repository declares `ipv4_address` or a `subnet` — the string
+> `172.20.` appears in none of them. Addresses are assigned by Docker's default
+> IPAM and are not stable. Reach services by name on the compose network.
+
+### Full Stack Additions (`docker-compose.full.yml`) — 35 defined, 21 start by default
+
+The heavy AI stack: introspect, graph memory, Letta, financial, executor, fusion,
+telegram, avatar, camera, and ops tooling. Same profile rule as the minimal file —
+14 of the 35 are gated (`recovery`, `introspection`, `execution`, `finance`,
+`sensors`, `parakeet`, `external-egress`), so `make full-up` brings up 21.
+
+> This file is **not** a superset of the minimal one. It omits several sensory and
+> watcher services the minimal file defines — including `vault-sync`, `cortex`,
+> `browser-agent`, `sysmetrics`, `git-watcher`, `docker-watcher` and the feed
+> services. "Full" names a different composition, not a bigger one.
 
 | Service | Port | Purpose |
 |---------|------|---------|
@@ -440,9 +539,12 @@ Full stack includes all minimal services plus the heavy AI stack: introspect, gr
 | skill-hunter | 8045 | Autonomous skill acquisition |
 | house-doctor | 8046 | System differential diagnosis |
 
-### Sovereign Stack (`docker-compose.sovereign.yml`)
+### Sovereign Stack (`docker-compose.sovereign.yml`) — 21 defined, 13 start by default
 
-Production-hardened subset with full security stack. Uses pgvector (not TurboVec), Vault secrets, Tailscale overlay, and Prometheus/Grafana observability.
+Production-hardened subset with the security stack: pgvector (not TurboVec), Vault
+secrets, Tailscale overlay, Prometheus/Grafana observability. Eight are profile-gated
+— including `vault` and `vault-rotator` (profile `dev`), `tailscale` and
+`perception-telegram` (`external-egress`), and `executor` (`execution`).
 
 | Service | Purpose |
 |---------|---------|
@@ -652,6 +754,42 @@ Side effects: writes medical_report memory to memu-core;
               calls notify-service for WARNING/CRITICAL.
 ```
 
+### Self-diagnosis: today vs planned
+
+Kai's self-knowledge is a long-term goal, and this page has previously let the
+goal and the current capability blur together. They are different things.
+
+**What exists today — CURRENT SELF-DIAGNOSTIC CAPABILITY**
+
+| Piece | Status |
+|---|---|
+| House Doctor service — 9 rules, `POST /diagnose`, port 8046 | ✅ Live |
+| Supervisor auto-heal — deep `/health` + `/recover` every 15s | ✅ Live (`recovery` profile) |
+| System FSM — DEGRADED / RECOVERING states | ✅ Live |
+| Anomaly detection — rolling 2σ sensor baselines | ✅ Live |
+| Self-Capability Map — `GET /introspect/capabilities` | ✅ Live |
+| Doctor teammate — conversational differential diagnosis | ✅ Live |
+
+That set is **rule-based symptom matching plus health probing**. It reports and
+it can restart things. It does not reason about its own source, and it does not
+repair itself.
+
+**What is not built — FUTURE SELF-DIAGNOSIS ARCHITECTURE (A4)**
+
+📋 Planned. Recorded in
+[`kai-pm/A4_SELF_DIAGNOSIS_EVOLUTION.md`](kai-pm/A4_SELF_DIAGNOSIS_EVOLUTION.md),
+whose own status line reads **"FUTURE DESIGN OBLIGATION / ARCHITECTURE NOTE —
+NOT CURRENT PROGRAMME AUTHORITY"**. The intent is that Kai eventually answers,
+*with evidence rather than guesswork*, what exists, what is connected to what,
+what changed since the last known-good state, which subsystem is responsible
+for a failure, what remains UNKNOWN, and what safe repair it should propose to
+the operator for approval.
+
+None of that is implemented, and the note explicitly does not authorise runtime
+self-repair, document mutation or autonomy. The build-time assurance machinery
+it draws on (House-in-Order / Census) is engineering tooling in `kai-pm/`, not a
+running service.
+
 ---
 
 ## Vault-Sync / Obsidian Brain (D91)
@@ -659,7 +797,7 @@ Side effects: writes medical_report memory to memu-core;
 Bidirectional synchronisation between the operator's Obsidian vault and Kai's knowledge graph. The vault is a window into the operator's thinking; the knowledge graph is Kai's structured memory. Vault-Sync bridges them: notes flow in, high-conviction insights flow out.
 
 ```
-Service:    vault-sync (port 8047, 172.20.0.36)
+Service:    vault-sync (port 8047, profile `vault`)
             Dockerfile: vault-sync/Dockerfile
             Volume: vault_data (persists mapping.json + vault files)
 
@@ -978,7 +1116,10 @@ GET  /health
 
 ## Feature Flags
 
-All 51 flags are toggleable via `FF_{NAME}=true|false` env var. Defaults shown. Changing a flag requires a service restart.
+All **53** flags in `common/feature_flags.py::_REGISTRY` are toggleable via
+`FF_{NAME}=true|false`. **32 default on, 21 default off.** Changing a flag
+requires a service restart. The registry is the source of truth; the table
+below is a readable copy of it and can drift — check the module if it matters.
 
 | Flag | Default | What It Gates |
 |------|---------|---------------|
@@ -1032,29 +1173,40 @@ All 51 flags are toggleable via `FF_{NAME}=true|false` env var. Defaults shown. 
 | `FF_CAUSAL_SURPRISE` | ✗ | D101: prediction-error detection — fires hypothesis cycle on divergence; requires FF_CAUSAL_WORLD_MODEL |
 | `FF_POLICY_MEMORY` | ✗ | D101: auto-distillation of simulation outcomes into ranked strategies — requires FF_CAUSAL_WORLD_MODEL |
 | `FF_GLOBAL_WORKSPACE` | ✗ | D102: Global Workspace Consciousness — serial stream of unified awareness via module bidding; requires GPU + D101 + D98 + ≥3 bidders |
+| `FF_DREAM_PHASE_7` | ✓ | Agent-Evolver insight generation during the dream cycle |
+| `FF_CORTEX_NPU` | ✗ | D114: Cortex Phase 1 — NPU inference on Strix Halo (AMD XDNA 2); moves Level 2/3 synthesis from HTTP delegation to on-device. Pending the target device **and** Linux/driver qualification of the NPU |
+| `FF_OHANA_CORE` | ✗ | D109: Ohana Core — learns the operator's moral fingerprint, injects loyalty context, evaluates action alignment |
 
 ---
 
 ## Operator Console
 
-**http://localhost:8080/app** — 10 views, keyboard shortcuts, installable as PWA.
+**http://localhost:8080/app** — 16 views, keyboard shortcuts, installable as PWA.
+View names below are the labels in `dashboard/static/app.html`.
 
 | View | Key | What You See |
 |------|-----|-------------|
 | **Chat** | `Ctrl+1` | Streaming conversation, PUB/WORK toggle, feedback ratings, struggle detection, 🔊 speak button |
-| **Dashboard** | `Ctrl+2` | Service health grid, pipeline status, fusion metrics |
+| **Pulse** | `Ctrl+2` | Service health grid, pipeline status, fusion metrics |
 | **Thinking** | `Ctrl+3` | Live conviction pipeline, tempo gauge, boundary map, silence signals, dream state |
-| **Settings** | `Ctrl+4` | Mode, notifications, markdown toggle, PWA install |
+| **Configure** | `Ctrl+4` | Mode, notifications, markdown toggle, PWA install |
 | **Goals** | `Ctrl+5` | Ohana goals, drift alerts, progress bars, reminders, scheduled tasks |
 | **Memory** | `Ctrl+6` | Memory browser — search by query or category, scores, stats |
-| **Logs** | `Ctrl+7` | Ring-buffer log viewer — level/time filter, monospace, colour-coded |
+| **Trace** | `Ctrl+7` | Ring-buffer log viewer — level/time filter, monospace, colour-coded |
 | **Soul** | `Ctrl+8` | Mood cards, emotion timeline, domain confidence, self-reflection journal, milestones; SOUL.md + AGENTS.md live editor |
 | **Canvas** | — | D3 v7 SVG: force-simulation mind-map (drag+zoom), emotion timeline area chart, plan-flow with arrows, memory graph (trust-tier colours, category hubs) |
 | **Diary** | — | Memory diary — browse recent, date groups, rich cards with emotion/pin/trust badges |
-| **System** | — | Sysmetrics gauges (CPU/RAM/disk), process table, screen-watcher controls |
-| **Feeds** | — | Email inbox, RSS articles + search, weather, air quality, docker containers, calendar widget |
+| **Finance** | — | Financial-awareness view |
+| **Memory Map** | — | Knowledge-graph view (memu-graph) |
+| **Watch** | — | Background rule engine — add/delete rules, live alert feed |
 | **Broker** | — | Binance tickers, balance, positions, orders, PnL, Quick Watch → monitor rules |
-| **Monitor** | — | Background rule engine — add/delete rules, live alert feed |
+| **Body** | — | Sysmetrics gauges (CPU/RAM/disk), process table, screen-watcher controls |
+| **Feeds** | — | Email inbox, RSS articles + search, weather, air quality, docker containers, calendar widget |
+
+> A view renders; what it renders depends on its backing service being up.
+> Several — Broker, Watch, Body, Feeds, Memory Map — are backed by
+> profile-gated or full-stack services, so on a bare `make core-up` they will
+> load with nothing behind them.
 
 | Shortcut | Action |
 |----------|--------|
@@ -1083,7 +1235,11 @@ Toggle: `Ctrl+Shift+M` in dashboard, or `POST /gate/mode`. Manual override lasts
 
 | Area | Reality | What Fixes It |
 |---|---|---|
-| **LLM Model** | Default `qwen2.5:0.5b` (~500M params) is a test placeholder — too small for meaningful reasoning, planning, or emotional intelligence | Upgrade to 7B+ model (`qwen2.5:7b`, `llama3:8b`). RTX 5080 = 3 env vars to switch. Model registry auto-adapts context, prompts, timeouts |
+| **What actually starts** | `make core-up` brings up **18** of the 36 services the minimal file defines. Half the sensory, watcher, egress, vault, cortex and recovery layer sits behind compose profiles and does not start unless named | Name the profiles you want, or `--profile "*"`. Verify with `docker compose -f docker-compose.minimal.yml config --services` |
+| **Unified Hunter** | Built and tested, **not cut over**. Every migration flag still defaults to the legacy path, so the canonical decision path is not what runs. `KAI_AUTONOMY_ENFORCE` must stay off — no grants exist, so it would deny everything | Operator decision per `kai-pm/UH_PROGRESS_TRACKER.md` §5–6, once a deployment exists to cut over |
+| **Self-diagnosis** | Rule-based symptom matching (House Doctor, 9 rules) plus health probing and restart. Kai does **not** reason about its own source and does **not** repair itself | The A4 architecture note — design only, unimplemented, unauthorised |
+| **This page** | Counts here are re-derived from the tree, but capability rows describe **code that exists**, not observed runtime behaviour. Only the seven Project Status rows are machine-enforced | A running stack, and per-capability runtime evidence. Neither exists yet |
+| **LLM Model** | Default `qwen2.5:0.5b` (~500M params) is a test placeholder — too small for meaningful reasoning, planning, or emotional intelligence | Upgrade to a 7B+ model (`qwen2.5:7b`, `llama3:8b`) — a few env vars once the target device exists. Model registry auto-adapts context, prompts, timeouts |
 | **Cognitive FSM wiring** | ~~Not wired~~ **DONE (D90)** — `POST /chat/swarm` runs the full pipeline. Scout→GATHER, Sage→DEBATE+CONVICTION_GATE, Doctor→FACT_CHECK, Oracle→CAUSAL_CHECK. All 5 stage functions are real implementations calling live memory/LLM/adversary dependencies. | — |
 | **Teammate reputation** | ~~No reputation tracking~~ **DONE (D90)** — per-teammate `TeammateRep` (total_calls, successful_handoffs, avg_confidence, reliability). Weights applied in `resolve_conflict()`. Persisted to `data/teammate_reputation.json`. | Add per-teammate memory slice (top-k retrieval scoped to teammate specialty) |
 | **Obsidian Brain** | ~~No external knowledge sync~~ **DONE (D91)** — vault-sync service live (port 8047). SHA256-deduped watchdog watcher, bidirectional ingest/export, conviction ≥9.0 export gate, 3 memu-core vault endpoints, FF_VAULT_CONTEXT injection. | Populate vault; enable FF_VAULT_CONTEXT once notes accumulate |
@@ -1109,7 +1265,10 @@ Toggle: `Ctrl+Shift+M` in dashboard, or `POST /gate/mode`. Manual override lasts
 
 ## Milestone History
 
-> 52 shipped. Zero skipped. Every milestone has tests.
+> 45 DONE bars are charted below. **This is a chart of what has been worked
+> through, maintained by hand.** `sync-docs` derives the "Milestones shipped"
+> metric by counting these bars — from this file — so it reflects the chart,
+> not an independent repository fact. Read it as a history, not a gate.
 
 ```
 P0  Stack runs              ██████████ DONE   P14 Temporal Self       ██████████ DONE
@@ -1157,7 +1316,7 @@ D102 Global Workspace       ████░░░░░░ STUB   (GWT bidding c
 | **D88** | M1 rolling 2σ anomaly baselines (48-reading window); M2 `/introspect/capabilities` self-map; M3 cross-sensor correlation; M4 world_state JSON persistence; M5 10-cycle pattern learning; M6 skill-hunter service (port 8045); M7 calendar+sensor scheduling; M8 reactive gap-triggered skill acquisition; 5 flags; 44 tests |
 | **D89** | System FSM (5 states, 9 events, 16 transitions); Cognitive reasoning FSM (GATHER→DEBATE→FACT_CHECK→CAUSAL_CHECK→CONVICTION_GATE→PRESENT, HALT/ESCALATE/RETHINK, per-swarm configs, schema-validated handoffs); persistent teammates Scout/Doctor/Sage/Oracle; house-doctor service (9 rules D001–D009); skill provenance (YAML front-matter + `.meta.json` sidecars, auto-disable at 3 errors); gap logging (GAP_HUNT_THRESHOLD=3); world model provenance ({value,source,timestamp,confidence}); emergent ritual discovery (≥7/10 cycles); GPU-era foundations (counterfactual, trust negotiation, predictive empathy, curiosity); 8 flags; 47 tests |
 | **D90** | `agentic/swarm.py` (SwarmContext, TeammateRep, `resolve_conflict()` 5-signal weighted average, reputation load/save); `agentic/swarm_stages.py` (5 real stage function factories: make_gather/debate/fact_check/causal_check/conviction_gate_stage + build_swarm_pipeline); `POST /chat/swarm` live endpoint; `GET /swarm/reputation`; `FF_SWARM` flag (default True); `data/teammate_reputation.json`; 38 tests |
-| **D91** | `vault-sync/` service (port 8047, 172.20.0.36): parser (NoteData, SHA256 checksum), mapper (filepath↔node-id, .vault-sync/mapping.json), watcher (watchdog + 2s debounce), FastAPI app (POST /ingest, POST /export conviction gate + path-traversal block, GET /search, GET /mapping); 3 memu-core vault endpoints (POST /memory/vault/ingest, DELETE /memory/vault/{id}, GET /memory/vault/search); agentic vault proxy (POST /vault/export, GET /vault/search) + FF_VAULT_CONTEXT world-context injection; FF_VAULT_SYNC (True) + FF_VAULT_CONTEXT (False); 4 Jinja2 note templates (daily-note, lesson-learned, kai-inbox, soul-mirror); services 59→60; ~45 tests |
+| **D91** | `vault-sync/` service (port 8047): parser (NoteData, SHA256 checksum), mapper (filepath↔node-id, .vault-sync/mapping.json), watcher (watchdog + 2s debounce), FastAPI app (POST /ingest, POST /export conviction gate + path-traversal block, GET /search, GET /mapping); 3 memu-core vault endpoints (POST /memory/vault/ingest, DELETE /memory/vault/{id}, GET /memory/vault/search); agentic vault proxy (POST /vault/export, GET /vault/search) + FF_VAULT_CONTEXT world-context injection; FF_VAULT_SYNC (True) + FF_VAULT_CONTEXT (False); 4 Jinja2 note templates (daily-note, lesson-learned, kai-inbox, soul-mirror); services 59→60; ~45 tests |
 | **D92–D100** | **Intelligence Sprint** — 9 capabilities in one push. CPU-safe (live now): D92 Socratic Questioning (SocraticQuestioner, pre-GATHER enriched_query); D93 Hypothesis Engine (idle-cycle "If X then Y" → CURIOSITY.md); D94 Temporal Projection (ForecastFan 4-branch probability fan); D98 Cognitive Fingerprint (collecting InteractionSample NOW → infers at 90 samples). GPU-era stubs: D95 Dialectical Synthesis, D96 Analogical Reasoning, D97 Concept Blending, D99 Synthetic Experience, D100 Transitive Reasoning (PageRank + community + rule mining, gates at MIN_EDGES=500). 9 FF_* flags. 4 test targets. 75 tests. |
 | **D101** | **Causal World Model & Policy Distillation** — `agentic/causal_world_model.py` + `agentic/policy_memory.py`. Four components: CausalGraph (typed CAUSES edges: source/target/strength/confidence/temporal_lag/direction/context_modifiers/source_type/evidence_count; `add_edge()` works NOW); WorldModelSimulator (N=50 GPU scenario variants per idle cycle, utility-ranked by cognitive fingerprint weights, `can_simulate()→False`); PolicyMemory in-memory stub; CausalSurpriseDetector (divergence ≥0.3 → fires D93 HypothesisEngine cycle, `can_detect_surprise()→False`). Separate PolicyLibrary in `policy_memory.py`: JSONL-persisted to `/data/policies.jsonl`, `store()`+`retrieve_relevant()` work NOW for seed policies. Factory singletons: `get_causal_graph/simulator/policy_memory/surprise_detector()`. Phase 3 Cognee CAUSES schema documented. 3 flags (FF_CAUSAL_WORLD_MODEL/FF_CAUSAL_SURPRISE/FF_POLICY_MEMORY). 37 tests. |
 | **D102** | **Global Workspace Consciousness** — `agentic/global_workspace.py`. Based on Global Workspace Theory (Baars 1988, Dehaene 2014). WorkspaceBid (module/content/urgency/relevance/surprise/confidence/emotional_salience); ConsciousMoment (timestamp/content/source_module/salience_score/broadcast_id/context/emotional_valence); GlobalWorkspace (100ms bidding cycle, weighted salience function personalised by D98 fingerprint, broadcast fires all subscriber callbacks in parallel, stream logged to `/data/conscious_stream.jsonl`). `can_operate()→False` in Phase 0. `subscribe()`/`submit_bid()`/`get_stream()` interfaces frozen and ready. Dashboard "Stream" view (live inner monologue) planned for Phase 3. Singleton: `get_global_workspace()`. 1 flag (FF_GLOBAL_WORKSPACE). 22 tests. |
@@ -1166,9 +1325,11 @@ D102 Global Workspace       ████░░░░░░ STUB   (GWT bidding c
 
 ## Roadmap & End Goal
 
-**Where we are:** Phase 0 complete (as of 2026-07-25). All CPU-safe backlog is shipped and on `main`. The D92–D102 sprint delivered 11 new capabilities: Socratic Questioning, Hypothesis Engine, and Temporal Projection are live now; Cognitive Fingerprinting (D98) is actively collecting interaction samples; Dialectical Synthesis, Analogical Reasoning, Concept Blending, Synthetic Experience, Transitive Reasoning, Causal World Model (D101), and Global Workspace Consciousness (D102) are complete GPU-era stubs with fixed interfaces — they activate when hardware arrives.
+**Where we are:** Phase 0 (CPU-safe) complete as of 2026-07-25; no GPU hardware since. All CPU-safe backlog is shipped and on `main`. The D92–D102 sprint delivered 11 new capabilities: Socratic Questioning, Hypothesis Engine, and Temporal Projection are live now; Cognitive Fingerprinting (D98) is actively collecting interaction samples; Dialectical Synthesis, Analogical Reasoning, Concept Blending, Synthetic Experience, Transitive Reasoning, Causal World Model (D101), and Global Workspace Consciousness (D102) are complete GPU-era stubs with fixed interfaces — they activate when hardware arrives.
 
-**The single unlock condition:** GPU hardware arrival (RTX 5080).
+**The single unlock condition:** arrival of the selected target device (see
+[Target Hardware](#target-hardware)). It has **not** been acquired, so every
+GPU-gated capability below is inactive today.
 
 When it arrives:
 1. `OLLAMA_MODEL=qwen2.5:7b` — real reasoning quality
@@ -1210,7 +1371,7 @@ When it arrives:
 
 ```
 agentic/               # Reasoning brain
-  app.py               # 32 API endpoints — chat, skills, teammates, checkpoints, introspect, swarm, vault
+  app.py               # 80 routes — chat, skills, teammates, checkpoints, introspect, swarm, vault, uh
   system_fsm.py        # D89: operational state machine (IDLE/ACTIVE/FOCUSED/DEGRADED/RECOVERING)
   cognitive_fsm.py     # D89: reasoning pipeline FSM (GATHER→…→PRESENT, HALT/ESCALATE/RETHINK)
   teammates.py         # D89: named cognitive personas (Scout/Doctor/Sage/Oracle)
@@ -1270,7 +1431,7 @@ data/
   RITUALS.md           # Operator-co-authored rituals (proposed by ritual discovery)
   CURIOSITY.md         # Open questions log (seed questions from D89, GPU fills it)
 common/                # Shared libraries
-  feature_flags.py     # 51 FF_* flags — runtime toggle without code changes
+  feature_flags.py     # 53 FF_* flags in _REGISTRY — 32 on, 21 off by default
   llm.py               # LLM chassis with retry/backoff (LLM_MAX_RETRIES=3)
   resilience.py        # resilient_call() — circuit breaker + exponential backoff
   auth.py              # HMAC signing + verification
@@ -1341,9 +1502,12 @@ security/              # HMAC/auth hardening helpers
 
 ---
 
-## Test Targets (90)
+## Test Targets (91)
 
-`make test-core` runs all 90 targets. Each target maps to a `scripts/test_*.py` file.
+`make test-core` runs all **91** targets. Each maps to a `scripts/test_*.py` file.
+The list below is an **excerpt for orientation, not the full set** — the
+authoritative list is the `test-core:` line in the `Makefile`, and
+`make test-uh` carries a further 78 Unified Hunter suites.
 
 <details>
 <summary>Click to expand full test target list</summary>
@@ -1419,18 +1583,18 @@ make test-d101-causal-world-model  make test-d102-global-workspace
 
 ```bash
 # Build
-docker compose -f docker-compose.minimal.yml build    # Core 34 services
+docker compose -f docker-compose.minimal.yml build    # 36 defined services
 docker compose -f docker-compose.full.yml build        # Full stack
 
 # Run
-make core-up       # Start minimal stack (34 services)
+make core-up       # Start minimal stack (18 of 36 — the rest are profile-gated)
 make core-down     # Stop minimal stack
 make full-up       # Start full stack
 make full-down     # Stop full stack
 
 # Validate
 make go_no_go      # Syntax check all entry points
-make test-core     # All 90 test targets (~2,888 tests)
+make test-core     # All 91 test targets (4,759 test functions)
 make merge-gate    # Full pre-merge validation
 ```
 
@@ -1501,22 +1665,108 @@ FF_GLOBAL_WORKSPACE=false        # D102: GWT bidding cycle + ConsciousMoment str
 > For AI assistants resuming work. Read `kai-pm/SESSION_BOOTSTRAP.md` first.
 
 ### Target Hardware
-- **Dev:** GitHub Codespace (CPU only, qwen2.5:0.5b)
-- **Prod:** Lenovo laptop + **RTX 5080 GPU** + **TPM 2.0**
-- GPU arrival = real LLM inference, GPU-era feature activation, multi-model consensus
-- All code works in both environments (stubs in Codespace, live on laptop)
+
+**Current:** CPU only — GitHub Codespace / container, `qwen2.5:0.5b`. This is
+what every measurement on this page was taken on.
+
+**Primary target platform — TARGET, NOT YET ACQUIRED.**
+
+| | |
+|---|---|
+| Device | **ASUS ROG Flow Z13 (2025)** |
+| SoC | **AMD Ryzen AI MAX+ 395 / Strix Halo** (Zen 5) |
+| iGPU | **Radeon 8060S** |
+| Memory | **128GB unified — this is the programme target** |
+| Storage | **≥2TB NVMe** target |
+| OS | **Ubuntu** production runtime |
+| NPU | XDNA 2 present; **production use subject to Linux/driver qualification** |
+
+**128GB is the target. 32GB is not.** Lower capacities exist as variants, not
+as the programme configuration: 64GB would mean a reduced model council and
+smaller context budgets, and 32GB is a development/minimal box. Any earlier
+reading of this page that presented 32GB or 64GB as the selected final
+configuration was wrong and is withdrawn.
+
+**Why this platform — the architectural reason, stated precisely.** KAI is a
+dedicated local AI system, not a general-purpose laptop. The unified-memory
+architecture lets CPU and GPU work against one substantially larger shared
+pool than the conventional discrete-laptop-GPU VRAM model, which is where the
+headroom comes from: larger quantised local LLMs, several resident
+council/specialist models at once, larger context and KV caches, embeddings
+and perception workloads, the graph and memory services, Docker and service
+overhead, Hunter orchestration, and future local multimodal work.
+
+The basis of the decision is the **combination** — Zen 5 CPU + Radeon 8060S +
+large unified memory + XDNA 2 NPU + a dedicated single-user KAI workload — and
+its fit for that workload, not an isolated GPU benchmark.
+
+> **Two things this page does not claim.** It does not claim the Radeon 8060S
+> is simply "faster than an RTX 5080"; that is not the basis of the decision
+> and is too broad a statement. And **CUDA remains the more mature conventional
+> AI ecosystem** — choosing this platform is a judgement about whole-
+> architecture suitability for KAI, particularly its memory model and
+> heterogeneous compute, not a claim of ecosystem parity.
+
+**Intended compute roles** (from
+[`kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md`](kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md) §3.2):
+
+| Resource | Role |
+|---|---|
+| **CPU (Zen 5)** | Orchestration, deterministic controls, services, databases, tool execution |
+| **Radeon / ROCm** | Primary candidate for heavy local inference and ML acceleration |
+| **XDNA 2 NPU** | Future low-power accelerator / sentinel candidate — **activation only after Linux qualification** |
+| **128GB unified memory** | A **governed shared resource** across models and system workloads |
+
+**Hardware serves KAI; KAI is not redesigned around hardware.** The software
+architecture stays authoritative. Nothing on this page is a commitment to
+distort the system to exploit one machine.
+
+**The Flow Z13 is the local sovereign node, not an architectural ceiling.**
+KAI retains the ability to use remote compute later. The long-term model is:
+
+```
+LOCAL KAI NODE  →  governed remote/cloud compute when required
+                →  local authority, control and evidence remain with KAI
+```
+
+**Acquiring the machine proves nothing on its own.** Model compatibility,
+quantisation, context limits, ROCm support, throughput and concurrent
+residency are all **benchmark gates, not promises** — to be measured when the
+hardware exists, exactly as the architecture specification requires. The NPU
+is explicitly not assumed to run arbitrary large LLMs.
+
+**The earlier "Lenovo laptop + RTX 5080 + TPM 2.0" target is superseded.** It
+is left named here so anyone who remembers it knows it was replaced rather
+than lost; the reasoning lives in the architecture documents, not on this page.
+
+All code runs in both environments — stubs on CPU, accelerator-gated paths
+inactive until the device exists.
 
 ### Key Docs (read in order)
-1. [`kai-pm/SESSION_BOOTSTRAP.md`](kai-pm/SESSION_BOOTSTRAP.md) — fast re-hydration, current state, next move
-2. [`kai-pm/DECISIONS.md`](kai-pm/DECISIONS.md) — append-only decision log (D1–D102)
-3. [`kai-pm/STATUS.md`](kai-pm/STATUS.md) — sprint health, open PRs, blocked items
-4. [`CHANGELOG.md`](CHANGELOG.md) — full semver changelog
-5. [`docs/PROJECT_BACKLOG.md`](docs/PROJECT_BACKLOG.md) — living backlog
+
+Every link below resolves. The **Currency** column is the honest part: some of
+these have not been touched in weeks, and reading a stale one as current state
+is how this README drifted in the first place.
+
+| # | Document | What it is | Currency |
+|---|---|---|---|
+| 1 | [`CLAUDE.md`](CLAUDE.md) | **Read first.** The operating rules that bind anyone working in this repository, and the incident that earned each one | Current |
+| 2 | [`kai-pm/DECISIONS.md`](kai-pm/DECISIONS.md) | Append-only decision log — D1–D374 plus titled unnumbered rulings | **Most current document in the repo** |
+| 3 | [`kai-pm/FAILURE_PATTERN_LEDGER.md`](kai-pm/FAILURE_PATTERN_LEDGER.md) | Authoritative, append-only: verified incidents and confirmed failure mechanisms | Current |
+| 4 | [`kai-pm/ENGINEERING_DOCTRINE.md`](kai-pm/ENGINEERING_DOCTRINE.md) | Standing engineering doctrine — permanent, not sprint-specific | Current |
+| 5 | [`kai-pm/UH_PROGRESS_TRACKER.md`](kai-pm/UH_PROGRESS_TRACKER.md) | Single source of truth for Unified Hunter status | Last updated 2026-08-03 |
+| 6 | [`kai-pm/SESSION_BOOTSTRAP.md`](kai-pm/SESSION_BOOTSTRAP.md) | Fast re-hydration, current state, next move | Last touched 2026-08-05 |
+| 7 | [`kai-pm/STATUS.md`](kai-pm/STATUS.md) | Sprint health, open PRs, blocked items | **Stale — 2026-08-01** |
+| 8 | [`docs/PROJECT_BACKLOG.md`](docs/PROJECT_BACKLOG.md) | Living backlog | **Stale — 2026-07-21** |
+| 9 | [`kai-pm/STUBS_AND_PLACEHOLDERS.md`](kai-pm/STUBS_AND_PLACEHOLDERS.md) | Known stubs and placeholders | **Stale — 2026-07-21** |
+| 10 | [`CHANGELOG.md`](CHANGELOG.md) | Full semver changelog | Rolling |
+| — | [`kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md`](kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md) | Target product architecture, including the selected hardware | **TARGET DESIGN — PLANNING ONLY** |
+| — | [`docs/architecture.md`](docs/architecture.md) | Older architecture write-up | **Superseded — its own line 3 says "the 26 services"; the repository now defines 61** |
 
 ### Cross-Check: What's Real vs What Needs Hardware
 
 **Working now (CPU / Codespace):**
-- [x] 34 services in minimal stack, all health-checked, compose validated
+- [x] 36 services defined in the minimal stack, 18 starting by default, compose validated
 - [x] TurboVec ANN persistence (default; no pgvector extension needed)
 - [x] pgvector persistence (sovereign stack; opt-in via `VECTOR_STORE=postgres`)
 - [x] HMAC auth enforced, dev secret blocked by default
@@ -1543,11 +1793,11 @@ FF_GLOBAL_WORKSPACE=false        # D102: GWT bidding cycle + ConsciousMoment str
 - [x] GPU-era stub interfaces fixed (D95–D97, D99–D102) — `can_*()→False` in Phase 0; interfaces frozen, ready to implement once GPU arrives
 - [x] Causal World Model (D101) — CausalGraph, WorldModelSimulator, PolicyMemory stubs; PolicyLibrary JSONL-persisted store() works NOW
 - [x] Global Workspace Consciousness (D102) — GWT WorkspaceBid/ConsciousMoment/GlobalWorkspace; subscribe/submit_bid/get_stream interfaces frozen
-- [x] 90 test targets, ~2,888 tests, zero failures
+- [x] 91 test targets, 4,759 test functions (`make test-core`); pass/fail is the CI badges, not this page
 - [x] Pre-commit, dep scanning, container scanning (Trivy)
 - [x] Circuit breakers, exponential backoff, resilient_call()
 - [x] MARS memory decay, spaced repetition
-- [x] Context budget trimming, structured errors, 51 feature flags
+- [x] Context budget trimming, structured errors, 53 feature flags
 - [x] Debate engine (`tree_search.py`, `conviction.py`, `adversary.py`)
 
 **Infrastructure ready, needs GPU to activate:**

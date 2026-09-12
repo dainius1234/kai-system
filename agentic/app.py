@@ -2943,13 +2943,37 @@ async def chat_stream(req: ChatRequest):
             )
         except Exception as e:
             failed.append(f"ohana: {e}")
-        # Cortex observe_turn — feeds context bridge and tacit knowledge accumulator
+        # Cortex observe_turn — feeds context bridge and tacit knowledge
+        # accumulator. SIGNED: /observe_turn derives the turn's provenance
+        # from the key that signs this request, so `json=` would be wrong
+        # twice over — it re-serialises with its own separators, and the
+        # receiver hashes the bytes that arrive. signed_json_request
+        # returns the bytes and the headers together so the two halves
+        # cannot drift.
+        #
+        # This call previously carried NO credentials at all, not even the
+        # shared token, so every one of them had been 401'd since
+        # /observe_turn was authenticated — and the failure was swallowed
+        # into record_degradation, which is why nothing said so.
         try:
+            from common.service_identity import signed_json_request
+            from urllib.parse import urlparse
+            raw, headers = signed_json_request(
+                # Derived from the URL actually in use, so an override
+                # changes the signed destination with it.
+                destination=urlparse(CORTEX_URL).hostname or "cortex",
+                method="POST", path="/observe_turn",
+                payload={"session_id": session, "user_message": u_msg[:500]})
             async with pooled_client(timeout=1.0) as client:
-                await client.post(
-                    f"{CORTEX_URL}/observe_turn",
-                    json={"session_id": session, "user_message": u_msg[:500]},
-                )
+                resp = await client.post(f"{CORTEX_URL}/observe_turn",
+                                         content=raw, headers=headers)
+            if resp.status_code >= 400:
+                # A refusal is a fact, not a nothing. Recorded so a
+                # misconfigured key does not read as a quiet system.
+                record_degradation(
+                    "cortex", "observe_turn_refused",
+                    RuntimeError(f"HTTP {resp.status_code}: "
+                                 f"{resp.text[:200]}"))
         except Exception as _exc:
             record_degradation("cortex", "learn_from_exchange", _exc)
 

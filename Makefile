@@ -6,7 +6,7 @@ export MEMU_ALLOW_FAKE_EMBEDDINGS ?= true
 # Self-audit and feedback
 self-audit:
 	python3 scripts/self_audit.py
-.PHONY: lint-blocking test-d109-ohana-core test-d92-socratic test-d93-hypothesis test-d94-forecaster test-d95-d100-foundations test-d101-causal-world-model test-d102-global-workspace test-d89-cognitive-depth go_no_go hardening_smoke pypi-shadow-check test-letta test-financial test-agentic-service test-agentic-introspect build-kai-control kai-control-selftest test-conviction kai-drill kai-drill-test test-self-emp game-day-scorecard hmac-rotation-drill hmac-auto-rotate hmac-migration-advice test-auth-hmac test-phase-b-memu chaos-ci health-sweep contract-smoke merge-gate phase1-closure paper-backup weekly-key-rotate weekly-ed25519-rotate core-up core-down core-smoke test-v7-verifier test-v7-quarantine test-v7-policy test-v7-idempotency test-integration-chain test-v7 test-heartbeat test-episode-saver test-episode-spool test-tool-gate-security test-error-budget test-invoice test-dashboard test-memu-retrieval test-memu-routes test-agentic-routes test-context-enrichment-ab test-ab-log test-screen-capture test-shell-sandbox test-hse-rams test-agentic test-router test-planner test-adversary test-failure-taxonomy test-selaur test-contradiction test-gem test-planner-prefs test-silence test-self-deception test-temporal-self test-predictive test-improvement-gate test-thinking-pathways test-dream-state test-security-audit test-gaps-sprint test-tree-search test-priority-queue test-model-selector test-prod-hardening test-p3-organic test-p4-personality test-p16-operational test-p17-emotional-intelligence test-p18-narrative-identity test-p19-imagination-engine test-p20-conscience-values test-p21-proactive-agent test-p22-operator-model test-error-codes test-feature-flags dep-audit coverage coverage-floors test-restart-persistence test-upload-fuzz test-audio-transcribe test-browser-agent test-vision-service test-clipboard-service test-files-service test-notify-service test-document-parser test-monitor-service test-broker-bridge test-sysmetrics test-screen-watcher test-email-reader test-news-feed test-weather-service test-docker-watcher test-airquality test-calendar-service test-git-watcher test-kai-intelligence test-cognitive-mechanisms sync-docs check-docs auto-changelog auto-session-log test-focus-compress test-context-budget test-predictive-failure test-multi-modal test-world-anchor test-self-healing-phases test-j-series test-behavioral test-docker-e2e test-chassis test-wake test-broker-bridge-yfinance test-perception-spine test-world-state test-proposal-workspace test-policy-bridge test-vertical-slice test-actuator-registry test-autonomy test-payload-bounds test-assessment test-invariant-guards test-concurrency-clock test-service-auth test-erasure test-legacy-bridge test-migration test-full-migration test-flags-enabled test-preflight test-architecture-rules test-dashboard-findings test-dashboard-auth test-dashboard-ui-auth test-degraded test-hygiene-gate test-assertion-floors test-gate-registry test-compose-drift test-secret-gates test-compose-gates test-ci-tolerations test-test-wiring test-test-isolation test-suite-floor test-conftest-guards suite-run suite-floor suite-floor-record test-isolation test-isolation-report test-isolation-baseline test-trust-ladder test-market test-cognition test-j-features test-perception-misc test-hmac-advisor test-untargeted test-smoke-core test-graph-live dashboard-findings hygiene-survey hygiene-gate hygiene-baseline verify-live-endpoints verify-live-mutating setup-service-token preflight test-uh assertion-floors assertion-floors-update gate-registry gate-registry-gate
+.PHONY: test-gated-commit test-embedding-backends test-runtime-topology test-degradation-tolerance test-model-load-denominator test-model-startup-classifier test-asset-contract test-memu-graph-acceptance test-graph-stall test-ingest-contract test-cognify-result test-llm-contract test-container-proof-harness test-observe-turn-identity test-service-identity-wiring service-keys verify-identity-containers lint-blocking test-d109-ohana-core test-d92-socratic test-d93-hypothesis test-d94-forecaster test-d95-d100-foundations test-d101-causal-world-model test-d102-global-workspace test-d89-cognitive-depth go_no_go hardening_smoke pypi-shadow-check test-letta test-financial test-agentic-service test-agentic-introspect build-kai-control kai-control-selftest test-conviction kai-drill kai-drill-test test-self-emp game-day-scorecard hmac-rotation-drill hmac-auto-rotate hmac-migration-advice test-auth-hmac test-phase-b-memu chaos-ci health-sweep contract-smoke merge-gate phase1-closure paper-backup weekly-key-rotate weekly-ed25519-rotate core-up core-down core-smoke test-v7-verifier test-v7-quarantine test-v7-policy test-v7-idempotency test-integration-chain test-v7 test-heartbeat test-episode-saver test-episode-spool test-tool-gate-security test-error-budget test-invoice test-dashboard test-memu-retrieval test-memu-routes test-agentic-routes test-context-enrichment-ab test-ab-log test-screen-capture test-shell-sandbox test-hse-rams test-agentic test-router test-planner test-adversary test-failure-taxonomy test-selaur test-contradiction test-gem test-planner-prefs test-silence test-self-deception test-temporal-self test-predictive test-improvement-gate test-thinking-pathways test-dream-state test-security-audit test-gaps-sprint test-tree-search test-priority-queue test-model-selector test-prod-hardening test-p3-organic test-p4-personality test-p16-operational test-p17-emotional-intelligence test-p18-narrative-identity test-p19-imagination-engine test-p20-conscience-values test-p21-proactive-agent test-p22-operator-model test-error-codes test-feature-flags dep-audit coverage coverage-floors test-restart-persistence test-upload-fuzz test-audio-transcribe test-browser-agent test-vision-service test-clipboard-service test-files-service test-notify-service test-document-parser test-monitor-service test-broker-bridge test-sysmetrics test-screen-watcher test-email-reader test-news-feed test-weather-service test-docker-watcher test-airquality test-calendar-service test-git-watcher test-kai-intelligence test-cognitive-mechanisms sync-docs check-docs auto-changelog auto-session-log test-focus-compress test-context-budget test-predictive-failure test-multi-modal test-world-anchor test-self-healing-phases test-j-series test-behavioral test-docker-e2e test-chassis test-wake test-broker-bridge-yfinance test-perception-spine test-world-state test-proposal-workspace test-policy-bridge test-vertical-slice test-actuator-registry test-autonomy test-payload-bounds test-assessment test-invariant-guards test-concurrency-clock test-service-auth test-erasure test-legacy-bridge test-migration test-full-migration test-flags-enabled test-preflight test-architecture-rules test-dashboard-findings test-dashboard-auth test-dashboard-ui-auth test-degraded test-hygiene-gate test-assertion-floors test-gate-registry test-compose-drift test-secret-gates test-compose-gates test-ci-tolerations test-test-wiring test-test-isolation test-suite-floor test-conftest-guards suite-run suite-floor suite-floor-record test-isolation test-isolation-report test-isolation-baseline test-trust-ladder test-market test-cognition test-j-features test-perception-misc test-hmac-advisor test-untargeted test-smoke-core test-graph-live dashboard-findings hygiene-survey hygiene-gate hygiene-baseline verify-live-endpoints verify-live-mutating setup-service-token preflight test-uh assertion-floors assertion-floors-update gate-registry gate-registry-gate
 
 # `lint-blocking` runs FIRST and byte-identically to python-app.yml's flake8
 # step. That step gates CI *ahead* of the tests, so a file that fails it
@@ -31,6 +31,17 @@ policy-check: lint-blocking
 	python3 scripts/security/check_architecture_rules.py
 	python3 scripts/security/hygiene_survey.py --gate
 	python3 scripts/security/check_ci_tolerations.py
+	python3 scripts/security/check_preflight_reachability.py \
+	  --expect-reachable scripts/test_item8_preflight.py
+	python3 scripts/test_capture_trigger_paths.py
+	python3 scripts/test_declared_prerequisites.py
+	python3 scripts/security/check_doctrine_integrity.py
+	python3 scripts/test_doctrine_integrity.py
+	python3 scripts/test_image_identity.py
+	python3 scripts/security/check_item8_design.py
+	python3 scripts/test_item8_instruments.py
+	python3 scripts/test_item8_verdicts.py
+	python3 scripts/test_item8_preflight.py
 	python3 scripts/security/check_workflow_filters.py
 	python3 scripts/security/check_workflow_outputs.py
 	python3 scripts/security/check_dockerfile_flags.py
@@ -43,6 +54,9 @@ policy-check: lint-blocking
 	python3 scripts/security/check_image_modules.py
 	python3 scripts/security/check_shipped_package_deps.py
 	python3 scripts/security/check_healthcheck_runnable.py
+	python3 scripts/security/check_service_identity_wiring.py
+	python3 scripts/security/check_bind_mount_portability.py
+	python3 scripts/security/check_depends_on_readiness.py
 	python3 scripts/security/check_test_identity.py
 	python3 scripts/security/check_test_wiring.py
 	python3 scripts/security/check_gate_registry.py --gate
@@ -301,6 +315,48 @@ setup-service-token:
 preflight:
 	PYTHONPATH=. python scripts/preflight_deploy.py
 
+# Everything that must be green before a push, in one command, in the
+# right order, joined by `&&` so a failure stops the chain.
+#
+# It exists because the pre-push mistakes were mechanical and repeated:
+# a `;` chain that pushed past a failing gate (twice in one day), stale
+# docs, and an assertion floor left unrecorded after adding a suite
+# (twice — the ratchet caught both). A checklist I have to remember is a
+# checklist I will skip while hurrying, which is precisely when I skip
+# things. See CLAUDE.md R0.
+# `coverage` runs the whole repo suite — 4,161 tests — and it is here
+# because omitting it is what let a broken push through. On 2026-08-07
+# prepush went green, the push landed, and CI died 14 minutes later on
+# `test_no_developer_home_paths`: a gate I had just written quoted, in
+# its own docstring, the literal that test forbids.
+#
+# prepush claimed to be "everything that must be green before a push"
+# while running neither the tests nor the coverage floors. A gate whose
+# scope is smaller than its name is this programme's entire subject, and
+# I had built one two hours earlier to prevent exactly this class.
+#
+# It costs ~6 minutes. The push it would have stopped cost 14.
+#
+# `test-uh` was added 2026-08-07, and its absence was the same defect
+# this programme keeps paying for: a gate whose scope was smaller than
+# its name implied. `prepush` had been widened once already — it ran
+# neither tests nor coverage before — and still excluded the suite that
+# tests the architecture and security invariants. A per-service identity
+# layer could be committed with its 76 refusal assertions never run.
+#
+# Measured before adding: test-uh takes 128s on this tree. Proven able
+# to fail: injecting one false assertion into the identity suite exits
+# prepush with code 2 at that target.
+prepush: policy-check test-uh coverage-floors test-assertion-floors
+	@echo
+	@echo "  prepush: gates green, docs current, assertion floors hold."
+	@echo "  Still yours to check, because no gate can:"
+	@echo "    - does the commit message say which half you VERIFIED,"
+	@echo "      and name what you could not verify here?  (R1)"
+	@echo "    - if this adds an external dependency or a new failure"
+	@echo "      mode, did you RUN the contingency?  (R2)"
+	@echo "    - if this fixes an instance, did you count the class?  (R6)"
+
 # Aggregate: every Unified Hunter work package + adversarial guards.
 test-uh: test-contracts test-perception-spine test-world-state \
 	test-proposal-workspace test-policy-bridge test-vertical-slice \
@@ -319,8 +375,19 @@ test-uh: test-contracts test-perception-spine test-world-state \
 	test-compose-interpolation test-unreachable-bindings \
 	test-implicit-deps test-image-modules test-test-identity \
 	test-execution-coverage test-bringup-guards test-ci-scripts \
+	test-post-mortem test-summarise-runs test-bind-mount-portability \
+	test-service-reachability test-perception-intake test-phase0-reducers \
+	test-service-identity test-service-identity-auth \
+	test-observe-turn-identity test-service-identity-wiring \
+	test-container-proof-harness test-embedding-backends \
+	test-runtime-topology test-degradation-tolerance \
+	test-model-load-denominator test-model-startup-classifier \
+	test-asset-contract test-memu-graph-acceptance \
+	test-graph-stall test-ingest-contract test-cognify-result \
+	test-llm-contract \
+	test-gated-commit \
 	test-shipped-package-deps test-policy-loader \
-	test-healthcheck-runnable \
+	test-healthcheck-runnable test-depends-on-readiness \
 	test-suite-floor
 	@echo "All Unified Hunter suites passed."
 
@@ -343,6 +410,8 @@ gate-registry:
 # A-04e will move this into policy-check. Runnable now to see it bite.
 gate-registry-gate:
 	python3 scripts/security/check_ci_tolerations.py
+	python3 scripts/security/check_preflight_reachability.py \
+	  --expect-reachable scripts/test_item8_preflight.py
 	python3 scripts/security/check_test_wiring.py
 	python3 scripts/security/check_gate_registry.py --gate
 
@@ -867,6 +936,219 @@ test-execution-coverage:
 test-bringup-guards:
 	python3 scripts/test_bringup_guards.py
 
+test-post-mortem:
+	python3 scripts/test_post_mortem.py
+
+test-bind-mount-portability:
+	python3 scripts/test_bind_mount_portability.py
+
+test-service-reachability:
+	python3 scripts/test_service_reachability.py
+
+test-perception-intake:
+	python3 scripts/test_perception_intake.py
+
+test-phase0-reducers:
+	python3 scripts/test_phase0_reducers.py
+
+test-service-identity:
+	python3 scripts/test_service_identity.py
+
+test-service-identity-auth:
+	python3 scripts/test_service_identity_auth.py
+
+test-observe-turn-identity:
+	python3 scripts/test_observe_turn_identity.py
+
+test-service-identity-wiring:
+	python3 scripts/test_service_identity_wiring.py
+
+# Drives verify_identity_in_containers.sh against a STUB docker.
+# Proves the harness control flow before the one real Docker run
+# is spent; it cannot and does not prove the images.
+test-container-proof-harness:
+	python3 scripts/test_container_proof_harness.py
+
+test-embedding-backends:
+	python3 scripts/test_embedding_backends.py
+
+# #41's denominator instrument. Its load-bearing case is the
+# known-positive for `--profile` / `COMPOSE_PROFILES`: the first parser
+# could not match `docker compose -f X --profile P up`, so the one
+# command form that would disprove its headline finding was the one form
+# it could not see. The real tree cannot reveal that -- the finding and
+# the blindness print the same thing -- so this suite is the only thing
+# standing between the report and an unfalsifiable claim.
+test-runtime-topology:
+	python3 scripts/test_runtime_topology.py
+
+# #41 class B. Its load-bearing assertion is that a probe actually
+# WAITED, not merely that it returned fast: resilient_call's breakers are
+# keyed by hostname, every probe targets 127.0.0.1, and a stale open
+# circuit made a blackhole read as a clean 0.0s degradation without ever
+# connecting. "Fast" and "correct" are different observations.
+test-degradation-tolerance:
+	python3 scripts/test_degradation_tolerance.py
+
+# The A/B/C model-load denominator. Its known-positive/known-negative
+# pairs exist because the first tracer's module-scope test used
+# `ast.walk`, which descends into function bodies, so every hit printed
+# IMPORT -- including two that load lazily behind a memoised getter. A
+# denominator wrong in that direction argues for baking a model into
+# four images on evidence that does not exist, and the output looked
+# entirely reasonable. `test_lazy_is_not_import` is that assertion.
+test-model-load-denominator:
+	python3 scripts/test_model_load_denominator.py
+
+# KAI-GATE-048's classifier, calibrated without a Docker daemon. Its
+# load-bearing assertion is that the four known shapes -- memu-core,
+# memu-core-introspect, ollama-pull and a lazy memu-graph -- produce four
+# DIFFERENT verdicts, and that `classify()` cannot see a service name at
+# all. A collapse there would answer the architecture question wrongly
+# while looking like a measurement.
+test-model-startup-classifier:
+	python3 scripts/test_model_startup_classifier.py
+
+# KAI-GATE-048's asset-contract summariser. Its load-bearing assertion
+# is that CONTRACT PROVEN can only be printed when the network-removed
+# stage SUCCEEDED on the asset set the fetch stage produced -- proven,
+# not-proven, disproven and ambiguous are four different findings with
+# four different remedies, and a bake built from an unproven list would
+# ship a still-broken image while every log said the contract was defined.
+test-asset-contract:
+	python3 scripts/test_asset_contract.py
+
+# KAI-GATE-048 Phase 1's verdict. Two load-bearing assertions: the
+# can-fail stage is INVERTED (a non-zero exit is its PASS), and blocking
+# ALL networking must NOT satisfy the capability check -- memu-graph
+# delegates embedding work to ollama, so `--network none` would test a
+# stricter and different system than production. D190 proposed exactly
+# that criterion and D191 corrected it; this suite is what stops it
+# coming back.
+test-memu-graph-acceptance:
+	python3 scripts/test_memu_graph_acceptance.py
+
+# KAI-GATE-049's stall analyser. Two load-bearing assertions: the four
+# states (slow LLM / waiting on delegate / stuck elsewhere / local
+# compute) must stay four distinct verdicts, because they have different
+# owners; and a non-return must NEVER read as a proven hang. Runs 4 and 6
+# agreed on ~291s because both used the same 300s client budget -- an
+# instrument-determined number read as a system property is the mistake
+# this whole unit exists to undo.
+test-graph-stall:
+	python3 scripts/test_graph_stall.py
+
+# KAI-GATE-050. The correlation between what cognee's pipeline actually
+# did and what /graph/ingest told the caller. HTTP 200 is NOT the success
+# predicate -- the 200 is the thing under suspicion, and a detector that
+# trusted it would agree with the defect and never find it (I-8). The
+# controls are real and come from the same request: `add` completes,
+# `cognify` failed, both in one cognee log.
+test-ingest-contract:
+	python3 scripts/test_ingest_contract.py
+
+# KAI-GATE-050's success predicate: did cognee return a TERMINAL
+# SUCCESSFUL pipeline result? Both directions, plus a status this file
+# has never been taught -- the predicate is a class, not the one failure
+# we happened to observe. Hard-coding PipelineRunFailedError would have
+# fixed run 9 and stayed blind to the next mode.
+test-cognify-result:
+	python3 scripts/test_cognify_result.py
+
+# KAI-GATE-048 C. The operator's fitness condition: if the instrument
+# cannot distinguish a schema DEFINITION from an INSTANCE of it, it is
+# not fit for the question -- the observed failure is exactly the first
+# wearing the shape of the second. Four kinds must stay four verdicts,
+# because a schema echo, a wrong-key object and no response at all have
+# three different owners.
+test-llm-contract:
+	python3 scripts/test_llm_contract.py
+
+# D248's P1 prerequisite. Separate from test-llm-contract on purpose:
+# sharing that file would have put a static census inside the LLM
+# capture workflow's paths filter, so editing an analyser would have
+# triggered a live model capture nobody authorised. The property under
+# test is that the two completeness axes NEVER substitute for one
+# another -- a spotless capture with no call-path source must read as
+# REQUEST_INCOMPLETE_POSITIONAL, not as replayable.
+test-p1-replay-completeness:
+	python3 scripts/test_p1_replay_completeness.py
+
+# S1's selection rule. The preconditions must REFUSE and the response
+# boundary must hold; a selector that quietly falls through to another
+# row would make the choice unfalsifiable after the fact.
+test-replay-subject-selection:
+	python3 scripts/test_replay_subject_selection.py
+
+# D247's Stage-1 experiment driver. Reconstruction, identity refusal,
+# the response boundary and the fixed denominator are all offline.
+test-stage1-replay:
+	python3 scripts/test_stage1_replay.py
+
+# D262's repair. A repair to the instrument is only admissible if the
+# model-facing invocation is unchanged, and this proves the check can
+# say BOTH things -- a mutation inside the derived surface breaches,
+# one outside it does not.
+test-invocation-identity:
+	python3 scripts/test_invocation_identity.py
+
+# D272 / rule 28. Governing material must be checkable from the work it
+# governs. Prints the fingerprint any external copy of the doctrine must
+# reproduce; `--quiet` emits that value alone, for reconciliation.
+doctrine-fingerprint:
+	python3 scripts/security/check_doctrine_integrity.py --quiet
+
+# D268. Nothing is true because it was true last time. A depends_on
+# condition is a record of intent; it becomes protection only where
+# something honours it. Earned by run 31906667051, where the condition
+# was declared in compose and bypassed by --no-deps at the call site.
+test-declared-prerequisites:
+	python3 scripts/test_declared_prerequisites.py
+
+# D265. A healthy server is not an available model: attempt 2 sent ten
+# requests 0.49s after the model-pull container started and got ten
+# 404s. Both directions, against a real HTTP server rather than a mock.
+test-model-ready:
+	python3 scripts/test_model_ready.py
+
+# D251. "I did not touch the probe" never proved that no live model
+# would run -- core-tests.yml has no paths filter and starts ollama on
+# every push, which this check found on its first execution. Run it
+# BEFORE pushing: the authorisation for a change must say whether a
+# trigger side effect is included, and that cannot be decided after the
+# run has started.
+trigger-check: test-capture-trigger-paths
+	python3 scripts/test_artifact_fetch_states.py
+	python3 scripts/security/check_capture_trigger_paths.py
+
+# Runs inside policy-check, so the trigger check's own
+# calibration can fail a build. A suite nothing can fail with
+# is a suite nobody has to keep working.
+test-capture-trigger-paths:
+	python3 scripts/test_capture_trigger_paths.py
+
+# Proves the drift guard REFUSES: a failing gate, and a tree that
+# changes while the gate runs. Uses throwaway repositories, so it
+# can never commit anything here.
+test-gated-commit:
+	bash scripts/test_gated_commit.sh
+
+# Generate per-service ed25519 keys. Writes to secrets/, which is
+# gitignored: a private key seen by two services makes them one
+# principal.
+service-keys:
+	python3 scripts/security/generate_service_keys.py \
+	  --service agentic --service cortex \
+	  --grant cortex_observe_turn=agentic
+
+# Answers the last UNKNOWN. Needs a Docker daemon; refuses to
+# report without one, because a skipped proof reads like a pass.
+verify-identity-containers:
+	bash scripts/security/verify_identity_in_containers.sh
+
+test-summarise-runs:
+	python3 scripts/test_summarise_runs.py
+
 test-ci-scripts:
 	python3 scripts/test_ci_scripts.py
 
@@ -878,6 +1160,9 @@ test-policy-loader:
 
 test-healthcheck-runnable:
 	python3 scripts/test_healthcheck_runnable.py
+
+test-depends-on-readiness:
+	python3 scripts/test_depends_on_readiness.py
 
 execution-coverage:
 	python3 scripts/security/report_execution_coverage.py

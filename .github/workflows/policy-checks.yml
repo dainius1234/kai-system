@@ -6,6 +6,16 @@ on:
       - 'docker-compose*.yml'
       - 'scripts/security/**'
       - '.github/workflows/policy-checks.yml'
+      # The suites this workflow runs are its inputs too; a change that
+      # weakened one would otherwise not cause the workflow to run it.
+      - 'scripts/test_capture_trigger_paths.py'
+      - 'scripts/test_declared_prerequisites.py'
+      - 'scripts/test_doctrine_integrity.py'
+      - 'scripts/test_image_identity.py'
+      - 'scripts/test_item8_instruments.py'
+      - 'scripts/test_item8_verdicts.py'
+      - 'kai-pm/DECISIONS.md'
+      - 'kai-pm/ENGINEERING_DOCTRINE.md'
   pull_request:
     paths:
       - 'docker-compose*.yml'
@@ -14,8 +24,25 @@ on:
 jobs:
   policy:
     runs-on: ubuntu-latest
+    # GitHub's default job timeout is 360 minutes; a hung job burns six
+    # hours and reads as "still running". Run 697 of core-tests sat at
+    # 133.9 minutes and finished with no conclusion at all. 60 is over
+    # twice the longest successful run of any workflow here, so it
+    # cannot cut short work that is progressing. All nine jobs were
+    # unbounded — the bound is applied to the whole set, not to the one
+    # workflow whose change prompted it.
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+        with:
+          # fetch-depth 2, NOT the default 1. scripts/test_item8_verdicts.py
+          # resolves HEAD~1 to build an authority envelope for a parent
+          # that is not the approved commit. `git rev-parse` echoes its
+          # argument back on stdout when a revision is missing, so at
+          # depth 1 that scenario silently measured a malformed envelope
+          # instead of the property it names -- red here since cf84ac1
+          # while passing locally on a full clone. (R11, I-8)
+          fetch-depth: 2
 
       - uses: actions/setup-python@v5
         with:
@@ -40,6 +67,53 @@ jobs:
             echo "Installing $req"
             pip install -r "$req"
           done
+
+      # D251. The trigger check answers "changed paths ∩ live-capture
+      # trigger paths = ∅" before a push. Its calibration runs HERE so a
+      # suite that has stopped being able to fail is caught by a gate,
+      # rather than by nobody: the check itself is author-invoked, and an
+      # author-invoked check with an unproven calibration is a comfort.
+      - name: Live-capture trigger check calibration
+        run: python scripts/test_capture_trigger_paths.py
+
+      # D268. `nothing is true because it was true last time`, in its one
+      # decidable form. The report itself is not enforcing yet -- it has
+      # open findings awaiting judgement -- but its calibration runs here
+      # so the instrument cannot quietly stop being able to fail while
+      # those findings are still open.
+      - name: Declared-prerequisite gate calibration
+        run: python scripts/test_declared_prerequisites.py
+
+      # D272 / rule 28. Two records of the same 27 rules diverged and the
+      # casualty was rule 4, the anti-drift rule. This publishes the
+      # fingerprint an external copy must reproduce, and fails on a gap,
+      # a duplicate or a rule with no recorded provenance.
+      - name: Doctrine integrity and fingerprint
+        run: python scripts/security/check_doctrine_integrity.py
+
+      - name: Doctrine integrity gate calibration
+        run: python scripts/test_doctrine_integrity.py
+
+      # D278 / D247 §6 item 10. The collector itself runs only in
+      # stage1-replay.yml, where a Docker daemon exists; its ability to
+      # REFUSE -- rather than write an empty identity -- is proven here,
+      # on every push, so it cannot quietly lapse between experiments.
+      - name: Image-identity collector calibration
+        run: python scripts/test_image_identity.py
+
+      # D288. The frozen Item-8 design must not drift between the
+      # freeze and the experiment, and the drift would be invisible
+      # without this. Runs on every push, not only when Item 8 runs.
+      - name: Item-8 frozen design integrity
+        run: python scripts/security/check_item8_design.py
+
+      - name: Item-8 instrument calibration
+        run: python scripts/test_item8_instruments.py
+
+      # The layer that turns six builds into verdicts. Its absence
+      # from the first calibration is why six verdict defects shipped.
+      - name: Item-8 verdict-layer calibration
+        run: python scripts/test_item8_verdicts.py
 
       - name: Port binding check
         run: python scripts/security/check_port_bindings.py
@@ -82,6 +156,11 @@ jobs:
       # A CI step that can pass without doing its job must be declared.
       - name: CI toleration register
         run: python scripts/security/check_ci_tolerations.py
+
+      - name: The standalone preflight must not reach the experiment
+        run: |
+          python scripts/security/check_preflight_reachability.py \
+            --expect-reachable scripts/test_item8_preflight.py
 
       # This step had a `- name:` and no body. A step with neither `run`
       # nor `uses` is schema-invalid, so GitHub rejected the whole file,
@@ -143,6 +222,37 @@ jobs:
 
       - name: Every healthcheck can run in the image it checks
         run: python scripts/security/check_healthcheck_runnable.py
+
+      # A private signing key mounted into two services makes them ONE
+      # principal, which is exactly the defect per-service identity was
+      # built to remove — it would come back wearing a signature.
+      - name: Every signing key has exactly one owner
+        run: python scripts/security/check_service_identity_wiring.py
+
+      # Docker CREATES a missing bind-mount source as an empty directory
+      # rather than failing, so a machine-specific path boots healthy and
+      # reads nothing. heartbeat scanned /var/log/sovereign for `timeout`,
+      # `blocked` and `injection` and published 0 hits from a directory
+      # that only ever existed on one laptop.
+      - name: Every bind mount names a path that exists on any host
+        run: python scripts/security/check_bind_mount_portability.py
+
+      # Reported, not enforced: all 5 findings need a network-topology
+      # decision, and network zones are policy with their own gate. It
+      # exits 0 by design; that is declared in gate_registry.py as
+      # kind=REPORT with pending_wiring naming what would promote it, so
+      # a `ci-toleration` marker here would be the same fact in two
+      # places — and two copies of one fact is the defect shape this
+      # repository has spent a fortnight removing.
+      - name: Peers named twice must be reachable (reported)
+        run: python scripts/security/check_service_reachability.py
+
+      # full.yml's sixteen bare `depends_on` lists were fixed and the
+      # class was called closed. Eleven survived in minimal.yml and
+      # sovereign.yml, in the same tree on the same day, because the fix
+      # had a scope and nothing measured the class.
+      - name: Every depends_on says what it waits for
+        run: python scripts/security/check_depends_on_readiness.py
 
       - name: Every test pins the identity it claims to run as
         run: python scripts/security/check_test_identity.py

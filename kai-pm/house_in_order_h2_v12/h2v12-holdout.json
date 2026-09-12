@@ -1,0 +1,3577 @@
+{
+ "holdout": "H2FINAL-D367",
+ "size": 40,
+ "selection_rule": "sha256(\"H2FINAL-D367:\" + \"86a1399e6e31477ba67cd38c12d22627a8b4d6ef\" + \":\" + CANDIDATE_AGGREGATE + \":\" + path), ascending, first 40",
+ "candidate_aggregate": "ba2b16d400aafd2b694890149bbaae1d1369d3771c25ce809d2f752d5248de4a",
+ "d366_commit": "86a1399e6e31477ba67cd38c12d22627a8b4d6ef",
+ "subject": "d8aac4d49e6ba997e3eb38062c0917186ee3f197",
+ "subject_tree": "3abc9e9d8ca11966a6f996d5f0af68072ee5b117",
+ "population": 272,
+ "adjudication": "KAI. Orion computes no agreement figure and this package carries none. Orion self-adjudication has ZERO final admission weight (D367 10).",
+ "evaluation_rule": {
+  "incorrect non-abstention verdict": "BLOCKER",
+  "false evidence fact": "BLOCKER",
+  "unsupported scope widening": "BLOCKER",
+  "forbidden or undeclared state emitted": "BLOCKER",
+  "determining witness absent or silently truncated": "BLOCKER",
+  "genuinely ambiguous source evidence": "UNRESOLVED",
+  "UNKNOWN": "ABSTENTION \u2014 never negative evidence",
+  "earnable positive emitted as UNKNOWN": "OVER_ABSTENTION / coverage finding, not automatically a safety blocker"
+ },
+ "rows": [
+  {
+   "path": "kai-pm/INSTRUMENTATION_ARCHITECTURE.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=PLAN from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness of a verified kind",
+    "observed": "witness kinds present: none",
+    "rationale": "witnesses exist but bind a span, not the document. A commit cited for one sentence is CITES_COMMIT, not a whole-file snapshot binding.",
+    "witness": null
+   },
+   "SCOPE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness",
+    "observed": "no witness whose applicability is the document as a whole",
+    "rationale": "SCOPE is EARNED or absent. v1.1 emitted WHOLE_FILE as a 'file-level default' on 272 of 272 rows; a value emitted when nothing was measured is a claim, not a measurement.",
+    "witness": null
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": true,
+    "CONSUMED_AT_SUBJECT": true,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": false,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "docs/personality_and_proactive.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=REFERENCE from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness of a verified kind",
+    "observed": "witness kinds present: none",
+    "rationale": "witnesses exist but bind a span, not the document. A commit cited for one sentence is CITES_COMMIT, not a whole-file snapshot binding.",
+    "witness": null
+   },
+   "SCOPE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness",
+    "observed": "no witness whose applicability is the document as a whole",
+    "rationale": "SCOPE is EARNED or absent. v1.1 emitted WHOLE_FILE as a 'file-level default' on 272 of 272 rows; a value emitted when nothing was measured is a claim, not a measurement.",
+    "witness": null
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": true,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": false,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_SYSMETRICS_EXTENSION.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=EVIDENCE from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "TIME_BOUND",
+    "rationale": "document-level date binding",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_SYSMETRICS_EXTENSION.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "SCOPE": {
+    "value": "WHOLE_FILE",
+    "rationale": "a structured binding whose subject is the document as a whole",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_SYSMETRICS_EXTENSION.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": false,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_EMAIL_READER_EXTENSION.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=EVIDENCE from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "TIME_BOUND",
+    "rationale": "document-level date binding",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_EMAIL_READER_EXTENSION.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "SCOPE": {
+    "value": "WHOLE_FILE",
+    "rationale": "a structured binding whose subject is the document as a whole",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_EMAIL_READER_EXTENSION.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": false,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 1,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 1,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 1
+    }
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_AUTONOMOUS_STATE.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=EVIDENCE from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "TIME_BOUND",
+    "rationale": "document-level date binding",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "26 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_AUTONOMOUS_STATE.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 26 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "SCOPE": {
+    "value": "WHOLE_FILE",
+    "rationale": "a structured binding whose subject is the document as a whole",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "26 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_AUTONOMOUS_STATE.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 26 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": false,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 1,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 1,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 1
+    }
+   }
+  },
+  {
+   "path": "skills/cis-deductions.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=RUNTIME_INPUT from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness of a verified kind",
+    "observed": "witness kinds present: none",
+    "rationale": "witnesses exist but bind a span, not the document. A commit cited for one sentence is CITES_COMMIT, not a whole-file snapshot binding.",
+    "witness": null
+   },
+   "SCOPE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness",
+    "observed": "no witness whose applicability is the document as a whole",
+    "rationale": "SCOPE is EARNED or absent. v1.1 emitted WHOLE_FILE as a 'file-level default' on 272 of 272 rows; a value emitted when nothing was measured is a claim, not a measurement.",
+    "witness": null
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": false,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": false,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "CLAUDE.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=GOVERNANCE from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness of a verified kind",
+    "observed": "witness kinds present: ['DATE']",
+    "rationale": "witnesses exist but bind a span, not the document. A commit cited for one sentence is CITES_COMMIT, not a whole-file snapshot binding.",
+    "witness": null
+   },
+   "SCOPE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness",
+    "observed": "no witness whose applicability is the document as a whole",
+    "rationale": "SCOPE is EARNED or absent. v1.1 emitted WHOLE_FILE as a 'file-level default' on 272 of 272 rows; a value emitted when nothing was measured is a claim, not a measurement.",
+    "witness": null
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": true,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 1,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 1,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 1
+    }
+   }
+  },
+  {
+   "path": "kai-pm/PLAYBOOKS/dispatch_jewel.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=USER_GUIDE from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness of a verified kind",
+    "observed": "witness kinds present: none",
+    "rationale": "witnesses exist but bind a span, not the document. A commit cited for one sentence is CITES_COMMIT, not a whole-file snapshot binding.",
+    "witness": null
+   },
+   "SCOPE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness",
+    "observed": "no witness whose applicability is the document as a whole",
+    "rationale": "SCOPE is EARNED or absent. v1.1 emitted WHOLE_FILE as a 'file-level default' on 272 of 272 rows; a value emitted when nothing was measured is a claim, not a measurement.",
+    "witness": null
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": true,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": false,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_MASTER.md",
+   "LIFECYCLE": {
+    "value": "HISTORICAL",
+    "rationale": "an audit artefact bound to a VERIFIED snapshot commit at document scope",
+    "witness": {
+     "witness_type": "COMMIT",
+     "witness_value": "2d830f25d569baa5ce955dd8d17e8f0744239876",
+     "source_path": "kai-pm/CODE_AUDIT_MASTER.md",
+     "source_selector": "L6",
+     "local_context": "Audited snapshot: default branch through findings commit `2d830f25d569baa5ce955dd8d17e8f0744239876`",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "VERIFIED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=EVIDENCE from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "EXACT_SNAPSHOT",
+    "rationale": "document-level binding, witness kind VERIFIED as COMMIT",
+    "witness": {
+     "witness_type": "COMMIT",
+     "witness_value": "2d830f25d569baa5ce955dd8d17e8f0744239876",
+     "source_path": "kai-pm/CODE_AUDIT_MASTER.md",
+     "source_selector": "L6",
+     "local_context": "Audited snapshot: default branch through findings commit `2d830f25d569baa5ce955dd8d17e8f0744239876`",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "VERIFIED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "SCOPE": {
+    "value": "WHOLE_FILE",
+    "rationale": "a structured binding whose subject is the document as a whole",
+    "witness": {
+     "witness_type": "COMMIT",
+     "witness_value": "2d830f25d569baa5ce955dd8d17e8f0744239876",
+     "source_path": "kai-pm/CODE_AUDIT_MASTER.md",
+     "source_selector": "L6",
+     "local_context": "Audited snapshot: default branch through findings commit `2d830f25d569baa5ce955dd8d17e8f0744239876`",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "VERIFIED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=SELF_ASSERTS_AUTHORITY",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": true,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": true,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": true,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "SELF_ASSERTS_AUTHORITY",
+   "authority_evidence": {
+    "determining": [
+     {
+      "polarity": "POSITIVE",
+      "subject": "SELF",
+      "subject_reason": "controlled field; the label's subject is the document",
+      "selector": "L4",
+      "text": "Status: **FINAL \u2014 SINGLE SOURCE OF TRUTH**"
+     }
+    ],
+    "total": 6,
+    "shown": 1,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 6,
+     "self_bound": 1,
+     "other_bound": 1,
+     "ambiguous": 4
+    }
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_OPERATOR_CONTROL_DRILLS.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=EVIDENCE from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "TIME_BOUND",
+    "rationale": "document-level date binding",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_OPERATOR_CONTROL_DRILLS.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "SCOPE": {
+    "value": "WHOLE_FILE",
+    "rationale": "a structured binding whose subject is the document as a whole",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_OPERATOR_CONTROL_DRILLS.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": false,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_GIT_WATCHER.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=EVIDENCE from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "TIME_BOUND",
+    "rationale": "document-level date binding",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_GIT_WATCHER.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "SCOPE": {
+    "value": "WHOLE_FILE",
+    "rationale": "a structured binding whose subject is the document as a whole",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_GIT_WATCHER.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": false,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_SHELL_SANDBOX_EXTENSION.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=EVIDENCE from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "TIME_BOUND",
+    "rationale": "document-level date binding",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_SHELL_SANDBOX_EXTENSION.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "SCOPE": {
+    "value": "WHOLE_FILE",
+    "rationale": "a structured binding whose subject is the document as a whole",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_SHELL_SANDBOX_EXTENSION.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": false,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_REGISTER_CONTINUED.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=EVIDENCE from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness of a verified kind",
+    "observed": "witness kinds present: ['DATE']",
+    "rationale": "witnesses exist but bind a span, not the document. A commit cited for one sentence is CITES_COMMIT, not a whole-file snapshot binding.",
+    "witness": null
+   },
+   "SCOPE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness",
+    "observed": "no witness whose applicability is the document as a whole",
+    "rationale": "SCOPE is EARNED or absent. v1.1 emitted WHOLE_FILE as a 'file-level default' on 272 of 272 rows; a value emitted when nothing was measured is a claim, not a measurement.",
+    "witness": null
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": true,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": ".github/PULL_REQUEST_TEMPLATE.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "no nominal function term and no purpose statement",
+    "rationale": "H2 has no qualified positive rule for FUNCTION beyond the objective MARKER case",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness of a verified kind",
+    "observed": "witness kinds present: none",
+    "rationale": "witnesses exist but bind a span, not the document. A commit cited for one sentence is CITES_COMMIT, not a whole-file snapshot binding.",
+    "witness": null
+   },
+   "SCOPE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness",
+    "observed": "no witness whose applicability is the document as a whole",
+    "rationale": "SCOPE is EARNED or absent. v1.1 emitted WHOLE_FILE as a 'file-level default' on 272 of 272 rows; a value emitted when nothing was measured is a claim, not a measurement.",
+    "witness": null
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": false,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": false,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "kai-pm/CLEANUP_TODO.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=STATUS from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness of a verified kind",
+    "observed": "witness kinds present: ['DATE']",
+    "rationale": "witnesses exist but bind a span, not the document. A commit cited for one sentence is CITES_COMMIT, not a whole-file snapshot binding.",
+    "witness": null
+   },
+   "SCOPE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness",
+    "observed": "no witness whose applicability is the document as a whole",
+    "rationale": "SCOPE is EARNED or absent. v1.1 emitted WHOLE_FILE as a 'file-level default' on 272 of 272 rows; a value emitted when nothing was measured is a claim, not a measurement.",
+    "witness": null
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": true,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 1,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 1,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 1
+    }
+   }
+  },
+  {
+   "path": "docs/operator-journal/_template.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "no nominal function term and no purpose statement",
+    "rationale": "H2 has no qualified positive rule for FUNCTION beyond the objective MARKER case",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness of a verified kind",
+    "observed": "witness kinds present: none",
+    "rationale": "witnesses exist but bind a span, not the document. A commit cited for one sentence is CITES_COMMIT, not a whole-file snapshot binding.",
+    "witness": null
+   },
+   "SCOPE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness",
+    "observed": "no witness whose applicability is the document as a whole",
+    "rationale": "SCOPE is EARNED or absent. v1.1 emitted WHOLE_FILE as a 'file-level default' on 272 of 272 rows; a value emitted when nothing was measured is a claim, not a measurement.",
+    "witness": null
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": false,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": false,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_MEMU_INTROSPECTION.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=EVIDENCE from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "TIME_BOUND",
+    "rationale": "document-level date binding",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_MEMU_INTROSPECTION.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "SCOPE": {
+    "value": "WHOLE_FILE",
+    "rationale": "a structured binding whose subject is the document as a whole",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_MEMU_INTROSPECTION.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": false,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 2,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 2,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 2
+    }
+   }
+  },
+  {
+   "path": "kai-pm/W1_DASHBOARD_REMEDIATION_PLAN.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a single corroborated functional role",
+    "observed": "nominal terms for ['PLAN', 'STATUS'] both present",
+    "rationale": "two roles are nominated and no evidence discriminates them; v1.1 resolved this by PATH_NOMINATION order, so a different ordering emitted a different verdict on identical evidence",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness of a verified kind",
+    "observed": "witness kinds present: ['COMMIT', 'DATE']",
+    "rationale": "witnesses exist but bind a span, not the document. A commit cited for one sentence is CITES_COMMIT, not a whole-file snapshot binding.",
+    "witness": null
+   },
+   "SCOPE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness",
+    "observed": "no witness whose applicability is the document as a whole",
+    "rationale": "SCOPE is EARNED or absent. v1.1 emitted WHOLE_FILE as a 'file-level default' on 272 of 272 rows; a value emitted when nothing was measured is a claim, not a measurement.",
+    "witness": null
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": true,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": true,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 3,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 3,
+     "self_bound": 0,
+     "other_bound": 2,
+     "ambiguous": 1
+    }
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_NOTIFY_SERVICE_EXTENSION.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=EVIDENCE from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "TIME_BOUND",
+    "rationale": "document-level date binding",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_NOTIFY_SERVICE_EXTENSION.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "SCOPE": {
+    "value": "WHOLE_FILE",
+    "rationale": "a structured binding whose subject is the document as a whole",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_NOTIFY_SERVICE_EXTENSION.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": false,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "SESSION_BACKLOG.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=PLAN from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness of a verified kind",
+    "observed": "witness kinds present: ['COMMIT', 'DATE']",
+    "rationale": "witnesses exist but bind a span, not the document. A commit cited for one sentence is CITES_COMMIT, not a whole-file snapshot binding.",
+    "witness": null
+   },
+   "SCOPE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness",
+    "observed": "no witness whose applicability is the document as a whole",
+    "rationale": "SCOPE is EARNED or absent. v1.1 emitted WHOLE_FILE as a 'file-level default' on 272 of 272 rows; a value emitted when nothing was measured is a claim, not a measurement.",
+    "witness": null
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=['scripts/auto_session_log.py']",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": true,
+    "CONSUMED_AT_SUBJECT": true,
+    "CITES_COMMIT": true,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_CHAOS_GONOGO_TEST_BOOTSTRAP.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=EVIDENCE from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "TIME_BOUND",
+    "rationale": "document-level date binding",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_CHAOS_GONOGO_TEST_BOOTSTRAP.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "SCOPE": {
+    "value": "WHOLE_FILE",
+    "rationale": "a structured binding whose subject is the document as a whole",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_CHAOS_GONOGO_TEST_BOOTSTRAP.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": false,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_KEY_ROTATION_MIGRATION.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=EVIDENCE from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "TIME_BOUND",
+    "rationale": "document-level date binding",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_KEY_ROTATION_MIGRATION.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "SCOPE": {
+    "value": "WHOLE_FILE",
+    "rationale": "a structured binding whose subject is the document as a whole",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_KEY_ROTATION_MIGRATION.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": false,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "docs/wake_intent_j2.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "no nominal function term and no purpose statement",
+    "rationale": "H2 has no qualified positive rule for FUNCTION beyond the objective MARKER case",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness of a verified kind",
+    "observed": "witness kinds present: none",
+    "rationale": "witnesses exist but bind a span, not the document. A commit cited for one sentence is CITES_COMMIT, not a whole-file snapshot binding.",
+    "witness": null
+   },
+   "SCOPE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness",
+    "observed": "no witness whose applicability is the document as a whole",
+    "rationale": "SCOPE is EARNED or absent. v1.1 emitted WHOLE_FILE as a 'file-level default' on 272 of 272 rows; a value emitted when nothing was measured is a claim, not a measurement.",
+    "witness": null
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": false,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": false,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "kai-pm/RUNTIME_TOPOLOGY_CENSUS.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=EVIDENCE from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness of a verified kind",
+    "observed": "witness kinds present: ['DATE', 'RUN_ID']",
+    "rationale": "witnesses exist but bind a span, not the document. A commit cited for one sentence is CITES_COMMIT, not a whole-file snapshot binding.",
+    "witness": null
+   },
+   "SCOPE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness",
+    "observed": "no witness whose applicability is the document as a whole",
+    "rationale": "SCOPE is EARNED or absent. v1.1 emitted WHOLE_FILE as a 'file-level default' on 272 of 272 rows; a value emitted when nothing was measured is a claim, not a measurement.",
+    "witness": null
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": true,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": true,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_LETTA_AGENT_EXTENSION.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a single corroborated functional role",
+    "observed": "nominal terms for ['EVIDENCE', 'RUNTIME_INPUT'] both present",
+    "rationale": "two roles are nominated and no evidence discriminates them; v1.1 resolved this by PATH_NOMINATION order, so a different ordering emitted a different verdict on identical evidence",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "TIME_BOUND",
+    "rationale": "document-level date binding",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_LETTA_AGENT_EXTENSION.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "SCOPE": {
+    "value": "WHOLE_FILE",
+    "rationale": "a structured binding whose subject is the document as a whole",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_LETTA_AGENT_EXTENSION.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": false,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "CHANGELOG.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "no nominal function term and no purpose statement",
+    "rationale": "H2 has no qualified positive rule for FUNCTION beyond the objective MARKER case",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness of a verified kind",
+    "observed": "witness kinds present: ['DATE']",
+    "rationale": "witnesses exist but bind a span, not the document. A commit cited for one sentence is CITES_COMMIT, not a whole-file snapshot binding.",
+    "witness": null
+   },
+   "SCOPE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness",
+    "observed": "no witness whose applicability is the document as a whole",
+    "rationale": "SCOPE is EARNED or absent. v1.1 emitted WHOLE_FILE as a 'file-level default' on 272 of 272 rows; a value emitted when nothing was measured is a claim, not a measurement.",
+    "witness": null
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=['scripts/auto_changelog.py']",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": true,
+    "CONSUMED_AT_SUBJECT": true,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_VAULT_BRIDGE_EXTENSION.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=EVIDENCE from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "TIME_BOUND",
+    "rationale": "document-level date binding",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_VAULT_BRIDGE_EXTENSION.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "SCOPE": {
+    "value": "WHOLE_FILE",
+    "rationale": "a structured binding whose subject is the document as a whole",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_VAULT_BRIDGE_EXTENSION.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": false,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_WAKE_SERVICE.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=EVIDENCE from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "TIME_BOUND",
+    "rationale": "document-level date binding",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_WAKE_SERVICE.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "SCOPE": {
+    "value": "WHOLE_FILE",
+    "rationale": "a structured binding whose subject is the document as a whole",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_WAKE_SERVICE.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": false,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "data/teammates/oracle.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "no nominal function term and no purpose statement",
+    "rationale": "H2 has no qualified positive rule for FUNCTION beyond the objective MARKER case",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness of a verified kind",
+    "observed": "witness kinds present: none",
+    "rationale": "witnesses exist but bind a span, not the document. A commit cited for one sentence is CITES_COMMIT, not a whole-file snapshot binding.",
+    "witness": null
+   },
+   "SCOPE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness",
+    "observed": "no witness whose applicability is the document as a whole",
+    "rationale": "SCOPE is EARNED or absent. v1.1 emitted WHOLE_FILE as a 'file-level default' on 272 of 272 rows; a value emitted when nothing was measured is a claim, not a measurement.",
+    "witness": null
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": true,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": false,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_ARCHITECTURE_INTERACTION.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a single corroborated functional role",
+    "observed": "nominal terms for ['EVIDENCE', 'REFERENCE'] both present",
+    "rationale": "two roles are nominated and no evidence discriminates them; v1.1 resolved this by PATH_NOMINATION order, so a different ordering emitted a different verdict on identical evidence",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "TIME_BOUND",
+    "rationale": "document-level date binding",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_ARCHITECTURE_INTERACTION.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "SCOPE": {
+    "value": "WHOLE_FILE",
+    "rationale": "a structured binding whose subject is the document as a whole",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_ARCHITECTURE_INTERACTION.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": false,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 5,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 5,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 5
+    }
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_EXECUTOR.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=EVIDENCE from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "TIME_BOUND",
+    "rationale": "document-level date binding",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_EXECUTOR.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "SCOPE": {
+    "value": "WHOLE_FILE",
+    "rationale": "a structured binding whose subject is the document as a whole",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_EXECUTOR.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": false,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_TEST_STUBS_EXTERNAL_MODEL_OCR_FUZZ.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=EVIDENCE from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "TIME_BOUND",
+    "rationale": "document-level date binding",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_TEST_STUBS_EXTERNAL_MODEL_OCR_FUZZ.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "SCOPE": {
+    "value": "WHOLE_FILE",
+    "rationale": "a structured binding whose subject is the document as a whole",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_TEST_STUBS_EXTERNAL_MODEL_OCR_FUZZ.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": false,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "kai-pm/REALITY_CHECK_2026-06-18.md",
+   "LIFECYCLE": {
+    "value": "HISTORICAL",
+    "rationale": "the path encodes a dated artefact whose scope is the whole document",
+    "witness": {
+     "witness_type": "DATED_ARTEFACT_PATH",
+     "witness_value": "kai-pm/REALITY_CHECK_2026-06-18.md",
+     "source_path": "kai-pm/REALITY_CHECK_2026-06-18.md",
+     "source_selector": "path",
+     "local_context": "kai-pm/REALITY_CHECK_2026-06-18.md",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "no nominal function term and no purpose statement",
+    "rationale": "H2 has no qualified positive rule for FUNCTION beyond the objective MARKER case",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness of a verified kind",
+    "observed": "witness kinds present: ['COMMIT', 'DATE']",
+    "rationale": "witnesses exist but bind a span, not the document. A commit cited for one sentence is CITES_COMMIT, not a whole-file snapshot binding.",
+    "witness": null
+   },
+   "SCOPE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness",
+    "observed": "no witness whose applicability is the document as a whole",
+    "rationale": "SCOPE is EARNED or absent. v1.1 emitted WHOLE_FILE as a 'file-level default' on 272 of 272 rows; a value emitted when nothing was measured is a claim, not a measurement.",
+    "witness": null
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": false,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": true,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "docs/production_hardening_plan.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=PLAN from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness of a verified kind",
+    "observed": "witness kinds present: none",
+    "rationale": "witnesses exist but bind a span, not the document. A commit cited for one sentence is CITES_COMMIT, not a whole-file snapshot binding.",
+    "witness": null
+   },
+   "SCOPE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness",
+    "observed": "no witness whose applicability is the document as a whole",
+    "rationale": "SCOPE is EARNED or absent. v1.1 emitted WHOLE_FILE as a 'file-level default' on 272 of 272 rows; a value emitted when nothing was measured is a claim, not a measurement.",
+    "witness": null
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": false,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": false,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_ENVIRONMENTAL_SENSORS_EXTENSION.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=EVIDENCE from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "TIME_BOUND",
+    "rationale": "document-level date binding",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_ENVIRONMENTAL_SENSORS_EXTENSION.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "SCOPE": {
+    "value": "WHOLE_FILE",
+    "rationale": "a structured binding whose subject is the document as a whole",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_ENVIRONMENTAL_SENSORS_EXTENSION.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": false,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 1,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 1,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 1
+    }
+   }
+  },
+  {
+   "path": "kai-pm/UH2_INTAKE_REDESIGN.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=REFERENCE from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness of a verified kind",
+    "observed": "witness kinds present: ['DATE']",
+    "rationale": "witnesses exist but bind a span, not the document. A commit cited for one sentence is CITES_COMMIT, not a whole-file snapshot binding.",
+    "witness": null
+   },
+   "SCOPE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness",
+    "observed": "no witness whose applicability is the document as a whole",
+    "rationale": "SCOPE is EARNED or absent. v1.1 emitted WHOLE_FILE as a 'file-level default' on 272 of 272 rows; a value emitted when nothing was measured is a claim, not a measurement.",
+    "witness": null
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": true,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 7,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 7,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 7
+    }
+   }
+  },
+  {
+   "path": "docs/hmac_rotation_runbook.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=USER_GUIDE from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness of a verified kind",
+    "observed": "witness kinds present: none",
+    "rationale": "witnesses exist but bind a span, not the document. A commit cited for one sentence is CITES_COMMIT, not a whole-file snapshot binding.",
+    "witness": null
+   },
+   "SCOPE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness",
+    "observed": "no witness whose applicability is the document as a whole",
+    "rationale": "SCOPE is EARNED or absent. v1.1 emitted WHOLE_FILE as a 'file-level default' on 272 of 272 rows; a value emitted when nothing was measured is a claim, not a measurement.",
+    "witness": null
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": true,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": false,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_AVATAR_SERVICE_EXTENSION.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=EVIDENCE from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "TIME_BOUND",
+    "rationale": "document-level date binding",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_AVATAR_SERVICE_EXTENSION.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "SCOPE": {
+    "value": "WHOLE_FILE",
+    "rationale": "a structured binding whose subject is the document as a whole",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_AVATAR_SERVICE_EXTENSION.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": false,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_BATCH_SHARED_RUNTIME_CONTROLS.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=EVIDENCE from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "TIME_BOUND",
+    "rationale": "document-level date binding",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_SHARED_RUNTIME_CONTROLS.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "SCOPE": {
+    "value": "WHOLE_FILE",
+    "rationale": "a structured binding whose subject is the document as a whole",
+    "witness": {
+     "witness_type": "DATE_STAMP",
+     "witness_value": "27 July 2026",
+     "source_path": "kai-pm/CODE_AUDIT_BATCH_SHARED_RUNTIME_CONTROLS.md",
+     "source_selector": "L5",
+     "local_context": "Reviewed: 27 July 2026",
+     "applicability_scope": "WHOLE_FILE",
+     "evidence_total": 1,
+     "evidence_shown": 1,
+     "truncated": false,
+     "polarity": "POSITIVE",
+     "certainty": "OBSERVED",
+     "temporal": "AT_COMMIT",
+     "subject": "SELF"
+    },
+    "claim_scope": "WHOLE_FILE",
+    "claim_polarity": "POSITIVE"
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": false,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  },
+  {
+   "path": "docs/gaps_and_hardening.md",
+   "LIFECYCLE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a named successor, or a bound snapshot/dated-artefact witness",
+    "observed": "superseded_by=None, document-scoped snapshot=False",
+    "rationale": "ACTIVE is H2_NOT_EARNABLE: maintenance, self-assertion and consumption are evidence facts, not verdicts (D360 5)",
+    "witness": null
+   },
+   "FUNCTION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "an objective witness of functional role",
+    "observed": "NOMINAL_FUNCTION=USER_GUIDE from self-description",
+    "rationale": "path and title share provenance: one source counted twice, not two independent proofs (D367 correction E)",
+    "witness": null
+   },
+   "VALIDITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness of a verified kind",
+    "observed": "witness kinds present: ['DATE']",
+    "rationale": "witnesses exist but bind a span, not the document. A commit cited for one sentence is CITES_COMMIT, not a whole-file snapshot binding.",
+    "witness": null
+   },
+   "SCOPE": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a document-level binding witness",
+    "observed": "no witness whose applicability is the document as a whole",
+    "rationale": "SCOPE is EARNED or absent. v1.1 emitted WHOLE_FILE as a 'file-level default' on 272 of 272 rows; a value emitted when nothing was measured is a claim, not a measurement.",
+    "witness": null
+   },
+   "AUTHORITY": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "qualification of the document's claims against programme authority",
+    "observed": "authority_claim=NO_SELF_CLAIM",
+    "rationale": "H2 verifies no claim; AUTHORITY states are DEFERRED_TO_H3",
+    "witness": null
+   },
+   "GENERATION": {
+    "value": "UNKNOWN",
+    "abstention": true,
+    "would_require": "a closed search space yielding NO_WRITER, or a writer with established scope",
+    "observed": "writers=none proven",
+    "rationale": "MANUAL/PARTIAL_DERIVED/FULL_DERIVED are H2_NOT_EARNABLE: the write search space is open and region scope is undetermined",
+    "witness": null
+   },
+   "evidence_facts": {
+    "MAINTENANCE_OBSERVED": true,
+    "CONSUMED_AT_SUBJECT": false,
+    "CITES_COMMIT": false,
+    "CITES_RUN": false,
+    "CARRIES_DATE_STAMP": true,
+    "BINDING_CONTRADICTION": false,
+    "SELF_ASSERTS_AUTHORITY": false,
+    "SELF_ASSERTS_NON_AUTHORITY": false
+   },
+   "authority_claim": "NO_SELF_CLAIM",
+   "authority_evidence": {
+    "determining": [],
+    "total": 0,
+    "shown": 0,
+    "truncated": false,
+    "note": "SELF-bound determining rows are carried in full; non-determining claims are counted, not dropped",
+    "counts": {
+     "total": 0,
+     "self_bound": 0,
+     "other_bound": 0,
+     "ambiguous": 0
+    }
+   }
+  }
+ ]
+}

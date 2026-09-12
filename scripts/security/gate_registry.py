@@ -44,6 +44,10 @@ from typing import Optional, Tuple
 GATE = "gate"
 REPORT = "report"
 
+# Trigger classes -- see Gate.trigger_class.
+CONTINUOUS = "CONTINUOUS"
+SENTINEL_AUTHORISED = "SENTINEL_AUTHORISED"
+
 COMPOSE_FILES = (
     "docker-compose.full.yml",
     "docker-compose.minimal.yml",
@@ -99,6 +103,30 @@ class Gate:
     in_policy_check: bool = False
     in_workflows: Tuple[str, ...] = ()
     pending_wiring: Optional[str] = None
+
+    # HOW THE WORKFLOWS IN `in_workflows` ARE TRIGGERED, machine-readably.
+    #
+    # Rule 9 says a gate's trigger conditions are part of the gate. The
+    # obvious reading -- "every input must appear in the workflow's
+    # paths: filter" -- is right for a CONTINUOUS gate and WRONG for a
+    # one-shot authorised experiment, where it would mean that editing an
+    # analyser DISPATCHES the experiment. That is a manufactured evidence
+    # run, and rule 10 already says evidence-admission rules do not
+    # authorise evidence production.
+    #
+    # Two classes, so a future paths-coverage detector (finding #50) can
+    # tell them apart FROM THE REGISTRY instead of inferring an exception
+    # from a comment it cannot parse:
+    #
+    #   CONTINUOUS          every enforcement input must trigger it.
+    #   SENTINEL_AUTHORISED input changes must NOT execute it. An explicit
+    #                       sentinel triggers it, and the run revalidates
+    #                       its frozen inputs and calibration before
+    #                       reaching the subject.
+    #
+    # Default CONTINUOUS: the safe direction is over-triggering a check,
+    # never silently exempting one. (D280)
+    trigger_class: str = "CONTINUOUS"
 
     # The register entry this check's own defects are tracked under.
     findings: Tuple[str, ...] = field(default_factory=tuple)
@@ -421,6 +449,14 @@ REGISTRY: Tuple[Gate, ...] = (
          proven_by="scripts/test_healthcheck_runnable.py",
          in_policy_check=True,
          in_workflows=("policy-checks.yml",)),
+    Gate(module="check_depends_on_readiness",
+         kind=GATE,
+         summary="every depends_on states what it waits for",
+         inputs=COMPOSE_FILES,
+         denominator=r"inspected: \d+ depends_on edge\(s\)",
+         proven_by="scripts/test_depends_on_readiness.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",)),
     Gate(module="check_test_identity",
          kind=GATE,
          summary="every test pins the identity it claims to run as",
@@ -560,7 +596,7 @@ REGISTRY: Tuple[Gate, ...] = (
                            "scripts/test_compose_probe.py against an "
                            "injected runner instead",
          proven_by="scripts/test_compose_probe.py",
-         in_workflows=("core-tests.yml",)),
+         in_workflows=("core-tests.yml", "stage1-replay.yml")),
     Gate(module="ci/kill_isolation",
          kind=GATE,
          summary="memu-core stays healthy AND writable with "
@@ -572,6 +608,1216 @@ REGISTRY: Tuple[Gate, ...] = (
                            "scripts/test_ci_scripts.py against injected "
                            "exec_http/load_ports instead",
          proven_by="scripts/test_ci_scripts.py",
+         in_workflows=("core-tests.yml",)),
+    Gate(module="report_service_identity",
+         kind=REPORT,
+         summary="which shared-token endpoints need verified caller "
+                 "identity (B) and which are fine on membership (A)",
+         inputs=(),
+         denominator=r"inspected: \d+ endpoint\(s\)",
+         probe=False,
+         probe_skip_reason="scans first-party service source; the A/B "
+                           "split is declared judgement, so it is "
+                           "reviewed rather than probed",
+         proven_by="scripts/test_service_identity.py",
+         pending_wiring="reported while the identity architecture is "
+                        "decided; it would gate at B == 0 or every B "
+                        "endpoint using verified identity",
+         in_workflows=()),
+    Gate(module="report_perception_intake",
+         kind=REPORT,
+         summary="the full UH-2 perception intake surface, with a verdict "
+                 "per source — WORKING only when the whole path is proven",
+         inputs=COMPOSE_FILES,
+         denominator=r"inspected: \d+ perception source\(s\)",
+         probe=False,
+         probe_skip_reason="imports the live UH-2 registry and reducer map; "
+                           "probed by scripts/test_perception_intake.py "
+                           "against synthetic compose trees instead",
+         proven_by="scripts/test_perception_intake.py",
+         pending_wiring="reported while the intake rebuild is decided; it "
+                        "would gate at WORKING == denominator, which is "
+                        "currently 2 of 44",
+         in_workflows=()),
+    Gate(module="check_service_reachability",
+         kind=REPORT,
+         summary="a service that both depends_on a peer and holds its URL "
+                 "must share a network with it — Docker DNS only resolves "
+                 "names on a joined network",
+         inputs=COMPOSE_FILES,
+         denominator=r"inspected: \d+ edge\(s\)",
+         proven_by="scripts/test_service_reachability.py",
+         calibrated_by="scripts/test_service_reachability.py",
+         pending_wiring="reported until the network-topology decision on "
+                        "its 5 findings is taken; widening a service's "
+                        "networks to silence it would change the security "
+                        "topology to quieten a check",
+         in_workflows=("policy-checks.yml",)),
+    # #41's denominator, derived rather than remembered. The task carried
+    # the figure 26 for weeks; the tree says 34. Its six columns exist
+    # because every adjacent pair has been conflated at least once:
+    # defined / profile-gated / profile-set-enabled / individually
+    # startable / runtime-proven / expected by a live caller.
+    # #41 defect class B. Profiles-off is the INTENDED posture, so what
+    # the live core does about an absent gated dependency is a question
+    # about the system as it is meant to run.
+    Gate(module="report_degradation_tolerance",
+         kind=REPORT,
+         summary="what the default core does when a profile-gated "
+                 "dependency is absent; 41 caller->dependency edges "
+                 "reduce to 4 call mechanisms, and the dangerous class "
+                 "lives at the call sites, not in the mechanisms",
+         inputs=COMPOSE_FILES,
+         denominator=r"inspected: \d+ live caller -> absent-dependency edge",
+         proven_by="scripts/test_degradation_tolerance.py",
+         calibrated_by="scripts/test_degradation_tolerance.py",
+         in_policy_check=False,
+         findings=("KAI-GATE-047",)),
+    # The A/B/C denominator for the offline-startup invariant. Three
+    # populations kept apart because merging any adjacent pair picks the
+    # architecture: source reachability is not deployment applicability,
+    # and neither is runtime evidence. Its own first version reported all
+    # four traced services as loading at IMPORT — an `ast.walk` that
+    # descends into function bodies — which would have argued for baking
+    # a model into every image on evidence that did not exist.
+    Gate(module="report_model_load_denominator",
+         kind=REPORT,
+         summary="A/B/C: which runnable container paths can reach a model "
+                 "load, which of those are deployed without egress, and "
+                 "which have a CITED runtime observation; A is source "
+                 "reachability and is NOT a count of affected services",
+         inputs=COMPOSE_FILES,
+         denominator=r"inspected: \d+ service definition\(s\)",
+         proven_by="scripts/test_model_load_denominator.py",
+         calibrated_by="scripts/test_model_load_denominator.py",
+         in_policy_check=False,
+         in_workflows=(),
+         findings=("KAI-GATE-048",)),
+    # KAI-GATE-048, the CALIBRATION half. The workflow runs it as its own
+    # step BEFORE the measurement, so a non-zero exit stops the job — an
+    # uncalibrated classifier must not get to decorate a verdict. That is
+    # what makes this an instrument rather than a test, and why I-4
+    # discovered it as one the moment it was wired.
+    Gate(module="test_model_startup_classifier",
+         kind=GATE,
+         summary="the four known model-startup shapes — memu-core, "
+                 "memu-core-introspect, ollama-pull and a lazy "
+                 "memu-graph — must produce four DIFFERENT verdicts, and "
+                 "`classify()` must not be able to see a service name",
+         inputs=(),
+         denominator=r"Model Startup Classifier Calibration: \d+ passed",
+         proven_by="scripts/test_model_startup_classifier.py",
+         calibrated_by="scripts/test_model_startup_classifier.py",
+         in_policy_check=False,
+         in_workflows=("memu-graph-startup-proof.yml",),
+         findings=("KAI-GATE-048",)),
+    Gate(module="summarise_memu_graph_startup",
+         kind=REPORT,
+         summary="reads the KAI-GATE-048 stage logs into an observation "
+                 "record; a missing or unparseable log stays NOT "
+                 "MEASURED and never becomes a proven absence",
+         inputs=(),
+         denominator=r"inspected: \d+ of \d+ expected stage log",
+         probe=False,
+         probe_skip_reason="requires a stage-log directory produced by a "
+                           "deployed collector; both parser directions "
+                           "are asserted on synthetic stage-log trees in "
+                           "scripts/test_model_startup_classifier.py",
+         proven_by="scripts/test_model_startup_classifier.py",
+         calibrated_by="scripts/test_model_startup_classifier.py",
+         in_policy_check=False,
+         # Invoked by collect_memu_graph_startup.sh, not by a workflow
+         # `run:` step. I-4 compares the declaration against what the
+         # parse can see, and the parse can only see direct invocations —
+         # so the honest declaration is (), with the real caller named.
+         in_workflows=(),
+         pending_wiring="run by scripts/security/collect_memu_graph_startup.sh, "
+                        "which memu-graph-startup-proof.yml invokes; a "
+                        "workflow-level declaration would claim a wiring "
+                        "the workflow parse cannot confirm",
+         findings=("KAI-GATE-048",)),
+    # D189's authorised definition unit. Its stages C and D are
+    # known-negatives that MUST fail, so it is a REPORT: a gate whose
+    # correct result includes failures is a gate people learn to ignore.
+    Gate(module="summarise_asset_contract",
+         kind=REPORT,
+         summary="answers KAI-GATE-048's five asset-contract questions "
+                 "from measured stage logs; the contract is PROVEN only "
+                 "when the network-removed stage succeeds on the asset "
+                 "set the fetch stage produced",
+         inputs=(),
+         denominator=r"inspected: \d+ of \d+ expected stage log",
+         probe=False,
+         probe_skip_reason="requires a stage-log directory produced by "
+                           "four throwaway containers with and without "
+                           "network; the parsers are asserted on "
+                           "synthetic stage-log trees in "
+                           "scripts/test_asset_contract.py",
+         proven_by="scripts/test_asset_contract.py",
+         calibrated_by="scripts/test_asset_contract.py",
+         in_policy_check=False,
+         in_workflows=(),
+         pending_wiring="run by "
+                        "scripts/security/define_memu_graph_asset_contract.sh, "
+                        "which memu-graph-startup-proof.yml invokes; a "
+                        "workflow-level declaration would claim a wiring "
+                        "the workflow parse cannot confirm",
+         findings=("KAI-GATE-048",)),
+    # KAI-GATE-048 Phase 1's verdict. A GATE, not a report: unlike the
+    # measurement jobs, its whole purpose is to refuse. It exits non-zero
+    # when acceptance is not met AND when the evidence is merely missing,
+    # because "we did not measure" must not read as "it works".
+    # Both calibrations are invoked as their own workflow `run:` steps,
+    # BEFORE the measurements they judge — so a broken instrument stops
+    # the job instead of decorating its output. That makes them
+    # enforcing, and I-4 discovered them as such the moment they were
+    # wired.
+    Gate(module="test_asset_contract",
+         kind=GATE,
+         summary="the asset-contract summariser may print CONTRACT PROVEN "
+                 "only when the network-removed stage SUCCEEDED on the "
+                 "asset set the fetch stage produced; proven / not-proven "
+                 "/ disproven / ambiguous stay four distinct findings",
+         inputs=(),
+         denominator=r"Asset Contract Summariser Calibration: \d+ passed",
+         proven_by="scripts/test_asset_contract.py",
+         calibrated_by="scripts/test_asset_contract.py",
+         in_policy_check=False,
+         in_workflows=("memu-graph-startup-proof.yml",),
+         findings=("KAI-GATE-048",)),
+    Gate(module="test_memu_graph_acceptance",
+         kind=GATE,
+         summary="the Phase 1 verdict's can-fail stage is INVERTED (a "
+                 "non-zero exit is its PASS), and blocking ALL networking "
+                 "must NOT satisfy the capability check — memu-graph "
+                 "delegates embedding work to an internal peer",
+         inputs=(),
+         denominator=r"memu-graph Acceptance Calibration: \d+ passed",
+         proven_by="scripts/test_memu_graph_acceptance.py",
+         calibrated_by="scripts/test_memu_graph_acceptance.py",
+         in_policy_check=False,
+         in_workflows=("memu-graph-startup-proof.yml",),
+         findings=("KAI-GATE-048",)),
+    Gate(module="summarise_memu_graph_acceptance",
+         kind=GATE,
+         summary="KAI-GATE-048 Phase 1 acceptance: the asset loads from "
+                 "the shipped image with no network, readiness is still "
+                 "reached without loading it, and the real capability "
+                 "works under the INTENDED topology with the internal "
+                 "delegate present and external registry egress absent",
+         inputs=(),
+         denominator=r"inspected: \d+ of \d+ expected stage log",
+         probe=False,
+         probe_skip_reason="requires a stage-log directory produced by a "
+                           "remediated image on a live stack; both "
+                           "directions of every check are asserted on "
+                           "synthetic stage-log trees in "
+                           "scripts/test_memu_graph_acceptance.py",
+         proven_by="scripts/test_memu_graph_acceptance.py",
+         calibrated_by="scripts/test_memu_graph_acceptance.py",
+         in_policy_check=False,
+         in_workflows=("memu-graph-startup-proof.yml",),
+         findings=("KAI-GATE-048",)),
+    # KAI-GATE-049's calibration, run as its own workflow step BEFORE
+    # the diagnostic — an uncalibrated analyser must not decorate a
+    # verdict about which stage owns a stall.
+    Gate(module="test_graph_stall",
+         kind=GATE,
+         summary="the four stall states — slow LLM work, waiting on the "
+                 "delegate, stuck elsewhere, local compute — must stay "
+                 "four distinct verdicts; a non-return must never read as "
+                 "a proven hang; and a container replaced mid-observation "
+                 "must yield UNKNOWN rather than an execution state, "
+                 "including when the identity fields are absent entirely",
+         inputs=(),
+         denominator=r"Graph Stall Analyser Calibration: \d+ passed",
+         proven_by="scripts/test_graph_stall.py",
+         calibrated_by="scripts/test_graph_stall.py",
+         in_policy_check=False,
+         in_workflows=("memu-graph-startup-proof.yml",),
+         findings=("KAI-GATE-049",)),
+    # A GATE, and it was a REPORT until run 8 showed why. What it
+    # ENFORCES is that the diagnostic run obtained an observation at all
+    # — `ingest.log` must carry the probe's pre-request `ENTERED` marker.
+    # It does NOT gate on the stall verdict: which stage owns the silence
+    # and whether the process was computing stay informational, because
+    # nobody has promised those are actionable yet.
+    #
+    # Run 8 fired no request (the probe was invoked without its
+    # subcommand), and the three sections each reported their own absence
+    # correctly — "no markers", "1 sample", "outcome not established" —
+    # while the module exited 0 and the job went green. Three true
+    # statements summed to a diagnostic run that diagnosed nothing.
+    Gate(module="summarise_graph_stall",
+         kind=GATE,
+         summary="fails closed when the run asked the service nothing, so "
+                 "an unmeasured diagnostic cannot go green; when a request "
+                 "WAS sent, names the cognee task entered without "
+                 "returning and whether the process was computing or "
+                 "blocked — but only after ADJACENT-PAIR continuity proves "
+                 "the samples describe one execution instance, since a "
+                 "replaced container reads as flat CPU to a first-vs-last "
+                 "difference; authorises no remedy — slow work, a blocked "
+                 "wait and a deadlock have three different owners",
+         inputs=(),
+         denominator=r"inspected: \d+ of \d+ expected stage log",
+         probe=False,
+         probe_skip_reason="requires a stage-log directory produced by a "
+                           "live stack observed past its own client "
+                           "budget; every branch is asserted on synthetic "
+                           "stage-log trees in scripts/test_graph_stall.py",
+         proven_by="scripts/test_graph_stall.py",
+         calibrated_by="scripts/test_graph_stall.py",
+         in_policy_check=False,
+         in_workflows=("memu-graph-startup-proof.yml",),
+         findings=("KAI-GATE-049",)),
+    Gate(module="probe_graph_stall",
+         kind=REPORT,
+         summary="runs INSIDE the image: POSTs /graph/ingest without the "
+                 "300s budget under investigation, and samples pid-1 CPU "
+                 "ticks, open sockets to the delegate, and the process "
+                 "identity (container_id, /proc/1/stat field 22) that lets "
+                 "a reader tell one execution instance from its "
+                 "replacement; its argv contract is a pure function so a "
+                 "caller's command line can be validated before any stack "
+                 "exists",
+         inputs=(),
+         denominator=r"inspected: \d+ connection\(s\), \d+ cognee log line",
+         probe=False,
+         probe_skip_reason="stdlib-only probe that must execute inside a "
+                           "running memu-graph container; reading "
+                           "/proc/1/stat and /proc/net/tcp on the host "
+                           "would measure the wrong process entirely",
+         proven_by="scripts/test_graph_stall.py",
+         in_policy_check=False,
+         in_workflows=(),
+         pending_wiring="invoked by "
+                        "scripts/security/diagnose_graph_stall.sh via "
+                        "`docker compose exec`, which the workflow parse "
+                        "cannot see as an invocation of this module",
+         findings=("KAI-GATE-049",)),
+    # KAI-GATE-050. Opened 2026-08-13 from run 31733359906: cognee's
+    # pipeline failed 422 and `/graph/ingest` answered 200
+    # {"status":"ingested"}. Established from source, not inferred —
+    # cognee raises PipelineRunFailedError (run_tasks.py:147) then
+    # deliberately does NOT re-raise it (:185-187, intent in a comment),
+    # so the failure travels as a return value; memu-graph/app.py:96
+    # discards that return value and its only predicate is
+    # `except Exception`, which cannot fire.
+    Gate(module="test_ingest_contract",
+         kind=GATE,
+         summary="HTTP 200 must never be the success predicate — the 200 "
+                 "is the thing under suspicion — and a pipeline with no "
+                 "terminal marker must not read as a completed one, "
+                 "because cognee swallows PipelineRunFailedError without "
+                 "re-raising it",
+         inputs=(),
+         denominator=r"Ingest Contract Analyser Calibration: \d+ passed",
+         proven_by="scripts/test_ingest_contract.py",
+         calibrated_by="scripts/test_ingest_contract.py",
+         in_policy_check=False,
+         in_workflows=("memu-graph-startup-proof.yml",),
+         findings=("KAI-GATE-050",)),
+    # KAI-GATE-050 REMEDIATION. The predicate itself lives in
+    # memu-graph/cognify_result.py -- production code, not a check -- so
+    # what is registered here is the suite that proves it fires. Without
+    # this entry the suite would be an enforced test nobody declared.
+    Gate(module="test_cognify_result",
+         kind=GATE,
+         summary="did cognee return a TERMINAL SUCCESSFUL pipeline "
+                 "result? Both directions, plus a status the predicate "
+                 "has never been taught -- the rule is a class, not the "
+                 "one failure observed; hard-coding PipelineRunFailedError "
+                 "would have fixed run 9 and stayed blind to the next mode",
+         inputs=(),
+         denominator=r"inspected: \d+ terminal-success status\(es\) accepted",
+         proven_by="scripts/test_cognify_result.py",
+         calibrated_by="scripts/test_cognify_result.py",
+         in_policy_check=False,
+         in_workflows=("memu-graph-startup-proof.yml",),
+         findings=("KAI-GATE-050",)),
+    Gate(module="summarise_ingest_contract",
+         kind=GATE,
+         summary="correlates cognee's OWN terminal pipeline status with "
+                 "the HTTP response `/graph/ingest` returned; fails on a "
+                 "2xx over a pipeline that did not complete, and equally "
+                 "on an observation that established neither side — "
+                 "unmeasured is not clean",
+         inputs=(),
+         denominator=r"inspected: \d+ clean-stack observation",
+         probe=False,
+         probe_skip_reason="requires a stage-log directory produced by "
+                           "two clean stacks each running a full "
+                           "~400s ingest; all four correlation cells and "
+                           "both failure-to-measure paths are asserted on "
+                           "synthetic stage-log trees in "
+                           "scripts/test_ingest_contract.py",
+         proven_by="scripts/test_ingest_contract.py",
+         calibrated_by="scripts/test_ingest_contract.py",
+         in_policy_check=False,
+         in_workflows=("memu-graph-startup-proof.yml",),
+         findings=("KAI-GATE-050",)),
+    Gate(module="probe_ingest_contract",
+         kind=REPORT,
+         summary="runs INSIDE the image: POSTs /graph/ingest recording "
+                 "status AND body, and dumps cognee's own log file IN "
+                 "FULL after the request returns — the terminal pipeline "
+                 "marker run 9 sampled past and never captured",
+         inputs=(),
+         denominator=r"inspected: \d+ cognee log file, \d+ line",
+         probe=False,
+         probe_skip_reason="stdlib-only probe that must execute inside a "
+                           "running memu-graph container; on the host "
+                           "there is no cognee log directory and no "
+                           "endpoint to call",
+         proven_by="scripts/test_ingest_contract.py",
+         in_policy_check=False,
+         in_workflows=(),
+         pending_wiring="invoked by "
+                        "scripts/security/measure_ingest_contract.sh via "
+                        "`docker compose exec`, which the workflow parse "
+                        "cannot see as an invocation of this module",
+         findings=("KAI-GATE-050",)),
+    # KAI-GATE-048 C, Q1/Q2/Q6 capture. Observation only -- it changes
+    # no mode, model, timeout, retry, schema, validation or topology.
+    Gate(module="test_llm_contract",
+         kind=GATE,
+         summary="a schema DEFINITION and an INSTANCE of it must never "
+                 "collapse to one verdict -- the observed failure is the "
+                 "first wearing the shape of the second -- and a schema "
+                 "echo, a wrong-key object and no response must stay three "
+                 "verdicts, because they have three different owners; "
+                 "REQUIRED FIELDS PRESENT must never be promoted to VALID "
+                 "INSTANCE, because a top-level key check is not JSON "
+                 "Schema validation; and each attempt's contract must be "
+                 "recovered from THAT attempt, never from the outer caller",
+         inputs=(),
+         denominator=r"inspected: \d+ response verdict\(s\) discriminated",
+         proven_by="scripts/test_llm_contract.py",
+         calibrated_by="scripts/test_llm_contract.py",
+         in_policy_check=False,
+         in_workflows=("memu-graph-startup-proof.yml", "stage1-replay.yml"),
+         findings=("KAI-GATE-048",)),
+    Gate(module="summarise_llm_contract",
+         kind=REPORT,
+         summary="the per-attempt table -- effective structured-output "
+                 "mode read at runtime rather than inferred from config, "
+                 "plus prompt/schema/response hashes so reproducibility is "
+                 "measured not eyeballed; assigns NO ownership between "
+                 "prompt construction, adapter mode, model compliance and "
+                 "the validator",
+         inputs=(),
+         denominator=r"inspected: \d+ model call\(s\)",
+         probe=False,
+         probe_skip_reason="requires a capture file produced by driving "
+                           "cognee in-process inside the memu-graph "
+                           "image; every branch is asserted on synthetic "
+                           "capture files in scripts/test_llm_contract.py",
+         proven_by="scripts/test_llm_contract.py",
+         calibrated_by="scripts/test_llm_contract.py",
+         in_policy_check=False,
+         in_workflows=("memu-graph-startup-proof.yml",),
+         findings=("KAI-GATE-048",)),
+    Gate(module="probe_llm_contract",
+         kind=REPORT,
+         summary="runs INSIDE the image: wraps the adapter's own client "
+                 "method with a strict pass-through, recording every "
+                 "attempt's request and raw response plus the RESOLVED "
+                 "instructor mode; alters no argument and returns the "
+                 "original object",
+         inputs=(),
+         denominator=r"inspected: \d+ model call\(s\) captured",
+         probe=False,
+         probe_skip_reason="imports cognee and drives a real pipeline "
+                           "inside a running memu-graph container; on the "
+                           "host there is no cognee, no adapter and no "
+                           "delegate to observe",
+         proven_by="scripts/test_llm_contract.py",
+         in_policy_check=False,
+         in_workflows=(),
+         pending_wiring="invoked by "
+                        "scripts/security/capture_llm_contract.sh via "
+                        "`docker compose exec`, which the workflow parse "
+                        "cannot see as an invocation of this module",
+         findings=("KAI-GATE-048",)),
+    # D248's P1 prerequisite, and the reason it is a separate suite: a
+    # shared file would have put a static census inside the LLM capture
+    # workflow's paths filter, so editing an analyser would have fired a
+    # live model capture nobody authorised.
+    # D251. Answers "changed paths ∩ live-capture trigger paths = ∅"
+    # BEFORE a push, because "I did not touch the probe" never proved it.
+    Gate(module="check_capture_trigger_paths",
+         kind=REPORT,
+         summary="which workflows can call a real model, which of those "
+                 "also WRITE a capture that could become evidence, and "
+                 "whether any changed path falls inside their trigger "
+                 "filters; both halves derived by walking the tree, and a "
+                 "workflow with no paths filter is reported as firing on "
+                 "every push rather than as having no triggers",
+         inputs=(),
+         denominator=r"inspected: \d+ changed path\(s\) against \d+ "
+                     r"live-capture workflow\(s\)",
+         probe=False,
+         probe_skip_reason="needs a working tree with changes to inspect; "
+                           "the matcher, the filter reader, the "
+                           "intersection and the two-class separation are "
+                           "each asserted with a known-positive and a "
+                           "known-negative in "
+                           "scripts/test_capture_trigger_paths.py",
+         proven_by="scripts/test_capture_trigger_paths.py",
+         calibrated_by="scripts/test_capture_trigger_paths.py",
+         in_policy_check=False,
+         in_workflows=(),
+         pending_wiring="invoked by the author before a push, and by "
+                        "`make trigger-check`; wiring it into a workflow "
+                        "needs a base ref to diff against, which a push "
+                        "event does not carry unambiguously",
+         findings=("KAI-GATE-048",)),
+    Gate(module="test_capture_trigger_paths",
+         kind=GATE,
+         summary="the trigger check must not answer its negative claim in "
+                 "the reassuring direction: a workflow with no paths "
+                 "filter reads as ABSENT rather than empty, `*` does not "
+                 "span a separator, a prefix is not a match, and "
+                 "live-model must stay separable from capture-writing",
+         inputs=(),
+         denominator=r"inspected: \d+ live-capture workflow\(s\)",
+         proven_by="scripts/test_capture_trigger_paths.py",
+         calibrated_by="scripts/test_capture_trigger_paths.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         findings=("KAI-GATE-048",)),
+    # D251. Five causes of a missing artifact, five states.
+    Gate(module="classify_artifact_fetch",
+         kind=REPORT,
+         summary="why an artifact did not arrive, as one of seven "
+                 "distinguishable states rather than one 'not performed': "
+                 "a run still going, a permissions failure HERE, a "
+                 "network failure, an artifact absent after a COMPLETED "
+                 "run, an expired one, a malformed one, and present; only "
+                 "the last licenses a measurement",
+         inputs=(),
+         denominator=r"inspected: \d+ artifact fetch across \d+ "
+                     r"distinguishable state\(s\)",
+         probe=False,
+         probe_skip_reason="the classification is a pure function of facts "
+                           "the caller gathered from the API, so it is "
+                           "calibrated without a network in "
+                           "scripts/test_artifact_fetch_states.py; only "
+                           "the gathering needs one",
+         proven_by="scripts/test_artifact_fetch_states.py",
+         calibrated_by="scripts/test_artifact_fetch_states.py",
+         in_policy_check=False,
+         in_workflows=("p1-replay-completeness.yml",),
+         findings=("KAI-GATE-048",)),
+    Gate(module="test_artifact_fetch_states",
+         kind=GATE,
+         summary="the five failure causes must stay distinguishable: a run "
+                 "in progress is not an absent artifact, a permissions "
+                 "failure here is not the subject having produced "
+                 "nothing, expired is not absent, and transport is asked "
+                 "before a run status we may not have been able to fetch",
+         inputs=(),
+         denominator=r"inspected: \d+ fetch state\(s\) discriminated",
+         proven_by="scripts/test_artifact_fetch_states.py",
+         calibrated_by="scripts/test_artifact_fetch_states.py",
+         in_policy_check=False,
+         in_workflows=("p1-replay-completeness.yml",),
+         findings=("KAI-GATE-048",)),
+    # S1 (D255-D257). Selection is the step where a post-result choice
+    # would be easiest to make and hardest to notice.
+    Gate(module="stage1_replay",
+         kind=REPORT,
+         summary="D247's Stage-1 experiment and nothing else: re-select "
+                 "under S1, REFUSE unless the frozen seq/prompt/contract "
+                 "identity reproduces, rebuild response_format with "
+                 "ast.literal_eval and assert the exact typed value, then "
+                 "replay N1=10 times with no Instructor, no validation and "
+                 "no retry; a transport error is one execution and is not "
+                 "replaced, and the original captured response is never "
+                 "read",
+         inputs=(),
+         denominator=r"inspected: \d+ replay execution\(s\) of \d+ "
+                     r"precommitted",
+         probe=False,
+         probe_skip_reason="needs a production capture and a live model "
+                           "endpoint; reconstruction, identity refusal, the "
+                           "response boundary and the fixed denominator are "
+                           "all asserted offline in "
+                           "scripts/test_stage1_replay.py",
+         proven_by="scripts/test_stage1_replay.py",
+         calibrated_by="scripts/test_stage1_replay.py",
+         in_policy_check=False,
+         in_workflows=("stage1-replay.yml",),
+         findings=("KAI-GATE-048",)),
+    Gate(module="test_stage1_replay",
+         kind=GATE,
+         summary="ast.literal_eval and never eval; a repr that parses to "
+                 "the wrong typed value REFUSES; a changed prompt, "
+                 "contract or seq REFUSES; a key recorded ABSENT is "
+                 "omitted rather than sent as null; and the original "
+                 "response is unreadable from the frozen manifest, "
+                 "asserted against a sentinel",
+         inputs=(),
+         denominator=r"inspected: \d+ precommitted replay execution\(s\)",
+         proven_by="scripts/test_stage1_replay.py",
+         calibrated_by="scripts/test_stage1_replay.py",
+         in_policy_check=False,
+         in_workflows=("stage1-replay.yml",),
+         findings=("KAI-GATE-048",)),
+    # D262's repair. "I only touched the plumbing" is an assertion
+    # until something computes it.
+    Gate(module="check_invocation_identity",
+         kind=REPORT,
+         summary="whether a repair changed what the model is actually "
+                 "asked: the transitive closure of module-level names "
+                 "reachable from the definitions that BUILD and SEND the "
+                 "request, digested per definition OLD vs NEW, with every "
+                 "reached repo module required unchanged in full and "
+                 "every out-of-surface change reported but not failed",
+         inputs=(),
+         denominator=r"inspected: \d+ top-level definition\(s\), \d+ in "
+                     r"the model-facing surface",
+         probe=False,
+         probe_skip_reason="it compares two git revisions, so a probe "
+                           "would need a repository state to compare "
+                           "against; both directions are calibrated by "
+                           "injected mutation in "
+                           "scripts/test_invocation_identity.py",
+         proven_by="scripts/test_invocation_identity.py",
+         calibrated_by="scripts/test_invocation_identity.py",
+         in_policy_check=False,
+         # Run BY HAND at repair time, against two git revisions. It is
+         # not wired into the Stage-1 workflow: making it a gate there
+         # means pinning a baseline commit into the experiment, which is
+         # a change to the experiment and needs its own authorisation.
+         in_workflows=(),
+         findings=("KAI-GATE-048",)),
+    Gate(module="test_invocation_identity",
+         kind=GATE,
+         summary="the identity check must be able to say BOTH things: a "
+                 "mutation inside the derived surface breaches, one "
+                 "outside it is reported and does not, a removed "
+                 "in-surface definition cannot take its own scope with "
+                 "it, and an aliased repo module resolves to its file "
+                 "rather than to its alias",
+         inputs=(),
+         denominator=r"inspected: \d+ top-level definition\(s\), \d+ in "
+                     r"the model-facing surface",
+         proven_by="scripts/test_invocation_identity.py",
+         calibrated_by="scripts/test_invocation_identity.py",
+         in_policy_check=False,
+         in_workflows=("stage1-replay.yml",),
+         findings=("KAI-GATE-048",)),
+    # D265. Attempt 2's defect: server health read as model readiness.
+    Gate(module="check_model_ready",
+         kind=REPORT,
+         summary="whether the EXACT model the replay will send is "
+                 "present, asked of the server's own inventory and "
+                 "matched exactly against runtime.model from the frozen "
+                 "manifest rather than a literal; a prefix is not a "
+                 "match, a pulled identity that disagrees with the one "
+                 "to be requested refuses, an unreadable inventory "
+                 "refuses, and /v1/models corroborates without a veto",
+         inputs=(),
+         denominator=r"inspected: \d+ model identities across \d+ server",
+         probe=False,
+         probe_skip_reason="it needs a running ollama on an internal "
+                           "network; both directions are calibrated "
+                           "against a real HTTP server serving fixture "
+                           "inventories in scripts/test_model_ready.py",
+         proven_by="scripts/test_model_ready.py",
+         calibrated_by="scripts/test_model_ready.py",
+         in_policy_check=False,
+         in_workflows=("stage1-replay.yml",),
+         findings=("KAI-GATE-048",)),
+    Gate(module="test_model_ready",
+         kind=GATE,
+         summary="the readiness gate must say BOTH things: a healthy "
+                 "server holding nothing refuses, a different tag of the "
+                 "same family refuses, the exact model permits the "
+                 "replay, every refusal returns a verdict rather than a "
+                 "traceback, and the pull is a foreground gate ordered "
+                 "before the probe and the replay",
+         inputs=(),
+         denominator=r"inspected: \d+ model-readiness scenario\(s\) "
+                     r"across \d+ gate",
+         proven_by="scripts/test_model_ready.py",
+         calibrated_by="scripts/test_model_ready.py",
+         in_policy_check=False,
+         in_workflows=("stage1-replay.yml",),
+         findings=("KAI-GATE-048",)),
+    # D268. The doctrine's spine, in its one decidable form. Earned by
+    # run 31906667051: the condition was declared and bypassed.
+    Gate(module="check_declared_prerequisites",
+         kind=REPORT,
+         summary="a depends_on condition must be IN FORCE where the "
+                 "service is started, not merely declared: every "
+                 "--no-deps site is resolved against the compose "
+                 "declarations it skips, an undeclared bypass fails, a "
+                 "compose file that cannot be resolved is UNRESOLVED "
+                 "rather than clean, and a service with no conditions is "
+                 "trivially clean rather than unresolvable",
+         inputs=(),
+         denominator=r"inspected: \d+ bypass site\(s\) against \d+ "
+                     r"declared condition\(s\)",
+         probe=False,
+         probe_skip_reason="it reads compose files and execution sites "
+                           "from the tree, so a probe would need a second "
+                           "tree to read; both directions are calibrated "
+                           "against fixture repositories built on disk in "
+                           "scripts/test_declared_prerequisites.py",
+         proven_by="scripts/test_declared_prerequisites.py",
+         calibrated_by="scripts/test_declared_prerequisites.py",
+         # REPORT, not GATE, and deliberately: it currently reports 3
+         # undeclared bypasses in verify_identity_in_containers.sh, which
+         # are a finding awaiting the operator's judgement (Programme
+         # Rule 7). Wiring a red gate into policy-check would force them
+         # to be declared away rather than decided. It is promoted to a
+         # GATE, in_policy_check, the moment they are judged. Until then
+         # calling it enforcing would be the claim this file exists to
+         # catch: a declaration that is not in force.
+         # NOT enforcing yet: it currently reports 3 undeclared bypasses
+         # in verify_identity_in_containers.sh, which are a finding
+         # awaiting the operator's judgement (Programme Rule 7). Wiring a
+         # red gate into policy-check would force them to be declared
+         # away rather than decided. It becomes enforcing when they are.
+         in_policy_check=False,
+         in_workflows=(),
+         findings=("KAI-GATE-048",)),
+    Gate(module="test_declared_prerequisites",
+         kind=GATE,
+         summary="the gate must be neither too narrow, too generous nor "
+                 "too wide: a service with no conditions is clean rather "
+                 "than unresolvable, an unresolvable compose file is "
+                 "UNRESOLVED rather than clean, a declaration for the "
+                 "wrong dependency does not cover a bypass, and "
+                 "--no-deps is never banned outright",
+         inputs=(),
+         denominator=r"inspected: \d+ declared-prerequisite scenario\(s\) "
+                     r"across \d+ gate",
+         proven_by="scripts/test_declared_prerequisites.py",
+         calibrated_by="scripts/test_declared_prerequisites.py",
+         # The CALIBRATION enforces even while the report it proves does
+         # not. An instrument with open findings is exactly the one whose
+         # ability to fail must not quietly lapse.
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         findings=("KAI-GATE-048",)),
+    # D273 / rule 28. Two records of the doctrine diverged and the
+    # casualty was rule 4 -- the anti-drift rule itself.
+    Gate(module="check_doctrine_integrity",
+         kind=GATE,
+         summary="the doctrine must stay mechanically comparable: rules "
+                 "numbered contiguously with no gap and no duplicate, "
+                 "every rule carrying provenance in the earned-by table, "
+                 "the population scoped to the rules section so a bold "
+                 "numbered item elsewhere is not counted, and a "
+                 "fingerprint published that any external copy must "
+                 "reproduce",
+         inputs=(),
+         denominator=r"inspected: \d+ rule\(s\) across \d+ provenance "
+                     r"entry\(s\)",
+         proven_by="scripts/test_doctrine_integrity.py",
+         calibrated_by="scripts/test_doctrine_integrity.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         findings=("KAI-GATE-048",)),
+    Gate(module="test_doctrine_integrity",
+         kind=GATE,
+         summary="the integrity gate must catch a dropped rule, a split "
+                 "rule and a missing rules section, must NOT count "
+                 "section 0's bold numbered step as a rule, must find a "
+                 "rule whose bold statement wraps, and its fingerprint "
+                 "must move on a reworded, dropped or renumbered rule "
+                 "while staying still for prose outside them",
+         inputs=(),
+         denominator=r"inspected: \d+ doctrine-integrity scenario\(s\) "
+                     r"across \d+ gate",
+         proven_by="scripts/test_doctrine_integrity.py",
+         calibrated_by="scripts/test_doctrine_integrity.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         findings=("KAI-GATE-048",)),
+    # D278 / D247 §6 item 10. The bar demanded tree, IMAGE and run id;
+    # nothing in the tree recorded an image identity (D277).
+    Gate(module="collect_image_identity",
+         kind=REPORT,
+         summary="which image actually executed, bound to the tree and "
+                 "run that produced it -- named DOCKER_LOCAL_IMAGE_ID "
+                 "rather than a digest, because a built-in-job image is "
+                 "never pushed and has no registry digest; RepoDigests "
+                 "kept as ABSENT/NULL/VALUE, and a failed, empty or "
+                 "Id-less inspect recorded as UNRECORDED rather than as "
+                 "an empty identity field",
+         inputs=COMPOSE_FILES,
+         denominator=r"inspected: \d+ service\(s\), \d+ recorded, "
+                     r"\d+ UNRECORDED",
+         probe=False,
+         probe_skip_reason="needs a Docker daemon and a built image; this "
+                           "host has neither. Every path -- the recorded "
+                           "case, all three RepoDigests states and six "
+                           "refusals -- is asserted against the shipped "
+                           "CLI with an injected docker in "
+                           "scripts/test_image_identity.py",
+         proven_by="scripts/test_image_identity.py",
+         calibrated_by="scripts/test_image_identity.py",
+         in_policy_check=False,
+         in_workflows=("stage1-replay.yml",),
+         trigger_class=SENTINEL_AUTHORISED,
+         findings=("KAI-GATE-048",)),
+    Gate(module="test_image_identity",
+         kind=GATE,
+         summary="the collector must record an identity when one exists "
+                 "and REFUSE when one does not: a failed inspect, an "
+                 "inspect exiting 0 with no payload, a payload carrying "
+                 "no Id, a service resolving to two images and a compose "
+                 "resolution that names nothing must all read UNRECORDED "
+                 "with the prerequisite named, never an empty string; "
+                 "and ABSENT must not collapse into NULL",
+         inputs=(),
+         denominator=r"inspected: \d+ image-identity scenario\(s\) across "
+                     r"\d+ collector",
+         proven_by="scripts/test_image_identity.py",
+         calibrated_by="scripts/test_image_identity.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         findings=("KAI-GATE-048",)),
+    # D285/D288. Item 8's frozen experiment and its three instruments.
+    Gate(module="check_item8_design",
+         kind=GATE,
+         summary="the frozen Item-8 canonical design must be byte-identical "
+                 "to what D288 froze before any build runs; a moved design, "
+                 "the superseded R1 digest, an unreadable decisions file or "
+                 "an ambiguous region all REFUSE, because an amended "
+                 "experiment running under a frozen design's authority "
+                 "would be invisible without this",
+         inputs=("kai-pm/DECISIONS.md",),
+         denominator=r"inspected: \d+ canonical region across \d+ frozen "
+                     r"design",
+         proven_by="scripts/test_item8_instruments.py",
+         calibrated_by="scripts/test_item8_instruments.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml", "item8-network-contingency.yml"),
+         findings=("KAI-GATE-048",)),
+    Gate(module="derive_item8_dockerfile",
+         kind=REPORT,
+         summary="Item 8's experimental Dockerfiles, derived mechanically "
+                 "from the shipped ones with treatment-mutation cardinality "
+                 "asserted (B1=0, B2=1, B3=1) and the pinned frontend added "
+                 "as scaffolding; refuses rather than silently emitting the "
+                 "source when its anchor no longer matches, and refuses to "
+                 "write over the shipped Dockerfile",
+         inputs=("memu-core/Dockerfile", "memu-graph/Dockerfile"),
+         denominator=r"inspected: \d+ shipped Dockerfile, \d+ treatment "
+                     r"mutation\(s\) of \d+ required",
+         probe=False,
+         probe_skip_reason="writes a derived file, so probing it in the "
+                           "meta-check would create artifacts as a side "
+                           "effect of measuring; all six derivations and "
+                           "every refusal are asserted in "
+                           "scripts/test_item8_instruments.py",
+         proven_by="scripts/test_item8_instruments.py",
+         calibrated_by="scripts/test_item8_instruments.py",
+         in_policy_check=False,
+         in_workflows=("item8-network-contingency.yml",),
+         trigger_class=SENTINEL_AUTHORISED,
+         findings=("KAI-GATE-048",)),
+    Gate(module="collect_explicit_image_identity",
+         kind=REPORT,
+         summary="identity for an image named directly rather than resolved "
+                 "through Compose, emitting the same JSONL contract as "
+                 "collect_image_identity by importing its primitives rather "
+                 "than copying them; a failed or Id-less inspect records "
+                 "UNRECORDED, never an empty identity field",
+         inputs=(),
+         denominator=r"inspected: \d+ explicit image reference, \d+ "
+                     r"recorded, \d+ UNRECORDED",
+         probe=False,
+         probe_skip_reason="needs a Docker daemon and a built experimental "
+                           "image; this host has neither. The recorded case "
+                           "and every refusal are asserted against the "
+                           "shipped CLI with an injected docker in "
+                           "scripts/test_item8_instruments.py",
+         proven_by="scripts/test_item8_instruments.py",
+         calibrated_by="scripts/test_item8_instruments.py",
+         in_policy_check=False,
+         in_workflows=("item8-network-contingency.yml",),
+         trigger_class=SENTINEL_AUTHORISED,
+         findings=("KAI-GATE-048",)),
+    Gate(module="summarise_item8",
+         kind=REPORT,
+         summary="Item 8's six verdicts on two axes that may not launder "
+                 "one another -- the contingency, and the collectors' first "
+                 "live-daemon qualification -- refusing to compose a verdict "
+                 "from fewer than the six precommitted branches",
+         inputs=(),
+         denominator=r"inspected: \d+ branch result\(s\) of \d+ "
+                     r"precommitted",
+         probe=False,
+         probe_skip_reason="needs a results file produced by the six frozen "
+                           "builds; its absent-input and short-input "
+                           "refusals are asserted in "
+                           "scripts/test_item8_instruments.py",
+         proven_by="scripts/test_item8_instruments.py",
+         calibrated_by="scripts/test_item8_instruments.py",
+         in_policy_check=False,
+         in_workflows=("item8-network-contingency.yml",),
+         trigger_class=SENTINEL_AUTHORISED,
+         findings=("KAI-GATE-048",)),
+    Gate(module="parse_buildkit_events",
+         kind=REPORT,
+         summary="separates a build step's INSTRUCTION TEXT from its "
+                 "RUNTIME OUTPUT using BuildKit rawjson events, so no "
+                 "amount of the log echoing an instruction can be read as "
+                 "execution; refuses an unparseable stream, a missing "
+                 "target vertex and an ambiguous one rather than "
+                 "reporting zero occurrences",
+         inputs=(),
+         denominator=r"inspected: \d+ target vertex of \d+ across \d+ "
+                     r"captured descriptor\(s\)",
+         probe=False,
+         probe_skip_reason="needs a BuildKit event stream, produced only "
+                           "by a real build; the positive case, the "
+                           "instruction-is-not-runtime case and four "
+                           "refusals are asserted against the shipped CLI "
+                           "in scripts/test_item8_verdicts.py",
+         proven_by="scripts/test_item8_verdicts.py",
+         calibrated_by="scripts/test_item8_verdicts.py",
+         in_policy_check=False,
+         in_workflows=("item8-network-contingency.yml",),
+         trigger_class=SENTINEL_AUTHORISED,
+         findings=("KAI-GATE-048",)),
+    Gate(module="check_item8_authority",
+         kind=GATE,
+         summary="no Item-8 build starts without an authority envelope "
+                 "that validates: it must name the frozen design digest "
+                 "that the tree actually holds, an approved commit that is "
+                 "an ancestor of HEAD, and HEAD must differ from that "
+                 "commit by the envelope alone -- otherwise review "
+                 "approves one artefact and the run executes another",
+         inputs=(),
+         denominator=r"inspected: \d+ authority envelope across \d+ "
+                     r"binding\(s\)",
+         probe=False,
+         probe_skip_reason="refuses without kai-pm/ITEM8_GO, which does "
+                           "not exist and must not be created outside an "
+                           "execution authorisation; every refusal path is "
+                           "asserted in scripts/test_item8_verdicts.py",
+         proven_by="scripts/test_item8_verdicts.py",
+         calibrated_by="scripts/test_item8_verdicts.py",
+         in_policy_check=False,
+         in_workflows=("item8-network-contingency.yml",
+                       "item8-preflight.yml"),
+         trigger_class=SENTINEL_AUTHORISED,
+         findings=("KAI-GATE-048",)),
+    Gate(module="preflight_buildkit_rawjson",
+         kind=GATE,
+         summary="qualifies --progress=rawjson against the REAL daemon "
+                 "before any subject build: the target vertex is "
+                 "identifiable, runtime output is attributed to it and the "
+                 "instruction's own mentions are not counted, `started` is "
+                 "readable, `cached` MOVES between a forced and a repeated "
+                 "build, and a deliberately failing step carries its own "
+                 "error -- three non-subject builds, so a failure costs "
+                 "ZERO experimental builds",
+         inputs=(),
+         denominator=r"inspected: \d+ non-subject build\(s\) across \d+ "
+                     r"required propert\(ies\)",
+         probe=False,
+         probe_skip_reason="needs a running Docker daemon, which is the "
+                           "whole point of it; the two refusal paths -- no "
+                           "docker at all, and a daemon emitting no rawjson "
+                           "-- are asserted against the shipped CLI in "
+                           "scripts/test_item8_verdicts.py",
+         proven_by="scripts/test_item8_verdicts.py",
+         calibrated_by="scripts/test_item8_verdicts.py",
+         in_policy_check=False,
+         in_workflows=("item8-network-contingency.yml",
+                       "item8-preflight.yml"),
+         trigger_class=SENTINEL_AUTHORISED,
+         findings=("KAI-GATE-048",)),
+    Gate(module="test_item8_preflight",
+         kind=GATE,
+         summary="calibration for the STANDALONE MEASUREMENT and nothing "
+                 "else: the preflight's refusals, that an unavailable "
+                 "digest corroborator is recorded rather than fatal, that "
+                 "raw captures survive only with --keep and their deletion "
+                 "is announced, and that a preflight envelope never "
+                 "authorises the experiment. Its dependency graph reaches "
+                 "no subject-build machinery, which "
+                 "check_preflight_reachability.py asserts mechanically",
+         inputs=(),
+         denominator=r"inspected: \d+ preflight scenario\(s\) across \d+ "
+                     r"shipped entry points",
+         probe=False,
+         probe_skip_reason="it IS the calibration; probing a calibration "
+                           "with itself is the self-reference I-8 exists "
+                           "to stop",
+         proven_by="scripts/test_item8_preflight.py",
+         calibrated_by="scripts/test_item8_preflight.py",
+         in_policy_check=True,
+         in_workflows=("item8-preflight.yml",),
+         trigger_class=SENTINEL_AUTHORISED,
+         findings=("KAI-GATE-048",)),
+    Gate(module="check_preflight_reachability",
+         kind=GATE,
+         summary="computes the TRANSITIVE closure of what the standalone "
+                 "preflight workflow can execute, and refuses if the "
+                 "six-build runner, the subject deriver or the claim engine "
+                 "is inside it -- because the previous claim of structural "
+                 "incapability was made by grepping one YAML file for a "
+                 "name while a path existed one file away; a mention counts "
+                 "as a reference on purpose, so the scan over-reports",
+         inputs=(".github/workflows/item8-preflight.yml",),
+         denominator=r"inspected: \d+ reachable script\(s\) against \d+ "
+                     r"forbidden target\(s\)",
+         probe=True,
+         proven_by="scripts/test_item8_preflight.py",
+         calibrated_by="scripts/test_item8_preflight.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         trigger_class=CONTINUOUS,
+         findings=("KAI-GATE-048",)),
+    Gate(module="check_item8_toolchain",
+         kind=GATE,
+         summary="validates the Item-8 toolchain record BEFORE build 1: "
+                 "every identity R2 names present, non-empty, resolved, "
+                 "the frontend equal to the pinned digest, and the commit "
+                 "and tree it names equal to this execution's -- because a "
+                 "SHA-256 of an incomplete record is a perfect hash of bad "
+                 "evidence, and the generator runs without `set -e` so a "
+                 "failed lookup leaves `key=` rather than UNRESOLVED",
+         inputs=(),
+         denominator=r"inspected: \d+ required identity\(s\), \d+ recorded",
+         probe=False,
+         probe_skip_reason="needs a toolchain record produced by the CI "
+                           "step that runs docker/buildx; the "
+                           "known-positive and eight refusals -- missing, "
+                           "empty, UNRESOLVED, floating frontend, stale "
+                           "commit, stale tree, wrong run and absent file "
+                           "-- are asserted against the shipped CLI in "
+                           "scripts/test_item8_verdicts.py",
+         proven_by="scripts/test_item8_verdicts.py",
+         calibrated_by="scripts/test_item8_verdicts.py",
+         in_policy_check=False,
+         in_workflows=("item8-network-contingency.yml",),
+         trigger_class=SENTINEL_AUTHORISED,
+         findings=("KAI-GATE-048",)),
+    Gate(module="test_item8_verdicts",
+         kind=GATE,
+         # The runner it calibrates is `run_item8_experiment.sh`, which
+         # is NOT in this registry: no shell script is, because the
+         # population is Python modules under scripts/security. That is
+         # finding #48's shape -- a denominator defined by file type
+         # rather than by what instruments exist -- and it is noted here
+         # rather than worked around by registering one .sh and leaving
+         # the other nine unregistered. (D291)
+         summary="the verdict layer must not launder one axis into the "
+                 "other, must refuse a B3 with four retries, must not "
+                 "count its own injection marker as a genuine retry, must "
+                 "compare the iidfile it writes, must reject a six-row "
+                 "result set containing a duplicate and a gap, and must "
+                 "exit non-zero on a genuine inability to measure",
+         inputs=(),
+         denominator=r"inspected: \d+ verdict-layer scenario\(s\) across "
+                     r"\d+ shipped entry points",
+         proven_by="scripts/test_item8_verdicts.py",
+         calibrated_by="scripts/test_item8_verdicts.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",
+                       "item8-network-contingency.yml"),
+         findings=("KAI-GATE-048",)),
+    Gate(module="test_item8_instruments",
+         kind=GATE,
+         summary="Item 8's three instruments must each refuse: a moved "
+                 "frozen design (including one differing by a single "
+                 "character) stops the build, a derivation whose anchor "
+                 "moved refuses instead of emitting the source, B3 denies "
+                 "network to exactly the HF instruction and leaves pip "
+                 "alone, and an explicit-image record must be readable by "
+                 "the unchanged sibling collector",
+         inputs=(),
+         denominator=r"inspected: \d+ Item-8 instrument scenario\(s\) "
+                     r"across \d+ instruments",
+         proven_by="scripts/test_item8_instruments.py",
+         calibrated_by="scripts/test_item8_instruments.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",
+                       "item8-network-contingency.yml"),
+         findings=("KAI-GATE-048",)),
+    Gate(module="select_replay_subject",
+         kind=REPORT,
+         summary="which captured request becomes the Stage-1 replay "
+                 "subject -- the lowest-seq production row, with five "
+                 "preconditions that REFUSE rather than fall through to "
+                 "another row -- published as an allow-list request-side "
+                 "projection so that no response field, no timing and no "
+                 "hash of the response-bearing row can bias or be inferred "
+                 "from the choice",
+         inputs=(),
+         denominator=r"inspected: \d+ production request row\(s\) across "
+                     r"\d+ S1 precondition\(s\)",
+         probe=False,
+         probe_skip_reason="needs a production capture, which exists only "
+                           "as a CI artifact; every precondition and the "
+                           "response boundary are asserted on synthetic "
+                           "rows in scripts/test_replay_subject_selection.py",
+         proven_by="scripts/test_replay_subject_selection.py",
+         calibrated_by="scripts/test_replay_subject_selection.py",
+         in_policy_check=False,
+         in_workflows=("p1-replay-completeness.yml",),
+         findings=("KAI-GATE-048",)),
+    Gate(module="test_replay_subject_selection",
+         kind=GATE,
+         summary="each of S1's five preconditions must refuse, and NO "
+                 "response-bearing value may reach the published "
+                 "projection -- asserted against rows whose response "
+                 "fields carry a sentinel, so a leak is detected rather "
+                 "than an absence merely observed",
+         inputs=(),
+         denominator=r"inspected: \d+ request-side field\(s\) allowed",
+         proven_by="scripts/test_replay_subject_selection.py",
+         calibrated_by="scripts/test_replay_subject_selection.py",
+         in_policy_check=False,
+         in_workflows=("p1-replay-completeness.yml", "stage1-replay.yml"),
+         findings=("KAI-GATE-048",)),
+    Gate(module="test_p1_replay_completeness",
+         kind=GATE,
+         summary="the two replay-completeness axes must NEVER substitute "
+                 "for one another -- a spotless capture with no call-path "
+                 "source must read as REQUEST_INCOMPLETE_POSITIONAL, not "
+                 "as replayable, because the probe records positional "
+                 "arguments nowhere; and the both-defects case must never "
+                 "collapse into either single verdict, because kwargs "
+                 "completeness and positional completeness have different "
+                 "repairs",
+         inputs=(),
+         denominator=r"inspected: \d+ P1 verdict\(s\) discriminated",
+         proven_by="scripts/test_p1_replay_completeness.py",
+         calibrated_by="scripts/test_p1_replay_completeness.py",
+         in_policy_check=False,
+         in_workflows=("p1-replay-completeness.yml",),
+         findings=("KAI-GATE-048",)),
+    Gate(module="p1_replay_completeness",
+         kind=REPORT,
+         summary="whether a captured request can be replayed faithfully, "
+                 "on two axes that may never substitute for one another: "
+                 "keyword completeness measured from the run's own "
+                 "artifact, and positional completeness established from "
+                 "the call path's source inside the image that ran it; "
+                 "emits one of five verdicts and never 'probably "
+                 "complete'",
+         inputs=(),
+         denominator=r"inspected: \d+ production request row\(s\)",
+         probe=False,
+         probe_skip_reason="needs a capture file produced by driving "
+                           "cognee in-process inside the memu-graph image "
+                           "AND that image's site-packages; on the host "
+                           "neither exists. Every verdict, both axes and "
+                           "each refusal path are asserted on synthetic "
+                           "captures and synthetic source trees in "
+                           "scripts/test_p1_replay_completeness.py",
+         proven_by="scripts/test_p1_replay_completeness.py",
+         calibrated_by="scripts/test_p1_replay_completeness.py",
+         in_policy_check=False,
+         in_workflows=("p1-replay-completeness.yml",),
+         findings=("KAI-GATE-048",)),
+    Gate(module="report_runtime_topology",
+         kind=REPORT,
+         summary="what the tree DEFINES, what it GATES, and what a "
+                 "repo-defined path actually STARTS; a never-started "
+                 "service is usually CORRECT, because the P0 containment "
+                 "model requires consequential services to be gated",
+         inputs=COMPOSE_FILES,
+         denominator=r"inspected: \d+ service definition\(s\)",
+         proven_by="scripts/test_runtime_topology.py",
+         calibrated_by="scripts/test_runtime_topology.py",
+         in_policy_check=False,
+         findings=("KAI-GATE-046",)),
+    Gate(module="report_embedding_backends",
+         kind=REPORT,
+         summary="every service choosing between a semantic backend and a "
+                 "fallback; 2 of 3 degrade SILENTLY, so 'service started' "
+                 "is not evidence the semantic backend started",
+         inputs=COMPOSE_FILES,
+         denominator=r"inspected: \d+ service\(s\) choosing between",
+         proven_by="scripts/test_embedding_backends.py",
+         calibrated_by="scripts/test_embedding_backends.py",
+         in_policy_check=False,
+         in_workflows=()),
+    Gate(module="probe_embedding_backend",
+         kind=REPORT,
+         summary="runs INSIDE a built image and reports whether the "
+                 "semantic operation actually executed; the verdict is the "
+                 "exit code, never a grep over its output",
+         inputs=(),
+         denominator=r"inspected: 3 stage\(s\) of .*semantic path",
+         proven_by="scripts/test_embedding_backends.py",
+         calibrated_by="scripts/test_embedding_backends.py",
+         probe=False,
+         probe_skip_reason="it is designed to run inside a service "
+                           "container, where the library and baked model "
+                           "exist. Probing it on the developer host would "
+                           "measure the host, and reporting that as the "
+                           "image's state is the exact confusion this "
+                           "instrument exists to prevent.",
+         in_policy_check=False,
+         in_workflows=()),
+    Gate(module="generate_service_keys",
+         kind=REPORT,
+         summary="generates one ed25519 keypair per service and the trusted "
+                 "receiver key map; NOT a gate — it writes deployment key "
+                 "material and must never run in policy-check",
+         inputs=(),
+         denominator=r"inspected: \d+ service key\(s\) generated",
+         proven_by="scripts/test_service_identity_wiring.py",
+         calibrated_by="scripts/test_service_identity_wiring.py",
+         probe=False,
+         probe_skip_reason="probing it would WRITE PRIVATE KEY MATERIAL. A "
+                           "meta-check must not create secrets as a side "
+                           "effect of measuring, and a generator run with no "
+                           "arguments correctly refuses rather than emitting "
+                           "an empty key map. The denominator is exercised in "
+                           "scripts/test_service_identity_wiring.py against a "
+                           "temporary directory instead.",
+         in_policy_check=False,
+         in_workflows=()),
+    Gate(module="check_service_identity_wiring",
+         kind=GATE,
+         summary="a private signing key must be mounted into exactly ONE "
+                 "service — two services sharing a key are one principal, "
+                 "which is the measured defect this mechanism removes",
+         inputs=COMPOSE_FILES,
+         denominator=r"inspected: \d+ service\(s\) that sign or verify",
+         proven_by="scripts/test_service_identity_wiring.py",
+         calibrated_by="scripts/test_service_identity_wiring.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",)),
+    Gate(module="check_bind_mount_portability",
+         kind=GATE,
+         summary="a bind mount must not name a path that exists on one "
+                 "machine — Docker creates a missing source as an EMPTY "
+                 "directory, so the service boots healthy and reads nothing",
+         inputs=COMPOSE_FILES,
+         denominator=r"inspected: \d+ bind mount\(s\)",
+         proven_by="scripts/test_bind_mount_portability.py",
+         calibrated_by="scripts/test_bind_mount_portability.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",)),
+    Gate(module="ci/post_mortem",
+         kind=REPORT,
+         summary="print the captured step logs that have content, and "
+                 "name the empty ones in one line instead of a section "
+                 "each — the noise is what evicted the real output",
+         inputs=(),
+         denominator=r"inspected: \d+ captured step log\(s\)",
+         probe=False,
+         probe_skip_reason="reads the log files a failed run left in "
+                           "/tmp; probed by scripts/test_post_mortem.py "
+                           "against fixtures shaped like run 712, where "
+                           "one section had output and twelve did not",
+         proven_by="scripts/test_post_mortem.py",
          in_workflows=("core-tests.yml",)),
     Gate(module="ci/assert_clean_bringup",
          kind=GATE,

@@ -1,0 +1,22 @@
+STEP 2 / M3 — PRE-REPAIR BASELINE, FROZEN BEFORE ANY M3 CODE CHANGE
+Banked under Kai's step-2 release. Orion produces no expected column.
+
+  subject            d8aac4d49e6ba997e3eb38062c0917186ee3f197
+  tree               3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+  documents          272
+  baseline total     492
+  emitted WHOLE_FILE 168
+  emitted SPAN       324
+
+  KAI PRECOMMITTED EXPECTED TRUTH TABLE (his adjudication, not mine)
+    expected WHOLE_FILE      214
+    expected SPAN            278
+    total                    492
+    known wrong               48   (47 under-assigned SPAN->WF,
+                                    1 over-assigned WF->SPAN)
+    expected correct         444
+    D14-B 76dbba4            SPAN -> SPAN, precommitted correct
+
+  ARITHMETIC CHECK: 168 + 47 - 1 = 214 ; 324 - 47 + 1 = 278
+
+  baseline record-set sha256  67ecb05980db14d07c656731b021a9d674cd52c29f28482192dd2825683e5ac8

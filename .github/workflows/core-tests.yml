@@ -20,6 +20,16 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    # GitHub's default job timeout is 360 minutes. Nothing in this
+    # repository has ever needed more than 28. Run 697 of core-tests sat
+    # at 133.9 minutes and finished with no conclusion at all during the
+    # runner-starvation incident, and `docker compose up -d` now blocks
+    # on `condition: service_healthy` — so a dependency that never turns
+    # healthy hangs the step rather than failing it. 60 minutes is over
+    # twice the longest successful run of any workflow here, so it
+    # cannot cut short work that is progressing, and it turns a hang
+    # into a red build with a reason.
+    timeout-minutes: 60
     permissions:
       contents: read
       models: read
@@ -451,6 +461,65 @@ jobs:
       #
       # The remedy that was found once and applied to one step, applied
       # to the rest of them.
+      # Two numbers were promised in D167 and no instrument existed to
+      # collect either. The post-mortem step is `skipped` on success, and
+      # the build log sits outside the Actions API's fixed byte window,
+      # so "tune start-period once CI reports a real number" described a
+      # report nothing produced. A measurement you have not arranged to
+      # read is not a measurement.
+      #
+      # `if: always()` on purpose: these are wanted MOST on the run that
+      # failed, and a diagnostic that only prints on success is the same
+      # mistake in the other direction.
+      - name: Measured — baked model revision and embedding load time
+        if: always()
+        run: |
+          # Written to $GITHUB_STEP_SUMMARY as well as stdout, and that
+          # is the point of the step rather than a flourish.
+          #
+          # This step sits at position 50 of 67. The Actions log API
+          # serves a fixed byte window from the END, and everything after
+          # it — live smoke, kill-isolation, restart-persistence, the
+          # memu-graph ingest/query/forget cycle, the full and sovereign
+          # profiles — emits far more than the window holds. So its
+          # output would very likely have been unreadable, which is the
+          # third round of the same mistake: run 712's build cause,
+          # D167's promised measurement, and now the instrument built to
+          # supply it.
+          #
+          # I did not verify that claim. I removed the dependency on it
+          # instead. The step summary is rendered on the run page and is
+          # not subject to log truncation at all, so the question of
+          # whether this lands inside the window stops mattering.
+          #
+          # General rule this implies: any diagnostic whose value is read
+          # by a human belongs in the step summary, not only in stdout.
+          exec > >(tee -a "${GITHUB_STEP_SUMMARY:-/dev/null}") 2>&1
+          echo "### Measured — memu-core embeddings"
+          echo '```'
+          echo "── revision baked into the image (pin from THIS value) ──"
+          # Image id asked of compose rather than spelled out. The first
+          # draft hard-coded `kai-system-memu-core:latest`, inferred from
+          # a pattern in an old log — a hand-written name beside the thing
+          # it describes, which is the exact defect class this programme
+          # has spent a week removing. Compose knows; ask it.
+          MEMU_IMAGE="$(docker compose -f docker-compose.minimal.yml images -q memu-core | head -1)"
+          if [ -n "$MEMU_IMAGE" ]; then
+            docker run --rm --entrypoint cat "$MEMU_IMAGE" \
+              /opt/hf_cache/BAKED_REVISION \
+              || echo "  (absent — image predates BAKED_REVISION, or the bake failed)"
+          else
+            echo "  (compose could not name the memu-core image)"
+          fi
+
+          echo "── how long the embedding backend took to be ready ──"
+          echo "  start-period is currently 60s, chosen as an over-allowance."
+          echo "  Tune it from the number below, not from this comment."
+          docker compose -f docker-compose.minimal.yml logs memu-core 2>&1 \
+            | grep -iE "embedding backend ready|Embedding backend unavailable" \
+            || echo "  (no embedding line found — memu-core may not have started)"
+          echo '```'
+
       - name: Live smoke against the running stack
         run: |
           set -o pipefail
@@ -722,34 +791,25 @@ jobs:
           echo "── minimal compose config parses? ──"
           docker compose -f docker-compose.minimal.yml config -q 2>&1 \
             && echo "config: VALID" || echo "config: INVALID"
-          echo "── the minimal image build (its real output) ──"
-          tail -25 /tmp/build-minimal.log 2>/dev/null || echo "(did not run)"
-          echo "── the full image build (its real output) ──"
-          tail -8 /tmp/build-full.log 2>/dev/null || echo "(did not run)"
-          echo "── what the bring-up itself said (its real output) ──"
-          tail -20 /tmp/bringup.log 2>/dev/null || echo "(did not run)"
-          echo "── live smoke (its real output) ──"
-          tail -25 /tmp/live-smoke.log 2>/dev/null || echo "(did not run)"
-          echo "── kill-isolation (its real output) ──"
-          tail -15 /tmp/kill-isolation.log 2>/dev/null || echo "(did not run)"
-          echo "── restart-persistence (its real output) ──"
-          tail -25 /tmp/restart-persistence.log 2>/dev/null \
-            || echo "(did not run)"
-          echo "── full profile bring-up (its real output) ──"
-          tail -20 /tmp/full-bringup.log 2>/dev/null || echo "(did not run)"
-          echo "── full profile live smoke (its real output) ──"
-          tail -30 /tmp/full-smoke.log 2>/dev/null || echo "(did not run)"
-          # The container logs, not just what compose said about them.
-          # `is unhealthy` names the container and not the cause, and the
-          # cause is only ever in the container's own output.
-          echo "── full profile: containers Docker says are wrong ──"
-          tail -45 /tmp/full-logs.log 2>/dev/null || echo "(did not run)"
-          echo "── sovereign boot (its real output) ──"
-          tail -30 /tmp/sovereign-boot.log 2>/dev/null || echo "(did not run)"
-          echo "── sovereign: containers Docker says are wrong ──"
-          tail -45 /tmp/sovereign-logs.log 2>/dev/null || echo "(did not run)"
-          echo "── minimal: containers Docker says are wrong ──"
-          tail -30 /tmp/minimal-logs.log 2>/dev/null || echo "(did not run)"
+          # Captured step logs, printed by a script that skips the empty
+          # ones — because printing them is what broke this step.
+          #
+          # Run 712 (2026-08-07) failed in the image build. Every step
+          # after it was skipped, so twelve of these thirteen sections
+          # said "(did not run)" — and the Actions log API serves a FIXED
+          # BYTE WINDOW from the end. Twelve empty headers plus the
+          # teardown chatter pushed the build's own output, which was
+          # first in the fixed order, clean out of the window. All that
+          # could be recovered from the run was that `memu-core` was
+          # missing from the "images built" list.
+          #
+          # The container dumps learned this already (dump_unhealthy.py
+          # prints only what Docker says is wrong). The post-mortem —
+          # the tool built to make failures readable — had not. The
+          # script also reverses the order: build logs LAST, since a
+          # failed build is the only thing that ran and the bottom of the
+          # output is the part guaranteed to be served.
+          python3 scripts/ci/post_mortem.py
           # This step runs LAST so it survives log truncation — which
           # means the teardown at step 54 has already run, so `ps -a`
           # finds nothing and prints a bare header. An empty container
