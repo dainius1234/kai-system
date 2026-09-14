@@ -530,6 +530,18 @@ def main() -> int:
               for t in sorted(floors) if counts[t] < floors[t]]
     unfloored = sorted(P - F)
 
+    # UNFLOORED_TARGET is a FINDING, not a refusal and not a floor erosion.
+    # The evidence is perfectly adjudicable — the run completed and every
+    # count is bound to its contracted result. What is incomplete is the
+    # POLICY: a population member nobody floored is a member nobody
+    # watches, and it can shrink to nothing unobserved.
+    #
+    # The first version of this gate printed "absence of a floor is NOT a
+    # pass" and then returned `1 if fallen else 0`, so a run with all 61
+    # floors met and 17 members unwatched exited GREEN. The prose was
+    # policy; the exit code was the admission, and only the exit code is
+    # read by CI. Both findings now make the process red.
+    findings = {"fallen": len(fallen), "unfloored": len(unfloored)}
     payload = {
         "aggregate_status": 0, "admissible": True, "adjudicated": True,
         "population": len(P), "floored": len(F),
@@ -537,6 +549,7 @@ def main() -> int:
         "counts": counts, "floors": floors,
         "fallen": fallen,
         "unfloored_targets": unfloored,
+        "findings": findings,
         "determinism_policy": determinism,
         "determinism_executed": False,
     }
@@ -546,18 +559,26 @@ def main() -> int:
         print(f"Assertion floors — {len(P)} targets, {len(F)} floored, "
               f"{sum(counts.values())} assertions")
         if fallen:
-            print("\n  COVERAGE FELL:")
+            print("\n  COVERAGE FELL — these targets exercise less than before:")
             for line in fallen:
                 print(f"    - {line}")
         if unfloored:
             print(f"\n  UNFLOORED TARGETS — {len(unfloored)} population "
                   f"member(s) carry no floor. Absence of a floor is NOT zero "
-                  f"and is NOT a pass; these await adjudication:")
+                  f"and is NOT a pass. This is a POLICY FINDING and it makes "
+                  f"this run red; the floor values are a separate decision:")
             for t in unfloored:
                 print(f"    - {t}")
-        if not fallen:
-            print("\n  PASS: every floored target met its floor.")
-    return 1 if fallen else 0
+        if fallen or unfloored:
+            # Never claim a pass over F while P is wider than F. True of the
+            # floored set, and operationally misleading about the population.
+            print(f"\n  FINDINGS: {len(fallen)} fallen, {len(unfloored)} "
+                  f"unfloored. The run is admissible and adjudicated; the "
+                  f"floor policy is not satisfied.")
+        else:
+            print(f"\n  PASS: all {len(P)} population members are floored and "
+                  f"every one met its floor.")
+    return 1 if (fallen or unfloored) else 0
 
 
 if __name__ == "__main__":

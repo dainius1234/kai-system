@@ -38,7 +38,7 @@ PLAN = REPO / "scripts" / "security" / "uh_execution_plan.json"
 passed = 0
 failed = 0
 executed: list[str] = []
-EXPECTED_SCENARIOS = 37
+EXPECTED_SCENARIOS = 39
 
 
 def check(name: str, condition: bool, detail: str = "") -> None:
@@ -369,6 +369,19 @@ def test_unfloored_targets_reported():
         partial.write_text(json.dumps(floors_v2(floored)), encoding="utf-8")
         rc, out = run_gate(root, partial)
         check("S adjudicates", out.get("adjudicated") is True, str(out)[:200])
+        # THE ASSERTION THAT WAS MISSING. The first version checked the
+        # report and never the return code, so the gate printed "NOT a pass"
+        # and exited 0. CI reads the exit code, not the prose.
+        check("S EXITS RED — unfloored targets are a finding", rc == 1,
+              f"rc={rc}; an unwatched population member cannot exit green")
+        check("S is admissible and adjudicated, not a refusal",
+              out.get("admissible") is True and out.get("adjudicated") is True,
+              str(out)[:160])
+        check("S counts it as a finding",
+              out.get("findings", {}).get("unfloored") == 17,
+              str(out.get("findings")))
+        check("S is not a floor erosion", out.get("fallen") == [],
+              str(out.get("fallen")))
         check("S reports exactly the 17 unfloored",
               len(out.get("unfloored_targets", [])) == 17,
               str(len(out.get("unfloored_targets", []))))
@@ -626,6 +639,39 @@ def test_plan_validator_known_negatives():
         check("AH the canonical plan still validates", False, str(exc))
 
 
+def test_fallen_and_unfloored_together():
+    """S2 — both findings at once must still be one red, adjudicated run."""
+    scenario("S2-fallen-and-unfloored")
+    with tempfile.TemporaryDirectory() as d:
+        tmp = Path(d)
+        root = build(tmp)
+        both = tmp / "both.json"
+        f = floors_v2(TARGETS[:-17])
+        f["floors"][TARGETS[2]] = 9999
+        both.write_text(json.dumps(f), encoding="utf-8")
+        rc, out = run_gate(root, both)
+        check("S2 exits red", rc == 1, f"rc={rc}")
+        check("S2 adjudicated", out.get("adjudicated") is True, str(out)[:160])
+        check("S2 reports both findings",
+              out.get("findings") == {"fallen": 1, "unfloored": 17},
+              str(out.get("findings")))
+
+
+def test_fully_floored_population_passes():
+    """S3 — the ONLY green: P floored entirely and every floor met."""
+    scenario("S3-fully-floored-green")
+    with tempfile.TemporaryDirectory() as d:
+        tmp = Path(d)
+        root = build(tmp)
+        rc, out = run_gate(root, tmp / "floors.json")
+        check("S3 exits green", rc == 0, f"rc={rc}")
+        check("S3 has no unfloored member",
+              out.get("unfloored_targets") == [], str(out.get("unfloored_targets")))
+        check("S3 findings are both zero",
+              out.get("findings") == {"fallen": 0, "unfloored": 0},
+              str(out.get("findings")))
+
+
 def run() -> None:
     test_root_absent()
     test_root_relative()
@@ -664,6 +710,8 @@ def run() -> None:
     test_population_not_an_integer()
     test_plan_path_lies()
     test_plan_validator_known_negatives()
+    test_fallen_and_unfloored_together()
+    test_fully_floored_population_passes()
 
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",
           len(executed) == EXPECTED_SCENARIOS,
