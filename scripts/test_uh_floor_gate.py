@@ -38,7 +38,7 @@ PLAN = REPO / "scripts" / "security" / "uh_execution_plan.json"
 passed = 0
 failed = 0
 executed: list[str] = []
-EXPECTED_SCENARIOS = 24
+EXPECTED_SCENARIOS = 37
 
 
 def check(name: str, condition: bool, detail: str = "") -> None:
@@ -54,37 +54,63 @@ def scenario(name: str) -> None:
     executed.append(name)
 
 
-def plan_targets() -> tuple[list[str], str]:
+def plan_pairs() -> tuple[list[tuple[str, str]], str]:
+    """(make_target, result_label) PAIRS from the canonical plan.
+
+    Deriving only the targets and inventing the labels is what made the
+    first version of this suite a negative fixture the gate accepted: every
+    "positive" case proved a weaker protocol than the one being shipped.
+    The expected answer must come from the authority, whole -- not half
+    from the authority and half from my imagination.
+    """
     raw = PLAN.read_bytes()
     doc = json.loads(raw.decode("utf-8"))
-    return [e["make_target"] for e in doc["targets"]], hashlib.sha256(raw).hexdigest()
+    return ([(e["make_target"], e["result_label"]) for e in doc["targets"]],
+            hashlib.sha256(raw).hexdigest())
 
 
-TARGETS, PLAN_DIGEST = plan_targets()
+PAIRS, PLAN_DIGEST = plan_pairs()
+TARGETS = [t for t, _ in PAIRS]
+LABELS = dict(PAIRS)
+CANONICAL_PLAN_PATH = "scripts/security/uh_execution_plan.json"
 
 
 def manifest(root: Path, *, targets=None, digest=None, scope="repository",
              schema="kai.uh-run/v1", states=None, evidence_root=None,
-             observations=None, passes=None) -> dict:
+             observations=None, passes=None, labels=None, positions=None,
+             exits=None, results=None, population=None,
+             plan_path=None) -> dict:
+    """A manifest whose defaults SATISFY the production contract.
+
+    Labels default to the canonical plan's, so the known-positive is a real
+    known-positive. Every override exists to build one specific negative.
+    """
     targets = TARGETS if targets is None else targets
     slots = []
     for i, t in enumerate(targets):
         state = (states or {}).get(t, "COMPLETED")
         obs = (observations or {}).get(t, "RESOLVED" if state == "COMPLETED"
                                        else "NOT_OBSERVED")
-        result = ({"passed": (passes or {}).get(t, 50), "failed": 0}
-                  if obs == "RESOLVED" else None)
-        slots.append({"position": i, "make_target": t,
-                      "result_label": f"{t} label",
+        if results is not None and t in results:
+            result = results[t]
+        elif obs == "RESOLVED":
+            result = {"passed": (passes or {}).get(t, 50), "failed": 0}
+        else:
+            result = None
+        slots.append({"position": (positions or {}).get(t, i),
+                      "make_target": t,
+                      "result_label": (labels or {}).get(t, LABELS.get(t, "?")),
                       "execution_state": state, "result_observation": obs,
-                      "exit_code": 0 if state == "COMPLETED" else 1,
+                      "exit_code": (exits or {}).get(
+                          t, 0 if state == "COMPLETED" else 1),
                       "result": result, "refusal": None})
     return {"schema": schema,
             "plan_digest": PLAN_DIGEST if digest is None else digest,
-            "plan_path": "scripts/security/uh_execution_plan.json",
+            "plan_path": CANONICAL_PLAN_PATH if plan_path is None else plan_path,
             "plan_scope": scope,
             "evidence_root": str(evidence_root or root),
-            "population": len(slots), "slots": slots}
+            "population": len(slots) if population is None else population,
+            "slots": slots}
 
 
 def floors_v2(targets, value=10, schema="kai.uh-floors/v2") -> dict:
@@ -422,6 +448,184 @@ def test_fallen_floor_is_a_finding_not_a_refusal():
               str(out.get("fallen")))
 
 
+# ── X-AH: the target-bound result contract ───────────────────────────
+#
+# These exist because the first version of this suite did NOT have them,
+# and its own positive fixture carried fabricated result labels that the
+# gate adjudicated cleanly. X is that exact recovered defect.
+
+def test_result_label_mismatch():
+    """X — the recovered incident. Correct target, wrong contracted label."""
+    scenario("X-label-mismatch")
+    with tempfile.TemporaryDirectory() as d:
+        tmp = Path(d)
+        victim = TARGETS[7]
+        root = build(tmp, man=lambda r: manifest(
+            r, labels={victim: f"{victim} label"}))
+        refused("X fabricated result_label", "RESULT_CONTRACT_CONFLICT",
+                root, tmp / "floors.json")
+
+
+def test_every_label_fabricated_is_refused():
+    """X2 — the literal shape of the old fixture must now be rejected."""
+    scenario("X2-all-labels-fabricated")
+    with tempfile.TemporaryDirectory() as d:
+        tmp = Path(d)
+        root = build(tmp, man=lambda r: manifest(
+            r, labels={t: f"{t} label" for t in TARGETS}))
+        refused("X2 every label fabricated", "RESULT_CONTRACT_CONFLICT",
+                root, tmp / "floors.json")
+
+
+def test_wrong_ordinal():
+    scenario("Y-wrong-ordinal")
+    with tempfile.TemporaryDirectory() as d:
+        tmp = Path(d)
+        root = build(tmp, man=lambda r: manifest(
+            r, positions={TARGETS[9]: 0}))
+        refused("Y wrong ordinal", "MANIFEST_INVALID",
+                root, tmp / "floors.json")
+
+
+def test_completed_with_nonzero_exit():
+    scenario("Z-completed-nonzero-exit")
+    with tempfile.TemporaryDirectory() as d:
+        tmp = Path(d)
+        root = build(tmp, man=lambda r: manifest(r, exits={TARGETS[2]: 1}))
+        refused("Z COMPLETED with exit 1", "MANIFEST_INVALID",
+                root, tmp / "floors.json")
+
+
+def test_missing_passed():
+    scenario("AA-missing-passed")
+    with tempfile.TemporaryDirectory() as d:
+        tmp = Path(d)
+        root = build(tmp, man=lambda r: manifest(
+            r, results={TARGETS[1]: {"failed": 0}}))
+        refused("AA no passed", "RESULT_CONTRACT_CONFLICT",
+                root, tmp / "floors.json")
+
+
+def test_invalid_passed():
+    scenario("AB-invalid-passed")
+    for label, value in (("True", True), ("string", "50"), ("negative", -1),
+                         ("float", 1.5), ("null", None)):
+        with tempfile.TemporaryDirectory() as d:
+            tmp = Path(d)
+            root = build(tmp, man=lambda r: manifest(
+                r, results={TARGETS[1]: {"passed": value, "failed": 0}}))
+            refused(f"AB passed={label}", "RESULT_CONTRACT_CONFLICT",
+                    root, tmp / "floors.json")
+
+
+def test_missing_failed():
+    scenario("AC-missing-failed")
+    with tempfile.TemporaryDirectory() as d:
+        tmp = Path(d)
+        root = build(tmp, man=lambda r: manifest(
+            r, results={TARGETS[1]: {"passed": 50}}))
+        refused("AC no failed", "RESULT_CONTRACT_CONFLICT",
+                root, tmp / "floors.json")
+
+
+def test_invalid_failed():
+    scenario("AD-invalid-failed")
+    for label, value in (("True", True), ("string", "0"), ("negative", -1),
+                         ("float", 0.0), ("null", None)):
+        with tempfile.TemporaryDirectory() as d:
+            tmp = Path(d)
+            root = build(tmp, man=lambda r: manifest(
+                r, results={TARGETS[1]: {"passed": 50, "failed": value}}))
+            refused(f"AD failed={label}", "RESULT_CONTRACT_CONFLICT",
+                    root, tmp / "floors.json")
+
+
+def test_resolved_result_reports_failures():
+    """AE — a green aggregate contradicting its own per-target tally."""
+    scenario("AE-result-reports-failures")
+    with tempfile.TemporaryDirectory() as d:
+        tmp = Path(d)
+        root = build(tmp, man=lambda r: manifest(
+            r, results={TARGETS[4]: {"passed": 50, "failed": 1}}))
+        rc, out = run_gate(root, tmp / "floors.json")
+        check("AE refuses", rc == 2, f"rc={rc}")
+        check("AE -> RESULT_CONTRACT_CONFLICT",
+              out.get("refusal", {}).get("code") == "RESULT_CONTRACT_CONFLICT",
+              str(out.get("refusal")))
+        check("AE never adjudicates the passed count",
+              "fallen" not in out and "counts" not in out, str(out.keys()))
+
+
+def test_population_lies():
+    scenario("AF-population-lies")
+    with tempfile.TemporaryDirectory() as d:
+        tmp = Path(d)
+        root = build(tmp, man=lambda r: manifest(r, population=77))
+        refused("AF population lies", "MANIFEST_INVALID",
+                root, tmp / "floors.json")
+
+
+def test_population_not_an_integer():
+    scenario("AF2-population-bool")
+    with tempfile.TemporaryDirectory() as d:
+        tmp = Path(d)
+        root = build(tmp, man=lambda r: manifest(r, population=True))
+        refused("AF2 population is bool", "MANIFEST_INVALID",
+                root, tmp / "floors.json")
+
+
+def test_plan_path_lies():
+    scenario("AG-plan-path-lies")
+    with tempfile.TemporaryDirectory() as d:
+        tmp = Path(d)
+        root = build(tmp, man=lambda r: manifest(
+            r, plan_path="scripts/security/some_other_plan.json"))
+        refused("AG plan_path lies", "MANIFEST_INVALID",
+                root, tmp / "floors.json")
+
+
+def test_plan_validator_known_negatives():
+    """AH — the plan validator itself, without touching the live plan."""
+    scenario("AH-plan-validator")
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "g", REPO / "scripts" / "security" / "uh_floor_gate.py")
+    g = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(g)
+    good = {"make_target": "test-x", "result_label": "X Tests"}
+    cases = [
+        ("missing make_target", {"schema": "kai.uh-plan/v1",
+                                 "targets": [{"result_label": "X"}]}),
+        ("empty make_target", {"schema": "kai.uh-plan/v1",
+                               "targets": [{"make_target": "",
+                                            "result_label": "X"}]}),
+        ("missing result_label", {"schema": "kai.uh-plan/v1",
+                                  "targets": [{"make_target": "test-x"}]}),
+        ("empty result_label", {"schema": "kai.uh-plan/v1",
+                                "targets": [{"make_target": "test-x",
+                                             "result_label": ""}]}),
+        ("duplicate target", {"schema": "kai.uh-plan/v1",
+                              "targets": [good, dict(good)]}),
+        ("unknown schema", {"schema": "kai.uh-plan/v9", "targets": [good]}),
+        ("empty targets", {"schema": "kai.uh-plan/v1", "targets": []}),
+        ("entry not object", {"schema": "kai.uh-plan/v1", "targets": ["x"]}),
+        ("not an object", ["not", "a", "dict"]),
+    ]
+    for name, doc in cases:
+        try:
+            g.validate_plan(doc)
+            check(f"AH {name} refuses", False, "accepted a malformed plan")
+        except g.Refusal as exc:
+            check(f"AH {name} refuses", exc.code == "PLAN_INVALID", exc.code)
+    # known-negative: the real plan must still validate
+    try:
+        entries = g.validate_plan(json.loads(PLAN.read_text()))
+        check("AH the canonical plan still validates", len(entries) == 78,
+              str(len(entries)))
+    except g.Refusal as exc:
+        check("AH the canonical plan still validates", False, str(exc))
+
+
 def run() -> None:
     test_root_absent()
     test_root_relative()
@@ -447,6 +651,19 @@ def run() -> None:
     test_root_plus_update_floors_refused()
     test_clean_run_adjudicates()
     test_fallen_floor_is_a_finding_not_a_refusal()
+    test_result_label_mismatch()
+    test_every_label_fabricated_is_refused()
+    test_wrong_ordinal()
+    test_completed_with_nonzero_exit()
+    test_missing_passed()
+    test_invalid_passed()
+    test_missing_failed()
+    test_invalid_failed()
+    test_resolved_result_reports_failures()
+    test_population_lies()
+    test_population_not_an_integer()
+    test_plan_path_lies()
+    test_plan_validator_known_negatives()
 
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",
           len(executed) == EXPECTED_SCENARIOS,

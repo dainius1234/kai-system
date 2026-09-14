@@ -143,13 +143,42 @@ def load_canonical_plan() -> Tuple[List[dict], str]:
         doc = json.loads(raw.decode("utf-8"))
     except (ValueError, UnicodeDecodeError) as exc:
         raise Refusal("PLAN_INVALID", f"plan unreadable: {exc}")
+    return validate_plan(doc), digest
+
+
+def validate_plan(doc: object) -> List[dict]:
+    """Validate the ONE canonical plan. This creates no second population.
+
+    The consumer does not assume the runner already checked this. Two
+    components reading one authority must each satisfy themselves it is
+    well-formed, or a malformed plan is only caught by whichever happens
+    to look first.
+    """
+    if not isinstance(doc, dict):
+        raise Refusal("PLAN_INVALID", "plan is not an object")
     if doc.get("schema") != PLAN_SCHEMA:
         raise Refusal("PLAN_INVALID",
                       f"unknown plan schema {doc.get('schema')!r}")
     entries = doc.get("targets")
     if not isinstance(entries, list) or not entries:
         raise Refusal("PLAN_INVALID", "plan declares no targets")
-    return entries, digest
+    seen = set()
+    for i, e in enumerate(entries):
+        if not isinstance(e, dict):
+            raise Refusal("PLAN_INVALID", f"plan entry {i} is not an object")
+        target, label = e.get("make_target"), e.get("result_label")
+        if not isinstance(target, str) or not target:
+            raise Refusal("PLAN_INVALID",
+                          f"plan entry {i} has no usable make_target")
+        if not isinstance(label, str) or not label:
+            raise Refusal("PLAN_INVALID",
+                          f"plan entry {i} ({target}) has no usable "
+                          f"result_label")
+        if target in seen:
+            raise Refusal("PLAN_INVALID",
+                          f"plan repeats target {target!r}")
+        seen.add(target)
+    return entries
 
 
 # ── 6/7. the manifest, and its reconciliation with the plan ──────────
@@ -191,9 +220,31 @@ def load_manifest(path: Path, root: Path, plan: List[dict],
                       f"not match the canonical plan's raw-byte sha256 "
                       f"{plan_digest}")
 
+    declared_path = doc.get("plan_path")
+    canonical_rel = str(CANONICAL_PLAN.relative_to(REPO))
+    if declared_path != canonical_rel:
+        raise Refusal("MANIFEST_INVALID",
+                      f"manifest plan_path is {declared_path!r}, not the "
+                      f"canonical {canonical_rel!r}. A correct scope and "
+                      f"digest do not entitle a false provenance field to "
+                      f"travel as trustworthy evidence.")
+
     slots = doc.get("slots")
     if not isinstance(slots, list):
         raise Refusal("MANIFEST_INVALID", "manifest carries no slots")
+
+    population = doc.get("population")
+    if isinstance(population, bool) or not isinstance(population, int):
+        raise Refusal("MANIFEST_INVALID",
+                      f"manifest population {population!r} is not an integer")
+    if population != len(plan):
+        raise Refusal("MANIFEST_INVALID",
+                      f"manifest declares population {population}, the "
+                      f"canonical plan declares {len(plan)}")
+    if population != len(slots):
+        raise Refusal("MANIFEST_INVALID",
+                      f"manifest declares population {population} but carries "
+                      f"{len(slots)} slots")
 
     expected = [e["make_target"] for e in plan]
     got = [s.get("make_target") for s in slots]
@@ -236,27 +287,92 @@ def load_manifest(path: Path, root: Path, plan: List[dict],
     return slots
 
 
-def coherent_with_status(slots: List[dict]) -> None:
-    """A zero authoritative status must agree with the slot states.
+def _count(value: object, field: str, target: str) -> int:
+    """A count, or a governed refusal. Never a TypeError.
 
-    This is a coherence check in ONE direction only. It can refuse; it can
-    never supply a status the sidecar did not give, and it is reached only
-    after the sidecar has already been read and found to be zero.
+    `bool` is excluded explicitly because it is an `int` in Python, and
+    `True` would otherwise pass as the number 1 — a count that is really a
+    flag, which is the shape of defect this gate exists to catch.
     """
-    bad = [s["make_target"] for s in slots
-           if s["execution_state"] != "COMPLETED"]
-    if bad:
-        raise Refusal("MANIFEST_INVALID",
-                      f"the authoritative status is 0, but {len(bad)} target(s) "
-                      f"are not COMPLETED: {bad[:5]}"
-                      + (" …" if len(bad) > 5 else ""))
-    unresolved = [s["make_target"] for s in slots
-                  if s.get("result_observation") != "RESOLVED"
-                  or not isinstance(s.get("result"), dict)]
-    if unresolved:
+    if isinstance(value, bool) or not isinstance(value, int):
         raise Refusal("RESULT_CONTRACT_CONFLICT",
-                      f"completed target(s) without a resolved result: "
-                      f"{unresolved[:5]}" + (" …" if len(unresolved) > 5 else ""))
+                      f"{target}: result {field} is {value!r}, not an integer")
+    if value < 0:
+        raise Refusal("RESULT_CONTRACT_CONFLICT",
+                      f"{target}: result {field} is {value}, which is negative")
+    return value
+
+
+def reconcile(slots: List[dict], plan: List[dict]) -> Dict[str, int]:
+    """Prove every slot is the target-bound result the plan asked for.
+
+    Reached only after the authoritative sidecar has been read and found
+    to be zero. Identity is checked BY ORDINAL against the canonical plan:
+    a slot must carry the plan's target AND the plan's exact result_label.
+
+    The label check is the frozen invariant -- every population member
+    proves one exact TARGET-BOUND assertion result. Without it a manifest
+    could present a count under a label the plan never declared, and the
+    count would be adjudicated anyway. The first version of this gate did
+    exactly that, and its own positive fixture carried fabricated labels
+    that adjudicated cleanly.
+
+    Returns target -> passed, and nothing reaches the floor comparison
+    that has not come through here.
+    """
+    counts: Dict[str, int] = {}
+    for i, (slot, entry) in enumerate(zip(slots, plan)):
+        target = entry["make_target"]
+
+        if slot.get("position") != i:
+            raise Refusal("MANIFEST_INVALID",
+                          f"slot for {target} carries position "
+                          f"{slot.get('position')!r}, expected ordinal {i}")
+        if slot.get("make_target") != target:
+            raise Refusal("MANIFEST_INVALID",
+                          f"ordinal {i}: manifest {slot.get('make_target')!r}, "
+                          f"plan {target!r}")
+        if slot.get("result_label") != entry["result_label"]:
+            raise Refusal("RESULT_CONTRACT_CONFLICT",
+                          f"{target}: manifest result_label "
+                          f"{slot.get('result_label')!r} is not the plan's "
+                          f"{entry['result_label']!r}. The count is not bound "
+                          f"to the contracted result.")
+        if slot.get("execution_state") != "COMPLETED":
+            raise Refusal("MANIFEST_INVALID",
+                          f"the authoritative status is 0, but {target} is "
+                          f"{slot.get('execution_state')!r}")
+        if slot.get("exit_code") != 0:
+            raise Refusal("MANIFEST_INVALID",
+                          f"{target} is COMPLETED with exit_code "
+                          f"{slot.get('exit_code')!r}")
+        if slot.get("result_observation") != "RESOLVED":
+            raise Refusal("RESULT_CONTRACT_CONFLICT",
+                          f"{target} is COMPLETED but its result observation "
+                          f"is {slot.get('result_observation')!r}")
+
+        result = slot.get("result")
+        if not isinstance(result, dict):
+            raise Refusal("RESULT_CONTRACT_CONFLICT",
+                          f"{target}: result is {result!r}, not an object")
+        if "passed" not in result:
+            raise Refusal("RESULT_CONTRACT_CONFLICT",
+                          f"{target}: result carries no `passed`")
+        if "failed" not in result:
+            raise Refusal("RESULT_CONTRACT_CONFLICT",
+                          f"{target}: result carries no `failed`")
+
+        passed = _count(result["passed"], "passed", target)
+        failed = _count(result["failed"], "failed", target)
+        if failed != 0:
+            # A green aggregate contradicting its own per-target tally must
+            # fail closed. Quietly using `passed` and ignoring `failed`
+            # would adjudicate a floor against a run that reported failures.
+            raise Refusal("RESULT_CONTRACT_CONFLICT",
+                          f"{target} reports {failed} failed while the "
+                          f"authoritative aggregate status is 0")
+        counts[target] = passed
+    return counts
 
 
 # ── 8. floors ────────────────────────────────────────────────────────
@@ -386,7 +502,7 @@ def main() -> int:
 
         plan, plan_digest = load_canonical_plan()
         slots = load_manifest(manifest_path, root, plan, plan_digest)
-        coherent_with_status(slots)
+        counts = reconcile(slots, plan)
 
         floors = load_floors(args.floors)
         P = {e["make_target"] for e in plan}
@@ -407,8 +523,9 @@ def main() -> int:
               else f"REFUSED ({r.code}): {r.message}")
         return 2
 
-    # ── 9. findings. Counts come from the manifest, never from run.log ──
-    counts = {s["make_target"]: s["result"]["passed"] for s in slots}
+    # ── 9. findings. Every count came through reconcile(), so each is
+    #      bound to the plan's exact result_label for that ordinal. Nothing
+    #      is read from run.log. ──
     fallen = [f"{t}: {floors[t]} → {counts[t]} ({counts[t] - floors[t]})"
               for t in sorted(floors) if counts[t] < floors[t]]
     unfloored = sorted(P - F)
