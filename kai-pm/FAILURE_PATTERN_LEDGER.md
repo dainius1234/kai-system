@@ -1671,3 +1671,227 @@ shape recorded at `INC-2026-08-29-10` and `INC-2026-09-12-14` stands at two
 preserved occurrences, unchanged here; `INC-2026-09-14-16` is NOT counted
 toward it, because its equivalence to that shape has not been adjudicated and
 resemblance is not a mechanism.
+
+---
+
+# APPEND 2026-09-14 (second) — a verification attached to the wrong tree,
+#                              and a contract the gate never checked
+
+Both found in the WF-3 shadow floor-consumer tranche. Neither reached
+production. The first misstated verification evidence for a banked commit;
+the second would have let floor counts be adjudicated without proving they
+belonged to the contracted result.
+
+
+### `INC-2026-09-14-17` — a verification run against the working tree,
+###                       transmitted as verification of the committed tree
+
+```
+INCIDENT_ID             INC-2026-09-14-17
+date                    2026-09-14
+producer                Orion
+subject/version         commit 009cfadd27c0f47f149c841934055556a39f3098
+
+false_or_faulty_output  The commit message states, under VERIFIED HERE:
+                        "check-docs exit 0".
+                        Against that committed tree, `make check-docs` exits
+                        2: "PROJECT_BACKLOG.md stale -- tests 4759 -> 4783".
+
+corrected_output        The successful measurement was taken against a
+                        DIFFERENT SUBJECT: the working tree, which contained
+                        a generated change to docs/PROJECT_BACKLOG.md that
+                        was then omitted from an explicit `git add` file
+                        list. The commit added a test file; sync_docs.py
+                        patches the generated test count in TWO files; only
+                        one was staged. The transmitted verification claim
+                        was therefore attached to the wrong tree identity.
+                        Corrected at 79cd2dbc420741b3d65073d4f62ec83519e17c13.
+
+detection_method        Post-push `git status` showed a leftover modification,
+                        followed by an explicit check of the committed tree
+                        via stash. NOT caught by the verification that was
+                        supposed to catch it.
+
+affected_scope          WF-3 shadow documentation consistency only.
+
+downstream_impact       No production verdict. No programme decision. Caught
+                        before Kai accepted the tranche. The impact is
+                        bounded by those facts -- and they do not make the
+                        false exact-tree verification claim disappear, which
+                        is why it is recorded rather than left in the commit
+                        history alone.
+
+mechanism_status        INCIDENT_ONLY
+mechanism_id            none assigned
+related_incidents       `M-SCOPE-WIDEN` is cited here as a QUALIFIED LOCATOR
+                        ONLY: the measured subject and the transmitted
+                        subject differ, which is that mechanism's shape. The
+                        incident is NOT assigned to it. That equivalence
+                        would alter recurrence and escalation state for a
+                        PATTERN_CONFIRMED mechanism, and is an adjudication,
+                        not a producer's self-certification.
+recurrence_count        1 measured occurrence of this shape
+
+stop_signal             "I verified a working tree and am about to claim the
+                        commit passed -- prove the tested tree ID equals the
+                        tree I am transmitting."
+
+current_control         For WF-3 tranche commits: verify the COMMITTED tree
+                        after commit and before push or acceptance. Applied
+                        immediately at 53389986aa3f9d067be0bd4d429b6038e5dc2e1f,
+                        where check-docs and the full suite were both run
+                        against the committed tree.
+control_type            MANUAL -- a producer discipline, not an executing
+                        check. NOT operationalised programme-wide, and no
+                        such claim is made: it currently binds WF-3 tranche
+                        commits and nothing else.
+control_introduced_at   53389986aa3f9d067be0bd4d429b6038e5dc2e1f
+recurred_after_control  NO measured recurrence
+
+owner/stage             Orion (execution) · Kai (adjudication) · Dainius
+                        (consequential authority)
+status                  CLOSED AS AN IMPLEMENTATION INCIDENT. WF-3 remains
+                        OPEN. This is NOT the DOC-1 plus-run amplification;
+                        that is separate and still open. The incident here is
+                        VERIFIED SUBJECT != COMMITTED SUBJECT.
+```
+
+---
+
+### `INC-2026-09-14-18` — the consumer adjudicated counts it never bound to
+###                       the contracted result
+
+```
+INCIDENT_ID             INC-2026-09-14-18
+date                    2026-09-14
+producer                Orion
+subject/version         shadow plan-aware floor consumer
+                        scripts/security/uh_floor_gate.py and its calibration
+                        scripts/test_uh_floor_gate.py at
+                        009cfadd27c0f47f149c841934055556a39f3098
+
+false_or_faulty_output  The consumer accepted a green manifest whose slots
+                        carried fabricated result labels -- literally
+                        f"{make_target} label" -- unrelated to the
+                        result_label values declared in the canonical
+                        execution plan, and adjudicated floor counts from
+                        them.
+                        It validated schema, evidence root, plan scope, plan
+                        digest, target count, uniqueness, foreign and missing
+                        targets, order, execution-state shape, and that
+                        result_observation was RESOLVED -- and then read
+                        slot["result"]["passed"] directly. It never checked
+                        result_label, ordinal, the completed target's
+                        exit_code, or that passed and failed were sane
+                        non-boolean non-negative integers with failed == 0.
+                        THE FALSIFIER WAS INSIDE MY OWN FIXTURE. Every
+                        "positive" case in the calibration carried wrong
+                        labels and adjudicated cleanly, so the suite was
+                        proving a weaker protocol than the one being shipped.
+
+corrected_output        reconcile() now validates each slot per ordinal
+                        against the canonical plan entry: position,
+                        make_target, result_label, execution_state COMPLETED,
+                        exit_code 0, result_observation RESOLVED, result an
+                        object, passed and failed both present, both integers,
+                        neither bool, neither negative, failed == 0 under a
+                        zero authoritative status. Counts reach the floor
+                        comparison only through it, and a malformed field
+                        produces a governed refusal rather than a KeyError or
+                        TypeError. The plan is validated by the consumer
+                        itself; manifest population and plan_path must agree
+                        with the canonical plan. The fixture now derives
+                        (make_target, result_label) PAIRS from the plan, so
+                        the known-positive genuinely satisfies the contract.
+
+detection_method        Kai independent source review of uh_floor_gate.py and
+                        test_uh_floor_gate.py. NOT found by Orion, and not
+                        found by the calibration suite -- which contained the
+                        falsifier and passed anyway.
+
+affected_scope          Shadow floor consumer only. No production caller. The
+                        Makefile, workflow, legacy consumer and live floor
+                        registry remained on the old production path.
+
+downstream_impact       NONE realised. Had it been cut over, floor counts
+                        could have been adjudicated without proving the count
+                        was bound to the plan-declared exact result label, and
+                        without validating the reported result structure --
+                        which could alter admission and floor findings.
+
+mechanism_status        INCIDENT_ONLY
+mechanism_id            none assigned
+                        This is a compound contract-validation omission until
+                        evidence establishes anything stronger. No mechanism
+                        is invented for it.
+related_incidents       none asserted. I-8 -- evidence for a check coming from
+                        the same place as the thing it checks -- describes the
+                        fixture's shape, but it is doctrine, not a banked
+                        mechanism, and no equivalence is claimed.
+recurrence_count        1 measured occurrence of this shape
+
+stop_signal             "My positive fixture is half-derived from the
+                        authority and half invented -- and the invented half
+                        is the field the contract turns on."
+
+current_control         Full per-ordinal manifest/plan reconciliation, plus 13
+                        new destructive scenarios covering fabricated labels
+                        on one target and on all 78, wrong ordinal, COMPLETED
+                        with non-zero exit, missing and invalid passed and
+                        failed, a resolved result reporting failures,
+                        population and plan_path lying, and the plan validator
+                        against nine malformed documents. 217 assertions, 0
+                        failures, 37 scenarios, with the original
+                        known-negatives re-run and unweakened.
+control_type            STRUCTURAL -- SHADOW IMPLEMENTATION STRUCTURE WITH AN
+                        EXECUTING CALIBRATION SUITE, but NOT YET
+                        CONTROL_OPERATIONALISED: no production caller invokes
+                        the consumer, and the suite is not yet wired into any
+                        make target or CI workflow.
+control_introduced_at   53389986aa3f9d067be0bd4d429b6038e5dc2e1f
+recurred_after_control  NO measured recurrence
+
+owner/stage             Orion (execution) · Kai (adjudication) · Dainius
+                        (consequential authority)
+status                  CLOSED AS A SHADOW IMPLEMENTATION INCIDENT. WF-3
+                        remains OPEN. Production cutover, CI integration, the
+                        real-78 traversal and the floor migration all remain
+                        held.
+```
+
+---
+
+## Ledger state after this append
+
+| id | producer | mechanism_status | assigned mechanism |
+|---|---|---|---|
+| `INC-2026-08-29-01` … `-03` | Orion | `PATTERN_CONFIRMED` | `M-SCOPE-WIDEN` |
+| `INC-2026-08-29-04` `-05` | Orion | `INCIDENT_ONLY` | none |
+| `INC-2026-08-29-06` | Kai | `INCIDENT_ONLY` | none — locator only |
+| `INC-2026-08-29-07` `-08` | DeepSeek | `INCIDENT_ONLY` | none |
+| `INC-2026-08-29-09` `-10` | Orion | `INCIDENT_ONLY` | none |
+| `INC-2026-08-29-11` | Kai | `INCIDENT_ONLY` | none |
+| `INC-2026-08-30-12` | Orion | `PATTERN_CANDIDATE` | `M-QUERY-OVERREACH` |
+| `INC-2026-09-12-13` | Orion | `PATTERN_CANDIDATE` | none assigned |
+| `INC-2026-09-12-14` | Orion | `PATTERN_CANDIDATE` | none assigned |
+| `INC-2026-09-14-15` | Orion | `INCIDENT_ONLY` | none assigned |
+| `INC-2026-09-14-16` | Orion | `INCIDENT_ONLY` | none assigned |
+| `INC-2026-09-14-17` | Orion | `INCIDENT_ONLY` | none assigned — `M-SCOPE-WIDEN` locator only |
+| `INC-2026-09-14-18` | Orion | `INCIDENT_ONLY` | none assigned |
+
+**Producers: Orion 14 · Kai 2 · DeepSeek 2. Total incidents 18.** The counts
+carry no fairness, quality or producer-reliability inference; they are the
+currently recorded population and nothing more.
+
+**Mechanisms: `M-SCOPE-WIDEN` `PATTERN_CONFIRMED` · `M-PRODUCER-CURATION`
+`PATTERN_CANDIDATE` · `P-ADJUDICATOR-PROPAGATION` `PATTERN_CANDIDATE` ·
+`M-QUERY-OVERREACH` `PATTERN_CANDIDATE`.** Unchanged by this append. No
+confirmed mechanism's recurrence count is altered. `INC-2026-09-14-17` cites
+`M-SCOPE-WIDEN` as a LOCATOR and is NOT assigned to it, so that mechanism's
+recurrence count and escalation state are untouched.
+
+**Escalation state.** Doctrine 49.6 fires on the third independently
+confirmed occurrence of ONE mechanism. Neither incident in this append is
+assigned to a mechanism, so neither advances any escalation. The
+independence / common-authority locator shape at `INC-2026-08-29-10` and
+`INC-2026-09-12-14` still stands at two preserved occurrences, unchanged.
