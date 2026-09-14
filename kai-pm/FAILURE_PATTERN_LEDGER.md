@@ -1076,3 +1076,345 @@ more.
 `PATTERN_CANDIDATE` · `P-ADJUDICATOR-PROPAGATION` `PATTERN_CANDIDATE` ·
 `M-QUERY-OVERREACH` `PATTERN_CANDIDATE`.** Three of the four are
 candidates. None is `CONTROL_OPERATIONALISED`.
+
+---
+
+# APPEND 2026-09-12 — a fabricated admissibility input, and a common-source
+#                      independence claim about its repair
+
+Two incidents, one producer, one session. The first is the defect the repair
+addressed; the second is a false claim made about the evidence for that
+repair, caught by external review before this append and before merge.
+
+Both are PATTERN_CANDIDATE with no mechanism assigned. Resemblance is a
+locator; equivalence has not been earned.
+
+
+### `INC-2026-09-12-13` — a gate's refusal branch made unreachable by a
+###                       fabricated input, and tested through a different door
+
+```
+INCIDENT_ID             INC-2026-09-12-13
+date                    2026-09-12 (defect present since the gate was
+                        authored; first measured consequence 2026-09-10)
+producer                Orion — the gate, its floors file, its test suite and
+                        the workflow that calls it were authored together in
+                        one stint (DECISIONS.md:3588). The same producer wrote
+                        the check and the evidence that it worked
+subject/version         scripts/security/check_assertion_floors.py at 1009f31
+                        .github/workflows/unified-hunter.yml at 1009f31
+
+false_or_faulty_output  On 1009f31 `make test-uh` exited 2, halting at
+                        prerequisite 61 of 78 (Makefile:970,
+                        test-container-proof-harness). The gate's report step
+                        published:
+                          "missing": ["Depends-On Readiness Tests",
+                                      "Healthcheck Runnable Tests",
+                                      "Policy Loader Tests",
+                                      "Shipped Package Deps Tests",
+                                      "Suite Floor Tests"]
+                        Those five are targets 74-78. They did not erode; they
+                        never started. A run that STOPPED was published as a
+                        surface that ERODED — two different problems with two
+                        different fixes
+
+corrected_output        `--from-log PATH` now derives admissibility from the
+                        bound `PATH.status`. A non-zero aggregate status
+                        refuses adjudication BEFORE floor comparison and omits
+                        the semantic finding buckets entirely — fallen,
+                        missing, unrecorded and drifted are absent from the
+                        payload rather than empty, because an empty list
+                        asserts an adjudicated finding of none. A zero,
+                        admissible status still executes the erosion
+                        comparison and still exposes the five never-run suites
+                        as `missing`. The refusal gates the detector; it does
+                        not switch it off
+
+mechanism (proposed,    `--from-log` bound the aggregate's exit status to the
+ NOT self-certified)    literal 0:
+                            output, status = args.from_log.read_text(...), 0
+                        so the `status != 0` refusal branch was UNREACHABLE on
+                        the only path CI used. That branch's prose had never
+                        executed in CI.
+                        The second half is why it survived a suite written to
+                        stop this gate eroding:
+                        test_a_failing_aggregate_run_is_reported_as_itself
+                        monkey-patched `run_suites`, which always carried the
+                        true status. THE TEST AND THE CI CALL SITE USED
+                        DIFFERENT DOORS. The gate's own docstring lists five
+                        checks that quietly stopped checking and three rules
+                        written to stop it becoming case 6. This is case 6,
+                        and those rules did not see it because they guard the
+                        comparison, not the admissibility of its input
+
+detection_method        Investigation of an unrelated CI failure (RC-7),
+                        during which the report-step payload was read rather
+                        than assumed. Not detected by any gate, test or review
+
+evidence                EVIDENCE INDEPENDENCE — STATED EXPLICITLY.
+                        Runner step conclusion and the .status sidecar agreed
+                        on aggregate status 2. These are TWO MANIFESTATIONS OF
+                        THE SAME status-capture mechanism, not independent
+                        producers: both descend from one shell `status`
+                        variable, which feeds the sidecar and `exit "$status"`
+                        alike. Their agreement is arithmetic, not
+                        corroboration. See INC-2026-09-12-14.
+
+                        Producer correctness is supported SEPARATELY, by
+                        controlled calibration of the capture itself —
+                        removing `pipefail` against a failing subject yields
+                        sidecar 0 AND a green step, exposing the common-mode
+                        dependency; removing `|| status=$?` yields no sidecar
+                        at all — and by subject-failure evidence present in
+                        the log body upstream of the status variable:
+                          setpriv: setresuid failed: Operation not permitted
+                          Container proof: 3 passed, 13 failed
+                          EXIT GATE: FAIL — status remains UNKNOWN
+                          subprocess.TimeoutExpired: ...
+                          make: *** [Makefile:970: ...] Error 1
+                        THE PRODUCTION GATE DOES NOT CONSUME THOSE WITNESSES.
+                        They corroborate producer truth retrospectively for
+                        evidential review; they are NOT an operating
+                        cross-check.
+
+                        The status 2/0 injection pair on one log demonstrates
+                        a DIFFERENT property — consumer gating with the
+                        erosion detector retained. It does not validate
+                        producer status truth. `"Assertion Floor Tests": 80`
+                        in the CI counts shows the current gate code executed
+                        on the runner; it does not authenticate the status.
+
+                        1009f31: run 34491294245 / job 102918401237 — the five
+                          published as `missing` against exit 2
+                        3d84d2d: run 34631061383 / job 103367725885 — same
+                          output; the status was recorded, nothing read it
+                        0545536: run 34699510366 / job 103568657812 — suite
+                          step exit 2, job RED, report step SUCCESS, payload
+                          aggregate_status 2 / admissible false /
+                          adjudicated false / refusal.code
+                          aggregate_incomplete, and NONE of missing, fallen,
+                          unrecorded, drifted
+
+affected_scope          The `--from-log` adjudication path only. Verified from
+                        the diff, not asserted: no hunk touches parse_counts,
+                        load_floors, compare, check_determinism,
+                        SUITE_TARGETS or run_suites. assertion_floors.json
+                        unchanged across 1009f31 -> 0545536. No floor value
+                        modified
+
+downstream_impact       No programme decision is known to have been taken on
+                        the false `missing` output. It was published to the CI
+                        log on at least three runs and read by Orion, Kai and
+                        Dainius during the RC-7 investigation before being
+                        identified
+
+mechanism_status        PATTERN_CANDIDATE
+mechanism_id            none assigned
+                        Candidate hypothesis preserved: an evidence /
+                        admissibility input was fabricated at the caller
+                        boundary, making the refusal branch unreachable, while
+                        the test intended to protect that behaviour exercised
+                        another entry path carrying the true status.
+                        Equivalence to I-8, to the self-consuming-guard
+                        family, or to any existing mechanism is NOT
+                        established. Those remain LOCATORS ONLY
+
+related_incidents       INC-2026-09-12-14 — the false independence claim made
+                        about this incident's own closure evidence
+                        INC-2026-08-29-09 (a control asserted as a current
+                        output, never checked) — EXPLICITLY QUALIFIED LOCATOR.
+                        No equivalence implied
+
+recurrence_count        1 measured occurrence of this candidate shape
+
+stop_signal             "the refusal text exists, therefore the refusal
+                        happens." The tell: prose in a branch, with no
+                        execution path from the caller that matters
+
+current_control         W2.1 3d84d2d — the CI step records the aggregate's
+                          exit status beside the log, and `exit "$status"`
+                          leaves the step's own conclusion unchanged
+                        W2.2 0545536 — `--from-log PATH` derives PATH.status
+                          and refuses without it. Five states: S0 adjudicate ·
+                          S1 aggregate_incomplete · S2
+                          required_input_missing · S3 status_unreadable ·
+                          S4 status_authority_conflict. `--status N` is an
+                          alternate authority, never a fallback, and cannot
+                          overrule the sidecar
+
+control_type            MACHINE — 8 permanent scenarios, each with a
+                        known-negative, plus a frozen hand-written fixture of
+                        the recovered incident. The load-bearing calibration
+                        is the status-2 / status-0 pair on one log: it proves
+                        the control gates admissibility WITHOUT disabling the
+                        detector it gates. EXPECTED_SCENARIOS 28, derived by
+                        running the suite and reading the population back
+control_introduced_at   3d84d2d (producer) · 0545536 (consumer + calibration)
+recurred_after_control  no
+
+THREAT-MODEL BOUNDARY (Kai, 2026-09-12, verbatim — this closure may not be
+read more widely than this):
+  "WF-2 closes the fabricated-status defect for the same-job CI
+  accidental-failure model. The log/status pair is process-bound evidence
+  generated by the same workflow step; W2.2 does not claim cryptographic
+  co-identity or protection against deliberate post-production tampering."
+
+NOT CLOSED BY THIS ENTRY — separate findings, not interchangeable:
+  WF-2R  `--from-log --update-floors` retains the legacy unbound capability.
+         Containment: no production repository caller exercises that
+         combination (Makefile:402 uses run_suites()). OPEN. No D-number
+  WF-3   The population is inferred lexically. False admission measured
+         ("Container proof": 3, the subject's own tally); false exclusion
+         measured (`Service identity (ed25519) tests` 80, `/observe_turn
+         identity slice` 43 — in neither bucket). 15 suites print tallies
+         with no floor. OPEN, DESIGN ONLY. The 15 must not be auto-floored
+  RC-7   Why the aggregate actually fails. 7a privilege-transition
+         assumption · 7b timeout-boundary control defect · 7c scenario does
+         not establish its named precondition. Reproduces identically at
+         0545536. OPEN
+  DOC-1  sync_docs.py backlog suffix self-amplification. OPEN
+
+owner/stage             Orion (execution) · Kai (adjudication) · Dainius
+                        (consequential authority)
+status                  WF-2 ORIGINAL IMPLEMENTATION DEFECT CLOSED, bounded as
+                        above. Mechanism remains a candidate
+```
+
+---
+
+### `INC-2026-09-12-14` — common-source observations reported as independent
+###                       evidence
+
+```
+INCIDENT_ID             INC-2026-09-12-14
+date                    2026-09-12
+producer                Orion
+subject/version         WF-2 closure evidence for 0545536; run 34699510366 /
+                        job 103568657812
+
+false_or_faulty_output  "The binding is from two independent producers."
+                        Earlier instance of the same error in the W2.2 CI
+                        evidence return: "the two halves of the evidence unit
+                        agree, from two different producers." Both described
+                        the GitHub step conclusion and the .status sidecar as
+                        independent corroboration of aggregate status 2
+
+corrected_output        NOT INDEPENDENT. Both descend from a single computed
+                        node:
+                          make test-uh | tee  ->  pipeline status
+                                              ->  status variable
+                                              ->  (a) .status sidecar
+                                              ->  (b) exit "$status"
+                                                      -> step conclusion
+                        Their agreement is arithmetic, not corroboration.
+                        Separate retrospective corroboration of
+                        O_subject = FAIL does exist, from a different
+                        authority: the subject's own stderr and tally, and
+                        make's own error line, all written to the log body
+                        upstream of the status variable. The production gate
+                        does not consume them
+
+detection_method        External adversarial review reconstructed the causal
+                        graph and applied Orion's OWN destructive calibration
+                        as the falsifier. Not detected by Orion, who had
+                        measured the falsifier, recorded it in the W2.1 commit
+                        message as the reason the line is load-bearing, and
+                        then published the independence claim regardless
+
+evidence                Common-source graph above.
+                        Falsifier, measured: remove `set -o pipefail` against
+                        a failing subject — `tee` returns 0, captured status
+                        becomes 0, sidecar reads 0, the script exits 0, and
+                        the GitHub step reports GREEN. Both alleged
+                        independent observations agree, and both are wrong
+                        about the failing subject.
+                        Independent subject-truth witnesses, upstream of
+                        $status, present in job 103568657812:
+                          setpriv: setresuid failed: Operation not permitted
+                          Container proof: 3 passed, 13 failed
+                          EXIT GATE: FAIL
+                          subprocess.TimeoutExpired: ...
+                          make: *** [Makefile:970: ...] Error 1
+
+affected_scope          WF-2 closure evidence WORDING only. No production code
+                        path, no gate behaviour, no test
+
+downstream_impact       Could have overstated the strength of the closure
+                        evidence in an append-only authoritative record.
+                        Caught before ledger banking and before merge. No
+                        programme decision rests on the false wording
+
+mechanism_status        PATTERN_CANDIDATE
+mechanism_id            none assigned
+                        Two preserved occurrences of the
+                        independence / common-authority shape now exist
+                        (INC-2026-08-29-10 and this). Causal equivalence is
+                        NOT declared from resemblance. THIRD-OCCURRENCE
+                        ESCALATION HAS NOT FIRED
+
+related_incidents       INC-2026-08-29-10 — reproducibility reported as
+                        independence. Same governing stop-signal. That entry
+                        already records "THE CONTROL EXISTED, WAS BANKED, AND
+                        DID NOT FIRE." This is the second time that same
+                        banked control did not fire
+                        INC-2026-09-12-13 — the incident whose closure
+                        evidence carried this false claim
+
+recurrence_count        2 preserved occurrences of the candidate shape
+
+stop_signal             "I am writing 'independent' — name the authority
+                        behind each leg." Present in CLAUDE.md R0 at the time
+                        of the failure, and quoted by Orion in the reviewer
+                        brief that solicited this very challenge
+
+current_control         doctrine 39 — NAME THE AUTHORITY BEHIND EVERY
+                        INDEPENDENCE CLAIM; rule 33's `independence_status`
+                        field; CLAUDE.md R0 tell as above
+control_type            MANUAL
+control_introduced_at   banked prior to 2026-08-29 (see INC-2026-08-29-10)
+recurred_after_control  YES
+
+owner/stage             Orion (producer) · Kai (adjudication) · Dainius
+                        (consequential authority)
+status                  CLOSED as an incident. Implementation unaffected — no
+                        code change is authorised or required by this
+                        incident. WF-2 remains CLOSED, narrowly scoped
+```
+
+---
+
+## Ledger state after this append
+
+| id | producer | mechanism_status | assigned mechanism |
+|---|---|---|---|
+| `INC-2026-08-29-01` … `-03` | Orion | `PATTERN_CONFIRMED` | `M-SCOPE-WIDEN` |
+| `INC-2026-08-29-04` `-05` | Orion | `INCIDENT_ONLY` | none |
+| `INC-2026-08-29-06` | Kai | `INCIDENT_ONLY` | none — locator only |
+| `INC-2026-08-29-07` `-08` | DeepSeek | `INCIDENT_ONLY` | none |
+| `INC-2026-08-29-09` `-10` | Orion | `INCIDENT_ONLY` | none |
+| `INC-2026-08-29-11` | Kai | `INCIDENT_ONLY` | none |
+| `INC-2026-08-30-12` | Orion | `PATTERN_CANDIDATE` | `M-QUERY-OVERREACH` |
+| `INC-2026-09-12-13` | Orion | `PATTERN_CANDIDATE` | none assigned |
+| `INC-2026-09-12-14` | Orion | `PATTERN_CANDIDATE` | none assigned |
+
+**Producers: Orion 10 · Kai 2 · DeepSeek 2. Total incidents 14.** The counts
+carry no fairness, quality or producer-reliability inference; they are the
+currently recorded population and nothing more.
+
+**Mechanisms: `M-SCOPE-WIDEN` `PATTERN_CONFIRMED` · `M-PRODUCER-CURATION`
+`PATTERN_CANDIDATE` · `P-ADJUDICATOR-PROPAGATION` `PATTERN_CANDIDATE` ·
+`M-QUERY-OVERREACH` `PATTERN_CANDIDATE`.** Unchanged by this append. No
+confirmed mechanism's recurrence count is altered: `-13` and `-14` are
+candidate locators and are assigned to no mechanism.
+
+**Escalation state.** INC-2026-08-29-10 and INC-2026-09-12-14 are two
+preserved occurrences of an independence / common-authority locator shape
+under the same MANUAL control, which existed and did not fire on both
+occasions. Causal equivalence has NOT been adjudicated; these therefore do
+not yet constitute two confirmed occurrences of one mechanism for doctrine
+49.6. Third-occurrence escalation has NOT fired. If these incidents are
+later adjudicated as occurrences of one mechanism, a subsequent third
+independently confirmed occurrence of that same mechanism would trigger
+doctrine 49.6: the prose/manual control is presumed insufficient and must
+escalate to machine enforcement, structural constraint, or an explicit
+accepted-risk decision.
