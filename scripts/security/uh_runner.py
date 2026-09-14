@@ -29,7 +29,24 @@ result-contract conflict would say "the plan's contract is wrong" when the
 truth is "the subject failed before it could report". The contract is
 mandatory only for a target that exits 0.
 
-Exit codes:
+**The runner does not own the aggregate evidence.** That boundary is
+WF-2's and it is not this component's to cross:
+
+    the workflow shell owns    the aggregate run.log, and run.log.status
+                               captured from TOP-LEVEL `make test-uh`
+                               under pipefail
+    the runner owns            plan traversal, per-target execution and
+                               result observations, and the final atomic
+                               results.json
+
+So the runner forwards each target's output to its own stdout and lets the
+outer `make test-uh 2>&1 | tee "$ROOT/run.log"` remain the single producer
+of the canonical log. It writes no status sidecar, and the manifest carries
+no aggregate status field. The runner's process exit and the top-level Make
+status are two different observations; naming them alike would invite a
+later reader to treat either as completion authority.
+
+Exit codes — a signal to Make, not the canonical status:
   0  every target COMPLETED and satisfied its result contract
   1  a target FAILED, or a completed target broke its contract
   2  the plan or the evidence context is unusable — nothing was run
@@ -156,6 +173,22 @@ def result_pattern(label: str) -> "re.Pattern[str]":
     return re.compile(rf"^{re.escape(label)}:\s+(\d+)\s+passed,\s+(\d+)\s+failed\s*$")
 
 
+def label_pattern(label: str) -> "re.Pattern[str]":
+    """Lines that CLAIM to be this target's result, valid or not.
+
+    Separating the claim from the grammar is what makes MALFORMED a real
+    state rather than a word in a docstring. A line reading
+    `Alpha Tests: seventeen passed` is the target asserting its own
+    result and getting it wrong — which is a contract defect. Folding it
+    into ABSENT would report "the target said nothing", and the target
+    said something quite loud.
+
+    Also line-start anchored, so indented nested output cannot claim a
+    parent's label.
+    """
+    return re.compile(rf"^{re.escape(label)}:")
+
+
 # ── the environment ──────────────────────────────────────────────────
 
 def check_makeflags(env: Dict[str, str]) -> None:
@@ -219,16 +252,26 @@ def classify(exit_code: int, output: str, label: str) -> Tuple[str, str, Optiona
     SC-1: the exit status decides the execution state FIRST. The result
     contract binds only a target that exited 0.
     """
-    matches = [m for m in (result_pattern(label).match(l.rstrip())
-                           for l in output.splitlines()) if m]
+    claims = [l.rstrip() for l in output.splitlines()
+              if label_pattern(label).match(l.rstrip())]
+    valid = [m for m in (result_pattern(label).match(l) for l in claims) if m]
 
-    if len(matches) == 1:
-        passed, failed = int(matches[0].group(1)), int(matches[0].group(2))
-        observed, result = "RESOLVED", {"passed": passed, "failed": failed}
-    elif not matches:
+    if not claims:
         observed, result = "ABSENT", None
-    else:
+    elif not valid:
+        # The target claimed its own result and the claim does not parse.
+        observed, result = "MALFORMED", None
+    elif len(valid) > 1:
         observed, result = "AMBIGUOUS", None
+    elif len(claims) > 1:
+        # Exactly one parses, but the target made another claim beside it.
+        # Fail closed: we cannot say which line is the result. Recorded as
+        # AMBIGUOUS rather than MALFORMED because the defect is that there
+        # is more than one candidate, not that the winner was unreadable.
+        observed, result = "AMBIGUOUS", None
+    else:
+        passed, failed = int(valid[0].group(1)), int(valid[0].group(2))
+        observed, result = "RESOLVED", {"passed": passed, "failed": failed}
 
     if exit_code != 0:
         # FAILED, always. Whatever the output did or did not contain is
@@ -236,9 +279,7 @@ def classify(exit_code: int, output: str, label: str) -> Tuple[str, str, Optiona
         # absence is not a contract defect.
         return "FAILED", observed, result, None
 
-    if observed == "ABSENT":
-        return "FAILED", observed, None, "RESULT_CONTRACT_CONFLICT"
-    if observed == "AMBIGUOUS":
+    if observed in ("ABSENT", "MALFORMED", "AMBIGUOUS"):
         return "FAILED", observed, None, "RESULT_CONTRACT_CONFLICT"
     if result and result["failed"] > 0:
         # A green process contradicting its own tally must fail closed.
@@ -246,7 +287,7 @@ def classify(exit_code: int, output: str, label: str) -> Tuple[str, str, Optiona
     return "COMPLETED", observed, result, None
 
 
-def run(entries: List[dict], env: Dict[str, str], log) -> List[dict]:
+def run(entries: List[dict], env: Dict[str, str]) -> List[dict]:
     slots: List[dict] = [
         {"position": i, "make_target": e["make_target"],
          "result_label": e["result_label"], "execution_state": "NOT_STARTED",
@@ -264,8 +305,19 @@ def run(entries: List[dict], env: Dict[str, str], log) -> List[dict]:
         proc = subprocess.run(["make", target], cwd=str(REPO), env=env,
                               capture_output=True, text=True)
         out = proc.stdout + proc.stderr
-        log.write(out)
-        log.flush()
+        # FORWARD, do not publish. The canonical aggregate log belongs to
+        # the workflow shell's `make test-uh 2>&1 | tee $ROOT/run.log`.
+        # The runner captures target output only to classify it, then
+        # writes it through so the outer tee remains the single producer.
+        #
+        # CAPTURE-THEN-FORWARD IS A DELIBERATE CHOICE WITH A KNOWN COST:
+        # a target's output appears all at once when it completes rather
+        # than streaming live, so interleaving and timing differ from the
+        # old aggregate. A streaming implementation would preserve timing
+        # but changes signal/complexity semantics. This choice is an input
+        # to the execution-semantics comparison, not a settled question.
+        sys.stdout.write(out)
+        sys.stdout.flush()
 
         state, observed, result, refusal = classify(
             proc.returncode, out, slot["result_label"])
@@ -313,25 +365,32 @@ def main() -> int:
     print(f"  plan digest   : {digest}")
     print(f"  evidence root : {root}")
 
-    log_path = root / "run.log"
-    with log_path.open("w", encoding="utf-8") as log:
-        slots = run(entries, env, log)
+    slots = run(entries, env)
 
     completed = sum(1 for s in slots if s["execution_state"] == "COMPLETED")
     failed = [s for s in slots if s["execution_state"] == "FAILED"]
     not_started = sum(1 for s in slots if s["execution_state"] == "NOT_STARTED")
-    status = 0 if not failed else 1
+
+    # A calibration plan may legitimately live outside the repository, and
+    # recording its identity must not crash. A repo-relative path is only
+    # meaningful for the canonical plan; anything else is recorded
+    # absolutely and marked, so an external fixture can never be mistaken
+    # for production authority.
+    resolved = args.plan.resolve()
+    try:
+        plan_path, scope = str(resolved.relative_to(REPO)), "repository"
+    except ValueError:
+        plan_path, scope = str(resolved), "external"
 
     publish(root, {
         "schema": RUN_SCHEMA,
         "plan_digest": digest,
-        "plan_path": str(args.plan.relative_to(REPO)),
+        "plan_path": plan_path,
+        "plan_scope": scope,
         "evidence_root": str(root),
         "population": len(slots),
-        "aggregate_status": status,
         "slots": slots,
     })
-    (root / "run.log.status").write_text(f"{status}\n", encoding="utf-8")
 
     print(f"\n  COMPLETED {completed} · FAILED {len(failed)} · "
           f"NOT_STARTED {not_started} of {len(slots)}")
@@ -340,7 +399,13 @@ def main() -> int:
         print(f"  FAILED at #{s['position']} {s['make_target']} "
               f"(exit {s['exit_code']}, result {s['result_observation']})"
               f"{detail}")
-    return status
+    # The process exit exists so Make can observe success or failure. It is
+    # NOT the canonical aggregate status: that is the top-level `make
+    # test-uh` pipeline status, captured by the workflow shell into
+    # run.log.status under the WF-2 pattern. What GNU Make returns to the
+    # workflow for each of these values is a measurement owed to the
+    # execution-semantics comparison, not something to assert here.
+    return 0 if not failed else 1
 
 
 if __name__ == "__main__":
