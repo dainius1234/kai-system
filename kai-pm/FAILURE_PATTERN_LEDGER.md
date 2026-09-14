@@ -1418,3 +1418,256 @@ independently confirmed occurrence of that same mechanism would trigger
 doctrine 49.6: the prose/manual control is presumed insufficient and must
 escalate to machine enforcement, structural constraint, or an explicit
 accepted-risk decision.
+
+---
+
+# APPEND 2026-09-14 — two shadow-implementation faults in the WF-3 runner
+
+Both were caught before any production path invoked the runner, and neither
+altered a CI result or a programme verdict. They are recorded because of what
+each would have done had it been cut over: the first would have let
+unsupported Make invocation modes pass a guard that reported its context
+valid; the second would have given a future consumer two plausible answers to
+"did the aggregate complete?".
+
+A verified bug is not automatically a material failure-pattern incident. Two
+other real defects found in the same correction -- MALFORMED being documented
+but unreachable, and an external calibration plan crashing on
+`relative_to(REPO)` -- are deliberately NOT recorded here. Neither changed an
+admission, closure or authority outcome in this shadow state; they live in the
+implementation evidence and the commit history, which is where they belong.
+
+Both incidents below are INCIDENT_ONLY with NO mechanism assigned.
+
+
+### `INC-2026-09-14-15` — an environment representation written from
+###                       intuition instead of measured from its producer
+
+```
+INCIDENT_ID             INC-2026-09-14-15
+date                    2026-09-14
+producer                Orion
+subject/version         WF-3 shadow runner during development leading to
+                        859526c28f890eda26f882506e86ce75f870e570
+
+false_or_faulty_output  The initial MAKEFLAGS guard encoded hostile Make
+                        options using intuitive DASHED spellings -- "-k",
+                        "--keep-going", "-i", "-n". GNU Make 4.3 does not
+                        export them that way. Measured:
+
+                          make -k            -> MAKEFLAGS=[k]
+                          make --keep-going  -> MAKEFLAGS=[k]
+                          make -i            -> MAKEFLAGS=[i]
+                          make -n            -> MAKEFLAGS=[n]
+                          make -kj2          -> MAKEFLAGS=[k -j2 --jobserver-auth=3,4]
+                          make -j4           -> MAKEFLAGS=[ -j4 --jobserver-auth=3,4]
+
+                        Single-letter options are PACKED UNDASHED into the
+                        first word; only argument-bearing options keep a
+                        dash. The guard therefore matched nothing for five of
+                        nine hostile invocations -- -k, -i, -n, --keep-going,
+                        --ignore-errors -- catching only -j, while REPORTING
+                        THE CONTEXT ACCEPTABLE.
+
+corrected_output        The runner parses the measured representation: the
+                        packed undashed first token, dashed argument-bearing
+                        forms, and long forms. Hostile letters j, i, k, n and
+                        their long options are refused. Known-negative forms
+                        were measured separately -- s, rR, w,
+                        --warn-undefined-variables must be ALLOWED -- so the
+                        guard discriminates rather than refusing all
+                        MAKEFLAGS. 13 cases, zero mismatches.
+
+detection_method        DYNAMIC CALIBRATION against a real GNU Make 4.3
+                        exporting MAKEFLAGS for each invocation. MEASUREMENT
+                        FOUND THIS DEFECT. Doctrine did not, static reasoning
+                        did not, and review had not yet seen it. The
+                        implementation contract's instruction to verify actual
+                        GNU Make behaviour rather than guess is the only
+                        reason it surfaced before cutover.
+
+affected_scope          Shadow WF-3 runner only. No production path invoked
+                        the runner at any point.
+
+downstream_impact       NONE. No production decision, CI result or programme
+                        verdict was affected. Had it been cut over
+                        uncorrected, unsupported invocation modes -- keep-
+                        going, ignore-errors, dry-run -- could have weakened
+                        the serial/fail-fast evidence model while the runner
+                        reported its context valid. A guard whose scope is
+                        narrower than its name is why this is ledger-material
+                        despite being caught pre-production.
+
+mechanism_status        INCIDENT_ONLY
+mechanism_id            none assigned
+related_incidents       none cited. Resemblance to existing mechanisms is not
+                        asserted; no locator is useful enough here to risk
+                        implying equivalence.
+recurrence_count        1 measured occurrence of this shape
+
+stop_signal             "I am writing an environment or protocol
+                        representation from memory instead of measuring what
+                        its producer actually emits."
+
+current_control         The corrected MAKEFLAGS parser in the shadow runner,
+                        plus measured positive and negative calibration.
+control_type            STRUCTURAL -- AND THE MATURITY IS QUALIFIED. The
+                        correction exists in SHADOW CODE. No executing
+                        regression test is banked for it yet, so this is not
+                        a MACHINE control, and production operationalisation
+                        is NOT established.
+control_introduced_at   859526c (guard present) / 8fc5bc (re-verified after
+                        the ownership correction)
+recurred_after_control  NO measured recurrence
+
+owner/stage             Orion (execution) · Kai (adjudication) · Dainius
+                        (consequential authority)
+status                  CLOSED AS AN IMPLEMENTATION INCIDENT.
+                        WF-3 itself remains OPEN. No production
+                        control-operationalised claim is made. CI semantics
+                        remain UNVERIFIED.
+```
+
+---
+
+### `INC-2026-09-14-16` — a second representation built for a fact whose
+###                       authoritative producer already existed
+
+```
+INCIDENT_ID             INC-2026-09-14-16
+date                    2026-09-14
+producer                Orion
+subject/version         WF-3 shadow runner.
+                        before: 859526c28f890eda26f882506e86ce75f870e570
+                        after:  8fc5bc085b1e124bb25e9aca0dcd6809d90853f9
+
+false_or_faulty_output  At 859526c the shadow runner did all three of:
+                          1. opened and wrote EVIDENCE_ROOT/run.log
+                          2. wrote EVIDENCE_ROOT/run.log.status from its own
+                             computed status
+                          3. published a manifest field `aggregate_status`
+                        Each duplicated an authority WF-2 had already assigned
+                        to the workflow shell: the TOP-LEVEL `make test-uh`
+                        pipeline status captured under pipefail. The result
+                        was two structurally different observations that a
+                        future consumer could plausibly read as
+                        aggregate-completion authority.
+
+corrected_output        ONE canonical aggregate completion authority:
+                          workflow shell -> `make test-uh 2>&1 | tee
+                          "$ROOT/run.log"` under pipefail -> shell status ->
+                          canonical run.log.status sidecar.
+                        The runner now owns only plan traversal, per-target
+                        sub-make execution observations, target result
+                        observations, the atomic results.json, and stdout
+                        forwarding so the outer tee remains the single
+                        producer of the canonical log. Its process exit is a
+                        signal upward to Make, documented as NOT a status.
+                        `aggregate_status` is REMOVED, NOT RENAMED, so no
+                        future code can mistake it for alternate truth.
+                        Measured after correction: the evidence root contains
+                        results.json AND NOTHING ELSE; no run.log; no
+                        run.log.status; the only remaining run.log strings in
+                        the source are comments naming whose file it is.
+
+detection_method        Kai architecture/review boundary check against frozen
+                        WF-2 authority semantics, followed by source
+                        correction and Orion's local boundary calibration.
+                        NOT found by Orion.
+
+evidence                before 859526c: runner wrote run.log, wrote
+                        run.log.status, manifest carried aggregate_status.
+                        after 8fc5bc: none of the three; manifest carries
+                        schema, plan_digest, plan_path, plan_scope,
+                        evidence_root, population, slots -- and no aggregate
+                        status field under any name.
+
+affected_scope          WF-3 shadow runner only. No production code invoked
+                        it. The Makefile, the production workflow, the
+                        existing assertion-floor consumer and the floor
+                        registry all remained on the old production path
+                        throughout.
+
+downstream_impact       NONE. No production verdict or programme decision was
+                        affected. Had the shadow design been cut over, the
+                        floor consumer could have faced competing sources for
+                        aggregate completion and potentially selected
+                        runner-derived status over the WF-2-authoritative
+                        workflow sidecar. It is an AUTHORITY-BOUNDARY defect,
+                        which is why it is ledger-material despite being
+                        caught before cutover.
+
+mechanism_status        INCIDENT_ONLY
+mechanism_id            none assigned
+related_incidents       INC-2026-09-12-13 and INC-2026-09-12-14 are recorded
+                        here as QUALIFIED LOCATORS ONLY. The current evidence
+                        does NOT establish causal equivalence with the
+                        fabricated-status incident or with the
+                        common-authority independence incident, and none is
+                        asserted.
+recurrence_count        1 measured occurrence of this exact candidate shape
+
+stop_signal             "I am about to create a second representation of a
+                        fact whose authoritative producer already exists --
+                        name which component owns the fact before writing
+                        another one."
+
+current_control         Structural ownership separation at 8fc5bc: the
+                        workflow shell holds aggregate log and status
+                        authority; the runner holds target and result
+                        evidence only.
+                        REMAINING ACCEPTANCE REQUIREMENT, recorded so it is
+                        not lost: the future floor consumer MUST consume the
+                        authoritative workflow status and MUST NEVER use
+                        manifest-derived state as a fallback for an absent or
+                        non-zero authoritative status.
+control_type            STRUCTURAL -- SHADOW IMPLEMENTATION STRUCTURE, NOT
+                        YET CONTROL_OPERATIONALISED IN PRODUCTION.
+control_introduced_at   8fc5bc085b1e124bb25e9aca0dcd6809d90853f9
+recurred_after_control  NO measured recurrence
+
+owner/stage             Orion (execution) · Kai (adjudication) · Dainius
+                        (consequential authority)
+status                  CLOSED AS A SHADOW IMPLEMENTATION INCIDENT.
+                        WF-3 remains OPEN. WF-2 remains CLOSED within its
+                        existing bounded threat model. No claim is made that
+                        WF-3 production control is operational until cutover
+                        and CI evidence exist.
+```
+
+---
+
+## Ledger state after this append
+
+| id | producer | mechanism_status | assigned mechanism |
+|---|---|---|---|
+| `INC-2026-08-29-01` … `-03` | Orion | `PATTERN_CONFIRMED` | `M-SCOPE-WIDEN` |
+| `INC-2026-08-29-04` `-05` | Orion | `INCIDENT_ONLY` | none |
+| `INC-2026-08-29-06` | Kai | `INCIDENT_ONLY` | none — locator only |
+| `INC-2026-08-29-07` `-08` | DeepSeek | `INCIDENT_ONLY` | none |
+| `INC-2026-08-29-09` `-10` | Orion | `INCIDENT_ONLY` | none |
+| `INC-2026-08-29-11` | Kai | `INCIDENT_ONLY` | none |
+| `INC-2026-08-30-12` | Orion | `PATTERN_CANDIDATE` | `M-QUERY-OVERREACH` |
+| `INC-2026-09-12-13` | Orion | `PATTERN_CANDIDATE` | none assigned |
+| `INC-2026-09-12-14` | Orion | `PATTERN_CANDIDATE` | none assigned |
+| `INC-2026-09-14-15` | Orion | `INCIDENT_ONLY` | none assigned |
+| `INC-2026-09-14-16` | Orion | `INCIDENT_ONLY` | none assigned |
+
+**Producers: Orion 12 · Kai 2 · DeepSeek 2. Total incidents 16.** The counts
+carry no fairness, quality or producer-reliability inference; they are the
+currently recorded population and nothing more.
+
+**Mechanisms: `M-SCOPE-WIDEN` `PATTERN_CONFIRMED` · `M-PRODUCER-CURATION`
+`PATTERN_CANDIDATE` · `P-ADJUDICATOR-PROPAGATION` `PATTERN_CANDIDATE` ·
+`M-QUERY-OVERREACH` `PATTERN_CANDIDATE`.** Unchanged by this append. No
+confirmed mechanism's recurrence count is altered: `-15` and `-16` are
+INCIDENT_ONLY and are assigned to no mechanism.
+
+**Escalation state.** Doctrine 49.6 fires on the third independently
+confirmed occurrence of ONE mechanism. Neither incident in this append is
+assigned to a mechanism, so neither contributes to any mechanism's count and
+neither advances an escalation. The independence / common-authority locator
+shape recorded at `INC-2026-08-29-10` and `INC-2026-09-12-14` stands at two
+preserved occurrences, unchanged here; `INC-2026-09-14-16` is NOT counted
+toward it, because its equivalence to that shape has not been adjudicated and
+resemblance is not a mechanism.
