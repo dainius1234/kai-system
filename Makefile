@@ -1171,6 +1171,9 @@ test-ci-scripts:
 test-uh-floor-gate:
 	python3 scripts/test_uh_floor_gate.py
 
+test-uh-runner:
+	python3 scripts/test_uh_runner.py
+
 test-shipped-package-deps:
 	python3 scripts/test_shipped_package_deps.py
 
