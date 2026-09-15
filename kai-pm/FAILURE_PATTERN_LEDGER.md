@@ -2129,3 +2129,347 @@ same gate family, same tranche — so it has no confirmed occurrences and
 advances no escalation. The independence / common-authority locator shape at
 `INC-2026-08-29-10` and `INC-2026-09-12-14` still stands at two preserved
 occurrences, unchanged.
+
+---
+
+# APPEND 2026-09-15 (second) — a machine control that fired, and a review
+#                              loop that advanced nine commits without
+#                              consuming its verdict
+
+One incident. The detector worked. We did not listen to it.
+
+This append also corrects a chronology that was wrong in the message that
+authorised it, and records a second prohibited condition that the first one
+had been hiding.
+
+
+### `INC-2026-09-15-20` — a banked calibration suite left unwired, detected
+###                       by the existing machine control, and advanced past
+
+```
+INCIDENT_ID             INC-2026-09-15-20
+date                    2026-09-15
+producer                Orion (implementation defect)
+                        Programme review loop — Orion · Kai · Dainius
+                        (acceptance defect). The acceptance side is NOT
+                        attributed to a single producer and is not counted
+                        against one.
+subject/version         scripts/test_uh_floor_gate.py — the WF-3 shadow floor
+                        consumer's calibration suite
+                        introduced at: 009cfadd (2026-09-14)
+                        still present at: 0c717ec3f8f49bb4135414a46fdf7068c9b5d4a2
+                        Policy-as-Code control: scripts/security/check_test_wiring.py
+                        wired as .github/workflows/policy-checks.yml step 26,
+                        "Test wiring — no test defined and never called"
+
+false_or_faulty_output  IMPLEMENTATION SIDE.
+                        scripts/test_uh_floor_gate.py reports through a
+                        check() helper and an `EXIT GATE` line, calling
+                        sys.exit(1) only under `if __name__ == "__main__"`.
+                        No Makefile recipe runs it as a script.
+
+                        DO NOT READ THIS AS "the 227 assertions never ran."
+                        They ran, repeatedly, under manual invocation during
+                        WF-3 development, and their results were transmitted
+                        and adjudicated. The supported statement is narrower
+                        and is the one that matters:
+
+                          once banked, the repository had NO Makefile
+                          execution path that made this EXIT-GATE suite's
+                          failures consequential through the normal governed
+                          test wiring.
+
+                        Under pytest collection every test_* function returns
+                        normally whatever check() recorded, so collection
+                        reports pass while the suite is failing. That is the
+                        exact condition check_test_wiring.py exists to detect.
+
+                        ACCEPTANCE SIDE — the load-bearing half.
+                        The condition was detected, on the exact banked SHA,
+                        by an existing machine control, and the programme
+                        advanced anyway.
+
+                        Verified at primary source (GitHub Actions API, this
+                        session, not from recollection):
+
+                          commit 18faee4a1d73306a31bc7e375e2d6a21479b4ab0
+                          workflow "Policy-as-Code Checks" run #282
+                            run id 34905078315 · job "policy" id 104179749481
+                            conclusion: failure
+                            steps 1–25 : success
+                            step 26 "Test wiring — no test defined and never
+                                     called" : FAILURE
+                            steps 27–45 : SKIPPED (19 steps)
+
+                        Step-26 log, quoted verbatim from the run:
+
+                          FAIL: 1 EXIT GATE suite(s) that no recipe runs as a
+                          script:
+                            - test_uh_floor_gate.py: reports through `check()`
+                              and `EXIT GATE`, but no Makefile recipe runs it
+                              as a script. Under pytest its failures are
+                              invisible — every test function returns normally
+                              whatever check() recorded.
+
+                        MACHINE DETECTOR: WORKED.
+                        RED SIGNAL: EXISTED, ON THE EXACT SHA.
+                        RESPONSE / ADJUDICATION: DID NOT HAPPEN.
+
+                        Aggravating detail, recorded because it is worse than
+                        an oversight. `INC-2026-09-14-19`, banked in this same
+                        ledger at this same commit 18faee4, states in its own
+                        `control_type` field:
+
+                          "...the suite is wired into no make target or
+                          workflow."
+
+                        The prohibited condition was written into the
+                        authoritative append-only ledger, by the producer, at
+                        the very commit whose required CI job was failing on
+                        that precise condition — and the tranche advanced.
+                        The signal was not missed for want of visibility. It
+                        was recorded and not treated as consequential.
+
+correction_to_the       The authorising message stated the red began at
+authorising_message     18faee4 and named run #282. Run #282 and its step are
+                        confirmed exactly as described. THE START POINT IS
+                        NOT.
+
+                        Policy-as-Code history on this branch, enumerated
+                        from the API (20 runs returned, branch-filtered):
+
+                          #269  abea33cf  success   <- LAST GREEN
+                          #270  859526c2  failure   <- FIRST RED
+                          #271  859526c2  failure
+                          #272  8fc5bc08  failure
+                          #273  8fc5bc08  failure
+                          #274  cb8cc270  failure
+                          #275  009cfadd  failure
+                          #276  009cfadd  failure
+                          #277  79cd2dbc  failure
+                          #278  53389986  failure
+                          #279  53389986  failure
+                          #280  efb9c63a  failure
+                          #281  18faee4a  failure
+                          #282  18faee4a  failure
+                          #283  0c717ec3  failure   <- CURRENT HEAD
+
+                        14 consecutive failing runs across 9 consecutive
+                        commits, beginning at 859526c2 — five commits before
+                        18faee4a, and before scripts/test_uh_floor_gate.py
+                        existed at all (it enters at 009cfadd).
+
+                        So the span of the acceptance defect is nine banked
+                        commits, not one.
+
+second_prohibited       At 859526c2 (run #270, id 34886024489, job id
+condition_found         104116773548) the failing step was NOT step 26.
+                        Step 26 "Test wiring" was SUCCESS there. The job
+                        failed at:
+
+                          step 45 "Instrumentation invariants (I-4 enforced)"
+                          run: python scripts/security/check_gate_registry.py --gate
+
+                        Reproduced locally at HEAD 0c717ec3 in this session:
+
+                          exit 1
+                            - uh_floor_gate: exists but is not in the registry
+                            - uh_runner: exists but is not in the registry
+                          GATE FAILED: 2 breach(es) of I-1, I-2, I-3, I-4,
+                          I-5, I-6, I-7.
+
+                        THERE ARE THEREFORE TWO DISTINCT PROHIBITED
+                        CONDITIONS LIVE ON THIS BRANCH, NOT ONE:
+
+                          (1) I-4 — uh_runner and uh_floor_gate on disk and
+                              unregistered. Live since 859526c2. Step 45.
+                          (2) test-wiring — test_uh_floor_gate.py unwired.
+                              Live since 009cfadd. Step 26.
+
+                        AND (2) MASKS (1). Step 26 runs before step 45, so
+                        from 009cfadd onward the job short-circuits and step
+                        45 is reported as `skipped`, not as the failure it
+                        would still be. Anyone reading only the FIRST FAILED
+                        STEP at 18faee4 concludes "one defect, wiring" and
+                        silently loses an I-4 breach that has been red for
+                        nine commits.
+
+                        This is not a new mechanism claim. It is a measured
+                        property of a short-circuiting job, recorded so the
+                        process control below is written wide enough to
+                        survive it.
+
+corrected_output        No repository code, test, Makefile, workflow, registry
+                        or floor value is changed by this append. The two
+                        prohibited conditions remain OPEN and are scheduled:
+                        DOC-1 first (authorised), then a bounded §24 tranche
+                        that must clear BOTH step 26 and step 45, not only the
+                        first-failing one.
+
+detection_method        The unwired condition: EXISTING MACHINE CONTROL —
+                        check_test_wiring.py via Policy-as-Code step 26, on
+                        the exact banked SHA, at bank time.
+
+                        Its re-surfacing on 2026-09-15: Orion source review
+                        while scoping §24, independently of the CI record.
+
+                        The nine-commit span, the 859526c2 start point and
+                        the step-45 masking: Orion primary-source enumeration
+                        of the Actions API in this session, prompted by Kai's
+                        chronology and NOT by trusting it.
+
+                        Recorded explicitly because an earlier draft of this
+                        incident was going to say the inert suite "was found
+                        by later source review rather than by any control we
+                        have." THAT WOULD HAVE BEEN FALSE, and Kai caught it.
+                        A finding that a control did not exist, when it
+                        existed and fired, is the most expensive kind of
+                        wrong entry this ledger can carry: it argues for
+                        building a detector we already have, and it conceals
+                        the actual defect, which is ours.
+
+affected_scope          Branch claude/project-rework-plan-pgvp35 only.
+                        Nine commits: 859526c2, 8fc5bc08, cb8cc270, 009cfadd,
+                        79cd2dbc, 53389986, efb9c63a, 18faee4a, 0c717ec3.
+                        No merge to main. No production cutover. No D-number.
+                        No floor value altered. PR #122 remains DO NOT MERGE.
+
+                        BOUNDED-SEARCH QUALIFIER. Three other workflows are
+                        also non-success at these SHAs — "Core Tests",
+                        "Python application" and "Unified Hunter Suites".
+                        THEIR FAILING STEPS WERE NOT INSPECTED. Nothing here
+                        classifies them as related, pre-existing, expected or
+                        unrelated. They are named because they were returned
+                        by the enumeration, not because their cause is known.
+                        "PM Status Check" was success at every SHA inspected.
+
+downstream_impact       No realised production impact. The cost is
+                        programme-internal and real:
+
+                        (a) WF-3 tranche progression, the real-78 shadow
+                            traversal and its acceptance all proceeded on
+                            commits whose required Policy-as-Code job already
+                            carried an unexplained red;
+                        (b) the floor-gate calibration was reasoned about as
+                            though its repository wiring were settled, when
+                            CI had already disproved that;
+                        (c) the real-78 traversal could not have reached 78
+                            under any outcome at plan member 27, because plan
+                            member 32 (test-test-wiring) was already failing
+                            for condition (2) — measured locally at HEAD:
+                            `make test-test-wiring` -> exit 2,
+                            "Test Wiring Tests: 18 passed, 1 failed".
+                            Traversal effort was spent against a population
+                            that could not complete.
+
+mechanism_status        INCIDENT_ONLY
+mechanism_id            none assigned. Explicitly NOT promoted into
+                        M-POLICY-ADMISSION-DIVERGENCE, NOT into M-SCOPE-WIDEN,
+                        NOT into any existing mechanism.
+related_findings        KAI-GATE-018 / test-wiring is a strong LOCATOR: the
+                        prohibited state is exactly what that machine control
+                        exists to detect. A repository finding ID is not
+                        automatically a ledger mechanism, and this one is not
+                        being made into one.
+related_incidents       INC-2026-09-14-19 — same commit, same suite; cited for
+                        the self-documented control_type field quoted above,
+                        not as causal equivalence.
+recurrence_count        1 measured occurrence of this incident
+
+stop_signal             "I am about to bank, advance a tranche, or accept an
+                        evidence package. What is the exact-SHA CI status,
+                        and have I read every required red down to its first
+                        failing step AND accounted for the steps that were
+                        skipped rather than passed?"
+
+current_control         MANUAL PROCESS CONTROL. Before any tranche is
+                        accepted or released after a banked commit:
+                          1. enumerate every workflow run for that exact SHA;
+                          2. inspect every required red;
+                          3. identify the first failed step;
+                          4. ALSO account for every step reported `skipped`
+                             after that failure — a short-circuiting job hides
+                             later breaches, as measured above, so the first
+                             failed step is a LOCATOR, NOT THE POPULATION;
+                          5. classify each red as expected known-negative /
+                             pre-existing / tranche-caused / unrelated, with
+                             evidence;
+                          6. do not advance while any required red is
+                             unexplained.
+control_type            MANUAL. NOT MACHINE. NOT CONTROL_OPERATIONALISED.
+                        No executing mechanism enforces any of the six steps.
+                        It must not be described as machine-enforced until
+                        one does.
+control_introduced_at   this append
+
+recurred_after_control  YES — the prohibited condition occurred while the
+                        KAI-GATE-018 machine control already existed, and the
+                        control DETECTED it.
+
+                        THIS IS NOT EVIDENCE THAT THE MACHINE DETECTOR
+                        FAILED. The detector contained the condition and
+                        reported it correctly on every one of the nine
+                        commits. The newly exposed weakness is the human
+                        acceptance loop: a red exact-SHA CI result was not
+                        reconciled before the next tranche advanced. Do not
+                        read this field as a detector-reliability signal.
+
+owner/stage             Orion (execution) · Kai (adjudication) · Dainius
+                        (consequential authority)
+status                  OPEN. The two prohibited conditions are unrepaired by
+                        design — DOC-1 is sequenced ahead of them. This
+                        incident closes only when §24 clears BOTH step 26 and
+                        step 45 on an exact-SHA CI run that is read and
+                        classified.
+```
+
+---
+
+## Ledger state after this append
+
+| id | producer | mechanism_status | assigned mechanism |
+|---|---|---|---|
+| `INC-2026-08-29-01` … `-03` | Orion | `PATTERN_CONFIRMED` | `M-SCOPE-WIDEN` |
+| `INC-2026-08-29-04` `-05` | Orion | `INCIDENT_ONLY` | none |
+| `INC-2026-08-29-06` | Kai | `INCIDENT_ONLY` | none — locator only |
+| `INC-2026-08-29-07` `-08` | DeepSeek | `INCIDENT_ONLY` | none |
+| `INC-2026-08-29-09` `-10` | Orion | `INCIDENT_ONLY` | none |
+| `INC-2026-08-29-11` | Kai | `INCIDENT_ONLY` | none |
+| `INC-2026-08-30-12` | Orion | `PATTERN_CANDIDATE` | `M-QUERY-OVERREACH` |
+| `INC-2026-09-12-13` | Orion | `PATTERN_CANDIDATE` | none assigned |
+| `INC-2026-09-12-14` | Orion | `PATTERN_CANDIDATE` | none assigned |
+| `INC-2026-09-14-15` | Orion | `INCIDENT_ONLY` | none assigned |
+| `INC-2026-09-14-16` | Orion | `INCIDENT_ONLY` | none assigned |
+| `INC-2026-09-14-17` | Orion | `INCIDENT_ONLY` | none assigned — `M-SCOPE-WIDEN` locator only |
+| `INC-2026-09-14-18` | Orion | `INCIDENT_ONLY` | none assigned — supporting evidence for `M-POLICY-ADMISSION-DIVERGENCE` |
+| `INC-2026-09-14-19` | Orion | `INCIDENT_ONLY` | none assigned — supporting evidence for `M-POLICY-ADMISSION-DIVERGENCE` |
+| `INC-2026-09-15-20` | Orion (implementation) · review loop (acceptance) | `INCIDENT_ONLY` | none assigned — `KAI-GATE-018` locator only |
+
+**Producers: Orion 16 · Kai 2 · DeepSeek 2. Total incidents 20.** Derivation:
+`grep -oE 'INC-2026-[0-9]{2}-[0-9]{2}-[0-9]+' kai-pm/FAILURE_PATTERN_LEDGER.md
+| sort -u | wc -l` returned 19 before this append; this append adds
+`INC-2026-09-15-20`. The counts carry no fairness, quality or
+producer-reliability inference; they are the currently recorded population
+and nothing more. `INC-2026-09-15-20`'s acceptance-side defect is attributed
+to the review loop as a whole and is deliberately NOT counted against any
+single producer — the implementation side is counted against Orion.
+
+**Mechanisms: unchanged by this append.** `M-SCOPE-WIDEN`
+`PATTERN_CONFIRMED` · `M-PRODUCER-CURATION` `PATTERN_CANDIDATE` ·
+`P-ADJUDICATOR-PROPAGATION` `PATTERN_CANDIDATE` · `M-QUERY-OVERREACH`
+`PATTERN_CANDIDATE` · `M-POLICY-ADMISSION-DIVERGENCE` `PATTERN_CANDIDATE`.
+No mechanism's recurrence count is altered. `INC-2026-09-15-20` is
+`INCIDENT_ONLY` with no mechanism assigned.
+
+**Escalation state.** Doctrine 49.6 fires on the third *independently
+confirmed* occurrence of ONE mechanism. This append confirms no mechanism
+and therefore advances no escalation. The nine-commit span recorded above is
+NINE OCCASIONS OF ONE UNCONSUMED SIGNAL, not nine independent occurrences of
+a mechanism, and must not be counted as recurrence evidence.
+
+**Doctrine 49.2 note.** The detector firing nine times is an incident record,
+not a mechanism. What is established is that on this branch, between
+`859526c2` and `0c717ec3`, the machine layer was correct and the acceptance
+layer did not consume it. Whether that acceptance failure has a mechanism —
+and whether it has occurred elsewhere in the programme — is UNMEASURED and
+is not claimed here.
