@@ -1152,6 +1152,25 @@ test-summarise-runs:
 test-ci-scripts:
 	python3 scripts/test_ci_scripts.py
 
+# WF-3 shadow calibration suites.
+#
+# Deliberately NOT prerequisites of `test-uh` and NOT of `test-core`.
+# `test-uh`'s prerequisite list IS the 78-member Unified Hunter population,
+# frozen and digest-bound in scripts/security/uh_execution_plan.json; adding
+# a member here would change the population the plan causes and invalidate
+# the digest. These are calibration for the shadow components, not members
+# of the thing they calibrate.
+#
+# The recipe is what makes the suites consequential. Both report through a
+# `check()` helper and an `EXIT GATE` line and call sys.exit(1) only under
+# `if __name__ == "__main__"`. Collected by pytest instead, every test_*
+# function returns normally whatever check() recorded, so pytest reports
+# pass while the suite is failing — check_test_wiring.py exists to find
+# exactly that, and it was red on this branch from 009cfad to abb7199
+# because test_uh_floor_gate.py was banked without this line.
+test-uh-floor-gate:
+	python3 scripts/test_uh_floor_gate.py
+
 test-shipped-package-deps:
 	python3 scripts/test_shipped_package_deps.py
 
