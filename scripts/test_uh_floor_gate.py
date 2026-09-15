@@ -26,6 +26,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -38,7 +39,13 @@ PLAN = REPO / "scripts" / "security" / "uh_execution_plan.json"
 passed = 0
 failed = 0
 executed: list[str] = []
-EXPECTED_SCENARIOS = 39
+# The denominator this gate is registered under. Declared here, beside
+# the assertion that checks it, so the registry entry and its evidence
+# cannot drift apart silently.
+DECLARED_DENOMINATOR = (
+    r"Assertion floors — \d+ targets, \d+ floored, \d+ assertions")
+
+EXPECTED_SCENARIOS = 40
 
 
 def check(name: str, condition: bool, detail: str = "") -> None:
@@ -672,6 +679,39 @@ def test_fully_floored_population_passes():
               str(out.get("findings")))
 
 
+def test_the_declared_denominator_is_what_it_prints():
+    """I-2, and the evidence `probe=False` rests on.
+
+    The registry declares this gate's denominator and skips the live
+    probe, because probing means handing it an evidence root and a floor
+    registry that only a real run produces. A denominator nobody ever
+    checks is the "pass that cannot be falsified" I-2 exists to prevent,
+    so the declaration is verified here instead — against the gate's real
+    human-readable output, which every other scenario bypasses with
+    --json.
+    """
+    scenario("declared denominator matches real output")
+    with tempfile.TemporaryDirectory() as d:
+        tmp = Path(d)
+        root = build(tmp)
+        p = subprocess.run(
+            [sys.executable, str(GATE), "--evidence-root", str(root),
+             "--floors", str(tmp / "floors.json")],
+            capture_output=True, text=True, cwd=str(REPO),
+            env={k: v for k, v in os.environ.items()
+                 if k != "KAI_UH_EVIDENCE_ROOT"})
+        check("the non-JSON path exits green on a clean root",
+              p.returncode == 0, f"rc={p.returncode} {p.stdout}{p.stderr}")
+        check("output matches the registry's declared denominator",
+              re.search(DECLARED_DENOMINATOR, p.stdout) is not None,
+              p.stdout[:200])
+        check("and the denominator names a non-zero population",
+              re.search(r"Assertion floors — (\d+) targets", p.stdout)
+              and int(re.search(r"Assertion floors — (\d+) targets",
+                                p.stdout).group(1)) > 0,
+              p.stdout[:200])
+
+
 def run() -> None:
     test_root_absent()
     test_root_relative()
@@ -712,6 +752,7 @@ def run() -> None:
     test_plan_validator_known_negatives()
     test_fallen_and_unfloored_together()
     test_fully_floored_population_passes()
+    test_the_declared_denominator_is_what_it_prints()
 
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",
           len(executed) == EXPECTED_SCENARIOS,

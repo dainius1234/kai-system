@@ -1882,6 +1882,67 @@ REGISTRY: Tuple[Gate, ...] = (
          # meta-check follows make targets now, so this is the answer it
          # gets rather than the one I guessed.
          in_workflows=("core-tests.yml",)),
+
+    # ── WF-3 shadow components ──────────────────────────────────────
+    #
+    # Declared before they are enforced, which is the point. Both have
+    # been on disk and undeclared since 859526c, and I-4 fired on them
+    # correctly every time — Policy-as-Code step 45 was red on nine
+    # consecutive commits and nobody read it, because from 009cfad the
+    # step-26 test-wiring failure short-circuited the job and step 45
+    # reported as `skipped` rather than as the failure it still was
+    # (INC-2026-09-15-20). `pending_wiring` is the truthful state: these
+    # gate nothing yet, and saying so on every run is the alternative to
+    # them being invisible.
+    Gate(module="uh_runner",
+         kind=GATE,
+         summary="the execution plan causes execution — traverse it "
+                 "serially, fail fast, and record what each member did",
+         inputs=("scripts/security/uh_execution_plan.json",),
+         denominator=r"Unified Hunter — \d+ targets from ",
+         probe=False,
+         # Not "too slow". Probing this one EXECUTES THE POPULATION.
+         # `main()` has no required argument: `--plan` defaults to the
+         # canonical 78-target plan and `--evidence-root` to a fresh temp
+         # directory, so a bare run invokes `make` 78 times. Reading a
+         # denominator must never cause the measurement — that is I-8's
+         # key generator, which would have written secrets as a side
+         # effect of being measured.
+         probe_skip_reason="a bare run EXECUTES all 78 population members: "
+                           "main() has no required argument, so probing it "
+                           "would invoke make 78 times as a side effect of "
+                           "reading a number. Probed by "
+                           "scripts/test_uh_runner.py against a synthetic "
+                           "plan with subprocess stubbed",
+         proven_by="scripts/test_uh_runner.py",
+         pending_wiring="shadow only — nothing invokes it. The production "
+                        "aggregate is still `make test-uh` under the "
+                        "workflow shell, which owns run.log and "
+                        "run.log.status. Wiring it is WF-3's cutover and is "
+                        "not authorised",
+         in_workflows=()),
+    Gate(module="uh_floor_gate",
+         kind=GATE,
+         summary="assertion floors judged only against a complete, "
+                 "plan-bound run — a non-zero aggregate refuses rather "
+                 "than adjudicating",
+         inputs=("scripts/security/uh_execution_plan.json",),
+         denominator=(r"Assertion floors — \d+ targets, \d+ floored, "
+                      r"\d+ assertions"),
+         probe=False,
+         probe_skip_reason="needs an evidence root and a v2 floor registry "
+                           "that only a real aggregate produces; there is no "
+                           "argument-free invocation that could print a "
+                           "denominator. Probed by "
+                           "scripts/test_uh_floor_gate.py against synthetic "
+                           "evidence roots",
+         proven_by="scripts/test_uh_floor_gate.py",
+         pending_wiring="shadow only — the production path is still "
+                        "check_assertion_floors.py. This consumer has never "
+                        "adjudicated a live run, and its 61-floored / "
+                        "17-unfloored policy remains UNVERIFIED against real "
+                        "records",
+         in_workflows=()),
 )
 
 BY_MODULE = {gate.module: gate for gate in REGISTRY}

@@ -38,6 +38,7 @@ import hashlib
 import io
 import json
 import os
+import re
 import sys
 import tempfile
 from pathlib import Path
@@ -52,7 +53,12 @@ PLAN = REPO / "scripts" / "security" / "uh_execution_plan.json"
 passed = 0
 failed = 0
 executed: list[str] = []
-EXPECTED_SCENARIOS = 21
+# The denominator this runner is registered under. Declared beside the
+# assertion that checks it, so the registry entry and its evidence
+# cannot drift apart silently.
+DECLARED_DENOMINATOR = r"Unified Hunter — \d+ targets from "
+
+EXPECTED_SCENARIOS = 22
 
 
 def check(name: str, condition: bool, detail: str = "") -> None:
@@ -604,6 +610,58 @@ def test_the_plan_causes_the_traversal() -> None:
           == ["NOT_STARTED", "NOT_STARTED"])
 
 
+def test_the_declared_denominator_is_what_it_prints() -> None:
+    """I-2, and the evidence `probe=False` rests on.
+
+    The registry declares this runner's denominator and skips the live
+    probe, because probing it means executing the whole population — the
+    meta-check would run 78 `make` invocations as a side effect of
+    reading a number. That is the shape recorded in I-8: a check that
+    wanted to probe a key generator to read its denominator, and would
+    have written secrets as a side effect of measuring.
+
+    So the declaration is verified here instead, against output from the
+    real `main()` — driven end to end over a synthetic three-target plan
+    with `subprocess` stubbed, so not one real target runs.
+    """
+    scenario("declared denominator matches real output")
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        plan = write_plan(root, "denominator",
+                          {"schema": R.PLAN_SCHEMA, "targets": three_entries()})
+        evidence = root / "evidence"
+        evidence.mkdir()
+
+        fake = _FakeSubprocess(
+            lambda t: _FakeProc(0, f"{t.split('-')[1].title()} Tests: "
+                                   f"7 passed, 0 failed\n"))
+        buf = io.StringIO()
+        saved_argv, saved_flags = sys.argv, os.environ.pop("MAKEFLAGS", None)
+        try:
+            sys.argv = ["uh_runner.py", "--plan", str(plan),
+                        "--evidence-root", str(evidence)]
+            with _Stub(R, subprocess=fake), contextlib.redirect_stdout(buf):
+                rc = R.main()
+        finally:
+            sys.argv = saved_argv
+            if saved_flags is not None:
+                os.environ["MAKEFLAGS"] = saved_flags
+
+        out = buf.getvalue()
+        check("a fully satisfied traversal exits 0", rc == 0, f"rc={rc} {out}")
+        check("output matches the registry's declared denominator",
+              re.search(DECLARED_DENOMINATOR, out) is not None, out[:200])
+        named = re.search(r"Unified Hunter — (\d+) targets", out)
+        check("the denominator names the plan's real population",
+              named is not None and int(named.group(1)) == 3,
+              named.group(1) if named else out[:200])
+        check("no real target was executed",
+              [c[1] for c in fake.calls]
+              == ["test-alpha", "test-beta", "test-gamma"], str(fake.calls))
+        check("the manifest landed in the declared root",
+              (evidence / "results.json").is_file())
+
+
 def run() -> None:
     test_the_canonical_plan_hashes_its_own_raw_bytes()
     test_one_changed_byte_is_a_different_plan()
@@ -626,6 +684,7 @@ def run() -> None:
     test_fail_fast_leaves_the_remainder_not_started()
     test_target_output_is_forwarded_not_swallowed()
     test_the_plan_causes_the_traversal()
+    test_the_declared_denominator_is_what_it_prints()
 
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",
           len(executed) == EXPECTED_SCENARIOS,
