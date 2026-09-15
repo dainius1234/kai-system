@@ -2473,3 +2473,291 @@ not a mechanism. What is established is that on this branch, between
 layer did not consume it. Whether that acceptance failure has a mechanism —
 and whether it has occurred elsewhere in the programme — is UNMEASURED and
 is not claimed here.
+
+---
+
+# APPEND 2026-09-15 (third) — the calibration proved a copy of the policy,
+#                             and the mechanism is now confirmed
+
+One incident, and the first promotion of a mechanism in this ledger from
+`PATTERN_CANDIDATE` to `PATTERN_CONFIRMED`.
+
+The incident is small. What it establishes is not: the third occurrence
+crosses out of the gate family the first two shared, which is the evidence
+that was missing when the candidate was registered.
+
+
+### `INC-2026-09-15-21` — the registration's calibration verified a
+###                       duplicate of the declaration, not the declaration
+
+```
+INCIDENT_ID             INC-2026-09-15-21
+date                    2026-09-15
+producer                Orion
+subject/version         §24 WF-3 registration
+                        scripts/security/gate_registry.py — the uh_runner and
+                        uh_floor_gate entries
+                        scripts/test_uh_runner.py
+                        scripts/test_uh_floor_gate.py
+                        at: a4296edf527f07c8c661fca686d92804bc35cfba
+
+false_or_faulty_output  Both new registry rows declare a denominator, and
+                        both carry `probe=False` with a skip reason naming
+                        the calibration suite that verifies it instead. That
+                        is the house form and it is the right shape.
+
+                        THE SUITES DID NOT READ THE DECLARATION. Each typed
+                        its own second copy:
+
+                          gate_registry.py
+                            uh_runner.denominator =
+                              r"Unified Hunter — \d+ targets from "
+                            uh_floor_gate.denominator =
+                              r"Assertion floors — \d+ targets, \d+ floored,
+                                \d+ assertions"
+
+                          test_uh_runner.py
+                            DECLARED_DENOMINATOR =
+                              r"Unified Hunter — \d+ targets from "
+                          test_uh_floor_gate.py
+                            DECLARED_DENOMINATOR =
+                              r"Assertion floors — \d+ targets, \d+ floored,
+                                \d+ assertions"
+
+                        The scenarios then proved the instrument's real
+                        output matched the LOCAL COPY. The comment beside
+                        each said "the registry's declared denominator is
+                        what it prints". What was proven is "a second regex
+                        typed into this file matches what it prints". Those
+                        are different propositions, and only the first is
+                        the one the machine admits on.
+
+                        The consequential path does not close the gap.
+                        `check_gate_registry.probe_denominator` returns
+                        `"skipped"` when `probe` is False, and `cross_check`
+                        raises a denominator finding only for `"missing"` or
+                        `"absent"`. I-3 checks that `proven_by` NAMES A FILE
+                        THAT EXISTS; it never executes it and never compares
+                        it to the declaration. So nothing anywhere binds the
+                        registry regex to the suite that claims to verify it.
+
+                        REPRODUCED, not reasoned. One character of the
+                        authoritative registry changed and nothing else:
+
+                          uh_runner.denominator = r"BOGUS NEVER MATCHES"
+
+                          make test-uh-runner            exit 0
+                                                         163 passed, 0 failed
+                          make test-test-wiring          exit 0
+                          check_gate_registry.py --gate  exit 0
+                            "GATE PASSED: I-1, I-2, I-3, I-4, I-5, I-6, I-7
+                             hold."
+
+                        Every surface green on a declaration that can never
+                        match anything. The same hole exists independently
+                        for uh_floor_gate.
+
+corrected_output        See the repair commit recorded beside this entry.
+                        One authoritative declaration per gate — the registry
+                        row — imported by the calibration through
+                        `gate_registry.BY_MODULE`, with the local copies
+                        removed; the suites additionally assert that
+                        `proven_by` names the suite that is executing, so the
+                        binding is checked in both directions. Both
+                        calibration suites are invoked by required
+                        Policy-as-Code so the assertions are consequential
+                        rather than locally green.
+
+                        This repairs TWO INSTANCES. It does not implement the
+                        generic control — see the escalation section.
+
+detection_method        Kai independent source review, performed AFTER the
+                        exact-SHA §24 CI came back green. Recorded plainly:
+                        the producer's own evidence package, the mutation
+                        testing in it, and a fully green required workflow
+                        all failed to surface this. Green CI is what the
+                        defect looks like.
+
+                        Worth stating because the §24 package did carry
+                        12-of-12 mutation detection — but every mutation was
+                        injected into `uh_runner.py`, the implementation. Not
+                        one was injected into the REGISTRY, the authority. A
+                        mutation set aimed only at the implementation cannot
+                        find a defect in what the implementation is measured
+                        against.
+
+affected_scope          Two shadow registry entries on branch
+                        claude/project-rework-plan-pgvp35. Both gates are
+                        `pending_wiring` and enforce nothing. No production
+                        caller, no floor value, no cutover, no merge to main.
+
+downstream_impact       NONE realised. The declarations happened to be
+                        correct; the defect is that nothing was checking
+                        whether they were. The realisable impact is a false
+                        denominator coexisting with green calibration, green
+                        gate-registry and green Policy-as-Code — I-2's "pass
+                        that cannot be falsified" inside the file whose job
+                        is to prevent exactly that.
+
+mechanism_status        PATTERN_CONFIRMED
+mechanism_id            M-POLICY-ADMISSION-DIVERGENCE
+related_incidents       INC-2026-09-14-18, INC-2026-09-14-19 — the two
+                        supporting occurrences, now confirmed as occurrences
+                        of the same mechanism. Their historical records are
+                        UNCHANGED; the adjudication is made here.
+recurrence_count        3 confirmed occurrences
+
+stop_signal             "I have written the authoritative value in one file
+                        and the expected value in another. Which one does
+                        the machine admit on, and is my test reading THAT
+                        object or a copy of it?"
+
+current_control         Repaired for these two instances only: the
+                        calibration imports the registry object, the local
+                        copies are gone, and a hostile mutation of the
+                        registry row alone now turns the calibration red.
+control_type            STRUCTURAL and OPERATIONALISED for the two named
+                        gates — the suites execute in required
+                        Policy-as-Code, so the binding is consequential.
+                        NOT MECHANISED as a general rule: nothing prevents
+                        the next registry entry from being calibrated
+                        against a retyped copy.
+control_introduced_at   the repair commit recorded beside this append
+
+recurred_after_control  YES — third occurrence of a mechanism registered as
+                        a candidate on 2026-09-15, one day after the second.
+
+owner/stage             Orion (execution) · Kai (adjudication) · Dainius
+                        (consequential authority)
+status                  CLOSED as an incident. The mechanism is OPEN and
+                        escalated.
+```
+
+---
+
+## `M-POLICY-ADMISSION-DIVERGENCE` — PROMOTED TO `PATTERN_CONFIRMED`
+
+**This section does not replace the `PATTERN_CANDIDATE` registration above.
+That entry stands as written, with its explicit statement that the two
+occurrences were not independent. This is the adjudication that followed.**
+
+**State: `PATTERN_CONFIRMED`. Adjudicated by Kai, 2026-09-15.**
+
+**The mechanism, unchanged in substance.** A gate carries a normative
+admission policy in one surface — prose, documentation, reporting or test
+intent — while the machine predicate that actually decides PASS, FINDING,
+REFUSAL, admissibility, adjudication or exit implements a different
+proposition. The producer's calibration then validates a SURROGATE of the
+policy rather than the policy itself, so the two can diverge while every
+surface stays green.
+
+**The three confirmed occurrences, and the one proposition they share.**
+
+| # | incident | the authoritative proposition | what the calibration actually checked |
+|---|---|---|---|
+| 1 | `INC-2026-09-14-18` | every member proves one exact target-bound result | a fixture that fabricated `result_label` — the field the contract turns on |
+| 2 | `INC-2026-09-14-19` | an unfloored member is not a pass | the explanatory report, never the consequential exit code |
+| 3 | `INC-2026-09-15-21` | the registry row's denominator | a second regex typed into the test file |
+
+In all three the calibration proved a surrogate, and the consequential
+authority remained free to diverge while green.
+
+**Why the third occurrence confirms what two could not.** The candidate
+registration recorded, correctly, that occurrences 1 and 2 were not
+independent: same producer, same gate family, same tranche, same development
+period. That reservation is still true of them. The third occurrence
+supplies what they lacked — it crosses a component boundary, from the WF-3
+floor consumer into the **instrumentation registry and its meta-gate**,
+which is a different component with a different author history and its own
+invariant framework (I-1 to I-7). The mechanism is therefore not a property
+of one gate's construction. Same producer still; the common-authority
+qualifier below is not withdrawn.
+
+**Doctrine 49.6: TRIGGERED.** Third confirmed occurrence of ONE mechanism.
+The producer is not the finding — the CONTROL is. Prose is no longer an
+acceptable remedy, and this append does not reissue the reminder.
+
+**Escalation, stated at the level actually reached.**
+
+```
+mechanism                          PATTERN_CONFIRMED
+doctrine 49.6                      TRIGGERED
+machine escalation                 BEGUN — PARTIAL
+generic cross-component control    NOT IMPLEMENTED
+mechanism controlled               NO
+```
+
+*Operationalised now, for the two named gates only:*
+
+1. one authoritative denominator declaration per gate, in the registry;
+2. the calibration imports that object rather than restating it;
+3. both suites assert `proven_by` names the suite that is executing;
+4. both suites are invoked by required Policy-as-Code, so their assertions
+   are consequential rather than locally green;
+5. a hostile mutation of the registry row **alone** makes the calibration
+   red — proven in both directions before banking.
+
+*Not implemented, and not to be reported as though it were:* the general
+rule that **a calibration must consume the same authoritative object the
+admission path consumes, never a retyped equivalent.** Nothing today stops
+the next registry entry, the next gate or the next producer from calibrating
+against a copy. `check_gate_registry` still admits `probe=False` without
+ever comparing the declaration to anything, and I-3 still checks only that
+`proven_by` names a file that exists.
+
+**Machine-hook owner:** WF-3 / instrumentation-governance tooling. The
+shape a generic control would take — an I-8 extension requiring that a
+`probe=False` entry's `proven_by` suite demonstrably consumes
+`BY_MODULE[module]` — is recorded as a direction, not a design, and nothing
+implements it.
+
+**What this append does NOT claim.** It does not claim the mechanism is
+controlled. It does not claim the two repaired instances generalise. It does
+not withdraw the same-producer qualifier: all three occurrences are Orion's,
+so this is recurrence across components under one producer, not across
+producers. And it does not alter `M-SCOPE-WIDEN`, `M-PRODUCER-CURATION`,
+`P-ADJUDICATOR-PROPAGATION` or `M-QUERY-OVERREACH`, whose counts and states
+are untouched.
+
+---
+
+## Ledger state after this append
+
+| id | producer | mechanism_status | assigned mechanism |
+|---|---|---|---|
+| `INC-2026-08-29-01` … `-03` | Orion | `PATTERN_CONFIRMED` | `M-SCOPE-WIDEN` |
+| `INC-2026-08-29-04` `-05` | Orion | `INCIDENT_ONLY` | none |
+| `INC-2026-08-29-06` | Kai | `INCIDENT_ONLY` | none — locator only |
+| `INC-2026-08-29-07` `-08` | DeepSeek | `INCIDENT_ONLY` | none |
+| `INC-2026-08-29-09` `-10` | Orion | `INCIDENT_ONLY` | none |
+| `INC-2026-08-29-11` | Kai | `INCIDENT_ONLY` | none |
+| `INC-2026-08-30-12` | Orion | `PATTERN_CANDIDATE` | `M-QUERY-OVERREACH` |
+| `INC-2026-09-12-13` | Orion | `PATTERN_CANDIDATE` | none assigned |
+| `INC-2026-09-12-14` | Orion | `PATTERN_CANDIDATE` | none assigned |
+| `INC-2026-09-14-15` | Orion | `INCIDENT_ONLY` | none assigned |
+| `INC-2026-09-14-16` | Orion | `INCIDENT_ONLY` | none assigned |
+| `INC-2026-09-14-17` | Orion | `INCIDENT_ONLY` | none assigned — `M-SCOPE-WIDEN` locator only |
+| `INC-2026-09-14-18` | Orion | `PATTERN_CONFIRMED` | `M-POLICY-ADMISSION-DIVERGENCE` — confirmed occurrence 1, adjudicated here; the incident's own record is unchanged |
+| `INC-2026-09-14-19` | Orion | `PATTERN_CONFIRMED` | `M-POLICY-ADMISSION-DIVERGENCE` — confirmed occurrence 2, adjudicated here; the incident's own record is unchanged |
+| `INC-2026-09-15-20` | Orion (implementation) · review loop (acceptance) | `INCIDENT_ONLY` | none assigned — `KAI-GATE-018` locator only |
+| `INC-2026-09-15-21` | Orion | `PATTERN_CONFIRMED` | `M-POLICY-ADMISSION-DIVERGENCE` — confirmed occurrence 3 |
+
+**Producers: Orion 17 · Kai 2 · DeepSeek 2. Total incidents 21.** Derivation:
+`grep -oE 'INC-2026-[0-9]{2}-[0-9]{2}-[0-9]+' kai-pm/FAILURE_PATTERN_LEDGER.md
+| sort -u | wc -l` returned 20 before this append; this append adds
+`INC-2026-09-15-21`. The counts carry no fairness, quality or
+producer-reliability inference.
+
+**Mechanisms.** `M-SCOPE-WIDEN` `PATTERN_CONFIRMED` · **`M-POLICY-ADMISSION-DIVERGENCE`
+`PATTERN_CONFIRMED` (promoted by this append, 3 confirmed occurrences)** ·
+`M-PRODUCER-CURATION` `PATTERN_CANDIDATE` · `P-ADJUDICATOR-PROPAGATION`
+`PATTERN_CANDIDATE` · `M-QUERY-OVERREACH` `PATTERN_CANDIDATE`. No other
+mechanism's state or recurrence count is altered.
+
+**Escalation state.** Doctrine 49.6 has fired for
+`M-POLICY-ADMISSION-DIVERGENCE` on its third confirmed occurrence. Machine
+escalation is BEGUN and PARTIAL: operationalised for the two named gates,
+with no generic cross-component control implemented. The mechanism is NOT
+controlled. The independence / common-authority locator shape at
+`INC-2026-08-29-10` and `INC-2026-09-12-14` still stands at two preserved
+occurrences, unchanged.
