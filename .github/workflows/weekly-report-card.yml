@@ -12,6 +12,14 @@ permissions:
 jobs:
   report-card:
     runs-on: ubuntu-latest
+    # GitHub's default job timeout is 360 minutes; a hung job burns six
+    # hours and reads as "still running". Run 697 of core-tests sat at
+    # 133.9 minutes and finished with no conclusion at all. 60 is over
+    # twice the longest successful run of any workflow here, so it
+    # cannot cut short work that is progressing. All nine jobs were
+    # unbounded — the bound is applied to the whole set, not to the one
+    # workflow whose change prompted it.
+    timeout-minutes: 60
 
     env:
       HMAC_ALLOW_DEV_SECRET: "true"

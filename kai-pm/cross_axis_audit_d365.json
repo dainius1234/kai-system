@@ -1,0 +1,298 @@
+{
+ "audit": "CROSS_AXIS_SEMANTIC",
+ "banked_under": "D365 (evidence only)",
+ "subject": "d8aac4d49e6ba997e3eb38062c0917186ee3f197",
+ "subject_tree": "3abc9e9d8ca11966a6f996d5f0af68072ee5b117",
+ "population": 272,
+ "axes_in_scope": [
+  "FUNCTION",
+  "AUTHORITY",
+  "GENERATION",
+  "SCOPE"
+ ],
+ "axes_audited_elsewhere": {
+  "LIFECYCLE": "D361-D363",
+  "VALIDITY": "D364"
+ },
+ "mutation_sweep": "17 fields x 9 values = 153 mutations per axis (a LOWER BOUND, unioned with corpus-observed values)",
+ "reachable_values": {
+  "FUNCTION": [
+   "EVIDENCE",
+   "GOVERNANCE",
+   "MARKER",
+   "OTHER",
+   "PLAN",
+   "REFERENCE",
+   "RUNTIME_INPUT",
+   "STATUS",
+   "UNKNOWN",
+   "USER_GUIDE"
+  ],
+  "AUTHORITY": [
+   "UNKNOWN"
+  ],
+  "GENERATION": [
+   "UNKNOWN"
+  ],
+  "SCOPE": [
+   "WHOLE_FILE"
+  ]
+ },
+ "deferred_by_design": {
+  "AUTHORITY": "declared unearnable; unobserved on the corpus; injecting 'ADVISORY' through the real path is REJECTED; and the clean row is still accepted (known-positive + known-negative)",
+  "GENERATION": "declared unearnable; unobserved on the corpus; injecting 'FULL_DERIVED' through the real path is REJECTED; and the clean row is still accepted (known-positive + known-negative)"
+ },
+ "not_deferred": {
+  "FUNCTION": "declared dispositions ['H2_EMITTABLE'] are earnable",
+  "SCOPE": "declared dispositions ['H2_EMITTABLE', 'H2_NOT_EARNABLE'] are earnable"
+ },
+ "tally_by_axis": {
+  "FUNCTION": {
+   "ABSTENTION": 50,
+   "UNSUPPORTED_POSITIVE": 63,
+   "PROVEN": 149,
+   "FALSE_POSITIVE": 6,
+   "AMBIGUOUS": 4
+  },
+  "AUTHORITY": {
+   "DEFERRED_BY_DESIGN": 272
+  },
+  "GENERATION": {
+   "DEFERRED_BY_DESIGN": 272
+  },
+  "SCOPE": {
+   "UNSUPPORTED_POSITIVE": 272
+  }
+ },
+ "flagged_rows": [
+  {
+   "path": "CHANGELOG.md",
+   "axis": "SCOPE",
+   "value": "WHOLE_FILE",
+   "witness_type": "default_pending_region",
+   "witness": "proven writer present: REGION DETERMINATION REQUIRED",
+   "class": "UNSUPPORTED_POSITIVE",
+   "why": "a default presented as a verdict; no determination performed",
+   "signals": {}
+  },
+  {
+   "path": "README.md",
+   "axis": "SCOPE",
+   "value": "WHOLE_FILE",
+   "witness_type": "default_pending_region",
+   "witness": "proven writer present: REGION DETERMINATION REQUIRED",
+   "class": "UNSUPPORTED_POSITIVE",
+   "why": "a default presented as a verdict; no determination performed",
+   "signals": {}
+  },
+  {
+   "path": "SESSION_BACKLOG.md",
+   "axis": "SCOPE",
+   "value": "WHOLE_FILE",
+   "witness_type": "default_pending_region",
+   "witness": "proven writer present: REGION DETERMINATION REQUIRED",
+   "class": "UNSUPPORTED_POSITIVE",
+   "why": "a default presented as a verdict; no determination performed",
+   "signals": {}
+  },
+  {
+   "path": "data/teammates/auditor.md",
+   "axis": "FUNCTION",
+   "value": "EVIDENCE",
+   "witness_type": "title_states_purpose",
+   "witness": "Auditor",
+   "class": "FALSE_POSITIVE",
+   "why": "matched term lies inside a different word, not a plural of it",
+   "signals": {
+    "word_boundary_violation": true,
+    "nominated": [
+     "EVIDENCE",
+     "RUNTIME_INPUT"
+    ],
+    "also_matched": [
+     "EVIDENCE"
+    ]
+   }
+  },
+  {
+   "path": "docs/PROJECT_BACKLOG.md",
+   "axis": "SCOPE",
+   "value": "WHOLE_FILE",
+   "witness_type": "default_pending_region",
+   "witness": "proven writer present: REGION DETERMINATION REQUIRED",
+   "class": "UNSUPPORTED_POSITIVE",
+   "why": "a default presented as a verdict; no determination performed",
+   "signals": {}
+  },
+  {
+   "path": "docs/ara_review_status.md",
+   "axis": "FUNCTION",
+   "value": "STATUS",
+   "witness_type": "title_states_purpose",
+   "witness": "Ara Review Follow-up Status",
+   "class": "AMBIGUOUS",
+   "why": "candidates ['STATUS', 'EVIDENCE'] both match; PATH_NOMINATION order decided the verdict",
+   "signals": {
+    "order_dependent": true,
+    "nominated": [
+     "STATUS",
+     "EVIDENCE",
+     "USER_GUIDE"
+    ],
+    "also_matched": [
+     "STATUS",
+     "EVIDENCE"
+    ]
+   }
+  },
+  {
+   "path": "docs/known_issues.md",
+   "axis": "FUNCTION",
+   "value": "OTHER",
+   "witness_type": "purpose_outside_declared_vocabulary",
+   "witness": "This file",
+   "class": "FALSE_POSITIVE",
+   "why": "closed-vocabulary negative computed over a trigger-only capture: satisfied by construction, not by the document",
+   "signals": {
+    "degenerate_capture": true
+   }
+  },
+  {
+   "path": "kai-pm/BASELINE_RESPONSES_0.5B.md",
+   "axis": "SCOPE",
+   "value": "WHOLE_FILE",
+   "witness_type": "default_pending_region",
+   "witness": "proven writer present: REGION DETERMINATION REQUIRED",
+   "class": "UNSUPPORTED_POSITIVE",
+   "why": "a default presented as a verdict; no determination performed",
+   "signals": {}
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_P3_RELIABILITY_AUDIT_PRIVACY_RECOVERY_PLAN.md",
+   "axis": "FUNCTION",
+   "value": "PLAN",
+   "witness_type": "title_states_purpose",
+   "witness": "Kai System \u2014 Phase 3 Reliability, Audit, Privacy and Recovery Plan",
+   "class": "AMBIGUOUS",
+   "why": "candidates ['PLAN', 'EVIDENCE'] both match; PATH_NOMINATION order decided the verdict",
+   "signals": {
+    "order_dependent": true,
+    "nominated": [
+     "PLAN",
+     "EVIDENCE"
+    ],
+    "also_matched": [
+     "PLAN",
+     "EVIDENCE"
+    ]
+   }
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_PLANNING_PACKAGE_QA.md",
+   "axis": "FUNCTION",
+   "value": "PLAN",
+   "witness_type": "title_states_purpose",
+   "witness": "Kai System \u2014 Planning Package Continuity and Integrity Review",
+   "class": "FALSE_POSITIVE",
+   "why": "matched term lies inside a different word, not a plural of it",
+   "signals": {
+    "word_boundary_violation": true,
+    "order_dependent": true,
+    "nominated": [
+     "PLAN",
+     "EVIDENCE"
+    ],
+    "also_matched": [
+     "PLAN",
+     "EVIDENCE"
+    ]
+   }
+  },
+  {
+   "path": "kai-pm/EVIDENCE_PLANE_RESEARCH_LINEAGE.md",
+   "axis": "FUNCTION",
+   "value": "PLAN",
+   "witness_type": "title_states_purpose",
+   "witness": "KAI Evidence Plane \u2014 Research Lineage and Continuity Note",
+   "class": "FALSE_POSITIVE",
+   "why": "matched term lies inside a different word, not a plural of it",
+   "signals": {
+    "word_boundary_violation": true,
+    "order_dependent": true,
+    "nominated": [
+     "PLAN",
+     "EVIDENCE"
+    ],
+    "also_matched": [
+     "PLAN",
+     "EVIDENCE"
+    ]
+   }
+  },
+  {
+   "path": "kai-pm/KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md",
+   "axis": "FUNCTION",
+   "value": "PLAN",
+   "witness_type": "title_states_purpose",
+   "witness": "Kai Unified Hunter Architecture and Migration Roadmap",
+   "class": "AMBIGUOUS",
+   "why": "candidates ['PLAN', 'REFERENCE'] both match; PATH_NOMINATION order decided the verdict",
+   "signals": {
+    "order_dependent": true,
+    "nominated": [
+     "PLAN",
+     "REFERENCE"
+    ],
+    "also_matched": [
+     "PLAN",
+     "REFERENCE"
+    ]
+   }
+  },
+  {
+   "path": "kai-pm/SERVICE_IDENTITY_STATE.md",
+   "axis": "FUNCTION",
+   "value": "OTHER",
+   "witness_type": "purpose_outside_declared_vocabulary",
+   "witness": "\nThis file",
+   "class": "FALSE_POSITIVE",
+   "why": "closed-vocabulary negative computed over a trigger-only capture: satisfied by construction, not by the document",
+   "signals": {
+    "degenerate_capture": true
+   }
+  },
+  {
+   "path": "kai-pm/VERIFICATION_ARCHITECTURE_REVIEW.md",
+   "axis": "FUNCTION",
+   "value": "EVIDENCE",
+   "witness_type": "title_states_purpose",
+   "witness": "Verification-architecture gap review",
+   "class": "AMBIGUOUS",
+   "why": "candidates ['EVIDENCE', 'REFERENCE'] both match; PATH_NOMINATION order decided the verdict",
+   "signals": {
+    "order_dependent": true,
+    "nominated": [
+     "EVIDENCE",
+     "REFERENCE"
+    ],
+    "also_matched": [
+     "EVIDENCE",
+     "REFERENCE"
+    ]
+   }
+  },
+  {
+   "path": "kai-pm/WAYPOINTS.md",
+   "axis": "FUNCTION",
+   "value": "OTHER",
+   "witness_type": "purpose_outside_declared_vocabulary",
+   "witness": "records",
+   "class": "FALSE_POSITIVE",
+   "why": "closed-vocabulary negative computed over a trigger-only capture: satisfied by construction, not by the document",
+   "signals": {
+    "degenerate_capture": true
+   }
+  }
+ ],
+ "caveat": "Adjudication classes are an AUTHOR NOMINATION derived by declared rule from mechanical signals. They carry no admission weight. Independent adjudication is required."
+}

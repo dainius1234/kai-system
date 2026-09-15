@@ -42,7 +42,7 @@ failed = 0
 
 # Meta-assertion (see module docstring). Raise this deliberately when a
 # scenario is added; it is the thing that notices when one disappears.
-EXPECTED_SCENARIOS = 20
+EXPECTED_SCENARIOS = 28
 executed: list[str] = []
 
 
@@ -80,10 +80,20 @@ def log_of(**suites: int) -> str:
 @contextlib.contextmanager
 def floors_of(**suites: int):
     """Point the gate at a temporary floors file for the duration."""
+    with floors_from({n.replace("_", " "): c for n, c in suites.items()}) as p:
+        yield p
+
+
+@contextlib.contextmanager
+def floors_from(recorded: dict):
+    """`floors_of` for labels that are not Python identifiers.
+
+    Real suite names carry hyphens and parentheses, and the incident
+    fixture below needs them spelled exactly as CI printed them.
+    """
     original = gate.FLOORS
     with tempfile.TemporaryDirectory() as tmp:
         path = Path(tmp) / "floors.json"
-        recorded = {n.replace("_", " "): c for n, c in suites.items()}
         path.write_text(json.dumps({
             "note": "synthetic",
             "floors": recorded,
@@ -96,22 +106,37 @@ def floors_of(**suites: int):
             gate.FLOORS = original
 
 
-def run_gate(log: str, *extra_args: str) -> tuple[int, str]:
-    """Invoke the gate's CLI against a synthetic log; capture its report."""
+def run_argv(*argv_tail: str) -> tuple[int, str]:
+    """Invoke the gate's CLI directly; capture its report."""
+    buffer = io.StringIO()
+    original_argv = sys.argv
+    sys.argv = ["check_assertion_floors.py", *argv_tail]
+    try:
+        with contextlib.redirect_stdout(buffer):
+            code = gate.main()
+    finally:
+        sys.argv = original_argv
+    return code, buffer.getvalue()
+
+
+def run_gate(log: str, *extra_args: str,
+             status: object = 0) -> tuple[int, str]:
+    """Invoke the gate against a synthetic log and its status sidecar.
+
+    `status` is written beside the log, because that pair is the evidence
+    the gate adjudicates: a log says what ran, never whether the run
+    finished. The default of 0 is what every case below except the new
+    status cases means — a complete, successful aggregate. `None` writes
+    no sidecar, which is the unbound-log case and must be refused.
+    """
     with tempfile.TemporaryDirectory() as tmp:
         log_path = Path(tmp) / "run.log"
         log_path.write_text(log, encoding="utf-8")
-        argv = ["check_assertion_floors.py", "--from-log", str(log_path),
-                *extra_args]
-        buffer = io.StringIO()
-        original_argv = sys.argv
-        sys.argv = argv
-        try:
-            with contextlib.redirect_stdout(buffer):
-                code = gate.main()
-        finally:
-            sys.argv = original_argv
-        return code, buffer.getvalue()
+        if status is not None:
+            (Path(tmp) / "run.log.status").write_text(
+                f"{status}\n" if isinstance(status, int) else str(status),
+                encoding="utf-8")
+        return run_argv("--from-log", str(log_path), *extra_args)
 
 
 # ── Parsing ──────────────────────────────────────────────────────────
@@ -323,6 +348,174 @@ def test_a_failing_aggregate_run_is_reported_as_itself():
     check("the real cause is named", "aggregate test run failed" in out, out)
 
 
+# ── The evidence unit: a log is not adjudicable without its status ───
+#
+# `--from-log` bound the status to the literal 0, so the refusal above
+# was unreachable on the only path CI uses. These cases drive the CLI the
+# way CI drives it, which is how the defect survived: the red-run case
+# just above monkey-patches `run_suites`, and that path always carried the
+# true status.
+
+# FROZEN, and hand-written. Never fetched from Actions at test time — a
+# fixture that reads live state drifts, which is the pattern this whole
+# file exists to catch.
+#
+#   run 34631061383 / job 103367725885 on 3d84d2d, and run 34491294245 /
+#   job 102918401237 on 1009f31 before it. ubuntu-latest. `make test-uh`
+#   exited 2, halting at prerequisite 61 of 78 (Makefile:970,
+#   test-container-proof-harness).
+#
+# The five labels absent from this log are targets 74-78 of test-uh. They
+# did not erode — they never started.
+INCIDENT_ABSENT = ("Depends-On Readiness Tests", "Healthcheck Runnable Tests",
+                   "Policy Loader Tests", "Shipped Package Deps Tests",
+                   "Suite Floor Tests")
+
+INCIDENT_LOG = (
+    "UH-1 Contract Tests: 126 passed, 0 failed\n"
+    "Architecture Rule Tests: 68 passed, 0 failed\n"
+    "Assertion Floor Tests: 40 passed, 0 failed\n"
+    "Service identity audit tests: 25 passed, 0 failed\n"
+    "Identity wiring gate tests: 28 passed, 0 failed\n"
+    # The harness's own SUBJECT leaked its tally into the aggregate log,
+    # and the parser admitted it as a suite. Kept deliberately: the
+    # fixture is what CI produced, not a tidied version. That is WF-3 and
+    # is not repaired here.
+    "Container proof: 3 passed, 13 failed\n"
+    "make: *** [Makefile:970: test-container-proof-harness] Error 1\n"
+)
+
+INCIDENT_FLOORS = {
+    "UH-1 Contract Tests": 126, "Architecture Rule Tests": 68,
+    "Assertion Floor Tests": 40, "Service identity audit tests": 25,
+    "Identity wiring gate tests": 28,
+    **{name: 16 for name in INCIDENT_ABSENT},
+}
+
+
+def test_the_recovered_incident_is_refused_not_adjudicated():
+    scenario("incident-status-2")
+    with floors_from(INCIDENT_FLOORS):
+        code, out = run_gate(INCIDENT_LOG, "--json", status=2)
+    payload = json.loads(out)
+    check("the incomplete aggregate fails the gate", code == 1, out)
+    check("it is refused, not adjudicated",
+          payload["adjudicated"] is False, out)
+    check("and inadmissible", payload["admissible"] is False, out)
+    check("the recorded status is carried through",
+          payload["aggregate_status"] == 2, out)
+    check("the refusal names the cause",
+          payload["refusal"]["code"] == "aggregate_incomplete", out)
+    check("no finding is published",
+          not any(f in payload
+                  for f in ("fallen", "missing", "unrecorded", "drifted")),
+          out)
+    check("NONE OF THE FIVE NEVER-RUN SUITES IS CALLED MISSING",
+          not any(name in out for name in INCIDENT_ABSENT), out)
+
+
+def test_the_same_incident_log_with_status_zero_still_finds_the_five():
+    """WF-2 changes ADMISSIBILITY only; the erosion detector is untouched.
+
+    Same log, same floors, one variable: the status. If the refusal had
+    disabled the missing-suite detector rather than gating it, this case
+    would pass silently and the gate would have stopped checking — case 6.
+    """
+    scenario("incident-status-0")
+    with floors_from(INCIDENT_FLOORS):
+        code, out = run_gate(INCIDENT_LOG, "--json", status=0)
+    payload = json.loads(out)
+    check("a status-0 run is adjudicated", payload["adjudicated"] is True, out)
+    check("and this one still fails", code == 1, out)
+    check("all five absent suites are reported missing",
+          sorted(payload["missing"]) == sorted(INCIDENT_ABSENT),
+          str(payload.get("missing")))
+
+
+def test_a_complete_successful_run_is_adjudicated_normally():
+    """The refusal is not unconditional."""
+    scenario("status-0-clean")
+    with floors_of(Alpha_Tests=10, Beta_Tests=20):
+        code, out = run_gate(log_of(Alpha_Tests=10, Beta_Tests=20), "--json")
+    payload = json.loads(out)
+    check("a clean complete run passes", code == 0, out)
+    check("it is admissible", payload["admissible"] is True, out)
+    check("and adjudicated", payload["adjudicated"] is True, out)
+    check("the findings fields are present", "missing" in payload, out)
+
+
+def test_an_unbound_log_is_refused():
+    scenario("status-absent")
+    with floors_of(Alpha_Tests=10):
+        code, out = run_gate(log_of(Alpha_Tests=10), "--json", status=None)
+    payload = json.loads(out)
+    check("an unbound log is not adjudicated", code == 1, out)
+    check("and does not read as a pass", payload["admissible"] is False, out)
+    check("the refusal names the class",
+          payload["refusal"]["code"] == "required_input_missing", out)
+    check("and says which input is absent",
+          "run.log.status" in payload["refusal"]["message"], out)
+
+
+def test_a_malformed_status_is_refused():
+    scenario("status-malformed")
+    for raw in ("", "   \n", "two\nlines\n", "not-a-number\n"):
+        with floors_of(Alpha_Tests=10):
+            code, out = run_gate(log_of(Alpha_Tests=10), "--json", status=raw)
+        payload = json.loads(out)
+        check(f"{raw!r} is refused rather than read as zero", code == 1, out)
+        check(f"{raw!r} is named unreadable",
+              payload["refusal"]["code"] == "status_unreadable", out)
+        check(f"{raw!r} publishes no verdict", "missing" not in payload, out)
+
+
+def test_agreeing_authorities_are_accepted_then_the_run_is_refused():
+    scenario("status-agree")
+    with floors_of(Alpha_Tests=10):
+        code, out = run_gate(log_of(Alpha_Tests=10), "--json",
+                             "--status", "2", status=2)
+    payload = json.loads(out)
+    check("agreement is not itself a conflict",
+          payload["refusal"]["code"] == "aggregate_incomplete", out)
+    check("the agreed status is carried", payload["aggregate_status"] == 2, out)
+    check("and the incomplete run is still refused",
+          code == 1 and payload["adjudicated"] is False, out)
+
+
+def test_disagreeing_authorities_refuse():
+    """The explicit argument must not be able to defeat the safeguard."""
+    scenario("status-conflict")
+    with floors_of(Alpha_Tests=10):
+        code, out = run_gate(log_of(Alpha_Tests=10), "--json",
+                             "--status", "0", status=2)
+    payload = json.loads(out)
+    check("--status 0 cannot overrule a sidecar of 2", code == 1, out)
+    check("the conflict is named",
+          payload["refusal"]["code"] == "status_authority_conflict", out)
+    check("both values are reported",
+          "2" in payload["refusal"]["message"]
+          and "0" in payload["refusal"]["message"], out)
+    check("no verdict is published", "missing" not in payload, out)
+
+
+def test_a_missing_log_refuses_rather_than_raising():
+    """Today this is a FileNotFoundError that `|| true` swallows in CI."""
+    scenario("log-absent")
+    with tempfile.TemporaryDirectory() as tmp:
+        absent = Path(tmp) / "never-written.log"
+        with floors_of(Alpha_Tests=10):
+            try:
+                code, out = run_argv("--from-log", str(absent), "--json")
+            except Exception as exc:                      # noqa: BLE001
+                code, out = None, f"raised {type(exc).__name__}: {exc}"
+    check("a missing log refuses instead of raising", code == 1, out)
+    payload = json.loads(out) if code == 1 else {}
+    check("the refusal names the missing input",
+          payload.get("refusal", {}).get("code") == "required_input_missing",
+          out)
+    check("and claims no status", payload.get("aggregate_status") is None, out)
+
+
 # ── Invariants of the real configuration ─────────────────────────────
 #
 # Structural, not numeric: they stay true as counts change, which is what
@@ -378,6 +571,14 @@ def run() -> None:
     test_raising_a_floor_is_recorded()
     test_updating_never_drops_a_suite_absent_from_this_run()
     test_a_failing_aggregate_run_is_reported_as_itself()
+    test_the_recovered_incident_is_refused_not_adjudicated()
+    test_the_same_incident_log_with_status_zero_still_finds_the_five()
+    test_a_complete_successful_run_is_adjudicated_normally()
+    test_an_unbound_log_is_refused()
+    test_a_malformed_status_is_refused()
+    test_agreeing_authorities_are_accepted_then_the_run_is_refused()
+    test_disagreeing_authorities_refuse()
+    test_a_missing_log_refuses_rather_than_raising()
     test_every_sampled_suite_is_floored()
     test_every_sampled_target_exists_in_the_makefile()
     test_every_floor_is_a_positive_integer()

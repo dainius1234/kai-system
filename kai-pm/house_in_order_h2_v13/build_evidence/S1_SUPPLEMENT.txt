@@ -1,0 +1,290 @@
+S1 SUPPLEMENT — THE FOUR CLOSURE QUESTIONS. MEASUREMENT ONLY.
+PRODUCED BY ORION. ZERO ADJUDICATION WEIGHT. NO REPAIR.
+The existing S1 investigation report is NOT modified.
+
+1. E2 CONTEMPORANEOUS SOURCE-BINDING EVIDENCE
+   TWO DIFFERENT CLAIMS, AND THEY MUST NOT BE MERGED.
+
+   1a. CLEAN WORKING TREE at the E2 Pass A production point
+       NOT PROVEN.
+       No banked artefact records worktree state at that point.
+       Files that DO check cleanliness -- found by INVOCATION
+       SHAPE, because these spell it as separate argv strings and a
+       literal search for 'status --porcelain' returns ZERO --
+       and why none of them helps:
+         e2_investigation.py
+         make_identity_manifest.py
+         make_record_manifest_treebound.py
+         make_source_packet.py
+         s1_investigation.py
+       Each checks its OWN run, not the E2 Pass A run. The S1 and
+       E2 investigation instruments record worktree_clean, but they
+       ran at other times, and a clean observation at one moment
+       does not prove the state at another. NOT RECONSTRUCTED, NOT
+       INFERRED.
+
+   1b. SOURCE-BYTE IDENTITY of what that run actually read
+       PROVEN FOR THE 272 DOCUMENTS.
+       The evidence is contemporaneous by construction: the E2
+       result file banked at cb38952 records the sha256 of the
+       passA.json its own run consumed. That digest is part of the
+       run, not a later observation.
+         banked digest        24fb1f555560277fd4555087f22ed06ef4a72efee845a339bbc87b925730f51c
+         regenerated digest   24fb1f555560277fd4555087f22ed06ef4a72efee845a339bbc87b925730f51c
+         reproduces           True
+         documents checked    272
+         sha256 mismatches vs the frozen tree  0
+         document set == tree .md set          True
+       A Pass A artefact with that digest carries exactly those
+       per-document hashes, and every one equals the frozen tree's
+       blob. So the bytes the E2 run analysed WERE the subject's
+       bytes. This is STRONGER than a clean-tree record, because
+       clean-tree is only ever a PROXY for byte identity.
+
+   1c. THE RESIDUAL GAP, stated rather than glossed
+       615 source files are read by
+       opscan and NONE of them is hashed anywhere in the Pass A
+       record. Their byte identity is NOT PROVEN. A dirty .py could
+       have moved readers/reader_ops without changing any document
+       hash. Untracked files are likewise invisible to 1b.
+       So: documents PROVEN, source files NOT PROVEN, clean tree
+       NOT PROVEN. The E2 MECHANISM is untouched by any of this.
+
+2. CALLER CENSUS — passa.build and the census functions Pass A uses
+   Walked by AST over every tracked .py file in the repository, so
+   a caller cannot hide in a directory nobody named (R5). This
+   instrument excludes ITSELF by resolved path identity (R9).
+   HISTORICAL  (14)
+     kai-pm/house_in_order_h2_v11/passa.py:108  census.tracked_md[G]  G.tracked_md(subject_repo)
+     kai-pm/house_in_order_h2_v11/passa.py:109  census.build_graph[G] G.build_graph(subject_repo, tracked)
+     kai-pm/house_in_order_h2_v11/passa.py:110  census.incoming[G]    G.incoming(edges)
+     kai-pm/house_in_order_h2_v11/passa.py:113  census.collect[O]     O.collect(subject_repo, tracked)
+     kai-pm/house_in_order_h2_v11/passa.py:114  census.classify[C]    C.classify(ops, tracked, set(O.tracked(subject_repo)))
+     kai-pm/house_in_order_h2_v11/passa.py:114  census.tracked[O]     O.tracked(subject_repo)
+     kai-pm/house_in_order_h2_v11/passa.py:176  passa.build           build(sr, hr, a.subject, pathlib.Path(a.census_package))
+     kai-pm/house_in_order_h2_v12/passa.py:241  census.tracked_md[G]  G.tracked_md(subject_repo)
+     kai-pm/house_in_order_h2_v12/passa.py:242  census.build_graph[G] G.build_graph(subject_repo, tracked)
+     kai-pm/house_in_order_h2_v12/passa.py:243  census.incoming[G]    G.incoming(edges)
+     kai-pm/house_in_order_h2_v12/passa.py:246  census.collect[O]     O.collect(subject_repo, tracked)
+     kai-pm/house_in_order_h2_v12/passa.py:247  census.classify[C]    C.classify(ops, tracked, set(O.tracked(subject_repo)))
+     kai-pm/house_in_order_h2_v12/passa.py:247  census.tracked[O]     O.tracked(subject_repo)
+     kai-pm/house_in_order_h2_v12/passa.py:307  passa.build           build(sr, hr, a.subject, pathlib.Path(a.census_package))
+   INVESTIGATION  (11)
+     kai-pm/house_in_order_h2_v13/build_evidence/e2_controls.py:158  census.tracked_md[G]  G.tracked_md(str(work))
+     kai-pm/house_in_order_h2_v13/build_evidence/e2_controls.py:159  census.collect[O]     O.collect(work, docs)
+     kai-pm/house_in_order_h2_v13/build_evidence/e2_controls.py:160  census.classify[C]    C.classify(ops, docs, set(O.tracked(str(work))))
+     kai-pm/house_in_order_h2_v13/build_evidence/e2_controls.py:160  census.tracked[O]     O.tracked(str(work))
+     kai-pm/house_in_order_h2_v13/build_evidence/e2_controls.py:204  passa.build           PA.build(a.subject_repo, a.subject_repo, subject, pathlib.Path(a.census_package))
+     kai-pm/house_in_order_h2_v13/build_evidence/e2_investigation.py:187  census.source_population[O]O.source_population(repo)
+     kai-pm/house_in_order_h2_v13/build_evidence/e2_investigation.py:188  census.tracked_md[G]  G.tracked_md(subject_repo)
+     kai-pm/house_in_order_h2_v13/build_evidence/e2_investigation.py:189  census.collect[O]     O.collect(repo, tracked)
+     kai-pm/house_in_order_h2_v13/build_evidence/e2_investigation.py:190  census.classify[C]    C.classify(ops, tracked, set(O.tracked(subject_repo)))
+     kai-pm/house_in_order_h2_v13/build_evidence/e2_investigation.py:190  census.tracked[O]     O.tracked(subject_repo)
+     kai-pm/house_in_order_h2_v13/build_evidence/s1_investigation.py:144  passa.build           PA.build(str(root), str(root), subject, pathlib.Path(census))
+   OTHER  (10)
+     kai-pm/census_v11_claim_sensitivity/run_mutations.py:35  census.tracked_md[G]  G.tracked_md(root)
+     kai-pm/census_v11_claim_sensitivity/run_mutations.py:36  census.collect[O]     O.collect(root, docs)
+     kai-pm/census_v11_claim_sensitivity/run_mutations.py:37  census.classify[C]    C.classify(ops, docs, set(O.tracked(root)))
+     kai-pm/census_v11_claim_sensitivity/run_mutations.py:37  census.tracked[O]     O.tracked(root)
+     kai-pm/census_v11_claim_sensitivity/run_mutations.py:38  census.tracked[O]     O.tracked(root)
+     kai-pm/house_in_order_census_v11/compare_v10_v11.py:80  census.tracked_md[G]  G.tracked_md(subject)
+     kai-pm/house_in_order_census_v11/compare_v10_v11.py:81  census.build_graph[G] G.build_graph(subject, d11)
+     kai-pm/house_in_order_census_v11/compare_v10_v11.py:82  census.collect[O]     O.collect(subject, d11)
+     kai-pm/house_in_order_census_v11/compare_v10_v11.py:83  census.tracked[O]     O.tracked(subject)
+     kai-pm/house_in_order_census_v11/compare_v10_v11.py:84  census.classify[C]    C.classify(o11, d11, ta11)
+   PRODUCTION  (12)
+     kai-pm/house_in_order_census_v11/run_census.py:127  census.tracked_md[G]  G.tracked_md(subject)
+     kai-pm/house_in_order_census_v11/run_census.py:130  census.tracked[O]     O.tracked(subject)
+     kai-pm/house_in_order_census_v11/run_census.py:132  census.build_graph[G] G.build_graph(subject, docs)
+     kai-pm/house_in_order_census_v11/run_census.py:133  census.collect[O]     O.collect(subject, docs)
+     kai-pm/house_in_order_census_v11/run_census.py:134  census.classify[C]    C.classify(ops, docs, tracked_all)
+     kai-pm/house_in_order_h2_v13/passa.py:536  census.tracked_md[G]  G.tracked_md(subject_repo)
+     kai-pm/house_in_order_h2_v13/passa.py:537  census.build_graph[G] G.build_graph(subject_repo, tracked)
+     kai-pm/house_in_order_h2_v13/passa.py:538  census.incoming[G]    G.incoming(edges)
+     kai-pm/house_in_order_h2_v13/passa.py:541  census.collect[O]     O.collect(subject_repo, tracked)
+     kai-pm/house_in_order_h2_v13/passa.py:542  census.classify[C]    C.classify(ops, tracked, set(O.tracked(subject_repo)))
+     kai-pm/house_in_order_h2_v13/passa.py:542  census.tracked[O]     O.tracked(subject_repo)
+     kai-pm/house_in_order_h2_v13/passa.py:614  passa.build           build(sr, hr, a.subject, pathlib.Path(a.census_package))
+   TEST_CALIBRATION  (20)
+     kai-pm/house_in_order_census_v11/cal_claims.py:195  census.tracked[O]     O.tracked(root)
+     kai-pm/house_in_order_census_v11/cal_claims.py:196  census.collect[O]     O.collect(root, docs)
+     kai-pm/house_in_order_census_v11/cal_claims.py:197  census.classify[C]    C.classify(ops, docs, set(O.tracked(root)))
+     kai-pm/house_in_order_census_v11/cal_claims.py:197  census.tracked[O]     O.tracked(root)
+     kai-pm/house_in_order_census_v11/cal_claims.py:237  census.tracked[O]     O.tracked(root)
+     kai-pm/house_in_order_census_v11/cal_claims.py:238  census.tracked[O]     O.tracked(root)
+     kai-pm/house_in_order_census_v11/cal_claims.py:239  census.collect[O]     O.collect(root, docs)
+     kai-pm/house_in_order_census_v11/cal_claims.py:240  census.classify[C]    C.classify(ops, docs, ta)
+     kai-pm/house_in_order_census_v11/cal_claims.py:268  census.tracked[O]     O.tracked(r2)
+     kai-pm/house_in_order_census_v11/cal_claims.py:269  census.tracked[O]     O.tracked(r2)
+     kai-pm/house_in_order_census_v11/cal_claims.py:270  census.collect[O]     O.collect(r2, docs2)
+     kai-pm/house_in_order_census_v11/cal_claims.py:271  census.classify[C]    C.classify(ops2, docs2, ta2)
+     kai-pm/house_in_order_census_v11/cal_docgraph.py:77  census.tracked_md[G]  G.tracked_md(root)
+     kai-pm/house_in_order_census_v11/cal_docgraph.py:78  census.build_graph[G] G.build_graph(root, tracked)
+     kai-pm/house_in_order_census_v11/cal_docgraph.py:138  census.tracked_md[G]  G.tracked_md(root)
+     kai-pm/house_in_order_census_v11/cal_docgraph.py:139  census.build_graph[G] G.build_graph(root, tracked)
+     kai-pm/house_in_order_census_v11/cal_opscan.py:70  census.tracked[O]     O.tracked(root)
+     kai-pm/house_in_order_census_v11/cal_opscan.py:71  census.collect[O]     O.collect(root, docs)
+     kai-pm/house_in_order_census_v11/cal_opscan.py:82  census.classify[C]    C.classify(ops, docs, set(O.tracked(root)))
+     kai-pm/house_in_order_census_v11/cal_opscan.py:82  census.tracked[O]     O.tracked(root)
+
+   PRODUCTION callers of passa.build: 1
+   A gate in passa.main() covers the CLI. It does NOT cover any
+   caller that imports passa and calls build() directly, and the
+   census-function callers show that importing a library and
+   calling into it is the established pattern here -- it is how
+   Pass A itself consumes the census. DeepSeek B2 is confirmed by
+   the census: an entrypoint gate is not closure.
+
+3. SYMLINK BEHAVIOUR THROUGH THE FULL MATERIALISATION PATH
+   git archive -> tar extraction -> Path.read_text()
+   This is the path a materialisation repair would introduce, so
+   the question decides whether materialisation ALONE is closure.
+   A_inside
+     git mode                 120000  (120000 = symlink)
+     blob content (the commit)'real.md'
+     extracted as a symlink   True  -> real.md
+     read_text() succeeded    27 bytes
+     content read             '# real\\n\\nINSIDE THE SUBJECT\\n'
+     equals the blob          False
+     INGESTS BYTES NOT IN THE COMMIT: True
+   B_escape
+     git mode                 120000  (120000 = symlink)
+     blob content (the commit)'/tmp/s1_sym_b6l9scta/outside.md'
+     extracted as a symlink   True  -> /tmp/s1_sym_b6l9scta/outside.md
+     read_text() succeeded    36 bytes
+     content read             '# outside\\n\\nNOT IN THE COMMIT AT ALL\\n'
+     equals the blob          False
+     INGESTS BYTES NOT IN THE COMMIT: True
+   C_broken
+     git mode                 120000  (120000 = symlink)
+     blob content (the commit)'no_such_file.md'
+     extracted as a symlink   True  -> no_such_file.md
+     read_text() FAILED       FileNotFoundError
+     INGESTS BYTES NOT IN THE COMMIT: False
+
+   ANSWER TO KAI'S QUESTION: YES for A and B. git stores a symlink
+   as a blob whose CONTENT IS THE TARGET PATH. Extraction restores
+   a real symlink, and read_text() FOLLOWS it, so the bytes
+   analysed are the target's, never the blob's. For B the target
+   lies OUTSIDE the materialised subject entirely, so the analysed
+   bytes are not represented by the frozen commit in any form. C
+   fails with an exception rather than drifting.
+   THEREFORE MATERIALISATION ALONE IS NOT CLOSURE. S1 closure
+   requires an explicit symlink policy. The measured options:
+     P1  REJECT any analysed path whose tree mode is 120000.
+         Fail-closed, smallest, and loses whatever a symlinked
+         document was contributing.
+     P2  TREAT THE BLOB AS THE EVIDENCE -- read the object, not the
+         filesystem. The blob is the target path string, which is
+         what the commit actually contains. Source-bound by
+         construction and it cannot leave the repository.
+     P3  RESOLVE INSIDE and reject escapes. Larger, and it still
+         analyses bytes the link does not itself contain.
+   MEASURED, NOT PREFERRED: P2 is the only one of the three that is
+   source-bound BY CONSTRUCTION rather than by a check that can be
+   forgotten. P1 is the smallest. THE CHOICE IS KAI'S.
+
+4. WHERE A PREREQUISITE GATE MUST EXECUTE
+   build() is defined at passa.py L532
+   first census call inside build   L536  G.tracked_md(subject_repo)
+   first filesystem read inside build L566  (pathlib.Path(subject_repo) / d).read_text(errors='ignore')
+   existing HEAD gates, by AST:
+     passa.py L602  git(sr, 'rev-parse', 'HEAD').stdout.strip()
+     passa.py L602  git(sr, 'rev-parse', 'HEAD')
+
+   THE GATE MUST RUN INSIDE build(), BEFORE ITS FIRST CENSUS CALL
+   at L536. A gate in main() alone leaves build() reachable, and
+   a gate placed after L536 lets the census read the filesystem
+   before the prerequisite is tested. For demonstration C to fail
+   CLOSED with a named prerequisite -- rather than the current
+   unhandled FileNotFoundError -- the check must precede BOTH the
+   census call and the document read.
+   THAT SINGLE PLACEMENT COVERS BOTH THE CLI AND THE LIBRARY PATH,
+   because every CLI run goes through build() too. It is one gate,
+   at the measurement boundary, not two at the entrypoints.
+
+5. REPAIR OPTIONS RANKED BY WHETHER THEY CLOSE THE ROOT
+   The root is an UNENFORCED PRECONDITION AT THE MEASUREMENT
+   BOUNDARY, so an option closes it only if the invariant is true
+   AT build(), for every caller, including symlinks.
+
+   R1  GATE IN build(): assert HEAD == subject AND clean worktree,
+       before the first census call. Abort with a named
+       prerequisite.
+       safety      YES for A and C, at build(), all callers
+       capability  NO -- non-HEAD subject still unanalysable
+       symlinks    NO -- a clean tree still contains symlinks that
+                   read_text() follows
+       CLOSES THE ROOT? PARTIALLY. Closes the realised exposure.
+
+   R2  MATERIALISE in build() via the census's proven materialise()
+       safety      YES for A, C, and for subject != HEAD
+       capability  YES
+       symlinks    NO -- section 3 proves extraction plus
+                   read_text() still escapes the commit
+       CLOSES THE ROOT? NO, not on its own.
+
+   R3  R2 + AN EXPLICIT SYMLINK POLICY (P1 or P2)
+       safety YES · capability YES · symlinks YES
+       CLOSES THE ROOT? YES.
+
+   R4  R1 + AN EXPLICIT SYMLINK POLICY
+       safety YES · capability NO · symlinks YES
+       CLOSES THE ROOT AS IT IS REALISED TODAY, and leaves the
+       non-HEAD capability absent -- which is a CORRECT REFUSAL,
+       not a defect.
+
+   SMALLEST ROOT-CLOSING MECHANISM, not the smallest line diff:
+   R4 if the programme accepts that a non-HEAD subject stays
+   unsupported; R3 if that capability is wanted. Both need the
+   symlink policy, and section 3 is why. THE CHOICE IS KAI'S.
+
+6. IS ONE PRODUCTION FILE STILL SUFFICIENT?
+   YES for R1 and R4: passa.py only.
+   YES for R2 and R3 as well, but with a qualification worth
+   stating: build() would IMPORT run_census.materialise rather than
+   reimplement it, so the census package is a DEPENDENCY, not an
+   edit. It stays frozen and byte-identical. If Kai would rather
+   not add that import, the alternative is duplicating a
+   calibrated guarantee, which R5 argues against.
+   NOTHING in classify.py, envelope.py, ontology.py, subjectbind.py
+   or run_h2_v12.py would change under any option.
+
+7. NORMALISED OUTCOME SUMMARY
+   sha256  eed1d664085975db11ded48fe47a44b82ab817df7145ccdc499542073289d08a
+   Stable semantic fields only: code digests, cases A-E with
+   expected/observed/exit class, affected products, root
+   classification, caller census, symlink results, E2 binding
+   status and the boundary line numbers. No temp paths, no
+   timestamps, no synthetic commit ids.
+
+8. PROPOSED FAIL-OLD / PASS-NEW CONTROLS
+   A  dirty worktree, HEAD == subject
+      FAIL-OLD predecessor writes output, rc=0, drifted witness
+      PASS-NEW named prerequisite abort, no output written
+   C  tracked file deleted
+      FAIL-OLD unhandled FileNotFoundError traceback
+      PASS-NEW named prerequisite abort BEFORE any filesystem read
+   LIBRARY PATH: both of the above asserted against build() called
+      DIRECTLY, not only through the CLI -- otherwise the control
+      proves only what the entrypoint does
+   SYMLINK A/B/C: under the chosen policy, each either rejected
+      with a named reason or evidenced by the blob; a CAN-FAIL
+      proof that an escaping link cannot contribute bytes
+   B/D/E remain refused, and the refusal message unchanged
+   CANONICAL REGRESSION: a clean run byte-identical to the accepted
+      figures -- 272 rows, 492 witnesses, M3 201/291, VALIDITY
+      260/7/5, all six axes, every evidence fact, the 5
+      static-reference identities
+   CAN-FAIL: the gate must be shown to FIRE, not merely to pass
+   predecessor loaded from the git object and executed
+   implementation banked BEFORE the corpus run
+
+9. WHAT MUST REMAIN UNCHANGED
+   Every accepted figure above · the E2 MECHANISM · M1 · M3 · the
+   frozen census package · the existing HEAD gates and their
+   messages · the A6-ii path · 272 in / 272 out.
+
+10. WHAT THIS IS NOT
+   Not a repair, not a policy decision, not an adjudication. No
+   production file was modified. No option was selected.

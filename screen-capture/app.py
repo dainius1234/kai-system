@@ -22,6 +22,7 @@ from fastapi import FastAPI, HTTPException, Request, UploadFile, File
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
+from common.degraded import record_degradation
 from common.http_hygiene import pooled_client
 from common.runtime import ErrorBudget, detect_device, sanitize_string, setup_json_logger
 
@@ -152,7 +153,29 @@ async def capture() -> CaptureResult:
                     "user_id": "screen-capture",
                 })
         except Exception as e:
-            logger.warning("auto-memorize failed: %s", e)
+        # A failed WRITE is not a failed read. A read that fails degrades
+        # and can be retried; this loses the observation permanently, and
+        # the only trace was a warning line nobody reads.
+        #
+        # Verified 2026-08-07: this call has NEVER SUCCEEDED in any
+        # profile. This service is on `sensor-net`, which is a sealed
+        # island — not one of its members is attached to any other
+        # network — and memu-core is on agent-net/data-net. Docker's DNS
+        # only resolves names on a joined network, so every one of these
+        # POSTs has failed at name resolution for the life of the
+        # project, been swallowed here, and the service reported healthy.
+        #
+        # The topology is almost certainly RIGHT: perception is the least
+        # trusted surface in the system (microphone, camera, screen,
+        # clipboard, files) and a direct route from it to the memory
+        # store would be the most valuable pivot available. The fix is a
+        # mediated, write-only path, not a new network edge — see
+        # kai-pm/DEEPSEEK_BRIEF_2026-08-07_TOPOLOGY.md.
+        #
+        # Until that exists this at least stops the loss being silent:
+        # record_degradation surfaces it in the degradation report rather
+        # than only in a log line.
+            record_degradation("screen-capture", "auto_memorize", e, logger=logger)
 
     # save capture to disk
     ts = int(time.time())
