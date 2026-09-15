@@ -1895,3 +1895,237 @@ confirmed occurrence of ONE mechanism. Neither incident in this append is
 assigned to a mechanism, so neither advances any escalation. The
 independence / common-authority locator shape at `INC-2026-08-29-10` and
 `INC-2026-09-12-14` still stands at two preserved occurrences, unchanged.
+
+---
+
+# APPEND 2026-09-15 — a policy the machine did not implement, and a
+#                     candidate mechanism for the shape
+
+One incident, and the first registration of a candidate mechanism drawn
+from it and from `INC-2026-09-14-18`.
+
+
+### `INC-2026-09-14-19` — an unwatched population member exited green
+
+```
+INCIDENT_ID             INC-2026-09-14-19
+date                    2026-09-14
+producer                Orion
+subject/version         WF-3 shadow plan-aware floor consumer
+                        scripts/security/uh_floor_gate.py and its calibration
+                        scripts/test_uh_floor_gate.py
+                        before: 53389986aa3f9d067be0bd4d429b6038e5dc2e1f
+                        after:  18faee4a1d73306a31bc7e375e2d6a21479b4ab0
+
+false_or_faulty_output  The consumer represented an unfloored population
+                        member to the operator as:
+                          "Absence of a floor is NOT zero and is NOT a pass"
+                        while the consequential admission predicate was:
+                          return 1 if fallen else 0
+                        So a complete, valid aggregate with all 61 floors
+                        satisfied and 17 admitted population members carrying
+                        no floor exited 0. Reproduced before repair: rc=0,
+                        adjudicated=true, fallen=0, unfloored=17.
+                        THE REPORTING SURFACE WAS RED IN MEANING. THE MACHINE
+                        ADMISSION SURFACE WAS GREEN. CI reads the second.
+
+                        Scenario S checked that the 17 were reported, that
+                        they carried no floor and that no zero was
+                        synthesised. It did NOT assert the return code. The
+                        test verified the explanation and left the
+                        consequential outcome unverified.
+
+corrected_output        UNFLOORED_TARGET is an admissible, adjudicated POLICY
+                        FINDING. It is not a refusal -- the evidence is
+                        perfectly adjudicable, the run completed and every
+                        count is bound to its contracted result. It is not a
+                        floor erosion -- no prior floor exists to fall from.
+                        It is not zero and not an exemption.
+                        Admission is now:
+                          fully floored + all met  -> exit 0   (the only green)
+                          fallen > 0               -> exit 1
+                          unfloored > 0            -> exit 1
+                          both                     -> exit 1
+                        The terminal statement no longer claims a pass over F
+                        while P is wider than F; a pass requires all 78
+                        floored AND all met, and says so. A machine-readable
+                        `findings: {fallen, unfloored}` was added so the
+                        count is not inferred from array lengths.
+                        No floor was assigned to the 17. No zero. No
+                        exemption. Their values remain a separate decision
+                        requiring evidence from a complete successful CI run,
+                        which does not yet exist.
+
+detection_method        Kai independent source review, triggered by Orion's
+                        strategic challenge concerning the unresolved
+                        17-target disposition. The challenge was strategic,
+                        not evidential; the inspection it prompted found the
+                        defect.
+
+affected_scope          Shadow floor consumer only. No production caller. The
+                        Makefile, workflow, legacy consumer and live floor
+                        registry remained on the old production path.
+
+downstream_impact       NONE realised. Had the shadow consumer been cut over,
+                        CI could have returned green while 17 admitted
+                        population members remained unwatched -- which is the
+                        precise condition the assertion-floor gate exists to
+                        make impossible.
+
+mechanism_status        INCIDENT_ONLY
+mechanism_id            none assigned directly
+related_incidents       INC-2026-09-14-18 — cited as supporting evidence for
+                        the candidate mechanism registered below, not as an
+                        assertion of causal equivalence.
+recurrence_count        1 measured occurrence of this incident
+
+stop_signal             "I have written the policy in prose and the admission
+                        in code -- prove they are the same proposition."
+
+current_control         The corrected admission predicate, plus scenario S
+                        asserting rc == 1 and that the run is admissible and
+                        adjudicated rather than refused; S2 covering both
+                        findings at once; S3 pinning the only green.
+                        227 assertions, 0 failures, 39 scenarios.
+control_type            STRUCTURAL -- SHADOW IMPLEMENTATION WITH AN EXECUTING
+                        CALIBRATION SUITE, but NOT CONTROL_OPERATIONALISED:
+                        no production caller invokes the consumer and the
+                        suite is wired into no make target or workflow.
+control_introduced_at   18faee4a1d73306a31bc7e375e2d6a21479b4ab0
+recurred_after_control  NO measured recurrence
+
+owner/stage             Orion (execution) · Kai (adjudication) · Dainius
+                        (consequential authority)
+status                  CLOSED AS A SHADOW IMPLEMENTATION INCIDENT. WF-3
+                        remains OPEN.
+```
+
+---
+
+## `M-POLICY-ADMISSION-DIVERGENCE` — PATTERN_CANDIDATE
+
+**State: `PATTERN_CANDIDATE`. NOT `PATTERN_CONFIRMED`.**
+
+**Candidate mechanism.** A gate carries a normative admission policy in one
+surface — prose, documentation, reporting, or test intent — while the actual
+machine predicate deciding PASS, FINDING, REFUSAL, admissibility,
+adjudication or exit status implements a weaker or different proposition.
+The producer's calibration then validates the descriptive surface without
+asserting the consequential admission boundary, so policy and admission
+diverge while the suite stays green.
+
+**Supporting occurrence 1 — `INC-2026-09-14-18`.**
+Normative policy: every population member must prove one exact target-bound
+result. Actual admission before repair: the consumer did not bind the
+canonical `result_label`, the ordinal, the completed target's zero exit, or
+a sane `passed`/`failed` structure before counts reached floor adjudication.
+Calibration defect: the positive fixture itself fabricated
+`result_label = f"{target} label"` and passed anyway. The intended policy and
+the consequential admission predicate were not the same proposition.
+
+**Supporting occurrence 2 — `INC-2026-09-14-19`.**
+Normative policy: unfloored population members are not a pass. Actual
+admission before repair: the return code depended only on `fallen`, so
+`unfloored > 0` with `fallen == 0` exited 0. Calibration defect: scenario S
+checked the report and not the consequential return code. Again the policy
+claim and the machine admission predicate differed.
+
+**`INC-2026-09-14-18` is retrospectively included as supporting evidence for
+candidate `M-POLICY-ADMISSION-DIVERGENCE`; its original ledger record remains
+unchanged, because the candidate mechanism had not yet been adjudicated when
+`INC-2026-09-14-18` was recorded.** This file is append-only and history is
+not rewritten to make a pattern look tidier than its discovery.
+
+**Why this is only a candidate.** The two occurrences share a producer, a
+gate family, a tranche and a development period. That is recurrence evidence
+and it is not independence. Causal equivalence is **not** established.
+
+```
+candidate occurrence count      2
+confirmed recurrence count      NOT ESTABLISHED
+doctrine 49.6 escalation        NOT TRIGGERED
+machine-control escalation      NOT CLAIMED
+cause                           NOT PROVEN
+```
+
+**Control hypothesis — NOT OPERATIONALISED, NOT IMPLEMENTED.**
+The denominator is not "every sentence the gate prints"; that is too broad
+to be a control. The load-bearing denominator is **normative admission
+propositions**: any proposition capable of changing `admissible`,
+`adjudicated`, PASS / FINDING / REFUSAL, process exit, finding code or
+refusal code.
+
+The proposed form is a decision-contract matrix whose expected outcomes are
+derived from the **frozen architecture**, not read back out of the
+implementation:
+
+| condition | admissible | adjudicated | disposition | exit | buckets |
+|---|---|---|---|---|---|
+| status != 0 | false | false | `AGGREGATE_INCOMPLETE` | 2 | none adjudicated |
+| complete + fallen | true | true | `FLOOR_FINDING` | 1 | present |
+| complete + unfloored | true | true | `UNFLOORED_TARGET` | 1 | present |
+| complete + no findings | true | true | `PASS` | 0 | present |
+| green aggregate + label mismatch | false | false | `RESULT_CONTRACT_CONFLICT` | 2 | none |
+
+This is a hypothesis recorded for later adjudication. Nothing implements it.
+
+**Detection-method correction, recorded because the earlier claim was
+wrong.** Orion stated in strategic advice that three defects —
+`INC-2026-09-14-15`, `-18` and `-19` — were all found by adversarial source
+reading. That is false and collapses two distinct detectors.
+`INC-2026-09-14-15` was found by **dynamic calibration against real GNU Make
+behaviour**; `-18` and `-19` were found by **independent adversarial contract
+and source review**. The supported programme lesson is that hostile execution
+and independent adversarial review are **complementary detectors, and neither
+substitutes for the other**.
+
+**Same-producer calibration, qualified.** A calibration suite written by the
+producer of the implementation can inherit that producer's blind spots — both
+supporting occurrences demonstrate it. That does **not** make same-producer
+hostile calibration invalid: it is useful MACHINE evidence. It is simply not
+independent corroboration. Same authority, different method, is cross-method
+convergence. For consequential admission logic, future acceptance should
+carry both producer hostile calibration **and** independent adversarial
+contract review, with the independent reviewer contributing at least one
+falsifier rather than only reading the existing suite.
+
+---
+
+## Ledger state after this append
+
+| id | producer | mechanism_status | assigned mechanism |
+|---|---|---|---|
+| `INC-2026-08-29-01` … `-03` | Orion | `PATTERN_CONFIRMED` | `M-SCOPE-WIDEN` |
+| `INC-2026-08-29-04` `-05` | Orion | `INCIDENT_ONLY` | none |
+| `INC-2026-08-29-06` | Kai | `INCIDENT_ONLY` | none — locator only |
+| `INC-2026-08-29-07` `-08` | DeepSeek | `INCIDENT_ONLY` | none |
+| `INC-2026-08-29-09` `-10` | Orion | `INCIDENT_ONLY` | none |
+| `INC-2026-08-29-11` | Kai | `INCIDENT_ONLY` | none |
+| `INC-2026-08-30-12` | Orion | `PATTERN_CANDIDATE` | `M-QUERY-OVERREACH` |
+| `INC-2026-09-12-13` | Orion | `PATTERN_CANDIDATE` | none assigned |
+| `INC-2026-09-12-14` | Orion | `PATTERN_CANDIDATE` | none assigned |
+| `INC-2026-09-14-15` | Orion | `INCIDENT_ONLY` | none assigned |
+| `INC-2026-09-14-16` | Orion | `INCIDENT_ONLY` | none assigned |
+| `INC-2026-09-14-17` | Orion | `INCIDENT_ONLY` | none assigned — `M-SCOPE-WIDEN` locator only |
+| `INC-2026-09-14-18` | Orion | `INCIDENT_ONLY` | none assigned — supporting evidence for `M-POLICY-ADMISSION-DIVERGENCE` |
+| `INC-2026-09-14-19` | Orion | `INCIDENT_ONLY` | none assigned — supporting evidence for `M-POLICY-ADMISSION-DIVERGENCE` |
+
+**Producers: Orion 15 · Kai 2 · DeepSeek 2. Total incidents 19.** The counts
+carry no fairness, quality or producer-reliability inference; they are the
+currently recorded population and nothing more.
+
+**Mechanisms: `M-SCOPE-WIDEN` `PATTERN_CONFIRMED` · `M-PRODUCER-CURATION`
+`PATTERN_CANDIDATE` · `P-ADJUDICATOR-PROPAGATION` `PATTERN_CANDIDATE` ·
+`M-QUERY-OVERREACH` `PATTERN_CANDIDATE` · `M-POLICY-ADMISSION-DIVERGENCE`
+`PATTERN_CANDIDATE` (new).** No existing mechanism's recurrence count is
+altered by this append. `INC-2026-09-14-18` and `-19` remain
+`INCIDENT_ONLY`: they are supporting evidence for a candidate, which is not
+an assignment.
+
+**Escalation state.** Doctrine 49.6 fires on the third independently
+confirmed occurrence of ONE mechanism. `M-POLICY-ADMISSION-DIVERGENCE` is a
+candidate with two occurrences that are not independent — same producer,
+same gate family, same tranche — so it has no confirmed occurrences and
+advances no escalation. The independence / common-authority locator shape at
+`INC-2026-08-29-10` and `INC-2026-09-12-14` still stands at two preserved
+occurrences, unchanged.
