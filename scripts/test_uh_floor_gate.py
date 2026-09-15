@@ -32,6 +32,9 @@ import sys
 import tempfile
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from scripts.security.gate_registry import BY_MODULE  # noqa: E402
+
 REPO = Path(__file__).resolve().parent.parent
 GATE = REPO / "scripts" / "security" / "uh_floor_gate.py"
 PLAN = REPO / "scripts" / "security" / "uh_execution_plan.json"
@@ -39,12 +42,6 @@ PLAN = REPO / "scripts" / "security" / "uh_execution_plan.json"
 passed = 0
 failed = 0
 executed: list[str] = []
-# The denominator this gate is registered under. Declared here, beside
-# the assertion that checks it, so the registry entry and its evidence
-# cannot drift apart silently.
-DECLARED_DENOMINATOR = (
-    r"Assertion floors — \d+ targets, \d+ floored, \d+ assertions")
-
 EXPECTED_SCENARIOS = 40
 
 
@@ -59,6 +56,26 @@ def check(name: str, condition: bool, detail: str = "") -> None:
 
 def scenario(name: str) -> None:
     executed.append(name)
+
+
+def registry_gate(module: str):
+    """The AUTHORITATIVE registry row for `module`, bound both ways.
+
+    One declaration per gate, in scripts/security/gate_registry.py. This
+    suite reads that object rather than restating it — see
+    INC-2026-09-15-21, where this file's own `DECLARED_DENOMINATOR` was a
+    second copy and a hostile edit to the registry row alone left every
+    surface green.
+    """
+    gate = BY_MODULE.get(module)
+    check(f"{module} is in the authoritative registry", gate is not None)
+    if gate is None:
+        return None
+    check(f"{module} declares a denominator", gate.denominator is not None)
+    here = Path(__file__).resolve().relative_to(REPO).as_posix()
+    check(f"{module}'s proven_by points back at this suite",
+          gate.proven_by == here, f"{gate.proven_by!r} != {here!r}")
+    return gate
 
 
 def plan_pairs() -> tuple[list[tuple[str, str]], str]:
@@ -702,9 +719,12 @@ def test_the_declared_denominator_is_what_it_prints():
                  if k != "KAI_UH_EVIDENCE_ROOT"})
         check("the non-JSON path exits green on a clean root",
               p.returncode == 0, f"rc={p.returncode} {p.stdout}{p.stderr}")
-        check("output matches the registry's declared denominator",
-              re.search(DECLARED_DENOMINATOR, p.stdout) is not None,
-              p.stdout[:200])
+        gate = registry_gate("uh_floor_gate")
+        check("output matches the REGISTRY's declared denominator",
+              gate is not None and gate.denominator is not None
+              and re.search(gate.denominator, p.stdout) is not None,
+              f"declared={getattr(gate, 'denominator', None)!r} "
+              f"output={p.stdout[:160]!r}")
         check("and the denominator names a non-zero population",
               re.search(r"Assertion floors — (\d+) targets", p.stdout)
               and int(re.search(r"Assertion floors — (\d+) targets",

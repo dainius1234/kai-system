@@ -1930,12 +1930,16 @@ REGISTRY: Tuple[Gate, ...] = (
          denominator=(r"Assertion floors — \d+ targets, \d+ floored, "
                       r"\d+ assertions"),
          probe=False,
-         probe_skip_reason="needs an evidence root and a v2 floor registry "
-                           "that only a real aggregate produces; there is no "
-                           "argument-free invocation that could print a "
-                           "denominator. Probed by "
+         # Corrected: the aggregate produces EXECUTION EVIDENCE. The
+         # floor registry is POLICY INPUT and the aggregate does not
+         # produce it. The earlier wording conflated the two.
+         probe_skip_reason="the live denominator needs an evidence root "
+                           "AND the target-keyed v2 floor policy — two "
+                           "different kinds of input, only the first of "
+                           "which an aggregate produces. A bare invocation "
+                           "can supply neither safely. Probed by "
                            "scripts/test_uh_floor_gate.py against synthetic "
-                           "evidence roots",
+                           "evidence roots plus policy fixtures",
          proven_by="scripts/test_uh_floor_gate.py",
          pending_wiring="shadow only — the production path is still "
                         "check_assertion_floors.py. This consumer has never "
@@ -1943,6 +1947,38 @@ REGISTRY: Tuple[Gate, ...] = (
                         "17-unfloored policy remains UNVERIFIED against real "
                         "records",
          in_workflows=()),
+
+    # The two calibration suites themselves. Wiring them into
+    # policy-checks.yml makes them instruments by this registry's own
+    # definition — CI runs them and a non-zero exit stops the build — so
+    # `enforcing_elsewhere()` discovers them and I-4 requires them
+    # declared. Measured, not assumed: adding the workflow steps moved
+    # `discover_modules()` from 103 to 105 with exactly these two
+    # unregistered.
+    #
+    # Unlike their subjects these ARE probed. Both are wholly synthetic
+    # and take seconds, so the meta-gate runs each one and matches its
+    # real output against the regex declared here. That is the strongest
+    # form available: no skip, no surrogate, and the thing that decides
+    # is the thing that was checked.
+    Gate(module="test_uh_runner",
+         kind=GATE,
+         summary="destructive calibration for the UH runner — SC-1 "
+                 "ordering, the measured MAKEFLAGS forms, evidence "
+                 "ownership, and plan-defined membership",
+         inputs=("scripts/security/uh_execution_plan.json",),
+         denominator=r"UH Runner Tests: \d+ passed, \d+ failed",
+         proven_by="scripts/test_uh_runner.py",
+         in_workflows=("policy-checks.yml",)),
+    Gate(module="test_uh_floor_gate",
+         kind=GATE,
+         summary="destructive calibration for the plan-aware floor "
+                 "consumer — every case injects a defect and proves the "
+                 "gate refuses it",
+         inputs=("scripts/security/uh_execution_plan.json",),
+         denominator=r"UH Floor Gate Tests: \d+ passed, \d+ failed",
+         proven_by="scripts/test_uh_floor_gate.py",
+         in_workflows=("policy-checks.yml",)),
 )
 
 BY_MODULE = {gate.module: gate for gate in REGISTRY}

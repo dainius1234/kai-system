@@ -47,17 +47,13 @@ REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
 
 from scripts.security import uh_runner as R            # noqa: E402
+from scripts.security.gate_registry import BY_MODULE   # noqa: E402
 
 PLAN = REPO / "scripts" / "security" / "uh_execution_plan.json"
 
 passed = 0
 failed = 0
 executed: list[str] = []
-# The denominator this runner is registered under. Declared beside the
-# assertion that checks it, so the registry entry and its evidence
-# cannot drift apart silently.
-DECLARED_DENOMINATOR = r"Unified Hunter — \d+ targets from "
-
 EXPECTED_SCENARIOS = 22
 
 
@@ -89,6 +85,41 @@ class _Stub:
     def __exit__(self, *exc):
         for k, v in self.saved.items():
             setattr(self.module, k, v)
+
+
+def registry_gate(module: str):
+    """The AUTHORITATIVE registry row for `module`, bound both ways.
+
+    There is exactly one declaration of a gate's denominator and it lives
+    in scripts/security/gate_registry.py. This suite reads that object.
+    It does not restate it, and it does not accept an equivalent regex.
+
+    INC-2026-09-15-21 is why. Both §24 calibration suites declared their
+    own `DECLARED_DENOMINATOR` and proved the instrument matched the local
+    copy. `check_gate_registry` returns "skipped" for a `probe=False`
+    entry and raises a denominator finding only for "missing" or "absent",
+    and I-3 checks that `proven_by` names an existing file without ever
+    executing it — so changing the registry row alone to
+    r"BOGUS NEVER MATCHES" left the calibration, the meta-gate and
+    Policy-as-Code all green. The calibration proved a surrogate while the
+    consequential authority was free to diverge: the third confirmed
+    occurrence of M-POLICY-ADMISSION-DIVERGENCE.
+
+    The binding is checked in both directions, because one is not enough:
+    reading the registry proves this suite uses the declaration, and
+    asserting `proven_by` proves the declaration points back at this
+    suite. Either alone can be satisfied while the pair is wrong.
+    """
+    gate = BY_MODULE.get(module)
+    check(f"{module} is in the authoritative registry", gate is not None,
+          f"BY_MODULE has {sorted(BY_MODULE)[:5]}…")
+    if gate is None:
+        return None
+    check(f"{module} declares a denominator", gate.denominator is not None)
+    here = Path(__file__).resolve().relative_to(REPO).as_posix()
+    check(f"{module}'s proven_by points back at this suite",
+          gate.proven_by == here, f"{gate.proven_by!r} != {here!r}")
+    return gate
 
 
 def refusal_of(fn, *args, **kwargs):
@@ -649,8 +680,12 @@ def test_the_declared_denominator_is_what_it_prints() -> None:
 
         out = buf.getvalue()
         check("a fully satisfied traversal exits 0", rc == 0, f"rc={rc} {out}")
-        check("output matches the registry's declared denominator",
-              re.search(DECLARED_DENOMINATOR, out) is not None, out[:200])
+        gate = registry_gate("uh_runner")
+        check("output matches the REGISTRY's declared denominator",
+              gate is not None and gate.denominator is not None
+              and re.search(gate.denominator, out) is not None,
+              f"declared={getattr(gate, 'denominator', None)!r} "
+              f"output={out[:160]!r}")
         named = re.search(r"Unified Hunter — (\d+) targets", out)
         check("the denominator names the plan's real population",
               named is not None and int(named.group(1)) == 3,

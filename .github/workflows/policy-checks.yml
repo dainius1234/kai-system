@@ -257,5 +257,27 @@ jobs:
       - name: Every test pins the identity it claims to run as
         run: python scripts/security/check_test_identity.py
 
+      # WF-3 shadow calibration. These run the two suites whose assertions
+      # the registry names as `proven_by` for uh_runner and uh_floor_gate.
+      # Until this step existed, `proven_by` was checked only for FILE
+      # EXISTENCE — the 166 and 233 assertions never executed in required
+      # CI, so the evidence behind two `probe=False` declarations was
+      # locally green and nothing more (INC-2026-09-15-21).
+      #
+      # This is CALIBRATION WIRING, not cutover. Both suites are wholly
+      # synthetic: the runner suite stubs `subprocess` so no population
+      # member executes, and the floor suite builds evidence roots in
+      # temporary directories. Their subjects, uh_runner and uh_floor_gate,
+      # remain `pending_wiring` and gate nothing.
+      #
+      # Two separate `make` lines on purpose: the registry's workflow
+      # scanner captures only the FIRST target after `make`, so
+      # `make a b` would leave the second invisible to it.
+      - name: WF-3 shadow calibration (runner)
+        run: make test-uh-runner
+
+      - name: WF-3 shadow calibration (floor consumer)
+        run: make test-uh-floor-gate
+
       - name: Instrumentation invariants (I-4 enforced)
         run: python scripts/security/check_gate_registry.py --gate
