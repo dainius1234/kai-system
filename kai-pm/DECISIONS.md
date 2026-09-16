@@ -34408,3 +34408,265 @@ PROHIBITED       No merge of PR #122 · no coverage/test floor change · no
 NEXT             Kai's ruling on the RC-1 manifest collision, then the
                  remainder of the tranche, then promotion adjudication.
 ```
+
+---
+
+## D376 — 2026-09-16 — RC-1 record correction and bounded implementation authority for the three-control architecture. NO SOURCE REPAIR AUTHORISED.
+
+**Authority.** Dainius, this session, on Kai's recommendation after design
+review: *"GO — bank D376, ledger first."* Allocated after a fresh allocator
+check: highest heading in this file was D375; next free is D376. Absent in
+1..375: D103–D108, D260, D344–D353 — seventeen, pre-existing, unchanged by
+this entry and not closed by it.
+
+**Subject.** `afe13a507179571adf30bd889a9b6f55953e5cd9` at time of writing;
+the implementation subject is re-established after this record is pushed.
+
+**CREATES NO AUTHORITY BEYOND §3.** Not H3, not 048, not Item 8, not A-4,
+not WF-3 cutover, not RC-7, not a floor.
+
+---
+
+### 1. CORRECTION OF RECORD — D375 §2, RC-1 PACKAGE TABLE
+
+`DECISIONS.md` is append-only. D375 is not edited and stands visible in full.
+This section records what independent re-measurement established against it.
+
+**1.1 — "Every offending file sits inside a hash-frozen evidence package" is
+not accurate.** `house_in_order_h2_v11` is recorded by **D363** as FINAL
+CANDIDATE `be37a0aa…f133`, **"NOT FROZEN. NOT ADMITTED."**
+`house_in_order_h2` is a durable package with a recorded aggregate (**D339
+§7**); no freeze decision located. `census_v11_claim_sensitivity` carries a
+hashed precommitment (**D354 §2**); no freeze decision located.
+
+**1.2 — Census v1.1: A LATER AUTHORISED LINEAGE WAS INTRODUCED. THE FREEZE
+WAS NOT SUPERSEDED.** D357 froze the predecessor identity at
+`eb7aad7c…fa0e`. On 2026-09-09 commit **`bd1cbb4b`** performed S1 O3
+consumption-time source hardening **under the narrow frozen-package
+exception Kai authorised**, changing `docgraph.py`, `opscan.py`, the package
+`MANIFEST.sha256` and the consuming `h2_v13/passa.py`. The manifest was
+regenerated and the movement `eb7aad7c… → 29064d65…` was surfaced
+deliberately; retaining the old manifest to preserve the prior digest was
+rejected at the time as false attestation. **S1 FINAL ACCEPTANCE banked the
+hardened lineage and PRESERVES BOTH DIGEST LINEAGES.**
+
+```
+D357  eb7aad7c…fa0e   frozen PREDECESSOR identity — historically meaningful, intact
+S1 O3 29064d65…757a   later AUTHORISED HARDENED lineage — current
+NEITHER IS SILENTLY REWRITTEN INTO THE OTHER. Both remain governed in
+their own contexts. "Superseded" is the wrong word and is not used here.
+```
+
+Independently reproduced: `sha256(MANIFEST.sha256)` = `eb7aad7c…` at
+`bd1cbb4b~1` and `29064d65…` at `bd1cbb4b`. **D375 records the current
+Census aggregate correctly.**
+
+**1.3 — One row of D375 §2's `aggregate` column is not governance-equivalent.**
+Two conventions are in use, both principled, both reproduced exactly at this
+subject:
+
+| convention | packages | derivation |
+|---|---|---|
+| self-embedding | `house_in_order_h2` | `sha256(manifest ENTRY LINES)` = `fa847726…45f4` (D339 §7), written back into the file as a comment — so the whole-file hash `8aeeacab…` necessarily differs and is **not** the governance identity |
+| whole-file | Census v1.1 · H2 v1.1 · claim-sensitivity | `sha256(whole MANIFEST.sha256)`. D375 records all three correctly; for H2 v1.1 `be37a0aa…f133` is additionally D363's FINAL CANDIDATE identity |
+
+**1.4 — The citation-cost derivation is WITHDRAWN.** D375 §2 concluded *"Two
+of the four packages have aggregates cited ZERO times in this log, so the
+cost is not uniform."* One of its four inputs — `house_in_order_h2` — was
+counted over a value that is not that package's governance identity, so the
+counts were not taken on a governance-equivalent unit across the row set.
+**The derivation is withdrawn. No replacement arithmetic is asserted and
+none is required to withdraw it.** Future cost analysis must normalise
+identities per package convention and state its unit and search universe.
+
+**1.5 — What the RC-1 hold now rests on.** The **HOLD REMAINS IN FORCE.** Its
+original uniform frozen-package rationale is **narrowed and withdrawn where
+disproven**; the population is split by semantic role — genuine machine-bound
+execution dependencies, calibration fixture data, and prose. **Remediation is
+held because no repair may proceed until the replacement control
+architecture is authorised and built.** The **R14 decision to stop rather
+than choose silently remains correct.**
+
+**1.6 — Core Tests causal attribution stands, established independently.**
+RC-1 is the sole first-effective cause at `c1b6efc`: the structural test
+fails inside `pytest scripts/` at `make coverage` (Makefile:837);
+`coverage-floors` never reaches its per-module reports. **No per-module floor
+failure has been established**; combined coverage **passed at 79.78%**.
+Skipped tail: **16 skipped, 11 `always()`-guarded** — the entire live-stack
+surface.
+
+---
+
+### 2. THE THREE-CONTROL ARCHITECTURE
+
+Visibility, operational portability and evidence integrity are three
+different services. **They must communicate; none may impersonate another.**
+
+**CONTROL A — whole-repository machine-path inventory.** Permanent
+`kind=REPORT`. **Never gates**, at any count. Population derived from
+`git ls-files`; exclusion set **EMPTY and printed as empty**; text/non-text
+split declared with its decidability rule and the non-text files listed by
+path, never counted as zero. **No floor, no ratchet, no baseline, no
+live-defect minimum.**
+
+**CONTROL B — operational portability.** Blocking. Its claim, and nothing
+wider: *No detected developer-checkout or ephemeral-session filesystem
+dependency exists on the workflow-and-Make enforcement surface derived by
+the shared execution-surface mechanism.* **Root classes outside that
+derivation — pytest collection, `python -m`, shell entrypoints, Docker
+ENTRYPOINT/CMD, Compose `command:`, service startup — remain EXPLICITLY
+UNMEASURED by this gate and are named in its own report.** `USER_HOME` means
+a developer-checkout dependency; a container/service home is a
+known-negative class.
+
+**CONTROL C — evidence integrity.** Blocking, read-only, **may never
+regenerate or repair a MANIFEST.** The accepted S1 mechanism at
+`kai-pm/house_in_order_h2_v13/build_evidence/s1_toctou_controls.py` remains
+**the authoritative mechanism for the Census consumption path and is reused,
+not recreated.** Control C adds only the missing **at-rest** verification of
+the four implicated lineages, each under its own identity convention.
+
+**NO GLOBAL FROZEN-PACKAGE EXEMPTION EXISTS.** A manifest creates no
+authority. No old freeze decision is reinterpreted as portability authority.
+
+**Census v1.1's role, recorded explicitly:** `FROZEN EVIDENCE + AUTHORISED
+SHARED LIBRARY + AUTHORISED REPRODUCER`. Three later H2 generations import
+its `docgraph`, `opscan` and `claims`. **It is not historical-only.**
+
+---
+
+### 3. AUTHORISED — ONE BOUNDED TRANCHE
+
+Extract the existing execution-surface discovery from `check_gate_registry.py`
+into one behaviour-preserving shared helper consumed by both the meta-gate
+and Control B · add Control A as a permanent `kind=REPORT`, advisory only,
+**outside `policy-check`** · add Control B bounded as in §2 · reuse the
+accepted S1 Census consumption-time mechanism · add Control C only for
+missing at-rest integrity of the four lineages · registry declarations ·
+Make/workflow wiring · **retire `test_no_developer_home_paths` as the
+blocking control**, preserving its historical role and its RC-1 examples as
+calibration/evidence · the full calibration matrix **with no live-defect
+floor, baseline inflation or ratchet**.
+
+**HOLDS IMPOSED BY THIS DECISION**
+
+```
+NO-NEW-EVIDENCE HOLD — these may not mint new current programme evidence
+  kai-pm/census_v11_claim_sensitivity/run_mutations.py
+  kai-pm/house_in_order_h2/pass_a.py
+  kai-pm/house_in_order_h2/cal_env.py
+  Historical outputs REMAIN READABLE. Reading is never gated.
+
+DO-NOT-RUN-IN-PLACE HOLD
+  kai-pm/house_in_order_h2/run_h2.py
+  It writes h2-classification-v1.json and h2-capability-contract.json into
+  its own package; both are MANIFEST-bound. Detection is not containment:
+  Control C detects such a rewrite AFTER the fact and does not prevent it.
+  H2 v1.0 LIFECYCLE AUTHORITY REMAINS UNRESOLVED.
+```
+
+**H2 v1.0 EVIDENCE-PACKAGE SELF-MUTATION PATH** remains a separate open
+finding. No mechanism ID, no repair, not folded into RC-1.
+
+---
+
+### 4. EXACT MUTATION SURFACE — 15 PATHS
+
+```
+ALREADY BANKED (1)
+  kai-pm/FAILURE_PATTERN_LEDGER.md        afe13a5 — INC-2026-09-15-22, -23
+THIS RECORD (1)
+  kai-pm/DECISIONS.md                     this entry
+REMAINING FOR IMPLEMENTATION (13)
+  NEW (8)
+    scripts/security/execution_surface.py
+    scripts/security/machine_path_inventory.py
+    scripts/security/check_operational_portability.py
+    scripts/security/check_evidence_package_integrity.py
+    scripts/test_execution_surface.py
+    scripts/test_machine_path_inventory.py
+    scripts/test_operational_portability.py
+    scripts/test_evidence_package_integrity.py
+  MODIFIED (5)
+    scripts/security/check_gate_registry.py
+    scripts/security/gate_registry.py
+    .github/workflows/policy-checks.yml
+    Makefile
+    scripts/test_p1_p4_enhancements.py
+```
+
+**ZERO BYTES CHANGE** in `house_in_order_h2`, `house_in_order_h2_v11`,
+`house_in_order_census_v11`, `census_v11_claim_sensitivity`, any
+`MANIFEST.sha256`, `s1_toctou_controls.py`, `eval_s1_toctou.py`, any floor or
+any baseline. **Any path not in this list is outside authority.**
+
+---
+
+### 5. CORE TESTS — THE AUTHORISED CLAIM, AND ONLY IT
+
+> Retiring the lexical test removes RC-1 as the cause of the `pytest scripts/`
+> failure. **RC-1 ceases to be the first-effective cause suppressing the next
+> Core observation.** Whether step 41 passes is **UNMEASURED** —
+> `coverage-floors` has never reached its per-module evaluations on this
+> subject. Exact-SHA CI determines whether the floors pass and the live tail
+> executes, or another independent first-effective failure appears.
+
+**SIGNAL IS NOT CAUSE applies to our own repair.** If another independent
+failure appears, **STOP AND REPORT. DO NOT PATCH THROUGH IT.** No workflow
+reorder is authorised.
+
+---
+
+### 6. SEQUENCE — BINDING
+
+```
+1  Bank D376 and the corrected D375 record          ← this entry
+2  Re-establish exact HEAD / tree
+3  Implement ONLY the authorised paths
+4  Run all approved synthetic calibration / regression / fail-old / pass-new
+5  Verify ZERO evidence-package mutation
+6  Push the exact implementation subject
+7  Let exact-SHA CI execute
+8  Return the complete evidence package to Kai
+9  Kai independently adjudicates before RC-1 closure or programme movement
+```
+
+**IMPLEMENTATION MAY NOT BEGIN BEFORE THIS RECORD IS BANKED AND PUSHED.**
+
+---
+
+### 7. NOT AUTHORISED
+
+No RC-1 source repair · no evidence-package source mutation · no MANIFEST
+regeneration · no successor package · no generic evidence-admission
+primitive · no RC-7 · no floor, threshold or baseline change · no WF-3
+cutover · no real-78 traversal · no 17-floor movement · no Item 8 execution ·
+no A-4_PROVENANCE implementation · no A4_SELF_DIAGNOSIS implementation · no
+generic M-POLICY framework · no `main` movement. **PR #122 remains DO NOT
+MERGE.**
+
+---
+
+### THREAD RECOVERY BLOCK — D376
+
+```
+PROGRAMME ORDER AUTHORITY  D359 §2 — cite, do not restate. House is at H2.
+CORRECTED                  D375 §2 aggregate column identity semantics;
+                           citation-cost derivation WITHDRAWN
+NOT CORRECTED              the RC-1 HOLD; the Core Tests causal chain;
+                           the R14 stop
+CENSUS LINEAGE             D357 eb7aad7c… frozen predecessor · S1 O3
+                           29064d65… later authorised hardened lineage ·
+                           BOTH PRESERVED, neither superseded
+RC-1 POPULATION            SPLIT — 4 machine-bound · 2 calibration fixture
+                           data · 1 prose. Never again one mechanism.
+AUTHORISED                 three-control architecture, 13 implementation
+                           paths, 15 total mutation surface
+HOLDS                      NO-NEW-EVIDENCE on 3 producers ·
+                           DO-NOT-RUN-IN-PLACE on run_h2.py
+OPEN, SEPARATE             H2 v1.0 evidence-package self-mutation path
+UNRESOLVED                 H2 v1.0 lifecycle authority
+LEDGER                     afe13a5 — INC-2026-09-15-22, INC-2026-09-15-23
+NEXT                       implement, calibrate, push, exact-SHA CI,
+                           return to Kai. Do not patch through a new failure.
+```
