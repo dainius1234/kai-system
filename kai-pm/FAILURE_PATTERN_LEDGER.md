@@ -2761,3 +2761,228 @@ with no generic cross-component control implemented. The mechanism is NOT
 controlled. The independence / common-authority locator shape at
 `INC-2026-08-29-10` and `INC-2026-09-12-14` still stands at two preserved
 occurrences, unchanged.
+
+---
+
+# APPEND 2026-09-16 — a freeze read as permanent state, and a distribution
+#                     claim that was never measured
+
+Two incidents, both mine, both caught by someone else before they entered a
+governed record — one of them by the adjudicator reopening a lineage I had
+stopped reading, the other by an allocator check I ran for an unrelated
+reason.
+
+The first is the more serious. It would have put a defect INTO an
+append-only correction written to remove a defect.
+
+
+### `INC-2026-09-15-22` — a dated freeze decision reported as the current
+###                       governance identity, six days after it moved
+
+```
+INCIDENT_ID             INC-2026-09-15-22
+date                    2026-09-15
+producer                Orion
+subject/version         RC-1 lineage analysis and the draft D375 correction
+                        kai-pm/DECISIONS.md D357 (freeze)
+                        kai-pm/house_in_order_census_v11/MANIFEST.sha256
+                        at: 5be90db24e054ffbc4d18b58ddc98273dafd911a
+
+false_or_faulty_output  Transmitted to Kai, twice, and carried into a draft
+                        append-only correction of D375:
+
+                          "for frozen Census v1.1 the governance identity
+                           is eb7aad7c...fa0e"
+
+                        and, built on it, the claim that D375's Census value
+                        29064d65...757a was "not the governance identity",
+                        offered as one of four rows supporting a finding that
+                        D375's aggregate column was wrong.
+
+                        I also reported the aggregate derivation as
+                        UNRESOLVED after failing to reproduce eb7aad7c from
+                        the manifest by six candidate formulas.
+
+what was actually true  D357 froze the PREDECESSOR Census identity at
+                        eb7aad7c...fa0e. On 2026-09-09, commit bd1cbb4b
+                        performed S1 O3 consumption-time source hardening
+                        UNDER A NARROW FROZEN-PACKAGE EXCEPTION KAI
+                        AUTHORISED, changing docgraph.py, opscan.py, the
+                        package MANIFEST.sha256, and the consuming
+                        h2_v13/passa.py. The manifest was regenerated and the
+                        movement was surfaced deliberately; retaining the old
+                        manifest to preserve eb7aad7c was explicitly rejected
+                        as false attestation. S1 FINAL ACCEPTANCE banked the
+                        hardened lineage and preserves BOTH digest lineages,
+                        neither silently rewritten into the other.
+
+                        So 29064d65...757a is the LATER AUTHORISED HARDENED
+                        lineage, and D375 records it correctly.
+
+                        The "UNRESOLVED" derivation resolved the moment the
+                        commit boundary was measured instead of the current
+                        tree:
+
+                          sha256(MANIFEST.sha256) @ bd1cbb4b~1 = eb7aad7c...
+                          sha256(MANIFEST.sha256) @ bd1cbb4b   = 29064d65...
+
+                        Two aggregate conventions exist, both principled and
+                        both reproduced exactly: house_in_order_h2 embeds its
+                        own aggregate (sha256 of the entry lines, fa847726...,
+                        written back as a comment, so the whole-file hash
+                        necessarily differs); the later packages use
+                        sha256 of the whole manifest file.
+
+mechanism               A DATED ADJUDICATION READ AS CURRENT STATE.
+
+                        This is not R16. I did open the authoritative source
+                        and I read it correctly. D357 says what I said it
+                        says. What I never did was ask whether anything had
+                        happened to it SINCE, and a freeze is exactly the
+                        kind of record that invites that omission: it
+                        announces permanence in its own language.
+
+                        Doctrine 0.0 states the principle -- nothing is true
+                        because it was true last time -- and I have quoted it
+                        in a staleness predicate I wrote into a document the
+                        day before this incident.
+
+                        The six failed derivation formulas are the tell I
+                        missed. I was trying to reproduce a digest from the
+                        CURRENT manifest that had been computed from a
+                        DIFFERENT one. Six failures in a row is not a hard
+                        problem; it is the wrong subject. R15 applied and I
+                        recorded the failure as a limitation instead of
+                        checking why.
+
+detection               KAI, by independently reopening the S1 lineage and
+                        supplying the commit. Not by me, and not by any
+                        control. I then verified it at source with
+                        `git show --numstat bd1cbb4b` and by hashing the
+                        manifest on both sides of the commit boundary.
+
+cost                    Kai was reasoning with a false premise across two
+                        exchanges. Had he not reopened the lineage, the
+                        correction of D375 would have entered an APPEND-ONLY
+                        log asserting that D375 got Census wrong, when D375
+                        had it right -- a correction carrying the defect it
+                        was written to fix, in the one file where a mistake
+                        cannot be edited out.
+
+status                  INCIDENT_ONLY. No mechanism assigned.
+
+                        One occurrence. Doctrine 37 and R18 bind: two
+                        mistakes that look alike are a locator, not a cause,
+                        and the mechanism has to be earned. Searched this
+                        ledger for a prior staleness-shaped occurrence before
+                        writing this entry: none found. The shape is recorded
+                        so a second occurrence can be recognised, and it is
+                        NOT registered as a mechanism on a population of one.
+
+control state           NONE. No control exists that asks whether a cited
+                        decision has been acted on since. Deliberately not
+                        proposed here: an automatic supersession detector is
+                        exactly the kind of generic mechanism this programme
+                        has just spent a tranche refusing to build on one
+                        occurrence.
+```
+
+
+### `INC-2026-09-15-23` — a count measured, a distribution asserted
+
+```
+INCIDENT_ID             INC-2026-09-15-23
+date                    2026-09-15
+producer                Orion
+subject/version         KAI_KINGSMAN_COLD_START_MASTER.md §5.2,
+                        banked at 5be90db24e054ffbc4d18b58ddc98273dafd911a
+
+false_or_faulty_output  "D344 through D353. Nothing else in the entire range
+                        is absent." and "the only hole in a 358-entry
+                        ledger". Transmitted to Dainius, transmitted to Kai,
+                        and COMMITTED to the repository.
+
+what was actually true  Three gaps, not one. Absent in 1..375:
+                        D103, D104, D105, D106, D107, D108, D260, and
+                        D344..D353. Seventeen absent, not ten.
+                        `grep -c "\bD103\b"` etc. return 0: they are absent
+                        in any form, not merely absent as headings.
+
+                        The entry count was right. 375 - 17 = 358, which is
+                        the figure I reported. I had the correct total and
+                        described its distribution without ever computing
+                        one.
+
+mechanism               `M-SCOPE-WIDEN` -- measured subject is not the
+                        transmitted subject. I measured CARDINALITY and
+                        transmitted a claim about CONTIGUITY. Those are
+                        different predicates over the same data, and the
+                        second was never run.
+
+                        R17 in its exact form: the sentence covered more
+                        ground than the check. The universal quantifier
+                        "nothing else in the entire range" is the tell; I
+                        wrote it without a predicate that could have
+                        falsified it.
+
+detection               By me, from an allocator check run for an unrelated
+                        purpose -- establishing the next free D-number before
+                        banking. The absent list printed itself. Nothing was
+                        looking for this.
+
+cost                    Low so far and bounded: no decision rests on it. But
+                        it is committed in a navigation document written to
+                        stop a cold thread re-deriving programme state, so
+                        its cost is deferred rather than absent. Recorded
+                        here for the next controlled correction of that
+                        document; NOT repaired in this append, because
+                        bundling an unrelated documentation repair into a
+                        ledger commit is the defect shape this programme
+                        keeps removing.
+
+status                  `M-SCOPE-WIDEN`, confirmed mechanism, one further
+                        occurrence. The mechanism's state is unchanged --
+                        it was already PATTERN_CONFIRMED and remains so.
+
+control state           UNCHANGED. R17 is banked doctrine, quoted in the R0
+                        stop-signal table, and it did not stop me. This is a
+                        producer-side recurrence against an existing rule,
+                        not evidence that the rule is wrong. No escalation is
+                        claimed on one further occurrence; doctrine 49.6's
+                        third-occurrence test applies to a mechanism's
+                        CONTROL, and M-SCOPE-WIDEN's control is the doctrine
+                        rule itself, which is already banked and already
+                        cited.
+```
+
+
+### Roster delta
+
+| incident | producer | status | mechanism |
+|---|---|---|---|
+| `INC-2026-09-15-22` | Orion | `INCIDENT_ONLY` | none assigned — dated-adjudication-as-current-state, locator only |
+| `INC-2026-09-15-23` | Orion | recurrence | `M-SCOPE-WIDEN` — one further occurrence |
+
+**Producers: Orion 19 · Kai 2 · DeepSeek 2. Total incidents 23.** Derivation:
+`grep -oE 'INC-2026-[0-9]{2}-[0-9]{2}-[0-9]+' kai-pm/FAILURE_PATTERN_LEDGER.md
+| sort -u | wc -l` returned 21 before this append; this append adds
+`INC-2026-09-15-22` and `INC-2026-09-15-23`. The counts carry no fairness,
+quality or producer-reliability inference.
+
+**Mechanisms.** `M-SCOPE-WIDEN` `PATTERN_CONFIRMED` (one further occurrence,
+state unchanged) · `M-POLICY-ADMISSION-DIVERGENCE` `PATTERN_CONFIRMED` ·
+`M-PRODUCER-CURATION` `PATTERN_CANDIDATE` · `P-ADJUDICATOR-PROPAGATION`
+`PATTERN_CANDIDATE` · `M-QUERY-OVERREACH` `PATTERN_CANDIDATE`. **No new
+mechanism is registered by this append.** No other mechanism's state or
+recurrence count is altered.
+
+**Escalation state.** Unchanged. Doctrine 49.6 remains fired for
+`M-POLICY-ADMISSION-DIVERGENCE`, machine escalation BEGUN and PARTIAL, the
+mechanism NOT controlled. Nothing in this append advances or retires it.
+
+**What both incidents share, recorded as an observation and not as a
+mechanism.** In each, the measurement was correct and the sentence built on
+it was not: a freeze correctly read but not followed forward, a cardinality
+correctly counted but described as a distribution. That is a locator across
+two entries by the same producer on the same day. It is not promoted here,
+and it must not be cited as a cause.
