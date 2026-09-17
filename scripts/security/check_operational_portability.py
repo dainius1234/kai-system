@@ -73,6 +73,7 @@ import argparse
 import ast
 import re
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
 
@@ -300,38 +301,103 @@ def _imports(path: Path) -> List[str]:
     return names
 
 
-def closure(roots: List[Path]) -> List[Path]:
-    """Transitive STATIC import closure, plus any root that is absent.
+# ── SUBJECT COMPLETENESS ──────────────────────────────────────────────
+#
+# THE INVARIANT THIS GATE IS BUILT AROUND:
+#
+#     derive the authoritative enforcing surface
+#         -> establish that the SUBJECT IS COMPLETE
+#             -> only then adjudicate portability
+#
+# A portability verdict is a statement about a subject. If the subject
+# could not be fully obtained, no verdict about it is available — not
+# "pass", not "fail", but REFUSE. That is R11 (no subject, no
+# observation) and I-1 (fail closed on a missing input) applied to the
+# thing this gate actually reasons over.
+#
+# There are three ways the subject can be incomplete, and they are ONE
+# PREREQUISITE wearing three faces:
+#
+#     NO_AUTHORITATIVE_ROOT        the derivation produced nothing
+#     ROOT_NAMED_BUT_UNRESOLVABLE  a workflow or Makefile names an
+#                                  enforcing script that resolves to no
+#                                  file in this repository
+#     SUBJECT_NAMED_BUT_UNOPENABLE a resolved member of the closure
+#                                  cannot be opened
+#
+# INC-2026-09-17-25 is what it costs to treat them as unrelated. Two of
+# the three refused and the third was PRINTED AND THEN ADMITTED: the
+# shipped gate certified PASS and exited 0 while an authoritative
+# enforcing root named by a workflow had resolved to nothing. The
+# relationship between the three existed only in prose, so the one that
+# was written last simply did not inherit it.
+#
+# They are therefore not three `if` statements in `main()`. They are
+# gaps recorded against ONE object, by ONE function, and consumed by
+# ONE refusal branch. Adding a fourth way to be incomplete means adding
+# a gap kind and a place that records it — it cannot mean forgetting to
+# add a fourth conditional, because there are no conditionals to
+# forget.
 
-    Returns (inspected, missing). A missing subject is never dropped:
-    the caller refuses rather than reporting a pass over code it could
-    not open.
+NO_AUTHORITATIVE_ROOT = "NO_AUTHORITATIVE_ROOT"
+ROOT_NAMED_BUT_UNRESOLVABLE = "ROOT_NAMED_BUT_UNRESOLVABLE"
+SUBJECT_NAMED_BUT_UNOPENABLE = "SUBJECT_NAMED_BUT_UNOPENABLE"
 
-    Following them would need execution, and executing an arbitrary
+#: Human wording per gap kind. Kept beside the constant deliberately:
+#: this is presentation, not policy, and nothing decides on it.
+_GAP_WORDING = {
+    NO_AUTHORITATIVE_ROOT:
+        "the derivation produced no authoritative enforcing root",
+    ROOT_NAMED_BUT_UNRESOLVABLE:
+        "named as an enforcing script but resolves to no file here",
+    SUBJECT_NAMED_BUT_UNOPENABLE:
+        "resolved into the closure but could not be opened",
+}
+
+
+@dataclass(frozen=True)
+class Subject:
+    """What this gate adjudicates, and whether it was fully obtained.
+
+    `gaps` is the whole completeness verdict. An empty `gaps` is the
+    ONLY state in which a portability verdict may be issued, and
+    `complete` is the single place that says so.
+    """
+
+    surface: str
+    roots: Tuple[Path, ...]
+    modules: Tuple[Path, ...]
+    gaps: Tuple[Tuple[str, str], ...]
+
+    @property
+    def complete(self) -> bool:
+        return not self.gaps
+
+
+def closure(roots: List[Path]) -> Tuple[List[Path], List[Path]]:
+    """Transitive STATIC import closure, plus any member that is absent.
+
+    Returns (inspected, unopenable). Dynamic imports are not followed:
+    resolving them would need execution, and executing an arbitrary
     repository module to decide whether it is portable is a worse idea
     than under-reporting. The boundary is printed with the result.
     """
     seen: Set[Path] = set()
-    missing: Set[Path] = set()
+    unopenable: Set[Path] = set()
     queue = list(roots)
     while queue:
         current = queue.pop()
-        if current in seen or current in missing:
+        if current in seen or current in unopenable:
             continue
-        # I-1: a subject that is not there is NOT a subject with nothing
-        # wrong in it. Skipping it would shrink the closure silently and
-        # let this gate report PASS over code it never opened — absence
-        # reading as correctness, which is the defect class this gate is
-        # part of removing. It is returned and the caller refuses.
         if not current.is_file():
-            missing.add(current)
+            unopenable.add(current)
             continue
         seen.add(current)
         for name in _imports(current):
             resolved = module_file(name)
             if resolved is not None and resolved not in seen:
                 queue.append(resolved)
-    return sorted(seen), sorted(missing)
+    return sorted(seen), sorted(unopenable)
 
 
 def enforcing_roots() -> Tuple[List[Path], List[str]]:
@@ -350,53 +416,67 @@ def enforcing_roots() -> Tuple[List[Path], List[str]]:
     return roots, unresolved
 
 
-def main(argv: Optional[List[str]] = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--root", action="append", default=None,
-                        help="qualify an explicit subject instead of the "
-                             "derived enforcing surface (use-time preflight)")
-    args = parser.parse_args(argv)
+def derive_subject(explicit: Optional[List[str]] = None) -> Subject:
+    """Derive the subject AND its completeness in one place.
 
-    if args.root:
-        roots = [Path(r) if Path(r).is_absolute() else REPO / r
-                 for r in args.root]
-        unresolved: List[str] = []
+    Every way of failing to obtain the subject is recorded as a gap
+    here. No caller re-derives completeness, and no caller may reach a
+    verdict without consulting `Subject.complete`.
+    """
+    gaps: List[Tuple[str, str]] = []
+
+    if explicit:
         surface = "explicit subject"
+        roots: List[Path] = []
+        for raw in explicit:
+            candidate = Path(raw) if Path(raw).is_absolute() else REPO / raw
+            # An explicitly named subject that does not exist is the
+            # same prerequisite failure as a derived one that does not
+            # resolve. The operator naming it does not make it present.
+            if candidate.is_file():
+                roots.append(candidate)
+            else:
+                gaps.append((ROOT_NAMED_BUT_UNRESOLVABLE, raw))
     else:
-        roots, unresolved = enforcing_roots()
         surface = "workflow-and-Make enforcement surface"
+        roots, unresolved = enforcing_roots()
+        for name in unresolved:
+            gaps.append((ROOT_NAMED_BUT_UNRESOLVABLE, name))
 
-    # I-1: no subject means no observation. An empty surface is a
-    # failure to derive, never a clean result.
     if not roots:
-        print("Operational portability — 0 roots, 0 modules, 0 finding(s)")
-        print("  REFUSED: no execution root could be derived. A gate with no "
-              "subject cannot report a pass (R11).")
-        return 1
+        gaps.append((NO_AUTHORITATIVE_ROOT, surface))
+        return Subject(surface, (), (), tuple(gaps))
 
-    modules, missing = closure(roots)
+    modules, unopenable = closure(roots)
+    for path in unopenable:
+        gaps.append((SUBJECT_NAMED_BUT_UNOPENABLE, str(path)))
 
-    # I-1 again, at the boundary that matters: if any named subject
-    # could not be opened, this gate cannot certify the surface. A
-    # pass here would mean 'nothing wrong in the files I managed to
-    # read', while the sentence printed says something wider.
-    if missing:
-        print('Operational portability — %d roots, %d modules, %d finding(s)'
-              % (len(roots), len(modules), len(missing)))
-        print('  REFUSED: %d named subject(s) could not be opened. A gate\n'
-              '  cannot certify a surface it did not read (R11, I-1):'
-              % len(missing))
-        for path in missing:
-            print('    %s' % path)
-        return 1
+    return Subject(surface, tuple(roots), tuple(modules), tuple(gaps))
+
+
+def adjudicate(subject: Subject) -> List[Dict[str, object]]:
+    """Portability findings over a subject. Callers must check `complete`.
+
+    Refuses to run at all on an incomplete subject rather than
+    returning an empty finding list that a caller could mistake for a
+    clean result — the shape that produced INC-2026-09-17-25.
+    """
+    if not subject.complete:
+        raise ValueError(
+            "adjudicate() called on an incomplete subject: %d gap(s)"
+            % len(subject.gaps))
     findings: List[Dict[str, object]] = []
-    for module in modules:
+    for module in subject.modules:
         findings.extend(scan_module(module))
+    return findings
 
+
+def _print_header(subject: Subject, findings: int) -> None:
     print("Operational portability — %d roots, %d modules, %d finding(s)"
-          % (len(roots), len(modules), len(findings)))
+          % (len(subject.roots), len(subject.modules), findings))
     print("  proposition        no developer-checkout or ephemeral-session")
-    print("                     filesystem dependency on the %s" % surface)
+    print("                     filesystem dependency on the %s"
+          % subject.surface)
     print("  predicate version  %s" % PREDICATE_VERSION)
     print("  roots derived by   scripts/security/execution_surface.py "
           "(shared with check_gate_registry.py)")
@@ -409,9 +489,36 @@ def main(argv: Optional[List[str]] = None) -> int:
     print("  and dynamic attribute access; runtime-built shell strings;")
     print("  anything reached through a non-static import.")
     print("  This gate does NOT claim the repository is portable.")
-    if unresolved:
-        print("  unresolved root names (reported, not silently dropped): %s"
-              % ", ".join(unresolved))
+
+
+def main(argv: Optional[List[str]] = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--root", action="append", default=None,
+                        help="qualify an explicit subject instead of the "
+                             "derived enforcing surface (use-time preflight)")
+    args = parser.parse_args(argv)
+
+    subject = derive_subject(args.root)
+
+    # THE INVARIANT, AS ONE BRANCH. Completeness is established before a
+    # verdict is even attempted, and every way of being incomplete
+    # arrives here through the same door.
+    if not subject.complete:
+        _print_header(subject, 0)
+        print("")
+        print("  SUBJECT INCOMPLETE — %d gap(s). REFUSED." % len(subject.gaps))
+        print("  A portability verdict is a statement about a subject. This")
+        print("  subject was not fully obtained, so no verdict about it is")
+        print("  available — not PASS, not FAIL (R11, I-1).")
+        for kind, detail in subject.gaps:
+            print("    %-28s %s" % (kind, detail))
+            print("    %-28s %s" % ("", _GAP_WORDING[kind]))
+        return 1
+
+    findings = adjudicate(subject)
+    _print_header(subject, len(findings))
+    print("  SUBJECT COMPLETE — every derived authoritative root resolved "
+          "and opened.")
 
     if not findings:
         print("  PASS: no machine- or session-bound dependency on the "

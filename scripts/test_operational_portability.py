@@ -27,6 +27,8 @@ dependency is what suppressed sixteen unrelated live-stack steps.
 from __future__ import annotations
 
 import os
+import shutil
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -240,6 +242,173 @@ def test_anti_blinding_root_taxonomy_mutation():
 
     check("the taxonomy is restored", len(scan_source(body)) >= 1,
           "the mutation leaked out of its own test")
+
+
+# ── HOSTILE SUBJECT-COMPLETENESS BOUNDARY — A to E ───────────────────
+#
+# INC-2026-09-17-25: the shipped gate certified PASS and exited 0 while an
+# authoritative enforcing root named by a workflow resolved to no file.
+# Two completeness failures refused and the third was printed and then
+# admitted.
+#
+# The calibration that missed it tested zero-root refusal and
+# resolved-but-unopenable refusal INDIVIDUALLY, and never the MIXED
+# population where one root resolves cleanly and another does not resolve
+# at all. Every case below therefore runs the REAL SHIPPED main() AS A
+# SUBPROCESS against a fixture repository holding byte-identical copies of
+# the gate and its helper, and asserts the PROCESS RETURN CODE. Calling a
+# helper and inferring the exit status is what let the defect through; it
+# is not done here.
+
+def _shipped_fixture(files: dict) -> Path:
+    """A fixture repo carrying byte-identical copies of the shipped gate."""
+    root = Path(tempfile.mkdtemp(prefix="cop-boundary-")) / "kai-system"
+    (root / "scripts" / "security").mkdir(parents=True)
+    (root / ".github" / "workflows").mkdir(parents=True)
+    here = Path(__file__).resolve().parent.parent / "scripts" / "security"
+    for name in ("check_operational_portability.py", "execution_surface.py"):
+        shutil.copyfile(here / name, root / "scripts" / "security" / name)
+    for rel, body in files.items():
+        target = root / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(body, encoding="utf-8")
+    return root
+
+
+def _run_shipped(root: Path, extra=()):
+    """Execute the shipped gate as a PROCESS. Returns (rc, stdout)."""
+    proc = subprocess.run(
+        [sys.executable, "scripts/security/check_operational_portability.py",
+         *extra],
+        cwd=root, capture_output=True, text=True)
+    return proc.returncode, proc.stdout + proc.stderr
+
+
+_CLEAN_GATE = (
+    "import pathlib\n"
+    "ROOT = pathlib.Path(__file__).resolve().parents[2]\n"
+    "def main():\n"
+    "    return 0\n")
+
+_WORKFLOW = ("name: Policy\njobs:\n  policy:\n    steps:\n"
+             "      - name: %s\n        run: python3 %s\n")
+
+
+def test_A_zero_derived_roots_refuses():
+    root = _shipped_fixture({
+        ".github/workflows/policy.yml": "name: Policy\njobs:\n  policy:\n"
+                                        "    steps:\n      - name: nothing\n"
+                                        "        run: echo hello\n",
+        "Makefile": "noop:\n\t@true\n",
+    })
+    rc, out = _run_shipped(root)
+    check("A zero derived roots refuses (non-zero)", rc == 1, f"rc={rc}")
+    check("A names the completeness gap kind",
+          cop.NO_AUTHORITATIVE_ROOT in out, out[-400:])
+    check("A does not print PASS", "PASS:" not in out, out[-400:])
+
+
+def test_B_resolved_but_unopenable_root_refuses():
+    """A root that resolves and then cannot be opened."""
+    root = _shipped_fixture({
+        ".github/workflows/policy.yml":
+            _WORKFLOW % ("a gate", "scripts/security/check_vanishing.py"),
+        "Makefile": "noop:\n\t@true\n",
+        "scripts/security/check_vanishing.py": _CLEAN_GATE,
+    })
+    rc, _ = _run_shipped(root)
+    check("B a complete subject with a resolvable root passes first",
+          rc == 0, "fixture did not start from a clean pass")
+    # Now make the resolved root unopenable and re-run the same subject.
+    (root / "scripts" / "security" / "check_vanishing.py").unlink()
+    rc, out = _run_shipped(root)
+    check("B a root that cannot be opened refuses (non-zero)", rc == 1,
+          f"rc={rc}")
+    check("B names a completeness gap",
+          (cop.SUBJECT_NAMED_BUT_UNOPENABLE in out
+           or cop.ROOT_NAMED_BUT_UNRESOLVABLE in out), out[-500:])
+    check("B does not print PASS", "PASS:" not in out, out[-400:])
+
+
+def test_C_mixed_resolved_and_unresolved_refuses():
+    """THE CASE THAT WAS MISSING. INC-2026-09-17-25, exactly.
+
+    One authoritative root resolves and is clean; one authoritative root
+    is named by the workflow and resolves to nothing. Before the repair
+    the shipped gate printed the unresolved name and exited 0.
+    """
+    root = _shipped_fixture({
+        ".github/workflows/policy.yml":
+            "name: Policy\njobs:\n  policy:\n    steps:\n"
+            "      - name: a resolvable enforcing gate\n"
+            "        run: python3 scripts/security/check_resolvable.py\n"
+            "      - name: an enforcing gate whose file is absent\n"
+            "        run: python3 scripts/ci/check_absent_gate.py\n",
+        "Makefile": "noop:\n\t@true\n",
+        "scripts/security/check_resolvable.py": _CLEAN_GATE,
+    })
+    rc, out = _run_shipped(root)
+    check("C MIXED resolved+unresolved REFUSES (non-zero)", rc == 1,
+          f"rc={rc} — this is the exact state that returned 0 before the "
+          f"repair. stdout tail: {out[-500:]}")
+    check("C names the unresolvable root",
+          "check_absent_gate" in out, out[-500:])
+    check("C names the completeness gap kind",
+          cop.ROOT_NAMED_BUT_UNRESOLVABLE in out, out[-500:])
+    check("C does NOT print PASS while a root is unresolved",
+          "PASS:" not in out,
+          "the gate certified a surface it could not fully derive")
+    check("C reports the subject as incomplete",
+          "SUBJECT INCOMPLETE" in out, out[-500:])
+
+
+def test_D_complete_and_clean_passes():
+    root = _shipped_fixture({
+        ".github/workflows/policy.yml":
+            _WORKFLOW % ("a gate", "scripts/security/check_clean.py"),
+        "Makefile": "noop:\n\t@true\n",
+        "scripts/security/check_clean.py": _CLEAN_GATE,
+    })
+    rc, out = _run_shipped(root)
+    check("D a complete, clean subject passes (zero)", rc == 0,
+          f"rc={rc} {out[-400:]}")
+    check("D states the subject was complete",
+          "SUBJECT COMPLETE" in out, out[-400:])
+    check("D prints PASS", "PASS:" in out, out[-400:])
+
+
+def test_E_complete_with_a_portability_finding_fails():
+    root = _shipped_fixture({
+        ".github/workflows/policy.yml":
+            _WORKFLOW % ("a gate", "scripts/security/check_bound.py"),
+        "Makefile": "noop:\n\t@true\n",
+        "scripts/security/check_bound.py":
+            'import pathlib\npathlib.Path("%s/x").read_text()\n' % CHECKOUT,
+    })
+    rc, out = _run_shipped(root)
+    check("E a complete subject with a finding fails (non-zero)", rc == 1,
+          f"rc={rc} {out[-400:]}")
+    check("E states the subject was complete before adjudicating",
+          "SUBJECT COMPLETE" in out, out[-400:])
+    check("E reports a FINDING, not a completeness gap",
+          "FINDING" in out and "SUBJECT INCOMPLETE" not in out, out[-500:])
+
+
+def test_adjudicate_refuses_an_incomplete_subject():
+    """The invariant held at the function boundary, not only in main().
+
+    An empty finding list from an incomplete subject is exactly what a
+    caller could mistake for a clean result.
+    """
+    subject = cop.Subject("synthetic", (), (), ((cop.NO_AUTHORITATIVE_ROOT, "x"),))
+    raised = False
+    try:
+        cop.adjudicate(subject)
+    except ValueError:
+        raised = True
+    check("adjudicate() refuses an incomplete subject rather than "
+          "returning an empty finding list", raised,
+          "a caller could read 'no findings' as 'clean'")
 
 
 def main() -> int:
