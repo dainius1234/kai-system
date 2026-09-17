@@ -3146,3 +3146,106 @@ fired for `M-POLICY-ADMISSION-DIVERGENCE` only, machine escalation BEGUN and
 PARTIAL, that mechanism NOT controlled. **Nothing in this append advances,
 retires or re-triggers any escalation.** The `M-SCOPE-WIDEN` recurrence rate
 is surfaced for adjudication and is not acted on by the producer who caused it.
+
+---
+
+# ADJUDICATION 2026-09-17 — `M-SCOPE-WIDEN` advances to
+#                           `RECURRED_AFTER_CONTROL`
+
+**This is a MECHANISM-STATE ADJUDICATION, not an incident.** No `INC-` is
+allocated. `INC-2026-09-17-24` is the occurrence; this records its effect on
+the existing mechanism's state. The original `M-SCOPE-WIDEN` mechanism
+section, `INC-2026-09-17-24`, and every prior entry are **unedited**.
+
+**Adjudicator: Kai**, on independent review of the D376/D377 authority
+surface, 2026-09-17.
+
+```
+mechanism                       M-SCOPE-WIDEN
+previous confirmed occurrences  3
+                                INC-2026-08-29-01, -02, -03
+                                all adjudicated by Kai
+new supporting occurrence       INC-2026-09-17-24
+confirmed occurrence count      4
+
+control existing before
+  the occurrence                doctrine 48 / CLAUDE.md R17 /
+                                R0 stop-signal table
+control type at recurrence      MANUAL
+recurred_after_control          YES
+mechanism state                 RECURRED_AFTER_CONTROL
+machine control                 NOT IMPLEMENTED
+controlled                      NO
+mechanised                      NO
+```
+
+### What this establishes
+
+**The fourth occurrence does not re-run the third-occurrence rule.** Doctrine
+49.6 triggered at occurrence 3, on 2026-08-29, and the control selected in
+response was the manual one: doctrine 48, CLAUDE.md R17, and the R0
+stop-signal rows. That control existed, was banked, was cited, and appears in
+the stop-signal table a producer is meant to consult in flight.
+
+`INC-2026-09-17-24` occurred on 2026-09-17, **after** that control existed.
+
+**Therefore what the fourth occurrence proves is not that the mechanism
+recurs — that was already established — but that THE CONTROL CHOSEN AFTER
+ESCALATION HAS NOT PREVENTED RECURRENCE.** That is stronger evidence than
+the original escalation, and it is the reason the state changes rather than
+staying at `PATTERN_CONFIRMED`.
+
+### What this explicitly does NOT establish
+
+* **Doctrine 49.6 is NOT triggered "for the first time."** It fired at
+  occurrence 3 and that firing stands unaltered.
+* **No new mechanism is registered.** The generated-path sub-shape recorded
+  in `INC-2026-09-17-24` — omitted paths produced by an existing governed
+  generator rather than by the author — is a sub-shape of `M-SCOPE-WIDEN`
+  and is **NOT** counted, promoted or named as a separate mechanism.
+* **No causal independence from `M-SCOPE-WIDEN` is claimed.**
+* **No generic scope-control system is authorised, designed or begun.**
+
+### Machine-hook obligation — governance status changed, not implemented
+
+The mechanism record already specifies the shape of the missing hook:
+*reconcile measured/extracted scope against the transmitted consequential
+claim scope, and refuse a claim whose declared universe exceeds what was
+measured.*
+
+```
+BEFORE INC-2026-09-17-24   machine hook SPECIFIED but UNIMPLEMENTED
+AFTER  INC-2026-09-17-24   machine hook is a REQUIRED OPEN CONTROL
+                           OBLIGATION. M-SCOPE-WIDEN may NOT be described
+                           as CONTROLLED or MECHANISED until it exists.
+```
+
+**THIS IS NOT IMPLEMENTATION AUTHORITY.** It is an outstanding control
+requirement. A later design tranche must decide its architecture,
+denominator and enforcement point. **It must NOT be bolted onto the D376
+tranche because the recurrence happened there** — that is the opportunistic
+shape this programme has spent the whole RC-1 sequence declining.
+
+### Arithmetic made legible — one attribution this count does NOT include
+
+`INC-2026-09-15-23` carries a **producer-assigned** `M-SCOPE-WIDEN`
+attribution, banked by Orion on 2026-09-15 and **not adjudicated**.
+**It is not included in the confirmed occurrence count of 4**, because
+producer attribution is not adjudication and the three counted predecessors
+are each recorded as `adjudicator (Kai)`.
+
+**Recorded so the ledger's arithmetic is checkable rather than apparently
+inconsistent:** a reader will find five `M-SCOPE-WIDEN` attributions in this
+file and a confirmed count of four. The difference is `INC-2026-09-15-23`.
+**If Kai adjudicates it as a confirmed occurrence, the count becomes 5 and
+this append is superseded by that adjudication — which is Kai's to make and
+is not made here.** Neither the count nor `INC-2026-09-15-23` is edited by
+this entry.
+
+### Unchanged by this adjudication
+
+`M-POLICY-ADMISSION-DIVERGENCE` `PATTERN_CONFIRMED`, doctrine 49.6 fired,
+machine escalation BEGUN and PARTIAL, mechanism NOT controlled — **no change
+of any kind.** `M-PRODUCER-CURATION`, `P-ADJUDICATOR-PROPAGATION` and
+`M-QUERY-OVERREACH` remain `PATTERN_CANDIDATE`. **No new mechanism. No new
+incident. Highest incident remains `INC-2026-09-17-24`. Total incidents 24.**
