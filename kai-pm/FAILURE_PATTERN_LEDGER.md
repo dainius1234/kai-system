@@ -3333,3 +3333,196 @@ mechanism NOT controlled. `M-PRODUCER-CURATION`,
 `P-ADJUDICATOR-PROPAGATION` and `M-QUERY-OVERREACH` remain
 `PATTERN_CANDIDATE`. **No D-number is required for this arithmetic
 correction and none is allocated.**
+
+---
+
+# APPEND 2026-09-17 (second) — a portability gate that certifies a surface
+#                              it could not fully derive
+
+One incident. Confirmed occurrence **4** of `M-POLICY-ADMISSION-DIVERGENCE`,
+and the first identified AFTER doctrine 49.6 escalated that mechanism at
+occurrence 3.
+
+Found before the defect could realise a false admission in any adjudicated
+evidence. **Whether CI ever entered the state is NOT established and is not
+claimed anywhere in this entry.**
+
+
+### `INC-2026-09-17-25` — an unresolved authoritative enforcing root is
+###                       printed, then admitted
+
+```
+INCIDENT_ID             INC-2026-09-17-25
+date                    2026-09-17
+producer                Orion
+subject                 0d05f2e90d9fa33307409714c172a85e7f9fceac
+                        tree 089d59833e09c5d520f252c9b4daf7101e9a36da
+file                    scripts/security/check_operational_portability.py
+status                  OPEN — pending local repair under D376/D377
+
+faulty admission
+proposition             The gate's normative contract, stated in its own
+                        docstring and in D376 §2, is that it adjudicates
+                        THE COMPLETE DERIVED WORKFLOW-AND-MAKE ENFORCING
+                        SURFACE.
+
+                        The machine can admit a strictly weaker
+                        proposition: "no finding among the roots I managed
+                        to resolve." An authoritative root that the
+                        workflow names but that cannot be resolved to a
+                        file is REPORTED and then does not participate in
+                        the verdict at all.
+
+static source evidence  enforcing_roots() returns (roots, unresolved).
+                        main() consumes `unresolved` exactly once, to
+                        print it. No branch tests it.
+
+                        Three prerequisites exist and only two refuse:
+                          not roots        -> REFUSE (R11 zero-subject)
+                          missing          -> REFUSE (I-1, added earlier
+                                              in this same tranche after
+                                              the meta-gate found it)
+                          unresolved       -> PRINTED ONLY
+
+                        So the module already contained the correct idea
+                        twice and failed to apply it the third time. The
+                        three are not unrelated conditions: they are three
+                        manifestations of ONE prerequisite — SUBJECT
+                        COMPLETENESS — and the implementation expressed
+                        that relationship only in prose.
+
+hostile execution       Real shipped main() executed as a PROCESS on a
+                        synthetic mixed-root subject, outside the tracked
+                        tree. The gate and its shared helper were copied
+                        BYTE-FOR-BYTE from the unchanged subject:
+                          check_operational_portability.py 796a99f6f12b7370…
+                          execution_surface.py             bcb1e1e13341585e…
+
+                        Fixture: one workflow naming TWO enforcing steps.
+                        `scripts/security/check_resolvable.py` exists and
+                        is deliberately clean (self-derived root only).
+                        `scripts/ci/check_absent_gate.py` is named by the
+                        workflow and NEVER CREATED.
+
+measured state          roots               1
+                        unresolved          1   ['ci/check_absent_gate']
+                        missing             0
+                        findings            0
+                        process return code 0
+
+                        stdout, terminal two lines:
+                          unresolved root names (reported, not silently
+                          dropped): ci/check_absent_gate
+                          PASS: no machine- or session-bound dependency on
+                          the derived surface.
+
+                        A gate that names the subject it could not obtain
+                        and then certifies the surface anyway.
+
+repository unchanged    HEAD, tree and porcelain identical before and
+                        after; whole-working-tree fingerprint
+                        9604e4bf55c9ae1e240845e94e748b3be8ee3cb7a86778ec75299463252059a2
+                        BEFORE and AFTER. No repository file created,
+                        modified or deleted by the experiment.
+
+realised historical
+false admission         NOT PROVEN, and NOT CLAIMED. The exact-SHA CI run
+                        at this subject reported 94 roots / 123 modules
+                        with no unresolved names printed, but this
+                        experiment establishes CAPABILITY ONLY. Whether CI
+                        ever entered the state has not been measured.
+
+mechanism               M-POLICY-ADMISSION-DIVERGENCE.
+
+                        Mapped causally, not by resemblance:
+                          NORMATIVE PROPOSITION  the gate adjudicates the
+                            complete derived enforcing surface
+                          MACHINE STATE          an enforcing root can be
+                            represented as unresolved
+                          MACHINE PREDICATE      once one root resolves,
+                            `unresolved` participates in neither refusal
+                            nor the terminal PASS/FAIL
+                          CALIBRATION            zero-root refusal and
+                            resolved-but-unopenable refusal are both
+                            tested; MIXED resolved+unresolved admission is
+                            not
+
+                        The machine therefore certifies a weaker
+                        proposition than the normative admission contract
+                        while every surface — the gate, its suite, the
+                        meta-gate, Policy-as-Code — stays green. That is
+                        the mechanism itself, not merely its outward
+                        shape.
+
+occurrence count        4.
+
+                        Predecessors: INC-2026-09-15-18 (a fixture that
+                        FABRICATED result_label), INC-2026-09-15-19 (the
+                        explanatory report checked instead of the exit
+                        code), INC-2026-09-15-21 (calibration verified a
+                        COPY of the declaration).
+
+post-escalation
+qualification           Doctrine 49.6 fired at occurrence 3 and is NOT
+                        triggered again by this entry.
+
+                        This is the FIRST CONFIRMED OCCURRENCE IDENTIFIED
+                        AFTER that escalation.
+
+                        The correct statement is NOT "the generic machine
+                        control failed." IT DID NOT EXIST. The mechanism
+                        recurred after escalation while the required
+                        generic cross-component machine control remained
+                        unimplemented, and the partial controls
+                        operationalised for the two earlier named gates do
+                        not cover this gate.
+
+discovery authorities   Kai — static source / control-flow review.
+                        Orion — hostile shipped-boundary execution on a
+                          mixed-root synthetic subject.
+                        DeepSeek — adversarial challenge over supplied
+                          evidence. It holds no repository access and
+                          supplied no repository evidence; its role here
+                          is CHALLENGE, NOT PROOF.
+
+                        Producer-independent authorship is NOT required
+                        and is not claimed: doctrine 49.6 requires an
+                        independently CONFIRMED occurrence, and rule 39
+                        separately marks same-authority/different-method
+                        evidence as cross-method convergence rather than
+                        authority-independent corroboration. All three
+                        prior occurrences were likewise Orion's.
+
+control state           Machine escalation BEGUN — PARTIAL.
+                        Generic cross-component control NOT IMPLEMENTED.
+                        Mechanism CONTROLLED: NO.
+                        The generic control remains a REQUIRED OPEN
+                        OBLIGATION receiving a separately governed design
+                        tranche. It is explicitly NOT authorised inside
+                        RC-1, and this occurrence does not change that.
+```
+
+
+### Roster delta
+
+| incident | producer | status | mechanism |
+|---|---|---|---|
+| `INC-2026-09-17-25` | Orion | OPEN — pending local repair | `M-POLICY-ADMISSION-DIVERGENCE` — confirmed occurrence 4 |
+
+**Producers: Orion 21 · Kai 2 · DeepSeek 2. Total incidents 25.** Derivation:
+`grep -oE 'INC-2026-[0-9]{2}-[0-9]{2}-[0-9]+' kai-pm/FAILURE_PATTERN_LEDGER.md
+| sort -u | wc -l` returned 24 before this append; this append adds
+`INC-2026-09-17-25`. The counts carry no fairness, quality or
+producer-reliability inference.
+
+**Mechanisms.** `M-POLICY-ADMISSION-DIVERGENCE` `PATTERN_CONFIRMED`, **4
+confirmed occurrences**, first post-escalation occurrence recorded here ·
+`M-SCOPE-WIDEN` `PATTERN_CONFIRMED`, 5 confirmed occurrences,
+`RECURRED_AFTER_CONTROL` — **unaltered by this append** ·
+`M-PRODUCER-CURATION`, `P-ADJUDICATOR-PROPAGATION` and `M-QUERY-OVERREACH`
+remain `PATTERN_CANDIDATE`. **No new mechanism is registered.**
+
+**Escalation state.** Doctrine 49.6 remains fired for
+`M-POLICY-ADMISSION-DIVERGENCE` from occurrence 3; it is **not re-triggered**.
+Machine escalation BEGUN and PARTIAL; generic control NOT IMPLEMENTED;
+mechanism NOT CONTROLLED. **No D-number is allocated by this entry.**
