@@ -3802,3 +3802,159 @@ occurrences · `M-SCOPE-WIDEN` `PATTERN_CONFIRMED`, 5 confirmed occurrences,
 `P-ADJUDICATOR-PROPAGATION`, `M-QUERY-OVERREACH` `PATTERN_CANDIDATE`.
 **No mechanism assigned to this incident. No new mechanism. Doctrine 49.6
 not triggered. No D-number.**
+
+---
+
+# CLOSURE 2026-09-17 — `INC-2026-09-17-25` CLOSED by the structural
+#                      subject-completeness repair
+
+**Incident closure adjudication. No incident is allocated.**
+`INC-2026-09-17-25` and every prior entry are unedited; this records the
+verified repair that closes it.
+
+**Adjudicator: Kai**, independent acceptance review of the D376/D377
+bounded implementation tranche, 2026-09-17.
+
+```
+defect subject          0d05f2e90d9fa33307409714c172a85e7f9fceac
+                        tree 089d59833e09c5d520f252c9b4daf7101e9a36da
+repair subject          106d23f9fe2690d7e95b57dcaeec7983f137c33b
+                        tree 803d95420007e86268c84a1c9393a6253a429e69
+status                  CLOSED
+```
+
+### Fail-old / pass-new, identical proposition
+
+The mixed-root falsifier built for the defect was re-run unchanged against
+the repaired gate. Same fixture, same inputs, byte-identical copies of the
+shipped gate and its shared helper on both sides.
+
+```
+                        roots  unresolved  missing  findings   verdict   rc
+BEFORE  0d05f2e             1           1        0         0   PASS       0
+AFTER   106d23f9            1           1        0         0   REFUSED    1
+                                                   ROOT_NAMED_BUT_UNRESOLVABLE
+                                                   SUBJECT INCOMPLETE
+```
+
+The gate that named the subject it could not obtain and certified the
+surface anyway now names it and refuses.
+
+### The repair is structural, not the instance
+
+```
+derive the authoritative enforcing surface
+    -> establish that the SUBJECT IS COMPLETE
+        -> only then adjudicate portability
+```
+
+`if unresolved: return 1` would have closed the instance and left the class
+open. Instead the three completeness failures are recorded as gaps against
+ONE object by ONE function and consumed by ONE refusal branch:
+
+```
+Subject(surface, roots, modules, gaps)   .complete == not gaps
+derive_subject()   records EVERY way of failing to obtain the subject
+adjudicate()       RAISES on an incomplete subject rather than returning
+                   an empty finding list a caller could read as clean
+main()             one branch: if not subject.complete -> refuse
+
+NO_AUTHORITATIVE_ROOT · ROOT_NAMED_BUT_UNRESOLVABLE · SUBJECT_NAMED_BUT_UNOPENABLE
+```
+
+Zero-root, unresolved-root and unopenable-subject are **manifestations of
+the same prerequisite**, not three unrelated conditions whose relationship
+lives in prose. That relationship living only in prose is exactly what
+produced the incident: the module already contained the correct idea twice
+and the third writing did not inherit it.
+
+An explicitly named `--root` that does not exist is now the same
+completeness failure as a derived one that does not resolve.
+
+### Hostile calibration at the shipped process boundary
+
+Every case builds a fixture repository holding byte-identical copies of the
+gate and helper, executes the real `main()` **as a subprocess**, and asserts
+the **process return code**. Calling a helper and inferring the exit status
+is what let the defect through and is not done.
+
+```
+A  zero derived roots                            REFUSE   rc 1
+B  resolved root that cannot be opened           REFUSE   rc 1
+C  MIXED resolved + unresolved                   REFUSE   rc 1
+D  complete and clean                            PASS     rc 0
+E  complete with a portability finding           FINDING  rc 1
+   adjudicate() refuses an incomplete subject at the function boundary
+```
+
+**C is the case the previous calibration did not have.** It tested A and B
+individually and never the mixed population, which is precisely why a green
+suite coexisted with the defect. **All ten pre-existing P/N cases are
+preserved unchanged; none was lowered, weakened or deleted.** The suite is
+16 scenarios / 36 assertions, up from 10 / 17.
+
+### Exact-SHA CI at the repair subject
+
+```
+Core Tests            #1174 push / #1175 PR   SUCCESS
+    consequential coverage-floor surface EXECUTES and passes
+    full live-stack surface EXECUTES: image builds, vulnerability scan,
+    minimal sovereign bring-up, live smoke, kill-isolation,
+    restart-persistence, memu-graph live ingest/query/forget, full-profile
+    bring-up and smoke, sovereign profile boot
+    5 skipped steps: 50, 55, 63, 66, 68 — ALL `if: failure()` diagnostic
+    and post-mortem paths, skipped BECAUSE nothing failed. Not suppressed
+    functional evidence.
+Policy-as-Code        #302 push / #303 PR     SUCCESS, zero skipped
+PM Status             #168                    SUCCESS
+Unified Hunter        #544 / #545             RED — first effective failure
+    is RC-7: verify_identity_in_containers.sh TimeoutExpired 120s ->
+    Makefile:972 test-container-proof-harness. Steps 7-8 consequently
+    skipped. SEPARATE OPEN MATTER.
+Python application    #1095 / #1096           RED — first effective failure
+    is A-05 cross-file isolation, byte-identical to the previous subject:
+    47 inspected, 0 replaced / 45 added / 38 env, same three files, none
+    of them this tranche's. Step 10 consequently skipped. Steps 7 and 8
+    now PASS. SEPARATE OPEN MATTER.
+```
+
+**No new independent first-effective failure appeared. Nothing was patched
+through.**
+
+### What this closure does NOT establish
+
+**REALISED HISTORICAL CI FALSE ADMISSION REMAINS NOT PROVEN.** The
+experiment that found the defect established CAPABILITY only; whether CI
+ever entered the state has never been measured, and closing the incident
+does not measure it.
+
+**The four genuine machine-bound dependencies are NOT repaired.** They
+remain under the existing NO-NEW-EVIDENCE hold. What closes here is the
+defective blocking-control and first-effective suppression path, plus the
+D376/D377 replacement-control implementation — **not RC-1's dependencies.**
+
+**Neither the repository nor PR #122 is green, and neither is claimed to
+be.** RC-7, A-05, the H2 v1.0 self-mutation containment and the four held
+dependencies all remain separately open.
+
+### Mechanism state — UNCHANGED BY THIS CLOSURE
+
+```
+M-POLICY-ADMISSION-DIVERGENCE
+  state                         PATTERN_CONFIRMED
+  confirmed occurrences         4          (INC-25 remains occurrence 4)
+  doctrine 49.6                 ALREADY TRIGGERED at occurrence 3
+  machine escalation            BEGUN — PARTIAL
+  generic cross-component hook  NOT IMPLEMENTED
+  mechanism controlled          NO
+```
+
+**The local Control B repair closes the INCIDENT. It does not constitute
+the generic mechanism control, and the distinction is not to be altered.**
+`M-SCOPE-WIDEN` remains `PATTERN_CONFIRMED`, 5 confirmed occurrences,
+`RECURRED_AFTER_CONTROL`, machine hook a required open obligation.
+`INC-2026-09-17-26` remains `INCIDENT_ONLY` with no mechanism assigned.
+
+**No incident allocated by this closure. Real incident population and
+highest allocated are unchanged. No new mechanism. Doctrine 49.6 not
+re-triggered. No D-number.**
