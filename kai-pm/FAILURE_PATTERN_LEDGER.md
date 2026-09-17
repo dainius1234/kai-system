@@ -3249,3 +3249,87 @@ machine escalation BEGUN and PARTIAL, mechanism NOT controlled — **no change
 of any kind.** `M-PRODUCER-CURATION`, `P-ADJUDICATOR-PROPAGATION` and
 `M-QUERY-OVERREACH` remain `PATTERN_CANDIDATE`. **No new mechanism. No new
 incident. Highest incident remains `INC-2026-09-17-24`. Total incidents 24.**
+
+---
+
+# ADJUDICATION 2026-09-17 (second) — `INC-2026-09-15-23` ruled a confirmed
+#                                    `M-SCOPE-WIDEN` occurrence; count 4 → 5
+
+**MECHANISM-STATE ADJUDICATION. No incident is allocated.**
+`INC-2026-09-15-23`, `INC-2026-09-17-24` and the adjudication at `54be438`
+are **unedited**. This entry supersedes only the occurrence count and
+chronology stated in that append, exactly as that append said it must be
+superseded if this ruling were made.
+
+**Adjudicator: Kai**, 2026-09-17, on independent reading of
+`INC-2026-09-15-23` against the authoritative `M-SCOPE-WIDEN` definition.
+
+### The ruling and its evidence
+
+`INC-2026-09-15-23` **IS** a confirmed occurrence of `M-SCOPE-WIDEN`.
+
+```
+measured proposition     cardinality — 358 entries present, 17 absent
+transmitted proposition  distribution / contiguity / universal absence —
+                         "D344 through D353. Nothing else in the entire
+                          range is absent."
+the second predicate     NEVER MEASURED
+therefore                MEASURED SUBJECT != TRANSMITTED SUBJECT
+```
+
+That is the mechanism's defining test, met exactly. The producer's own entry
+records the same facts; what was missing was the adjudication, not the
+evidence.
+
+### Corrected count and chronology
+
+```
+1  INC-2026-08-29-01
+2  INC-2026-08-29-02
+3  INC-2026-08-29-03     <- doctrine 49.6 fired here, 2026-08-29
+4  INC-2026-09-15-23     <- FIRST confirmed recurrence AFTER the manual control
+5  INC-2026-09-17-24     <- SECOND confirmed recurrence AFTER the manual control
+
+confirmed occurrence count   5
+```
+
+**Chronology correction:** the `54be438` append named `INC-2026-09-17-24` as
+the post-control recurrence. **`INC-2026-09-15-23` is the first; `INC-24` is
+the second.** The `54be438` entry remains historically correct as the
+adjudication made *before* `INC-23` was ruled on, and is not edited.
+
+### Mechanism state
+
+```
+mechanism                M-SCOPE-WIDEN
+confirmed occurrences    5
+state                    RECURRED_AFTER_CONTROL
+post-control recurrences INC-2026-09-15-23, INC-2026-09-17-24
+control type             MANUAL (doctrine 48 / CLAUDE.md R17 /
+                         R0 stop-signal table)
+machine hook             NOT IMPLEMENTED
+controlled               NO
+mechanised               NO
+```
+
+**Doctrine 49.6 is NOT triggered again.** It fired at occurrence 3 and that
+firing stands. What occurrences 4 and 5 establish is stronger and more
+specific: **the MANUAL post-escalation control has now failed to prevent
+recurrence TWICE.**
+
+The machine hook remains a **REQUIRED OPEN CONTROL OBLIGATION** — specified,
+owned, unimplemented — and `M-SCOPE-WIDEN` may not be described as
+`CONTROLLED` or `MECHANISED` until it exists. **No implementation authority
+for that hook exists inside D376/D377, and it must not be built there.**
+
+### Unchanged
+
+**No new mechanism. No new incident.** Highest incident remains
+`INC-2026-09-17-24`; total incidents 24. The generated-path sub-shape stays a
+sub-shape of `M-SCOPE-WIDEN` and is not promoted.
+`M-POLICY-ADMISSION-DIVERGENCE` is unchanged in every respect —
+`PATTERN_CONFIRMED`, 49.6 fired, machine escalation BEGUN and PARTIAL,
+mechanism NOT controlled. `M-PRODUCER-CURATION`,
+`P-ADJUDICATOR-PROPAGATION` and `M-QUERY-OVERREACH` remain
+`PATTERN_CANDIDATE`. **No D-number is required for this arithmetic
+correction and none is allocated.**
