@@ -1979,6 +1979,116 @@ REGISTRY: Tuple[Gate, ...] = (
          denominator=r"UH Floor Gate Tests: \d+ passed, \d+ failed",
          proven_by="scripts/test_uh_floor_gate.py",
          in_workflows=("policy-checks.yml",)),
+
+    # ── RC-1 THREE-CONTROL ARCHITECTURE — D376 §3, corrected by D377 ────
+    #
+    # Visibility, operational portability and evidence integrity are three
+    # different services. They must communicate; none may impersonate
+    # another. That separation is the whole architecture, and it is why
+    # the first row below is a REPORT and the next two are GATEs.
+    #
+    # Together they replace `test_p1_p4_enhancements.py::
+    # test_no_developer_home_paths`, retired as a blocking control in the
+    # same tranche. Nothing it could see stops being visible; what changes
+    # is which surface is allowed to block.
+
+    Gate(module="machine_path_inventory",
+         kind=REPORT,
+         summary="whole-repository occurrence report for machine- and "
+                 "session-bound paths — every tracked text file, empty "
+                 "exclusion set, never gates",
+         # Population is `git ls-files`, which is the tree's own
+         # membership rule rather than a directory walk plus a skip list.
+         # There is no input file to declare: the subject IS the tree.
+         inputs=(),
+         denominator=(r"Machine-path inventory — \d+ tracked, \d+ text, "
+                      r"\d+ non-text, \d+ occurrence"),
+         proven_by="scripts/test_machine_path_inventory.py",
+         # NO `pending_wiring`. This is a PERMANENT report, not a gate
+         # waiting to be enforced, and encoding a promotion path here
+         # would be the code making a governance decision. Promoting it
+         # would need its own authority.
+         in_policy_check=False,
+         in_workflows=("policy-checks.yml",),
+         findings=()),
+
+    Gate(module="check_operational_portability",
+         kind=GATE,
+         summary="no developer-checkout or ephemeral-session filesystem "
+                 "dependency on the derived workflow-and-Make enforcement "
+                 "surface — deliberately NOT a portability claim",
+         inputs=("Makefile",),
+         denominator=(r"Operational portability — \d+ roots, \d+ modules, "
+                      r"\d+ finding"),
+         proven_by="scripts/test_operational_portability.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         findings=()),
+
+    Gate(module="check_evidence_package_integrity",
+         kind=GATE,
+         summary="at-rest verification of the four implicated evidence "
+                 "lineages under each package's own identity convention — "
+                 "read-only, never regenerates a MANIFEST",
+         inputs=("kai-pm/house_in_order_h2/MANIFEST.sha256",
+                 "kai-pm/house_in_order_census_v11/MANIFEST.sha256",
+                 "kai-pm/house_in_order_h2_v11/MANIFEST.sha256",
+                 "kai-pm/census_v11_claim_sensitivity/MANIFEST.sha256"),
+         denominator=(r"Evidence-package integrity — \d+ packages, "
+                      r"\d+/\d+ manifest-listed artefacts verified, "
+                      r"\d+ finding"),
+         proven_by="scripts/test_evidence_package_integrity.py",
+         in_policy_check=True,
+         in_workflows=("policy-checks.yml",),
+         findings=()),
+
+    # The four calibration suites. They are registered because CI runs
+    # them and a non-zero exit stops the build, which is this registry's
+    # own definition of an instrument — and because INC-2026-09-15-21 is
+    # what happens when a `proven_by` is checked for FILE EXISTENCE while
+    # its assertions never execute in required CI.
+
+    Gate(module="test_execution_surface",
+         kind=GATE,
+         summary="pins the extracted execution-surface functions against "
+                 "synthetic fixtures — the lost `- name:` duplicate-run "
+                 "key and the comment-names-a-script cases survive the "
+                 "move as assertions, not as docstrings",
+         inputs=(),
+         denominator=r"Execution surface calibration — \d+ scenarios, \d+ passed, \d+ failed",
+         proven_by="scripts/test_execution_surface.py",
+         in_workflows=("policy-checks.yml",)),
+
+    Gate(module="test_machine_path_inventory",
+         kind=GATE,
+         summary="synthetic known-positive per syntactic class, "
+                 "deployment-path known-negative, and predicate mutation — "
+                 "NO live-tree floor in either direction",
+         inputs=(),
+         denominator=r"Machine-path inventory calibration — \d+ scenarios, \d+ passed, \d+ failed",
+         proven_by="scripts/test_machine_path_inventory.py",
+         in_workflows=("policy-checks.yml",)),
+
+    Gate(module="test_operational_portability",
+         kind=GATE,
+         summary="P1 developer checkout, P2 session scratch, P3 sys.path "
+                 "resolution, P4 active code on the derived surface; N1 "
+                 "docstring, N2 fixture data, N3 deployment path — the "
+                 "exact RC-1 classes, as calibration",
+         inputs=(),
+         denominator=r"Operational portability calibration — \d+ scenarios, \d+ passed, \d+ failed",
+         proven_by="scripts/test_operational_portability.py",
+         in_workflows=("policy-checks.yml",)),
+
+    Gate(module="test_evidence_package_integrity",
+         kind=GATE,
+         summary="byte mutation, removed entry, the H2 v1.0 in-place "
+                 "rewrite simulated, and a tree-hash assertion that the "
+                 "gate itself writes nothing",
+         inputs=(),
+         denominator=r"Evidence-package integrity calibration — \d+ scenarios, \d+ passed, \d+ failed",
+         proven_by="scripts/test_evidence_package_integrity.py",
+         in_workflows=("policy-checks.yml",)),
 )
 
 BY_MODULE = {gate.module: gate for gate in REGISTRY}

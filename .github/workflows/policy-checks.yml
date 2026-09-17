@@ -279,5 +279,52 @@ jobs:
       - name: WF-3 shadow calibration (floor consumer)
         run: make test-uh-floor-gate
 
+      # RC-1 three-control architecture (D376 §3, corrected by D377).
+      # Visibility, operational portability and evidence integrity are
+      # three different services; none may impersonate another.
+      #
+      # These replace test_p1_p4_enhancements.py::test_no_developer_home_paths,
+      # retired as a blocking control in the same tranche. That test asked
+      # "does this string appear?" and was read as answering "does this
+      # code depend on that path?" — and because it blocked inside
+      # `pytest scripts/`, three non-defects (two calibration fixtures and
+      # one docstring) failed `make coverage`, so `coverage-floors` never
+      # reached its per-module evaluations and sixteen unrelated
+      # live-stack steps were skipped on every Core Tests run.
+      #
+      # The portability question now lives HERE, where it belongs: a
+      # policy failure makes Policy-as-Code red without erasing unrelated
+      # diagnostic execution in another workflow.
+      #
+      # Separate `make` lines throughout, on purpose: the registry's
+      # workflow scanner captures only the FIRST target after `make`, so
+      # `make a b` would leave the second invisible to it.
+
+      - name: Machine-path inventory (report — advisory, never blocking)
+        run: make machine-path-inventory
+
+      - name: Operational portability gate
+        run: make check-operational-portability
+
+      - name: Evidence-package integrity (at rest, read-only)
+        run: make check-evidence-integrity
+
+      # The four calibrations. Registered and executed, because a
+      # `proven_by` that is only checked for FILE EXISTENCE is what
+      # INC-2026-09-15-21 was: 166 and 233 assertions locally green and
+      # nothing more.
+
+      - name: Execution-surface extraction regression
+        run: make test-execution-surface
+
+      - name: Machine-path inventory calibration
+        run: make test-machine-path-inventory
+
+      - name: Operational portability calibration
+        run: make test-operational-portability
+
+      - name: Evidence-package integrity calibration
+        run: make test-evidence-package-integrity
+
       - name: Instrumentation invariants (I-4 enforced)
         run: python scripts/security/check_gate_registry.py --gate

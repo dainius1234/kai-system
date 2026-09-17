@@ -6,7 +6,7 @@ export MEMU_ALLOW_FAKE_EMBEDDINGS ?= true
 # Self-audit and feedback
 self-audit:
 	python3 scripts/self_audit.py
-.PHONY: test-gated-commit test-embedding-backends test-runtime-topology test-degradation-tolerance test-model-load-denominator test-model-startup-classifier test-asset-contract test-memu-graph-acceptance test-graph-stall test-ingest-contract test-cognify-result test-llm-contract test-container-proof-harness test-observe-turn-identity test-service-identity-wiring service-keys verify-identity-containers lint-blocking test-d109-ohana-core test-d92-socratic test-d93-hypothesis test-d94-forecaster test-d95-d100-foundations test-d101-causal-world-model test-d102-global-workspace test-d89-cognitive-depth go_no_go hardening_smoke pypi-shadow-check test-letta test-financial test-agentic-service test-agentic-introspect build-kai-control kai-control-selftest test-conviction kai-drill kai-drill-test test-self-emp game-day-scorecard hmac-rotation-drill hmac-auto-rotate hmac-migration-advice test-auth-hmac test-phase-b-memu chaos-ci health-sweep contract-smoke merge-gate phase1-closure paper-backup weekly-key-rotate weekly-ed25519-rotate core-up core-down core-smoke test-v7-verifier test-v7-quarantine test-v7-policy test-v7-idempotency test-integration-chain test-v7 test-heartbeat test-episode-saver test-episode-spool test-tool-gate-security test-error-budget test-invoice test-dashboard test-memu-retrieval test-memu-routes test-agentic-routes test-context-enrichment-ab test-ab-log test-screen-capture test-shell-sandbox test-hse-rams test-agentic test-router test-planner test-adversary test-failure-taxonomy test-selaur test-contradiction test-gem test-planner-prefs test-silence test-self-deception test-temporal-self test-predictive test-improvement-gate test-thinking-pathways test-dream-state test-security-audit test-gaps-sprint test-tree-search test-priority-queue test-model-selector test-prod-hardening test-p3-organic test-p4-personality test-p16-operational test-p17-emotional-intelligence test-p18-narrative-identity test-p19-imagination-engine test-p20-conscience-values test-p21-proactive-agent test-p22-operator-model test-error-codes test-feature-flags dep-audit coverage coverage-floors test-restart-persistence test-upload-fuzz test-audio-transcribe test-browser-agent test-vision-service test-clipboard-service test-files-service test-notify-service test-document-parser test-monitor-service test-broker-bridge test-sysmetrics test-screen-watcher test-email-reader test-news-feed test-weather-service test-docker-watcher test-airquality test-calendar-service test-git-watcher test-kai-intelligence test-cognitive-mechanisms sync-docs check-docs auto-changelog auto-session-log test-focus-compress test-context-budget test-predictive-failure test-multi-modal test-world-anchor test-self-healing-phases test-j-series test-behavioral test-docker-e2e test-chassis test-wake test-broker-bridge-yfinance test-perception-spine test-world-state test-proposal-workspace test-policy-bridge test-vertical-slice test-actuator-registry test-autonomy test-payload-bounds test-assessment test-invariant-guards test-concurrency-clock test-service-auth test-erasure test-legacy-bridge test-migration test-full-migration test-flags-enabled test-preflight test-architecture-rules test-dashboard-findings test-dashboard-auth test-dashboard-ui-auth test-degraded test-hygiene-gate test-assertion-floors test-gate-registry test-compose-drift test-secret-gates test-compose-gates test-ci-tolerations test-test-wiring test-test-isolation test-suite-floor test-conftest-guards suite-run suite-floor suite-floor-record test-isolation test-isolation-report test-isolation-baseline test-trust-ladder test-market test-cognition test-j-features test-perception-misc test-hmac-advisor test-untargeted test-smoke-core test-graph-live dashboard-findings hygiene-survey hygiene-gate hygiene-baseline verify-live-endpoints verify-live-mutating setup-service-token preflight test-uh assertion-floors assertion-floors-update gate-registry gate-registry-gate
+.PHONY: test-gated-commit test-embedding-backends test-runtime-topology test-degradation-tolerance test-model-load-denominator test-model-startup-classifier test-asset-contract test-memu-graph-acceptance test-graph-stall test-ingest-contract test-cognify-result test-llm-contract test-container-proof-harness test-observe-turn-identity test-service-identity-wiring service-keys verify-identity-containers lint-blocking test-d109-ohana-core test-d92-socratic test-d93-hypothesis test-d94-forecaster test-d95-d100-foundations test-d101-causal-world-model test-d102-global-workspace test-d89-cognitive-depth go_no_go hardening_smoke pypi-shadow-check test-letta test-financial test-agentic-service test-agentic-introspect build-kai-control kai-control-selftest test-conviction kai-drill kai-drill-test test-self-emp game-day-scorecard hmac-rotation-drill hmac-auto-rotate hmac-migration-advice test-auth-hmac test-phase-b-memu chaos-ci health-sweep contract-smoke merge-gate phase1-closure paper-backup weekly-key-rotate weekly-ed25519-rotate core-up core-down core-smoke test-v7-verifier test-v7-quarantine test-v7-policy test-v7-idempotency test-integration-chain test-v7 test-heartbeat test-episode-saver test-episode-spool test-tool-gate-security test-error-budget test-invoice test-dashboard test-memu-retrieval test-memu-routes test-agentic-routes test-context-enrichment-ab test-ab-log test-screen-capture test-shell-sandbox test-hse-rams test-agentic test-router test-planner test-adversary test-failure-taxonomy test-selaur test-contradiction test-gem test-planner-prefs test-silence test-self-deception test-temporal-self test-predictive test-improvement-gate test-thinking-pathways test-dream-state test-security-audit test-gaps-sprint test-tree-search test-priority-queue test-model-selector test-prod-hardening test-p3-organic test-p4-personality test-p16-operational test-p17-emotional-intelligence test-p18-narrative-identity test-p19-imagination-engine test-p20-conscience-values test-p21-proactive-agent test-p22-operator-model test-error-codes test-feature-flags dep-audit coverage coverage-floors test-restart-persistence test-upload-fuzz test-audio-transcribe test-browser-agent test-vision-service test-clipboard-service test-files-service test-notify-service test-document-parser test-monitor-service test-broker-bridge test-sysmetrics test-screen-watcher test-email-reader test-news-feed test-weather-service test-docker-watcher test-airquality test-calendar-service test-git-watcher test-kai-intelligence test-cognitive-mechanisms sync-docs check-docs auto-changelog auto-session-log test-focus-compress test-context-budget test-predictive-failure test-multi-modal test-world-anchor test-self-healing-phases test-j-series test-behavioral test-docker-e2e test-chassis test-wake test-broker-bridge-yfinance test-perception-spine test-world-state test-proposal-workspace test-policy-bridge test-vertical-slice test-actuator-registry test-autonomy test-payload-bounds test-assessment test-invariant-guards test-concurrency-clock test-service-auth test-erasure test-legacy-bridge test-migration test-full-migration test-flags-enabled test-preflight test-architecture-rules test-dashboard-findings test-dashboard-auth test-dashboard-ui-auth test-degraded test-hygiene-gate test-assertion-floors test-gate-registry test-compose-drift test-secret-gates test-compose-gates test-ci-tolerations test-test-wiring test-test-isolation test-suite-floor test-conftest-guards suite-run suite-floor suite-floor-record test-isolation test-isolation-report test-isolation-baseline test-trust-ladder test-market test-cognition test-j-features test-perception-misc test-hmac-advisor test-untargeted test-smoke-core test-graph-live dashboard-findings hygiene-survey hygiene-gate hygiene-baseline verify-live-endpoints verify-live-mutating setup-service-token preflight test-uh assertion-floors assertion-floors-update gate-registry gate-registry-gate machine-path-inventory check-operational-portability check-evidence-integrity test-execution-surface test-machine-path-inventory test-operational-portability test-evidence-package-integrity
 
 # `lint-blocking` runs FIRST and byte-identically to python-app.yml's flake8
 # step. That step gates CI *ahead* of the tests, so a file that fails it
@@ -29,6 +29,8 @@ policy-check: lint-blocking
 	python3 scripts/security/check_image_tags.py
 	python3 scripts/security/check_compose_drift.py
 	python3 scripts/security/check_architecture_rules.py
+	python3 scripts/security/check_operational_portability.py
+	python3 scripts/security/check_evidence_package_integrity.py
 	python3 scripts/security/hygiene_survey.py --gate
 	python3 scripts/security/check_ci_tolerations.py
 	python3 scripts/security/check_preflight_reachability.py \
@@ -1173,6 +1175,37 @@ test-uh-floor-gate:
 
 test-uh-runner:
 	python3 scripts/test_uh_runner.py
+
+# ── RC-1 three-control architecture (D376 §3, corrected by D377) ──────
+# Visibility, operational portability and evidence integrity are three
+# different services. None of these is a prerequisite of test-uh,
+# test-core or coverage: a policy question must not be able to suppress
+# the live-stack tail again, which is exactly what RC-1 did through the
+# retired lexical test.
+
+# REPORT, advisory only. Deliberately NOT in `policy-check`: the registry
+# treats absence from that target as how a non-gating instrument is
+# represented, and adding it there would make it a gate by placement.
+machine-path-inventory:
+	python3 scripts/security/machine_path_inventory.py
+
+check-operational-portability:
+	python3 scripts/security/check_operational_portability.py
+
+check-evidence-integrity:
+	python3 scripts/security/check_evidence_package_integrity.py
+
+test-execution-surface:
+	python3 scripts/test_execution_surface.py
+
+test-machine-path-inventory:
+	python3 scripts/test_machine_path_inventory.py
+
+test-operational-portability:
+	python3 scripts/test_operational_portability.py
+
+test-evidence-package-integrity:
+	python3 scripts/test_evidence_package_integrity.py
 
 test-shipped-package-deps:
 	python3 scripts/test_shipped_package_deps.py
