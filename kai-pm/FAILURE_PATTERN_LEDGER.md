@@ -2986,3 +2986,163 @@ it was not: a freeze correctly read but not followed forward, a cardinality
 correctly counted but described as a distribution. That is a locator across
 two entries by the same producer on the same day. It is not promoted here,
 and it must not be cited as a cause.
+
+---
+
+# APPEND 2026-09-17 — an authority record that declared a complete mutation
+#                     surface it had not measured
+
+One incident. It reached an APPEND-ONLY authority record and was caught by
+independent contract review **before any implementation began**, so no
+out-of-authority mutation occurred. The stop worked.
+
+
+### `INC-2026-09-17-24` — D376's "exact mutation surface" omitted the paths
+###                       a governed generator necessarily derives
+
+```
+INCIDENT_ID             INC-2026-09-17-24
+date                    2026-09-17
+producer                Orion
+subject/version         kai-pm/DECISIONS.md — D376 §4 EXACT MUTATION SURFACE
+                        banked at e0507701b31fe9444c6fe3e6156512cd861993df
+
+false_or_faulty_output  D376 §4 declares:
+
+                          "EXACT MUTATION SURFACE — 15 PATHS"
+
+                        and closes the boundary explicitly:
+
+                          "Any path not in this list is outside authority."
+
+                        README.md and docs/PROJECT_BACKLOG.md appear
+                        nowhere in that list.
+
+what was actually true  scripts/sync_docs.py is an existing governed
+                        generator. Measured at this subject, not assumed:
+
+                          count_test_files()     globs scripts/test_*.py
+                          count_test_functions() counts ^\s*def test_ in
+                                                 those same files
+                          count_python_loc()     rglobs every *.py except
+                                                 .git, __pycache__, _archive
+
+                        and it writes exactly two files, at
+                        sync_docs.py:200 and :287 —
+                          README.md
+                          docs/PROJECT_BACKLOG.md
+
+                        The tranche authorised by D376 adds 8 new .py files,
+                        4 of them scripts/test_*.py, and the house
+                        calibration style does use `def test_` — measured,
+                        not assumed: 22 in test_uh_runner.py, 40 in
+                        test_uh_floor_gate.py, 39 in test_gate_registry.py.
+                        It also retires one `def test_` from
+                        test_p1_p4_enhancements.py.
+
+                        So the authorised work NECESSARILY moves the
+                        individual-test count, the test-file count and the
+                        Python LOC figure, and therefore both generated
+                        files.
+
+                        Sharper than the review's statement, and measured:
+                        the TARGETS metric does NOT move. count_test_targets()
+                        parses the `test-core:` dependency list, and the
+                        tranche deliberately adds no prerequisite to it.
+
+                        The contract as banked is therefore not executable:
+                        syncing the documentation violates D376's own
+                        boundary clause, and not syncing it knowingly leaves
+                        generated documentation stale and the documentation
+                        gate red. Neither branch is acceptable.
+
+mechanism               `M-SCOPE-WIDEN`.
+
+                        Assigned against the roster's definition rather than
+                        by resemblance, as the review required. The roster
+                        at the time of writing: M-SCOPE-WIDEN and
+                        M-POLICY-ADMISSION-DIVERGENCE PATTERN_CONFIRMED;
+                        M-PRODUCER-CURATION, P-ADJUDICATOR-PROPAGATION and
+                        M-QUERY-OVERREACH PATTERN_CANDIDATE. The defining
+                        test for M-SCOPE-WIDEN is MEASURED SUBJECT IS NOT
+                        TRANSMITTED SUBJECT, and that test is met exactly: I
+                        enumerated THE PATHS I WOULD AUTHOR and transmitted
+                        it as THE COMPLETE SET OF PATHS THAT WOULD CHANGE.
+                        Those are two different sets and only the first was
+                        measured.
+
+                        A distinguishing sub-shape is recorded WITHOUT
+                        minting a new identifier, on one occurrence, per
+                        doctrine 37: the omitted paths are produced by an
+                        EXISTING GOVERNED GENERATOR, not by the author. No
+                        amount of enumerating my own edits would have
+                        surfaced them; only asking what the repository
+                        derives FROM those edits would. First-order surface
+                        declared as total surface.
+
+                        NO ESCALATION IS ADVANCED BY THIS ENTRY. The review
+                        that found this explicitly warned against advancing
+                        escalation mechanically from its wording, and
+                        doctrine 49.6's third-occurrence test applies to a
+                        mechanism's CONTROL. M-SCOPE-WIDEN's control is the
+                        banked doctrine rule R17/48, already in the R0
+                        stop-signal table. What this occurrence establishes
+                        is a RECURRENCE RATE worth an adjudicator's
+                        attention — INC-2026-09-15-23 was two days ago — and
+                        that judgement is Kai's, not mine.
+
+detection               KAI, by independent contract review of the banked
+                        D376 text before implementation started. Not by me,
+                        and not by any control. Verified at source here:
+                        sync_docs.py metric scanners and both write sites,
+                        and the `def test_` population of three existing
+                        house suites.
+
+cost                    NONE REALISED. No implementation had begun; no path
+                        outside authority was touched; the working tree was
+                        clean at e050770. The counterfactual is the finding:
+                        had the build started, the FIRST CORRECT ACTION —
+                        running the documentation sync the repository already
+                        requires — would itself have exceeded the recorded
+                        authority, and the alternative would have been to
+                        suppress a sync and call a knowingly stale tree
+                        verified.
+
+status                  `M-SCOPE-WIDEN`, confirmed mechanism, one further
+                        occurrence. The mechanism's state is UNCHANGED — it
+                        was already PATTERN_CONFIRMED and remains so.
+
+control state           UNCHANGED, and the gap is worth naming precisely: no
+                        control asks "what does this repository DERIVE from
+                        the paths I am about to change?" before a mutation
+                        surface is declared. None is proposed here. Proposing
+                        a generic derived-surface control on one occurrence is
+                        the shape this programme has spent the whole RC-1
+                        tranche declining to build, and the correction that
+                        matters is the authority record, not a new detector.
+```
+
+
+### Roster delta
+
+| incident | producer | status | mechanism |
+|---|---|---|---|
+| `INC-2026-09-17-24` | Orion | recurrence | `M-SCOPE-WIDEN` — one further occurrence, state unchanged |
+
+**Producers: Orion 20 · Kai 2 · DeepSeek 2. Total incidents 24.** Derivation:
+`grep -oE 'INC-2026-[0-9]{2}-[0-9]{2}-[0-9]+' kai-pm/FAILURE_PATTERN_LEDGER.md
+| sort -u | wc -l` returned 23 before this append; this append adds
+`INC-2026-09-17-24`. The counts carry no fairness, quality or
+producer-reliability inference.
+
+**Mechanisms.** `M-SCOPE-WIDEN` `PATTERN_CONFIRMED` (one further occurrence,
+state unchanged) · `M-POLICY-ADMISSION-DIVERGENCE` `PATTERN_CONFIRMED` ·
+`M-PRODUCER-CURATION` `PATTERN_CANDIDATE` · `P-ADJUDICATOR-PROPAGATION`
+`PATTERN_CANDIDATE` · `M-QUERY-OVERREACH` `PATTERN_CANDIDATE`. **No new
+mechanism is registered. No mechanism state is altered by this append.**
+
+**Escalation state.** UNCHANGED, and deliberately so. Doctrine 49.6 remains
+fired for `M-POLICY-ADMISSION-DIVERGENCE` only, machine escalation BEGUN and
+PARTIAL, that mechanism NOT controlled. **Nothing in this append advances,
+retires or re-triggers any escalation.** The `M-SCOPE-WIDEN` recurrence rate
+is surfaced for adjudication and is not acted on by the producer who caused it.
