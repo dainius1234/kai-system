@@ -3615,3 +3615,190 @@ it here.** A producer adjudicating the mechanism of its own error is the
 thing this ledger exists to prevent. It is recorded now, durably and in
 the authoritative file, because doctrine 49.1 requires the record — not the
 adjudication — to be immediate.
+
+---
+
+# APPEND 2026-09-17 (third) — a ledger write that mis-identified two
+#                             incidents and counted its own population with
+#                             the wrong instrument
+
+One incident, in this file, about a write to this file. The factual
+correction is already banked; this records the defect and, more
+importantly, replaces the population instrument that let it pass.
+
+**The incident-population selector used until now was wrong, and the
+correction first offered for it was an instance patch.** Both are addressed
+below by deriving the population from the ledger's own structural
+definition sites.
+
+
+### `INC-2026-09-17-26` — three coupled defects in one authoritative write
+
+```
+INCIDENT_ID             INC-2026-09-17-26
+date                    2026-09-17
+producer                Orion
+subject                 the INC-2026-09-17-25 append (commit c76f385f) and
+                        its incident-count derivation
+                        kai-pm/FAILURE_PATTERN_LEDGER.md
+status                  OPEN / RECORDED — the factual correction is banked
+                        at 177576f0; no further repair to INC-25 is required
+
+DEFECT A — LOCAL IDENTITY ERROR
+
+                        The INC-25 entry cited its mechanism predecessors as
+                        INC-2026-09-15-18 and INC-2026-09-15-19. The true
+                        incidents are INC-2026-09-14-18 and
+                        INC-2026-09-14-19. Two dates typed wrong, and two
+                        identities that name nothing thereby transmitted into
+                        an append-only record.
+
+DEFECT B — MEASUREMENT-INSTRUMENT ERROR
+
+                        The entry's roster published this as the derivation
+                        of the incident population:
+
+                          grep -oE 'INC-2026-[0-9]{2}-[0-9]{2}-[0-9]+' \
+                            kai-pm/FAILURE_PATTERN_LEDGER.md | sort -u | wc -l
+
+                        THAT SELECTOR DOES NOT MEASURE INCIDENT RECORDS. It
+                        measures unique incident-SHAPED TOKENS anywhere in an
+                        append-only narrative — so definitions, roster rows,
+                        predecessor citations, adjudication appends,
+                        corrections and phantoms all enter one denominator.
+
+                        The instrument was wrong before this incident and had
+                        been reported with every previous append. It happened
+                        to agree with reality only while every token in the
+                        file also had a definition behind it.
+
+DEFECT C — PROCESS ERROR
+
+                        The count was transmitted without running the
+                        published command against the committed result. Had
+                        it been run, it returned 27 against a stated 25, and
+                        the discrepancy would have surfaced the two phantoms
+                        immediately. The command was published as evidence
+                        and used as none.
+
+                        R13 requires the derivation to travel WITH the claim
+                        at transmission. It travelled; it had not been
+                        executed. A derivation printed beside a number is not
+                        the same as a number derived.
+
+measured                unique tokens after the INC-25 append        27
+                        introduced by that append                    3
+                          INC-2026-09-17-25   real
+                          INC-2026-09-15-18   phantom
+                          INC-2026-09-15-19   phantom
+                        real incident population                     25
+
+STRUCTURAL POPULATION   Measured from this file rather than assumed. Three
+DERIVATION              candidate schemas were compared before choosing:
+
+                          token anywhere                     27  DEFECTIVE
+                          lines beginning `INCIDENT_ID`      14  INCOMPLETE —
+                            the eleven 2026-08-29 incidents predate that
+                            field and do not carry it
+                          `### ` heading naming an incident   25  CORRECT
+
+                        THE DEFINITION SITE IS THE HEADING. Every real
+                        incident in this file, in both schema generations,
+                        opens with
+
+                          ### `INC-YYYY-MM-DD-NN` — <title>
+
+                        and nothing else in the file does. The authoritative
+                        derivation is therefore:
+
+                          grep -oE '^### +.?INC-2026-[0-9]{2}-[0-9]{2}-[0-9]+' \
+                            kai-pm/FAILURE_PATTERN_LEDGER.md \
+                            | grep -oE 'INC-2026-[0-9-]+' | sort -u
+
+                        real incidents      = line count of that output
+                        highest allocated   = its last line
+                        next allocator      = highest + 1
+
+                        THE PHANTOMS ARE EXCLUDED BECAUSE THEY ARE NOT
+                        DEFINITION SITES — they appear only as a citation
+                        inside INC-25 and as content of the correction. No
+                        identifier is named in the selector, no exclusion
+                        list is maintained, and a future phantom would be
+                        excluded by the same structural property without
+                        anyone editing anything.
+
+                        The `grep -vE 'INC-2026-09-15-(18|19)'` form given in
+                        the 177576f0 correction explained the discrepancy
+                        correctly but is an INSTANCE PATCH: it hard-codes
+                        today's phantoms and keeps the defective population
+                        definition. IT IS SUPERSEDED BY THE DERIVATION ABOVE
+                        AND MUST NOT BE USED AS THE ALLOCATOR METHOD.
+
+mechanism               NONE ASSIGNED. `INCIDENT_ONLY`.
+
+                        NOT assigned to M-POLICY-ADMISSION-DIVERGENCE,
+                        M-SCOPE-WIDEN, M-PRODUCER-CURATION,
+                        P-ADJUDICATOR-PROPAGATION or M-QUERY-OVERREACH.
+
+                        Defect B resembles the measured-subject-is-not-the-
+                        transmitted-subject family and Defect C resembles the
+                        derivation-not-executed family, but RESEMBLANCE IS A
+                        LOCATOR (doctrine 37). The Control-B admission defect
+                        recorded one entry above and this ledger-writing
+                        defect are different failures in different subjects,
+                        and assigning either mechanism here without a
+                        separate causal adjudication would inflate a
+                        confirmed recurrence count on similarity alone. No
+                        new mechanism is created either.
+
+                        Mechanism assignment, if any, is Kai's.
+
+detection               Orion, by running the entry's own published
+                        derivation command against its own committed output —
+                        the step whose omission is Defect C. Disclosed before
+                        the authorised Control-B repair began.
+                        Adjudicated a material incident by Kai.
+
+cost                    No adjudication rested on the wrong count. The cost
+                        realised is corruption of identity references and of
+                        the evidence offered for a population count, inside
+                        the AUTHORITATIVE failure-pattern ledger — the file
+                        whose entire purpose is that such things are
+                        recoverable.
+
+control state           The population instrument is corrected by this entry
+                        and is now structural. NO SCRIPT, GATE OR GENERIC
+                        LEDGER FRAMEWORK IS CREATED: the existing structure
+                        supports a truthful derivation, so a measurement
+                        correction is the whole repair.
+
+                        No control asks whether a published derivation was
+                        executed before its result was transmitted. None is
+                        proposed here on one occurrence.
+```
+
+
+### Roster delta
+
+| incident | producer | status | mechanism |
+|---|---|---|---|
+| `INC-2026-09-17-26` | Orion | `INCIDENT_ONLY` / OPEN-RECORDED | none assigned — ledger identity and population-measurement defect |
+
+**Real incidents: 26. Highest allocated: `INC-2026-09-17-26`.** Derived
+structurally from definition headings, not from token occurrences:
+
+```
+grep -oE '^### +.?INC-2026-[0-9]{2}-[0-9]{2}-[0-9]+' kai-pm/FAILURE_PATTERN_LEDGER.md \
+  | grep -oE 'INC-2026-[0-9-]+' | sort -u | wc -l
+```
+
+**Producers: Orion 22 · Kai 2 · DeepSeek 2.** The counts carry no fairness,
+quality or producer-reliability inference.
+
+**Mechanisms — NONE ALTERED BY THIS APPEND.**
+`M-POLICY-ADMISSION-DIVERGENCE` `PATTERN_CONFIRMED`, 4 confirmed
+occurrences · `M-SCOPE-WIDEN` `PATTERN_CONFIRMED`, 5 confirmed occurrences,
+`RECURRED_AFTER_CONTROL` · `M-PRODUCER-CURATION`,
+`P-ADJUDICATOR-PROPAGATION`, `M-QUERY-OVERREACH` `PATTERN_CANDIDATE`.
+**No mechanism assigned to this incident. No new mechanism. Doctrine 49.6
+not triggered. No D-number.**
