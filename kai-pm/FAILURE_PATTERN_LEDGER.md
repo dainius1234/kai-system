@@ -3526,3 +3526,92 @@ remain `PATTERN_CANDIDATE`. **No new mechanism is registered.**
 `M-POLICY-ADMISSION-DIVERGENCE` from occurrence 3; it is **not re-triggered**.
 Machine escalation BEGUN and PARTIAL; generic control NOT IMPLEMENTED;
 mechanism NOT CONTROLLED. **No D-number is allocated by this entry.**
+
+---
+
+# CORRECTION 2026-09-17 — two phantom incident identifiers introduced by
+#                         the INC-2026-09-17-25 append, and a falsified
+#                         derivation line in that same entry
+
+**Append-only. `INC-2026-09-17-25` is NOT edited; its substance, mechanism
+assignment, occurrence count and escalation qualification all stand
+unchanged.** This entry corrects two factual defects in its supporting
+text, both of them the producer's, both caught by running the entry's own
+published derivation command against the committed result.
+
+### Defect 1 — two identifiers that name no incident
+
+`INC-2026-09-17-25` cites its `M-POLICY-ADMISSION-DIVERGENCE` predecessors
+as `INC-2026-09-15-18` and `INC-2026-09-15-19`.
+
+**Those identifiers do not exist and never have.** The dates are wrong.
+
+```
+WRITTEN (phantom)        CORRECT (verified in this file)
+INC-2026-09-15-18   ->   INC-2026-09-14-18   confirmed occurrence 1
+INC-2026-09-15-19   ->   INC-2026-09-14-19   confirmed occurrence 2
+INC-2026-09-15-21        INC-2026-09-15-21   confirmed occurrence 3  (correct as written)
+```
+
+`INC-2026-09-14-18` and `INC-2026-09-14-19` are the real incidents,
+adjudicated `PATTERN_CONFIRMED` as occurrences 1 and 2 of
+`M-POLICY-ADMISSION-DIVERGENCE`. **`INC-2026-09-15-18` and
+`INC-2026-09-15-19` are PHANTOM IDENTIFIERS. They must never be cited, and
+a future reader finding them will find them only inside the erroneous
+citation and inside this correction.**
+
+The mechanism chain itself is unaffected: occurrences 1, 2, 3, 4 are
+`INC-2026-09-14-18`, `INC-2026-09-14-19`, `INC-2026-09-15-21`,
+`INC-2026-09-17-25`.
+
+### Defect 2 — the derivation line in that entry is falsified by its own command
+
+`INC-2026-09-17-25`'s roster block states *"returned 24 before this append;
+this append adds `INC-2026-09-17-25`"* and reports **Total incidents 25**.
+
+Running the command it publishes, against the committed result, returns
+**27** — because the append introduced THREE identifiers into the file's ID
+space, not one: the intended incident plus the two phantoms above.
+
+```
+unique ids in the parent commit                     24
+unique ids after the append                         27
+introduced by the append   INC-2026-09-17-25        1  real
+                           INC-2026-09-15-18        1  phantom
+                           INC-2026-09-15-19        1  phantom
+REAL INCIDENT TOTAL                                 25
+```
+
+**The count of 25 real incidents is correct. The derivation offered for it
+is not**, because a bare unique-identifier grep over this file now counts
+phantoms. Corrected derivation, which any reader can re-run:
+
+```
+grep -oE 'INC-2026-[0-9]{2}-[0-9]{2}-[0-9]+' kai-pm/FAILURE_PATTERN_LEDGER.md \
+  | sort -u | grep -vE 'INC-2026-09-15-(18|19)' | wc -l      # -> 25
+```
+
+### What this correction does NOT change
+
+`INC-2026-09-17-25` stands in full: the confirmed Control B defect, the
+static source evidence, the hostile mixed-root execution (roots 1,
+unresolved 1, missing 0, findings 0, rc 0), the repository-unchanged proof,
+`realised historical CI false admission = NOT PROVEN`, the
+`M-POLICY-ADMISSION-DIVERGENCE` assignment, **confirmed occurrence count 4**,
+the post-escalation qualification, and `status OPEN pending local repair`.
+`M-SCOPE-WIDEN` is untouched. **Doctrine 49.6 is not re-triggered. No new
+mechanism. No D-number.**
+
+### Producer's note, for the adjudicator
+
+Both defects are mine and are the same shape as the mechanism recorded two
+entries above: a count and a set of identifiers **transmitted without being
+measured against the committed result**. The entry published a derivation
+command and did not run it against its own output.
+
+**Whether this warrants its own incident allocation and mechanism
+assignment is Kai's to rule, and no incident number has been allocated for
+it here.** A producer adjudicating the mechanism of its own error is the
+thing this ledger exists to prevent. It is recorded now, durably and in
+the authoritative file, because doctrine 49.1 requires the record — not the
+adjudication — to be immediate.
