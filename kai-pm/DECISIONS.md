@@ -34670,3 +34670,172 @@ LEDGER                     afe13a5 — INC-2026-09-15-22, INC-2026-09-15-23
 NEXT                       implement, calibrate, push, exact-SHA CI,
                            return to Kai. Do not patch through a new failure.
 ```
+
+---
+
+## D377 — 2026-09-17 — D376 mutation-surface correction: 15 → 17 unique paths, generated-output-only authority. D376 OTHERWISE UNCHANGED.
+
+**Authority.** Dainius, this session, on Kai's contract review before
+implementation began. Allocated after a fresh allocator check: highest
+heading in this file was D376; next free is D377.
+
+**Subject.** `73fbfb64d40e57b9c4d1747e2b336ae3c4e8ea57`, tree re-established
+below. Incident banked first at the same SHA: `INC-2026-09-17-24`.
+
+**D376 IS NOT EDITED.** Its architecture, holds, sequence, prohibitions and
+implementation authority **remain in force in full**. This entry corrects
+one defect in it and nothing else.
+
+---
+
+### 1. THE DEFECT IN D376
+
+D376 §4 declares an **"EXACT MUTATION SURFACE — 15 PATHS"** and closes the
+boundary: *"Any path not in this list is outside authority."*
+**`README.md` and `docs/PROJECT_BACKLOG.md` appear nowhere in that list.**
+
+`scripts/sync_docs.py` is an existing governed generator. Measured at this
+subject, not assumed:
+
+```
+count_test_files()      globs scripts/test_*.py
+count_test_functions()  counts ^\s*def test_ within those same files
+count_python_loc()      rglobs every *.py except .git, __pycache__, _archive
+writes exactly two files — sync_docs.py:200 README.md
+                           sync_docs.py:287 docs/PROJECT_BACKLOG.md
+```
+
+The authorised tranche adds **8 new `.py` files, 4 of them
+`scripts/test_*.py`**, and retires one `def test_` from
+`test_p1_p4_enhancements.py`. The house calibration style **does** use
+`def test_` — measured: 22, 40 and 39 in three existing suites. **The
+authorised work therefore necessarily moves the individual-test count, the
+test-file count and the Python LOC figure, and so both generated files.**
+
+**Measured and sharper than the review: the TARGETS metric does NOT move.**
+`count_test_targets()` parses the `test-core:` dependency list, and this
+tranche deliberately adds no prerequisite to it.
+
+D376 as banked was therefore **not executable**: syncing breaches its own
+boundary clause; not syncing leaves generated documentation knowingly stale
+and the documentation gate red. **Neither branch is taken. The authority is
+corrected first.**
+
+---
+
+### 2. CORRECTED SURFACE — 17 UNIQUE PATHS
+
+```
+ALREADY BANKED (3 commits, 2 unique paths)
+  kai-pm/FAILURE_PATTERN_LEDGER.md   afe13a5  INC-2026-09-15-22, -23
+                                     73fbfb6  INC-2026-09-17-24
+  kai-pm/DECISIONS.md                e050770  D376
+                                     THIS ENTRY  D377
+
+IMPLEMENTATION (13) — unchanged from D376 §4
+  NEW (8)
+    scripts/security/execution_surface.py
+    scripts/security/machine_path_inventory.py
+    scripts/security/check_operational_portability.py
+    scripts/security/check_evidence_package_integrity.py
+    scripts/test_execution_surface.py
+    scripts/test_machine_path_inventory.py
+    scripts/test_operational_portability.py
+    scripts/test_evidence_package_integrity.py
+  MODIFIED (5)
+    scripts/security/check_gate_registry.py
+    scripts/security/gate_registry.py
+    .github/workflows/policy-checks.yml
+    Makefile
+    scripts/test_p1_p4_enhancements.py
+
+GENERATED CONSEQUENCES (2) — ADDED BY THIS ENTRY
+    README.md
+    docs/PROJECT_BACKLOG.md
+
+TOTAL UNIQUE PATHS: 17
+```
+
+**D377 consumes the already-counted `kai-pm/DECISIONS.md` path and creates no
+eighteenth unique path.**
+
+---
+
+### 3. THE TWO ADDED PATHS — GENERATED OUTPUT ONLY
+
+Their authority is **narrower than any other path in this tranche.**
+
+```
+PERMITTED
+  Changes arising ONLY from running the existing documentation generator
+  as a consequence of authorised source/test changes.
+
+PROHIBITED
+  Hand-editing any derived metric value.
+  Any unrelated prose change.
+  Any cold-start-master correction.
+  Any documentation redesign.
+  Any modification of scripts/sync_docs.py.
+  Expansion into any other generated file.
+
+IF THE GENERATOR PROPOSES A THIRD PATH — STOP AND REPORT.
+  Measured at this subject: sync_docs.py has exactly two write sites.
+  A third would mean the generator is not what this entry measured.
+```
+
+---
+
+### 4. TERMINOLOGY — D376's TITLE READ CORRECTLY
+
+D376's title says **"NO SOURCE REPAIR AUTHORISED"** while its §3 authorises
+new control-source implementation. **The consistent reading, made explicit
+here so nobody later reads the title as contradicting the body:**
+
+> **"NO SOURCE REPAIR" means NO REPAIR OF THE HELD EVIDENCE AND PACKAGE
+> SUBJECTS** — the RC-1 occurrences, the four evidence packages, their
+> MANIFESTs, and `run_h2.py`.
+> **It does NOT prohibit the explicitly enumerated control, test and wiring
+> paths.** Those are new construction under §3, not repair of a held subject.
+
+---
+
+### 5. EVERYTHING ELSE IN D376 REMAINS BINDING
+
+Control A `kind=REPORT`, advisory, outside `policy-check`, **never gates** ·
+Control B bounded to the shared workflow-and-Make execution surface, naming
+its unmeasured root classes in its own report · Control C **read-only and
+at-rest only**, may never regenerate a MANIFEST · the accepted S1 Census
+consumption mechanism **reused, not recreated** · **no evidence-package bytes
+changed** · **no MANIFEST regenerated** · no floor, threshold or baseline
+change · **no H2 v1.0 in-place execution** · the lexical developer-home test
+retired as blocking authority with its examples preserved as calibration ·
+the calibration matrix with **no live-defect floor** · the NO-NEW-EVIDENCE
+and DO-NOT-RUN-IN-PLACE holds · the binding sequence · and §7's full
+not-authorised list. **PR #122 remains DO NOT MERGE.**
+
+**On Core Tests the authorised claim is unchanged and remains only:** RC-1
+ceases to be the first-effective cause suppressing the next Core
+observation. **Any independent new failure after RC-1 is removed → STOP AND
+REPORT. NO PATCH-THROUGH.**
+
+---
+
+### THREAD RECOVERY BLOCK — D377
+
+```
+CORRECTS            D376 §4 mutation surface ONLY — 15 → 17 unique paths
+NOT CORRECTED       D376's architecture, holds, sequence, prohibitions,
+                    implementation authority, Core Tests claim — all in force
+ADDED PATHS         README.md · docs/PROJECT_BACKLOG.md
+                    GENERATED OUTPUT ONLY. No hand-edited metric values.
+                    A third generated path ⇒ STOP AND REPORT.
+METRICS THAT MOVE   individual tests · test files · Python LOC
+METRIC THAT DOES NOT  targets — test-core gains no prerequisite
+TITLE READING       "NO SOURCE REPAIR" = no repair of HELD EVIDENCE/PACKAGE
+                    subjects; the 13 enumerated control paths are authorised
+LEDGER              73fbfb6 — INC-2026-09-17-24, M-SCOPE-WIDEN recurrence,
+                    no escalation advanced
+NEXT                Kai verifies the exact authority surface, then
+                    implementation GO. Build the 13, calibrate, sync docs,
+                    verify zero evidence-package mutation, push, exact-SHA CI.
+```
