@@ -4321,3 +4321,191 @@ M-POLICY-ADMISSION-DIVERGENCE
 `P-ADJUDICATOR-PROPAGATION`, `M-QUERY-OVERREACH` unchanged,
 `PATTERN_CANDIDATE`. `INC-26` and `INC-27` remain `INCIDENT_ONLY`.
 **No new mechanism. No D-number.**
+
+---
+
+### `INC-2026-09-17-29` — a repair proposition that would have deepened the
+###                      coupling it was meant to break
+
+```
+INCIDENT_ID             INC-2026-09-17-29
+date                    2026-09-17
+producer                Orion
+subject                 the I1 return of the pre-candidate packet,
+                        2026-09-17, section 6 and its synthetic proof
+status                  INCIDENT_ONLY — corrected by Kai before any byte of
+                        any manifest, package or candidate was produced
+
+THE FALSE PROPOSITION   I proposed, and built a synthetic proof for, this
+                        repair of I1:
+
+                          "PRE-HOLDOUT MANIFEST INCLUDES PASS A
+                           -> PASS A BYTES PARTICIPATE IN CANDIDATE AGGREGATE
+                           -> HOLDOUT SELECTION BINDS THE COMPLETE
+                              PRE-HOLDOUT EVIDENCE SUBJECT"
+
+                        and reported that it holds without modifying
+                        holdout.py.
+
+                        THE PROOF WAS SOUND AND THE PROPOSITION WAS WRONG.
+                        What I demonstrated is that including an
+                        execution-produced artefact in the blind-selection
+                        identity makes the sample move when that artefact
+                        moves. That is not the repair. THAT IS THE EXACT
+                        COUPLING I1-A EXISTS TO FORBID, demonstrated
+                        working.
+
+THE ACCEPTED DESIGN     kai-pm/H2_CONSOLIDATED_REPAIR_SPEC_DRAFT.md,
+I DID NOT OPEN          Revision 4, lines 918-1002, formalised at Kai Round
+                        2 section 5 and closed at Round 3:
+
+                          I1-A  the candidate identity used for blind
+                                selection must contain NO EXECUTION-PRODUCED
+                                ARTEFACT
+                          I1-B  the holdout selection universe must come
+                                from the IMMUTABLE FROZEN SUBJECT TREE,
+                                never from candidate output rows
+
+                        STAGE A EXCLUSIONS, enumerated in that source, not
+                        implied:
+
+                          passA.json - h2v12-classification.json -
+                          h2v12-holdout.json - RUN.md - qualification
+                          output - logs - generated evidence - ANY ARTEFACT
+                          WHOSE BYTES RESULT FROM RUNNING THE CANDIDATE
+
+                        THE MEMBERSHIP TEST, Kai Round 3 section 5:
+
+                          NOT "committed, therefore static."
+                          THE TEST IS: could these exact bytes change
+                          because the candidate was executed? If YES ->
+                          Stage B, not Stage A.
+
+                        passA.json is the FIRST NAMED EXCLUSION. My
+                        proposition was to add it to the identity.
+
+                        The same source states, in terms, what I proposed
+                        as novel analysis: "MANIFEST.sha256 CANNOT SERVE AS
+                        STAGE A IN ITS CURRENT FORM -- it already contains
+                        h2v12-classification.json. PACKAGE.sha256 cannot
+                        either. Stage A is a NEW, SEPARATELY CONSTRUCTED
+                        MANIFEST."
+
+CORRECTED PROPOSITION   Stage A is a NEW, SEPARATELY CONSTRUCTED
+                        PRE-EXECUTION identity with CLOSED MEMBERSHIP, every
+                        member mechanically proven to exist independently of
+                        executing the candidate. Execution-produced evidence
+                        -- Pass A, the classification result, qualification
+                        output, the holdout artefact, RUN.md -- belongs to
+                        STAGE B, the post-execution package identity, and
+                        must never influence blind selection.
+
+                        Neither the current MANIFEST.sha256 nor
+                        PACKAGE.sha256 may serve as Stage A.
+
+WHAT I ACTUALLY DID     I derived the repair from D373's one-line
+                        description of I1 rather than from the accepted
+                        design it refers to:
+
+                          "I1 - sha256(MANIFEST.sha256) seeds the frozen
+                           holdout and MANIFEST.sha256 does not list
+                           passA.json. BLOCKER on the blind-holdout
+                           admission path."
+
+                        Read alone, that sentence identifies the absence of
+                        passA as the defect, and "add passA" as the remedy.
+                        Under I1-A the true defect is the OPPOSITE HALF of
+                        the same sentence: the seed is taken from an
+                        identity that CONTAINS h2v12-classification.json.
+                        passA's absence is the only correct property the
+                        current manifest has.
+
+                        MEASURED, since the point turns on it:
+                        MANIFEST.sha256 holds 10 entries -- 9 source modules
+                        plus h2v12-classification.json. The blind-selection
+                        identity already contains candidate output.
+
+                        THE SOURCE TENSION IS RECORDED AS A FINDING, NOT AS
+                        AN EXCUSE. D373 is a governing entry and its I1
+                        line, read without the Revision-4 design, points a
+                        reader at the wrong repair. The obligation was mine:
+                        R16 requires opening the design a summary refers to
+                        before building a remedy on it, and the design was
+                        one grep away in a file I had already opened for M2
+                        in the same session.
+
+doctrine 47             I opened H2_CONSOLIDATED_REPAIR_SPEC_DRAFT.md and
+applicability           read its mechanism table and the A3/M2 section. I
+                        did not read the I1 section in the same file. SOURCE
+                        OPENED != SOURCE READ, within a single document:
+                        having the right file open for one obligation
+                        establishes nothing about a different obligation in
+                        it.
+
+downstream impact       CONTAINED. Nothing was built:
+                          - no Stage A identity constructed;
+                          - no manifest written or altered;
+                          - no candidate byte produced;
+                          - no holdout selected, resolved or revealed;
+                          - no source repaired;
+                          - holdout.py unmodified, as reported.
+                        The synthetic proof used dummy paths only and
+                        touched no real document or candidate.
+
+detection               KAI, by reopening the accepted I1-A / I1-B design
+                        and comparing the proposed repair against it.
+                        NOT self-detected.
+
+mechanism               NONE ASSIGNED. `INCIDENT_ONLY`.
+
+                        NOT assigned to M-POLICY-ADMISSION-DIVERGENCE,
+                        M-SCOPE-WIDEN, M-PRODUCER-CURATION,
+                        P-ADJUDICATOR-PROPAGATION or M-QUERY-OVERREACH.
+
+                        This and INC-2026-09-17-27 are both "built on a
+                        source I did not open far enough", two entries
+                        apart, and the temptation to call that a mechanism
+                        is exactly what doctrine 37 forbids on appearance.
+                        RESEMBLANCE IS A LOCATOR. INC-27 was a stale
+                        CURRENT-STATE claim in an append-only record;
+                        this is a REMEDY DESIGNED FROM A SUMMARY OF A
+                        DESIGN. Whether one mechanism produces both is a
+                        causal adjudication and IT IS KAI'S, not mine, and
+                        he has reserved it.
+
+cost                    One correction cycle. No evidence corrupted, no
+                        artefact mutated, no blindness consumed. Had the
+                        proposition been authorised and executed, the blind
+                        selection would have been coupled to a SECOND
+                        execution-produced artefact, and the resulting
+                        sample would have been defensible against neither
+                        I1-A nor I1-B.
+
+control state           NO CONTROL requires a proposed remedy to cite the
+                        accepted design for the obligation it claims to
+                        repair. None is proposed here on one occurrence.
+```
+
+
+### Roster delta
+
+| incident | producer | status | mechanism |
+|---|---|---|---|
+| `INC-2026-09-17-29` | Orion | `INCIDENT_ONLY` / OPEN-RECORDED | none assigned — remedy designed from a summary of a design |
+
+**Real incidents: 29. Highest allocated: `INC-2026-09-17-29`.**
+
+**Producers: Orion 24 · Kai 2 · DeepSeek 2 · instrument 1.**
+The counts carry no fairness, quality or producer-reliability inference.
+The `instrument` producer is `INC-2026-09-17-28`, whose subject is a
+program rather than a person or model.
+
+**MECHANISMS — NONE ALTERED BY THIS APPEND.**
+`M-POLICY-ADMISSION-DIVERGENCE` `PATTERN_CONFIRMED`, **5 confirmed
+occurrences** (unchanged since `INC-28`), doctrine 49.6 already triggered
+at occurrence 3 and not re-triggered, generic control **NOT IMPLEMENTED**,
+mechanism **NOT CONTROLLED** · `M-SCOPE-WIDEN` `PATTERN_CONFIRMED`, 5
+confirmed occurrences, `RECURRED_AFTER_CONTROL` · `M-PRODUCER-CURATION`,
+`P-ADJUDICATOR-PROPAGATION`, `M-QUERY-OVERREACH` `PATTERN_CANDIDATE`.
+**No mechanism assigned to this incident. No new mechanism. Doctrine 49.6
+not triggered. No D-number.**
