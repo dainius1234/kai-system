@@ -3958,3 +3958,200 @@ the generic mechanism control, and the distinction is not to be altered.**
 **No incident allocated by this closure. Real incident population and
 highest allocated are unchanged. No new mechanism. Doctrine 49.6 not
 re-triggered. No D-number.**
+
+---
+
+### `INC-2026-09-17-27` — a candidate's status read from its own entry, after
+###                      two later entries had already changed it
+
+```
+INCIDENT_ID             INC-2026-09-17-27
+date                    2026-09-17
+producer                Orion
+subject                 the READ-ONLY D359 programme-recovery return of
+                        2026-09-17, sections (B) and (H), delivered at
+                        repository HEAD 8ba69d93e7d9dc479cfc7f2d737e9b738c503991
+status                  INCIDENT_ONLY — corrected by Kai before any
+                        implementation, candidate byte or holdout row existed
+
+THE FALSE PREMISE       I reported that HOUSE_H2 v1.2, aggregate
+                        ba2b16d400aafd2b694890149bbaae1d1369d3771c25ce809d2f752d5248de4a,
+                        was NOT FROZEN and NOT ADMITTED and was awaiting its
+                        FIRST admission adjudication — specifically "awaiting
+                        Kai's independent verification of the candidate and
+                        his blind adjudication of the 40-document six-axis
+                        holdout".
+
+                        On that premise I built recommendation H-1 as an OPEN
+                        FORK: put v1.2 itself to the D367 contract, or build a
+                        fresh v1.3 candidate. I presented the first limb as
+                        live and available.
+
+                        IT WAS NOT LIVE. IT HAD BEEN ADJUDICATED AND FAILED.
+
+THE DISPROVING SOURCE   kai-pm/DECISIONS.md line 33287, inside D373:
+
+                          "D368 CANDIDATE - 9d787706..., aggregate
+                           ba2b16d4...de4a, NOT FROZEN, NOT ADMITTED, NOT
+                           ADMISSIBLE on M1, M2, M3, residual D14, E1, Q1 and
+                           I1. Root-cause deduplication remains open"
+
+                        and line 33417, inside D374, recording the same.
+
+                        D373 also records, at its HOLDOUT line, that the 40
+                        rows were NOT REGENERATED and the revealed rows are
+                        retained as regression and defect-discovery evidence,
+                        and that a repaired candidate requires a NEW
+                        pre-holdout identity and a NEWLY SELECTED blind
+                        sample. The holdout I described as pending had
+                        already been spent for blindness.
+
+WHAT I ACTUALLY DID     I opened D368. I read D368 to its end, including its
+                        THREAD RECOVERY BLOCK, and I quoted that block
+                        accurately. D368's own AUTHORISED NEXT ACTION does
+                        say "NONE. RETURN. Awaiting Kai's independent
+                        verification of the candidate and his blind
+                        adjudication of the 40-document six-axis holdout."
+
+                        THE QUOTATION WAS CORRECT. THE CLAIM BUILT ON IT WAS
+                        NOT. D368 records the state AS AT D368. Two later
+                        entries changed it. I did not open them.
+
+                        I enumerated D360-D378 by heading and selected D368
+                        to read in full. D373 and D374 are titled
+                        "Rule 48: evidence handoff is lossless and
+                        scope-preserving. GOVERNANCE ONLY" and "Rule 49:
+                        failure patterns are first-class engineering
+                        evidence. GOVERNANCE ONLY". I classified both as
+                        doctrine entries carrying no programme state and did
+                        not open either. Both carry substantive H2 findings
+                        and the candidate's adjudicated status in their
+                        recovery blocks. THE HEADING WAS A POOR PREDICATE FOR
+                        THE CONTENT, AND I TREATED IT AS A SUFFICIENT ONE.
+
+doctrine 47             SOURCE OPENED != SOURCE READ. Here in its wider
+applicability           form: reading the whole of the right entry is still
+                        insufficient when the claim is about CURRENT STATE
+                        and the record is APPEND-ONLY. An append-only ledger
+                        means a status assertion is only as good as the
+                        SEARCH FOR LATER ENTRIES THAT AMEND IT. My inspection
+                        universe was one entry; my claim was about the
+                        programme's present position.
+
+                        The bounded negative I owed and did not run, and
+                        which took one command once Kai named the correction:
+
+                          awk 'NR>33434' kai-pm/DECISIONS.md | grep -nE \
+                            'NOT ADMISSIBLE|residual D14|\bE1\b|\bQ1\b|\bI1\b'
+
+                        R17: a claim about the candidate's CURRENT status
+                        needed a universe of EVERY ENTRY AFTER IT, not the
+                        entry itself.
+
+                        Recorded as an aggravating circumstance, not a
+                        mitigating one: in section (G) of the SAME return I
+                        warned that D359 section 5's House-state table was
+                        three candidates out of date and would mislead a cold
+                        reader who took a node's own entry as its current
+                        state. I described this exact trap one screen above
+                        falling into it.
+
+downstream impact       CONTAINED. The wrong premise reached a proposed next
+                        programme decision and no further:
+
+                          - H-1 was offered as a fork whose first limb was
+                            already closed;
+                          - no D-number was allocated;
+                          - no candidate byte was produced;
+                          - no holdout row was selected, resolved or revealed;
+                          - no repository file was modified;
+                          - no instrument was run.
+
+                        The return was READ-ONLY by instruction, and that
+                        instruction is what bounded the cost. HAD THE SAME
+                        PREMISE ARRIVED UNDER BUILD AUTHORITY, v1.2 WOULD
+                        HAVE BEEN PUT TO A CONTRACT IT HAD ALREADY FAILED,
+                        AND THE SECOND HOLDOUT COULD HAVE BEEN SPENT
+                        ESTABLISHING WHAT D373 ALREADY RECORDED.
+
+corrected state         HOUSE_H2 v1.2 ba2b16d4...de4a is HISTORICAL FAILED
+                        EVIDENCE: NOT FROZEN, NOT ADMITTED, NOT ADMISSIBLE on
+                        M1, M2, M3, residual D14, E1, Q1, I1. It is
+                        preserved, not rebuilt in place, and not re-used as
+                        the candidate for House admission. The original
+                        40-row holdout is SPENT FOR BLINDNESS. A future
+                        candidate must be FRESH, with a new pre-holdout
+                        identity and a newly selected blind sample.
+
+detection               KAI, by continuing the source read into D373 and D374
+                        after receiving the return, and correcting the
+                        premise before issuing any build authority. NOT
+                        self-detected. The correction arrived as a ruling,
+                        not as a question.
+
+mechanism               NONE ASSIGNED. `INCIDENT_ONLY`.
+
+                        NOT assigned to M-SCOPE-WIDEN, M-QUERY-OVERREACH,
+                        P-ADJUDICATOR-PROPAGATION, M-POLICY-ADMISSION-
+                        DIVERGENCE or M-PRODUCER-CURATION.
+
+                        The bounded-search shape resembles M-QUERY-OVERREACH
+                        and the stale-freeze shape resembles
+                        INC-2026-09-15-22, where a dated freeze decision was
+                        reported as current state. RESEMBLANCE IS A LOCATOR,
+                        NOT A CAUSE (doctrine 37). INC-22 was a FROZEN
+                        artefact read as CURRENT; this is a CURRENT-state
+                        claim sourced from a SUPERSEDED entry in an
+                        append-only record. Whether those share a mechanism
+                        is a causal adjudication, and assigning one here on
+                        similarity would inflate a confirmed recurrence count
+                        without earning it.
+
+                        No new mechanism is created. MECHANISM ASSIGNMENT, IF
+                        ANY, IS KAI'S, and he has expressly reserved it.
+
+cost                    Kai's correction cycle, and one proposed programme
+                        fork built on a closed limb. No evidence was
+                        corrupted, no artefact mutated, no blindness consumed.
+
+control state           NO CONTROL EXISTS that requires a current-state claim
+                        about an append-only record to be accompanied by a
+                        search for later amending entries. None is proposed
+                        here on one occurrence, and none is built under this
+                        entry.
+
+                        Recorded as the open question rather than answered:
+                        the recovery discipline already demands the
+                        allocator be re-derived structurally before taking a
+                        number. It does not demand the same of a STATUS read.
+                        Those are the same class of question asked of the
+                        same file.
+```
+
+
+### Roster delta
+
+| incident | producer | status | mechanism |
+|---|---|---|---|
+| `INC-2026-09-17-27` | Orion | `INCIDENT_ONLY` / OPEN-RECORDED | none assigned — current-state claim sourced from a superseded entry |
+
+**Real incidents: 27. Highest allocated: `INC-2026-09-17-27`.** Derived
+structurally from definition headings per the `INC-2026-09-17-26` method,
+run against this file before this append and returning 26 / highest
+`INC-2026-09-17-26`:
+
+```
+grep -oE '^### +.?INC-2026-[0-9]{2}-[0-9]{2}-[0-9]+' kai-pm/FAILURE_PATTERN_LEDGER.md \
+  | grep -oE 'INC-2026-[0-9-]+' | sort -u | wc -l
+```
+
+**Producers: Orion 23 · Kai 2 · DeepSeek 2.** The counts carry no fairness,
+quality or producer-reliability inference.
+
+**Mechanisms — NONE ALTERED BY THIS APPEND.**
+`M-POLICY-ADMISSION-DIVERGENCE` `PATTERN_CONFIRMED`, 4 confirmed
+occurrences, `NOT CONTROLLED` · `M-SCOPE-WIDEN` `PATTERN_CONFIRMED`, 5
+confirmed occurrences, `RECURRED_AFTER_CONTROL` · `M-PRODUCER-CURATION`,
+`P-ADJUDICATOR-PROPAGATION`, `M-QUERY-OVERREACH` `PATTERN_CANDIDATE`.
+**No mechanism assigned to this incident. No new mechanism. Doctrine 49.6
+not triggered. No D-number.**
