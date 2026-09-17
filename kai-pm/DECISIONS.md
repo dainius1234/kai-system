@@ -34839,3 +34839,125 @@ NEXT                Kai verifies the exact authority surface, then
                     implementation GO. Build the 13, calibrate, sync docs,
                     verify zero evidence-package mutation, push, exact-SHA CI.
 ```
+
+---
+
+## D378 — 2026-09-17 — RC-1 replacement-control tranche: D376/D377 ACCEPTED. No release or main readiness.
+
+**Authority.** Dainius, on Kai's independent acceptance review of
+2026-09-17. Allocated after a structural allocator derivation over
+decision-definition headings: highest was **D377**, next free **D378**, and
+no `D378` definition existed. **This is a programme-state banking action
+only. It changes no code and authorises no implementation.**
+
+---
+
+### 1. ACCEPTED
+
+The **D376** bounded implementation tranche, as corrected by **D377**, is
+**ACCEPTED** at subject:
+
+```
+commit  106d23f9fe2690d7e95b57dcaeec7983f137c33b
+tree    803d95420007e86268c84a1c9393a6253a429e69
+```
+
+The **replacement control architecture is QUALIFIED**:
+
+* **Control A** — whole-repository machine-path inventory. `kind=REPORT`,
+  **never gates**, `git ls-files` population, empty exclusion set printed
+  as empty, text/non-text rule declared and non-text files named.
+* **Control B** — operational portability. Blocking, on a deliberately
+  bounded proposition, with the **subject-completeness invariant**:
+  derive the authoritative enforcing surface → establish subject
+  completeness → only then adjudicate. Its unmeasured root classes are
+  printed as unmeasured on every run.
+* **Control C** — evidence-package integrity, at rest, **read-only**,
+  never regenerating a MANIFEST, under each package's own identity
+  convention. The accepted S1 consumption-time mechanism is **reused, not
+  recreated**.
+* the **shared execution-surface extraction**, behaviour-preserving and
+  proven byte-identical across the move;
+* the **retirement of `test_no_developer_home_paths`** as the blocking
+  control, with its RC-1 examples preserved as calibration.
+
+---
+
+### 2. WHAT CLOSES
+
+**RC-1 as the defective blocking-control and first-effective suppression
+path is CLOSED**, together with the D376/D377 replacement-control
+implementation. **`INC-2026-09-17-25` is CLOSED** by the structural
+subject-completeness repair (ledger closure at `c6ffb524`).
+
+On the accepted subject, **Core Tests executes its consequential
+coverage-floor surface and its full live-stack surface and is GREEN**.
+Policy-as-Code is GREEN with zero skipped steps.
+
+---
+
+### 3. WHAT DOES NOT CLOSE
+
+* The **four genuine machine-bound path dependencies are NOT REPAIRED** and
+  remain under the **NO-NEW-EVIDENCE hold**.
+* **RC-7** remains OPEN — the first effective failure of Unified Hunter.
+* **A-05** remains OPEN — the first effective failure of Python application.
+* The **H2 v1.0 evidence-package self-mutation path** remains OPEN under its
+  **DO-NOT-RUN-IN-PLACE hold**; H2 v1.0 lifecycle authority remains
+  **UNRESOLVED**.
+* **`M-POLICY-ADMISSION-DIVERGENCE`** remains `PATTERN_CONFIRMED`, **4
+  confirmed occurrences**, doctrine 49.6 already triggered, machine
+  escalation **BEGUN — PARTIAL**, generic cross-component control **NOT
+  IMPLEMENTED**, mechanism **NOT CONTROLLED**. The local Control B repair
+  closes the incident and **does not constitute the generic mechanism
+  control.**
+* **`M-SCOPE-WIDEN`** remains `PATTERN_CONFIRMED`, **5 confirmed
+  occurrences**, `RECURRED_AFTER_CONTROL`, machine hook a **required open
+  obligation**.
+* **`INC-2026-09-17-26`** remains `INCIDENT_ONLY`, no mechanism assigned.
+* **Realised historical CI false admission remains NOT PROVEN** and is not
+  claimed.
+
+---
+
+### 4. NO READINESS CLAIM
+
+**Neither the repository nor PR #122 is green, and neither is claimed to
+be.** **PR #122 remains DO NOT MERGE.** No main merge. No production
+cutover. **No floor, baseline or threshold movement.**
+
+---
+
+### 5. NO ONWARD AUTHORITY
+
+This closure authorises **NOTHING FURTHER**. Not RC-7, not A-05, not the
+generic mechanism controls, not WF-3 cutover, not the real-78 traversal,
+not the 17-floor adjudication, not Item 8, not A-4_PROVENANCE, not
+A4_SELF_DIAGNOSIS, not H3–H6, not repository consolidation.
+
+**The next programme stage is NOT automatically authorised by this
+closure. D359 continues to govern programme order.**
+
+---
+
+### THREAD RECOVERY BLOCK — D378
+
+```
+PROGRAMME ORDER AUTHORITY  D359 §2 — cite, do not restate. House is at H2.
+ACCEPTED                   D376 + D377 tranche at 106d23f9 / tree 803d9542
+QUALIFIED                  Controls A (REPORT) · B (GATE, subject
+                           completeness) · C (GATE, read-only at rest) ·
+                           shared execution-surface extraction ·
+                           lexical test retired as blocking authority
+CLOSED                     RC-1 defective blocking-control / first-effective
+                           suppression path · INC-2026-09-17-25
+NOT REPAIRED               the four genuine machine-bound dependencies,
+                           under the NO-NEW-EVIDENCE hold
+OPEN, SEPARATE             RC-7 · A-05 · H2 v1.0 self-mutation containment
+MECHANISMS                 M-POLICY-ADMISSION-DIVERGENCE 4 occurrences,
+                           NOT CONTROLLED · M-SCOPE-WIDEN 5 occurrences,
+                           RECURRED_AFTER_CONTROL · INC-26 INCIDENT_ONLY
+NOT GREEN                  repository and PR #122. DO NOT MERGE.
+AUTHORISES                 nothing further. D359 still governs order.
+LEDGER                     c6ffb524 — INC-25 closure adjudication
+```
