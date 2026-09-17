@@ -4155,3 +4155,169 @@ confirmed occurrences, `RECURRED_AFTER_CONTROL` · `M-PRODUCER-CURATION`,
 `P-ADJUDICATOR-PROPAGATION`, `M-QUERY-OVERREACH` `PATTERN_CANDIDATE`.
 **No mechanism assigned to this incident. No new mechanism. Doctrine 49.6
 not triggered. No D-number.**
+
+---
+
+### `INC-2026-09-17-28` — an optional flag removes a required admission
+###                      criterion instead of refusing an incomplete subject
+
+```
+INCIDENT_ID             INC-2026-09-17-28
+date                    2026-09-17
+producer                the HOUSE_H2 qualification instrument
+                        kai-pm/house_in_order_h2_v13/qualify.py
+                        sha256 ee4e18240596d712027bad2f2499fcac026b47e963e886cd27793af2d17ba3b3
+                        BYTE-IDENTICAL to the module in the v1.2 candidate
+status                  OPEN — adjudicated by Kai 2026-09-17. No repair is
+                        authorised by this entry
+
+THE DEFECT              D367 8(6) requires, as one of eight qualification
+                        criteria: RUNTIME MODULE IDENTITY -- every loaded
+                        module's __file__ resolves under the candidate
+                        directory AND its source bytes hash to the manifest
+                        entry.
+
+                        qualify.py implements it as criterion [6], guarded:
+
+                          ap.add_argument("--manifest", default=None)
+                          ...
+                          if a.manifest:
+                              rows_id, bad = runtime_module_identity(a.manifest)
+
+                        --manifest is OPTIONAL. Omitting it does not abort,
+                        does not warn, and does not mark the criterion
+                        UNMEASURED. The criterion simply is not there, and
+                        the printed output runs from [5] straight to the
+                        utility profile. A reader of that output cannot tell
+                        that 8(6) exists, let alone that it was skipped.
+
+CAUSAL MAPPING          normative admission   D367 8(6) REQUIRES runtime
+                        (Kai's adjudication)  module identity
+                        machine admission     --manifest is OPTIONAL
+                        on omission           the required criterion is
+                                              REMOVED, rather than the
+                                              incomplete qualification
+                                              subject being REFUSED
+                        result                A FAILING QUALIFICATION
+                                              BECOMES A PASS
+
+HOSTILE EXECUTION       Two arms, same unchanged instrument, same result
+PROOF                   file, run 2026-09-17. Nothing written to the
+                        repository; qualify.py only prints.
+
+                          RESULT   kai-pm/house_in_order_h2_v12/
+                                   h2v12-classification.json
+                                   eb50452d7f119d1e2bbe2cb8af5ccebcb355a4b444dafddadf8c72393f0ad2fd
+                          MANIFEST kai-pm/house_in_order_h2_v12/MANIFEST.sha256
+                                   ba2b16d400aafd2b694890149bbaae1d1369d3771c25ce809d2f752d5248de4a
+
+                          ARM A  --result R --manifest M   rc 1  FINDINGS 1
+                                 [6] present, RUNTIME_IDENTITY finding raised
+                          ARM B  --result R                rc 0  FINDINGS 0
+                                 [6] absent, no refusal, no UNMEASURED marker
+
+                        Full outputs retained: arm A 4180 bytes, arm B 3696
+                        bytes. The COMPLETE difference, not an excerpt, is
+                        the seven-line [6] block and the verdict line:
+
+                          63,69d62
+                          <   [6] RUNTIME MODULE IDENTITY - which bytes executed
+                          <       classify       under-candidate=False sha-match=False
+                          <       envelope       under-candidate=False sha-match=False
+                          <       ontology       under-candidate=False sha-match=False
+                          <       passa          under-candidate=False sha-match=False
+                          <       subjectbind    under-candidate=False sha-match=False
+                          81,82c74
+                          <   FINDINGS: 1
+                          <     RUNTIME_IDENTITY::classify.py,envelope.py,
+                          <       ontology.py,passa.py,subjectbind.py -
+                          <       loaded module is not the candidate's byte
+                          ---
+                          >   FINDINGS: 0
+
+                        The arm-A finding is genuine for those inputs: the
+                        v1.3 instrument was run against the v1.2 manifest
+                        from the repository root, so the modules are
+                        legitimately not under the candidate directory. That
+                        is what makes it a usable KNOWN-POSITIVE, and arm B
+                        erases it.
+
+mechanism               M-POLICY-ADMISSION-DIVERGENCE
+                        CONFIRMED OCCURRENCE 5.
+
+                        Assigned BY KAI on the causal mapping above, not by
+                        the producer and not on resemblance. The divergence
+                        is between what the governing policy REQUIRES to be
+                        evaluated and what the machine actually EVALUATES
+                        before admitting -- the same mechanism, in the
+                        qualification instrument itself.
+
+                        SECOND CONFIRMED OCCURRENCE AFTER ESCALATION.
+                        Doctrine 49.6 was ALREADY TRIGGERED at occurrence 3
+                        and IS NOT RE-TRIGGERED HERE, per Kai's express
+                        instruction.
+
+                        generic cross-component machine control
+                                                      NOT IMPLEMENTED
+                        mechanism controlled          NO
+
+NOT PROVEN, NOT         REALISED HISTORICAL EXPLOITATION IS NOT PROVEN AND
+CLAIMED                 IS NOT CLAIMED. This establishes CAPABILITY only.
+
+                        Positively to the contrary, and recorded so no later
+                        reader infers otherwise:
+                        kai-pm/house_in_order_h2_v12/RUN.md line 56 records
+                        the D368 invocation WITH the flag:
+
+                          python3 qualify.py --result h2v12-classification.json \
+                                             --manifest MANIFEST.sha256
+
+                        NOTHING HERE SUGGESTS THE HISTORICAL CANDIDATE
+                        EXPLOITED THIS CAPABILITY.
+
+detection               Orion, by hostile two-arm execution ordered by Kai
+                        after Orion reported the optionality as a static
+                        reading. The static observation alone did not
+                        establish the verdict flip; the execution did.
+                        Adjudicated by Kai, who assigned the mechanism.
+
+cost                    None realised. No qualification of record was
+                        produced by the omitting form.
+
+control state           NO CONTROL. The generic cross-component
+                        policy-versus-machine admission control remains
+                        NOT IMPLEMENTED and is NOT built by this entry.
+                        The local repair -- making --manifest fail closed --
+                        is a proposed D379 obligation, NOT AUTHORISED HERE,
+                        and would close the INSTANCE, not the mechanism.
+```
+
+
+### Roster delta
+
+| incident | producer | status | mechanism |
+|---|---|---|---|
+| `INC-2026-09-17-28` | qualification instrument | OPEN / adjudicated | **`M-POLICY-ADMISSION-DIVERGENCE`, confirmed occurrence 5** |
+
+**Real incidents: 28. Highest allocated: `INC-2026-09-17-28`.**
+
+**MECHANISM STATE — CHANGED BY THIS APPEND.**
+
+```
+M-POLICY-ADMISSION-DIVERGENCE
+  state                         PATTERN_CONFIRMED
+  confirmed occurrences         4 -> 5
+  occurrence 5                  INC-2026-09-17-28
+  doctrine 49.6                 ALREADY TRIGGERED at occurrence 3.
+                                NOT RE-TRIGGERED (Kai, 2026-09-17)
+  post-escalation occurrences   2 (this is the second)
+  machine escalation            BEGUN — PARTIAL
+  generic cross-component hook  NOT IMPLEMENTED
+  mechanism controlled          NO
+```
+
+`M-SCOPE-WIDEN` unchanged: `PATTERN_CONFIRMED`, 5 confirmed occurrences,
+`RECURRED_AFTER_CONTROL`. `M-PRODUCER-CURATION`,
+`P-ADJUDICATOR-PROPAGATION`, `M-QUERY-OVERREACH` unchanged,
+`PATTERN_CANDIDATE`. `INC-26` and `INC-27` remain `INCIDENT_ONLY`.
+**No new mechanism. No D-number.**
