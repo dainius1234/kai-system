@@ -5685,3 +5685,145 @@ CONTROL STATE           NONE. Nothing compared the qualifier's classified
                         population, though both ran in the same process and
                         disagreed about the same two modules.
 ```
+
+---
+
+### `INC-2026-09-19-37` — the PRODUCER classifier treats a missing `__file__`
+###                      as built-in/frozen, and skips every other
+###                      non-filesystem origin without classifying it
+
+```
+INCIDENT_ID             INC-2026-09-19-37
+date                    2026-09-19
+                        TIME BASIS: found at 2026-09-18 23:50:23 UTC =
+                        2026-09-19 00:50 BST, per the adjudicated
+                        local-date convention.
+producer                Orion — HOUSE_H2 v1.3 producer runtime population
+subject                 kai-pm/house_in_order_h2_v13/stage_identity.py
+                            producer_population()
+                        measured at 5045b081dbc5d714a80aba11da5e7ebd69211929
+status                  OPEN-RECORDED / INCIDENT_ONLY /
+                        BLOCKS THE §8(6) REPAIR, WHICH MAY NOT PROCEED
+                        UNTIL stage_identity.py's CLASSIFIER IS ADJUDICATED
+
+                        SEPARATE FROM INC-36. Kai anticipated this exact
+                        possibility and directed that it be probed BEFORE
+                        stage_identity.py is touched, and that it NOT be
+                        folded into INC-36 without authority. It is not.
+
+THE DEFECT              producer_population() does:
+
+                          f = getattr(mod, "__file__", None)
+                          if not f:
+                              continue      # built-in / frozen
+
+                        The comment states the assumption the code does not
+                        test. `__file__ is None` is treated as EQUIVALENT to
+                        "built-in or frozen". It is not equivalent, and the
+                        mechanical test is available and unused.
+
+THE MANDATED PROBE, AND WHAT IT RETURNED
+
+                        Three synthetic modules, each with __file__ = None
+                        and a __spec__.origin that is neither built-in nor
+                        frozen:
+
+                          origin 'some-unknown-origin'      SILENTLY SKIPPED
+                          origin None  (namespace-like)     SILENTLY SKIPPED
+                          origin '/opt/outside/governed/…'  SILENTLY SKIPPED
+
+                        Required by D379 §5 rule 6 and D380 §6: REFUSE.
+                        Observed: no classification, no refusal, no record.
+
+NOT ONLY SYNTHETIC — MEASURED IN THE LIVE PROCESS
+
+                        With the governed H2 modules imported, 32 live
+                        modules carry __file__ = None. Of those:
+
+                          29  __spec__.origin == 'built-in'   (legitimate)
+                           3  __spec__ is None, origin None    SKIPPED
+
+                        The three are:
+
+                          __main__      the executing entry point
+                          typing.io     deprecated alias submodule
+                          typing.re     deprecated alias submodule
+
+                        None is mechanically built-in and none is
+                        mechanically frozen. All three are silently
+                        discarded from the producer population today.
+
+A SECOND, INDEPENDENT D379 §5 REQUIREMENT IS ALSO UNIMPLEMENTED
+
+                        D379 §5 states, in the runtime-derived producer
+                        population rule:
+
+                          "the executing entry-point source (__main__) is
+                           included EXPLICITLY"
+
+                        producer_population() contains no explicit __main__
+                        handling at all. Under `-c` execution __main__ has
+                        no __file__ and is therefore skipped by the same
+                        branch; under file execution it is admitted only
+                        incidentally, because it happens to have a path,
+                        and never because the rule was implemented.
+
+                        RECORDED AS A SECOND OBSERVED MANIFESTATION WITHIN
+                        THIS INCIDENT, not as a separate incident and not
+                        as a mechanism. Whether it is one defect or two is
+                        for adjudication, not for me to assert.
+
+THE MECHANICAL TEST IS AVAILABLE AND WAS NOT USED
+
+                        Measured on this interpreter:
+
+                          sys        __file__ None   spec.origin 'built-in'
+                          _imp       __file__ None   spec.origin 'built-in'
+                          builtins   __file__ None   spec.origin 'built-in'
+                          zipimport  has __file__    spec.origin 'frozen'
+                          os         has __file__    spec.origin 'frozen'
+
+                        So origin is reported mechanically for both classes,
+                        and `os` shows the converse trap: a module may carry
+                        a __file__ AND be frozen, so the filesystem path is
+                        not a reliable discriminator in either direction.
+
+WHY THIS BLOCKS THE INC-36 REPAIR
+
+                        Kai's §3 forbids repairing qualify.py by delegating
+                        to producer_population() as an answer oracle,
+                        precisely to avoid a self-certified denominator. But
+                        the same classification gap exists on the producer
+                        side, so building the qualifier's closed classifier
+                        now — while the producer's is known to skip — would
+                        leave the two sides disagreeing about the same
+                        origins, which is the condition INC-36 was banked
+                        for, mirrored.
+
+MECHANISM               NONE ASSIGNED.
+
+                        QUALIFIED LOCATORS ONLY, no causal equivalence:
+                        INC-2026-09-19-36 (the qualifier-side narrowing),
+                        M-SCOPE-WIDEN, and earlier denominator incidents.
+                        The two are the same SHAPE — a population rule with
+                        an unclassified escape bucket — but one is a
+                        filesystem-parent narrowing and the other is a
+                        missing-file-implies-built-in equivalence. Shape is
+                        a locator, not a cause (doctrine 37).
+
+CONTROL STATE           NONE. DEP exercises producer_population() but only
+                        over modules that HAVE a file, so the `if not f`
+                        branch has never been calibrated. R8: it is
+                        never-executed code, which is where the defects are.
+
+PROVENANCE              Found by the hostile probe Kai mandated, BEFORE any
+                        modification to stage_identity.py, and before any
+                        production Stage A, candidate, Pass A, holdout or
+                        admission existed.
+
+NO D-NUMBER ALLOCATED   D387 remains free. No new authority is requested
+                        here; the question is whether the existing D379 §5
+                        rule may be implemented in stage_identity.py under
+                        the current release, or whether that requires its
+                        own adjudication. That is Kai's call, not mine.
+```
