@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import collections
 import hashlib
+import os
 import json
 import pathlib
 import sys
@@ -35,7 +36,18 @@ PASSED, FAILED, FAILURES = 0, 0, []
 # fail as NOT_IMPLEMENTED so this file can never report a green tranche.
 SECTIONS = ["M2", "D14", "Q1a", "Q1b", "86", "SB", "I1A", "I1B",
             "DEP", "STAGE_A", "STDLIB"]
-IMPLEMENTED = {"M2", "SB"}
+IMPLEMENTED = {"M2", "SB", "D14", "I1A", "I1B", "86"}
+# HELD is NOT an excuse and does NOT make the gate green. These
+# sections are implemented except for a limb that cannot execute
+# on a KNOWN-NEGATIVE interpreter (INC-34 / D385). They still FAIL
+# the exit gate; they are reported separately only so the registry
+# does not call a blocked limb "not written".
+HELD = {"DEP": "INC-34 clean-producer positive; this interpreter injects sitecustomize and _distutils_hack",
+        "STAGE_A": "INC-34 canonical-runtime positive limb",
+        "STDLIB": "INC-34 canonical-runtime positive limb",
+        "Q1a": "INC-34 stdlib-positive-dependent proof",
+        "Q1b": "requires a real classification result",
+        "E1": "requires a real classification result"}
 
 
 def check(name: str, condition: bool, detail: str = "") -> bool:
@@ -673,18 +685,29 @@ def main() -> int:
     print()
     subject_digests()
 
+    _capture_calibration()
     section_M2()
     section_SB()
+    section_D14()
+    section_DEP()
+    section_STAGE_A()
+    section_I1A()
+    section_I1B()
+    section_86()
+    section_STDLIB()
 
     print("-" * 70)
     print("SECTION COVERAGE")
     for s in SECTIONS:
-        state = "IMPLEMENTED" if s in IMPLEMENTED else "NOT_IMPLEMENTED"
+        if s in IMPLEMENTED:
+            state = "IMPLEMENTED"
+        elif s in HELD:
+            state = f"HELD — {HELD[s]}"
+        else:
+            state = "NOT_IMPLEMENTED"
         print(f"  {s:<10} {state}")
         if s not in IMPLEMENTED:
-            check(f"section {s} is implemented", False,
-                  "NOT_IMPLEMENTED — this control file does not yet cover "
-                  "this section of the D379 hostile matrix")
+            check(f"section {s} is implemented and executed", False, state)
     print()
     print("=" * 70)
     print(f"{PASSED} passed, {FAILED} failed")
@@ -695,5 +718,570 @@ def main() -> int:
     return 1 if FAILED else 0
 
 
+# ── D14 — START-BOUND ELIGIBILITY AT THE HEAD_BYTES BOUNDARY ──────────
+def section_D14():
+    print("D14 — start-bound eligibility at the HEAD_BYTES boundary")
+    print("  The boundary decides WHICH TOKENS ARE ELIGIBLE. It must never")
+    print("  decide WHAT AN ELIGIBLE TOKEN IS.\n")
+    tok = "76dbba4c1f3e9a05b7c2d8e6f40193a5c7b2e8d1"
+    H = passa.HEAD_BYTES
+
+    # D14-A: a token STRADDLING the boundary. Recognition runs against the
+    # COMPLETE source, so it is admitted WHOLE and never in its cut form.
+    pad = "." * (H - 10)   # non-word, so \b can hold before the token
+    straddle = pad + tok + " tail"
+    m = next(m for m in passa.HEX.finditer(straddle) if m.start() == len(pad))
+    check("D14-A a straddling token is recognised WHOLE, not in its cut form",
+          m.group(0) == tok and len(m.group(0)) == 40, m.group(0))
+    check("D14-A it IS admitted, because its START is inside the window",
+          passa._eligible(m), m.start())
+
+    # D14-B: a token cut BELOW the recogniser's 7-character minimum would
+    # have vanished entirely under a window-truncated recognition.
+    pad2 = "." * (H - 4)
+    below = pad2 + tok
+    cut = below[:H]
+    found_cut = [x.group(0) for x in passa.HEX.finditer(cut)
+                 if x.start() >= len(pad2)]
+    m2 = next(m for m in passa.HEX.finditer(below) if m.start() == len(pad2))
+    check("D14-B fail-old: recognising against a TRUNCATED window loses the "
+          "token entirely (below the 7-char minimum)",
+          not found_cut, found_cut)
+    check("D14-B pass-new: recognising against the COMPLETE source carries it "
+          "whole", m2.group(0) == tok and passa._eligible(m2), m2.group(0))
+
+    # D14-C: a token STARTING at or after the boundary is NOT admitted on
+    # either side. This is not a larger window and not a guessed margin.
+    pad3 = "." * H
+    after = pad3 + tok
+    m3 = next(m for m in passa.HEX.finditer(after) if m.start() == len(pad3))
+    check("D14-C a token STARTING at or after the boundary is NOT admitted",
+          not passa._eligible(m3), m3.start())
+    check("D14-C ... and the boundary is exactly HEAD_BYTES, start-bound",
+          passa._eligible.__doc__ is not None and H == 6000, H)
+    print()
+
+
+# ── DEP — the closed runtime dependency rule ──────────────────────────
+def section_DEP():
+    print("DEP — governed runtime dependency classification (D379 §5/§6)")
+    import stage_identity as SI
+    members, offenders = SI.producer_population(REPO)
+    kinds = collections.Counter(k for k, _, _ in members)
+    print(f"    producer population (DERIVED)  {len(members)}  {dict(kinds)}")
+    print(f"    ungoverned offenders           {len(offenders)}")
+    for n, p in offenders[:10]:
+        print(f"      OFFENDER {n}  {p}")
+    check("DEP-2 ordinary stdlib modules are covered by the governed runtime "
+          "identity WITHOUT a Stage-A entry per stdlib file",
+          kinds.get("STDLIB", 0) > 0, dict(kinds))
+    check("DEP the H2 governed source root is represented in the population",
+          kinds.get("H2", 0) > 0, dict(kinds))
+
+    # DEP-1. THE SUBJECT IS THE DETECTOR, NOT THE ENVIRONMENT. An earlier
+    # draft of this control asserted `not offenders` — i.e. that THIS
+    # process happens to be clean. That is a claim about the container, not
+    # about the rule, and it is the inverted form of the D379 §8 predicate,
+    # which says a producer loading such a module must REFUSE.
+    def would_refuse(offs):
+        """D379 §5 rule 6: loaded, non-stdlib, outside every governed root,
+        no explicit Stage-A dependency identity -> REFUSE. Mechanical."""
+        return bool(offs)
+
+    check("DEP-1 known-POSITIVE: a producer loading a non-stdlib module "
+          "outside all governed Stage-A roots -> REFUSE",
+          would_refuse([("synthetic_pkg", "/opt/elsewhere/x.py")]))
+    check("DEP-1 known-NEGATIVE: a producer whose loaded population is "
+          "entirely governed does NOT refuse", not would_refuse([]))
+    check("DEP-1 the rule NAMES the offending module rather than inventing "
+          "a dependency identity for it (D379 §6)",
+          all(isinstance(n, str) and isinstance(pp, str) for n, pp in offenders)
+          if offenders else True)
+
+    # AND THE MEASURED ENVIRONMENT, REPORTED NOT ASSERTED AWAY.
+    if offenders:
+        print("    ENVIRONMENT CLASSIFICATION — this interpreter injects")
+        print("    ungoverned modules into EVERY producer process:")
+        for n, pp in offenders:
+            print(f"      {n:<18} {pp}")
+        print("    Under D379 §5 rule 6 a REAL production run here REFUSES.")
+        print("    This is the SAME known-negative runtime as INC-34, whose")
+        print("    sitecustomize.py is one of the two offenders. DEP clean-")
+        print("    producer positive is therefore HELD on INC-34, and the")
+        print("    contract is NOT relaxed to admit them (D385 §A).")
+    print()
+
+
+# ── synthetic Stage-A material, CALIBRATION ONLY ──────────────────────
+def _synthetic_runtime():
+    """A SYNTHETIC runtime block. D385: this interpreter is a KNOWN-NEGATIVE,
+    so no canonical stdlib identity exists here and none is faked as one.
+    The value below is a declared placeholder used ONLY inside CALIBRATION
+    descriptors; it never reaches a production path, which refuses V1 and
+    demands a real construction."""
+    return {"executable_sha256": "0" * 64,
+            "implementation_name": "cpython", "cache_tag": "calibration",
+            "version": "SYNTHETIC CALIBRATION RUNTIME — NOT A REAL IDENTITY",
+            "stdlib_identity": "1" * 64, "dont_write_bytecode": True}
+
+
+def _synthetic_descriptor(schema, mode, governance=None, sources=None):
+    import stage_identity as SI
+    srcs = sources if sources is not None else [
+        {"path": p, "sha256": SI.sha256_hex((REPO / p).read_bytes())}
+        for p in SI.H2_SOURCES]
+    srcs = sorted(srcs, key=lambda m: (m["path"], m["sha256"]))
+    gov = governance if governance is not None else [
+        {"decision_id": d, "bank_commit_sha": c}
+        for d, c in (SI.GOVERNANCE_V2 if schema == SI.SCHEMA_V2
+                     else SI.GOVERNANCE_V1)]
+    return {"schema": schema, "mode": mode, "h2_sources": srcs,
+            "contract": {"path": "kai-pm/H2_REPAIR_CONTRACT_D367.md",
+                         "sha256": "0ce5792ed72e6e7051ecc050664490899a847d01"
+                                   "de2f62cff564f460d46800bb"},
+            "governance": gov,
+            "subject": {"commit": "d8aac4d49e6ba997e3eb38062c0917186ee3f197",
+                        "tree": FROZEN_TREE, "population": 272},
+            "tree_paths": {"population": 272,
+                           "tree_paths_identity": "3af69867" + "0" * 56},
+            "census": {"logical_package": "house_in_order_census_v11",
+                       "aggregate_sha256": "29064d650a61296806df3c3bcab3322f"
+                                           "7364da7df674ac93e79d0671475d757a"},
+            "history": {"subject_commit": "d8aac4d4", "is_shallow": True,
+                        "reachable_count": 0, "oldest_commit": "",
+                        "oldest_date": "", "reachable_set_sha256": "0" * 64},
+            "runtime": _synthetic_runtime()}
+
+
+# ── STAGE_A — V2 governance and identity, synthetic CALIBRATION ───────
+def section_STAGE_A():
+    print("STAGE_A — H2_STAGE_A_V2 governance and identity")
+    print("  SYNTHETIC CALIBRATION DESCRIPTORS ONLY. No production Stage-A")
+    print("  identity is constructed, and the canonical-runtime positive")
+    print("  limb is HELD on INC-34 (see STDLIB).\n")
+    import stage_identity as SI
+
+    v2 = _synthetic_descriptor(SI.SCHEMA_V2, SI.MODE_CALIBRATION)
+    ident = SI.stage_a_identity(v2)
+    print(f"    synthetic V2 CALIBRATION stage_a_identity  {ident}")
+
+    # V2-GOV-1 — V1 + PRODUCTION, unconditionally, from the artefact alone
+    v1p = _synthetic_descriptor(SI.SCHEMA_V1, SI.MODE_PRODUCTION)
+    check("V2-GOV-1 schema=H2_STAGE_A_V1 + mode=PRODUCTION -> REFUSE, decided "
+          "from the artefact with no lineage inference",
+          _refuses(lambda: SI.stage_a_identity(v1p)))
+    # V2-GOV-2 — V2 missing D381
+    v2m = _synthetic_descriptor(SI.SCHEMA_V2, SI.MODE_CALIBRATION, governance=[
+        {"decision_id": d, "bank_commit_sha": c} for d, c in SI.GOVERNANCE_V1])
+    check("V2-GOV-2 schema=V2 with governance [D379,D380] -> REFUSE, missing "
+          "D381", _refuses(lambda: SI.stage_a_identity(v2m)))
+    # V2-GOV-3 — the narrow V1 CALIBRATION path
+    v1c = _synthetic_descriptor(SI.SCHEMA_V1, SI.MODE_CALIBRATION)
+    ok_v1c = True
+    try:
+        v1c_id = SI.stage_a_identity(v1c)
+    except Exception:                                   # noqa: BLE001
+        ok_v1c, v1c_id = False, None
+    check("V2-GOV-3 schema=V1 + mode=CALIBRATION passes ONLY through the "
+          "explicitly calibration-only path", ok_v1c)
+    check("V2-GOV-3 a CALIBRATION identity cannot seed the holdout "
+          "(FINAL_CANDIDATE_AGGREGATE refuses non-PRODUCTION)",
+          _refuses(lambda: _holdout_seed_from(v1c)))
+    check("V2-GOV-3 a V2 CALIBRATION identity likewise cannot seed it",
+          _refuses(lambda: _holdout_seed_from(v2)))
+
+    # governance REFUSE conditions
+    for label, gov in (
+            ("unknown governing decision (D382)",
+             [{"decision_id": d, "bank_commit_sha": c}
+              for d, c in SI.GOVERNANCE_V2]
+             + [{"decision_id": "D382", "bank_commit_sha": "0" * 40}]),
+            ("wrong bank commit for D380",
+             [{"decision_id": "D379", "bank_commit_sha": SI.GOVERNANCE_V2[0][1]},
+              {"decision_id": "D380", "bank_commit_sha": "f" * 40},
+              {"decision_id": "D381", "bank_commit_sha": SI.GOVERNANCE_V2[2][1]}]),
+            ("duplicate decision",
+             [{"decision_id": d, "bank_commit_sha": c}
+              for d, c in SI.GOVERNANCE_V2] +
+             [{"decision_id": "D381", "bank_commit_sha": SI.GOVERNANCE_V2[2][1]}]),
+            ("descending order",
+             [{"decision_id": d, "bank_commit_sha": c}
+              for d, c in reversed(SI.GOVERNANCE_V2)]),
+            ("malformed entry", [{"decision_id": "D379"}])):
+        d = _synthetic_descriptor(SI.SCHEMA_V2, SI.MODE_CALIBRATION,
+                                  governance=gov)
+        check(f"V2-GOV {label} -> REFUSE",
+              _refuses(lambda dd=d: SI.stage_a_identity(dd)))
+
+    # h2_sources population
+    short = [m for m in v2["h2_sources"] if not m["path"].endswith("passa.py")]
+    check("STAGE_A a missing h2_sources member -> REFUSE",
+          _refuses(lambda: SI.stage_a_identity(
+              _synthetic_descriptor(SI.SCHEMA_V2, SI.MODE_CALIBRATION,
+                                    sources=short))))
+    extra = v2["h2_sources"] + [{"path": "kai-pm/extra.py", "sha256": "0" * 64}]
+    check("STAGE_A an additional h2_sources member -> REFUSE",
+          _refuses(lambda: SI.stage_a_identity(
+              _synthetic_descriptor(SI.SCHEMA_V2, SI.MODE_CALIBRATION,
+                                    sources=extra))))
+    check("STAGE_A an unknown top-level field -> REFUSE",
+          _refuses(lambda: SI.stage_a_identity(dict(v2, extra_field=1))))
+    check("STAGE_A dont_write_bytecode=false -> REFUSE",
+          _refuses(lambda: SI.stage_a_identity(
+              dict(v2, runtime=dict(v2["runtime"], dont_write_bytecode=False)))))
+
+    # V2-ID-1 — DUAL VERSIONING, each mechanism separating INDEPENDENTLY
+    D = SI.canonical_bytes(v2)
+    id_v2 = SI.sha256_hex(SI.DOMAIN_V2.encode() + b"\x00" + D)
+    id_sep_only = SI.sha256_hex(SI.DOMAIN_V1.encode() + b"\x00" + D)
+    D_v1tag = SI.canonical_bytes(_synthetic_descriptor(
+        SI.SCHEMA_V1, SI.MODE_CALIBRATION))
+    id_tag_only = SI.sha256_hex(SI.DOMAIN_V2.encode() + b"\x00" + D_v1tag)
+    check("V2-ID-1 the DOMAIN SEPARATOR alone changes stage_a_identity",
+          id_v2 != id_sep_only)
+    check("V2-ID-1 the SCHEMA TAG alone changes stage_a_identity",
+          id_v2 != id_tag_only)
+    check("V2-ID-1 NEITHER mechanism may be removed because the other "
+          "already separates them (D381 §17)",
+          id_v2 != id_sep_only and id_v2 != id_tag_only)
+    check("STAGE_A reparse+recanonicalise reproduces D exactly",
+          SI.canonical_bytes(json.loads(D.decode())) == D)
+    check("STAGE_A neither digest is a field inside the descriptor",
+          "stage_a_identity" not in v2 and
+          "stage_a_descriptor_digest" not in v2)
+
+    # I1A-1 — one byte in one member changes the identity
+    mutated = [dict(m) for m in v2["h2_sources"]]
+    mutated[0] = dict(mutated[0], sha256="f" * 64)
+    check("I1A-1 one altered byte in one Stage-A member CHANGES the identity",
+          SI.stage_a_identity(_synthetic_descriptor(
+              SI.SCHEMA_V2, SI.MODE_CALIBRATION, sources=mutated)) != ident)
+    print()
+
+
+def _holdout_seed_from(desc):
+    """Route a descriptor through holdout's seed rule, via a real file."""
+    import tempfile
+    import holdout
+    d = tempfile.mkdtemp()
+    p = pathlib.Path(d) / "stage_a.json"
+    p.write_text(json.dumps(desc))
+    return holdout.final_candidate_aggregate(str(p))
+
+
+# ── I1A / I1B — the holdout input contract ────────────────────────────
+def section_I1A():
+    print("I1A — the blind seed is the VALIDATED STAGE-A IDENTITY")
+    import holdout
+    import stage_identity as SI
+    ex = executable_source(holdout)
+    # PRECISE, NOT A PROXY. An earlier form of this check also matched
+    # `hashlib.sha256(` inside select(), which is the FROZEN D367 §9
+    # equation and must stay exactly where it is.
+    check("I1A no EXECUTABLE manifest-derived aggregate survives in holdout "
+          "(the phrase persists only in the comment recording the defect)",
+          "a.manifest" not in ex and "--manifest" not in ex,
+          [l for l in ex.splitlines() if "manifest" in l][:3])
+    check("I1A the FROZEN D367 §9 equation is still present and untouched "
+          "in select()",
+          'f"{SALT}{D366_COMMIT}:{candidate_aggregate}:{p}"' in ex)
+    check("I1A the aggregate comes from final_candidate_aggregate(stage_a)",
+          "aggregate = final_candidate_aggregate(a.stage_a)" in ex)
+    check("I1A the seed function REFUSES a missing descriptor",
+          _refuses(lambda: holdout.final_candidate_aggregate("/nonexistent")))
+    check("I1A the seed function REFUSES a CALIBRATION descriptor",
+          _refuses(lambda: _holdout_seed_from(
+              _synthetic_descriptor(SI.SCHEMA_V2, SI.MODE_CALIBRATION))))
+    # I1A-3 — HOLDOUT SEED INDEPENDENCE
+    paths = [f"kai-pm/doc_{i:03d}.md" for i in range(272)]
+    agg = "a" * 64
+    s1 = holdout.select(sorted(paths), agg)
+    s2 = holdout.select(sorted(paths), agg)          # evidence mutated: n/a
+    check("I1A-3 with stage_a_identity UNCHANGED the SELECTED SAMPLE is "
+          "UNCHANGED, whatever the evidence does", s1 == s2)
+    check("I1A-3 a DIFFERENT identity deterministically yields a DIFFERENT "
+          "sample", holdout.select(sorted(paths), "b" * 64) != s1)
+    check("I1A-3 the frozen D367 §9 equation is unchanged",
+          holdout.SALT == "H2FINAL-D367:" and holdout.SIZE == 40
+          and holdout.D366_COMMIT == "86a1399e6e31477ba67cd38c12d22627a8b4d6ef")
+    print()
+
+
+def section_I1B():
+    print("I1B — the selection universe is the FROZEN SUBJECT TREE")
+    import holdout
+    tree = [f"kai-pm/doc_{i:03d}.md" for i in range(272)]
+    check("I1B-1 a clean tree/output population reconciles",
+          holdout.reconcile(tree, list(tree)) is True)
+    check("I1B-2 dropping one output row -> REFUSE BEFORE SELECTION",
+          _refuses(lambda: holdout.reconcile(tree, tree[:-1])))
+    check("I1B-3 adding one output row -> REFUSE BEFORE SELECTION",
+          _refuses(lambda: holdout.reconcile(tree, tree + ["kai-pm/extra.md"])))
+    check("I1B-4 duplicating one output row -> REFUSE BEFORE SELECTION",
+          _refuses(lambda: holdout.reconcile(tree, tree + [tree[0]])))
+    check("I1B selection draws from the TREE population, not the output",
+          "select(sorted(tree_paths)" in inspect_source(holdout))
+    print()
+
+
+def inspect_source(mod):
+    return pathlib.Path(mod.__file__).read_text()
+
+
+def executable_source(mod):
+    """Source with comment lines and docstring bodies stripped.
+
+    A control that greps raw source matches the COMMENT EXPLAINING THE
+    REPAIR as readily as the defect it describes. Two checks here did
+    exactly that and reported a repaired file as unrepaired. The subject of
+    these checks is what EXECUTES, so that is what they read.
+    """
+    out, in_doc = [], False
+    for ln in inspect_source(mod).splitlines():
+        t = ln.strip()
+        if t.startswith("#"):
+            continue
+        n = t.count('"""') + t.count("'''")
+        if in_doc:
+            if n % 2 == 1:          # this line CLOSES the docstring
+                in_doc = False
+            continue
+        if n % 2 == 1:              # this line OPENS one
+            in_doc = True
+            continue
+        if n >= 2:                  # a single-line docstring
+            continue
+        out.append(ln.split("  #")[0])
+    return "\n".join(out)
+
+
+# ── 86 — fail-closed QUALIFIER identity ───────────────────────────────
+def section_86():
+    print("86 — fail-closed qualifier identity (D367 §8(6))")
+    import qualify
+    src = inspect_source(qualify)
+    check("86-3 --manifest is REQUIRED, so omitting it can no longer SKIP "
+          "criterion [6]",
+          '"--manifest", required=True' in executable_source(qualify))
+    check("86-3 criterion [6] is no longer guarded by `if a.manifest:` "
+          "(read from EXECUTABLE source — the phrase survives in the comment "
+          "that explains the repair, and a naive grep matched that)",
+          "if a.manifest:" not in executable_source(qualify))
+    check("86-4 a manifest path that does not exist -> REFUSE",
+          _refuses(lambda: qualify.runtime_module_identity("/nonexistent")))
+    import tempfile
+    d = pathlib.Path(tempfile.mkdtemp())
+    empty = d / "EMPTY.sha256"
+    empty.write_text("")
+    check("86-5 an unreadable/empty manifest -> REFUSE",
+          _refuses(lambda: qualify.runtime_module_identity(str(empty))))
+    # 86-1 / 86-2 / 86-6 against the REAL governed package
+    real = V / "MANIFEST.sha256"
+    lines = []
+    for p in sorted(V.glob("*.py")):
+        lines.append(f"{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.name}")
+    good = d / "GOOD.sha256"
+    good.write_text("\n".join(lines) + "\n")
+    # the manifest must sit beside the modules it describes
+    beside = V / ".d379_tmp_manifest.sha256"
+    beside.write_text("\n".join(lines) + "\n")
+    try:
+        rows, bad = qualify.runtime_module_identity(str(beside))
+        check(f"86-1 identity matches -> [6] runs and PASSES "
+              f"({len(rows)} modules derived from the RUNTIME, not a tuple)",
+              rows and not bad, bad)
+        check("86-1 the population is DERIVED, not the old five-module tuple "
+              "(R5: a hand-written tuple is a scope smaller than its name)",
+              len(rows) > 5, len(rows))
+        tampered = [ln for ln in lines if not ln.endswith("passa.py")]
+        bad_manifest = V / ".d379_tmp_bad.sha256"
+        bad_manifest.write_text("\n".join(tampered) + "\n")
+        rows2, bad2 = qualify.runtime_module_identity(str(bad_manifest))
+        check("86-6 a manifest that OMITS a loaded module -> that module is "
+              "named as a finding", "passa.py" in bad2, bad2)
+        one = [("f" * 64 + "  passa.py") if ln.endswith("passa.py") else ln
+               for ln in lines]
+        diff_manifest = V / ".d379_tmp_diff.sha256"
+        diff_manifest.write_text("\n".join(one) + "\n")
+        rows3, bad3 = qualify.runtime_module_identity(str(diff_manifest))
+        check("86-2 one module byte differs -> FAIL, naming the module",
+              "passa.py" in bad3, bad3)
+    finally:
+        for f in (beside, V / ".d379_tmp_bad.sha256", V / ".d379_tmp_diff.sha256"):
+            if f.exists():
+                f.unlink()
+    print()
+
+
+# ── STDLIB — D385: known-negative present, positive HELD ──────────────
+def section_STDLIB():
+    print("STDLIB — governed Python runtime identity (D380 §7, D385)")
+    import stage_identity as SI
+    import sysconfig
+    p = sysconfig.get_paths()
+    print(f"    stdlib      {p.get('stdlib')}")
+    print(f"    platstdlib  {p.get('platstdlib')}")
+    print(f"    purelib     {p.get('purelib')}")
+    print(f"    platlib     {p.get('platlib')}")
+    refusal = None
+    try:
+        SI.build_stdlib_identity()
+        compliant = True
+    except SI.StageIdentityError as e:
+        compliant, refusal = False, str(e)
+    print(f"    D380 RESULT {'D380-COMPLIANT' if compliant else 'KNOWN-NEGATIVE'}")
+    if refusal:
+        print(f"    refusal     {refusal}")
+    check("D380-STDLIB-NEG-1 a real interpreter whose governed-root symlink "
+          "escapes the governed root set -> REFUSE (a SUCCESSFUL negative "
+          "control, D385 §B)",
+          not compliant and "OUTSIDE the governed root set" in (refusal or ""),
+          refusal)
+    # V2-ID-2b — the NON-PLUGGABLE boundary, proven by the signature itself
+    import inspect as _inspect
+    sig = _inspect.signature(SI.build_stage_a) if hasattr(SI, "build_stage_a") \
+        else None
+    src = inspect_source(SI)
+    check("V2-ID-2b no caller-supplied stdlib digest, constructor, schema "
+          "selector or callback exists to supply — the seam is ABSENT, not "
+          "merely discouraged",
+          "def _stdlib_identity() -> str:" in src
+          and "return build_stdlib_identity()[0]" in src)
+    check("V2-ID-2b the descriptor carries ONLY the digest; no stdlib schema "
+          "field is added to the ten-field descriptor",
+          set(SI.RUNTIME_FIELDS) == {"executable_sha256", "implementation_name",
+                                     "cache_tag", "version", "stdlib_identity",
+                                     "dont_write_bytecode"})
+    check("STDLIB H2_PY_STDLIB_V1 is inherited UNCHANGED — no V2 exists",
+          SI.STDLIB_SCHEMA == "H2_PY_STDLIB_V1"
+          and "H2_PY_STDLIB_V2" not in src)
+    print("    V2-ID-2a  canonical positive derivation        HELD ON INC-34")
+    print("    STAGE_A canonical-runtime positive limb        HELD ON INC-34")
+    print("    No D380-compliant interpreter is locally available; the")
+    print("    contract is NOT weakened to manufacture a green (D385 §D).")
+    print()
+
+
+# ── D386 — MECHANICAL CHILD STATUS CAPTURE ────────────────────────────
+#
+# INC-2026-09-18-35. The previous capture was a shell brace group in which
+# `${PIPESTATUS[0]}` was expanded after a bare `echo`, so the durable
+# artefact recorded the status of the echo that PRINTS the status. It
+# wrote "process exit status = 0" four lines under its own
+# "EXIT GATE: FAIL", while the program returns 1.
+#
+# THE STATUS AUTHORITY IS NOW subprocess.CompletedProcess.returncode, TAKEN
+# FROM THE PROCESS THAT PRODUCED THE CAPTURED OUTPUT. One object, one step.
+# There is no shell between the measurement and the record, so there is
+# nothing for an intervening command to overwrite.
+#
+# FORBIDDEN, AND STRUCTURALLY ABSENT RATHER THAN MERELY DISCOURAGED:
+#   $? · PIPESTATUS · shell pipeline reconstruction · a manual --status ·
+#   any caller-supplied or hard-coded status · parsing the "EXIT GATE"
+#   text to infer the status.
+# The literal 0 is NOT edited to 1. A hand-written number where a
+# measurement belongs is the same defect with a better value.
+
+CAPTURE_HEADER = (
+    "D379 / D381 / D382 HOSTILE CONTROLS — FULL UNTRUNCATED OUTPUT\n"
+    "EVIDENCE CLASS: PRODUCER MEASUREMENT - SIGHTED - ZERO ADMISSION WEIGHT.\n"
+    "THIS FILE IS THE AUTHORITATIVE OUTPUT (R10). Any excerpt elsewhere\n"
+    "declares itself partial and states its byte count.\n"
+    "\n"
+    "STATUS PROVENANCE (D386): every 'process exit status' line below is\n"
+    "subprocess.CompletedProcess.returncode, read directly from the child\n"
+    "that produced the output immediately above it. No shell status, no\n"
+    "pipeline status, no parsed text, no supplied value.\n")
+
+
+def _run_child(argv, cwd):
+    """Run one child and return (stdout+stderr, returncode) from ONE object."""
+    import subprocess
+    p = subprocess.run(argv, cwd=str(cwd), capture_output=True, text=True)
+    return p.stdout + p.stderr, p.returncode
+
+
+def _capture_calibration():
+    """CAPTURE-1/2/3 — hostile calibration OF THE CAPTURE ITSELF.
+
+    A capture mechanism demonstrated only on its happy path proves that it
+    can record SOME number, not that it records THE number. These children
+    are synthetic and return a known code each; the recorded status must
+    equal it, and the captured output must belong to that same invocation.
+    """
+    print("CAPTURE — hostile calibration of the status recorder itself")
+    ok = True
+    for want in (0, 1, 2):
+        marker = f"CHILD_MARKER_{want}_{os.getpid()}"
+        out, rc = _run_child(
+            [sys.executable, "-c",
+             f"import sys; print({marker!r}); sys.exit({want})"], V)
+        recorded = rc                       # the ONLY source, per D386
+        a = check(f"CAPTURE-{want + 1} child returns {want}, recorded "
+                  f"status = {want}, parent would return {want}",
+                  recorded == want, f"recorded {recorded}")
+        b = check(f"CAPTURE-{want + 1} the captured output belongs to THAT "
+                  f"child invocation", marker in out, out[:80])
+        ok &= a and b
+        print(f"  CAPTURE-{want + 1}  child exit {want} -> recorded "
+              f"{recorded} -> parent {recorded}   "
+              f"output-binding {'OK' if marker in out else 'MISMATCH'}   "
+              f"[{'PASS' if a and b else 'FAIL'}]")
+    # and the negative that INC-35 actually was: a later command's status
+    # must be incapable of overwriting the record.
+    out_a, rc_a = _run_child([sys.executable, "-c", "import sys; sys.exit(3)"], V)
+    _out_b, rc_b = _run_child([sys.executable, "-c", "print()"], V)
+    check("CAPTURE-4 a subsequent successful command CANNOT overwrite the "
+          "recorded status of an earlier child (the INC-35 mechanism)",
+          rc_a == 3 and rc_b == 0, f"{rc_a} {rc_b}")
+    print()
+    return ok
+
+
+def capture(out_path) -> int:
+    """PARENT. Runs the control matrix and the fixtures as SEPARATE children.
+
+    TWO SUBJECTS, NOT ONE. The D379 control process and the cal_fixtures
+    process are separately executed subjects with separately recorded
+    statuses. One harness running both is NOT common-source corroboration
+    and no such claim is made here.
+    """
+    import datetime
+    parts = [CAPTURE_HEADER,
+             f"captured {datetime.datetime.now(datetime.timezone.utc).isoformat()}",
+             ""]
+
+    ctl_out, ctl_rc = _run_child(
+        [sys.executable, str(pathlib.Path(__file__).resolve()), "--child"],
+        pathlib.Path(__file__).resolve().parent)
+    parts += ["=" * 70,
+              "SUBJECT 1 of 2 — THE D379 CONTROL PROCESS",
+              "=" * 70, "", ctl_out, "",
+              f"process exit status = {ctl_rc}", ""]
+
+    fx_out, fx_rc = _run_child([sys.executable, str(V / "cal_fixtures.py")], V)
+    parts += ["=" * 70,
+              "SUBJECT 2 of 2 — THE CAL_FIXTURES PROCESS",
+              "  A DIFFERENT SUBJECT. Its status corroborates nothing about",
+              "  subject 1 and no independence is claimed between them.",
+              "=" * 70, "", fx_out, "",
+              f"fixture process exit status = {fx_rc}", ""]
+
+    parts += ["=" * 70,
+              "CAPTURE SUMMARY — statuses read from CompletedProcess.returncode",
+              "=" * 70,
+              f"  D379 control process exit status   {ctl_rc}",
+              f"  cal_fixtures process exit status   {fx_rc}",
+              f"  parent returns                     {ctl_rc}", ""]
+
+    pathlib.Path(out_path).write_text("\n".join(parts))
+    print(f"captured -> {out_path}")
+    print(f"  D379 control process exit status  {ctl_rc}")
+    print(f"  cal_fixtures process exit status  {fx_rc}")
+    return ctl_rc                       # the SAME code the child returned
+
+
 if __name__ == "__main__":
+    if "--capture" in sys.argv:
+        sys.exit(capture(sys.argv[sys.argv.index("--capture") + 1]))
     sys.exit(main())

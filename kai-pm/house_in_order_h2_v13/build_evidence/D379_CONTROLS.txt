@@ -1,8 +1,18 @@
 D379 / D381 / D382 HOSTILE CONTROLS — FULL UNTRUNCATED OUTPUT
-Generated 2026-09-18T23:17:00Z at HEAD bf52445266354aaf9053ef30a72018d9c04cdc4d
 EVIDENCE CLASS: PRODUCER MEASUREMENT - SIGHTED - ZERO ADMISSION WEIGHT.
-THIS FILE IS THE AUTHORITATIVE OUTPUT. Any excerpt elsewhere declares itself
-partial and states its byte count (R10).
+THIS FILE IS THE AUTHORITATIVE OUTPUT (R10). Any excerpt elsewhere
+declares itself partial and states its byte count.
+
+STATUS PROVENANCE (D386): every 'process exit status' line below is
+subprocess.CompletedProcess.returncode, read directly from the child
+that produced the output immediately above it. No shell status, no
+pipeline status, no parsed text, no supplied value.
+
+captured 2026-09-18T23:36:09.173544+00:00
+
+======================================================================
+SUBJECT 1 of 2 — THE D379 CONTROL PROCESS
+======================================================================
 
 ======================================================================
 D379 HOSTILE CONTROLS — PRODUCER MEASUREMENT, SIGHTED,
@@ -14,11 +24,16 @@ SUBJECT — the exact bytes measured
   classify.py      226873676c2373faaf29f4709bb1bb62d1d22f3c56cbdc0e594314cb6e5df9e8
   envelope.py      fdcc1b73d7cd32e540c63ca926d5393901ea63b357fbf339819f07256e6a5a3f
   run_h2_v12.py    ab6f54c54c5bdd82c83f9de013311c5771d7eaabad2cec91dd46521d881f7ec7
-  qualify.py       ee4e18240596d712027bad2f2499fcac026b47e963e886cd27793af2d17ba3b3
-  holdout.py       4c5c06ac5eb717d1178df9c9a1d36e280f4a2bcc073ad3a8058ae8bea5798ff9
+  qualify.py       e2c7b6d0f44b3ae5e74fa47aff7618364f643bee593593faaa42ceb9af7beb4f
+  holdout.py       e9cd5f3874ba14c2c33166671da6b8cc65574a040e6b276c955cd9f0a49b1766
   cal_fixtures.py  4299bd58bd34705d044056d03901f3d674f09e2afde1fff5811a55dfca5f737b
   ontology.py      a92e68c7518578e177c6c67d95efdc1e8b4a92c4406aa2778678119babb721bc
   subjectbind.py   19f295d731183bf672061d60b17b0f7d01ce9d1aa3d340bdb2854b0bda4352fb
+
+CAPTURE — hostile calibration of the status recorder itself
+  CAPTURE-1  child exit 0 -> recorded 0 -> parent 0   output-binding OK   [PASS]
+  CAPTURE-2  child exit 1 -> recorded 1 -> parent 1   output-binding OK   [PASS]
+  CAPTURE-3  child exit 2 -> recorded 2 -> parent 2   output-binding OK   [PASS]
 
 M2 / A3-i — LIFECYCLE SUBJECT BINDING
   invariant: the subject of a LIFECYCLE verdict is THE DOCUMENT.
@@ -104,32 +119,204 @@ SB — D381 SUBJECT BINDING, AND THE D382 EXECUTED DERIVATION
       VALIDITY   EXACT_SNAPSHOT  -> UNKNOWN
       LIFECYCLE  UNKNOWN         -> UNKNOWN
 
+D14 — start-bound eligibility at the HEAD_BYTES boundary
+  The boundary decides WHICH TOKENS ARE ELIGIBLE. It must never
+  decide WHAT AN ELIGIBLE TOKEN IS.
+
+
+DEP — governed runtime dependency classification (D379 §5/§6)
+    producer population (DERIVED)  90  {'H2': 6, 'STDLIB': 84}
+    ungoverned offenders           2
+      OFFENDER _distutils_hack  /usr/lib/python3/dist-packages/_distutils_hack/__init__.py
+      OFFENDER sitecustomize  /etc/python3.11/sitecustomize.py
+    ENVIRONMENT CLASSIFICATION — this interpreter injects
+    ungoverned modules into EVERY producer process:
+      _distutils_hack    /usr/lib/python3/dist-packages/_distutils_hack/__init__.py
+      sitecustomize      /etc/python3.11/sitecustomize.py
+    Under D379 §5 rule 6 a REAL production run here REFUSES.
+    This is the SAME known-negative runtime as INC-34, whose
+    sitecustomize.py is one of the two offenders. DEP clean-
+    producer positive is therefore HELD on INC-34, and the
+    contract is NOT relaxed to admit them (D385 §A).
+
+STAGE_A — H2_STAGE_A_V2 governance and identity
+  SYNTHETIC CALIBRATION DESCRIPTORS ONLY. No production Stage-A
+  identity is constructed, and the canonical-runtime positive
+  limb is HELD on INC-34 (see STDLIB).
+
+    synthetic V2 CALIBRATION stage_a_identity  40260e9035fd071d02e68946a4d4867671f413444ad800cfb9dac2a681057d7d
+
+I1A — the blind seed is the VALIDATED STAGE-A IDENTITY
+
+I1B — the selection universe is the FROZEN SUBJECT TREE
+
+86 — fail-closed qualifier identity (D367 §8(6))
+
+STDLIB — governed Python runtime identity (D380 §7, D385)
+    stdlib      /usr/lib/python3.11
+    platstdlib  /usr/lib/python3.11
+    purelib     /usr/local/lib/python3.11/dist-packages
+    platlib     /usr/local/lib/python3.11/dist-packages
+    D380 RESULT KNOWN-NEGATIVE
+    refusal     REFUSE: symlink sitecustomize.py under stdlib resolves OUTSIDE the governed root set. There is no external-dependency escape hatch in this schema.
+    V2-ID-2a  canonical positive derivation        HELD ON INC-34
+    STAGE_A canonical-runtime positive limb        HELD ON INC-34
+    No D380-compliant interpreter is locally available; the
+    contract is NOT weakened to manufacture a green (D385 §D).
+
 ----------------------------------------------------------------------
 SECTION COVERAGE
   M2         IMPLEMENTED
-  D14        NOT_IMPLEMENTED
-  Q1a        NOT_IMPLEMENTED
-  Q1b        NOT_IMPLEMENTED
-  86         NOT_IMPLEMENTED
+  D14        IMPLEMENTED
+  Q1a        HELD — INC-34 stdlib-positive-dependent proof
+  Q1b        HELD — requires a real classification result
+  86         IMPLEMENTED
   SB         IMPLEMENTED
-  I1A        NOT_IMPLEMENTED
-  I1B        NOT_IMPLEMENTED
-  DEP        NOT_IMPLEMENTED
-  STAGE_A    NOT_IMPLEMENTED
-  STDLIB     NOT_IMPLEMENTED
+  I1A        IMPLEMENTED
+  I1B        IMPLEMENTED
+  DEP        HELD — INC-34 clean-producer positive; this interpreter injects sitecustomize and _distutils_hack
+  STAGE_A    HELD — INC-34 canonical-runtime positive limb
+  STDLIB     HELD — INC-34 canonical-runtime positive limb
 
 ======================================================================
-65 passed, 9 failed
-  FAIL section D14 is implemented: NOT_IMPLEMENTED — this control file does not yet cover this section of the D379 hostile matrix
-  FAIL section Q1a is implemented: NOT_IMPLEMENTED — this control file does not yet cover this section of the D379 hostile matrix
-  FAIL section Q1b is implemented: NOT_IMPLEMENTED — this control file does not yet cover this section of the D379 hostile matrix
-  FAIL section 86 is implemented: NOT_IMPLEMENTED — this control file does not yet cover this section of the D379 hostile matrix
-  FAIL section I1A is implemented: NOT_IMPLEMENTED — this control file does not yet cover this section of the D379 hostile matrix
-  FAIL section I1B is implemented: NOT_IMPLEMENTED — this control file does not yet cover this section of the D379 hostile matrix
-  FAIL section DEP is implemented: NOT_IMPLEMENTED — this control file does not yet cover this section of the D379 hostile matrix
-  FAIL section STAGE_A is implemented: NOT_IMPLEMENTED — this control file does not yet cover this section of the D379 hostile matrix
-  FAIL section STDLIB is implemented: NOT_IMPLEMENTED — this control file does not yet cover this section of the D379 hostile matrix
+128 passed, 5 failed
+  FAIL section Q1a is implemented and executed: HELD — INC-34 stdlib-positive-dependent proof
+  FAIL section Q1b is implemented and executed: HELD — requires a real classification result
+  FAIL section DEP is implemented and executed: HELD — INC-34 clean-producer positive; this interpreter injects sitecustomize and _distutils_hack
+  FAIL section STAGE_A is implemented and executed: HELD — INC-34 canonical-runtime positive limb
+  FAIL section STDLIB is implemented and executed: HELD — INC-34 canonical-runtime positive limb
 EXIT GATE: FAIL
 ======================================================================
 
-process exit status = 0
+
+process exit status = 1
+
+======================================================================
+SUBJECT 2 of 2 — THE CAL_FIXTURES PROCESS
+  A DIFFERENT SUBJECT. Its status corroborates nothing about
+  subject 1 and no independence is claimed between them.
+======================================================================
+
+HOUSE_H2 v1.2 — HOSTILE FIXTURES
+  fail-old imported from COMMITTED house_in_order_h2_v11
+
+D1 — a commit cited for ONE SENTENCE is not a whole-file binding
+  [PASS] D1a FAIL-OLD: committed v1.1 emits EXACT_SNAPSHOT from a bare flag
+  [PASS] D1b PASS-NEW: v1.2 ABSTAINS on a SPAN-scoped citation
+  [PASS] D1c BOUNDARY: a SELF-bound document-level binding STILL earns EXACT_SNAPSHOT
+  [PASS] D1c' KNOWN-NEGATIVE: the SAME whole-file binding, subject NOT the document, does NOT earn EXACT_SNAPSHOT
+  [PASS] D1d the envelope refuses the widening structurally
+
+D2 — witness KIND is discriminated, never assumed from shape
+  [PASS] D2a FAIL-OLD: v1.1 SHA pattern accepts 'ed25519'
+  [PASS] D2b PASS-NEW: v1.2 rejects 'ed25519' as a commit (-> HEX_SHAPED_UNRESOLVED)
+  [PASS] D2a FAIL-OLD: v1.1 SHA pattern accepts '1700000000'
+  [PASS] D2b PASS-NEW: v1.2 rejects '1700000000' as a commit (-> DECIMAL_TOKEN)
+  [PASS] D2a FAIL-OLD: v1.1 SHA pattern accepts 'b5e68a3'
+  [PASS] D2b PASS-NEW: v1.2 rejects 'b5e68a3' as a commit (-> DIGEST_FRAGMENT)
+  [PASS] D2c KNOWN-NEGATIVE: a REAL commit still resolves
+
+D3 — a currency self-claim the history refutes cannot earn a verdict
+  [PASS] D3a the contradiction is DETECTED
+  [PASS] D3b PASS-NEW: the verdict ABSTAINS
+  [PASS] D3c KNOWN-NEGATIVE: a consistent claim is NOT contradicted
+  [PASS] D3d ... and still earns TIME_BOUND
+  [PASS] D3e a VERSION date is not a currency claim, so not a contradiction
+
+D4 — the RUN detector fires through markdown
+  [PASS] D4a FAIL-OLD: v1.1 RUN misses '**Last run:** 31570714150'
+  [PASS] D4b PASS-NEW: v1.2 detects it
+  [PASS] D4a FAIL-OLD: v1.1 RUN misses 'run `31894868473` (tree'
+  [PASS] D4b PASS-NEW: v1.2 detects it
+  [PASS] D4a FAIL-OLD: v1.1 RUN misses 'Deployed run 1 (`316051385'
+  [PASS] D4b PASS-NEW: v1.2 detects it
+  [PASS] D4c KNOWN-NEGATIVE: prose with letters between is NOT a run id
+
+D5 — the raw present-tense flag no longer exists as a verdict input
+  [PASS] D5a FAIL-OLD: v1.1 emits CURRENT_TREE from the raw flag
+  [PASS] D5b PASS-NEW: v1.2 has no present_tense input at all
+  [PASS] D5c and CURRENT_TREE is unreachable without a witness of that kind
+
+D6/D7 — SCOPE is EARNED or absent; no default, no contradiction
+  [PASS] D6a FAIL-OLD: v1.1 dispositions WHOLE_FILE as a 'file-level default'
+  [PASS] D6b FAIL-OLD: v1.1 SCOPE cannot abstain
+  [PASS] D6c PASS-NEW: v1.2 SCOPE abstains with no binding witness
+  [PASS] D6d BOUNDARY: a binding witness STILL earns WHOLE_FILE
+  [PASS] D7a a row with only SPAN witnesses cannot emit WHOLE_FILE
+  [PASS] D6e v1.2 SCOPE=UNKNOWN is emittable
+
+D8 — term matching respects word boundaries, plurals excepted
+  [PASS] D8a FAIL-OLD: v1.1 matches 'audit' inside 'Auditor'
+  [PASS] D8b PASS-NEW: v1.2 does NOT match 'audit' in 'Auditor'
+  [PASS] D8a FAIL-OLD: v1.1 matches 'plan' inside 'Plane'
+  [PASS] D8b PASS-NEW: v1.2 does NOT match 'plan' in 'Plane'
+  [PASS] D8a FAIL-OLD: v1.1 matches 'plan' inside 'Planning'
+  [PASS] D8b PASS-NEW: v1.2 does NOT match 'plan' in 'Planning'
+  [PASS] D8c KNOWN-NEGATIVE: a PLURAL still matches ('Audits')
+  [PASS] D8c KNOWN-NEGATIVE: a PLURAL still matches ('Decisions')
+  [PASS] D8c KNOWN-NEGATIVE: a PLURAL still matches ('Plans')
+
+D9 — the purpose capture is SUBSTANTIVE, not a trigger phrase
+  [PASS] D9a FAIL-OLD: v1.1 captures only the trigger 'This file'
+  [PASS] D9a FAIL-OLD: v1.1 captures only the trigger 'records'
+  [PASS] D9b PASS-NEW: v1.2 captures the BODY, not the trigger
+  [PASS] D9c a trigger with no substantive body is NOT a purpose statement
+
+D10 — the purpose branch fires, or the fixture fails
+  [PASS] D10a the purpose path is REACHED (observed mentions the term)
+
+D11 — two corroborated roles are AMBIGUITY, not a list-order win
+  [PASS] D11a v1.2 abstains and NAMES both candidates
+  [PASS] D11b KNOWN-NEGATIVE: a single role still resolves to one nominal
+
+D12/D13/D14 — subject binding, polarity, and evidence truncation
+  [PASS] D12a FAIL-OLD: committed v1.1 binds README's 'It' to SELF
+  [PASS] D12b PASS-NEW: v1.2 binds it to the named antecedent
+  [PASS] D12c KNOWN-NEGATIVE: a bare pronoun with NO antecedent is SELF
+  [PASS] D13a FAIL-OLD: v1.1 scores 'This document is non-authori' POSITIVE
+  [PASS] D13b PASS-NEW: v1.2 scores it NEGATIVE
+  [PASS] D13a FAIL-OLD: v1.1 scores '**Status:** non-authoritativ' POSITIVE
+  [PASS] D13b PASS-NEW: v1.2 scores it NEGATIVE
+  [PASS] D13c KNOWN-NEGATIVE: a genuine positive is still POSITIVE
+  [PASS] D14a FAIL-OLD: v1.1 truncates to 6 with no SELF row carried
+  [PASS] D14b PASS-NEW: the determining row IS carried, whatever the total
+  [PASS] D14c the envelope refuses an undeclared truncation
+
+D15 — every positive carries a source-bound witness
+  [PASS] D15a every non-abstention cell carries value+selector+context (0 missing)
+  [PASS] D15b FAIL-OLD: v1.1 records a STATIC string on 26 cells
+
+D16/D17 — the ontology invariant, and a gate that can see an omission
+  [PASS] D16a FAIL-OLD: v1.1 SCOPE alphabet omits UNKNOWN
+  [PASS] D16b PASS-NEW: v1.2 has UNKNOWN on EVERY axis
+  [PASS] D17a REMOVAL CALIBRATION: removing UNKNOWN from LIFECYCLE MUST be detected
+  [PASS] D17a REMOVAL CALIBRATION: removing UNKNOWN from FUNCTION MUST be detected
+  [PASS] D17a REMOVAL CALIBRATION: removing UNKNOWN from AUTHORITY MUST be detected
+  [PASS] D17a REMOVAL CALIBRATION: removing UNKNOWN from GENERATION MUST be detected
+  [PASS] D17a REMOVAL CALIBRATION: removing UNKNOWN from VALIDITY MUST be detected
+  [PASS] D17a REMOVAL CALIBRATION: removing UNKNOWN from SCOPE MUST be detected
+  [PASS] D17b restored: invariants clean again
+  [PASS] D17c a value OUTSIDE the alphabet is detected from OUTPUT
+  [PASS] D17d KNOWN-NEGATIVE: clean rows produce no finding
+
+REGRESSION — the 5 rows Kai adjudicated CORRECT must not move
+  [PASS] R-CODE_AUDIT_MASTER.md still SELF_ASSERTS_AUTHORITY
+  [PASS] R-DECISIONS.md still SELF_ASSERTS_AUTHORITY
+  [PASS] R-KAI_ORION_CONTINUITY.md still SELF_ASSERTS_NON_AUTHORITY
+  [PASS] R-KAI_UNIFIED_HUNTER_ARCHITE still SELF_ASSERTS_AUTHORITY
+  [PASS] R-PHASE1_READINESS.md still SELF_ASSERTS_AUTHORITY
+
+REGRESSION — EXACT_SNAPSHOT must equal Kai's independent D364 set
+  [PASS] R-EXACT_SNAPSHOT == the 6 Kai adjudicated from source
+
+  PASS 79   FAIL 0
+
+
+fixture process exit status = 0
+
+======================================================================
+CAPTURE SUMMARY — statuses read from CompletedProcess.returncode
+======================================================================
+  D379 control process exit status   1
+  cal_fixtures process exit status   0
+  parent returns                     1

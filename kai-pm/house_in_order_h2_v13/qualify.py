@@ -90,35 +90,78 @@ def removal_calibration():
     return results, clean
 
 
+class QualifierIdentityError(AssertionError):
+    """D367 §8(6) refused. Raised, never returned."""
+
+
 def runtime_module_identity(manifest_path):
     """WHICH BYTES ACTUALLY EXECUTED. Inspecting sys.path and concluding
     stale imports are impossible is the reasoning that has already failed
-    three times in this workstream."""
-    import classify, envelope, ontology, passa, subjectbind
+    three times in this workstream.
+
+    D379 §5 — THE HARD-CODED FIVE-MODULE TUPLE IS ABOLISHED AND IS NOT
+    REPLACED BY ANOTHER LITERAL TUPLE. The population is DERIVED from the
+    modules actually loaded in this interpreter. A hand-written tuple
+    beside the thing it measures is a scope smaller than its name (R5),
+    and this one was: it named five modules while the governed package has
+    ten, so `holdout`, `qualify`, `run_h2_v12`, `cal_fixtures` and
+    `stage_identity` could execute from anywhere without being checked.
+
+    FAIL CLOSED, per D367 §8(6). A missing, unreadable or malformed
+    manifest REFUSES; it does not degrade to "no finding".
+    """
+    p = pathlib.Path(manifest_path)
+    if not p.is_file():
+        raise QualifierIdentityError(
+            f"REFUSE: qualifier manifest {manifest_path} does not exist. "
+            f"D367 §8(6) is fail-closed: an unestablished qualifier identity "
+            f"is not a passing one.")
+    try:
+        text = p.read_text()
+    except OSError as e:
+        raise QualifierIdentityError(
+            f"REFUSE: qualifier manifest {manifest_path} is unreadable: {e}")
     manifest = {}
-    for line in pathlib.Path(manifest_path).read_text().splitlines():
+    for line in text.splitlines():
         if "  " in line:
             h, n = line.split("  ", 1)
             manifest[n.strip()] = h.strip()
-    here = pathlib.Path(manifest_path).resolve().parent
+    if not manifest:
+        raise QualifierIdentityError(
+            f"REFUSE: qualifier manifest {manifest_path} yielded no entries")
+
+    here = p.resolve().parent
     rows, bad = [], []
-    for m in (classify, envelope, ontology, passa, subjectbind):
-        f = pathlib.Path(m.__file__).resolve()
-        digest = hashlib.sha256(f.read_bytes()).hexdigest()
-        ok = f.parent == here and digest == manifest.get(f.name)
-        rows.append({"module": m.__name__, "file": str(f),
-                     "under_candidate_dir": f.parent == here,
+    for name, mod in sorted(sys.modules.items()):
+        f = getattr(mod, "__file__", None)
+        if not f:
+            continue
+        fp = pathlib.Path(f).resolve()
+        if fp.parent != here:
+            continue                       # not a governed candidate module
+        digest = hashlib.sha256(fp.read_bytes()).hexdigest()
+        declared = manifest.get(fp.name)
+        ok = declared is not None and digest == declared
+        rows.append({"module": name, "file": str(fp),
+                     "under_candidate_dir": True,
                      "source_sha256": digest,
-                     "manifest_sha256": manifest.get(f.name), "matches": ok})
+                     "manifest_sha256": declared, "matches": ok})
         if not ok:
-            bad.append(f.name)
+            bad.append(fp.name)
+    if not rows:
+        raise QualifierIdentityError(
+            "REFUSE: no governed candidate module was observed loaded from "
+            f"{here}. A qualifier that measures nothing has not passed.")
     return rows, bad
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--result", required=True)
-    ap.add_argument("--manifest", default=None)
+    ap.add_argument("--manifest", required=True,
+                    help="the candidate MANIFEST.sha256. REQUIRED: "
+                         "D367 8(6) is fail-closed, and an omitted "
+                         "manifest silently SKIPPED criterion [6]")
     a = ap.parse_args()
     res = json.load(open(a.result))
     findings = []
@@ -185,7 +228,11 @@ def main():
         findings.append(("WITNESS", ax, "-", f"{p} has no witness value"))
 
     # ── 6. runtime identity ───────────────────────────────────────────
-    if a.manifest:
+    # D367 8(6) IS NOT OPTIONAL. It was guarded by `if a.manifest:` behind a
+    # `default=None` flag, so omitting one argument silently skipped the
+    # criterion and the qualifier still reported a result. An absent check
+    # that reads as a pass is the defect class this programme exists to find.
+    if True:
         rows_id, bad = runtime_module_identity(a.manifest)
         print(f"\n  [6] RUNTIME MODULE IDENTITY — which bytes executed")
         for r in rows_id:

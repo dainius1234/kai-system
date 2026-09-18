@@ -1,0 +1,73 @@
+D379 / D381 / D382 TRANCHE — CLOSE-OUT
+EVIDENCE CLASS: PRODUCER MEASUREMENT - SIGHTED - ZERO ADMISSION WEIGHT.
+Orion self-adjudication carries no admission weight and none is claimed.
+
+THIS TRANCHE IS NOT CLOSED. The exit gate is FAIL and says so.
+
+STATUS PROVENANCE (D386): every status below is
+subprocess.CompletedProcess.returncode, read from the child that produced
+the captured output in D379_CONTROLS.txt. No shell status, no pipeline
+status, no parsed text, no supplied value.
+
+  D379 control process exit status    1
+  cal_fixtures process exit status    0
+  capture parent returns              1
+
+SECTION STATE
+  M2        IMPLEMENTED   discrimination demonstrated
+  D14       IMPLEMENTED   A/B/C start-bound eligibility
+  86        IMPLEMENTED   fail-closed qualifier identity, derived population
+  SB        IMPLEMENTED   D381 subject matrix + D382 executed derivation
+  I1A       IMPLEMENTED   seed is the validated Stage-A identity
+  I1B       IMPLEMENTED   universe is the frozen tree, multiset reconciled
+  DEP       HELD          INC-34: this interpreter injects sitecustomize
+                          and _distutils_hack into every producer process
+  STAGE_A   HELD          INC-34: canonical-runtime positive limb
+  STDLIB    HELD          INC-34: no D380-compliant interpreter available
+  Q1a       HELD          INC-34: stdlib-positive-dependent proof
+  Q1b       HELD          requires a real classification result carrying
+                          per-fact traces; the frozen v1.2 artefact records
+                          evidence_facts as bare booleans
+
+HELD IS NOT A PASS. Every HELD section still FAILS the exit gate. The
+label exists so the registry does not describe a blocked limb as unwritten.
+
+D385 STANDS. D380 section 7.6 is not weakened, no external-target
+exception exists, no distro-specific root is admitted, and no
+H2_PY_STDLIB_V2 was created. The contract was not relaxed to manufacture
+a green.
+
+INTERPRETER INVENTORY, READ-ONLY, NOTHING INSTALLED OR BUILT
+  /usr/bin/python3.10   3.10.20   KNOWN-NEGATIVE
+  /usr/bin/python3.11   3.11.15   KNOWN-NEGATIVE
+  /usr/bin/python3.12   3.12.3    KNOWN-NEGATIVE
+  /usr/bin/python3.13   3.13.12   KNOWN-NEGATIVE
+  All four refuse identically: sitecustomize.py under the governed stdlib
+  root resolves outside the governed root set.
+  NO D380-COMPLIANT INTERPRETER IS LOCALLY AVAILABLE.
+
+CLOSURE CANDIDATES, FOR KAI — NOT SELF-CLOSED
+  INC-32  the executed derivation now produces every figure mechanically:
+          491 emitted records / 480 distinct identities / 9 duplicate
+          groups / 11 excess; Population A 167 consumer-relevant over
+          166/272 with 168 all-kind; Population B 165 over 164/272 with
+          DATE 160 and COMMIT 5; exactly two A->B movements;
+          SB-SCOPE-ALL 491 comparable, 0 differences, 0 unresolved;
+          SB-CORPUS-3 exact.
+  INC-33  one blob-bound loader, two consumers, exact blob verified,
+          79 PASS / 0 FAIL, process exit 0, historical six preserved.
+  INC-35  CAPTURE-1/2/3 prove child exit 0/1/2 each recorded and returned
+          unchanged, with output bound to that invocation; CAPTURE-4 proves
+          a later successful command cannot overwrite an earlier status.
+          The failing-control case is recorded truthfully as 1 in this run.
+          The green case remains to be demonstrated when a run is green.
+
+  Their ledger records are NOT edited. Closure is Kai's action.
+
+STILL OPEN
+  INC-34  no compliant interpreter measured
+  INC-35  awaits a truthful capture of a GREEN run as well as this failing one
+
+NO production Stage A, candidate, Pass A, classification run, Stage-B
+package, holdout, blind 40, admission or freeze was created.
+PR #122 remains DO NOT MERGE.
