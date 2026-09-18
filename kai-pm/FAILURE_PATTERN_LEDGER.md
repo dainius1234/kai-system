@@ -4733,3 +4733,342 @@ confirmed occurrences, `RECURRED_AFTER_CONTROL` · `M-PRODUCER-CURATION`,
 `P-ADJUDICATOR-PROPAGATION`, `M-QUERY-OVERREACH` `PATTERN_CANDIDATE`.
 **No mechanism assigned to this incident. No new mechanism. Doctrine 49.6
 not triggered. No D-number allocated by this entry.**
+
+---
+
+### `INC-2026-09-18-31` — document-level applicability was conflated with
+###                      semantic SELF subject, and no consumer ever tested it
+
+```
+INCIDENT_ID             INC-2026-09-18-31
+date                    2026-09-18
+producer                Orion (HOUSE_H2 instrument lineage)
+subject                 kai-pm/house_in_order_h2_v13/passa.py  (producer)
+                        kai-pm/house_in_order_h2_v13/classify.py (consumers)
+                        kai-pm/house_in_order_h2_v13/envelope.py (dimension)
+                        measured at HEAD 92c0e3d72c9dde3ade001d2fb115e70c06224f2b
+status                  OPEN-RECORDED / INCIDENT_ONLY
+
+ROOT CAUSE — ONE        HOUSE_H2 conflated DOCUMENT-LEVEL APPLICABILITY with
+                        SEMANTIC SELF SUBJECT. The producer's closed binding
+                        table granted whole-document scope and allowed every
+                        Witness to inherit subject=SELF; the subject
+                        dimension remained CONSTANT in production and was
+                        IGNORED by the relevant classifier consumers.
+                        Non-SELF measurement targets therefore licensed
+                        SELF-only VALIDITY and LIFECYCLE conclusions.
+
+                        THIS IS ONE ROOT CAUSE WITH MULTIPLE DOWNSTREAM
+                        CELLS. It is deliberately NOT recorded as a separate
+                        VALIDITY incident and a separate LIFECYCLE incident.
+
+THE MECHANISM, TRACED   passa.BINDING_PREDICATES           (closed table)
+                              |
+                        passa._scope_of()                  -> WHOLE_FILE
+                              |
+                        envelope.Witness(...)              -> subject defaults SELF
+                              |
+                        classify._binding_witness(row, ...)
+                              tests ONLY applicability_scope == "WHOLE_FILE"
+                              |
+                        classify.validity()   -> EXACT_SNAPSHOT
+                        classify.lifecycle()  -> HISTORICAL  (with AUDIT_PATH)
+
+                        The table's own rationales already answer two
+                        different questions. "the snapshot IT AUDITS" and
+                        "the document names ITS MEASUREMENT SUBJECT" are, on
+                        their face, statements about ANOTHER ARTEFACT. The
+                        remaining entries are document lifecycle/currency
+                        predicates. One table, two semantics, no distinction
+                        drawn anywhere.
+
+TWO DOWNSTREAM MANIFESTATIONS OF THE SAME CAUSE
+
+  (1) M2 / LIFECYCLE    D379's M2 predicate: a COMMIT witness may determine
+                        LIFECYCLE only if its binding predicate makes THE
+                        DOCUMENT ITSELF the subject. The COMMIT snapshot
+                        route never tests subject.
+
+  (2) RESIDUAL D1 /     D367 section 6 requires a positive whole-file
+      D367 SECTION 6    VALIDITY verdict to satisfy FIVE separate
+                        conditions, of which "subject = document as a whole"
+                        is ONE and "applicability_scope = whole document" is
+                        ANOTHER. classify.validity() mechanically enforces
+                        only the second.
+
+                        THIS IS NOT A NEWLY INVENTED REQUIREMENT. It is a
+                        FROZEN D367 CONDITION THAT THE MACHINE NEVER
+                        IMPLEMENTED — which is why a defect of this shape
+                        survived inside a closed defect class.
+
+POPULATION A — HISTORICAL FROZEN v1.2 OUTPUT
+NOT SUMMABLE WITH POPULATION B
+
+                        WHOLE_FILE witnesses                    167
+                        documents                          166 / 272
+                        COMMIT                                    6
+                        DATE                                    161
+                        RUN_ID                                    0
+                        SUPERSEDED_BY                             0
+                        subject distribution        SELF        167
+
+                        Confirmed historical false output from the shared
+                        subject-binding root:
+
+                        documents with false output               4
+                        false VALIDITY cells                      4
+                        false LIFECYCLE cells                     3
+                        false SCOPE cells                         0
+
+POPULATION B — CURRENT v1.3 SCOPE PROJECTION ON FROZEN SOURCE BYTES
+NOT SUMMABLE WITH POPULATION A
+NOT A FRESH v1.3 PASS A
+
+                        WHOLE_FILE witnesses                    165
+                        documents                          164 / 272
+                        frozen-record COMMIT-kind witnesses
+                          projecting WHOLE_FILE                   5
+                        DATE                                    160
+                        RUN_ID                                    0
+                        SUPERSEDED_BY                             0
+                        subject currently emitted   SELF        165
+
+                        Confirmed current semantic exposure:
+
+                        documents with false output               3
+                        false VALIDITY cells                      3
+                        false LIFECYCLE cells                     2
+                        false SCOPE cells                         0
+
+                        The three currently affected documents:
+                          kai-pm/CODE_AUDIT_FINAL_REPORT.md
+                          kai-pm/CODE_AUDIT_MASTER.md
+                          kai-pm/house_in_order_instrument/AUTHORITY_ONTOLOGY.md
+                        The current false LIFECYCLE subset is the two
+                        audit-path documents.
+
+POPULATION B —          "5 frozen-record COMMIT-kind witnesses whose tokens
+EXACT QUALIFICATION     remain admitted and whose applicability scope
+THAT MUST TRAVEL        projects to WHOLE_FILE under unchanged v1.3
+                        _eligible / _scope_of semantics."
+
+                        Witness KIND in Population B was INHERITED FROM THE
+                        FROZEN RECORD because the required non-shallow
+                        history source was unavailable and not authorised.
+                        Population B is a CURRENT v1.3 SCOPE PROJECTION ON
+                        FROZEN SOURCE BYTES. IT IS NOT A FRESH v1.3 PASS A.
+                        It must never be described as "5 v1.3 COMMIT
+                        witnesses" without this qualification.
+
+HISTORICAL / CURRENT    Two historical WHOLE_FILE witnesses project to SPAN
+DIFFERENCE              under unchanged v1.3 scope semantics:
+
+                          CODE_AUDIT_PLANNING_PACKAGE_QA.md
+                            COMMIT, "findings-bearing audited snapshot"
+                          ORION_FIELD_NOTES.md
+                            DATE, "last updated"
+
+                        The QA route is mechanically proven: the witness
+                        line start (755) is at or beyond the first H2
+                        section start (_preamble_end = 197), and
+                        passa._scope_of returns SPAN at that test BEFORE
+                        label evaluation is reached.
+
+                        The ORION_FIELD_NOTES DATE move is DENOMINATOR-ONLY
+                        for this incident: its SELF subject remains truthful
+                        and it generated none of the subject-driven false
+                        VALIDITY/LIFECYCLE outputs.
+
+CARRIED QUALIFICATION   THE CONSUMER-SIDE DEFECT IS LATENT IN THE CURRENT
+— CONSUMER LATENCY      PRODUCTION POPULATION. Producer behaviour is
+                        subject=SELF 167/167 (A) and 165/165 (B).
+
+                        THEREFORE EXISTING CORPUS ROWS CANNOT DISCRIMINATE
+                        "the consumer ignores subject" FROM "the consumer
+                        correctly requires SELF": every current witness
+                        passes either implementation.
+
+                        Consequently the eventual consumer repair MUST be
+                        proven by HOSTILE SYNTHETIC NON-SELF WITNESSES. A
+                        green replay of today's corpus is INSUFFICIENT and
+                        must not be offered as proof.
+
+CARRIED QUALIFICATION   The audited-snapshot NON-SELF ruling is a SEMANTIC
+— SEMANTIC, NOT         ruling from the source statement and the predicate's
+RESOLUTION              own declared meaning. It is NOT a claim that this
+                        shallow worktree freshly resolved
+                        2d830f25d569baa5ce955dd8d17e8f0744239876 against the
+                        required non-shallow history source.
+
+                        "Audited snapshot: default branch through findings
+                        commit X" has as its subject the audited Git
+                        snapshot. That semantic fact is independent of
+                        whether this local shallow clone can resolve X. In
+                        fact it cannot: 2d830f25... and 7adab8d2... do not
+                        resolve here; 773d21d and 9d15bcd2... do.
+
+CARRIED QUALIFICATION   NO BULK DATE ASSERTION IS MADE OR RECORDED.
+— DATE SEMANTICS
+                        No DATE witness is currently implicated in the
+                        confirmed subject-driven false-output set. DATE
+                        predicate subject semantics remain PER-PREDICATE.
+                        classify.STATE_PREDICATES admits only
+
+                          last updated - updated - version
+
+                        as state-binding predicates eligible for
+                        VALIDITY=TIME_BOUND, and excludes reviewed / last
+                        reviewed / review date / created / generated /
+                        opened / started / prepared / planning date / sent /
+                        written / closed / date, each for a ruled reason
+                        recorded in that source. Those excluded families
+                        therefore cannot currently create the subject-driven
+                        VALIDITY defect under discussion.
+
+                        "Date: is SELF" means THE DATE STATEMENT IS ABOUT
+                        THE DOCUMENT'S OWN DATE. It does NOT mean that date
+                        establishes temporal VALIDITY. Those are separate
+                        propositions and each predicate must carry its own
+                        declared subject role in any future repair.
+
+CARRIED OBLIGATION      Governed Pass A source construction requires
+— COMMIT CERTAINTY        git cat-file -e <token>^{commit}
+                        before emitting kind COMMIT, and assigns that path
+                        certainty=VERIFIED.
+
+                        THIS INVARIANT WAS NOT DISCHARGED against the
+                        historical audited-snapshot / acquisition tokens in
+                        the active shallow worktree. It remains a CARRIED
+                        CALIBRATION OBLIGATION for the authorised synthetic
+                        or non-shallow governed environment. It is NOT
+                        weakened and is NOT claimed to be freshly
+                        demonstrated here.
+
+DISCOVERED REQUIREMENT  envelope.Witness documents a subject vocabulary
+— SUBJECT GRAMMAR         SELF - OTHER:<path> - AMBIGUOUS
+NOT IMPLEMENTED         but NO RUNTIME VALIDATION OF IT EXISTS. The
+                        dimension is declared, never varied, and never read.
+
+                        The discovered non-document subjects cannot be
+                        represented by OTHER:<path>, which addresses another
+                        DOCUMENT. Kai's adjudicated V1 direction is
+
+                          SELF
+                          AMBIGUOUS
+                          OTHER:DOCUMENT:<repo-relative path>
+                          OTHER:GIT_COMMIT:<full lower-case 40-hex>
+
+                        with legacy OTHER:<path> accepted only as a
+                        transitional document-subject spelling.
+
+                        NOT IMPLEMENTED BY THIS ENTRY. The incident records
+                        the requirement. A later authorised decision, if
+                        taken, governs implementation.
+
+SUPPORTING EVIDENCE     kai-pm/house_in_order_instrument/AUTHORITY_ONTOLOGY.md
+— QUALIFICATION_SUBJECT records
+                          Subject: QUALIFICATION_SUBJECT 9d15bcd / tree 627104d6
+
+                        which resolves to
+                          commit 9d15bcd207ad7a33e1087667b245970f989e366f
+                          tree   627104d61b4f91e110a36cf65a44fed2cfbad078
+
+                        The explicit tree is exactly that commit's tree.
+                        THE TREE IS REDUNDANT SUBJECT IDENTITY, NOT A
+                        SEPARATE SUBJECT TYPE. Future canonical direction is
+                        OTHER:GIT_COMMIT:<full commit>, with any explicitly
+                        supplied tree cross-checked against the commit's
+                        tree. No GIT_COMMIT_TREE subject type is presently
+                        required.
+
+NEVER-FIRED ROUTES      passa._scope_of has SEVEN routes capable of emitting
+                        WHOLE_FILE. In BOTH populations exactly ONE fires —
+                        the labelled closed-predicate route. R1 (H1 title),
+                        R2 (explicit SELF_SUBJECT phrase), R4 (contextual
+                        root Status), R5 (root lifecycle dateline), R6 (bare
+                        dateline) and R7 (SUPERSEDED_BY, hard-coded
+                        WHOLE_FILE at passa.py:526) produce ZERO witnesses.
+
+                        Recorded because doctrine R8 applies: never-executed
+                        code is where the defects are. Subject policy for a
+                        future repair may not stop at the one route that
+                        fires.
+
+discovery               D379 M2 pre-measurement (synthetic discrimination
+                        failure) -> real frozen witness recovery -> consumer
+                        dependency map -> DeepSeek adversarial review ->
+                        full producer-route census -> corrected A/B
+                        population separation.
+
+                        The corrected A/B separation was forced by KAI, who
+                        identified that an intermediate census had mixed
+                        frozen v1.2 WHOLE_FILE membership with v1.3 route
+                        attribution in one denominator. That mixing was
+                        Orion's, it is the reason two populations are
+                        recorded separately here, and it surfaced a SECOND
+                        moved witness (ORION_FIELD_NOTES.md) that the mixed
+                        census had concealed.
+
+impact                  NO real candidate produced.
+                        NO real Stage A produced.
+                        NO real Pass A produced.
+                        NO holdout run. NO blind 40 exposed.
+                        NO admission. NO freeze.
+                        NO downstream A-4 provenance contaminated.
+
+                        The defect was discovered INSIDE HOUSE_H2
+                        pre-candidate repair, before any candidate was spent
+                        and before downstream provenance could harden the
+                        wrong subject.
+
+mechanism               NONE ASSIGNED. `INCIDENT_ONLY`.
+
+                        Expressly NOT assigned to
+                        M-POLICY-ADMISSION-DIVERGENCE, M-SCOPE-WIDEN,
+                        M-PRODUCER-CURATION, P-ADJUDICATOR-PROPAGATION or
+                        M-QUERY-OVERREACH.
+
+                        This incident concerns a PRODUCER/CONSUMER
+                        SEMANTIC-SUBJECT CONTRACT: a dimension that is
+                        declared, constant in production, unvalidated at the
+                        envelope, and untested by its consumers. That is not
+                        the policy-versus-machine-admission shape, and it is
+                        not a scope-widening shape. Mechanism adjudication
+                        comes later IF evidence earns one. Doctrine 37.
+
+control state           NO CONTROL exists that requires a declared evidence
+                        dimension to be either VALIDATED at its envelope or
+                        CONSUMED by the verdicts that depend on it. None is
+                        proposed here, and none is built by this entry.
+
+                        Recorded as the open question rather than answered:
+                        Witness.subject has existed, documented, through
+                        every H2 revision, carrying exactly one value in
+                        every record ever emitted, and no calibration ever
+                        asked why.
+```
+
+
+### Roster delta
+
+| incident | producer | status | mechanism |
+|---|---|---|---|
+| `INC-2026-09-18-31` | Orion | `INCIDENT_ONLY` / OPEN-RECORDED | none assigned — producer/consumer semantic-subject contract |
+
+**Real incidents: 31. Highest allocated: `INC-2026-09-18-31`.** Derived
+structurally from definition headings by the `INC-2026-09-17-26` method,
+run against this file before this append and returning 30 / highest
+`INC-2026-09-18-30`.
+
+**Producers: Orion 26 · Kai 2 · DeepSeek 2 · instrument 1.** The counts
+carry no fairness, quality or producer-reliability inference.
+
+**MECHANISMS — NONE ALTERED BY THIS APPEND.**
+`M-POLICY-ADMISSION-DIVERGENCE` `PATTERN_CONFIRMED`, **5 confirmed
+occurrences**, doctrine 49.6 already triggered at occurrence 3 and not
+re-triggered, generic control **NOT IMPLEMENTED**, mechanism **NOT
+CONTROLLED** · `M-SCOPE-WIDEN` `PATTERN_CONFIRMED`, 5 confirmed
+occurrences, `RECURRED_AFTER_CONTROL` · `M-PRODUCER-CURATION`,
+`P-ADJUDICATOR-PROPAGATION`, `M-QUERY-OVERREACH` `PATTERN_CANDIDATE`.
+**No mechanism assigned to this incident. No new mechanism. Doctrine 49.6
+not triggered. No D-number allocated by this entry.**
