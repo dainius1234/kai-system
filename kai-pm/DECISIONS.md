@@ -38481,3 +38481,348 @@ ALLOCATOR                  before this append: population 365, distinct 365,
 INCIDENT ALLOCATOR         33 incidents after this turn, highest
                            INC-2026-09-18-33.
 ```
+
+## D384 — 2026-09-18 — COMPLETE INC-33 HISTORICAL CLASSIFICATION FIXTURE-INPUT REPAIR ACROSS D15 AND REGRESSION_FIVE. CAL_FIXTURES ONLY. GOVERNANCE ONLY — BANKING IS NOT EXECUTION. NO STAGE-A PROPOSITION CHANGE.
+
+**Authority.** Kai's ruling of 2026-09-18 accepting Orion's line-422
+finding, relayed by Dainius, following independent verification of D383
+(`1bc7c50639671cabf4d2aad0cb4f1e2b59390ac2`, server-verified valid SSH, two
+banking paths, +369/−0, no source mutation). Allocator derived structurally
+over decision headings matching `^## D[0-9]+( +—|$)` immediately before this
+append: population **366**, distinct **366**, duplicates **none**, highest
+**D383**, `D384` count **0**, next free **D384**.
+
+**BANKING IS NOT EXECUTION.** No fixture byte changes under this entry until
+Kai releases it.
+
+---
+
+### 1. WHAT D384 IS, AND WHAT IT IS NOT
+
+**D384 DOES NOT CREATE A SECOND REPAIR MECHANISM.** It **EXTENDS** the
+already-banked `INC-2026-09-18-33` / D383 repair to the second confirmed
+call site.
+
+**THE LINE-422 FAILURE IS NOT A NEW INCIDENT.** It belongs to
+`INC-2026-09-18-33` because it shares: the same producer · the same file ·
+the same bad path-construction mechanism · the same intended historical
+artefact · the same pre-existing provenance. **`INC-34` IS NOT ALLOCATED.**
+
+**D383 IS NOT STRETCHED TO REACH IT.** D383 grants the D15 repair only and
+expressly records `regression_five()` as outside its scope. Treating line
+422 as D383-authorised would violate the banked authority itself. **D384 is
+the authority for that site; D383 is not.**
+
+---
+
+### 2. THE CORRECTED CLASS
+
+> **Every governed `cal_fixtures.py` use of the frozen v1.2
+> `h2v12-classification.json`, for D15 or for opposite-side regression
+> evidence, must resolve the SAME mechanically bound historical artefact.**
+
+**THE TWO AUTHORISED CONSUMERS ARE EXACTLY:**
+
+```
+d15()                line 362   json.load(open(HERE / "h2v12-classification.json"))
+regression_five()    line 422   json.load(open(HERE / "h2v12-classification.json"))
+```
+
+**NO OTHER FIXTURE INPUT IS OPENED BY ASSOCIATION.**
+
+**MEASURED, AND EXPRESSLY OUT OF SCOPE — the file's OTHER historical
+input.** `d15()` line 375 reads `OLD / "h2v11-classification.json"`, where
+`OLD = HERE.parent / "house_in_order_h2_v11"`. **That one RESOLVES
+CORRECTLY** — the artefact exists at
+`kai-pm/house_in_order_h2_v11/h2v11-classification.json`, Git blob
+`09cefb5f411117471f1912eee40af8bfab7b64cb`. **It is not defective, it is not
+repaired, and it is not touched.**
+
+That line is worth naming for a second reason: **the file ALREADY CONTAINS
+THE CORRECT IDIOM** for reaching a sibling frozen package. The v1.2 case
+simply never acquired the equivalent constant, and two independent path
+literals were written instead.
+
+---
+
+### 3. ONE INTERNAL FAIL-CLOSED LOADER — THE PREFERRED FORM
+
+**Two independent path literals created this defect twice. Repairing both
+with two NEW independent literals would close the instances and preserve
+the class** (R6: fix the class, not the instance).
+
+D384 authorises **ONE private internal loader** inside
+`kai-pm/house_in_order_h2_v13/cal_fixtures.py`, conceptually:
+
+```
+_load_frozen_v12_classification()
+```
+
+consumed by **BOTH** `d15()` and `regression_five()`.
+
+**THE LOADER MUST:**
+
+```
+1. resolve ONLY the sibling frozen v1.2 classification artefact
+     kai-pm/house_in_order_h2_v12/h2v12-classification.json
+2. ESTABLISH that it is the exact governed historical input, bound to
+     Git blob  ee524b47b43cfb4a0cc7bc9cb6c3c8f9ae389740
+3. FAIL CLOSED if the expected artefact cannot be established
+4. parse those exact bytes ONLY AFTER identity validation
+```
+
+**FORBIDDEN, EXPLICITLY:**
+
+```
+a generated or current v1.3 result MUST NEVER substitute
+a v13-local file of the same filename MUST NEVER win by path coincidence
+NO searching upward or downward for a convenient matching filename
+```
+
+**THE INVARIANT MADE STRUCTURAL:**
+
+```
+one historical artefact identity · one loader · two consumers
+```
+
+**This is BOUNDED CLASS REPAIR, NOT ADJACENT REFACTORING.**
+
+**IF the helper cannot be introduced without changing unrelated fixture
+semantics: STOP. DO NOT BROADEN.**
+
+---
+
+### 4. WHY "MUST NEVER SUBSTITUTE" IS NOT A STYLE PREFERENCE — MEASURED
+
+`regression_five()` asserts that the historical `EXACT_SNAPSHOT` set equals
+the six documents Kai adjudicated independently from source under D364:
+
+```
+kai-pm/CODE_AUDIT_FINAL_REPORT.md
+kai-pm/CODE_AUDIT_MASTER.md
+kai-pm/CODE_AUDIT_PLANNING_PACKAGE_QA.md
+kai-pm/UH0_EVIDENCE_MANIFEST.md
+kai-pm/SERVICE_IDENTITY_STATE.md
+kai-pm/house_in_order_instrument/AUTHORITY_ONTOLOGY.md
+```
+
+**Measured under the D382 §5 projection methodology — WHICH IS A SCOPE
+PROJECTION AND NOT A FRESH v1.3 PASS A — four of those six no longer carry
+`EXACT_SNAPSHOT` after the D381 subject repair:**
+
+```
+MOVED  EXACT_SNAPSHOT -> UNKNOWN   CODE_AUDIT_FINAL_REPORT.md
+MOVED  EXACT_SNAPSHOT -> UNKNOWN   CODE_AUDIT_MASTER.md
+MOVED  EXACT_SNAPSHOT -> UNKNOWN   CODE_AUDIT_PLANNING_PACKAGE_QA.md
+MOVED  EXACT_SNAPSHOT -> UNKNOWN   house_in_order_instrument/AUTHORITY_ONTOLOGY.md
+SAME   EXACT_SNAPSHOT              UH0_EVIDENCE_MANIFEST.md
+SAME   EXACT_SNAPSHOT              SERVICE_IDENTITY_STATE.md
+```
+
+**CONSEQUENCE, AND IT IS THE POINT:** had anyone "repaired" line 422 by
+repointing it at CURRENT v1.3 output, the control would compare a set of
+**2** against an expected set of **6** and FAIL — and the natural next move
+would have been to "update the expected set", which would have silently
+destroyed a Kai-adjudicated historical non-regression control.
+
+**THE FROZEN BINDING IS WHAT MAKES IT A HISTORICAL CONTROL AT ALL.** A
+fixture that reads today's output and compares it to today's output is a
+tautology wearing the costume of a regression test, and it would pass.
+
+**AND THE TWO SURVIVORS CORROBORATE D381 §5.2 INDEPENDENTLY.**
+`UH0_EVIDENCE_MANIFEST.md` binds through `acquisition commit` and
+`SERVICE_IDENTITY_STATE.md` through `validated checkpoint` — **exactly the
+two predicates D381 §5.2 adjudicated `SELF`**, and they are exactly the two
+that survive. That was not designed into the fixture; it fell out of the
+measurement.
+
+---
+
+### 5. FIXTURE SEMANTICS DO NOT CHANGE
+
+**D384 CHANGES ONLY HISTORICAL-INPUT ACQUISITION.**
+
+It does **NOT** change the expected answers of `D15` or `regression_five`.
+
+It does **NOT** change:
+
+```
+D1-D14 · D16-D17 · authority regression expectations ·
+the EXACT_SNAPSHOT expected set · subject semantics · scope semantics
+```
+
+**The five correctly adjudicated AUTHORITY rows remain opposite-side
+non-regression controls. The historical `EXACT_SNAPSHOT` set remains
+whatever the exact frozen v1.2 classification artefact records** — six, from
+those bytes, unchanged by anything D381 did to current behaviour.
+
+---
+
+### 6. NO NEW MUTATION PATH
+
+**D384 mutation scope, closed:**
+
+```
+kai-pm/house_in_order_h2_v13/cal_fixtures.py     and nothing else
+```
+
+No additional tracked source file. No new evidence file. **NO change under
+D384 to:**
+
+```
+envelope.py · passa.py · classify.py · run_h2_v12.py · qualify.py ·
+holdout.py · stage_identity.py · ontology.py · subjectbind.py
+```
+
+---
+
+### 7. STAGE-A GOVERNANCE REMAINS UNCHANGED
+
+**D384 changes NO Stage-A proposition.** Therefore:
+
+```
+H2_STAGE_A_V2   governance = [D379, D380, D381]   EXACT
+
+D379   608d706d8452b8e578a484f7b75331a5cb9c28d9
+D380   c50989779baf0485e2a4a5ceb2113093441691e3
+D381   838b7637058c5ba3b8f3b6c5430ebdc324249b96
+```
+
+```
+DO NOT add D382, D383 or D384 to the V2 governance list.
+No schema bump. No domain-separator change.
+No FINAL_CANDIDATE_AGGREGATE change. D367 §9 untouched.
+```
+
+**The eventual `cal_fixtures.py` byte change is captured naturally**, because
+that file is already one of the ten Stage-A `h2_sources` members (D381 §15).
+**Membership does not change; bytes do.** That is the designed behaviour.
+
+---
+
+### 8. `INC-2026-09-18-33` STATUS
+
+```
+OPEN-RECORDED / INCIDENT_ONLY / BLOCKS COMPLETE FIXTURE EXECUTION
+```
+
+**No new incident. No mechanism assignment yet.** D383 **and** D384 together
+provide the bounded repair authority; neither alone is sufficient.
+
+**INC-33 CLOSES ONLY AFTER EXECUTION DEMONSTRATES ALL OF:**
+
+```
+the complete fixture suite reaches its end
+d15 executes
+regression_five executes
+no FileNotFoundError from the historical classification input
+all governed expectations pass
+no unrelated fixture behaviour moves
+```
+
+---
+
+### 9. STOP
+
+**D384 DOES NOT AUTHORISE:** a real Stage A · a candidate · a real Pass A ·
+a real classification run · a Stage-B package · a holdout · the blind 40 ·
+admission · freeze · Item 8 · the six subject builds · KAI-GATE-048
+progression · `A-4_PROVENANCE` · `A4_SELF_DIAGNOSIS` · Control C
+integration · RC-7 · A-05 · provisioning the non-shallow history source ·
+`git fetch --unshallow` against the active worktree · any merge.
+
+**Execution of the D15 and `regression_five` repair awaits Kai's
+verification of this bank.**
+
+**PR #122 remains DO NOT MERGE. D359 governs programme order.**
+
+---
+
+### THREAD RECOVERY BLOCK — D384
+
+```
+PROGRAMME ORDER AUTHORITY  D359 §2 — cite, do not restate. House is at H2.
+ENTRY                      D384, banked 2026-09-18 on
+                           claude/project-rework-plan-pgvp35.
+                           GOVERNANCE ONLY. No source byte changed in the
+                           banking commit. BANKING IS NOT EXECUTION.
+RELATION TO D383           D384 EXTENDS the INC-33/D383 repair to the second
+                           call site. It creates NO second mechanism.
+                           D383 covers d15 ONLY and is NOT stretched;
+                           D384 is the authority for regression_five.
+                           Line 422 is NOT a new incident — same producer,
+                           file, mechanism, artefact and provenance.
+                           INC-34 NOT ALLOCATED.
+CORRECTED CLASS            every governed cal_fixtures.py use of the frozen
+                           v1.2 h2v12-classification.json must resolve the
+                           SAME mechanically bound historical artefact.
+                           Authorised consumers EXACTLY: d15() line 362 and
+                           regression_five() line 422.
+BOUND ARTEFACT             kai-pm/house_in_order_h2_v12/
+                             h2v12-classification.json
+                           Git blob ee524b47b43cfb4a0cc7bc9cb6c3c8f9ae389740
+OUT OF SCOPE — MEASURED    d15() line 375 reads OLD /
+                           "h2v11-classification.json" (blob
+                           09cefb5f411117471f1912eee40af8bfab7b64cb). It
+                           RESOLVES CORRECTLY, is NOT defective, and is NOT
+                           touched. It is also the correct sibling idiom the
+                           v1.2 case never acquired.
+PREFERRED FORM             ONE private fail-closed loader,
+                           _load_frozen_v12_classification(), consumed by
+                           BOTH sites: resolve only the sibling frozen v1.2
+                           artefact, establish the bound blob identity, FAIL
+                           CLOSED if it cannot be established, parse only
+                           after validation. One identity, one loader, two
+                           consumers. Two new independent literals would
+                           close the instances and preserve the class (R6).
+                           If the helper cannot be added without changing
+                           unrelated fixture semantics: STOP, do not broaden.
+FORBIDDEN                  a generated/current v1.3 result substituting · a
+                           v13-local file winning by path coincidence ·
+                           searching up or down for a matching filename
+WHY, MEASURED              under the D382 §5 projection (NOT a fresh v1.3
+                           Pass A), FOUR of Kai's six D364 EXACT_SNAPSHOT
+                           documents move to UNKNOWN after the D381 subject
+                           repair; only UH0_EVIDENCE_MANIFEST.md and
+                           SERVICE_IDENTITY_STATE.md survive. Repointing
+                           line 422 at current output would compare 2
+                           against an expected 6, fail, and invite someone
+                           to "update" a Kai-adjudicated historical control
+                           out of existence. The two survivors bind through
+                           `acquisition commit` and `validated checkpoint` —
+                           exactly the two predicates D381 §5.2 adjudicated
+                           SELF. Independent corroboration of the registry.
+SEMANTICS UNCHANGED        D384 changes ONLY historical-input acquisition.
+                           Expected answers of D15 and regression_five,
+                           D1-D14, D16-D17, authority regression
+                           expectations, the EXACT_SNAPSHOT expected set,
+                           subject semantics and scope semantics are all
+                           untouched.
+MUTATION SCOPE             kai-pm/house_in_order_h2_v13/cal_fixtures.py ONLY.
+                           No other tracked source file, no new evidence
+                           file. envelope/passa/classify/run_h2_v12/qualify/
+                           holdout/stage_identity/ontology/subjectbind are
+                           NOT changed under D384.
+STAGE-A GOVERNANCE         UNCHANGED at [D379, D380, D381]. D382, D383 and
+                           D384 are NONE of them added to the V2 descriptor.
+                           No schema bump, no domain-separator change, no
+                           FINAL_CANDIDATE_AGGREGATE change, D367 §9
+                           untouched. cal_fixtures.py is already one of the
+                           ten h2_sources, so its byte change is captured
+                           when a real Stage A is authorised.
+INC-33                     OPEN-RECORDED / INCIDENT_ONLY / BLOCKS COMPLETE
+                           FIXTURE EXECUTION. Mechanism NONE ASSIGNED.
+                           D383 + D384 together are the repair authority.
+                           Closes only on the six execution conditions in §8.
+INC-32                     OPEN, until the executed derivation and
+                           SB-SCOPE-ALL pass. Unaffected by this entry.
+AUTHORISES                 NOTHING to execute. The repair awaits Kai's
+                           verification of this bank.
+NOT GREEN                  repository and PR #122. DO NOT MERGE.
+ALLOCATOR                  before this append: population 366, distinct 366,
+                           duplicates none, highest D383, D384 count 0, next
+                           free D384. After: next free D385 — NOT TO BE
+                           TAKEN without authorisation.
+INCIDENT ALLOCATOR         33 incidents, highest INC-2026-09-18-33.
+                           UNCHANGED by this entry.
+```
