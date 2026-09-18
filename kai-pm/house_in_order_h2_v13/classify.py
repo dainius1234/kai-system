@@ -172,6 +172,12 @@ def _state_binding_witnesses(row):
     """
     return [(Witness(**w), lab) for w in row["witnesses"].get("DATE", [])
             if w["applicability_scope"] == "WHOLE_FILE"
+            # D381 8: TIME_BOUND is a POSITIVE whole-file VALIDITY route,
+            # so it carries the same subject requirement as the COMMIT and
+            # RUN_ID routes. Repairing only the COMMIT path and leaving a
+            # positive route able to consume non-SELF evidence is expressly
+            # forbidden.
+            and E.subject_is_self(w["subject"])
             and (lab := _predicate_of(w)) in STATE_PREDICATES]
 
 
@@ -213,6 +219,45 @@ def _binding_witness(row, *kinds):
     return None
 
 
+def _self_binding_witness(row, *kinds):
+    """A witness that is BOTH applicable to the whole document AND whose
+    semantic subject is the document. D381 8.
+
+    A SEPARATE HELPER, AND THAT IS THE POINT. `_binding_witness` above is
+    NOT globally subject-filtered, because SCOPE carries no SELF
+    requirement: an audit report whose subject is the audited tree still
+    applies to the whole report. A global filter inside the shared helper
+    would silently move SCOPE verdicts -- the same collateral the M1
+    repair avoided for the same reason.
+
+    Subject policy is therefore EXPLICIT PER CONSUMING AXIS. The cost of
+    the alternative is that a future axis forgets which it needs; the cost
+    of this is one more named function.
+
+    THE SCAN CONTINUES PAST A NON-SELF WITNESS. Returning the first
+    WHOLE_FILE witness and then testing its subject would let a non-SELF
+    witness in source position 1 mask a genuine SELF witness at position 2.
+    """
+    for k in kinds:
+        for w in row["witnesses"].get(k, []):
+            if (w["applicability_scope"] == "WHOLE_FILE"
+                    and E.subject_is_self(w["subject"])):
+                return Witness(**w)
+    return None
+
+
+def _nonself_binding_witnesses(row, *kinds):
+    """The whole-file witnesses REFUSED on subject, for the abstention.
+
+    R10/R13: the observation that made the axis abstain travels with the
+    abstention. "No SELF-bound witness" and "a witness exists and binds a
+    different subject" are different findings and must not read alike.
+    """
+    return [Witness(**w) for k in kinds for w in row["witnesses"].get(k, [])
+            if w["applicability_scope"] == "WHOLE_FILE"
+            and not E.subject_is_self(w["subject"])]
+
+
 # ── SCOPE (D6, D7) ────────────────────────────────────────────────────
 def scope(row):
     w = _binding_witness(row, "COMMIT", "RUN_ID", "DATE", "SUPERSEDED_BY")
@@ -223,9 +268,17 @@ def scope(row):
             "SCOPE is EARNED or absent. v1.1 emitted WHOLE_FILE as a "
             "'file-level default' on 272 of 272 rows; a value emitted "
             "when nothing was measured is a claim, not a measurement.")
+    # D381 8, RATIONALE TRUTH CORRECTION AND NOTHING ELSE. The VALUE and
+    # the population are unchanged. The old wording said the witness's
+    # SUBJECT is the document as a whole; SCOPE measures APPLICABILITY,
+    # which is a different dimension, and a witness whose subject is an
+    # audited tree can still apply to the whole report. That sentence was
+    # the conflation INC-31 named, sitting inside the verdict it explains.
     return E.claim(w, "WHOLE_FILE", scope="WHOLE_FILE",
-                   rationale="a structured binding whose subject is the "
-                             "document as a whole")
+                   rationale="a structured binding whose APPLICABILITY is "
+                             "the document as a whole (its semantic "
+                             f"subject is {w.subject!r}; SCOPE does not "
+                             "require SELF)")
 
 
 # ── VALIDITY (D1-D5) ──────────────────────────────────────────────────
@@ -239,12 +292,40 @@ def validity(row, contradiction):
             "an assertion the evidence refutes is an assertion plus a "
             "contradiction, not a verdict")
 
+    # D381 8. D367 6 lists FOUR SEPARATE conditions for a positive
+    # whole-file VALIDITY route: explicit document-level binding WHOSE
+    # SUBJECT IS THE DOCUMENT, a verified witness kind, whole-document
+    # applicability, and no unresolved material contradiction. The machine
+    # implemented every condition except the first, and the first is the
+    # one INC-31 is about.
     for kinds, value in (("RUN_ID",), "RUN_ARTEFACT"), (("COMMIT",), "EXACT_SNAPSHOT"):
-        w = _binding_witness(row, *kinds)
+        w = _self_binding_witness(row, *kinds)
         if w is not None:
             return E.claim(w, value, scope="WHOLE_FILE",
-                           rationale=f"document-level binding, witness kind "
-                                     f"VERIFIED as {w.witness_type}")
+                           rationale=f"document-level binding whose semantic "
+                                     f"subject is the document itself, "
+                                     f"witness kind VERIFIED as "
+                                     f"{w.witness_type}")
+    # D381 8. The INC-31 abstention, and it is a DISTINCT observation from
+    # every other one here: a verified whole-file snapshot witness EXISTS,
+    # and it binds a subject that is not this document. Collapsing it into
+    # "no binding witness" would hide exactly the finding that earned the
+    # repair.
+    misbound = _nonself_binding_witnesses(row, "RUN_ID", "COMMIT")
+    if misbound:
+        return E.abstain(
+            "VALIDITY", "a document-level binding witness of a verified "
+                        "kind WHOSE SEMANTIC SUBJECT IS THIS DOCUMENT",
+            "whole-file witnesses present, none SELF-bound: "
+            + str([(w.witness_type, w.source_selector, w.subject)
+                   for w in misbound]),
+            "the witness applies to the whole document and is evidence "
+            "ABOUT SOMETHING ELSE — the snapshot the document audits, or "
+            "the tree it measures. Evidence about an artefact a document "
+            "DESCRIBES is evidence about that artefact, and it cannot "
+            "establish the document's own temporal validity (D367 6, "
+            "INC-2026-09-18-31).")
+
     # M1. A document-scoped DATE is NECESSARY and NOT SUFFICIENT. The
     # verdict is decided by the qualified SET, never by which member of
     # it Pass A emitted first.
@@ -293,6 +374,8 @@ def function(row, text):
                     source_path=path, source_selector="L1",
                     local_context=title[:120] or "(no title)",
                     applicability_scope="WHOLE_FILE",
+                    # the byte count and path role OF THIS FILE
+                    subject=E.SUBJECT_SELF,
                     evidence_total=1, evidence_shown=1, truncated=False,
                     polarity="POSITIVE", certainty="VERIFIED")
         return E.claim(w, "MARKER", rationale="objective: byte count and "
@@ -360,13 +443,38 @@ def lifecycle(*, path, superseded_by, snapshot_witness, blocked):
                        rationale="an explicitly named successor document")
     if snapshot_witness is not None and AUDIT_PATH.search(path):
         w = Witness(**snapshot_witness)
+        # M2 / D379 mechanism 1, now IMPLEMENTED rather than merely stated.
+        # D379 already held the substantive proposition -- a COMMIT witness
+        # may determine LIFECYCLE only where THE DOCUMENT ITSELF is the
+        # semantic subject -- but it did not authorise this file, so the
+        # predicate had no place to live. D381 supplies the surface.
+        #
+        # THE GATE IS HERE, INSIDE THE AXIS, not at the call site. This
+        # function is keyword-only and is called directly by the hostile
+        # controls; a gate applied only where `classify()` selects the
+        # witness would leave the axis itself able to emit HISTORICAL from
+        # non-SELF evidence, which is the defect, not the repair.
+        if not E.subject_is_self(w.subject):
+            return E.abstain(
+                "LIFECYCLE", "a snapshot witness whose semantic subject is "
+                             "THIS document",
+                f"snapshot witness {w.witness_type} {w.source_selector} "
+                f"binds subject {w.subject!r}",
+                "an audit report's snapshot commit is the tree it AUDITS. "
+                "That commit's history is the audited tree's lifecycle, "
+                "not the report's. Evidence about an artefact the document "
+                "describes is evidence about that artefact (D379 "
+                "mechanism 1, INC-2026-09-18-31).")
         return E.claim(w, "HISTORICAL",
                        rationale="an audit artefact bound to a VERIFIED "
-                                 "snapshot commit at document scope")
+                                 "snapshot commit at document scope, whose "
+                                 "semantic subject is the document itself")
     if DATED_ARTEFACT.search(path):
         w = Witness(witness_type="DATED_ARTEFACT_PATH", witness_value=path,
                     source_path=path, source_selector="path",
                     local_context=path, applicability_scope="WHOLE_FILE",
+                    # the path OF THIS DOCUMENT encodes its own dating
+                    subject=E.SUBJECT_SELF,
                     evidence_total=1, evidence_shown=1, truncated=False,
                     polarity="POSITIVE", certainty="OBSERVED")
         return E.claim(w, "HISTORICAL",

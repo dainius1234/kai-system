@@ -99,7 +99,15 @@ GENUINE_ROUTE_TEXT = (
 
 
 def _commit_witness(text, path):
-    """Build the COMMIT witness exactly as passa.scan() builds one."""
+    """Build the COMMIT witness exactly as passa.scan() builds one.
+
+    D381: that now includes the SUBJECT, derived by the same governed
+    producer function `passa._subject_of`. The token is a full 40-hex
+    commit, so a NONSELF_GIT_COMMIT policy can name its subject exactly
+    without consulting a history source -- `resolve` returns the literal
+    token. No git call, and no synthetic subject invented here: the
+    control asks the producer, it does not answer for it.
+    """
     m = passa.HEX.search(text)
     assert m is not None and m.group(0) == COMMIT
     assert passa._eligible(m)
@@ -109,6 +117,8 @@ def _commit_witness(text, path):
         source_selector=passa._selector(text, m.start()),
         local_context=passa._context(text, m.start(), m.end()),
         applicability_scope=passa._scope_of(head, m.start(), "HEX"),
+        subject=passa._subject_of(head, m.start(), "HEX",
+                                  resolve=lambda: COMMIT),
         evidence_total=1, evidence_shown=1, truncated=False,
         polarity="POSITIVE", certainty="VERIFIED")
 
@@ -162,8 +172,13 @@ def section_M2():
     print(f"  LIMB I  {'PASS' if limb1 else 'FAIL'}"
           f"     LIMB II {'PASS' if limb2 else 'FAIL'}")
     if limb1 and limb2:
-        print("  M2 PREDICATE SATISFIED — no M2 semantic edit is authorised.")
-        print("  M2 discrimination DEMONSTRATED.")
+        print("  M2 PREDICATE SATISFIED — discrimination DEMONSTRATED.")
+        print("  SAY WHICH TREE THIS IS TRUE OF. Against UNCHANGED v1.3 this")
+        print("  predicate FAILED: both limbs classified HISTORICAL, which is")
+        print("  what INC-2026-09-18-31 records and what D381 was banked to")
+        print("  repair. It passes here because the governed subject gate is")
+        print("  now IMPLEMENTED in classify.lifecycle. This is a pass-new")
+        print("  reading, not evidence that the defect was never present.")
     else:
         print("  M2 PREDICATE NOT SATISFIED — the bounded A3-i correction is")
         print("  the ONLY authorised semantic mutation. No adjacent cleanup,")

@@ -60,6 +60,7 @@ import pathlib
 import re
 import subprocess
 import sys
+import typing
 
 HERE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
@@ -95,37 +96,143 @@ SUPES = re.compile(r"\bsupersedes\b", re.I)
 # not derived -- there is no tree to derive it from -- so it is declared
 # closed-world, carries a rationale per entry, and cal_fixtures.py holds
 # a known-negative for each family it must NOT match.
+#
+# D381 5.1 -- ONE GOVERNED REGISTRY. Every entry carries BOTH its
+# document-binding rationale AND its subject policy, because a predicate
+# is INSEPARABLE from its subject semantics. A second free-standing
+# subject map beside this one is expressly forbidden: that is a list kept
+# beside the thing it governs (R5), and it is how INC-31 survived --
+# `audited snapshot` granted whole-document APPLICABILITY while nothing
+# anywhere recorded that its SUBJECT is the audited tree, not the
+# document.
+
+# The recognised subject policies. A policy outside this set REFUSES.
+POLICY_SELF = "SELF"
+POLICY_AMBIGUOUS = "AMBIGUOUS"
+POLICY_NONSELF_GIT_COMMIT = "NONSELF_GIT_COMMIT"
+SUBJECT_POLICIES = (POLICY_SELF, POLICY_AMBIGUOUS, POLICY_NONSELF_GIT_COMMIT)
+
+
+class SubjectPolicyError(AssertionError):
+    """A binding predicate reached the producer without usable subject
+    semantics. D381 5.3: REFUSE -- never default SELF, never silently
+    default AMBIGUOUS."""
+
+
+class Binding(typing.NamedTuple):
+    rationale: str
+    subject_policy: str
+
+
 BINDING_PREDICATES = {
-    r"audited snapshot": "the document states the snapshot it audits",
-    r"acquisition commit": "the document states the commit it was taken at",
-    r"validated checkpoint": "the document states its validated point",
-    r"findings-bearing[^:]*snapshot": "the document states its findings base",
-    r"subject": "the document names its measurement subject",
-    r"measured at": "the document states its measurement point",
-    r"snapshot": "the document states its snapshot",
-    r"last updated": "the document states its own currency",
-    r"last reviewed": "the document states its own review point",
-    r"reviewed": "the document states its own review point",
-    r"planning date": "the document states its own authoring date",
-    r"date": "the document states its own date",
-    r"version": "the document states its own version point",
+    # NON-SELF. The label grants document-level APPLICABILITY and names a
+    # subject that is NOT this document. This is the INC-31 class.
+    r"audited snapshot": Binding(
+        "the document states the snapshot it audits",
+        POLICY_NONSELF_GIT_COMMIT),
+    r"findings-bearing[^:]*snapshot": Binding(
+        "the document states its findings base",
+        POLICY_NONSELF_GIT_COMMIT),
+    r"subject": Binding(
+        "the document names its measurement subject",
+        POLICY_NONSELF_GIT_COMMIT),
+    # SELF, for the CURRENTLY ADJUDICATED SOURCE FORMS. UH0_EVIDENCE_-
+    # MANIFEST.md states an immutable baseline acquired at that commit;
+    # SERVICE_IDENTITY_STATE.md states the authoritative engineering state
+    # at that checkpoint. The adjudication is of those forms, not of the
+    # words in the abstract.
+    r"acquisition commit": Binding(
+        "the document states the commit it was taken at", POLICY_SELF),
+    r"validated checkpoint": Binding(
+        "the document states its validated point", POLICY_SELF),
+    # AMBIGUOUS, EXPLICITLY AND BY RULING. Both have ZERO occurrences in
+    # the subject. A valid SHA token proves WHAT COMMIT WAS MENTIONED; it
+    # does not prove whether that commit is the document's own validity
+    # point or an external measurement target, so neither may earn SELF
+    # from the label alone. AMBIGUOUS here is a GOVERNED POLICY, not a
+    # fallback -- D381 5.3 forbids reaching it by default.
+    r"measured at": Binding(
+        "the document states its measurement point", POLICY_AMBIGUOUS),
+    r"snapshot": Binding(
+        "the document states its snapshot", POLICY_AMBIGUOUS),
+    # The DATE / current-state families. Their per-predicate governed role
+    # is unchanged: the statement is about THIS document's own date,
+    # currency, version or lifecycle point. D381 6 preserves the separate
+    # question of whether such a date ESTABLISHES VALIDITY -- being SELF
+    # is necessary there and is not sufficient.
+    r"last updated": Binding(
+        "the document states its own currency", POLICY_SELF),
+    r"last reviewed": Binding(
+        "the document states its own review point", POLICY_SELF),
+    r"reviewed": Binding(
+        "the document states its own review point", POLICY_SELF),
+    r"planning date": Binding(
+        "the document states its own authoring date", POLICY_SELF),
+    r"date": Binding(
+        "the document states its own date", POLICY_SELF),
+    r"version": Binding(
+        "the document states its own version point", POLICY_SELF),
     # CYCLE 4. Document-lifecycle predicates, source-confirmed in the
     # accepted regression set. Same declared closed-world standing and
     # the same form of rationale as the entries above.
-    r"created": "the document states its own creation point",
-    r"generated": "the document states its own generation point",
-    r"opened": "the document states when it was opened",
-    r"updated": "the document states its own currency",
-    r"finali[sz]ed": "the document states its own completion point",
-    r"report completed": "the document states its own completion point",
-    r"(?:log|register) started": "the document states when its record began",
-    r"started": "the document states when its record began",
-    r"prepared": "the document states its own preparation point",
-    r"review date": "the document states its own review point",
-    r"sent": "the document states when it was sent",
-    r"written": "the document states when it was written",
-    r"agreed": "the document states when it was agreed",
+    r"created": Binding(
+        "the document states its own creation point", POLICY_SELF),
+    r"generated": Binding(
+        "the document states its own generation point", POLICY_SELF),
+    r"opened": Binding(
+        "the document states when it was opened", POLICY_SELF),
+    r"updated": Binding(
+        "the document states its own currency", POLICY_SELF),
+    r"finali[sz]ed": Binding(
+        "the document states its own completion point", POLICY_SELF),
+    r"report completed": Binding(
+        "the document states its own completion point", POLICY_SELF),
+    r"(?:log|register) started": Binding(
+        "the document states when its record began", POLICY_SELF),
+    r"started": Binding(
+        "the document states when its record began", POLICY_SELF),
+    r"prepared": Binding(
+        "the document states its own preparation point", POLICY_SELF),
+    r"review date": Binding(
+        "the document states its own review point", POLICY_SELF),
+    r"sent": Binding(
+        "the document states when it was sent", POLICY_SELF),
+    r"written": Binding(
+        "the document states when it was written", POLICY_SELF),
+    r"agreed": Binding(
+        "the document states when it was agreed", POLICY_SELF),
 }
+
+
+def validate_registry(registry=None):
+    """D381 5.3, enforced AT IMPORT and re-runnable as a control.
+
+    > No binding predicate may exist in the governed registry without an
+    > explicit recognised subject policy / resolver.
+
+    Missing policy, unknown policy or a malformed entry REFUSES. There is
+    no default SELF and no silent default to AMBIGUOUS -- AMBIGUOUS is a
+    governed policy that an entry must CLAIM.
+    """
+    reg = BINDING_PREDICATES if registry is None else registry
+    for pattern, entry in reg.items():
+        if not isinstance(entry, Binding):
+            raise SubjectPolicyError(
+                f"binding predicate {pattern!r} carries {entry!r}, not a "
+                f"Binding(rationale, subject_policy). A predicate added "
+                f"without its subject semantics is REFUSED (D381 5.3/5.4).")
+        if not entry.rationale:
+            raise SubjectPolicyError(
+                f"binding predicate {pattern!r} has no rationale")
+        if entry.subject_policy not in SUBJECT_POLICIES:
+            raise SubjectPolicyError(
+                f"binding predicate {pattern!r} has subject policy "
+                f"{entry.subject_policy!r}, which is not one of "
+                f"{SUBJECT_POLICIES}. REFUSED — no default is applied.")
+    return len(reg)
+
+
+validate_registry()
 # The POSITIVE semantic authority for INPUT 3 at document root. Cycle 3
 # declared these predicates document-binding and then rejected several of
 # them through ARTEFACT_LABEL because their VALUES are artefacts --
@@ -318,13 +425,65 @@ def _contextual_document_metadata(text, ls, lab, line):
     return not EMBEDDED_SUBJECT.search(value)               # 5
 
 
-def _scope_of(text, start, detector=None):
-    """WHOLE_FILE iff BOTH conjuncts of the Rev4 rule hold, derived
-    separately. Uniqueness (INPUT 2) never promotes on its own.
+# ── D381 7: THE SEVEN WHOLE_FILE PRODUCER ROUTES, NAMED ───────────────
+# SIX are decided here in _route_of; the seventh, R7_SUPERSEDED_BY, is
+# hard-coded WHOLE_FILE in scan() and never reaches this function.
+#
+# In BOTH measured populations exactly ONE fires: R3. R1, R2, R4, R5, R6
+# and R7 produce ZERO witnesses -- which is why each needs explicit
+# subject semantics and hostile coverage rather than an assumption. R8:
+# never-executed code is where the defects are, and a dormant route is
+# not exempt because it is dormant.
+ROUTE_R1_H1 = "R1_H1"
+ROUTE_R2_SELF_SUBJECT = "R2_SELF_SUBJECT"
+ROUTE_R3_LABELLED = "R3_LABELLED"
+ROUTE_R4_CONTEXTUAL = "R4_CONTEXTUAL"
+ROUTE_R5_ROOT_LIFECYCLE = "R5_ROOT_LIFECYCLE"
+ROUTE_R6_BARE_DATELINE = "R6_BARE_DATELINE"
+ROUTE_R7_SUPERSEDED_BY = "R7_SUPERSEDED_BY"
+# Non-promoting routes. They return SPAN, and they still need an explicit
+# subject answer, because "this witness did not earn document scope" is
+# not the same statement as "this witness is about the document".
+ROUTE_TABLE_ROW = "TABLE_ROW"
+ROUTE_IN_SECTION = "IN_SECTION"
+ROUTE_LABELLED_REPEATED = "LABELLED_REPEATED"
+ROUTE_LABELLED_UNBOUND = "LABELLED_UNBOUND"
+ROUTE_UNLABELLED = "UNLABELLED"
 
-    `detector` gates the bare-dateline route only (cycle 5). It is NOT a
-    scope input anywhere else: Rev4 excludes it, and every other route
-    here decides on structure and subject alone.
+# The subject policy of each route, for a witness NO governed binding
+# predicate labels. EXPLICIT AND TOTAL -- a route missing from this table
+# REFUSES rather than inheriting anything.
+ROUTE_SUBJECT_POLICY = {
+    # D381 7: scope may be WHOLE_FILE, but the subject is NOT
+    # automatically SELF merely because the token sits in the H1. Fail
+    # closed unless SELF is earned some other way.
+    ROUTE_R1_H1: POLICY_AMBIGUOUS,
+    # the matched statement mechanically establishes SELF ("this document")
+    ROUTE_R2_SELF_SUBJECT: POLICY_SELF,
+    # decided by the registry; present here only for totality
+    ROUTE_R3_LABELLED: POLICY_AMBIGUOUS,
+    ROUTE_LABELLED_REPEATED: POLICY_AMBIGUOUS,
+    # the five contextual conditions already establish DOCUMENT-LEVEL STATE
+    ROUTE_R4_CONTEXTUAL: POLICY_SELF,
+    ROUTE_R5_ROOT_LIFECYCLE: POLICY_SELF,
+    ROUTE_R6_BARE_DATELINE: POLICY_SELF,
+    ROUTE_R7_SUPERSEDED_BY: POLICY_SELF,
+    # no governed predicate spoke for these, so no subject was established
+    ROUTE_TABLE_ROW: POLICY_AMBIGUOUS,
+    ROUTE_IN_SECTION: POLICY_AMBIGUOUS,
+    ROUTE_LABELLED_UNBOUND: POLICY_AMBIGUOUS,
+    ROUTE_UNLABELLED: POLICY_AMBIGUOUS,
+}
+
+
+def _route_of(text, start, detector=None):
+    """(scope, route, label) -- the Rev4 decision, with its ROUTE named.
+
+    THE SCOPE ANSWER IS BIT-FOR-BIT THE PRE-D381 ONE. The body below is
+    the previous `_scope_of` with a route label attached to each return;
+    no condition, no order and no threshold moved. D381 20.3 requires
+    that the subject repair leave `_eligible`/`_scope_of` membership
+    unchanged, so the scope decision is deliberately not touched here.
     """
     ls = text.rfind("\n", 0, start) + 1
     le = text.find("\n", start)
@@ -333,17 +492,17 @@ def _scope_of(text, start, detector=None):
 
     # INPUT 4. A table row's subject is the row.
     if TABLE_ROW.match(line):
-        return "SPAN"
+        return "SPAN", ROUTE_TABLE_ROW, None
     # INPUT 1. Inside an H2+ section the section is a nearer subject.
     if ls >= _preamble_end(text):
-        return "SPAN"
+        return "SPAN", ROUTE_IN_SECTION, _label_of(before)
 
     # ---- document root ----
     m1 = H1.search(text)
     if m1 and m1.start() == ls:                 # the document names itself
-        return "WHOLE_FILE"
+        return "WHOLE_FILE", ROUTE_R1_H1, None
     if SELF_SUBJECT.search(line):               # INPUT 3, explicit
-        return "WHOLE_FILE"
+        return "WHOLE_FILE", ROUTE_R2_SELF_SUBJECT, None
 
     lab = _label_of(before)
     if lab is not None:
@@ -352,7 +511,9 @@ def _scope_of(text, start, detector=None):
         if DOC_BINDING.match(lab):
             # INPUT 2, and only now: one document-level field, or a
             # repeated per-entry stamp?
-            return "WHOLE_FILE" if _label_hits(text, lab) <= 1 else "SPAN"
+            if _label_hits(text, lab) <= 1:
+                return "WHOLE_FILE", ROUTE_R3_LABELLED, lab
+            return "SPAN", ROUTE_LABELLED_REPEATED, lab
         # CYCLE 6. Failing the INTRINSIC test is a failed conjunct, NOT a
         # terminal veto. Absence of intrinsic document-binding evidence is
         # not proof of local scope, so the remaining authorised evidence is
@@ -365,16 +526,123 @@ def _scope_of(text, start, detector=None):
         # declared its own predicate, and letting it reach those routes
         # would widen the repair past the class Kai demonstrated.
         if _contextual_document_metadata(text, ls, lab, line):
-            return "WHOLE_FILE"
-        return "SPAN"
+            return "WHOLE_FILE", ROUTE_R4_CONTEXTUAL, lab
+        return "SPAN", ROUTE_LABELLED_UNBOUND, lab
 
     # INPUT 3 without a colon: a root lifecycle dateline.
     if ROOT_LIFECYCLE.search(before):
-        return "WHOLE_FILE"
+        return "WHOLE_FILE", ROUTE_R5_ROOT_LIFECYCLE, None
     if BARE_DATELINE.match(before) and detector in DATELINE_DETECTORS:
-        return "WHOLE_FILE"
+        return "WHOLE_FILE", ROUTE_R6_BARE_DATELINE, None
 
-    return "SPAN"
+    return "SPAN", ROUTE_UNLABELLED, None
+
+
+def _scope_of(text, start, detector=None):
+    """WHOLE_FILE iff BOTH conjuncts of the Rev4 rule hold, derived
+    separately. Uniqueness (INPUT 2) never promotes on its own.
+
+    `detector` gates the bare-dateline route only (cycle 5). It is NOT a
+    scope input anywhere else: Rev4 excludes it, and every other route
+    here decides on structure and subject alone.
+
+    The signature and the answer are UNCHANGED by D381. Eight files under
+    build_evidence/ call this with (head, offset, detector) and several
+    compare its output against committed pre-repair bytes; it stays a
+    pure scope predicate so those comparisons keep meaning what they meant.
+    """
+    return _route_of(text, start, detector)[0]
+
+
+def registry_lookup(label):
+    """The governed Binding for `label`, or None if no binding predicate
+    claims it.
+
+    FAILS CLOSED ON AMBIGUITY. If two declared patterns both fullmatch a
+    label the registry does not speak with one voice about that label, and
+    guessing which entry wins would be the defect this registry exists to
+    prevent.
+    """
+    if label is None:
+        return None
+    hits = [(p, e) for p, e in BINDING_PREDICATES.items()
+            if re.fullmatch(p, label, re.I)]
+    if not hits:
+        return None
+    if len(hits) > 1:
+        raise SubjectPolicyError(
+            f"label {label!r} is claimed by {len(hits)} binding predicates "
+            f"{[p for p, _ in hits]} — REFUSED. The governed registry must "
+            f"give one answer per label (D381 5.1).")
+    return hits[0][1]
+
+
+def _apply_policy(policy, *, resolve=None):
+    """A governed subject policy -> a grammar-valid subject string.
+
+    `resolve` is a zero-argument callable returning the FULL 40-hex commit
+    the witness token names, or None. It is a callable rather than a value
+    so the declared history source is consulted ONLY on the one policy
+    that needs it -- a SELF-policy date must not cost a subprocess.
+
+    NONSELF_GIT_COMMIT needs the full commit to name its subject in the
+    closed grammar. Where the token is abbreviated, or the declared
+    history source could not resolve it, the honest answer is AMBIGUOUS:
+    we know the subject is not this document, and we cannot name it. It
+    still cannot earn a SELF-gated verdict, so failing closed here costs
+    precision in the trace and nothing in the verdict.
+    """
+    if policy == POLICY_SELF:
+        return "SELF"
+    if policy == POLICY_AMBIGUOUS:
+        return "AMBIGUOUS"
+    if policy == POLICY_NONSELF_GIT_COMMIT:
+        resolved = resolve() if resolve is not None else None
+        if resolved and re.fullmatch(r"[0-9a-f]{40}", resolved):
+            return f"OTHER:GIT_COMMIT:{resolved}"
+        return "AMBIGUOUS"
+    raise SubjectPolicyError(
+        f"subject policy {policy!r} is not recognised — REFUSED. No "
+        f"default SELF and no silent default AMBIGUOUS (D381 5.3).")
+
+
+def _subject_of(text, start, detector=None, *, resolve=None):
+    """THE SEMANTIC SUBJECT of a witness at `start`. D381 5.
+
+    Determined ONCE, here, at the governed producer boundary, from the
+    source context -- never re-derived downstream (D381 5.5).
+
+    A GOVERNED BINDING PREDICATE DECIDES WHEREVER ONE LABELS THE WITNESS,
+    at any scope. That is deliberate and it is not the same question as
+    scope: an `**Audited snapshot:**` field inside an H2 section does not
+    earn document-level APPLICABILITY, but its SUBJECT is still the
+    audited tree. Only where no governed predicate speaks does the
+    producing route answer.
+    """
+    _scope, route, label = _route_of(text, start, detector)
+    entry = registry_lookup(label)
+    if entry is not None:
+        return _apply_policy(entry.subject_policy, resolve=resolve)
+    if route not in ROUTE_SUBJECT_POLICY:
+        raise SubjectPolicyError(
+            f"route {route!r} has no declared subject policy — REFUSED.")
+    return _apply_policy(ROUTE_SUBJECT_POLICY[route], resolve=resolve)
+
+
+def full_commit(history_repo, token):
+    """The full 40-hex commit a token names, or None.
+
+    Separate from `classify_token_kind` on purpose: that function's
+    contract (kind, is_commit) is consumed by cal_fixtures and by the
+    committed control files, and widening its arity would change a
+    surface D381 did not open. This only ever runs for a token the same
+    declared history source has ALREADY resolved as a commit.
+    """
+    r = git(history_repo, "rev-parse", "--verify", f"{token}^{{commit}}")
+    if r.returncode != 0:
+        return None
+    out = r.stdout.strip()
+    return out if re.fullmatch(r"[0-9a-f]{40}", out) else None
 
 
 def git(repo, *a):
@@ -483,11 +751,16 @@ def scan(path, text, history_repo, subject):
         if not _eligible(m):
             continue
         kind, is_commit = classify_token_kind(text, m, history_repo, subject)
+        tok = m.group(0)
         out["COMMIT" if is_commit else kind].append(Witness(
-            witness_type=kind, witness_value=m.group(0), source_path=path,
+            witness_type=kind, witness_value=tok, source_path=path,
             source_selector=_selector(text, m.start()),
             local_context=_context(text, m.start(), m.end()),
             applicability_scope=_scope_of(head, m.start(), "HEX"),
+            subject=_subject_of(
+                head, m.start(), "HEX",
+                resolve=(lambda t=tok: full_commit(history_repo, t))
+                if is_commit else None),
             evidence_total=1, evidence_shown=1, truncated=False,
             polarity="POSITIVE", certainty="VERIFIED" if is_commit else "OBSERVED"))
 
@@ -503,6 +776,7 @@ def scan(path, text, history_repo, subject):
             source_selector=_selector(text, m.start()),
             local_context=_context(text, m.start(), m.end()),
             applicability_scope=_scope_of(head, m.start(), "DECIMAL_RUN"),
+            subject=_subject_of(head, m.start(), "DECIMAL_RUN"),
             evidence_total=1, evidence_shown=1, truncated=False,
             polarity="POSITIVE", certainty="OBSERVED"))
 
@@ -514,6 +788,7 @@ def scan(path, text, history_repo, subject):
             source_path=path, source_selector=_selector(text, m.start()),
             local_context=_context(text, m.start(), m.end()),
             applicability_scope=_scope_of(head, m.start(), "DATE"),
+            subject=_subject_of(head, m.start(), "DATE"),
             evidence_total=1, evidence_shown=1, truncated=False,
             polarity="POSITIVE", certainty="OBSERVED"))
 
@@ -524,6 +799,13 @@ def scan(path, text, history_repo, subject):
             source_path=path, source_selector=_selector(text, m.start()),
             local_context=_context(text, m.start(), m.end()),
             applicability_scope="WHOLE_FILE",   # supersession is file-level
+            # R7, the seventh WHOLE_FILE producer route and the only one
+            # decided outside _route_of. Its subject is SELF: the witness
+            # concerns THIS document's own successor relation, not the
+            # successor document. D381 7 requires it to say so explicitly
+            # rather than inherit SELF from a dataclass default, exactly
+            # as the six routes in _route_of now do.
+            subject=_apply_policy(ROUTE_SUBJECT_POLICY[ROUTE_R7_SUPERSEDED_BY]),
             evidence_total=1, evidence_shown=1, truncated=False,
             polarity="POSITIVE", certainty="OBSERVED"))
     return dict(out)

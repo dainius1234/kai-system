@@ -73,12 +73,24 @@ def old(snippet):
 
 
 def w(**kw):
+    """A fixture witness. `subject` HAS NO DEFAULT HERE EITHER.
+
+    D381 5.5 / INC-31: a default subject in a fixture builder is the same
+    defect as a default subject in the producer, and it is worse, because
+    a fixture is what would have caught it. Every call site below states
+    the subject the source language actually supports.
+    """
     d = dict(witness_type="commit_sha", witness_value="97a3a61",
              source_path="x.md", source_selector="L30",
              local_context="J1-J7 are DONE (see commit 97a3a61)",
              applicability_scope="SPAN", evidence_total=1, evidence_shown=1,
              truncated=False, polarity="POSITIVE")
     d.update(kw)
+    if "subject" not in d:
+        raise AssertionError(
+            "cal_fixtures.w(): subject not stated. State it explicitly — "
+            "a fixture that inherits a subject cannot discriminate a "
+            "correct implementation from the INC-31 one.")
     return Witness(**d)
 
 
@@ -99,17 +111,38 @@ def d1():
             '"present_tense":False})))')
     check("D1a FAIL-OLD: committed v1.1 emits EXACT_SNAPSHOT from a bare flag",
           o["value"] == "EXACT_SNAPSHOT", o)
-    span = {"COMMIT": [w().asdict()]}
+    span = {"COMMIT": [w(subject="AMBIGUOUS").asdict()]}
     n = cl.validity(row(witnesses=span), None)
     check("D1b PASS-NEW: v1.2 ABSTAINS on a SPAN-scoped citation",
           n["value"] == "UNKNOWN", n)
+    # D381 / INC-31. THIS FIXTURE USED TO ENCODE THE DEFECT. Its boundary
+    # case was `Audited snapshot: 97a3a61` at WHOLE_FILE, asserting that it
+    # STILL earns EXACT_SNAPSHOT -- which is precisely the false positive
+    # INC-31 is about, written down as the expected answer. A calibration
+    # that asserts the defect cannot detect the defect.
+    #
+    # The positive boundary now uses a predicate whose subject IS the
+    # document, and the audited-snapshot case moves to a known-negative
+    # immediately below, where it belongs.
     bound = {"COMMIT": [w(applicability_scope="WHOLE_FILE",
-                          local_context="Audited snapshot: `97a3a61`").asdict()]}
+                          subject="SELF",
+                          local_context="Acquisition commit: `97a3a61`").asdict()]}
     b = cl.validity(row(witnesses=bound), None)
-    check("D1c BOUNDARY: a document-level binding STILL earns EXACT_SNAPSHOT",
+    check("D1c BOUNDARY: a SELF-bound document-level binding STILL earns "
+          "EXACT_SNAPSHOT",
           b["value"] == "EXACT_SNAPSHOT", b)
+    # The known-negative the old boundary case was standing in the way of.
+    misbound = {"COMMIT": [w(
+        applicability_scope="WHOLE_FILE",
+        subject="OTHER:GIT_COMMIT:" + "9" * 40,
+        local_context="Audited snapshot: `97a3a61`").asdict()]}
+    mb = cl.validity(row(witnesses=misbound), None)
+    check("D1c' KNOWN-NEGATIVE: the SAME whole-file binding, subject NOT the "
+          "document, does NOT earn EXACT_SNAPSHOT",
+          mb["value"] == "UNKNOWN", mb)
     check("D1d the envelope refuses the widening structurally",
-          _raises(lambda: E.claim(w(), "EXACT_SNAPSHOT", scope="WHOLE_FILE")))
+          _raises(lambda: E.claim(w(subject="AMBIGUOUS"), "EXACT_SNAPSHOT",
+                                  scope="WHOLE_FILE")))
 
 
 # ── D2 witness kind assumed from shape ────────────────────────────────
@@ -137,7 +170,7 @@ def d3():
     import run_h2_v12 as R
     r = row(last="2026-08-22", witnesses={"DATE": [w(
         witness_type="DATE_STAMP", witness_value="2026-07-21",
-        applicability_scope="WHOLE_FILE",
+        applicability_scope="WHOLE_FILE", subject="SELF",
         local_context="**Last updated:** 2026-07-21").asdict()]})
     c = R.contradiction_of(r)
     check("D3a the contradiction is DETECTED", c is not None and c["drift_days"] == 32, c)
@@ -150,7 +183,7 @@ def d3():
           cl.validity(r2, c2)["value"] == "TIME_BOUND")
     r3 = row(last="2026-06-02", witnesses={"DATE": [w(
         witness_type="DATE_STAMP", witness_value="2 Mar 2026",
-        applicability_scope="WHOLE_FILE",
+        applicability_scope="WHOLE_FILE", subject="SELF",
         local_context="> Version: 1.0 — 2 Mar 2026").asdict()]})
     check("D3e a VERSION date is not a currency claim, so not a contradiction",
           R.contradiction_of(r3) is None)
@@ -201,11 +234,16 @@ def d6_d7():
     check("D6b FAIL-OLD: v1.1 SCOPE cannot abstain", not d[1], d[1])
     check("D6c PASS-NEW: v1.2 SCOPE abstains with no binding witness",
           cl.scope(row())["value"] == "UNKNOWN")
-    bound = {"COMMIT": [w(applicability_scope="WHOLE_FILE").asdict()]}
+    # D381 8: SCOPE carries NO SELF requirement, so this deliberately uses
+    # a NON-SELF subject. An audit report whose subject is the audited tree
+    # still applies to the whole report. If this ever starts failing, some
+    # consumer has been given a global subject filter it must not have.
+    bound = {"COMMIT": [w(applicability_scope="WHOLE_FILE",
+                          subject="OTHER:GIT_COMMIT:" + "9" * 40).asdict()]}
     check("D6d BOUNDARY: a binding witness STILL earns WHOLE_FILE",
           cl.scope(row(witnesses=bound))["value"] == "WHOLE_FILE")
     check("D7a a row with only SPAN witnesses cannot emit WHOLE_FILE",
-          cl.scope(row(witnesses={"COMMIT": [w().asdict()]}))["value"] == "UNKNOWN")
+          cl.scope(row(witnesses={"COMMIT": [w(subject="AMBIGUOUS").asdict()]}))["value"] == "UNKNOWN")
     check("D6e v1.2 SCOPE=UNKNOWN is emittable", ont.emittable("SCOPE", "UNKNOWN"))
 
 

@@ -26,6 +26,8 @@ four times in one instrument.
 from __future__ import annotations
 import dataclasses
 import json
+import re
+import unicodedata
 
 # ── the ordered dimensions ────────────────────────────────────────────
 # Each tuple is ordered NARROW -> WIDE. Moving right is a PROMOTION and
@@ -43,6 +45,135 @@ POLARITIES = ("POSITIVE", "NEGATIVE", "NEUTRAL")
 class PromotionError(AssertionError):
     """A claim tried to exceed its evidence. Raised, never returned --
     a violation that can be ignored by a caller is not a control."""
+
+
+class SubjectError(PromotionError):
+    """The subject grammar refused. D381 3.
+
+    A subclass, so every existing `except PromotionError` still catches a
+    subject violation -- a fail-closed rule that a caller could step over
+    by catching the narrower parent would not be fail-closed.
+    """
+
+
+# ── D381 3: THE CLOSED SUBJECT GRAMMAR ────────────────────────────────
+#
+# INC-2026-09-18-31: HOUSE_H2 conflated DOCUMENT-LEVEL APPLICABILITY with
+# SEMANTIC SELF SUBJECT. Every witness inherited `subject="SELF"` from a
+# dataclass default, so the subject dimension was CONSTANT in production
+# and no corpus row could discriminate a correct consumer from a broken
+# one. The default is gone (see REQUIRED below) and the grammar is closed.
+#
+# THE FOUR CANONICAL FORMS, AND NO OTHERS:
+#
+#     SELF
+#     AMBIGUOUS
+#     OTHER:DOCUMENT:<normalised repo-relative path>
+#     OTHER:GIT_COMMIT:<full lower-case 40-hex commit>
+#
+# `OTHER:<path>` is the TRANSITIONAL legacy spelling of the DOCUMENT form
+# and is deliberately NARROWER than the canonical payload: it forbids a
+# colon, so a malformed typed form can never reach it. New producers emit
+# the canonical typed form.
+
+SUBJECT_SELF = "SELF"
+SUBJECT_AMBIGUOUS = "AMBIGUOUS"
+DOCUMENT_PREFIX = "OTHER:DOCUMENT:"
+GIT_COMMIT_PREFIX = "OTHER:GIT_COMMIT:"
+LEGACY_PREFIX = "OTHER:"
+
+FULL_COMMIT = re.compile(r"\A[0-9a-f]{40}\Z")
+
+
+def valid_repo_relative_path(p) -> bool:
+    """D380 6.10: relative - POSIX '/' - no leading '/' - no '.' or '..'
+    segment - no backslash alias - valid UTF-8 - Unicode NFC."""
+    if not isinstance(p, str) or not p:
+        return False
+    try:
+        p.encode("utf-8")
+    except UnicodeEncodeError:
+        return False
+    if p != unicodedata.normalize("NFC", p):
+        return False
+    if "\\" in p or p.startswith("/"):
+        return False
+    return all(seg not in ("", ".", "..") for seg in p.split("/"))
+
+
+def parse_subject(subject):
+    """The D381 3.1 NORMATIVE PARSER. Returns (kind, payload) or raises.
+
+    A CLOSED ORDERED MATCH, NOT A HEURISTIC. A generic "uppercase token"
+    test was expressly rejected: it would reserve arbitrary uppercase
+    repository path names as though they were type tags.
+
+    RULES 3 AND 4 ARE TERMINAL ON THEIR PREFIX. That is the whole defect
+    being closed here: a malformed `OTHER:GIT_COMMIT:not-a-commit` must
+    REFUSE, and must never fall through to legacy parsing where it would
+    be silently accepted as a document path.
+    """
+    if not isinstance(subject, str):
+        raise SubjectError(f"subject must be a string, got {type(subject).__name__}")
+    # 1, 2 -- the two bare forms
+    if subject == SUBJECT_SELF:
+        return ("SELF", None)
+    if subject == SUBJECT_AMBIGUOUS:
+        return ("AMBIGUOUS", None)
+    # 3 -- typed DOCUMENT, TERMINAL
+    if subject.startswith(DOCUMENT_PREFIX):
+        payload = subject[len(DOCUMENT_PREFIX):]
+        if not valid_repo_relative_path(payload):
+            raise SubjectError(
+                f"malformed OTHER:DOCUMENT payload {payload!r} — REFUSED. "
+                f"A typed prefix is TERMINAL: it does not fall through to "
+                f"legacy parsing (D381 3.1 rule 3).")
+        return ("DOCUMENT", payload)
+    # 4 -- typed GIT_COMMIT, TERMINAL
+    if subject.startswith(GIT_COMMIT_PREFIX):
+        payload = subject[len(GIT_COMMIT_PREFIX):]
+        if not FULL_COMMIT.match(payload):
+            raise SubjectError(
+                f"malformed OTHER:GIT_COMMIT payload {payload!r} — REFUSED. "
+                f"A full lower-case 40-hex commit is required, and a typed "
+                f"prefix is TERMINAL (D381 3.1 rule 4).")
+        return ("GIT_COMMIT", payload)
+    # 5 -- the transitional legacy DOCUMENT alias, deliberately narrower
+    if subject.startswith(LEGACY_PREFIX):
+        payload = subject[len(LEGACY_PREFIX):]
+        if not payload or ":" in payload or not valid_repo_relative_path(payload):
+            raise SubjectError(
+                f"legacy OTHER: payload {payload!r} — REFUSED. The "
+                f"transitional alias admits a non-empty repo-relative path "
+                f"containing NO ':' (D381 3.1 rule 5). A path containing a "
+                f"colon is representable only as OTHER:DOCUMENT:<path>.")
+        return ("DOCUMENT", payload)
+    # 6 -- everything else
+    raise SubjectError(
+        f"unknown subject {subject!r} — REFUSED. The grammar is CLOSED: "
+        f"SELF, AMBIGUOUS, OTHER:DOCUMENT:<path>, OTHER:GIT_COMMIT:<40hex>, "
+        f"or the transitional OTHER:<path> (D381 3.1 rule 6).")
+
+
+def subject_is_self(subject) -> bool:
+    """Validated SELF. The ONLY way an axis asks the question.
+
+    D381 5.5: consumers GATE on the producer-bound subject and never
+    reinterpret it. This reads the field; it does not re-derive it from a
+    label, a local_context, a path or an applicability scope.
+    """
+    return parse_subject(subject)[0] == "SELF"
+
+
+class _Required:
+    """Sentinel: `subject` has NO default and must be stated explicitly."""
+    __slots__ = ()
+
+    def __repr__(self):
+        return "<REQUIRED>"
+
+
+REQUIRED = _Required()
 
 
 @dataclasses.dataclass(frozen=True)
@@ -67,9 +198,19 @@ class Witness:
     polarity: str = "NEUTRAL"
     certainty: str = "OBSERVED"
     temporal: str = "AT_COMMIT"
-    subject: str = "SELF"      # SELF | OTHER:<path> | AMBIGUOUS
+    # NO DEFAULT. D381 3 / INC-31: `subject = "SELF"` here is precisely how
+    # 167 witnesses inherited a semantic claim nobody made about them. The
+    # sentinel keeps the field order stable while making omission FAIL.
+    subject: str = REQUIRED
 
     def __post_init__(self):
+        if self.subject is REQUIRED:
+            raise SubjectError(
+                f"subject NOT STATED for {self.witness_type} witness at "
+                f"{self.source_path} {self.source_selector}. There is no "
+                f"default: a witness's semantic subject is determined once, "
+                f"at the governed producer boundary (D381 5.5).")
+        parse_subject(self.subject)          # fail-closed, D381 3.1
         if self.applicability_scope not in SCOPE_ORDER:
             raise PromotionError(f"unknown scope {self.applicability_scope!r}")
         if self.polarity not in POLARITIES:

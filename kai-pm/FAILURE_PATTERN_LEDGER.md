@@ -5072,3 +5072,127 @@ occurrences, `RECURRED_AFTER_CONTROL` · `M-PRODUCER-CURATION`,
 `P-ADJUDICATOR-PROPAGATION`, `M-QUERY-OVERREACH` `PATTERN_CANDIDATE`.
 **No mechanism assigned to this incident. No new mechanism. Doctrine 49.6
 not triggered. No D-number allocated by this entry.**
+
+---
+
+### `INC-2026-09-18-32` — a banked derivation recipe that does not reproduce
+###                      its own banked figures, and a total stated over a
+###                      narrower universe than the sentence carrying it
+
+```
+INCIDENT_ID             INC-2026-09-18-32
+date                    2026-09-18
+producer                Orion (D381 section 21, drafted by me, banked at
+                        838b7637058c5ba3b8f3b6c5430ebdc324249b96)
+subject                 kai-pm/DECISIONS.md  D381 section 21.1 / 21.2
+                        measured at HEAD 838b7637058c5ba3b8f3b6c5430ebdc324249b96
+status                  OPEN-RECORDED / INCIDENT_ONLY / BLOCKS SB-CORPUS-1
+                        Kai adjudication required. No D-number self-allocated.
+
+WHAT WAS FOUND — TWO DEFECTS IN ONE BANKED SECTION
+
+  (A) UNIVERSE NOT STATED ON THE TOTAL
+      D381 21.1 states "WHOLE_FILE witnesses 167" and enumerates
+      "COMMIT 6 - DATE 161 - RUN_ID 0 - SUPERSEDED_BY 0".
+      Measured over the frozen v1.2 Pass-A blob f88e929b, the WHOLE_FILE
+      total over ALL emitted witness kinds is 168, not 167. The residual
+      is ONE HEX_SHAPED_UNRESOLVED whole-file witness, which the
+      enumeration does not mention and the total silently excludes.
+      167 is the total over the FOUR CONSUMER-RELEVANT KINDS. That is a
+      defensible universe -- classify consumes exactly COMMIT, RUN_ID,
+      DATE and SUPERSEDED_BY -- but the sentence does not say so.
+      The same holds for Population B: 166 all-kinds, 165 consumed.
+
+  (B) THE RECIPE DOES NOT REPRODUCE THE FIGURES
+      D381 21.2 states the Population B derivation as:
+        "Start from the exact frozen v1.2 Pass-A witness records. FOR EACH
+         SOURCE-BOUND WITNESS: ... re-evaluate ONLY current v1.3 _eligible
+         and _scope_of ... count the resulting WHOLE_FILE membership."
+      Executed literally over every witness, that recipe yields
+        WHOLE_FILE 200 (consumed kinds) - documents 194 - 37 A->B moves.
+      The banked figures are 165 / 164 / exactly 2 moves.
+      Those figures are reproduced EXACTLY -- 165, 164, DATE 160,
+      COMMIT 5, and precisely the two banked moves -- only when the
+      universe is RESTRICTED to witnesses that were ALREADY WHOLE_FILE
+      under v1.2. The banked recipe states no such restriction.
+
+      CONSEQUENCE, AND IT IS NOT COSMETIC. D381 20.3 makes SB-CORPUS-1 a
+      REQUIRED control asserting the literal values 165 and 164/272. The
+      banked authority therefore specifies a control whose stated
+      derivation and stated expected values disagree, and the gap is 35
+      witnesses across 30 documents.
+
+THE MECHANISM            CLAIM_SCOPE wider than MEASURED_SCOPE. Both halves
+                         are the R17 / doctrine-48 mechanism: a measurement
+                         was taken over a narrower universe than the
+                         sentence that carries it, and the qualifier was
+                         dropped between the working table and the prose.
+
+                         (A) dropped "over the consumed kinds".
+                         (B) dropped "over the witnesses already WHOLE_FILE
+                             under v1.2".
+
+RECURRENCE — THIS IS THE FINDING, NOT THE INSTANCE
+
+  R17 was banked on 2026-08-29 (doctrine 48) after THREE instances in one
+  session. R18 was banked the same day and states the rule that applies
+  here: a third confirmed occurrence means THE CONTROL HAS FAILED, NOT
+  THE PRODUCER, and the response is structure or machine enforcement --
+  not another reminder.
+
+  This is that case. R17 is written in CLAUDE.md, in the doctrine, and in
+  the stop-signal table. I read it, cited it, and drafted section 21
+  anyway. A rule I can quote and still breach while drafting the very
+  document that repairs a scope-conflation defect is not being enforced
+  by anything mechanical.
+
+  WHAT MAKES IT WORSE, AND IT SHOULD BE SAID PLAINLY: D381 exists to
+  repair a conflation between a measured property (applicability) and a
+  claimed property (subject). Section 21 of that same entry conflates a
+  measured universe with a claimed one. The entry reproduced its own
+  defect class in its evidence section.
+
+WHAT IS *NOT* WRONG — MEASURED, NOT ASSUMED
+
+  Everything else in D381 that this tranche has exercised reproduces
+  EXACTLY, and the repair itself is sound:
+
+    SB-CORPUS-3   the three-row delta reproduces cell-for-cell
+    SB-MOVED-1/2  both banked moves reproduce, and only those two
+    D381 4        AUTHORITY_ONTOLOGY.md resolves from the live history
+                  source to OTHER:GIT_COMMIT:9d15bcd207ad7a33e1087667b2
+                  45970f989e366f, exactly as ruled
+    scope         485 witnesses compared pre- vs post-repair: ZERO scope
+                  differences. The subject repair moved no membership.
+    M2            LIMB I now UNKNOWN, LIMB II still HISTORICAL
+
+  The DEFECT IS IN THE EVIDENCE SECTION'S SELF-DESCRIPTION, not in the
+  architecture, not in the grammar, not in the axis gates and not in the
+  repair scope. No repair scope changes because of it.
+
+CONTROL STATE            NONE. There is no mechanical check that a banked
+                         derivation recipe reproduces its own banked
+                         figures. The recipe and the figures sat in
+                         adjacent paragraphs, and nothing executed either.
+
+                         This is the structural gap R18 asks for after a
+                         repeat: the remedy is an EXECUTED derivation, not
+                         a better-worded one. A figure whose recipe has
+                         been run is a measurement; a figure printed beside
+                         an unrun recipe is a recollection with a citation.
+
+IMMEDIATE EFFECT         SB-CORPUS-1 is HELD. It cannot be reported green
+                         against literal 165/164 without silently adopting
+                         an interpretation the banked text does not state,
+                         and it cannot be reported red without asserting a
+                         defect in the repair that measurement does not
+                         support.
+
+                         The D381 subject-binding implementation itself is
+                         NOT held by this and is not in doubt.
+
+REPORTED                 To Kai, with both universes measured and named,
+                         before any closure claim. R11: the prerequisite
+                         for SB-CORPUS-1's expected value is unproven, so
+                         the dependent verdict is not emitted.
+```
