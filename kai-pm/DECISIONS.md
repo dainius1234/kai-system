@@ -38826,3 +38826,424 @@ ALLOCATOR                  before this append: population 366, distinct 366,
 INCIDENT ALLOCATOR         33 incidents, highest INC-2026-09-18-33.
                            UNCHANGED by this entry.
 ```
+
+## D385 — 2026-09-18 — INC-34 ADJUDICATION. H2_PY_STDLIB_V1 UNCHANGED; CURRENT DISTRIBUTION CPYTHON IS A KNOWN-NEGATIVE RUNTIME. GOVERNED KNOWN-POSITIVE INTERPRETER REQUIRED. NO STAGE-A SCHEMA OR GOVERNANCE CHANGE.
+
+**Authority.** Kai's ruling of 2026-09-18 on `INC-2026-09-18-34`, relayed by
+Dainius, following independent verification of checkpoint
+`7613ce88ae896b2fad72252f12b5cde63458c08e` (server-verified valid SSH,
++1294/−19, within the released surface). Allocator derived structurally over
+`^## D[0-9]+( +—|$)` immediately before this append: population **367**,
+distinct **367**, duplicates **none**, highest **D384**, `D385` count **0**,
+next free **D385**.
+
+**DATE NOTE.** Kai's instruction proposed the title date 2026-09-19.
+Measured UTC at allocation was **2026-09-18 23:24:13**, so this entry
+carries the **MEASURED** date. A governed append-only record is not
+future-dated; flagged for correction if the 09-19 identifier is wanted.
+
+**BANKING IS NOT EXECUTION.**
+
+---
+
+### A. D380 REMAINS NORMATIVE, UNCHANGED
+
+**`H2_PY_STDLIB_V1` IS NOT AMENDED.** §7.6 remains exactly:
+
+```
+final symlink target outside the governed root set   ->   REFUSE
+there is no external-dependency escape hatch in this schema
+```
+
+**THE IMPLEMENTATION IS NOT DEFECTIVE.** It did exactly what D380 says, on
+its first contact with a real interpreter.
+
+**EXPRESSLY FORBIDDEN, AND THIS IS THE CORE OF THE RULING:**
+
+```
+DO NOT weaken §7.6
+DO NOT invent an external-target exception
+DO NOT hash raw absolute symlink targets
+DO NOT add distro-specific root allowances
+DO NOT create H2_PY_STDLIB_V2
+DO NOT bump H2_STAGE_A_V2
+```
+
+> **WE KEEP THE STRICT RUNTIME IDENTITY CONTRACT AND CHANGE THE
+> ENVIRONMENT, NOT THE SECURITY RULE.** §7.6 exists so that identical
+> governed content installed at different filesystem locations yields the
+> same digest — and that digest seeds the blind 40. Admitting an
+> out-of-root target, or storing a raw `readlink` text, puts machine
+> placement into the identity.
+
+---
+
+### B. THE CURRENT INTERPRETER IS A KNOWN-NEGATIVE
+
+Measured in the execution container:
+
+```
+stdlib / platstdlib   /usr/lib/python3.11                     (CASE A)
+purelib / platlib     /usr/local/lib/python3.11/dist-packages
+
+sitecustomize.py                     -> /etc/python3.11/sitecustomize.py
+config-3.11-x86_64-linux-gnu/
+  libpython3.11.so                   -> /usr/lib/x86_64-linux-gnu/
+                                         libpython3.11.so.1.0
+```
+
+Neither target lies under `purelib`, `platlib`, `site-packages` or
+`dist-packages`, so D380 §7.3's external-package exclusion does not reach
+them. They are symlinks under a governed root pointing out of it.
+
+> **THIS INTERPRETER IS NOT A D380-COMPLIANT GOVERNED INTERPRETER.**
+
+**This is USEFUL CALIBRATION EVIDENCE, and it is banked as a control:**
+
+```
+D380-STDLIB-NEG-1
+  a real interpreter carrying a governed-root symlink whose final target
+  escapes the governed root set        ->   REFUSE
+```
+
+**THAT IS A SUCCESSFUL NEGATIVE CONTROL**, not a failure. A third symlink,
+`_sysconfigdata__linux_x86_64-linux-gnu.py`, resolves INSIDE stdlib and is
+not implicated.
+
+---
+
+### C. POSITIVE CALIBRATION REQUIRES A D380-COMPLIANT INTERPRETER
+
+A known-positive interpreter must satisfy the EXISTING D380 rules, with
+**no new exception class**:
+
+```
+stdlib / platstdlib mechanically identified
+external package roots excluded
+EVERY governed symlink's final target remains within the governed root set
+no dangling links
+single ownership
+no duplicate canonical member
+loaded filesystem-backed stdlib represented
+```
+
+**CALL THIS A `D380-COMPLIANT INTERPRETER`, NEVER "special Debian
+handling".** The name matters: one describes a property the runtime either
+has or lacks; the other describes an exception we would then have to
+maintain.
+
+---
+
+### D. CALIBRATION-ONLY RUNTIME MAY BE LOCAL OR SYNTHETIC
+
+D379 §8 already permits synthetic and local calibration subjects. A local
+temporary interpreter may therefore be used **solely** for STDLIB /
+STAGE_A calibration **if it satisfies D380 byte-for-byte**.
+
+**IT MUST NOT:**
+
+```
+become a production Stage A
+seed the holdout
+modify repository source merely to fit its layout
+introduce an ungoverned dependency
+silently substitute for the later real candidate runtime
+```
+
+**IF NO COMPLIANT INTERPRETER IS LOCALLY AVAILABLE:**
+
+```
+the STDLIB POSITIVE LIMB remains HELD.
+DO NOT WEAKEN THE CONTRACT TO PRODUCE A GREEN.
+```
+
+---
+
+### E. FUTURE PRODUCTION IMPLICATION
+
+The eventual real candidate must execute under a governed runtime
+satisfying the same D380 conditions. **THAT IS A PRODUCTION-ENVIRONMENT
+PREREQUISITE, NOT A REASON TO CHANGE THE IDENTITY SCHEMA.**
+
+---
+
+### F. STAGE-A GOVERNANCE REMAINS EXACT
+
+**D385 changes NO Stage-A proposition.**
+
+```
+H2_STAGE_A_V2   governance = [D379, D380, D381]   UNCHANGED
+
+D382 · D383 · D384 · D385   remain OUTSIDE the descriptor
+No schema bump.  No separator change.
+No FINAL_CANDIDATE_AGGREGATE change.  D367 §9 untouched.
+```
+
+---
+
+### G. WHAT REMAINS OPEN
+
+```
+INC-2026-09-18-34   OPEN. Closes when a D380-compliant known-positive
+                    interpreter is ACTUALLY MEASURED, not when one is
+                    described.
+STDLIB positive     HELD
+STAGE_A positive using the canonical runtime   HELD
+```
+
+**D385 DOES NOT AUTHORISE:** a real Stage A · a candidate · a real Pass A ·
+a holdout · the blind 40 · admission · freeze · any merge.
+
+**PR #122 remains DO NOT MERGE. D359 governs programme order.**
+
+---
+
+### THREAD RECOVERY BLOCK — D385
+
+```
+ENTRY                 D385, banked 2026-09-18. GOVERNANCE ONLY.
+RULING                D380 §7.6 is NOT weakened. The implementation is not
+                      defective; it enforced the banked rule on first
+                      contact with a real interpreter.
+FORBIDDEN             external-target exception · raw absolute symlink
+                      target hashing · distro-specific root allowances ·
+                      H2_PY_STDLIB_V2 · any H2_STAGE_A_V2 bump
+KNOWN-NEGATIVE        the container's Debian-packaged CPython 3.11.
+                      sitecustomize.py -> /etc/python3.11/... and
+                      config-.../libpython3.11.so -> /usr/lib/x86_64-
+                      linux-gnu/... escape the governed roots and are not
+                      excluded by §7.3. Banked as control D380-STDLIB-NEG-1,
+                      a SUCCESSFUL negative control.
+KNOWN-POSITIVE        requires a D380-COMPLIANT INTERPRETER meeting the
+                      existing rules with NO new exception class. Not
+                      "special Debian handling".
+CALIBRATION RUNTIME   a local/synthetic interpreter is permitted for
+                      STDLIB/STAGE_A calibration ONLY if D380-compliant
+                      byte-for-byte. It may never become production Stage
+                      A, seed the holdout, force repository source changes,
+                      introduce an ungoverned dependency, or substitute for
+                      the real candidate runtime. If none is available the
+                      STDLIB positive limb stays HELD.
+PRODUCTION           the real candidate must run under a governed
+                      D380-compliant runtime. Environment prerequisite,
+                      NOT a schema change.
+STAGE-A GOVERNANCE    UNCHANGED at [D379, D380, D381]. D382/D383/D384/D385
+                      all outside the descriptor.
+INC-34                OPEN until a compliant interpreter is MEASURED.
+ALLOCATOR             before append: 367/367/none, highest D384, D385 count
+                      0. After D385 and D386: next free D387 — NOT TO BE
+                      TAKEN without authorisation.
+```
+
+---
+
+## D386 — 2026-09-18 — BOUNDED D379 CONTROL-EVIDENCE EXIT-STATUS CAPTURE REPAIR. D379_CONTROLS HARNESS ONLY. GOVERNANCE ONLY — BANKING IS NOT EXECUTION. NO STAGE-A PROPOSITION CHANGE.
+
+**Authority.** Kai's ruling of 2026-09-18 on `INC-2026-09-18-35`, relayed by
+Dainius, after independently reading the committed evidence artefact rather
+than the producer's summary of it. Allocator: this entry takes **D386**,
+the next free number after D385 in the same append.
+
+**DATE NOTE.** As for D385: Kai proposed 2026-09-19; measured UTC at
+allocation was 2026-09-18 23:24:13, and the measured date is used.
+
+---
+
+### 1. THE DEFECT
+
+```
+committed build_evidence/D379_CONTROLS.txt ends:
+
+    65 passed, 9 failed
+    EXIT GATE: FAIL
+    ==================================
+    process exit status = 0
+
+d379_controls.py line 695:      return 1 if FAILED else 0
+executed directly:              exit status 1
+```
+
+**THE DURABLE EVIDENCE FILE CONTAINS A FALSE PROCESS-EXIT CLAIM**, four
+lines below its own `EXIT GATE: FAIL`.
+
+**THE MECHANISM.** The capture was a brace group in which
+`${PIPESTATUS[0]}` was expanded after a bare `echo`, so it reported the
+status of the echo that prints the status. **The instrument measured itself
+and reported the world** — R9's shape in a different costume.
+
+**D379 §8 requires "the ACTUAL SUBPROCESS RETURN CODE".** The artefact is
+the durable record; a commit message is not.
+
+---
+
+### 2. MUTATION SCOPE — CLOSED
+
+```
+kai-pm/house_in_order_h2_v13/build_evidence/d379_controls.py
+kai-pm/house_in_order_h2_v13/build_evidence/D379_CONTROLS.txt
+```
+
+**NO NEW CONTROL FILE. NO OTHER TRACKED PATH.**
+
+---
+
+### 3. THE REPAIR IS MECHANICAL CAPTURE, NOT A CORRECTED NUMBER
+
+> **DO NOT FIX THIS BY EDITING `process exit status = 0` TO `1`.**
+> That leaves a hand-written number where a measurement belongs — the same
+> defect carrying a better value, and undetectable next time.
+
+**Required bounded design:**
+
+```
+d379_controls.py --capture D379_CONTROLS.txt     acts as a PARENT process.
+
+PARENT   launches the real control execution as a CHILD subprocess
+CHILD    executes the control matrix
+         prints complete untruncated output
+         returns its real exit status
+PARENT   captures stdout + stderr
+         captures child.returncode DIRECTLY from the subprocess object
+         writes the exact child output
+         writes   process exit status = <child.returncode>
+         returns  the SAME child.returncode
+```
+
+**FORBIDDEN:**
+
+```
+no shell $? reconstructed later
+no pipeline status
+no manually supplied status
+no caller-supplied --status
+```
+
+> **THE RECORDED STATUS MUST COME DIRECTLY FROM THE SUBPROCESS OBJECT THAT
+> PRODUCED THE CAPTURED OUTPUT.** Same object, one step, no intermediary
+> that could be describing something else.
+
+---
+
+### 4. FIXTURE EXECUTION BECOMES DURABLE TOO
+
+Under D386 the same capture harness **may** execute `cal_fixtures.py` as a
+**DISTINCT** subprocess and record its full output and real exit status.
+This gives INC-33 machine evidence rather than a commit-message claim.
+
+**KEEP THE IDENTITIES SEPARATE:**
+
+```
+D379 CONTROL PROCESS STATUS    !=    CAL_FIXTURES PROCESS STATUS
+```
+
+**They are two separately executed subjects. NO COMMON-SOURCE INDEPENDENCE
+CLAIM** — one harness running both does not make either corroborate the
+other.
+
+---
+
+### 5. `INC-32` AND `INC-33` — CLOSURE CANDIDATES, NOT CLOSED
+
+The substantive evidence is strong and is recorded:
+
+```
+INC-32   491 emitted records · 480 distinct identities · 9 duplicate groups
+         · 11 excess · Population A derived · Population B derived · exactly
+         two A->B moves · SB-SCOPE-ALL 491 / 0 differences / 0 unresolved ·
+         SB-CORPUS-3 exact
+INC-33   one blob-bound v12 loader · both call sites consume it · historical
+         six preserved · 79 PASS / 0 FAIL · suite reaches its end
+```
+
+**CLOSURE IS HELD until the repaired D386 capture records the relevant
+ACTUAL SUBPROCESS STATUSES truthfully. NEITHER LEDGER ENTRY IS CLOSED IN
+THIS BANKING TURN**, and neither existing record is rewritten.
+
+---
+
+### 6. WHAT MAY CONTINUE AFTER RELEASE
+
+Once Kai verifies both banks and releases execution, independent D379
+sections that do **NOT** require a positive stdlib construction may proceed:
+
+```
+D14 · Q1a portions independent of a real stdlib positive · Q1b · E1 ·
+I1-A · I1-B · DEP
+```
+
+**`INC-34` MUST NOT UNNECESSARILY FREEZE THOSE.** But:
+
+```
+STDLIB positive                                   HELD
+STAGE_A positive using the canonical runtime      HELD
+```
+
+until a D380-compliant known-positive interpreter is **actually measured**.
+The current interpreter remains the **known-negative**.
+
+---
+
+### 7. STAGE-A GOVERNANCE REMAINS EXACT
+
+**D386 changes NO Stage-A proposition.**
+
+```
+H2_STAGE_A_V2   governance = [D379, D380, D381]   UNCHANGED
+D382 · D383 · D384 · D385 · D386   all OUTSIDE the descriptor
+No schema bump.  No separator change.  D367 §9 untouched.
+```
+
+`d379_controls.py` and `D379_CONTROLS.txt` are **not** `h2_sources`
+members, so this repair does not touch the Stage-A hash at all.
+
+**D386 DOES NOT AUTHORISE:** a real Stage A · a candidate · a real Pass A ·
+a holdout · the blind 40 · admission · freeze · any merge.
+
+**PR #122 remains DO NOT MERGE.**
+
+---
+
+### THREAD RECOVERY BLOCK — D386
+
+```
+ENTRY                 D386, banked 2026-09-18. GOVERNANCE ONLY. No source
+                      byte changed in the banking commit.
+DEFECT                D379_CONTROLS.txt recorded "process exit status = 0"
+                      while d379_controls.py returns 1 on 9 failures, four
+                      lines below its own EXIT GATE: FAIL. Cause:
+                      ${PIPESTATUS[0]} expanded after a bare echo, so the
+                      capture reported the echo that prints the status.
+                      R9's shape — the instrument measured itself.
+MUTATION SCOPE        build_evidence/d379_controls.py and
+                      build_evidence/D379_CONTROLS.txt ONLY. No new control
+                      file, no other tracked path.
+THE REPAIR            MECHANICAL CAPTURE. Parent process launches the
+                      control matrix as a CHILD subprocess, captures
+                      stdout+stderr and child.returncode DIRECTLY from the
+                      subprocess object, writes the exact output and
+                      "process exit status = <child.returncode>", and
+                      returns the SAME code.
+                      EDITING THE LITERAL 0 TO 1 IS FORBIDDEN — that is the
+                      same defect with a better value.
+FORBIDDEN             shell $? reconstructed later · pipeline status ·
+                      manually supplied status · caller-supplied --status
+FIXTURES              cal_fixtures.py may be captured as a DISTINCT
+                      subprocess with its own real status. Control status
+                      != fixture status. NO common-source independence
+                      claim: one harness running both corroborates neither.
+INC-32 / INC-33       CLOSURE CANDIDATES ONLY. Held until the repaired
+                      capture records the actual statuses. Existing ledger
+                      records are NOT rewritten.
+INC-34 / INC-35       OPEN.
+MAY CONTINUE          D14 · Q1a (parts independent of a stdlib positive) ·
+                      Q1b · E1 · I1-A · I1-B · DEP.
+STILL HELD            STDLIB positive · STAGE_A positive using the
+                      canonical runtime, until a D380-compliant
+                      known-positive interpreter is MEASURED.
+STAGE-A GOVERNANCE    UNCHANGED at [D379, D380, D381]. D382-D386 all
+                      outside the descriptor. Neither mutated file is an
+                      h2_sources member, so the Stage-A hash is untouched.
+ALLOCATOR             after this append: population 369, highest D386, next
+                      free D387 — NOT TO BE TAKEN without authorisation.
+INCIDENT ALLOCATOR    35 incidents, highest INC-2026-09-18-35.
+```

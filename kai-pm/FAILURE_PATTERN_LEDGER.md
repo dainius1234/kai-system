@@ -5425,3 +5425,113 @@ REPORTED                To Kai before any closure claim, with the exact
                         sections are not measured and no substitute is
                         invented.
 ```
+
+---
+
+### `INC-2026-09-18-35` — the durable control evidence recorded a process
+###                      exit status that no process ever returned
+
+```
+INCIDENT_ID             INC-2026-09-18-35
+date                    2026-09-18
+                        DATE NOTE: Kai's instruction proposed
+                        INC-2026-09-19-35. Measured UTC at allocation was
+                        2026-09-18 23:24:13, so this entry carries the
+                        MEASURED date. A governed append-only record must
+                        not be future-dated; flagged to Kai for correction
+                        if the 09-19 identifier is wanted.
+producer                Orion — the D379 hostile-control EVIDENCE CAPTURE,
+                        not the control program
+subject                 kai-pm/house_in_order_h2_v13/build_evidence/
+                        D379_CONTROLS.txt, as committed at
+                        7613ce88ae896b2fad72252f12b5cde63458c08e
+status                  OPEN-RECORDED / INCIDENT_ONLY /
+                        BLOCKS D379 CONTROL-EVIDENCE CLOSURE
+
+FAULTY OUTPUT           The committed evidence file ends:
+
+                          65 passed, 9 failed
+                          EXIT GATE: FAIL
+                          ==================================
+                          process exit status = 0
+
+ACTUAL GOVERNED STATE   d379_controls.py line 695:
+
+                          return 1 if FAILED else 0
+
+                        Executed directly at the same tree:
+
+                          python3 d379_controls.py ; echo $?   ->   1
+
+                        65 passed / 9 failed / EXIT GATE FAIL, so the
+                        program returns 1. THE ARTEFACT CONTRADICTS THE
+                        PROGRAM IT RECORDS.
+
+THE MECHANISM, EXACTLY  The capture was written as a brace group:
+
+                          { echo ...
+                            python3 d379_controls.py
+                            echo
+                            echo "process exit status = ${PIPESTATUS[0]}"
+                          } > D379_CONTROLS.txt 2>&1
+
+                        `${PIPESTATUS[0]}` reports on the LAST PIPELINE
+                        EXECUTED. By the time it is expanded, that is the
+                        bare `echo` immediately before it — which
+                        succeeded. So the recorded status is the status of
+                        the echo that prints the status.
+
+                        Demonstrated, not inferred:
+                          { true; echo; echo "${PIPESTATUS[0]}"; }  ->  0
+
+                        THE INSTRUMENT MEASURED ITSELF AND REPORTED THE
+                        WORLD. That is R9's shape exactly, in a different
+                        costume: R9 was a watcher whose own command line
+                        matched its search pattern; this is a status
+                        capture whose own echo became the subject of the
+                        status.
+
+WHY IT IS MATERIAL      D379 §8 requires controls EXECUTED, never
+                        asserted, with "the ACTUAL SUBPROCESS RETURN
+                        CODE". The evidence artefact is the durable
+                        record; the commit message is not. A reader
+                        holding only D379_CONTROLS.txt is told the control
+                        process succeeded. It did not.
+
+                        The internal gate line "EXIT GATE: FAIL" sits four
+                        lines above the false status, so the file is
+                        INTERNALLY CONTRADICTORY, which is the only reason
+                        it was catchable by reading.
+
+                        THE SUMMARY WAS RIGHT AND THE ARTEFACT WAS WRONG.
+                        My own message said "d379_controls.py exit 1",
+                        which was true — I had measured it separately.
+                        That is worse, not better: it means the durable
+                        evidence and the transient claim disagreed, and
+                        only the transient one was correct. Kai caught it
+                        by reading the artefact instead of the message.
+
+MECHANISM               NONE ASSIGNED.
+
+                        QUALIFIED LOCATORS ONLY. Earlier status-capture
+                        and false-green incidents may point at where to
+                        look, but causal equivalence is NOT established
+                        and is not claimed (doctrine 37).
+
+DO NOT MERGE WITH       INC-2026-09-18-32 · INC-2026-09-18-33 ·
+                        INC-2026-09-18-34 · RC-7
+                        unless later evidence establishes equivalence.
+
+CONTROL STATE           NONE. Nothing compared the recorded status against
+                        the status the control program actually returned.
+                        The two lived in the same file, four lines apart,
+                        and nothing read them together.
+
+REPAIR AUTHORITY        D386, banked the same turn. The repair is
+                        MECHANICAL CAPTURE — a parent process that takes
+                        the status directly from the subprocess object
+                        that produced the captured output. Editing the
+                        literal 0 to 1 is EXPRESSLY FORBIDDEN: it would
+                        leave a hand-written number where a measurement
+                        belongs, which is the defect with a better value.
+```
