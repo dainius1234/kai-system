@@ -4509,3 +4509,227 @@ confirmed occurrences, `RECURRED_AFTER_CONTROL` · `M-PRODUCER-CURATION`,
 `P-ADJUDICATOR-PROPAGATION`, `M-QUERY-OVERREACH` `PATTERN_CANDIDATE`.
 **No mechanism assigned to this incident. No new mechanism. Doctrine 49.6
 not triggered. No D-number.**
+
+---
+
+### `INC-2026-09-18-30` — a banked authority denied amending the contract it
+###                      was substantively replacing in three places
+
+```
+INCIDENT_ID             INC-2026-09-18-30
+date                    2026-09-18
+producer                Orion
+subject                 the BANKED D379 authority
+                        kai-pm/DECISIONS.md lines 34964-35641
+                        commit 608d706d8452b8e578a484f7b75331a5cb9c28d9
+                        tree   004b9bb1e0b0eddec2591ac8d6549a0fcd81981d
+status                  OPEN / RECORDED — correction path is a later
+                        D-numbered superseding authority. D379 is
+                        append-only and is NOT edited.
+
+THE DEFECT              D379 asserts, in its own preamble and again in its
+                        recovery block:
+
+                          "kai-pm/H2_REPAIR_CONTRACT_D367.md ... IS NOT
+                           AMENDED. D379 changes nothing about what
+                           admission requires."
+
+                        while simultaneously carrying propositions that
+                        materially change three frozen D367 provisions:
+
+                        1. D367 section 1 CENSUS DEPENDENCY
+                             frozen:  eb7aad7c1a565cb25fcf6a7e250133e95d210f3e8ceb8765489046e3d945fa0e
+                             D379:    CONSUMED 29064d650a61296806df3c3bcab3322f7364da7df674ac93e79d0671475d757a
+                           D367 section 1 additionally states "Census v1.1
+                           and HOUSE_H2 v1.0 are untouched and remain so",
+                           which is prescriptive, not descriptive.
+
+                        2. D367 section 8(6) RUNTIME MODULE IDENTITY
+                             frozen:  "every loaded module's __file__
+                                       resolves under the candidate
+                                       directory and its source bytes hash
+                                       to the manifest entry"
+                             D379:    three governed source classes -
+                                       governed H2 root, governed hardened
+                                       Census root, governed Python runtime
+                                       identity
+
+                        3. D367 section 9 FINAL_CANDIDATE_AGGREGATE
+                             D379 makes the validated stage_a_identity the
+                             value substituted into the frozen selection
+                             equation, replacing the post-execution
+                             manifest-derived aggregate the shipped
+                             holdout.py computes.
+
+                        A single entry cannot both deny amending a frozen
+                        contract and replace three of its provisions. The
+                        denial is the defect, not the replacements: the
+                        replacements are each independently well-reasoned
+                        and two of them repair real, demonstrated faults.
+
+MEASURED, NOT INFERRED  The source recovery that established this was
+                        bounded and is reproducible:
+
+                          "D367 section 1" / "D367 §1"
+                            0 occurrences in kai-pm/DECISIONS.md.
+                            The only D367-section citations in the entire
+                            file are sections 12 and 13, at line 33460.
+
+                          a Census lineage bound to QUALIFICATION or
+                          ADMISSION, before D379
+                            0 occurrences after line 33400 in
+                            kai-pm/DECISIONS.md.
+
+                          D367 section 8(6) interpreted, qualified or
+                          replaced by any authority between D367 and D379
+                            0 occurrences. The only references to 8(6) in
+                            the file are D367's own summary at line 32045
+                            and D379's own at 35009, 35021, 35058, 35439,
+                            35540.
+
+                        NOT_FOUND_IN_SEARCHED_AUTHORITY_POPULATION. The
+                        population searched was kai-pm/DECISIONS.md (35641
+                        lines), kai-pm/H2_REPAIR_CONTRACT_D367.md (389
+                        lines, sha256 re-verified 0ce5792e...00bb), its
+                        .sha256, and kai-pm/FAILURE_PATTERN_LEDGER.md. No
+                        README, STATUS, SEQUENCE, cold-start summary, chat,
+                        memory or implementation file was used to establish
+                        any of it.
+
+                        Two further source facts bear on the defect and are
+                        recorded because they change how it should be read:
+
+                        * D367 section 8(6) read literally has NEVER been
+                          satisfiable by any H2 producer that has existed.
+                          Pass A necessarily loads Census modules from
+                          outside the candidate directory - passa.py lines
+                          746-747 perform sys.path.insert(0, census_pkg)
+                          then import docgraph, opscan, claims - and the
+                          stdlib resolves under neither root. The shipped
+                          qualify.py never attempted it either: its
+                          runtime_module_identity() hard-codes five
+                          candidate modules and checks no Census module.
+
+                        * D367 section 9 NEVER DEFINES
+                          FINAL_CANDIDATE_AGGREGATE. The symbol appears
+                          twice in the contract, at lines 294 and 300, and
+                          is never given a construction. holdout.py's
+                          sha256(MANIFEST.sha256) was an IMPLEMENTATION
+                          choice filling an undefined contract symbol -
+                          which is how the I1-A output-coupling entered in
+                          the first place.
+
+                        So of the three, item 2 replaces a provision that
+                        could not be met and item 3 supplies a definition
+                        the contract never gave. Only item 1 replaces a
+                        provision that was both meetable and met.
+
+WHAT WENT WRONG IN      The wording was mine, and it was not a slip of
+THE PRODUCER            phrasing. Across the D379 drafting cycles I
+                        repeated "D367 IS NOT AMENDED" as a reassurance
+                        that the tranche was bounded, and I never tested
+                        that sentence against the provisions the tranche
+                        was actually replacing. I had read section 1 and
+                        section 8(6) in this same session, and had myself
+                        reported that section 8(6)'s literal reading was
+                        unsatisfiable, one review cycle before banking an
+                        entry asserting the contract was unchanged.
+
+                        The assurance was easier to keep writing than to
+                        check, and each review that accepted the packet
+                        made the sentence feel more settled rather than
+                        less.
+
+DISCOVERY               KAI, by adversarial review AFTER D379 banking and
+                        BEFORE any implementation. Not self-detected.
+
+IMPACT                  GOVERNANCE ONLY.
+                          no implementation
+                          no candidate
+                          no Stage A, real or otherwise
+                          no Pass A
+                          no classification
+                          no holdout selected, resolved or revealed
+                          no admission
+                          no merge
+                        A defective authority DID reach durable programme
+                        state - it is banked, signed, pushed and
+                        independently signature-verified - and that is why
+                        this is an incident rather than a review note.
+
+CONTAINMENT             D379 implementation was HELD immediately on Kai's
+                        ruling and has never started.
+
+CORRECTION PATH         A later D-numbered SUPERSEDING / QUALIFYING
+                        authority which names the three affected
+                        propositions exactly, leaves every other D367
+                        provision governing, and does NOT edit D367's
+                        frozen file. D379 is not edited; the false sentence
+                        stays visible beside its correction, as required.
+
+mechanism               NONE ASSIGNED. `INCIDENT_ONLY`.
+
+                        Expressly NOT assigned to
+                        M-POLICY-ADMISSION-DIVERGENCE, M-SCOPE-WIDEN,
+                        P-ADJUDICATOR-PROPAGATION, M-PRODUCER-CURATION or
+                        M-QUERY-OVERREACH.
+
+                        The resemblance to M-POLICY-ADMISSION-DIVERGENCE is
+                        the strongest yet recorded and is therefore the one
+                        most worth refusing on: that mechanism is a
+                        divergence between what a policy REQUIRES and what
+                        a MACHINE ADMITS. This is a divergence between what
+                        an authority CLAIMED ABOUT ITSELF and what it
+                        CONTAINED. No machine admitted anything here; no
+                        instrument ran. Assigning it would raise a
+                        confirmed recurrence count from 5 to 6 on
+                        similarity alone, and doctrine 37 forbids exactly
+                        that. MECHANISM ASSIGNMENT, IF ANY, IS KAI'S.
+
+cost                    One governance correction cycle and one additional
+                        D-number. No evidence corrupted, no artefact
+                        mutated, no blindness consumed, no implementation
+                        built on the false premise.
+
+control state           NO CONTROL requires a banked authority to reconcile
+                        its own "does not amend X" claims against the named
+                        provisions of X before banking. None is proposed
+                        here on one occurrence, and none is built by this
+                        entry.
+
+                        Recorded as the open question rather than answered:
+                        the banking discipline already requires the
+                        ALLOCATOR to be re-derived structurally before a
+                        number is taken. It requires nothing of the
+                        entry's claims about OTHER governing documents.
+```
+
+
+### Roster delta
+
+| incident | producer | status | mechanism |
+|---|---|---|---|
+| `INC-2026-09-18-30` | Orion | `INCIDENT_ONLY` / OPEN-RECORDED | none assigned — authority denied amending a contract it substantively replaced |
+
+**Real incidents: 30. Highest allocated: `INC-2026-09-18-30`.** Derived
+structurally from definition headings by the `INC-2026-09-17-26` method,
+run against this file before this append and returning 29 / highest
+`INC-2026-09-17-29`:
+
+```
+grep -oE '^### +.?INC-2026-[0-9]{2}-[0-9]{2}-[0-9]+' kai-pm/FAILURE_PATTERN_LEDGER.md \
+  | grep -oE 'INC-2026-[0-9-]+' | sort -u | wc -l
+```
+
+**Producers: Orion 25 · Kai 2 · DeepSeek 2 · instrument 1.** The counts
+carry no fairness, quality or producer-reliability inference.
+
+**MECHANISMS — NONE ALTERED BY THIS APPEND.**
+`M-POLICY-ADMISSION-DIVERGENCE` `PATTERN_CONFIRMED`, **5 confirmed
+occurrences**, doctrine 49.6 already triggered at occurrence 3 and not
+re-triggered, generic cross-component control **NOT IMPLEMENTED**,
+mechanism **NOT CONTROLLED** · `M-SCOPE-WIDEN` `PATTERN_CONFIRMED`, 5
+confirmed occurrences, `RECURRED_AFTER_CONTROL` · `M-PRODUCER-CURATION`,
+`P-ADJUDICATOR-PROPAGATION`, `M-QUERY-OVERREACH` `PATTERN_CANDIDATE`.
+**No mechanism assigned to this incident. No new mechanism. Doctrine 49.6
+not triggered. No D-number allocated by this entry.**
