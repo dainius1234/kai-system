@@ -34961,3 +34961,681 @@ NOT GREEN                  repository and PR #122. DO NOT MERGE.
 AUTHORISES                 nothing further. D359 still governs order.
 LEDGER                     c6ffb524 — INC-25 closure adjudication
 ```
+
+---
+
+## D379 — 2026-09-18 — HOUSE_H2 PRE-CANDIDATE ADMISSION-SURFACE REPAIR. TEN BOUNDED MECHANISMS. NO CANDIDATE, NO REAL IDENTITY, NO HOLDOUT, NO ADMISSION.
+
+**Authority.** Kai's final D379 review ruling of 2026-09-18, relayed by
+Dainius, following the read-only programme recovery and source
+reconciliation of 2026-09-17 and the banking of `INC-2026-09-17-27`,
+`INC-2026-09-17-28` and `INC-2026-09-17-29`. Allocated after a structural
+allocator derivation over decision-definition headings
+`^## D[0-9]+( +—|$)`, run fresh immediately before this append: population
+**361**, distinct **361**, duplicates **none**, highest **D378**, `D379`
+count **0**, next free **D379**.
+
+**`kai-pm/H2_REPAIR_CONTRACT_D367.md`, sha256
+`0ce5792ed72e6e7051ecc050664490899a847d01de2f62cff564f460d46800bb`, IS NOT
+AMENDED.** D379 changes nothing about what admission requires. It makes
+what admission requires actually measurable.
+
+**`kai-pm/H2_CONSOLIDATED_REPAIR_SPEC_DRAFT.md` remains, by its own first
+page, `DRAFT FOR REVIEW. NOT AUTHORISED. NO IMPLEMENTATION.` D379 DOES NOT
+ADOPT IT. THE PHRASE "IMPLEMENT REVISION 4" IS NOT AUTHORITY AND MUST NOT
+BE USED.**
+
+**BANKING IS NOT EXECUTION.** Operational execution is HELD until Kai
+verifies the banking commit itself. Nothing in this entry may begin before
+that verification.
+
+---
+
+### 1. THE TEN BOUNDED MECHANISMS — THE COMPLETE GRANT
+
+Nothing else in any draft receives authority by association, adjacency or
+citation.
+
+```
+ 1  M2 / A3-i        a COMMIT witness may determine LIFECYCLE only if its
+                     binding predicate makes THE DOCUMENT ITSELF the
+                     subject, with the mandatory same-route positive
+ 2  residual D14     start-bound eligibility at the HEAD_BYTES boundary
+ 3  Q1a              producer-byte provenance
+ 4  Q1b              complete DERIVED section-5 denominator over the
+                     emitted result schema
+ 5  E1 proof         the repaired emission produces compliant traces and
+                     reconciles its abstentions
+ 6  section 8(6)     fail-closed QUALIFIER identity
+ 7  I1-A             the blind-selection identity contains NO
+                     execution-produced artefact
+ 8  I1-B             the selection universe comes from the immutable
+                     frozen subject tree, with a reconciliation gate that
+                     can abort selection
+ 9  Stage-A          closed-membership construction
+10  Stage-A/Stage-B  two-stage identity separation, no self-referential
+                     aggregate
+```
+
+**Q1a asks WHO PRODUCED THE RESULT. Q1b asks WHETHER THE QUALIFIER
+OBSERVES THE COMPLETE SECTION-5 SUBJECT POPULATION. Section 8(6) asks
+WHETHER THE QUALIFIER ITSELF IS THE EXPECTED BYTES.** Three separate
+controls. None may be collapsed into another.
+
+**M2 IS A SEPARATE PRE-ADMISSION BLOCKER** — outside the frozen D1-D17
+contract, honouring the D373/D374 admission state, amending D367 in no
+respect. **It must be closed before a fresh candidate is produced. No
+candidate may be built while M2 is knowingly live.**
+
+**CENSUS LINEAGE — BOUND EXPLICITLY AS PRODUCER IDENTITY.** The Pass-A
+path imports `docgraph`, `opscan` and `claims` from the supplied package,
+so this is not descriptive metadata.
+
+```
+CONSUMED — authorised hardened lineage
+  29064d650a61296806df3c3bcab3322f7364da7df674ac93e79d0671475d757a
+PRESERVED, NOT SUPERSEDED, NOT CONSUMED — historical predecessor
+  eb7aad7c1a565cb25fcf6a7e250133e95d210f3e8ceb8765489046e3d945fa0e
+```
+
+No implicit "latest". No substitution. No digest rewriting. The S1
+predecessor qualification — that `24fb1f5555602…` was reproduced **under a
+one-field controlled substitution of `census_dependency.package`, not by an
+untouched end-to-end historical invocation** — remains permanent and
+travels with that claim wherever it is made.
+
+---
+
+### 2. EXACT MUTATION SURFACE
+
+**EXISTING TRACKED — REQUIRED**
+
+```
+kai-pm/house_in_order_h2_v13/qualify.py
+    Q1a   verify RECORDED producer provenance against Stage A, never by
+          re-importing current modules
+    Q1b   complete derived section-5 denominator
+    8(6)  fail-closed qualifier identity
+
+kai-pm/house_in_order_h2_v13/passa.py
+    REQUIRED     Q1a Pass-A producer provenance: verify self against
+                 Stage A BEFORE producing; derive runtime population;
+                 record provenance; REFUSE on incomplete or mismatched
+                 subject
+    CONDITIONAL  M2 A3-i semantic repair, ONLY if the precommitted
+                 calibration against unchanged v1.3 fails (section 3)
+
+kai-pm/house_in_order_h2_v13/run_h2_v12.py
+    REQUIRED     Q1a classification-producer provenance: consume/verify
+                 Stage-A identity; hash the exact Pass-A bytes it reads;
+                 verify the Pass-A producer binding; record classification
+                 provenance; bind to the same Stage-A identity
+    NOT AUTHORISED: any classification-semantic change. E1 stays as
+                 repaired and is NOT reopened.
+
+kai-pm/house_in_order_h2_v13/cal_fixtures.py
+    residual D14 A/B/C calibration
+    M2 same-route calibration
+
+kai-pm/house_in_order_h2_v13/holdout.py
+    REQUIRED  I1-A: the blind-selection aggregate comes from the VALIDATED
+              STAGE-A IDENTITY — never MANIFEST.sha256, never
+              PACKAGE.sha256, never result bytes
+    REQUIRED  I1-B: selection universe from the immutable frozen subject
+              tree; the candidate output multiset must reconcile EXACTLY
+              before selection
+    REFUSE    missing or invalid Stage-A descriptor - tree/output count
+              mismatch - duplicate output path - tree-only path -
+              output-only path
+```
+
+**NEW — REQUIRED**
+
+```
+kai-pm/house_in_order_h2_v13/stage_identity.py
+    Stage-A closed-membership construction; EXTERNAL Stage-B artifact
+    binding
+kai-pm/house_in_order_h2_v13/build_evidence/d379_controls.py
+kai-pm/house_in_order_h2_v13/build_evidence/D379_CONTROLS.txt
+kai-pm/house_in_order_h2_v13/build_evidence/D379_CLOSEOUT.txt
+```
+
+**BANKING RECORD ONLY** — `kai-pm/DECISIONS.md`, append-only.
+**LEDGER ONLY IF A GENUINELY NEW MATERIAL INCIDENT ARISES** —
+`kai-pm/FAILURE_PATTERN_LEDGER.md`, append-only.
+**NO OTHER TRACKED PATH.**
+
+**STILL EXCLUDED.** `scripts/security/check_evidence_package_integrity.py`
+(Control C — later candidate-production tranche; it MAY later consume the
+Stage-B convention defined here) - `envelope.py` - `classify.py` -
+`ontology.py` - `subjectbind.py` - `H2_REPAIR_CONTRACT_D367.md` - all
+historical H2 packages - `kai-pm/house_in_order_census_v11/**`, which is
+**identified and consumed, never modified** - `.github/**` - service code -
+`data/SOUL.md`.
+
+**HOLDS RE-CONFIRMED NON-CONFLICTING.** The D376 NO-NEW-EVIDENCE list
+(`census_v11_claim_sensitivity/run_mutations.py`,
+`house_in_order_h2/pass_a.py`, `house_in_order_h2/cal_env.py`) and the
+in-place runner hold (`house_in_order_h2/run_h2.py`) contain **no path in
+this surface**.
+
+---
+
+### 3. M2 CONDITIONAL PREDICATE — PRECOMMITTED, SEPARATE FROM Q1a
+
+`passa.py` changes under D379 regardless, for provenance. **That is not
+M2.** The two changes are recorded separately in the diff and in the
+evidence, and neither licenses the other.
+
+```
+Measured against UNCHANGED v1.3 passa.py
+  a5ae00d0a3410cea56bce77f159cd654e2e77dc62a8e6a4e015f24b94d335372
+
+IF   (i)  the three false audited-snapshot COMMIT routes no longer
+          classify HISTORICAL —
+            kai-pm/CODE_AUDIT_FINAL_REPORT.md
+            kai-pm/CODE_AUDIT_MASTER.md
+            kai-pm/CODE_AUDIT_PLANNING_PACKAGE_QA.md
+          each witness_type=COMMIT, subject=SELF, carrying
+          2d830f25d569baa5ce955dd8d17e8f0744239876
+AND  (ii) the genuine same-route document-lifecycle positive STILL
+          classifies HISTORICAL
+THEN NO M2 SEMANTIC EDIT. Recorded as M2 discrimination DEMONSTRATED.
+ELSE apply ONLY the bounded A3-i semantic correction, and nothing else.
+```
+
+Both limbs are required: (i) alone is satisfiable by A3-ii, which was
+rejected for removing genuine cases with the defective ones. **Q1a
+provenance work grants no authority to tune M2 semantics.**
+
+---
+
+### 4. Q1a — NON-SELF-REFERENTIAL PRODUCER / STAGE-B BINDING
+
+**A producer never records the whole-file digest of its own
+still-being-created output inside that output.** A producer records facts
+about what it consumed and what executed, never about its own final bytes.
+
+**PASS A — in-band**
+
+```
+producer_provenance = {
+  stage_a_identity,
+  stage_a_descriptor_digest,
+  producer_component:  "PASS_A",
+  producer_population: [ ...runtime-derived, section 5... ],
+  producer_denominator,
+  runtime_identity,
+  subject_commit,
+  subject_tree,
+  tree_paths_identity,
+  census_identity,
+  history_source_identity
+}
+```
+
+**CLASSIFICATION — in-band**
+
+```
+producer_provenance = {
+  stage_a_identity,
+  stage_a_descriptor_digest,
+  producer_component:  "CLASSIFICATION",
+  producer_population: [ ...runtime-derived... ],
+  producer_denominator,
+  runtime_identity,
+  subject_commit,
+  subject_tree,
+  tree_paths_identity,
+  input_binding: {
+    pass_a_artifact_sha256,
+    pass_a_stage_a_identity,
+    pass_a_producer_provenance_digest
+  }
+}
+```
+
+**NO SELF-OUTPUT DIGEST IN EITHER.**
+
+**EXTERNAL STAGE-B BINDING — owned by `stage_identity.py`, computed on
+FINAL bytes**
+
+```
+finalise artefact -> hash the exact final artefact bytes -> binding entry
+
+{ artifact_path, artifact_sha256, artifact_kind,
+  stage_a_identity, producer_component, producer_provenance_digest }
+```
+
+The Stage-B aggregate is derived **externally** over a canonical ordered
+set of binding entries. **The aggregate is never placed inside the byte
+population from which it is derived. No fixed-point hash. No manifest
+hashing itself. No circular package identity.**
+
+**CLASSIFICATION INPUT BINDING HASHES THE BYTES IT ACTUALLY READS** — the
+accepted S1 principle, read, verify THOSE bytes, then use:
+
+```
+read exact Pass-A file bytes -> sha256(those exact bytes) -> parse THOSE
+SAME bytes
+```
+
+Never read, then hash a second read, then assume they match. Classification
+additionally verifies `pass_a.stage_a_identity == supplied
+stage_a_identity`. **Mismatched: REFUSE. Missing provenance: REFUSE.
+Malformed provenance: REFUSE. No silent inheritance.**
+
+**THE BOUNDARY IS UNCHANGED BY Q1a.**
+
+```
+STAGE A  immutable pre-execution subject
+   |  producer verifies ITSELF against Stage A, before producing evidence
+   |  producer records Stage-A identity + derived runtime provenance
+STAGE B  execution-produced evidence, bound EXTERNALLY after finalisation
+   |  qualifier verifies RECORDED provenance against Stage A
+```
+
+Result bytes never enter Stage A. Never `result -> Stage A -> result`.
+
+---
+
+### 5. EXACT RUNTIME-DERIVED PRODUCER-POPULATION RULE
+
+**The hard-coded five-module tuple is abolished and is NOT replaced by
+another literal tuple.** At each production boundary, provenance is derived
+from **actually loaded modules in the live interpreter**:
+
+```
+for every loaded module carrying a file/origin:
+  1. resolve its real source path
+  2. classify that path by the CLOSED rule of section 6
+  3. if under the governed H2 source root:
+       include in producer_population; hash the EXACT source bytes;
+       map it to the corresponding Stage-A member
+  4. if under the governed hardened Census root:
+       include and bind as the Census dependency
+  5. if mechanically classified as Python standard library under the
+     governed interpreter AND not under site-packages/dist-packages:
+       covered by the governed Python runtime identity
+  6. otherwise it is a NON-STDLIB EXTERNAL DEPENDENCY: it MUST already
+     have an explicit Stage-A dependency identity, and
+       IF LOADED NON-STDLIB EXTERNAL AND NOT EXPLICITLY GOVERNED IN
+       STAGE A -> REFUSE
+
+the executing entry-point source (__main__) is included EXPLICITLY
+deduplicate by resolved source path
+sort canonically before hashing and recording
+PRINT producer_denominator, every resolved source path, every source
+      sha256, every Stage-A classification.        NO SILENT MEMBER.
+```
+
+**THERE IS NO SEPARATE CONSEQUENTIALITY PREDICATE. NO ALLOW-BY-JUDGEMENT.
+NO SILENT EXTERNAL DEPENDENCY.** Whether a loaded non-stdlib external
+module belongs to the governed runtime population is decided mechanically
+by the rule above and by nothing else.
+
+**STAGE A BINDS THE WHOLE CANDIDATE; A PRODUCER STAGE EXECUTES ONLY A
+SUBSET OF IT.** Pass A is not required to load `qualify.py` or
+`holdout.py` merely because they are Stage-A members. The rule is
+directional:
+
+> **Governed runtime modules actually loaded MUST be represented in
+> Stage A. NOT: every Stage-A module must appear in every process.**
+
+**INDEPENDENT EXPECTED DENOMINATOR.** The expected population is never
+derived from the recorded provenance. At the production boundary the
+runtime observation and the provenance construction are bound in one step,
+and **before the output is written**:
+
+```
+assert  emitted provenance population == canonical runtime-observed
+        population
+```
+
+For durable production the external Stage-B binding carries
+`producer_provenance_digest` **alongside** `artifact_sha256`, and that
+digest is the independent anchor the qualifier compares against. **No
+provenance list defines its own completeness.**
+
+---
+
+### 6. GOVERNED PYTHON RUNTIME DEPENDENCY RULE — CLOSED
+
+**PYTHON INTERPRETER IDENTITY**, bound mechanically:
+
+```
+realpath(sys.executable)
+sha256(exact sys.executable bytes)
+sys.implementation.name
+sys.implementation.cache_tag
+sys.version
+```
+
+**STANDARD LIBRARY.** A loaded module is treated as Python standard library
+**only** when its resolved source/origin is classified by the interpreter's
+own stdlib location **and is not under `site-packages` or
+`dist-packages`**. Stdlib modules are covered by the governed Python
+runtime identity for this bounded tranche and do not receive individual
+Stage-A entries.
+
+**NON-STDLIB EXTERNAL MODULES.** Any loaded module outside the governed H2
+source root, outside the governed hardened Census root, and not
+mechanically classified as governed Python standard library, **MUST
+already have an explicit Stage-A dependency identity. If it does not:
+REFUSE.** Do not invent a dependency identity on the fly. Such a dependency
+requires explicit review and binding before proceeding.
+
+**STAGE-A CLOSED MEMBERSHIP — FINAL EIGHT CLASSES**
+
+```
+1  H2 candidate / instrument source members
+     cal_fixtures.py  classify.py  envelope.py  ontology.py  passa.py
+     qualify.py  run_h2_v12.py  subjectbind.py  stage_identity.py
+2  holdout-selection code            holdout.py
+3  frozen H2 contract                0ce5792e…00bb
+4  subject commit / tree identity    commit d8aac4d4…f197
+                                     tree   3abc9e9d…b117
+5  TREE_PATHS identity               3af69867…0b40 — 272 tracked .md of the
+                                     frozen subject tree; recompute at
+                                     build time
+6  hardened Census dependency        29064d65…757a
+                                     predecessor eb7aad7c…fa0e preserved,
+                                     NOT consumed
+7  history-source identity           FUTURE REAL CANDIDATE ONLY — not
+                                     under D379
+8  governed Python runtime identity  as defined above
+```
+
+> **RUNTIME OBSERVATION OF ANY LOADED NON-STDLIB DEPENDENCY OUTSIDE THE
+> GOVERNED H2 ROOT, THE GOVERNED CENSUS ROOT AND THE GOVERNED PYTHON
+> STDLIB CLASSIFICATION, WITHOUT AN EXPLICIT STAGE-A DEPENDENCY IDENTITY,
+> IS A COMPLETENESS FAILURE AND FORCES REFUSAL.**
+>
+> No ninth implicit bucket. No "etc." No "as applicable." No silent
+> external library.
+
+**ADMISSION TEST**, unchanged: not *"committed, therefore static"* — **could
+these exact bytes change because the candidate was executed? If YES, then
+Stage B.**
+
+**EXCLUSIONS, ENUMERATED.** `passA.json` - classification result - holdout
+artefact - **`RUN.md`** - qualification output - logs - generated
+evidence - **any artefact whose bytes result from running the candidate.**
+
+**Neither `MANIFEST.sha256` nor `PACKAGE.sha256` may serve as Stage A**,
+and their semantics are not repurposed. `stage_identity.py` hashing its own
+SOURCE bytes is required and is not self-referential; an identity
+containing its own OUTPUT is the forbidden shape.
+
+Class-1 digests measured at `be7b05b5` are **superseded the moment any
+member in section 2 is modified** and must be recomputed at build time.
+
+---
+
+### 7. I1-A — THE HOLDOUT SEED CHANGE
+
+`holdout.py` today computes `aggregate = sha256(read_bytes(MANIFEST.sha256))`
+and uses it as `CANDIDATE_AGGREGATE`. **That manifest contains execution
+output** — measured: 10 entries, nine source modules **plus
+`h2v12-classification.json`**. The seed is therefore derived from the
+candidate's own output.
+
+**The frozen D367 selection equation is UNCHANGED and is NOT amended:**
+
+```
+key = sha256("H2FINAL-D367:" + "86a1399e6e31477ba67cd38c12d22627a8b4d6ef"
+             + ":" + FINAL_CANDIDATE_AGGREGATE + ":" + path)
+sort ascending, first 40
+```
+
+**Only what is substituted changes:**
+
+```
+FINAL_CANDIDATE_AGGREGATE = validated Stage-A identity
+```
+
+because Stage A **is** the candidate precommit identity and contains no
+execution output.
+
+**REPAIRED HOLDOUT INPUT CONTRACT.** It must no longer infer candidate
+identity from a post-execution manifest:
+
+```
+holdout.py
+  receives the Stage-A descriptor / identity
+  verifies the descriptor identity
+  obtains stage_a_identity
+  derives frozen tree_paths
+  reconciles the candidate output path MULTISET against tree_paths
+  REFUSES any mismatch
+  selects from sorted(tree_paths) using stage_a_identity
+```
+
+> **The candidate output determines WHETHER RECONCILIATION PASSES. It must
+> never determine WHAT POPULATION IS SELECTED or WHAT IDENTITY SEEDS
+> SELECTION. That distinction is the whole I1 repair.**
+
+---
+
+### 8. HOSTILE CALIBRATION — COMPLETE MATRIX
+
+All cases run as subprocesses asserting the real process return code,
+against **synthetic and local subjects only**. No real H2 candidate, no
+real Pass A, no real holdout, no real 40-row selection. Every control
+**executed, never asserted** (R2).
+
+```
+Q1a-1   clean chain: Pass-A producer, classification producer and
+        qualifier all on one synthetic Stage A            PASS
+Q1a-2   one governed Pass-A producer byte changed after Stage A fixed
+                                    Pass-A production REFUSES
+Q1a-3   one governed classification-producer byte changed after Stage A
+        fixed                       classification production REFUSES
+Q1a-4   stale input: Pass A under Stage-A A, classification under
+        Stage-A B                   REFUSE, no result accepted
+Q1a-5   recorded producer digest / Stage-A identity tampered in a
+        synthetic result            qualification FAILS / REFUSES
+Q1a-6   provenance valid, qualifier runtime differs from governed
+        Stage-A qualification bytes 8(6) FAIL — producer and qualifier
+                                    identity are independent controls
+Q1a-7   one governed member deleted from the OUTPUT provenance after
+        production, independently captured runtime binding unchanged
+                                    REFUSE — recorded provenance does not
+                                    match the bound producer population
+Q1a-8   a governed module not represented in Stage A is loaded at
+        production                  REFUSE — no silent runtime expansion
+Q1a-9   SELF-HASH PROHIBITION: construct producer evidence whose in-band
+        provenance declares its own whole-file digest among the hashed
+        bytes                       REFUSE AS INVALID IDENTITY
+                                    CONSTRUCTION; then prove the accepted
+                                    path — finalise file, hash exact final
+                                    bytes, external Stage-B binding
+                                    created, PASS
+
+DEP-1   synthetic producer loads a non-stdlib module outside all governed
+        Stage-A roots                                     REFUSE
+DEP-2   producer loads ordinary stdlib modules under the governed
+        interpreter        PASS, without inventing a Stage-A entry for
+                           every stdlib file
+DEP-3   Stage A expects runtime identity A; producer presents mismatching
+        governed interpreter identity B                   REFUSE
+
+I1A-1   one byte altered in one Stage-A member    Stage-A identity CHANGES
+I1A-2   evidence artefact mutated after a valid Stage A exists, output
+        path population intact      Stage-A unchanged - tree-derived paths
+                                    unchanged - Stage-B CHANGES
+I1A-3   HOLDOUT SEED INDEPENDENCE. Synthetic Stage A fixed; output-path
+        population held constant; classification evidence mutated.
+          OLD  manifest-derived aggregate changes -> sample changes
+          NEW  stage_a_identity unchanged -> SELECTED SAMPLE UNCHANGED
+               -> Stage-B identity changes
+        Proves holdout.py itself, not merely stage_identity.py, has
+        stopped deriving blind selection from execution output.
+
+I1B-1   clean tree/result population       gate passes, selection proceeds
+I1B-2   drop one output row                REFUSE BEFORE SELECTION
+I1B-3   add one output row                 REFUSE BEFORE SELECTION
+I1B-4   duplicate one output row           REFUSE BEFORE SELECTION
+
+Q1b-1   clean complete result   PASS, both denominators and their sum
+                                printed
+Q1b-2   one positive evidence fact missing its trace
+                                FAIL, naming fact and row
+Q1b-3   an axis-cell witness failure                      FAIL
+Q1b-4   abstention list inconsistent with emitted positives
+                                                          FAIL
+Q1b-5   denominator shrink: a fact class removed from the emitted set
+                                FAIL — the D17 lesson
+Q1b-6   opposite-side clean known-negative                PASS
+
+86-1    --manifest supplied, identity matches   [6] runs, PASS
+86-2    --manifest supplied, one module byte differs
+                                                FAIL, naming the module
+86-3    --manifest OMITTED                      REFUSE
+86-4    manifest path does not exist            REFUSE
+86-5    manifest unreadable                     REFUSE
+86-6    manifest omits a module that was loaded FAIL
+
+SB-1    Pass A absent                           REFUSE, R11 abort
+SB-2    Pass A altered     Stage-B CHANGES, Stage-A unchanged
+SB-3    Pass A unbound                          REFUSE
+
+M2-1    fail-old: the three false COMMIT routes classify HISTORICAL
+        against committed pre-repair bytes
+M2-2    pass-new: they no longer do
+M2-3    same-route positive STILL classifies HISTORICAL
+
+D14-A   straddling token   fail-old partial / pass-new complete
+D14-B   straddling below recogniser minimum
+                           fail-old silently lost / pass-new complete
+D14-C   token starting at or after the boundary
+                           NOT ADMITTED ON EITHER SIDE
+```
+
+Q1b takes no Pass-A input; Pass-A package completeness belongs to Stage-B
+integrity. The current measurement — 343 non-abstention verdicts plus 316
+positive evidence facts, **659** section-5-governed subjects — is **today's
+measurement and not the definition**; no control may encode it.
+
+Full output to `D379_CONTROLS.txt`, untruncated. Any excerpt declares
+itself partial and states its byte count (R10).
+
+**EVIDENCE CLASS — PRODUCER MEASUREMENT - SIGHTED - ZERO ADMISSION
+WEIGHT**, labelled so wherever cited. Orion self-adjudication carries no
+admission weight and none is claimed.
+
+---
+
+### 9. STOP BOUNDARY
+
+D379 closes only when all of the following hold, and then **RETURNS TO
+KAI**:
+
+```
+M2 discriminating calibration passes
+residual D14 fail-old/pass-new passes
+Q1a producer-byte provenance fail-closed and hostile-calibrated
+Q1b sees the complete derived section-5 population
+E1 visible and proven THROUGH Q1b
+section 8(6) qualifier identity fail-closed
+Stage-A builder hostile-calibrated
+Stage-A dependency membership closed and enumerated
+I1-B tree reconciliation hostile-calibrated
+Stage-B separation / integrity hostile-calibrated
+full evidence written
+no new independent first-effective defect remains
+Kai independent review requested
+```
+
+**SEQUENCE, FIXED**
+
+```
+D379 repair -> hostile calibration -> KAI INDEPENDENT REVIEW
+  -> tranche ACCEPT / REJECT
+only after acceptance: later candidate authority -> final source bytes
+  frozen -> real full-history source bound -> real Stage-A identity
+  created ONCE -> candidate executed
+```
+
+**THEN STOP. NOT AUTHORISED BY THIS ENTRY:** final production Stage-A
+identity - real H2 candidate - real Pass A - real holdout - admission -
+freeze - D380 assumption - RC-7 - A-05 - generic
+`M-POLICY-ADMISSION-DIVERGENCE` control - Control-C integration - main
+merge.
+
+**HISTORY SOURCE.** `git fetch --unshallow` against the active worktree is
+**NOT AUTHORISED**. Calibration uses synthetic and local histories only.
+**If any required proof needs the real full history source: STOP AND
+REPORT.**
+
+**AND THE GATE ON EVERYTHING DOWNSTREAM:** M2 must be closed before a fresh
+candidate is produced. **No candidate while M2 is knowingly live.**
+
+---
+
+### THREAD RECOVERY BLOCK — D379
+
+```
+PROGRAMME ORDER AUTHORITY  D359 section 2 — cite, do not restate.
+                           House is at H2.
+ENTRY                      D379, banked 2026-09-18 on
+                           claude/project-rework-plan-pgvp35.
+                           BANKING IS NOT EXECUTION — operational
+                           execution HELD until Kai verifies this
+                           banking commit.
+AUTHORISES                 ten bounded mechanisms, section 1. Nothing
+                           else, by association, adjacency or citation.
+CONTRACT                   H2_REPAIR_CONTRACT_D367.md 0ce5792e…00bb,
+                           NOT AMENDED.
+DRAFT STATUS               H2_CONSOLIDATED_REPAIR_SPEC_DRAFT.md remains
+                           NOT AUTHORISED. "Implement Revision 4" is not
+                           authority.
+PRE-ADMISSION BLOCKER      M2. No candidate while M2 is knowingly live.
+MUTATION SURFACE           qualify.py - passa.py - run_h2_v12.py -
+                           cal_fixtures.py - holdout.py - NEW
+                           stage_identity.py - NEW build_evidence/
+                           d379_controls.py, D379_CONTROLS.txt,
+                           D379_CLOSEOUT.txt - DECISIONS.md (banking) -
+                           FAILURE_PATTERN_LEDGER.md (only on a new
+                           material incident). NO OTHER TRACKED PATH.
+EXCLUDED                   Control C - envelope.py - classify.py -
+                           ontology.py - subjectbind.py - the frozen
+                           contract - all historical H2 packages -
+                           house_in_order_census_v11/** - .github/** -
+                           service code - data/SOUL.md
+CENSUS                     CONSUMED 29064d65…757a. PRESERVED, NOT
+                           CONSUMED eb7aad7c…fa0e. No implicit latest.
+IDENTITY RULE              no self-output digest in band; Stage-B bound
+                           EXTERNALLY on final bytes; no fixed-point
+                           hash; no manifest hashing itself.
+PRODUCER POPULATION        runtime-derived, entry-point included,
+                           denominator printed. The five-module tuple is
+                           abolished and not replaced by a literal list.
+DEPENDENCY RULE            CLOSED. No consequentiality predicate. A loaded
+                           non-stdlib external module without an explicit
+                           Stage-A dependency identity forces REFUSE.
+HOLDOUT SEED               FINAL_CANDIDATE_AGGREGATE = validated Stage-A
+                           identity. D367's equation unchanged.
+NOT AUTHORISED             real Stage-A identity - candidate - real Pass
+                           A - real holdout - admission - freeze - D380
+                           assumption - RC-7 - A-05 - generic M-POLICY
+                           control - Control-C integration - unshallow -
+                           main merge.
+NOT GREEN                  repository and PR #122. DO NOT MERGE.
+ALLOCATOR                  derived fresh before this append: population
+                           361, distinct 361, duplicates none, highest
+                           D378, D379 count 0, next free D379.
+                           After this entry: next free D380 — NOT TO BE
+                           TAKEN without authorisation.
+LEDGER                     INC-2026-09-17-27 (8213e48b),
+                           INC-2026-09-17-28 (56446046),
+                           INC-2026-09-17-29 (be7b05b5). Real incident
+                           population 29.
+MECHANISMS                 M-POLICY-ADMISSION-DIVERGENCE
+                           PATTERN_CONFIRMED, 5 confirmed occurrences,
+                           49.6 already triggered at occurrence 3 and NOT
+                           re-triggered, generic control NOT IMPLEMENTED,
+                           mechanism NOT CONTROLLED - M-SCOPE-WIDEN
+                           PATTERN_CONFIRMED, 5 occurrences,
+                           RECURRED_AFTER_CONTROL
+```
