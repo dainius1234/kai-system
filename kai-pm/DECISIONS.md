@@ -35639,3 +35639,826 @@ MECHANISMS                 M-POLICY-ADMISSION-DIVERGENCE
                            PATTERN_CONFIRMED, 5 occurrences,
                            RECURRED_AFTER_CONTROL
 ```
+
+---
+
+## D380 — 2026-09-18 — EXPRESS SUPERSESSION OF TWO NAMED D367 PROVISIONS, DEFINITION OF D367 §9 FINAL_CANDIDATE_AGGREGATE, AND CANONICAL STAGE-A IDENTITY FOR THE CURRENT POST-S1 HOUSE_H2 LINEAGE. GOVERNANCE ONLY — NO IMPLEMENTATION AUTHORITY.
+
+**Authority.** Kai's authority-reconciliation ruling of 2026-09-18 and his
+four subsequent D380 normative review rulings of the same date, relayed by
+Dainius, on the read-only source recovery of 2026-09-18 and the banking of
+`INC-2026-09-18-30` (`72654abe73967d9f4e295788f8e73a7e99cc673d`, signature
+independently verified). Allocator derived structurally over decision
+headings `^## D[0-9]+( +—|$)` immediately before this append: population
+**362**, distinct **362**, duplicates **none**, highest **D379**, `D380`
+count **0**, next free **D380**.
+
+**THIS ENTRY CREATES NO IMPLEMENTATION AUTHORITY.** No code, no candidate,
+no Stage-A identity, no Pass A, no holdout, no admission, and no new
+implementation surface beyond D379.
+
+**THIS ENTRY IS SELF-CONTAINED AS TO EVERY NEW, SUPERSEDING AND
+IDENTITY-CONSTRUCTION RULE IT CREATES.** Unchanged D367 provisions remain
+governed by the hash-bound D367 contract identified here. RFC 8785 JCS is
+incorporated by normative reference for canonical JSON serialisation. **No
+chat packet, external draft, README, STATUS file, memory or implementation
+source is required to determine any rule newly created or superseded by
+D380.**
+
+---
+
+### 1. THE GOVERNING PROPOSITION
+
+**D367 remains the governing HOUSE_H2 admission contract EXCEPT where a
+later D-numbered authority expressly supersedes a named frozen proposition.
+D380 names those propositions exactly.**
+
+Neither "D367 was never changed" nor "D367 is replaced" is true, and
+neither is to be used. **`kai-pm/H2_REPAIR_CONTRACT_D367.md` IS NOT
+EDITED.** Its sha256 remains
+`0ce5792ed72e6e7051ecc050664490899a847d01de2f62cff564f460d46800bb`.
+
+**D380 performs TWO express supersessions and ONE normative definition.**
+D367 §9 contained no definition of `FINAL_CANDIDATE_AGGREGATE` to
+supersede: the symbol occurs at contract lines 294 and 300 and is given no
+construction anywhere in the contract.
+
+---
+
+### 2. SUPERSESSION 1 — D367 §1 CENSUS DEPENDENCY
+
+**FOR THE CURRENT POST-S1 HOUSE_H2 CANDIDATE LINEAGE ONLY, D380 SUPERSEDES
+D367 §1's `Census dependency` FIELD FROM**
+
+```
+eb7aad7c1a565cb25fcf6a7e250133e95d210f3e8ceb8765489046e3d945fa0e
+```
+
+**TO**
+
+```
+29064d650a61296806df3c3bcab3322f7364da7df674ac93e79d0671475d757a
+```
+
+— the accepted hardened O3 lineage.
+
+**THIS IS NOT RETROSPECTIVE.** `eb7aad7c…fa0e` remains immutable historical
+predecessor evidence, remains the correct identity for claims about the
+pre-O3 lineage, is **NOT silently rewritten**, and is **NOT the consumed
+Census dependency for the new post-S1 candidate**. Historical v1.1 and v1.2
+evidence remains bound to the lineage that actually produced it.
+
+**S1's predecessor qualification remains permanent and travels with that
+claim wherever it is made:** the historical pre-O3 Pass A digest
+
+```
+24fb1f555560277fd4555087f22ed06ef4a72efee845a339bbc87b925730f51c
+```
+
+was reproduced **under a one-field controlled substitution of
+`census_dependency.package` to its historical canonical absolute path
+spelling, NOT by a completely untouched single end-to-end historical
+invocation.**
+
+D367 §1's sentence *"Census v1.1 and HOUSE_H2 v1.0 are untouched and remain
+so"* is superseded **ONLY as to Census v1.1** and **ONLY for this lineage**.
+**HOUSE_H2 v1.0 remains untouched and remains so**, under its existing
+DO-NOT-RUN-IN-PLACE hold.
+
+**All other D367 §1 fields are UNCHANGED:** subject commit
+`d8aac4d49e6ba997e3eb38062c0917186ee3f197`; subject tree
+`3abc9e9d8ca11966a6f996d5f0af68072ee5b117`; population **272** tracked `.md`
+documents; failed candidate
+`be37a0aa5d56255a151c31361d93e8b4be94ab912ec9441c8ac3535a84fbf133`;
+contract-freeze commit `86a1399e6e31477ba67cd38c12d22627a8b4d6ef`; the
+non-shallow history-source requirement; the rule that the active shallow
+repository must not be used as a history source and that every
+history-consuming instrument must abort on a shallow source; and the
+preservation of the failed candidate as evidence.
+
+---
+
+### 3. SUPERSESSION 2 — D367 §8(6)
+
+D367 §8(6) reads:
+
+> *runtime module identity — every loaded module's `__file__` resolves
+> under the candidate directory and its source bytes hash to the manifest
+> entry*
+
+**That literal proposition is NOT satisfied and is NOT to be called
+satisfied.** It cannot describe a producer that necessarily loads the
+separately governed Census package and the Python standard library:
+`passa.py` lines 746-747 perform `sys.path.insert(0, census_pkg)` and then
+import `docgraph`, `opscan` and `claims`, whose `__file__` resolves under
+the Census package; the standard library resolves under neither root.
+
+**D380 SUPERSEDES D367 §8(6) FOR THE POST-S1 LINEAGE WITH THE FOLLOWING
+CRITERION:**
+
+> **PYTHON RUNTIME / MODULE IDENTITY.**
+>
+> Qualification may pass only when **every Python module / import origin**
+> loaded by a governed H2 producer or qualifier is mechanically classified
+> into **exactly one** of:
+>
+> 1. **H2 candidate / instrument source** — a declared Stage-A
+>    `h2_sources` member whose exact source bytes equal its Stage-A
+>    `sha256`.
+> 2. **Hardened Census source** — belonging to the governed Census package
+>    whose aggregate is
+>    `29064d650a61296806df3c3bcab3322f7364da7df674ac93e79d0671475d757a`,
+>    with the consumed bytes bound to that governed dependency identity.
+> 3. **Governed Python runtime** — either
+>    **(a)** a filesystem-backed origin represented in the canonical
+>    `H2_PY_STDLIB_V1` snapshot of §7, or
+>    **(b)** a built-in or frozen origin, which has no ordinary source file
+>    and is governed by `executable_sha256`, `implementation_name`,
+>    `cache_tag` and `version`.
+>
+> **Any Python module / import origin outside those three classes is a
+> SUBJECT-COMPLETENESS FAILURE and forces REFUSAL.**
+>
+> The governed interpreter executable is separately bound by its exact
+> executable bytes and its runtime identity fields.
+>
+> **No external Python dependency is admitted. No allow-by-judgement. No
+> implicit dependency. No runtime invention of authority. No silent
+> denominator narrowing.**
+
+**SCOPE IS DELIBERATELY LIMITED TO PYTHON MODULE / IMPORT ORIGINS**,
+matching D367 §8(6)'s own concern with loaded modules, `__file__` and source
+bytes. **D380 does NOT claim to cryptographically attest every native
+process or operating-system library dependency** — libc, the dynamic
+loader, system TLS, kernel interfaces and transitively loaded native
+libraries are outside this contract, and no whole-OS attestation is claimed
+or implied.
+
+**D367 §8(6)'s ORIGINAL INTENT IS PRESERVED IN FULL: the bytes which
+executed must be the bytes qualified.** Only its impossible
+single-directory formulation is replaced. Class 3(a) exists precisely
+because an interpreter executable hash does **not** cryptographically bind
+the independent standard-library files installed beside it.
+
+---
+
+### 4. DEFINITION — D367 §9 `FINAL_CANDIDATE_AGGREGATE`
+
+**For the current post-S1 candidate lineage, `FINAL_CANDIDATE_AGGREGATE` in
+D367 §9 SHALL mean the canonical `stage_a_identity` defined in §6.10.**
+
+**The D367 §9 selection rule remains normative exactly as frozen:**
+
+```
+key = sha256(
+    "H2FINAL-D367:"
+    + "86a1399e6e31477ba67cd38c12d22627a8b4d6ef"
+    + ":" + FINAL_CANDIDATE_AGGREGATE
+    + ":" + path
+)
+sort ascending, select the first 40
+```
+
+**D367 §9's ANTI-PEEKING PURPOSE IS PRESERVED AND IS NOT WEAKENED.** The
+real Stage-A identity may be created **only** under the later
+candidate-production authority, after D379 is independently accepted.
+**Neither D379 nor D380 permits the holdout.** A descriptor with
+`mode = "CALIBRATION"` may **NEVER** serve as `FINAL_CANDIDATE_AGGREGATE`.
+
+**All other D367 §9 provisions are UNCHANGED:** size 40; the evaluation-rule
+table and every BLOCKER disposition in it; *"Kai independently adjudicates
+all 40 documents across all six axes. Orion computes no acceptance
+agreement figure"*; and the D363 24-row holdout as partially revealed
+regression evidence only, not to be inspected further.
+
+---
+
+### 5. PRODUCER IDENTITY AND QUALIFIER IDENTITY REMAIN DISTINCT
+
+**Q1a asks: WHO PRODUCED THE RESULT?**
+**§8(6) as superseded asks: ARE THE QUALIFIER'S OWN EXECUTING BYTES THE
+GOVERNED BYTES?**
+
+Both fail closed. **A qualifier importing today's modules cannot
+retroactively establish which bytes produced yesterday's result.** These
+are two controls and must never be collapsed into one.
+
+---
+
+### 6. `H2_STAGE_A_V1` — THE CANONICAL STAGE-A IDENTITY
+
+#### 6.1 Top-level schema — exactly TEN fields
+
+```
+schema        "H2_STAGE_A_V1"
+mode          "PRODUCTION" | "CALIBRATION"
+h2_sources    [ {path, sha256} ]
+contract      {path, sha256}
+governance    [ {decision_id, bank_commit_sha} ]
+subject       {commit, tree, population}
+tree_paths    {population, tree_paths_identity}
+census        {logical_package, aggregate_sha256}
+history       {subject_commit, is_shallow, reachable_count,
+               oldest_commit, oldest_date, reachable_set_sha256}
+runtime       {executable_sha256, implementation_name, cache_tag,
+               version, stdlib_identity, dont_write_bytecode}
+```
+
+**FORBIDDEN:** any digest of the descriptor · any Stage-A identity field ·
+any Stage-B field · any output field · any machine-local absolute path ·
+`executable_realpath` · `class_id` · `external_dependencies`.
+
+**Unknown top-level field → REFUSE. Duplicate logical member → REFUSE.**
+
+The descriptor contains **ONLY pre-execution identity**.
+
+#### 6.2 `h2_sources` — no class label, exactly ten members
+
+```
+h2_sources: [ { "path": <normalised repo-relative path>,
+                "sha256": <sha256 of exact source bytes> } ]
+```
+
+**There is no `class_id` field.** There is exactly one H2 source class in
+this array, so no implementation-selected label exists and none may be
+introduced; a free label would let identical source bytes yield different
+Stage-A identities, and that identity seeds the blind 40.
+
+**Required population — exactly these ten, no more and no fewer:**
+
+```
+kai-pm/house_in_order_h2_v13/cal_fixtures.py
+kai-pm/house_in_order_h2_v13/classify.py
+kai-pm/house_in_order_h2_v13/envelope.py
+kai-pm/house_in_order_h2_v13/holdout.py
+kai-pm/house_in_order_h2_v13/ontology.py
+kai-pm/house_in_order_h2_v13/passa.py
+kai-pm/house_in_order_h2_v13/qualify.py
+kai-pm/house_in_order_h2_v13/run_h2_v12.py
+kai-pm/house_in_order_h2_v13/subjectbind.py
+kai-pm/house_in_order_h2_v13/stage_identity.py
+```
+
+**Population is exactly 10. Missing member → REFUSE. Additional member →
+REFUSE unless a later authority changes this schema. Duplicate normalised
+path → REFUSE.** No generated evidence may appear here.
+
+**Sort before canonicalisation by `(normalised_path, sha256)`,
+lexicographically.**
+
+#### 6.3 `contract` — the immutable D367 base contract
+
+```
+{ "path":   "kai-pm/H2_REPAIR_CONTRACT_D367.md",
+  "sha256": "0ce5792ed72e6e7051ecc050664490899a847d01de2f62cff564f460d46800bb" }
+```
+
+That D380 qualifies named provisions does **not** rewrite that historical
+file.
+
+#### 6.4 `governance` — closed binding of the later governing authorities
+
+Stage A must bind not merely code but the exact governing authority set
+under which the candidate exists. Without it, identical code, contract,
+Census, subject and runtime bytes would yield the **same** identity under a
+**different** governing authority — and that identity seeds blind
+selection.
+
+**For `H2_STAGE_A_V1` and the current post-S1 lineage the list is CLOSED and
+is exactly:**
+
+```
+governance = [
+  { "decision_id": "D379",
+    "bank_commit_sha": "608d706d8452b8e578a484f7b75331a5cb9c28d9" },
+  { "decision_id": "D380",
+    "bank_commit_sha": "<the verified commit in which D380 is banked>" }
+]
+```
+
+The D380 bank commit is unknown at authorship and is populated **only after
+D380 is banked and independently verified**. **This is not circular: D380
+contains no Stage-A identity; the later descriptor contains the
+already-final D380 bank commit.**
+
+**REFUSE on:** an unknown governing decision · missing D379 · missing D380 ·
+a wrong bank commit · a duplicate decision · **any order other than
+ascending numeric decision ID, checked before canonicalisation.**
+
+**NEVER use `latest`, branch HEAD, the current `DECISIONS.md` blob, or any
+open-ended selector. Exact identities only.** A future governing decision
+that changes a Stage-A proposition cannot be appended invisibly; it requires
+express authority or a new schema version. **That is the intended cost of
+closure.**
+
+#### 6.5 `subject`
+
+```
+{ "commit": "d8aac4d49e6ba997e3eb38062c0917186ee3f197",
+  "tree":   "3abc9e9d8ca11966a6f996d5f0af68072ee5b117",
+  "population": 272 }
+```
+
+#### 6.6 `tree_paths` — explicit construction
+
+```
+1. enumerate the 272 tracked `.md` paths from the frozen Git tree
+   3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+2. normalise each as a repository-relative POSIX path
+3. duplicate after normalisation -> REFUSE
+4. sort bytewise UTF-8 lexicographic
+5. construct the byte sequence
+
+     UTF8( path_1 + "\n" + path_2 + "\n" + ... + path_272 + "\n" )
+
+   THE FINAL LF AFTER THE FINAL PATH IS INCLUDED
+
+6. tree_paths_identity = sha256(those exact bytes), lower-case 64-hex
+```
+
+Descriptor field: `{ "population": 272, "tree_paths_identity": <digest> }`.
+
+**Expected known-positive, measured at the frozen tree:**
+
+```
+3af69867813d336f014931e2cfbad8fa4dae14df66cf8df25a5efb1ec2110b40
+```
+
+**Final production MUST re-derive it. Mismatch → REFUSE.**
+
+#### 6.7 `census`
+
+```
+{ "logical_package":  "house_in_order_census_v11",
+  "aggregate_sha256": "29064d650a61296806df3c3bcab3322f7364da7df674ac93e79d0671475d757a" }
+```
+
+**No machine-specific absolute Census path enters Stage-A identity.**
+Runtime provenance independently resolves actual source paths and proves
+that the loaded Census source belongs to this governed aggregate.
+
+#### 6.8 `history` — explicit construction
+
+The descriptor binds the content identity of the real non-shallow history
+source **without binding any local clone path**.
+
+```
+1. derive every commit OID reachable from
+   d8aac4d49e6ba997e3eb38062c0917186ee3f197
+2. verify  is_shallow        = false
+           reachable_count   = 986
+           oldest_commit     = e8c3209c0131e1401f6002ab984c0728a40424e4
+           oldest_date       = 2025-06-18
+3. reachable_oid_set = sorted(unique(lower-case full 40-hex OIDs)),
+   lexicographic
+4. reachable_set_sha256 = sha256(
+       UTF8( oid_1 + "\n" + oid_2 + "\n" + ... + oid_n + "\n" ) )
+   THE FINAL LF AFTER THE FINAL OID IS INCLUDED
+```
+
+Descriptor field:
+
+```
+{ "subject_commit": "d8aac4d49e6ba997e3eb38062c0917186ee3f197",
+  "is_shallow": false,
+  "reachable_count": 986,
+  "oldest_commit": "e8c3209c0131e1401f6002ab984c0728a40424e4",
+  "oldest_date": "2025-06-18",
+  "reachable_set_sha256": <digest> }
+```
+
+**No local clone pathname.** Any mismatch from the frozen history
+requirements → **REFUSE**. **D380 does NOT authorise provisioning this
+source**; that remains future candidate-production authority.
+
+#### 6.9 `runtime` — portable, location-independent
+
+```
+{ "executable_sha256":   <sha256 of the exact interpreter bytes>,
+  "implementation_name": <sys.implementation.name>,
+  "cache_tag":           <sys.implementation.cache_tag>,
+  "version":             <sys.version>,
+  "stdlib_identity":     <H2_PY_STDLIB_V1 digest, §7>,
+  "dont_write_bytecode": true }
+```
+
+**`executable_realpath` is EXCLUDED from the hashed descriptor.** It is
+machine placement, not candidate identity: `/usr/bin/python3` versus
+`/opt/python/bin/python3` would otherwise change `stage_a_identity` and
+therefore the blind 40. It MAY be recorded in runtime provenance for
+diagnostics only.
+
+**`dont_write_bytecode` is inside the hashed bytes and has exactly ONE
+valid value: literal boolean `true`. Missing → REFUSE. `false` → REFUSE.**
+A `false` value must not be able to produce a different but otherwise valid
+Stage-A identity. The reason is structural: the stdlib snapshot
+deliberately excludes mutable generated bytecode, so candidate execution
+must be prohibited from generating those excluded bytes.
+
+**The candidate-production invocation must arrange the interpreter so that
+bytecode writing is disabled FROM PROCESS INITIALISATION** — an interpreter
+startup mechanism such as `-B` or an equivalent governed launch condition —
+**not a late mutation after the candidate has already begun importing its
+governed modules.** D380 prescribes the state, not one shell spelling:
+**bytecode writing disabled from process startup, and verified before
+governed measurement.**
+
+**Producer and qualifier startup check, in order:** verify
+`executable_sha256` · `implementation_name` · `cache_tag` · `version` ·
+verify `sys.dont_write_bytecode is True` · independently derive
+`stdlib_identity` and compare it with Stage A. **Any mismatch → REFUSE.**
+Diagnostic runtime provenance MAY record the actual executable realpath and
+the actual stdlib root realpaths; **those values are Stage-B / runtime
+evidence only and never enter Stage-A identity.**
+
+#### 6.10 Canonicalisation and digests
+
+**Canonical serialisation: RFC 8785 JSON Canonicalization Scheme (JCS),
+incorporated by normative reference. Encoding UTF-8. No BOM. The canonical
+byte sequence is exactly the JCS output. NO trailing newline is added to
+the hashed byte sequence.**
+
+All SHA-256 strings are lower-case 64-character hexadecimal. All Git object
+IDs are lower-case 40-character hexadecimal.
+
+**Path rules, everywhere in this schema and in §7:** relative · POSIX `/`
+separator · no leading `/` · no `.` segment · no `..` segment · no
+backslash alias · valid UTF-8 · Unicode NFC · **duplicate after
+normalisation → REFUSE.**
+
+**All member arrays are sorted BEFORE canonicalisation by the sort rules
+given for each array. The sort is part of this authority. No filesystem
+enumeration order may influence identity.**
+
+Let **`D`** = the exact RFC 8785 canonical descriptor bytes. Then:
+
+```
+stage_a_descriptor_digest = sha256(D)
+
+stage_a_identity          = sha256( UTF8("H2-STAGE-A-V1") + 0x00 + D )
+```
+
+both lower-case 64-hex.
+
+**NEITHER DIGEST IS A FIELD INSIDE `D`. THERE IS THEREFORE NO
+SELF-REFERENCE.**
+
+A materialised descriptor file must contain **EXACTLY `D`** — no added
+newline, no pretty printing, no field reordering, no metadata wrapper.
+**A reparse and recanonicalise cycle MUST reproduce the exact same `D`
+bytes, or REFUSE.**
+
+#### 6.11 Excluded from Stage A — enumerated
+
+`passA.json` · the classification output · the qualification output · the
+holdout output · `RUN.md` · logs · generated evidence · Stage-B bindings ·
+the Stage-B aggregate · **any byte produced because the candidate
+executed.**
+
+**No output may feed the Stage-A descriptor. No circular aggregate.**
+
+---
+
+### 7. `H2_PY_STDLIB_V1` — GOVERNED PYTHON STANDARD-LIBRARY SNAPSHOT
+
+#### 7.1 Governed root resolution
+
+Obtain Python's configured paths mechanically and use the logical roles
+**`stdlib`** and **`platstdlib`**. Also obtain **`purelib`** and
+**`platlib`** solely in order to EXCLUDE external package roots.
+
+Resolve each governed role to its canonical local filesystem directory
+**for containment testing only**. **Absolute local filesystem paths are
+used only during enumeration and NEVER enter Stage-A identity.**
+
+```
+CASE A — stdlib and platstdlib resolve to the SAME directory
+         ONE governed root, root_id = "stdlib".
+         Do NOT duplicate its contents: one local directory serving two
+         runtime roles does not create two copies of one byte population.
+
+CASE B — DISTINCT, NON-OVERLAPPING resolved roots
+         TWO governed roots, root_id = "stdlib" and "platstdlib".
+         Enumerate both. Sort roots by root_id.
+
+CASE C — DISTINCT, but ONE RESOLVED ROOT CONTAINS THE OTHER
+         Both logical roots remain governed, AND every physical
+         filesystem member receives EXACTLY ONE owning root_id.
+```
+
+#### 7.2 MOST-SPECIFIC GOVERNED ROOT WINS
+
+For any filesystem entry:
+
+```
+1. determine every governed resolved root that contains it;
+2. assign the entry to the containing root with the LONGEST resolved
+   root path;
+3. where only one governed root contains it, that root owns it;
+4. an equal-root case has already collapsed under CASE A.
+```
+
+Therefore, when `platstdlib` is nested inside `stdlib`, **the `stdlib`
+recursive enumeration MUST NOT emit entries whose resolved filesystem
+location belongs to the more-specific `platstdlib` root**; those entries
+are emitted once, under `platstdlib`. The same rule applies in the opposite
+nesting direction.
+
+**Every accepted physical member appears EXACTLY ONCE in
+`H2_PY_STDLIB_V1`.** Without this rule a nested layout would enter the
+identity twice — once as `stdlib:platform/X` and again as `platstdlib:X` —
+making identity depend on installation layout.
+
+#### 7.3 External package exclusion PRECEDES root ownership
+
+The exclusion check for **`purelib`**, **`platlib`**, `site-packages` and
+`dist-packages` **happens BEFORE a filesystem member is accepted into a
+governed stdlib root.**
+
+```
+external package population   BEATS   stdlib/platstdlib containment
+```
+
+**A package does not become standard library merely because its filesystem
+location is nested under a governed stdlib root.** It must not be
+snapshotted as stdlib, and if such a module is loaded under
+`H2_STAGE_A_V1`: **REFUSE.**
+
+#### 7.4 Enumeration
+
+* Enumerate with **`lstat` semantics**.
+* **Do NOT follow directory symlinks while recursively walking.**
+* Every symlink is treated as a symlink entry first.
+* Detect symlink loops. Detect dangling links. Detect links escaping the
+  governed root set.
+* **Exclude mutable generated bytecode: `__pycache__/**`, `*.pyc`,
+  `*.pyo`.**
+
+#### 7.5 Entry schema — exactly two forms
+
+```
+FILE
+{ "type":    "file",
+  "root_id": "stdlib" | "platstdlib",
+  "path":    <normalised path relative to that governed root>,
+  "sha256":  <sha256 of exact file bytes> }
+
+SYMLINK
+{ "type":           "symlink",
+  "root_id":        "stdlib" | "platstdlib",
+  "path":           <normalised path relative to that governed root>,
+  "target_root_id": "stdlib" | "platstdlib",
+  "target":         <normalised path relative to target_root_id> }
+```
+
+**No local absolute pathname enters the object. No mode-dependent
+enumeration order. No mtime. No inode. No owner.**
+
+**Any other filesystem type → REFUSE.**
+
+#### 7.6 Portable symlink resolution across the governed root set
+
+For every symlink: resolve its local filesystem target, resolving relative
+to the symlink's parent where necessary; **detect cycles**; **reject
+dangling targets**; determine whether the final resolved target lies inside
+the governed root set; then determine `target_root_id` **using the SAME
+most-specific-governed-root rule of §7.2**, and store the target as the
+path relative to that owning root.
+
+**Store the normalised root-relative resolved target, NEVER the exact local
+`readlink` text.** Storing the raw target text would reintroduce machine
+placement into identity: the same governed content installed at
+`/usr/lib/python3.12/…` and at `/opt/python/lib/python3.12/…` would
+otherwise yield different digests and therefore a different blind 40.
+Applying the most-specific rule to targets prevents one resolved target
+from receiving two possible canonical identities where governed roots
+overlap.
+
+**If the final target resolves outside the governed root set → REFUSE.**
+There is no external-dependency escape hatch in this schema. A legitimate
+symlink from `stdlib` into `platstdlib` is expressible without embedding
+either machine-local root.
+
+#### 7.7 Single-ownership assertion
+
+Before canonicalisation the builder MUST assert that **every accepted
+stdlib physical member maps to exactly one canonical
+`(root_id, path)` pair.**
+
+```
+zero owners                              -> REFUSE
+more than one owner after §7.2           -> REFUSE
+duplicate canonical (root_id, path)      -> REFUSE
+```
+
+This assertion is **defined here and hostile-calibrated later under D379.**
+D380 defines it only.
+
+#### 7.8 Sort — normative
+
+Sort entries lexicographically by:
+
+```
+( type, root_id, path, discriminator )
+
+  discriminator for a file     = sha256
+  discriminator for a symlink  = target_root_id + "\x00" + target
+```
+
+**No filesystem walk order influences identity.**
+
+#### 7.9 Object and digest
+
+```
+{ "schema": "H2_PY_STDLIB_V1", "entries": [ ... ] }
+```
+
+**The local root paths themselves are NOT stored.** Canonicalise with the
+same RFC 8785 JCS rules of §6.10. Let **`S`** = the exact canonical bytes.
+Then:
+
+```
+stdlib_identity = sha256(S)          lower-case 64-hex
+```
+
+Two installations with identical governed content therefore produce the
+same `stdlib_identity` even when installed at different filesystem
+locations.
+
+#### 7.10 Built-in and frozen modules
+
+A Python module whose import origin is mechanically reported as **built-in**
+or **frozen** has no ordinary source file to hash. It is governed by
+`executable_sha256`, `implementation_name`, `cache_tag` and `version`.
+**Do not create fake file entries for it. Any other non-filesystem import
+origin → REFUSE.**
+
+#### 7.11 Loaded stdlib module rule
+
+For a loaded module classified as standard library, its normalised
+root-relative origin under its owning `root_id` **must be represented in
+the governed snapshot**, or it must be a built-in or frozen module. **A
+filesystem-backed stdlib module not represented in the governed snapshot →
+REFUSE.** This closes the claim that a runtime dependency existed but was
+not inside the identity denominator.
+
+---
+
+### 8. ZERO EXTERNAL PYTHON DEPENDENCIES
+
+**`H2_STAGE_A_V1` ADMITS ZERO EXTERNAL PYTHON DEPENDENCIES.**
+
+There is **no external-dependency class**, **no `external_dependencies`
+field**, **no empty placeholder**, **no generic extension point** and **no
+implicit fourth class**. Any loaded Python module or import origin outside
+the governed H2 source set, the governed hardened Census package, and the
+governed Python stdlib / built-in / frozen runtime **forces REFUSAL**.
+
+This is closure, not omission: in the H2 and Census production source
+population reviewed, **no third-party Python import was found**, so this
+schema closes rather than carrying an open bucket.
+
+**If a future legitimate external Python dependency becomes necessary, it
+requires new authority plus a new schema version or an express amendment.
+IT MUST NOT BE INVENTED AT RUNTIME.**
+
+---
+
+### 9. THE PORTABILITY INVARIANT, AND D367 §8(7)
+
+**D367 §8(7) — *"fresh reproduction from an unrelated directory: all rows
+and the admission contract byte-identical"* — is NOT superseded, NOT
+qualified and NOT amended by D380.** It is one reason machine-local paths
+must not enter Stage-A identity, and the rules above are what make it
+satisfiable.
+
+```
+clone directory moved            stage_a_identity UNCHANGED
+Census local path moved          stage_a_identity UNCHANGED
+history clone path moved         stage_a_identity UNCHANGED
+Python installation path moved   stage_a_identity UNCHANGED
+    provided interpreter bytes, runtime properties and governed
+    stdlib CONTENT are identical
+
+actual CONTENT changed           stage_a_identity CHANGES
+governing AUTHORITY changed      stage_a_identity CHANGES
+```
+
+**Location changes do not alter identity. Content and governing-authority
+changes do.**
+
+---
+
+### 10. RELATIONSHIP BETWEEN D367, D379 AND D380
+
+```
+D367 remains governing EXCEPT:
+  §1 Census dependency    SUPERSEDED for the current post-S1 H2 candidate
+                          lineage, by D380 §2
+  §8(6)                   SUPERSEDED by D380 §3's three-class fail-closed
+                          Python runtime / module identity criterion
+  §9 FINAL_CANDIDATE_     DEFINED for the current post-S1 lineage as the
+     AGGREGATE            D380 §6.10 canonical stage_a_identity. There was
+                          no prior definition to supersede.
+EVERYTHING ELSE IN D367 REMAINS UNCHANGED, INCLUDING §8(7).
+```
+
+Unchanged in full: D367 §2 (the D1–D17 defect-class register), §3, §4, §5
+(the nine mandatory witness fields), §6, §7, §10, §11, §12, §13; §8
+criteria (1), (2), (3), (4), (5), (7) and (8); and every D367 §1 and §9
+provision not expressly named above.
+
+**D379 remains the governing implementation authority for the bounded
+repair tranche, subject to these corrections.** Any D379 sentence asserting
+*"D367 IS NOT AMENDED"*, *"changes nothing about what admission
+requires"*, or equivalent — in its preamble and in its THREAD RECOVERY
+BLOCK alike — **is superseded to this narrower proposition:**
+
+> **D379 and D380 do not alter D367 except for the three provisions
+> expressly named above.**
+
+**No other D379 scope expands.** Its ten bounded mechanisms, its exact
+mutation surface, its hostile-calibration matrix and its stop boundary are
+unchanged. D379's Stage-A class list and its `runtime` field list are
+superseded by §§6 and 7 of this entry. **`DECISIONS.md` is append-only:
+D379 is NOT edited, and the superseded sentences stay visible beside this
+correction.**
+
+---
+
+### 11. STOP
+
+**D380 is governance reconciliation and canonical identity definition. It
+creates no new implementation surface beyond D379.**
+
+After D380 is banked: **STOP. Kai verifies the D380 banking commit.** Only
+then may Kai decide whether the already-banked D379 implementation
+authority is now executable. **Implementation does not auto-start merely
+because D380 exists.**
+
+**NOT AUTHORISED BY THIS ENTRY:** any code · D379 execution · the M2
+measurement · the Stage-A builder · a real Stage-A identity · a real Pass A
+· a classification run · a holdout · a candidate · admission · freeze ·
+Control-C integration · RC-7 · A-05 · the generic
+`M-POLICY-ADMISSION-DIVERGENCE` control · provisioning the non-shallow
+history source · `git fetch --unshallow` against the active worktree · a
+D381 assumption · any merge.
+
+**PR #122 remains DO NOT MERGE. D359 governs programme order.**
+
+---
+
+### THREAD RECOVERY BLOCK — D380
+
+```
+PROGRAMME ORDER AUTHORITY  D359 §2 — cite, do not restate. House is at H2.
+ENTRY                      D380, banked 2026-09-18 on
+                           claude/project-rework-plan-pgvp35.
+                           GOVERNANCE ONLY. Banking is not execution.
+PERFORMS                   2 express supersessions + 1 definition.
+                           D367 §1 Census dependency  SUPERSEDED
+                           D367 §8(6)                 SUPERSEDED
+                           D367 §9 FINAL_CANDIDATE_AGGREGATE  DEFINED
+                           (no prior definition existed to supersede)
+UNTOUCHED                  all other D367 provisions, INCLUDING §8(7)
+                           fresh unrelated-directory reproduction
+CONTRACT                   H2_REPAIR_CONTRACT_D367.md 0ce5792e…00bb
+                           NOT EDITED
+CENSUS                     CONSUMED 29064d65…757a, current post-S1 lineage
+                           PRESERVED, NOT CONSUMED eb7aad7c…fa0e
+                           S1 predecessor qualification permanent
+IDENTITY                   H2_STAGE_A_V1, 10 top-level fields, RFC 8785 JCS
+                           stage_a_identity = sha256("H2-STAGE-A-V1"||0x00||D)
+                           neither digest is a field in D — no self-reference
+GOVERNANCE BINDING         CLOSED [D379, D380] with exact bank commits.
+                           D379 = 608d706d8452b8e578a484f7b75331a5cb9c28d9
+                           No latest, no branch HEAD, no mutable blob.
+STDLIB                     H2_PY_STDLIB_V1, multi-root (stdlib/platstdlib),
+                           MOST-SPECIFIC GOVERNED ROOT WINS, external
+                           package exclusion precedes root ownership,
+                           single-ownership assertion, root_id on every
+                           entry, portable resolved symlink targets, lstat,
+                           no directory-symlink traversal, bytecode caches
+                           excluded
+RUNTIME                    no executable_realpath; dont_write_bytecode=true
+                           is hashed and is the ONLY valid value
+EXTERNAL DEPENDENCIES      ZERO admitted. No fourth class. No placeholder.
+TREE PATHS                 explicit construction; known-positive
+                           3af69867…0b40; re-derive at production or REFUSE
+HISTORY                    reachable-OID-set digest, no clone pathname;
+                           986 / e8c3209c…24e4 / 2025-06-18
+AUTHORISES                 NOTHING to execute. D379 remains HELD pending
+                           Kai's verification of this banking commit.
+LEDGER                     INC-2026-09-18-30 at 72654abe — the D379
+                           internal authority inconsistency this entry
+                           corrects. INCIDENT_ONLY, no mechanism.
+MECHANISMS                 M-POLICY-ADMISSION-DIVERGENCE PATTERN_CONFIRMED,
+                           5 confirmed occurrences, NOT CONTROLLED ·
+                           M-SCOPE-WIDEN PATTERN_CONFIRMED, 5,
+                           RECURRED_AFTER_CONTROL
+NOT GREEN                  repository and PR #122. DO NOT MERGE.
+ALLOCATOR                  before this append: population 362, distinct 362,
+                           duplicates none, highest D379, D380 count 0,
+                           next free D380. After: next free D381 — NOT TO
+                           BE TAKEN without authorisation.
+```
