@@ -36462,3 +36462,1281 @@ ALLOCATOR                  before this append: population 362, distinct 362,
                            next free D380. After: next free D381 — NOT TO
                            BE TAKEN without authorisation.
 ```
+
+## D381 — 2026-09-18 — BOUNDED SUBJECT-BINDING REPAIR CLASS FROM INC-2026-09-18-31, AND H2_STAGE_A_V2. GOVERNANCE AND BOUNDED IMPLEMENTATION SCOPE — BANKING IS NOT EXECUTION.
+
+**Authority.** Kai's D381 integration rulings of 2026-09-18, relayed by
+Dainius, following the banking and independent verification of
+`INC-2026-09-18-31`
+(`de3d05c63bedf015c0fa29a8ab455c5c363332b1`), the completed
+subject-binding adversarial reviews, and the completed final adversarial
+review of the D381 / `H2_STAGE_A_V2` authority shape. **No further
+adversarial cycle on this authority is required.** Allocator derived
+structurally over decision headings matching the exact pattern
+`^## D[0-9]+( +—|$)` immediately before this append: population **363**,
+distinct **363**, duplicates **none**, highest **D380**, `D381` count
+**0**, next free **D381**. *(Derivation note, so the figure is
+reproducible: a looser pattern `^## D[0-9]+` returns **364** because it
+also matches `## D370 CORRECTION / ERRATA` at line 32709, which is an
+errata heading and not a decision heading. The allocator universe is the
+strict pattern only.)*
+
+**TWO-STAGE GATE — MECHANICAL, NOT RHETORICAL.**
+
+```
+D381 DEFINES the only permitted future mutation scope.
+D381 BANKING DOES NOT ACTIVATE that scope.
+Kai's SEPARATE POST-BANK EXECUTION RELEASE, issued after independent
+verification of the D381 bank commit, is required before any source byte
+may change.
+```
+
+**THIS ENTRY IS SELF-CONTAINED AS TO EVERY NEW, SUPERSEDING AND
+IDENTITY-CONSTRUCTION RULE IT CREATES.** Unchanged D367 provisions remain
+governed by the hash-bound D367 contract; unchanged D379 and D380
+provisions remain governed by their own banked entries; RFC 8785 JCS is
+incorporated by normative reference. No chat packet, external draft,
+README, STATUS file, memory or implementation source is required to
+determine any rule newly created or superseded here.
+
+---
+
+### 1. PURPOSE, AND THE EXACT D379 / D381 AUTHORITY SPLIT
+
+`INC-2026-09-18-31` established ONE shared root cause:
+
+> **HOUSE_H2 conflated DOCUMENT-LEVEL APPLICABILITY with SEMANTIC SELF
+> SUBJECT.** The producer's closed binding table granted whole-document
+> scope and allowed every Witness to inherit `subject=SELF`; the subject
+> dimension remained CONSTANT in production and was IGNORED by the relevant
+> classifier consumers. Non-SELF measurement targets therefore licensed
+> SELF-only VALIDITY and LIFECYCLE conclusions.
+
+That one cause has TWO downstream manifestations:
+
+```
+LIFECYCLE / M2                     the D379 M2 predicate
+VALIDITY  / residual D1 + D367 §6  a frozen contract condition the machine
+                                   never implemented
+```
+
+**THE AUTHORITY PROVENANCE OF THE TWO MANIFESTATIONS IS NOT THE SAME, AND
+THIS ENTRY DOES NOT BLUR THEM.**
+
+> **D379's authorisation was COMPLETE IN AUTHORISED SCOPE. It was NOT
+> necessarily COMPLETE IN IMPLEMENTATION.**
+
+**LIFECYCLE / M2 — D379 REMAINS THE SUBSTANTIVE AUTHORITY.** D379 already
+holds the substantive proposition: *a COMMIT witness may determine document
+LIFECYCLE only where the document itself is the semantic subject.* What
+D379 lacked was the complete mutation surface needed to implement that
+predicate truthfully — it did not authorise `classify.py` or
+`envelope.py`. **D381 supplies that missing implementation surface and the
+shared governed subject mechanism. D381 does NOT replace, re-grant or
+retrospectively reinterpret D379's substantive M2 authority.**
+
+**VALIDITY / residual D1 + D367 §6 — D381 SUPPLIES THE NEW SUBSTANTIVE
+AUTHORITY.** This manifestation was **not** one of D379's ten granted
+mechanisms. It was discovered later, through INC-31. D381 therefore
+supplies the substantive implementation authority for it, and does **not**
+pretend D379 authorised it.
+
+**WHY ONE CLASS AND NOT TWO.** The two manifestations are repaired in ONE
+COORDINATED SUBJECT-BINDING CLASS because INC-31 established one
+producer/consumer root cause — the same producer subject error, the same
+witness, the same selector family, the same missing subject enforcement.
+**They are NOT unified because D381 claims both requirements originated in
+D381.** One cause, one coordinated class, **two different authority
+provenances**. No separate per-axis repair architecture is created.
+
+---
+
+### 2. NO CHANGE TO THE D367 BASE FILE
+
+`kai-pm/H2_REPAIR_CONTRACT_D367.md` remains BYTE-IMMUTABLE. Its frozen
+sha256 remains
+
+```
+0ce5792ed72e6e7051ecc050664490899a847d01de2f62cff564f460d46800bb
+```
+
+**D381 does not edit the contract file. It supplies later governing
+authority only through propositions expressly stated in THIS ENTRY.
+Section 18 contains the SOLE express supersession of a D380 proposition —
+the current-lineage `FINAL_CANDIDATE_AGGREGATE` definition.**
+
+**A NEW RULE IS NOT A SUPERSESSION.** D381 creates many new rules, in
+§§3–17 and §§19–20. Exactly one previously banked proposition is expressly
+superseded.
+
+---
+
+### 3. THE CLOSED SUBJECT GRAMMAR, AND ITS NORMATIVE PARSER
+
+D381 authorises CENTRAL FAIL-CLOSED VALIDATION of `Witness.subject`.
+
+**Canonical allowed forms, and no others:**
+
+```
+SELF
+AMBIGUOUS
+OTHER:DOCUMENT:<normalised repo-relative path>
+OTHER:GIT_COMMIT:<full lower-case 40-hex commit>
+```
+
+**3.1 NORMATIVE PARSING ORDER — CLOSED, NO HEURISTICS.**
+
+A generic "uppercase token" heuristic is expressly NOT adopted: it would
+reserve arbitrary uppercase path names. The parser is a closed ordered
+match.
+
+```
+1. exact "SELF"
+       -> SELF
+2. exact "AMBIGUOUS"
+       -> AMBIGUOUS
+3. prefix "OTHER:DOCUMENT:" + payload
+       -> typed DOCUMENT form
+       -> validate payload against the D380 §6.10 repo-relative path rules
+       -> malformed payload            REFUSE
+       -> NEVER falls through to legacy parsing
+4. prefix "OTHER:GIT_COMMIT:" + payload
+       -> typed GIT_COMMIT form
+       -> payload MUST be exactly full lower-case 40-hex
+       -> malformed payload            REFUSE
+       -> NEVER falls through to legacy parsing
+5. prefix "OTHER:" + payload
+       -> transitional legacy DOCUMENT alias ONLY IF ALL hold:
+            payload is non-empty
+            payload contains NO ":" character
+            payload satisfies the D380 §6.10 repo-relative path rules
+       -> otherwise                    REFUSE
+6. anything else
+       -> REFUSE
+```
+
+**Required consequences, which are normative:**
+
+```
+OTHER:MYSTERY:foo                REFUSE
+OTHER:GIT_COMMIT:not-a-commit    REFUSE — no legacy fallback
+OTHER:DOCUMENT:bad/../path       REFUSE — no legacy fallback
+OTHER:kai-pm/file.md             accepted transitionally, as
+                                 OTHER:DOCUMENT:kai-pm/file.md
+```
+
+**Rules 3 and 4 are TERMINAL on match of their prefix.** A malformed typed
+form MUST NOT reach rule 5. That fall-through was the identified defect and
+is closed mechanically, not by convention.
+
+**THE TRANSITIONAL LEGACY ALIAS IS DELIBERATELY NARROWER THAN THE CANONICAL
+DOCUMENT PAYLOAD.** It forbids `:`; the canonical typed form does not. A
+future legitimate repository path containing `:` is representable
+canonically as `OTHER:DOCUMENT:<path-containing-colon>` and is NOT
+representable through the legacy alias. **Source measurement over the
+frozen subject tree `3abc9e9d8ca11966a6f996d5f0af68072ee5b117`: tracked
+blobs 1032, tracked `.md` paths 272, tracked paths containing `:` — ZERO.**
+No current path is affected by the restriction.
+
+**NEW PRODUCERS MUST EMIT THE CANONICAL TYPED FORM.** The legacy spelling
+is transitional only.
+
+Path rules for `OTHER:DOCUMENT:` are D380 §6.10's: relative · POSIX `/` ·
+no leading `/` · no `.` or `..` segment · no backslash alias · valid UTF-8 ·
+Unicode NFC.
+
+**There is no arbitrary free-form `OTHER:<prose>` namespace, no
+`OTHER:GIT_COMMIT_TREE` type, and no encoded grammar-version field.**
+
+**3.2 ENFORCEMENT BOUNDARY — BOUNDED, AND STATED TRUTHFULLY.**
+
+The closed grammar is mechanically enforced at the governed
+`envelope.Witness` construction / rehydration boundary and on any
+D381-authorised path that constructs or rehydrates such a Witness.
+
+**Witness constructor census, measured over the current governed H2 package
+plus the D379 hostile-control surface at the pre-D381 state:**
+
+```
+passa.py                                  4 syntactic Witness construction sites
+classify.py                               7 construction / rehydration sites
+cal_fixtures.py                           2 construction sites
+build_evidence/d379_controls.py           1 construction site
+--------------------------------------------------------------------
+TOTAL                                    14
+```
+
+**All fourteen lie inside the combined D379/D381 mutation and control
+surface.** `envelope.py` **defines** `Witness` and constructs none.
+`subjectbind.py` constructs NO Witness. `run_h2_v12.py` constructs NO
+Witness object, but does manually construct separate evidence-trace
+dictionaries carrying a `subject` key.
+
+> **D381 DOES NOT CLAIM TO INTRODUCE A UNIVERSAL VALIDATOR FOR EVERY
+> ARBITRARY `subject` FIELD IN EVERY RESULT DICTIONARY.** It governs
+> `envelope.Witness` construction and rehydration. **No `run_h2_v12.py`
+> semantic widening is authorised**, and its manually constructed trace
+> dictionaries remain under their existing D379 scope. The legacy
+> `OTHER:<path>` spelling remains accepted as the transitional
+> document-subject form wherever it is encountered, including there and in
+> the excluded `subjectbind.py`.
+
+---
+
+### 4. THE QUALIFICATION SUBJECT
+
+`kai-pm/house_in_order_instrument/AUTHORITY_ONTOLOGY.md` records
+
+```
+Subject: QUALIFICATION_SUBJECT 9d15bcd / tree 627104d6
+```
+
+whose full identities are
+
+```
+commit  9d15bcd207ad7a33e1087667b245970f989e366f
+tree    627104d61b4f91e110a36cf65a44fed2cfbad078
+```
+
+The explicit tree is exactly that commit's tree. **Canonical witness
+subject:**
+
+```
+OTHER:GIT_COMMIT:9d15bcd207ad7a33e1087667b245970f989e366f
+```
+
+Where structured source supplies BOTH commit and tree: resolve the full
+commit → derive its tree → resolve the supplied tree → **require
+equality** → on mismatch, **REFUSE / fail closed**, and do not manufacture
+a determinate subject.
+
+**THE TREE IS CONSISTENCY EVIDENCE, NOT A SECOND SUBJECT IDENTITY.**
+
+---
+
+### 5. PRODUCER SUBJECT SEMANTICS — ONE GOVERNED REGISTRY, FAIL-CLOSED
+
+**5.1 ONE REGISTRY, NOT TWO.**
+
+D381 expressly forbids maintaining `passa.BINDING_PREDICATES` **plus a
+second free-standing subject map**. D381 requires **ONE GOVERNED PREDICATE
+REGISTRY** in which every binding-predicate entry carries BOTH:
+
+```
+its document-binding / applicability rationale
+AND
+its subject policy / subject resolver
+```
+
+**Conceptually a predicate is INSEPARABLE from its subject semantics.** A
+second list beside the first would be exactly the maintained-beside-it
+defect the doctrine forbids.
+
+**5.2 CURRENT EXPLICIT POLICIES.**
+
+```
+audited snapshot                     NONSELF_GIT_COMMIT
+findings-bearing audited snapshot    NONSELF_GIT_COMMIT
+subject / QUALIFICATION_SUBJECT      NONSELF_GIT_COMMIT
+acquisition commit                   SELF   (currently adjudicated source form)
+validated checkpoint                 SELF   (currently adjudicated source form)
+snapshot                             AMBIGUOUS
+measured at                          AMBIGUOUS
+```
+
+The two SELF policies are adjudicated **for their currently observed source
+forms**: `UH0_EVIDENCE_MANIFEST.md` states an immutable baseline acquired
+at that commit; `SERVICE_IDENTITY_STATE.md` states the authoritative
+engineering state at that checkpoint. The DATE / current-state families
+retain their per-predicate governed roles.
+
+**5.3 THE FAIL-CLOSED INVARIANT — NORMATIVE.**
+
+> **No binding predicate may exist in the governed registry without an
+> explicit recognised subject policy / resolver.**
+
+```
+missing policy                                REFUSE
+unknown policy                                REFUSE
+malformed registry entry                      REFUSE
+predicate added without its subject semantics REFUSE
+```
+
+**NOT default SELF. And NOT a silent default to AMBIGUOUS either.**
+`AMBIGUOUS` must itself be an EXPLICIT governed policy, as it is for the
+current zero-occurrence `snapshot` and `measured at` predicates.
+
+**`snapshot` and `measured at` have ZERO current occurrences. They MUST NOT
+silently earn SELF from the label alone.** A valid SHA token proves WHAT
+COMMIT WAS MENTIONED; it does not prove whether that commit is the
+document's own validity point or an external measurement target. They
+therefore cannot earn SELF-required VALIDITY or LIFECYCLE, and are
+**DECLARED / ZERO-OCCURRENCE / SYNTHETIC-CALIBRATION-REQUIRED.**
+
+**5.4 ADDING A PREDICATE.** A NEW binding predicate requires, before it may
+enter the closed registry: **explicit later authority · a subject policy or
+resolver · hostile calibration.** This makes recurrence of the INC-31
+mechanism mechanically visible rather than a matter of remembering.
+
+**5.5 SUBJECT IS DETERMINED ONCE, AT THE PRODUCER.**
+
+> **`subject` is an EVIDENCE-ENVELOPE PROPERTY. It is determined EXACTLY
+> ONCE, at the governed producer boundary, from the source context.**
+
+```
+producer   ASSIGNS and VALIDATES subject
+consumer   GATES on the validated subject
+consumer   does NOT remap subject
+```
+
+**Consumers MUST NOT independently reinterpret or reconstruct `subject`
+from predicate labels, `local_context`, file path, or applicability
+scope.** This is not justified by any claim that only the producer can
+physically see context — downstream records may carry local context. It is
+justified because **a second consumer-side predicate→subject table would
+create TWO SEMANTIC AUTHORITIES FOR THE SAME EVIDENCE DIMENSION and permit
+producer/consumer drift — which is the defect class D381 exists to
+eliminate.**
+
+**This rule is load-bearing.**
+
+---
+
+### 6. DATE PREDICATES — PER-PREDICATE, NO BULK ASSERTION
+
+**No bulk assertion that all DATE witnesses are equivalent is made or
+authorised.** Subject semantics remain PER PREDICATE, carried inside the
+single governed registry of §5.1.
+
+`classify.STATE_PREDICATES` is currently exactly
+
+```
+last updated · updated · version
+```
+
+**Only those may currently support `VALIDITY = TIME_BOUND`.** Expressly
+excluded from that role, each for a reason recorded in that source:
+
+```
+reviewed · last reviewed · review date · created · generated · opened ·
+started · prepared · planning date · sent · written · closed · date
+```
+
+**Document-level applicability does NOT make a predicate temporal-validity
+evidence.** `Date:` being SELF means the date statement is about the
+document's own date; it does not mean that date establishes VALIDITY.
+**D381 preserves that distinction and does not widen it.**
+
+---
+
+### 7. ALL SEVEN WHOLE_FILE PRODUCER ROUTES
+
+**`passa` has SEVEN producer routes capable of emitting `WHOLE_FILE`: six
+are decided through `_scope_of`, while the seventh — `SUPERSEDED_BY` — is
+hard-coded `WHOLE_FILE` in `scan()`.**
+
+In BOTH measured populations exactly ONE fires — the labelled
+closed-predicate route (R3). **R1** (H1 title), **R2** (explicit
+`SELF_SUBJECT` phrase), **R4** (contextual root `Status`), **R5** (root
+lifecycle dateline), **R6** (bare dateline) and **R7** (`SUPERSEDED_BY`)
+produce ZERO witnesses.
+
+**THE CLASS FIX MAY NOT STOP AT R3.** Every one of the seven must receive
+explicit subject semantics under §5. **Doctrine R8 applies: never-executed
+code is where the defects are, and the six dormant routes are NOT exempt.**
+Semantic direction, to be proven by calibration rather than assumed:
+
+```
+R1  H1 / title            scope may be WHOLE_FILE; subject is NOT
+                          automatically SELF merely because the token sits
+                          in H1. Fail closed unless SELF is otherwise earned
+R2  SELF_SUBJECT phrase   SELF where the matched statement mechanically
+                          establishes SELF
+R3  labelled predicate    the governed per-predicate subject policy of §5
+R4  contextual Status     SELF only where its existing contextual proof
+                          establishes document state
+R5  root lifecycle line   SELF
+R6  bare dateline         SELF
+R7  SUPERSEDED_BY         SELF — the witness concerns the current
+                          document's successor relation
+```
+
+**DO NOT INFER SELF SIMPLY FROM WHOLE_FILE.**
+
+---
+
+### 8. CLASSIFIER SEMANTICS — AXIS-SPECIFIC, NEVER GLOBAL
+
+> **`WHOLE_FILE` AND `SELF` ARE INDEPENDENT DIMENSIONS. D381 DOES NOT
+> GLOBALLY DEFINE `WHOLE_FILE == SELF`.**
+
+Consumers gate on the producer-validated subject and never remap it (§5.5).
+
+**SCOPE — NO SELF REQUIREMENT.** A witness may truthfully carry
+`applicability_scope = WHOLE_FILE` with `subject = OTHER:GIT_COMMIT:<…>`
+and still support `SCOPE = WHOLE_FILE`: the entire audit report can concern
+an audited repository snapshot, so the statement applies across the whole
+report while its semantic subject is the snapshot. **SCOPE VALUE SEMANTICS
+ARE UNCHANGED.** Any existing SCOPE rationale that falsely states the
+witness subject is necessarily the document **must be corrected to describe
+applicability**, and that correction is the only SCOPE change authorised.
+
+**VALIDITY — D367 §6 REQUIRES A DOCUMENT SUBJECT FOR EVERY POSITIVE
+WHOLE-FILE ROUTE.** D367 §6 lists explicit document-level binding whose
+subject is the document, a verified witness KIND, whole-document
+applicability, and no unresolved material contradiction as SEPARATE
+conditions. **D381 enforces the SUBJECT condition** on every positive
+whole-file route, as applicable:
+
+```
+COMMIT             -> EXACT_SNAPSHOT
+RUN_ID             -> RUN_ARTEFACT
+DATE/state-binding -> TIME_BOUND
+```
+
+**A POSITIVE VALIDITY ROUTE MUST NOT CONSUME NON-SELF EVIDENCE.** Repairing
+only the COMMIT path and leaving another positive route able to consume
+non-SELF evidence is expressly forbidden.
+
+**NO GENERIC CERTAINTY WIDENING IS AUTHORISED.** D367 §6's *"verified
+witness KIND"* means, for COMMIT, resolution as a commit in the declared
+history source. **That is NOT the same proposition as
+`Witness.certainty == VERIFIED` for every possible DATE or RUN_ID
+witness, and D381 does not convert it into one.** The only certainty
+obligation carried is §9's.
+
+**LIFECYCLE — the COMMIT snapshot route requires `subject == SELF`**, which
+is D379's existing substantive M2 proposition, implemented here rather than
+re-granted.
+
+**Do NOT globally subject-filter `_binding_witness()`**, because SCOPE
+carries no SELF requirement and a global filter would break it. **Subject
+policy must be explicit per consuming axis, with no silent semantic
+default** — a future consumer must not be able to forget whether it
+requires SELF.
+
+---
+
+### 9. COMMIT CERTAINTY — CARRIED, NOT REOPENED
+
+**No classifier certainty repair is authorised.** The governed producer
+rule stands: `git cat-file -e <token>^{commit}` must succeed before witness
+kind `COMMIT` is emitted, and that route sets `certainty = VERIFIED`.
+
+**The historical audited-snapshot and acquisition commits were NOT freshly
+discharged against the required non-shallow history source during INC-31
+work.** This remains a CARRIED CALIBRATION OBLIGATION. D381 requires a
+hostile control proving that the governed Pass A **cannot** emit
+`witness_type = COMMIT` with `certainty != VERIFIED`. **No weakening.** If
+that invariant can be violated through the governed producer path, **STOP
+AND REPORT SEPARATELY.**
+
+---
+
+### 10. MUTATION SCOPE
+
+**NEWLY OPENED BY D381 — semantic changes only where required for this class:**
+
+```
+kai-pm/house_in_order_h2_v13/envelope.py    closed subject-grammar validation
+                                            per the §3.1 normative parser,
+                                            fail-closed in Witness.__post_init__,
+                                            and directly necessary support
+kai-pm/house_in_order_h2_v13/classify.py    axis-specific subject enforcement:
+                                            VALIDITY subject gate, LIFECYCLE
+                                            subject gate, SCOPE value preserved,
+                                            SCOPE rationale truth correction only.
+                                            NO consumer-side subject remapping.
+```
+
+**EXISTING D379-AUTHORISED SURFACE USED UNDER NEW D381 SEMANTICS:**
+
+```
+kai-pm/house_in_order_h2_v13/stage_identity.py
+    implement H2_STAGE_A_V2;
+    enforce the V2 schema and domain separator;
+    enforce the closed V2 governance set [D379, D380, D381];
+    enforce V1 + PRODUCTION refusal;
+    enforce the narrow V1 CALIBRATION-only path;
+    own the non-pluggable H2_PY_STDLIB_V1 derivation (§16);
+    derive / validate the V2 Stage-A identity;
+    REFUSE any descriptor that violates the D381 V2 rules.
+```
+
+**THE AUTHORITY LAYERING IS CLOSED FROM D379's OWN TEXT, NOT INFERRED.**
+D379 authorises, verbatim under its **NEW — REQUIRED** heading:
+
+```
+kai-pm/house_in_order_h2_v13/stage_identity.py
+    Stage-A closed-membership construction; EXTERNAL Stage-B artifact
+    binding
+```
+
+**There is NO V1-only constraint in that grant.** Therefore:
+
+```
+D379   authorises the stage_identity.py implementation surface and the
+       Stage-A construction responsibility
+D380   supplied H2_STAGE_A_V1 semantics
+D381   supplies H2_STAGE_A_V2 semantics and the production-use rules
+```
+
+**No retrospective enlargement of D379 is required or performed, and there
+is no implementation-authority gap.** `stage_identity.py` is **NOT** newly
+opened by D381.
+
+**EXISTING D379 SURFACE USED FOR THIS REPAIR:**
+
+```
+kai-pm/house_in_order_h2_v13/passa.py                        truthful subject production
+kai-pm/house_in_order_h2_v13/cal_fixtures.py                 bounded fixture helpers,
+                                                             fail-old/pass-new and
+                                                             opposite-side cases
+kai-pm/house_in_order_h2_v13/build_evidence/d379_controls.py THE integrated executable
+                                                             hostile-control gate
+kai-pm/house_in_order_h2_v13/build_evidence/D379_CONTROLS.txt full untruncated output
+kai-pm/house_in_order_h2_v13/build_evidence/D379_CLOSEOUT.txt close-out
+```
+
+**THE D381 HOSTILE MATRIX LIVES IN THE EXISTING `d379_controls.py`. NO
+`d381_controls.py` IS CREATED, AND NO NEW TRACKED EVIDENCE PATH IS
+AUTHORISED.** The existing registry structure is used; at minimum the new
+controls occupy or extend the already-declared families
+
+```
+SB · STAGE_A · STDLIB
+```
+
+all three of which are already members of that module's declared
+`SECTIONS` list at the pre-D381 state.
+
+**NO NEW SEMANTIC WIDENING OF `run_h2_v12.py`, `qualify.py` or
+`holdout.py`. Their existing D379 authority remains EXACTLY what it was.**
+
+**THE STAGE-A / HOLDOUT AUTHORITY BOUNDARY — EXPLICIT:**
+
+```
+stage_identity.py   DETERMINES whether a Stage-A descriptor / identity is
+                    valid for PRODUCTION under V2.
+holdout.py          CONSUMES ONLY the validated production Stage-A identity,
+                    under its existing D379 authority.
+```
+
+**Therefore V1 + PRODUCTION refusal, the V1 calibration zero-weight rule,
+V2 governance completeness and V2 schema validation belong at the Stage-A
+identity boundary and MUST NOT be duplicated as holdout policy.**
+
+**If the eventual implementation shows that `holdout.py` must itself learn
+new V2-specific semantics rather than simply consume the validated
+identity: STOP. That requires separate adjudication before the file is
+widened.**
+
+**STILL EXCLUDED:** `ontology.py` · `subjectbind.py` · Control C
+(`scripts/security/check_evidence_package_integrity.py`) · all historical H2
+packages · `kai-pm/house_in_order_census_v11/**` · `.github/**` · service
+code · `data/SOUL.md`.
+
+**`subjectbind.py` AND THE MANUAL FACT TRACE — EXPRESSLY OUT OF SCOPE.**
+`subjectbind.py` returns subject strings for AUTHORITY evidence binding but
+**constructs no `Witness`**; its `OTHER:<path>` values are legacy
+document-subject spellings. The current positive authority fact path only
+promotes SELF-bound determining claims into the relevant manually
+constructed fact trace; OTHER-bound claims prevent SELF authority and are
+not converted into a positive SELF evidence trace. **D381 does NOT broaden
+itself into an AUTHORITY / `subjectbind` redesign.** If execution reveals a
+`subjectbind` or manual-trace path that MUST consume the new typed grammar
+to make the INC-31 VALIDITY/LIFECYCLE repair truthful: **STOP.** That is a
+separate scope finding, **not licence to widen silently.**
+
+**BANKING RECORD ONLY:** `kai-pm/DECISIONS.md`, append-only. **LEDGER ONLY
+ON A GENUINELY NEW MATERIAL INCIDENT:** `kai-pm/FAILURE_PATTERN_LEDGER.md`,
+append-only. **NO OTHER TRACKED PATH.**
+
+---
+
+### 11. `H2_STAGE_A_V2` — A NEW SCHEMA, NOT AN IN-PLACE AMENDMENT
+
+D381 introduces **`H2_STAGE_A_V2`** as the production Stage-A schema.
+
+**D380's V1 SCHEMA DEFINITION IS NOT AMENDED, NOT REWRITTEN AND NOT
+SUPERSEDED.** D380 §6.4 permits either express authority or a new schema
+version; V2 is chosen because **A SCHEMA IDENTIFIER MUST IDENTIFY ONE
+DETERMINISTIC VALIDATION CONTRACT.** Amending V1 would make
+`schema = "H2_STAGE_A_V1"` denote two historical closed contracts —
+`[D379, D380]` before D381 and `[D379, D380, D381]` after — so a validator
+presented only with that identifier could not determine which closed rule
+it denotes without consulting additional authority state. That is not an
+identity-collision problem: the governance array is inside the canonical
+bytes, so the two forms hash differently. **It is a validator-determinism
+problem**, and it weakens the self-description property this tranche exists
+to build.
+
+**NO PRODUCTION `H2_STAGE_A_V1` IDENTITY HAS EVER BEEN CREATED**, so there
+is zero migration or compatibility cost to avoiding the ambiguity now.
+
+**THE HISTORICAL V1 SCHEMA REMAINS IMMUTABLE AND HISTORICALLY CORRECT:**
+
+```
+H2_STAGE_A_V1   governance exactly [D379, D380]
+                mode grammar "PRODUCTION" | "CALIBRATION", exactly as D380
+                defined it — D381 does NOT pretend that grammar never existed
+                a V1 descriptor containing D381 is ALREADY rejected by
+                D380's existing rule as "an unknown governing decision"
+```
+
+**That V1 rule is not changed, and that is the central advantage of V2:
+no existing rule's meaning is mutated.**
+
+---
+
+### 12. V1 PRODUCTION USE — A NEW OUTER RULE, NOT A REWRITE OF V1
+
+**LAYER DISTINCTION, AND IT IS LOAD-BEARING:**
+
+```
+HISTORICAL V1 SCHEMA GRAMMAR   D380's canonical V1 grammar remains immutable
+                               and historically means exactly what D380 said,
+                               INCLUDING its mode = PRODUCTION | CALIBRATION.
+                               D381 does not rewrite that schema definition.
+
+D381 PRODUCTION-USE POLICY     D381 adds a NEW OUTER PRODUCTION-USE RULE:
+                               any Stage-A production construction or
+                               validation path governed after D381 MUST REFUSE
+
+                                   schema = H2_STAGE_A_V1
+                                   mode   = PRODUCTION
+```
+
+**This is a NEW D381 RULE. IT IS NOT A RETROSPECTIVE REWRITE OF THE
+HISTORICAL V1 DESCRIPTOR GRAMMAR, AND IT IS NOT A SUPERSESSION OF ANY D380
+PROPOSITION.**
+
+**Enforcement locus is mechanically local:** the `stage_identity.py`
+production path. **No "current lineage" inference. No branch state. No
+external mutable state.** The validator decides from the artefact in hand.
+
+No production V1 identity has ever existed; none may now be created.
+
+---
+
+### 13. V1 CALIBRATION — NARROW EXCEPTION, NOT A LOOPHOLE
+
+V1 is not deleted. Existing or synthetic V1 fixtures may be constructed or
+validated **solely** through an explicitly calibration-only path with
+`schema = H2_STAGE_A_V1` and `mode = CALIBRATION`, and **solely to test V1
+historical / canonicalisation / regression behaviour where the control
+EXPLICITLY DECLARES V1.**
+
+A V1 calibration identity carries **ZERO production weight, ZERO admission
+weight, ZERO holdout weight**, and may NEVER: serve as
+`FINAL_CANDIDATE_AGGREGATE` · enter the production candidate path · seed
+the blind 40 · be promoted into V2 · be treated as an earlier production
+candidate.
+
+**NO GENERIC "V1 CALIBRATION REMAINS VALID" PERMISSION IS CREATED.
+`mode = CALIBRATION` is not a route around V2.**
+
+---
+
+### 14. V2 GOVERNANCE — A NEW CLOSED CONTRACT
+
+```
+governance = [
+  { "decision_id": "D379", "bank_commit_sha": "608d706d8452b8e578a484f7b75331a5cb9c28d9" },
+  { "decision_id": "D380", "bank_commit_sha": "c50989779baf0485e2a4a5ceb2113093441691e3" },
+  { "decision_id": "D381", "bank_commit_sha": "<the verified commit in which D381 is banked>" }
+]
+```
+
+**This is a NEW closed contract, NOT an extension of V1's REFUSE list.**
+D381's own bank commit is populated only after D381 is banked and
+independently verified, by the non-circular pattern D380 established:
+**D381 itself contains no Stage-A identity; the later descriptor binds the
+already-final verified D381 bank commit.**
+
+**V2 REFUSE conditions:** missing D379 · missing D380 · **missing D381** ·
+an unknown governing decision · a wrong bank commit · a duplicate
+decision · **any order other than ascending numeric decision ID, checked
+before canonicalisation** · a malformed governance entry.
+
+**NEVER use `latest`, branch HEAD, the current `DECISIONS.md` blob, or any
+open-ended selector. Exact identities only.**
+
+---
+
+### 15. V2 SOURCE POPULATION — EXACTLY THE D380 TEN
+
+The `h2_sources` population remains **EXACTLY** D380's ten members, no more
+and no fewer:
+
+```
+kai-pm/house_in_order_h2_v13/{cal_fixtures, classify, envelope, holdout,
+  ontology, passa, qualify, run_h2_v12, subjectbind, stage_identity}.py
+```
+
+**`envelope.py`, `classify.py` and `stage_identity.py` are ALREADY Stage-A
+members. D381 changes their AUTHORISED SEMANTICS AND THEIR BYTES, NOT THE
+MEMBERSHIP.** Missing member → REFUSE. Additional member → REFUSE.
+Duplicate normalised path → REFUSE. Sort before canonicalisation by
+`(normalised_path, sha256)`. **Any source-byte change naturally changes the
+V2 identity, which is the intended behaviour.**
+
+---
+
+### 16. `H2_PY_STDLIB_V1` — INHERITED UNCHANGED, AND NON-PLUGGABLE
+
+> **`H2_STAGE_A_V2` CONTINUES TO CONSUME THE UNCHANGED `H2_PY_STDLIB_V1`
+> RUNTIME SNAPSHOT DEFINED BY D380 §7.**
+
+**D381 does NOT modify it, supersede it, version it, or create
+`H2_PY_STDLIB_V2`, and does NOT imply that version numbers advance in
+lockstep. No `H2_PY_STDLIB_V2` field is invented.**
+
+**16.1 THE NON-PLUGGABLE CONSTRUCTION BOUNDARY — NORMATIVE.**
+
+Python function-object identity is expressly NOT the normative mechanism.
+The mechanism is a **non-pluggable construction boundary**:
+
+> **`stage_identity.py` OWNS the canonical Stage-A construction of
+> `runtime.stdlib_identity` and derives it mechanically by the unchanged
+> D380 §7 `H2_PY_STDLIB_V1` algorithm.**
+
+The Stage-A builder **MUST NOT accept**:
+
+```
+a caller-supplied stdlib digest as authority
+a caller-supplied stdlib constructor
+a schema selector for an alternative stdlib algorithm
+a plugin / callback which can replace the governed D380 §7 derivation
+```
+
+**16.2 WHAT THE DESCRIPTOR STORES.** The final descriptor still stores
+**ONLY**
+
+```
+runtime.stdlib_identity = <digest>
+```
+
+**No stdlib schema-name field is added to the ten-field Stage-A
+descriptor.** The control is therefore at the CONSTRUCTION BOUNDARY, not a
+field comparison.
+
+**16.3 WHY THIS IS SUFFICIENT.** The execution bytes of
+`stage_identity.py` are themselves part of the closed Stage-A source
+population (§15), so a tampered derivation changes the V2 identity.
+Independently, producer and qualifier runtime checks continue to re-derive
+the D380 §7 stdlib identity and compare it with Stage A, **as D380 §6.9
+already requires, with any mismatch → REFUSE.**
+
+---
+
+### 17. V2 CONSTRUCTION — EXPLICIT DELTA AGAINST D380
+
+`H2_STAGE_A_V2` inherits the D380 Stage-A construction rules **EXCEPT for
+the propositions expressly replaced by D381:**
+
+```
+D380 §6.1    top-level field POPULATION and STRUCTURE remain the same ten
+             fields; the schema VALUE becomes "H2_STAGE_A_V2".
+
+D380 §6.4    V1 governance remains historically unchanged; V2 receives the
+             NEW closed [D379, D380, D381] governance contract of §14.
+
+D380 §6.10   RFC 8785 JCS, UTF-8, no BOM, no trailing newline in the hashed
+             bytes, lower-case hex, path normalisation, the
+             sort-before-canonicalisation rule and the
+             stage_a_descriptor_digest construction ALL REMAIN UNCHANGED;
+             the stage_a_identity DOMAIN SEPARATOR becomes "H2-STAGE-A-V2".
+```
+
+**All other applicable D380 Stage-A construction propositions are inherited
+unchanged, including:**
+
+```
+§6.2   h2_sources population and ordering
+§6.3   contract binding
+§6.5   frozen subject
+§6.6   tree_paths construction and known-positive
+§6.7   census
+§6.8   history reachable-set construction
+§6.9   runtime, including the unchanged H2_PY_STDLIB_V1, the independent
+       re-derivation and comparison against Stage A, and
+       dont_write_bytecode = true as the only valid value
+§6.11  excluded execution-produced artefacts
+```
+
+**The V2 identity construction, stated whole:**
+
+```
+schema            "H2_STAGE_A_V2"
+
+stage_a_identity  = sha256( UTF8("H2-STAGE-A-V2") + 0x00
+                            + canonical_descriptor_bytes )
+
+stage_a_descriptor_digest = sha256( canonical_descriptor_bytes )
+```
+
+**Neither digest is a field inside the descriptor. `H2-STAGE-A-V1` MUST NOT
+BE REUSED.**
+
+**THE IMPLEMENTATION LOCUS FOR EVERY RULE IN THIS SECTION IS
+`kai-pm/house_in_order_h2_v13/stage_identity.py`**, an existing
+D379-authorised Stage-A surface receiving these new D381-governed
+semantics, per §10.
+
+**DUAL VERSIONING IS INTENTIONAL DEFENCE IN DEPTH.** Synthetic read-only
+pre-bank measurement demonstrated that **changing the schema tag alone
+changes `stage_a_identity`, and changing the domain separator alone changes
+`stage_a_identity`.** Neither pre-bank scratchpad measurement is a
+production Stage-A identity. **The authorised calibration must reproduce
+both properties mechanically.** Because each mechanism alone already
+separates the identities, a later implementer may observe that one appears
+sufficient — **NEITHER MECHANISM MAY BE REMOVED ON THAT GROUND.**
+
+---
+
+### 18. `FINAL_CANDIDATE_AGGREGATE` — THE SOLE EXPRESS SUPERSESSION
+
+**D381 EXPRESSLY SUPERSEDES D380's CURRENT-LINEAGE DEFINITION.** For the
+post-D381 production candidate lineage:
+
+```
+FINAL_CANDIDATE_AGGREGATE  =  canonical H2_STAGE_A_V2 stage_a_identity
+```
+
+**D367 §9's SELECTION EQUATION REMAINS EXACTLY UNCHANGED:**
+
+```
+key = sha256(
+    "H2FINAL-D367:"
+    + "86a1399e6e31477ba67cd38c12d22627a8b4d6ef"
+    + ":" + FINAL_CANDIDATE_AGGREGATE
+    + ":" + path
+)
+sort ascending, select the first 40
+```
+
+Path ordering, sample size 40, the evaluation-rule table and the
+anti-peeking rules are untouched. **ONLY THE DEFINITION OF THE AGGREGATE
+FEEDING THAT FROZEN EQUATION CHANGES.** A `CALIBRATION`-mode identity of
+either schema version may never serve as `FINAL_CANDIDATE_AGGREGATE`.
+
+---
+
+### 19. REQUIRED V2 GOVERNANCE AND STDLIB CALIBRATION
+
+```
+V2-GOV-1   schema=H2_STAGE_A_V1, mode=PRODUCTION        REFUSE, unconditionally,
+                                                        decided from the artefact
+V2-GOV-2   schema=H2_STAGE_A_V2, governance=[D379,D380] REFUSE, missing D381
+V2-GOV-3   schema=H2_STAGE_A_V1, mode=CALIBRATION,
+           otherwise-valid historical/synthetic fixture PASS only through the
+           explicitly calibration-only V1 path, and PROVE it cannot serve
+           FINAL_CANDIDATE_AGGREGATE, cannot seed the holdout, cannot enter
+           the production path, cannot be promoted into V2
+
+V2-ID-1    the same descriptor payload expressed as V1 and as V2
+           identities differ, AND each of the schema tag and the domain
+           separator INDEPENDENTLY changes the identity
+
+V2-ID-2a   canonical NON-PLUGGABLE D380 §7 H2_PY_STDLIB_V1 derivation,
+           owned by stage_identity.py                   PASS
+
+V2-ID-2b   attempted caller-supplied stdlib digest, caller-supplied
+           constructor, alternate stdlib schema selector, or plugin /
+           callback replacing the governed D380 §7 derivation
+                                                        REFUSE
+
+V2-ID-2c   independently re-derived runtime stdlib digest differs from the
+           Stage-A value                                REFUSE
+```
+
+**The descriptor still contains ONLY the digest; no stdlib schema field is
+added to the ten-field Stage-A descriptor.**
+
+---
+
+### 20. REQUIRED SUBJECT-BINDING CALIBRATION
+
+**20.1 GRAMMAR, PRODUCER AND CONSUMER MATRIX.**
+
+```
+grammar    valid closed-grammar forms pass
+           OTHER:MYSTERY:foo                REFUSE
+           OTHER:GIT_COMMIT:not-a-commit    REFUSE, no legacy fallback
+           OTHER:DOCUMENT:bad/../path       REFUSE, no legacy fallback
+           OTHER:kai-pm/file.md             transitional DOCUMENT alias
+           legacy alias with a ":" in the payload        REFUSE
+           empty descriptor                              REFUSE
+           unknown subject type                          REFUSE
+           a malformed typed prefix CANNOT fall through to legacy parsing
+
+registry   every binding predicate carries an explicit subject policy
+           a predicate with missing / unknown / malformed policy   REFUSE
+           an unmapped predicate does NOT default to SELF
+           an unmapped predicate does NOT default to AMBIGUOUS
+
+producer   audited snapshot                    -> non-SELF
+           findings-bearing audited snapshot   -> non-SELF
+           qualification subject               -> non-SELF
+           acquisition commit, current form    -> SELF
+           validated checkpoint, current form  -> SELF
+           generic `snapshot`   does NOT silently earn SELF
+           generic `measured at` does NOT silently earn SELF
+           all SIX never-fired WHOLE_FILE routes receive hostile coverage
+           governed COMMIT cannot be emitted with certainty != VERIFIED
+
+consumer   WHOLE_FILE + non-SELF STILL permits SCOPE = WHOLE_FILE
+           non-SELF cannot earn EXACT_SNAPSHOT
+           non-SELF cannot earn the snapshot HISTORICAL route
+           EVERY positive VALIDITY route obeys the subject requirement
+           current state-binding DATE positives preserve intended behaviour
+           the consumer filter is DISCRIMINATED by synthetic non-SELF rows
+           NO consumer re-derives subject from label, local_context,
+             path or applicability scope
+```
+
+**20.2 THE CORPUS IS REGRESSION EVIDENCE ONLY — SHARPENED.**
+
+> **The current corpus supplies ZERO POSITIVE DISCRIMINATION EVIDENCE for
+> the consumer SELF gate, because its existing emitted `subject` field is
+> CONSTANT. Positive proof of that consumer repair MUST come from hostile
+> synthetic non-SELF witnesses. Current-corpus replay is REGRESSION
+> EVIDENCE ONLY.**
+
+**A blanket requirement that "all 165 current SELF witnesses preserve
+current verdicts" is EXPRESSLY REJECTED**, because three currently emitted
+SELF witnesses are precisely the falsely-SELF rows INC-31 requires us to
+correct. The correct matrix is below.
+
+**20.3 `SB-CORPUS-1` — SCOPE MEMBERSHIP PRESERVATION.**
+
+Under the bounded current-v1.3 scope projection methodology of §21:
+
+```
+WHOLE_FILE witnesses   remains 165
+documents              remains 164 / 272
+```
+
+**Subject repair MUST NOT change `_eligible` / `_scope_of` membership.**
+
+**20.4 `SB-CORPUS-2` — TRUTHFUL-SELF NON-REGRESSION.**
+
+Every currently adjudicated witness whose repaired subject remains `SELF`
+must preserve its D381-relevant SCOPE / VALIDITY / LIFECYCLE behaviour. Any
+unrelated movement → **FAIL**.
+
+**20.5 `SB-CORPUS-3` — EXACT AFFECTED-CELL DELTA.**
+
+For the three current NON-SELF rows, and no others:
+
+```
+kai-pm/CODE_AUDIT_FINAL_REPORT.md
+    SCOPE       WHOLE_FILE      -> WHOLE_FILE
+    VALIDITY    EXACT_SNAPSHOT  -> UNKNOWN
+    LIFECYCLE   HISTORICAL      -> UNKNOWN
+
+kai-pm/CODE_AUDIT_MASTER.md
+    SCOPE       WHOLE_FILE      -> WHOLE_FILE
+    VALIDITY    EXACT_SNAPSHOT  -> UNKNOWN
+    LIFECYCLE   HISTORICAL      -> UNKNOWN
+
+kai-pm/house_in_order_instrument/AUTHORITY_ONTOLOGY.md
+    SCOPE       WHOLE_FILE      -> WHOLE_FILE
+    VALIDITY    EXACT_SNAPSHOT  -> UNKNOWN
+    LIFECYCLE   UNKNOWN         -> UNKNOWN
+```
+
+**No other D381-driven verdict movement is accepted without separate
+adjudication.**
+
+**20.6 `SB-MOVED-1` AND `SB-MOVED-2` — THE TWO A→B MOVES STAY MOVED.**
+
+```
+SB-MOVED-1  kai-pm/CODE_AUDIT_PLANNING_PACKAGE_QA.md
+            findings-bearing audited snapshot
+            MUST REMAIN  SPAN  under current v1.3 _scope_of.
+            It MUST NOT be re-promoted by subject work.
+
+SB-MOVED-2  kai-pm/ORION_FIELD_NOTES.md
+            last updated DATE
+            MUST REMAIN  SPAN  under current v1.3 _scope_of.
+```
+
+**20.7 `SCOPE-CONFINEMENT-1` — A CONTROL, NOT A PROMISE.**
+
+After the authorised implementation, compare tracked changes against the
+execution base. **Every changed tracked path must be inside the exact
+D379/D381 authorised mutation and evidence surface. Any unauthorised
+tracked path → FAIL / STOP.**
+
+**20.8 EXECUTION DISCIPLINE.** Every control is **EXECUTED, NEVER ASSERTED**
+(R2). Controls whose subject is a shipped process entry point assert the
+ACTUAL SUBPROCESS RETURN CODE. Full untruncated output to
+`D379_CONTROLS.txt`; any excerpt declares itself partial and states its
+byte count (R10).
+
+---
+
+### 21. POPULATIONS A AND B — REPRODUCIBLE FROM IMMUTABLE GIT OBJECTS
+
+**No new evidence file is created to restate this census. The derivation is
+bound to exact existing Git objects**, all verified present at the
+pre-D381 state `de3d05c63bedf015c0fa29a8ab455c5c363332b1`:
+
+```
+Population A Pass A blob
+  kai-pm/house_in_order_h2_v12/passA.json
+  git blob  f88e929b8c0f569dd7f730e12a8459b00f405595
+
+Population A classification blob
+  kai-pm/house_in_order_h2_v12/h2v12-classification.json
+  git blob  ee524b47b43cfb4a0cc7bc9cb6c3c8f9ae389740
+
+Population B scope implementation
+  kai-pm/house_in_order_h2_v13/passa.py
+  git blob  c70dabf29fd23dd5328dc15a919386d300f849c3
+
+Current classifier source used for the exposure reading
+  kai-pm/house_in_order_h2_v13/classify.py
+  git blob  8860bebf3b975b3ff97699d3405893bf0975f696
+
+Frozen subject tree
+  3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+```
+
+**21.1 POPULATION A — HISTORICAL FROZEN v1.2 OUTPUT.**
+
+*Recipe.* Parse the exact frozen v1.2 Pass-A and classification blobs
+above. Count the emitted historical rows / witnesses **directly**. **No
+reinterpretation through v1.3.**
+
+```
+WHOLE_FILE witnesses 167 · documents 166/272 · COMMIT 6 · DATE 161
+RUN_ID 0 · SUPERSEDED_BY 0 · subject distribution SELF 167
+confirmed false output: VALIDITY 4 · LIFECYCLE 3 · SCOPE 0
+```
+
+**21.2 POPULATION B — CURRENT v1.3 SCOPE PROJECTION ON FROZEN SOURCE
+BYTES.**
+
+*Recipe.* Start from the exact frozen v1.2 Pass-A witness records. For each
+source-bound witness:
+
+```
+1. read the exact source document bytes from frozen tree 3abc9e9d…;
+2. locate the emitted witness by its source path / selector / value;
+3. INHERIT witness KIND from the frozen v1.2 record;
+4. re-evaluate ONLY current v1.3 _eligible and _scope_of, from the exact
+   passa.py blob c70dabf2…;
+5. do NOT call fresh classify_token_kind;
+6. do NOT consult history;
+7. count the resulting WHOLE_FILE membership.
+```
+
+**That is precisely why Population B is a SCOPE PROJECTION and NOT a fresh
+v1.3 Pass A.**
+
+```
+WHOLE_FILE witnesses 165 · documents 164/272 · DATE 160
+RUN_ID 0 · SUPERSEDED_BY 0 · subject currently emitted SELF 165
+5 frozen-record COMMIT-kind witnesses whose tokens remain admitted and whose
+  applicability scope projects to WHOLE_FILE under unchanged v1.3
+  _eligible / _scope_of semantics
+confirmed current exposure: VALIDITY 3 · LIFECYCLE 2 · SCOPE 0
+```
+
+**The two A→B moves MUST reproduce exactly:**
+
+```
+kai-pm/CODE_AUDIT_PLANNING_PACKAGE_QA.md   WHOLE_FILE -> SPAN
+kai-pm/ORION_FIELD_NOTES.md                WHOLE_FILE -> SPAN
+```
+
+The false-output exposure is then evaluated against the exact current
+classifier source `8860bebf…` plus the D381 semantic subject adjudications
+of §5.
+
+**21.3 QUALIFICATIONS THAT MUST TRAVEL.**
+
+> **A AND B ARE NOT SUMMABLE. B IS NOT A FRESH v1.3 PASS A.**
+
+**Witness KIND in Population B was INHERITED FROM THE FROZEN RECORD**
+because the required non-shallow history source was unavailable and not
+authorised. **THEY MUST NEVER BE CALLED "5 v1.3 COMMIT WITNESSES".**
+
+---
+
+### 22. NO EXECUTION AUTHORITY BY BANKING ALONE
+
+**D381 DEFINES the only permitted future mutation scope. D381 BANKING DOES
+NOT ACTIVATE THAT SCOPE.** Source mutation requires Kai's separate
+post-bank execution release, issued after independent verification of the
+D381 bank commit.
+
+**D381 DOES NOT AUTHORISE:** a real Stage A · a candidate · a real Pass A ·
+a real classification run · a holdout · the blind 40 · admission · freeze ·
+Item 8 · the six subject builds · KAI-GATE-048 progression ·
+`A-4_PROVENANCE` · `A4_SELF_DIAGNOSIS` · Assurance Integration · the
+Evidence Plane / Kingsman · Control C integration · RC-7 · A-05 · the
+generic `M-POLICY-ADMISSION-DIVERGENCE` control · provisioning the
+non-shallow history source · `git fetch --unshallow` against the active
+worktree · a D382 assumption · any merge.
+
+**PR #122 remains DO NOT MERGE. D359 governs programme order.**
+
+---
+
+### THREAD RECOVERY BLOCK — D381
+
+```
+PROGRAMME ORDER AUTHORITY  D359 §2 — cite, do not restate. House is at H2.
+ENTRY                      D381, banked 2026-09-18 on
+                           claude/project-rework-plan-pgvp35.
+                           BANKING IS NOT EXECUTION. A separate post-bank
+                           execution release is required.
+REVIEW STATE               The final adversarial review of this authority
+                           shape is COMPLETE. No further adversarial cycle
+                           on D381 prose is required.
+GRANTS                     ONE coordinated bounded subject-binding repair
+                           class from INC-2026-09-18-31, with VALIDITY and
+                           LIFECYCLE as two manifestations of one cause.
+AUTHORITY SPLIT            D379 was COMPLETE IN AUTHORISED SCOPE, not
+                           necessarily complete in IMPLEMENTATION.
+                           LIFECYCLE/M2 — D379 remains the SUBSTANTIVE
+                           authority; D381 supplies only the missing
+                           mutation surface (classify.py, envelope.py) and
+                           the shared subject mechanism.
+                           VALIDITY/D367 §6 — D381 supplies the NEW
+                           substantive authority; it was not one of D379's
+                           ten mechanisms.
+                           One cause, one class, TWO authority provenances.
+SOLE SUPERSESSION          D380's current-lineage FINAL_CANDIDATE_AGGREGATE
+                           definition: V1 identity -> V2 identity.
+                           D367 §9's equation UNCHANGED.
+                           EVERYTHING ELSE IN D381 IS A NEW RULE.
+NOT AMENDED                D367 contract file 0ce5792e…00bb · D380's V1
+                           SCHEMA DEFINITION, including its
+                           PRODUCTION|CALIBRATION mode grammar · D380's V1
+                           governance rule · H2_PY_STDLIB_V1
+V2 CONSTRUCTION DELTA      D380 §6.1 schema VALUE · §6.4 governance contract
+                           · §6.10 domain separator. All other applicable
+                           §6.x propositions inherited unchanged.
+SCHEMA                     H2_STAGE_A_V2, domain separator H2-STAGE-A-V2.
+                           Dual versioning is DEFENCE IN DEPTH; neither
+                           mechanism may later be removed.
+V2 GOVERNANCE              NEW CLOSED CONTRACT [D379, D380, D381]
+                           D379 = 608d706d8452b8e578a484f7b75331a5cb9c28d9
+                           D380 = c50989779baf0485e2a4a5ceb2113093441691e3
+                           D381 = populated after verified banking
+V1 STATUS                  schema immutable and historically correct,
+                           governance exactly [D379, D380], mode grammar
+                           unchanged. D381 adds a NEW OUTER PRODUCTION-USE
+                           RULE refusing V1 + PRODUCTION unconditionally,
+                           decided from the artefact, no lineage inference.
+                           CALIBRATION only through an explicitly
+                           V1-declaring path, zero weight.
+SOURCE POPULATION          the SAME ten h2_sources members. envelope.py,
+                           classify.py and stage_identity.py already
+                           members; semantics and bytes change, membership
+                           does not.
+MUTATION SCOPE             NEWLY OPENED BY D381: envelope.py · classify.py
+                           EXISTING D379-AUTHORISED SURFACE UNDER NEW D381
+                           SEMANTICS: stage_identity.py. D379's own text
+                           grants it "Stage-A closed-membership
+                           construction; EXTERNAL Stage-B artifact binding"
+                           with NO V1-only constraint, so no retrospective
+                           enlargement is needed and no authority gap exists.
+                           EXISTING D379 SURFACE: passa.py · cal_fixtures.py
+                           · d379_controls.py · D379_CONTROLS.txt ·
+                           D379_CLOSEOUT.txt
+                           NO widening of run_h2_v12.py, qualify.py,
+                           holdout.py. ontology.py and subjectbind.py
+                           still excluded.
+CALIBRATION LOCUS          the EXISTING build_evidence/d379_controls.py.
+                           NO d381_controls.py. NO new tracked evidence
+                           path. Families SB · STAGE_A · STDLIB, all three
+                           already declared in that module's SECTIONS.
+AUTHORITY BOUNDARY         stage_identity.py DETERMINES production validity
+                           under V2; holdout.py CONSUMES ONLY the validated
+                           identity under existing D379 authority. V2 rules
+                           are NOT duplicated as holdout policy. If holdout
+                           must learn V2 semantics: STOP and adjudicate.
+SUBJECT GRAMMAR            CLOSED: SELF · AMBIGUOUS · OTHER:DOCUMENT:<path>
+                           · OTHER:GIT_COMMIT:<40-hex>. Legacy OTHER:<path>
+                           is a transitional DOCUMENT alias ONLY, and is
+                           deliberately NARROWER: no ":" in its payload.
+                           Typed prefixes are TERMINAL — a malformed typed
+                           form REFUSES and never falls through to legacy
+                           parsing. No uppercase-token heuristic. No
+                           free-form namespace. No GIT_COMMIT_TREE type.
+                           No encoded grammar-version field.
+                           Frozen subject tree: 1032 blobs, 272 .md, ZERO
+                           paths containing ":".
+ENFORCEMENT BOUNDARY       governed envelope.Witness construction /
+                           rehydration. Census: passa.py 4 · classify.py 7
+                           · cal_fixtures.py 2 · d379_controls.py 1 = 14,
+                           all inside the authorised surface. envelope.py
+                           defines Witness and constructs none.
+                           subjectbind.py constructs none. run_h2_v12.py
+                           constructs none but hand-builds trace dicts
+                           carrying "subject" — NOT widened, and D381 does
+                           NOT claim a universal validator for every
+                           arbitrary subject field.
+SUBJECT IS PRODUCER-ONLY   subject is an evidence-envelope property set
+                           ONCE at the governed producer boundary.
+                           Consumers GATE on it; consumers NEVER remap it
+                           from label, local_context, path or scope. A
+                           second consumer-side table would create two
+                           semantic authorities and permit drift.
+PREDICATE REGISTRY         ONE governed registry carrying BOTH applicability
+                           rationale AND subject policy per predicate. No
+                           second free-standing map. Missing / unknown /
+                           malformed policy REFUSES — no default SELF and
+                           no silent default AMBIGUOUS. A new predicate
+                           needs explicit authority, a policy and hostile
+                           calibration.
+PRODUCER ROUTES            SEVEN capable of emitting WHOLE_FILE: SIX decided
+                           through _scope_of, the seventh (SUPERSEDED_BY)
+                           hard-coded WHOLE_FILE in scan(). All seven
+                           require explicit subject semantics; six are
+                           dormant and not exempt (R8).
+AXIS POLICY                SCOPE no subject gate, value unchanged, rationale
+                           corrected · VALIDITY subject gate on EVERY
+                           positive route · LIFECYCLE COMMIT snapshot
+                           requires SELF · _binding_witness NOT globally
+                           subject-filtered · NO generic certainty widening
+STDLIB MECHANISM           H2_PY_STDLIB_V1 unchanged. stage_identity.py owns
+                           a NON-PLUGGABLE D380 §7 derivation: no
+                           caller-supplied digest, constructor, alternate
+                           schema selector or plugin. Descriptor stores the
+                           digest ONLY; no stdlib schema field is added.
+                           V2-ID-2a PASS / 2b REFUSE / 2c REFUSE.
+CARRIED OBLIGATION         governed Pass A cannot emit COMMIT with
+                           certainty != VERIFIED — NOT discharged in the
+                           shallow worktree, NOT weakened
+POPULATIONS                A 167/166 (V 4, L 3) · B 165/164 (V 3, L 2).
+                           NOT SUMMABLE. B is NOT a fresh v1.3 Pass A.
+                           Both reproducible from banked Git objects:
+                           passA.json f88e929b · classification ee524b47 ·
+                           passa.py c70dabf2 · classify.py 8860bebf ·
+                           frozen subject tree 3abc9e9d. Recipes in §21.
+CALIBRATION                the corpus is REGRESSION EVIDENCE ONLY; it gives
+                           ZERO positive discrimination for the consumer
+                           SELF gate because emitted subject is constant.
+                           Positive proof requires hostile synthetic
+                           non-SELF witnesses. SB-CORPUS-1/2/3,
+                           SB-MOVED-1/2, SCOPE-CONFINEMENT-1 bind.
+AUTHORISES                 NOTHING to execute. Kai's separate post-bank
+                           execution release is required.
+NOT GREEN                  repository and PR #122. DO NOT MERGE.
+LEDGER                     INC-2026-09-18-31 at de3d05c6 — the shared
+                           subject-binding root cause this entry repairs.
+                           INCIDENT_ONLY. D381 does not assign it to any
+                           mechanism.
+ALLOCATOR                  before this append, over ^## D[0-9]+( +—|$):
+                           population 363, distinct 363, duplicates none,
+                           highest D380, D381 count 0, next free D381.
+                           After: next free D382 — NOT TO BE TAKEN without
+                           authorisation.
+```
