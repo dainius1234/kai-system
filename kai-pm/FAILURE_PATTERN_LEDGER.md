@@ -5535,3 +5535,153 @@ REPAIR AUTHORITY        D386, banked the same turn. The repair is
                         leave a hand-written number where a measurement
                         belongs, which is the defect with a better value.
 ```
+
+---
+
+### `INC-2026-09-19-36` — the qualifier's §8(6) population silently skipped
+###                      every loaded origin outside the candidate directory,
+###                      and its own calibration asked the same narrow question
+
+```
+INCIDENT_ID             INC-2026-09-19-36
+date                    2026-09-19
+                        TIME BASIS: allocated at 2026-09-18 23:42:58 UTC =
+                        2026-09-19 00:42 BST. Kai adjudicated on the prior
+                        turn that the operator's local date governs and that
+                        the basis should be stated where the boundary is
+                        material. It is stated.
+producer                Orion — the HOUSE_H2 v1.3 qualifier identity
+                        implementation AND its own 86 calibration
+subject                 kai-pm/house_in_order_h2_v13/qualify.py
+                            runtime_module_identity()
+                        kai-pm/house_in_order_h2_v13/build_evidence/
+                            d379_controls.py  section_86()
+                        measured at a233a210535755fefb3cb6f43e503c1b66248e50
+status                  OPEN-RECORDED / INCIDENT_ONLY /
+                        BLOCKS §8(6) CLOSURE AND D379 TRANCHE CLOSURE
+
+THE DEFECT              runtime_module_identity() iterates sys.modules and
+                        then does:
+
+                          fp = pathlib.Path(f).resolve()
+                          if fp.parent != here:
+                              continue      # not a governed candidate module
+
+                        EVERY filesystem-backed loaded origin outside the
+                        candidate/manifest directory is SILENTLY SKIPPED
+                        rather than classified or refused.
+
+REQUIRED CONTRACT       D380's superseding D367 §8(6) rule requires every
+                        loaded Python module / import origin to resolve into
+                        EXACTLY ONE of:
+
+                          1. governed H2 source
+                          2. governed hardened Census source
+                          3. governed Python runtime — filesystem-backed
+                             stdlib represented in H2_PY_STDLIB_V1, or
+                             built-in / frozen
+
+                        ANYTHING ELSE -> REFUSE.
+
+                        There is no fourth bucket and no `continue` for
+                        "not candidate". The implementation has one.
+
+MEASURED MANIFESTATION  In the very run that produced the checkpoint:
+
+                          loaded filesystem-backed modules silently
+                          skipped by the parent!=here rule        73
+
+                        including BOTH origins D380 requires the qualifier
+                        to reject:
+
+                          _distutils_hack
+                            /usr/lib/python3/dist-packages/_distutils_hack/
+                            __init__.py
+                          sitecustomize
+                            /etc/python3.11/sitecustomize.py
+
+                        So a real qualifier execution in this environment
+                        omits exactly the loaded origins the contract
+                        exists to refuse.
+
+THE CONTROL DEFECT — AND THIS IS THE PART THAT MATTERS
+
+                        section_86() calls the SAME narrowed
+                        runtime_module_identity() and derives its
+                        expectations from it. It tests: --manifest
+                        required, missing manifest refuses, empty manifest
+                        refuses, an omitted candidate module is named, a
+                        differing candidate byte is named, and the
+                        population exceeds the old five-module tuple.
+
+                        EVERY ONE OF THOSE IS A QUESTION ABOUT THE
+                        CANDIDATE DIRECTORY. None asks about a Census
+                        origin, a governed stdlib origin, a built-in or
+                        frozen origin, or an external loaded module. The
+                        calibration and the implementation share a
+                        denominator, so the check could not fail for the
+                        reason the implementation was wrong.
+
+                        THAT IS I-8 EXACTLY: the source of the expected
+                        answer was the thing under test. `86 IMPLEMENTED`
+                        was therefore a FALSE GREEN, and I reported it as
+                        implemented in the same message that separately
+                        measured the two offenders under DEP.
+
+                        I HAD THE COUNTEREVIDENCE IN THE SAME RUN. DEP
+                        named `_distutils_hack` and `sitecustomize` as
+                        ungoverned offenders, and §8(6) skipped them, and
+                        I did not put the two together.
+
+IMPACT                  §8(6) cannot currently establish subject
+                        completeness and may treat a qualifier population
+                        as complete when it is not. The narrowed check is
+                        the shape D379 §5 abolished for the producer -- a
+                        scope smaller than its name (R5) -- reappearing on
+                        the qualifier side.
+
+PROVENANCE              Found BEFORE any production Stage A, candidate,
+                        Pass A, holdout or admission existed. Nothing
+                        downstream consumed it.
+
+MECHANISM               NONE ASSIGNED.
+
+                        QUALIFIED LOCATORS ONLY, no causal equivalence
+                        claimed: M-SCOPE-WIDEN · M-POLICY-ADMISSION-
+                        DIVERGENCE · earlier denominator and
+                        self-certified-control incidents. Resemblance is a
+                        locator, not a cause (doctrine 37).
+
+NO D-NUMBER ALLOCATED   D379 ALREADY grants the substantive authority and
+                        the exact mutation surface — qualify.py,
+                        d379_controls.py, D379_CONTROLS.txt,
+                        D379_CLOSEOUT.txt — and already specifies the
+                        closed runtime population. This is a FAILURE TO
+                        IMPLEMENT EXISTING AUTHORITY, not a new design
+                        need. D387 is NOT taken.
+
+ALSO CORRECTED BY KAI, NOT A SEPARATE INCIDENT
+
+                        Q1b was reported HELD "requires a real
+                        classification result". That is contrary to D379
+                        §8, which states all hostile cases run against
+                        SYNTHETIC AND LOCAL SUBJECTS ONLY and that Q1b
+                        takes no Pass-A input. The frozen v1.2 artefact
+                        carrying boolean-only evidence_facts means only
+                        that it is the wrong fixture, not that the section
+                        is blocked. E1 is proven THROUGH Q1b and is not a
+                        separate gate. Both are to be implemented with
+                        synthetic/local result objects, deriving both
+                        denominators from the emitted result schema and
+                        hard-coding no historical measurement.
+
+                        DEP-2 is likewise not established by
+                        kinds.get("STDLIB") > 0: it requires ordinary
+                        stdlib under a GOVERNED interpreter, and this one
+                        is known-negative (INC-34).
+
+CONTROL STATE           NONE. Nothing compared the qualifier's classified
+                        population against the producer's own derived
+                        population, though both ran in the same process and
+                        disagreed about the same two modules.
+```
