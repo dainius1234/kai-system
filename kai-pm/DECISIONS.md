@@ -38202,3 +38202,282 @@ ALLOCATOR                  before this append: population 364, distinct 364,
 INCIDENT ALLOCATOR         32 incidents, highest INC-2026-09-18-32.
                            UNCHANGED by this entry.
 ```
+
+## D383 — 2026-09-18 — BOUNDED D15 HISTORICAL-FIXTURE INPUT REPAIR. CAL_FIXTURES ONLY. GOVERNANCE ONLY — BANKING IS NOT EXECUTION. NO STAGE-A PROPOSITION CHANGE.
+
+**Authority.** Kai's ruling of 2026-09-18 on `INC-2026-09-18-33`, relayed by
+Dainius, following independent verification of D382
+(`782bdf01d567c74a2a8d48ed8f0166a73aebb95b`, server-verified valid SSH, one
+changed path, +462/−0). Allocator derived structurally over decision
+headings matching `^## D[0-9]+( +—|$)` immediately before this append:
+population **365**, distinct **365**, duplicates **none**, highest **D382**,
+`D383` count **0**, next free **D383**.
+
+**BANKING IS NOT EXECUTION.** No fixture byte changes under this entry until
+Kai releases it. D383 defines a permitted repair; it does not perform one.
+
+---
+
+### 1. THE DEFECT, MEASURED
+
+```
+kai-pm/house_in_order_h2_v13/cal_fixtures.py   line 362, def d15()
+    json.load(open(HERE / "h2v12-classification.json"))
+
+kai-pm/house_in_order_h2_v13/h2v12-classification.json
+    DOES NOT EXIST
+
+kai-pm/house_in_order_h2_v12/h2v12-classification.json
+    EXISTS — frozen Git blob
+    ee524b47b43cfb4a0cc7bc9cb6c3c8f9ae389740
+```
+
+`D15` resolves its immutable historical input **relative to the v1.3 fixture
+directory**, while the artefact exists only in the sibling frozen v1.2
+package.
+
+**PROVENANCE: PRESENT AT EXECUTION BASE `838b7637`.** Both the call site and
+the v1.2 blob were confirmed in the committed bytes at that commit.
+**PRE-EXISTING. NOT INTRODUCED BY D381. NOT `INC-2026-09-18-32`. NOT
+AUTOMATICALLY RC-7** — being a harness defect does not assign a mechanism,
+and no mechanism is assigned here.
+
+---
+
+### 2. THE GRANT — EXACTLY ONE SEMANTIC REPAIR
+
+**MUTATION SURFACE, CLOSED:**
+
+```
+kai-pm/house_in_order_h2_v13/cal_fixtures.py     and nothing else
+```
+
+`D15` must consume the intended **immutable historical v1.2 classification
+artefact**
+
+```
+kai-pm/house_in_order_h2_v12/h2v12-classification.json
+```
+
+and **FAIL CLOSED** if that exact historical input cannot be established.
+
+**BIND IT MECHANICALLY TO THE FROZEN REPOSITORY OBJECT:**
+
+```
+Git blob   ee524b47b43cfb4a0cc7bc9cb6c3c8f9ae389740
+```
+
+> **A CURRENT OR GENERATED v1.3 CLASSIFICATION OUTPUT MUST NOT SILENTLY
+> SUBSTITUTE FOR THE HISTORICAL FIXTURE.** The whole purpose of D15 is to
+> assert against what the historical run actually emitted. A fixture that
+> reads today's output and compares it to itself is a tautology wearing the
+> costume of a regression test — and it would pass.
+
+**EXPRESSLY NOT AUTHORISED BY THIS ENTRY:**
+
+```
+no adjacent fixture cleanup
+no other D15 semantic redesign
+no change to D1-D14 or D16-D17 expectations
+no change to any file other than cal_fixtures.py
+```
+
+---
+
+### 3. MEASURED, AND **NOT** COVERED BY THIS GRANT
+
+> **THE SAME DEFECTIVE RESOLUTION OCCURS TWICE IN THE SAME FILE.**
+
+```
+line 362   def d15()
+line 422   def regression_five()
+```
+
+Both read `HERE / "h2v12-classification.json"`. `regression_five` is the
+OPPOSITE-SIDE control this module's own docstring describes — the five rows
+Kai adjudicated CORRECT, asserted unchanged so that a repair cannot silently
+destroy the property it was protecting.
+
+**D383's grant names D15. IT DOES NOT COVER LINE 422, AND THIS ENTRY DOES
+NOT WIDEN ITSELF TO REACH IT.**
+
+**THE CONSEQUENCE IS STATED SO IT CANNOT BE DISCOVERED LATER:** repairing
+D15 alone will **NOT** restore complete fixture execution. The suite will
+abort at `regression_five` instead of at `d15`. That is a measured property
+of the committed bytes, not a prediction.
+
+```
+STATUS   flagged to Kai, recorded in INC-2026-09-18-33,
+         AWAITING A SEPARATE RULING.
+         R6 says fix the class, not the instance.
+         R12 says flag the better route and do NOT implement scope
+         expansion without authorisation.
+         Both are obeyed by stating it here and changing nothing.
+```
+
+---
+
+### 4. D383 DOES NOT CHANGE STAGE-A GOVERNANCE
+
+**D383 changes NO Stage-A proposition.** Therefore:
+
+```
+H2_STAGE_A_V2   governance = [D379, D380, D381]   UNCHANGED
+
+D379   608d706d8452b8e578a484f7b75331a5cb9c28d9
+D380   c50989779baf0485e2a4a5ceb2113093441691e3
+D381   838b7637058c5ba3b8f3b6c5430ebdc324249b96
+```
+
+```
+DO NOT add D382 to the V2 governance descriptor.
+DO NOT add D383 to the V2 governance descriptor.
+No schema bump. No domain-separator change.
+No FINAL_CANDIDATE_AGGREGATE change. D367 §9 untouched.
+```
+
+**The eventual source-byte change to `cal_fixtures.py` is captured naturally
+by the Stage-A `h2_sources` hash when a real Stage A is later authorised**
+(D381 §15: `cal_fixtures.py` is already one of the ten members). That is the
+designed behaviour — membership does not change, bytes do.
+
+---
+
+### 5. RELATIONSHIP TO `INC-2026-09-18-32` AND THE 491-RECORD RESOLUTION
+
+**SEPARATE, AND KEPT SEPARATE.** D383 has nothing to do with INC-32. It is
+recorded here only so the two are not later conflated by adjacency.
+
+For completeness of the programme record, and because it changes how
+`SB-SCOPE-ALL` must be built rather than what D382 says:
+
+```
+the six "unlocated" RUN_ID records are NOT missing evidence.
+Every value is PRESENT at its exact recorded selector in frozen tree
+3abc9e9d8ca11966a6f996d5f0af68072ee5b117 — verified.
+
+Frozen Pass A emitted each of those six evidence identities TWICE. The
+one-off comparator consumed each physical source occurrence once, so the
+second copy of each was dropped. A COMPARATOR DEFECT, NOT MISSING EVIDENCE.
+
+emitted witness records              491
+distinct exact evidence identities   480
+duplicate identity groups              9
+duplicate excess records              11
+
+  RUN_ID  x2  EMBEDDING_BACKEND_STATE.md  L14  31570714150
+  RUN_ID  x2  ORION_FIELD_NOTES.md        L18  31894868473
+  RUN_ID  x2  ORION_FIELD_NOTES.md        L23  31899571806
+  RUN_ID  x2  ORION_FIELD_NOTES.md        L27  31906667051
+  RUN_ID  x2  ORION_FIELD_NOTES.md        L33  31908872172
+  RUN_ID  x2  RUNTIME_TOPOLOGY_CENSUS.md  L13  31605138566
+  DATE    x3  TECH_WATCH.md               L19  2026-06-19
+  DATE    x3  TECH_WATCH.md               L24  2026-06-19
+  COMMIT  x2  WAYPOINTS.md                L87  097c91d
+
+491 = the truthfulness / emitted-record denominator.
+480 = diagnostic distinct exact evidence identities.
+NEITHER REPLACES THE OTHER. Duplicates may be labelled NON-INDEPENDENT
+evidence; they may NOT disappear from the denominator.
+```
+
+**NO D382 REWRITE IS REQUIRED AND NONE IS MADE.** D382 §8 already required
+the control to derive its own denominator, declared 485 non-normative, and
+permitted missing records to be separately explained and adjudicated. They
+now are. **No new incident is opened for those six**, and no D-number is
+allocated for the resolution.
+
+**`SB-SCOPE-ALL` MUST COMPARE THE MULTISET OF ALL EMITTED RECORDS**, never a
+deduplicated set, and must not consume a source occurrence after the first
+matching record. The durable record of this resolution belongs in
+`build_evidence/D379_CONTROLS.txt` and `D379_CLOSEOUT.txt`, and in INC-32's
+eventual closure.
+
+**`INC-2026-09-18-32` REMAINS OPEN** until the executed derivation and
+`SB-SCOPE-ALL` pass.
+
+---
+
+### 6. STOP
+
+**D383 DOES NOT AUTHORISE:** a real Stage A · a candidate · a real Pass A ·
+a real classification run · a Stage-B package · a holdout · the blind 40 ·
+admission · freeze · Item 8 · the six subject builds · KAI-GATE-048
+progression · `A-4_PROVENANCE` · `A4_SELF_DIAGNOSIS` · Control C
+integration · RC-7 · A-05 · provisioning the non-shallow history source ·
+`git fetch --unshallow` against the active worktree · any merge.
+
+**Execution of the D15 repair itself awaits Kai's verification of this
+bank.**
+
+**PR #122 remains DO NOT MERGE. D359 governs programme order.**
+
+---
+
+### THREAD RECOVERY BLOCK — D383
+
+```
+PROGRAMME ORDER AUTHORITY  D359 §2 — cite, do not restate. House is at H2.
+ENTRY                      D383, banked 2026-09-18 on
+                           claude/project-rework-plan-pgvp35.
+                           GOVERNANCE ONLY. No source byte changed in the
+                           banking commit. BANKING IS NOT EXECUTION.
+GRANTS                     exactly ONE semantic repair, in exactly ONE file:
+                           cal_fixtures.py D15 must consume
+                           kai-pm/house_in_order_h2_v12/
+                             h2v12-classification.json
+                           bound to frozen Git blob ee524b47b43cfb4a0cc7b
+                           c9bc6c3c8f9ae389740, and FAIL CLOSED if that
+                           exact historical input cannot be established.
+FORBIDS                    substituting a current/generated v1.3
+                           classification output for the historical
+                           fixture · adjacent fixture cleanup · other D15
+                           redesign · any change to D1-D14 / D16-D17 · any
+                           file other than cal_fixtures.py
+NOT COVERED — MEASURED     regression_five() at line 422 resolves the SAME
+                           artefact by the SAME defective path. D383 does
+                           NOT authorise repairing it. Therefore repairing
+                           D15 alone will NOT restore complete fixture
+                           execution — the suite will abort at
+                           regression_five instead. Flagged, recorded in
+                           INC-33, AWAITING A SEPARATE KAI RULING. Not
+                           self-authorised (R6 / R12).
+PROVENANCE OF THE DEFECT   present at execution base 838b7637. Pre-existing.
+                           NOT caused by D381. NOT INC-32. NOT RC-7.
+                           MECHANISM: NONE ASSIGNED.
+STAGE-A GOVERNANCE         UNCHANGED at [D379, D380, D381]. Neither D382 nor
+                           D383 enters the V2 descriptor. No schema bump, no
+                           domain-separator change, no
+                           FINAL_CANDIDATE_AGGREGATE change, D367 §9
+                           untouched. cal_fixtures.py is already one of the
+                           ten h2_sources members, so its eventual byte
+                           change is captured by the Stage-A hash when a
+                           real Stage A is authorised — membership does not
+                           change, bytes do.
+491 / 480 RESOLUTION       the six "unlocated" RUN_ID records are PRESENT at
+                           their exact recorded selectors. Frozen Pass A
+                           emitted each identity TWICE; the one-off
+                           comparator consumed each physical source
+                           occurrence once. COMPARATOR DEFECT, NOT MISSING
+                           EVIDENCE. 491 emitted records · 480 distinct
+                           identities · 9 duplicate groups · 11 excess.
+                           491 is the truthfulness denominator; 480 is
+                           diagnostic. Neither replaces the other.
+                           SB-SCOPE-ALL compares the MULTISET of all 491,
+                           never a deduplicated set.
+                           NO D382 rewrite. NO new incident for the six.
+                           NO D-number for the resolution.
+INC-32                     OPEN, until the executed derivation and
+                           SB-SCOPE-ALL pass.
+INC-33                     OPEN-RECORDED / INCIDENT_ONLY / BLOCKS COMPLETE
+                           FIXTURE EXECUTION. Mechanism NONE ASSIGNED.
+AUTHORISES                 NOTHING to execute. The D15 repair awaits Kai's
+                           verification of this bank.
+NOT GREEN                  repository and PR #122. DO NOT MERGE.
+ALLOCATOR                  before this append: population 365, distinct 365,
+                           duplicates none, highest D382, D383 count 0,
+                           next free D383. After: next free D384 — NOT TO BE
+                           TAKEN without authorisation.
+INCIDENT ALLOCATOR         33 incidents after this turn, highest
+                           INC-2026-09-18-33.
+```

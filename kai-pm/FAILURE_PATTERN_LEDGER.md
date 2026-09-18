@@ -5196,3 +5196,93 @@ REPORTED                 To Kai, with both universes measured and named,
                          for SB-CORPUS-1's expected value is unproven, so
                          the dependent verdict is not emitted.
 ```
+
+---
+
+### `INC-2026-09-18-33` — a fixture resolves its immutable historical input
+###                      against its own package directory, and the artefact
+###                      lives only in the sibling frozen package
+
+```
+INCIDENT_ID             INC-2026-09-18-33
+date                    2026-09-18
+producer                HOUSE_H2 v1.3 fixture harness (pre-dates D381)
+subject                 kai-pm/house_in_order_h2_v13/cal_fixtures.py
+                        measured at execution base
+                        838b7637058c5ba3b8f3b6c5430ebdc324249b96
+                        and re-confirmed at
+                        782bdf01d567c74a2a8d48ed8f0166a73aebb95b
+status                  OPEN-RECORDED / INCIDENT_ONLY /
+                        BLOCKS COMPLETE FIXTURE EXECUTION
+
+DEFECT                  D15 resolves `h2v12-classification.json` RELATIVE TO
+                        THE v13 FIXTURE DIRECTORY, although the historical
+                        artefact exists only in the sibling frozen v1.2
+                        package.
+
+                          cal_fixtures.py  line 362, inside def d15()
+                              json.load(open(HERE / "h2v12-classification.json"))
+
+                          kai-pm/house_in_order_h2_v13/h2v12-classification.json
+                              DOES NOT EXIST
+
+                          kai-pm/house_in_order_h2_v12/h2v12-classification.json
+                              EXISTS — frozen Git blob
+                              ee524b47b43cfb4a0cc7bc9cb6c3c8f9ae389740
+
+EFFECT                  cal_fixtures.py executes 60 PASS / 0 FAIL and then
+                        ABORTS with FileNotFoundError before completing D15
+                        and the remainder of the fixture suite. The suite
+                        therefore has never reported a complete result in
+                        this package.
+
+A SECOND CALL SITE — MEASURED, AND NOT THE ONE NAMED
+
+                        The same defective resolution occurs TWICE in the
+                        same file:
+
+                          line 362   def d15()
+                          line 422   def regression_five()
+
+                        Both read `HERE / "h2v12-classification.json"`.
+                        `regression_five` is the OPPOSITE-SIDE control this
+                        module's own docstring describes — the five rows Kai
+                        adjudicated CORRECT, asserted unchanged so a repair
+                        cannot silently destroy what it was protecting.
+
+                        RECORDED HERE AS FACT, NOT AS SCOPE. D383 grants the
+                        D15 repair only. Repairing D15 alone will NOT restore
+                        complete fixture execution, because the suite will
+                        then abort at `regression_five` instead. That is a
+                        measured consequence, not a prediction, and it needs
+                        its own Kai ruling.
+
+PROVENANCE              PRESENT AT EXECUTION BASE 838b7637 — both call sites
+                        confirmed in the committed bytes there, and the v12
+                        blob confirmed identical at that commit. Therefore
+                        PRE-EXISTING and NOT INTRODUCED BY the D381 subject
+                        repair.
+
+MECHANISM               NONE ASSIGNED.
+
+                        No mechanism is attributed without evidence. Being a
+                        harness defect does not make it RC-7; resemblance is
+                        a locator, not a cause (doctrine 37).
+
+DO NOT MERGE WITH       INC-2026-09-18-32
+                        the subject-binding class (INC-2026-09-18-31)
+                        RC-7
+                        unless LATER EVIDENCE establishes causal
+                        equivalence.
+
+CONTROL STATE           NONE. Nothing executed the fixture suite to
+                        completion, so nothing could observe that it never
+                        reached its own final third. A suite that aborts
+                        partway and is read as "60 passed" is the same shape
+                        as an excerpt that does not announce it is an
+                        excerpt (R10).
+
+REPAIR AUTHORITY        D383, banked the same day. GOVERNANCE ONLY —
+                        banking is not execution, and no fixture byte
+                        changes under that entry until Kai releases it.
+```
