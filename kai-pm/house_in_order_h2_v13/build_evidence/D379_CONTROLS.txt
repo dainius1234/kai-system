@@ -1,16 +1,22 @@
+D379 / D381 / D382 HOSTILE CONTROLS — FULL UNTRUNCATED OUTPUT
+Generated 2026-09-18T23:17:00Z at HEAD bf52445266354aaf9053ef30a72018d9c04cdc4d
+EVIDENCE CLASS: PRODUCER MEASUREMENT - SIGHTED - ZERO ADMISSION WEIGHT.
+THIS FILE IS THE AUTHORITATIVE OUTPUT. Any excerpt elsewhere declares itself
+partial and states its byte count (R10).
+
 ======================================================================
 D379 HOSTILE CONTROLS — PRODUCER MEASUREMENT, SIGHTED,
                         ZERO ADMISSION WEIGHT
 ======================================================================
 
 SUBJECT — the exact bytes measured
-  passa.py         a5ae00d0a3410cea56bce77f159cd654e2e77dc62a8e6a4e015f24b94d335372
-  classify.py      1cd4503361dfdb8b522a31ad92de51989e07b383b5177b1fea1f0cac52b351a2
-  envelope.py      cedb4205870da011c40a85ed1f1c8b2784202579b747a9f68f16e8b9c5af33f1
+  passa.py         73dbca128a6f85ebfa02148cf21c394cb72a631c786ebce3e82eff19d6cf0e61
+  classify.py      226873676c2373faaf29f4709bb1bb62d1d22f3c56cbdc0e594314cb6e5df9e8
+  envelope.py      fdcc1b73d7cd32e540c63ca926d5393901ea63b357fbf339819f07256e6a5a3f
   run_h2_v12.py    ab6f54c54c5bdd82c83f9de013311c5771d7eaabad2cec91dd46521d881f7ec7
   qualify.py       ee4e18240596d712027bad2f2499fcac026b47e963e886cd27793af2d17ba3b3
   holdout.py       4c5c06ac5eb717d1178df9c9a1d36e280f4a2bcc073ad3a8058ae8bea5798ff9
-  cal_fixtures.py  53c526113929aa9b45202219da5e753d8f54e2b4dad466e0b55880f8e1d2b666
+  cal_fixtures.py  4299bd58bd34705d044056d03901f3d674f09e2afde1fff5811a55dfca5f737b
   ontology.py      a92e68c7518578e177c6c67d95efdc1e8b4a92c4406aa2778678119babb721bc
   subjectbind.py   19f295d731183bf672061d60b17b0f7d01ce9d1aa3d340bdb2854b0bda4352fb
 
@@ -21,10 +27,10 @@ M2 / A3-i — LIFECYCLE SUBJECT BINDING
 
   M2-1 LIMB I  false audited-snapshot route
       applicability_scope  WHOLE_FILE
-      witness subject      SELF
+      witness subject      OTHER:GIT_COMMIT:2d830f25d569baa5ce955dd8d17e8f0744239876
       _binding_witness     returned a witness
-      LIFECYCLE            HISTORICAL
-      rationale            an audit artefact bound to a VERIFIED snapshot commit at document scop
+      LIFECYCLE            UNKNOWN
+      rationale            an audit report's snapshot commit is the tree it AUDITS. That commit's
   M2-2 LIMB II genuine own-lifecycle route
       applicability_scope  WHOLE_FILE
       witness subject      SELF
@@ -32,10 +38,71 @@ M2 / A3-i — LIFECYCLE SUBJECT BINDING
       LIFECYCLE            HISTORICAL
       rationale            an audit artefact bound to a VERIFIED snapshot commit at document scop
 
-  LIMB I  FAIL     LIMB II PASS
-  M2 PREDICATE NOT SATISFIED — the bounded A3-i correction is
-  the ONLY authorised semantic mutation. No adjacent cleanup,
-  no vocabulary redesign, no unrelated Pass-A semantics.
+  LIMB I  PASS     LIMB II PASS
+  M2 PREDICATE SATISFIED — discrimination DEMONSTRATED.
+  SAY WHICH TREE THIS IS TRUE OF. Against UNCHANGED v1.3 this
+  predicate FAILED: both limbs classified HISTORICAL, which is
+  what INC-2026-09-18-31 records and what D381 was banked to
+  repair. It passes here because the governed subject gate is
+  now IMPLEMENTED in classify.lifecycle. This is a pass-new
+  reading, not evidence that the defect was never present.
+
+SB — D381 SUBJECT BINDING, AND THE D382 EXECUTED DERIVATION
+  Every denominator below is DERIVED. No transcribed figure
+  carries closure weight (D382 §7/§10, R18).
+
+  GRAMMAR — the closed six-step parser
+
+  REGISTRY — one governed registry, fail-closed
+
+  ROUTES — all SEVEN WHOLE_FILE producer routes have subject semantics
+
+  CONSUMER — discriminated by SYNTHETIC non-SELF witnesses
+  The corpus emits a CONSTANT subject, so it gives ZERO positive
+  discrimination here. These rows are the actual proof.
+
+
+  D382 EXECUTED DERIVATION — populations A and B, derived here
+    emitted witness records            491
+    distinct exact evidence identities 480
+    duplicate identity groups          9
+    duplicate excess records           11
+      COMMIT   x2  kai-pm/WAYPOINTS.md  L87  097c91d
+      DATE     x3  kai-pm/TECH_WATCH.md  L19  2026-06-19
+      DATE     x3  kai-pm/TECH_WATCH.md  L24  2026-06-19
+      RUN_ID   x2  kai-pm/EMBEDDING_BACKEND_STATE.md  L14  31570714150
+      RUN_ID   x2  kai-pm/ORION_FIELD_NOTES.md  L18  31894868473
+      RUN_ID   x2  kai-pm/ORION_FIELD_NOTES.md  L23  31899571806
+      RUN_ID   x2  kai-pm/ORION_FIELD_NOTES.md  L27  31906667051
+      RUN_ID   x2  kai-pm/ORION_FIELD_NOTES.md  L33  31908872172
+      RUN_ID   x2  kai-pm/RUNTIME_TOPOLOGY_CENSUS.md  L13  31605138566
+
+    POPULATION A  consumer-relevant 167 over 166/272 documents  {'DATE': 161, 'COMMIT': 6}
+                  ALL-KIND diagnostic 168 over 166/272  {'DATE': 161, 'COMMIT': 6, 'HEX_SHAPED_UNRESOLVED': 1}
+
+    POPULATION B  consumer-relevant 165 over 164/272 documents  {'DATE': 160, 'COMMIT': 5}
+    A -> B MOVEMENTS:
+      kai-pm/CODE_AUDIT_PLANNING_PACKAGE_QA.md  COMMIT  L20  WHOLE_FILE -> SPAN
+      kai-pm/ORION_FIELD_NOTES.md  DATE  L9  WHOLE_FILE -> SPAN
+
+  SB-SCOPE-ALL — every comparable EMITTED record, pre vs post
+    comparable emitted records  491   (DERIVED)
+    scope differences           0
+    unresolved records          0
+
+  SB-CORPUS-3 — the exact D381-driven delta
+    kai-pm/CODE_AUDIT_FINAL_REPORT.md
+      SCOPE      WHOLE_FILE      -> WHOLE_FILE
+      VALIDITY   EXACT_SNAPSHOT  -> UNKNOWN
+      LIFECYCLE  HISTORICAL      -> UNKNOWN
+    kai-pm/CODE_AUDIT_MASTER.md
+      SCOPE      WHOLE_FILE      -> WHOLE_FILE
+      VALIDITY   EXACT_SNAPSHOT  -> UNKNOWN
+      LIFECYCLE  HISTORICAL      -> UNKNOWN
+    kai-pm/house_in_order_instrument/AUTHORITY_ONTOLOGY.md
+      SCOPE      WHOLE_FILE      -> WHOLE_FILE
+      VALIDITY   EXACT_SNAPSHOT  -> UNKNOWN
+      LIFECYCLE  UNKNOWN         -> UNKNOWN
 
 ----------------------------------------------------------------------
 SECTION COVERAGE
@@ -44,7 +111,7 @@ SECTION COVERAGE
   Q1a        NOT_IMPLEMENTED
   Q1b        NOT_IMPLEMENTED
   86         NOT_IMPLEMENTED
-  SB         NOT_IMPLEMENTED
+  SB         IMPLEMENTED
   I1A        NOT_IMPLEMENTED
   I1B        NOT_IMPLEMENTED
   DEP        NOT_IMPLEMENTED
@@ -52,14 +119,11 @@ SECTION COVERAGE
   STDLIB     NOT_IMPLEMENTED
 
 ======================================================================
-1 passed, 12 failed
-  FAIL M2-1 LIMB I: the false audited-snapshot COMMIT route does NOT classify HISTORICAL: classified HISTORICAL — the commit is the snapshot the document AUDITS, i.e. evidence about a DIFFERENT subject, and it determined the document's own lifecycle
-  FAIL M2-3 the two routes are DISTINGUISHED from one another: both routes classified HISTORICAL with the same rationale — the binding predicate did not discriminate between evidence about the document and evidence about an artefact it describes
+65 passed, 9 failed
   FAIL section D14 is implemented: NOT_IMPLEMENTED — this control file does not yet cover this section of the D379 hostile matrix
   FAIL section Q1a is implemented: NOT_IMPLEMENTED — this control file does not yet cover this section of the D379 hostile matrix
   FAIL section Q1b is implemented: NOT_IMPLEMENTED — this control file does not yet cover this section of the D379 hostile matrix
   FAIL section 86 is implemented: NOT_IMPLEMENTED — this control file does not yet cover this section of the D379 hostile matrix
-  FAIL section SB is implemented: NOT_IMPLEMENTED — this control file does not yet cover this section of the D379 hostile matrix
   FAIL section I1A is implemented: NOT_IMPLEMENTED — this control file does not yet cover this section of the D379 hostile matrix
   FAIL section I1B is implemented: NOT_IMPLEMENTED — this control file does not yet cover this section of the D379 hostile matrix
   FAIL section DEP is implemented: NOT_IMPLEMENTED — this control file does not yet cover this section of the D379 hostile matrix
@@ -67,3 +131,5 @@ SECTION COVERAGE
   FAIL section STDLIB is implemented: NOT_IMPLEMENTED — this control file does not yet cover this section of the D379 hostile matrix
 EXIT GATE: FAIL
 ======================================================================
+
+process exit status = 0

@@ -5286,3 +5286,142 @@ REPAIR AUTHORITY        D383, banked the same day. GOVERNANCE ONLY —
                         banking is not execution, and no fixture byte
                         changes under that entry until Kai releases it.
 ```
+
+---
+
+### `INC-2026-09-18-34` — the governed `H2_PY_STDLIB_V1` portability rule
+###                      REFUSES on a stock distribution CPython, because
+###                      packaged stdlib symlinks leave the governed roots
+
+```
+INCIDENT_ID             INC-2026-09-18-34
+date                    2026-09-18
+producer                D380 §7.6, as implemented in
+                        kai-pm/house_in_order_h2_v13/stage_identity.py
+subject                 the governed Python runtime identity construction
+                        measured at execution base
+                        bf52445266354aaf9053ef30a72018d9c04cdc4d
+status                  OPEN-RECORDED / INCIDENT_ONLY /
+                        BLOCKS D379 SECTIONS STAGE_A AND STDLIB
+                        Kai adjudication required. No D-number
+                        self-allocated. No rule relaxed.
+
+WHAT HAPPENED           The first execution of the governed
+                        H2_PY_STDLIB_V1 builder REFUSED:
+
+                          REFUSE: symlink sitecustomize.py under stdlib
+                          resolves OUTSIDE the governed root set. There is
+                          no external-dependency escape hatch in this
+                          schema.
+
+                        THE IMPLEMENTATION IS NOT DEFECTIVE. It is
+                        enforcing D380 §7.6 exactly as banked. The rule
+                        fired on real data on its first contact with a
+                        real interpreter.
+
+THE MEASURED ENVIRONMENT
+
+                        sysconfig roles, this container:
+                          stdlib      /usr/lib/python3.11
+                          platstdlib  /usr/lib/python3.11      (CASE A)
+                          purelib     /usr/local/lib/python3.11/dist-packages
+                          platlib     /usr/local/lib/python3.11/dist-packages
+
+                        Symlinks directly under the governed stdlib root
+                        whose resolved targets lie OUTSIDE the governed
+                        root set:
+
+                          sitecustomize.py
+                              -> /etc/python3.11/sitecustomize.py
+                          config-3.11-x86_64-linux-gnu/libpython3.11.so
+                              -> /usr/lib/x86_64-linux-gnu/libpython3.11.so.1.0
+
+                        A third symlink,
+                          _sysconfigdata__linux_x86_64-linux-gnu.py
+                              -> _sysconfigdata__x86_64-linux-gnu.py
+                        resolves INSIDE stdlib and is not implicated.
+
+                        Neither escaping target is under purelib, platlib,
+                        site-packages or dist-packages, so D380 §7.3's
+                        external-package exclusion does not reach them.
+                        They are symlinks under a governed root pointing
+                        out of it, which is precisely §7.6's REFUSE case.
+
+THE COLLISION           D380 §7.6 states, and this is not ambiguous:
+
+                          "If the final target resolves outside the
+                           governed root set -> REFUSE. There is no
+                           external-dependency escape hatch in this
+                           schema."
+
+                        Debian/Ubuntu packaged CPython places
+                        configuration and the shared library outside the
+                        stdlib tree and symlinks them in. That layout is
+                        not exotic; it is the default on the most common
+                        Linux Python packaging in existence.
+
+                        THEREFORE: H2_PY_STDLIB_V1 AS BANKED CANNOT BE
+                        CONSTRUCTED ON A STOCK DISTRIBUTION CPYTHON.
+
+WHY THE RULE IS STILL RIGHT
+
+                        §7.6 exists so that identical governed content
+                        installed at different filesystem locations yields
+                        the same digest, because that digest seeds the
+                        blind 40. Storing a raw readlink target, or
+                        silently admitting an out-of-root target, would
+                        put machine placement into the identity. The rule
+                        is protecting the portability invariant D380 §9
+                        names.
+
+                        The question this incident raises is NOT whether
+                        to weaken §7.6. It is what the governed answer is
+                        for a symlink that leaves the governed roots on a
+                        real interpreter: REFUSE the interpreter as
+                        ungoverned, classify such entries explicitly, or
+                        require a governed interpreter whose stdlib is
+                        self-contained.
+
+                        NO OPTION IS SELECTED HERE AND NONE IS
+                        IMPLEMENTED. D379 §6 forbids inventing a
+                        dependency identity on the fly, and this is the
+                        same prohibition one layer down.
+
+MECHANISM               NONE ASSIGNED.
+
+                        It is NOT INC-32 (a measurement-universe
+                        description defect), NOT INC-33 (a fixture path
+                        defect), and NOT the subject-binding class
+                        INC-31. Resemblance to "another environment
+                        problem" is a locator, not a cause (doctrine 37).
+
+EFFECT ON THIS TRANCHE  D379 sections STAGE_A and STDLIB cannot execute
+                        their positive limbs, because V2-ID-2a requires a
+                        canonical non-pluggable D380 §7 derivation to
+                        PASS and it cannot on this interpreter.
+
+                        NOT AFFECTED, and all executed green: the D381
+                        subject-binding repair, the D382 executed
+                        derivation, SB-SCOPE-ALL, SB-CORPUS-1/3,
+                        SB-MOVED-1/2, M2, and the complete fixture suite.
+
+CONTROL STATE           NONE BEFORE NOW. D380 §7 was written, banked and
+                        cited without ever being executed against an
+                        interpreter. This is the first contact between
+                        that rule and a real Python installation, and the
+                        rule refused immediately.
+
+                        That is the control working, not failing —
+                        but it also means the portability invariant had
+                        never been calibrated against a known-positive
+                        environment, which is what I-8 requires and what
+                        would have surfaced this at banking time.
+
+REPORTED                To Kai before any closure claim, with the exact
+                        refusal text, the exact sysconfig roles and the
+                        exact offending symlinks. R11: the prerequisite
+                        for a governed runtime identity is unproven on
+                        this interpreter, so the dependent Stage-A
+                        sections are not measured and no substitute is
+                        invented.
+```

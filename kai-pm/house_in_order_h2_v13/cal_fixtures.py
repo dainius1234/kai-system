@@ -22,6 +22,7 @@ import sys
 
 HERE = pathlib.Path(__file__).resolve().parent
 OLD = HERE.parent / "house_in_order_h2_v11"
+V12 = HERE.parent / "house_in_order_h2_v12"
 sys.path.insert(0, str(HERE))
 
 import classify as cl                                          # noqa: E402
@@ -70,6 +71,73 @@ def old(snippet):
     if r.returncode != 0:
         raise RuntimeError(f"fail-old subprocess failed: {r.stderr[-400:]}")
     return json.loads(r.stdout.strip().splitlines()[-1])
+
+
+# ── INC-33 / D383 + D384: the ONE governed historical v1.2 input ──────
+#
+# THE DEFECT THIS CLOSES. `d15()` and `regression_five()` each carried
+# their own path literal, and both resolved `h2v12-classification.json`
+# against the v1.3 fixture directory, where it has never existed. The
+# suite ran 60 PASS / 0 FAIL and then aborted, so it had never once
+# reached its own final third -- and "60 passed" reads like a result.
+#
+# ONE ARTEFACT IDENTITY, ONE LOADER, TWO CONSUMERS. Repairing the two
+# sites with two NEW correct literals would close the instances and keep
+# the class (R6), which is how they drifted apart in the first place.
+#
+# IDENTITY, NOT PRESENCE. The check is the canonical Git blob object id
+# of the exact bytes, not the filename. A same-named file is not the same
+# artefact, and this control exists precisely because a path was trusted.
+V12_CLASSIFICATION_BLOB = "ee524b47b43cfb4a0cc7bc9cb6c3c8f9ae389740"
+
+
+def _git_blob_id(data: bytes) -> str:
+    """The canonical Git blob object name of exactly these bytes."""
+    import hashlib
+    return hashlib.sha1(
+        b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
+
+
+def _load_frozen_v12_classification():
+    """The frozen v1.2 classification artefact, or FAIL CLOSED.
+
+    Resolves ONE path and verifies ONE identity. It does not search, does
+    not fall back, does not accept a v13-local file of the same name, does
+    not accept current classifier output, and takes no bytes, digest or
+    path from a caller. The historical input is FIXED.
+
+    WHY THE FROZEN BINDING IS LOAD-BEARING. `regression_five` asserts the
+    historical EXACT_SNAPSHOT set equals the six rows Kai adjudicated
+    independently from source under D364. Measured under the D382 §5
+    projection, the D381 subject repair leaves only TWO of those six
+    earning EXACT_SNAPSHOT today. Pointing this loader at current output
+    would therefore compare 2 against an expected 6, fail, and invite
+    someone to "update" a Kai-adjudicated historical control out of
+    existence. A fixture that reads today's output and compares it to
+    today's output is a tautology wearing the costume of a regression
+    test, and it would pass.
+    """
+    p = V12 / "h2v12-classification.json"
+    if not p.is_file():
+        raise AssertionError(
+            f"FAIL CLOSED: the governed frozen v1.2 classification artefact "
+            f"is not present at {p}. INC-2026-09-18-33 / D383 / D384 bind "
+            f"this fixture to that exact artefact; no substitute is "
+            f"admissible and none is searched for.")
+    data = p.read_bytes()
+    got = _git_blob_id(data)
+    if got != V12_CLASSIFICATION_BLOB:
+        raise AssertionError(
+            f"FAIL CLOSED: {p} is not the governed historical artefact. "
+            f"Git blob {got} != {V12_CLASSIFICATION_BLOB}. The bytes at the "
+            f"expected path are not the bytes this control adjudicates "
+            f"against, and a same-named file is not the same artefact.")
+    try:
+        return json.loads(data.decode("utf-8"))
+    except Exception as e:                       # noqa: BLE001
+        raise AssertionError(
+            f"FAIL CLOSED: the governed artefact {p} verified its blob "
+            f"identity {got} and then failed to parse as JSON: {e}") from e
 
 
 def w(**kw):
@@ -359,7 +427,7 @@ def d12_d13_d14():
 # ── D15 artefact cannot adjudicate its own cell ───────────────────────
 def d15():
     print("\nD15 — every positive carries a source-bound witness")
-    res = json.load(open(HERE / "h2v12-classification.json"))
+    res = _load_frozen_v12_classification()
     missing = []
     for r in res["rows"]:
         for ax in ont.ALPHABETS:
@@ -419,7 +487,7 @@ def regression_five():
         check(f"R-{p.split('/')[-1][:26]} still {v}",
               sb.authority_claim(c) == v, sb.authority_claim(c))
     print("\nREGRESSION — EXACT_SNAPSHOT must equal Kai's independent D364 set")
-    res = json.load(open(HERE / "h2v12-classification.json"))
+    res = _load_frozen_v12_classification()
     got = {r["path"] for r in res["rows"]
            if r["VALIDITY"]["value"] == "EXACT_SNAPSHOT"}
     kai6 = {"kai-pm/CODE_AUDIT_FINAL_REPORT.md", "kai-pm/CODE_AUDIT_MASTER.md",
