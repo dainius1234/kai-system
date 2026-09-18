@@ -37740,3 +37740,465 @@ ALLOCATOR                  before this append, over ^## D[0-9]+( +—|$):
                            After: next free D382 — NOT TO BE TAKEN without
                            authorisation.
 ```
+
+## D382 — 2026-09-18 — CORRECTION OF D381 §20.3 / §21 POPULATION UNIVERSE AND EXECUTED-DERIVATION CONTROL. GOVERNANCE ONLY. NO STAGE-A PROPOSITION OR MUTATION-SCOPE CHANGE.
+
+**Authority.** Kai's ruling of 2026-09-18 on `INC-2026-09-18-32`, relayed by
+Dainius, following Orion's executed measurement at the D381 execution base
+and Kai's independent verification of checkpoint commit
+`971919324ebc1c44824cb102606354194b32f15e`. Allocator derived structurally
+over decision headings matching `^## D[0-9]+( +—|$)` immediately before
+this append: population **364**, distinct **364**, duplicates **none**,
+highest **D381**, `D382` count **0**, next free **D382**.
+
+**A NUMBERED DECISION, NOT AN ERRATA FOOTNOTE.** The `D370 CORRECTION /
+ERRATA` precedent exists, but this programme now runs a hash-bound Stage-A
+governance model. **A REQUIRED CONTROL MUST NOT ACQUIRE NEW MEANING
+THROUGH AN UNBOUND FOOTNOTE**, so the correction takes a decision number
+and is cited like any other authority.
+
+---
+
+### 1. WHAT `INC-2026-09-18-32` ESTABLISHED, AND WHAT IT DID NOT
+
+**THE DEFECT IS IN D381's BANKED EVIDENCE-UNIVERSE DESCRIPTION. IT IS NOT
+IN THE REPAIR.**
+
+Expressly NOT defective, and NOT reopened by this entry:
+
+```
+the subject architecture      the closed subject grammar
+the producer registry         the VALIDITY subject gate
+the LIFECYCLE subject gate    SCOPE semantics
+the three-row repair delta    the two known A->B moves
+```
+
+D381 stated figures measured over a NARROWER universe than its own written
+recipe describes. **That is R17 — `CLAIM_SCOPE` wider than
+`MEASURED_SCOPE`** — and under R18 the recurrence is the finding, not the
+instance.
+
+**THE MECHANICAL EVIDENCE FOR THE REPAIR IS STRONG AND IS RESTATED HERE
+BECAUSE IT IS WHAT BOUNDS THIS CORRECTION:**
+
+```
+subject-repair scope comparison   485 witnesses compared,
+                                  0 applicability-scope differences
+SB-CORPUS-3                       reproduces exactly
+SB-MOVED-1 / SB-MOVED-2           reproduce exactly, and ONLY those two move
+M2                                false audited-snapshot route  -> UNKNOWN
+                                  genuine document-lifecycle route
+                                                                -> HISTORICAL
+```
+
+> **THE SUBJECT REPAIR IS NOT ROLLED BACK.**
+
+**AND THE HEADLINE NUMBERS DO NOT MEAN WHAT THEY LOOK LIKE.** Nothing was
+found to have broken 35 extra witnesses. A written recipe asked a BROADER
+QUESTION than the number printed beside it answered. The 165 was never
+fabricated; the recipe simply failed to state the restriction that
+produced it.
+
+---
+
+### 2. SCOPE OF THIS ENTRY — CLOSED
+
+D382 corrects **ONLY**:
+
+```
+D381 §20.3   SB-CORPUS-1 interpretation
+D381 §21.1   Population A universe description
+D381 §21.2   Population B universe and derivation recipe
+```
+
+and adds the executed-derivation requirement of §7 below.
+
+**D382 DOES NOT:** change D381 architecture · change the D381 mutation
+surface · change the subject grammar · change axis semantics · change
+`H2_STAGE_A_V2` · create `H2_STAGE_A_V3` · change the V2 domain separator ·
+change `FINAL_CANDIDATE_AGGREGATE` · alter D367 §9 · authorise production
+Stage A · authorise candidate production.
+
+---
+
+### 3. D382 DOES NOT ENTER V2 STAGE-A GOVERNANCE — LOAD-BEARING
+
+**D382 CHANGES NO STAGE-A PROPOSITION.** It corrects a PRE-CANDIDATE
+CALIBRATION / EVIDENCE proposition, not Stage-A construction or identity.
+
+Therefore `H2_STAGE_A_V2` remains EXACTLY:
+
+```
+governance = [D379, D380, D381]
+
+D379   608d706d8452b8e578a484f7b75331a5cb9c28d9
+D380   c50989779baf0485e2a4a5ceb2113093441691e3
+D381   838b7637058c5ba3b8f3b6c5430ebdc324249b96
+```
+
+```
+DO NOT add D382 to the V2 descriptor.
+DO NOT bump the schema.
+The domain separator remains "H2-STAGE-A-V2".
+```
+
+**The V2 REFUSE conditions of D381 §14 are unchanged, and a V2 descriptor
+naming D382 is therefore REFUSED as "an unknown governing decision" —
+which is the correct behaviour, not an oversight.**
+
+---
+
+### 4. CORRECTION — POPULATION A UNIVERSE
+
+**THE NORMATIVE CONSUMER-RELEVANT UNIVERSE IS EXACTLY FOUR WITNESS
+FAMILIES**, because those are exactly the families `classify` consumes:
+
+```
+COMMIT · RUN_ID · DATE · SUPERSEDED_BY
+```
+
+D381 §21.1's bare phrase **"WHOLE_FILE witnesses 167"** is SUPERSEDED by:
+
+> **167 CONSUMER-RELEVANT WHOLE_FILE witnesses, over exactly `COMMIT`,
+> `RUN_ID`, `DATE` and `SUPERSEDED_BY`. 168 WHOLE_FILE witnesses over ALL
+> emitted witness kinds, the difference being one
+> `HEX_SHAPED_UNRESOLVED` witness.**
+
+```
+Population A — corrected statement
+  consumer-relevant WHOLE_FILE witnesses   167
+  documents                                166 / 272
+  COMMIT                                     6
+  DATE                                     161
+  RUN_ID                                     0
+  SUPERSEDED_BY                              0
+  ----------------------------------------------
+  additionally, DIAGNOSTIC ONLY:
+  HEX_SHAPED_UNRESOLVED WHOLE_FILE           1
+  ALL-KIND WHOLE_FILE total                168
+```
+
+**THE ALL-KIND 168 IS DIAGNOSTIC. It is NOT part of the four-kind
+classifier-consumer denominator that produced 167.** Both figures travel
+together from here on; neither is quoted without its universe.
+
+---
+
+### 5. CORRECTION — POPULATION B UNIVERSE AND RECIPE
+
+**D381 §21.2's recipe is SUPERSEDED.** The baseline universe is now defined
+MECHANICALLY rather than described in prose:
+
+```
+U_A  =  every frozen v1.2 Pass-A witness satisfying BOTH:
+
+        1. witness family ∈ {COMMIT, RUN_ID, DATE, SUPERSEDED_BY}
+        AND
+        2. frozen v1.2 applicability_scope == WHOLE_FILE
+```
+
+**Population B is a PROJECTION OF `U_A`.** For every witness in `U_A`:
+
+```
+1. read the exact source bytes from the frozen tree
+     3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+2. locate the exact frozen witness by path / selector / witness value
+3. RETAIN the frozen witness kind
+4. evaluate ONLY current-v1.3 eligibility / scope semantics, from the
+   PRE-D381 passa.py blob
+5. do NOT freshly classify token kind
+6. do NOT consult history
+7. record the resulting applicability_scope
+```
+
+**The bounded projection MUST reproduce:**
+
+```
+consumer-relevant WHOLE_FILE   165
+documents                      164 / 272
+DATE                           160
+COMMIT                           5
+RUN_ID                           0
+SUPERSEDED_BY                    0
+```
+
+**and EXACTLY these two movements, with no other A→B movement inside
+`U_A`:**
+
+```
+kai-pm/CODE_AUDIT_PLANNING_PACKAGE_QA.md    WHOLE_FILE -> SPAN
+kai-pm/ORION_FIELD_NOTES.md                 WHOLE_FILE -> SPAN
+```
+
+**Analogous all-kind baseline projection: WHOLE_FILE total `166`**, because
+the additional `HEX_SHAPED_UNRESOLVED` witness remains outside the four
+consumed families. Diagnostic, exactly as in §4.
+
+---
+
+### 6. WHAT POPULATION B IS NOT — STATED EXPRESSLY
+
+**Population B is NOT** the complete present-day v1.3 WHOLE_FILE census over
+every frozen witness, **and it is NOT** a fresh v1.3 Pass A.
+
+**Population B IS:**
+
+> the current-v1.3 scope projection of the previously-WHOLE_FILE,
+> consumer-relevant frozen-v1.2 witness baseline.
+
+**THEREFORE THE TWO RESULTS DO NOT CONTRADICT EACH OTHER.** The literal
+full-universe procedure that yielded
+
+```
+200 WHOLE_FILE · 194 documents · 37 movements
+```
+
+**answered a DIFFERENT QUESTION.** It is not evidence of a defect in the
+repair and it is not a competing census. **The defect was that D381's prose
+failed to say which question it was answering.**
+
+---
+
+### 7. SB-CORPUS-1 — CORRECTED MEANING, AND IT MUST DERIVE
+
+D381 §20.3's `SB-CORPUS-1` is superseded **AS TO ITS UNIVERSE DEFINITION
+ONLY**:
+
+```
+SB-CORPUS-1
+  derive U_A MECHANICALLY from the exact frozen v1.2 Pass-A blob;
+  project U_A through the exact pre-D381 v1.3 scope semantics;
+  assert
+      WHOLE_FILE     165
+      documents      164 / 272
+      DATE           160
+      COMMIT           5
+      RUN_ID           0
+      SUPERSEDED_BY    0
+  and assert EXACTLY the two known A->B moves.
+```
+
+> **THE CONTROL MAY NOT SIMPLY COMPARE HARD-CODED NUMBERS WITHOUT DERIVING
+> THE UNIVERSE AND THE PROJECTION THAT PRODUCED THEM.**
+
+A hard-coded 165 beside an unrun recipe is the very shape INC-32 records.
+
+---
+
+### 8. NEW REQUIRED CONTROL — `SB-SCOPE-ALL`
+
+**The bounded 165/164 projection is REGRESSION EVIDENCE. It is NOT by
+itself proof that the D381 subject repair preserved SCOPE across the
+complete comparable witness population.** The two are different claims and
+D381 carried only the first.
+
+`SB-SCOPE-ALL` must:
+
+```
+enumerate EVERY comparable witness before vs after the D381 subject repair;
+bind rows by stable evidence identity;
+compare applicability_scope;
+DERIVE ITS OWN DENOMINATOR;
+FAIL on any missing, extra or changed comparable witness unless separately
+     explained and adjudicated.
+```
+
+Current executed measurement, **which is the expected result and NOT the
+definition**:
+
+```
+485 comparable witnesses · 0 scope differences
+```
+
+> **DO NOT MERELY HARD-CODE 485.** The control derives the denominator and
+> then asserts that every comparison is equal.
+
+**This is the actual CLASS-WIDE proof that the subject repair did not
+silently move SCOPE.**
+
+---
+
+### 9. `SB-CORPUS-3` AND THE `SB-MOVED` CONTROLS STAND UNCHANGED
+
+No correction is made to the banked expected D381 subject delta. Required,
+and already reproduced:
+
+```
+kai-pm/CODE_AUDIT_FINAL_REPORT.md
+    SCOPE      WHOLE_FILE      -> WHOLE_FILE
+    VALIDITY   EXACT_SNAPSHOT  -> UNKNOWN
+    LIFECYCLE  HISTORICAL      -> UNKNOWN
+
+kai-pm/CODE_AUDIT_MASTER.md
+    SCOPE      WHOLE_FILE      -> WHOLE_FILE
+    VALIDITY   EXACT_SNAPSHOT  -> UNKNOWN
+    LIFECYCLE  HISTORICAL      -> UNKNOWN
+
+kai-pm/house_in_order_instrument/AUTHORITY_ONTOLOGY.md
+    SCOPE      WHOLE_FILE      -> WHOLE_FILE
+    VALIDITY   EXACT_SNAPSHOT  -> UNKNOWN
+    LIFECYCLE  UNKNOWN         -> UNKNOWN
+```
+
+```
+kai-pm/CODE_AUDIT_PLANNING_PACKAGE_QA.md   remains SPAN
+kai-pm/ORION_FIELD_NOTES.md                remains SPAN
+```
+
+---
+
+### 10. R18 — THE RECIPE MUST NOW EXECUTE
+
+**INC-32 demonstrated that PROSE BESIDE NUMBERS IS INSUFFICIENT.** R17 was
+banked, cited, and quoted in the very tranche that breached it. Under R18 a
+repeat means **the CONTROL failed, not the producer**, and the remedy is
+machine enforcement rather than a better-worded reminder.
+
+**THE STRUCTURAL REMEDY IS MACHINE EXECUTION**, inside the EXISTING
+authorised control file:
+
+```
+kai-pm/house_in_order_h2_v13/build_evidence/d379_controls.py
+```
+
+**NO NEW CONTROL FILE.** The control must mechanically derive and emit:
+
+```
+Population A four-kind universe
+Population A all-kind diagnostic total
+U_A membership
+Population B four-kind projection
+Population B all-kind projection diagnostic
+document denominator
+per-kind counts
+the exact A->B movement list
+SB-SCOPE-ALL denominator and difference count
+```
+
+Full untruncated evidence to `build_evidence/D379_CONTROLS.txt`; any
+excerpt declares itself partial and states its byte count (R10).
+
+> **NO MANUALLY TRANSCRIBED DENOMINATOR MAY CARRY CLOSURE WEIGHT.**
+
+**`INC-2026-09-18-32` REMAINS OPEN UNTIL THIS EXECUTED CONTROL PASSES.**
+
+---
+
+### 11. THE `D15` FIXTURE ABORT IS A SEPARATE ISSUE
+
+**DO NOT silently fold it into INC-32.** Measured at the D381 execution
+base `838b7637`:
+
+```
+cal_fixtures.py D15 reads   HERE / "h2v12-classification.json"
+the file exists at          kai-pm/house_in_order_h2_v12/h2v12-classification.json
+and does NOT exist in       kai-pm/house_in_order_h2_v13/
+```
+
+**The defect PREDATES the D381 execution base.**
+
+```
+DO NOT repair it under D382.
+Record it for SEPARATE Kai adjudication after D382 is banked.
+NO ADJACENT CLEANUP.
+```
+
+---
+
+### 12. BANKING ONLY — NO SOURCE MUTATION IN THIS TURN
+
+**This entry is appended with NO implementation-source change whatsoever.**
+The D379/D381 execution release remains in force and resumes after this
+bank; D382 neither widens nor narrows the mutation surface it governs.
+
+**D382 DOES NOT AUTHORISE:** a real Stage A · a candidate · a real Pass A ·
+a real classification run · a Stage-B package · a holdout · the blind 40 ·
+admission · freeze · Item 8 · the six subject builds · KAI-GATE-048
+progression · `A-4_PROVENANCE` · `A4_SELF_DIAGNOSIS` · Control C
+integration · RC-7 · A-05 · provisioning the non-shallow history source ·
+`git fetch --unshallow` against the active worktree · any merge.
+
+**PR #122 remains DO NOT MERGE. D359 governs programme order.**
+
+---
+
+### THREAD RECOVERY BLOCK — D382
+
+```
+PROGRAMME ORDER AUTHORITY  D359 §2 — cite, do not restate. House is at H2.
+ENTRY                      D382, banked 2026-09-18 on
+                           claude/project-rework-plan-pgvp35.
+                           GOVERNANCE ONLY. No source byte changed in the
+                           banking commit.
+WHY A DECISION NUMBER      a required control must not acquire new meaning
+                           through an unbound footnote under a hash-bound
+                           Stage-A governance model. The D370 ERRATA
+                           precedent is not followed here.
+CORRECTS                   D381 §20.3 SB-CORPUS-1 universe ·
+                           D381 §21.1 Population A universe ·
+                           D381 §21.2 Population B universe and recipe
+DOES NOT TOUCH             D381 architecture · mutation surface · subject
+                           grammar · axis semantics · H2_STAGE_A_V2 · the
+                           V2 domain separator · FINAL_CANDIDATE_AGGREGATE
+                           · D367 §9
+STAGE-A GOVERNANCE         UNCHANGED at [D379, D380, D381].
+                           D382 IS NOT ADDED to the V2 descriptor and the
+                           schema is NOT bumped. A V2 descriptor naming
+                           D382 is REFUSED by D381 §14 as an unknown
+                           governing decision — correct, not an oversight.
+CONSUMER UNIVERSE          exactly COMMIT · RUN_ID · DATE · SUPERSEDED_BY
+POPULATION A               167 consumer-relevant WHOLE_FILE · 166/272 docs
+                           COMMIT 6 · DATE 161 · RUN_ID 0 · SUPBY 0
+                           DIAGNOSTIC: +1 HEX_SHAPED_UNRESOLVED = 168
+                           all-kind. The all-kind total is NOT the
+                           classifier-consumer denominator.
+U_A                        frozen v1.2 witnesses that are BOTH in the four
+                           consumer families AND WHOLE_FILE under v1.2.
+                           Derived mechanically, never transcribed.
+POPULATION B               the current-v1.3 scope PROJECTION OF U_A.
+                           165 · 164/272 · DATE 160 · COMMIT 5 · RUN_ID 0
+                           · SUPBY 0. All-kind diagnostic 166.
+                           Exactly two moves, both WHOLE_FILE -> SPAN:
+                           CODE_AUDIT_PLANNING_PACKAGE_QA.md and
+                           ORION_FIELD_NOTES.md.
+B IS NOT                   NOT the full present-day v1.3 WHOLE_FILE census
+                           and NOT a fresh v1.3 Pass A. The full-universe
+                           procedure's 200/194/37 ANSWERED A DIFFERENT
+                           QUESTION and contradicts nothing.
+SB-CORPUS-1                superseded as to universe ONLY. It must DERIVE
+                           U_A and the projection; hard-coded numbers
+                           without a derivation carry no weight.
+SB-SCOPE-ALL               NEW REQUIRED CONTROL. Enumerate every comparable
+                           witness pre/post repair, bind by stable evidence
+                           identity, DERIVE the denominator, assert zero
+                           differences. Expected 485 / 0 — expected result,
+                           NOT the definition. Do not hard-code 485.
+SB-CORPUS-3 / SB-MOVED     UNCHANGED and still required. Already reproduced.
+EXECUTED DERIVATION        inside the EXISTING build_evidence/
+                           d379_controls.py. NO d381_controls.py, NO
+                           d382_controls.py, no new tracked evidence path.
+                           Full untruncated output to D379_CONTROLS.txt.
+INC-32                     OPEN. It closes only when the executed
+                           derivation control passes.
+D15 FIXTURE ABORT          SEPARATE. Predates execution base 838b7637.
+                           NOT repaired under D382. Awaits its own Kai
+                           adjudication. No adjacent cleanup.
+CHECKPOINT ACCEPTED        971919324ebc1c44824cb102606354194b32f15e
+                           parent 838b7637… · tree 196f8095…
+                           CHECKPOINT ONLY — not the implementation
+                           candidate, closes no mechanism, admits nothing.
+                           Server: +769/-61 total; ledger +124/-0; five
+                           implementation/control paths +645/-61.
+                           Orion's earlier "+650/-61" was numerically
+                           inaccurate; the server numbers govern. NO
+                           INCIDENT is assigned to that discrepancy.
+AUTHORISES                 NOTHING to execute. The D379/D381 execution
+                           release already in force resumes after this bank.
+NOT GREEN                  repository and PR #122. DO NOT MERGE.
+ALLOCATOR                  before this append: population 364, distinct 364,
+                           duplicates none, highest D381, D382 count 0,
+                           next free D382. After: next free D383 — NOT TO BE
+                           TAKEN without authorisation.
+INCIDENT ALLOCATOR         32 incidents, highest INC-2026-09-18-32.
+                           UNCHANGED by this entry.
+```
