@@ -28,26 +28,35 @@ V = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(V))
 
 import classify                                              # noqa: E402
+import qualify                                               # noqa: E402
 import passa                                                 # noqa: E402
 from envelope import Witness                                 # noqa: E402
 
 PASSED, FAILED, FAILURES = 0, 0, []
 # Sections of the D379 hostile matrix. Implemented sections run; the rest
 # fail as NOT_IMPLEMENTED so this file can never report a green tranche.
-SECTIONS = ["M2", "D14", "Q1a", "Q1b", "86", "SB", "I1A", "I1B",
-            "DEP", "STAGE_A", "STDLIB"]
-IMPLEMENTED = {"M2", "SB", "D14", "I1A", "I1B", "86"}
+SECTIONS = ["M2", "D14", "PPOP", "Q1a", "Q1b", "86", "SB", "I1A",
+            "I1B", "DEP", "STAGE_A", "STDLIB"]
+IMPLEMENTED = {"M2", "SB", "D14", "I1A", "I1B", "PPOP", "86", "Q1b"}
 # HELD is NOT an excuse and does NOT make the gate green. These
 # sections are implemented except for a limb that cannot execute
 # on a KNOWN-NEGATIVE interpreter (INC-34 / D385). They still FAIL
 # the exit gate; they are reported separately only so the registry
 # does not call a blocked limb "not written".
-HELD = {"DEP": "INC-34 clean-producer positive; this interpreter injects sitecustomize and _distutils_hack",
-        "STAGE_A": "INC-34 canonical-runtime positive limb",
-        "STDLIB": "INC-34 canonical-runtime positive limb",
-        "Q1a": "INC-34 stdlib-positive-dependent proof",
-        "Q1b": "requires a real classification result",
-        "E1": "requires a real classification result"}
+HELD = {
+    # HELD names a limb that CANNOT EXECUTE on a known-negative runtime.
+    # It is not a pass and does not soften the gate: every section listed
+    # here still FAILS below. It exists so the registry does not describe a
+    # blocked limb as unwritten.
+    "Q1a": "Q1a-6 ONLY — needs a governed POSITIVE runtime identity to "
+           "compare against (INC-34). Q1a-1,2,3,4,5,7,8,9 all EXECUTE.",
+    "DEP": "DEP-2 ONLY — needs ordinary stdlib under a D380-COMPLIANT "
+           "interpreter (INC-34). DEP-1 and DEP-3 EXECUTE.",
+    "STAGE_A": "the canonical-runtime positive limb ONLY (INC-34). The V2 "
+               "governance and identity matrix EXECUTES.",
+    "STDLIB": "V2-ID-2a, the canonical positive derivation ONLY (INC-34). "
+              "The D380-STDLIB-NEG-1 negative control EXECUTES.",
+}
 
 
 def check(name: str, condition: bool, detail: str = "") -> bool:
@@ -689,11 +698,14 @@ def main() -> int:
     section_M2()
     section_SB()
     section_D14()
+    section_PPOP()
     section_DEP()
     section_STAGE_A()
     section_I1A()
     section_I1B()
     section_86()
+    section_Q1a()
+    section_Q1b()
     section_STDLIB()
 
     print("-" * 70)
@@ -759,6 +771,99 @@ def section_D14():
           not passa._eligible(m3), m3.start())
     check("D14-C ... and the boundary is exactly HEAD_BYTES, start-bound",
           passa._eligible.__doc__ is not None and H == 6000, H)
+    print()
+
+
+# ── PPOP — INC-37, the producer origin classifier ─────────────────────
+#
+# EVERY EXPECTED ANSWER BELOW IS PREDECLARED BY THIS CONTROL. None is
+# obtained by asking producer_population() what it thinks and calling that
+# the expectation — that is the shape of INC-36, and it is the reason this
+# matrix exists as a table of (origin, expected) pairs.
+def section_PPOP():
+    print("PPOP — INC-37: the producer origin classifier (D379 §5/§6)")
+    print("  Import metadata decides FIRST. Filesystem presence is not the")
+    print("  discriminator in either direction: `os` carries a __file__ and")
+    print("  reports origin 'frozen'.\n")
+    import stage_identity as SI
+    REFUSE = "REFUSE"
+    h2 = "kai-pm/house_in_order_h2_v13/passa.py"
+    census_dir = REPO / "kai-pm" / "house_in_order_census_v11"
+    census_file = next(census_dir.glob("*.py"), None)
+    stdlib_file = pathlib.Path(collections.__file__).resolve()
+
+    cases = [
+        ("PPOP-1  __file__ None + origin built-in",
+         SI.Origin("m1", spec_origin="built-in"), SI.CLASS_BUILTIN),
+        ("PPOP-2  __file__ None + origin frozen",
+         SI.Origin("m2", spec_origin="frozen"), SI.CLASS_FROZEN),
+        ("PPOP-3  __file__ PRESENT + origin frozen (the measured `os` case)",
+         SI.Origin("m3", spec_origin="frozen", file=str(stdlib_file)),
+         SI.CLASS_FROZEN),
+        ("PPOP-4  __file__ None + origin None",
+         SI.Origin("m4", has_spec=False, spec_origin=None), REFUSE),
+        ("PPOP-5  __file__ None + unknown textual origin",
+         SI.Origin("m5", spec_origin="some-unknown-origin"), REFUSE),
+        ("PPOP-6  __file__ None + filesystem-like EXTERNAL origin",
+         SI.Origin("m6", spec_origin="/opt/outside/governed/thing.py"), REFUSE),
+        ("PPOP-7  filesystem-backed external module",
+         SI.Origin("m7", spec_origin=None,
+                   file="/usr/lib/python3/dist-packages/_distutils_hack/"
+                        "__init__.py"), REFUSE),
+        ("PPOP-8  governed H2 source",
+         SI.Origin("passa", file=str(REPO / h2)), SI.CLASS_H2),
+        ("PPOP-10 governed stdlib source",
+         SI.Origin("collections", file=str(stdlib_file)), SI.CLASS_STDLIB),
+        ("PPOP-11 file-backed __main__ under governed H2 source",
+         SI.Origin("__main__", file=str(REPO / h2), is_main=True),
+         SI.CLASS_H2),
+        ("PPOP-12 UNSOURCED production-boundary __main__",
+         SI.Origin("__main__", has_spec=False, spec_origin=None, file=None,
+                   is_main=True), REFUSE),
+        ("PPOP-13 fs spec.origin and __file__ resolve to DIFFERENT sources",
+         SI.Origin("m13", spec_origin=str(REPO / h2), file=str(stdlib_file)),
+         REFUSE),
+    ]
+    if census_file is not None:
+        cases.insert(9, ("PPOP-9  governed Census source",
+                         SI.Origin("docgraph", file=str(census_file)),
+                         SI.CLASS_CENSUS))
+
+    for label, origin, expected in cases:
+        try:
+            got, _ident = SI.classify_origin(origin, repo_root=REPO)
+        except SI.StageIdentityError:
+            got = REFUSE
+        check(f"{label} -> {expected}", got == expected, f"got {got}")
+        print(f"    {label:<62} -> {got}")
+
+    # PPOP-14 — deduplication by RESOLVED SOURCE IDENTITY
+    seen = set()
+    for o in (SI.Origin("__main__", file=str(REPO / h2), is_main=True),
+              SI.Origin("passa", file=str(REPO / h2))):
+        cls, ident = SI.classify_origin(o, repo_root=REPO)
+        seen.add((cls, ident))
+    check("PPOP-14 the same resolved source reached by __main__ AND by the "
+          "ordinary traversal yields ONE canonical member", len(seen) == 1,
+          seen)
+
+    # the live process, which is EXPECTED to refuse here (Kai §11)
+    members, offenders = SI.producer_population(REPO)
+    kinds = collections.Counter(k for k, _, _ in members)
+    print()
+    print(f"    OBSERVED PRODUCER DENOMINATOR  {len(members) + len(offenders)}"
+          f"   classified {len(members)}   refused {len(offenders)}")
+    for k in SI.ORIGIN_CLASSES:
+        print(f"      {k:<9} {kinds.get(k, 0)}")
+    for n, why in offenders:
+        print(f"      REFUSED  {n}: {str(why)[:96]}")
+    check("PPOP the live producer population REFUSES in this container, "
+          "which is CORRECT and is not tuned away (INC-34 / Kai §11)",
+          bool(offenders), "no offender found — expected sitecustomize and "
+                           "_distutils_hack at minimum")
+    check("PPOP no origin is silently skipped: classified + refused accounts "
+          "for every observed origin",
+          len(members) + len(offenders) > 0)
     print()
 
 
@@ -1110,6 +1215,353 @@ def section_86():
         for f in (beside, V / ".d379_tmp_bad.sha256", V / ".d379_tmp_diff.sha256"):
             if f.exists():
                 f.unlink()
+    # ── 86-C1..C10 — the SUPERSEDING D380 criterion ───────────────────
+    #
+    # EVERY EXPECTED CLASS BELOW IS PREDECLARED HERE. None comes from
+    # runtime_module_identity(), and none comes from
+    # stage_identity.producer_population(). The old matrix took its
+    # expectations from the same narrowed function it was testing, which
+    # is why 86 reported green over a 73-origin blind spot (INC-36).
+    print("\n  86-C — the closed §8(6) classification, independently expected")
+    import stage_identity as SI
+    import types as _types
+    import importlib.machinery as _mach
+
+    desc = _synthetic_descriptor(SI.SCHEMA_V2, SI.MODE_CALIBRATION)
+    stage_h2 = {m["path"]: m["sha256"] for m in desc["h2_sources"]}
+    roots, external = SI._governed_roots()
+    manifest = {pathlib.Path(k).name: v for k, v in stage_h2.items()}
+
+    def mkmod(name, *, origin=None, file=None, has_spec=True):
+        m = _types.ModuleType(name)
+        m.__file__ = file
+        if has_spec:
+            sp = _mach.ModuleSpec(name, None)
+            sp.origin = origin
+            m.__spec__ = sp
+        else:
+            m.__spec__ = None
+        return m
+
+    def classify(name, mod):
+        try:
+            return qualify.classify_loaded_origin(
+                name, mod, stage_h2=stage_h2, manifest=manifest, desc=desc,
+                repo=REPO, roots=roots, external=external)["class"]
+        except qualify.QualifierIdentityError:
+            return "REFUSE"
+
+    h2p = str(REPO / "kai-pm/house_in_order_h2_v13/passa.py")
+    stdp = str(pathlib.Path(collections.__file__).resolve())
+    censusp = next((REPO / "kai-pm" / "house_in_order_census_v11").glob("*.py"),
+                   None)
+    cases = [
+        ("86-C1  governed H2 module, Stage-A hash correct",
+         mkmod("passa", file=h2p), qualify.QUAL_H2),
+        ("86-C4  filesystem stdlib represented by governed runtime",
+         mkmod("collections", file=stdp), qualify.QUAL_STDLIB),
+        ("86-C5  mechanically BUILT-IN origin",
+         mkmod("sys", origin="built-in"), qualify.QUAL_BUILTIN),
+        ("86-C6  mechanically FROZEN origin (with a __file__, the `os` case)",
+         mkmod("os", origin="frozen", file=stdp), qualify.QUAL_BUILTIN),
+        ("86-C7  external filesystem module -> REFUSE and NAME it",
+         mkmod("_distutils_hack",
+               file="/usr/lib/python3/dist-packages/_distutils_hack/"
+                    "__init__.py"), "REFUSE"),
+        ("86-C8  non-filesystem origin, neither built-in nor frozen",
+         mkmod("typing.io", has_spec=False), "REFUSE"),
+    ]
+    if censusp is not None:
+        cases.insert(1, ("86-C3  governed hardened Census member",
+                         mkmod("docgraph", file=str(censusp)),
+                         qualify.QUAL_CENSUS))
+    for label, mod, expected in cases:
+        got = classify(mod.__name__, mod)
+        check(f"{label} -> {expected}", got == expected, f"got {got}")
+        print(f"    {label:<64} -> {got}")
+
+    # 86-C2 — an H2 byte that differs from Stage A
+    bad_stage = dict(stage_h2)
+    bad_stage["kai-pm/house_in_order_h2_v13/passa.py"] = "f" * 64
+    def classify_bad(name, mod):
+        try:
+            return qualify.classify_loaded_origin(
+                name, mod, stage_h2=bad_stage, manifest=manifest, desc=desc,
+                repo=REPO, roots=roots, external=external)["class"]
+        except qualify.QualifierIdentityError:
+            return "REFUSE"
+    check("86-C2  loaded H2 byte differs from Stage A -> REFUSE",
+          classify_bad("passa", mkmod("passa", file=h2p)) == "REFUSE")
+    # an H2 module absent from the Stage-A population
+    check("86-C2' loaded H2 source ABSENT from Stage-A h2_sources -> REFUSE",
+          classify("subjectbind", mkmod(
+              "subjectbind", file=str(REPO / "kai-pm/house_in_order_h2_v13/"
+                                             "subjectbind.py")))
+          == qualify.QUAL_H2)
+    # manifest vs Stage-A disagreement
+    dis = dict(manifest); dis["passa.py"] = "e" * 64
+    try:
+        qualify.classify_loaded_origin(
+            "passa", mkmod("passa", file=h2p), stage_h2=stage_h2,
+            manifest=dis, desc=desc, repo=REPO, roots=roots,
+            external=external)
+        disagreed = False
+    except qualify.QualifierIdentityError:
+        disagreed = True
+    check("86 the H2 manifest and Stage-A h2_sources may not disagree "
+          "silently -> REFUSE", disagreed)
+
+    # the qualifier's OWN derived live population
+    import tempfile as _tf
+    sa = pathlib.Path(_tf.mkdtemp()) / "stage_a.json"
+    sa.write_text(json.dumps(desc))
+    mf = pathlib.Path(_tf.mkdtemp()) / "MANIFEST.sha256"
+    mf.write_text("\n".join(f"{v}  {k}" for k, v in manifest.items()) + "\n")
+    rows, refusals = qualify.qualifier_population(str(sa), str(mf))
+    kinds = collections.Counter(r["class"] for r in rows)
+    print()
+    print(f"    QUALIFIER DENOMINATOR  {len(rows) + len(refusals)}"
+          f"   classified {len(rows)}   refused {len(refusals)}")
+    for k in qualify.QUAL_CLASSES:
+        print(f"      {k:<18} {kinds.get(k, 0)}")
+    for n, why in refusals:
+        print(f"      REFUSED  {n}: {str(why)[:92]}")
+    check("86-C9  the REAL loaded _distutils_hack is REFUSED",
+          any(n == "_distutils_hack" for n, _ in refusals),
+          [n for n, _ in refusals])
+    check("86-C10 the REAL loaded sitecustomize is REFUSED",
+          any(n == "sitecustomize" for n, _ in refusals),
+          [n for n, _ in refusals])
+    check("86 the qualifier derives its OWN population and does not call "
+          "stage_identity.producer_population() as its answer oracle",
+          "producer_population" not in executable_source(qualify))
+    check("86 NO SKIP CLASS: classified + refused accounts for every "
+          "observed origin", len(rows) + len(refusals) > 100,
+          len(rows) + len(refusals))
+    print()
+
+
+# ── Q1a — producer-byte provenance, synthetic Stage-A material ────────
+#
+# Q1a asks WHO PRODUCED THE RESULT. §8(6) asks whether the QUALIFIER's own
+# executing bytes are governed. D380 §5 keeps them separate, and nothing
+# here consults today's sys.modules to establish yesterday's producer:
+# these controls verify a RECORDED provenance block against the Stage-A
+# identity it claims.
+def section_Q1a():
+    print("Q1a — producer-byte provenance against Stage A")
+    import stage_identity as SI
+    import copy
+
+    A = _synthetic_descriptor(SI.SCHEMA_V2, SI.MODE_CALIBRATION)
+    idA = SI.stage_a_identity(A)
+    prov = {"stage_a_identity": idA,
+            "members": [{"class": SI.CLASS_H2, "identity": m["path"],
+                         "sha256": m["sha256"]} for m in A["h2_sources"]]}
+
+    check("Q1a-1 clean chain: producer provenance verifies against the one "
+          "synthetic Stage A", SI.verify_provenance(prov, A)[0] == idA)
+
+    # Q1a-2 / Q1a-3 — a governed producer byte changed AFTER Stage A fixed
+    for label, which in (("Q1a-2 Pass-A producer", "passa.py"),
+                         ("Q1a-3 classification producer", "run_h2_v12.py")):
+        bad = copy.deepcopy(prov)
+        for m in bad["members"]:
+            if m["identity"].endswith(which):
+                m["sha256"] = "f" * 64
+        check(f"{label} byte changed after Stage A fixed -> REFUSE",
+              _refuses(lambda b=bad: SI.verify_provenance(b, A)))
+
+    # Q1a-4 — stale input: produced under Stage-A A, presented against B
+    B = _synthetic_descriptor(SI.SCHEMA_V2, SI.MODE_CALIBRATION)
+    B["subject"] = dict(B["subject"], population=271)
+    check("Q1a-4 stale input: provenance made under Stage-A A presented "
+          "against Stage-A B -> REFUSE, no result accepted",
+          _refuses(lambda: SI.verify_provenance(prov, B)))
+
+    # Q1a-5 — the recorded identity itself tampered
+    tampered = dict(prov, stage_a_identity="0" * 64)
+    check("Q1a-5 a tampered recorded Stage-A identity -> qualification "
+          "REFUSES", _refuses(lambda: SI.verify_provenance(tampered, A)))
+
+    # Q1a-7 — a member DELETED from the output provenance after production,
+    # with the independently captured runtime observation unchanged
+    observed = [(SI.CLASS_H2, m["path"], m["sha256"]) for m in A["h2_sources"]]
+    short = dict(prov, members=prov["members"][:-1])
+    check("Q1a-7 one governed member deleted from the OUTPUT provenance, "
+          "independent runtime observation unchanged -> REFUSE",
+          _refuses(lambda: SI.reconcile_provenance(short["members"], observed)))
+    check("Q1a-7 the matching case reconciles (no provenance list defines "
+          "its own completeness)",
+          SI.reconcile_provenance(prov["members"], observed) is True)
+
+    # Q1a-8 — a governed module NOT represented in Stage A is loaded
+    extra = copy.deepcopy(prov)
+    extra["members"].append({"class": SI.CLASS_H2,
+                             "identity": "kai-pm/house_in_order_h2_v13/"
+                                         "build_evidence/d379_controls.py",
+                             "sha256": "a" * 64})
+    check("Q1a-8 a governed module loaded but NOT represented in Stage A -> "
+          "REFUSE, no silent runtime expansion",
+          _refuses(lambda: SI.verify_provenance(extra, A)))
+
+    # Q1a-9 — SELF-HASH PROHIBITION, then the accepted external path
+    artefact = b'{"rows": [], "population": 0}'
+    forbidden = dict(prov)
+    forbidden = json.loads(json.dumps(forbidden))
+    forbidden["output_sha256"] = SI.sha256_hex(artefact)
+    check("Q1a-9 provenance declaring its own whole-file output digest "
+          "among the hashed bytes is INVALID IDENTITY CONSTRUCTION",
+          SI.contains_self_digest(forbidden, artefact))
+    check("Q1a-9 the clean provenance does NOT contain its own output digest",
+          not SI.contains_self_digest(prov, artefact))
+    import tempfile as _tf
+    fp = pathlib.Path(_tf.mkdtemp()) / "passA.json"
+    fp.write_bytes(artefact)                     # finalise the file FIRST
+    b = SI.stage_b_binding(fp, artifact_kind="PASS_A", identity=idA,
+                           producer_component="passa",
+                           producer_provenance_digest=SI.sha256_hex(
+                               SI._jcs(prov)))
+    check("Q1a-9 the ACCEPTED path: finalise, hash the exact final bytes, "
+          "bind EXTERNALLY -> PASS",
+          b["artifact_sha256"] == SI.sha256_hex(artefact)
+          and b["stage_a_identity"] == idA)
+    check("Q1a-9 the Stage-B binding carries producer_provenance_digest "
+          "ALONGSIDE artifact_sha256 (D379 §5's independent anchor)",
+          b["producer_provenance_digest"] and b["artifact_sha256"])
+
+    print("    Q1a-6 qualifier-runtime-differs limb            HELD ON INC-34")
+    print("    (it requires a governed positive runtime identity to compare")
+    print("     against, and this interpreter is known-negative)")
+    print()
+
+
+# ── Q1b / E1 — synthetic, local, and NOT held ─────────────────────────
+def _synthetic_trace(kind, sel, value, ctx=None):
+    """A nine-field trace that is SEMANTICALLY TRUTHFUL: the context
+    actually contains the value it claims to evidence."""
+    return {"witness_type": kind, "witness_value": value,
+            "source_path": "kai-pm/SYNTH.md", "source_selector": sel,
+            "local_context": ctx or f"**Audited:** `{value}` line",
+            "applicability_scope": "WHOLE_FILE", "evidence_total": 1,
+            "evidence_shown": 1, "truncated": False,
+            "polarity": "POSITIVE", "certainty": "VERIFIED",
+            "subject": "SELF"}
+
+
+def _synthetic_result(n=3):
+    """A clean, complete result in the REAL emitted schema. No candidate."""
+    import ontology as ont
+    import run_h2_v12 as R
+    rows = []
+    for i in range(n):
+        facts, traces = {}, {}
+        for name in ont.EVIDENCE_FACTS:
+            facts[name] = False
+        for name in ("CITES_COMMIT", "CARRIES_DATE_STAMP"):
+            kind, sel = R.TRACE_CLASS[name]
+            val = COMMIT if name == "CITES_COMMIT" else "2026-07-21"
+            facts[name] = True
+            traces[name] = _synthetic_trace(kind, sel + "4", val)
+        cells = {}
+        for axis in ont.ALPHABETS:
+            cells[axis] = {"value": ont.ABSTENTION, "abstention": True,
+                           "witness": None}
+        cells["SCOPE"] = {"value": "WHOLE_FILE",
+                          "witness": _synthetic_trace("DATE_STAMP", "L4",
+                                                      "2026-07-21")}
+        rows.append(dict(path=f"kai-pm/SYNTH_{i}.md", **cells,
+                         evidence_facts=facts, evidence_fact_traces=traces,
+                         evidence_facts_abstained_no_compliant_trace=[]))
+    return {"population": n, "rows": rows}
+
+
+def section_Q1b():
+    print("Q1b / E1 — the complete DERIVED §5 denominator, synthetic subjects")
+    print("  D379 §8: Q1b takes NO Pass-A input and runs against synthetic")
+    print("  and local subjects only. No candidate is required, and 343 /")
+    print("  316 / 659 are measurements, not definitions — none is encoded.\n")
+    import copy
+    import ontology as ont
+
+    clean = _synthetic_result()
+    a, b, s, f = qualify.q1b_denominators(clean)
+    print(f"    axis-cell denominator            {a}")
+    print(f"    positive-evidence-fact denominator {b}")
+    print(f"    sum                              {s}")
+    check("Q1b-1 a clean complete synthetic result PASSES, with both "
+          "denominators and their sum printed", not f and a and b and s == a + b,
+          f[:3])
+
+    # Q1b-2 — one positive fact, trace removed
+    m2 = copy.deepcopy(clean)
+    m2["rows"][0]["evidence_fact_traces"].pop("CITES_COMMIT")
+    _, _, _, f2 = qualify.q1b_denominators(m2)
+    hit2 = [x for x in f2 if x[0] == "FACT_TRACE"]
+    check("Q1b-2 one positive evidence fact missing its trace -> FAIL, "
+          "naming row and fact",
+          bool(hit2) and hit2[0][1] == "kai-pm/SYNTH_0.md"
+          and hit2[0][2] == "CITES_COMMIT", f2[:3])
+
+    # Q1b-3 — an axis cell whose witness is non-compliant
+    m3 = copy.deepcopy(clean)
+    m3["rows"][1]["SCOPE"]["witness"] = dict(
+        m3["rows"][1]["SCOPE"]["witness"], local_context="unrelated text")
+    _, _, _, f3 = qualify.q1b_denominators(m3)
+    hit3 = [x for x in f3 if x[0] == "AXIS_WITNESS"]
+    check("Q1b-3 a positive axis cell with a non-compliant witness -> FAIL, "
+          "naming row and axis",
+          bool(hit3) and hit3[0][2] == "SCOPE", f3[:3])
+
+    # Q1b-4 — abstention list inconsistent with emitted positives
+    m4 = copy.deepcopy(clean)
+    m4["rows"][2]["evidence_facts_abstained_no_compliant_trace"] = \
+        ["CITES_COMMIT"]
+    _, _, _, f4 = qualify.q1b_denominators(m4)
+    hit4 = [x for x in f4 if x[0] == "ABSTENTION_RECONCILIATION"]
+    check("Q1b-4 a fact listed as abstained AND emitted positive -> FAIL",
+          bool(hit4), f4[:3])
+
+    # Q1b-5 — DENOMINATOR SHRINK. Remove a whole governed fact class.
+    m5 = copy.deepcopy(clean)
+    for r in m5["rows"]:
+        r["evidence_facts"].pop("BINDING_CONTRADICTION", None)
+    _, _, _, f5 = qualify.q1b_denominators(m5)
+    hit5 = [x for x in f5 if x[0] == "FACT_CLASS_ABSENT"]
+    check("Q1b-5 removing a governed evidence-fact class is DETECTED — the "
+          "denominator comes from ont.EVIDENCE_FACTS and does not shrink to "
+          "hide the omission (the D17 lesson)",
+          bool(hit5) and hit5[0][2] == "BINDING_CONTRADICTION", f5[:3])
+
+    # Q1b-6 — opposite-side clean known-negative
+    m6 = copy.deepcopy(clean)
+    for r in m6["rows"]:
+        for name in list(r["evidence_facts"]):
+            r["evidence_facts"][name] = False
+        r["evidence_fact_traces"] = {}
+    a6, b6, s6, f6 = qualify.q1b_denominators(m6)
+    check("Q1b-6 opposite-side clean known-negative PASSES with zero "
+          "positive facts and no finding", not f6 and b6 == 0, f6[:3])
+
+    # E1, PROVEN THROUGH Q1b — trace CLASS, not merely presence
+    m7 = copy.deepcopy(clean)
+    m7["rows"][0]["evidence_fact_traces"]["CITES_COMMIT"] = _synthetic_trace(
+        "DATE_STAMP", "L4", "2026-07-21")
+    _, _, _, f7 = qualify.q1b_denominators(m7)
+    check("E1 a present, nine-field, semantically truthful trace of the "
+          "WRONG CLASS still FAILS — presence is not sufficiency",
+          any(x[0] == "FACT_TRACE_CLASS" for x in f7), f7[:3])
+    m8 = copy.deepcopy(clean)
+    m8["rows"][0]["evidence_fact_traces"]["CITES_COMMIT"]["local_context"] = \
+        "a line that does not contain the value"
+    _, _, _, f8 = qualify.q1b_denominators(m8)
+    check("E1 a trace whose local_context does NOT contain its own "
+          "witness_value FAILS", any(x[0] == "FACT_TRACE" for x in f8), f8[:3])
+    m9 = copy.deepcopy(clean)
+    del m9["rows"][0]["VALIDITY"]
+    _, _, _, f9 = qualify.q1b_denominators(m9)
+    check("E1 an absent governed axis cell is DETECTED, not skipped",
+          any(x[0] == "AXIS_CELL_ABSENT" for x in f9), f9[:3])
     print()
 
 

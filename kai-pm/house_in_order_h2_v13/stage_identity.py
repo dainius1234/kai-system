@@ -460,36 +460,190 @@ def stage_a_descriptor_digest(desc) -> str:
 
 
 # ── D379 §5 — runtime-derived producer population ─────────────────────
-def producer_population(repo_root):
-    """Governed modules ACTUALLY LOADED, classified by the closed rule.
+#
+# INC-2026-09-19-37. The previous implementation opened with
+#
+#     f = getattr(mod, "__file__", None)
+#     if not f:
+#         continue                      # built-in / frozen
+#
+# and that comment stated an assumption the code never tested. Three
+# synthetic origins and three REAL live modules (__main__, typing.io,
+# typing.re) were silently discarded: none is mechanically built-in and
+# none is mechanically frozen.
+#
+# FILESYSTEM PRESENCE IS NOT THE DISCRIMINATOR, IN EITHER DIRECTION.
+# Measured on this interpreter, `os` carries a __file__ AND reports
+# spec.origin 'frozen'. So a missing file does not imply built-in, and a
+# present file does not imply not-frozen. IMPORT METADATA DECIDES FIRST.
+#
+# There is no SKIP class. Every observed origin earns exactly one of
+# BUILTIN, FROZEN, H2, CENSUS, STDLIB — or it REFUSES.
 
-    Directional, per D379 §5: governed runtime modules actually loaded
-    MUST be represented in Stage A; NOT every Stage-A module must appear
-    in every process. Returns (members, external_offenders).
+CLASS_BUILTIN = "BUILTIN"
+CLASS_FROZEN = "FROZEN"
+CLASS_H2 = "H2"
+CLASS_CENSUS = "CENSUS"
+CLASS_STDLIB = "STDLIB"
+ORIGIN_CLASSES = (CLASS_BUILTIN, CLASS_FROZEN, CLASS_H2, CLASS_CENSUS,
+                  CLASS_STDLIB)
+
+
+class Origin:
+    """ONE OBSERVED IMPORT ORIGIN, as data.
+
+    Separating observation from classification is what lets a hostile
+    control supply a synthetic origin WITH ITS OWN PREDECLARED EXPECTED
+    ANSWER, instead of asking the classifier what it thinks and calling
+    that the expectation. The qualifier-side version of that mistake is
+    INC-36.
     """
+    __slots__ = ("name", "has_spec", "spec_origin", "file", "is_main")
+
+    def __init__(self, name, *, has_spec=True, spec_origin=None, file=None,
+                 is_main=False):
+        self.name = name
+        self.has_spec = has_spec
+        self.spec_origin = spec_origin
+        self.file = file
+        self.is_main = is_main
+
+    def __repr__(self):
+        return (f"Origin({self.name!r}, spec_origin={self.spec_origin!r}, "
+                f"file={self.file!r}, is_main={self.is_main})")
+
+
+def observe_origin(name, mod):
+    """Read one live module's import metadata. NO classification here."""
+    spec = getattr(mod, "__spec__", None)
+    return Origin(name, has_spec=spec is not None,
+                  spec_origin=getattr(spec, "origin", None),
+                  file=getattr(mod, "__file__", None),
+                  is_main=(name == "__main__"))
+
+
+def classify_origin(o, *, repo_root, roots=None, external=None):
+    """Classify ONE origin into the closed set, or REFUSE. D379 §5/§6.
+
+    Returns (class, identity_detail). Raises StageIdentityError to REFUSE.
+    """
+    if roots is None or external is None:
+        roots, external = _governed_roots()
     root = pathlib.Path(repo_root).resolve()
     h2root = (root / "kai-pm" / "house_in_order_h2_v13").resolve()
     census = (root / "kai-pm" / "house_in_order_census_v11").resolve()
+
+    # 1. IMPORT METADATA FIRST, and it OUTRANKS __file__ (Kai §4).
+    #    A frozen module carrying a convenience path stays FROZEN.
+    if o.spec_origin == "built-in":
+        return CLASS_BUILTIN, o.name
+    if o.spec_origin == "frozen":
+        return CLASS_FROZEN, o.name
+
+    # 2. __main__ is handled EXPLICITLY, as D379 §5 requires in terms.
+    #    An unsourced production entry point cannot satisfy that clause,
+    #    and pretending it is built-in is exactly the INC-37 equivalence.
+    if o.is_main and not o.file and not _is_fs_origin(o.spec_origin):
+        raise StageIdentityError(
+            f"REFUSE: the executing entry point __main__ has no mechanically "
+            f"establishable source (spec_origin={o.spec_origin!r}, "
+            f"file={o.file!r}). D379 §5 requires the entry-point source to be "
+            f"included EXPLICITLY; an unsourced __main__ is not built-in and "
+            f"is not frozen.")
+
+    # 3. A filesystem origin. Where BOTH a filesystem spec.origin and a
+    #    __file__ exist they must identify the SAME source object; picking
+    #    whichever is convenient is how two implementations drift apart.
+    cands = []
+    if _is_fs_origin(o.spec_origin):
+        cands.append(os.path.realpath(o.spec_origin))
+    if o.file:
+        cands.append(os.path.realpath(o.file))
+    if len(cands) == 2 and cands[0] != cands[1]:
+        raise StageIdentityError(
+            f"REFUSE: {o.name} has a filesystem spec.origin and a __file__ "
+            f"that resolve to DIFFERENT sources: {cands[0]} != {cands[1]}")
+    if not cands:
+        # 4. No file, and the origin is neither built-in nor frozen.
+        raise StageIdentityError(
+            f"REFUSE: {o.name} has no filesystem source and its origin is "
+            f"neither 'built-in' nor 'frozen' (has_spec={o.has_spec}, "
+            f"spec_origin={o.spec_origin!r}). A missing __file__ is NOT an "
+            f"answer (INC-2026-09-19-37).")
+
+    rp = cands[0]
+    p = pathlib.Path(rp)
+    if str(p).startswith(str(h2root) + os.sep):
+        return CLASS_H2, p.relative_to(root).as_posix()
+    if str(p).startswith(str(census) + os.sep):
+        return CLASS_CENSUS, p.relative_to(root).as_posix()
+    # external package population BEATS stdlib containment (D380 §7.3)
+    if _is_external(rp, external):
+        raise StageIdentityError(
+            f"REFUSE: {o.name} is a loaded non-stdlib EXTERNAL module at "
+            f"{rp}, outside every governed Stage-A root, with no explicit "
+            f"Stage-A dependency identity. None is invented here (D379 §6).")
+    if _owning_root(rp, roots) is not None:
+        return CLASS_STDLIB, rp
+    raise StageIdentityError(
+        f"REFUSE: {o.name} at {rp} lies outside the governed H2 root, the "
+        f"governed Census root and the governed Python stdlib classification.")
+
+
+def _is_fs_origin(origin):
+    """A spec origin that names a real filesystem location."""
+    return bool(origin) and origin not in ("built-in", "frozen") \
+        and os.path.exists(origin)
+
+
+def producer_population(repo_root):
+    """Every observed import origin, classified or REFUSED. D379 §5.
+
+    Directional, per D379 §5: governed runtime modules actually loaded
+    MUST be represented in Stage A; NOT every Stage-A module must appear
+    in every process.
+
+    Returns (members, offenders). `members` carries
+    (class, identity, sha256-or-"") and is deduplicated BY RESOLVED SOURCE
+    IDENTITY, so an entry point reached both explicitly and through the
+    ordinary traversal yields ONE canonical member. NO SILENT MEMBER: an
+    origin that cannot be classified appears in `offenders` with the exact
+    refusal text, never by omission.
+    """
+    root = pathlib.Path(repo_root).resolve()
     roots, external = _governed_roots()
-    members, offenders = [], []
-    for name, mod in list(sys.modules.items()):
-        f = getattr(mod, "__file__", None)
-        if not f:
-            continue                                   # built-in / frozen
-        rp = os.path.realpath(f)
-        p = pathlib.Path(rp)
-        if str(p).startswith(str(h2root) + os.sep):
-            members.append(("H2", p.relative_to(root).as_posix(),
-                            sha256_hex(p.read_bytes())))
-        elif str(p).startswith(str(census) + os.sep):
-            members.append(("CENSUS", p.relative_to(root).as_posix(),
-                            sha256_hex(p.read_bytes())))
-        elif _is_external(rp, external):
-            offenders.append((name, rp))
-        elif _owning_root(rp, roots) is not None:
-            members.append(("STDLIB", name, ""))       # covered by runtime id
-        else:
-            offenders.append((name, rp))
+    members, offenders, seen = [], [], set()
+
+    def take(o):
+        try:
+            cls, ident = classify_origin(o, repo_root=root, roots=roots,
+                                         external=external)
+        except StageIdentityError as e:
+            offenders.append((o.name, str(e)))
+            return
+        key = (cls, ident)
+        if key in seen:                       # D379 §5: deduplicate
+            return
+        seen.add(key)
+        digest = ""
+        if cls in (CLASS_H2, CLASS_CENSUS):
+            digest = sha256_hex((root / ident).read_bytes())
+        members.append((cls, ident, digest))
+
+    # D379 §5 — "the executing entry-point source (__main__) is included
+    # EXPLICITLY". Explicitly means BEFORE and INDEPENDENTLY of the general
+    # traversal, not "incidentally, if it happens to carry a path".
+    main = sys.modules.get("__main__")
+    if main is not None:
+        take(observe_origin("__main__", main))
+
+    for name, mod in sorted(sys.modules.items()):
+        if name == "__main__":
+            continue                          # already taken, explicitly
+        if mod is None:
+            continue
+        take(observe_origin(name, mod))
+
     members.sort()
     return members, offenders
 
@@ -526,3 +680,69 @@ if __name__ == "__main__":
                       "stdlib_schema": STDLIB_SCHEMA,
                       "governance_v2": [list(g) for g in GOVERNANCE_V2],
                       "h2_sources": list(H2_SOURCES)}, indent=1))
+
+
+# ── Q1a — PRODUCER-BYTE PROVENANCE (D379 §4/§5) ───────────────────────
+#
+# "WHO PRODUCED THE RESULT?" — a separate question from §8(6)'s "are the
+# QUALIFIER's own executing bytes governed?". The two are never collapsed:
+# this verifies a RECORDED provenance block against the Stage-A identity
+# it claims, and it deliberately does NOT consult today's sys.modules,
+# because today's module state cannot establish yesterday's producer bytes.
+def verify_provenance(recorded, descriptor):
+    """Verify a RECORDED producer provenance against Stage A, or REFUSE.
+
+    `recorded` is what the producer wrote beside its output:
+        {stage_a_identity, members: [{class, identity, sha256}]}
+    """
+    ident = stage_a_identity(descriptor)
+    if not isinstance(recorded, dict):
+        raise StageIdentityError("REFUSE: provenance is not an object")
+    if recorded.get("stage_a_identity") != ident:
+        raise StageIdentityError(
+            f"REFUSE: recorded stage_a_identity "
+            f"{recorded.get('stage_a_identity')} does not match the Stage-A "
+            f"descriptor it claims ({ident}). Stale input, or a tampered "
+            f"identity — either way the result is not accepted.")
+    stage_h2 = {m["path"]: m["sha256"] for m in descriptor["h2_sources"]}
+    members = recorded.get("members")
+    if not isinstance(members, list) or not members:
+        raise StageIdentityError("REFUSE: provenance records no member")
+    seen = set()
+    for m in members:
+        if set(m) != {"class", "identity", "sha256"}:
+            raise StageIdentityError(f"REFUSE: malformed provenance member {m!r}")
+        if m["class"] != CLASS_H2:
+            continue
+        if m["identity"] not in stage_h2:
+            raise StageIdentityError(
+                f"REFUSE: provenance names H2 member {m['identity']}, which "
+                f"is NOT represented in Stage A. No silent runtime expansion.")
+        if m["sha256"] != stage_h2[m["identity"]]:
+            raise StageIdentityError(
+                f"REFUSE: provenance H2 member {m['identity']} byte mismatch "
+                f"against Stage A.")
+        seen.add(m["identity"])
+    return ident, seen
+
+
+def reconcile_provenance(recorded_members, observed_members):
+    """D379 §5: the emitted provenance population must EQUAL the canonical
+    runtime-observed population. No provenance list defines its own
+    completeness, so this compares against an INDEPENDENT observation."""
+    r = {(m["class"], m["identity"]) for m in recorded_members}
+    o = {(c, i) for c, i, _ in observed_members}
+    if r != o:
+        raise StageIdentityError(
+            f"REFUSE: recorded provenance does not match the observed "
+            f"producer population. observed-only={sorted(o - r)[:4]} "
+            f"recorded-only={sorted(r - o)[:4]}")
+    return True
+
+
+def contains_self_digest(provenance, artifact_bytes):
+    """Q1a-9 SELF-HASH PROHIBITION. An identity containing its own OUTPUT
+    digest is the forbidden shape; the accepted path finalises the file
+    first and binds it EXTERNALLY."""
+    own = sha256_hex(artifact_bytes)
+    return own in json.dumps(provenance)

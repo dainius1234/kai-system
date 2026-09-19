@@ -34,6 +34,7 @@ import argparse
 import collections
 import hashlib
 import json
+import os
 import pathlib
 import sys
 
@@ -155,6 +156,142 @@ def runtime_module_identity(manifest_path):
     return rows, bad
 
 
+# ── §8(6), THE SUPERSEDING D380 RULE — INC-2026-09-19-36 ──────────────
+#
+# THE DEFECT THIS REPLACES. `runtime_module_identity` narrows to modules
+# whose resolved parent equals the manifest directory and `continue`s past
+# everything else. Measured: 73 loaded filesystem-backed origins silently
+# skipped, including the two the contract exists to reject. Its own
+# calibration asked the same narrow question, so the check could not fail
+# for the reason the implementation was wrong.
+#
+# THE QUALIFIER DERIVES ITS OWN POPULATION. It does NOT call
+# stage_identity.producer_population() and accept the answer: that would
+# make qualifier completeness depend on the producer classifier and
+# recreate the self-certified denominator one layer up. The two share
+# deterministic low-level normalisation only, never the ANSWER.
+#
+# THE MANIFEST ALONE CANNOT ESTABLISH §8(6). It says nothing about Census,
+# stdlib identity, interpreter identity or built-in/frozen origins, so a
+# VALIDATED Stage-A descriptor is a required fail-closed input.
+
+QUAL_H2 = "H2"
+QUAL_CENSUS = "CENSUS"
+QUAL_STDLIB = "GOVERNED_STDLIB"
+QUAL_BUILTIN = "BUILTIN_OR_FROZEN"
+QUAL_CLASSES = (QUAL_H2, QUAL_CENSUS, QUAL_STDLIB, QUAL_BUILTIN)
+
+
+def _load_stage_a(stage_a_path):
+    """Validate the supplied Stage-A descriptor BEFORE using it."""
+    import stage_identity as SI
+    sp = pathlib.Path(stage_a_path)
+    if not sp.is_file():
+        raise QualifierIdentityError(
+            f"REFUSE: no Stage-A descriptor at {stage_a_path}. §8(6) cannot "
+            f"be established from a manifest alone.")
+    desc = json.loads(sp.read_bytes().decode("utf-8"))
+    SI.validate_descriptor(desc)
+    return desc
+
+
+def classify_loaded_origin(name, mod, *, stage_h2, manifest, desc,
+                           repo, roots, external):
+    """ONE loaded origin -> exactly one governed class, or REFUSE.
+
+    ORIGIN METADATA FIRST, and it outranks __file__ — a frozen module
+    carrying a convenience path stays frozen.
+    """
+    import os as _os
+    import stage_identity as SI
+    o = SI.observe_origin(name, mod)
+    if o.spec_origin in ("built-in", "frozen"):
+        return {"module": name, "class": QUAL_BUILTIN,
+                "identity": o.spec_origin}
+    cands = []
+    if (o.spec_origin and o.spec_origin not in ("built-in", "frozen")
+            and _os.path.exists(o.spec_origin)):
+        cands.append(_os.path.realpath(o.spec_origin))
+    if o.file:
+        cands.append(_os.path.realpath(o.file))
+    if len(cands) == 2 and cands[0] != cands[1]:
+        raise QualifierIdentityError(
+            f"REFUSE: {name} spec.origin and __file__ resolve to different "
+            f"sources: {cands[0]} != {cands[1]}")
+    if not cands:
+        raise QualifierIdentityError(
+            f"REFUSE: {name} has no filesystem source and its origin is "
+            f"neither built-in nor frozen (spec_origin={o.spec_origin!r}).")
+    rp = cands[0]
+    fp = pathlib.Path(rp)
+    h2root = (repo / "kai-pm" / "house_in_order_h2_v13").resolve()
+    censusroot = (repo / "kai-pm" / "house_in_order_census_v11").resolve()
+    if str(fp).startswith(str(h2root) + _os.sep):
+        rel = fp.relative_to(repo).as_posix()
+        if rel not in stage_h2:
+            raise QualifierIdentityError(
+                f"REFUSE: loaded H2 source {rel} is ABSENT from the Stage-A "
+                f"h2_sources population.")
+        digest = hashlib.sha256(fp.read_bytes()).hexdigest()
+        if digest != stage_h2[rel]:
+            raise QualifierIdentityError(
+                f"REFUSE: loaded H2 source {rel} byte mismatch against "
+                f"Stage A: {digest} != {stage_h2[rel]}")
+        declared = manifest.get(fp.name)
+        if declared is not None and declared != digest:
+            raise QualifierIdentityError(
+                f"REFUSE: the H2 manifest and Stage-A h2_sources DISAGREE "
+                f"about {rel}: {declared} != {digest}")
+        return {"module": name, "class": QUAL_H2, "identity": rel,
+                "source_sha256": digest}
+    if str(fp).startswith(str(censusroot) + _os.sep):
+        return {"module": name, "class": QUAL_CENSUS,
+                "identity": fp.relative_to(repo).as_posix(),
+                "census_aggregate": desc["census"]["aggregate_sha256"]}
+    if SI._is_external(rp, external):
+        raise QualifierIdentityError(
+            f"REFUSE: {name} is a loaded EXTERNAL module at {rp}, outside "
+            f"every governed root, with no Stage-A dependency identity.")
+    if SI._owning_root(rp, roots) is not None:
+        return {"module": name, "class": QUAL_STDLIB, "identity": rp,
+                "stdlib_identity": desc["runtime"]["stdlib_identity"]}
+    raise QualifierIdentityError(
+        f"REFUSE: {name} at {rp} lies outside the governed H2 root, the "
+        f"governed Census root and the governed stdlib classification.")
+
+
+def qualifier_population(stage_a_path, manifest_path):
+    """EVERY loaded origin, classified or REFUSED. NO SKIP CLASS."""
+    import stage_identity as SI
+    desc = _load_stage_a(stage_a_path)
+    stage_h2 = {m["path"]: m["sha256"] for m in desc["h2_sources"]}
+    mp = pathlib.Path(manifest_path)
+    if not mp.is_file():
+        raise QualifierIdentityError(
+            f"REFUSE: qualifier manifest {manifest_path} does not exist.")
+    manifest = {}
+    for line in mp.read_text().splitlines():
+        if "  " in line:
+            h, n = line.split("  ", 1)
+            manifest[n.strip()] = h.strip()
+    if not manifest:
+        raise QualifierIdentityError(
+            f"REFUSE: qualifier manifest {manifest_path} yielded no entries")
+    repo = HERE.parent.parent
+    roots, external = SI._governed_roots()
+    rows, refusals = [], []
+    for name, mod in sorted(sys.modules.items()):
+        if mod is None:
+            continue
+        try:
+            rows.append(classify_loaded_origin(
+                name, mod, stage_h2=stage_h2, manifest=manifest, desc=desc,
+                repo=repo, roots=roots, external=external))
+        except QualifierIdentityError as e:
+            refusals.append((name, str(e)))
+    return rows, refusals
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--result", required=True)
@@ -262,3 +399,77 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
+
+# ── Q1b — THE COMPLETE DERIVED §5 DENOMINATOR, AND E1 THROUGH IT ──────
+#
+# D379 §8: Q1b takes NO Pass-A input and runs against SYNTHETIC AND LOCAL
+# SUBJECTS ONLY. It was briefly reported HELD "requires a real
+# classification result"; that was wrong. The frozen v1.2 artefact records
+# evidence_facts as bare booleans, which makes it the WRONG FIXTURE, not a
+# blocker.
+#
+# BOTH DENOMINATORS COME FROM THE GOVERNING SCHEMA, NEVER FROM THE RESULT.
+# The expected evidence-fact classes are ont.EVIDENCE_FACTS and the axes
+# are ont.ALPHABETS. That is what lets Q1b-5 detect the deletion of a whole
+# fact class: if the denominator were read off the emitted keys, removing a
+# class would remove it from the denominator too and the omission would
+# vanish. That is the D17 lesson, one layer out.
+#
+# NO MEASUREMENT IS ENCODED. 343, 316 and 659 were observations of one
+# subject on one day, not definitions, and none appears here.
+
+def q1b_denominators(result):
+    """(axis_cells, positive_facts, sum, findings). Derived, not read off."""
+    import run_h2_v12 as R
+    findings = []
+    rows = result.get("rows", [])
+
+    axis_cells = 0
+    for r in rows:
+        for axis in ont.ALPHABETS:                    # the GOVERNING axis set
+            cell = r.get(axis)
+            if cell is None:
+                findings.append(("AXIS_CELL_ABSENT", r.get("path"), axis,
+                                 "the emitted row has no cell for a governed "
+                                 "axis"))
+                continue
+            if cell.get("value") in (ont.ABSTENTION, ont.CAPABILITY_FAILURE):
+                continue
+            axis_cells += 1
+            w = cell.get("witness")
+            if not R._compliant(w):
+                findings.append(("AXIS_WITNESS", r.get("path"), axis,
+                                 "non-abstaining cell carries no compliant "
+                                 "witness"))
+
+    positive_facts = 0
+    for r in rows:
+        emitted = r.get("evidence_facts") or {}
+        traces = r.get("evidence_fact_traces") or {}
+        abstained = r.get("evidence_facts_abstained_no_compliant_trace") or []
+        for name in ont.EVIDENCE_FACTS:               # the GOVERNING schema
+            if name not in emitted:
+                findings.append(("FACT_CLASS_ABSENT", r.get("path"), name,
+                                 "a governed evidence-fact class is missing "
+                                 "from the emitted result; the denominator "
+                                 "does NOT shrink to hide it"))
+                continue
+            if not emitted[name]:
+                continue
+            positive_facts += 1
+            # E1, PROVEN HERE AND NOT IN A SEPARATE GATE.
+            t = traces.get(name)
+            if not R._compliant(t):
+                findings.append(("FACT_TRACE", r.get("path"), name,
+                                 "positive evidence fact without a compliant "
+                                 "nine-field determining trace"))
+            elif not R._class_ok(name, t):
+                findings.append(("FACT_TRACE_CLASS", r.get("path"), name,
+                                 "the trace class does not match the fact "
+                                 "class"))
+            if name in abstained:
+                findings.append(("ABSTENTION_RECONCILIATION", r.get("path"),
+                                 name, "fact is listed as abstained for want "
+                                 "of a compliant trace AND emitted positive"))
+    return axis_cells, positive_facts, axis_cells + positive_facts, findings

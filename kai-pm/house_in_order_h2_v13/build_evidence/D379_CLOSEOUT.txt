@@ -9,25 +9,44 @@ subprocess.CompletedProcess.returncode, read from the child that produced
 the captured output in D379_CONTROLS.txt. No shell status, no pipeline
 status, no parsed text, no supplied value.
 
-  D379 control process exit status    1
-  cal_fixtures process exit status    0
+  D379 control process exit status    1     (179 passed, 4 failed)
+  cal_fixtures process exit status    0     (79 PASS, 0 FAIL)
   capture parent returns              1
 
 SECTION STATE
   M2        IMPLEMENTED   discrimination demonstrated
   D14       IMPLEMENTED   A/B/C start-bound eligibility
-  86        IMPLEMENTED   fail-closed qualifier identity, derived population
+  PPOP      IMPLEMENTED   INC-37: origin metadata decides first; PPOP-1..14
+  86        IMPLEMENTED   INC-36: the closed four-class rule, 86-C1..C10
   SB        IMPLEMENTED   D381 subject matrix + D382 executed derivation
   I1A       IMPLEMENTED   seed is the validated Stage-A identity
   I1B       IMPLEMENTED   universe is the frozen tree, multiset reconciled
-  DEP       HELD          INC-34: this interpreter injects sitecustomize
-                          and _distutils_hack into every producer process
-  STAGE_A   HELD          INC-34: canonical-runtime positive limb
-  STDLIB    HELD          INC-34: no D380-compliant interpreter available
-  Q1a       HELD          INC-34: stdlib-positive-dependent proof
-  Q1b       HELD          requires a real classification result carrying
-                          per-fact traces; the frozen v1.2 artefact records
-                          evidence_facts as bare booleans
+  Q1b       IMPLEMENTED   Q1b-1..6 on synthetic subjects; E1 proven THROUGH
+                          it. Both denominators DERIVED from the governing
+                          schema; 343/316/659 appear nowhere.
+  Q1a       HELD (Q1a-6)  Q1a-1,2,3,4,5,7,8,9 EXECUTE. Only the
+                          qualifier-runtime-differs limb needs a governed
+                          POSITIVE runtime identity (INC-34).
+  DEP       HELD (DEP-2)  DEP-1 and DEP-3 EXECUTE. Only the governed-stdlib
+                          positive needs a compliant interpreter (INC-34).
+  STAGE_A   HELD          canonical-runtime positive limb only (INC-34)
+  STDLIB    HELD          V2-ID-2a only (INC-34). D380-STDLIB-NEG-1 executes.
+
+PRODUCER / QUALIFIER POPULATIONS — DERIVED INDEPENDENTLY, NOT SHARED
+  producer   127 observed   123 classified   4 refused
+             BUILTIN 33  FROZEN 19  H2 6  CENSUS 0  STDLIB 65
+  qualifier  130 observed   125 classified   5 refused
+             H2 7  CENSUS 0  GOVERNED_STDLIB 66  BUILTIN_OR_FROZEN 52
+  The qualifier does NOT call producer_population(). The two counts differ
+  because they are two independent observations of two different processes'
+  module tables, which is the point.
+  Refused by both: _distutils_hack, sitecustomize, typing.io, typing.re.
+  The qualifier additionally refuses __main__, because d379_controls.py is
+  under the H2 root and is NOT one of the ten Stage-A members. That is
+  correct (Kai §8): the test harness is not a production producer, and the
+  rule was not weakened to let it pass.
+
+  Before this tranche the qualifier SKIPPED 73 loaded origins silently.
 
 HELD IS NOT A PASS. Every HELD section still FAILS the exit gate. The
 label exists so the registry does not describe a blocked limb as unwritten.

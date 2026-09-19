@@ -8,7 +8,7 @@ subprocess.CompletedProcess.returncode, read directly from the child
 that produced the output immediately above it. No shell status, no
 pipeline status, no parsed text, no supplied value.
 
-captured 2026-09-18T23:36:09.173544+00:00
+captured 2026-09-19T00:02:16.399105+00:00
 
 ======================================================================
 SUBJECT 1 of 2 — THE D379 CONTROL PROCESS
@@ -24,7 +24,7 @@ SUBJECT — the exact bytes measured
   classify.py      226873676c2373faaf29f4709bb1bb62d1d22f3c56cbdc0e594314cb6e5df9e8
   envelope.py      fdcc1b73d7cd32e540c63ca926d5393901ea63b357fbf339819f07256e6a5a3f
   run_h2_v12.py    ab6f54c54c5bdd82c83f9de013311c5771d7eaabad2cec91dd46521d881f7ec7
-  qualify.py       e2c7b6d0f44b3ae5e74fa47aff7618364f643bee593593faaa42ceb9af7beb4f
+  qualify.py       dcfe77c79fb63a71755e3788e48713742a12bb39d1db78c171c0261de1f872cb
   holdout.py       e9cd5f3874ba14c2c33166671da6b8cc65574a040e6b276c955cd9f0a49b1766
   cal_fixtures.py  4299bd58bd34705d044056d03901f3d674f09e2afde1fff5811a55dfca5f737b
   ontology.py      a92e68c7518578e177c6c67d95efdc1e8b4a92c4406aa2778678119babb721bc
@@ -124,15 +124,49 @@ D14 — start-bound eligibility at the HEAD_BYTES boundary
   decide WHAT AN ELIGIBLE TOKEN IS.
 
 
+PPOP — INC-37: the producer origin classifier (D379 §5/§6)
+  Import metadata decides FIRST. Filesystem presence is not the
+  discriminator in either direction: `os` carries a __file__ and
+  reports origin 'frozen'.
+
+    PPOP-1  __file__ None + origin built-in                        -> BUILTIN
+    PPOP-2  __file__ None + origin frozen                          -> FROZEN
+    PPOP-3  __file__ PRESENT + origin frozen (the measured `os` case) -> FROZEN
+    PPOP-4  __file__ None + origin None                            -> REFUSE
+    PPOP-5  __file__ None + unknown textual origin                 -> REFUSE
+    PPOP-6  __file__ None + filesystem-like EXTERNAL origin        -> REFUSE
+    PPOP-7  filesystem-backed external module                      -> REFUSE
+    PPOP-8  governed H2 source                                     -> H2
+    PPOP-10 governed stdlib source                                 -> STDLIB
+    PPOP-9  governed Census source                                 -> CENSUS
+    PPOP-11 file-backed __main__ under governed H2 source          -> H2
+    PPOP-12 UNSOURCED production-boundary __main__                 -> REFUSE
+    PPOP-13 fs spec.origin and __file__ resolve to DIFFERENT sources -> REFUSE
+
+    OBSERVED PRODUCER DENOMINATOR  128   classified 124   refused 4
+      BUILTIN   33
+      FROZEN    19
+      H2        7
+      CENSUS    0
+      STDLIB    65
+      REFUSED  _distutils_hack: REFUSE: _distutils_hack is a loaded non-stdlib EXTERNAL module at /usr/lib/python3/dist-packages
+      REFUSED  sitecustomize: REFUSE: sitecustomize at /etc/python3.11/sitecustomize.py lies outside the governed H2 root, the
+      REFUSED  typing.io: REFUSE: typing.io has no filesystem source and its origin is neither 'built-in' nor 'frozen' (ha
+      REFUSED  typing.re: REFUSE: typing.re has no filesystem source and its origin is neither 'built-in' nor 'frozen' (ha
+
 DEP — governed runtime dependency classification (D379 §5/§6)
-    producer population (DERIVED)  90  {'H2': 6, 'STDLIB': 84}
-    ungoverned offenders           2
-      OFFENDER _distutils_hack  /usr/lib/python3/dist-packages/_distutils_hack/__init__.py
-      OFFENDER sitecustomize  /etc/python3.11/sitecustomize.py
+    producer population (DERIVED)  124  {'BUILTIN': 33, 'FROZEN': 19, 'H2': 7, 'STDLIB': 65}
+    ungoverned offenders           4
+      OFFENDER _distutils_hack  REFUSE: _distutils_hack is a loaded non-stdlib EXTERNAL module at /usr/lib/python3/dist-packages/_distutils_hack/__init__.py, outside every governed Stage-A root, with no explicit Stage-A dependency identity. None is invented here (D379 §6).
+      OFFENDER sitecustomize  REFUSE: sitecustomize at /etc/python3.11/sitecustomize.py lies outside the governed H2 root, the governed Census root and the governed Python stdlib classification.
+      OFFENDER typing.io  REFUSE: typing.io has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origin=None). A missing __file__ is NOT an answer (INC-2026-09-19-37).
+      OFFENDER typing.re  REFUSE: typing.re has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origin=None). A missing __file__ is NOT an answer (INC-2026-09-19-37).
     ENVIRONMENT CLASSIFICATION — this interpreter injects
     ungoverned modules into EVERY producer process:
-      _distutils_hack    /usr/lib/python3/dist-packages/_distutils_hack/__init__.py
-      sitecustomize      /etc/python3.11/sitecustomize.py
+      _distutils_hack    REFUSE: _distutils_hack is a loaded non-stdlib EXTERNAL module at /usr/lib/python3/dist-packages/_distutils_hack/__init__.py, outside every governed Stage-A root, with no explicit Stage-A dependency identity. None is invented here (D379 §6).
+      sitecustomize      REFUSE: sitecustomize at /etc/python3.11/sitecustomize.py lies outside the governed H2 root, the governed Census root and the governed Python stdlib classification.
+      typing.io          REFUSE: typing.io has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origin=None). A missing __file__ is NOT an answer (INC-2026-09-19-37).
+      typing.re          REFUSE: typing.re has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origin=None). A missing __file__ is NOT an answer (INC-2026-09-19-37).
     Under D379 §5 rule 6 a REAL production run here REFUSES.
     This is the SAME known-negative runtime as INC-34, whose
     sitecustomize.py is one of the two offenders. DEP clean-
@@ -144,13 +178,47 @@ STAGE_A — H2_STAGE_A_V2 governance and identity
   identity is constructed, and the canonical-runtime positive
   limb is HELD on INC-34 (see STDLIB).
 
-    synthetic V2 CALIBRATION stage_a_identity  40260e9035fd071d02e68946a4d4867671f413444ad800cfb9dac2a681057d7d
+    synthetic V2 CALIBRATION stage_a_identity  8019070de9c37591e198bd7079360702d7c655793cddb3b3456f144111ed6cc1
 
 I1A — the blind seed is the VALIDATED STAGE-A IDENTITY
 
 I1B — the selection universe is the FROZEN SUBJECT TREE
 
 86 — fail-closed qualifier identity (D367 §8(6))
+
+  86-C — the closed §8(6) classification, independently expected
+    86-C1  governed H2 module, Stage-A hash correct                  -> H2
+    86-C3  governed hardened Census member                           -> CENSUS
+    86-C4  filesystem stdlib represented by governed runtime         -> GOVERNED_STDLIB
+    86-C5  mechanically BUILT-IN origin                              -> BUILTIN_OR_FROZEN
+    86-C6  mechanically FROZEN origin (with a __file__, the `os` case) -> BUILTIN_OR_FROZEN
+    86-C7  external filesystem module -> REFUSE and NAME it          -> REFUSE
+    86-C8  non-filesystem origin, neither built-in nor frozen        -> REFUSE
+
+    QUALIFIER DENOMINATOR  130   classified 125   refused 5
+      H2                 7
+      CENSUS             0
+      GOVERNED_STDLIB    66
+      BUILTIN_OR_FROZEN  52
+      REFUSED  __main__: REFUSE: loaded H2 source kai-pm/house_in_order_h2_v13/build_evidence/d379_controls.py is ABS
+      REFUSED  _distutils_hack: REFUSE: _distutils_hack is a loaded EXTERNAL module at /usr/lib/python3/dist-packages/_distu
+      REFUSED  sitecustomize: REFUSE: sitecustomize at /etc/python3.11/sitecustomize.py lies outside the governed H2 root,
+      REFUSED  typing.io: REFUSE: typing.io has no filesystem source and its origin is neither built-in nor frozen (sp
+      REFUSED  typing.re: REFUSE: typing.re has no filesystem source and its origin is neither built-in nor frozen (sp
+
+Q1a — producer-byte provenance against Stage A
+    Q1a-6 qualifier-runtime-differs limb            HELD ON INC-34
+    (it requires a governed positive runtime identity to compare
+     against, and this interpreter is known-negative)
+
+Q1b / E1 — the complete DERIVED §5 denominator, synthetic subjects
+  D379 §8: Q1b takes NO Pass-A input and runs against synthetic
+  and local subjects only. No candidate is required, and 343 /
+  316 / 659 are measurements, not definitions — none is encoded.
+
+    axis-cell denominator            3
+    positive-evidence-fact denominator 6
+    sum                              9
 
 STDLIB — governed Python runtime identity (D380 §7, D385)
     stdlib      /usr/lib/python3.11
@@ -168,23 +236,23 @@ STDLIB — governed Python runtime identity (D380 §7, D385)
 SECTION COVERAGE
   M2         IMPLEMENTED
   D14        IMPLEMENTED
-  Q1a        HELD — INC-34 stdlib-positive-dependent proof
-  Q1b        HELD — requires a real classification result
+  PPOP       IMPLEMENTED
+  Q1a        HELD — Q1a-6 ONLY — needs a governed POSITIVE runtime identity to compare against (INC-34). Q1a-1,2,3,4,5,7,8,9 all EXECUTE.
+  Q1b        IMPLEMENTED
   86         IMPLEMENTED
   SB         IMPLEMENTED
   I1A        IMPLEMENTED
   I1B        IMPLEMENTED
-  DEP        HELD — INC-34 clean-producer positive; this interpreter injects sitecustomize and _distutils_hack
-  STAGE_A    HELD — INC-34 canonical-runtime positive limb
-  STDLIB     HELD — INC-34 canonical-runtime positive limb
+  DEP        HELD — DEP-2 ONLY — needs ordinary stdlib under a D380-COMPLIANT interpreter (INC-34). DEP-1 and DEP-3 EXECUTE.
+  STAGE_A    HELD — the canonical-runtime positive limb ONLY (INC-34). The V2 governance and identity matrix EXECUTES.
+  STDLIB     HELD — V2-ID-2a, the canonical positive derivation ONLY (INC-34). The D380-STDLIB-NEG-1 negative control EXECUTES.
 
 ======================================================================
-128 passed, 5 failed
-  FAIL section Q1a is implemented and executed: HELD — INC-34 stdlib-positive-dependent proof
-  FAIL section Q1b is implemented and executed: HELD — requires a real classification result
-  FAIL section DEP is implemented and executed: HELD — INC-34 clean-producer positive; this interpreter injects sitecustomize and _distutils_hack
-  FAIL section STAGE_A is implemented and executed: HELD — INC-34 canonical-runtime positive limb
-  FAIL section STDLIB is implemented and executed: HELD — INC-34 canonical-runtime positive limb
+179 passed, 4 failed
+  FAIL section Q1a is implemented and executed: HELD — Q1a-6 ONLY — needs a governed POSITIVE runtime identity to compare against (INC-34). Q1a-1,2,3,4,5,7,8,9 all EXECUTE.
+  FAIL section DEP is implemented and executed: HELD — DEP-2 ONLY — needs ordinary stdlib under a D380-COMPLIANT interpreter (INC-34). DEP-1 and DEP-3 EXECUTE.
+  FAIL section STAGE_A is implemented and executed: HELD — the canonical-runtime positive limb ONLY (INC-34). The V2 governance and identity matrix EXECUTES.
+  FAIL section STDLIB is implemented and executed: HELD — V2-ID-2a, the canonical positive derivation ONLY (INC-34). The D380-STDLIB-NEG-1 negative control EXECUTES.
 EXIT GATE: FAIL
 ======================================================================
 
