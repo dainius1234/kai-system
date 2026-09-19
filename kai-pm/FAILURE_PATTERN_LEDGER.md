@@ -5827,3 +5827,197 @@ NO D-NUMBER ALLOCATED   D387 remains free. No new authority is requested
                         the current release, or whether that requires its
                         own adjudication. That is Kai's call, not mine.
 ```
+
+---
+
+### `INC-2026-09-19-38` — assurance was implemented in importable helpers and
+###                      calibrated by importing them, while the governed
+###                      executables kept walking around it
+
+```
+INCIDENT_ID             INC-2026-09-19-38
+date                    2026-09-19          (00:11 UTC)
+producer                Orion — D379 implementation AND its hostile-control
+                        integration
+subject                 kai-pm/house_in_order_h2_v13/qualify.py
+                        kai-pm/house_in_order_h2_v13/passa.py
+                        kai-pm/house_in_order_h2_v13/run_h2_v12.py
+                        kai-pm/house_in_order_h2_v13/build_evidence/
+                            d379_controls.py
+                        measured at 88e54cef3c1d20b4765fdda8546dbe11a88fd534
+status                  OPEN-RECORDED / INCIDENT_ONLY /
+                        BLOCKS Q1a, Q1b/E1, §8(6), INC-36 CLOSURE AND
+                        D379 TRANCHE CLOSURE
+
+ROOT OBSERVATION        Assurance behaviour was implemented in sidecar /
+                        helper functions and calibrated BY IMPORTING THOSE
+                        FUNCTIONS, while the governed executables did not
+                        invoke them. The control matrix went green over
+                        code the real program never runs.
+
+                        THIS IS EXECUTION-PATH DIVERGENCE, NOT MISSING TEST
+                        COVERAGE. The right code existed and the tests
+                        proved that code; the program walked around it.
+
+MANIFESTATION A — §8(6)  qualify.main() still executes
+
+                            rows_id, bad = runtime_module_identity(a.manifest)
+
+                         which is the OLD candidate-directory-only
+                         classifier that caused INC-36. The CLI declares
+                         only --result and --manifest; there is NO
+                         --stage-a. qualifier_population() and
+                         classify_loaded_origin() are never reached by the
+                         executable path. Verified at source.
+
+MANIFESTATION B — Q1b/E1 q1b_denominators() is DEFINED AT LINE 422.
+                         `if __name__ == "__main__": sys.exit(main())` is at
+                         LINE 400. Verified by line number, not by reading.
+
+                         Imported by the control harness, __name__ is not
+                         "__main__", execution continues past the guard, the
+                         definition is reached, and the controls go green.
+                         Executed as a program, sys.exit() fires at line 400
+                         and the definition is NEVER REACHED. And main()
+                         does not call it in any case.
+
+                         A function that only exists when someone imports
+                         the module cannot be part of qualification.
+
+MANIFESTATION C — Q1a    Measured token counts in the actual producers:
+
+                           passa.py          run_h2_v12.py
+                           producer_provenance  0        0
+                           stage_a_identity     0        0
+                           --stage-a            0        0
+                           input_binding        0        0
+
+                         D379 requires Pass A to verify itself against
+                         Stage A BEFORE producing, derive its runtime
+                         population, record provenance in band and REFUSE
+                         on mismatch; and the classification producer to
+                         consume Stage A, read the Pass-A bytes ONCE, hash
+                         those exact bytes, parse THOSE SAME bytes, verify
+                         the Pass-A binding and record its own provenance
+                         and input binding. None of it is wired.
+
+                         Q1a-1/2/3/4/5/7/8/9 therefore exercise
+                         stage_identity helper functions over synthetic
+                         dictionaries. Those helpers may be individually
+                         correct. They do not prove Pass A or
+                         classification production implements Q1a.
+
+THE CONTROL DEFECT       D379 §8 states the cases run AS SUBPROCESSES
+                         ASSERTING THE REAL PROCESS RETURN CODE. Measured:
+
+                           section_Q1a   subprocess calls  0
+                           section_Q1b   subprocess calls  0
+                           section_86    subprocess calls  0
+
+                         D386 correctly made the OUTER control program a
+                         subprocess. That does not turn an in-process helper
+                         call into the hostile subprocess execution D379 §8
+                         required. They are different process boundaries,
+                         and I treated the outer repair as though it covered
+                         the inner one.
+
+RECURRENCE — AND THIS IS THE FINDING, NOT THE INSTANCE
+
+                         THE SAME REASONING STEP HAS NOW PRODUCED FIVE
+                         DEFECTS IN THIS WORKSTREAM:
+
+                           INC-35  recorded the status of the echo that
+                                   PRINTS the status, not of the process
+                           3 control bugs (a233a210) greps matched MY OWN
+                                   COMMENTS explaining the repair, not the
+                                   code
+                           INC-36  section_86 asked the same narrow
+                                   question as the implementation it tested
+                           INC-37  a `continue` whose COMMENT asserted the
+                                   classification the code never performed
+                           INC-38  controls import a helper and verify the
+                                   helper, while the executable runs older
+                                   code
+
+                         THE MECHANISM, STATED PLAINLY: I SUBSTITUTE THE
+                         NEAREST REACHABLE PROXY FOR THE ACTUAL SUBJECT,
+                         AND THEN VERIFY THE PROXY. Echo instead of
+                         process. Narrow function instead of contract.
+                         Comment instead of code. Helper instead of
+                         executable.
+
+                         In every case the proxy was easier to reach from
+                         where I was standing, and in every case it agreed
+                         with me — because I had just written it.
+
+                         R18: a third confirmed occurrence means THE
+                         CONTROL HAS FAILED, NOT THE PRODUCER, and the
+                         remedy is structure or machine enforcement, NOT
+                         another reminder. This is the fifth. I-8 and R2
+                         are both already written down, already cited by me
+                         in this very tranche, and neither stopped it.
+                         Restating them a sixth time is not a remedy.
+
+PROPOSED STRUCTURAL REMEDY — REQUIRES KAI'S AUTHORITY, NOT SELF-ADOPTED
+
+                         A MACHINE-ENFORCED SUBJECT DECLARATION for every
+                         control. Sketch, for adjudication:
+
+                           1. every control section declares its SUBJECT as
+                              an artefact identity — path + sha256 — and
+                              the exact invocation that exercised it;
+                           2. a meta-check FAILS any section whose declared
+                              subject is a shipped executable but which
+                              performs zero subprocess invocations of that
+                              executable;
+                           3. a meta-check FAILS any control that reads
+                              source text as evidence without reading it
+                              through the comment-stripped executable form;
+                           4. the declared subject digest must match the
+                              file the executable actually loaded.
+
+                         (2) would have caught INC-35 and INC-38. (3) would
+                         have caught the three a233a210 control bugs. (1)
+                         would have made INC-36's shared denominator
+                         visible as a declaration rather than an assumption.
+
+                         NO PART OF THIS IS IMPLEMENTED OR AUTHORISED HERE.
+                         It is recorded so the remedy is structural when
+                         Kai rules on it, rather than another promise.
+
+IMPACT                   Imported controls can report the intended policy
+                         correct while the real command-line production and
+                         qualification path performs old or absent
+                         behaviour. Section coverage overstated completeness
+                         even though the 179/4 tally and the recorded exit
+                         status 1 were themselves truthful.
+
+PROVENANCE               Found by Kai's source-level IV&V AFTER a green
+                         control matrix, before any production Stage A, real
+                         candidate, Pass A, holdout, blind 40 or admission.
+
+MECHANISM                NONE ASSIGNED.
+
+                         QUALIFIED LOCATORS ONLY: I-8, INC-36, INC-37, and
+                         the earlier self-certified-control and denominator
+                         incidents. The recurrence analysis above is a
+                         producer's account of his own reasoning, NOT an
+                         adjudicated causal equivalence, and it is not to be
+                         read as one.
+
+RELATIONSHIPS            INC-36 remains OPEN — the helper is improved, the
+                         executable still runs the old function.
+                         INC-37 remains OPEN / NOT CLOSED — the classifier
+                         repair and PPOP matrix are substantive, but the
+                         real producer paths do not invoke the runtime
+                         population / provenance boundary.
+                         INC-32, INC-33, INC-35 remain closure candidates;
+                         their evidence is NOT invalidated by this entry.
+                         INC-34 remains OPEN.
+
+NO D-NUMBER ALLOCATED    D387 remains free. D379 already grants the
+                         substantive authority and every mutation path
+                         needed: passa.py, run_h2_v12.py, qualify.py,
+                         stage_identity.py, d379_controls.py,
+                         D379_CONTROLS.txt, D379_CLOSEOUT.txt.
+```
