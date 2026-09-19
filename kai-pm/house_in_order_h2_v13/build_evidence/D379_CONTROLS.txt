@@ -1,0 +1,390 @@
+D379 / D381 / D382 HOSTILE CONTROLS — FULL UNTRUNCATED OUTPUT
+EVIDENCE CLASS: PRODUCER MEASUREMENT - SIGHTED - ZERO ADMISSION WEIGHT.
+THIS FILE IS THE AUTHORITATIVE OUTPUT (R10). Any excerpt elsewhere
+declares itself partial and states its byte count.
+
+STATUS PROVENANCE (D386): every 'process exit status' line below is
+subprocess.CompletedProcess.returncode, read directly from the child
+that produced the output immediately above it. No shell status, no
+pipeline status, no parsed text, no supplied value.
+
+captured 2026-09-19T00:02:16.399105+00:00
+
+======================================================================
+SUBJECT 1 of 2 — THE D379 CONTROL PROCESS
+======================================================================
+
+======================================================================
+D379 HOSTILE CONTROLS — PRODUCER MEASUREMENT, SIGHTED,
+                        ZERO ADMISSION WEIGHT
+======================================================================
+
+SUBJECT — the exact bytes measured
+  passa.py         73dbca128a6f85ebfa02148cf21c394cb72a631c786ebce3e82eff19d6cf0e61
+  classify.py      226873676c2373faaf29f4709bb1bb62d1d22f3c56cbdc0e594314cb6e5df9e8
+  envelope.py      fdcc1b73d7cd32e540c63ca926d5393901ea63b357fbf339819f07256e6a5a3f
+  run_h2_v12.py    ab6f54c54c5bdd82c83f9de013311c5771d7eaabad2cec91dd46521d881f7ec7
+  qualify.py       dcfe77c79fb63a71755e3788e48713742a12bb39d1db78c171c0261de1f872cb
+  holdout.py       e9cd5f3874ba14c2c33166671da6b8cc65574a040e6b276c955cd9f0a49b1766
+  cal_fixtures.py  4299bd58bd34705d044056d03901f3d674f09e2afde1fff5811a55dfca5f737b
+  ontology.py      a92e68c7518578e177c6c67d95efdc1e8b4a92c4406aa2778678119babb721bc
+  subjectbind.py   19f295d731183bf672061d60b17b0f7d01ce9d1aa3d340bdb2854b0bda4352fb
+
+CAPTURE — hostile calibration of the status recorder itself
+  CAPTURE-1  child exit 0 -> recorded 0 -> parent 0   output-binding OK   [PASS]
+  CAPTURE-2  child exit 1 -> recorded 1 -> parent 1   output-binding OK   [PASS]
+  CAPTURE-3  child exit 2 -> recorded 2 -> parent 2   output-binding OK   [PASS]
+
+M2 / A3-i — LIFECYCLE SUBJECT BINDING
+  invariant: the subject of a LIFECYCLE verdict is THE DOCUMENT.
+  Evidence about an artefact the document DESCRIBES is evidence
+  about that artefact.
+
+  M2-1 LIMB I  false audited-snapshot route
+      applicability_scope  WHOLE_FILE
+      witness subject      OTHER:GIT_COMMIT:2d830f25d569baa5ce955dd8d17e8f0744239876
+      _binding_witness     returned a witness
+      LIFECYCLE            UNKNOWN
+      rationale            an audit report's snapshot commit is the tree it AUDITS. That commit's
+  M2-2 LIMB II genuine own-lifecycle route
+      applicability_scope  WHOLE_FILE
+      witness subject      SELF
+      _binding_witness     returned a witness
+      LIFECYCLE            HISTORICAL
+      rationale            an audit artefact bound to a VERIFIED snapshot commit at document scop
+
+  LIMB I  PASS     LIMB II PASS
+  M2 PREDICATE SATISFIED — discrimination DEMONSTRATED.
+  SAY WHICH TREE THIS IS TRUE OF. Against UNCHANGED v1.3 this
+  predicate FAILED: both limbs classified HISTORICAL, which is
+  what INC-2026-09-18-31 records and what D381 was banked to
+  repair. It passes here because the governed subject gate is
+  now IMPLEMENTED in classify.lifecycle. This is a pass-new
+  reading, not evidence that the defect was never present.
+
+SB — D381 SUBJECT BINDING, AND THE D382 EXECUTED DERIVATION
+  Every denominator below is DERIVED. No transcribed figure
+  carries closure weight (D382 §7/§10, R18).
+
+  GRAMMAR — the closed six-step parser
+
+  REGISTRY — one governed registry, fail-closed
+
+  ROUTES — all SEVEN WHOLE_FILE producer routes have subject semantics
+
+  CONSUMER — discriminated by SYNTHETIC non-SELF witnesses
+  The corpus emits a CONSTANT subject, so it gives ZERO positive
+  discrimination here. These rows are the actual proof.
+
+
+  D382 EXECUTED DERIVATION — populations A and B, derived here
+    emitted witness records            491
+    distinct exact evidence identities 480
+    duplicate identity groups          9
+    duplicate excess records           11
+      COMMIT   x2  kai-pm/WAYPOINTS.md  L87  097c91d
+      DATE     x3  kai-pm/TECH_WATCH.md  L19  2026-06-19
+      DATE     x3  kai-pm/TECH_WATCH.md  L24  2026-06-19
+      RUN_ID   x2  kai-pm/EMBEDDING_BACKEND_STATE.md  L14  31570714150
+      RUN_ID   x2  kai-pm/ORION_FIELD_NOTES.md  L18  31894868473
+      RUN_ID   x2  kai-pm/ORION_FIELD_NOTES.md  L23  31899571806
+      RUN_ID   x2  kai-pm/ORION_FIELD_NOTES.md  L27  31906667051
+      RUN_ID   x2  kai-pm/ORION_FIELD_NOTES.md  L33  31908872172
+      RUN_ID   x2  kai-pm/RUNTIME_TOPOLOGY_CENSUS.md  L13  31605138566
+
+    POPULATION A  consumer-relevant 167 over 166/272 documents  {'DATE': 161, 'COMMIT': 6}
+                  ALL-KIND diagnostic 168 over 166/272  {'DATE': 161, 'COMMIT': 6, 'HEX_SHAPED_UNRESOLVED': 1}
+
+    POPULATION B  consumer-relevant 165 over 164/272 documents  {'DATE': 160, 'COMMIT': 5}
+    A -> B MOVEMENTS:
+      kai-pm/CODE_AUDIT_PLANNING_PACKAGE_QA.md  COMMIT  L20  WHOLE_FILE -> SPAN
+      kai-pm/ORION_FIELD_NOTES.md  DATE  L9  WHOLE_FILE -> SPAN
+
+  SB-SCOPE-ALL — every comparable EMITTED record, pre vs post
+    comparable emitted records  491   (DERIVED)
+    scope differences           0
+    unresolved records          0
+
+  SB-CORPUS-3 — the exact D381-driven delta
+    kai-pm/CODE_AUDIT_FINAL_REPORT.md
+      SCOPE      WHOLE_FILE      -> WHOLE_FILE
+      VALIDITY   EXACT_SNAPSHOT  -> UNKNOWN
+      LIFECYCLE  HISTORICAL      -> UNKNOWN
+    kai-pm/CODE_AUDIT_MASTER.md
+      SCOPE      WHOLE_FILE      -> WHOLE_FILE
+      VALIDITY   EXACT_SNAPSHOT  -> UNKNOWN
+      LIFECYCLE  HISTORICAL      -> UNKNOWN
+    kai-pm/house_in_order_instrument/AUTHORITY_ONTOLOGY.md
+      SCOPE      WHOLE_FILE      -> WHOLE_FILE
+      VALIDITY   EXACT_SNAPSHOT  -> UNKNOWN
+      LIFECYCLE  UNKNOWN         -> UNKNOWN
+
+D14 — start-bound eligibility at the HEAD_BYTES boundary
+  The boundary decides WHICH TOKENS ARE ELIGIBLE. It must never
+  decide WHAT AN ELIGIBLE TOKEN IS.
+
+
+PPOP — INC-37: the producer origin classifier (D379 §5/§6)
+  Import metadata decides FIRST. Filesystem presence is not the
+  discriminator in either direction: `os` carries a __file__ and
+  reports origin 'frozen'.
+
+    PPOP-1  __file__ None + origin built-in                        -> BUILTIN
+    PPOP-2  __file__ None + origin frozen                          -> FROZEN
+    PPOP-3  __file__ PRESENT + origin frozen (the measured `os` case) -> FROZEN
+    PPOP-4  __file__ None + origin None                            -> REFUSE
+    PPOP-5  __file__ None + unknown textual origin                 -> REFUSE
+    PPOP-6  __file__ None + filesystem-like EXTERNAL origin        -> REFUSE
+    PPOP-7  filesystem-backed external module                      -> REFUSE
+    PPOP-8  governed H2 source                                     -> H2
+    PPOP-10 governed stdlib source                                 -> STDLIB
+    PPOP-9  governed Census source                                 -> CENSUS
+    PPOP-11 file-backed __main__ under governed H2 source          -> H2
+    PPOP-12 UNSOURCED production-boundary __main__                 -> REFUSE
+    PPOP-13 fs spec.origin and __file__ resolve to DIFFERENT sources -> REFUSE
+
+    OBSERVED PRODUCER DENOMINATOR  128   classified 124   refused 4
+      BUILTIN   33
+      FROZEN    19
+      H2        7
+      CENSUS    0
+      STDLIB    65
+      REFUSED  _distutils_hack: REFUSE: _distutils_hack is a loaded non-stdlib EXTERNAL module at /usr/lib/python3/dist-packages
+      REFUSED  sitecustomize: REFUSE: sitecustomize at /etc/python3.11/sitecustomize.py lies outside the governed H2 root, the
+      REFUSED  typing.io: REFUSE: typing.io has no filesystem source and its origin is neither 'built-in' nor 'frozen' (ha
+      REFUSED  typing.re: REFUSE: typing.re has no filesystem source and its origin is neither 'built-in' nor 'frozen' (ha
+
+DEP — governed runtime dependency classification (D379 §5/§6)
+    producer population (DERIVED)  124  {'BUILTIN': 33, 'FROZEN': 19, 'H2': 7, 'STDLIB': 65}
+    ungoverned offenders           4
+      OFFENDER _distutils_hack  REFUSE: _distutils_hack is a loaded non-stdlib EXTERNAL module at /usr/lib/python3/dist-packages/_distutils_hack/__init__.py, outside every governed Stage-A root, with no explicit Stage-A dependency identity. None is invented here (D379 §6).
+      OFFENDER sitecustomize  REFUSE: sitecustomize at /etc/python3.11/sitecustomize.py lies outside the governed H2 root, the governed Census root and the governed Python stdlib classification.
+      OFFENDER typing.io  REFUSE: typing.io has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origin=None). A missing __file__ is NOT an answer (INC-2026-09-19-37).
+      OFFENDER typing.re  REFUSE: typing.re has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origin=None). A missing __file__ is NOT an answer (INC-2026-09-19-37).
+    ENVIRONMENT CLASSIFICATION — this interpreter injects
+    ungoverned modules into EVERY producer process:
+      _distutils_hack    REFUSE: _distutils_hack is a loaded non-stdlib EXTERNAL module at /usr/lib/python3/dist-packages/_distutils_hack/__init__.py, outside every governed Stage-A root, with no explicit Stage-A dependency identity. None is invented here (D379 §6).
+      sitecustomize      REFUSE: sitecustomize at /etc/python3.11/sitecustomize.py lies outside the governed H2 root, the governed Census root and the governed Python stdlib classification.
+      typing.io          REFUSE: typing.io has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origin=None). A missing __file__ is NOT an answer (INC-2026-09-19-37).
+      typing.re          REFUSE: typing.re has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origin=None). A missing __file__ is NOT an answer (INC-2026-09-19-37).
+    Under D379 §5 rule 6 a REAL production run here REFUSES.
+    This is the SAME known-negative runtime as INC-34, whose
+    sitecustomize.py is one of the two offenders. DEP clean-
+    producer positive is therefore HELD on INC-34, and the
+    contract is NOT relaxed to admit them (D385 §A).
+
+STAGE_A — H2_STAGE_A_V2 governance and identity
+  SYNTHETIC CALIBRATION DESCRIPTORS ONLY. No production Stage-A
+  identity is constructed, and the canonical-runtime positive
+  limb is HELD on INC-34 (see STDLIB).
+
+    synthetic V2 CALIBRATION stage_a_identity  8019070de9c37591e198bd7079360702d7c655793cddb3b3456f144111ed6cc1
+
+I1A — the blind seed is the VALIDATED STAGE-A IDENTITY
+
+I1B — the selection universe is the FROZEN SUBJECT TREE
+
+86 — fail-closed qualifier identity (D367 §8(6))
+
+  86-C — the closed §8(6) classification, independently expected
+    86-C1  governed H2 module, Stage-A hash correct                  -> H2
+    86-C3  governed hardened Census member                           -> CENSUS
+    86-C4  filesystem stdlib represented by governed runtime         -> GOVERNED_STDLIB
+    86-C5  mechanically BUILT-IN origin                              -> BUILTIN_OR_FROZEN
+    86-C6  mechanically FROZEN origin (with a __file__, the `os` case) -> BUILTIN_OR_FROZEN
+    86-C7  external filesystem module -> REFUSE and NAME it          -> REFUSE
+    86-C8  non-filesystem origin, neither built-in nor frozen        -> REFUSE
+
+    QUALIFIER DENOMINATOR  130   classified 125   refused 5
+      H2                 7
+      CENSUS             0
+      GOVERNED_STDLIB    66
+      BUILTIN_OR_FROZEN  52
+      REFUSED  __main__: REFUSE: loaded H2 source kai-pm/house_in_order_h2_v13/build_evidence/d379_controls.py is ABS
+      REFUSED  _distutils_hack: REFUSE: _distutils_hack is a loaded EXTERNAL module at /usr/lib/python3/dist-packages/_distu
+      REFUSED  sitecustomize: REFUSE: sitecustomize at /etc/python3.11/sitecustomize.py lies outside the governed H2 root,
+      REFUSED  typing.io: REFUSE: typing.io has no filesystem source and its origin is neither built-in nor frozen (sp
+      REFUSED  typing.re: REFUSE: typing.re has no filesystem source and its origin is neither built-in nor frozen (sp
+
+Q1a — producer-byte provenance against Stage A
+    Q1a-6 qualifier-runtime-differs limb            HELD ON INC-34
+    (it requires a governed positive runtime identity to compare
+     against, and this interpreter is known-negative)
+
+Q1b / E1 — the complete DERIVED §5 denominator, synthetic subjects
+  D379 §8: Q1b takes NO Pass-A input and runs against synthetic
+  and local subjects only. No candidate is required, and 343 /
+  316 / 659 are measurements, not definitions — none is encoded.
+
+    axis-cell denominator            3
+    positive-evidence-fact denominator 6
+    sum                              9
+
+STDLIB — governed Python runtime identity (D380 §7, D385)
+    stdlib      /usr/lib/python3.11
+    platstdlib  /usr/lib/python3.11
+    purelib     /usr/local/lib/python3.11/dist-packages
+    platlib     /usr/local/lib/python3.11/dist-packages
+    D380 RESULT KNOWN-NEGATIVE
+    refusal     REFUSE: symlink sitecustomize.py under stdlib resolves OUTSIDE the governed root set. There is no external-dependency escape hatch in this schema.
+    V2-ID-2a  canonical positive derivation        HELD ON INC-34
+    STAGE_A canonical-runtime positive limb        HELD ON INC-34
+    No D380-compliant interpreter is locally available; the
+    contract is NOT weakened to manufacture a green (D385 §D).
+
+----------------------------------------------------------------------
+SECTION COVERAGE
+  M2         IMPLEMENTED
+  D14        IMPLEMENTED
+  PPOP       IMPLEMENTED
+  Q1a        HELD — Q1a-6 ONLY — needs a governed POSITIVE runtime identity to compare against (INC-34). Q1a-1,2,3,4,5,7,8,9 all EXECUTE.
+  Q1b        IMPLEMENTED
+  86         IMPLEMENTED
+  SB         IMPLEMENTED
+  I1A        IMPLEMENTED
+  I1B        IMPLEMENTED
+  DEP        HELD — DEP-2 ONLY — needs ordinary stdlib under a D380-COMPLIANT interpreter (INC-34). DEP-1 and DEP-3 EXECUTE.
+  STAGE_A    HELD — the canonical-runtime positive limb ONLY (INC-34). The V2 governance and identity matrix EXECUTES.
+  STDLIB     HELD — V2-ID-2a, the canonical positive derivation ONLY (INC-34). The D380-STDLIB-NEG-1 negative control EXECUTES.
+
+======================================================================
+179 passed, 4 failed
+  FAIL section Q1a is implemented and executed: HELD — Q1a-6 ONLY — needs a governed POSITIVE runtime identity to compare against (INC-34). Q1a-1,2,3,4,5,7,8,9 all EXECUTE.
+  FAIL section DEP is implemented and executed: HELD — DEP-2 ONLY — needs ordinary stdlib under a D380-COMPLIANT interpreter (INC-34). DEP-1 and DEP-3 EXECUTE.
+  FAIL section STAGE_A is implemented and executed: HELD — the canonical-runtime positive limb ONLY (INC-34). The V2 governance and identity matrix EXECUTES.
+  FAIL section STDLIB is implemented and executed: HELD — V2-ID-2a, the canonical positive derivation ONLY (INC-34). The D380-STDLIB-NEG-1 negative control EXECUTES.
+EXIT GATE: FAIL
+======================================================================
+
+
+process exit status = 1
+
+======================================================================
+SUBJECT 2 of 2 — THE CAL_FIXTURES PROCESS
+  A DIFFERENT SUBJECT. Its status corroborates nothing about
+  subject 1 and no independence is claimed between them.
+======================================================================
+
+HOUSE_H2 v1.2 — HOSTILE FIXTURES
+  fail-old imported from COMMITTED house_in_order_h2_v11
+
+D1 — a commit cited for ONE SENTENCE is not a whole-file binding
+  [PASS] D1a FAIL-OLD: committed v1.1 emits EXACT_SNAPSHOT from a bare flag
+  [PASS] D1b PASS-NEW: v1.2 ABSTAINS on a SPAN-scoped citation
+  [PASS] D1c BOUNDARY: a SELF-bound document-level binding STILL earns EXACT_SNAPSHOT
+  [PASS] D1c' KNOWN-NEGATIVE: the SAME whole-file binding, subject NOT the document, does NOT earn EXACT_SNAPSHOT
+  [PASS] D1d the envelope refuses the widening structurally
+
+D2 — witness KIND is discriminated, never assumed from shape
+  [PASS] D2a FAIL-OLD: v1.1 SHA pattern accepts 'ed25519'
+  [PASS] D2b PASS-NEW: v1.2 rejects 'ed25519' as a commit (-> HEX_SHAPED_UNRESOLVED)
+  [PASS] D2a FAIL-OLD: v1.1 SHA pattern accepts '1700000000'
+  [PASS] D2b PASS-NEW: v1.2 rejects '1700000000' as a commit (-> DECIMAL_TOKEN)
+  [PASS] D2a FAIL-OLD: v1.1 SHA pattern accepts 'b5e68a3'
+  [PASS] D2b PASS-NEW: v1.2 rejects 'b5e68a3' as a commit (-> DIGEST_FRAGMENT)
+  [PASS] D2c KNOWN-NEGATIVE: a REAL commit still resolves
+
+D3 — a currency self-claim the history refutes cannot earn a verdict
+  [PASS] D3a the contradiction is DETECTED
+  [PASS] D3b PASS-NEW: the verdict ABSTAINS
+  [PASS] D3c KNOWN-NEGATIVE: a consistent claim is NOT contradicted
+  [PASS] D3d ... and still earns TIME_BOUND
+  [PASS] D3e a VERSION date is not a currency claim, so not a contradiction
+
+D4 — the RUN detector fires through markdown
+  [PASS] D4a FAIL-OLD: v1.1 RUN misses '**Last run:** 31570714150'
+  [PASS] D4b PASS-NEW: v1.2 detects it
+  [PASS] D4a FAIL-OLD: v1.1 RUN misses 'run `31894868473` (tree'
+  [PASS] D4b PASS-NEW: v1.2 detects it
+  [PASS] D4a FAIL-OLD: v1.1 RUN misses 'Deployed run 1 (`316051385'
+  [PASS] D4b PASS-NEW: v1.2 detects it
+  [PASS] D4c KNOWN-NEGATIVE: prose with letters between is NOT a run id
+
+D5 — the raw present-tense flag no longer exists as a verdict input
+  [PASS] D5a FAIL-OLD: v1.1 emits CURRENT_TREE from the raw flag
+  [PASS] D5b PASS-NEW: v1.2 has no present_tense input at all
+  [PASS] D5c and CURRENT_TREE is unreachable without a witness of that kind
+
+D6/D7 — SCOPE is EARNED or absent; no default, no contradiction
+  [PASS] D6a FAIL-OLD: v1.1 dispositions WHOLE_FILE as a 'file-level default'
+  [PASS] D6b FAIL-OLD: v1.1 SCOPE cannot abstain
+  [PASS] D6c PASS-NEW: v1.2 SCOPE abstains with no binding witness
+  [PASS] D6d BOUNDARY: a binding witness STILL earns WHOLE_FILE
+  [PASS] D7a a row with only SPAN witnesses cannot emit WHOLE_FILE
+  [PASS] D6e v1.2 SCOPE=UNKNOWN is emittable
+
+D8 — term matching respects word boundaries, plurals excepted
+  [PASS] D8a FAIL-OLD: v1.1 matches 'audit' inside 'Auditor'
+  [PASS] D8b PASS-NEW: v1.2 does NOT match 'audit' in 'Auditor'
+  [PASS] D8a FAIL-OLD: v1.1 matches 'plan' inside 'Plane'
+  [PASS] D8b PASS-NEW: v1.2 does NOT match 'plan' in 'Plane'
+  [PASS] D8a FAIL-OLD: v1.1 matches 'plan' inside 'Planning'
+  [PASS] D8b PASS-NEW: v1.2 does NOT match 'plan' in 'Planning'
+  [PASS] D8c KNOWN-NEGATIVE: a PLURAL still matches ('Audits')
+  [PASS] D8c KNOWN-NEGATIVE: a PLURAL still matches ('Decisions')
+  [PASS] D8c KNOWN-NEGATIVE: a PLURAL still matches ('Plans')
+
+D9 — the purpose capture is SUBSTANTIVE, not a trigger phrase
+  [PASS] D9a FAIL-OLD: v1.1 captures only the trigger 'This file'
+  [PASS] D9a FAIL-OLD: v1.1 captures only the trigger 'records'
+  [PASS] D9b PASS-NEW: v1.2 captures the BODY, not the trigger
+  [PASS] D9c a trigger with no substantive body is NOT a purpose statement
+
+D10 — the purpose branch fires, or the fixture fails
+  [PASS] D10a the purpose path is REACHED (observed mentions the term)
+
+D11 — two corroborated roles are AMBIGUITY, not a list-order win
+  [PASS] D11a v1.2 abstains and NAMES both candidates
+  [PASS] D11b KNOWN-NEGATIVE: a single role still resolves to one nominal
+
+D12/D13/D14 — subject binding, polarity, and evidence truncation
+  [PASS] D12a FAIL-OLD: committed v1.1 binds README's 'It' to SELF
+  [PASS] D12b PASS-NEW: v1.2 binds it to the named antecedent
+  [PASS] D12c KNOWN-NEGATIVE: a bare pronoun with NO antecedent is SELF
+  [PASS] D13a FAIL-OLD: v1.1 scores 'This document is non-authori' POSITIVE
+  [PASS] D13b PASS-NEW: v1.2 scores it NEGATIVE
+  [PASS] D13a FAIL-OLD: v1.1 scores '**Status:** non-authoritativ' POSITIVE
+  [PASS] D13b PASS-NEW: v1.2 scores it NEGATIVE
+  [PASS] D13c KNOWN-NEGATIVE: a genuine positive is still POSITIVE
+  [PASS] D14a FAIL-OLD: v1.1 truncates to 6 with no SELF row carried
+  [PASS] D14b PASS-NEW: the determining row IS carried, whatever the total
+  [PASS] D14c the envelope refuses an undeclared truncation
+
+D15 — every positive carries a source-bound witness
+  [PASS] D15a every non-abstention cell carries value+selector+context (0 missing)
+  [PASS] D15b FAIL-OLD: v1.1 records a STATIC string on 26 cells
+
+D16/D17 — the ontology invariant, and a gate that can see an omission
+  [PASS] D16a FAIL-OLD: v1.1 SCOPE alphabet omits UNKNOWN
+  [PASS] D16b PASS-NEW: v1.2 has UNKNOWN on EVERY axis
+  [PASS] D17a REMOVAL CALIBRATION: removing UNKNOWN from LIFECYCLE MUST be detected
+  [PASS] D17a REMOVAL CALIBRATION: removing UNKNOWN from FUNCTION MUST be detected
+  [PASS] D17a REMOVAL CALIBRATION: removing UNKNOWN from AUTHORITY MUST be detected
+  [PASS] D17a REMOVAL CALIBRATION: removing UNKNOWN from GENERATION MUST be detected
+  [PASS] D17a REMOVAL CALIBRATION: removing UNKNOWN from VALIDITY MUST be detected
+  [PASS] D17a REMOVAL CALIBRATION: removing UNKNOWN from SCOPE MUST be detected
+  [PASS] D17b restored: invariants clean again
+  [PASS] D17c a value OUTSIDE the alphabet is detected from OUTPUT
+  [PASS] D17d KNOWN-NEGATIVE: clean rows produce no finding
+
+REGRESSION — the 5 rows Kai adjudicated CORRECT must not move
+  [PASS] R-CODE_AUDIT_MASTER.md still SELF_ASSERTS_AUTHORITY
+  [PASS] R-DECISIONS.md still SELF_ASSERTS_AUTHORITY
+  [PASS] R-KAI_ORION_CONTINUITY.md still SELF_ASSERTS_NON_AUTHORITY
+  [PASS] R-KAI_UNIFIED_HUNTER_ARCHITE still SELF_ASSERTS_AUTHORITY
+  [PASS] R-PHASE1_READINESS.md still SELF_ASSERTS_AUTHORITY
+
+REGRESSION — EXACT_SNAPSHOT must equal Kai's independent D364 set
+  [PASS] R-EXACT_SNAPSHOT == the 6 Kai adjudicated from source
+
+  PASS 79   FAIL 0
+
+
+fixture process exit status = 0
+
+======================================================================
+CAPTURE SUMMARY — statuses read from CompletedProcess.returncode
+======================================================================
+  D379 control process exit status   1
+  cal_fixtures process exit status   0
+  parent returns                     1
