@@ -8,7 +8,7 @@ subprocess.CompletedProcess.returncode, read directly from the child
 that produced the output immediately above it. No shell status, no
 pipeline status, no parsed text, no supplied value.
 
-captured 2026-09-19T00:02:16.399105+00:00
+captured 2026-09-22T18:40:38.134380+00:00
 
 ======================================================================
 SUBJECT 1 of 2 — THE D379 CONTROL PROCESS
@@ -20,11 +20,11 @@ D379 HOSTILE CONTROLS — PRODUCER MEASUREMENT, SIGHTED,
 ======================================================================
 
 SUBJECT — the exact bytes measured
-  passa.py         73dbca128a6f85ebfa02148cf21c394cb72a631c786ebce3e82eff19d6cf0e61
+  passa.py         843c260aebe739602828f7d72b03d5e03221d3fc2b62b90fe1d27823b75b4bd5
   classify.py      226873676c2373faaf29f4709bb1bb62d1d22f3c56cbdc0e594314cb6e5df9e8
   envelope.py      fdcc1b73d7cd32e540c63ca926d5393901ea63b357fbf339819f07256e6a5a3f
-  run_h2_v12.py    ab6f54c54c5bdd82c83f9de013311c5771d7eaabad2cec91dd46521d881f7ec7
-  qualify.py       dcfe77c79fb63a71755e3788e48713742a12bb39d1db78c171c0261de1f872cb
+  run_h2_v12.py    e5eb66df53c34560c49ee5ecd13aacff86b0c18fbc3871a373ca06d29aa63380
+  qualify.py       ac74aa66fdff188455e53a1e96261a396ad5d8aefa7fe234d0b8c3d6f3c91bc1
   holdout.py       e9cd5f3874ba14c2c33166671da6b8cc65574a040e6b276c955cd9f0a49b1766
   cal_fixtures.py  4299bd58bd34705d044056d03901f3d674f09e2afde1fff5811a55dfca5f737b
   ontology.py      a92e68c7518578e177c6c67d95efdc1e8b4a92c4406aa2778678119babb721bc
@@ -178,7 +178,7 @@ STAGE_A — H2_STAGE_A_V2 governance and identity
   identity is constructed, and the canonical-runtime positive
   limb is HELD on INC-34 (see STDLIB).
 
-    synthetic V2 CALIBRATION stage_a_identity  8019070de9c37591e198bd7079360702d7c655793cddb3b3456f144111ed6cc1
+    synthetic V2 CALIBRATION stage_a_identity  2313a601d228382dc1a5199f540112c70568856edfbd0b4e57cc8da3ee58b6ea
 
 I1A — the blind seed is the VALIDATED STAGE-A IDENTITY
 
@@ -232,6 +232,40 @@ STDLIB — governed Python runtime identity (D380 §7, D385)
     No D380-compliant interpreter is locally available; the
     contract is NOT weakened to manufacture a green (D385 §D).
 
+
+D379 §8 EXECUTABLE-BOUND EXECUTION — the real shipped CLIs
+  Each case: exact hostile subject, actual subprocess, rc from
+  CompletedProcess, actual reason, first-effective failure.
+  A red process without the intended subject AND the intended
+  reason earns no calibration claim.
+
+  passa.py
+    Q1a-2        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+                 an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+    Q1a-8        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+                 an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+    DEP-1        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+                 an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  run_h2_v12.py
+    Q1a-4        rc=1   REFUSE  intended=Y  blocker=N  -> PASS
+    Q1a-9        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+                 the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+  qualify.py
+    Q1a-5        rc=1   REFUSE  intended=Y  blocker=Y  -> HELD
+                 OVER-DETERMINED: the intended finding IS present in the output, but so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]), so rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
+    86-3         rc=2   REFUSE  intended=Y  blocker=N  -> PASS
+    Q1b-1        rc=1   REFUSE  intended=Y  blocker=Y  -> HELD
+                 the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+    Q1b-2        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+                 an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  holdout.py   (already CLI-wired; not redesigned)
+    I1B-2        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+                 an earlier independent blocker decided the outcome: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+
+    executable-bound cases  10   PASS 2   FAIL 0   HELD 8
+    (HELD is not a pass and not a skip: it fails the gate and
+     names the predicate that could not be measured.)
+
 ----------------------------------------------------------------------
 SECTION COVERAGE
   M2         IMPLEMENTED
@@ -248,7 +282,15 @@ SECTION COVERAGE
   STDLIB     HELD — V2-ID-2a, the canonical positive derivation ONLY (INC-34). The D380-STDLIB-NEG-1 negative control EXECUTES.
 
 ======================================================================
-179 passed, 4 failed
+181 passed, 12 failed
+  FAIL Q1a-2 (D379 §2/§4 Pass-A producer provenance) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  FAIL Q1a-8 (D379 §5 no silent runtime expansion) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  FAIL DEP-1 (D379 §8 synthetic producer, external dep) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  FAIL Q1a-9 (D379 §4 self-hash prohibition) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+  FAIL Q1a-5 (D379 §8 tampered recorded Stage-A identity) verdict PASS: HELD: OVER-DETERMINED: the intended finding IS present in the output, but so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]), so rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
+  FAIL Q1b-1 (D379 §8 clean complete result -> PASS) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+  FAIL Q1b-2 (D379 §8 missing positive-fact trace -> FAIL) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  FAIL I1B-2 (D379 §7 drop one output row -> REFUSE) verdict PASS: HELD: an earlier independent blocker decided the outcome: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
   FAIL section Q1a is implemented and executed: HELD — Q1a-6 ONLY — needs a governed POSITIVE runtime identity to compare against (INC-34). Q1a-1,2,3,4,5,7,8,9 all EXECUTE.
   FAIL section DEP is implemented and executed: HELD — DEP-2 ONLY — needs ordinary stdlib under a D380-COMPLIANT interpreter (INC-34). DEP-1 and DEP-3 EXECUTE.
   FAIL section STAGE_A is implemented and executed: HELD — the canonical-runtime positive limb ONLY (INC-34). The V2 governance and identity matrix EXECUTES.
@@ -277,114 +319,36 @@ D1 — a commit cited for ONE SENTENCE is not a whole-file binding
 
 D2 — witness KIND is discriminated, never assumed from shape
   [PASS] D2a FAIL-OLD: v1.1 SHA pattern accepts 'ed25519'
-  [PASS] D2b PASS-NEW: v1.2 rejects 'ed25519' as a commit (-> HEX_SHAPED_UNRESOLVED)
-  [PASS] D2a FAIL-OLD: v1.1 SHA pattern accepts '1700000000'
-  [PASS] D2b PASS-NEW: v1.2 rejects '1700000000' as a commit (-> DECIMAL_TOKEN)
-  [PASS] D2a FAIL-OLD: v1.1 SHA pattern accepts 'b5e68a3'
-  [PASS] D2b PASS-NEW: v1.2 rejects 'b5e68a3' as a commit (-> DIGEST_FRAGMENT)
-  [PASS] D2c KNOWN-NEGATIVE: a REAL commit still resolves
-
-D3 — a currency self-claim the history refutes cannot earn a verdict
-  [PASS] D3a the contradiction is DETECTED
-  [PASS] D3b PASS-NEW: the verdict ABSTAINS
-  [PASS] D3c KNOWN-NEGATIVE: a consistent claim is NOT contradicted
-  [PASS] D3d ... and still earns TIME_BOUND
-  [PASS] D3e a VERSION date is not a currency claim, so not a contradiction
-
-D4 — the RUN detector fires through markdown
-  [PASS] D4a FAIL-OLD: v1.1 RUN misses '**Last run:** 31570714150'
-  [PASS] D4b PASS-NEW: v1.2 detects it
-  [PASS] D4a FAIL-OLD: v1.1 RUN misses 'run `31894868473` (tree'
-  [PASS] D4b PASS-NEW: v1.2 detects it
-  [PASS] D4a FAIL-OLD: v1.1 RUN misses 'Deployed run 1 (`316051385'
-  [PASS] D4b PASS-NEW: v1.2 detects it
-  [PASS] D4c KNOWN-NEGATIVE: prose with letters between is NOT a run id
-
-D5 — the raw present-tense flag no longer exists as a verdict input
-  [PASS] D5a FAIL-OLD: v1.1 emits CURRENT_TREE from the raw flag
-  [PASS] D5b PASS-NEW: v1.2 has no present_tense input at all
-  [PASS] D5c and CURRENT_TREE is unreachable without a witness of that kind
-
-D6/D7 — SCOPE is EARNED or absent; no default, no contradiction
-  [PASS] D6a FAIL-OLD: v1.1 dispositions WHOLE_FILE as a 'file-level default'
-  [PASS] D6b FAIL-OLD: v1.1 SCOPE cannot abstain
-  [PASS] D6c PASS-NEW: v1.2 SCOPE abstains with no binding witness
-  [PASS] D6d BOUNDARY: a binding witness STILL earns WHOLE_FILE
-  [PASS] D7a a row with only SPAN witnesses cannot emit WHOLE_FILE
-  [PASS] D6e v1.2 SCOPE=UNKNOWN is emittable
-
-D8 — term matching respects word boundaries, plurals excepted
-  [PASS] D8a FAIL-OLD: v1.1 matches 'audit' inside 'Auditor'
-  [PASS] D8b PASS-NEW: v1.2 does NOT match 'audit' in 'Auditor'
-  [PASS] D8a FAIL-OLD: v1.1 matches 'plan' inside 'Plane'
-  [PASS] D8b PASS-NEW: v1.2 does NOT match 'plan' in 'Plane'
-  [PASS] D8a FAIL-OLD: v1.1 matches 'plan' inside 'Planning'
-  [PASS] D8b PASS-NEW: v1.2 does NOT match 'plan' in 'Planning'
-  [PASS] D8c KNOWN-NEGATIVE: a PLURAL still matches ('Audits')
-  [PASS] D8c KNOWN-NEGATIVE: a PLURAL still matches ('Decisions')
-  [PASS] D8c KNOWN-NEGATIVE: a PLURAL still matches ('Plans')
-
-D9 — the purpose capture is SUBSTANTIVE, not a trigger phrase
-  [PASS] D9a FAIL-OLD: v1.1 captures only the trigger 'This file'
-  [PASS] D9a FAIL-OLD: v1.1 captures only the trigger 'records'
-  [PASS] D9b PASS-NEW: v1.2 captures the BODY, not the trigger
-  [PASS] D9c a trigger with no substantive body is NOT a purpose statement
-
-D10 — the purpose branch fires, or the fixture fails
-  [PASS] D10a the purpose path is REACHED (observed mentions the term)
-
-D11 — two corroborated roles are AMBIGUITY, not a list-order win
-  [PASS] D11a v1.2 abstains and NAMES both candidates
-  [PASS] D11b KNOWN-NEGATIVE: a single role still resolves to one nominal
-
-D12/D13/D14 — subject binding, polarity, and evidence truncation
-  [PASS] D12a FAIL-OLD: committed v1.1 binds README's 'It' to SELF
-  [PASS] D12b PASS-NEW: v1.2 binds it to the named antecedent
-  [PASS] D12c KNOWN-NEGATIVE: a bare pronoun with NO antecedent is SELF
-  [PASS] D13a FAIL-OLD: v1.1 scores 'This document is non-authori' POSITIVE
-  [PASS] D13b PASS-NEW: v1.2 scores it NEGATIVE
-  [PASS] D13a FAIL-OLD: v1.1 scores '**Status:** non-authoritativ' POSITIVE
-  [PASS] D13b PASS-NEW: v1.2 scores it NEGATIVE
-  [PASS] D13c KNOWN-NEGATIVE: a genuine positive is still POSITIVE
-  [PASS] D14a FAIL-OLD: v1.1 truncates to 6 with no SELF row carried
-  [PASS] D14b PASS-NEW: the determining row IS carried, whatever the total
-  [PASS] D14c the envelope refuses an undeclared truncation
-
-D15 — every positive carries a source-bound witness
-  [PASS] D15a every non-abstention cell carries value+selector+context (0 missing)
-  [PASS] D15b FAIL-OLD: v1.1 records a STATIC string on 26 cells
-
-D16/D17 — the ontology invariant, and a gate that can see an omission
-  [PASS] D16a FAIL-OLD: v1.1 SCOPE alphabet omits UNKNOWN
-  [PASS] D16b PASS-NEW: v1.2 has UNKNOWN on EVERY axis
-  [PASS] D17a REMOVAL CALIBRATION: removing UNKNOWN from LIFECYCLE MUST be detected
-  [PASS] D17a REMOVAL CALIBRATION: removing UNKNOWN from FUNCTION MUST be detected
-  [PASS] D17a REMOVAL CALIBRATION: removing UNKNOWN from AUTHORITY MUST be detected
-  [PASS] D17a REMOVAL CALIBRATION: removing UNKNOWN from GENERATION MUST be detected
-  [PASS] D17a REMOVAL CALIBRATION: removing UNKNOWN from VALIDITY MUST be detected
-  [PASS] D17a REMOVAL CALIBRATION: removing UNKNOWN from SCOPE MUST be detected
-  [PASS] D17b restored: invariants clean again
-  [PASS] D17c a value OUTSIDE the alphabet is detected from OUTPUT
-  [PASS] D17d KNOWN-NEGATIVE: clean rows produce no finding
-
-REGRESSION — the 5 rows Kai adjudicated CORRECT must not move
-  [PASS] R-CODE_AUDIT_MASTER.md still SELF_ASSERTS_AUTHORITY
-  [PASS] R-DECISIONS.md still SELF_ASSERTS_AUTHORITY
-  [PASS] R-KAI_ORION_CONTINUITY.md still SELF_ASSERTS_NON_AUTHORITY
-  [PASS] R-KAI_UNIFIED_HUNTER_ARCHITE still SELF_ASSERTS_AUTHORITY
-  [PASS] R-PHASE1_READINESS.md still SELF_ASSERTS_AUTHORITY
-
-REGRESSION — EXACT_SNAPSHOT must equal Kai's independent D364 set
-  [PASS] R-EXACT_SNAPSHOT == the 6 Kai adjudicated from source
-
-  PASS 79   FAIL 0
+Traceback (most recent call last):
+  File "/home/user/kai-system/kai-pm/house_in_order_h2_v13/cal_fixtures.py", line 522, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/user/kai-system/kai-pm/house_in_order_h2_v13/cal_fixtures.py", line 514, in main
+    fn()
+  File "/home/user/kai-system/kai-pm/house_in_order_h2_v13/cal_fixtures.py", line 226, in d2
+    kind, is_commit = passa.classify_token_kind(ctx, m, HISTORY, "x")
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/kai-system/kai-pm/house_in_order_h2_v13/passa.py", line 711, in classify_token_kind
+    resolved = git(history_repo, "cat-file", "-e",
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/kai-system/kai-pm/house_in_order_h2_v13/passa.py", line 649, in git
+    return subprocess.run(["git", *a], cwd=str(repo),
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/usr/lib/python3.11/subprocess.py", line 1955, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/tmp.849NW5Ho8U/recover'
 
 
-fixture process exit status = 0
+fixture process exit status = 1
 
 ======================================================================
 CAPTURE SUMMARY — statuses read from CompletedProcess.returncode
 ======================================================================
   D379 control process exit status   1
-  cal_fixtures process exit status   0
+  cal_fixtures process exit status   1
   parent returns                     1

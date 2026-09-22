@@ -41,6 +41,7 @@ import sys
 HERE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import ontology as ont                                         # noqa: E402
+from stage_identity import verify_provenance as SI_verify      # noqa: E402
 
 
 def dispositions(result):
@@ -295,6 +296,11 @@ def qualifier_population(stage_a_path, manifest_path):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--result", required=True)
+    ap.add_argument("--stage-a", required=True, dest="stage_a",
+                    help="the Stage-A descriptor. REQUIRED: §8(6) cannot be "
+                         "established from a manifest alone, which says "
+                         "nothing about Census, stdlib identity, interpreter "
+                         "identity or built-in/frozen origins.")
     ap.add_argument("--manifest", required=True,
                     help="the candidate MANIFEST.sha256. REQUIRED: "
                          "D367 8(6) is fail-closed, and an omitted "
@@ -364,20 +370,52 @@ def main():
     for p, ax in missing[:5]:
         findings.append(("WITNESS", ax, "-", f"{p} has no witness value"))
 
-    # ── 6. runtime identity ───────────────────────────────────────────
-    # D367 8(6) IS NOT OPTIONAL. It was guarded by `if a.manifest:` behind a
-    # `default=None` flag, so omitting one argument silently skipped the
-    # criterion and the qualifier still reported a result. An absent check
-    # that reads as a pass is the defect class this programme exists to find.
-    if True:
-        rows_id, bad = runtime_module_identity(a.manifest)
-        print(f"\n  [6] RUNTIME MODULE IDENTITY — which bytes executed")
-        for r in rows_id:
-            print(f"      {r['module']:<14} under-candidate="
-                  f"{r['under_candidate_dir']}  sha-match={r['matches']}")
-        if bad:
-            findings.append(("RUNTIME_IDENTITY", ",".join(bad), "-",
-                             "loaded module is not the candidate's byte"))
+    # ── 6. runtime identity — the CLOSED §8(6) rule ───────────────────
+    # INC-36: this executed runtime_module_identity(a.manifest), which
+    # skipped every loaded origin outside the candidate directory (73 of
+    # them, measured). INC-38: the repaired classifier existed but the CLI
+    # never called it. Both are closed here, on the executable path.
+    rows_id, refusals = qualifier_population(a.stage_a, a.manifest)
+    kinds = collections.Counter(r["class"] for r in rows_id)
+    print(f"\n  [6] §8(6) CLOSED ORIGIN CLASSIFICATION — every loaded origin")
+    print(f"      observed {len(rows_id) + len(refusals)}   "
+          f"classified {len(rows_id)}   refused {len(refusals)}")
+    for k in QUAL_CLASSES:
+        print(f"      {k:<18} {kinds.get(k, 0)}")
+    for n, why in refusals:
+        print(f"      REFUSED {n}: {str(why)[:110]}")
+        findings.append(("RUNTIME_IDENTITY", n, "-", str(why)))
+
+    # ── 7. Q1a — RECORDED provenance verified against Stage A ─────────
+    # D379 §2: never by re-importing current modules. Today's module state
+    # cannot establish yesterday's producer bytes.
+    prov = res.get("producer_provenance")
+    print(f"\n  [7] Q1a RECORDED PRODUCER PROVENANCE vs STAGE A")
+    if prov is None:
+        print("      no producer_provenance recorded in the result")
+        findings.append(("Q1A_PROVENANCE", "-", "-",
+                         "REFUSE: the result carries no in-band "
+                         "producer_provenance (D379 §4)"))
+    else:
+        try:
+            desc = _load_stage_a(a.stage_a)
+            ident, _seen = SI_verify(prov, desc)
+            print(f"      verified against stage_a_identity {ident[:16]}…")
+        except Exception as e:                        # noqa: BLE001
+            print(f"      {str(e)[:150]}")
+            findings.append(("Q1A_PROVENANCE", "-", "-", str(e)))
+
+    # ── 8. Q1b / E1 — the complete DERIVED §5 denominator ─────────────
+    # INC-38: q1b_denominators() was defined after the __main__ guard and
+    # was never called by main(). It is called here, and its findings
+    # determine the process verdict like any other.
+    axis_cells, positive_facts, total, q1b = q1b_denominators(res)
+    print(f"\n  [8] Q1b / E1 — DERIVED denominators (D379 §8)")
+    print(f"      axis-cell denominator              {axis_cells}")
+    print(f"      positive-evidence-fact denominator {positive_facts}")
+    print(f"      sum                                {total}")
+    for kind, path, name, note in q1b:
+        findings.append((kind, path, name, note))
 
     # ── utility profile, reported SEPARATELY from correctness ─────────
     print("\n  UTILITY PROFILE — reported, never optimised (D367 11)")
@@ -397,8 +435,6 @@ def main():
     return 1 if findings else 0
 
 
-if __name__ == "__main__":
-    sys.exit(main())
 
 
 # ── Q1b — THE COMPLETE DERIVED §5 DENOMINATOR, AND E1 THROUGH IT ──────
@@ -473,3 +509,7 @@ def q1b_denominators(result):
                                  name, "fact is listed as abstained for want "
                                  "of a compliant trace AND emitted positive"))
     return axis_cells, positive_facts, axis_cells + positive_facts, findings
+
+
+if __name__ == "__main__":
+    sys.exit(main())

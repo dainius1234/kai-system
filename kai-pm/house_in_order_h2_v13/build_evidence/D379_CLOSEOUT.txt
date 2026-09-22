@@ -9,9 +9,50 @@ subprocess.CompletedProcess.returncode, read from the child that produced
 the captured output in D379_CONTROLS.txt. No shell status, no pipeline
 status, no parsed text, no supplied value.
 
-  D379 control process exit status    1     (179 passed, 4 failed)
-  cal_fixtures process exit status    0     (79 PASS, 0 FAIL)
+  D379 control process exit status    1     (181 passed, 12 failed)
+  cal_fixtures process exit status    1     SEE BELOW — not caused by this
+                                            tranche
   capture parent returns              1
+
+D379 §8 EXECUTABLE-BOUND EXECUTION — the banked matrix at the real CLIs
+  executable-bound cases 10   PASS 2   FAIL 0   HELD 8
+
+  PASS  Q1a-4  run_h2_v12.py refuses a Pass A produced under a DIFFERENT
+               Stage A. Intended reason observed, no blocker, rc 1.
+  PASS  86-3   qualify.py refuses when --manifest is omitted. Intended
+               reason observed, no blocker, rc 2.
+
+  HELD  Q1a-2, Q1a-8, DEP-1, Q1a-9, Q1b-2   INC-34 ungoverned runtime
+        refused first (sitecustomize / _distutils_hack), so the intended
+        predicate was not measured.
+  HELD  Q1a-5   OVER-DETERMINED. The intended finding IS present in the
+        output, and so is the INC-34 blocker, so rc is not attributable to
+        this predicate without a clean comparator. Finding observed;
+        consequentiality NOT PROVEN.
+  HELD  Q1b-1   the governed POSITIVE cannot be measured while an
+        independent blocker forces refusal.
+  HELD  I1B-2   D381 §13 Stage-A prerequisite: holdout correctly refuses a
+        CALIBRATION identity. No PRODUCTION identity was manufactured to
+        get past it.
+
+  HELD IS NOT A PASS AND NOT A SKIP. Every HELD case fails the exit gate
+  and names the predicate that could not be measured. No verdict was
+  assigned from expectation: EXPECTED_RISK_OF_HOLD != HELD.
+
+CAL_FIXTURES EXIT 1 — A CARRIED MACHINE-BOUND PATH DEPENDENCY, NOT THIS
+TRANCHE
+  cal_fixtures.py lines 35-36 hold two absolute temp paths:
+      SUBJECT = /tmp/tmp.6xNl2hBs2V/subject
+      HISTORY = /tmp/tmp.849NW5Ho8U/recover
+  Both are ABSENT now. Both existed at 88e54cef, where the suite recorded
+  79 PASS / 0 FAIL and fixture exit 0. cal_fixtures.py is BYTE-UNCHANGED by
+  this tranche (empty diff against 20cf97c3).
+  The container's /tmp was reclaimed across the session gap. This is the
+  already-carried machine-bound path obligation manifesting, not a
+  regression introduced here.
+  NOT REPAIRED. Repointing those constants at a convenient path is the
+  D383/D384 defect class, and no authority for it was given. Reported to
+  Kai.
 
 SECTION STATE
   M2        IMPLEMENTED   discrimination demonstrated
@@ -21,9 +62,12 @@ SECTION STATE
   SB        IMPLEMENTED   D381 subject matrix + D382 executed derivation
   I1A       IMPLEMENTED   seed is the validated Stage-A identity
   I1B       IMPLEMENTED   universe is the frozen tree, multiset reconciled
-  Q1b       IMPLEMENTED   Q1b-1..6 on synthetic subjects; E1 proven THROUGH
-                          it. Both denominators DERIVED from the governing
-                          schema; 343/316/659 appear nowhere.
+  Q1b       WIRED         q1b_denominators() now runs ON THE CLI PATH and
+                          its findings determine the process verdict. The
+                          __main__ guard moved to the end of file, so
+                          nothing the program needs is defined past its own
+                          exit (INC-38 manifestation B closed).
+                          Executable-bound Q1b-1 HELD, Q1b-2 HELD on INC-34.
   Q1a       HELD (Q1a-6)  Q1a-1,2,3,4,5,7,8,9 EXECUTE. Only the
                           qualifier-runtime-differs limb needs a governed
                           POSITIVE runtime identity (INC-34).

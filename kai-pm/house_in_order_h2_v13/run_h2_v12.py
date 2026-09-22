@@ -309,14 +309,79 @@ def evidence_facts(row, claims, contradiction, determining=(),
     return f, ac, traces, abstained
 
 
+def _classification_provenance(stage_a_path, repo_root, pa, pa_sha):
+    """D379 §4 CLASSIFICATION in-band provenance + input_binding.
+
+    Consumes stage_identity.py. Defines no identity of its own. REFUSES on
+    missing, malformed or mismatched Pass-A provenance — no silent
+    inheritance.
+    """
+    import stage_identity as SI
+    sp = pathlib.Path(stage_a_path)
+    if not sp.is_file():
+        raise SystemExit(f"REFUSE: no Stage-A descriptor at {stage_a_path}")
+    desc = json.loads(sp.read_bytes().decode("utf-8"))
+    SI.validate_descriptor(desc)
+    ident = SI.stage_a_identity(desc)
+
+    pprov = pa.get("producer_provenance")
+    if pprov is None:
+        raise SystemExit(
+            "REFUSE: the Pass-A input carries no in-band producer_provenance "
+            "(D379 §4). Missing provenance: REFUSE, no silent inheritance.")
+    if not isinstance(pprov, dict) or "stage_a_identity" not in pprov:
+        raise SystemExit("REFUSE: malformed Pass-A producer_provenance")
+    if pprov["stage_a_identity"] != ident:
+        raise SystemExit(
+            f"REFUSE: Pass-A stage_a_identity {pprov['stage_a_identity'][:16]}… "
+            f"does not match the supplied Stage-A identity {ident[:16]}…. "
+            f"Stale input across two Stage As.")
+
+    members, offenders = SI.producer_population(repo_root)
+    if offenders:
+        raise SystemExit(
+            "REFUSE: the classification runtime population contains "
+            "ungoverned origins: "
+            + "; ".join(f"{n}: {str(w)[:90]}" for n, w in offenders[:4]))
+
+    return {
+        "stage_a_identity": ident,
+        "stage_a_descriptor_digest": SI.stage_a_descriptor_digest(desc),
+        "producer_component": "CLASSIFICATION",
+        "producer_population": [list(m) for m in members],
+        "producer_denominator": len(members),
+        "runtime_identity": desc["runtime"],
+        "subject_commit": desc["subject"]["commit"],
+        "subject_tree": desc["subject"]["tree"],
+        "tree_paths_identity": desc["tree_paths"]["tree_paths_identity"],
+        "input_binding": {
+            "pass_a_artifact_sha256": pa_sha,
+            "pass_a_stage_a_identity": pprov["stage_a_identity"],
+            "pass_a_producer_provenance_digest":
+                SI.sha256_hex(SI._jcs(pprov)),
+        },
+    }
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--subject-repo", required=True)
     ap.add_argument("--passa", required=True)
     ap.add_argument("--out", required=True)
+    ap.add_argument("--stage-a", required=True, dest="stage_a",
+                    help="the Stage-A descriptor this producer consumes and "
+                         "verifies, and against which the Pass-A input "
+                         "binding is checked (D379 §2/§4).")
     a = ap.parse_args()
 
-    pa = json.load(open(a.passa))
+    # ── D379 §4 — READ ONCE, HASH THOSE BYTES, PARSE THOSE SAME BYTES ──
+    # The accepted S1 principle. Never read, then hash a second read, then
+    # assume they match.
+    _pa_bytes = pathlib.Path(a.passa).read_bytes()
+    _pa_sha = hashlib.sha256(_pa_bytes).hexdigest()
+    pa = json.loads(_pa_bytes.decode("utf-8"))
+    _cls_prov = _classification_provenance(a.stage_a, pathlib.Path(
+        a.subject_repo), pa, _pa_sha)
     sr = pathlib.Path(a.subject_repo)
     head = passa.git(sr, "rev-parse", "HEAD").stdout.strip()
     if head != pa["subject"]:
@@ -363,6 +428,9 @@ def main():
     tallies = {ax: dict(collections.Counter(r[ax]["value"] for r in rows))
                for ax in ont.ALPHABETS}
     payload = {
+        # D379 §4 — IN-BAND, with the exact input binding. NEVER a digest
+        # of these very bytes.
+        "producer_provenance": _cls_prov,
         "instrument": "HOUSE_H2_CLASSIFIER_v1.2",
         "subject": pa["subject"], "subject_tree": pa["subject_tree"],
         "history_identity": pa["history_identity"],

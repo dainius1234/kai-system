@@ -1090,6 +1090,62 @@ def build(subject_repo, history_repo, subject, census_pkg):
     return rows, tracked
 
 
+def _producer_provenance(stage_a_path, repo_root):
+    """D379 §4 PASS-A in-band provenance, after verifying self against
+    Stage A. REFUSES on an unrepresented or mismatched producer population.
+
+    Every identity here is CONSUMED from stage_identity.py. This function
+    defines no closure policy and no runtime identity of its own.
+    """
+    import stage_identity as SI
+    p = pathlib.Path(stage_a_path)
+    if not p.is_file():
+        raise SystemExit(f"REFUSE: no Stage-A descriptor at {stage_a_path}")
+    desc = json.loads(p.read_bytes().decode("utf-8"))
+    SI.validate_descriptor(desc)
+    ident = SI.stage_a_identity(desc)
+
+    members, offenders = SI.producer_population(repo_root)
+    if offenders:
+        raise SystemExit(
+            "REFUSE: the producer runtime population contains origins "
+            "outside every governed Stage-A root, with no Stage-A "
+            "dependency identity: "
+            + "; ".join(f"{n}: {str(w)[:90]}" for n, w in offenders[:4]))
+
+    stage_h2 = {m["path"]: m["sha256"] for m in desc["h2_sources"]}
+    for cls, identity, digest in members:
+        if cls != SI.CLASS_H2:
+            continue
+        if identity not in stage_h2:
+            raise SystemExit(
+                f"REFUSE: loaded H2 source {identity} is NOT represented in "
+                f"Stage A. No silent runtime expansion.")
+        if digest != stage_h2[identity]:
+            raise SystemExit(
+                f"REFUSE: loaded H2 source {identity} byte mismatch against "
+                f"Stage A: {digest} != {stage_h2[identity]}")
+
+    prov = {
+        "stage_a_identity": ident,
+        "stage_a_descriptor_digest": SI.stage_a_descriptor_digest(desc),
+        "producer_component": "PASS_A",
+        "producer_population": [list(m) for m in members],
+        "producer_denominator": len(members),
+        "runtime_identity": desc["runtime"],
+        "subject_commit": desc["subject"]["commit"],
+        "subject_tree": desc["subject"]["tree"],
+        "tree_paths_identity": desc["tree_paths"]["tree_paths_identity"],
+        "census_identity": desc["census"]["aggregate_sha256"],
+        "history_source_identity": desc["history"]["reachable_set_sha256"],
+    }
+    # D379 §5 — the emitted population must EQUAL the independently
+    # observed one, checked BEFORE the output is written.
+    SI.reconcile_provenance(
+        [{"class": c, "identity": i} for c, i, _ in members], members)
+    return prov
+
+
 def main():
     ap = argparse.ArgumentParser(description="HOUSE_H2 v1.2 Pass A")
     ap.add_argument("--subject-repo", required=True)
@@ -1097,7 +1153,16 @@ def main():
     ap.add_argument("--subject", required=True)
     ap.add_argument("--census-package", required=True)
     ap.add_argument("--out", required=True)
+    ap.add_argument("--stage-a", required=True, dest="stage_a",
+                    help="the Stage-A descriptor this producer verifies "
+                         "ITSELF against BEFORE producing (D379 §2/§4).")
     a = ap.parse_args()
+
+    # ── Q1a / D379 §2 — VERIFY SELF AGAINST STAGE A BEFORE PRODUCING ──
+    # The order matters and is D379's own: a producer that writes evidence
+    # first and checks afterwards has already emitted it. No irreversible,
+    # output-producing work happens above this point.
+    prov = _producer_provenance(a.stage_a, pathlib.Path(a.subject_repo))
 
     sr, hr = pathlib.Path(a.subject_repo), pathlib.Path(a.history_repo)
     head = git(sr, "rev-parse", "HEAD").stdout.strip()
@@ -1132,6 +1197,8 @@ def main():
                               "aggregate": hashlib.sha256(
                                   cm.read_bytes()).hexdigest()},
         "population": len(tracked), "rows": rows,
+        # D379 §4 — IN-BAND, and NEVER the digest of these very bytes.
+        "producer_provenance": prov,
     }
     pathlib.Path(a.out).write_text(json.dumps(payload, indent=1))
 
