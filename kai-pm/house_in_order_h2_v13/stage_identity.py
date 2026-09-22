@@ -692,8 +692,14 @@ if __name__ == "__main__":
 def verify_provenance(recorded, descriptor):
     """Verify a RECORDED producer provenance against Stage A, or REFUSE.
 
-    `recorded` is what the producer wrote beside its output:
-        {stage_a_identity, members: [{class, identity, sha256}]}
+    `recorded` is the D379 §4 in-band block the producer wrote:
+        {stage_a_identity, producer_population: [{class, identity, sha256}],
+         runtime_identity, ...}
+
+    ONE CANONICAL SCHEMA. This verifier previously read `members` while
+    D379 §4 names `producer_population`, so a genuinely produced provenance
+    object could not pass its own verifier. Reconciled to the D379 name; a
+    second duplicate field was NOT added to satisfy the older helper.
     """
     ident = stage_a_identity(descriptor)
     if not isinstance(recorded, dict):
@@ -705,9 +711,10 @@ def verify_provenance(recorded, descriptor):
             f"descriptor it claims ({ident}). Stale input, or a tampered "
             f"identity — either way the result is not accepted.")
     stage_h2 = {m["path"]: m["sha256"] for m in descriptor["h2_sources"]}
-    members = recorded.get("members")
+    members = recorded.get("producer_population")
     if not isinstance(members, list) or not members:
-        raise StageIdentityError("REFUSE: provenance records no member")
+        raise StageIdentityError(
+            "REFUSE: provenance records no producer_population member")
     seen = set()
     for m in members:
         if set(m) != {"class", "identity", "sha256"}:
@@ -724,6 +731,28 @@ def verify_provenance(recorded, descriptor):
                 f"against Stage A.")
         seen.add(m["identity"])
     return ident, seen
+
+
+def verify_runtime_identity(descriptor):
+    """D379 DEP-3. OBSERVE the executing runtime and compare it with the
+    identity Stage A expects. REFUSE on mismatch.
+
+    A producer that copies `descriptor["runtime"]` into its own provenance
+    is attesting from the EXPECTED value: it says "my runtime is whatever
+    Stage A says it should be", which cannot fail and therefore proves
+    nothing. This observes, then compares, then returns the OBSERVED block
+    for recording.
+    """
+    observed = build_runtime()                    # the existing authority
+    expected = descriptor.get("runtime") or {}
+    diff = [k for k in RUNTIME_FIELDS if observed.get(k) != expected.get(k)]
+    if diff:
+        raise StageIdentityError(
+            f"REFUSE: DEP-3 executing runtime identity differs from the "
+            f"identity Stage A expects, on {diff}. "
+            f"observed stdlib_identity={observed.get('stdlib_identity')} "
+            f"expected={expected.get('stdlib_identity')}")
+    return observed
 
 
 def reconcile_provenance(recorded_members, observed_members):

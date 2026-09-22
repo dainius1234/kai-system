@@ -336,7 +336,20 @@ def _classification_provenance(stage_a_path, repo_root, pa, pa_sha):
             f"REFUSE: Pass-A stage_a_identity {pprov['stage_a_identity'][:16]}… "
             f"does not match the supplied Stage-A identity {ident[:16]}…. "
             f"Stale input across two Stage As.")
+    # D379 §4 requires verification of the Pass-A PRODUCER BINDING, not
+    # merely that its identity string matches. A Pass A can carry the right
+    # identity while its recorded population is malformed, incomplete or
+    # byte-wrong. The existing authority does this; no second verifier is
+    # authored here.
+    try:
+        SI.verify_provenance(pprov, desc)
+    except SI.StageIdentityError as e:
+        raise SystemExit(f"REFUSE: Pass-A producer provenance does not "
+                         f"verify against Stage A: {e}")
 
+    # D379 DEP-3 — observe this producer's runtime, do not copy the
+    # expected value out of the descriptor.
+    observed_runtime = SI.verify_runtime_identity(desc)
     members, offenders = SI.producer_population(repo_root)
     if offenders:
         raise SystemExit(
@@ -348,9 +361,10 @@ def _classification_provenance(stage_a_path, repo_root, pa, pa_sha):
         "stage_a_identity": ident,
         "stage_a_descriptor_digest": SI.stage_a_descriptor_digest(desc),
         "producer_component": "CLASSIFICATION",
-        "producer_population": [list(m) for m in members],
+        "producer_population": [{"class": c, "identity": i, "sha256": d}
+                                for c, i, d in members],
         "producer_denominator": len(members),
-        "runtime_identity": desc["runtime"],
+        "runtime_identity": observed_runtime,
         "subject_commit": desc["subject"]["commit"],
         "subject_tree": desc["subject"]["tree"],
         "tree_paths_identity": desc["tree_paths"]["tree_paths_identity"],

@@ -708,7 +708,9 @@ def exec_fixtures():
     prov = {"stage_a_identity": _FIX["stage_a_identity"],
             "stage_a_descriptor_digest": SI.stage_a_descriptor_digest(desc),
             "producer_component": "PASS_A",
-            "producer_population": [[SI.CLASS_H2, m["path"], m["sha256"]]
+            "producer_population": [{"class": SI.CLASS_H2,
+                                     "identity": m["path"],
+                                     "sha256": m["sha256"]}
                                     for m in desc["h2_sources"]],
             "producer_denominator": len(desc["h2_sources"]),
             "runtime_identity": desc["runtime"],
@@ -782,6 +784,61 @@ def exec_fixtures():
     (d / "tree_paths.txt").write_text("\n".join(
         f"kai-pm/doc_{i:03d}.md" for i in range(272)) + "\n")
     _FIX["tree_paths"] = d / "tree_paths.txt"
+    # B7. `--subject HEAD` is a literal string; passa resolves repo HEAD to
+    # a SHA and compares, so "HEAD" would itself trip the R11 abort once
+    # INC-34 stopped masking the case. And the Census package is a governed
+    # directory, not the repository root.
+    def _rows_q1b3():
+        m = copy.deepcopy(_synthetic_result())
+        m["rows"][1]["SCOPE"]["witness"] = dict(
+            m["rows"][1]["SCOPE"]["witness"], local_context="unrelated text")
+        return m
+
+    def _rows_q1b4():
+        m = copy.deepcopy(_synthetic_result())
+        m["rows"][2]["evidence_facts_abstained_no_compliant_trace"] = \
+            ["CITES_COMMIT"]
+        return m
+
+    def _rows_q1b5():
+        m = copy.deepcopy(_synthetic_result())
+        for r in m["rows"]:
+            r["evidence_facts"].pop("BINDING_CONTRADICTION", None)
+        return m
+
+    def _rows_q1b6():
+        m = copy.deepcopy(_synthetic_result())
+        for r in m["rows"]:
+            for n in list(r["evidence_facts"]):
+                r["evidence_facts"][n] = False
+            r["evidence_fact_traces"] = {}
+        return m
+
+    for key, fn in (("result_q1b3", _rows_q1b3), ("result_q1b4", _rows_q1b4),
+                    ("result_q1b5", _rows_q1b5), ("result_q1b6", _rows_q1b6)):
+        _FIX[key] = d / (key + ".json")
+        _FIX[key].write_text(json.dumps(_result(fn, cls_prov)))
+
+    # Q1a-7: a governed member DELETED from the output provenance
+    short_prov = copy.deepcopy(cls_prov)
+    short_prov["producer_population"] = short_prov["producer_population"][:-1]
+    _FIX["result_short_prov"] = d / "result_short_prov.json"
+    _FIX["result_short_prov"].write_text(
+        json.dumps(_result(_synthetic_result, short_prov)))
+
+    (d / "EMPTY.sha256").write_text("")
+    _FIX["empty_manifest"] = d / "EMPTY.sha256"
+    tp = [f"kai-pm/doc_{i:03d}.md" for i in range(272)]
+    (d / "tree_extra.txt").write_text("\n".join(tp + ["kai-pm/extra.md"]) + "\n")
+    _FIX["tree_paths_extra"] = d / "tree_extra.txt"
+    (d / "tree_dup.txt").write_text("\n".join(tp + [tp[0]]) + "\n")
+    _FIX["tree_paths_dup"] = d / "tree_dup.txt"
+
+    import subprocess as _sp
+    _FIX["subject_sha"] = _sp.run(
+        ["git", "rev-parse", "HEAD"], cwd=str(REPO),
+        capture_output=True, text=True).stdout.strip()
+    _FIX["census_pkg"] = REPO / "kai-pm" / "house_in_order_census_v11"
     _FIX["dir"] = d
     return _FIX
 
@@ -804,7 +861,8 @@ def exec_bound_cases():
     d379_case("Q1a-2", clause="D379 §2/§4 Pass-A producer provenance",
               executable=V / "passa.py",
               argv=["--subject-repo", str(REPO), "--history-repo", str(REPO),
-                    "--subject", "HEAD", "--census-package", str(REPO),
+                    "--subject", f["subject_sha"],
+                    "--census-package", str(f["census_pkg"]),
                     "--out", str(f["dir"] / "q1a2.json"),
                     "--stage-a", str(f["stage_a"])],
               intended_reason="byte mismatch against Stage A",
@@ -812,7 +870,8 @@ def exec_bound_cases():
     d379_case("Q1a-8", clause="D379 §5 no silent runtime expansion",
               executable=V / "passa.py",
               argv=["--subject-repo", str(REPO), "--history-repo", str(REPO),
-                    "--subject", "HEAD", "--census-package", str(REPO),
+                    "--subject", f["subject_sha"],
+                    "--census-package", str(f["census_pkg"]),
                     "--out", str(f["dir"] / "q1a8.json"),
                     "--stage-a", str(f["stage_a"])],
               intended_reason="NOT represented in Stage A",
@@ -820,7 +879,8 @@ def exec_bound_cases():
     d379_case("DEP-1", clause="D379 §8 synthetic producer, external dep",
               executable=V / "passa.py",
               argv=["--subject-repo", str(REPO), "--history-repo", str(REPO),
-                    "--subject", "HEAD", "--census-package", str(REPO),
+                    "--subject", f["subject_sha"],
+                    "--census-package", str(f["census_pkg"]),
                     "--out", str(f["dir"] / "dep1.json"),
                     "--stage-a", str(f["stage_a"])],
               intended_reason="SYNTHETIC_HOSTILE_DEPENDENCY",
@@ -881,6 +941,104 @@ def exec_bound_cases():
               intended_reason="REFUSE BEFORE SELECTION",
               expect_class="REFUSE")
 
+
+    # ── the rest of the CLI-BOUND families ────────────────────────────
+    # NO MATRIX EXPANSION: every id below is already banked in D379 §8.
+    # The only change is the boundary. Cases whose governed subject is a
+    # decision function rather than a shipped executable (M2-1..3,
+    # D14-A/B/C, SB-1..3) are named in NON_CLI_SUBJECTS and stay with the
+    # function that IS their subject.
+    d379_case("Q1a-1", clause="D379 §8 clean chain on one Stage A",
+              executable=V / "passa.py",
+              argv=["--subject-repo", str(REPO), "--history-repo", str(REPO),
+                    "--subject", f["subject_sha"],
+                    "--census-package", str(f["census_pkg"]),
+                    "--out", str(f["dir"] / "q1a1.json"),
+                    "--stage-a", str(f["stage_a"])],
+              intended_reason="PASS A", expect_class="ACCEPT")
+    d379_case("Q1a-3", clause="D379 §8 classification-producer byte changed",
+              executable=V / "run_h2_v12.py",
+              argv=["--subject-repo", str(REPO), "--passa", str(f["passa"]),
+                    "--out", str(f["dir"] / "q1a3.json"),
+                    "--stage-a", str(f["stage_a"])],
+              intended_reason="byte mismatch against Stage A",
+              expect_class="REFUSE")
+    d379_case("Q1a-6", clause="D379 §8 qualifier runtime differs",
+              executable=V / "qualify.py",
+              argv=["--result", str(f["result"]),
+                    "--manifest", str(f["manifest"]),
+                    "--stage-a", str(f["stage_a"])],
+              intended_reason="DEP-3 executing runtime identity differs",
+              expect_class="REFUSE")
+    d379_case("Q1a-7", clause="D379 §8 member deleted from OUTPUT provenance",
+              executable=V / "qualify.py",
+              argv=["--result", str(f["result_short_prov"]),
+                    "--manifest", str(f["manifest"]),
+                    "--stage-a", str(f["stage_a"])],
+              intended_reason="NOT represented in Stage A",
+              expect_class="REFUSE")
+    d379_case("DEP-2", clause="D379 §8 ordinary stdlib under a governed "
+                              "interpreter",
+              executable=V / "passa.py",
+              argv=["--subject-repo", str(REPO), "--history-repo", str(REPO),
+                    "--subject", f["subject_sha"],
+                    "--census-package", str(f["census_pkg"]),
+                    "--out", str(f["dir"] / "dep2.json"),
+                    "--stage-a", str(f["stage_a"])],
+              intended_reason="PASS A", expect_class="ACCEPT")
+    d379_case("DEP-3", clause="D379 §8 runtime identity mismatch",
+              executable=V / "passa.py",
+              argv=["--subject-repo", str(REPO), "--history-repo", str(REPO),
+                    "--subject", f["subject_sha"],
+                    "--census-package", str(f["census_pkg"]),
+                    "--out", str(f["dir"] / "dep3.json"),
+                    "--stage-a", str(f["stage_a"])],
+              intended_reason="DEP-3 executing runtime identity differs",
+              expect_class="REFUSE")
+    for cid, res_key, reason in (
+            ("Q1b-3", "result_q1b3", "SCOPE"),
+            ("Q1b-4", "result_q1b4", "ABSTENTION_RECONCILIATION"),
+            ("Q1b-5", "result_q1b5", "FACT_CLASS_ABSENT"),
+            ("Q1b-6", "result_q1b6", "positive-evidence-fact denominator")):
+        d379_case(cid, clause="D379 §8 Q1b derived denominator",
+                  executable=V / "qualify.py",
+                  argv=["--result", str(f[res_key]),
+                        "--manifest", str(f["manifest"]),
+                        "--stage-a", str(f["stage_a"])],
+                  intended_reason=reason,
+                  expect_class="ACCEPT" if cid == "Q1b-6" else "REFUSE")
+    for cid, argv_extra, reason in (
+            ("86-1", [], "§8(6) CLOSED ORIGIN CLASSIFICATION"),
+            ("86-4", ["--manifest", "/nonexistent"], "does not exist"),
+            ("86-5", ["--manifest", str(f["empty_manifest"])],
+             "yielded no entries")):
+        base = ["--result", str(f["result"]), "--stage-a", str(f["stage_a"])]
+        if not argv_extra:
+            base += ["--manifest", str(f["manifest"])]
+        d379_case(cid, clause="D367 §8(6) fail-closed qualifier identity",
+                  executable=V / "qualify.py", argv=base + argv_extra,
+                  intended_reason=reason,
+                  expect_class="ACCEPT" if cid == "86-1" else "REFUSE")
+    for cid, tp_key, reason in (
+            ("I1B-1", "tree_paths", "BLIND HOLDOUT"),
+            ("I1B-3", "tree_paths_extra", "REFUSE BEFORE SELECTION"),
+            ("I1B-4", "tree_paths_dup", "REFUSE BEFORE SELECTION")):
+        d379_case(cid, clause="D379 §7 I1-B tree/output reconciliation",
+                  executable=V / "holdout.py",
+                  argv=["--result", str(f["result"]),
+                        "--stage-a", str(f["stage_a"]),
+                        "--tree-paths", str(f[tp_key]),
+                        "--out", str(f["dir"] / (cid + ".json"))],
+                  intended_reason=reason,
+                  expect_class="ACCEPT" if cid == "I1B-1" else "REFUSE")
+    d379_case("I1A-1", clause="D379 §7 I1-A seed is the Stage-A identity",
+              executable=V / "holdout.py",
+              argv=["--result", str(f["result"]),
+                    "--stage-a", str(f["stage_a"]),
+                    "--tree-paths", str(f["tree_paths"]),
+                    "--out", str(f["dir"] / "i1a1.json")],
+              intended_reason="candidate aggregate", expect_class="ACCEPT")
+
     held = [c for c in CASES if c["verdict"] == "HELD"]
     passed = [c for c in CASES if c["verdict"] == "PASS"]
     failed = [c for c in CASES if c["verdict"] == "FAIL"]
@@ -924,15 +1082,54 @@ def main() -> int:
 
     print("-" * 70)
     print("SECTION COVERAGE")
+    # B6 — THE ROLL-UP IS DERIVED FROM THE EXECUTABLE-BOUND VERDICTS
+    # wherever D379 names a shipped executable subject. INC-38 exists
+    # because helper status was allowed to stand in for executable status;
+    # a helper check can no longer make a section green over an executable
+    # HELD. Helper checks remain above as supplementary diagnostics.
+    by_family = collections.defaultdict(list)
+    for c in CASES:
+        fam = c["case"].split("-")[0]
+        fam = {"Q1a": "Q1a", "Q1b": "Q1b", "86": "86", "DEP": "DEP",
+               "I1A": "I1A", "I1B": "I1B"}.get(fam, fam)
+        by_family[fam].append(c)
+    # Cases whose governed subject is a DECISION FUNCTION, not a shipped
+    # executable. Named explicitly so the exemption is visible, not assumed.
+    NON_CLI_SUBJECTS = {
+        "M2": "classify.lifecycle — a classification decision function",
+        "D14": "passa._eligible — the boundary predicate",
+        "SB": "passa scope derivation + the D382 executed derivation",
+        "PPOP": "stage_identity.classify_origin",
+        "STAGE_A": "stage_identity Stage-A construction",
+        "STDLIB": "stage_identity stdlib construction (D380 §7)",
+    }
     for s in SECTIONS:
-        if s in IMPLEMENTED:
-            state = "IMPLEMENTED"
-        elif s in HELD:
-            state = f"HELD — {HELD[s]}"
+        exec_cases = by_family.get(s, [])
+        if exec_cases:
+            heldc = [c for c in exec_cases if c["verdict"] == "HELD"]
+            failc = [c for c in exec_cases if c["verdict"] == "FAIL"]
+            passc = [c for c in exec_cases if c["verdict"] == "PASS"]
+            if failc:
+                state = (f"FAIL (executable) — {len(failc)} of "
+                         f"{len(exec_cases)} cases")
+            elif heldc:
+                state = (f"HELD (executable) — {len(passc)} PASS, "
+                         f"{len(heldc)} HELD of {len(exec_cases)}: "
+                         + ", ".join(c["case"] for c in heldc[:6]))
+            else:
+                state = f"IMPLEMENTED (executable) — {len(passc)}/{len(passc)}"
+            ok = not failc and not heldc
+        elif s in NON_CLI_SUBJECTS:
+            ok = s in IMPLEMENTED
+            state = (("IMPLEMENTED" if ok else "HELD")
+                     + f" — subject is {NON_CLI_SUBJECTS[s]}, not a CLI")
+            if not ok:
+                state += f"; {HELD.get(s, '')}"
         else:
-            state = "NOT_IMPLEMENTED"
+            ok = False
+            state = "NOT_IMPLEMENTED — no executable-bound case ran"
         print(f"  {s:<10} {state}")
-        if s not in IMPLEMENTED:
+        if not ok:
             check(f"section {s} is implemented and executed", False, state)
     print()
     print("=" * 70)
@@ -1569,9 +1766,13 @@ def section_Q1a():
 
     A = _synthetic_descriptor(SI.SCHEMA_V2, SI.MODE_CALIBRATION)
     idA = SI.stage_a_identity(A)
+    # ONE CANONICAL SCHEMA (D379 §4). This helper previously built
+    # `members`, which is the key the old verifier read and the producers
+    # never emit.
     prov = {"stage_a_identity": idA,
-            "members": [{"class": SI.CLASS_H2, "identity": m["path"],
-                         "sha256": m["sha256"]} for m in A["h2_sources"]]}
+            "producer_population": [
+                {"class": SI.CLASS_H2, "identity": m["path"],
+                 "sha256": m["sha256"]} for m in A["h2_sources"]]}
 
     check("Q1a-1 clean chain: producer provenance verifies against the one "
           "synthetic Stage A", SI.verify_provenance(prov, A)[0] == idA)
@@ -1580,7 +1781,7 @@ def section_Q1a():
     for label, which in (("Q1a-2 Pass-A producer", "passa.py"),
                          ("Q1a-3 classification producer", "run_h2_v12.py")):
         bad = copy.deepcopy(prov)
-        for m in bad["members"]:
+        for m in bad["producer_population"]:
             if m["identity"].endswith(which):
                 m["sha256"] = "f" * 64
         check(f"{label} byte changed after Stage A fixed -> REFUSE",
@@ -1601,17 +1802,17 @@ def section_Q1a():
     # Q1a-7 — a member DELETED from the output provenance after production,
     # with the independently captured runtime observation unchanged
     observed = [(SI.CLASS_H2, m["path"], m["sha256"]) for m in A["h2_sources"]]
-    short = dict(prov, members=prov["members"][:-1])
+    short = dict(prov, producer_population=prov["producer_population"][:-1])
     check("Q1a-7 one governed member deleted from the OUTPUT provenance, "
           "independent runtime observation unchanged -> REFUSE",
-          _refuses(lambda: SI.reconcile_provenance(short["members"], observed)))
+          _refuses(lambda: SI.reconcile_provenance(short["producer_population"], observed)))
     check("Q1a-7 the matching case reconciles (no provenance list defines "
           "its own completeness)",
-          SI.reconcile_provenance(prov["members"], observed) is True)
+          SI.reconcile_provenance(prov["producer_population"], observed) is True)
 
     # Q1a-8 — a governed module NOT represented in Stage A is loaded
     extra = copy.deepcopy(prov)
-    extra["members"].append({"class": SI.CLASS_H2,
+    extra["producer_population"].append({"class": SI.CLASS_H2,
                              "identity": "kai-pm/house_in_order_h2_v13/"
                                          "build_evidence/d379_controls.py",
                              "sha256": "a" * 64})

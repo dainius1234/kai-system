@@ -374,7 +374,10 @@ def main():
     # INC-36: this executed runtime_module_identity(a.manifest), which
     # skipped every loaded origin outside the candidate directory (73 of
     # them, measured). INC-38: the repaired classifier existed but the CLI
-    # never called it. Both are closed here, on the executable path.
+    # never called it. Both are WIRED ON THE EXECUTABLE PATH here.
+    # That is an implementation state, not a closure: closure is a
+    # programme decision after the required evidence, and neither
+    # incident is closed by this code existing.
     rows_id, refusals = qualifier_population(a.stage_a, a.manifest)
     kinds = collections.Counter(r["class"] for r in rows_id)
     print(f"\n  [6] §8(6) CLOSED ORIGIN CLASSIFICATION — every loaded origin")

@@ -1090,27 +1090,38 @@ def build(subject_repo, history_repo, subject, census_pkg):
     return rows, tracked
 
 
-def _producer_provenance(stage_a_path, repo_root):
-    """D379 §4 PASS-A in-band provenance, after verifying self against
-    Stage A. REFUSES on an unrepresented or mismatched producer population.
+def _load_and_authorise(stage_a_path, repo_root):
+    """MOMENT 1 — D379 §2: verify the producer is AUTHORISED before it
+    produces anything. Returns the validated descriptor.
 
-    Every identity here is CONSUMED from stage_identity.py. This function
-    defines no closure policy and no runtime identity of its own.
+    This runs before `build()`, so no irreversible, output-producing work
+    happens above it. It deliberately does NOT record the final producer
+    population: `build()` subsequently imports the hardened Census modules,
+    and a population captured here would be stale before Pass A had done
+    its work. That is MOMENT 2, below.
     """
     import stage_identity as SI
-    p = pathlib.Path(stage_a_path)
-    if not p.is_file():
+    sp = pathlib.Path(stage_a_path)
+    if not sp.is_file():
         raise SystemExit(f"REFUSE: no Stage-A descriptor at {stage_a_path}")
-    desc = json.loads(p.read_bytes().decode("utf-8"))
+    desc = json.loads(sp.read_bytes().decode("utf-8"))
     SI.validate_descriptor(desc)
-    ident = SI.stage_a_identity(desc)
+    # D379 DEP-3 — OBSERVE the executing runtime and compare it against the
+    # identity Stage A expects. Copying desc["runtime"] would be attesting
+    # from the expected value and could never fail.
+    SI.verify_runtime_identity(desc)
+    _check_population(SI, desc, repo_root, "pre-production")
+    return desc
 
+
+def _check_population(SI, desc, repo_root, when):
+    """The closed population check, applied at BOTH moments."""
     members, offenders = SI.producer_population(repo_root)
     if offenders:
         raise SystemExit(
-            "REFUSE: the producer runtime population contains origins "
-            "outside every governed Stage-A root, with no Stage-A "
-            "dependency identity: "
+            f"REFUSE ({when}): the producer runtime population contains "
+            f"origins outside every governed Stage-A root, with no Stage-A "
+            f"dependency identity: "
             + "; ".join(f"{n}: {str(w)[:90]}" for n, w in offenders[:4]))
 
     stage_h2 = {m["path"]: m["sha256"] for m in desc["h2_sources"]}
@@ -1126,13 +1137,28 @@ def _producer_provenance(stage_a_path, repo_root):
                 f"REFUSE: loaded H2 source {identity} byte mismatch against "
                 f"Stage A: {digest} != {stage_h2[identity]}")
 
+    return members
+
+
+def _producer_provenance(desc, repo_root):
+    """MOMENT 2 — the D379 §4 in-band block, recorded from the population
+    observed AFTER the work and BEFORE the output is written.
+
+    Every identity is CONSUMED from stage_identity.py. No closure policy
+    and no runtime identity is defined here.
+    """
+    import stage_identity as SI
+    ident = SI.stage_a_identity(desc)
+    observed_runtime = SI.verify_runtime_identity(desc)   # observed, not copied
+    members = _check_population(SI, desc, repo_root, "pre-write")
     prov = {
         "stage_a_identity": ident,
         "stage_a_descriptor_digest": SI.stage_a_descriptor_digest(desc),
         "producer_component": "PASS_A",
-        "producer_population": [list(m) for m in members],
+        "producer_population": [{"class": c, "identity": i, "sha256": d}
+                                for c, i, d in members],
         "producer_denominator": len(members),
-        "runtime_identity": desc["runtime"],
+        "runtime_identity": observed_runtime,
         "subject_commit": desc["subject"]["commit"],
         "subject_tree": desc["subject"]["tree"],
         "tree_paths_identity": desc["tree_paths"]["tree_paths_identity"],
@@ -1141,8 +1167,7 @@ def _producer_provenance(stage_a_path, repo_root):
     }
     # D379 §5 — the emitted population must EQUAL the independently
     # observed one, checked BEFORE the output is written.
-    SI.reconcile_provenance(
-        [{"class": c, "identity": i} for c, i, _ in members], members)
+    SI.reconcile_provenance(prov["producer_population"], members)
     return prov
 
 
@@ -1162,7 +1187,8 @@ def main():
     # The order matters and is D379's own: a producer that writes evidence
     # first and checks afterwards has already emitted it. No irreversible,
     # output-producing work happens above this point.
-    prov = _producer_provenance(a.stage_a, pathlib.Path(a.subject_repo))
+    _stage_a_desc = _load_and_authorise(a.stage_a,
+                                        pathlib.Path(a.subject_repo))
 
     sr, hr = pathlib.Path(a.subject_repo), pathlib.Path(a.history_repo)
     head = git(sr, "rev-parse", "HEAD").stdout.strip()
@@ -1178,6 +1204,9 @@ def main():
             "Refusing to measure.")
 
     rows, tracked = build(sr, hr, a.subject, pathlib.Path(a.census_package))
+    # MOMENT 2: the Census modules are loaded by build(), so the population
+    # is observed HERE, after the work and before any byte is written.
+    prov = _producer_provenance(_stage_a_desc, pathlib.Path(a.subject_repo))
     cm = pathlib.Path(a.census_package) / "MANIFEST.sha256"
     payload = {
         "subject": a.subject,

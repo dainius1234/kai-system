@@ -15,29 +15,49 @@ status, no parsed text, no supplied value.
   capture parent returns              1
 
 D379 §8 EXECUTABLE-BOUND EXECUTION — the banked matrix at the real CLIs
-  executable-bound cases 10   PASS 2   FAIL 0   HELD 8
+  executable-bound cases 27   PASS 4   FAIL 0   HELD 23
 
-  PASS  Q1a-4  run_h2_v12.py refuses a Pass A produced under a DIFFERENT
-               Stage A. Intended reason observed, no blocker, rc 1.
-  PASS  86-3   qualify.py refuses when --manifest is omitted. Intended
-               reason observed, no blocker, rc 2.
+  THIS IS THE CLI-BOUND SLICE OF THE BANKED MATRIX, NOT THE WHOLE OF IT.
+  Cases whose governed subject is a DECISION FUNCTION rather than a shipped
+  executable stay with the function that IS their subject, and are named:
+    M2-1..3    classify.lifecycle
+    D14-A/B/C  passa._eligible
+    SB         passa scope derivation + the D382 executed derivation
+    PPOP       stage_identity.classify_origin
+    STAGE_A / STDLIB  stage_identity construction
+  No matrix expansion and no matrix reduction: the same banked cases, each
+  routed to its own governed boundary.
 
-  HELD  Q1a-2, Q1a-8, DEP-1, Q1a-9, Q1b-2   INC-34 ungoverned runtime
-        refused first (sitecustomize / _distutils_hack), so the intended
-        predicate was not measured.
-  HELD  Q1a-5   OVER-DETERMINED. The intended finding IS present in the
-        output, and so is the INC-34 blocker, so rc is not attributable to
-        this predicate without a clean comparator. Finding observed;
-        consequentiality NOT PROVEN.
-  HELD  Q1b-1   the governed POSITIVE cannot be measured while an
-        independent blocker forces refusal.
-  HELD  I1B-2   D381 §13 Stage-A prerequisite: holdout correctly refuses a
-        CALIBRATION identity. No PRODUCTION identity was manufactured to
-        get past it.
+  PASS  Q1a-4  run_h2_v12 refuses a Pass A made under a DIFFERENT Stage A
+  PASS  86-3   qualify refuses when --manifest is omitted
+  PASS  86-4   qualify refuses a manifest path that does not exist
+  PASS  86-5   qualify refuses an empty/unreadable manifest
+  All four are blocker-free and first-effective.
 
-  HELD IS NOT A PASS AND NOT A SKIP. Every HELD case fails the exit gate
-  and names the predicate that could not be measured. No verdict was
-  assigned from expectation: EXPECTED_RISK_OF_HOLD != HELD.
+  HELD 23, by cause:
+    INC-34 ungoverned runtime refused first, or forced a refusal the
+    governed POSITIVE could not survive — Q1a-1,2,3,5,6,7,8,9, DEP-1,2,3,
+    Q1b-1..6, 86-1
+    D381 §13 Stage-A prerequisite — holdout correctly refuses a CALIBRATION
+    identity — I1A-1, I1B-1,2,3,4
+  Six of those (Q1a-5, Q1b-3, Q1b-4, Q1b-5) are recorded as OVER-DETERMINED:
+  the intended finding IS present in the output, and so is an independent
+  blocker, so rc is not attributable to the predicate without a clean
+  comparator. Finding observed; CONSEQUENTIALITY NOT PROVEN.
+
+  HELD IS NOT A PASS AND NOT A SKIP. Every HELD case fails the exit gate and
+  names the predicate that could not be measured. No verdict was assigned
+  from expectation: EXPECTED_RISK_OF_HOLD != HELD, EXPECTED_PASS != PASS.
+
+  SECTION ROLL-UP IS DERIVED FROM THESE EXECUTABLE VERDICTS wherever D379
+  names a shipped executable subject. A helper check can no longer make a
+  section green over an executable HELD; helper checks remain as
+  supplementary diagnostics only.
+
+NOTHING IS CLOSED HERE. INC-36, INC-37 and INC-38 have repair candidates
+implemented and wired on the executable path. That is an implementation
+state, subject to hostile calibration and Kai adjudication. No ledger record
+was edited and no incident is closed.
 
 CAL_FIXTURES EXIT 1 — A CARRIED MACHINE-BOUND PATH DEPENDENCY, NOT THIS
 TRANCHE
@@ -66,7 +86,9 @@ SECTION STATE
                           its findings determine the process verdict. The
                           __main__ guard moved to the end of file, so
                           nothing the program needs is defined past its own
-                          exit (INC-38 manifestation B closed).
+                          exit. INC-38 manifestation B is WIRED, not closed —
+                          repair candidate subject to hostile
+                          calibration and Kai adjudication.
                           Executable-bound Q1b-1 HELD, Q1b-2 HELD on INC-34.
   Q1a       HELD (Q1a-6)  Q1a-1,2,3,4,5,7,8,9 EXECUTE. Only the
                           qualifier-runtime-differs limb needs a governed

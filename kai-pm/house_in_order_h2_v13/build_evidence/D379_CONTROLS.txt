@@ -8,7 +8,7 @@ subprocess.CompletedProcess.returncode, read directly from the child
 that produced the output immediately above it. No shell status, no
 pipeline status, no parsed text, no supplied value.
 
-captured 2026-09-22T18:40:38.134380+00:00
+captured 2026-09-22T18:50:43.745174+00:00
 
 ======================================================================
 SUBJECT 1 of 2 — THE D379 CONTROL PROCESS
@@ -20,11 +20,11 @@ D379 HOSTILE CONTROLS — PRODUCER MEASUREMENT, SIGHTED,
 ======================================================================
 
 SUBJECT — the exact bytes measured
-  passa.py         843c260aebe739602828f7d72b03d5e03221d3fc2b62b90fe1d27823b75b4bd5
+  passa.py         33cba1c500091f61f3be76d20e00c5983a6a3d97f1b82cad1e3db949026ed497
   classify.py      226873676c2373faaf29f4709bb1bb62d1d22f3c56cbdc0e594314cb6e5df9e8
   envelope.py      fdcc1b73d7cd32e540c63ca926d5393901ea63b357fbf339819f07256e6a5a3f
-  run_h2_v12.py    e5eb66df53c34560c49ee5ecd13aacff86b0c18fbc3871a373ca06d29aa63380
-  qualify.py       ac74aa66fdff188455e53a1e96261a396ad5d8aefa7fe234d0b8c3d6f3c91bc1
+  run_h2_v12.py    e33446c351ce22f861c58aea6772417f8bedd993f1d7b6cebbf63def48037b36
+  qualify.py       118badb0abf01b616b18bc796fd6e607c2fdf1c0dcfaf9209a1baf6e67d04664
   holdout.py       e9cd5f3874ba14c2c33166671da6b8cc65574a040e6b276c955cd9f0a49b1766
   cal_fixtures.py  4299bd58bd34705d044056d03901f3d674f09e2afde1fff5811a55dfca5f737b
   ontology.py      a92e68c7518578e177c6c67d95efdc1e8b4a92c4406aa2778678119babb721bc
@@ -178,7 +178,7 @@ STAGE_A — H2_STAGE_A_V2 governance and identity
   identity is constructed, and the canonical-runtime positive
   limb is HELD on INC-34 (see STDLIB).
 
-    synthetic V2 CALIBRATION stage_a_identity  2313a601d228382dc1a5199f540112c70568856edfbd0b4e57cc8da3ee58b6ea
+    synthetic V2 CALIBRATION stage_a_identity  1fd058f99a285049bb6a7535505a44473e66525f1450dcb15f8ddbc6d07a7c1d
 
 I1A — the blind seed is the VALIDATED STAGE-A IDENTITY
 
@@ -261,28 +261,60 @@ D379 §8 EXECUTABLE-BOUND EXECUTION — the real shipped CLIs
   holdout.py   (already CLI-wired; not redesigned)
     I1B-2        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
                  an earlier independent blocker decided the outcome: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+    Q1a-1        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+                 the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+    Q1a-3        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+                 an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+    Q1a-6        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+                 an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+    Q1a-7        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+                 an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+    DEP-2        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+                 the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+    DEP-3        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+                 an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+    Q1b-3        rc=1   REFUSE  intended=Y  blocker=Y  -> HELD
+                 OVER-DETERMINED: the intended finding IS present in the output, but so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]), so rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
+    Q1b-4        rc=1   REFUSE  intended=Y  blocker=Y  -> HELD
+                 OVER-DETERMINED: the intended finding IS present in the output, but so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]), so rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
+    Q1b-5        rc=1   REFUSE  intended=Y  blocker=Y  -> HELD
+                 OVER-DETERMINED: the intended finding IS present in the output, but so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]), so rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
+    Q1b-6        rc=1   REFUSE  intended=Y  blocker=Y  -> HELD
+                 the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+    86-1         rc=1   REFUSE  intended=Y  blocker=Y  -> HELD
+                 the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+    86-4         rc=1   REFUSE  intended=Y  blocker=N  -> PASS
+    86-5         rc=1   REFUSE  intended=Y  blocker=N  -> PASS
+    I1B-1        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+                 the governed positive cannot be measured while an independent blocker forces refusal: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+    I1B-3        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+                 an earlier independent blocker decided the outcome: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+    I1B-4        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+                 an earlier independent blocker decided the outcome: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+    I1A-1        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+                 the governed positive cannot be measured while an independent blocker forces refusal: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
 
-    executable-bound cases  10   PASS 2   FAIL 0   HELD 8
+    executable-bound cases  27   PASS 4   FAIL 0   HELD 23
     (HELD is not a pass and not a skip: it fails the gate and
      names the predicate that could not be measured.)
 
 ----------------------------------------------------------------------
 SECTION COVERAGE
-  M2         IMPLEMENTED
-  D14        IMPLEMENTED
-  PPOP       IMPLEMENTED
-  Q1a        HELD — Q1a-6 ONLY — needs a governed POSITIVE runtime identity to compare against (INC-34). Q1a-1,2,3,4,5,7,8,9 all EXECUTE.
-  Q1b        IMPLEMENTED
-  86         IMPLEMENTED
-  SB         IMPLEMENTED
-  I1A        IMPLEMENTED
-  I1B        IMPLEMENTED
-  DEP        HELD — DEP-2 ONLY — needs ordinary stdlib under a D380-COMPLIANT interpreter (INC-34). DEP-1 and DEP-3 EXECUTE.
-  STAGE_A    HELD — the canonical-runtime positive limb ONLY (INC-34). The V2 governance and identity matrix EXECUTES.
-  STDLIB     HELD — V2-ID-2a, the canonical positive derivation ONLY (INC-34). The D380-STDLIB-NEG-1 negative control EXECUTES.
+  M2         IMPLEMENTED — subject is classify.lifecycle — a classification decision function, not a CLI
+  D14        IMPLEMENTED — subject is passa._eligible — the boundary predicate, not a CLI
+  PPOP       IMPLEMENTED — subject is stage_identity.classify_origin, not a CLI
+  Q1a        HELD (executable) — 1 PASS, 8 HELD of 9: Q1a-2, Q1a-8, Q1a-9, Q1a-5, Q1a-1, Q1a-3
+  Q1b        HELD (executable) — 0 PASS, 6 HELD of 6: Q1b-1, Q1b-2, Q1b-3, Q1b-4, Q1b-5, Q1b-6
+  86         HELD (executable) — 3 PASS, 1 HELD of 4: 86-1
+  SB         IMPLEMENTED — subject is passa scope derivation + the D382 executed derivation, not a CLI
+  I1A        HELD (executable) — 0 PASS, 1 HELD of 1: I1A-1
+  I1B        HELD (executable) — 0 PASS, 4 HELD of 4: I1B-2, I1B-1, I1B-3, I1B-4
+  DEP        HELD (executable) — 0 PASS, 3 HELD of 3: DEP-1, DEP-2, DEP-3
+  STAGE_A    HELD — subject is stage_identity Stage-A construction, not a CLI; the canonical-runtime positive limb ONLY (INC-34). The V2 governance and identity matrix EXECUTES.
+  STDLIB     HELD — subject is stage_identity stdlib construction (D380 §7), not a CLI; V2-ID-2a, the canonical positive derivation ONLY (INC-34). The D380-STDLIB-NEG-1 negative control EXECUTES.
 
 ======================================================================
-181 passed, 12 failed
+183 passed, 31 failed
   FAIL Q1a-2 (D379 §2/§4 Pass-A producer provenance) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
   FAIL Q1a-8 (D379 §5 no silent runtime expansion) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
   FAIL DEP-1 (D379 §8 synthetic producer, external dep) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
@@ -291,10 +323,29 @@ SECTION COVERAGE
   FAIL Q1b-1 (D379 §8 clean complete result -> PASS) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
   FAIL Q1b-2 (D379 §8 missing positive-fact trace -> FAIL) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
   FAIL I1B-2 (D379 §7 drop one output row -> REFUSE) verdict PASS: HELD: an earlier independent blocker decided the outcome: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
-  FAIL section Q1a is implemented and executed: HELD — Q1a-6 ONLY — needs a governed POSITIVE runtime identity to compare against (INC-34). Q1a-1,2,3,4,5,7,8,9 all EXECUTE.
-  FAIL section DEP is implemented and executed: HELD — DEP-2 ONLY — needs ordinary stdlib under a D380-COMPLIANT interpreter (INC-34). DEP-1 and DEP-3 EXECUTE.
-  FAIL section STAGE_A is implemented and executed: HELD — the canonical-runtime positive limb ONLY (INC-34). The V2 governance and identity matrix EXECUTES.
-  FAIL section STDLIB is implemented and executed: HELD — V2-ID-2a, the canonical positive derivation ONLY (INC-34). The D380-STDLIB-NEG-1 negative control EXECUTES.
+  FAIL Q1a-1 (D379 §8 clean chain on one Stage A) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+  FAIL Q1a-3 (D379 §8 classification-producer byte changed) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  FAIL Q1a-6 (D379 §8 qualifier runtime differs) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  FAIL Q1a-7 (D379 §8 member deleted from OUTPUT provenance) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  FAIL DEP-2 (D379 §8 ordinary stdlib under a governed interpreter) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+  FAIL DEP-3 (D379 §8 runtime identity mismatch) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  FAIL Q1b-3 (D379 §8 Q1b derived denominator) verdict PASS: HELD: OVER-DETERMINED: the intended finding IS present in the output, but so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]), so rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
+  FAIL Q1b-4 (D379 §8 Q1b derived denominator) verdict PASS: HELD: OVER-DETERMINED: the intended finding IS present in the output, but so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]), so rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
+  FAIL Q1b-5 (D379 §8 Q1b derived denominator) verdict PASS: HELD: OVER-DETERMINED: the intended finding IS present in the output, but so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]), so rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
+  FAIL Q1b-6 (D379 §8 Q1b derived denominator) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+  FAIL 86-1 (D367 §8(6) fail-closed qualifier identity) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+  FAIL I1B-1 (D379 §7 I1-B tree/output reconciliation) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+  FAIL I1B-3 (D379 §7 I1-B tree/output reconciliation) verdict PASS: HELD: an earlier independent blocker decided the outcome: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+  FAIL I1B-4 (D379 §7 I1-B tree/output reconciliation) verdict PASS: HELD: an earlier independent blocker decided the outcome: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+  FAIL I1A-1 (D379 §7 I1-A seed is the Stage-A identity) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+  FAIL section Q1a is implemented and executed: HELD (executable) — 1 PASS, 8 HELD of 9: Q1a-2, Q1a-8, Q1a-9, Q1a-5, Q1a-1, Q1a-3
+  FAIL section Q1b is implemented and executed: HELD (executable) — 0 PASS, 6 HELD of 6: Q1b-1, Q1b-2, Q1b-3, Q1b-4, Q1b-5, Q1b-6
+  FAIL section 86 is implemented and executed: HELD (executable) — 3 PASS, 1 HELD of 4: 86-1
+  FAIL section I1A is implemented and executed: HELD (executable) — 0 PASS, 1 HELD of 1: I1A-1
+  FAIL section I1B is implemented and executed: HELD (executable) — 0 PASS, 4 HELD of 4: I1B-2, I1B-1, I1B-3, I1B-4
+  FAIL section DEP is implemented and executed: HELD (executable) — 0 PASS, 3 HELD of 3: DEP-1, DEP-2, DEP-3
+  FAIL section STAGE_A is implemented and executed: HELD — subject is stage_identity Stage-A construction, not a CLI; the canonical-runtime positive limb ONLY (INC-34). The V2 governance and identity matrix EXECUTES.
+  FAIL section STDLIB is implemented and executed: HELD — subject is stage_identity stdlib construction (D380 §7), not a CLI; V2-ID-2a, the canonical positive derivation ONLY (INC-34). The D380-STDLIB-NEG-1 negative control EXECUTES.
 EXIT GATE: FAIL
 ======================================================================
 
