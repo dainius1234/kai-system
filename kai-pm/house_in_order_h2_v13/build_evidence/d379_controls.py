@@ -1448,6 +1448,24 @@ def exec_bound_cases():
     the governed target, and the expected disposition. A case whose proof
     does not derive is a CONTROL/FIXTURE FAILURE and is reported as one.
     """
+    # CALIBRATE THE VOCABULARY CHECK BEFORE TRUSTING IT (I-8). Known-
+    # positive: each out-of-vocabulary label this harness has itself used
+    # must raise. Known-negative: each banked label must not.
+    for bad in ("FIXTURE", "RETURNED", "PASS ", "pass", ""):
+        try:
+            assert_verdict(bad)
+            _raised = False
+        except VerdictVocabularyError:
+            _raised = True
+        check(f"vocabulary calibration: {bad!r} is refused", _raised)
+        print(f"  vocabulary calibration  known-positive {bad!r:12} "
+              f"{'REFUSED' if _raised else 'ACCEPTED — MISCALIBRATED'}")
+    for good in VERDICTS:
+        _ok = assert_verdict(good) == good
+        check(f"vocabulary calibration: {good!r} is accepted", _ok)
+        print(f"  vocabulary calibration  known-negative {good!r:12} "
+              f"{'ACCEPTED' if _ok else 'REFUSED — MISCALIBRATED'}")
+
     print("\nD379 §8 EXECUTABLE-BOUND EXECUTION — the real shipped CLIs")
     print("  Each case: CONSTRUCTED hostile subject proved from raw facts,")
     print("  actual subprocess, rc from CompletedProcess, actual reason,")
@@ -1938,64 +1956,113 @@ sys.exit(1)
     #   UNCHANGED -> REFUSE: recorded provenance does not match the bound
     #   producer population.
     #
-    #   Kai, on 0523108, and he is right: the previous construction removed
-    #   a population entry, left producer_denominator alone, and called the
-    #   denominator/population mismatch the proof. That denominator lives
-    #   INSIDE THE SAME TAMPERED OBJECT. It is not an independent binding,
-    #   so a self-consistent deletion -- one that shortens the population
-    #   AND the denominator together -- defeats it entirely, and the banked
-    #   subject was never built.
+    #   86ebfde recorded this as "RETURNED -- subject not constructible".
+    #   That was false, and the invented status is what let it through. The
+    #   SUBJECT is constructible from artefacts we already produce; what is
+    #   missing is the SHIPPED QUALIFIER's ability to detect it. A product
+    #   gap is measured by running the product, not renamed.
     #
-    #   The D379-compliant independent anchor EXISTS in the decision: §4's
-    #   external Stage-B binding carries `producer_provenance_digest`
-    #   alongside `artifact_sha256`, computed OUTSIDE the artefact on its
-    #   FINAL bytes. A recorded provenance can be checked against it
-    #   because tampering after production changes the provenance digest
-    #   while the external binding still carries the original.
-    #
-    #   THE SHIPPED QUALIFIER CANNOT REACH IT. It receives --result,
-    #   --stage-a and --manifest, and no external Stage-B binding. Stage A
-    #   cannot substitute: D379 §5 says explicitly that NOT every Stage-A
-    #   member must load in every process, so a shortened population is not
-    #   distinguishable from a legitimately smaller one by comparison
-    #   against Stage A alone.
-    #
-    #   That makes Q1a-7 a CLI CONTRACT QUESTION, not an implementation
-    #   choice. Returned rather than proxied.
-    d379_returned(
-        "Q1a-7",
-        clause="D379 §8 member deleted from OUTPUT provenance, independent "
-               "runtime binding unchanged",
-        why="the banked subject requires an INDEPENDENT anchor, and the "
-            "shipped qualifier is given none. Any check I could write "
-            "today would compare the tampered object with itself, which is "
-            "the proxy just removed.",
-        requirement=[
-            "PRECISE INTERFACE REQUIREMENT, for Kai's decision:",
-            "",
-            "  qualify.py would need a fourth input --",
-            "      --stage-b <path to the external Stage-B binding set>",
-            "  each entry being the D379 §4 binding:",
-            "      {artifact_path, artifact_sha256, artifact_kind,",
-            "       stage_a_identity, producer_component,",
-            "       producer_provenance_digest}",
-            "",
-            "  and criterion [7] would additionally verify:",
-            "    1. artifact_sha256 == sha256(the exact result bytes read)",
-            "    2. producer_provenance_digest ==",
-            "         provenance_digest(result.producer_provenance)",
-            "    3. stage_a_identity == the supplied Stage-A identity",
-            "",
-            "  (2) is the anchor: it detects a SELF-CONSISTENT deletion,",
-            "  which no comparison against Stage A can detect, because",
-            "  D379 §5 permits a process to load fewer members than",
-            "  Stage A enumerates.",
-            "",
-            "  COST/RISK: this WIDENS A PRODUCTION CLI CONTRACT. It also",
-            "  requires the binding to be produced and carried for real",
-            "  candidates, which touches the Stage-B pipeline. NOT DONE.",
-            "  Authorisation withheld pending Kai.",
-        ])
+    #   CONSTRUCTION, exactly as banked:
+    #     1. a clean CLASSIFICATION result, provenance valid under Stage A;
+    #     2. the INDEPENDENT binding captured FIRST: stage_identity.
+    #        stage_b_binding() over the finished clean artefact, written to
+    #        its own file. It carries producer_provenance_digest of the
+    #        ORIGINAL provenance, and it is not touched again;
+    #     3. AFTER production, one governed member deleted from the output
+    #        provenance AND the denominator decremented with it. That is the
+    #        SELF-CONSISTENT tamper -- the one an in-object check cannot
+    #        see, and the reason the banked case says "independently".
+    #   The tampered result is handed to the real qualify.py. D379 expects
+    #   REFUSE.
+    import copy as _copy
+    _q7dir = f["dir"] / "q1a7"
+    _q7dir.mkdir(exist_ok=True)
+    _q7desc = json.loads(f["stage_a"].read_bytes())
+    _q7clean = json.loads(f["result"].read_bytes())
+    _q7orig = _copy.deepcopy(_q7clean["producer_provenance"])
+    (_q7dir / "result_clean.json").write_text(json.dumps(_q7clean))
+    _q7bind = SI.stage_b_binding(
+        _q7dir / "result_clean.json", artifact_kind="CLASSIFICATION",
+        identity=SI.stage_a_identity(_q7desc),
+        producer_component="CLASSIFICATION",
+        producer_provenance_digest=SI.provenance_digest(_q7orig))
+    (_q7dir / "stage_b_binding.json").write_text(json.dumps(_q7bind))
+    _q7t = _copy.deepcopy(_q7clean)
+    _q7removed = _q7t["producer_provenance"]["producer_population"].pop()
+    _q7t["producer_provenance"]["producer_denominator"] = len(
+        _q7t["producer_provenance"]["producer_population"])
+    (_q7dir / "result_tampered.json").write_text(json.dumps(_q7t))
+    _q7tp = _q7t["producer_provenance"]
+    # the tamper must be INVISIBLE to the in-object verifier, or this is
+    # not the self-consistent case -- run the governed verifier and record
+    # its actual outcome rather than assuming it
+    try:
+        SI.verify_provenance(_q7tp, _q7desc)
+        _q7_inobject = "ACCEPTED"
+    except SI.StageIdentityError as _e:
+        _q7_inobject = "REFUSED: " + str(_e)[:120]
+    import subprocess as _sp
+    _q7help = _sp.run([sys.executable, str(V / "qualify.py"), "--help"],
+                      capture_output=True, text=True).stdout
+    d379_case("Q1a-7", clause="D379 §8 member deleted from OUTPUT provenance, "
+                              "independent binding unchanged",
+              subject_proof={
+                  "original_population": sorted(
+                      m["identity"] for m in _q7orig["producer_population"]),
+                  "tampered_population": sorted(
+                      m["identity"] for m in _q7tp["producer_population"]),
+                  "original_denominator": _q7orig["producer_denominator"],
+                  "tampered_denominator": _q7tp["producer_denominator"],
+                  "binding_file": str(_q7dir / "stage_b_binding.json"),
+                  "binding_producer_provenance_digest":
+                      json.loads((_q7dir / "stage_b_binding.json")
+                                 .read_bytes())["producer_provenance_digest"],
+                  "digest_of_original_provenance":
+                      SI.provenance_digest(_q7orig),
+                  "digest_of_tampered_provenance":
+                      SI.provenance_digest(_q7tp),
+                  "in_object_verifier_on_tampered": _q7_inobject,
+                  "qualifier_cli_flags": sorted(set(
+                      w.strip("[],") for w in _q7help.split()
+                      if w.strip("[],").startswith("--")))},
+              subject_holds=lambda pr: (
+                  # exactly one member removed ...
+                  len(pr["original_population"])
+                  - len(pr["tampered_population"]) == 1
+                  and set(pr["tampered_population"])
+                  < set(pr["original_population"])
+                  # ... SELF-CONSISTENTLY ...
+                  and pr["tampered_denominator"]
+                  == len(pr["tampered_population"])
+                  # ... so the in-object check really cannot see it ...
+                  and pr["in_object_verifier_on_tampered"] == "ACCEPTED"
+                  # ... while the INDEPENDENT binding still carries the
+                  # original, and disagrees with what is now recorded
+                  and pr["binding_producer_provenance_digest"]
+                  == pr["digest_of_original_provenance"]
+                  != pr["digest_of_tampered_provenance"]),
+              executable=V / "qualify.py",
+              argv=qargv(_q7dir / "result_tampered.json"),
+              intended_reason="does not match the bound producer population",
+              expect_class="REFUSE")
+    # WHAT IS KNOWN WITHOUT BEING PREDICTED. The binding exists on disk and
+    # disagrees with the tampered provenance. The shipped qualifier's own
+    # --help lists the flags it accepts, and none carries a Stage-B
+    # binding; so whatever the run's first-effective outcome is, there is
+    # no input path by which the independent anchor can reach it. That is
+    # a PRODUCT gap. Its remedy -- a Stage-B input to the qualifier --
+    # widens a production CLI contract and is Kai's decision; NOT done.
+    _q7rec = CASES[-1]
+    _q7flags = _q7rec["subject_proof"]["qualifier_cli_flags"]
+    _q7anchor = [x for x in _q7flags if "stage-b" in x or "binding" in x]
+    print(f"               qualifier --help flags ({len(_q7flags)}): {_q7flags}")
+    print(f"               flags that could carry a Stage-B binding: "
+          f"{_q7anchor or 'NONE'}")
+    check("Q1a-7 product gap: the shipped qualifier exposes an input path "
+          "for the independent Stage-B anchor", bool(_q7anchor),
+          f"of {len(_q7flags)} flags {_q7flags}, none names stage-b or a "
+          f"binding. The anchor exists on disk and cannot reach the "
+          f"qualifier. Remedy widens a production CLI contract: Kai's call.")
 
     # Q1b-1..6 · the derived-denominator family.
     #
@@ -2426,13 +2493,15 @@ print('SEED MOVED WITH EVIDENCE'); sys.exit(1)
     held = [c for c in CASES if c["verdict"] == "HELD"]
     passed = [c for c in CASES if c["verdict"] == "PASS"]
     failed = [c for c in CASES if c["verdict"] == "FAIL"]
-    fixture = [c for c in CASES if c["verdict"] == "FIXTURE"]
+    control = [c for c in failed if c["why"].startswith("CONTROL FAILURE")]
     print(f"\n    executable-bound cases  {len(CASES)}"
           f"   PASS {len(passed)}   FAIL {len(failed)}   HELD {len(held)}"
-          f"   FIXTURE {len(fixture)}")
+          f"   (of FAIL: {len(control)} CONTROL FAILURE)")
     print("    (HELD is not a pass and not a skip: it fails the gate and")
-    print("     names the predicate that could not be measured. FIXTURE is")
-    print("     worse than either — the banked subject was never built.)")
+    print("     names the predicate that could not be measured. A CONTROL")
+    print("     FAILURE is a FAIL whose reason is that the banked subject")
+    print("     was never built -- a FAIL, described, not a fourth status.")
+    print("     Verdict vocabulary: " + " / ".join(VERDICTS) + " (closed).)")
     print()
 
 
@@ -3557,25 +3626,44 @@ def run_governed_child(*, executable=None, argv=(), snippet=None, cwd=None,
     return pr.stdout + pr.stderr, pr.returncode
 
 
-def d379_returned(case_id, *, clause, why, requirement):
-    """A banked case whose subject CANNOT be constructed without a decision
-    that is not mine to take.
+# ── THE VERDICT VOCABULARY IS CLOSED, AND IT IS NOT MINE ─────────────
+#
+# PASS / FAIL / HELD. HELD is banked (D385, D386: a limb that cannot
+# execute on a named unmet prerequisite). Nothing else is.
+#
+# I added two more. FIXTURE turned Kai's directive -- "CONTROL / FIXTURE
+# FAILURE: not PASS, not HELD" -- into a fourth status, when the directive
+# already said which of the three it was. RETURNED I invented outright in
+# 86ebfde, with no authority, to label Q1a-7 -- and the label hid the
+# worse error underneath it: I called Q1a-7's subject "not constructible"
+# when the subject is perfectly constructible and what is missing is the
+# PRODUCT's ability to detect it. An invented status is where a product
+# gap goes to be renamed as an unmeasured test.
+#
+# So the set is a constant, every recorded verdict is checked against it,
+# and anything else is a crash rather than a judgement call. Calibrated in
+# main(): an out-of-vocabulary verdict must raise, an in-vocabulary one
+# must not.
+VERDICTS = ("PASS", "FAIL", "HELD")
 
-    This is not a HELD (no blocker decided a run -- no run was authorised)
-    and not a FIXTURE (nothing was built wrong). It is a case STOPPED at
-    the boundary of my authority, and it FAILS the gate, because a banked
-    case that was never measured must not read as one that was.
-    """
-    rec = {"case": case_id, "clause": clause, "verdict": "RETURNED",
-           "subject_proof": {"returned_to": "KAI", "reason": why},
-           "rc": None, "why": why, "requirement": requirement}
+
+class VerdictVocabularyError(AssertionError):
+    """A verdict outside the contract's closed set. Never caught."""
+
+
+def assert_verdict(v):
+    if v not in VERDICTS:
+        raise VerdictVocabularyError(
+            f"verdict {v!r} is not in the closed vocabulary {VERDICTS}. "
+            f"A status the contract does not define is a programme "
+            f"nonconformance, not a reporting choice.")
+    return v
+
+
+def record_case(rec):
+    """The ONLY way a case enters CASES."""
+    assert_verdict(rec["verdict"])
     CASES.append(rec)
-    print(f"    {case_id:<8} -> RETURNED TO KAI (subject not constructible "
-          f"under the current contract)")
-    print(f"               {why}")
-    for line in requirement:
-        print(f"               | {line}")
-    check(f"{case_id} ({clause}) verdict PASS", False, "RETURNED: " + why)
     return rec
 
 
@@ -3590,8 +3678,8 @@ def d379_case(case_id, *, clause, subject_proof, subject_holds,
     free `hostile_subject_established = YES` would become the next proxy:
     it would prove nothing except that the harness printed it.
 
-    If the raw proof is absent or contradictory the verdict is FIXTURE —
-    a CONTROL/FIXTURE FAILURE. It is NOT a PASS, and it is NOT a HELD on
+    If the raw proof is absent or contradictory the verdict is FAIL, and
+    its reason says CONTROL FAILURE. It is NOT a PASS, and it is NOT a HELD on
     the intended predicate: an unrelated INC-34 refusal does not excuse a
     failure to construct the hostile subject.
 
@@ -3618,14 +3706,15 @@ def d379_case(case_id, *, clause, subject_proof, subject_holds,
           f"{'YES' if subj_ok else 'NO'} — {subj_why}")
 
     if not subj_ok:
-        rec = {"case": case_id, "clause": clause, "verdict": "FIXTURE",
+        rec = {"case": case_id, "clause": clause, "verdict": "FAIL",
                "subject_proof": subject_proof, "rc": None,
-               "why": f"the hostile subject was NOT constructed: {subj_why}"}
-        CASES.append(rec)
-        print(f"    {case_id:<8} -> FIXTURE  (control/fixture failure; the "
+               "why": f"CONTROL FAILURE — the banked hostile subject was "
+                      f"NOT constructed: {subj_why}"}
+        record_case(rec)
+        print(f"    {case_id:<8} -> FAIL  (CONTROL FAILURE; the "
               f"banked condition was never built)")
         check(f"{case_id} ({clause}) verdict PASS", False,
-              "FIXTURE: " + rec["why"])
+              "FAIL: " + rec["why"])
         return rec
 
     out, rc = run_governed_child(executable=executable, argv=argv,
@@ -3678,7 +3767,7 @@ def d379_case(case_id, *, clause, subject_proof, subject_holds,
            "intended_observed": intended_seen, "earlier_blocker": blocker,
            "prerequisite_reached": reached, "verdict": verdict, "why": why,
            "evidence": out.strip().splitlines()[-1][:160] if out.strip() else ""}
-    CASES.append(rec)
+    record_case(rec)
     print(f"    {case_id:<8} rc={rc if rc is not None else '-':<3} "
           f"{disposition:<7} intended={'Y' if intended_seen else 'N'}  "
           f"blocker={'Y' if blocker else 'N'}  -> {verdict}")
@@ -3745,8 +3834,15 @@ def _render_closeout(state, ctl_rc, fx_rc, controls_path):
     """
     cases = state["cases"]
     by = lambda v: [c for c in cases if c["verdict"] == v]
-    P, F, H, X = by("PASS"), by("FAIL"), by("HELD"), by("FIXTURE")
-    RET = by("RETURNED")
+    P, F, H = by("PASS"), by("FAIL"), by("HELD")
+    X = [c for c in F if c["why"].startswith("CONTROL FAILURE")]
+    # the renderer refuses a state it cannot classify, rather than
+    # dropping it: every case must land in exactly one of the three
+    stray = [c for c in cases if c["verdict"] not in VERDICTS]
+    if stray or len(P) + len(F) + len(H) != len(cases):
+        raise VerdictVocabularyError(
+            f"close-out cannot be derived: {len(cases)} cases, "
+            f"{len(P)}+{len(F)}+{len(H)} classified, stray={stray[:3]}")
     raw = controls_path.read_bytes() if controls_path.is_file() else b""
     L = ["D379 / D381 / D382 TRANCHE — CLOSE-OUT",
          "EVIDENCE CLASS: PRODUCER MEASUREMENT - SIGHTED - ZERO ADMISSION "
@@ -3780,21 +3876,19 @@ def _render_closeout(state, ctl_rc, fx_rc, controls_path):
          "D379 §8 BANKED CASES — EACH AGAINST ITS OWN CONSTRUCTED SUBJECT",
          "=" * 70,
          f"  cases {len(cases)}   PASS {len(P)}   FAIL {len(F)}   "
-         f"HELD {len(H)}   FIXTURE {len(X)}   RETURNED {len(RET)}",
+         f"HELD {len(H)}   (of FAIL: {len(X)} CONTROL FAILURE)",
+         f"  verdict vocabulary {' / '.join(VERDICTS)} — closed; any other "
+         f"value raises",
          "",
          "  STEP 1 OF EVERY CASE IS RAW EVIDENCE, NOT A FLAG. Each case",
          "  carries the measured facts that establish its hostile subject,",
          "  and the harness DERIVES whether the subject holds. A case whose",
-         "  proof does not derive is FIXTURE — a control failure. It is not",
+         "  proof does not derive is a FAIL whose reason is CONTROL FAILURE. It is not",
          "  a PASS, and it is not a HELD on the intended predicate.",
          ""]
-    for c in RET:
-        L += ["", "  RETURNED TO KAI — " + c["case"] + ": " + c["clause"],
-              "    " + c["why"], ""]
-        L += ["    " + x for x in c.get("requirement", [])]
-        L += [""]
     if X:
-        L += ["  FIXTURE — THE BANKED SUBJECT WAS NEVER CONSTRUCTED:"]
+        L += ["  FAIL / CONTROL FAILURE — THE BANKED SUBJECT WAS NEVER "
+              "CONSTRUCTED:"]
         L += [f"    {c['case']:<8} {c['why']}" for c in X]
         L += [""]
     if P:
