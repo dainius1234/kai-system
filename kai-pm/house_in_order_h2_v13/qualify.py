@@ -239,7 +239,18 @@ def classify_loaded_origin(name, mod, *, stage_h2, manifest, desc,
                 f"REFUSE: loaded H2 source {rel} byte mismatch against "
                 f"Stage A: {digest} != {stage_h2[rel]}")
         declared = manifest.get(fp.name)
-        if declared is not None and declared != digest:
+        # D379 §8 case 86-6 -- "manifest omits a module that was loaded:
+        # FAIL". The guard below was `declared is not None`, so an OMITTED
+        # entry was the one manifest defect that passed silently: the
+        # check only ever fired on a DISAGREEMENT, never on an absence. A
+        # fail-closed identity criterion cannot treat "the manifest says
+        # nothing about this module" as "the manifest agrees".
+        if declared is None:
+            raise QualifierIdentityError(
+                f"REFUSE: the H2 manifest OMITS {fp.name}, which this "
+                f"qualifier process actually loaded ({rel}). An omitted "
+                f"entry is not agreement; §8(6) is fail-closed.")
+        if declared != digest:
             raise QualifierIdentityError(
                 f"REFUSE: the H2 manifest and Stage-A h2_sources DISAGREE "
                 f"about {rel}: {declared} != {digest}")
@@ -402,7 +413,16 @@ def main():
     else:
         try:
             desc = _load_stage_a(a.stage_a)
-            ident, _seen = SI_verify(prov, desc)
+            # The qualifier holds the RESULT and the DESCRIPTOR. It
+            # does not hold the Pass-A artefact, so the two
+            # byte-derived input_binding fields cannot be
+            # established here. They are NAMED, never skipped: an
+            # unstated gap reads exactly like a verified field.
+            ident, _seen, _unv = SI_verify(prov, desc)
+            for _f in sorted(_unv):
+                print(f'      NOT MECHANICALLY VERIFIED HERE: {_f} '
+                      f'(requires the exact Pass-A bytes; this '
+                      f'qualifier is not given them)')
             print(f"      verified against stage_a_identity {ident[:16]}…")
         except Exception as e:                        # noqa: BLE001
             print(f"      {str(e)[:150]}")

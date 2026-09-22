@@ -309,7 +309,8 @@ def evidence_facts(row, claims, contradiction, determining=(),
     return f, ac, traces, abstained
 
 
-def _classification_provenance(stage_a_path, repo_root, pa, pa_sha):
+def _classification_provenance(stage_a_path, repo_root, pa, pa_sha,
+                               pa_bytes):
     """D379 §4 CLASSIFICATION in-band provenance + input_binding.
 
     Consumes stage_identity.py. Defines no identity of its own. REFUSES on
@@ -342,7 +343,11 @@ def _classification_provenance(stage_a_path, repo_root, pa, pa_sha):
     # byte-wrong. The existing authority does this; no second verifier is
     # authored here.
     try:
-        SI.verify_provenance(pprov, desc)
+        # THE EXACT BYTES THAT WERE PARSED. `pa` came from json.loads of
+        # these same bytes (read-once binding), so the digest verified here
+        # is the digest of what actually became the input -- not of a
+        # second read that might differ.
+        SI.verify_provenance(pprov, desc, pass_a_bytes=pa_bytes)
     except SI.StageIdentityError as e:
         raise SystemExit(f"REFUSE: Pass-A producer provenance does not "
                          f"verify against Stage A: {e}")
@@ -350,12 +355,15 @@ def _classification_provenance(stage_a_path, repo_root, pa, pa_sha):
     # D379 DEP-3 — observe this producer's runtime, do not copy the
     # expected value out of the descriptor.
     observed_runtime = SI.verify_runtime_identity(desc)
-    members, offenders = SI.producer_population(repo_root)
-    if offenders:
-        raise SystemExit(
-            "REFUSE: the classification runtime population contains "
-            "ungoverned origins: "
-            + "; ".join(f"{n}: {str(w)[:90]}" for n, w in offenders[:4]))
+    # D379 Q1a-3. This producer must verify ITS OWN executing bytes against
+    # Stage A, exactly as the Pass-A producer does. It previously only
+    # collected the population and refused on unclassifiable origins, so a
+    # changed classification-producer byte was recorded faithfully and
+    # accepted -- the banked refusal had no implementation here.
+    try:
+        members = SI.check_population(repo_root, desc, "classification")
+    except SI.StageIdentityError as e:
+        raise SystemExit(str(e))
 
     return {
         "stage_a_identity": ident,
@@ -395,7 +403,7 @@ def main():
     _pa_sha = hashlib.sha256(_pa_bytes).hexdigest()
     pa = json.loads(_pa_bytes.decode("utf-8"))
     _cls_prov = _classification_provenance(a.stage_a, pathlib.Path(
-        a.subject_repo), pa, _pa_sha)
+        a.subject_repo), pa, _pa_sha, _pa_bytes)
     sr = pathlib.Path(a.subject_repo)
     head = passa.git(sr, "rev-parse", "HEAD").stdout.strip()
     if head != pa["subject"]:

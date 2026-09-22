@@ -648,6 +648,45 @@ def producer_population(repo_root):
     return members, offenders
 
 
+def check_population(repo_root, descriptor, when="production"):
+    """Observe this process's population and verify it against Stage A.
+
+    ONE AUTHORITY, BOTH PRODUCERS. This check previously existed only as a
+    private helper inside passa.py, so the Pass-A producer verified its own
+    executing bytes and the CLASSIFICATION producer did NOT: it observed
+    its population, recorded it, and never compared a single digest against
+    the descriptor. D379 Q1a-3 -- "one governed classification-producer byte
+    changed after Stage A fixed -> classification production REFUSES" -- had
+    no implementation in the shipped executable at all.
+
+    That is INC-38's shape a second time: correct logic reachable in one
+    place while the real program walks around it. The remedy is not a copy
+    in the other producer; it is one authority that both consume.
+
+    Returns the observed members. Raises StageIdentityError to REFUSE.
+    """
+    members, offenders = producer_population(repo_root)
+    if offenders:
+        raise StageIdentityError(
+            f"REFUSE ({when}): the producer runtime population contains "
+            f"origins outside every governed Stage-A root, with no Stage-A "
+            f"dependency identity: "
+            + "; ".join(f"{n}: {str(w)[:90]}" for n, w in offenders[:4]))
+    stage_h2 = {m["path"]: m["sha256"] for m in descriptor["h2_sources"]}
+    for cls, identity, digest in members:
+        if cls != CLASS_H2:
+            continue
+        if identity not in stage_h2:
+            raise StageIdentityError(
+                f"REFUSE ({when}): loaded H2 source {identity} is NOT "
+                f"represented in Stage A. No silent runtime expansion.")
+        if digest != stage_h2[identity]:
+            raise StageIdentityError(
+                f"REFUSE ({when}): loaded H2 source {identity} byte mismatch "
+                f"against Stage A: {digest} != {stage_h2[identity]}")
+    return members
+
+
 # ── Stage-B: EXTERNAL binding on FINAL bytes (D379 §4) ────────────────
 def stage_b_binding(artifact_path, *, artifact_kind, identity,
                     producer_component, producer_provenance_digest):
@@ -689,27 +728,111 @@ if __name__ == "__main__":
 # this verifies a RECORDED provenance block against the Stage-A identity
 # it claims, and it deliberately does NOT consult today's sys.modules,
 # because today's module state cannot establish yesterday's producer bytes.
-def verify_provenance(recorded, descriptor):
+# D379 §4 names the canonical in-band block EXACTLY, and it names a
+# DIFFERENT field set per component. A verifier that accepts either shape
+# accepts a PASS_A block emitted by classification, and a classification
+# block with no input_binding at all.
+_PROV_COMMON = ("stage_a_identity", "stage_a_descriptor_digest",
+                "producer_component", "producer_population",
+                "producer_denominator", "runtime_identity",
+                "subject_commit", "subject_tree", "tree_paths_identity")
+PROV_SHAPE = {
+    "PASS_A": _PROV_COMMON + ("census_identity", "history_source_identity"),
+    "CLASSIFICATION": _PROV_COMMON + ("input_binding",),
+}
+INPUT_BINDING_FIELDS = ("pass_a_artifact_sha256", "pass_a_stage_a_identity",
+                        "pass_a_producer_provenance_digest")
+
+
+def provenance_digest(prov):
+    """Canonical digest of an in-band provenance block (D379 §4)."""
+    return sha256_hex(_jcs(prov))
+
+
+def _prov_comparators(descriptor):
+    """The AUTHORITATIVE expected value of every mechanically verifiable
+    D379 §4 field, derived from the Stage-A descriptor — never from the
+    provenance block being verified."""
+    return {
+        "stage_a_identity": stage_a_identity(descriptor),
+        "stage_a_descriptor_digest": stage_a_descriptor_digest(descriptor),
+        "runtime_identity": descriptor.get("runtime"),
+        "subject_commit": descriptor["subject"]["commit"],
+        "subject_tree": descriptor["subject"]["tree"],
+        "tree_paths_identity":
+            descriptor["tree_paths"]["tree_paths_identity"],
+        "census_identity": descriptor["census"]["aggregate_sha256"],
+        "history_source_identity":
+            descriptor["history"]["reachable_set_sha256"],
+    }
+
+
+def verify_provenance(recorded, descriptor, *, pass_a_bytes=None,
+                      artifact_bytes=None):
     """Verify a RECORDED producer provenance against Stage A, or REFUSE.
 
-    `recorded` is the D379 §4 in-band block the producer wrote:
-        {stage_a_identity, producer_population: [{class, identity, sha256}],
-         runtime_identity, ...}
+    FULL D379 §4, NOT A PREFIX OF IT. The previous implementation verified
+    `stage_a_identity` and `producer_population` and returned success — so
+    a block whose `subject_commit`, `runtime_identity`, `census_identity`,
+    `tree_paths_identity` or `producer_denominator` were wrong verified
+    CLEAN. Two of eleven fields checked is not "provenance verified"; it is
+    a narrower check wearing a wider name (R5).
 
-    ONE CANONICAL SCHEMA. This verifier previously read `members` while
-    D379 §4 names `producer_population`, so a genuinely produced provenance
-    object could not pass its own verifier. Reconciled to the D379 name; a
-    second duplicate field was NOT added to satisfy the older helper.
+    FAIL CLOSED ON SHAPE. The accepted field set is COMPONENT-SPECIFIC and
+    compared for EXACT EQUALITY: a missing field REFUSES, and so does an
+    unexpected one, because an unexpected field is either a schema drift
+    nobody governed or a place to hide a self-output digest.
+
+    Returns (stage_a_identity, verified_h2_identities, unverified_fields).
+    `unverified_fields` is NEVER empty-by-assumption: it names every field
+    this call could not establish against an authority, so a caller cannot
+    mistake a partial verification for a complete one (R17).
     """
     ident = stage_a_identity(descriptor)
     if not isinstance(recorded, dict):
         raise StageIdentityError("REFUSE: provenance is not an object")
-    if recorded.get("stage_a_identity") != ident:
+
+    comp = recorded.get("producer_component")
+    if comp not in PROV_SHAPE:
         raise StageIdentityError(
-            f"REFUSE: recorded stage_a_identity "
-            f"{recorded.get('stage_a_identity')} does not match the Stage-A "
-            f"descriptor it claims ({ident}). Stale input, or a tampered "
-            f"identity — either way the result is not accepted.")
+            f"REFUSE: producer_component {comp!r} is not one of the D379 §4 "
+            f"governed components {sorted(PROV_SHAPE)}. An unrecognised "
+            f"component has no governed field set to verify against.")
+    expect_fields = set(PROV_SHAPE[comp])
+    got = set(recorded)
+    if got != expect_fields:
+        raise StageIdentityError(
+            f"REFUSE: {comp} provenance does not carry the D379 §4 field "
+            f"set. missing={sorted(expect_fields - got)} "
+            f"unexpected={sorted(got - expect_fields)}")
+
+    # ── D379 §4: NO SELF-OUTPUT DIGEST IN EITHER ──────────────────────
+    # BEFORE the value comparators. A planted self-digest necessarily
+    # makes some field diverge from Stage A, so a comparator running
+    # first reports a stale-field mismatch and the structural
+    # prohibition is never the reason given. Same red process, wrong
+    # predicate -- which is the defect this tranche exists to remove.
+    if artifact_bytes is not None:
+        own = sha256_hex(artifact_bytes)
+        hit = [k for k, v in recorded.items()
+               if isinstance(v, str) and v == own]
+        if hit:
+            raise StageIdentityError(
+                f"REFUSE AS INVALID IDENTITY CONSTRUCTION: the in-band "
+                f"provenance declares the artefact's own whole-file digest "
+                f"in {hit}. D379 §4 — no self-output digest, no fixed-point "
+                f"hash.")
+    # ── every field with an authoritative comparator, mechanically ────
+    cmps = _prov_comparators(descriptor)
+    for field in sorted(expect_fields & set(cmps)):
+        if recorded[field] != cmps[field]:
+            raise StageIdentityError(
+                f"REFUSE: {comp} provenance field {field!r} does not match "
+                f"the Stage-A descriptor it claims. recorded="
+                f"{str(recorded[field])[:80]!r} "
+                f"stage_a={str(cmps[field])[:80]!r}")
+
+    # ── producer_population, member by member ─────────────────────────
     stage_h2 = {m["path"]: m["sha256"] for m in descriptor["h2_sources"]}
     members = recorded.get("producer_population")
     if not isinstance(members, list) or not members:
@@ -717,7 +840,7 @@ def verify_provenance(recorded, descriptor):
             "REFUSE: provenance records no producer_population member")
     seen = set()
     for m in members:
-        if set(m) != {"class", "identity", "sha256"}:
+        if not isinstance(m, dict) or set(m) != {"class", "identity", "sha256"}:
             raise StageIdentityError(f"REFUSE: malformed provenance member {m!r}")
         if m["class"] != CLASS_H2:
             continue
@@ -730,7 +853,51 @@ def verify_provenance(recorded, descriptor):
                 f"REFUSE: provenance H2 member {m['identity']} byte mismatch "
                 f"against Stage A.")
         seen.add(m["identity"])
-    return ident, seen
+
+    if recorded["producer_denominator"] != len(members):
+        raise StageIdentityError(
+            f"REFUSE: producer_denominator {recorded['producer_denominator']} "
+            f"does not equal the recorded producer_population size "
+            f"{len(members)}. A denominator that does not count its own "
+            f"population is not a denominator (R5).")
+
+    unverified = set()
+    if comp == "CLASSIFICATION":
+        ib = recorded["input_binding"]
+        if not isinstance(ib, dict) or set(ib) != set(INPUT_BINDING_FIELDS):
+            raise StageIdentityError(
+                f"REFUSE: classification input_binding does not carry the "
+                f"D379 §4 field set {list(INPUT_BINDING_FIELDS)}; got "
+                f"{sorted(ib) if isinstance(ib, dict) else type(ib).__name__}")
+        if ib["pass_a_stage_a_identity"] != ident:
+            raise StageIdentityError(
+                f"REFUSE: input_binding.pass_a_stage_a_identity does not "
+                f"match the Stage-A identity. Stale input across two "
+                f"Stage As.")
+        # THE EXACT BYTES, OR NAMED AS UNVERIFIED. These two fields are
+        # derived from the Pass-A artefact, not from Stage A, so a caller
+        # holding only the descriptor CANNOT establish them. Saying so is
+        # the whole point: a silent skip here is indistinguishable from a
+        # verified field.
+        if pass_a_bytes is None:
+            unverified |= {"input_binding.pass_a_artifact_sha256",
+                           "input_binding.pass_a_producer_provenance_digest"}
+        else:
+            actual = sha256_hex(pass_a_bytes)
+            if ib["pass_a_artifact_sha256"] != actual:
+                raise StageIdentityError(
+                    f"REFUSE: input_binding.pass_a_artifact_sha256 "
+                    f"{ib['pass_a_artifact_sha256']} is not the digest of "
+                    f"the exact Pass-A bytes consumed ({actual}).")
+            pp = json.loads(pass_a_bytes.decode("utf-8")).get(
+                "producer_provenance")
+            if pp is None or ib["pass_a_producer_provenance_digest"] !=                     provenance_digest(pp):
+                raise StageIdentityError(
+                    "REFUSE: input_binding.pass_a_producer_provenance_digest "
+                    "is not the canonical digest of the provenance block "
+                    "inside the exact Pass-A bytes consumed.")
+
+    return ident, seen, unverified
 
 
 def verify_runtime_identity(descriptor):

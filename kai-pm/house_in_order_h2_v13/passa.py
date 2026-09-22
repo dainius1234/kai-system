@@ -1115,29 +1115,13 @@ def _load_and_authorise(stage_a_path, repo_root):
 
 
 def _check_population(SI, desc, repo_root, when):
-    """The closed population check, applied at BOTH moments."""
-    members, offenders = SI.producer_population(repo_root)
-    if offenders:
-        raise SystemExit(
-            f"REFUSE ({when}): the producer runtime population contains "
-            f"origins outside every governed Stage-A root, with no Stage-A "
-            f"dependency identity: "
-            + "; ".join(f"{n}: {str(w)[:90]}" for n, w in offenders[:4]))
-
-    stage_h2 = {m["path"]: m["sha256"] for m in desc["h2_sources"]}
-    for cls, identity, digest in members:
-        if cls != SI.CLASS_H2:
-            continue
-        if identity not in stage_h2:
-            raise SystemExit(
-                f"REFUSE: loaded H2 source {identity} is NOT represented in "
-                f"Stage A. No silent runtime expansion.")
-        if digest != stage_h2[identity]:
-            raise SystemExit(
-                f"REFUSE: loaded H2 source {identity} byte mismatch against "
-                f"Stage A: {digest} != {stage_h2[identity]}")
-
-    return members
+    """Delegate to the ONE authority. Kept as a named local seam so the
+    call sites and their `when` labels read unchanged; the policy itself
+    is not defined here and is not duplicated here."""
+    try:
+        return SI.check_population(repo_root, desc, when)
+    except SI.StageIdentityError as e:
+        raise SystemExit(str(e))
 
 
 def _producer_provenance(desc, repo_root):
