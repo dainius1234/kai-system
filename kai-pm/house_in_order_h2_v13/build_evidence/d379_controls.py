@@ -837,21 +837,10 @@ def exec_fixtures():
     (d / "stage_a_other.json").write_text(json.dumps(other))
     _FIX["stage_a_other"] = d / "stage_a_other.json"
 
-    # a synthetic Pass-A artefact carrying in-band provenance
-    prov = {"stage_a_identity": _FIX["stage_a_identity"],
-            "stage_a_descriptor_digest": SI.stage_a_descriptor_digest(desc),
-            "producer_component": "PASS_A",
-            "producer_population": [{"class": SI.CLASS_H2,
-                                     "identity": m["path"],
-                                     "sha256": m["sha256"]}
-                                    for m in desc["h2_sources"]],
-            "producer_denominator": len(desc["h2_sources"]),
-            "runtime_identity": desc["runtime"],
-            "subject_commit": desc["subject"]["commit"],
-            "subject_tree": desc["subject"]["tree"],
-            "tree_paths_identity": desc["tree_paths"]["tree_paths_identity"],
-            "census_identity": desc["census"]["aggregate_sha256"],
-            "history_source_identity": desc["history"]["reachable_set_sha256"]}
+    # a synthetic Pass-A artefact carrying in-band provenance, built by the
+    # SAME builder every other fixture uses, so no fixture can drift from
+    # the D379 §4 field set on its own
+    prov = _prov_block(SI, desc, "PASS_A")
     passa_doc = {"subject": desc["subject"]["commit"],
                  "subject_tree": desc["subject"]["tree"],
                  "history_identity": {}, "census_dependency": {},
@@ -859,11 +848,6 @@ def exec_fixtures():
     (d / "passA.json").write_text(json.dumps(passa_doc))
     _FIX["passa"] = d / "passA.json"
 
-    # the same Pass A with its recorded identity TAMPERED (Q1a-5)
-    bad = json.loads(json.dumps(passa_doc))
-    bad["producer_provenance"]["stage_a_identity"] = "0" * 64
-    (d / "passA_tampered.json").write_text(json.dumps(bad))
-    _FIX["passa_tampered"] = d / "passA_tampered.json"
 
     # A synthetic classification result in the REAL emitted schema. The
     # qualifier reads subject / subject_tree / history_identity /
@@ -883,12 +867,25 @@ def exec_fixtures():
                 "population": r["population"], "rows": r["rows"],
                 "producer_provenance": prov}
 
-    cls_prov = dict(prov, producer_component="CLASSIFICATION",
-                    input_binding={"pass_a_artifact_sha256": "0" * 64,
-                                   "pass_a_stage_a_identity":
-                                       _FIX["stage_a_identity"],
-                                   "pass_a_producer_provenance_digest":
-                                       "0" * 64})
+    # ROOT CAUSE OF A 10-FIXTURE DEFECT. This was
+    #     cls_prov = dict(prov, producer_component="CLASSIFICATION", ...)
+    # i.e. the PASS_A block RELABELLED -- so every CLASSIFICATION fixture
+    # carried census_identity and history_source_identity, which D379 §4
+    # does not give that component. Invalid since 56d2b89 made the verifier
+    # shape-strict, and invisible because every qualifier case is HELD on
+    # INC-34 at criterion [6], before [7] verifies provenance. Q1a-7's
+    # subject gate, which runs the verifier directly, is what exposed it.
+    #
+    # And input_binding was "0"*64 twice. Those fields are digests of the
+    # REAL Pass-A bytes, so they are computed from the real Pass-A bytes.
+    _pa_raw = _FIX["passa"].read_bytes()
+    cls_prov = _prov_block(
+        SI, desc, "CLASSIFICATION",
+        input_binding={
+            "pass_a_artifact_sha256": SI.sha256_hex(_pa_raw),
+            "pass_a_stage_a_identity": _FIX["stage_a_identity"],
+            "pass_a_producer_provenance_digest": SI.provenance_digest(
+                json.loads(_pa_raw)["producer_provenance"])})
     _FIX["result"] = d / "result.json"
     _FIX["result"].write_text(json.dumps(_result(_synthetic_result, cls_prov)))
 
@@ -959,13 +956,6 @@ def exec_fixtures():
         _FIX[key] = d / (key + ".json")
         _FIX[key].write_text(json.dumps(_result(fn, cls_prov)))
 
-    # Q1a-7: a governed member DELETED from the output provenance
-    short_prov = copy.deepcopy(cls_prov)
-    short_prov["producer_population"] = short_prov["producer_population"][:-1]
-    _FIX["result_short_prov"] = d / "result_short_prov.json"
-    _FIX["result_short_prov"].write_text(
-        json.dumps(_result(_synthetic_result, short_prov)))
-
     # ── SUBJECTS THAT MUST ACTUALLY BE BUILT ──────────────────────────
     # Everything below exists because a case id is not a subject. Six
     # cases previously shared ONE clean argv and differed only in the
@@ -993,38 +983,6 @@ def exec_fixtures():
                 "recorded": "f" * 64, "actual": actual}
 
     _FIX["byte_passa"] = _stage_a_wrong_byte("passa.py", "byte_passa")
-    _FIX["byte_classify"] = _stage_a_wrong_byte("classify.py", "byte_classify")
-
-    # Q1a-3 consumes a Pass A. If that Pass A is bound to the CLEAN Stage
-    # A, the stale-input predicate (Q1a-4) fires first and Q1a-3 is never
-    # reached -- the case would be red for the wrong reason. Its Pass A is
-    # therefore bound to the SAME wrong-byte descriptor.
-    def _passa_for(dsc, name):
-        pv = {"stage_a_identity": SI.stage_a_identity(dsc),
-              "stage_a_descriptor_digest": SI.stage_a_descriptor_digest(dsc),
-              "producer_component": "PASS_A",
-              "producer_population": [{"class": SI.CLASS_H2,
-                                       "identity": m["path"],
-                                       "sha256": m["sha256"]}
-                                      for m in dsc["h2_sources"]],
-              "producer_denominator": len(dsc["h2_sources"]),
-              "runtime_identity": dsc["runtime"],
-              "subject_commit": dsc["subject"]["commit"],
-              "subject_tree": dsc["subject"]["tree"],
-              "tree_paths_identity": dsc["tree_paths"]["tree_paths_identity"],
-              "census_identity": dsc["census"]["aggregate_sha256"],
-              "history_source_identity":
-                  dsc["history"]["reachable_set_sha256"]}
-        doc = {"subject": dsc["subject"]["commit"],
-               "subject_tree": dsc["subject"]["tree"],
-               "history_identity": {}, "census_dependency": {},
-               "population": 0, "rows": [], "producer_provenance": pv}
-        q = d / name
-        q.write_text(json.dumps(doc))
-        return q
-
-    _FIX["passa_byte_classify"] = _passa_for(
-        _FIX["byte_classify"]["desc"], "passA_byte_classify.json")
 
     # Q1a-6 / DEP-3 -- Stage A expects runtime identity A, the executing
     # interpreter presents B. Constructed by declaring a DIFFERENT stdlib
@@ -1037,20 +995,6 @@ def exec_fixtures():
     _FIX["stage_a_runtime_b"] = d / "stage_a_runtime_b.json"
     _FIX["runtime_expected"] = desc["runtime"]["stdlib_identity"]
     _FIX["runtime_other"] = rt["runtime"]["stdlib_identity"]
-
-    # Q1a-7 -- a member DELETED from the output provenance while the
-    # independently captured denominator is unchanged. Truncating both
-    # would be a self-consistent smaller population, which is a different
-    # subject: the banked one is a provenance that no longer matches the
-    # producer population it claims.
-    del_prov = copy.deepcopy(cls_prov)
-    _FIX["q1a7_removed"] = del_prov["producer_population"][-1]["identity"]
-    del_prov["producer_population"] = del_prov["producer_population"][:-1]
-    _FIX["q1a7_denominator"] = del_prov["producer_denominator"]
-    _FIX["q1a7_population"] = len(del_prov["producer_population"])
-    _FIX["result_member_deleted"] = d / "result_member_deleted.json"
-    _FIX["result_member_deleted"].write_text(
-        json.dumps(_result(_synthetic_result, del_prov)))
 
     # 86-6 -- a manifest that OMITS a module this qualifier actually loads.
     _FIX["omitted_module"] = "classify.py"
