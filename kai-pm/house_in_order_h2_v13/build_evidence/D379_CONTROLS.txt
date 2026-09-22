@@ -8,7 +8,7 @@ subprocess.CompletedProcess.returncode, read directly from the child
 that produced the output immediately above it. No shell status, no
 pipeline status, no parsed text, no supplied value.
 
-captured 2026-09-22T18:50:43.745174+00:00
+captured 2026-09-22T19:16:15.389865+00:00
 
 ======================================================================
 SUBJECT 1 of 2 — THE D379 CONTROL PROCESS
@@ -20,11 +20,11 @@ D379 HOSTILE CONTROLS — PRODUCER MEASUREMENT, SIGHTED,
 ======================================================================
 
 SUBJECT — the exact bytes measured
-  passa.py         33cba1c500091f61f3be76d20e00c5983a6a3d97f1b82cad1e3db949026ed497
+  passa.py         9d2788893765523367d7d4979ca831c3e48495c9c9ecf052baa62232e89985a6
   classify.py      226873676c2373faaf29f4709bb1bb62d1d22f3c56cbdc0e594314cb6e5df9e8
   envelope.py      fdcc1b73d7cd32e540c63ca926d5393901ea63b357fbf339819f07256e6a5a3f
-  run_h2_v12.py    e33446c351ce22f861c58aea6772417f8bedd993f1d7b6cebbf63def48037b36
-  qualify.py       118badb0abf01b616b18bc796fd6e607c2fdf1c0dcfaf9209a1baf6e67d04664
+  run_h2_v12.py    586f12de3f4ef05f3d865df4ed1ee6cd961ee3b854116338e54d43c48bbff139
+  qualify.py       f7ff84f6e6c0aa81e0c475b7ce66a7456a1d4c87669c124ea1d84f47c80a6485
   holdout.py       e9cd5f3874ba14c2c33166671da6b8cc65574a040e6b276c955cd9f0a49b1766
   cal_fixtures.py  4299bd58bd34705d044056d03901f3d674f09e2afde1fff5811a55dfca5f737b
   ontology.py      a92e68c7518578e177c6c67d95efdc1e8b4a92c4406aa2778678119babb721bc
@@ -178,7 +178,7 @@ STAGE_A — H2_STAGE_A_V2 governance and identity
   identity is constructed, and the canonical-runtime positive
   limb is HELD on INC-34 (see STDLIB).
 
-    synthetic V2 CALIBRATION stage_a_identity  1fd058f99a285049bb6a7535505a44473e66525f1450dcb15f8ddbc6d07a7c1d
+    synthetic V2 CALIBRATION stage_a_identity  6dc373c558e48e35379e2683862c9bcdbaba76d0a589fcc36ba84ac34d26ba0a
 
 I1A — the blind seed is the VALIDATED STAGE-A IDENTITY
 
@@ -234,116 +234,304 @@ STDLIB — governed Python runtime identity (D380 §7, D385)
 
 
 D379 §8 EXECUTABLE-BOUND EXECUTION — the real shipped CLIs
-  Each case: exact hostile subject, actual subprocess, rc from
-  CompletedProcess, actual reason, first-effective failure.
-  A red process without the intended subject AND the intended
-  reason earns no calibration claim.
+  Each case: CONSTRUCTED hostile subject proved from raw facts,
+  actual subprocess, rc from CompletedProcess, actual reason,
+  first-effective failure. A case name proves nothing.
 
   passa.py
-    Q1a-2        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
-                 an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
-    Q1a-8        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
-                 an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
-    DEP-1        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
-                 an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+    Q1a-1    SUBJECT PROOF (D379 §8 clean chain on one Stage A)
+               stage_a_recorded[passa.py]         9d27888937655233…
+               actual_sha256(passa.py)            9d27888937655233…
+               subject constructed?           YES — derived from the raw facts above
+    Q1a-1    rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+               the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+    Q1a-2    SUBJECT PROOF (D379 §8 Pass-A producer byte changed)
+               member                             kai-pm/house_in_order_h2_v13/passa.py
+               stage_a_records                    ffffffffffffffff…
+               bytes_on_disk                      9d27888937655233…
+               divergence                         True
+               subject constructed?           YES — derived from the raw facts above
+    Q1a-2    rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+               an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+    DEP-2    SUBJECT PROOF (D379 §8 ordinary stdlib under a governed interpreter)
+               stage_a_recorded[passa.py]         9d27888937655233…
+               actual_sha256(passa.py)            9d27888937655233…
+               stdlib_modules_loaded_sample       __future__,_bz2,_collections_abc
+               stdlib_in_stage_a_h2_sources       0
+               subject constructed?           YES — derived from the raw facts above
+    DEP-2    rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+               the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+    DEP-3    SUBJECT PROOF (D379 §8 runtime identity mismatch)
+               stage_a_expects_stdlib_identity    2222222222222222…
+               baseline_stage_a_stdlib_identity   1111111111111111…
+               divergence                         True
+               subject constructed?           YES — derived from the raw facts above
+    DEP-3    rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+               an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+    Q1a-8    SUBJECT PROOF (D379 §5 no silent runtime expansion)
+               omitted_from_descriptor            kai-pm/house_in_order_h2_v13/classify.py
+               module_is_loaded_in_child          classify (imported below)
+               resolved_path_under_h2_root        True
+               governed_target                    stage_identity.check_population
+               subject constructed?           YES — derived from the raw facts above
+    Q1a-8    rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+               an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+    DEP-1    SUBJECT PROOF (D379 §8 synthetic producer, external dep)
+               external_module_path               /tmp/d379_exec_m3nr37pu/ext_pkg/hostile_ext.py
+               file_exists                        True
+               under_h2_root                      False
+               under_census_root                  False
+               under_stdlib_prefix                False
+               governed_target                    stage_identity.producer_population
+               subject constructed?           YES — derived from the raw facts above
+    DEP-1    rc=1   REFUSE  intended=Y  blocker=Y  -> HELD
+               OVER-DETERMINED: the intended finding IS present and so is an independent blocker (lies outside the governed H2 root [INC-34 ungoverned runtime]); rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
   run_h2_v12.py
-    Q1a-4        rc=1   REFUSE  intended=Y  blocker=N  -> PASS
-    Q1a-9        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
-                 the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+    Q1a-3    SUBJECT PROOF (D379 §8 classification-producer byte changed)
+               member                             kai-pm/house_in_order_h2_v13/classify.py
+               stage_a_records                    ffffffffffffffff…
+               bytes_on_disk                      226873676c2373fa…
+               divergence                         True
+               pass_a_bound_to_same_stage_a       True
+               subject constructed?           YES — derived from the raw facts above
+    Q1a-3    rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+               an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+    Q1a-4    SUBJECT PROOF (D379 §4 stale input across two Stage As)
+               pass_a_recorded_identity           6dc373c558e48e35…
+               classification_given_identity      70ee2759bd4a2f82…
+               identities_differ                  True
+               subject constructed?           YES — derived from the raw facts above
+    Q1a-4    rc=1   REFUSE  intended=Y  blocker=N  -> PASS
+    Q1a-9    SUBJECT PROOF (D379 §4 self-hash prohibition (both limbs))
+               limb_a                             provenance declares sha256(its own artefact)
+               limb_b                             finalise -> hash final bytes -> Stage-B binding
+               planted_digest_is_artefact_digest  verified in child
+               governed_target                    stage_identity.verify_provenance + stage_b_binding
+               subject constructed?           YES — derived from the raw facts above
+    Q1a-9    rc=0   ACCEPT  intended=Y  blocker=N  -> PASS
   qualify.py
-    Q1a-5        rc=1   REFUSE  intended=Y  blocker=Y  -> HELD
-                 OVER-DETERMINED: the intended finding IS present in the output, but so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]), so rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
-    86-3         rc=2   REFUSE  intended=Y  blocker=N  -> PASS
-    Q1b-1        rc=1   REFUSE  intended=Y  blocker=Y  -> HELD
-                 the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
-    Q1b-2        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
-                 an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
-  holdout.py   (already CLI-wired; not redesigned)
-    I1B-2        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
-                 an earlier independent blocker decided the outcome: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
-    Q1a-1        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
-                 the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
-    Q1a-3        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
-                 an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
-    Q1a-6        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
-                 an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
-    Q1a-7        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
-                 an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
-    DEP-2        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
-                 the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
-    DEP-3        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
-                 an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
-    Q1b-3        rc=1   REFUSE  intended=Y  blocker=Y  -> HELD
-                 OVER-DETERMINED: the intended finding IS present in the output, but so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]), so rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
-    Q1b-4        rc=1   REFUSE  intended=Y  blocker=Y  -> HELD
-                 OVER-DETERMINED: the intended finding IS present in the output, but so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]), so rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
-    Q1b-5        rc=1   REFUSE  intended=Y  blocker=Y  -> HELD
-                 OVER-DETERMINED: the intended finding IS present in the output, but so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]), so rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
-    Q1b-6        rc=1   REFUSE  intended=Y  blocker=Y  -> HELD
-                 the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
-    86-1         rc=1   REFUSE  intended=Y  blocker=Y  -> HELD
-                 the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
-    86-4         rc=1   REFUSE  intended=Y  blocker=N  -> PASS
-    86-5         rc=1   REFUSE  intended=Y  blocker=N  -> PASS
-    I1B-1        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
-                 the governed positive cannot be measured while an independent blocker forces refusal: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
-    I1B-3        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
-                 an earlier independent blocker decided the outcome: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
-    I1B-4        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
-                 an earlier independent blocker decided the outcome: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
-    I1A-1        rc=1   REFUSE  intended=N  blocker=Y  -> HELD
-                 the governed positive cannot be measured while an independent blocker forces refusal: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+    Q1a-5    SUBJECT PROOF (D379 §8 tampered recorded Stage-A identity)
+               result_records_identity            0000000000000000…
+               stage_a_actual_identity            6dc373c558e48e35…
+               tampered                           True
+               subject constructed?           YES — derived from the raw facts above
+    Q1a-5    rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+               an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+    Q1a-6    SUBJECT PROOF (D379 §8 qualifier runtime differs)
+               stage_a_expects_stdlib_identity    2222222222222222…
+               baseline_stage_a_stdlib_identity   1111111111111111…
+               divergence                         True
+               provenance_valid_against_baseline  True
+               subject constructed?           YES — derived from the raw facts above
+    Q1a-6    rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+               an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+    Q1a-7    SUBJECT PROOF (D379 §8 member deleted from OUTPUT provenance)
+               member_removed                     kai-pm/house_in_order_h2_v13/subjectbind.py
+               recorded_population_size           9
+               recorded_denominator_unchanged     10
+               mismatch                           True
+               subject constructed?           YES — derived from the raw facts above
+    Q1a-7    rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+               an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+    Q1b-1    SUBJECT PROOF (D379 §8 Q1b derived denominator)
+               fixture                            result (clean)
+               construction                       clean complete result, nothing removed
+               differs_from_clean_result          False
+               rows                               3
+               subject constructed?           YES — derived from the raw facts above
+    Q1b-1    rc=1   REFUSE  intended=Y  blocker=Y  -> HELD
+               the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+    Q1b-2    SUBJECT PROOF (D379 §8 Q1b derived denominator)
+               fixture                            result_missing_trace
+               construction                       one positive evidence fact stripped of its trace
+               differs_from_clean_result          True
+               rows                               3
+               subject constructed?           YES — derived from the raw facts above
+    Q1b-2    rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+               an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+    Q1b-3    SUBJECT PROOF (D379 §8 Q1b derived denominator)
+               fixture                            result_q1b3
+               construction                       an axis-cell witness broken
+               differs_from_clean_result          True
+               rows                               3
+               subject constructed?           YES — derived from the raw facts above
+    Q1b-3    rc=1   REFUSE  intended=Y  blocker=Y  -> HELD
+               OVER-DETERMINED: the intended finding IS present and so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]); rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
+    Q1b-4    SUBJECT PROOF (D379 §8 Q1b derived denominator)
+               fixture                            result_q1b4
+               construction                       abstention list inconsistent with emitted positives
+               differs_from_clean_result          True
+               rows                               3
+               subject constructed?           YES — derived from the raw facts above
+    Q1b-4    rc=1   REFUSE  intended=Y  blocker=Y  -> HELD
+               OVER-DETERMINED: the intended finding IS present and so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]); rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
+    Q1b-5    SUBJECT PROOF (D379 §8 Q1b derived denominator)
+               fixture                            result_q1b5
+               construction                       a fact CLASS removed from the emitted set (the D17 lesson)
+               differs_from_clean_result          True
+               rows                               3
+               subject constructed?           YES — derived from the raw facts above
+    Q1b-5    rc=1   REFUSE  intended=Y  blocker=Y  -> HELD
+               OVER-DETERMINED: the intended finding IS present and so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]); rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
+    Q1b-6    SUBJECT PROOF (D379 §8 Q1b derived denominator)
+               fixture                            result_q1b6
+               construction                       opposite-side clean known-negative: all facts false, no traces
+               differs_from_clean_result          True
+               rows                               3
+               subject constructed?           YES — derived from the raw facts above
+    Q1b-6    rc=1   REFUSE  intended=Y  blocker=Y  -> HELD
+               the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+    86-1     SUBJECT PROOF (D367 §8(6) fail-closed qualifier identity)
+               manifest_supplied                  True
+               entries                            10
+               identity_matches_stage_a           True
+               subject constructed?           YES — derived from the raw facts above
+    86-1     rc=1   REFUSE  intended=Y  blocker=Y  -> HELD
+               the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+    86-3     SUBJECT PROOF (D367 §8(6) fail-closed qualifier identity)
+               manifest_argument_present          False
+               argv_contains__manifest            False
+               subject constructed?           YES — derived from the raw facts above
+    86-3     rc=2   REFUSE  intended=Y  blocker=N  -> PASS
+    86-4     SUBJECT PROOF (D367 §8(6) fail-closed qualifier identity)
+               manifest_path                      /nonexistent/MANIFEST.sha256
+               path_exists                        False
+               subject constructed?           YES — derived from the raw facts above
+    86-4     rc=1   REFUSE  intended=Y  blocker=N  -> PASS
+    86-5     SUBJECT PROOF (D367 §8(6) fail-closed qualifier identity)
+               manifest_path                      /tmp/d379_exec_m3nr37pu/EMPTY.sha256
+               path_exists                        True
+               byte_size                          0
+               subject constructed?           YES — derived from the raw facts above
+    86-5     rc=1   REFUSE  intended=Y  blocker=N  -> PASS
+    86-2     SUBJECT PROOF (D367 §8(6) fail-closed qualifier identity)
+               module                             envelope.py
+               manifest_declares                  eeeeeeeeeeeeeeee…
+               bytes_on_disk                      fdcc1b73d7cd32e5…
+               divergence                         True
+               module_is_loaded_by_qualifier      True
+               subject constructed?           YES — derived from the raw facts above
+    86-2     rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+               an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+    86-6     SUBJECT PROOF (D367 §8(6) fail-closed qualifier identity)
+               omitted_module                     classify.py
+               full_manifest_entries              10
+               omitting_manifest_entries          9
+               exactly_one_entry_removed          True
+               module_is_loaded_by_qualifier      True
+               subject constructed?           YES — derived from the raw facts above
+    86-6     rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+               an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  holdout.py
+    I1B-1    SUBJECT PROOF (D379 §7 I1-B tree/output reconciliation)
+               construction                       tree and output populations equal
+               tree_path_population               3
+               output_row_population              3
+               equal                              True
+               subject constructed?           YES — derived from the raw facts above
+    I1B-1    rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+               the governed positive cannot be measured while an independent blocker forces refusal: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+    I1B-2    SUBJECT PROOF (D379 §7 I1-B tree/output reconciliation)
+               construction                       drop one output row
+               tree_path_population               3
+               output_row_population              2
+               equal                              False
+               subject constructed?           YES — derived from the raw facts above
+    I1B-2    rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+               an earlier independent blocker decided the outcome: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+    I1B-3    SUBJECT PROOF (D379 §7 I1-B tree/output reconciliation)
+               construction                       add one tree path
+               tree_path_population               4
+               output_row_population              3
+               equal                              False
+               subject constructed?           YES — derived from the raw facts above
+    I1B-3    rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+               an earlier independent blocker decided the outcome: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+    I1B-4    SUBJECT PROOF (D379 §7 I1-B tree/output reconciliation)
+               construction                       duplicate one tree path
+               tree_path_population               4
+               output_row_population              3
+               equal                              False
+               subject constructed?           YES — derived from the raw facts above
+    I1B-4    rc=1   REFUSE  intended=N  blocker=Y  -> HELD
+               an earlier independent blocker decided the outcome: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+    I1A-1    SUBJECT PROOF (D379 §7 I1-A one member byte -> identity moves)
+               member                             kai-pm/house_in_order_h2_v13/passa.py
+               descriptor_A_records               6dc373c558e48e35…
+               descriptor_B_member_digest         ffffffffffffffff…
+               exactly_one_member_differs         True
+               governed_target                    stage_identity.stage_a_identity
+               subject constructed?           YES — derived from the raw facts above
+    I1A-1    rc=0   ACCEPT  intended=Y  blocker=N  -> PASS
+    I1A-2    SUBJECT PROOF (D379 §7 mutate evidence -> only Stage-B moves)
+               stage_a_held_constant              /tmp/d379_exec_m3nr37pu/stage_a.json
+               clean_evidence                     /tmp/d379_exec_m3nr37pu/result.json
+               mutated_evidence                   /tmp/d379_exec_m3nr37pu/result_evidence_mutated.json
+               evidence_bytes_differ              True
+               governed_target                    stage_identity.stage_b_binding
+               subject constructed?           YES — derived from the raw facts above
+    I1A-2    rc=0   ACCEPT  intended=Y  blocker=N  -> PASS
+    I1A-3    SUBJECT PROOF (D379 §7 I1-A holdout seed independence)
+               stage_a_held_constant              /tmp/d379_exec_m3nr37pu/stage_a.json
+               tree_paths_held_constant           3
+               evidence_mutated                   True
+               governed_target                    holdout.py, executed twice
+               subject constructed?           YES — derived from the raw facts above
+    I1A-3    rc=2   REFUSE  intended=N  blocker=Y  -> HELD
+               the governed positive cannot be measured while an independent blocker forces refusal: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
 
-    executable-bound cases  27   PASS 4   FAIL 0   HELD 23
+    executable-bound cases  31   PASS 7   FAIL 0   HELD 24   FIXTURE 0
     (HELD is not a pass and not a skip: it fails the gate and
-     names the predicate that could not be measured.)
+     names the predicate that could not be measured. FIXTURE is
+     worse than either — the banked subject was never built.)
 
 ----------------------------------------------------------------------
 SECTION COVERAGE
   M2         IMPLEMENTED — subject is classify.lifecycle — a classification decision function, not a CLI
   D14        IMPLEMENTED — subject is passa._eligible — the boundary predicate, not a CLI
   PPOP       IMPLEMENTED — subject is stage_identity.classify_origin, not a CLI
-  Q1a        HELD (executable) — 1 PASS, 8 HELD of 9: Q1a-2, Q1a-8, Q1a-9, Q1a-5, Q1a-1, Q1a-3
+  Q1a        HELD (executable) — 2 PASS, 7 HELD of 9: Q1a-1, Q1a-2, Q1a-8, Q1a-3, Q1a-5, Q1a-6
   Q1b        HELD (executable) — 0 PASS, 6 HELD of 6: Q1b-1, Q1b-2, Q1b-3, Q1b-4, Q1b-5, Q1b-6
-  86         HELD (executable) — 3 PASS, 1 HELD of 4: 86-1
+  86         HELD (executable) — 3 PASS, 3 HELD of 6: 86-1, 86-2, 86-6
   SB         IMPLEMENTED — subject is passa scope derivation + the D382 executed derivation, not a CLI
-  I1A        HELD (executable) — 0 PASS, 1 HELD of 1: I1A-1
-  I1B        HELD (executable) — 0 PASS, 4 HELD of 4: I1B-2, I1B-1, I1B-3, I1B-4
-  DEP        HELD (executable) — 0 PASS, 3 HELD of 3: DEP-1, DEP-2, DEP-3
+  I1A        HELD (executable) — 2 PASS, 1 HELD of 3: I1A-3
+  I1B        HELD (executable) — 0 PASS, 4 HELD of 4: I1B-1, I1B-2, I1B-3, I1B-4
+  DEP        HELD (executable) — 0 PASS, 3 HELD of 3: DEP-2, DEP-3, DEP-1
   STAGE_A    HELD — subject is stage_identity Stage-A construction, not a CLI; the canonical-runtime positive limb ONLY (INC-34). The V2 governance and identity matrix EXECUTES.
   STDLIB     HELD — subject is stage_identity stdlib construction (D380 §7), not a CLI; V2-ID-2a, the canonical positive derivation ONLY (INC-34). The D380-STDLIB-NEG-1 negative control EXECUTES.
 
 ======================================================================
-183 passed, 31 failed
-  FAIL Q1a-2 (D379 §2/§4 Pass-A producer provenance) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
-  FAIL Q1a-8 (D379 §5 no silent runtime expansion) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
-  FAIL DEP-1 (D379 §8 synthetic producer, external dep) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
-  FAIL Q1a-9 (D379 §4 self-hash prohibition) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
-  FAIL Q1a-5 (D379 §8 tampered recorded Stage-A identity) verdict PASS: HELD: OVER-DETERMINED: the intended finding IS present in the output, but so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]), so rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
-  FAIL Q1b-1 (D379 §8 clean complete result -> PASS) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
-  FAIL Q1b-2 (D379 §8 missing positive-fact trace -> FAIL) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
-  FAIL I1B-2 (D379 §7 drop one output row -> REFUSE) verdict PASS: HELD: an earlier independent blocker decided the outcome: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+186 passed, 32 failed
   FAIL Q1a-1 (D379 §8 clean chain on one Stage A) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
-  FAIL Q1a-3 (D379 §8 classification-producer byte changed) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
-  FAIL Q1a-6 (D379 §8 qualifier runtime differs) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
-  FAIL Q1a-7 (D379 §8 member deleted from OUTPUT provenance) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  FAIL Q1a-2 (D379 §8 Pass-A producer byte changed) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
   FAIL DEP-2 (D379 §8 ordinary stdlib under a governed interpreter) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
   FAIL DEP-3 (D379 §8 runtime identity mismatch) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
-  FAIL Q1b-3 (D379 §8 Q1b derived denominator) verdict PASS: HELD: OVER-DETERMINED: the intended finding IS present in the output, but so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]), so rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
-  FAIL Q1b-4 (D379 §8 Q1b derived denominator) verdict PASS: HELD: OVER-DETERMINED: the intended finding IS present in the output, but so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]), so rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
-  FAIL Q1b-5 (D379 §8 Q1b derived denominator) verdict PASS: HELD: OVER-DETERMINED: the intended finding IS present in the output, but so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]), so rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
+  FAIL Q1a-8 (D379 §5 no silent runtime expansion) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  FAIL DEP-1 (D379 §8 synthetic producer, external dep) verdict PASS: HELD: OVER-DETERMINED: the intended finding IS present and so is an independent blocker (lies outside the governed H2 root [INC-34 ungoverned runtime]); rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
+  FAIL Q1a-3 (D379 §8 classification-producer byte changed) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  FAIL Q1a-5 (D379 §8 tampered recorded Stage-A identity) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  FAIL Q1a-6 (D379 §8 qualifier runtime differs) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  FAIL Q1a-7 (D379 §8 member deleted from OUTPUT provenance) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  FAIL Q1b-1 (D379 §8 Q1b derived denominator) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+  FAIL Q1b-2 (D379 §8 Q1b derived denominator) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  FAIL Q1b-3 (D379 §8 Q1b derived denominator) verdict PASS: HELD: OVER-DETERMINED: the intended finding IS present and so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]); rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
+  FAIL Q1b-4 (D379 §8 Q1b derived denominator) verdict PASS: HELD: OVER-DETERMINED: the intended finding IS present and so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]); rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
+  FAIL Q1b-5 (D379 §8 Q1b derived denominator) verdict PASS: HELD: OVER-DETERMINED: the intended finding IS present and so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]); rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
   FAIL Q1b-6 (D379 §8 Q1b derived denominator) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
   FAIL 86-1 (D367 §8(6) fail-closed qualifier identity) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+  FAIL 86-2 (D367 §8(6) fail-closed qualifier identity) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  FAIL 86-6 (D367 §8(6) fail-closed qualifier identity) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
   FAIL I1B-1 (D379 §7 I1-B tree/output reconciliation) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+  FAIL I1B-2 (D379 §7 I1-B tree/output reconciliation) verdict PASS: HELD: an earlier independent blocker decided the outcome: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
   FAIL I1B-3 (D379 §7 I1-B tree/output reconciliation) verdict PASS: HELD: an earlier independent blocker decided the outcome: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
   FAIL I1B-4 (D379 §7 I1-B tree/output reconciliation) verdict PASS: HELD: an earlier independent blocker decided the outcome: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
-  FAIL I1A-1 (D379 §7 I1-A seed is the Stage-A identity) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
-  FAIL section Q1a is implemented and executed: HELD (executable) — 1 PASS, 8 HELD of 9: Q1a-2, Q1a-8, Q1a-9, Q1a-5, Q1a-1, Q1a-3
+  FAIL I1A-3 (D379 §7 I1-A holdout seed independence) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+  FAIL section Q1a is implemented and executed: HELD (executable) — 2 PASS, 7 HELD of 9: Q1a-1, Q1a-2, Q1a-8, Q1a-3, Q1a-5, Q1a-6
   FAIL section Q1b is implemented and executed: HELD (executable) — 0 PASS, 6 HELD of 6: Q1b-1, Q1b-2, Q1b-3, Q1b-4, Q1b-5, Q1b-6
-  FAIL section 86 is implemented and executed: HELD (executable) — 3 PASS, 1 HELD of 4: 86-1
-  FAIL section I1A is implemented and executed: HELD (executable) — 0 PASS, 1 HELD of 1: I1A-1
-  FAIL section I1B is implemented and executed: HELD (executable) — 0 PASS, 4 HELD of 4: I1B-2, I1B-1, I1B-3, I1B-4
-  FAIL section DEP is implemented and executed: HELD (executable) — 0 PASS, 3 HELD of 3: DEP-1, DEP-2, DEP-3
+  FAIL section 86 is implemented and executed: HELD (executable) — 3 PASS, 3 HELD of 6: 86-1, 86-2, 86-6
+  FAIL section I1A is implemented and executed: HELD (executable) — 2 PASS, 1 HELD of 3: I1A-3
+  FAIL section I1B is implemented and executed: HELD (executable) — 0 PASS, 4 HELD of 4: I1B-1, I1B-2, I1B-3, I1B-4
+  FAIL section DEP is implemented and executed: HELD (executable) — 0 PASS, 3 HELD of 3: DEP-2, DEP-3, DEP-1
   FAIL section STAGE_A is implemented and executed: HELD — subject is stage_identity Stage-A construction, not a CLI; the canonical-runtime positive limb ONLY (INC-34). The V2 governance and identity matrix EXECUTES.
   FAIL section STDLIB is implemented and executed: HELD — subject is stage_identity stdlib construction (D380 §7), not a CLI; V2-ID-2a, the canonical positive derivation ONLY (INC-34). The D380-STDLIB-NEG-1 negative control EXECUTES.
 EXIT GATE: FAIL

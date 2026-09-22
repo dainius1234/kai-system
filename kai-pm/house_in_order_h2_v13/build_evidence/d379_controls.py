@@ -781,8 +781,15 @@ def exec_fixtures():
              for m in desc["h2_sources"]]
     (d / "MANIFEST.sha256").write_text("\n".join(lines) + "\n")
     _FIX["manifest"] = d / "MANIFEST.sha256"
-    (d / "tree_paths.txt").write_text("\n".join(
-        f"kai-pm/doc_{i:03d}.md" for i in range(272)) + "\n")
+    # I1-B's CLEAN case requires the frozen tree path population and the
+    # candidate output path population to RECONCILE. A 272-path tree
+    # against a 3-row synthetic result never could, so I1B-1 was not the
+    # banked clean case at all and I1B-3/-4 were not "one added" or "one
+    # duplicated" relative to anything. The tree is derived FROM the
+    # result's own paths, which is what "the same population" means.
+    _clean_paths = sorted(r["path"] for r in
+                          json.loads(_FIX["result"].read_bytes())["rows"])
+    (d / "tree_paths.txt").write_text("\n".join(_clean_paths) + "\n")
     _FIX["tree_paths"] = d / "tree_paths.txt"
     # B7. `--subject HEAD` is a literal string; passa resolves repo HEAD to
     # a SHA and compares, so "HEAD" would itself trip the R11 abort once
@@ -826,9 +833,134 @@ def exec_fixtures():
     _FIX["result_short_prov"].write_text(
         json.dumps(_result(_synthetic_result, short_prov)))
 
+    # ── SUBJECTS THAT MUST ACTUALLY BE BUILT ──────────────────────────
+    # Everything below exists because a case id is not a subject. Six
+    # cases previously shared ONE clean argv and differed only in the
+    # string they hoped to see; none of them constructed the banked
+    # hostile condition at all.
+    import stage_identity as SI
+
+    def _stage_a_wrong_byte(module_name, tag):
+        """Stage A that RECORDS a digest for `module_name` which differs
+        from the bytes on disk. The file is NOT touched: the hostile
+        condition is 'Stage A was fixed, then the producer byte changed',
+        and recording a different digest is the same divergence from the
+        producer's side without mutating the governed tree."""
+        srcs = [dict(m) for m in desc["h2_sources"]]
+        hit = [m for m in srcs
+               if pathlib.Path(m["path"]).name == module_name]
+        assert len(hit) == 1, f"{module_name} not uniquely in h2_sources"
+        actual = SI.sha256_hex((REPO / hit[0]["path"]).read_bytes())
+        hit[0]["sha256"] = "f" * 64
+        bad = _synthetic_descriptor(SI.SCHEMA_V2, SI.MODE_CALIBRATION,
+                                    sources=srcs)
+        path = d / f"stage_a_{tag}.json"
+        path.write_text(json.dumps(bad))
+        return {"path": path, "desc": bad, "rel": hit[0]["path"],
+                "recorded": "f" * 64, "actual": actual}
+
+    _FIX["byte_passa"] = _stage_a_wrong_byte("passa.py", "byte_passa")
+    _FIX["byte_classify"] = _stage_a_wrong_byte("classify.py", "byte_classify")
+
+    # Q1a-3 consumes a Pass A. If that Pass A is bound to the CLEAN Stage
+    # A, the stale-input predicate (Q1a-4) fires first and Q1a-3 is never
+    # reached -- the case would be red for the wrong reason. Its Pass A is
+    # therefore bound to the SAME wrong-byte descriptor.
+    def _passa_for(dsc, name):
+        pv = {"stage_a_identity": SI.stage_a_identity(dsc),
+              "stage_a_descriptor_digest": SI.stage_a_descriptor_digest(dsc),
+              "producer_component": "PASS_A",
+              "producer_population": [{"class": SI.CLASS_H2,
+                                       "identity": m["path"],
+                                       "sha256": m["sha256"]}
+                                      for m in dsc["h2_sources"]],
+              "producer_denominator": len(dsc["h2_sources"]),
+              "runtime_identity": dsc["runtime"],
+              "subject_commit": dsc["subject"]["commit"],
+              "subject_tree": dsc["subject"]["tree"],
+              "tree_paths_identity": dsc["tree_paths"]["tree_paths_identity"],
+              "census_identity": dsc["census"]["aggregate_sha256"],
+              "history_source_identity":
+                  dsc["history"]["reachable_set_sha256"]}
+        doc = {"subject": dsc["subject"]["commit"],
+               "subject_tree": dsc["subject"]["tree"],
+               "history_identity": {}, "census_dependency": {},
+               "population": 0, "rows": [], "producer_provenance": pv}
+        q = d / name
+        q.write_text(json.dumps(doc))
+        return q
+
+    _FIX["passa_byte_classify"] = _passa_for(
+        _FIX["byte_classify"]["desc"], "passA_byte_classify.json")
+
+    # Q1a-6 / DEP-3 -- Stage A expects runtime identity A, the executing
+    # interpreter presents B. Constructed by declaring a DIFFERENT stdlib
+    # identity in the descriptor, so the observed/expected comparison has
+    # a real divergence to find.
+    rt = _synthetic_descriptor(SI.SCHEMA_V2, SI.MODE_CALIBRATION)
+    rt["runtime"] = dict(rt["runtime"], stdlib_identity="2" * 64,
+                         cache_tag="calibration-B")
+    (d / "stage_a_runtime_b.json").write_text(json.dumps(rt))
+    _FIX["stage_a_runtime_b"] = d / "stage_a_runtime_b.json"
+    _FIX["runtime_expected"] = desc["runtime"]["stdlib_identity"]
+    _FIX["runtime_other"] = rt["runtime"]["stdlib_identity"]
+
+    # Q1a-7 -- a member DELETED from the output provenance while the
+    # independently captured denominator is unchanged. Truncating both
+    # would be a self-consistent smaller population, which is a different
+    # subject: the banked one is a provenance that no longer matches the
+    # producer population it claims.
+    del_prov = copy.deepcopy(cls_prov)
+    _FIX["q1a7_removed"] = del_prov["producer_population"][-1]["identity"]
+    del_prov["producer_population"] = del_prov["producer_population"][:-1]
+    _FIX["q1a7_denominator"] = del_prov["producer_denominator"]
+    _FIX["q1a7_population"] = len(del_prov["producer_population"])
+    _FIX["result_member_deleted"] = d / "result_member_deleted.json"
+    _FIX["result_member_deleted"].write_text(
+        json.dumps(_result(_synthetic_result, del_prov)))
+
+    # 86-6 -- a manifest that OMITS a module this qualifier actually loads.
+    _FIX["omitted_module"] = "classify.py"
+    (d / "MANIFEST_omit.sha256").write_text("\n".join(
+        l for l in lines if not l.endswith("  " + _FIX["omitted_module"])) + "\n")
+    _FIX["manifest_omit"] = d / "MANIFEST_omit.sha256"
+    # 86-2 -- manifest supplied, ONE module byte differs. Banked, and
+    # absent from the matrix alongside 86-6: the family ran 1,3,4,5.
+    _FIX["disagree_module"] = "envelope.py"
+    _FIX["manifest_disagree"] = d / "MANIFEST_disagree.sha256"
+    _FIX["manifest_disagree"].write_text("\n".join(
+        ("e" * 64 + "  " + _FIX["disagree_module"])
+        if l.endswith("  " + _FIX["disagree_module"]) else l
+        for l in lines) + "\n")
+    _FIX["manifest_entries"] = len(lines)
+    _FIX["manifest_omit_entries"] = len(
+        [l for l in lines if not l.endswith("  " + _FIX["omitted_module"])])
+
+    # I1A-3 -- HOLDOUT SEED INDEPENDENCE. Same Stage A, same output-path
+    # population, MUTATED classification evidence. The selected sample must
+    # not move. Two distinct result files are required or there is no
+    # differential and nothing is being measured.
+    def _rows_mutated_evidence():
+        m = copy.deepcopy(_synthetic_result())
+        for r in m["rows"]:
+            for n in list(r["evidence_facts"]):
+                r["evidence_facts"][n] = not r["evidence_facts"][n]
+        return m
+    _FIX["result_evidence_mutated"] = d / "result_evidence_mutated.json"
+    _FIX["result_evidence_mutated"].write_text(
+        json.dumps(_result(_rows_mutated_evidence, cls_prov)))
+
+    # DEP-1 -- a non-stdlib module outside EVERY governed root. Written
+    # under the fixture directory, which is under none of them.
+    ext = d / "ext_pkg"
+    ext.mkdir()
+    (ext / "hostile_ext.py").write_text("VALUE = 'outside every governed root'\n")
+    _FIX["ext_dir"] = ext
+    _FIX["ext_mod"] = ext / "hostile_ext.py"
+
     (d / "EMPTY.sha256").write_text("")
     _FIX["empty_manifest"] = d / "EMPTY.sha256"
-    tp = [f"kai-pm/doc_{i:03d}.md" for i in range(272)]
+    tp = list(_clean_paths)
     (d / "tree_extra.txt").write_text("\n".join(tp + ["kai-pm/extra.md"]) + "\n")
     _FIX["tree_paths_extra"] = d / "tree_extra.txt"
     (d / "tree_dup.txt").write_text("\n".join(tp + [tp[0]]) + "\n")
@@ -844,208 +976,611 @@ def exec_fixtures():
 
 
 def exec_bound_cases():
-    """The BANKED D379 cases, run against the REAL shipped executables.
+    """The BANKED D379 cases, each against ITS OWN CONSTRUCTED SUBJECT.
 
-    NOT A NEW MATRIX. Every case id below is already in D379 §8; the only
-    change is the boundary at which it is exercised. Helper-level checks
-    remain above as supplementary evidence and carry no verdict.
+    NOT A NEW MATRIX. Every id below is already in D379 §8. What changed
+    is that the hostile condition is now BUILT and PROVED rather than
+    named. Six cases previously shared one clean invocation and differed
+    only in the string they searched the output for -- the case label was
+    doing the work the subject was supposed to do.
+
+    Each case declares, beside itself: the banked proposition, how the
+    subject is constructed, the RAW mechanical proof of that construction,
+    the governed target, and the expected disposition. A case whose proof
+    does not derive is a CONTROL/FIXTURE FAILURE and is reported as one.
     """
     print("\nD379 §8 EXECUTABLE-BOUND EXECUTION — the real shipped CLIs")
-    print("  Each case: exact hostile subject, actual subprocess, rc from")
-    print("  CompletedProcess, actual reason, first-effective failure.")
-    print("  A red process without the intended subject AND the intended")
-    print("  reason earns no calibration claim.\n")
+    print("  Each case: CONSTRUCTED hostile subject proved from raw facts,")
+    print("  actual subprocess, rc from CompletedProcess, actual reason,")
+    print("  first-effective failure. A case name proves nothing.\n")
     f = exec_fixtures()
+    import stage_identity as SI
 
+    def clean(*extra):
+        """Raw facts for a case whose subject is the CLEAN chain: the
+        Stage-A recorded digest for the entry point EQUALS the bytes on
+        disk. A positive case still has a subject and still has to prove
+        it (I-8: the known-negative and the known-positive are both
+        constructed, neither is assumed)."""
+        rel = "kai-pm/house_in_order_h2_v13/passa.py"
+        rec = {m["path"]: m["sha256"]
+               for m in json.loads(f["stage_a"].read_bytes())["h2_sources"]}
+        pr = {"stage_a_recorded[passa.py]": rec[rel][:16] + "…",
+              "actual_sha256(passa.py)":
+                  SI.sha256_hex((REPO / rel).read_bytes())[:16] + "…"}
+        pr.update(dict(extra))
+        return pr
+
+    def clean_holds(pr):
+        return (pr["stage_a_recorded[passa.py]"]
+                == pr["actual_sha256(passa.py)"])
+
+    passa_argv = lambda stage_a, out: [
+        "--subject-repo", str(REPO), "--history-repo", str(REPO),
+        "--subject", f["subject_sha"], "--census-package", str(f["census_pkg"]),
+        "--out", str(f["dir"] / out), "--stage-a", str(stage_a)]
+
+    # ── Q1a-1 · banked: clean chain on one synthetic Stage A -> PASS ──
+    #    subject: the CLEAN Stage A, recorded digests equal to disk.
+    #    proof: recorded[passa.py] == sha256(passa.py on disk).
+    #    target: passa.py (the shipped CLI). expect ACCEPT.
     print("  passa.py")
-    d379_case("Q1a-2", clause="D379 §2/§4 Pass-A producer provenance",
+    d379_case("Q1a-1", clause="D379 §8 clean chain on one Stage A",
+              subject_proof=clean(), subject_holds=clean_holds,
               executable=V / "passa.py",
-              argv=["--subject-repo", str(REPO), "--history-repo", str(REPO),
-                    "--subject", f["subject_sha"],
-                    "--census-package", str(f["census_pkg"]),
-                    "--out", str(f["dir"] / "q1a2.json"),
-                    "--stage-a", str(f["stage_a"])],
+              argv=passa_argv(f["stage_a"], "q1a1.json"),
+              intended_reason="PASS A", expect_class="ACCEPT")
+
+    # ── Q1a-2 · banked: one governed Pass-A producer byte changed after
+    #    Stage A fixed -> Pass-A production REFUSES.
+    #    subject: a Stage A whose recorded digest for passa.py differs
+    #             from the bytes the interpreter will actually execute.
+    #    proof: recorded != actual, both measured here.
+    #    target: passa.py. expect REFUSE on the byte mismatch.
+    bp = f["byte_passa"]
+    d379_case("Q1a-2", clause="D379 §8 Pass-A producer byte changed",
+              subject_proof={"member": bp["rel"],
+                             "stage_a_records": bp["recorded"][:16] + "…",
+                             "bytes_on_disk": bp["actual"][:16] + "…",
+                             "divergence": bp["recorded"] != bp["actual"]},
+              subject_holds=lambda pr: (pr["divergence"] is True
+                                        and pr["stage_a_records"]
+                                        != pr["bytes_on_disk"]),
+              executable=V / "passa.py",
+              argv=passa_argv(bp["path"], "q1a2.json"),
               intended_reason="byte mismatch against Stage A",
               expect_class="REFUSE")
-    d379_case("Q1a-8", clause="D379 §5 no silent runtime expansion",
+
+    # ── DEP-2 · banked: producer loads ordinary stdlib modules under the
+    #    governed interpreter -> PASS, without inventing a Stage-A entry
+    #    for every stdlib file. Same clean subject as Q1a-1; the
+    #    PROPOSITION differs (stdlib containment, not the chain), and the
+    #    blocker is INC-34 either way.
+    stdlib_loaded = sorted(
+        n for n, m in list(sys.modules.items())
+        if m is not None and getattr(m, "__file__", None)
+        and "/lib/python3" in str(getattr(m, "__file__", "")))[:3]
+    d379_case("DEP-2", clause="D379 §8 ordinary stdlib under a governed "
+                              "interpreter",
+              subject_proof=clean(("stdlib_modules_loaded_sample",
+                                   ",".join(stdlib_loaded) or "NONE"),
+                                  ("stdlib_in_stage_a_h2_sources", 0)),
+              subject_holds=lambda pr: (clean_holds(pr)
+                                        and pr["stdlib_in_stage_a_h2_sources"]
+                                        == 0),
               executable=V / "passa.py",
-              argv=["--subject-repo", str(REPO), "--history-repo", str(REPO),
-                    "--subject", f["subject_sha"],
-                    "--census-package", str(f["census_pkg"]),
-                    "--out", str(f["dir"] / "q1a8.json"),
-                    "--stage-a", str(f["stage_a"])],
+              argv=passa_argv(f["stage_a"], "dep2.json"),
+              intended_reason="PASS A", expect_class="ACCEPT")
+
+    # ── DEP-3 · banked: Stage A expects runtime identity A; the producer
+    #    presents mismatching governed interpreter identity B -> REFUSE.
+    #    subject: a Stage A declaring a DIFFERENT stdlib identity.
+    #    proof: the two descriptors' stdlib_identity values differ.
+    rt_proof = {"stage_a_expects_stdlib_identity": f["runtime_other"][:16] + "…",
+                "baseline_stage_a_stdlib_identity":
+                    f["runtime_expected"][:16] + "…",
+                "divergence": f["runtime_other"] != f["runtime_expected"]}
+    rt_holds = lambda pr: pr["divergence"] is True
+    d379_case("DEP-3", clause="D379 §8 runtime identity mismatch",
+              subject_proof=rt_proof, subject_holds=rt_holds,
+              executable=V / "passa.py",
+              argv=passa_argv(f["stage_a_runtime_b"], "dep3.json"),
+              intended_reason="executing runtime identity differs",
+              expect_class="REFUSE")
+
+    # ── Q1a-8 · banked: a governed module NOT represented in Stage A is
+    #    loaded at production -> REFUSE, no silent runtime expansion.
+    #    SUBJECT IS A GOVERNED DECISION FUNCTION (check_population), so the
+    #    child imports the ACTUAL shipped function and exits from ITS
+    #    result. Stage A cannot simply omit a member -- validate_descriptor
+    #    governs the descriptor shape -- so the omission is made in the
+    #    descriptor handed to the function, which is exactly the condition
+    #    the clause governs.
+    #    proof: the omitted module IS in sys.modules AND its resolved path
+    #           IS under the governed H2 root.
+    omit_rel = "kai-pm/house_in_order_h2_v13/classify.py"
+    d379_case("Q1a-8", clause="D379 §5 no silent runtime expansion",
+              subject_proof={
+                  "omitted_from_descriptor": omit_rel,
+                  "module_is_loaded_in_child": "classify (imported below)",
+                  "resolved_path_under_h2_root":
+                      str((REPO / omit_rel).resolve()).startswith(
+                          str((REPO / "kai-pm/house_in_order_h2_v13")
+                              .resolve()) + os.sep),
+                  "governed_target": "stage_identity.check_population"},
+              subject_holds=lambda pr: pr["resolved_path_under_h2_root"] is True,
+              snippet=f"""
+import json, sys
+import classify                      # the module to be omitted, REALLY loaded
+import stage_identity as SI
+desc = json.loads(open({str(f["stage_a"])!r}, 'rb').read().decode('utf-8'))
+desc['h2_sources'] = [m for m in desc['h2_sources']
+                      if m['path'] != {omit_rel!r}]
+assert {omit_rel!r} not in [m['path'] for m in desc['h2_sources']]
+assert 'classify' in sys.modules
+try:
+    SI.check_population({str(REPO)!r}, desc, 'production')
+except SI.StageIdentityError as e:
+    print(str(e)); sys.exit(1)
+print('ACCEPTED — no refusal'); sys.exit(0)
+""",
               intended_reason="NOT represented in Stage A",
               expect_class="REFUSE")
+
+    # ── DEP-1 · banked: synthetic producer loads a non-stdlib module
+    #    outside all governed Stage-A roots -> REFUSE.
+    #    subject: a real .py file under the fixture directory, imported by
+    #             the child before the governed function runs.
+    #    proof: the file EXISTS, and its realpath is under NONE of the
+    #           governed roots. Measured, not asserted.
+    h2root = str((REPO / "kai-pm/house_in_order_h2_v13").resolve())
+    censusroot = str((REPO / "kai-pm/house_in_order_census_v11").resolve())
+    extp = str(f["ext_mod"].resolve())
     d379_case("DEP-1", clause="D379 §8 synthetic producer, external dep",
-              executable=V / "passa.py",
-              argv=["--subject-repo", str(REPO), "--history-repo", str(REPO),
-                    "--subject", f["subject_sha"],
-                    "--census-package", str(f["census_pkg"]),
-                    "--out", str(f["dir"] / "dep1.json"),
-                    "--stage-a", str(f["stage_a"])],
+              subject_proof={
+                  "external_module_path": extp,
+                  "file_exists": f["ext_mod"].is_file(),
+                  "under_h2_root": extp.startswith(h2root + os.sep),
+                  "under_census_root": extp.startswith(censusroot + os.sep),
+                  "under_stdlib_prefix": extp.startswith(
+                      os.path.dirname(os.__file__) + os.sep),
+                  "governed_target": "stage_identity.producer_population"},
+              subject_holds=lambda pr: (pr["file_exists"] is True
+                                        and not pr["under_h2_root"]
+                                        and not pr["under_census_root"]
+                                        and not pr["under_stdlib_prefix"]),
+              snippet=f"""
+import sys
+sys.path.insert(0, {str(f["ext_dir"])!r})
+import hostile_ext                    # NON-STDLIB, OUTSIDE EVERY GOVERNED ROOT
+import stage_identity as SI
+assert hostile_ext.__file__
+members, offenders = SI.producer_population({str(REPO)!r})
+hit = [w for n, w in offenders if n == 'hostile_ext']
+if hit:
+    print('SYNTHETIC_HOSTILE_DEPENDENCY: ' + hit[0]); sys.exit(1)
+print('ACCEPTED — hostile_ext produced no offender; members=%d offenders=%d'
+      % (len(members), len(offenders)))
+sys.exit(0)
+""",
               intended_reason="SYNTHETIC_HOSTILE_DEPENDENCY",
               expect_class="REFUSE")
 
+    # ── Q1a-3 · banked: one governed CLASSIFICATION-producer byte changed
+    #    after Stage A fixed -> classification production REFUSES.
+    #    subject: a Stage A recording a wrong digest for classify.py, AND
+    #             a Pass A bound to THAT SAME Stage A -- otherwise the
+    #             stale-input predicate (Q1a-4) fires first and this case
+    #             is red for another case's reason.
+    #    proof: recorded != actual for classify.py, and the Pass-A input
+    #           carries the SAME stage_a_identity as the descriptor.
     print("  run_h2_v12.py")
+    bc = f["byte_classify"]
+    pa_bound = json.loads(f["passa_byte_classify"].read_bytes())
+    d379_case("Q1a-3", clause="D379 §8 classification-producer byte changed",
+              subject_proof={
+                  "member": bc["rel"],
+                  "stage_a_records": bc["recorded"][:16] + "…",
+                  "bytes_on_disk": bc["actual"][:16] + "…",
+                  "divergence": bc["recorded"] != bc["actual"],
+                  "pass_a_bound_to_same_stage_a":
+                      pa_bound["producer_provenance"]["stage_a_identity"]
+                      == SI.stage_a_identity(bc["desc"])},
+              subject_holds=lambda pr: (pr["divergence"] is True
+                                        and pr["pass_a_bound_to_same_stage_a"]
+                                        is True),
+              executable=V / "run_h2_v12.py",
+              argv=["--subject-repo", str(REPO),
+                    "--passa", str(f["passa_byte_classify"]),
+                    "--out", str(f["dir"] / "q1a3.json"),
+                    "--stage-a", str(bc["path"])],
+              intended_reason="byte mismatch against Stage A",
+              expect_class="REFUSE")
+
+    # ── Q1a-4 · banked: stale input -- Pass A under Stage-A A,
+    #    classification under Stage-A B -> REFUSE, no result accepted.
+    #    proof: the two identities differ, and the Pass A carries A.
+    idA = f["stage_a_identity"]
+    idB = SI.stage_a_identity(json.loads(f["stage_a_other"].read_bytes()))
     d379_case("Q1a-4", clause="D379 §4 stale input across two Stage As",
+              subject_proof={
+                  "pass_a_recorded_identity": idA[:16] + "…",
+                  "classification_given_identity": idB[:16] + "…",
+                  "identities_differ": idA != idB},
+              subject_holds=lambda pr: pr["identities_differ"] is True,
               executable=V / "run_h2_v12.py",
               argv=["--subject-repo", str(REPO), "--passa", str(f["passa"]),
                     "--out", str(f["dir"] / "q1a4.json"),
                     "--stage-a", str(f["stage_a_other"])],
-              intended_reason="stage_a_identity",
-              expect_class="REFUSE")
-    d379_case("Q1a-9", clause="D379 §4 self-hash prohibition",
-              executable=V / "run_h2_v12.py",
-              argv=["--subject-repo", str(REPO), "--passa", str(f["passa"]),
-                    "--out", str(f["dir"] / "q1a9.json"),
-                    "--stage-a", str(f["stage_a"])],
-              intended_reason="producer_provenance",
+              intended_reason="stage_a_identity", expect_class="REFUSE")
+
+    # ── Q1a-9 · banked, TWO LIMBS IN ONE CASE, as D379 states it:
+    #    (a) construct producer evidence whose in-band provenance declares
+    #        its OWN whole-file digest among the hashed bytes -> REFUSE AS
+    #        INVALID IDENTITY CONSTRUCTION;
+    #    (b) then prove the ACCEPTED path -- finalise file, hash exact
+    #        final bytes, external Stage-B binding created -> PASS.
+    #    The child exits from the CONJUNCTION of the two real predicate
+    #    results. Neither limb is a separate matrix member.
+    #    proof: the digest planted IS sha256 of the exact artefact bytes.
+    d379_case("Q1a-9", clause="D379 §4 self-hash prohibition (both limbs)",
+              subject_proof={
+                  "limb_a": "provenance declares sha256(its own artefact)",
+                  "limb_b": "finalise -> hash final bytes -> Stage-B binding",
+                  "planted_digest_is_artefact_digest": "verified in child",
+                  "governed_target":
+                      "stage_identity.verify_provenance + stage_b_binding"},
+              subject_holds=lambda pr: pr["limb_a"].startswith("provenance"),
+              snippet=f"""
+import json, hashlib, pathlib, sys
+import stage_identity as SI
+desc = json.loads(open({str(f["stage_a"])!r}, 'rb').read().decode('utf-8'))
+prov = json.loads(open({str(f["passa"])!r}, 'rb').read()
+                  .decode('utf-8'))['producer_provenance']
+art = pathlib.Path({str(f["dir"])!r}) / 'q1a9_artifact.json'
+
+# LIMB A -- plant the artefact's OWN whole-file digest inside its own
+# in-band provenance. The digest must be of the EXACT bytes written.
+doc = {{'rows': [], 'producer_provenance': dict(prov)}}
+raw = json.dumps(doc).encode()
+own = hashlib.sha256(raw).hexdigest()
+doc['producer_provenance']['history_source_identity'] = own
+art.write_bytes(json.dumps(doc).encode())
+bad = dict(prov, history_source_identity=own)
+assert own == hashlib.sha256(raw).hexdigest()
+limb_a = False
+try:
+    SI.verify_provenance(bad, desc, artifact_bytes=raw)
+except SI.StageIdentityError as e:
+    limb_a = 'INVALID IDENTITY CONSTRUCTION' in str(e)
+    print('LIMB A: ' + str(e)[:200])
+
+# LIMB B -- the accepted path. Finalise, hash the exact final bytes from
+# OUTSIDE the artefact, create the external Stage-B binding.
+final = pathlib.Path({str(f["dir"])!r}) / 'q1a9_final.json'
+final.write_bytes(json.dumps({{'rows': [], 'producer_provenance': prov}}).encode())
+b = SI.stage_b_binding(final, artifact_kind='PASS_A', identity=prov['stage_a_identity'],
+                       producer_component='PASS_A',
+                       producer_provenance_digest=SI.provenance_digest(prov))
+limb_b = (b['artifact_sha256'] == hashlib.sha256(final.read_bytes()).hexdigest()
+          and b['artifact_sha256'] not in json.dumps(
+              json.loads(final.read_bytes())['producer_provenance']))
+print('LIMB B: stage-b binding on final bytes = %s, absent from in-band = %s'
+      % (b['artifact_sha256'][:16], limb_b))
+if limb_a and limb_b:
+    print('SELF_HASH_PROHIBITION_BOTH_LIMBS_HELD'); sys.exit(0)
+print('LIMB FAILURE limb_a=%s limb_b=%s' % (limb_a, limb_b)); sys.exit(1)
+""",
+              intended_reason="SELF_HASH_PROHIBITION_BOTH_LIMBS_HELD",
               expect_class="ACCEPT")
 
+    # ── the qualifier family ──────────────────────────────────────────
     print("  qualify.py")
+    qargv = lambda res, man=None, sa=None: [
+        "--result", str(res), "--manifest", str(man or f["manifest"]),
+        "--stage-a", str(sa or f["stage_a"])]
+
+    def _prov_of(path):
+        return json.loads(pathlib.Path(path).read_bytes())[
+            "producer_provenance"]
+
+    # Q1a-5 · banked: recorded producer digest / Stage-A identity tampered
+    #   in a synthetic result -> qualification FAILS / REFUSES.
+    tp = _prov_of(f["result_tampered"])
     d379_case("Q1a-5", clause="D379 §8 tampered recorded Stage-A identity",
-              executable=V / "qualify.py",
-              argv=["--result", str(f["result_tampered"]),
-                    "--manifest", str(f["manifest"]),
-                    "--stage-a", str(f["stage_a"])],
+              subject_proof={
+                  "result_records_identity": tp["stage_a_identity"][:16] + "…",
+                  "stage_a_actual_identity": idA[:16] + "…",
+                  "tampered": tp["stage_a_identity"] != idA},
+              subject_holds=lambda pr: pr["tampered"] is True,
+              executable=V / "qualify.py", argv=qargv(f["result_tampered"]),
               intended_reason="does not match the Stage-A descriptor",
               expect_class="REFUSE")
-    d379_case("86-3", clause="D367 §8(6) manifest omitted -> REFUSE",
-              executable=V / "qualify.py",
-              argv=["--result", str(f["result"]),
-                    "--stage-a", str(f["stage_a"])],
-              intended_reason="the following arguments are required: --manifest",
-              expect_class="REFUSE")
-    d379_case("Q1b-1", clause="D379 §8 clean complete result -> PASS",
-              executable=V / "qualify.py",
-              argv=["--result", str(f["result"]),
-                    "--manifest", str(f["manifest"]),
-                    "--stage-a", str(f["stage_a"])],
-              intended_reason="positive-evidence-fact denominator",
-              expect_class="ACCEPT")
-    d379_case("Q1b-2", clause="D379 §8 missing positive-fact trace -> FAIL",
-              executable=V / "qualify.py",
-              argv=["--result", str(f["result_missing_trace"]),
-                    "--manifest", str(f["manifest"]),
-                    "--stage-a", str(f["stage_a"])],
-              intended_reason="CITES_COMMIT",
-              expect_class="REFUSE")
 
-    print("  holdout.py   (already CLI-wired; not redesigned)")
-    d379_case("I1B-2", clause="D379 §7 drop one output row -> REFUSE",
-              executable=V / "holdout.py",
-              argv=["--result", str(f["result"]),
-                    "--stage-a", str(f["stage_a"]),
-                    "--tree-paths", str(f["tree_paths"]),
-                    "--out", str(f["dir"] / "i1b2.json")],
-              intended_reason="REFUSE BEFORE SELECTION",
-              expect_class="REFUSE")
-
-
-    # ── the rest of the CLI-BOUND families ────────────────────────────
-    # NO MATRIX EXPANSION: every id below is already banked in D379 §8.
-    # The only change is the boundary. Cases whose governed subject is a
-    # decision function rather than a shipped executable (M2-1..3,
-    # D14-A/B/C, SB-1..3) are named in NON_CLI_SUBJECTS and stay with the
-    # function that IS their subject.
-    d379_case("Q1a-1", clause="D379 §8 clean chain on one Stage A",
-              executable=V / "passa.py",
-              argv=["--subject-repo", str(REPO), "--history-repo", str(REPO),
-                    "--subject", f["subject_sha"],
-                    "--census-package", str(f["census_pkg"]),
-                    "--out", str(f["dir"] / "q1a1.json"),
-                    "--stage-a", str(f["stage_a"])],
-              intended_reason="PASS A", expect_class="ACCEPT")
-    d379_case("Q1a-3", clause="D379 §8 classification-producer byte changed",
-              executable=V / "run_h2_v12.py",
-              argv=["--subject-repo", str(REPO), "--passa", str(f["passa"]),
-                    "--out", str(f["dir"] / "q1a3.json"),
-                    "--stage-a", str(f["stage_a"])],
-              intended_reason="byte mismatch against Stage A",
-              expect_class="REFUSE")
+    # Q1a-6 · banked: provenance valid, QUALIFIER RUNTIME differs from the
+    #   governed Stage-A qualification bytes -> §8(6) FAIL. Producer and
+    #   qualifier identity are INDEPENDENT controls, so the subject is the
+    #   Stage A the qualifier is run against, not the result.
     d379_case("Q1a-6", clause="D379 §8 qualifier runtime differs",
+              subject_proof=dict(rt_proof, provenance_valid_against_baseline=
+                                 tp["stage_a_identity"] != idA),
+              subject_holds=rt_holds,
               executable=V / "qualify.py",
-              argv=["--result", str(f["result"]),
-                    "--manifest", str(f["manifest"]),
-                    "--stage-a", str(f["stage_a"])],
-              intended_reason="DEP-3 executing runtime identity differs",
+              argv=qargv(f["result"], sa=f["stage_a_runtime_b"]),
+              intended_reason="executing runtime identity differs",
               expect_class="REFUSE")
+
+    # Q1a-7 · banked: one governed member DELETED from the OUTPUT
+    #   provenance after production, independently captured runtime
+    #   binding UNCHANGED -> REFUSE: recorded provenance does not match the
+    #   bound producer population.
+    #   proof: population shrank by one, denominator did NOT.
     d379_case("Q1a-7", clause="D379 §8 member deleted from OUTPUT provenance",
+              subject_proof={
+                  "member_removed": f["q1a7_removed"],
+                  "recorded_population_size": f["q1a7_population"],
+                  "recorded_denominator_unchanged": f["q1a7_denominator"],
+                  "mismatch": f["q1a7_denominator"] != f["q1a7_population"]},
+              subject_holds=lambda pr: pr["mismatch"] is True,
               executable=V / "qualify.py",
-              argv=["--result", str(f["result_short_prov"]),
-                    "--manifest", str(f["manifest"]),
-                    "--stage-a", str(f["stage_a"])],
-              intended_reason="NOT represented in Stage A",
+              argv=qargv(f["result_member_deleted"]),
+              intended_reason="does not equal the recorded producer_population",
               expect_class="REFUSE")
-    d379_case("DEP-2", clause="D379 §8 ordinary stdlib under a governed "
-                              "interpreter",
-              executable=V / "passa.py",
-              argv=["--subject-repo", str(REPO), "--history-repo", str(REPO),
-                    "--subject", f["subject_sha"],
-                    "--census-package", str(f["census_pkg"]),
-                    "--out", str(f["dir"] / "dep2.json"),
-                    "--stage-a", str(f["stage_a"])],
-              intended_reason="PASS A", expect_class="ACCEPT")
-    d379_case("DEP-3", clause="D379 §8 runtime identity mismatch",
-              executable=V / "passa.py",
-              argv=["--subject-repo", str(REPO), "--history-repo", str(REPO),
-                    "--subject", f["subject_sha"],
-                    "--census-package", str(f["census_pkg"]),
-                    "--out", str(f["dir"] / "dep3.json"),
-                    "--stage-a", str(f["stage_a"])],
-              intended_reason="DEP-3 executing runtime identity differs",
-              expect_class="REFUSE")
-    for cid, res_key, reason in (
-            ("Q1b-3", "result_q1b3", "SCOPE"),
-            ("Q1b-4", "result_q1b4", "ABSTENTION_RECONCILIATION"),
-            ("Q1b-5", "result_q1b5", "FACT_CLASS_ABSENT"),
-            ("Q1b-6", "result_q1b6", "positive-evidence-fact denominator")):
+
+    # Q1b-1..6 · the derived-denominator family. Each result differs from
+    #   the clean one in exactly the way its clause names, and the proof is
+    #   the measured difference against the clean fixture.
+    clean_doc = json.loads(f["result"].read_bytes())
+    def _q1b_proof(key, what):
+        cur = json.loads(f[key].read_bytes()) if key else clean_doc
+        return {"fixture": key or "result (clean)", "construction": what,
+                "differs_from_clean_result":
+                    json.dumps(cur, sort_keys=True)
+                    != json.dumps(clean_doc, sort_keys=True),
+                "rows": len(cur["rows"])}
+    for cid, key, what, reason, cls in (
+            ("Q1b-1", None, "clean complete result, nothing removed",
+             "positive-evidence-fact denominator", "ACCEPT"),
+            ("Q1b-2", "result_missing_trace",
+             "one positive evidence fact stripped of its trace",
+             "CITES_COMMIT", "REFUSE"),
+            ("Q1b-3", "result_q1b3", "an axis-cell witness broken",
+             "SCOPE", "REFUSE"),
+            ("Q1b-4", "result_q1b4",
+             "abstention list inconsistent with emitted positives",
+             "ABSTENTION_RECONCILIATION", "REFUSE"),
+            ("Q1b-5", "result_q1b5",
+             "a fact CLASS removed from the emitted set (the D17 lesson)",
+             "FACT_CLASS_ABSENT", "REFUSE"),
+            ("Q1b-6", "result_q1b6",
+             "opposite-side clean known-negative: all facts false, no traces",
+             "positive-evidence-fact denominator", "ACCEPT")):
         d379_case(cid, clause="D379 §8 Q1b derived denominator",
+                  subject_proof=_q1b_proof(key, what),
+                  subject_holds=(lambda pr: pr["rows"] > 0) if cid in
+                  ("Q1b-1", "Q1b-6") else
+                  (lambda pr: pr["differs_from_clean_result"] is True),
                   executable=V / "qualify.py",
-                  argv=["--result", str(f[res_key]),
-                        "--manifest", str(f["manifest"]),
-                        "--stage-a", str(f["stage_a"])],
-                  intended_reason=reason,
-                  expect_class="ACCEPT" if cid == "Q1b-6" else "REFUSE")
-    for cid, argv_extra, reason in (
-            ("86-1", [], "§8(6) CLOSED ORIGIN CLASSIFICATION"),
-            ("86-4", ["--manifest", "/nonexistent"], "does not exist"),
-            ("86-5", ["--manifest", str(f["empty_manifest"])],
-             "yielded no entries")):
-        base = ["--result", str(f["result"]), "--stage-a", str(f["stage_a"])]
-        if not argv_extra:
-            base += ["--manifest", str(f["manifest"])]
+                  argv=qargv(f[key] if key else f["result"]),
+                  intended_reason=reason, expect_class=cls)
+
+    # 86-1..86-6 · fail-closed qualifier identity. The subject of each is
+    #   the MANIFEST ARGUMENT, so the proof is a fact about that argument.
+    for cid, base, proof, holds, reason, cls in (
+            ("86-1", qargv(f["result"]),
+             {"manifest_supplied": True,
+              "entries": f["manifest_entries"],
+              "identity_matches_stage_a": True},
+             lambda pr: pr["manifest_supplied"] and pr["entries"] > 0,
+             "§8(6) CLOSED ORIGIN CLASSIFICATION", "ACCEPT"),
+            ("86-3", ["--result", str(f["result"]),
+                      "--stage-a", str(f["stage_a"])],
+             {"manifest_argument_present": False,
+              "argv_contains__manifest": False},
+             lambda pr: pr["argv_contains__manifest"] is False,
+             "the following arguments are required: --manifest", "REFUSE"),
+            ("86-4", qargv(f["result"], man="/nonexistent/MANIFEST.sha256"),
+             {"manifest_path": "/nonexistent/MANIFEST.sha256",
+              "path_exists": pathlib.Path("/nonexistent/MANIFEST.sha256")
+              .exists()},
+             lambda pr: pr["path_exists"] is False,
+             "does not exist", "REFUSE"),
+            ("86-5", qargv(f["result"], man=f["empty_manifest"]),
+             {"manifest_path": str(f["empty_manifest"]),
+              "path_exists": f["empty_manifest"].is_file(),
+              "byte_size": f["empty_manifest"].stat().st_size},
+             lambda pr: pr["path_exists"] is True and pr["byte_size"] == 0,
+             "yielded no entries", "REFUSE"),
+            ("86-2", qargv(f["result"], man=f["manifest_disagree"]),
+             {"module": f["disagree_module"],
+              "manifest_declares": "e" * 16 + "…",
+              "bytes_on_disk": hashlib.sha256(
+                  (V / f["disagree_module"]).read_bytes()).hexdigest()[:16]
+                  + "…",
+              "divergence": True,
+              "module_is_loaded_by_qualifier":
+                  f["disagree_module"][:-3] in sys.modules},
+             lambda pr: (pr["divergence"] is True
+                         and pr["manifest_declares"] != pr["bytes_on_disk"]
+                         and pr["module_is_loaded_by_qualifier"] is True),
+             "DISAGREE", "REFUSE"),
+            ("86-6", qargv(f["result"], man=f["manifest_omit"]),
+             {"omitted_module": f["omitted_module"],
+              "full_manifest_entries": f["manifest_entries"],
+              "omitting_manifest_entries": f["manifest_omit_entries"],
+              "exactly_one_entry_removed":
+                  f["manifest_entries"] - f["manifest_omit_entries"] == 1,
+              "module_is_loaded_by_qualifier": "classify" in sys.modules},
+             lambda pr: (pr["exactly_one_entry_removed"] is True
+                         and pr["module_is_loaded_by_qualifier"] is True),
+             "OMITS", "REFUSE")):
         d379_case(cid, clause="D367 §8(6) fail-closed qualifier identity",
-                  executable=V / "qualify.py", argv=base + argv_extra,
-                  intended_reason=reason,
-                  expect_class="ACCEPT" if cid == "86-1" else "REFUSE")
-    for cid, tp_key, reason in (
-            ("I1B-1", "tree_paths", "BLIND HOLDOUT"),
-            ("I1B-3", "tree_paths_extra", "REFUSE BEFORE SELECTION"),
-            ("I1B-4", "tree_paths_dup", "REFUSE BEFORE SELECTION")):
+                  subject_proof=proof, subject_holds=holds,
+                  executable=V / "qualify.py", argv=base,
+                  intended_reason=reason, expect_class=cls)
+
+    # ── the holdout input contract ────────────────────────────────────
+    print("  holdout.py")
+    tree_n = len(f["tree_paths"].read_text().split())
+    for cid, tp_key, what, reason, cls in (
+            ("I1B-1", "tree_paths", "tree and output populations equal",
+             "BLIND HOLDOUT", "ACCEPT"),
+            ("I1B-2", "tree_paths", "drop one output row", 
+             "REFUSE BEFORE SELECTION", "REFUSE"),
+            ("I1B-3", "tree_paths_extra", "add one tree path",
+             "REFUSE BEFORE SELECTION", "REFUSE"),
+            ("I1B-4", "tree_paths_dup", "duplicate one tree path",
+             "REFUSE BEFORE SELECTION", "REFUSE")):
+        n = len(f[tp_key].read_text().split())
+        rows = len(json.loads(f["result"].read_bytes())["rows"])
+        res = f["result"]
+        if cid == "I1B-2":
+            # the banked subject is a DROPPED OUTPUT ROW, not a longer
+            # tree. Previously this ran the clean result against the clean
+            # tree and relied on the row count happening to differ, which
+            # is the population defect, not the banked one.
+            doc = json.loads(f["result"].read_bytes())
+            doc["rows"] = doc["rows"][:-1] if len(doc["rows"]) > 1 else []
+            doc["population"] = len(doc["rows"])
+            res = f["dir"] / "result_dropped_row.json"
+            res.write_text(json.dumps(doc))
+            rows = len(doc["rows"])
         d379_case(cid, clause="D379 §7 I1-B tree/output reconciliation",
+                  subject_proof={"construction": what,
+                                 "tree_path_population": n,
+                                 "output_row_population": rows,
+                                 "equal": n == rows},
+                  subject_holds=((lambda pr: pr["equal"] is True)
+                                 if cid == "I1B-1"
+                                 else (lambda pr: pr["equal"] is False)),
                   executable=V / "holdout.py",
-                  argv=["--result", str(f["result"]),
-                        "--stage-a", str(f["stage_a"]),
+                  argv=["--result", str(res), "--stage-a", str(f["stage_a"]),
                         "--tree-paths", str(f[tp_key]),
                         "--out", str(f["dir"] / (cid + ".json"))],
-                  intended_reason=reason,
-                  expect_class="ACCEPT" if cid == "I1B-1" else "REFUSE")
-    d379_case("I1A-1", clause="D379 §7 I1-A seed is the Stage-A identity",
-              executable=V / "holdout.py",
-              argv=["--result", str(f["result"]),
-                    "--stage-a", str(f["stage_a"]),
-                    "--tree-paths", str(f["tree_paths"]),
-                    "--out", str(f["dir"] / "i1a1.json")],
-              intended_reason="candidate aggregate", expect_class="ACCEPT")
+                  intended_reason=reason, expect_class=cls)
+
+    # ── I1A-1 · banked: one byte altered in one Stage-A member ->
+    #    STAGE-A IDENTITY CHANGES. The subject is stage_a_identity, a
+    #    governed decision FUNCTION, so the child imports it and exits from
+    #    the real comparison. Binding this id to holdout.py, as it was,
+    #    measured a different function entirely.
+    d379_case("I1A-1", clause="D379 §7 I1-A one member byte -> identity moves",
+              subject_proof={
+                  "member": bp["rel"],
+                  "descriptor_A_records": f["stage_a_identity"][:16] + "…",
+                  "descriptor_B_member_digest": bp["recorded"][:16] + "…",
+                  "exactly_one_member_differs": True,
+                  "governed_target": "stage_identity.stage_a_identity"},
+              subject_holds=lambda pr: pr["exactly_one_member_differs"] is True,
+              snippet=f"""
+import json, sys
+import stage_identity as SI
+A = json.loads(open({str(f["stage_a"])!r}, 'rb').read().decode('utf-8'))
+B = json.loads(open({str(bp["path"])!r}, 'rb').read().decode('utf-8'))
+diff = [a['path'] for a, b in zip(A['h2_sources'], B['h2_sources'])
+        if a != b]
+assert diff == [{bp["rel"]!r}], diff          # EXACTLY ONE member differs
+ia, ib = SI.stage_a_identity(A), SI.stage_a_identity(B)
+print('A=%s B=%s' % (ia[:16], ib[:16]))
+if ia != ib:
+    print('STAGE_A_IDENTITY_CHANGES'); sys.exit(0)
+print('IDENTITY UNCHANGED — one altered member byte did not move it')
+sys.exit(1)
+""",
+              intended_reason="STAGE_A_IDENTITY_CHANGES", expect_class="ACCEPT")
+
+    # ── I1A-2 · banked: evidence artefact mutated after a valid Stage A
+    #    exists, output path population intact -> Stage A UNCHANGED,
+    #    tree-derived paths UNCHANGED, STAGE-B CHANGES.
+    d379_case("I1A-2", clause="D379 §7 mutate evidence -> only Stage-B moves",
+              subject_proof={
+                  "stage_a_held_constant": str(f["stage_a"]),
+                  "clean_evidence": str(f["result"]),
+                  "mutated_evidence": str(f["result_evidence_mutated"]),
+                  "evidence_bytes_differ":
+                      f["result"].read_bytes()
+                      != f["result_evidence_mutated"].read_bytes(),
+                  "governed_target": "stage_identity.stage_b_binding"},
+              subject_holds=lambda pr: pr["evidence_bytes_differ"] is True,
+              snippet=f"""
+import json, sys
+import stage_identity as SI
+desc = json.loads(open({str(f["stage_a"])!r}, 'rb').read().decode('utf-8'))
+ident = SI.stage_a_identity(desc)
+paths = lambda p: sorted(r['path'] for r in
+                         json.loads(open(p, 'rb').read().decode('utf-8'))['rows'])
+p1, p2 = {str(f["result"])!r}, {str(f["result_evidence_mutated"])!r}
+assert paths(p1) == paths(p2)                 # output path population INTACT
+b1 = SI.stage_b_binding(p1, artifact_kind='CLASSIFICATION', identity=ident,
+                        producer_component='CLASSIFICATION',
+                        producer_provenance_digest='0'*64)
+b2 = SI.stage_b_binding(p2, artifact_kind='CLASSIFICATION', identity=ident,
+                        producer_component='CLASSIFICATION',
+                        producer_provenance_digest='0'*64)
+same_a = b1['stage_a_identity'] == b2['stage_a_identity'] == ident
+moved_b = SI.stage_b_aggregate([b1]) != SI.stage_b_aggregate([b2])
+print('stage_a same=%s  stage_b moved=%s' % (same_a, moved_b))
+if same_a and moved_b:
+    print('STAGE_A_UNCHANGED_STAGE_B_CHANGES'); sys.exit(0)
+sys.exit(1)
+""",
+              intended_reason="STAGE_A_UNCHANGED_STAGE_B_CHANGES",
+              expect_class="ACCEPT")
+
+    # ── I1A-3 · banked: HOLDOUT SEED INDEPENDENCE. Synthetic Stage A
+    #    fixed; output-path population held constant; classification
+    #    evidence mutated. OLD: manifest-derived aggregate changes ->
+    #    sample changes. NEW: stage_a_identity unchanged -> SELECTED SAMPLE
+    #    UNCHANGED. Proves holdout.py ITSELF, not merely stage_identity.py,
+    #    has stopped deriving blind selection from execution output --
+    #    so this one is EXECUTABLE-BOUND on holdout.py, twice, and the
+    #    child compares the two real selections.
+    d379_case("I1A-3", clause="D379 §7 I1-A holdout seed independence",
+              subject_proof={
+                  "stage_a_held_constant": str(f["stage_a"]),
+                  "tree_paths_held_constant": tree_n,
+                  "evidence_mutated":
+                      f["result"].read_bytes()
+                      != f["result_evidence_mutated"].read_bytes(),
+                  "governed_target": "holdout.py, executed twice"},
+              subject_holds=lambda pr: (pr["evidence_mutated"] is True
+                                        and pr["tree_paths_held_constant"] > 0),
+              snippet=f"""
+import json, subprocess, sys, pathlib
+d = pathlib.Path({str(f["dir"])!r})
+def run(res, out):
+    pr = subprocess.run([sys.executable, {str(V / "holdout.py")!r},
+                         '--result', res, '--stage-a', {str(f["stage_a"])!r},
+                         '--tree-paths', {str(f["tree_paths"])!r},
+                         '--out', str(d / out)], capture_output=True, text=True)
+    return pr.returncode, pr.stdout + pr.stderr
+rc1, o1 = run({str(f["result"])!r}, 'i1a3_clean.json')
+rc2, o2 = run({str(f["result_evidence_mutated"])!r}, 'i1a3_mutated.json')
+if rc1 != 0 or rc2 != 0:
+    print('PREREQUISITE NOT REACHED rc1=%s rc2=%s' % (rc1, rc2))
+    print((o1 + o2)[-600:]); sys.exit(2)
+a = json.loads((d / 'i1a3_clean.json').read_bytes())
+b = json.loads((d / 'i1a3_mutated.json').read_bytes())
+same_seed = a['candidate_aggregate'] == b['candidate_aggregate']
+same_rows = [r['path'] for r in a['rows']] == [r['path'] for r in b['rows']]
+print('seed same=%s  selected sample same=%s' % (same_seed, same_rows))
+if same_seed and same_rows:
+    print('HOLDOUT_SEED_INDEPENDENT_OF_EVIDENCE'); sys.exit(0)
+print('SEED MOVED WITH EVIDENCE'); sys.exit(1)
+""",
+              intended_reason="HOLDOUT_SEED_INDEPENDENT_OF_EVIDENCE",
+              expect_class="ACCEPT")
 
     held = [c for c in CASES if c["verdict"] == "HELD"]
     passed = [c for c in CASES if c["verdict"] == "PASS"]
     failed = [c for c in CASES if c["verdict"] == "FAIL"]
+    fixture = [c for c in CASES if c["verdict"] == "FIXTURE"]
     print(f"\n    executable-bound cases  {len(CASES)}"
-          f"   PASS {len(passed)}   FAIL {len(failed)}   HELD {len(held)}")
+          f"   PASS {len(passed)}   FAIL {len(failed)}   HELD {len(held)}"
+          f"   FIXTURE {len(fixture)}")
     print("    (HELD is not a pass and not a skip: it fails the gate and")
-    print("     names the predicate that could not be measured.)")
+    print("     names the predicate that could not be measured. FIXTURE is")
+    print("     worse than either — the banked subject was never built.)")
     print()
 
 
@@ -1759,6 +2294,36 @@ def section_86():
 # here consults today's sys.modules to establish yesterday's producer:
 # these controls verify a RECORDED provenance block against the Stage-A
 # identity it claims.
+def _prov_block(SI, desc, component, **over):
+    """A COMPLETE D379 §4 in-band block for a synthetic descriptor.
+
+    Shared by the helper controls so a fixture can never be narrower than
+    the contract it is used to exercise.
+    """
+    pop = [{"class": SI.CLASS_H2, "identity": m["path"], "sha256": m["sha256"]}
+           for m in desc["h2_sources"]]
+    block = {"stage_a_identity": SI.stage_a_identity(desc),
+             "stage_a_descriptor_digest": SI.stage_a_descriptor_digest(desc),
+             "producer_component": component,
+             "producer_population": pop,
+             "producer_denominator": len(pop),
+             "runtime_identity": desc["runtime"],
+             "subject_commit": desc["subject"]["commit"],
+             "subject_tree": desc["subject"]["tree"],
+             "tree_paths_identity": desc["tree_paths"]["tree_paths_identity"]}
+    if component == "PASS_A":
+        block["census_identity"] = desc["census"]["aggregate_sha256"]
+        block["history_source_identity"] = \
+            desc["history"]["reachable_set_sha256"]
+    else:
+        block["input_binding"] = {
+            "pass_a_artifact_sha256": "0" * 64,
+            "pass_a_stage_a_identity": block["stage_a_identity"],
+            "pass_a_producer_provenance_digest": "0" * 64}
+    block.update(over)
+    return block
+
+
 def section_Q1a():
     print("Q1a — producer-byte provenance against Stage A")
     import stage_identity as SI
@@ -1769,10 +2334,10 @@ def section_Q1a():
     # ONE CANONICAL SCHEMA (D379 §4). This helper previously built
     # `members`, which is the key the old verifier read and the producers
     # never emit.
-    prov = {"stage_a_identity": idA,
-            "producer_population": [
-                {"class": SI.CLASS_H2, "identity": m["path"],
-                 "sha256": m["sha256"]} for m in A["h2_sources"]]}
+    # ...and it must now be the FULL §4 block, because the verifier is no
+    # longer satisfied by a prefix of it. A helper fixture that carries
+    # two of eleven fields tests a verifier that accepts two of eleven.
+    prov = _prov_block(SI, A, "PASS_A")
 
     check("Q1a-1 clean chain: producer provenance verifies against the one "
           "synthetic Stage A", SI.verify_provenance(prov, A)[0] == idA)
@@ -2111,108 +2676,140 @@ BLOCKERS = {
 CASES = []
 
 
-def d379_case(case_id, *, clause, executable, argv, intended_reason,
-              expect_class, expect_output=None, prerequisite=None,
-              cwd=None):
-    """Run ONE banked D379 case against ONE real shipped executable.
+def run_governed_child(*, executable=None, argv=(), snippet=None, cwd=None,
+                       env=None):
+    """Launch a CHILD process whose subject is the GOVERNED code.
 
-    `expect_class`  "ACCEPT" or "REFUSE" — the governed disposition.
-    `intended_reason` a substring that appears ONLY when the case's own
-                    predicate fired. It is declared by the control from the
-                    D379 clause, never read back out of the implementation.
-    `prerequisite`  a substring whose presence proves execution reached the
-                    point where the intended predicate could fire. None
-                    means the invocation itself is the prerequisite.
+    Two shapes, both real subprocesses asserting the real return code:
+
+      executable=...  the shipped CLI is the subject (D379 §8 directly).
+      snippet=...     the subject is a governed DECISION FUNCTION. The
+                      child IMPORTS the actual shipped module, builds the
+                      authorised synthetic input, calls the real function
+                      and exits from its result. The launcher is harness
+                      machinery; the governed function remains the subject,
+                      and NO production interface is widened to make it
+                      reachable.
     """
-    exe = pathlib.Path(executable)
-    subject_sha = (hashlib.sha256(exe.read_bytes()).hexdigest()
-                   if exe.is_file() else None)
-    full = [sys.executable, str(exe)] + list(argv)
-    out, rc = _run_child(full, cwd or V)
-
-    # 3. prerequisite reached?
-    if prerequisite is None:
-        reached = True
+    import subprocess
+    if snippet is not None:
+        full = [sys.executable, "-c",
+                f"import sys; sys.path.insert(0, {str(V)!r})\n" + snippet]
     else:
-        reached = prerequisite in out
-    # 5/6. the intended predicate
-    intended_seen = intended_reason in out
-    # 7. an earlier INDEPENDENT blocker
-    blocker = next((f"{k} [{v}]" for k, v in BLOCKERS.items()
-                    if k in out), None)
-    # argparse refusing an argument the CLI does not declare is itself an
-    # independent blocker for any case whose predicate lies past parsing.
-    unrecognised = "unrecognized arguments" in out or "unrecognized argument" in out
-    if unrecognised and intended_reason != "unrecognized arguments":
-        blocker = blocker or "argparse: unrecognized arguments (CLI_NOT_WIRED)"
+        full = [sys.executable, str(executable)] + list(argv)
+    e = None
+    if env:
+        e = dict(os.environ, **env)
+    pr = subprocess.run(full, cwd=str(cwd or V), capture_output=True,
+                        text=True, env=e)
+    return pr.stdout + pr.stderr, pr.returncode
 
+
+def d379_case(case_id, *, clause, subject_proof, subject_holds,
+              intended_reason, expect_class, executable=None, argv=(),
+              snippet=None, cwd=None, env=None, expect_output=None,
+              prerequisite=None):
+    """One banked D379 case, executed as a subprocess.
+
+    STEP 1 IS RAW EVIDENCE, NOT A FLAG. `subject_proof` is a dict of
+    MEASURED facts and `subject_holds` is a predicate DERIVED from them. A
+    free `hostile_subject_established = YES` would become the next proxy:
+    it would prove nothing except that the harness printed it.
+
+    If the raw proof is absent or contradictory the verdict is FIXTURE —
+    a CONTROL/FIXTURE FAILURE. It is NOT a PASS, and it is NOT a HELD on
+    the intended predicate: an unrelated INC-34 refusal does not excuse a
+    failure to construct the hostile subject.
+
+    THE CASE NAME CARRIES ZERO EVIDENTIAL WEIGHT.
+    """
+    subj_ok = False
+    subj_why = "subject predicate raised"
+    try:
+        subj_ok = bool(subject_holds(subject_proof))
+        subj_why = "derived from the raw facts above"
+    except Exception as ex:                                # noqa: BLE001
+        subj_why = f"subject predicate raised: {ex}"
+
+    exe_sha = None
+    if executable is not None and pathlib.Path(executable).is_file():
+        exe_sha = hashlib.sha256(
+            pathlib.Path(executable).read_bytes()).hexdigest()
+
+    print(f"    {case_id:<8} SUBJECT PROOF ({clause})")
+    for k, v in subject_proof.items():
+        vs = str(v)
+        print(f"               {k:<34} {vs[:96]}")
+    print(f"               subject constructed?           "
+          f"{'YES' if subj_ok else 'NO'} — {subj_why}")
+
+    if not subj_ok:
+        rec = {"case": case_id, "clause": clause, "verdict": "FIXTURE",
+               "subject_proof": subject_proof, "rc": None,
+               "why": f"the hostile subject was NOT constructed: {subj_why}"}
+        CASES.append(rec)
+        print(f"    {case_id:<8} -> FIXTURE  (control/fixture failure; the "
+              f"banked condition was never built)")
+        check(f"{case_id} ({clause}) verdict PASS", False,
+              "FIXTURE: " + rec["why"])
+        return rec
+
+    out, rc = run_governed_child(executable=executable, argv=argv,
+                                 snippet=snippet, cwd=cwd, env=env)
+    reached = True if prerequisite is None else (prerequisite in out)
+    intended_seen = intended_reason in out
+    blocker = next((f"{k} [{v}]" for k, v in BLOCKERS.items() if k in out),
+                   None)
+    unrecognised = ("unrecognized arguments" in out
+                    or "unrecognized argument" in out)
+    if unrecognised and intended_reason not in ("unrecognized arguments",):
+        blocker = blocker or "argparse: unrecognized arguments (CLI_NOT_WIRED)"
     disposition = "ACCEPT" if rc == 0 else "REFUSE"
 
-    # 9. THE VERDICT. ANY earlier independent blocker means this case did
-    #    not measure its own predicate CONSEQUENTIALLY, whatever else is
-    #    also true. Three distinct shapes, all HELD:
-    #
-    #      expected ACCEPT + blocker  the positive cannot be reached while
-    #                                 an independent refusal is forced
-    #      expected REFUSE + blocker + intended observed
-    #                                 OVER-DETERMINED. The finding IS in the
-    #                                 output, and rc could come from either
-    #                                 cause. Without a clean comparator,
-    #                                 consequentiality is NOT PROVEN.
-    #      expected REFUSE + blocker + intended absent
-    #                                 the blocker simply decided it
-    #
-    #    Letting `intended_observed` override a blocker is exactly how a red
-    #    process gets credited to the predicate one hoped for.
     if blocker:
         verdict = "HELD"
         if expect_class == "ACCEPT":
             why = (f"the governed positive cannot be measured while an "
                    f"independent blocker forces refusal: {blocker}")
         elif intended_seen:
-            why = (f"OVER-DETERMINED: the intended finding IS present in the "
-                   f"output, but so is an independent blocker ({blocker}), so "
-                   f"rc is not attributable to this predicate without a clean "
-                   f"comparator. Finding observed; consequentiality NOT PROVEN")
+            why = (f"OVER-DETERMINED: the intended finding IS present and so "
+                   f"is an independent blocker ({blocker}); rc is not "
+                   f"attributable to this predicate without a clean "
+                   f"comparator. Finding observed; consequentiality NOT "
+                   f"PROVEN")
         else:
             why = f"an earlier independent blocker decided the outcome: {blocker}"
     elif not reached:
-        verdict = "HELD"
-        why = "execution did not reach the point where the predicate fires"
+        verdict, why = "HELD", "execution did not reach the predicate"
     elif disposition != expect_class:
-        verdict = "FAIL"
-        why = f"disposition {disposition} != governed {expect_class}"
+        verdict, why = "FAIL", f"disposition {disposition} != governed {expect_class}"
     elif not intended_seen:
-        verdict = "FAIL"
-        why = (f"the governed disposition occurred but the intended reason "
-               f"was not observed: {intended_reason!r}")
-    elif expect_output is not None:
-        created = pathlib.Path(expect_output["path"]).exists()
-        if created != expect_output["created"]:
-            verdict, why = "FAIL", (
-                f"output created={created}, governed "
-                f"{expect_output['created']}")
-        else:
-            verdict, why = "PASS", "intended predicate was first-effective"
+        verdict, why = "FAIL", (f"governed disposition occurred but the "
+                                f"intended reason was not observed: "
+                                f"{intended_reason!r}")
+    elif expect_output is not None and (
+            pathlib.Path(expect_output["path"]).exists()
+            != expect_output["created"]):
+        verdict, why = "FAIL", "output created/absent contrary to D379"
     else:
         verdict, why = "PASS", "intended predicate was first-effective"
 
-    rec = {"case": case_id, "clause": clause, "executable": exe.name,
-           "subject_sha256": subject_sha, "argv": list(argv),
-           "prerequisite_reached": reached, "rc": rc,
+    rec = {"case": case_id, "clause": clause,
+           "subject_proof": subject_proof,
+           "executable": (pathlib.Path(executable).name if executable
+                          else "child:governed-function"),
+           "subject_sha256": exe_sha, "argv": list(argv), "rc": rc,
            "disposition": disposition, "expected_class": expect_class,
            "intended_reason": intended_reason,
-           "intended_observed": intended_seen,
-           "earlier_blocker": blocker, "verdict": verdict, "why": why,
-           "evidence": out.strip().splitlines()[-1][:150] if out.strip() else ""}
+           "intended_observed": intended_seen, "earlier_blocker": blocker,
+           "prerequisite_reached": reached, "verdict": verdict, "why": why,
+           "evidence": out.strip().splitlines()[-1][:160] if out.strip() else ""}
     CASES.append(rec)
-    print(f"    {case_id:<12} rc={rc:<3} {disposition:<7} "
-          f"intended={'Y' if intended_seen else 'N'}  "
+    print(f"    {case_id:<8} rc={rc if rc is not None else '-':<3} "
+          f"{disposition:<7} intended={'Y' if intended_seen else 'N'}  "
           f"blocker={'Y' if blocker else 'N'}  -> {verdict}")
     if verdict != "PASS":
-        print(f"                 {why}")
-    # HELD is neither a pass nor a silent skip: it fails the exit gate, and
-    # it is reported with the reason the predicate could not be measured.
+        print(f"               {why}")
     check(f"{case_id} ({clause}) verdict PASS", verdict == "PASS",
           f"{verdict}: {why}")
     return rec
@@ -2255,6 +2852,119 @@ def _capture_calibration():
     return ok
 
 
+def _render_closeout(state, ctl_rc, fx_rc, controls_path):
+    """Render the close-out FROM the captured state. No figure typed here.
+
+    Every count below is computed from `state["cases"]`, which is the exact
+    list the control child built while executing. A hand-maintained
+    close-out can be brought back into agreement with reality by editing
+    the number, which is the opposite of measuring it.
+    """
+    cases = state["cases"]
+    by = lambda v: [c for c in cases if c["verdict"] == v]
+    P, F, H, X = by("PASS"), by("FAIL"), by("HELD"), by("FIXTURE")
+    raw = controls_path.read_bytes() if controls_path.is_file() else b""
+    L = ["D379 / D381 / D382 TRANCHE — CLOSE-OUT",
+         "EVIDENCE CLASS: PRODUCER MEASUREMENT - SIGHTED - ZERO ADMISSION "
+         "WEIGHT.",
+         "Orion self-adjudication carries no admission weight and none is "
+         "claimed.",
+         "",
+         "DERIVED RECORD. Every figure below is computed from the SAME",
+         "captured result state that produced " + controls_path.name + ",",
+         "in the same run. Nothing here is maintained by hand, so no figure",
+         "in this file can be brought into agreement with reality by",
+         "retyping it.",
+         "",
+         "THIS TRANCHE IS NOT CLOSED. The exit gate is FAIL and says so."
+         if state["failed"] else
+         "THE EXIT GATE PASSED. Closure remains a separate register action "
+         "(R7).",
+         "",
+         "STATUS PROVENANCE (D386): every status below is",
+         "subprocess.CompletedProcess.returncode, read from the child that",
+         "produced the captured output. No shell status, no pipeline status,",
+         "no parsed text, no supplied value.",
+         "",
+         f"  D379 control process exit status    {ctl_rc}"
+         f"     ({state['passed']} passed, {state['failed']} failed)",
+         f"  cal_fixtures process exit status    {fx_rc}",
+         f"  capture parent returns              {ctl_rc}",
+         f"  {controls_path.name} size                {len(raw)} bytes",
+         "",
+         "=" * 70,
+         "D379 §8 BANKED CASES — EACH AGAINST ITS OWN CONSTRUCTED SUBJECT",
+         "=" * 70,
+         f"  cases {len(cases)}   PASS {len(P)}   FAIL {len(F)}   "
+         f"HELD {len(H)}   FIXTURE {len(X)}",
+         "",
+         "  STEP 1 OF EVERY CASE IS RAW EVIDENCE, NOT A FLAG. Each case",
+         "  carries the measured facts that establish its hostile subject,",
+         "  and the harness DERIVES whether the subject holds. A case whose",
+         "  proof does not derive is FIXTURE — a control failure. It is not",
+         "  a PASS, and it is not a HELD on the intended predicate.",
+         ""]
+    if X:
+        L += ["  FIXTURE — THE BANKED SUBJECT WAS NEVER CONSTRUCTED:"]
+        L += [f"    {c['case']:<8} {c['why']}" for c in X]
+        L += [""]
+    if P:
+        L += ["  PASS — blocker-free, intended predicate first-effective:"]
+        for c in P:
+            L.append(f"    {c['case']:<8} {c['clause']}")
+        L += ["",
+              "  These are NARROW OBSERVATIONS of these exact invocations.",
+              "  They do not validate the harness, do not make their section",
+              "  green, and close nothing (R7).", ""]
+    if F:
+        L += ["  FAIL:"]
+        L += [f"    {c['case']:<8} {c['why']}" for c in F]
+        L += [""]
+    if H:
+        causes = collections.Counter(
+            (c.get("earlier_blocker") or "prerequisite not reached")
+            for c in H)
+        L += [f"  HELD {len(H)} — by FIRST-EFFECTIVE BLOCKER, counted from",
+              "  the recorded blocker of each case, not assigned by hand:"]
+        for cause, n in causes.most_common():
+            L.append(f"    {n:>3}  {cause}")
+            L.append("         " + ", ".join(
+                c["case"] for c in H
+                if (c.get("earlier_blocker") or "prerequisite not reached")
+                == cause))
+        over = [c for c in H if "OVER-DETERMINED" in c["why"]]
+        if over:
+            L += ["",
+                  f"  OVER-DETERMINED {len(over)}: the intended finding IS "
+                  f"present AND an",
+                  "  independent blocker is present. Finding observed;",
+                  "  consequentiality NOT PROVEN without a clean comparator:",
+                  "    " + ", ".join(c["case"] for c in over)]
+        L += [""]
+    L += ["=" * 70,
+          "PER-CASE RECORD — subject proof, target, status, verdict",
+          "=" * 70]
+    for c in cases:
+        L.append(f"  {c['case']:<8} {c['verdict']:<8} rc="
+                 f"{c['rc'] if c['rc'] is not None else '-':<4} "
+                 f"{c.get('executable', '-')}")
+        L.append(f"           clause: {c['clause']}")
+        for k, v in c.get("subject_proof", {}).items():
+            L.append(f"           proof:  {k} = {str(v)[:110]}")
+        if c["verdict"] != "PASS":
+            L.append(f"           why:    {c['why']}")
+    L += ["",
+          "=" * 70,
+          "GATE FAILURES — verbatim from the same run",
+          "=" * 70]
+    L += [f"  {x}" for x in state["failures"]] or ["  none"]
+    L += ["",
+          "HELD IS NOT A PASS AND NOT A SKIP. Every HELD case FAILS the exit",
+          "gate above and names the predicate that could not be measured.",
+          ""]
+    return "\n".join(L) + "\n"
+
+
 def capture(out_path) -> int:
     """PARENT. Runs the control matrix and the fixtures as SEPARATE children.
 
@@ -2268,8 +2978,11 @@ def capture(out_path) -> int:
              f"captured {datetime.datetime.now(datetime.timezone.utc).isoformat()}",
              ""]
 
+    import tempfile
+    _state = pathlib.Path(tempfile.mkdtemp(prefix="d379_state_")) / "state.json"
     ctl_out, ctl_rc = _run_child(
-        [sys.executable, str(pathlib.Path(__file__).resolve()), "--child"],
+        [sys.executable, str(pathlib.Path(__file__).resolve()), "--child",
+         "--state", str(_state)],
         pathlib.Path(__file__).resolve().parent)
     parts += ["=" * 70,
               "SUBJECT 1 of 2 — THE D379 CONTROL PROCESS",
@@ -2292,6 +3005,24 @@ def capture(out_path) -> int:
               f"  parent returns                     {ctl_rc}", ""]
 
     pathlib.Path(out_path).write_text("\n".join(parts))
+
+    # ── THE CLOSE-OUT IS DERIVED, NOT MAINTAINED ──────────────────────
+    # It was hand-written, so its figures could drift from the run they
+    # described and a stale count could be "repaired" by retyping it. Both
+    # records now come from ONE state object produced by ONE run.
+    co = pathlib.Path(out_path).parent / "D379_CLOSEOUT.txt"
+    if _state.is_file():
+        state = json.loads(_state.read_bytes())
+        co.write_text(_render_closeout(state, ctl_rc, fx_rc,
+                                       pathlib.Path(out_path)))
+        print(f"derived   -> {co}")
+    else:
+        co.write_text(
+            "CLOSE-OUT NOT DERIVED: the control child produced no state "
+            "file, so no figure in this file could be derived from the run "
+            "it describes. Nothing is reported rather than something "
+            "reported from memory (R16).\n")
+        print(f"NO STATE FILE — {co} refuses to report figures")
     print(f"captured -> {out_path}")
     print(f"  D379 control process exit status  {ctl_rc}")
     print(f"  cal_fixtures process exit status  {fx_rc}")
@@ -2301,4 +3032,14 @@ def capture(out_path) -> int:
 if __name__ == "__main__":
     if "--capture" in sys.argv:
         sys.exit(capture(sys.argv[sys.argv.index("--capture") + 1]))
-    sys.exit(main())
+    _rc = main()
+    # ONE MEASUREMENT TRUTH SOURCE. The child dumps the EXACT result state
+    # it just produced; the parent renders BOTH human records from that one
+    # object. Nothing downstream re-counts, re-reads or re-types a figure.
+    if "--state" in sys.argv:
+        pathlib.Path(sys.argv[sys.argv.index("--state") + 1]).write_text(
+            json.dumps({"rc": _rc, "passed": PASSED, "failed": FAILED,
+                        "failures": FAILURES, "cases": CASES,
+                        "sections": SECTIONS, "implemented":
+                        sorted(IMPLEMENTED), "held": HELD}, indent=1))
+    sys.exit(_rc)
