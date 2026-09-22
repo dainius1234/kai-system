@@ -20,6 +20,105 @@
 git log over it — and then fix it, because a handover note that lies is
 worse than none.*
 
+### RESTART POINT — 2026-09-22, D379 executable-bound tranche, FROZEN
+
+*Written at Dainius's explicit instruction, 2026-09-22T20:26:04Z:
+"log current state what we doing where we going, what next". This block
+is NON-AUTHORITATIVE, like the rest of this file. It is NOT the
+ledger-only incident Kai is holding for Dainius's separate decision.
+Every figure here is re-derivable from the source named beside it;
+re-derive before relying on it (R16).*
+
+**WHAT WE ARE DOING.** Wiring the D379 obligations into the REAL shipped
+CLIs and running the banked D379 §8 hostile matrix against them —
+"GO for bounded D379 executable-wiring implementation and hostile
+calibration only. No downstream authority." (Dainius). Governing
+decisions: D379 (`608d706d`), D380, D381 (`838b7637`), D382–D386.
+DECISIONS.md: 370 entries, highest D386; D387 FREE. Ledger highest:
+`INC-2026-09-19-38`.
+
+**WHERE WE ARE GOING** — D379 §9, SEQUENCE FIXED:
+
+    D379 repair -> hostile calibration -> KAI INDEPENDENT REVIEW
+      -> tranche ACCEPT / REJECT
+    only after acceptance: later candidate authority -> final source
+      bytes frozen -> real full-history source bound -> real Stage-A
+      identity created ONCE -> candidate executed
+
+We are inside the first two arrows. Nothing beyond "Kai independent
+review" is authorised.
+
+**THE FOUR STATES — kept separate, because they are not the same thing**
+
+| state | position | source |
+|---|---|---|
+| physical | remote branch `claude/project-rework-plan-pgvp35` HEAD `eb52f73`; PR #122 OPEN, head `eb52f73`, NOT merged | Kai verified remote |
+| authorised baseline | `86ebfdeeeff8b11a4add1cdd7dc0ea03af953de8` | Kai frozen position |
+| unadmitted | `8e3ee69` `fc1bb9d` `630ceaf` `eb52f73` — made after authority was consumed at the return of `86ebfde` for IV&V; technical merit is a SEPARATE question | Kai frozen position |
+| admission | nothing admitted; tranche NOT closed | Kai frozen position |
+
+**MEASUREMENT** — producer measurement, zero admission weight, read
+from the derived close-out of each commit:
+
+    86ebfde  40 cases  PASS 16  FAIL 0  HELD 23  FIXTURE 0  RETURNED 1
+             control rc 1, 196 passed / 32 failed
+    eb52f73  40 cases  PASS 16  FAIL 0  HELD 24
+             control rc 1, 204 passed / 33 failed     (UNADMITTED)
+    both     cal_fixtures rc 1 — machine-bound /tmp paths, NOT repaired,
+             NOT authorised
+
+HELD is dominated by INC-34: this interpreter injects ungoverned
+modules (`sitecustomize`, `_distutils_hack`, `typing.io`, `typing.re`)
+into every producer process, so executable positives cannot be measured
+until a D380-COMPLIANT interpreter exists. D385: change the
+environment, not the rule.
+
+**OPEN, AND WHOSE**
+
+* Kai adjudication, no Orion coding around them:
+  1. Stage-A subject commit/tree <-> actual processed subject binding.
+  2. Q1a-7 external Stage-B anchor transport — `qualify.py` receives no
+     external `producer_provenance_digest`; REPO_CONFIRMED_DEFECT, remedy
+     widens a production CLI contract, UNAUTHORISED.
+  3. Q1a-9 literal self-hash wording vs the constructible structural
+     prohibition.
+  4. D380/D385-compliant runtime prerequisite for executable hostile
+     calibration.
+* Kai: admission review of the four unadmitted commits.
+* Dainius: whether to authorise the ledger-only incident on the
+  authority nonconformance (source facts only, no mechanism, no motive,
+  no INC-38 link; wording in Kai's frozen position).
+* Governance gap, bidirectional: no authoritative receipt chain for
+  instructions or reports between Kai and Orion. Delivery of the two
+  HOLDs to this executor session is UNVERIFIED. Git is the only artefact
+  both sides inspect directly.
+* Incidents OPEN: INC-34, INC-36, INC-37, INC-38. None closed.
+
+**WHAT NEXT, IN ORDER**
+
+1. Kai rules on the four root items and on admitting / not admitting
+   the four commits.
+2. Only then: resume from the admitted state, never from physical HEAD
+   by default. If none of the four is admitted, the restart tree is
+   `86ebfde`'s.
+3. Rerun `python3 d379_controls.py --capture D379_CONTROLS.txt` from
+   `kai-pm/house_in_order_h2_v13/build_evidence/`; controls and close-out
+   derive from ONE captured state. Verify `git status` clean and the
+   ten governed sources unchanged after the run.
+4. Return for Kai independent review. Then STOP until a positive grant.
+
+**STANDING PROHIBITIONS** — no banking, no D387, no incident closure, no
+mechanism assignment, no production Stage A, no candidate, no production
+Pass A / classification, no holdout / blind 40, no merge. PR #122 DO NOT
+MERGE. `NEXT_STINT_PLAN.md` was written 2026-08-07 and predates this
+tranche; it is not the current plan.
+
+**THE STANDING LESSON, one line.** Authority is part of correctness:
+"return for IV&V" ends the authorised step, and no later message that
+does not NAME a mutation grants one.
+
+---
+
 **Last updated:** 2026-08-11, end of the service-identity stint. The
 KAI-GATE-048 C position below is newer than that date and is kept
 current separately.
