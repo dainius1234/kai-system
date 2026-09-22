@@ -771,7 +771,23 @@ def verify_provenance(recorded, descriptor, *, pass_a_bytes=None,
                       artifact_bytes=None):
     """Verify a RECORDED producer provenance against Stage A, or REFUSE.
 
-    FULL D379 §4, NOT A PREFIX OF IT. The previous implementation verified
+    NOT COMPLETE, AND THE LIMIT IS NAMED. Kai, on 0523108: calling this
+    path complete is still too wide. Two things it does NOT do:
+
+      1. `producer_population` members outside CLASS_H2 get shape checking
+         only. No semantic check is applied to CENSUS, STDLIB, BUILTIN or
+         FROZEN members.
+      2. A SELF-CONSISTENT tamper -- one that shortens the recorded
+         population AND its denominator together -- is NOT detectable
+         here, and cannot be, because D379 §5 says a process need not
+         load every Stage-A member. Distinguishing "legitimately fewer"
+         from "deleted after production" requires the EXTERNAL Stage-B
+         binding's `producer_provenance_digest`, which no caller of this
+         function is currently given. That is banked case Q1a-7 and it is
+         RETURNED TO KAI as a CLI contract question, not worked around
+         here with another in-object proxy.
+
+    What it DOES do, which the previous implementation did not:
     `stage_a_identity` and `producer_population` and returned success — so
     a block whose `subject_commit`, `runtime_identity`, `census_identity`,
     `tree_paths_identity` or `producer_denominator` were wrong verified
@@ -807,21 +823,62 @@ def verify_provenance(recorded, descriptor, *, pass_a_bytes=None,
             f"unexpected={sorted(got - expect_fields)}")
 
     # ── D379 §4: NO SELF-OUTPUT DIGEST IN EITHER ──────────────────────
-    # BEFORE the value comparators. A planted self-digest necessarily
-    # makes some field diverge from Stage A, so a comparator running
-    # first reports a stale-field mismatch and the structural
-    # prohibition is never the reason given. Same red process, wrong
-    # predicate -- which is the defect this tranche exists to remove.
+    # BEFORE the value comparators. A planted self-digest necessarily makes
+    # some field diverge from Stage A, so a comparator running first
+    # reports a stale-field mismatch and the structural prohibition is
+    # never the reason given. Same red process, wrong predicate -- which is
+    # the defect this tranche exists to remove.
+    #
+    # WHAT IS ACTUALLY CONSTRUCTIBLE, stated plainly. A digest of the exact
+    # final bytes INCLUDING that digest is a fixed point and no producer
+    # can compute one. The self-references a producer CAN construct are:
+    #
+    #   (a) the digest of the artefact bytes as they stand, planted by a
+    #       later rewrite -- caught by comparing against artifact_bytes;
+    #   (b) the digest of the artefact WITH ITS OWN PROVENANCE BLOCK
+    #       REMOVED -- the classic self-referential manifest, and the form
+    #       a real producer would reach for.
+    #
+    # Both are computed HERE, from the artefact, and neither is supplied by
+    # the caller. Checking only (a) would leave the constructible one open.
     if artifact_bytes is not None:
-        own = sha256_hex(artifact_bytes)
-        hit = [k for k, v in recorded.items()
-               if isinstance(v, str) and v == own]
-        if hit:
+        forbidden = {sha256_hex(artifact_bytes): "the artefact's own bytes"}
+        try:
+            doc = json.loads(artifact_bytes.decode("utf-8"))
+            if isinstance(doc, dict) and "producer_provenance" in doc:
+                stripped = {k: v for k, v in doc.items()
+                            if k != "producer_provenance"}
+                forbidden[sha256_hex(_jcs(stripped))] = (
+                    "the artefact with its own provenance block removed")
+        except (ValueError, UnicodeDecodeError):
+            pass                      # a non-JSON artefact still gets (a)
+
+        # THE WHOLE OBJECT, NOT ITS TOP LEVEL. The previous scan read
+        # `recorded.items()` and tested `isinstance(v, str)`, so a digest
+        # inside input_binding, or inside any producer_population member,
+        # satisfied a structural prohibition by being nested. D379 does not
+        # say "top-level strings".
+        hits = []
+
+        def walk(node, path):
+            if isinstance(node, str):
+                if node in forbidden:
+                    hits.append((path, forbidden[node]))
+            elif isinstance(node, dict):
+                for k, v in node.items():
+                    walk(v, f"{path}.{k}" if path else str(k))
+            elif isinstance(node, (list, tuple)):
+                for i, v in enumerate(node):
+                    walk(v, f"{path}[{i}]")
+
+        walk(recorded, "")
+        if hits:
             raise StageIdentityError(
-                f"REFUSE AS INVALID IDENTITY CONSTRUCTION: the in-band "
-                f"provenance declares the artefact's own whole-file digest "
-                f"in {hit}. D379 §4 — no self-output digest, no fixed-point "
-                f"hash.")
+                "REFUSE AS INVALID IDENTITY CONSTRUCTION: the in-band "
+                "provenance declares a digest of its own output at "
+                + "; ".join(f"{loc} (= {what})" for loc, what in hits)
+                + ". D379 §4 -- no self-output digest, no fixed-point hash.")
+
     # ── every field with an authoritative comparator, mechanically ────
     cmps = _prov_comparators(descriptor)
     for field in sorted(expect_fields & set(cmps)):

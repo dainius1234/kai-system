@@ -399,7 +399,19 @@ def main():
     # ── D379 §4 — READ ONCE, HASH THOSE BYTES, PARSE THOSE SAME BYTES ──
     # The accepted S1 principle. Never read, then hash a second read, then
     # assume they match.
-    _pa_bytes = pathlib.Path(a.passa).read_bytes()
+    # D379 §8 SB-1 -- "Pass A absent -> REFUSE, R11 abort". There was no
+    # gate here: the next line raised FileNotFoundError and the process
+    # died with a traceback. A crash is not a fail-closed governed
+    # refusal. It happens to be red, which is exactly why it passed for a
+    # governed refusal, and a red process without the governed predicate
+    # earns no calibration claim.
+    _pa_path = pathlib.Path(a.passa)
+    if not _pa_path.is_file():
+        raise SystemExit(
+            f"R11 ABORT: no Pass-A artefact at {a.passa}. The subject of "
+            f"classification does not exist, so nothing downstream of it "
+            f"may be measured. Refusing before any work.")
+    _pa_bytes = _pa_path.read_bytes()
     _pa_sha = hashlib.sha256(_pa_bytes).hexdigest()
     pa = json.loads(_pa_bytes.decode("utf-8"))
     _cls_prov = _classification_provenance(a.stage_a, pathlib.Path(
