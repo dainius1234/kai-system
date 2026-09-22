@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kai.cai.work_authority.v1",
+  "title": "CAI Work Authority record (payload of a signed tag under refs/tags/kai-wa/wa/)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "repository_id",
+    "repository_full_name",
+    "wa_id",
+    "baseline_commit",
+    "baseline_tree",
+    "control_level",
+    "allowed_paths",
+    "allowed_prefixes",
+    "forbidden_paths",
+    "forbidden_prefixes",
+    "expires_at",
+    "governing_refs",
+    "required_verification",
+    "prohibited_operations",
+    "issuer",
+    "note"
+  ],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "kai.cai.work_authority.v1"
+    },
+    "repository_id": {
+      "type": "integer",
+      "const": 1004463473
+    },
+    "repository_full_name": {
+      "type": "string",
+      "const": "dainius1234/kai-system"
+    },
+    "wa_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+    },
+    "baseline_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "baseline_tree": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "control_level": {
+      "type": "string",
+      "pattern": "^C[0-9]$"
+    },
+    "allowed_paths": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[^/].*[^/]$"
+      }
+    },
+    "allowed_prefixes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[^/].*/$"
+      }
+    },
+    "forbidden_paths": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[^/].*[^/]$"
+      }
+    },
+    "forbidden_prefixes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[^/].*/$"
+      }
+    },
+    "expires_at": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "governing_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "commit",
+          "path",
+          "sha256"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "git-blob"
+          },
+          "commit": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40}$"
+          },
+          "path": {
+            "type": "string",
+            "pattern": "^[^\\x00-\\x1f\\x7f\\\\]{1,4096}$"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "required_verification": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "prohibited_operations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "issuer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "note": {
+      "type": "string"
+    }
+  }
+}

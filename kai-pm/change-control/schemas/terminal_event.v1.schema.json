@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kai.cai.terminal_event.v1",
+  "title": "CAI HOLD / REVOKE record (payload of a signed tag under refs/tags/kai-wa/ev/<wa_id>/)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "repository_id",
+    "repository_full_name",
+    "event_id",
+    "wa_id",
+    "event",
+    "admission_sequence_at_issue",
+    "issuer",
+    "note"
+  ],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "kai.cai.terminal_event.v1"
+    },
+    "repository_id": {
+      "type": "integer",
+      "const": 1004463473
+    },
+    "repository_full_name": {
+      "type": "string",
+      "const": "dainius1234/kai-system"
+    },
+    "event_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+    },
+    "wa_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+    },
+    "event": {
+      "type": "string",
+      "enum": [
+        "HOLD",
+        "REVOKE"
+      ]
+    },
+    "admission_sequence_at_issue": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "issuer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "note": {
+      "type": "string"
+    }
+  }
+}
