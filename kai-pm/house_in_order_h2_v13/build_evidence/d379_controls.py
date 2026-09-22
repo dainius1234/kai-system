@@ -1227,10 +1227,10 @@ sys.exit(1)
             k for k, v in FALSE_ROUTE_TEXTS.items() if COMMIT in v),
         "pre_repair_commit": PRE_REPAIR_COMMIT,
         "pre_repair_package_dir": str(pre),
-        "pre_repair_passa_has_subject_of":
-            "_subject_of" in (pre / "passa.py").read_text(),
-        "current_passa_has_subject_of":
-            "_subject_of" in (V / "passa.py").read_text()}
+        "pre_repair_passa_defs_of_subject_of":
+            (pre / "passa.py").read_text().count("def _subject_of("),
+        "current_passa_defs_of_subject_of":
+            (V / "passa.py").read_text().count("def _subject_of(")}
     m2_holds = lambda pr: (
         pr["false_route_count"] == 3
         and sorted(pr["commit_token_present_in"])
@@ -1239,8 +1239,8 @@ sys.exit(1)
         and pr["genuine_route_sha256"] not in pr["false_route_sha256"].values()
         and sorted(pr["route_paths_matching_AUDIT_PATH"])
         == sorted(pr["false_route_predicates"])
-        and pr["pre_repair_passa_has_subject_of"] is False
-        and pr["current_passa_has_subject_of"] is True)
+        and pr["pre_repair_passa_defs_of_subject_of"] == 0
+        and pr["current_passa_defs_of_subject_of"] == 1)
 
     print("  classify.lifecycle   (child process, real governed function)")
 
@@ -1298,9 +1298,10 @@ TOK = {tok!r}
               subject_proof={"HEAD_BYTES": H, "token_length": len(tok),
                              "token_start_offset": H - 10,
                              "token_end_offset": H - 10 + len(tok),
-                             "straddles_boundary": (H - 10) < H < (H - 10 + len(tok)),
                              "governed_target": "passa.HEX + passa._eligible"},
-              subject_holds=lambda pr: pr["straddles_boundary"] is True,
+              subject_holds=lambda pr: (pr["token_start_offset"]
+                                        < pr["HEAD_BYTES"]
+                                        < pr["token_end_offset"]),
               snippet=D14_HEAD + """
 pad = '.' * (H - 10)
 s = pad + TOK + ' tail'
@@ -1385,12 +1386,12 @@ sys.exit(1)
     d379_case("SB-3", clause="D379 §8 Pass A unbound -> REFUSE",
               subject_proof={
                   "passa_path": str(unbound), "path_exists": unbound.is_file(),
-                  "carries_producer_provenance":
-                      "producer_provenance" in json.loads(unbound.read_bytes()),
+                  "top_level_keys":
+                      sorted(json.loads(unbound.read_bytes())),
                   "governed_target": "run_h2_v12.py"},
               subject_holds=lambda pr: (pr["path_exists"] is True
-                                        and pr["carries_producer_provenance"]
-                                        is False),
+                                        and "producer_provenance"
+                                        not in pr["top_level_keys"]),
               executable=V / "run_h2_v12.py",
               argv=["--subject-repo", str(REPO), "--passa", str(unbound),
                     "--out", str(d / "sb3.json"),
@@ -1406,11 +1407,12 @@ sys.exit(1)
                              "Stage-A unchanged",
               subject_proof={
                   "original": str(f["passa"]), "altered": str(altered),
-                  "bytes_differ": f["passa"].read_bytes()
-                  != altered.read_bytes(),
+                  "original_sha256": SI.sha256_hex(f["passa"].read_bytes()),
+                  "altered_sha256": SI.sha256_hex(altered.read_bytes()),
                   "stage_a_untouched": str(f["stage_a"]),
                   "governed_target": "stage_identity.stage_b_binding"},
-              subject_holds=lambda pr: pr["bytes_differ"] is True,
+              subject_holds=lambda pr: (pr["original_sha256"]
+                                        != pr["altered_sha256"]),
               snippet=f"""
 import json, sys
 import stage_identity as SI
@@ -1464,9 +1466,13 @@ def exec_bound_cases():
         rel = "kai-pm/house_in_order_h2_v13/passa.py"
         rec = {m["path"]: m["sha256"]
                for m in json.loads(f["stage_a"].read_bytes())["h2_sources"]}
-        pr = {"stage_a_recorded[passa.py]": rec[rel][:16] + "…",
+        # FULL DIGESTS. These were truncated to 16 characters and then
+        # COMPARED truncated, so the proof claimed digest equality and
+        # measured prefix equality. A display truncation must never become
+        # the operand of the predicate.
+        pr = {"stage_a_recorded[passa.py]": rec[rel],
               "actual_sha256(passa.py)":
-                  SI.sha256_hex((REPO / rel).read_bytes())[:16] + "…"}
+                  SI.sha256_hex((REPO / rel).read_bytes())}
         pr.update(dict(extra))
         return pr
 
@@ -1646,15 +1652,13 @@ print('ACCEPTED — no refusal'); sys.exit(0)
               subject_proof={
                   "external_module_path": extp,
                   "file_exists": f["ext_mod"].is_file(),
-                  "under_h2_root": extp.startswith(h2root + os.sep),
-                  "under_census_root": extp.startswith(censusroot + os.sep),
-                  "under_stdlib_prefix": extp.startswith(
-                      os.path.dirname(os.__file__) + os.sep),
+                  "governed_roots": [h2root, censusroot,
+                                     os.path.dirname(os.__file__)],
                   "governed_target": "stage_identity.producer_population"},
-              subject_holds=lambda pr: (pr["file_exists"] is True
-                                        and not pr["under_h2_root"]
-                                        and not pr["under_census_root"]
-                                        and not pr["under_stdlib_prefix"]),
+              subject_holds=lambda pr: (
+                  pr["file_exists"] is True
+                  and not any(pr["external_module_path"].startswith(r + os.sep)
+                              for r in pr["governed_roots"])),
               snippet=f"""
 import sys
 sys.path.insert(0, {str(f["ext_dir"])!r})
@@ -1908,16 +1912,16 @@ sys.exit(1)
                   "disposable_tree": str(t6),
                   "producer_provenance_verifies_under_this_stage_a":
                       _p6_verifies,
-                  "producer_population_includes_qualify_py": any(
-                      m["identity"].endswith("qualify.py")
-                      for m in _p6["producer_population"]),
+                  "producer_population_identities": sorted(
+                      m["identity"] for m in _p6["producer_population"]),
                   "mutated_member": H2REL + "qualify.py",
                   "stage_a_records_sha": bs6[H2REL + "qualify.py"],
                   "sha_when_stage_a_was_fixed": a6,
                   "sha_of_bytes_now_on_disk": b6},
               subject_holds=lambda pr: (
                   pr["producer_provenance_verifies_under_this_stage_a"] is True
-                  and pr["producer_population_includes_qualify_py"] is False
+                  and not any(i.endswith("/qualify.py")
+                              for i in pr["producer_population_identities"])
                   and pr["stage_a_records_sha"]
                   == pr["sha_when_stage_a_was_fixed"]
                   != pr["sha_of_bytes_now_on_disk"]),

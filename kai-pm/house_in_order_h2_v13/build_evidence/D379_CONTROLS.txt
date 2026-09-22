@@ -8,7 +8,7 @@ subprocess.CompletedProcess.returncode, read directly from the child
 that produced the output immediately above it. No shell status, no
 pipeline status, no parsed text, no supplied value.
 
-captured 2026-09-22T19:35:54.619512+00:00
+captured 2026-09-22T19:51:42.580151+00:00
 
 ======================================================================
 SUBJECT 1 of 2 — THE D379 CONTROL PROCESS
@@ -240,13 +240,13 @@ D379 §8 EXECUTABLE-BOUND EXECUTION — the real shipped CLIs
 
   passa.py
     Q1a-1    SUBJECT PROOF (D379 §8 clean chain on one Stage A)
-               stage_a_recorded[passa.py]         9d27888937655233…
-               actual_sha256(passa.py)            9d27888937655233…
+               stage_a_recorded[passa.py]         9d2788893765523367d7d4979ca831c3e48495c9c9ecf052baa62232e89985a6
+               actual_sha256(passa.py)            9d2788893765523367d7d4979ca831c3e48495c9c9ecf052baa62232e89985a6
                subject constructed?           YES — derived from the raw facts above
     Q1a-1    rc=1   REFUSE  intended=N  blocker=Y  -> HELD
                the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
     Q1a-2    SUBJECT PROOF (D379 §8 Pass-A producer byte changed AFTER Stage A fixed)
-               disposable_tree                    /tmp/d379_tree_q1a2_u0nzliv8
+               disposable_tree                    /tmp/d379_tree_q1a2_sp1ok2pv
                mutated_member                     kai-pm/house_in_order_h2_v13/passa.py
                stage_a_records_sha                9d2788893765523367d7d4979ca831c3e48495c9c9ecf052baa62232e89985a6
                sha_when_stage_a_was_fixed         9d2788893765523367d7d4979ca831c3e48495c9c9ecf052baa62232e89985a6
@@ -255,8 +255,8 @@ D379 §8 EXECUTABLE-BOUND EXECUTION — the real shipped CLIs
     Q1a-2    rc=1   REFUSE  intended=N  blocker=Y  -> HELD
                an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
     DEP-2    SUBJECT PROOF (D379 §8 ordinary stdlib under a governed interpreter)
-               stage_a_recorded[passa.py]         9d27888937655233…
-               actual_sha256(passa.py)            9d27888937655233…
+               stage_a_recorded[passa.py]         9d2788893765523367d7d4979ca831c3e48495c9c9ecf052baa62232e89985a6
+               actual_sha256(passa.py)            9d2788893765523367d7d4979ca831c3e48495c9c9ecf052baa62232e89985a6
                stdlib_modules_loaded_sample       __future__,_bz2,_collections_abc
                stdlib_modules_loaded_count        88
                stage_a_h2_source_count            10
@@ -271,30 +271,28 @@ D379 §8 EXECUTABLE-BOUND EXECUTION — the real shipped CLIs
     DEP-3    rc=1   REFUSE  intended=N  blocker=Y  -> HELD
                an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
     Q1a-8    SUBJECT PROOF (D379 §5 no silent runtime expansion)
-               disposable_tree                    /tmp/d379_tree_q1a8_qsle695h
+               disposable_tree                    /tmp/d379_tree_q1a8_e64blgzi
                stage_a_member_paths               ['kai-pm/house_in_order_h2_v13/cal_fixtures.py', 'kai-pm/house_in_order_h2_v13/classify.py', 'ka
                stage_a_member_count               10
                validate_descriptor_accepted       True
                extra_module_rel                   kai-pm/house_in_order_h2_v13/extra_governed_module.py
-               extra_module_resolved              /tmp/d379_tree_q1a8_qsle695h/kai-pm/house_in_order_h2_v13/extra_governed_module.py
-               governed_h2_root                   /tmp/d379_tree_q1a8_qsle695h/kai-pm/house_in_order_h2_v13
+               extra_module_resolved              /tmp/d379_tree_q1a8_e64blgzi/kai-pm/house_in_order_h2_v13/extra_governed_module.py
+               governed_h2_root                   /tmp/d379_tree_q1a8_e64blgzi/kai-pm/house_in_order_h2_v13
                governed_target                    stage_identity.check_population
                subject constructed?           YES — derived from the raw facts above
     Q1a-8    rc=1   REFUSE  intended=N  blocker=Y  -> HELD
                an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
     DEP-1    SUBJECT PROOF (D379 §8 synthetic producer, external dep)
-               external_module_path               /tmp/d379_exec_jreuc_t3/ext_pkg/hostile_ext.py
+               external_module_path               /tmp/d379_exec_4k0do9ty/ext_pkg/hostile_ext.py
                file_exists                        True
-               under_h2_root                      False
-               under_census_root                  False
-               under_stdlib_prefix                False
+               governed_roots                     ['/home/user/kai-system/kai-pm/house_in_order_h2_v13', '/home/user/kai-system/kai-pm/house_in_or
                governed_target                    stage_identity.producer_population
                subject constructed?           YES — derived from the raw facts above
     DEP-1    rc=1   REFUSE  intended=Y  blocker=Y  -> HELD
                OVER-DETERMINED: the intended finding IS present and so is an independent blocker (lies outside the governed H2 root [INC-34 ungoverned runtime]); rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
   run_h2_v12.py
     Q1a-3    SUBJECT PROOF (D379 §8 classification-producer byte changed AFTER Stage A fixed)
-               disposable_tree                    /tmp/d379_tree_q1a3__qy3lc8l
+               disposable_tree                    /tmp/d379_tree_q1a3_ygmc5060
                mutated_member                     kai-pm/house_in_order_h2_v13/classify.py
                stage_a_records_sha                226873676c2373faaf29f4709bb1bb62d1d22f3c56cbdc0e594314cb6e5df9e8
                sha_when_stage_a_was_fixed         226873676c2373faaf29f4709bb1bb62d1d22f3c56cbdc0e594314cb6e5df9e8
@@ -310,7 +308,7 @@ D379 §8 EXECUTABLE-BOUND EXECUTION — the real shipped CLIs
                subject constructed?           YES — derived from the raw facts above
     Q1a-4    rc=1   REFUSE  intended=Y  blocker=N  -> PASS
     Q1a-9    SUBJECT PROOF (D379 §4 self-hash prohibition (both limbs))
-               artifact                           /tmp/d379_exec_jreuc_t3/q1a9_artifact.json
+               artifact                           /tmp/d379_exec_4k0do9ty/q1a9_artifact.json
                planted_value                      033cc16a6f5015bedc9c4145687ccadfbff8e0e870a7d51522be6039ac83afe9
                digest_of_written_artifact_minus_provenance 033cc16a6f5015bedc9c4145687ccadfbff8e0e870a7d51522be6039ac83afe9
                digest_of_written_artifact_as_a_whole 8153575a0b2063de53963216f6b426aed5ec273eb6133db8d68c6b6af071f931
@@ -325,9 +323,9 @@ D379 §8 EXECUTABLE-BOUND EXECUTION — the real shipped CLIs
     Q1a-5    rc=1   REFUSE  intended=N  blocker=Y  -> HELD
                an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
     Q1a-6    SUBJECT PROOF (D379 §8 producer provenance VALID, qualifier qualification bytes differ -> §8(6))
-               disposable_tree                    /tmp/d379_tree_q1a6_ntdtbna4
+               disposable_tree                    /tmp/d379_tree_q1a6_4nk64m5o
                producer_provenance_verifies_under_this_stage_a True
-               producer_population_includes_qualify_py False
+               producer_population_identities     ['kai-pm/house_in_order_h2_v13/cal_fixtures.py', 'kai-pm/house_in_order_h2_v13/classify.py', 'ka
                mutated_member                     kai-pm/house_in_order_h2_v13/qualify.py
                stage_a_records_sha                f7ff84f6e6c0aa81e0c475b7ce66a7456a1d4c87669c124ea1d84f47c80a6485
                sha_when_stage_a_was_fixed         f7ff84f6e6c0aa81e0c475b7ce66a7456a1d4c87669c124ea1d84f47c80a6485
@@ -426,7 +424,7 @@ D379 §8 EXECUTABLE-BOUND EXECUTION — the real shipped CLIs
     Q1b-6    rc=1   REFUSE  intended=Y  blocker=Y  -> HELD
                the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
     86-1     SUBJECT PROOF (D367 §8(6) fail-closed qualifier identity)
-               manifest_path                      /tmp/d379_exec_jreuc_t3/MANIFEST.sha256
+               manifest_path                      /tmp/d379_exec_4k0do9ty/MANIFEST.sha256
                manifest_entries                   10
                manifest_pairs                     [['19f295d731183bf672061d60b17b0f7d01ce9d1aa3d340bdb2854b0bda4352fb', 'subjectbind.py'], ['22687
                stage_a_pairs                      [['19f295d731183bf672061d60b17b0f7d01ce9d1aa3d340bdb2854b0bda4352fb', 'subjectbind.py'], ['22687
@@ -435,7 +433,7 @@ D379 §8 EXECUTABLE-BOUND EXECUTION — the real shipped CLIs
                the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
     86-3     SUBJECT PROOF (D367 §8(6) fail-closed qualifier identity)
                argv_flags                         ['--result', '--stage-a']
-               argv_as_passed                     ['--result', '/tmp/d379_exec_jreuc_t3/result.json', '--stage-a', '/tmp/d379_exec_jreuc_t3/stage_
+               argv_as_passed                     ['--result', '/tmp/d379_exec_4k0do9ty/result.json', '--stage-a', '/tmp/d379_exec_4k0do9ty/stage_
                subject constructed?           YES — derived from the raw facts above
     86-3     rc=2   REFUSE  intended=Y  blocker=N  -> PASS
     86-4     SUBJECT PROOF (D367 §8(6) fail-closed qualifier identity)
@@ -444,7 +442,7 @@ D379 §8 EXECUTABLE-BOUND EXECUTION — the real shipped CLIs
                subject constructed?           YES — derived from the raw facts above
     86-4     rc=1   REFUSE  intended=Y  blocker=N  -> PASS
     86-5     SUBJECT PROOF (D367 §8(6) fail-closed qualifier identity)
-               manifest_path                      /tmp/d379_exec_jreuc_t3/EMPTY.sha256
+               manifest_path                      /tmp/d379_exec_4k0do9ty/EMPTY.sha256
                path_exists                        True
                byte_size                          0
                subject constructed?           YES — derived from the raw facts above
@@ -504,16 +502,16 @@ D379 §8 EXECUTABLE-BOUND EXECUTION — the real shipped CLIs
                subject constructed?           YES — derived from the raw facts above
     I1A-1    rc=0   ACCEPT  intended=Y  blocker=N  -> PASS
     I1A-2    SUBJECT PROOF (D379 §7 mutate evidence -> only Stage-B moves)
-               stage_a_held_constant              /tmp/d379_exec_jreuc_t3/stage_a.json
-               clean_evidence                     /tmp/d379_exec_jreuc_t3/result.json
-               mutated_evidence                   /tmp/d379_exec_jreuc_t3/result_evidence_mutated.json
+               stage_a_held_constant              /tmp/d379_exec_4k0do9ty/stage_a.json
+               clean_evidence                     /tmp/d379_exec_4k0do9ty/result.json
+               mutated_evidence                   /tmp/d379_exec_4k0do9ty/result_evidence_mutated.json
                clean_evidence_sha256              22a7a4e57953a8c039faede49bb6c3b66a0acfc8f3bffa16629914b1a2e1305f
                mutated_evidence_sha256            038d9728a938e74149a698837347a1a582eb2b0c120dbe7f742a74aa88381572
                governed_target                    stage_identity.stage_b_binding
                subject constructed?           YES — derived from the raw facts above
     I1A-2    rc=0   ACCEPT  intended=Y  blocker=N  -> PASS
     I1A-3    SUBJECT PROOF (D379 §7 I1-A holdout seed independence)
-               stage_a_held_constant              /tmp/d379_exec_jreuc_t3/stage_a.json
+               stage_a_held_constant              /tmp/d379_exec_4k0do9ty/stage_a.json
                tree_paths_held_constant           3
                clean_evidence_sha256              22a7a4e57953a8c039faede49bb6c3b66a0acfc8f3bffa16629914b1a2e1305f
                mutated_evidence_sha256            038d9728a938e74149a698837347a1a582eb2b0c120dbe7f742a74aa88381572
@@ -531,9 +529,9 @@ D379 §8 EXECUTABLE-BOUND EXECUTION — the real shipped CLIs
                route_paths_matching_AUDIT_PATH    ['audited snapshot', 'findings-bearing snapshot', 'subject']
                commit_token_present_in            ['audited snapshot', 'findings-bearing snapshot', 'subject']
                pre_repair_commit                  838b7637
-               pre_repair_package_dir             /tmp/pre_repair_z5p65t11
-               pre_repair_passa_has_subject_of    False
-               current_passa_has_subject_of       True
+               pre_repair_package_dir             /tmp/pre_repair_l8qpiebj
+               pre_repair_passa_defs_of_subject_of 0
+               current_passa_defs_of_subject_of   1
                subject constructed?           YES — derived from the raw facts above
     M2-1     rc=0   ACCEPT  intended=Y  blocker=N  -> PASS
     M2-2     SUBJECT PROOF (D379 §8 PASS-NEW: the three false COMMIT routes no longer classify HISTORICAL)
@@ -545,9 +543,9 @@ D379 §8 EXECUTABLE-BOUND EXECUTION — the real shipped CLIs
                route_paths_matching_AUDIT_PATH    ['audited snapshot', 'findings-bearing snapshot', 'subject']
                commit_token_present_in            ['audited snapshot', 'findings-bearing snapshot', 'subject']
                pre_repair_commit                  838b7637
-               pre_repair_package_dir             /tmp/pre_repair_z5p65t11
-               pre_repair_passa_has_subject_of    False
-               current_passa_has_subject_of       True
+               pre_repair_package_dir             /tmp/pre_repair_l8qpiebj
+               pre_repair_passa_defs_of_subject_of 0
+               current_passa_defs_of_subject_of   1
                subject constructed?           YES — derived from the raw facts above
     M2-2     rc=0   ACCEPT  intended=Y  blocker=N  -> PASS
     M2-3     SUBJECT PROOF (D379 §8 the same-route positive STILL classifies HISTORICAL)
@@ -559,9 +557,9 @@ D379 §8 EXECUTABLE-BOUND EXECUTION — the real shipped CLIs
                route_paths_matching_AUDIT_PATH    ['audited snapshot', 'findings-bearing snapshot', 'subject']
                commit_token_present_in            ['audited snapshot', 'findings-bearing snapshot', 'subject']
                pre_repair_commit                  838b7637
-               pre_repair_package_dir             /tmp/pre_repair_z5p65t11
-               pre_repair_passa_has_subject_of    False
-               current_passa_has_subject_of       True
+               pre_repair_package_dir             /tmp/pre_repair_l8qpiebj
+               pre_repair_passa_defs_of_subject_of 0
+               current_passa_defs_of_subject_of   1
                subject constructed?           YES — derived from the raw facts above
     M2-3     rc=0   ACCEPT  intended=Y  blocker=N  -> PASS
   passa._eligible      (child process, real boundary predicate)
@@ -570,7 +568,6 @@ D379 §8 EXECUTABLE-BOUND EXECUTION — the real shipped CLIs
                token_length                       40
                token_start_offset                 5990
                token_end_offset                   6030
-               straddles_boundary                 True
                governed_target                    passa.HEX + passa._eligible
                subject constructed?           YES — derived from the raw facts above
     D14-A    rc=0   ACCEPT  intended=Y  blocker=N  -> PASS
@@ -590,23 +587,24 @@ D379 §8 EXECUTABLE-BOUND EXECUTION — the real shipped CLIs
     D14-C    rc=0   ACCEPT  intended=Y  blocker=N  -> PASS
   run_h2_v12.py        (Stage-B input conditions)
     SB-1     SUBJECT PROOF (D379 §8 Pass A absent -> REFUSE, R11 abort)
-               passa_path                         /tmp/d379_exec_jreuc_t3/no_such_passA.json
+               passa_path                         /tmp/d379_exec_4k0do9ty/no_such_passA.json
                path_exists                        False
                governed_target                    run_h2_v12.py
                subject constructed?           YES — derived from the raw facts above
     SB-1     rc=1   REFUSE  intended=Y  blocker=N  -> PASS
     SB-3     SUBJECT PROOF (D379 §8 Pass A unbound -> REFUSE)
-               passa_path                         /tmp/d379_exec_jreuc_t3/passA_unbound.json
+               passa_path                         /tmp/d379_exec_4k0do9ty/passA_unbound.json
                path_exists                        True
-               carries_producer_provenance        False
+               top_level_keys                     ['census_dependency', 'history_identity', 'population', 'rows', 'subject', 'subject_tree']
                governed_target                    run_h2_v12.py
                subject constructed?           YES — derived from the raw facts above
     SB-3     rc=1   REFUSE  intended=Y  blocker=N  -> PASS
     SB-2     SUBJECT PROOF (D379 §8 Pass A altered -> Stage-B CHANGES, Stage-A unchanged)
-               original                           /tmp/d379_exec_jreuc_t3/passA.json
-               altered                            /tmp/d379_exec_jreuc_t3/passA_altered.json
-               bytes_differ                       True
-               stage_a_untouched                  /tmp/d379_exec_jreuc_t3/stage_a.json
+               original                           /tmp/d379_exec_4k0do9ty/passA.json
+               altered                            /tmp/d379_exec_4k0do9ty/passA_altered.json
+               original_sha256                    ab0fd930f49b3679f07c29efe70f53dab1c00f8d8368dad1a5e7f0d7b5c1c0ad
+               altered_sha256                     8d83869420fed425ac67d83de008bf8163ff914c0eb04f7439470d4136fa7cd0
+               stage_a_untouched                  /tmp/d379_exec_4k0do9ty/stage_a.json
                governed_target                    stage_identity.stage_b_binding
                subject constructed?           YES — derived from the raw facts above
     SB-2     rc=0   ACCEPT  intended=Y  blocker=N  -> PASS

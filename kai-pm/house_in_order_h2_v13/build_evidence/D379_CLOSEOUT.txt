@@ -18,7 +18,7 @@ no parsed text, no supplied value.
   D379 control process exit status    1     (196 passed, 32 failed)
   cal_fixtures process exit status    1
   capture parent returns              1
-  D379_CONTROLS.txt size                56458 bytes
+  D379_CONTROLS.txt size                56890 bytes
 
 ======================================================================
 D379 §8 BANKED CASES — EACH AGAINST ITS OWN CONSTRUCTED SUBJECT
@@ -101,12 +101,12 @@ PER-CASE RECORD — subject proof, target, status, verdict
 ======================================================================
   Q1a-1    HELD     rc=1    passa.py
            clause: D379 §8 clean chain on one Stage A
-           proof:  stage_a_recorded[passa.py] = 9d27888937655233…
-           proof:  actual_sha256(passa.py) = 9d27888937655233…
+           proof:  stage_a_recorded[passa.py] = 9d2788893765523367d7d4979ca831c3e48495c9c9ecf052baa62232e89985a6
+           proof:  actual_sha256(passa.py) = 9d2788893765523367d7d4979ca831c3e48495c9c9ecf052baa62232e89985a6
            why:    the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
   Q1a-2    HELD     rc=1    passa.py
            clause: D379 §8 Pass-A producer byte changed AFTER Stage A fixed
-           proof:  disposable_tree = /tmp/d379_tree_q1a2_u0nzliv8
+           proof:  disposable_tree = /tmp/d379_tree_q1a2_sp1ok2pv
            proof:  mutated_member = kai-pm/house_in_order_h2_v13/passa.py
            proof:  stage_a_records_sha = 9d2788893765523367d7d4979ca831c3e48495c9c9ecf052baa62232e89985a6
            proof:  sha_when_stage_a_was_fixed = 9d2788893765523367d7d4979ca831c3e48495c9c9ecf052baa62232e89985a6
@@ -114,8 +114,8 @@ PER-CASE RECORD — subject proof, target, status, verdict
            why:    an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
   DEP-2    HELD     rc=1    passa.py
            clause: D379 §8 ordinary stdlib under a governed interpreter
-           proof:  stage_a_recorded[passa.py] = 9d27888937655233…
-           proof:  actual_sha256(passa.py) = 9d27888937655233…
+           proof:  stage_a_recorded[passa.py] = 9d2788893765523367d7d4979ca831c3e48495c9c9ecf052baa62232e89985a6
+           proof:  actual_sha256(passa.py) = 9d2788893765523367d7d4979ca831c3e48495c9c9ecf052baa62232e89985a6
            proof:  stdlib_modules_loaded_sample = __future__,_bz2,_collections_abc
            proof:  stdlib_modules_loaded_count = 88
            proof:  stage_a_h2_source_count = 10
@@ -128,27 +128,25 @@ PER-CASE RECORD — subject proof, target, status, verdict
            why:    an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
   Q1a-8    HELD     rc=1    child:governed-function
            clause: D379 §5 no silent runtime expansion
-           proof:  disposable_tree = /tmp/d379_tree_q1a8_qsle695h
+           proof:  disposable_tree = /tmp/d379_tree_q1a8_e64blgzi
            proof:  stage_a_member_paths = ['kai-pm/house_in_order_h2_v13/cal_fixtures.py', 'kai-pm/house_in_order_h2_v13/classify.py', 'kai-pm/house_in_
            proof:  stage_a_member_count = 10
            proof:  validate_descriptor_accepted = True
            proof:  extra_module_rel = kai-pm/house_in_order_h2_v13/extra_governed_module.py
-           proof:  extra_module_resolved = /tmp/d379_tree_q1a8_qsle695h/kai-pm/house_in_order_h2_v13/extra_governed_module.py
-           proof:  governed_h2_root = /tmp/d379_tree_q1a8_qsle695h/kai-pm/house_in_order_h2_v13
+           proof:  extra_module_resolved = /tmp/d379_tree_q1a8_e64blgzi/kai-pm/house_in_order_h2_v13/extra_governed_module.py
+           proof:  governed_h2_root = /tmp/d379_tree_q1a8_e64blgzi/kai-pm/house_in_order_h2_v13
            proof:  governed_target = stage_identity.check_population
            why:    an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
   DEP-1    HELD     rc=1    child:governed-function
            clause: D379 §8 synthetic producer, external dep
-           proof:  external_module_path = /tmp/d379_exec_jreuc_t3/ext_pkg/hostile_ext.py
+           proof:  external_module_path = /tmp/d379_exec_4k0do9ty/ext_pkg/hostile_ext.py
            proof:  file_exists = True
-           proof:  under_h2_root = False
-           proof:  under_census_root = False
-           proof:  under_stdlib_prefix = False
+           proof:  governed_roots = ['/home/user/kai-system/kai-pm/house_in_order_h2_v13', '/home/user/kai-system/kai-pm/house_in_order_census_v11
            proof:  governed_target = stage_identity.producer_population
            why:    OVER-DETERMINED: the intended finding IS present and so is an independent blocker (lies outside the governed H2 root [INC-34 ungoverned runtime]); rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
   Q1a-3    HELD     rc=1    run_h2_v12.py
            clause: D379 §8 classification-producer byte changed AFTER Stage A fixed
-           proof:  disposable_tree = /tmp/d379_tree_q1a3__qy3lc8l
+           proof:  disposable_tree = /tmp/d379_tree_q1a3_ygmc5060
            proof:  mutated_member = kai-pm/house_in_order_h2_v13/classify.py
            proof:  stage_a_records_sha = 226873676c2373faaf29f4709bb1bb62d1d22f3c56cbdc0e594314cb6e5df9e8
            proof:  sha_when_stage_a_was_fixed = 226873676c2373faaf29f4709bb1bb62d1d22f3c56cbdc0e594314cb6e5df9e8
@@ -162,7 +160,7 @@ PER-CASE RECORD — subject proof, target, status, verdict
            proof:  classification_given_identity = 6e8d8089c8446eed72996624451c8946a07c8b0cf9c5eeb91b649445a08d3c4b
   Q1a-9    PASS     rc=0    child:governed-function
            clause: D379 §4 self-hash prohibition (both limbs)
-           proof:  artifact = /tmp/d379_exec_jreuc_t3/q1a9_artifact.json
+           proof:  artifact = /tmp/d379_exec_4k0do9ty/q1a9_artifact.json
            proof:  planted_value = 033cc16a6f5015bedc9c4145687ccadfbff8e0e870a7d51522be6039ac83afe9
            proof:  digest_of_written_artifact_minus_provenance = 033cc16a6f5015bedc9c4145687ccadfbff8e0e870a7d51522be6039ac83afe9
            proof:  digest_of_written_artifact_as_a_whole = 8153575a0b2063de53963216f6b426aed5ec273eb6133db8d68c6b6af071f931
@@ -174,9 +172,9 @@ PER-CASE RECORD — subject proof, target, status, verdict
            why:    an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
   Q1a-6    HELD     rc=1    qualify.py
            clause: D379 §8 producer provenance VALID, qualifier qualification bytes differ -> §8(6)
-           proof:  disposable_tree = /tmp/d379_tree_q1a6_ntdtbna4
+           proof:  disposable_tree = /tmp/d379_tree_q1a6_4nk64m5o
            proof:  producer_provenance_verifies_under_this_stage_a = True
-           proof:  producer_population_includes_qualify_py = False
+           proof:  producer_population_identities = ['kai-pm/house_in_order_h2_v13/cal_fixtures.py', 'kai-pm/house_in_order_h2_v13/classify.py', 'kai-pm/house_in_
            proof:  mutated_member = kai-pm/house_in_order_h2_v13/qualify.py
            proof:  stage_a_records_sha = f7ff84f6e6c0aa81e0c475b7ce66a7456a1d4c87669c124ea1d84f47c80a6485
            proof:  sha_when_stage_a_was_fixed = f7ff84f6e6c0aa81e0c475b7ce66a7456a1d4c87669c124ea1d84f47c80a6485
@@ -247,7 +245,7 @@ PER-CASE RECORD — subject proof, target, status, verdict
            why:    the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
   86-1     HELD     rc=1    qualify.py
            clause: D367 §8(6) fail-closed qualifier identity
-           proof:  manifest_path = /tmp/d379_exec_jreuc_t3/MANIFEST.sha256
+           proof:  manifest_path = /tmp/d379_exec_4k0do9ty/MANIFEST.sha256
            proof:  manifest_entries = 10
            proof:  manifest_pairs = [['19f295d731183bf672061d60b17b0f7d01ce9d1aa3d340bdb2854b0bda4352fb', 'subjectbind.py'], ['226873676c2373faaf2
            proof:  stage_a_pairs = [['19f295d731183bf672061d60b17b0f7d01ce9d1aa3d340bdb2854b0bda4352fb', 'subjectbind.py'], ['226873676c2373faaf2
@@ -255,14 +253,14 @@ PER-CASE RECORD — subject proof, target, status, verdict
   86-3     PASS     rc=2    qualify.py
            clause: D367 §8(6) fail-closed qualifier identity
            proof:  argv_flags = ['--result', '--stage-a']
-           proof:  argv_as_passed = ['--result', '/tmp/d379_exec_jreuc_t3/result.json', '--stage-a', '/tmp/d379_exec_jreuc_t3/stage_a.json']
+           proof:  argv_as_passed = ['--result', '/tmp/d379_exec_4k0do9ty/result.json', '--stage-a', '/tmp/d379_exec_4k0do9ty/stage_a.json']
   86-4     PASS     rc=1    qualify.py
            clause: D367 §8(6) fail-closed qualifier identity
            proof:  manifest_path = /nonexistent/MANIFEST.sha256
            proof:  path_exists = False
   86-5     PASS     rc=1    qualify.py
            clause: D367 §8(6) fail-closed qualifier identity
-           proof:  manifest_path = /tmp/d379_exec_jreuc_t3/EMPTY.sha256
+           proof:  manifest_path = /tmp/d379_exec_4k0do9ty/EMPTY.sha256
            proof:  path_exists = True
            proof:  byte_size = 0
   86-2     HELD     rc=1    qualify.py
@@ -313,15 +311,15 @@ PER-CASE RECORD — subject proof, target, status, verdict
            proof:  governed_target = stage_identity.stage_a_identity
   I1A-2    PASS     rc=0    child:governed-function
            clause: D379 §7 mutate evidence -> only Stage-B moves
-           proof:  stage_a_held_constant = /tmp/d379_exec_jreuc_t3/stage_a.json
-           proof:  clean_evidence = /tmp/d379_exec_jreuc_t3/result.json
-           proof:  mutated_evidence = /tmp/d379_exec_jreuc_t3/result_evidence_mutated.json
+           proof:  stage_a_held_constant = /tmp/d379_exec_4k0do9ty/stage_a.json
+           proof:  clean_evidence = /tmp/d379_exec_4k0do9ty/result.json
+           proof:  mutated_evidence = /tmp/d379_exec_4k0do9ty/result_evidence_mutated.json
            proof:  clean_evidence_sha256 = 22a7a4e57953a8c039faede49bb6c3b66a0acfc8f3bffa16629914b1a2e1305f
            proof:  mutated_evidence_sha256 = 038d9728a938e74149a698837347a1a582eb2b0c120dbe7f742a74aa88381572
            proof:  governed_target = stage_identity.stage_b_binding
   I1A-3    HELD     rc=2    child:governed-function
            clause: D379 §7 I1-A holdout seed independence
-           proof:  stage_a_held_constant = /tmp/d379_exec_jreuc_t3/stage_a.json
+           proof:  stage_a_held_constant = /tmp/d379_exec_4k0do9ty/stage_a.json
            proof:  tree_paths_held_constant = 3
            proof:  clean_evidence_sha256 = 22a7a4e57953a8c039faede49bb6c3b66a0acfc8f3bffa16629914b1a2e1305f
            proof:  mutated_evidence_sha256 = 038d9728a938e74149a698837347a1a582eb2b0c120dbe7f742a74aa88381572
@@ -337,9 +335,9 @@ PER-CASE RECORD — subject proof, target, status, verdict
            proof:  route_paths_matching_AUDIT_PATH = ['audited snapshot', 'findings-bearing snapshot', 'subject']
            proof:  commit_token_present_in = ['audited snapshot', 'findings-bearing snapshot', 'subject']
            proof:  pre_repair_commit = 838b7637
-           proof:  pre_repair_package_dir = /tmp/pre_repair_z5p65t11
-           proof:  pre_repair_passa_has_subject_of = False
-           proof:  current_passa_has_subject_of = True
+           proof:  pre_repair_package_dir = /tmp/pre_repair_l8qpiebj
+           proof:  pre_repair_passa_defs_of_subject_of = 0
+           proof:  current_passa_defs_of_subject_of = 1
   M2-2     PASS     rc=0    child:governed-function
            clause: D379 §8 PASS-NEW: the three false COMMIT routes no longer classify HISTORICAL
            proof:  false_route_count = 3
@@ -350,9 +348,9 @@ PER-CASE RECORD — subject proof, target, status, verdict
            proof:  route_paths_matching_AUDIT_PATH = ['audited snapshot', 'findings-bearing snapshot', 'subject']
            proof:  commit_token_present_in = ['audited snapshot', 'findings-bearing snapshot', 'subject']
            proof:  pre_repair_commit = 838b7637
-           proof:  pre_repair_package_dir = /tmp/pre_repair_z5p65t11
-           proof:  pre_repair_passa_has_subject_of = False
-           proof:  current_passa_has_subject_of = True
+           proof:  pre_repair_package_dir = /tmp/pre_repair_l8qpiebj
+           proof:  pre_repair_passa_defs_of_subject_of = 0
+           proof:  current_passa_defs_of_subject_of = 1
   M2-3     PASS     rc=0    child:governed-function
            clause: D379 §8 the same-route positive STILL classifies HISTORICAL
            proof:  false_route_count = 3
@@ -363,16 +361,15 @@ PER-CASE RECORD — subject proof, target, status, verdict
            proof:  route_paths_matching_AUDIT_PATH = ['audited snapshot', 'findings-bearing snapshot', 'subject']
            proof:  commit_token_present_in = ['audited snapshot', 'findings-bearing snapshot', 'subject']
            proof:  pre_repair_commit = 838b7637
-           proof:  pre_repair_package_dir = /tmp/pre_repair_z5p65t11
-           proof:  pre_repair_passa_has_subject_of = False
-           proof:  current_passa_has_subject_of = True
+           proof:  pre_repair_package_dir = /tmp/pre_repair_l8qpiebj
+           proof:  pre_repair_passa_defs_of_subject_of = 0
+           proof:  current_passa_defs_of_subject_of = 1
   D14-A    PASS     rc=0    child:governed-function
            clause: D379 §8 straddling token: admitted WHOLE
            proof:  HEAD_BYTES = 6000
            proof:  token_length = 40
            proof:  token_start_offset = 5990
            proof:  token_end_offset = 6030
-           proof:  straddles_boundary = True
            proof:  governed_target = passa.HEX + passa._eligible
   D14-B    PASS     rc=0    child:governed-function
            clause: D379 §8 cut below the recogniser minimum: fail-old loses it, pass-new carries it whole
@@ -388,21 +385,22 @@ PER-CASE RECORD — subject proof, target, status, verdict
            proof:  governed_target = passa._eligible
   SB-1     PASS     rc=1    run_h2_v12.py
            clause: D379 §8 Pass A absent -> REFUSE, R11 abort
-           proof:  passa_path = /tmp/d379_exec_jreuc_t3/no_such_passA.json
+           proof:  passa_path = /tmp/d379_exec_4k0do9ty/no_such_passA.json
            proof:  path_exists = False
            proof:  governed_target = run_h2_v12.py
   SB-3     PASS     rc=1    run_h2_v12.py
            clause: D379 §8 Pass A unbound -> REFUSE
-           proof:  passa_path = /tmp/d379_exec_jreuc_t3/passA_unbound.json
+           proof:  passa_path = /tmp/d379_exec_4k0do9ty/passA_unbound.json
            proof:  path_exists = True
-           proof:  carries_producer_provenance = False
+           proof:  top_level_keys = ['census_dependency', 'history_identity', 'population', 'rows', 'subject', 'subject_tree']
            proof:  governed_target = run_h2_v12.py
   SB-2     PASS     rc=0    child:governed-function
            clause: D379 §8 Pass A altered -> Stage-B CHANGES, Stage-A unchanged
-           proof:  original = /tmp/d379_exec_jreuc_t3/passA.json
-           proof:  altered = /tmp/d379_exec_jreuc_t3/passA_altered.json
-           proof:  bytes_differ = True
-           proof:  stage_a_untouched = /tmp/d379_exec_jreuc_t3/stage_a.json
+           proof:  original = /tmp/d379_exec_4k0do9ty/passA.json
+           proof:  altered = /tmp/d379_exec_4k0do9ty/passA_altered.json
+           proof:  original_sha256 = ab0fd930f49b3679f07c29efe70f53dab1c00f8d8368dad1a5e7f0d7b5c1c0ad
+           proof:  altered_sha256 = 8d83869420fed425ac67d83de008bf8163ff914c0eb04f7439470d4136fa7cd0
+           proof:  stage_a_untouched = /tmp/d379_exec_4k0do9ty/stage_a.json
            proof:  governed_target = stage_identity.stage_b_binding
 
 ======================================================================
