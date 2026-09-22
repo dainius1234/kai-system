@@ -1,0 +1,296 @@
+E2 — ROOT-CAUSE INVESTIGATION. MEASUREMENT ONLY, NO REPAIR.
+PRODUCED BY ORION. ZERO ADJUDICATION WEIGHT. NOT AN ANSWER KEY.
+lineage      M3 002e0ab · M1 53791c4 · acceptance c4960ff
+subject tree 3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+
+1. THE PRODUCER — located by AST, not by grep
+   house_in_order_h2_v13/run_h2_v12.py L244
+     cand['CONSUMED_AT_SUBJECT'] = (bool(row['readers']), lambda: _reader_trace(row, subject_repo))
+   assignment sites in the accepted package: 1
+
+   FINDING — KAI'S QUOTED REV4 LINE IS NOT THE CURRENT CODE.
+   Rev4 quotes  f["CONSUMED_AT_SUBJECT"] = bool(row["readers"])
+   That line is house_in_order_h2_v12/run_h2_v12.py L84. In the
+   ACCEPTED v13 lineage the E1 repair already attached a trace and
+   an evidence-class gate, so the boolean is now paired with a
+   STATIC_READER_REFERENCE witness. The evidence class is therefore
+   already stated correctly IN THE TRACE. What remains inflated is
+   the FACT NAME. This narrows the defect; it does not remove it.
+
+2. WHAT row["readers"] CONTAINS, AND HOW IT IS DERIVED
+   passa.build L551-562, L582:
+     readers[o.target].add(o.src)  for every census Op whose
+     disposition == RESOLVED_READ; row["readers"] is the sorted
+     list of READER SOURCE PATHS, and row["reader_ops"] keeps the
+     src/line/mode/expr locator.
+   census claims.classify L164:
+     o.disposition = {"R": "RESOLVED_READ", ...}[o.mode]
+     reached only when the operation's path fragments are FULLY
+     LEXICALLY FIXED and resolve to a tracked .md document.
+   census opscan._python_ops L269:
+     Op(fn, "R", ast.dump(...), lineno) for a read call found by
+     WALKING THE ABSTRACT SYNTAX TREE of the reading file.
+
+3. DOES ANY RUNTIME OBSERVATION CONTRIBUTE? — NO. Derived:
+   opscan parses source with ast                       True
+   opscan subprocess calls                             
+       L66: subprocess.run(['git', *a], cwd=str(repo), capture_output=True, text=True)
+   opscan reads reader source text from the filesystem True
+   opscan enumerates via git ls-tree HEAD              True
+   claims.py imports subprocess                        False
+   claims.py executes anything                         False
+   The ONLY process ever spawned in the chain is `git ls-tree`, to
+   enumerate tracked files. No target document is executed, no
+   reading script is executed, no import of either is performed,
+   and no execution trace, log, coverage record or invocation
+   observation enters at any stage.
+
+4. IS THE FACT EVER TRUE FOR A NON-STATIC REASON? — NO.
+   There is exactly 1 assignment site and its predicate is
+   bool(row["readers"]). row["readers"] has exactly one producer,
+   shown in section 2. There is no second path.
+
+5. EXACT CURRENT AFFECTED POPULATION
+   reader ANALYSIS SCOPE     615 source files
+     by suffix               {'yml': 29, 'yaml': 1, 'Makefile': 1, 'py': 556, 'sh': 28}
+     admitted suffixes       ['.py', '.sh', '.bash', '.yml', '.yaml'] + Makefile
+     excluded directories    ['__pycache__', '.git', 'node_modules', '.pytest_cache', '.mypy_cache', '.ruff_cache', 'htmlcov', '.venv', 'venv']
+   raw candidate matches     1458
+   rejected non-operations   272
+   admitted operations       1186
+   dispositions              {'UNRESOLVED_RELEVANCE': 715, 'RESOLVED_NON_DOCUMENT_TARGET': 421, 'UNRESOLVED_TARGET': 37, 'RESOLVED_READ': 8, 'RESOLVED_WRITE': 5}
+   RESOLVED_READ operations  8
+   distinct .md read targets 5
+   rows with readers         5
+   rows with reader_ops      5
+   FACT EMITTED TRUE         5
+   abstained under A6-ii     0
+   tracked .md documents     272
+
+   WHY IT IS 5, PROVED RATHER THAN MATCHED TO THE HISTORICAL 5:
+   8 RESOLVED_READ operations collapse onto
+   5 distinct .md targets, one row each,
+   and every one carries a compliant trace so none abstains. The
+   producer condition and the emitted fact coincide exactly.
+   Agreement with the historical figure is an OUTCOME. It was not
+   used as a target and no step was tuned toward it.
+
+   THE NEGATIVE IS ALSO INFLATED, AND THIS IS A SEPARATE FINDING.
+   715 operations could
+   not be shown relevant and 37 could not be resolved
+   to a target. A False therefore means NO RESOLVABLE STATIC READ
+   WAS FOUND IN THE ANALYSED SCOPE -- not that the document is
+   unread. Anything reading False as 'not consumed' inflates an
+   abstention into a negative.
+
+6. EVERY AFFECTED ROW, with the raw reading line
+   CHANGELOG.md
+     readers : ['scripts/auto_changelog.py']
+     op      : scripts/auto_changelog.py:L55 mode=R disp=RESOLVED_READ
+       source: text = CHANGELOG.read_text()
+       expr  : Name(id='CHANGELOG', ctx=Load())
+     op      : scripts/auto_changelog.py:L112 mode=R disp=RESOLVED_READ
+       source: text = CHANGELOG.read_text()
+       expr  : Name(id='CHANGELOG', ctx=Load())
+   README.md
+     readers : ['scripts/sync_docs.py']
+     op      : scripts/sync_docs.py:L139 mode=R disp=RESOLVED_READ
+       source: text = readme_path.read_text()
+       expr  : Name(id='readme_path', ctx=Load())
+   SESSION_BACKLOG.md
+     readers : ['scripts/auto_session_log.py']
+     op      : scripts/auto_session_log.py:L28 mode=R disp=RESOLVED_READ
+       source: text = SESSION_LOG.read_text()
+       expr  : Name(id='SESSION_LOG', ctx=Load())
+     op      : scripts/auto_session_log.py:L77 mode=R disp=RESOLVED_READ
+       source: text = SESSION_LOG.read_text()
+       expr  : Name(id='SESSION_LOG', ctx=Load())
+     op      : scripts/auto_session_log.py:L92 mode=R disp=RESOLVED_READ
+       source: text = SESSION_LOG.read_text()
+       expr  : Name(id='SESSION_LOG', ctx=Load())
+   docs/PROJECT_BACKLOG.md
+     readers : ['scripts/sync_docs.py']
+     op      : scripts/sync_docs.py:L212 mode=R disp=RESOLVED_READ
+       source: text = backlog_path.read_text()
+       expr  : Name(id='backlog_path', ctx=Load())
+   kai-pm/INSTRUMENTATION_ARCHITECTURE.md
+     readers : ['scripts/security/check_gate_registry.py']
+     op      : scripts/security/check_gate_registry.py:L742 mode=R disp=RESOLVED_READ
+       source: doc = ARCHITECTURE_DOC.read_text(encoding="utf-8")
+       expr  : Name(id='ARCHITECTURE_DOC', ctx=Load())
+
+7. EVERY CONSUMER — the fact, the field, and the locator
+   row['readers'] read at, by AST:
+     house_in_order_h2_v13/run_h2_v12.py L245   row['readers']
+   FACT NAME referenced in the accepted package:
+     kai-pm/house_in_order_h2_v13/ontology.py:58:                  "CONSUMED_AT_SUBJECT", "CITES_COMMIT", "CITES_RUN",
+     kai-pm/house_in_order_h2_v13/passa.py:547:    # source path, so a CONSUMED_AT_SUBJECT fact had no locator anywhere
+     kai-pm/house_in_order_h2_v13/run_h2_v12.py:118:    """CONSUMED_AT_SUBJECT. The determining evidence is a STATIC READER
+     kai-pm/house_in_order_h2_v13/run_h2_v12.py:193:    "CONSUMED_AT_SUBJECT":        ("STATIC_READER_REFERENCE", "opscan:"),
+     kai-pm/house_in_order_h2_v13/run_h2_v12.py:231:    CONSUMED_AT_SUBJECT had no witness at all, and 5
+     kai-pm/house_in_order_h2_v13/run_h2_v12.py:244:    cand["CONSUMED_AT_SUBJECT"] = (
+   FACT NAME referenced elsewhere in the tracked repository (file: hits):
+     kai-pm/DECISIONS.md                                           3
+     kai-pm/FAILURE_PATTERN_LEDGER.md                              1
+     kai-pm/H2_CONSOLIDATED_REPAIR_SPEC_DRAFT.md                   2
+     kai-pm/house_in_order_h2_v11/PRECOMMIT.md                     2
+     kai-pm/house_in_order_h2_v11/RUN.md                           2
+     kai-pm/house_in_order_h2_v11/cal_fixtures.py                  2
+     kai-pm/house_in_order_h2_v11/evidence.py                      2
+     kai-pm/house_in_order_h2_v11/h2v11-classification.json        274
+     kai-pm/house_in_order_h2_v11/h2v11-holdout.json               24
+     kai-pm/house_in_order_h2_v11/holdout.py                       1
+     kai-pm/house_in_order_h2_v11/ontology.py                      2
+     kai-pm/house_in_order_h2_v12/RUN.md                           1
+     kai-pm/house_in_order_h2_v12/h2v12-classification.json        273
+     kai-pm/house_in_order_h2_v12/h2v12-holdout.json               40
+     kai-pm/house_in_order_h2_v12/ontology.py                      1
+     kai-pm/house_in_order_h2_v12/run_h2_v12.py                    1
+
+8. WOULD A RENAME MOVE ANY AXIS? — AST-PROVEN NO, WITH ONE TRAP
+   classify.py references to 'CONSUMED_AT_SUBJECT'/'readers'/'reader_ops'/'evidence_facts': NONE
+   The verdict layer receives (row, text, contradiction). It never
+   reads the field or the fact, so VALIDITY, SCOPE, FUNCTION,
+   AUTHORITY, GENERATION and LIFECYCLE cannot move.
+   envelope.py is not on the path at all: evidence facts are
+   booleans plus traces and never pass through envelope.claim, so
+   no conservation or promotion behaviour is involved.
+
+   THE TRAP, DEMONSTRATED NOT PREDICTED. run_h2_v12.TRACE_CLASS is
+   keyed BY FACT NAME and gates the fact through _class_ok. A
+   rename that does not update that key does NOT raise -- the fact
+   fails the class gate and A6-ii abstains it:
+     probe row                     CHANGELOG.md
+     baseline                      (True, 'STATIC_READER_REFERENCE', [])
+     TRACE_CLASS entry removed     (False, None, ['CONSUMED_AT_SUBJECT'])
+     restored                      (True, 'STATIC_READER_REFERENCE', [])
+   Silent loss of every positive, with a successful exit code.
+   ontology.EVIDENCE_FACTS carries the same shape more weakly: it
+   drives only the printed summary loop, so a stale name there
+   hides the fact from the report while leaving the JSON tally.
+
+9. STATIC_REFERENCE_AT_SUBJECT + AN EXPLICIT ANALYSIS_SCOPE —
+   SUFFICIENT? The name would be accurate. The SCOPE is the gap:
+   nothing in the fact, the trace or the record STATES the analysed
+   universe. The record carries census_dependency (package path and
+   aggregate hash), which REFERENCES the scope but does not state
+   it. To read the fact correctly a reader needs: 615 source files,
+   suffixes .py/.sh/.bash/.yml/.yaml plus Makefile, nine excluded
+   directory names, and lexically-fixed resolution only.
+
+10. DOES THE §5 SCHEMA ALREADY CARRY WHAT A RENAMED FACT NEEDS?
+   The trace built by _reader_trace carries all nine §5 fields plus
+   two declared extras, reader_ast_expr and reader_mode. It names
+   the READER as source_path, an opscan:<src>:L<n> selector, the
+   reading line as local_context, applicability_scope SPAN and
+   subject OTHER:<document>. Multiple ops are carried with
+   evidence_total/evidence_shown and truncated=True.
+   MISSING: the analysis scope of section 9. It is a property of
+   the EXTRACTION, not of any one witness, so a per-witness field
+   would repeat it on every trace. Whether it belongs in a bounded
+   record-level field or in the existing census_dependency is a
+   DESIGN QUESTION FOR KAI, not settled here.
+
+11. WOULD E2 ALTER ANY FACT ENUMERATION USED BY Q1b?
+   No Q1b implementation exists in the accepted package: a search
+   for 'Q1a'/'Q1b' over its .py files returns nothing, and
+   qualify.py contains no evidence-fact reference. The only
+   enumerations are ontology.EVIDENCE_FACTS and the runtime
+   evidence_fact_tally keys. A rename changes both STRINGS, so any
+   later qualification logic keyed on the old name would need the
+   same update -- which is why section 8's trap matters.
+
+12. TESTS, FIXTURES AND PROSE ASSERTING THE STRONGER MEANING
+   CODE outside the accepted package that names the fact:
+     kai-pm/house_in_order_h2_v11/cal_fixtures.py:102:    check("F3a CONSUMED_AT_SUBJECT is present",
+     kai-pm/house_in_order_h2_v11/cal_fixtures.py:103:          facts["CONSUMED_AT_SUBJECT"]["present"], facts["CONSUMED_AT_SUBJECT"])
+     kai-pm/house_in_order_h2_v11/evidence.py:14:  CONSUMED_AT_SUBJECT   an executable operation reads it at the subject.
+     kai-pm/house_in_order_h2_v11/evidence.py:117:    out["CONSUMED_AT_SUBJECT"] = (
+     kai-pm/house_in_order_h2_v11/holdout.py:64:                                         "CONSUMED_AT_SUBJECT")},
+     kai-pm/house_in_order_h2_v11/ontology.py:14:  * an executable read proves CONSUMED_AT_SUBJECT. Stale, deprecated and
+     kai-pm/house_in_order_h2_v11/ontology.py:50:                  "CONSUMED_AT_SUBJECT")
+     kai-pm/house_in_order_h2_v12/ontology.py:58:                  "CONSUMED_AT_SUBJECT", "CITES_COMMIT", "CITES_RUN",
+     kai-pm/house_in_order_h2_v12/run_h2_v12.py:84:    f["CONSUMED_AT_SUBJECT"] = bool(row["readers"])
+   PROSE that names the fact AND asserts execution:
+     kai-pm/house_in_order_h2_v11/PRECOMMIT.md:44:| `CONSUMED_AT_SUBJECT` | a proven executable read of the document at the subject |
+     kai-pm/house_in_order_h2_v11/RUN.md:24:| `CONSUMED_AT_SUBJECT` | code reads it at the subject | that it is live — stale artefacts are read too |
+   Loose pattern hits that do NOT name the fact -- reported, not
+   dropped, and NOT evidence about the fact:
+     kai-pm/CODE_AUDIT_P2_ISOLATION_AND_INTEGRITY_PLAN.md:42:Every executable operation has:
+   NOTE ON SCOPE. Everything above except the two v12 ontology/
+   runner lines lives in house_in_order_h2_v11 and _v12, which are
+   HISTORICAL PACKAGES, not the accepted lineage. The v13
+   cal_fixtures.py does not assert the fact at all -- its only
+   contact is a fixture row built with readers=[]. So NO TEST IN
+   THE ACCEPTED LINEAGE asserts the runtime meaning. The live
+   governance exposure is DECISIONS.md, which is append-only: a
+   correction there would be a new entry, never an edit.
+
+13. INPUT DIGESTS
+   passA.json                  24fb1f555560277fd4555087f22ed06ef4a72efee845a339bbc87b925730f51c
+   classification.json         dd3c029da6126bcf5fe2741793f444e6656ecec04a277a17d62fcd8496481c69
+   run_h2_v12.py               0e3d4289fc958e40390f8d2f390119a33cf3ca75df630bc29d580a97eb2cc3a6
+   passa.py                    ab2d98d030f61ba12b8280e1639da92b2726bf7b91c12941336dceefb12f5a6e
+
+14. SECONDARY MECHANISMS EXPOSED — reported, NOT repaired
+   S1  SOURCE BINDING IN THE READER EXTRACTION, LATENT.
+       census opscan.tracked L70-76 enumerates with
+       `git ls-tree -r --name-only HEAD` -- the repo's OWN HEAD,
+       not the subject argument, which is never passed to opscan --
+       and opscan.collect L356 then reads each file with
+       (repo / fn).read_text(). ENUMERATION FROM GIT, BYTES FROM
+       THE WORKING FILESYSTEM. That is the SAME SHAPE as the
+       already-confirmed manifest source-binding defect repaired
+       forward at 479596e.
+       Realised here? NO. HEAD d8aac4d49e6b == subject d8aac4d49e6b: True; worktree clean: True. LATENT, not realised.
+       OUTSIDE THE E2 SURFACE. The census package is frozen and
+       Kai's authorisation names run_h2_v12.py. Reported for a
+       separate ruling; nothing here touches it.
+   S2  REACHABILITY IS UNMEASURED, AND NOT OBTAINABLE FROM THIS
+       EVIDENCE CLASS. A resolvable read CALL SITE is counted
+       whether or not the enclosing function is ever called, the
+       script ever invoked, or the guard ever passed. Two of the
+       five sites sit behind `if not X.exists(): return` and one
+       inside try/except OSError. Establishing reachability needs a
+       different evidence class -- and a call graph or a Makefile/CI
+       reference would still be STATIC, not runtime. This is why a
+       rename alone may be insufficient: the honest claim is a
+       static reference, bounded by a stated scope, carrying NO
+       reachability assertion.
+   S3  THE NEGATIVE, in section 5: False is an abstention wearing
+       the shape of a negative.
+
+15. SMALLEST PLAUSIBLE REPAIR PRINCIPLE (proposal, NOT implemented)
+   Rename the FACT to state its evidence class, carry the analysed
+   scope with the record rather than only referencing it, and
+   update TRACE_CLASS in the SAME edit so the class gate cannot
+   silently abstain. Attach no reachability claim.
+   FILES THAT WOULD NEED MODIFICATION IF LATER AUTHORISED:
+     run_h2_v12.py   the cand[...] key, the TRACE_CLASS key, and
+                     the _reader_trace docstring
+     ontology.py     the EVIDENCE_FACTS tuple entry
+   AND NOTHING ELSE. passa.py, classify.py, envelope.py,
+   subjectbind.py and the census package need no change: the field
+   name `readers` is internal and never surfaces as a fact name.
+   MUST REMAIN UNCHANGED, AND BE PROVEN SO:
+     the 5-row population and its identities · all six axis
+     tallies · every other evidence fact · trace content, selector
+     and witness_type · evidence_total/shown/truncated · the A6-ii
+     abstention path · 272 rows in / 272 out.
+   MANDATORY CONTROLS BEFORE ANY IMPLEMENTATION:
+     FAIL-OLD  the predecessor emits the OLD name on all 5 rows
+     PASS-NEW  the candidate emits the NEW name on the SAME 5
+     the old name appears NOWHERE in the new output
+     TRACE_CLASS keyed on the new name, plus a CAN-FAIL proof that
+       omitting it ABSTAINS all 5 rather than raising
+     ontology.EVIDENCE_FACTS updated, plus a can-fail proof that a
+       stale entry hides the fact from the printed summary
+     trace bytes identical field-for-field except the fact key
+     all six axes and every other fact tally unchanged
+     predecessor loaded from the git object and executed
+     implementation banked BEFORE the corpus run
+
+16. WHAT THIS IS NOT
+   Not a repair, not a rename, not an adjudication, not an answer
+   key. No production module was modified. The historical 5 was
+   used as a locator only and never as a target.

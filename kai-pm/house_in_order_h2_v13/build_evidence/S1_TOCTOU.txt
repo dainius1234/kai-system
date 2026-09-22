@@ -1,0 +1,160 @@
+S1 TOCTOU — SOURCE-STABILITY INVESTIGATION. MEASUREMENT ONLY.
+PRODUCED BY ORION. ZERO ADJUDICATION WEIGHT. NO HARDENING BUILT.
+the accepted S1 implementation ba258b8 is executed as banked
+
+1. IS THE TOCTOU WINDOW REACHABLE? — YES, DEMONSTRATED
+   A tracked file is changed AFTER the gate has passed and BEFORE
+   its own measurement read. The mutation is fired from a read hook
+   so the timing is deterministic; the hook changes only WHEN the
+   external write lands, never what Pass A does.
+     mutation fired                True
+     Pass A completed              True
+     frozen subject sha256(beta)   b96f8891ff6b9a77
+     sha256 Pass A RECORDED        180b0cd11e912521
+     bytes consumed == frozen      False
+     witnesses emitted             ['2099-11-22']
+     the injected value 2099-11-22 reached a witness: True
+   The gate passed, the run completed, and a witness carries a
+   value that is NOT in the frozen subject. TOCTOU IS REACHABLE.
+
+2. WOULD A POST-CHECK CATCH IT? — IN THE SIMPLE CASE, YES
+     worktree dirty after measurement  True
+   With the change left in place a post-measurement status check
+   would see a dirty tree and could refuse. That is real value.
+
+3. CHANGE-AND-RESTORE — DEFEATS A POST-CHECK, AND SHOWS WHICH
+   READ PATH IS EXPOSED
+   The same mutation, restored the moment its bytes are consumed.
+     mutation fired                True
+     restore fired                 True
+     Pass A completed              True
+     frozen sha256(beta)           b96f8891ff6b9a77
+     INJECTED sha256(beta)         180b0cd11e912521
+     WORKTREE DIRTY AFTER          False
+   EVERY DOCUMENT READ, ATTRIBUTED TO ITS CALLING MODULE:
+     docgraph  alpha.md    55e0b519138a7367  
+     docgraph  beta.md     180b0cd11e912521  <-- INJECTED BYTES
+     passa     alpha.md    55e0b519138a7367  
+     passa     beta.md     b96f8891ff6b9a77  
+     sha256 Pass A RECORDED for beta b96f8891ff6b9a77
+     witnesses emitted               ['2026-01-02']
+
+   READ THE ATTRIBUTION BEFORE THE CONCLUSION. The injected bytes
+   were consumed by DOCGRAPH, whose read happens first; by the time
+   Pass A read the same file the restore had landed, so Pass A's own
+   sha256 and witnesses are CLEAN. My first draft of this section
+   asserted 'wrong bytes analysed' while displaying evidence that
+   showed Pass A's path unaffected -- the sentence was wider than
+   the measurement, so the instrument was changed to attribute each
+   read rather than the claim being softened.
+
+   WHAT IT ACTUALLY PROVES, AND IT IS STRONGER:
+     (a) PRE-CHECK CLEAN and POST-CHECK CLEAN while foreign bytes
+         were consumed by the measurement. A POST-CHECK ALONE IS
+         NOT SUFFICIENT -- Kai's question 2, answered by execution.
+     (b) row['sha256'] DID NOT DETECT IT, because the contaminated
+         read was not the read that hash covers. A per-document
+         hash cannot police the census read paths.
+   Both demonstrations together bound the exposure: whichever read
+   the window lands on is the one that is contaminated, and only
+   one of the three read paths carries a hash that would notice.
+
+4. EVERY FILESYSTEM READ ON THE PASS A PATH
+   passa document read  (passa.py)
+     L692  (pathlib.Path(subject_repo) / d).read_text(errors='ignore')
+     L758  cm.read_bytes()
+     hash of THOSE bytes already survives: True
+     row['sha256'] is computed from the very bytes this read returned, so it already witnesses them
+     inside passa.py: True
+   docgraph link scan  (docgraph.py)
+     L126  (repo / src).read_text(errors='ignore')
+     hash of THOSE bytes already survives: False
+     a SECOND, separate read of the same documents; nothing hashes what IT returned
+     inside passa.py: False
+   opscan source read  (opscan.py)
+     L356  (repo / fn).read_text(errors='ignore')
+     hash of THOSE bytes already survives: False
+     615 source files; no hash of their bytes exists anywhere in the record
+     inside passa.py: False
+
+5. H1 / H2 / H3 ASSESSED AGAINST THAT
+   H1 POST-CHECK ONLY
+      CATCHES a mutation left in place (section 2).
+      CANNOT CATCH change-and-restore (section 3), and cannot
+      catch a mutation reverted by any means before the check.
+      CLASSIFICATION: PARTIAL RACE DETECTION ONLY. Not closure.
+
+   H2 PER-READ GIT-BLOB IDENTITY
+      The right shape: compare the bytes ACTUALLY CONSUMED against
+      the frozen blob, at the moment of consumption. A restore
+      cannot defeat it, because the comparison happens before the
+      restore can occur.
+      REUSE OF EXISTING PRODUCTS, as Kai required: the document
+      path already carries what is needed. row['sha256'] is
+      computed from the very bytes the read returned, so verifying
+      it against `git show <tree>:<path>` needs NO new hash and no
+      restatement of any population rule.
+      THE OTHER TWO PATHS DO NOT. docgraph re-reads the documents
+      independently and opscan reads 615 source files, and nothing
+      hashes what either of those reads returned.
+      CLASSIFICATION: CLOSES THE DOCUMENT PATH COMPLETELY. Does
+      NOT close the census paths without hashing inside them.
+
+   H3 IMMUTABLE SNAPSHOT READ
+      Only reachable by materialising the subject, which is the R3
+      capability redesign Kai has ruled out for this cycle. NOT
+      EVALUATED FURTHER, per that instruction.
+
+6. IS passa.py ALONE STILL SUFFICIENT? — NO, AND THIS IS THE
+   STOP CONDITION KAI NAMED
+     read paths inside passa.py        1
+     read paths inside the census      2
+       docgraph link scan — docgraph.py
+       opscan source read — opscan.py
+   A passa.py-only change can verify the DOCUMENT bytes it reads
+   itself. It cannot verify bytes read by docgraph or opscan,
+   because those reads happen inside the FROZEN census package and
+   nothing about them survives into the record.
+   PER KAI'S INSTRUCTION I AM STOPPING HERE RATHER THAN WIDENING.
+   The options that follow are for Kai to choose between; none is
+   implemented and none is preferred here.
+     O1 CLOSE THE DOCUMENT PATH ONLY, in passa.py, and record the
+        census paths as a declared residual. Smallest, honest, and
+        it leaves readers/reader_ops and the link graph unproven.
+     O2 VERIFY THE CENSUS INPUT SET in passa.py BEFORE and AFTER
+        the census call by comparing every file in the reader
+        population against its blob. Still a window, but a much
+        narrower one, and it needs no census change.
+     O3 HASH INSIDE THE CENSUS. Complete, and it modifies a FROZEN
+        package -- the widening Kai told me to stop before.
+   O1 and O2 are passa.py-only. O3 is not.
+
+7. PROPOSED FAIL-OLD / PASS-NEW CONTROLS for whichever is chosen
+   FAIL-OLD, against ba258b8 exactly as banked:
+     mutation left in place  -> wrong bytes consumed, run completes
+     change-and-restore      -> wrong bytes consumed, pre and post
+                                status both clean
+   PASS-NEW:
+     both cases REFUSED with a named prerequisite, before any
+       output is written
+     the refusal must name the PATH whose bytes diverged
+     a CAN-FAIL proof that the comparison can actually fire
+     the clean canonical subject still produces every ruled figure
+       and the unchanged passA digest
+   READER-POPULATION REGRESSION, retained as a guard rather than a
+   new restriction: every path from which Pass A or the census
+   obtains analysed bytes must remain inside the tracked git
+   population. It does today -- 272 documents and 615 source files,
+   all tracked. If a future change starts walking untracked paths,
+   that change fails this control rather than passing silently.
+   Harmless untracked files are NOT rejected.
+
+8. DIGESTS
+   passa.py                  0384a7627e1126b514dfed10b7049fee16315b9cbd8cba63262d0845fe34377c
+   opscan.py                 55dee3aa851a1c582d69a27f89a5eb0c78c48306a935a1c65a6774758ce2abe1
+   docgraph.py               1ad714e74a344f222effb75d65d68e78c85745a19625fc3efbd3db5d6b0865d2
+
+9. WHAT THIS IS NOT
+   Not a repair, not a selection, not an adjudication. No
+   production file was modified. R4 + P1 is not redesigned and the
+   root investigation is not reopened.

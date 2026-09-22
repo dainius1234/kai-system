@@ -75,11 +75,77 @@ def invocations() -> Tuple[Set[str], Set[str]]:
     return collected, self_run
 
 
+def _collects_via_unittest(text: str) -> bool:
+    """True if the module actually CALLS `unittest.main()`.
+
+    This was a substring test, and it had the defect it was written to
+    tolerate. `scripts/test_test_wiring.py` mentions `unittest.main()`
+    three times — in a docstring, in a string fixture, and in a comment —
+    and **not once as code**. It had therefore been exempt from orphan
+    detection since it was written, purely because it *describes* the
+    exemption. A genuine orphan added to it in this commit went
+    unreported until this was changed.
+
+    Population measured before changing anything: 1 of 218 test files
+    differed between the substring answer and the real one, and it was
+    that file. Contained, so the fix is the whole class.
+    """
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return False
+    return any(
+        isinstance(n, ast.Call)
+        and getattr(n.func, "attr", None) == "main"
+        and getattr(getattr(n.func, "value", None), "id", None) == "unittest"
+        for n in ast.walk(tree))
+
+
+def _dispatches_dynamically(text: str) -> bool:
+    """True if the suite collects its own tests from the module namespace.
+
+    A suite that iterates ``globals()`` for names beginning ``test_`` and
+    calls them is a *collector*, in the same sense `unittest.main()` is:
+    a new test is dispatched by existing, so there is no orphan to find.
+    Enumerating call sites cannot see that, and would report every test
+    in such a file.
+
+    Detected on the **parse tree**, not the text, and that is
+    load-bearing. The first version matched substrings, and the file
+    that tests this exemption immediately exempted itself — because it
+    contains the pattern as *test data* inside string literals. A check
+    whose own fixtures satisfy it is the self-consuming shape this
+    repository has now hit six times.
+
+    A string literal is not a Call node, so test data cannot buy the
+    exemption. BOTH parts must be real code: reading the namespace, and
+    filtering it by the `test_` prefix.
+    """
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return False
+    reads_namespace = any(
+        isinstance(n, ast.Call) and getattr(n.func, "id", None) == "globals"
+        for n in ast.walk(tree))
+    if not reads_namespace:
+        return False
+    return any(
+        isinstance(n, ast.Call)
+        and getattr(n.func, "attr", None) == "startswith"
+        and n.args
+        and isinstance(n.args[0], ast.Constant)
+        and n.args[0].value == "test_"
+        for n in ast.walk(tree))
+
+
 def orphans(path: Path) -> List[str]:
     """Tests defined in a self-run script that nothing in it calls."""
     text = path.read_text(encoding="utf-8")
-    if "unittest.main()" in text:
+    if _collects_via_unittest(text):
         return []                       # unittest collects them
+    if _dispatches_dynamically(text):
+        return []                       # the suite collects its own
     try:
         tree = ast.parse(text)
     except SyntaxError:

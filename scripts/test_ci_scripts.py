@@ -45,7 +45,7 @@ import scripts.test_restart_persistence as restart   # noqa: E402
 
 passed = 0
 failed = 0
-EXPECTED_SCENARIOS = 13
+EXPECTED_SCENARIOS = 16
 executed: list = []
 
 
@@ -215,6 +215,91 @@ def test_a_stale_readme_is_reported() -> None:
           "deadbeef" in table or "1" in table, table[:120])
 
 
+# ── DOC-1: the individual-tests row is one canonical representation ──
+#
+# The writer appended a `+` unconditionally, then asked whether the
+# character at an offset taken from the PRE-mutation string was a `+` —
+# which it always was, because that was the one it had just written — and
+# rebuilt from the already-mutated text. The row therefore grew by exactly
+# one `+` on every metric change, reaching 129 in docs/PROJECT_BACKLOG.md
+# before anyone looked at it. `--check` read the count and ignored the run,
+# so the drift gate declared the corrupted row current on every run.
+#
+# The historical known-positive is the real line as it stood at
+# 7c8436c406ba2208452a6f4e124fe4c10e7f8f8b:
+#   | Individual tests | 4798<129 plus signs> passing, 0 failures |
+# The run is generated mechanically below rather than pasted, so this
+# fixture stays a regression test rather than a copy of one artefact.
+
+_LEGACY_RUN = 129
+
+
+def _backlog_row(count: int, pluses: int) -> str:
+    return (f"| Test targets | 91 (make test-core) |\n"
+            f"| Individual tests | {count}{'+' * pluses} passing, 0 failures |\n")
+
+
+def test_only_exactly_one_plus_is_a_current_backlog_row() -> None:
+    """The check path. A wrong count is stale — that much always worked.
+    Zero, two and 129 pluses are stale too, and none of them were."""
+    scenario("sync_docs canonical backlog row")
+    for pluses, expected_current in ((1, True), (0, False),
+                                     (2, False), (_LEGACY_RUN, False)):
+        _, is_current, observed = sync_docs.backlog_tests_row(
+            _backlog_row(4798, pluses), 4798)
+        check(f"count correct + {pluses} plus -> "
+              f"{'current' if expected_current else 'stale'}",
+              is_current is expected_current, observed[:40])
+    _, is_current, _ = sync_docs.backlog_tests_row(_backlog_row(4798, 1), 4799)
+    check("count stale + 1 plus -> stale", is_current is False)
+    check("a row that is not there is not a failure",
+          sync_docs.backlog_tests_row("no such row\n", 1) is None)
+
+
+def test_the_writer_collapses_any_plus_run_and_then_holds() -> None:
+    """The write path, end to end against a temp ROOT, and the property
+    that actually stops the bleeding: the canonical form is a fixed
+    point, so a second sync is byte-identical."""
+    scenario("sync_docs collapses the plus run")
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        (root / "docs").mkdir()
+        backlog = root / "docs" / "PROJECT_BACKLOG.md"
+        backlog.write_text(_backlog_row(4798, _LEGACY_RUN))
+        with _Patch(sync_docs, ROOT=root):
+            sync_docs.sync_backlog({"targets": 91, "tests": 4799})
+            once = backlog.read_text()
+            check("a 129-run collapses to exactly one +",
+                  once.count("+") == 1, f"{once.count('+')} pluses")
+            check("the new count is written", "4799+" in once, once[:60])
+            sync_docs.sync_backlog({"targets": 91, "tests": 4799})
+            check("a second sync is byte-identical",
+                  backlog.read_text() == once)
+            check("and --check now agrees it is current",
+                  sync_docs.sync_backlog({"targets": 91, "tests": 4799},
+                                         check_only=True) is True)
+
+
+def test_the_row_survives_a_change_of_digit_width() -> None:
+    """The stale-offset half. While the count kept the same width the
+    broken index happened to land on a `+`; a width change is where an
+    offset taken before mutation points somewhere else entirely."""
+    scenario("sync_docs handles digit-width changes")
+    for before, after in ((999, 1000), (1000, 999)):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "docs").mkdir()
+            backlog = root / "docs" / "PROJECT_BACKLOG.md"
+            backlog.write_text(_backlog_row(before, _LEGACY_RUN))
+            with _Patch(sync_docs, ROOT=root):
+                sync_docs.sync_backlog({"targets": 91, "tests": after})
+            out = backlog.read_text()
+            check(f"{before} -> {after} leaves exactly one +",
+                  out.count("+") == 1, f"{out.count('+')} pluses")
+            check(f"{before} -> {after} writes the new count",
+                  f"| Individual tests | {after}+ " in out, out[:70])
+
+
 # ── go_no_go_check: absence is not a GO ──────────────────────────────
 
 def test_an_unreachable_dashboard_fails_by_default() -> None:
@@ -261,6 +346,9 @@ def run_all() -> None:
     test_the_caller_reports_the_body_on_error()
     test_the_counters_return_real_numbers()
     test_a_stale_readme_is_reported()
+    test_only_exactly_one_plus_is_a_current_backlog_row()
+    test_the_writer_collapses_any_plus_run_and_then_holds()
+    test_the_row_survives_a_change_of_digit_width()
     test_an_unreachable_dashboard_fails_by_default()
     test_absence_may_be_declared_at_the_call_site()
     test_a_non_go_decision_fails()

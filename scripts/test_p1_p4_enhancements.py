@@ -356,44 +356,55 @@ class TestNoDeprecatedCalls(unittest.TestCase):
                     offenders.append(f"{path.name}:{node.lineno}")
         return offenders, scanned
 
-    def test_no_developer_home_paths(self):
-        """No file may name one machine's checkout.
-
-        Thirteen occurrences of one contributor's checkout root, across
-        three test
-        files cost **26 of the 42 failures** on CI's first complete run.
-        They cannot fail here, by construction: this *is* that machine. So
-        the rule has to be structural rather than behavioural — a path that
-        only works in one checkout is wrong even when it works.
-
-        Scans every .py in the repository, not a list of files, because the
-        list would only ever have caught what someone already knew about —
-        which is exactly how the get_event_loop rule below missed five
-        files. `Path(__file__).resolve().parents[N]` is the fix and costs
-        nothing.
-        """
-        import re
-        offenders, scanned = [], 0
-        skip = {"_archive", ".venv", "__pycache__", "node_modules", ".git"}
-        # Built, not written out — and the docstring above says "one
-        # contributor's checkout root" rather than quoting it, because the
-        # first version of this rule flagged *itself*: the literal was in
-        # its own explanation. Third time today that an assertion matched
-        # its own prose (class C in TEST_WRITING_REVIEW.md).
-        needle = "/" + "home/user/" + "kai-system"
-        for path in sorted(ROOT.rglob("*.py")):
-            if any(part in skip for part in path.parts):
-                continue
-            scanned += 1
-            text = path.read_text(encoding="utf-8", errors="replace")
-            for num, line in enumerate(text.splitlines(), 1):
-                if needle in line and "needle" not in line:
-                    offenders.append(f"{path.relative_to(ROOT)}:{num}")
-        self.assertGreater(scanned, 200, "scanned implausibly few files")
-        self.assertEqual(
-            offenders, [],
-            f"{len(offenders)} absolute path(s) to one developer's checkout. "
-            f"Use Path(__file__).resolve().parents[N]. Found: {offenders[:6]}")
+    # ── RETIRED AS A BLOCKING CONTROL — D376 §3, corrected by D377 ──────
+    #
+    # `test_no_developer_home_paths` lived here. It was earned: thirteen
+    # occurrences of one contributor's checkout root cost **26 of the 42
+    # failures** on CI's first complete run, and it was widened from a
+    # list of filenames to every `.py` in the tree precisely so it could
+    # not only catch what someone already knew about. That was the right
+    # correction at the time and the finding it made is not withdrawn.
+    #
+    # It is retired because its PROPOSITION was wrong, not its intent. It
+    # asked *does this string appear?* and was read as answering *does
+    # this code depend on that path?* Those are different questions, and
+    # RC-1 is what conflating them cost: of its seven occurrences, four
+    # were genuine machine-bound execution dependencies, two were
+    # deliberate calibration fixtures proving a classifier discriminates
+    # absolute paths, and one was a sentence in a docstring describing a
+    # defect that had already been repaired. Because this test blocked,
+    # those three non-defects failed `pytest scripts/` inside
+    # `make coverage`, which meant `coverage-floors` never reached its
+    # per-module evaluations and **sixteen unrelated live-stack steps were
+    # skipped on every run.**
+    #
+    # It also under-reported the thing it existed to find. It matched one
+    # literal prefix, so it never saw the ephemeral session-scratch paths
+    # at `cal_env.py:15` and `pass_a.py:59` — machine-bound dependencies
+    # in the very files it was flagging — nor the `sys.path` insertion at
+    # `run_mutations.py:13` that actually resolves an import.
+    #
+    # Its two halves are now separate controls, and BOTH are stronger:
+    #
+    #   scripts/security/machine_path_inventory.py       REPORT, never gates
+    #       every tracked TEXT file, not only `.py`, with an EMPTY
+    #       exclusion set. Strictly wider visibility than this test had.
+    #
+    #   scripts/security/check_operational_portability.py   GATE
+    #       AST plus dataflow over the derived enforcing execution
+    #       surface. Catches the scratch-path and `sys.path` classes this
+    #       test could not, and distinguishes a docstring from a
+    #       dependency, which this test could not.
+    #
+    # Its seven examples are preserved as calibration, not discarded:
+    # P1-P3 and N1-N2 in `scripts/test_operational_portability.py` are
+    # those exact cases. **This is controlled supersession. No third
+    # competing live classifier is kept** — two classifiers disagreeing
+    # about one subject is the defect shape this repository keeps
+    # removing.
+    #
+    # Full record: D376 §1 and §3, D377 §2, and INC-2026-09-15-21's
+    # neighbours in kai-pm/FAILURE_PATTERN_LEDGER.md.
 
     def test_no_utcnow_in_tests(self):
         offenders, scanned = self._calls("datetime.utcnow")

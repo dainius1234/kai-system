@@ -1,0 +1,614 @@
+# Operating rules — read this first
+
+Standing rules for anyone (including me) working in this repository.
+Every rule here exists because it was broken, and the incident is named
+so the rule is not mistaken for taste. The long form is in
+`kai-pm/ORION_FIELD_NOTES.md`; this file is the part that binds.
+
+---
+
+## R0. Stop signals — the tells, in one place
+
+The rules below explain *why*. This is the part that has to work **in
+flight**, so it is first and it is short. If a sentence I am about to
+write or a command I am about to run matches one of these, stop and
+check before continuing.
+
+| the tell | what it usually means |
+|---|---|
+| "would have", "cannot", "is simply", "should work", "it's just a" | R1 — I am asserting something I have not run |
+| "saved to…", "added to…", "wired into…" | R1 — a claim about *my own action*. `ls` it, or do not say it |
+| "recorded", "banked", "documented", "carried forward" | R1 — verifiable state claims. `grep` the record before saying them |
+| I am describing a safety net in the present tense | R2 — I have written a contingency, not run one |
+| I am about to describe the *shape* of a failure ("it's X, not Y") | §3.1 — my scope may be narrower than my claim. What is the full set? |
+| I am writing a name I recognise rather than one I looked up | R5 — a list beside the thing. Derive it |
+| I am about to `cut`, `head` or `tail` a diagnostic | R10 — keep the full output somewhere, and say how big the excerpt is |
+| A prerequisite failed and I am still collecting rows | R11 — no subject, no observation. Abort at the boundary |
+| I am fixing the second instance of something | R6 — count the population first, then fix all of it |
+| "we'll tune this once we measure it" | ship the instrument that produces the number in the *same* commit |
+| I am typing `;` between commands | R3 — use `&&` |
+| I am writing a loop that waits for a process by name | R9 — the loop's own command line contains that name. It will match itself and wait forever |
+| My evidence that a check works comes from the same place as the thing it checks | I-8 — calibrate against something independent, with a known-positive and a known-negative |
+| I am about to send a count, ratio, "clean", "byte-identical" or "independent" | R13 — the derivation travels with the claim, at transmission, not on request |
+| I can name a literal string in the query behind a number I am calling a *mechanism* | R13 — I am counting instances of a string and reporting instances of a cause |
+| I grouped rows by a key **I** constructed and called the groups *mechanisms* | R13 / doctrine 37 — that is a **routing signature**. Same path ≠ same cause |
+| I am reasoning strategically from a candidate that has not passed adjudication | doctrine 41 — diagnostic signal only, never a baseline |
+| An instruction lets me do **less** than the contract requires | R14 — re-read the contract before executing. A verified state under an unverified instruction is not a verified position |
+| I am writing "independent" | name the authority behind each leg. Same authority, different method = cross-method convergence |
+| I am about to write `UNRESOLVED` | is the **source** unclear, or is my **evidence** insufficient? Only the first is ambiguity |
+| Something registers as wrong and I am writing it down rather than checking it | R15 — a worry beside the deliverable is insurance, not action. The sentence I am writing IS the instruction to check |
+| "I remember…", "from memory…", "as I recall…" | R16 — STOP. Open the authoritative source before continuing |
+| I am about to say what a named artefact **contains or lacks**, and I have not opened it | R16 — memory locates, it never establishes. Open it |
+| I am designing a remedy from **someone else's** description of a file | R16 — no cascaded memory authority. Their recollection is not my premise |
+| I opened the file, read one section, and am about to say what the **document** contains or lacks | doctrine 47 — opened ≠ read. `NOT_FOUND_IN_INSPECTED_RANGE`, never `NOT_FOUND_IN_DOCUMENT` |
+| I am writing "not found", "no", "none", "nothing in X" | doctrine 47 — state the inspection universe that earns the negative. "I opened it" is not "I checked it" |
+| "worth noting", "deserves suspicion", "I would flag" — and then I continue | R15 — stop there and look. Clean costs minutes; not looking costs someone else, later and larger |
+| I searched X and am about to write "nowhere", "none", "nothing", "no", "all" or "only" **without naming X** | R17 — a bounded search earns a bounded sentence. Name the universe or do not make the claim |
+| I am describing a snippet, an excerpt, a `local_context`, a log tail or an API window as though it were the source, the package or the system | R17 — the instrument's output is not the artefact. Open the artefact |
+| I measured one field of one file and the sentence I am writing says *the package* / *the candidate* / *anywhere* | R17 — `CLAIM_SCOPE ⊆ MEASURED_SCOPE`. The qualifier was in my table; keep it in the prose |
+| The predicate returned an awkward row and I am considering leaving it out | R17 — everything returned travels. Dropping it is editing the evidence, not tidying it |
+| I filtered, normalised, deduplicated, ranked or aggregated and have not said so | R17 — name the transformation and reconcile it against the raw count |
+| I have made essentially this correction before | R18 — search `FAILURE_PATTERN_LEDGER.md` before continuing. Recurrence is the finding, not the instance |
+| A different incident, but the *reasoning step* feels familiar | R18 — compare mechanisms, not appearances |
+| The same rule has been broken again and I am about to restate it | R18 — do not reissue the reminder. Test whether the **control** failed |
+| I corrected it and am about to move on | R18 — if it was consequential, record the incident and check for recurrence first |
+| I am calling two mistakes the same pattern because they look alike | R18 / doctrine 37 — that is a locator. The mechanism has to be earned |
+
+**The trigger is speed, not ignorance.** Every R1 breach on 2026-08-07
+happened while moving fast — a hard-coded image name, a guessed job id,
+two files claimed as saved. None happened because I did not know better;
+each happened because checking felt slower than continuing. When the
+work is flowing is exactly when these tells matter, which is the
+opposite of when they feel necessary.
+
+## R1. Do not assert what you have not run
+
+If a sentence contains **"would have"**, **"cannot"**, **"is simply"**,
+**"should work"**, or **"it's just a"** — stop. Run the thing. Read the
+field. Compute the date.
+
+Earned by, in one week:
+
+* Claimed a CI re-run "bought nothing" — which assumed it would
+  complete. It was cancelled.
+* Claimed run 695 had "survived past the 15-minute mark". It had not; I
+  judged elapsed time instead of computing it.
+* Wrote in a post-mortem that `workflow_dispatch` "cannot help" — it was
+  the thing that unblocked the incident.
+* Argued a failure could not be mine because the change was downstream.
+  The argument was sound. It was still only an argument. The re-run
+  proved the failure deterministic when I had predicted a flake.
+
+The cost of checking is seconds. The cost of being wrong in writing is
+that someone believes it.
+
+**Corollary — say which half you verified.** When part of a change can
+only be tested elsewhere (CI, a runner, a network you cannot reach), say
+so explicitly in the commit message: what was verified here, what was
+not, and what will verify it.
+
+**Corollary — this applies to your own actions, not only to the code.**
+"Saved to `<path>`", "added to the register", "wired into the Makefile"
+are all assertions, and they are the easiest kind to get wrong because
+they feel like memory rather than inference. On 2026-08-07 I told the
+operator twice that a document had been saved to `kai-pm/`. Neither file
+existed; the text had only ever been in a chat message. Both claims were
+made in the same conversation where this rule was written down.
+
+`ls` it, or do not say it.
+
+**Earned a second time, 2026-08-12.** I ended a session by listing what
+to "carry forward" — a run's result, a three-layer mechanism, a
+correction, an unmeasured question — as though naming them preserved
+them. `grep` over `kai-pm/` found none of it: the run id appeared
+nowhere, the differential nowhere. Everything since the previous decision
+entry existed only in chat, and the session was one message from ending.
+The check took seconds; without it a full day's evidence would have been
+lost while I reported a clean handoff.
+
+The operator's formulation, which is the one to keep:
+
+> **"Recorded", "saved", "banked" and "documented" are verifiable state
+> claims. Verify the artefact exists before asserting them.**
+
+This applies to our own work at least as aggressively as to evidence from
+the system — more so, because nobody else is auditing it.
+
+## R2. Always *run* the contingency, never merely write one
+
+A rollback that has not been executed is a hypothesis with good
+presentation. Before relying on one:
+
+```bash
+git revert --no-commit <sha>     # does it even apply?
+```
+
+and check the resulting tree actually has the property you are claiming
+for it. Then write down what you ran, not what you intended.
+
+Earned 2026-08-07: asked whether a contingency existed, checking rather
+than answering found that the "fail closed" model download I had shipped
+an hour earlier had **no retry** — so a single dropped packet failed
+every build. Fail closed means *never ship a broken image*; it does not
+mean *die on the first blip*. Brittle and strict are different
+properties wearing the same word.
+
+**A contingency must also survive the failure it is for.** The rollback
+target for a build that depends on huggingface.co must be a commit that
+builds *without* huggingface.co. Verify that specifically.
+
+## R3. `&&`, never `;`
+
+    make policy-check && git commit && git push
+
+Twice in one day I ran `make policy-check ; git commit ; git push` and
+pushed past a failing gate — the second time hours after writing the
+first one down. If a chain contains a gate, the gate must be able to
+stop it.
+
+## R4. Measure the population before fixing it
+
+Never apply a new rule to a large denominator before counting what it
+hits. The sequence, in order:
+
+1. One **confirmed** instance — observed, not suspected.
+2. Derive the rule from why that instance is wrong.
+3. **Count the hits. Fix nothing yet.**
+4. Calibrate against a known answer — run it against the tree one commit
+   before a known fix; it must report exactly the known defects.
+5. Fix the whole population.
+6. Gate it, printing the denominator, with proof it can fail.
+
+Step 3 before step 5 is load-bearing. Uncalibrated rules produced 100+
+findings for 1 real defect, and 69 findings against a tree that was
+already correct. A gate with false positives sends people to break
+working code and buries the true finding.
+
+Counting has twice changed the design and twice stopped me "fixing"
+things that were right. It also caught me over-claiming a scope of three
+when the real population was one.
+
+## R5. State the denominator, and derive it from the tree
+
+A check's scope is defined by the data it traverses, not by a list kept
+beside it. Seventeen defects in one stint were all the same shape: *a
+check whose scope was smaller than its name implied*. Any hand-written
+tuple of names in a gate is a defect waiting to be found.
+
+The inverted form is worse: a scope **larger** than reality reports
+failure over things that are right.
+
+## R6. Fix the class, not the instance
+
+If a remedy has a denominator, apply it to the denominator. Fixing one
+file and declaring the class closed is how 16 `depends_on` declarations
+got fixed in one compose file while 11 survived in two others, on the
+same day.
+
+## R7. Findings stay open until a formal closure review
+
+Counts do not change because a fix landed. Closure is a separate,
+evidence-backed register action.
+
+## R8. Never-executed code is where the defects are
+
+Every defect of the 2026-08-07 stint lived in code or configuration that
+had never run. Not one was code that used to work and broke. When
+choosing where to look, ask what has no execution path — not what looks
+suspicious.
+
+## R9. A watcher must not be able to observe itself
+
+    until ! pgrep -f "make prepush"; do sleep 15; done
+
+This never exits. `pgrep -f` matches the full command line, and the
+command line of the waiting shell *contains the string it is searching
+for*. The loop finds itself, concludes the job is still running, and
+waits forever.
+
+Earned 2026-08-07. Eight of these accumulated in one stint. The gate
+chain they were guarding never ran, so `prepush.log` stayed empty, the
+tree stayed dirty, and the commit never happened — while I reported,
+repeatedly and in good faith, that the gates were "still running". The
+observation was true of the watcher and false of the world.
+
+Two fixes, in order of preference:
+
+1. **Do not wait.** Run the chain in the foreground with a long timeout.
+   `make prepush && git commit && git push` needs no supervision, and
+   the `&&` still stops it at a failing gate.
+2. If a wait is genuinely needed, watch something the watcher cannot
+   be — a pid captured before the loop, a sentinel file, an exit-code
+   file — never a name that appears in the watcher's own text.
+
+The general shape is worth more than the instance: **an instrument whose
+own presence changes what it measures reports on itself and calls it the
+world.** That is the same defect as a check whose scope is wrong, seen
+from the other side, and §3.5 predicts it — diagnostics are structurally
+the least-executed code, so they are where this lands.
+
+## R10. Full diagnostic output survives; excerpts say they are excerpts
+
+**The full output of a diagnostic is authoritative and must survive.**
+Any human-facing excerpt must visibly declare that it is partial, and
+must preserve the terminal failure context by default.
+
+Earned twice, the same defect wearing different clothes:
+
+* 2026-08-11, #47 run 2: a resolver sent stdout, stderr and the exit
+  status of every attempt to `/dev/null` and returned one string. When it
+  came back empty the chain collapsed to `UNRESOLVED` and the failing
+  stage was unknowable.
+* 2026-08-12, #41-B deployed run 1: a collector recorded
+  `cut -c1-1500` of a 197KB build log. The first 1500 characters are
+  Dockerfile parsing; the failure is at the end. The record stopped at
+  `#13 … load build definition`, and the run could not say why the stack
+  had not started.
+
+**A truncation is a `/dev/null` with better manners.** Tail-by-default is
+right for build and process failures, because the causal error is
+normally terminal — but the tail is a convenience, and the full artefact
+is what stops one blind spot being swapped for another. Record the byte
+count too: an excerpt that does not announce its own size reads like the
+whole thing.
+
+## R11. No subject → no observation
+
+**A dependent measurement may not execute after its prerequisite state is
+unproven.**
+
+Earned 2026-08-12. `compose up` failed, so the system under test did not
+exist — and the collector went on to run fifty probes against it,
+recording fifty results. Every one was correct. `service "dashboard" is
+not running`, fifty times. Not fifty measurements: **one failed
+prerequisite repeated fifty times**, in a table whose shape said
+otherwise.
+
+That shape is the danger. An empty table invites a question; a full table
+of correct-looking rows invites a conclusion.
+
+Abort at the prerequisite boundary, say which prerequisite failed, and
+say what was therefore not measured.
+
+**And classify the abort honestly.** An instrument that detects an unmet
+prerequisite and refuses to measure has *worked*. Calling that an
+"instrument failure" blames the thermometer for the fever — the correct
+label names the unmet prerequisite and leaves its root cause UNKNOWN
+until something measures it.
+
+## I-8. Calibrate against independent evidence
+
+**Every instrument must be calibrated against evidence independent of
+the result it is trying to prove, with a known-positive and a
+known-negative case wherever that is feasible.**
+
+Not a second measurement system for everything — that is unaffordable
+and usually impossible. The requirement is that the evidence and the
+claim come from *different places*, so neither can excuse the other.
+
+Six failures in one stint were this one rule, unnamed:
+
+* a detector's population included **its own docstring**, and the count
+  was checked against itself;
+* `prepush` reported "gates green" while skipping the suite that tests
+  the architecture — the pass was evidence only about what it ran;
+* a watcher used `pgrep` on a string its own command line contained, so
+  it measured itself and reported the world;
+* a denominator **shrank when a defect was repaired**, so progress and
+  absence became indistinguishable;
+* a meta-check wanted to *probe* a key generator to read its
+  denominator, which would have written secrets as a side effect of
+  measuring;
+* a `KEY_ID` was classified by the word in its name rather than by what
+  it is, and an exception for it would have blinded the detector to real
+  key material.
+
+The practical form, in order:
+
+1. a **known-positive** — inject the defect, prove the check fires;
+2. a **known-negative** — the correct case, prove it does not;
+3. the *source of the expected answer* must not be the thing under test.
+
+A test list derived from the module it tests is fine; a test list
+**maintained beside** it is not, and neither is a count the instrument
+computes about itself.
+
+---
+
+## Hard constraints
+
+* **`BINANCE_API_KEY` and `BINANCE_API_SECRET` never leave the
+  broker-bridge service.** They must not reach the dashboard layer under
+  any bring-up, profile, or debug path.
+* **No push to `main` without explicit authorisation.** Development
+  happens on the designated branch.
+* **`kai-pm/DECISIONS.md` is append-only.** A correction is a new entry,
+  never an edit. Disproven claims stay, struck through, with what
+  disproved them — deleting them hides the pattern that made the
+  mistakes visible.
+* **No destructive git operations without explicit permission.**
+* **Do not open a pull request unless asked.**
+
+## R12. Flag the better route, even unasked
+
+**If a materially safer, stronger, more correct, more maintainable or
+more evidentially defensible route exists, say so — even when nobody
+asked for it.** Silence is not permission to take the easiest path, and
+the operator not knowing that a technical question exists is not
+permission to ignore it.
+
+Flag → explain (FACT / EVIDENCE / INFERENCE) → give the options →
+recommend → name the cost and risk → **and do not implement scope
+expansion without authorisation.** Proactive engineering is not
+autonomous scope expansion.
+
+## R13. A derived claim travels with its derivation
+
+**Any figure or derived statement that could change an adjudication,
+admission, repair scope or programme decision carries its computation at
+the moment it is sent** — subject, exact query, instrument, denominator,
+**unit**, raw result, limitations, and how to re-run it. The obligation
+is mine as producer. Nobody should have to discover later that a
+computation was missing.
+
+Earned 2026-08-27. I reported "18 of 40 rows share the mechanism". The
+query had filtered the literal `Reviewed: 27 July 2026`; one member
+carried 26 July. The real figure was 19, and the wrong one was in front
+of the adjudicator while he reasoned. Corpus-wide the same mistake would
+have returned 120 instead of 144.
+
+**Say the unit.** Literal matches, rows, cells, mechanisms and runs are
+different denominators. A query proves what it actually matches.
+
+Single-producer reproducible evidence *is* evidence. It is not
+*independent corroboration* — say which one it is. **The card is
+universal; independent reproduction is not.** It is required only where
+the claim itself could decide admission, closure, authority or
+irreversible scope — elsewhere, label the evidence honestly and move on.
+
+**And a grouping I built is not a cause.** If I keyed rows by something
+I constructed — a witness type, a classifier route, an emitted value —
+that is a **routing signature**. It says those rows travelled the same
+path, not that one mechanism produced them.
+
+## R14. Reconcile the instruction against the contract before executing
+
+**When an instruction changes, narrows, shortcuts or expands work
+governed by a frozen or active contract, re-read the contract first.**
+Execute only if compatible; otherwise HOLD and escalate. This binds no
+matter who issued the instruction.
+
+Earned 2026-08-27: I was told to stop a 40-row holdout at the first
+blocker when the frozen contract required all forty. I had verified
+`HEAD`, the tree, every checksum and the D-number allocator — and had
+not checked the instruction against the thing that governed it.
+
+**A verified repository state under an unverified instruction is not a
+verified programme position.**
+
+## R15. If it does not feel right, check. Directed by Dainius, 2026-08-27
+
+**When something snags — when a number, a result or a claim registers as
+wrong before I can say why — that is a stop, not a footnote.** Go and
+look. Then continue.
+
+**The snag is a POINTER, not a CLAIM.** It does not license asserting
+anything; R1 still binds absolutely. What it does is decide *where to
+spend the next check*. Dainius's formulation, which is the one to keep:
+*"if you feel it's not right, nothing bad will happen if you do check.
+If nothing, ok. But if something, that's a win."*
+
+The asymmetry is never close, and the failure is not weighing it at all:
+
+* check, and it is clean → minutes spent, confidence gained;
+* check, and it is not → caught before it reaches anybody else;
+* do not check → the cost lands on someone downstream, and it lands
+  later and larger.
+
+Earned 2026-08-27, D368. `VALIDITY` rose 56 → 161 while every other axis
+fell. Something registered as wrong and I wrote it into the report as
+worry **W2** — *"an increase after an honesty repair deserves
+suspicion"* — and then shipped 161 positives anyway, because I had an
+explanation I liked and no proof.
+
+**A worry recorded beside the thing it is worried about is not acting on
+it.** It is insurance against being wrong later. The check I skipped was
+minutes of source reading: *does `Reviewed: 27 July 2026` prove the
+document's validity is bound to that date, or only that someone reviewed
+it?* What I actually weighed was that the work was finished and the
+fixtures were green — sunk cost dressed as judgement.
+
+The cost landed elsewhere: Kai reasoned with my wrong figure in front of
+him, and DeepSeek had to push twice. I saved about ten minutes of my own
+discomfort.
+
+**The tell:** I am about to write *"worth noting"*, *"deserves
+suspicion"*, *"I would flag"* — and then continue to the deliverable.
+Stop there. The sentence I am writing IS the instruction to check.
+
+**This is the in-flight form of doctrine rule 40**, which states the
+producer-independent principle: *an anomaly signal is an instruction to
+check, not a caveat to record.* That rule binds every producer — human,
+model or instrument. What is below is my version of it, in the tense I
+need it in while working.
+
+> **Provenance:** directed by Dainius on 2026-08-27 after the D368
+> holdout findings, and banked at his explicit instruction. Placed in
+> **both** layers at his observation that the principle is doctrine and
+> not merely personal. Recorded rather than self-adopted, because a rule
+> that widens my own latitude must not enter the binding layer on my own
+> authority.
+
+## R16. Memory is a locator, never evidence. Directed by Dainius, 2026-08-28
+
+**A remembered fact tells me where to look. It never tells me what is
+true.** Before asserting anything source-dependent — what a file
+contains or lacks, a decision, a sequence, a count, an identity, a
+status, an existence or an absence — **open the authoritative source**.
+
+**PRIMARY SOURCE BEFORE SYNTHESIS.** No remedy, decision, scope change,
+repository change or challenge to another producer may be built on a
+*remembered description* of an artefact. Open it first.
+
+**Positive and negative are equally bound.** *"It contains X"* needs
+inspection. *"It does not contain X"* needs inspection **plus a bounded
+search** big enough to earn the negative.
+
+**No cascaded memory authority.** Someone else's unverified recollection
+is not my verified premise — and mine is not theirs. This binds in every
+direction, including toward the adjudicating authority.
+
+If the source cannot be retrieved or the subject cannot be established:
+`UNVERIFIED` / `STATE RECOVERY INCOMPLETE` / the governing abstention.
+**Never fill the gap from memory.**
+
+Earned 2026-08-28, the D359 incident. I stated six specific things were
+absent from D359 — Item 8 inside the 048 path, `A-4_PROVENANCE` distinct
+from `A4_SELF_DIAGNOSIS`, Assurance Integration, repository
+consolidation, Evidence Plane last, and the Dainius House Exit Ruling.
+**All six were already in D359. I never opened it.** Kai accepted the
+summary and designed a governance remedy on the false premise; only
+Dainius's scrutiny forced the file open.
+
+I wrote that enumerated negative in a message *about durability
+discipline*, one paragraph after quoting *"recorded, banked and
+documented are verifiable state claims."*
+
+**The tell:** an uncited sentence about what a named artefact contains
+or lacks. That sentence is the instruction to open it.
+
+**Opening the source is only half of it.** Doctrine rule 47 is R16's
+coupled half: *source opened ≠ source read; inspection must be
+claim-sufficient.* Going to the right file and reading 10% of it still
+produces a false premise — one that arrives wearing a citation, which is
+worse. **Read to the claim boundary, and if the reading was partial, the
+claim must be partial too.**
+
+> **Provenance:** directed by Dainius on 2026-08-28 and banked under
+> doctrine rule 46, which states the producer-independent form. Recorded
+> rather than self-adopted. Rule 47 was added the same day, after this
+> very rule was followed and still produced a false negative from a
+> shallow read.
+
+## R17. Never say more than you measured; never silently tidy what came back. Directed by Dainius, 2026-08-29
+
+**The sentence I transmit may not cover more ground than the check I
+ran.** Not a wider universe, not a wider subject, not more certainty.
+And whatever the query returned goes out — all of it.
+
+```
+CLAIM_SCOPE ⊆ MEASURED_SCOPE
+TRANSMITTED_RESULT = PREDICATE_RESULT     (before any transformation I NAME)
+```
+
+This is not R16 again. R16 is about where I looked; R47/R47's half is
+about how far I read. **R17 is about the sentence I write afterwards.**
+All three can fail separately, and the third is the one that reaches
+another person.
+
+* Searched two paths → `NOT_FOUND_IN_SEARCHED_PATHS`. Never *nowhere*.
+* Measured one field of one file → say **that file, that field**.
+* A `local_context`, an excerpt, a log tail, an API window **is not the
+  source.** Describing it as the source is the same error twice.
+* Awkward rows, duplicates, nulls, malformed records and counterexamples
+  **travel**. If I drop one, I have edited the evidence.
+* If I filtered, normalised, deduplicated or ranked — **say so, and
+  reconcile against the raw count.**
+* Transport limits are not permission to filter: chunk deterministically
+  and reconcile at the end.
+
+Every consequential extraction carries: subject/version · universe ·
+predicate · **raw count** · **transmitted count** · transformations ·
+claim scope · limitations.
+
+Earned 2026-08-29, three times in one session, each measurement correct
+and each sentence wider than it:
+
+1. A Pass A `local_context` cut at 6000 bytes → *"the document itself
+   carries a truncated SHA"*. The document was intact. I had read my own
+   instrument's output as the artefact.
+2. `find` over two `/tmp` paths → *"passA.json was not preserved
+   anywhere on disk. I looked."* It was in the repository, tracked, and
+   hash-bound.
+3. *0 witnesses in `h2v12-classification.json`* → *"316 positive facts
+   carry none"*. **235 of 316 carry the full nine-field trace** in the
+   package-bound sidecar.
+
+The tell in all three: I had the qualifier while measuring and dropped
+it one line later. **The table said "in the RESULT"; the prose did not,
+and the prose is what enters the record.**
+
+> **Provenance:** directed by Dainius on 2026-08-29 after Kai adjudicated
+> the third instance. Banked as doctrine rule 48, which states the
+> producer-independent form. Recorded rather than self-adopted.
+
+## R18. A mistake is not finished when it is corrected. Check whether it is a pattern. Directed by Dainius, 2026-08-29
+
+**Correcting the output is the cheap half.** The expensive half is
+asking whether the *reasoning step* that produced it has produced others.
+
+R17 exists because three different-looking incidents were one mechanism.
+Correcting each one in turn would have left the mechanism live — and it
+was live while doctrine rules 33, 35, 46 and 47 were all banked, all
+cited, and one of them quoted in the message that broke it.
+
+* A material error gets **recorded**, not just fixed —
+  `kai-pm/FAILURE_PATTERN_LEDGER.md`, append-only.
+* **Incident ≠ mechanism.** Two mistakes that look alike are a locator,
+  not a cause. Earn the mechanism before calling it a pattern.
+* Once a mechanism is confirmed, **go looking** for it in work already
+  done, where the denominator matters.
+* **Third confirmed occurrence ⇒ the control has failed, not the
+  producer.** Do not write the reminder a second time. Escalate to
+  structure or machine enforcement, or record accepted risk with reasons.
+* The false claim stays visible beside its correction. Always.
+* **I am not the only producer in the denominator** — nor is any
+  adjudicator exempt.
+
+> **Provenance:** directed by Dainius on 2026-08-29, banked as doctrine
+> rule 49. His instruction, which is the one to keep: *make the lesson
+> part of the engineering system so none of us has to remember to be
+> good at it next time.*
+
+The full doctrine this serves, its standing rules and the specific
+failure that earned each one, is in `kai-pm/ENGINEERING_DOCTRINE.md`.
+It applies to my work and to anything delegated to a subagent, and it
+outlives the investigation that produced it.
+
+---
+
+## Where things are
+
+| file | what it holds |
+|---|---|
+| `kai-pm/ENGINEERING_DOCTRINE.md` | the standing engineering doctrine — permanent, not 048-specific |
+| `kai-pm/ORION_FIELD_NOTES.md` §0 | **start here** — where the last stint stopped, what to look at first, and what is on `main` versus the branch |
+| `kai-pm/WAYPOINTS.md` | known-good commits with evidence, and standing contingencies |
+| `kai-pm/DECISIONS.md` | append-only decision log |
+| `kai-pm/ORION_FIELD_NOTES.md` | **NON-AUTHORITATIVE WORKING MEMORY** — defect shapes, my failure modes and the tell for each. Creates no programme state, authority, acceptance criteria, closure or permission; a decision may cite it as a pointer but must re-earn the original evidence |
+| `kai-pm/FAILURE_PATTERN_LEDGER.md` | **AUTHORITATIVE, APPEND-ONLY** — verified incidents and confirmed failure mechanisms, with the control state of each. Consult it *before* consequential work (R18), not after. Distinct from the field notes: this one is governed |
+| `kai-pm/NEXT_STINT_PLAN.md` | current plan of work and its ordering |
+| `scripts/security/` | the gates; `check_gate_registry.py --gate` audits them |
+
+## Facts about this system worth not re-deriving
+
+* Images are `python:3.11-slim`. **No Dockerfile installs `wget` or
+  `curl`** — healthchecks must use `python -c "import urllib.request…"`.
+* `docker compose config` runs client-side, no daemon needed.
+* Docker seeds a named volume from the image directory's contents *and*
+  ownership — **and only when the volume is new.** Image content under a
+  mount path is shadowed on any pre-existing volume.
+* A bare `depends_on` list waits for container **creation**, not
+  readiness.
+* Compose passes a variable into a container **only if the service names
+  it**.
+* A workflow step with neither `run` nor `uses` is schema-invalid:
+  GitHub rejects the file, schedules **zero jobs**, and the run reads
+  like an ordinary red build.
+* The Actions log API serves a **fixed byte window** from the end —
+  measured identical at 15,780 characters for two different
+  `tail_lines`. Diagnostics outside it may as well not exist, which is
+  why live steps tee to a file the post-mortem reprints last.
+* Several services are attached only to networks declared
+  `internal: true` and therefore have **no egress at runtime**, by
+  design. Anything they need from the network must be in the image.
