@@ -15,15 +15,15 @@ subprocess.CompletedProcess.returncode, read from the child that
 produced the captured output. No shell status, no pipeline status,
 no parsed text, no supplied value.
 
-  D379 control process exit status    1     (186 passed, 32 failed)
+  D379 control process exit status    1     (195 passed, 32 failed)
   cal_fixtures process exit status    1
   capture parent returns              1
-  D379_CONTROLS.txt size                42841 bytes
+  D379_CONTROLS.txt size                48060 bytes
 
 ======================================================================
 D379 §8 BANKED CASES — EACH AGAINST ITS OWN CONSTRUCTED SUBJECT
 ======================================================================
-  cases 31   PASS 7   FAIL 0   HELD 24   FIXTURE 0
+  cases 40   PASS 16   FAIL 0   HELD 24   FIXTURE 0
 
   STEP 1 OF EVERY CASE IS RAW EVIDENCE, NOT A FLAG. Each case
   carries the measured facts that establish its hostile subject,
@@ -39,6 +39,15 @@ D379 §8 BANKED CASES — EACH AGAINST ITS OWN CONSTRUCTED SUBJECT
     86-5     D367 §8(6) fail-closed qualifier identity
     I1A-1    D379 §7 I1-A one member byte -> identity moves
     I1A-2    D379 §7 mutate evidence -> only Stage-B moves
+    M2-1     D379 §8 fail-old: the false audited-snapshot COMMIT route must NOT classify HISTORICAL
+    M2-2     D379 §8 pass-new: the genuine own-lifecycle COMMIT route STILL classifies HISTORICAL
+    M2-3     D379 §8 the two routes are DISTINGUISHED
+    D14-A    D379 §8 straddling token: admitted WHOLE
+    D14-B    D379 §8 cut below the recogniser minimum: fail-old loses it, pass-new carries it whole
+    D14-C    D379 §8 token starting at or after the boundary: NOT ADMITTED ON EITHER SIDE
+    SB-1     D379 §8 Pass A absent -> REFUSE, R11 abort
+    SB-3     D379 §8 Pass A unbound -> REFUSE
+    SB-2     D379 §8 Pass A altered -> Stage-B CHANGES, Stage-A unchanged
 
   These are NARROW OBSERVATIONS of these exact invocations.
   They do not validate the harness, do not make their section
@@ -95,7 +104,7 @@ PER-CASE RECORD — subject proof, target, status, verdict
            why:    an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
   DEP-1    HELD     rc=1    child:governed-function
            clause: D379 §8 synthetic producer, external dep
-           proof:  external_module_path = /tmp/d379_exec_m3nr37pu/ext_pkg/hostile_ext.py
+           proof:  external_module_path = /tmp/d379_exec_ewh7orip/ext_pkg/hostile_ext.py
            proof:  file_exists = True
            proof:  under_h2_root = False
            proof:  under_census_root = False
@@ -199,7 +208,7 @@ PER-CASE RECORD — subject proof, target, status, verdict
            proof:  path_exists = False
   86-5     PASS     rc=1    qualify.py
            clause: D367 §8(6) fail-closed qualifier identity
-           proof:  manifest_path = /tmp/d379_exec_m3nr37pu/EMPTY.sha256
+           proof:  manifest_path = /tmp/d379_exec_ewh7orip/EMPTY.sha256
            proof:  path_exists = True
            proof:  byte_size = 0
   86-2     HELD     rc=1    qualify.py
@@ -255,18 +264,83 @@ PER-CASE RECORD — subject proof, target, status, verdict
            proof:  governed_target = stage_identity.stage_a_identity
   I1A-2    PASS     rc=0    child:governed-function
            clause: D379 §7 mutate evidence -> only Stage-B moves
-           proof:  stage_a_held_constant = /tmp/d379_exec_m3nr37pu/stage_a.json
-           proof:  clean_evidence = /tmp/d379_exec_m3nr37pu/result.json
-           proof:  mutated_evidence = /tmp/d379_exec_m3nr37pu/result_evidence_mutated.json
+           proof:  stage_a_held_constant = /tmp/d379_exec_ewh7orip/stage_a.json
+           proof:  clean_evidence = /tmp/d379_exec_ewh7orip/result.json
+           proof:  mutated_evidence = /tmp/d379_exec_ewh7orip/result_evidence_mutated.json
            proof:  evidence_bytes_differ = True
            proof:  governed_target = stage_identity.stage_b_binding
   I1A-3    HELD     rc=2    child:governed-function
            clause: D379 §7 I1-A holdout seed independence
-           proof:  stage_a_held_constant = /tmp/d379_exec_m3nr37pu/stage_a.json
+           proof:  stage_a_held_constant = /tmp/d379_exec_ewh7orip/stage_a.json
            proof:  tree_paths_held_constant = 3
            proof:  evidence_mutated = True
            proof:  governed_target = holdout.py, executed twice
            why:    the governed positive cannot be measured while an independent blocker forces refusal: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+  M2-1     PASS     rc=0    child:governed-function
+           clause: D379 §8 fail-old: the false audited-snapshot COMMIT route must NOT classify HISTORICAL
+           proof:  false_route_bytes = 179
+           proof:  genuine_route_bytes = 159
+           proof:  false_route_sha256 = 00f09abf46eab6a7…
+           proof:  genuine_route_sha256 = 0569cc2e729937e0…
+           proof:  texts_differ = True
+           proof:  both_carry_the_commit_token = True
+           proof:  governed_target = classify.lifecycle via classify._binding_witness
+  M2-2     PASS     rc=0    child:governed-function
+           clause: D379 §8 pass-new: the genuine own-lifecycle COMMIT route STILL classifies HISTORICAL
+           proof:  false_route_bytes = 179
+           proof:  genuine_route_bytes = 159
+           proof:  false_route_sha256 = 00f09abf46eab6a7…
+           proof:  genuine_route_sha256 = 0569cc2e729937e0…
+           proof:  texts_differ = True
+           proof:  both_carry_the_commit_token = True
+           proof:  governed_target = classify.lifecycle via classify._binding_witness
+  M2-3     PASS     rc=0    child:governed-function
+           clause: D379 §8 the two routes are DISTINGUISHED
+           proof:  false_route_bytes = 179
+           proof:  genuine_route_bytes = 159
+           proof:  false_route_sha256 = 00f09abf46eab6a7…
+           proof:  genuine_route_sha256 = 0569cc2e729937e0…
+           proof:  texts_differ = True
+           proof:  both_carry_the_commit_token = True
+           proof:  governed_target = classify.lifecycle via classify._binding_witness
+  D14-A    PASS     rc=0    child:governed-function
+           clause: D379 §8 straddling token: admitted WHOLE
+           proof:  HEAD_BYTES = 6000
+           proof:  token_length = 40
+           proof:  token_start_offset = 5990
+           proof:  token_end_offset = 6030
+           proof:  straddles_boundary = True
+           proof:  governed_target = passa.HEX + passa._eligible
+  D14-B    PASS     rc=0    child:governed-function
+           clause: D379 §8 cut below the recogniser minimum: fail-old loses it, pass-new carries it whole
+           proof:  HEAD_BYTES = 6000
+           proof:  token_start_offset = 5996
+           proof:  characters_inside_window = 4
+           proof:  recogniser_minimum = 7
+           proof:  governed_target = passa.HEX + passa._eligible
+  D14-C    PASS     rc=0    child:governed-function
+           clause: D379 §8 token starting at or after the boundary: NOT ADMITTED ON EITHER SIDE
+           proof:  HEAD_BYTES = 6000
+           proof:  token_start_offset = 6000
+           proof:  governed_target = passa._eligible
+  SB-1     PASS     rc=1    run_h2_v12.py
+           clause: D379 §8 Pass A absent -> REFUSE, R11 abort
+           proof:  passa_path = /tmp/d379_exec_ewh7orip/no_such_passA.json
+           proof:  path_exists = False
+           proof:  governed_target = run_h2_v12.py
+  SB-3     PASS     rc=1    run_h2_v12.py
+           clause: D379 §8 Pass A unbound -> REFUSE
+           proof:  passa_path = /tmp/d379_exec_ewh7orip/passA_unbound.json
+           proof:  path_exists = True
+           proof:  carries_producer_provenance = False
+           proof:  governed_target = run_h2_v12.py
+  SB-2     PASS     rc=0    child:governed-function
+           clause: D379 §8 Pass A altered -> Stage-B CHANGES, Stage-A unchanged
+           proof:  original = /tmp/d379_exec_ewh7orip/passA.json
+           proof:  altered = /tmp/d379_exec_ewh7orip/passA_altered.json
+           proof:  bytes_differ = True
+           proof:  stage_a_untouched = /tmp/d379_exec_ewh7orip/stage_a.json
+           proof:  governed_target = stage_identity.stage_b_binding
 
 ======================================================================
 GATE FAILURES — verbatim from the same run

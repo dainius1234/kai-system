@@ -975,6 +975,268 @@ def exec_fixtures():
     return _FIX
 
 
+def exec_function_subject_cases(f):
+    """M2-1..3, D14-A/B/C, SB-1..3 — the last banked cases without verdicts.
+
+    These stayed in-process because their governed subject is a DECISION
+    FUNCTION rather than a shipped CLI. In-process is precisely how INC-38
+    happened: the right code was proved while the real program walked
+    around it. Each case below now runs in a CHILD PROCESS that imports the
+    ACTUAL shipped function, builds the authorised synthetic input with the
+    real producer helpers, and exits from the real predicate result.
+
+    NO PRODUCTION INTERFACE IS WIDENED. Nothing is added to passa.py,
+    classify.py or stage_identity.py to make any of this reachable; the
+    children call what the producers already call.
+
+    SB-1 and SB-3 turned out NOT to be function subjects at all: "Pass A
+    absent" and "Pass A unbound" are conditions of the CLASSIFICATION
+    executable's input, so they are bound to run_h2_v12.py, which is what
+    actually decides them.
+    """
+    import stage_identity as SI
+    d = f["dir"]
+    (d / "false_route.md").write_text(FALSE_ROUTE_TEXT)
+    (d / "genuine_route.md").write_text(GENUINE_ROUTE_TEXT)
+
+    # The witness construction, using ONLY governed producer functions.
+    # Shared by the three M2 children so each measures the same subject.
+    M2_BUILD = f"""
+import json, sys
+sys.path.insert(0, {str(V)!r})
+import passa, classify
+from envelope import Witness
+def lifecycle_of(text, path):
+    m = passa.HEX.search(text)
+    assert m is not None and passa._eligible(m)
+    head = text[:passa.HEAD_BYTES]
+    w = Witness(witness_type='COMMIT', witness_value=m.group(0),
+                source_path=path,
+                source_selector=passa._selector(text, m.start()),
+                local_context=passa._context(text, m.start(), m.end()),
+                applicability_scope=passa._scope_of(head, m.start(), 'HEX'),
+                subject=passa._subject_of(head, m.start(), 'HEX',
+                                          resolve=lambda: m.group(0)),
+                evidence_total=1, evidence_shown=1, truncated=False,
+                polarity='POSITIVE', certainty='VERIFIED')
+    row = {{'path': path, 'witnesses': {{'COMMIT': [w.asdict()]}}}}
+    snap = classify._binding_witness(row, 'COMMIT')
+    return classify.lifecycle(path=path, superseded_by=None,
+                              snapshot_witness=snap.asdict() if snap else None,
+                              blocked=None), w
+FALSE = open({str(d / "false_route.md")!r}).read()
+GENUINE = open({str(d / "genuine_route.md")!r}).read()
+FP = 'kai-pm/SYNTHETIC_CODE_AUDIT_FALSE_ROUTE.md'
+GP = 'kai-pm/SYNTHETIC_CODE_AUDIT_GENUINE_ROUTE.md'
+"""
+
+    # raw facts about the CONSTRUCTED inputs, measured here
+    fr, gr = FALSE_ROUTE_TEXT, GENUINE_ROUTE_TEXT
+    m2_proof = {
+        "false_route_bytes": len(fr.encode()),
+        "genuine_route_bytes": len(gr.encode()),
+        "false_route_sha256": hashlib.sha256(fr.encode()).hexdigest()[:16] + "…",
+        "genuine_route_sha256": hashlib.sha256(gr.encode()).hexdigest()[:16] + "…",
+        "texts_differ": fr != gr,
+        "both_carry_the_commit_token": COMMIT in fr and COMMIT in gr,
+        "governed_target": "classify.lifecycle via classify._binding_witness"}
+    m2_holds = lambda pr: (pr["texts_differ"] is True
+                           and pr["both_carry_the_commit_token"] is True)
+
+    print("  classify.lifecycle   (child process, real governed function)")
+    d379_case("M2-1", clause="D379 §8 fail-old: the false audited-snapshot "
+                             "COMMIT route must NOT classify HISTORICAL",
+              subject_proof=m2_proof, subject_holds=m2_holds,
+              snippet=M2_BUILD + """
+res, w = lifecycle_of(FALSE, FP)
+print('scope=%s subject=%s LIFECYCLE=%s' % (w.applicability_scope, w.subject,
+                                            res['value']))
+if res['value'] != 'HISTORICAL':
+    print('M2_FALSE_ROUTE_NOT_HISTORICAL'); sys.exit(0)
+print('the commit the document AUDITS decided the document lifecycle')
+sys.exit(1)
+""",
+              intended_reason="M2_FALSE_ROUTE_NOT_HISTORICAL",
+              expect_class="ACCEPT")
+
+    d379_case("M2-2", clause="D379 §8 pass-new: the genuine own-lifecycle "
+                             "COMMIT route STILL classifies HISTORICAL",
+              subject_proof=m2_proof, subject_holds=m2_holds,
+              snippet=M2_BUILD + """
+res, w = lifecycle_of(GENUINE, GP)
+print('scope=%s subject=%s LIFECYCLE=%s' % (w.applicability_scope, w.subject,
+                                            res['value']))
+if res['value'] == 'HISTORICAL':
+    print('M2_GENUINE_ROUTE_STILL_HISTORICAL'); sys.exit(0)
+print('suppression, not discrimination'); sys.exit(1)
+""",
+              intended_reason="M2_GENUINE_ROUTE_STILL_HISTORICAL",
+              expect_class="ACCEPT")
+
+    d379_case("M2-3", clause="D379 §8 the two routes are DISTINGUISHED",
+              subject_proof=m2_proof, subject_holds=m2_holds,
+              snippet=M2_BUILD + """
+a, _ = lifecycle_of(FALSE, FP)
+b, _ = lifecycle_of(GENUINE, GP)
+print('false=%s genuine=%s' % (a['value'], b['value']))
+if a['value'] != b['value']:
+    print('M2_ROUTES_DISCRIMINATED'); sys.exit(0)
+print('both routes classified %s — the binding predicate did not '
+      'discriminate' % a['value'])
+sys.exit(1)
+""",
+              intended_reason="M2_ROUTES_DISCRIMINATED", expect_class="ACCEPT")
+
+    # ── D14 — the HEAD_BYTES boundary decides WHICH TOKENS ARE ELIGIBLE,
+    #    never WHAT AN ELIGIBLE TOKEN IS. Subject: passa._eligible and the
+    #    recogniser, in a child that imports the real passa.
+    H = passa.HEAD_BYTES
+    tok = "76dbba4c1f3e9a05b7c2d8e6f40193a5c7b2e8d1"
+    D14_HEAD = f"""
+import sys
+sys.path.insert(0, {str(V)!r})
+import passa
+H = passa.HEAD_BYTES
+TOK = {tok!r}
+"""
+    print("  passa._eligible      (child process, real boundary predicate)")
+    d379_case("D14-A", clause="D379 §8 straddling token: admitted WHOLE",
+              subject_proof={"HEAD_BYTES": H, "token_length": len(tok),
+                             "token_start_offset": H - 10,
+                             "token_end_offset": H - 10 + len(tok),
+                             "straddles_boundary": (H - 10) < H < (H - 10 + len(tok)),
+                             "governed_target": "passa.HEX + passa._eligible"},
+              subject_holds=lambda pr: pr["straddles_boundary"] is True,
+              snippet=D14_HEAD + """
+pad = '.' * (H - 10)
+s = pad + TOK + ' tail'
+m = next(x for x in passa.HEX.finditer(s) if x.start() == len(pad))
+print('recognised=%r len=%d start=%d eligible=%s'
+      % (m.group(0), len(m.group(0)), m.start(), passa._eligible(m)))
+if m.group(0) == TOK and len(m.group(0)) == 40 and passa._eligible(m):
+    print('D14_STRADDLING_TOKEN_ADMITTED_WHOLE'); sys.exit(0)
+sys.exit(1)
+""",
+              intended_reason="D14_STRADDLING_TOKEN_ADMITTED_WHOLE",
+              expect_class="ACCEPT")
+
+    d379_case("D14-B", clause="D379 §8 cut below the recogniser minimum: "
+                              "fail-old loses it, pass-new carries it whole",
+              subject_proof={"HEAD_BYTES": H,
+                             "token_start_offset": H - 4,
+                             "characters_inside_window": 4,
+                             "recogniser_minimum": 7,
+                             "governed_target": "passa.HEX + passa._eligible"},
+              # DERIVED FROM THE TWO NUMBERS, not supplied as a verdict. A
+              # precomputed `cut_is_below_minimum: True` would be the flag
+              # this whole repair removes.
+              subject_holds=lambda pr: (pr["characters_inside_window"]
+                                        < pr["recogniser_minimum"]),
+              snippet=D14_HEAD + """
+pad = '.' * (H - 4)
+whole = pad + TOK
+cut = whole[:H]
+lost = [x.group(0) for x in passa.HEX.finditer(cut) if x.start() >= len(pad)]
+m = next(x for x in passa.HEX.finditer(whole) if x.start() == len(pad))
+print('fail-old found in truncated window: %r' % lost)
+print('pass-new against complete source: %r eligible=%s'
+      % (m.group(0), passa._eligible(m)))
+if not lost and m.group(0) == TOK and passa._eligible(m):
+    print('D14_COMPLETE_SOURCE_RECOGNITION'); sys.exit(0)
+sys.exit(1)
+""",
+              intended_reason="D14_COMPLETE_SOURCE_RECOGNITION",
+              expect_class="ACCEPT")
+
+    d379_case("D14-C", clause="D379 §8 token starting at or after the "
+                              "boundary: NOT ADMITTED ON EITHER SIDE",
+              subject_proof={"HEAD_BYTES": H, "token_start_offset": H,
+                             "governed_target": "passa._eligible"},
+              subject_holds=lambda pr: (pr["token_start_offset"]
+                                        >= pr["HEAD_BYTES"]),
+              snippet=D14_HEAD + """
+pad = '.' * H
+s = pad + TOK
+m = next(x for x in passa.HEX.finditer(s) if x.start() == len(pad))
+print('start=%d HEAD_BYTES=%d eligible=%s' % (m.start(), H, passa._eligible(m)))
+if not passa._eligible(m) and m.start() == H:
+    print('D14_AT_OR_AFTER_BOUNDARY_NOT_ADMITTED'); sys.exit(0)
+sys.exit(1)
+""",
+              intended_reason="D14_AT_OR_AFTER_BOUNDARY_NOT_ADMITTED",
+              expect_class="ACCEPT")
+
+    # ── SB — Stage-B separation and integrity ─────────────────────────
+    #    SB-1 and SB-3 are conditions of the CLASSIFICATION EXECUTABLE's
+    #    input, so they are bound to run_h2_v12.py. SB-2 is a differential
+    #    over stage_b_binding and runs as a child on that function.
+    print("  run_h2_v12.py        (Stage-B input conditions)")
+    missing = d / "no_such_passA.json"
+    d379_case("SB-1", clause="D379 §8 Pass A absent -> REFUSE, R11 abort",
+              subject_proof={"passa_path": str(missing),
+                             "path_exists": missing.exists(),
+                             "governed_target": "run_h2_v12.py"},
+              subject_holds=lambda pr: pr["path_exists"] is False,
+              executable=V / "run_h2_v12.py",
+              argv=["--subject-repo", str(REPO), "--passa", str(missing),
+                    "--out", str(d / "sb1.json"),
+                    "--stage-a", str(f["stage_a"])],
+              intended_reason="No such file", expect_class="REFUSE")
+
+    unbound = d / "passA_unbound.json"
+    _u = json.loads(f["passa"].read_bytes())
+    _u.pop("producer_provenance")
+    unbound.write_text(json.dumps(_u))
+    d379_case("SB-3", clause="D379 §8 Pass A unbound -> REFUSE",
+              subject_proof={
+                  "passa_path": str(unbound), "path_exists": unbound.is_file(),
+                  "carries_producer_provenance":
+                      "producer_provenance" in json.loads(unbound.read_bytes()),
+                  "governed_target": "run_h2_v12.py"},
+              subject_holds=lambda pr: (pr["path_exists"] is True
+                                        and pr["carries_producer_provenance"]
+                                        is False),
+              executable=V / "run_h2_v12.py",
+              argv=["--subject-repo", str(REPO), "--passa", str(unbound),
+                    "--out", str(d / "sb3.json"),
+                    "--stage-a", str(f["stage_a"])],
+              intended_reason="carries no in-band producer_provenance",
+              expect_class="REFUSE")
+
+    altered = d / "passA_altered.json"
+    _a = json.loads(f["passa"].read_bytes())
+    _a["population"] = 99
+    altered.write_text(json.dumps(_a))
+    d379_case("SB-2", clause="D379 §8 Pass A altered -> Stage-B CHANGES, "
+                             "Stage-A unchanged",
+              subject_proof={
+                  "original": str(f["passa"]), "altered": str(altered),
+                  "bytes_differ": f["passa"].read_bytes()
+                  != altered.read_bytes(),
+                  "stage_a_untouched": str(f["stage_a"]),
+                  "governed_target": "stage_identity.stage_b_binding"},
+              subject_holds=lambda pr: pr["bytes_differ"] is True,
+              snippet=f"""
+import json, sys
+import stage_identity as SI
+desc = json.loads(open({str(f["stage_a"])!r}, 'rb').read().decode('utf-8'))
+ident = SI.stage_a_identity(desc)
+def b(p):
+    return SI.stage_b_binding(p, artifact_kind='PASS_A', identity=ident,
+                              producer_component='PASS_A',
+                              producer_provenance_digest='0'*64)
+b1, b2 = b({str(f["passa"])!r}), b({str(altered)!r})
+same_a = b1['stage_a_identity'] == b2['stage_a_identity'] == ident
+moved_b = SI.stage_b_aggregate([b1]) != SI.stage_b_aggregate([b2])
+print('stage_a same=%s  stage_b moved=%s' % (same_a, moved_b))
+if same_a and moved_b:
+    print('SB_STAGE_A_UNCHANGED_STAGE_B_CHANGES'); sys.exit(0)
+sys.exit(1)
+""",
+              intended_reason="SB_STAGE_A_UNCHANGED_STAGE_B_CHANGES",
+              expect_class="ACCEPT")
+
+
 def exec_bound_cases():
     """The BANKED D379 cases, each against ITS OWN CONSTRUCTED SUBJECT.
 
@@ -1570,6 +1832,8 @@ print('SEED MOVED WITH EVIDENCE'); sys.exit(1)
 """,
               intended_reason="HOLDOUT_SEED_INDEPENDENT_OF_EVIDENCE",
               expect_class="ACCEPT")
+
+    exec_function_subject_cases(f)
 
     held = [c for c in CASES if c["verdict"] == "HELD"]
     passed = [c for c in CASES if c["verdict"] == "PASS"]

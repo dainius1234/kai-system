@@ -8,7 +8,7 @@ subprocess.CompletedProcess.returncode, read directly from the child
 that produced the output immediately above it. No shell status, no
 pipeline status, no parsed text, no supplied value.
 
-captured 2026-09-22T19:16:15.389865+00:00
+captured 2026-09-22T19:18:45.100555+00:00
 
 ======================================================================
 SUBJECT 1 of 2 — THE D379 CONTROL PROCESS
@@ -277,7 +277,7 @@ D379 §8 EXECUTABLE-BOUND EXECUTION — the real shipped CLIs
     Q1a-8    rc=1   REFUSE  intended=N  blocker=Y  -> HELD
                an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
     DEP-1    SUBJECT PROOF (D379 §8 synthetic producer, external dep)
-               external_module_path               /tmp/d379_exec_m3nr37pu/ext_pkg/hostile_ext.py
+               external_module_path               /tmp/d379_exec_ewh7orip/ext_pkg/hostile_ext.py
                file_exists                        True
                under_h2_root                      False
                under_census_root                  False
@@ -399,7 +399,7 @@ D379 §8 EXECUTABLE-BOUND EXECUTION — the real shipped CLIs
                subject constructed?           YES — derived from the raw facts above
     86-4     rc=1   REFUSE  intended=Y  blocker=N  -> PASS
     86-5     SUBJECT PROOF (D367 §8(6) fail-closed qualifier identity)
-               manifest_path                      /tmp/d379_exec_m3nr37pu/EMPTY.sha256
+               manifest_path                      /tmp/d379_exec_ewh7orip/EMPTY.sha256
                path_exists                        True
                byte_size                          0
                subject constructed?           YES — derived from the raw facts above
@@ -464,36 +464,113 @@ D379 §8 EXECUTABLE-BOUND EXECUTION — the real shipped CLIs
                subject constructed?           YES — derived from the raw facts above
     I1A-1    rc=0   ACCEPT  intended=Y  blocker=N  -> PASS
     I1A-2    SUBJECT PROOF (D379 §7 mutate evidence -> only Stage-B moves)
-               stage_a_held_constant              /tmp/d379_exec_m3nr37pu/stage_a.json
-               clean_evidence                     /tmp/d379_exec_m3nr37pu/result.json
-               mutated_evidence                   /tmp/d379_exec_m3nr37pu/result_evidence_mutated.json
+               stage_a_held_constant              /tmp/d379_exec_ewh7orip/stage_a.json
+               clean_evidence                     /tmp/d379_exec_ewh7orip/result.json
+               mutated_evidence                   /tmp/d379_exec_ewh7orip/result_evidence_mutated.json
                evidence_bytes_differ              True
                governed_target                    stage_identity.stage_b_binding
                subject constructed?           YES — derived from the raw facts above
     I1A-2    rc=0   ACCEPT  intended=Y  blocker=N  -> PASS
     I1A-3    SUBJECT PROOF (D379 §7 I1-A holdout seed independence)
-               stage_a_held_constant              /tmp/d379_exec_m3nr37pu/stage_a.json
+               stage_a_held_constant              /tmp/d379_exec_ewh7orip/stage_a.json
                tree_paths_held_constant           3
                evidence_mutated                   True
                governed_target                    holdout.py, executed twice
                subject constructed?           YES — derived from the raw facts above
     I1A-3    rc=2   REFUSE  intended=N  blocker=Y  -> HELD
                the governed positive cannot be measured while an independent blocker forces refusal: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+  classify.lifecycle   (child process, real governed function)
+    M2-1     SUBJECT PROOF (D379 §8 fail-old: the false audited-snapshot COMMIT route must NOT classify HISTORICAL)
+               false_route_bytes                  179
+               genuine_route_bytes                159
+               false_route_sha256                 00f09abf46eab6a7…
+               genuine_route_sha256               0569cc2e729937e0…
+               texts_differ                       True
+               both_carry_the_commit_token        True
+               governed_target                    classify.lifecycle via classify._binding_witness
+               subject constructed?           YES — derived from the raw facts above
+    M2-1     rc=0   ACCEPT  intended=Y  blocker=N  -> PASS
+    M2-2     SUBJECT PROOF (D379 §8 pass-new: the genuine own-lifecycle COMMIT route STILL classifies HISTORICAL)
+               false_route_bytes                  179
+               genuine_route_bytes                159
+               false_route_sha256                 00f09abf46eab6a7…
+               genuine_route_sha256               0569cc2e729937e0…
+               texts_differ                       True
+               both_carry_the_commit_token        True
+               governed_target                    classify.lifecycle via classify._binding_witness
+               subject constructed?           YES — derived from the raw facts above
+    M2-2     rc=0   ACCEPT  intended=Y  blocker=N  -> PASS
+    M2-3     SUBJECT PROOF (D379 §8 the two routes are DISTINGUISHED)
+               false_route_bytes                  179
+               genuine_route_bytes                159
+               false_route_sha256                 00f09abf46eab6a7…
+               genuine_route_sha256               0569cc2e729937e0…
+               texts_differ                       True
+               both_carry_the_commit_token        True
+               governed_target                    classify.lifecycle via classify._binding_witness
+               subject constructed?           YES — derived from the raw facts above
+    M2-3     rc=0   ACCEPT  intended=Y  blocker=N  -> PASS
+  passa._eligible      (child process, real boundary predicate)
+    D14-A    SUBJECT PROOF (D379 §8 straddling token: admitted WHOLE)
+               HEAD_BYTES                         6000
+               token_length                       40
+               token_start_offset                 5990
+               token_end_offset                   6030
+               straddles_boundary                 True
+               governed_target                    passa.HEX + passa._eligible
+               subject constructed?           YES — derived from the raw facts above
+    D14-A    rc=0   ACCEPT  intended=Y  blocker=N  -> PASS
+    D14-B    SUBJECT PROOF (D379 §8 cut below the recogniser minimum: fail-old loses it, pass-new carries it whole)
+               HEAD_BYTES                         6000
+               token_start_offset                 5996
+               characters_inside_window           4
+               recogniser_minimum                 7
+               governed_target                    passa.HEX + passa._eligible
+               subject constructed?           YES — derived from the raw facts above
+    D14-B    rc=0   ACCEPT  intended=Y  blocker=N  -> PASS
+    D14-C    SUBJECT PROOF (D379 §8 token starting at or after the boundary: NOT ADMITTED ON EITHER SIDE)
+               HEAD_BYTES                         6000
+               token_start_offset                 6000
+               governed_target                    passa._eligible
+               subject constructed?           YES — derived from the raw facts above
+    D14-C    rc=0   ACCEPT  intended=Y  blocker=N  -> PASS
+  run_h2_v12.py        (Stage-B input conditions)
+    SB-1     SUBJECT PROOF (D379 §8 Pass A absent -> REFUSE, R11 abort)
+               passa_path                         /tmp/d379_exec_ewh7orip/no_such_passA.json
+               path_exists                        False
+               governed_target                    run_h2_v12.py
+               subject constructed?           YES — derived from the raw facts above
+    SB-1     rc=1   REFUSE  intended=Y  blocker=N  -> PASS
+    SB-3     SUBJECT PROOF (D379 §8 Pass A unbound -> REFUSE)
+               passa_path                         /tmp/d379_exec_ewh7orip/passA_unbound.json
+               path_exists                        True
+               carries_producer_provenance        False
+               governed_target                    run_h2_v12.py
+               subject constructed?           YES — derived from the raw facts above
+    SB-3     rc=1   REFUSE  intended=Y  blocker=N  -> PASS
+    SB-2     SUBJECT PROOF (D379 §8 Pass A altered -> Stage-B CHANGES, Stage-A unchanged)
+               original                           /tmp/d379_exec_ewh7orip/passA.json
+               altered                            /tmp/d379_exec_ewh7orip/passA_altered.json
+               bytes_differ                       True
+               stage_a_untouched                  /tmp/d379_exec_ewh7orip/stage_a.json
+               governed_target                    stage_identity.stage_b_binding
+               subject constructed?           YES — derived from the raw facts above
+    SB-2     rc=0   ACCEPT  intended=Y  blocker=N  -> PASS
 
-    executable-bound cases  31   PASS 7   FAIL 0   HELD 24   FIXTURE 0
+    executable-bound cases  40   PASS 16   FAIL 0   HELD 24   FIXTURE 0
     (HELD is not a pass and not a skip: it fails the gate and
      names the predicate that could not be measured. FIXTURE is
      worse than either — the banked subject was never built.)
 
 ----------------------------------------------------------------------
 SECTION COVERAGE
-  M2         IMPLEMENTED — subject is classify.lifecycle — a classification decision function, not a CLI
-  D14        IMPLEMENTED — subject is passa._eligible — the boundary predicate, not a CLI
+  M2         IMPLEMENTED (executable) — 3/3
+  D14        IMPLEMENTED (executable) — 3/3
   PPOP       IMPLEMENTED — subject is stage_identity.classify_origin, not a CLI
   Q1a        HELD (executable) — 2 PASS, 7 HELD of 9: Q1a-1, Q1a-2, Q1a-8, Q1a-3, Q1a-5, Q1a-6
   Q1b        HELD (executable) — 0 PASS, 6 HELD of 6: Q1b-1, Q1b-2, Q1b-3, Q1b-4, Q1b-5, Q1b-6
   86         HELD (executable) — 3 PASS, 3 HELD of 6: 86-1, 86-2, 86-6
-  SB         IMPLEMENTED — subject is passa scope derivation + the D382 executed derivation, not a CLI
+  SB         IMPLEMENTED (executable) — 3/3
   I1A        HELD (executable) — 2 PASS, 1 HELD of 3: I1A-3
   I1B        HELD (executable) — 0 PASS, 4 HELD of 4: I1B-1, I1B-2, I1B-3, I1B-4
   DEP        HELD (executable) — 0 PASS, 3 HELD of 3: DEP-2, DEP-3, DEP-1
@@ -501,7 +578,7 @@ SECTION COVERAGE
   STDLIB     HELD — subject is stage_identity stdlib construction (D380 §7), not a CLI; V2-ID-2a, the canonical positive derivation ONLY (INC-34). The D380-STDLIB-NEG-1 negative control EXECUTES.
 
 ======================================================================
-186 passed, 32 failed
+195 passed, 32 failed
   FAIL Q1a-1 (D379 §8 clean chain on one Stage A) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
   FAIL Q1a-2 (D379 §8 Pass-A producer byte changed) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
   FAIL DEP-2 (D379 §8 ordinary stdlib under a governed interpreter) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
