@@ -1,0 +1,153 @@
+{
+ "base": "194db0a0c13b4d5b322997fc1ceb33bdd21a77bc",
+ "tracked_files": 896,
+ "universe_exec_config": 572,
+ "excluded_docs": 309,
+ "other_excluded": 15,
+ "patterns": {
+  "P1 rev-parse HEAD": "rev-parse[\\s\"',\\[\\]]+(?:--[\\w-]+[\\s\"',\\[\\]]+)*HEAD\\b",
+  "P2 github.sha/GITHUB_SHA": "github\\.sha\\b|\\bGITHUB_SHA\\b",
+  "P3 github.ref family": "github\\.(?:ref|ref_name|head_ref|base_ref)\\b|\\bGITHUB_(?:REF|REF_NAME|HEAD_REF|BASE_REF)\\b",
+  "P4 hard-coded main": "origin/main\\b|refs/heads/main\\b|(?:checkout|switch|--branch|-b)[\\s\"',\\[\\]]+main\\b|branches:\\s*\\[[^\\]]*\\bmain\\b|^\\s*-\\s*main\\s*$",
+  "P5 current branch": "rev-parse[\\s\"',\\[\\]]+--abbrev-ref|symbolic-ref\\b|branch[\\s\"',\\[\\]]+--show-current",
+  "P6 git describe": "\\bgit[\\s\"',\\[\\]]+describe\\b",
+  "P7 other git cmd on HEAD": "\\bgit\\b[^\\n]*\\b(?:log|diff|show|rev-list|cat-file|ls-tree|archive|diff-tree)\\b[^\\n]*\\bHEAD\\b"
+ },
+ "hits": [
+  {
+   "file": ".github/workflows/core-tests.yml",
+   "line": 8,
+   "pattern": "P4 hard-coded main",
+   "text": "branches: [\"main\", \"claude/**\"]"
+  },
+  {
+   "file": ".github/workflows/core-tests.yml",
+   "line": 10,
+   "pattern": "P4 hard-coded main",
+   "text": "branches: [main]"
+  },
+  {
+   "file": ".github/workflows/python-app.yml",
+   "line": 10,
+   "pattern": "P4 hard-coded main",
+   "text": "branches: [ \"main\", \"claude/**\" ]"
+  },
+  {
+   "file": ".github/workflows/python-app.yml",
+   "line": 12,
+   "pattern": "P4 hard-coded main",
+   "text": "branches: [ \"main\" ]"
+  },
+  {
+   "file": ".github/workflows/unified-hunter.yml",
+   "line": 15,
+   "pattern": "P4 hard-coded main",
+   "text": "branches: [\"main\", \"claude/**\"]"
+  },
+  {
+   "file": ".github/workflows/unified-hunter.yml",
+   "line": 17,
+   "pattern": "P4 hard-coded main",
+   "text": "branches: [main]"
+  },
+  {
+   "file": "git-watcher/app.py",
+   "line": 92,
+   "pattern": "P1 rev-parse HEAD",
+   "text": "base[\"branch\"] = _run_git([\"rev-parse\", \"--abbrev-ref\", \"HEAD\"], path)"
+  },
+  {
+   "file": "git-watcher/app.py",
+   "line": 92,
+   "pattern": "P5 current branch",
+   "text": "base[\"branch\"] = _run_git([\"rev-parse\", \"--abbrev-ref\", \"HEAD\"], path)"
+  },
+  {
+   "file": "git-watcher/app.py",
+   "line": 98,
+   "pattern": "P1 rev-parse HEAD",
+   "text": "base[\"commit_hash\"] = _run_git([\"rev-parse\", \"--short\", \"HEAD\"], path)"
+  },
+  {
+   "file": "scripts/sync_docs.py",
+   "line": 105,
+   "pattern": "P1 rev-parse HEAD",
+   "text": "[\"git\", \"rev-parse\", \"--short\", \"HEAD\"],"
+  }
+ ],
+ "doc_hits_count": 5,
+ "doc_hits": [
+  {
+   "file": "SESSION_BACKLOG.md",
+   "line": 196,
+   "pattern": "P4 hard-coded main",
+   "text": "- Merge branch 'origin/main' into copilot/fix-ci-on-pr-60"
+  },
+  {
+   "file": "kai-pm/DECISIONS.md",
+   "line": 1404,
+   "pattern": "P4 hard-coded main",
+   "text": "Merged `origin/main` (`2b17d5e`) into the feature branch \u2014 no content conflicts (feature branch already contained everything in that merge commit). Pushed updat"
+  },
+  {
+   "file": "kai-pm/ORION_FIELD_NOTES.md",
+   "line": 148,
+   "pattern": "P7 other git cmd on HEAD",
+   "text": "detector. `git show HEAD:file > file`, run, count, restore."
+  },
+  {
+   "file": "kai-pm/REALITY_CHECK_2026-06-18.md",
+   "line": 60,
+   "pattern": "P4 hard-coded main",
+   "text": "- `git diff origin/main..claude/project-rework-plan-pgvp35 --stat`: 28 files changed,"
+  },
+  {
+   "file": "kai-pm/WAYPOINTS.md",
+   "line": 35,
+   "pattern": "P7 other git cmd on HEAD",
+   "text": "git diff <sha>..HEAD --stat         # what changed since"
+  }
+ ],
+ "loose_unmatched": [
+  {
+   "file": "common/resilience.py",
+   "line": 77,
+   "text": "idempotent = method.upper() in {\"GET\", \"HEAD\", \"OPTIONS\", \"PUT\", \"DELETE\"}"
+  },
+  {
+   "file": "git-watcher/app.py",
+   "line": 86,
+   "text": "_run_git([\"rev-parse\", \"--git-dir\"], path)"
+  },
+  {
+   "file": "git-watcher/app.py",
+   "line": 134,
+   "text": "[\"rev-list\", \"--left-right\", \"--count\", \"HEAD...@{upstream}\"], path,"
+  },
+  {
+   "file": "scripts/auto_changelog.py",
+   "line": 64,
+   "text": "cmd.append(f\"{ref}..HEAD\")"
+  },
+  {
+   "file": "scripts/ci/compose_probe.py",
+   "line": 233,
+   "text": "f\"data=body.encode() if '{method}' not in ('GET','HEAD') else None\\n\""
+  },
+  {
+   "file": "scripts/security/check_image_tags.py",
+   "line": 124,
+   "text": "# auth endpoint for an anonymous pull token, then HEAD the manifest."
+  },
+  {
+   "file": "scripts/security/check_image_tags.py",
+   "line": 174,
+   "text": "manifest_url.format(repo=repo, tag=tag), method=\"HEAD\")"
+  },
+  {
+   "file": "scripts/sync_docs.py",
+   "line": 102,
+   "text": "\"\"\"Get short hash of HEAD.\"\"\""
+  }
+ ]
+}
