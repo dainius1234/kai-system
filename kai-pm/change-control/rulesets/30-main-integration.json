@@ -1,0 +1,45 @@
+{
+  "name": "CAI main integration \u2014 no deletion, no force push, trusted verifier required",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "include": [
+        "~DEFAULT_BRANCH"
+      ],
+      "exclude": []
+    }
+  },
+  "rules": [
+    {
+      "type": "deletion"
+    },
+    {
+      "type": "non_fast_forward"
+    },
+    {
+      "type": "pull_request",
+      "parameters": {
+        "required_approving_review_count": 0,
+        "dismiss_stale_reviews_on_push": true,
+        "require_code_owner_review": false,
+        "require_last_push_approval": false,
+        "required_review_thread_resolution": false
+      }
+    },
+    {
+      "type": "workflows",
+      "parameters": {
+        "do_not_enforce_on_create": false,
+        "workflows": [
+          {
+            "path": ".github/workflows/cai-authority-verifier.yml",
+            "repository_id": 1004463473,
+            "sha": "<<VERIFIER_COMMIT_SHA: the exact commit of cai-authority-verifier.yml Kai reviewed>>"
+          }
+        ]
+      }
+    }
+  ],
+  "bypass_actors": []
+}

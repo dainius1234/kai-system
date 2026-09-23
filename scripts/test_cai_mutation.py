@@ -23,7 +23,8 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SUITES = ["test_cai_authority.py", "test_cai_scope.py", "test_cai_admission.py"]
+SUITES = ["test_cai_authority.py", "test_cai_scope.py", "test_cai_admission.py",
+          "test_cai_bootstrap.py"]
 
 # id: (control, [(old, new), ...], target cases that MUST fail)
 MUTANTS = {
@@ -174,6 +175,26 @@ MUTANTS = {
             [('              for x in wa_standing(repo, wa, a.tag.tagger_time)]',
               '              for x in wa_standing(repo, wa, int(time.time()))]')],
             ["X2"]),
+    # ── check_cai_bootstrap.py: the ruleset DESIGN invariants ─────────
+    "M31": ("identity collapse not detected",
+            [('            elif executor_id is not None and aid == executor_id:',
+              '            elif False:')],
+            ["B3"]),
+    "M32": ("immutability bypass allowed",
+            [('        if rs.get("bypass_actors"):\n            r.append(f"{rs.get(\'name\')!r}: immutability',
+              '        if False:\n            r.append(f"{rs.get(\'name\')!r}: immutability')],
+            ["B4"]),
+    "M33": ("verifier pinned by movable ref accepted",
+            [('            if "ref" in w:', '            if False:'),
+             ('            if not w.get("sha"):', '            if False:')],
+            ["B8"]),
+    "M34": ("exclude holes in the authority namespaces accepted",
+            [('        if _excludes(rs):\n            r.append(f"{rs.get(\'name\')!r}: exclude patterns carve',
+              '        if False:\n            r.append(f"{rs.get(\'name\')!r}: exclude patterns carve')],
+            ["B7"]),
+    "M35": ("live server state not compared with the design",
+            [('                if want != got:', '                if False:')],
+            ["B12", "B13"]),
 }
 
 
@@ -188,7 +209,8 @@ def apply(dst: Path, edits):
         hits = []
         for fn in ("scripts/security/cai_lib.py",
                    "scripts/security/check_cai_authority.py",
-                   "scripts/security/check_cai_admission.py"):
+                   "scripts/security/check_cai_admission.py",
+                   "scripts/security/check_cai_bootstrap.py"):
             p = dst / fn
             if p.read_text().count(old):
                 hits.append((p, p.read_text().count(old)))

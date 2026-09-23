@@ -18,10 +18,20 @@ calibration case is not claimed as covered.
 | candidate drift — same tree, different commit | commit identity, not tree identity | V3 |
 | stale baseline | P-7 | A9 |
 | path / mode bypass | symlink, gitlink, rename-both-ends, ambiguity, collision | S3–S7 |
-| ordinary check spoofing | required-workflow pinning by exact workflow SHA — **capability unverified — researched in this leg's workflow/ruleset commit** | not claimed until leg 2 |
+| ordinary check spoofing | required-workflow pinning by exact workflow SHA — **server availability UNVERIFIED — `rulesets/PINNING_RESEARCH.md` §3** | not claimed until leg 2 |
 | verifier outage | every unavailability → UNKNOWN → REFUSE | A5 |
 | forked admission history | sibling successors → UNRESOLVED; orphans → REFUSE | D3–D5 |
 | cross-repository replay | payload binds `repository_id` **and** full name | A6, D6 |
+
+## ARCHITECTURE FINDING — the in-scope/out-of-scope line has collapsed
+
+Measured 2026-09-23: the executor pushes as `dainius1234` (216391246),
+the same GitHub identity as the authority. "Compromised executor
+credentials" (in scope) is therefore today "a compromised Dainius GitHub
+account" (out of scope). Signature pinning still prevents forgery;
+rulesets cannot separate the two principals, and deletion of the head
+admission would silently regress the baseline. Returned to Kai and
+Dainius: `rulesets/PINNING_RESEARCH.md` §4.
 
 ## Explicitly out of scope (order §9)
 

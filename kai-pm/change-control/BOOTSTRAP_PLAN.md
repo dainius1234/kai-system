@@ -45,7 +45,11 @@ may "CAI ACTIVE" be proposed to Dainius. No self-certification.
 workflow runs with an enforcing exit code, and fails invariant I-4 for
 any that is not declared in `scripts/security/gate_registry.py`. That
 file and the `Makefile` `policy-check` target are **not** on the
-authorised surface. The exact entries CAI needs will be prepared, unapplied, as a
-proposed patch inside `kai-pm/change-control/` for a ruling. Relocating or renaming the
+authorised surface. The exact entries CAI needs are in `REGISTRY_INTEGRATION.patch`
+(98 lines, unapplied). Measured in a throwaway worktree: with it the
+gate PASSES, 49 declared / 49 on disk, I-1..I-7 hold, and
+`check_cai_authority` / `check_cai_scope` are reported as declared but
+not yet enforced until leg 2. `git apply --check` passes on this
+branch. Relocating or renaming the
 verifiers to escape discovery would bypass an existing control and is
 not done.

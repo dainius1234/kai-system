@@ -1,0 +1,69 @@
+name: CAI authority verifier
+
+# Change Authority Interlock v1.0 — tranche CAI-BOOT-001, leg 1.
+# NOT ACTIVE. No ruleset requires this workflow yet; it enforces nothing
+# on its own. The proposed ruleset that WOULD require it pins it by exact
+# commit sha (kai-pm/change-control/rulesets/30-main-integration.json),
+# never by name or ref.
+#
+# The verifier's token is READ-ONLY. It never pushes, tags, merges,
+# admits or creates authority.
+
+on:
+  push:
+    branches: [claude/cai-v1-bootstrap]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  calibration:
+    name: Hostile calibration and ruleset design
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: OpenPGP tooling present (SSH signatures are not implemented, P-4)
+        run: gpg --version | head -1
+      - name: Authority, HOLD/REVOKE and namespace cases (A1-A9, H1-H4, N1-N3)
+        run: python scripts/test_cai_authority.py
+      - name: Path and mode scope cases (S1-S7)
+        run: python scripts/test_cai_scope.py
+      - name: IV&V, admission chain and namespace cases (V1-V5, D1-D8, N4, X1-X9)
+        run: python scripts/test_cai_admission.py
+      - name: Ruleset design cases (B1-B13)
+        run: python scripts/test_cai_bootstrap.py
+      - name: Mutation calibration of all four suites
+        run: python scripts/test_cai_mutation.py
+      - name: Ruleset design invariants
+        run: python scripts/security/check_cai_bootstrap.py --design kai-pm/change-control/rulesets
+
+  derivation:
+    # Derives the programme baseline from THIS repository's real tags.
+    # Leg 1: manual dispatch only. No authority key is pinned, so the
+    # verifier can only REFUSE ("UNKNOWN: no authority key is pinned"), and
+    # a job that is red on every push teaches everyone to ignore red. It
+    # joins push/pull_request in leg 2, when the key is pinned.
+    name: Programme baseline derivation
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Fetch every tag (the authoritative namespaces are tags)
+        run: git fetch --force --tags origin
+      - name: Admission chain
+        run: python scripts/security/check_cai_admission.py --repo . --authority-config kai-pm/change-control/authority_keys.json

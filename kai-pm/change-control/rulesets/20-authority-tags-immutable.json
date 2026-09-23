@@ -1,0 +1,26 @@
+{
+  "name": "CAI authority tags \u2014 immutable: no update, no deletion, NO bypass",
+  "target": "tag",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "include": [
+        "refs/tags/kai-wa/**",
+        "refs/tags/kai-admitted/**"
+      ],
+      "exclude": []
+    }
+  },
+  "rules": [
+    {
+      "type": "update",
+      "parameters": {
+        "update_allows_fetch_and_merge": false
+      }
+    },
+    {
+      "type": "deletion"
+    }
+  ],
+  "bypass_actors": []
+}

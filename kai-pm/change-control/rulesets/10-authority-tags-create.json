@@ -1,0 +1,26 @@
+{
+  "name": "CAI authority tags \u2014 creation restricted to the authority identity",
+  "target": "tag",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "include": [
+        "refs/tags/kai-wa/**",
+        "refs/tags/kai-admitted/**"
+      ],
+      "exclude": []
+    }
+  },
+  "rules": [
+    {
+      "type": "creation"
+    }
+  ],
+  "bypass_actors": [
+    {
+      "actor_type": "User",
+      "actor_id": "<<AUTHORITY_ACTOR_ID: a GitHub identity the EXECUTOR DOES NOT HOLD \u2014 see PINNING_RESEARCH.md \u00a73>>",
+      "bypass_mode": "always"
+    }
+  ]
+}
