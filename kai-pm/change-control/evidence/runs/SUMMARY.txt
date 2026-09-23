@@ -1,0 +1,17 @@
+CAI-BOOT-001 evidence capture
+captured 2026-09-23T10:35:54.294774+00:00
+HEAD 46c4dc57dfcc2374e47f24fb66d525c24d675faf
+working tree CLEAN
+
+step                    rc    bytes  sha256 (first 16)
+
+test_cai_authority       0     1475  9382ce2017d9a60c
+test_cai_scope           0      694  51ea1ecb75afdffb
+test_cai_admission       0     2073  667a07747bb7a320
+test_cai_bootstrap       0     1206  ef671133ef4558f2
+test_cai_mutation        0     3748  bcfdc41e3d212efb
+bootstrap_design         0      282  8310595fa61b09bd
+authority_real_repo      1      290  fe978c994fb9f752
+admission_real_repo      1      338  c34c71ee0d409cba
+gate_registry            1     1345  18957052fc2da9d6
+test_wiring              0      250  429d501f456f2bb3

@@ -1,0 +1,22 @@
+$ /usr/local/bin/python3 scripts/test_cai_authority.py
+
+  A1    PASS  rc=0 (want 0)  correct authority-signed WA -> PASS
+  A2    PASS  rc=1 (want 1)  unsigned WA -> REFUSE
+  A3    PASS  rc=1 (want 1)  wrong signer -> REFUSE; swapped key file -> REFUSE
+  A4    PASS  rc=1 (want 1)  invalid signature (signed bytes altered) -> REFUSE
+  A5    PASS  rc=1 (want 1)  verification unavailable (no gpg; gpg that cannot verify; nothing pinned over an empty namespace) -> REFUSE UNKNOWN
+  A6    PASS  rc=1 (want 1)  wrong repository id / wrong full name -> REFUSE
+  A7    PASS  rc=1 (want 1)  malformed schema; non-canonical payload -> REFUSE
+  A8    PASS  rc=1 (want 1)  expired WA -> REFUSE
+  A9    PASS  rc=1 (want 1)  replayed WA (already admitted) / stale WA (baseline != programme baseline) -> REFUSE
+  H1    PASS  rc=0 (want 0)  active WA (HOLD exists on ANOTHER WA) -> eligible
+  H2    PASS  rc=1 (want 1)  valid signed HOLD -> REFUSE
+  H3    PASS  rc=1 (want 1)  valid signed REVOKE -> REFUSE
+  H4    PASS  rc=0 (want 0)  chat/text-only HOLD, no signed event -> no mechanical state change (WA still eligible)
+  N1    PASS  rc=0 (want 0)  record at refs/tags/kai-wa/wa/<id> is recognised
+  N2    PASS  rc=1 (want 1)  kai-wa-evil/... is never enumerated: no record, no anomaly
+  N3    PASS  rc=1 (want 1)  nested / look-alike / re-named refs inside kai-wa/ -> anomaly -> REFUSE (P-3)
+
+  test_cai_authority: declared 16, executed 16, passed 16, failed 0
+
+process exit status = 0

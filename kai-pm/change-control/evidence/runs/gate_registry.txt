@@ -1,0 +1,24 @@
+$ /usr/local/bin/python3 scripts/security/check_gate_registry.py --gate
+
+Instrumentation invariants — 40 declared, 49 found on disk, 11 finding(s) closed and re-verified
+
+  Enforcing: I-1 (fail closed on a missing input, 0), I-2 (report a denominator, 0), I-3 (prove it can fail, 0), I-4 (declare in one place, 9), I-5 (no inert rules, 0), I-6 (closures still hold, 0), I-7 (a ratchet proves it still measures, 0)
+
+  UNREGISTERED — on disk, undeclared (I-4):
+    - check_cai_admission: exists but is not in the registry
+    - check_cai_authority: exists but is not in the registry
+    - check_cai_bootstrap: exists but is not in the registry
+    - check_cai_scope: exists but is not in the registry
+    - test_cai_admission: exists but is not in the registry
+    - test_cai_authority: exists but is not in the registry
+    - test_cai_bootstrap: exists but is not in the registry
+    - test_cai_mutation: exists but is not in the registry
+    - test_cai_scope: exists but is not in the registry
+
+  9 finding(s) across 4 invariants. Register: KAI-GATE-001..005.
+  Boundary-blindness scan is a **lower bound** — it matches only
+  the explicit `if not X.exists(): continue` shape, because a
+  survey with false positives invites fixes to working code.
+  GATE FAILED: 9 breach(es) of I-1, I-2, I-3, I-4, I-5, I-6, I-7.
+
+process exit status = 1

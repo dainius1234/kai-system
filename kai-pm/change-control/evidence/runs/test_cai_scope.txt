@@ -1,0 +1,13 @@
+$ /usr/local/bin/python3 scripts/test_cai_scope.py
+
+  S1    PASS  rc=0 (want 0)  allowed path modified -> PASS
+  S2    PASS  rc=1 (want 1)  outside-scope path, and prefix-boundary look-alike 'allowed-evil/' -> REFUSE
+  S3    PASS  rc=1 (want 1)  rename INTO forbidden scope -> REFUSE (new end)
+  S4    PASS  rc=1 (want 1)  rename OUT OF forbidden scope -> REFUSE (old end)
+  S5    PASS  rc=1 (want 1)  symlink (mode 120000) inside allowed scope -> REFUSE
+  S6    PASS  rc=1 (want 1)  gitlink (mode 160000) inside allowed scope -> REFUSE
+  S7    PASS  rc=1 (want 1)  ambiguous path representations -> REFUSE
+
+  test_cai_scope: declared 7, executed 7, passed 7, failed 0
+
+process exit status = 0

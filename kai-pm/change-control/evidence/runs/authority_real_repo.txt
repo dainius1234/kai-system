@@ -1,0 +1,7 @@
+$ /usr/local/bin/python3 scripts/security/check_cai_authority.py --repo . --authority-config kai-pm/change-control/authority_keys.json --now 2026-09-23T00:00:00Z
+
+  kai-wa records: 0 WA, 0 terminal events, 0 anomalies
+REFUSE
+  - UNKNOWN: no authority key is pinned
+
+process exit status = 1

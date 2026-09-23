@@ -1,0 +1,29 @@
+$ /usr/local/bin/python3 scripts/test_cai_admission.py
+
+  V1    PASS  rc=0 (want 0)  exact candidate + its evidence -> PASS, baseline is that exact commit
+  V2    PASS  rc=1 (want 1)  admission of a different candidate SHA than IV&V reviewed -> REFUSE
+  V3    PASS  rc=1 (want 1)  same tree, different commit object -> REFUSE
+  V4    PASS  rc=1 (want 1)  IV&V evidence missing -> REFUSE
+  V5    PASS  rc=1 (want 1)  IV&V evidence digest mismatch -> REFUSE
+  D1    PASS  rc=0 (want 0)  valid genesis -> PASS
+  D2    PASS  rc=0 (want 0)  valid successor -> PASS, baseline advances to C2
+  D3    PASS  rc=1 (want 1)  skipped sequence (1 -> 3) -> REFUSE
+  D4    PASS  rc=1 (want 1)  two valid siblings at sequence 2 -> UNRESOLVED, no baseline chosen
+  D5    PASS  rc=1 (want 1)  wrong predecessor tag object -> REFUSE
+  D6    PASS  rc=1 (want 1)  admission for another repository -> REFUSE
+  D7    PASS  rc=1 (want 1)  admission tag target != IV&V candidate -> REFUSE
+  D8    PASS  rc=1 (want 1)  unsigned admission / wrong-signer admission -> REFUSE
+  N4    PASS  rc=1 (want 1)  kai-admitted-x/... ignored (baseline unchanged); kai-admitted/nested/... -> REFUSE
+  X1    PASS  rc=1 (want 1)  P-2: HOLD issued at position 0 dominates admission 1; HOLD issued at position 1 leaves admission 1 intact
+  X2    PASS  rc=1 (want 1)  P-5: WA expired before the admission tagger time -> REFUSE; expiring after it (but before today) -> PASS
+  X3    PASS  rc=1 (want 1)  P-7: successor WA not based on the previous admitted candidate -> REFUSE
+  X4    PASS  rc=1 (want 1)  P-8: candidate not descended from the baseline -> REFUSE
+  X5    PASS  rc=1 (want 1)  admission of an out-of-scope candidate -> REFUSE
+  X6    PASS  rc=1 (want 1)  governing ref digest wrong -> REFUSE; correct -> PASS
+  X7    PASS  rc=1 (want 1)  IV&V disposition REJECT -> REFUSE
+  X8    PASS  rc=1 (want 1)  IV&V evidence names another WA -> REFUSE
+  X9    PASS  rc=1 (want 1)  sequence 1 with a predecessor -> REFUSE
+
+  test_cai_admission: declared 23, executed 23, passed 23, failed 0
+
+process exit status = 0

@@ -1,0 +1,77 @@
+$ /usr/local/bin/python3 scripts/test_cai_mutation.py
+
+  CONTROL (unmutated copy): failing cases = none
+  M01 KILLED   signature: everything is VALID_PINNED
+        targets ['A2', 'A3', 'A4', 'D8']  failed ['A2', 'A3', 'A4', 'A5', 'D8']
+  M02 KILLED   every unpinned / unavailable keyring guard removed
+        targets ['A5']  failed ['A3', 'A5']
+  M03 KILLED   WA expiry not checked
+        targets ['A8']  failed ['A8', 'X2']
+  M04 KILLED   terminal events never found
+        targets ['H2', 'H3']  failed ['H2', 'H3', 'X1']
+  M05 KILLED   forbidden scope not enforced
+        targets ['S3', 'S4']  failed ['S3', 'S4']
+  M06 KILLED   symlink / gitlink modes not refused
+        targets ['S5', 'S6']  failed ['S5', 'S6']
+  M07 KILLED   path ambiguity not refused
+        targets ['S7']  failed ['S7']
+  M08 KILLED   prefix boundary: prefixes need not end in '/'
+        targets ['S2']  failed ['S2']
+  M09 KILLED   fork taken as the first sibling (a max/latest proxy)
+        targets ['D4']  failed ['D4']
+  M10 KILLED   orphans (skipped / wrong predecessor) ignored
+        targets ['D3', 'D5']  failed ['D3', 'D5']
+  M11 KILLED   IV&V: evidence candidate not compared to admission target
+        targets ['V2', 'V3']  failed ['D7', 'V2', 'V3']
+  M12 KILLED   IV&V: digest not compared
+        targets ['V5']  failed ['V5']
+  M13 KILLED   admission tag target not compared to candidate_commit
+        targets ['D7']  failed ['D7']
+  M14 KILLED   canonical-form requirement dropped
+        targets ['A7']  failed ['A7']
+  M15 KILLED   repository identity: explicit check AND schema const removed
+        targets ['A6', 'D6']  failed ['A6', 'D6']
+  M16 KILLED   look-alike refs silently skipped
+        targets ['N3', 'N4']  failed ['N3', 'N4']
+  M17 KILLED   tag object name not compared to its ref
+        targets ['N3']  failed ['N3']
+  M18 KILLED   replay (single use) not enforced in the authority check
+        targets ['A9']  failed ['A9']
+  M19 KILLED   staleness not enforced in the authority check
+        targets ['A9']  failed ['A9']
+  M20 KILLED   repository identity: explicit check only (schema const kept)
+        targets ['A6', 'D6']  failed ['A6', 'D6']
+  M21 KILLED   P-2: terminal event never dominates an admission
+        targets ['X1']  failed ['X1']
+  M22 KILLED   P-5: WA expiry not evaluated at the admission's tagger time
+        targets ['X2', 'A8']  failed ['A8', 'X2']
+  M23 KILLED   P-7: admission-level staleness not enforced
+        targets ['X3']  failed ['X3']
+  M24 KILLED   P-8: ancestry not enforced
+        targets ['X4']  failed ['X4']
+  M25 KILLED   scope not enforced at admission
+        targets ['X5']  failed ['X5']
+  M26 KILLED   governing_refs digest not compared
+        targets ['X6']  failed ['X6']
+  M27 KILLED   IV&V disposition not required to be ACCEPT_FOR_ADMISSION
+        targets ['X7']  failed ['X7']
+  M28 KILLED   IV&V evidence may name another work authority
+        targets ['X8']  failed ['X8']
+  M29 KILLED   genesis rule (sequence 1 <=> null predecessor) not enforced
+        targets ['X9']  failed ['X9']
+  M30 KILLED   P-5: admission expiry judged by the WALL CLOCK
+        targets ['X2']  failed ['X2']
+  M31 KILLED   identity collapse not detected
+        targets ['B3']  failed ['B3']
+  M32 KILLED   immutability bypass allowed
+        targets ['B4']  failed ['B4']
+  M33 KILLED   verifier pinned by movable ref accepted
+        targets ['B8']  failed ['B8']
+  M34 KILLED   exclude holes in the authority namespaces accepted
+        targets ['B7']  failed ['B7']
+  M35 KILLED   live server state not compared with the design
+        targets ['B12', 'B13']  failed ['B12', 'B13']
+
+  mutants declared 35 (selected all), executed 35, killed 35, survived 0
+
+process exit status = 0

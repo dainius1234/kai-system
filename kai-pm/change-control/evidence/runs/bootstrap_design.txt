@@ -1,0 +1,7 @@
+$ /usr/local/bin/python3 scripts/security/check_cai_bootstrap.py --design kai-pm/change-control/rulesets
+
+  design rulesets read: 3 (10-authority-tags-create.json, 20-authority-tags-immutable.json, 30-main-integration.json)
+  placeholders in design: 2
+PASS
+
+process exit status = 0

@@ -1,0 +1,19 @@
+$ /usr/local/bin/python3 scripts/test_cai_bootstrap.py
+
+  B1    PASS  rc=0 (want 0)  committed design satisfies the design invariants
+  B2    PASS  rc=1 (want 1)  committed design is NOT apply-ready (2 placeholders)
+  B3    PASS  rc=1 (want 1)  authority bypass == executor identity -> IDENTITY COLLAPSE REFUSE
+  B4    PASS  rc=1 (want 1)  a bypass on the immutability ruleset -> REFUSE
+  B5    PASS  rc=1 (want 1)  deletion not restricted -> REFUSE
+  B6    PASS  rc=1 (want 1)  a namespace left uncovered (kai-wa/ dropped) -> REFUSE
+  B7    PASS  rc=1 (want 1)  an exclude pattern carving a hole -> REFUSE
+  B8    PASS  rc=1 (want 1)  verifier pinned by movable 'ref' instead of exact 'sha' -> REFUSE
+  B9    PASS  rc=1 (want 1)  a ruleset not 'active' -> REFUSE
+  B10   PASS  rc=0 (want 0)  filled with a NON-executor authority and a real sha -> apply-ready PASS
+  B11   PASS  rc=0 (want 0)  live rulesets equal the design -> PASS
+  B12   PASS  rc=1 (want 1)  live server grants a bypass the design does not -> REFUSE
+  B13   PASS  rc=1 (want 1)  live server has NO rulesets (today's measured state) -> REFUSE
+
+  test_cai_bootstrap: declared 13, executed 13, passed 13, failed 0
+
+process exit status = 0

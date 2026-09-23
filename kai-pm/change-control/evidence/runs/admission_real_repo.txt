@@ -1,0 +1,9 @@
+$ /usr/local/bin/python3 scripts/security/check_cai_admission.py --repo . --authority-config kai-pm/change-control/authority_keys.json
+
+  records: 0 WA, 0 admissions, 0 anomalies
+  chain length: 0
+REFUSE
+  - UNKNOWN: no authority key is pinned
+  - no admission records: no programme baseline exists (EMPTY chain)
+
+process exit status = 1

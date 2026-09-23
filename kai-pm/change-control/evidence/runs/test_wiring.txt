@@ -1,0 +1,8 @@
+$ /usr/local/bin/python3 scripts/security/check_test_wiring.py
+
+  inspected: 107 self-run suites (76 more are collected by pytest)
+  calibrated against 5 known-good suites
+
+PASS: every test in a self-run suite is dispatched.
+
+process exit status = 0
