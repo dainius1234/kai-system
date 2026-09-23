@@ -1,0 +1,8 @@
+{
+  "schema": "kai.cai.authority_keys.v1",
+  "issuer": "dainius1234",
+  "pinned_primary_fingerprint": null,
+  "public_key_armored_path": null,
+  "gpg_program": "gpg",
+  "status": "UNPINNED. Leg 2 pins Dainius's OpenPGP primary key after Kai rules READY FOR BOOTSTRAP. Until then every signature classifies UNKNOWN and every authority decision is REFUSE."
+}
