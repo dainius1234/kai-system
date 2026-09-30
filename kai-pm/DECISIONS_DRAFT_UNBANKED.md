@@ -211,3 +211,149 @@ full A7/A8 tables are still open, as stated above.
 3. For A2's blocker list and C1–C2, get the verbatim text from its holder
    (Kai; the other session) before banking.
 4. Only then: re-derive the allocator, and append with `&&`-chained gates.
+
+---
+
+## E. FINAL TEXT FOR CONFIRMATION — Dainius's choice of 2026-09-30
+
+**Dainius, verbatim:** "go with your recommendation". That means: fold A1–A6
+into one continuity entry; bank A7 and A8, each as its own entry, with their
+full text copied word for word; keep B1–B5 and C1–C2 in the log only.
+
+**Still NOT appended.** The three entries below come back to Dainius for
+confirmation first. The D-numbers stay placeholders (`D<a>`, `D<b>`,
+`D<c>`). At the moment of an authorised append, the allocator is
+re-derived with `^## D[0-9]+( +—|$)`, and the entries take the next free
+numbers in this order. `<UTC>` is the measured time of the append.
+
+**How the quotes were produced.** Each quoted block below was CUT by a
+program from the source message text in this session's transcript, never
+retyped. After assembly, every block was checked as a substring of its
+source (see E.4). Tabs in the Q6–Q9 table are kept inside a code block.
+
+### E.1 — Continuity record (folds A1–A6)
+
+```
+## D<a> — <UTC> — CONTINUITY RECORD: THE 25 SEPTEMBER 2026 ADMISSION OF 8e3ee69 · fc1bb9d · 630ceaf · eb52f73, AND RELATED RULINGS. GOVERNANCE ONLY — NO IMPLEMENTATION, CANDIDATE, STAGE-A OR HOLDOUT AUTHORITY.
+```
+
+**Authority.** Kai's rulings received by Orion's session on
+2026-09-25T16:18:17Z, relayed by Dainius; banked at Dainius's instruction
+of 2026-09-30 ("go with your recommendation"). The record's content is
+the specification Kai himself wrote for it:
+
+> who: Dainius as final authority, following Kai’s commit-by-commit adjudication
+> when: 25 September 2026
+> why: the four commits were individually adjudicated; D379 closeout remained rejected but their bounded changes were accepted
+> state: eb52f73 is the admitted technical restart point; fc1bb9d carries zero authority weight; no candidate/downstream authority was granted
+> correction: the later reconstruction-from-86ebfde ruling resulted from incomplete cold-start recovery and does not supersede the 25 September admission
+
+**The ruling, in Kai's words:**
+
+> The contradiction is resolved. The 25 September admission ruling stands.
+>
+> I recovered the earlier ruling from the prior thread. It was explicit and commit-scoped: 8e3ee69, fc1bb9d, 630ceaf, and eb52f73 were accepted; fc1bb9d carried zero authority weight because it is non-authoritative field notes; and eb52f73 was named the last admitted technical state. You then explicitly accepted that position and said future repair work starts from eb52f73.
+
+**Programme state as Kai recorded it:**
+
+```
+Physical HEAD: 0af5d32072bcf1d09c09e5c83c9b5b71b5560676
+Physical tree: 4c05a750e1aed738879c140b51782de83bdf26e3
+Admitted technical state: eb52f73fa6485534ca7e28a42055861c69e94cc4
+D379 tranche: still not closed
+Candidate / real Stage A / production holdout: still not authorised
+PR #122: remains DO NOT MERGE
+```
+
+**Correction, in Kai's words:**
+
+> My later new-thread ruling to reconstruct from 86ebfde was therefore wrong. It was made with incomplete continuity: I had repository evidence but was missing an already-made consequential admission decision. That is exactly the kind of cold-start failure our doctrine is supposed to prevent.
+
+**Related rulings in the same message (A3, A5, A6):**
+
+- Rebuild from 86ebfde (K1):
+> NO. The rebuild is cancelled.
+  The repair base is `eb52f73fa6485534ca7e28a42055861c69e94cc4`.
+- K2:
+> The number of launch sites is a reported measurement, not a hard-coded gate. We must never encode “there shall be nine” because the legitimate denominator can change.
+>
+> The coverage property is a gate:
+>
+> Every Python child-process launch in the governed harness population must pass through the governed launcher and therefore receive the required startup condition; any bypassing Python launch site is a hard failure.
+- Build-log store:
+> For the durable canonical copy, I choose Dropbox, not a GitHub Actions artifact.
+>
+> No build starts until the durable destination exists.
+
+**Not banked here, stated.** The list of the six blockers behind the
+rejected closeout is not held in Kai's words in this session, so it is not
+put in Kai's mouth. Orion's working list is in `kai-pm/D379_PLAN_V4_1.md`
+§B1 (non-authoritative).
+
+**Rule carried.** Repository silence cannot erase a consequential decision
+that was explicitly made and accepted; recover the authority history first,
+then adjudicate. Kai, verbatim, on one line:
+
+> current repository state can invalidate an old factual claim, but repository silence cannot erase a prior consequential decision that was explicitly made and accepted.
+
+### E.2 — Q6–Q9 rulings (A7)
+
+```
+## D<b> — <UTC> — KAI RULINGS Q6–Q9 ON THE D379 REPAIR PLAN (F12, F13, plan_selection, BUILD-LOG AUTHORITY). GOVERNANCE ONLY — BANKING IS NOT EXECUTION.
+```
+
+**Authority.** Kai's ruling received 2026-09-25T15:57:02Z, relayed by
+Dainius. Table verbatim, tabs preserved:
+
+```
+Q6–Q9 — KAI RULING
+
+Question	Ruling	Reason	Confidence
+Q6 — F12 B5 blocker?	YES — BLOCKER	D379 explicitly requires I1B-4 duplicate output → REFUSE BEFORE SELECTION. Current reconcile() accepts identical duplicate multisets.	1.00
+Q7 — F13 harness blocker?	YES — BLOCKER	I independently counted 9 [sys.executable, …] launch sites. Python flags do not inherit from the parent merely because sys.executable is reused.	0.99
+Q8 — plan_selection acceptable?	YES, with strict boundary conditions	A single real decision function inside holdout.py is preferable to reproducing holdout semantics inside the harness.	0.96
+Q9 — commit build log if ≤5 MB?	NO, not as stated	File size does not create repository authority. R10 says full evidence survives; D379 says no arbitrary new tracked paths.	0.99
+```
+
+**Scope, stated.** The same message also ruled on the F12 class repair, the
+F13 launcher location, Q1a-9's semantic invariant, the interpreter build,
+and the repair branch base. Its branch-base ruling (rebuild from `86ebfde`)
+was later withdrawn by Kai (see D<a>). Those parts are not banked by this
+entry.
+
+### E.3 — Plan v4 findings (A8)
+
+```
+## D<c> — <UTC> — KAI FINDINGS KAI-V4-01 … 08 ON D379 REPAIR PLAN v4. PLAN RETURNED FOR REVISION. GOVERNANCE ONLY — BANKING IS NOT EXECUTION.
+```
+
+**Authority.** Received 2026-09-30T17:34:56Z from Dainius, reproducing the
+findings of "Kai's 30 September adjudication". Findings verbatim:
+
+> 1. KAI‑V4‑01 — BLOCKER: Stage‑B result, provenance and binding can be changed together and self-certify.
+> 2. KAI‑V4‑02 — BLOCKER: Repaired controls can generate their own acceptance evidence without a pre-capture fixity gate.
+> 3. KAI‑V4‑03 — BLOCKER: F13’s child-launch population is not closed across aliases, wrappers and alternate launch mechanisms.
+> 4. KAI‑V4‑04 — BLOCKER: E7’s full-log round-trip cannot occur before the build that creates the log.
+> 5. KAI‑V4‑05 — MAJOR: Interpreter dependency and signature closure are incomplete.
+> 6. KAI‑V4‑06 — MAJOR: The NFC/NFD refusal lacks an explicit canonicalisation rule.
+> 7. KAI‑V4‑07 — MAJOR: A Part D commit placed only on the old branch would not be ancestral to the repair branch.
+> 8. KAI‑V4‑08 — MAJOR: Authority calibration proves mapping completeness, but not that each authority mapping is correct.
+
+**Consequence.** Plan v4.1 (`kai-pm/D379_PLAN_V4_1.md`) was written in
+response. Kai has not yet checked v4.1, and DeepSeek has not attacked it.
+D379 execution remains stopped.
+
+### E.4 — Verification record
+
+Measured on 2026-09-30 after assembly, against the three source messages
+(transcript timestamps 2026-09-25T15:57:02Z, 2026-09-25T16:18:17Z,
+2026-09-30T17:34:56Z):
+
+- blockquote paragraphs and code-block spans checked: **14**, found verbatim
+  in a source: **14**, not found: **0**. That is 13 spans from the first run,
+  plus the Kai "Rule carried" quote, which the first run missed because it
+  was line-wrapped inside quotation marks; it now stands on one line and
+  matches.
+- Checker calibration: one character changed in a verified span
+  ("self-certify" → "self certify") → NOT found (known-positive); the
+  unchanged span → found (known-negative).

@@ -583,3 +583,68 @@ python3 -B .claude/skills/kai-handoff/handoff.py due
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
 python3 -B .claude/skills/kai-handoff/handoff.py due
+
+## HANDOFF 2026-09-30T20:53:29Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-09-30T20:53:29Z  [CMD `date -u +%FT%TZ` → 2026-09-30T20:53:29Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 46f3784311ecbb03a4523622888e3fc80a88571c  [CMD `git rev-parse HEAD` → 46f3784311ecbb03a4523622888e3fc80a88571c]
+- tree: 956681d4429a9fa2d0aa94f0f889b8f01ac36dc6  [CMD `git rev-parse HEAD^{tree}` → 956681d4429a9fa2d0aa94f0f889b8f01ac36dc6]
+- uncommitted_paths: 1  [CMD `git status --porcelain | count lines` → 1]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 46f3784311ecbb03a4523622888e3fc80a88571c  [CMD `git ls-remote --heads origin` → 46f3784311ecbb03a4523622888e3fc80a88571c]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- decisions_headings: 369  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 369]
+- decisions_distinct: 369  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 369]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D386  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D386]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 8  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 8]
+
+### 1. The four states
+
+- physical: HEAD `46f3784`; the draft file's new section E is uncommitted at measurement time  [GIT 46f3784]
+- authorised: D379 execution — NONE, unchanged  [CONVERSATION 2026-09-30 Dainius, "Execution remains stopped"]
+- evidence: section E holds the final text of 3 candidate DECISIONS entries; 14 of 14 quoted spans verified verbatim against the source messages, with the checker calibrated  [FILE kai-pm/DECISIONS_DRAFT_UNBANKED.md]
+- admission: unchanged; ⚠ UNBANKED until Dainius confirms section E and the append runs  [CONVERSATION 2026-09-25 Kai]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-09-30 · banking route: fold A1–A6 into one continuity entry; bank A7 and A8 separately; B and C stay in the log only ⚠ UNBANKED  [CONVERSATION 2026-09-30 Dainius, "go with your recommendation"]
+- Dainius · 2026-09-30 · the other session is archived; Orion is the only writer. Measured: SESSION_STATUS_ARCHIVED ⚠ UNBANKED  [CONVERSATION 2026-09-30 Dainius, "I've archived it now"] [CMD `get_session session_01PvwTQHZU2sxi6i3oBmoqoT` → SESSION_STATUS_ARCHIVED]
+
+### 3. Authorised / Held / Forbidden
+
+- DONE: final candidate text, draft section E (D<a> continuity, D<b> Q6–Q9, D<c> KAI-V4 findings)  [FILE kai-pm/DECISIONS_DRAFT_UNBANKED.md]
+- HELD: the append itself, until Dainius confirms section E  [CONVERSATION 2026-09-30 Orion, "comes back to you to confirm before the append"]
+
+### 4. Open questions
+
+- Dainius: confirm section E, then authorise the append (allocator re-derived at append time) — owner: Dainius  [FILE kai-pm/DECISIONS_DRAFT_UNBANKED.md]
+- Branch clean-up: `claude/new-season-g1zxjc`, `claude/main-baseline-probe`, `claude/cai-v1-bootstrap` — owner: Dainius  [CMD `git ls-remote --heads origin` → all three present]
+
+### 5. Incidents and corrections
+
+- Caught by my own check: a Kai quote was line-wrapped inside quotation marks, so it was not verbatim as written. It now stands on one line and verifies  [FILE kai-pm/DECISIONS_DRAFT_UNBANKED.md]
+
+### 6. Next authorised step
+
+- Dainius's confirmation of draft section E; D379 execution stays stopped  [CONVERSATION 2026-09-30 Dainius]
+
+### 7. What I am unsure of
+
+- D<c>'s findings reached this session in a message from Dainius that attributes them to "Kai's 30 September adjudication"; Kai's own message is not held  [CONVERSATION 2026-09-30 Dainius]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
+python3 -B .claude/skills/kai-handoff/handoff.py due
