@@ -145,9 +145,15 @@ Run it after any change to `handoff.py`.
 
 ## Limits, stated plainly
 
-- Nothing forces WRITE to run. It depends on the producer running it at
-  the right moments listed in the description, unless a SessionStart or
-  PreCompact hook is added later.
+- **READ is automatic.** `.claude/hooks/session-start.sh`, registered in
+  `.claude/settings.json` for `startup|resume|clear|compact|fork`, runs
+  `verify` and `check` and puts their output into the session's context.
+  It is read-only, always exits 0, and bounds the remote query (30 s,
+  then a re-run without the remote that says so). If its output is
+  missing from a session, run READ by hand.
+- **Nothing forces WRITE.** It depends on the producer running it at the
+  moments listed in the description. A hook cannot write a handoff:
+  sections 1–7 need judgement and sources, not measurement.
 - `check` proves that the entry has the right form and carries sources.
   It does not prove that a source says what the line claims. READ mode
   re-verifies section 0 mechanically. Sections 1–7 are checked by

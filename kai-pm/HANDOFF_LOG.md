@@ -163,3 +163,68 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-09-30T19:12:21Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-09-30T19:12:21Z  [CMD `date -u +%FT%TZ` → 2026-09-30T19:12:21Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: ee5f500ff5c947ffa2bf3e3543c3d41999ffcc7c  [CMD `git rev-parse HEAD` → ee5f500ff5c947ffa2bf3e3543c3d41999ffcc7c]
+- tree: cbb3b6d1c5e28991c02857e02d6c159d62754d75  [CMD `git rev-parse HEAD^{tree}` → cbb3b6d1c5e28991c02857e02d6c159d62754d75]
+- uncommitted_paths: 5  [CMD `git status --porcelain | count lines` → 5]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/project-rework-plan-pgvp35: ee5f500ff5c947ffa2bf3e3543c3d41999ffcc7c  [CMD `git ls-remote --heads origin` → ee5f500ff5c947ffa2bf3e3543c3d41999ffcc7c]
+- decisions_headings: 369  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 369]
+- decisions_distinct: 369  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 369]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D386  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D386]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 2  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 2]
+
+### 1. The four states
+
+- physical: HEAD `ee5f500`; the SessionStart hook, its settings, and the handoff.py/SKILL.md/CLAUDE.md updates are uncommitted at measurement time  [GIT ee5f500]
+- authorised: D379 execution — NONE, unchanged  [CONVERSATION 2026-09-30 Dainius, "Execution remains stopped"]
+- evidence: unchanged  [FILE kai-pm/house_in_order_h2_v13/build_evidence/D379_CLOSEOUT.txt:26]
+- admission: unchanged; the 25 Sept admission is still ⚠ UNBANKED  [CONVERSATION 2026-09-25 Kai]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-09-30 · make READ mode automatic, with every check done before implementing ⚠ UNBANKED  [CONVERSATION 2026-09-30 Dainius, "Make it automatic but make sure all checks done"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: `.claude/hooks/session-start.sh`, `.claude/settings.json` (a SessionStart hook), and the related handoff.py/SKILL.md/CLAUDE.md updates, committed to `claude/project-rework-plan-pgvp35`  [CONVERSATION 2026-09-30 Dainius]
+- HELD and FORBIDDEN: unchanged from the first entry  [CONVERSATION 2026-09-30 Dainius]
+
+### 4. Open questions
+
+- RESOLVED: "nothing enforces READ". The SessionStart hook now runs verify + check on startup, resume, clear, compact and fork  [FILE .claude/settings.json]
+- Whether web sessions read the hook from the checked-out branch or only from the default branch is not stated in the hooks docs; it is observable at the next session start — owner: Orion  [CONVERSATION 2026-09-30 claude-code-guide report, code.claude.com/docs/en/hooks.md]
+- All other open questions carry forward from the first entry — owners as listed there  [CONVERSATION 2026-09-30 Orion]
+
+### 5. Incidents and corrections
+
+- Defect found in hook testing and fixed: with the remote not measured (timeout or no network), `verify` reported every remote branch "DIFFERS → <absent>", which claims a deletion nobody measured. Now UNMEASURED, via a pure `compare()` with 7 new calibration cases  [CMD `handoff.py selftest` → 32 passed, 0 failed]
+- An R9 breach of mine: a `pgrep -f 'scripts/test_gate_registry.py'` watcher matched its own shell. That output was discarded and replaced by a faulthandler stack dump  [FILE CLAUDE.md:214-243]
+- A claim of mine corrected: "test-gate-registry passed in seconds earlier" was never timed. The test runs every registered gate as a subprocess (`probe_denominator`), so it is slow by design; it passed 82/0 with the change present  [FILE scripts/security/check_gate_registry.py:353]
+
+### 6. Next authorised step
+
+- D379: "Execution remains stopped." The next gate is still Kai's check of plan v4.1  [CONVERSATION 2026-09-30 Dainius]
+
+### 7. What I am unsure of
+
+- The hook has not yet been observed firing in a real new session. It was tested by running the registered command with synthetic event JSON, in a disposable clone and in the repository  [CMD `bash -c <registered command>` → rc 0, all five sources]
+- The docs state no size limit for SessionStart stdout; the hook output measured about 1.9 KB  [CMD `wc -c` → 1862 bytes]
+- The docs do not state the behaviour of exit code 1, so the hook always exits 0 and reports failures in stdout instead  [CONVERSATION 2026-09-30 claude-code-guide report]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check

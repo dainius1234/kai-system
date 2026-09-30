@@ -305,6 +305,40 @@ def last_entry_state(text: str):
     return block[0], state
 
 
+def _remote_measured(state: dict, *, queried: bool = True) -> bool:
+    """Were remote heads actually measured on this side?
+
+    Not queried (--no-remote) or queried-and-failed (a `remote` key holding
+    UNMEASURED) both mean NO. A branch missing from an unmeasured side is
+    unknown, not deleted: reporting it as DIFFERS would claim a fact
+    nobody measured (R17)."""
+    return queried and "UNMEASURED" not in state.get("remote", "")
+
+
+def compare(old: dict, new: dict, *, new_remote_queried: bool = True):
+    """Pure comparison of two section-0 states. Returns rows of
+    (status, key, old, new) with status MATCH / DIFFERS / UNMEASURED."""
+    old_rm = _remote_measured(old)
+    new_rm = _remote_measured(new, queried=new_remote_queried)
+    rows = []
+    for k in sorted(set(old) | set(new)):
+        if k in NOT_COMPARED:
+            continue
+        o, n = old.get(k, "<absent>"), new.get(k, "<absent>")
+        if k.startswith("remote:") and not (old_rm and new_rm):
+            status = "UNMEASURED"
+            if not new_rm:
+                n = "UNMEASURED(remote not measured this run)"
+            else:
+                o = "UNMEASURED(remote not measured in the recorded entry)"
+        elif "UNMEASURED" in o or "UNMEASURED" in n:
+            status = "UNMEASURED"
+        else:
+            status = "MATCH" if o == n else "DIFFERS"
+        rows.append((status, k, o, n))
+    return rows
+
+
 def verify(root: pathlib.Path, *, remote: bool = True):
     log = root / LOG_REL
     if not log.is_file():
@@ -313,17 +347,9 @@ def verify(root: pathlib.Path, *, remote: bool = True):
     header, old = last_entry_state(log.read_text(encoding="utf-8"))
     new = {k: v for k, v, _ in measure(root, remote=remote)}
     print(f"VERIFY against: {header}")
+    rows = compare(old, new, new_remote_queried=remote)
     diffs = 0
-    for k in sorted(set(old) | set(new)):
-        if k in NOT_COMPARED:
-            continue
-        o, n = old.get(k, "<absent>"), new.get(k, "<absent>")
-        if "UNMEASURED" in o or "UNMEASURED" in n:
-            status = "UNMEASURED"
-        elif k.startswith("remote:") and (o == "<absent>" or n == "<absent>"):
-            status = "DIFFERS"
-        else:
-            status = "MATCH" if o == n else "DIFFERS"
+    for status, k, o, n in rows:
         if status != "MATCH":
             diffs += 1
         print(f"  {status:<10} {k}: {o}" + ("" if o == n else f"  →  {n}"))
@@ -338,8 +364,10 @@ def verify(root: pathlib.Path, *, remote: bool = True):
             print(f"  WARNING: recorded HEAD {oh[:12]} is NOT an ancestor of "
                   f"the current HEAD. History diverged or was rewritten — "
                   f"stop and report before any work.")
-    print(f"VERIFY: compared={len([k for k in set(old) | set(new) if k not in NOT_COMPARED])} "
-          f"not-matching={diffs}. The repository wins for FACTS; rulings "
+    counts = {s: sum(1 for r in rows if r[0] == s)
+              for s in ("MATCH", "DIFFERS", "UNMEASURED")}
+    print(f"VERIFY: compared={len(rows)} match={counts['MATCH']} "
+          f"differs={counts['DIFFERS']} unmeasured={counts['UNMEASURED']}. The repository wins for FACTS; rulings "
           f"marked {UNBANKED} must be raised with the operator.")
     return diffs
 
@@ -414,6 +442,44 @@ def selftest():
     _, st = last_entry_state(two)
     cases.append(("NEG verify reads the LAST entry's section 0",
                   st.get("head") == "b" * 40, [st.get("head", "")[:8]]))
+
+    # compare(): the expected status of every key is fixed by construction
+    base = {"head": "h1", "decisions_highest": "D386",
+            "remote:main": "m1", "remote:gone": "g1"}
+
+    def statuses(old, new, **kw):
+        return {k: s for s, k, _, _ in compare(old, new, **kw)}
+
+    for name, old, new, kw, want in (
+        ("NEG identical state", base, dict(base), {},
+         {"head": "MATCH", "decisions_highest": "MATCH",
+          "remote:main": "MATCH", "remote:gone": "MATCH"}),
+        ("POS head moved", base, dict(base, head="h2"), {},
+         {"head": "DIFFERS"}),
+        ("POS remote branch deleted, remote measured both sides", base,
+         {k: v for k, v in base.items() if k != "remote:gone"}, {},
+         {"remote:gone": "DIFFERS", "remote:main": "MATCH"}),
+        ("NEG remote NOT queried: branches unknown, not deleted", base,
+         {"head": "h1", "decisions_highest": "D386"},
+         {"new_remote_queried": False},
+         {"remote:main": "UNMEASURED", "remote:gone": "UNMEASURED",
+          "head": "MATCH"}),
+        ("NEG remote query FAILED: branches unknown, not deleted", base,
+         {"head": "h1", "decisions_highest": "D386",
+          "remote": "UNMEASURED(rc=128: no network)"}, {},
+         {"remote:main": "UNMEASURED", "remote:gone": "UNMEASURED"}),
+        ("NEG recorded entry had no remote: new branches unknown-before",
+         {"head": "h1", "remote": "UNMEASURED(rc=128)"},
+         {"head": "h1", "remote:main": "m1"}, {},
+         {"remote:main": "UNMEASURED", "head": "MATCH"}),
+        ("POS value UNMEASURED on one side", base,
+         dict(base, decisions_highest="UNMEASURED(no file)"), {},
+         {"decisions_highest": "UNMEASURED"}),
+    ):
+        got = statuses(old, new, **kw)
+        ok = all(got.get(k) == v for k, v in want.items())
+        cases.append((f"{name.split()[0]} compare: {' '.join(name.split()[1:])}",
+                      ok, sorted(f"{k}={got.get(k)}" for k in want)))
 
     # the tag grammar itself: known-good and known-bad tags
     for tag, want in (("[GIT 0af5d32]", True), ("[D386]", True),

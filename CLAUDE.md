@@ -5,9 +5,11 @@ Every rule here exists because it was broken, and the incident is named
 so the rule is not mistaken for taste. The long form is in
 `kai-pm/ORION_FIELD_NOTES.md`; this file is the part that binds.
 
-**Session start — before any other work:** run the `kai-handoff` READ
-mode (`python3 -B .claude/skills/kai-handoff/handoff.py verify`, then
-read the last entry of `kai-pm/HANDOFF_LOG.md`) and report its
+**Session start — before any other work:** the SessionStart hook
+(`.claude/hooks/session-start.sh`) runs `kai-handoff` READ mode
+automatically; if its output is absent, run
+`python3 -B .claude/skills/kai-handoff/handoff.py verify` by hand. Read the
+last entry of `kai-pm/HANDOFF_LOG.md`, and report its
 differences, `⚠ UNBANKED` rulings and next authorised step. **Before a
 session ends or its context is compressed, and after any consequential
 ruling:** run WRITE mode (`.claude/skills/kai-handoff/SKILL.md`). The log
