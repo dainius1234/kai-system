@@ -370,3 +370,73 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
 python3 -B .claude/skills/kai-handoff/handoff.py due
+
+## HANDOFF 2026-09-30T20:36:59Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-09-30T20:36:59Z  [CMD `date -u +%FT%TZ` → 2026-09-30T20:36:59Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git rev-parse HEAD` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- tree: fa574058d0363ae189a87436280df33143903c7b  [CMD `git rev-parse HEAD^{tree}` → fa574058d0363ae189a87436280df33143903c7b]
+- uncommitted_paths: 2  [CMD `git status --porcelain | count lines` → 2]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:claude/project-rework-plan-pgvp35: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/handoff-hook-main: c3d21af91231e4bb2e686e21853e38d20bcce5d7  [CMD `git ls-remote --heads origin` → c3d21af91231e4bb2e686e21853e38d20bcce5d7]
+- decisions_headings: 369  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 369]
+- decisions_distinct: 369  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 369]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D386  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D386]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 5  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 5]
+
+### 1. The four states
+
+- physical: HEAD `a9b2693` (fast-forwarded from `6df3054`), with two new uncommitted files at measurement time: `kai-pm/D379_PLAN_V4_1.md`, `kai-pm/DECISIONS_DRAFT_UNBANKED.md`  [GIT a9b2693]
+- authorised: D379 execution — NONE, unchanged  [CONVERSATION 2026-09-30 Dainius, "Execution remains stopped"]
+- evidence: plan v4.1 preserved; its body is byte-identical to the transmitted text (41,284 chars, 0 diff lines against the session transcript)  [FILE kai-pm/D379_PLAN_V4_1.md]
+- admission: unchanged; the 25 Sept admission is still ⚠ UNBANKED, and is now DRAFTED for banking  [CONVERSATION 2026-09-25 Kai] [FILE kai-pm/DECISIONS_DRAFT_UNBANKED.md]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-09-30 · row 2 parts A and B (plan v4.1 into a file; a DRAFT banking file with no D-number and no DECISIONS.md append) ⚠ UNBANKED  [CONVERSATION 2026-09-30 Dainius, "Yes: A and B"]
+- Dainius · 2026-09-30 · send Orion's review findings on the hook work to the other session ⚠ UNBANKED  [CONVERSATION 2026-09-30 Dainius, "Yes, send them"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED and DONE: part A `kai-pm/D379_PLAN_V4_1.md`; part B `kai-pm/DECISIONS_DRAFT_UNBANKED.md` (draft only)  [CONVERSATION 2026-09-30 Dainius, "Yes: A and B"]
+- HELD: any append to `DECISIONS.md` until Dainius confirms the draft; D379 execution; Dropbox; capture  [CONVERSATION 2026-09-30 Dainius]
+- FORBIDDEN: merging PR #122  [FILE kai-pm/DECISIONS.md:39202]
+
+### 4. Open questions
+
+- Dainius: confirm the banking draft, ruling by ruling — owner: Dainius  [FILE kai-pm/DECISIONS_DRAFT_UNBANKED.md]
+- The six-blocker list (draft A2), and the rulings C1–C2 given to session_01PvwTQHZU2sxi6i3oBmoqoT, need their verbatim text from the holder — owner: Kai / that session  [FILE kai-pm/DECISIONS_DRAFT_UNBANKED.md]
+- FOR session_01PvwTQHZU2sxi6i3oBmoqoT (no send_message tool exists in Orion's session, so this entry is the channel). Review of `c3d21af` / `a9b2693`, measured in disposable clones. MAJOR: on a FULL (non-shallow) clone, `session-start.sh`'s `git fetch --depth=50` makes the repository shallow and cuts history (synthetic repository: main 60 → 40 commits; the same fetch without `--depth` stays at 60). It fires only when a session starts on a branch without the log. Fix: add `--depth` only if `git rev-parse --is-shallow-repository` is `true`. D379/D380 need full history — owner: that session  [CMD `git fetch --depth=50` on a full clone → shallow=true, main 60 → 40]
+- FOR that session, MINOR: `handoff-hook.sh` / `hook_action` say the hooks docs state that blocking an auto compaction fails the request; per a docs read, the docs do not state that (the never-block-auto behaviour is still right). MINOR: an instant fetch failure is reported as "failed or timed out after 45s". PASSED: all 5 triggers, failure paths, worktree cleanup, 11 Stop/PreCompact cases, selftest 56/0, and `policy-check` on `c3d21af` identical to untouched `main`  [CONVERSATION 2026-09-30 claude-code-guide report, code.claude.com/docs/en/hooks.md]
+
+### 5. Incidents and corrections
+
+- Correction of mine: entry 1 dates Kai's rulings (admission stands, 86ebfde withdrawn, K2, Dropbox, Q6–Q9) as 2026-09-30. The transcript timestamps show they were received on 2026-09-25 (15:57:02Z and 16:18:17Z). I dated them from "today" after the session date changed (R16). Entry 1 stays as written (append-only); the draft uses the measured dates  [FILE kai-pm/DECISIONS_DRAFT_UNBANKED.md]
+- Instrument defect of mine, caught: my first verbatim diff found the marker text inside the provenance paragraph and reported a false difference. The corrected exact-line match gives 0 diff lines  [CMD `unified_diff(transcript, file body)` → 0 lines]
+
+### 6. Next authorised step
+
+- D379: "Execution remains stopped." The next gate is still Kai's check of plan v4.1, now readable at `kai-pm/D379_PLAN_V4_1.md`  [CONVERSATION 2026-09-30 Dainius]
+
+### 7. What I am unsure of
+
+- Draft A7 (Q6–Q9) and A8 (KAI-V4-01..08): only the first heading of each was substring-verified; the full tables must be copied from the source messages and re-checked before any append  [FILE kai-pm/DECISIONS_DRAFT_UNBANKED.md]
+- Draft A1 banks Kai's own RESTATEMENT of the 25 Sept admission; the original wording is not held in this session  [CONVERSATION 2026-09-25 Kai]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
+python3 -B .claude/skills/kai-handoff/handoff.py due
