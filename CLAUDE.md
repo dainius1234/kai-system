@@ -7,12 +7,15 @@ so the rule is not mistaken for taste. The long form is in
 
 **Session start — before any other work:** the SessionStart hook
 (`.claude/hooks/session-start.sh`) runs `kai-handoff` READ mode
-automatically; if its output is absent, run
+automatically, on any branch (a branch without the log reads the live
+branch named in `.claude/handoff-branch`); if its output is absent, run
 `python3 -B .claude/skills/kai-handoff/handoff.py verify` by hand. Read the
 last entry of `kai-pm/HANDOFF_LOG.md`, and report its
-differences, `⚠ UNBANKED` rulings and next authorised step. **Before a
-session ends or its context is compressed, and after any consequential
-ruling:** run WRITE mode (`.claude/skills/kai-handoff/SKILL.md`). The log
+differences, `⚠ UNBANKED` rulings, `HOOK:` lines and next authorised step.
+**Before a session ends or its context is compressed, and after any
+consequential ruling:** run WRITE mode (`.claude/skills/kai-handoff/SKILL.md`).
+The Stop and PreCompact hooks remind once when `handoff.py due` finds
+commits no entry covers; they cannot see conversation-only rulings. The log
 is non-authoritative working memory with sources. It grants nothing, and
 it exists because a ruling made only in conversation was reversed on
 repository silence (the 2026-09-25 admission; a later cold-start thread

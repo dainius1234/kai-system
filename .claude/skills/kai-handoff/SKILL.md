@@ -79,6 +79,11 @@ python3 -B .claude/skills/kai-handoff/handoff.py verify
 
 ## WRITE mode
 
+0. `python3 -B .claude/skills/kai-handoff/handoff.py fresh` — one live
+   log, one writer. `FRESH`/`AHEAD`: go on. `STALE`: another writer
+   pushed; `git pull --ff-only` first. `NOT-LIVE`: this branch is not the
+   one named in `.claude/handoff-branch`; an entry here reaches the live
+   log only when merged, so say so in section 7. `UNKNOWN`: say so.
 1. `python3 -B .claude/skills/kai-handoff/handoff.py measure` and paste
    the output into section 0.
 2. Fill sections 1–8 from sources you **open now** (R16). Use the template
@@ -151,9 +156,26 @@ Run it after any change to `handoff.py`.
   It is read-only, always exits 0, and bounds the remote query (30 s,
   then a re-run without the remote that says so). If its output is
   missing from a session, run READ by hand.
-- **Nothing forces WRITE.** It depends on the producer running it at the
-  moments listed in the description. A hook cannot write a handoff:
-  sections 1–7 need judgement and sources, not measurement.
+- **READ works from any branch.** A session on a branch without the log
+  (for example `main`, the app's default) fetches the live branch named
+  in `.claude/handoff-branch`, runs READ in a temporary worktree, removes
+  it, and warns that its own commits do not land on the live line.
+- **WRITE is reminded, not forced.** A hook cannot write a handoff:
+  sections 1–7 need judgement and sources. `handoff.py due` measures
+  whether one is owed: commits after the last entry's recorded HEAD
+  that no entry covers. `.claude/hooks/handoff-hook.sh` acts on it:
+  - **Stop**: feedback once per HEAD; never inside its own continuation
+    (`stop_hook_active`), so it cannot loop.
+  - **PreCompact**: blocks a *manual* `/compact` once per HEAD; a second
+    `/compact` proceeds. It **never** blocks an *auto* compaction — the
+    hooks docs state that blocking it at the context limit fails the
+    request. After an auto compaction, SessionStart:compact reports
+    `WRITE-DUE`.
+  - **Blind spot:** a ruling made only in conversation leaves no trace in
+    Git, so `due` cannot see it. The producer still judges those.
+- **Shallow clones.** Cloud sessions clone about 50 commits deep. A
+  recorded HEAD older than that is *absent*, which `verify` and `due`
+  report as `UNKNOWN`, never as diverged.
 - `check` proves that the entry has the right form and carries sources.
   It does not prove that a source says what the line claims. READ mode
   re-verifies section 0 mechanically. Sections 1–7 are checked by

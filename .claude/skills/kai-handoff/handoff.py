@@ -17,6 +17,15 @@ Subcommands, all read-only with respect to the repository:
   selftest   calibrate `check` and `verify` against synthetic logs with
              a known answer (I-8: a known-positive and a known-negative
              for every rule)
+  due        is a WRITE owed? commits since the last entry's recorded
+             HEAD that no entry covers (commits only; conversation-only
+             rulings are invisible to it, and it says so)
+  fresh      may an entry be appended here? compares this branch with
+             the live handoff branch named in .claude/handoff-branch
+             (fetches it; the only subcommand that touches the network
+             besides verify's ls-remote)
+  hook       Stop / PreCompact entry point: remind once per state, never
+             loop, never block an automatic compaction
 
 Standard library only. No shell=True. No command is ever read from the
 log and executed: `verify` re-runs this module's own fixed measurements.
@@ -81,6 +90,23 @@ def _run(argv, cwd):
     """Run one fixed command. Returns (rc, stdout, stderr). Never a shell."""
     p = subprocess.run(argv, cwd=cwd, capture_output=True, text=True)
     return p.returncode, p.stdout, p.stderr
+
+
+def ancestry(root: pathlib.Path, rev: str) -> str:
+    """Is `rev` an ancestor of HEAD? YES, NO, or UNKNOWN(<reason>).
+
+    Cloud sessions clone SHALLOW (about 50 commits). A recorded HEAD older
+    than the clone depth is ABSENT from the object store, which
+    `merge-base --is-ancestor` also reports as non-zero. Absent is not
+    diverged: reading it as NO would tell a session to stop over a fact
+    nobody measured (R17). Only exit 1 with the commit present means NO."""
+    if _run(["git", "cat-file", "-e", f"{rev}^{{commit}}"], root)[0] != 0:
+        rc, out, _ = _run(["git", "rev-parse", "--is-shallow-repository"], root)
+        why = ("not in this SHALLOW clone's history; `git fetch --unshallow` "
+               "to measure" if out.strip() == "true" else "commit not found")
+        return f"UNKNOWN({why})"
+    rc = _run(["git", "merge-base", "--is-ancestor", rev, "HEAD"], root)[0]
+    return {0: "YES", 1: "NO"}.get(rc, f"UNKNOWN(merge-base rc={rc})")
 
 
 def repo_root(start: pathlib.Path) -> pathlib.Path:
@@ -355,21 +381,228 @@ def verify(root: pathlib.Path, *, remote: bool = True):
         print(f"  {status:<10} {k}: {o}" + ("" if o == n else f"  →  {n}"))
     oh = old.get("head")
     if oh and oh != new.get("head") and "UNMEASURED" not in oh:
-        rc, _, _ = _run(["git", "merge-base", "--is-ancestor", oh, "HEAD"], root)
-        if rc == 0:
+        anc = ancestry(root, oh)
+        if anc == "YES":
             _, out, _ = _run(["git", "log", "--oneline", f"{oh}..HEAD"], root)
             print(f"  commits since the recorded HEAD ({oh[:12]}):")
             print("".join(f"    {l}\n" for l in out.splitlines()) or "    (none)")
-        else:
+        elif anc == "NO":
             print(f"  WARNING: recorded HEAD {oh[:12]} is NOT an ancestor of "
                   f"the current HEAD. History diverged or was rewritten — "
                   f"stop and report before any work.")
+        else:
+            print(f"  UNMEASURED ancestry of recorded HEAD {oh[:12]}: {anc}. "
+                  f"Divergence is NOT established; commits since it are "
+                  f"not listed.")
     counts = {s: sum(1 for r in rows if r[0] == s)
               for s in ("MATCH", "DIFFERS", "UNMEASURED")}
     print(f"VERIFY: compared={len(rows)} match={counts['MATCH']} "
           f"differs={counts['DIFFERS']} unmeasured={counts['UNMEASURED']}. The repository wins for FACTS; rulings "
           f"marked {UNBANKED} must be raised with the operator.")
     return diffs
+
+
+# ── due: is a WRITE owed? ────────────────────────────────────────────────
+# Measured signal only: COMMITS after the last entry's recorded HEAD that no
+# entry covers. A commit touching the log is a WRITE commit and covers
+# itself (only WRITE appends to it). Conversation-only rulings leave no
+# trace in Git, so no hook can detect them; the output says so every time.
+DUE_BLIND = ("commits only: a conversation-only ruling is invisible to "
+             "this check; judge those yourself")
+
+
+def classify_due(commits, *, recorded_head, ancestry_state, wt_entries,
+                 head_entries):
+    """Pure. `commits` = [(sha, subject, [paths])] in recorded_head..HEAD.
+    Returns (status, detail, uncovered) with status one of
+    DUE / NOT-DUE / WRITTEN-UNCOMMITTED / DIVERGED / UNKNOWN."""
+    if wt_entries > head_entries:
+        return ("WRITTEN-UNCOMMITTED",
+                f"{wt_entries - head_entries} entry(ies) appended in the "
+                f"working tree, not yet committed (commit follows authority)",
+                [])
+    if not recorded_head or "UNMEASURED" in recorded_head:
+        return ("UNKNOWN", "the last entry recorded no measured HEAD", [])
+    if ancestry_state == "NO":
+        return ("DIVERGED", f"recorded HEAD {recorded_head[:12]} is not an "
+                            f"ancestor of HEAD", [])
+    if ancestry_state != "YES":
+        return ("UNKNOWN", f"recorded HEAD {recorded_head[:12]}: "
+                           f"{ancestry_state}", [])
+    uncovered = [c for c in commits if LOG_REL not in c[2]]
+    if uncovered:
+        return ("DUE", f"{len(uncovered)} commit(s) since the last entry's "
+                       f"recorded HEAD {recorded_head[:12]} are covered by no "
+                       f"entry", uncovered)
+    return ("NOT-DUE", f"no uncovered commit since {recorded_head[:12]}", [])
+
+
+def due_state(root: pathlib.Path):
+    log = root / LOG_REL
+    if not log.is_file():
+        raise Refusal(f"{LOG_REL} is absent")
+    wt = log.read_text(encoding="utf-8")
+    committed = committed_text(root, "HEAD")
+    wt_n = len(_entries(wt))
+    head_n = len(_entries(committed)) if committed else 0
+    _, st = last_entry_state(committed if committed and head_n else wt)
+    rh = st.get("head", "")
+    anc = ancestry(root, rh) if rh and "UNMEASURED" not in rh else "UNKNOWN"
+    commits = []
+    if anc == "YES":
+        _, out, _ = _run(["git", "log", "--format=@@%H %s", "--name-only",
+                          f"{rh}..HEAD"], root)
+        for line in out.splitlines():
+            if line.startswith("@@"):
+                sha, _, subj = line[2:].partition(" ")
+                commits.append((sha, subj, []))
+            elif line.strip() and commits:
+                commits[-1][2].append(line.strip())
+    _, head, _ = _run(["git", "rev-parse", "HEAD"], root)
+    return classify_due(commits, recorded_head=rh, ancestry_state=anc,
+                        wt_entries=wt_n, head_entries=head_n), head.strip()
+
+
+def format_due(res):
+    status, detail, uncovered = res
+    lines = [f"WRITE-DUE: {status} — {detail} ({DUE_BLIND})"]
+    lines += [f"    {sha[:7]} {subj}" for sha, subj, _ in uncovered[:8]]
+    if len(uncovered) > 8:
+        lines.append(f"    … and {len(uncovered) - 8} more "
+                     f"(listed {min(8, len(uncovered))} of {len(uncovered)})")
+    return "\n".join(lines)
+
+
+# ── fresh: one live log, one writer ─────────────────────────────────────
+POINTER_REL = ".claude/handoff-branch"
+
+
+def live_branch(root: pathlib.Path):
+    p = root / POINTER_REL
+    if not p.is_file():
+        return None
+    name = p.read_text(encoding="utf-8").strip()
+    return name or None
+
+
+def classify_fresh(*, current, live, head, remote_sha, remote_ancestry):
+    """Pure. May an entry be appended here without losing another
+    writer's? Returns (status, detail): FRESH / AHEAD / STALE / NOT-LIVE /
+    UNKNOWN."""
+    if not live:
+        return ("UNKNOWN", f"no live branch named in {POINTER_REL}")
+    if current != live:
+        return ("NOT-LIVE", f"this branch is {current}; the live handoff log "
+                            f"is on {live} [FILE {POINTER_REL}]. An entry "
+                            f"committed here reaches the live log only when "
+                            f"merged there")
+    if not remote_sha or "UNMEASURED" in remote_sha:
+        return ("UNKNOWN", f"origin/{live} not measured: {remote_sha}")
+    if remote_sha == head:
+        return ("FRESH", f"HEAD equals origin/{live}")
+    if remote_ancestry == "YES":
+        return ("AHEAD", f"HEAD is ahead of origin/{live}; no other writer "
+                         f"pushed")
+    if remote_ancestry == "NO":
+        return ("STALE", f"origin/{live} ({remote_sha[:12]}) has commits this "
+                         f"HEAD lacks: another writer pushed. `git pull "
+                         f"--ff-only origin {live}` BEFORE appending")
+    return ("UNKNOWN", f"ancestry of origin/{live}: {remote_ancestry}")
+
+
+def fresh_state(root: pathlib.Path, *, timeout=45):
+    live = live_branch(root)
+    _, cur, _ = _run(["git", "rev-parse", "--abbrev-ref", "HEAD"], root)
+    _, head, _ = _run(["git", "rev-parse", "HEAD"], root)
+    remote_sha, anc = "UNMEASURED(not queried)", "UNKNOWN"
+    if live and cur.strip() == live:
+        try:
+            p = subprocess.run(["git", "fetch", "--quiet", "origin",
+                                f"refs/heads/{live}"], cwd=root,
+                               capture_output=True, text=True, timeout=timeout)
+            if p.returncode == 0:
+                remote_sha = _run(["git", "rev-parse", "FETCH_HEAD"],
+                                  root)[1].strip()
+                anc = ancestry(root, remote_sha)
+            else:
+                remote_sha = f"UNMEASURED(fetch rc={p.returncode}: " \
+                             f"{p.stderr.strip()[:100]})"
+        except subprocess.TimeoutExpired:
+            remote_sha = f"UNMEASURED(fetch timed out after {timeout}s)"
+    return classify_fresh(current=cur.strip(), live=live, head=head.strip(),
+                          remote_sha=remote_sha, remote_ancestry=anc)
+
+
+# ── hook: Stop and PreCompact decisions ─────────────────────────────────
+OWED = ("DUE", "DIVERGED")
+
+
+def hook_action(event, payload, status, seen):
+    """Pure. What a hook does, given the event, its input JSON, the due
+    status and whether this exact reminder was already given. Returns
+    ("silent",) / ("context", why) / ("block", why).
+
+    Stop: never re-fires inside its own continuation (stop_hook_active),
+    and fires once per state, so it cannot loop or nag.
+    PreCompact: blocks MANUAL /compact once per state. Never blocks AUTO:
+    the docs state a blocked auto-compaction at the context limit makes
+    the request fail. After an auto-compaction the SessionStart:compact
+    hook reports WRITE-DUE instead."""
+    if status not in OWED or seen:
+        return ("silent",)
+    if event == "stop":
+        if payload.get("stop_hook_active"):
+            return ("silent",)
+        return ("context", "remind")
+    if event == "precompact":
+        if payload.get("trigger") != "manual":
+            return ("silent",)
+        return ("block", "remind")
+    return ("silent",)
+
+
+def _marker(payload):
+    import os
+    import tempfile
+    sid = re.sub(r"[^A-Za-z0-9_-]", "_", str(payload.get("session_id")
+                                             or "nosession"))[:80]
+    d = pathlib.Path(os.environ.get("TMPDIR") or tempfile.gettempdir()) \
+        / "kai-handoff-hooks"
+    d.mkdir(parents=True, exist_ok=True)
+    return d / sid
+
+
+def run_hook(event, root: pathlib.Path):
+    import json
+    raw = sys.stdin.read() if not sys.stdin.isatty() else ""
+    try:
+        payload = json.loads(raw) if raw.strip() else {}
+    except ValueError:
+        payload = {}
+    (status, detail, uncovered), head = due_state(root)
+    key = f"{event}:{head}:{status}"
+    mk = _marker(payload)
+    seen = mk.is_file() and key in mk.read_text(encoding="utf-8").split()
+    act = hook_action(event, payload, status, seen)
+    if act[0] == "silent":
+        return 0
+    with mk.open("a", encoding="utf-8") as f:
+        f.write(key + "\n")
+    text = format_due((status, detail, uncovered))
+    if act[0] == "context":
+        msg = (f"kai-handoff (Stop hook, fires once per HEAD): {text}\n"
+               f"Before ending: run kai-handoff WRITE "
+               f"(.claude/skills/kai-handoff/SKILL.md), or tell the operator "
+               f"in one line why not (for example: committing it is not "
+               f"authorised).")
+        print(json.dumps({"hookSpecificOutput": {
+            "hookEventName": "Stop", "additionalContext": msg}}))
+        return 0
+    print(f"kai-handoff: compaction blocked ONCE because a handoff WRITE is "
+          f"owed.\n{text}\nAsk Claude to run kai-handoff WRITE, then /compact "
+          f"again. Running /compact again now proceeds without it.",
+          file=sys.stderr)
+    return 2
 
 
 # ── selftest (calibration) ──────────────────────────────────────────────
@@ -481,6 +714,80 @@ def selftest():
         cases.append((f"{name.split()[0]} compare: {' '.join(name.split()[1:])}",
                       ok, sorted(f"{k}={got.get(k)}" for k in want)))
 
+    # classify_due(): expected status fixed by construction
+    code = ("c1", "fix x", ["a.py"])
+    entry = ("c2", "handoff", [LOG_REL])
+    both = ("c3", "entry+code", [LOG_REL, "b.py"])
+    for name, kw, want, n_unc in (
+        ("NEG nothing since the entry", dict(commits=[]), "NOT-DUE", 0),
+        ("NEG only the entry's own commit", dict(commits=[entry]),
+         "NOT-DUE", 0),
+        ("POS a code commit after the entry", dict(commits=[entry, code]),
+         "DUE", 1),
+        ("POS a code commit before the entry commit",
+         dict(commits=[code, entry]), "DUE", 1),
+        ("NEG a WRITE commit that also touched code covers itself",
+         dict(commits=[both]), "NOT-DUE", 0),
+        ("NEG entry appended but uncommitted",
+         dict(commits=[code], wt_entries=5), "WRITTEN-UNCOMMITTED", 0),
+        ("POS history diverged", dict(commits=[], ancestry_state="NO"),
+         "DIVERGED", 0),
+        ("NEG shallow clone: absent is UNKNOWN, not DIVERGED",
+         dict(commits=[], ancestry_state="UNKNOWN(not in this SHALLOW clone)"),
+         "UNKNOWN", 0),
+        ("NEG no recorded HEAD", dict(commits=[code], recorded_head=""),
+         "UNKNOWN", 0),
+    ):
+        args = dict(recorded_head="a" * 40, ancestry_state="YES",
+                    wt_entries=4, head_entries=4)
+        args.update(kw)
+        st, _, unc = classify_due(**args)
+        cases.append((f"{name.split()[0]} due: {' '.join(name.split()[1:])}",
+                      st == want and len(unc) == n_unc, [st, len(unc)]))
+
+    # classify_fresh()
+    h, r = "h" * 40, "r" * 40
+    for name, kw, want in (
+        ("NEG head equals remote", dict(remote_sha=h), "FRESH"),
+        ("NEG local ahead of remote",
+         dict(remote_sha=r, remote_ancestry="YES"), "AHEAD"),
+        ("POS another writer pushed",
+         dict(remote_sha=r, remote_ancestry="NO"), "STALE"),
+        ("POS not on the live branch", dict(current="other"), "NOT-LIVE"),
+        ("NEG remote unmeasured is UNKNOWN, not FRESH",
+         dict(remote_sha="UNMEASURED(x)"), "UNKNOWN"),
+        ("NEG no pointer is UNKNOWN", dict(live=None), "UNKNOWN"),
+    ):
+        args = dict(current="live", live="live", head=h, remote_sha=h,
+                    remote_ancestry="UNKNOWN")
+        args.update(kw)
+        st, _ = classify_fresh(**args)
+        cases.append((f"{name.split()[0]} fresh: {' '.join(name.split()[1:])}",
+                      st == want, [st]))
+
+    # hook_action(): loop safety and the never-block-auto rule
+    for name, ev, pl, st, seen, want in (
+        ("POS stop, due, first time", "stop", {}, "DUE", False, "context"),
+        ("NEG stop inside its own continuation", "stop",
+         {"stop_hook_active": True}, "DUE", False, "silent"),
+        ("NEG stop, same state already reminded", "stop", {}, "DUE", True,
+         "silent"),
+        ("NEG stop, not due", "stop", {}, "NOT-DUE", False, "silent"),
+        ("NEG stop, written but uncommitted", "stop", {},
+         "WRITTEN-UNCOMMITTED", False, "silent"),
+        ("POS manual compact, due", "precompact", {"trigger": "manual"},
+         "DUE", False, "block"),
+        ("NEG manual compact, second attempt proceeds", "precompact",
+         {"trigger": "manual"}, "DUE", True, "silent"),
+        ("NEG AUTO compact is never blocked", "precompact",
+         {"trigger": "auto"}, "DUE", False, "silent"),
+        ("NEG unknown ancestry never blocks", "precompact",
+         {"trigger": "manual"}, "UNKNOWN", False, "silent"),
+    ):
+        got = hook_action(ev, pl, st, seen)[0]
+        cases.append((f"{name.split()[0]} hook: {' '.join(name.split()[1:])}",
+                      got == want, [got]))
+
     # the tag grammar itself: known-good and known-bad tags
     for tag, want in (("[GIT 0af5d32]", True), ("[D386]", True),
                       ("[LEDGER INC-2026-09-19-38]", True),
@@ -516,6 +823,11 @@ def main(argv=None):
     v.add_argument("--strict", action="store_true",
                    help="exit 1 if any compared value differs")
     sub.add_parser("selftest")
+    sub.add_parser("due", help="is a WRITE owed? exit 1 if DUE/DIVERGED")
+    sub.add_parser("fresh", help="may an entry be appended here? exit 1 if "
+                                 "STALE/NOT-LIVE, 2 if UNKNOWN")
+    hk = sub.add_parser("hook", help="Stop/PreCompact hook entry point")
+    hk.add_argument("event", choices=("stop", "precompact"))
     a = ap.parse_args(argv)
 
     try:
@@ -542,7 +854,28 @@ def main(argv=None):
         if a.cmd == "verify":
             d = verify(root, remote=not a.no_remote)
             return 1 if (a.strict and d) else 0
+        if a.cmd == "due":
+            res, _ = due_state(root)
+            print(format_due(res))
+            return 1 if res[0] in OWED else 0
+        if a.cmd == "fresh":
+            st, detail = fresh_state(root)
+            print(f"FRESH: {st} — {detail}")
+            return {"FRESH": 0, "AHEAD": 0, "UNKNOWN": 2}.get(st, 1)
+        if a.cmd == "hook":
+            # A hook must never break a session: any internal failure is
+            # reported on stderr and exits 0 (non-blocking).
+            try:
+                return run_hook(a.event, root)
+            except Exception as e:                    # noqa: BLE001
+                print(f"kai-handoff hook {a.event}: internal error, "
+                      f"nothing enforced: {e!r}", file=sys.stderr)
+                return 0
     except Refusal as e:
+        if a.cmd == "hook":
+            print(f"kai-handoff hook: REFUSE {e}; nothing enforced",
+                  file=sys.stderr)
+            return 0
         print(f"REFUSE: {e}", file=sys.stderr)
         return 2
     return 0
