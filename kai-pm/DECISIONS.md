@@ -39247,3 +39247,116 @@ ALLOCATOR             after this append: population 369, highest D386, next
                       free D387 — NOT TO BE TAKEN without authorisation.
 INCIDENT ALLOCATOR    35 incidents, highest INC-2026-09-18-35.
 ```
+
+---
+
+## D387 — 2026-09-30 — CONTINUITY RECORD: THE 25 SEPTEMBER 2026 ADMISSION OF 8e3ee69 · fc1bb9d · 630ceaf · eb52f73, AND RELATED RULINGS. GOVERNANCE ONLY — NO IMPLEMENTATION, CANDIDATE, STAGE-A OR HOLDOUT AUTHORITY.
+
+**Allocator.** Derived structurally over `^## D[0-9]+( +—|$)` immediately before this append (2026-09-30T21:03:07Z): population **369**, distinct **369**, duplicates **none**, highest **D386**; D387, D388 and D389 each absent. D387–D389 are taken in one governance commit, in this order. **BANKING IS NOT EXECUTION.** No implementation, production Stage A, candidate, holdout, blind 40, capture or PR #122 merge authority follows from this entry.
+
+**Authority.** Kai's rulings received by Orion's session on
+2026-09-25T16:18:17Z, relayed by Dainius; banked at Dainius's instruction
+of 2026-09-30 ("go with your recommendation"). The record's content is
+the specification Kai himself wrote for it:
+
+> who: Dainius as final authority, following Kai’s commit-by-commit adjudication
+> when: 25 September 2026
+> why: the four commits were individually adjudicated; D379 closeout remained rejected but their bounded changes were accepted
+> state: eb52f73 is the admitted technical restart point; fc1bb9d carries zero authority weight; no candidate/downstream authority was granted
+> correction: the later reconstruction-from-86ebfde ruling resulted from incomplete cold-start recovery and does not supersede the 25 September admission
+
+**The ruling, in Kai's words:**
+
+> The contradiction is resolved. The 25 September admission ruling stands.
+>
+> I recovered the earlier ruling from the prior thread. It was explicit and commit-scoped: 8e3ee69, fc1bb9d, 630ceaf, and eb52f73 were accepted; fc1bb9d carried zero authority weight because it is non-authoritative field notes; and eb52f73 was named the last admitted technical state. You then explicitly accepted that position and said future repair work starts from eb52f73.
+
+**Programme state as Kai recorded it:**
+
+```
+Physical HEAD: 0af5d32072bcf1d09c09e5c83c9b5b71b5560676
+Physical tree: 4c05a750e1aed738879c140b51782de83bdf26e3
+Admitted technical state: eb52f73fa6485534ca7e28a42055861c69e94cc4
+D379 tranche: still not closed
+Candidate / real Stage A / production holdout: still not authorised
+PR #122: remains DO NOT MERGE
+```
+
+**Correction, in Kai's words:**
+
+> My later new-thread ruling to reconstruct from 86ebfde was therefore wrong. It was made with incomplete continuity: I had repository evidence but was missing an already-made consequential admission decision. That is exactly the kind of cold-start failure our doctrine is supposed to prevent.
+
+**Related rulings in the same message (A3, A5, A6):**
+
+- Rebuild from 86ebfde (K1):
+> NO. The rebuild is cancelled.
+  The repair base is `eb52f73fa6485534ca7e28a42055861c69e94cc4`.
+- K2:
+> The number of launch sites is a reported measurement, not a hard-coded gate. We must never encode “there shall be nine” because the legitimate denominator can change.
+>
+> The coverage property is a gate:
+>
+> Every Python child-process launch in the governed harness population must pass through the governed launcher and therefore receive the required startup condition; any bypassing Python launch site is a hard failure.
+- Build-log store:
+> For the durable canonical copy, I choose Dropbox, not a GitHub Actions artifact.
+>
+> No build starts until the durable destination exists.
+
+**Not banked here, stated.** The list of the six blockers behind the
+rejected closeout is not held in Kai's words in this session, so it is not
+put in Kai's mouth. Orion's working list is in `kai-pm/D379_PLAN_V4_1.md`
+§B1 (non-authoritative).
+
+**Rule carried.** Repository silence cannot erase a consequential decision
+that was explicitly made and accepted; recover the authority history first,
+then adjudicate. Kai, verbatim, on one line:
+
+> current repository state can invalidate an old factual claim, but repository silence cannot erase a prior consequential decision that was explicitly made and accepted.
+
+---
+
+## D388 — 2026-09-30 — KAI RULINGS Q6–Q9 ON THE D379 REPAIR PLAN (F12, F13, plan_selection, BUILD-LOG AUTHORITY). GOVERNANCE ONLY — BANKING IS NOT EXECUTION.
+
+**Allocator.** Derived structurally over `^## D[0-9]+( +—|$)` immediately before this append (2026-09-30T21:03:07Z): population **369**, distinct **369**, duplicates **none**, highest **D386**; D387, D388 and D389 each absent. D387–D389 are taken in one governance commit, in this order. **BANKING IS NOT EXECUTION.** No implementation, production Stage A, candidate, holdout, blind 40, capture or PR #122 merge authority follows from this entry.
+
+**Authority.** Kai's ruling received 2026-09-25T15:57:02Z, relayed by
+Dainius. Table verbatim, tabs preserved:
+
+```
+Q6–Q9 — KAI RULING
+
+Question	Ruling	Reason	Confidence
+Q6 — F12 B5 blocker?	YES — BLOCKER	D379 explicitly requires I1B-4 duplicate output → REFUSE BEFORE SELECTION. Current reconcile() accepts identical duplicate multisets.	1.00
+Q7 — F13 harness blocker?	YES — BLOCKER	I independently counted 9 [sys.executable, …] launch sites. Python flags do not inherit from the parent merely because sys.executable is reused.	0.99
+Q8 — plan_selection acceptable?	YES, with strict boundary conditions	A single real decision function inside holdout.py is preferable to reproducing holdout semantics inside the harness.	0.96
+Q9 — commit build log if ≤5 MB?	NO, not as stated	File size does not create repository authority. R10 says full evidence survives; D379 says no arbitrary new tracked paths.	0.99
+```
+
+**Scope, stated.** The same message also ruled on the F12 class repair, the
+F13 launcher location, Q1a-9's semantic invariant, the interpreter build,
+and the repair branch base. Its branch-base ruling (rebuild from `86ebfde`)
+was later withdrawn by Kai (see D387). Those parts are not banked by this
+entry.
+
+---
+
+## D389 — 2026-09-30 — KAI FINDINGS KAI-V4-01 … 08 ON D379 REPAIR PLAN v4. PLAN RETURNED FOR REVISION. GOVERNANCE ONLY — BANKING IS NOT EXECUTION.
+
+**Allocator.** Derived structurally over `^## D[0-9]+( +—|$)` immediately before this append (2026-09-30T21:03:07Z): population **369**, distinct **369**, duplicates **none**, highest **D386**; D387, D388 and D389 each absent. D387–D389 are taken in one governance commit, in this order. **BANKING IS NOT EXECUTION.** No implementation, production Stage A, candidate, holdout, blind 40, capture or PR #122 merge authority follows from this entry.
+
+**Authority.** Received 2026-09-30T17:34:56Z from Dainius, reproducing the
+findings of "Kai's 30 September adjudication". Findings verbatim:
+
+> 1. KAI‑V4‑01 — BLOCKER: Stage‑B result, provenance and binding can be changed together and self-certify.
+> 2. KAI‑V4‑02 — BLOCKER: Repaired controls can generate their own acceptance evidence without a pre-capture fixity gate.
+> 3. KAI‑V4‑03 — BLOCKER: F13’s child-launch population is not closed across aliases, wrappers and alternate launch mechanisms.
+> 4. KAI‑V4‑04 — BLOCKER: E7’s full-log round-trip cannot occur before the build that creates the log.
+> 5. KAI‑V4‑05 — MAJOR: Interpreter dependency and signature closure are incomplete.
+> 6. KAI‑V4‑06 — MAJOR: The NFC/NFD refusal lacks an explicit canonicalisation rule.
+> 7. KAI‑V4‑07 — MAJOR: A Part D commit placed only on the old branch would not be ancestral to the repair branch.
+> 8. KAI‑V4‑08 — MAJOR: Authority calibration proves mapping completeness, but not that each authority mapping is correct.
+
+**Consequence.** Plan v4.1 (`kai-pm/D379_PLAN_V4_1.md`) was written in
+response.
+
+At the time of these KAI-V4-01…08 findings, plan v4 was returned for revision and the resulting v4.1 had not yet completed Kai/DeepSeek review. This entry banks the historical findings only; it does not describe the later repair-plan review state. D379 execution remained stopped under that ruling.
