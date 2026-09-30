@@ -167,9 +167,11 @@ Run it after any change to `handoff.py`.
   - **Stop**: feedback once per HEAD; never inside its own continuation
     (`stop_hook_active`), so it cannot loop.
   - **PreCompact**: blocks a *manual* `/compact` once per HEAD; a second
-    `/compact` proceeds. It **never** blocks an *auto* compaction — the
-    hooks docs state that blocking it at the context limit fails the
-    request. After an auto compaction, SessionStart:compact reports
+    `/compact` proceeds. It **never** blocks an *auto* compaction: the
+    hooks docs state that when compaction was "triggered to recover from
+    a context-limit error already returned by the API", blocking it means
+    "the current request fails", and a hook cannot tell that case from a
+    proactive one. After an auto compaction, SessionStart:compact reports
     `WRITE-DUE`.
   - **Blind spot:** a ruling made only in conversation leaves no trace in
     Git, so `due` cannot see it. The producer still judges those.

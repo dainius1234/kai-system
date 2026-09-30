@@ -545,8 +545,10 @@ def hook_action(event, payload, status, seen):
     Stop: never re-fires inside its own continuation (stop_hook_active),
     and fires once per state, so it cannot loop or nag.
     PreCompact: blocks MANUAL /compact once per state. Never blocks AUTO:
-    the docs state a blocked auto-compaction at the context limit makes
-    the request fail. After an auto-compaction the SessionStart:compact
+    the hooks docs state that when compaction was "triggered to recover
+    from a context-limit error already returned by the API", blocking it
+    makes "the current request fail[s]"; the input cannot tell that case
+    from a proactive one. After an auto-compaction the SessionStart:compact
     hook reports WRITE-DUE instead."""
     if status not in OWED or seen:
         return ("silent",)

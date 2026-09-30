@@ -17,8 +17,12 @@
 #     nothing and changes nothing.
 #   - ANY BRANCH. A session started from `main` (the app's default) has
 #     no handoff tool or log. The live branch is named in ONE place,
-#     .claude/handoff-branch; the hook fetches it (bounded, --depth 50),
-#     runs READ in a temporary detached worktree, and removes the worktree.
+#     .claude/handoff-branch; the hook fetches it (time-bounded), runs READ
+#     in a temporary detached worktree, and removes the worktree.
+#   - NEVER MAKES A FULL CLONE SHALLOW. `git fetch --depth` on a full
+#     clone converts the WHOLE repository to shallow and cuts history
+#     (measured 60 -> 50 commits; Orion measured 60 -> 40). --depth=50 is
+#     passed only when the clone is already shallow (cloud sessions).
 #     The only side effects are Git's fetch refs and that transient worktree.
 #     This file is byte-identical on every branch that carries it, so
 #     merging branches never conflicts on it.
@@ -84,8 +88,16 @@ elif [ -z "$LIVE" ]; then
 else
   echo "HOOK: this session is on '$CUR', which has no handoff tool/log. The live handoff branch is '$LIVE' [FILE .claude/handoff-branch]. Reading it from there (fetch, temporary worktree):"
   git worktree prune 2>/dev/null
-  if ! timeout "$FETCH_TIMEOUT" git fetch --quiet --depth=50 origin "refs/heads/$LIVE" 2>&1; then
-    echo "HOOK: fetching '$LIVE' failed or timed out after ${FETCH_TIMEOUT}s — READ mode NOT run. Run by hand: git fetch origin $LIVE, then read kai-pm/HANDOFF_LOG.md there."
+  DEPTH=""
+  [ "$(git rev-parse --is-shallow-repository 2>/dev/null)" = "true" ] && DEPTH="--depth=50"
+  timeout "$FETCH_TIMEOUT" git fetch --quiet $DEPTH origin "refs/heads/$LIVE" 2>&1
+  frc=$?
+  if [ "$frc" -ne 0 ]; then
+    if [ "$frc" -eq 124 ]; then
+      echo "HOOK: fetching '$LIVE' timed out after ${FETCH_TIMEOUT}s — READ mode NOT run. Run by hand: git fetch origin $LIVE, then read kai-pm/HANDOFF_LOG.md there."
+    else
+      echo "HOOK: fetching '$LIVE' failed (git exit $frc) — READ mode NOT run. Run by hand: git fetch origin $LIVE, then read kai-pm/HANDOFF_LOG.md there."
+    fi
   else
     SHA="$(git rev-parse FETCH_HEAD)"
     TMPD="$(mktemp -d "${TMPDIR:-/tmp}/kai-handoff-live.XXXXXX")"
