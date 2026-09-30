@@ -844,3 +844,72 @@ python3 -B .claude/skills/kai-handoff/handoff.py due
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
 python3 -B .claude/skills/kai-handoff/handoff.py due
+
+## HANDOFF 2026-09-30T21:18:40Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-09-30T21:18:40Z  [CMD `date -u +%FT%TZ` → 2026-09-30T21:18:40Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: b5963f989eb16e75c86143280a902111b7de07b3  [CMD `git rev-parse HEAD` → b5963f989eb16e75c86143280a902111b7de07b3]
+- tree: eddb8525edad95e86882100d168bcdb5917961a9  [CMD `git rev-parse HEAD^{tree}` → eddb8525edad95e86882100d168bcdb5917961a9]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:claude/project-rework-plan-pgvp35: b5963f989eb16e75c86143280a902111b7de07b3  [CMD `git ls-remote --heads origin` → b5963f989eb16e75c86143280a902111b7de07b3]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- decisions_headings: 372  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 372]
+- decisions_distinct: 372  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 372]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D389  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D389]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 12  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 12]
+
+### 1. The four states
+
+- physical: HEAD `b5963f9`, clean; the v4.5 records are at `cb4d986`; G is `77fdc37`  [GIT b5963f9]
+- authorised: D379 implementation — NONE. Next is Dainius's implementation-authority decision on v4.5  [FILE kai-pm/D379_PLAN_V4_5_KAI_RECONCILIATION.md]
+- evidence: Kai independently recomputed the repository hashes and git blob IDs of the three v4.5 records; they match Orion's. Two-stage chain (transcript cut + repository hashes); no third byte source is claimed  [CONVERSATION 2026-09-30 Kai via Dainius, "The Git blob IDs also match Orion's report exactly."]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-09-30 · preservation gate crossed; "technical execution remains stopped"; Dainius's questions come next, before any implementation grant ⚠ UNBANKED  [CONVERSATION 2026-09-30 Kai via Dainius, "Ask the questions you wanted to go through."]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: R, the repair branch, E7a, CPython builds, B4 mutation, F, capture — until Dainius's explicit grant  [FILE kai-pm/D379_PLAN_V4_5_KAI_RECONCILIATION.md]
+- FORBIDDEN: production Stage A, candidate, holdout, blind 40, PR #122 merge; merging this branch into the repair branch  [D387]
+
+### 4. Open questions
+
+- NEXT: Dainius asks his questions on v4.5 before deciding the grant — owner: Dainius  [CONVERSATION 2026-09-30 Kai via Dainius]
+- Grant scope, as v4.5 reads it: stage 1 only (R + repair branch from eb52f73, E7a, 2 builds, B4 repairs, stop at F); Kai reviews F; a separate one-time capture grant — owner: Dainius  [FILE kai-pm/D379_PLAN_V4_5.md]
+- Unmeasured feasibility 1: can this container mechanically disable outbound network for the builds (DS-V4.5-01)? If not → STOP — owner: Orion, first measurement once granted  [FILE kai-pm/D379_PLAN_V4_5_KAI_RECONCILIATION.md]
+- Unmeasured feasibility 2: Dropbox connector size limit, overwrite behaviour and byte fidelity (E7a); failure → no build (S9); it writes to Dainius's Dropbox, so the grant must name it — owner: Dainius  [FILE kai-pm/D379_PLAN_V4_5.md]
+- Risk: build logs exist only in the ephemeral container until E7b; the builds and E7b must run in one uninterrupted stretch — owner: Orion  [FILE kai-pm/D379_PLAN_V4_5.md]
+- Checkpoints: does Dainius want a stop after each milestone (R, builds, repairs, F), or only at F? — owner: Dainius  [CONVERSATION 2026-09-30 Orion]
+- Housekeeping: delete the branches `claude/new-season-g1zxjc`, `claude/main-baseline-probe`, `claude/cai-v1-bootstrap`; `main`'s CI red (pre-existing) before the hook can go to main — owner: Dainius  [CMD `git ls-remote --heads origin` → all three present]
+
+### 5. Incidents and corrections
+
+- None since entry 12  [GIT b5963f9]
+
+### 6. Next authorised step
+
+- Answer Dainius's questions. Do NOT start any D379 technical work without his explicit grant  [CONVERSATION 2026-09-30 Kai via Dainius]
+
+### 7. What I am unsure of
+
+- Whether this session resumes with its context intact or compacted after the usage reset. Either way, the SessionStart hook re-runs READ, and this entry is the restart point  [FILE .claude/settings.json]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
+python3 -B .claude/skills/kai-handoff/handoff.py due
