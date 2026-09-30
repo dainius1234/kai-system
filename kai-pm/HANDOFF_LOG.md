@@ -228,3 +228,67 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-09-30T19:38:10Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-09-30T19:38:10Z  [CMD `date -u +%FT%TZ` → 2026-09-30T19:38:10Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 48d2b3dcdd1152f250db824f40f161e3f0e18cdc  [CMD `git rev-parse HEAD` → 48d2b3dcdd1152f250db824f40f161e3f0e18cdc]
+- tree: 50b007579540c045cf1ad1c1d440a439d3ae6274  [CMD `git rev-parse HEAD^{tree}` → 50b007579540c045cf1ad1c1d440a439d3ae6274]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 48d2b3dcdd1152f250db824f40f161e3f0e18cdc  [CMD `git ls-remote --heads origin` → 48d2b3dcdd1152f250db824f40f161e3f0e18cdc]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- decisions_headings: 369  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 369]
+- decisions_distinct: 369  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 369]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D386  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D386]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 3  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 3]
+
+### 1. The four states
+
+- physical: HEAD `48d2b3d`, clean before this entry  [GIT 48d2b3d]
+- authorised: D379 execution — NONE, unchanged  [CONVERSATION 2026-09-30 Dainius, "Execution remains stopped"]
+- evidence: the hook fired in a real session on `resume`, and its output reached context before any work  [CONVERSATION 2026-09-30 SessionStart:resume hook output]
+- admission: unchanged; the 25 Sept admission is still ⚠ UNBANKED  [CONVERSATION 2026-09-25 Kai]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-09-30 · finish all tests with real, unassumed results ⚠ UNBANKED  [CONVERSATION 2026-09-30 Dainius, "how we finish all test and get real unassumed results"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: running the test chain and recording the results in this log  [CONVERSATION 2026-09-30 Dainius]
+- HELD and FORBIDDEN: unchanged from the first entry  [CONVERSATION 2026-09-30 Dainius]
+
+### 4. Open questions
+
+- RESOLVED: the hook fires in a real session — observed on `resume`  [CONVERSATION 2026-09-30 SessionStart:resume hook output]
+- RESOLVED: web sessions read the hook from the CHECKED-OUT branch. `main` (`194db0a`) has no `.claude/settings.json` and no hook, yet the hook ran  [CMD `git show main:.claude/settings.json` → fatal: exists on disk, but not in 'main']
+- OPEN: `startup` (brand-new session) and `compact` triggers not yet observed live — owner: Dainius (open a new session / type /compact)  [CONVERSATION 2026-09-30 Orion]
+- OPEN: pre-existing environment gaps: `pytest` and `jsonschema` are not importable in this container, and README is stale for check-docs. Fixing either needs its own authority — owner: Dainius  [CMD `python3 -c 'import pytest'` → ModuleNotFoundError]
+
+### 5. Incidents and corrections
+
+- Full chain `make -k prepush` at `48d2b3d`: exit 2; 83 EXIT GATE PASS lines, 2 FAIL lines; 4 failing targets (check-docs, test-test-isolation 22/9, test-llm-contract 263/2, coverage). `-k` was used so that the pre-existing check-docs failure could not hide the rest. Full log is 110961 bytes (scratchpad, ephemeral)  [CMD `make -k prepush` → rc 2]
+- Baseline control on a clean clone at `0af5d32` (before any handoff work, no `.claude/`): the same 4 targets fail identically (22/9, 263/2, pytest and jsonschema missing, README stale). Regressions caused by the handoff work: 0  [CMD `make <4 targets>` at 0af5d32 → rc 2 each, identical counts]
+
+### 6. Next authorised step
+
+- D379: "Execution remains stopped." The next gate is still Kai's check of plan v4.1  [CONVERSATION 2026-09-30 Dainius]
+
+### 7. What I am unsure of
+
+- The 83/2 figures are counts of `EXIT GATE:` lines in one log, not a count of distinct targets. Two FAIL lines map to the llm-contract and test-isolation calibrations; coverage and check-docs fail through make without an EXIT GATE line  [CMD `grep -c '^EXIT GATE: PASS'` → 83]
+- The full prepush log exists only in the ephemeral scratchpad; this entry carries its counts, not its bytes  [CMD `wc -c prepush.log` → 110961]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
