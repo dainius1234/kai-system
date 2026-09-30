@@ -516,3 +516,70 @@ python3 -B .claude/skills/kai-handoff/handoff.py due
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
 python3 -B .claude/skills/kai-handoff/handoff.py due
+
+## HANDOFF 2026-09-30T20:48:13Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-09-30T20:48:13Z  [CMD `date -u +%FT%TZ` → 2026-09-30T20:48:13Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: dc25a3e46f6b5a91528888fbaed6e534c7961c58  [CMD `git rev-parse HEAD` → dc25a3e46f6b5a91528888fbaed6e534c7961c58]
+- tree: 62b81c08771f488bff3812a39ff77ed39f083af0  [CMD `git rev-parse HEAD^{tree}` → 62b81c08771f488bff3812a39ff77ed39f083af0]
+- uncommitted_paths: 1  [CMD `git status --porcelain | count lines` → 1]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/project-rework-plan-pgvp35: dc25a3e46f6b5a91528888fbaed6e534c7961c58  [CMD `git ls-remote --heads origin` → dc25a3e46f6b5a91528888fbaed6e534c7961c58]
+- decisions_headings: 369  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 369]
+- decisions_distinct: 369  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 369]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D386  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D386]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 7  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 7]
+
+### 1. The four states
+
+- physical: HEAD `dc25a3e` after a fast-forward from `2817bd8`; the only uncommitted file at measurement time is the draft update  [GIT dc25a3e]
+- authorised: D379 execution — NONE, unchanged  [CONVERSATION 2026-09-30 Dainius, "Execution remains stopped"]
+- evidence: the other session's fix `3feea9e` was re-tested independently with the real hook on a synthetic repository. Full clone: shallow false→false, main 60→60, READ ran. Shallow clone: stays shallow, READ ran, history deepened 5→40 (nothing lost)  [GIT 3feea9e] [CMD `bash .claude/hooks/session-start.sh` on full/shallow synthetic clones → rc 0 both]
+- admission: unchanged; the 25 Sept admission is still ⚠ UNBANKED (drafted)  [CONVERSATION 2026-09-25 Kai]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-09-30 · one session per branch; the other session hands over and stops; Orion continues. Worded by Orion, sent by Dainius ⚠ UNBANKED  [CONVERSATION 2026-09-30 Dainius, pasted the handover message]
+
+### 3. Authorised / Held / Forbidden
+
+- DONE: draft section C updated. C1 and C2 are now drafted from relayed-verbatim quotes, with evidence class and caveats stated  [FILE kai-pm/DECISIONS_DRAFT_UNBANKED.md]
+- HELD: any DECISIONS.md append until Dainius confirms the draft; D379 execution  [CONVERSATION 2026-09-30 Dainius]
+
+### 4. Open questions
+
+- Archive session_01PvwTQHZU2sxi6i3oBmoqoT; it reports that it has stopped — owner: Dainius  [CONVERSATION 2026-09-30 other session's final report, pasted by Dainius]
+- Delete the branches `claude/new-season-g1zxjc` (a9b2693, contained in the live branch) and `claude/main-baseline-probe` (194db0a = main). Neither holds unique commits; branch deletion is refused to this session (HTTP 403, measured earlier) — owner: Dainius  [CMD `git ls-remote --heads origin` → both present]
+- `main`'s own CI is red (dependency drift, per the other session's control run of 194db0a); the hook on `main` waits on that fix. Orion has not reproduced this — owner: Dainius to authorise the next step  [GIT dc25a3e]
+
+### 5. Incidents and corrections
+
+- Two measurements of the same defect differ (60→50 by the other session, 60→40 by Orion) because the synthetic repositories were built differently; both are correct for their setup  [FILE .claude/hooks/session-start.sh:24]
+- Attribution flagged: entry 7 §2 records a ruling whose wording is Orion's (a paste message Orion drafted), sent by Dainius  [FILE kai-pm/DECISIONS_DRAFT_UNBANKED.md]
+
+### 6. Next authorised step
+
+- D379: "Execution remains stopped." The next gates are Dainius's decision on the banking draft, and Kai's check of plan v4.1  [CONVERSATION 2026-09-30 Dainius]
+
+### 7. What I am unsure of
+
+- C1–C2 quotes are relayed from a transcript Orion cannot open; one source, not independently verified  [FILE kai-pm/HANDOFF_LOG.md]
+- `main`'s CI failure diagnosis (dependency drift) is the other session's measurement, not reproduced here  [CONVERSATION 2026-09-30 other session's final report]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
+python3 -B .claude/skills/kai-handoff/handoff.py due

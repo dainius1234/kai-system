@@ -159,6 +159,47 @@ call; they change no Stage-A proposition and no D379 state.
 | C1 | Dainius · 2026-09-30 · "option 2: start sessions on the rework branch, and fix the hook so READ happens automatically" (E5 §2) | Said to session_01PvwTQHZU2sxi6i3oBmoqoT, not to this one. A substring search of this transcript for "Go with option 2" finds **0** matches. Quoting it from that session's log would be cascaded memory (R16). That session, or Dainius, holds the verbatim text. |
 | C2 | Dainius · 2026-09-30 · "I authorise" to that session's gap table, rows 1–5 (E5 §2) | Same: given to the other session. This session received a *different* "I authorise" (about the hook reaching `main`), which must not be conflated with it. |
 
+**The table above is kept as written (the state at 2817bd8).** Update below.
+
+### C-UPDATE (2026-09-30, after HANDOFF_LOG entry 7) — C1 and C2 now drafted, as RELAYED quotes
+
+The other session (session_01PvwTQHZU2sxi6i3oBmoqoT) copied Dainius's
+messages to it word for word into HANDOFF_LOG entry 7 §2, and Dainius
+pasted the same list into this session (received 2026-09-30T20:46:45Z).
+A substring search finds each quote in both places.
+
+**Evidence class, stated.** These are **relayed** quotes: both copies were
+produced by that session from its own transcript, which this session
+cannot open. That is one source, not two independent ones (R13). Dainius
+is the ruling-maker and pasted them himself, which is why they are drafted
+here. Exact send times are not held; the date 2026-09-30 is.
+
+**C1 → drafted.** Dainius, verbatim (relayed):
+> "Go with option 2, start sessions on the rework branch and fix hook auto restart"
+
+**C2 → drafted.** Dainius, verbatim (relayed), to that session's gap
+table (rows 1–5, as HANDOFF_LOG entry 5 §2 lists them):
+> "I authorise"
+
+Caution: in this session's own transcript, "I authorise" also occurs
+four times with other meanings. The row list it approved is taken from
+entry 5, not from the quote itself.
+
+**Also relayed in entry 7, not rulings:** "New season" (the session's
+name); "So  is it best you can do and is it all avenues explored to make
+sure hook works and you got long term memory" (a question, double space
+as sent); "Yes, send Orion the row 2 request" (an instruction to relay,
+not a programme ruling).
+
+**New in entry 7 §2, attribution noted.** The ruling "Orion continues all
+other work; one session per branch at a time" was **worded by Orion**, in
+a message Orion drafted for Dainius to paste. It is Dainius's because he
+sent it. If banked, it should say so.
+
+**Result.** Section C now has **0** rulings that cannot be banked from a
+verbatim or relayed-verbatim source. The six-blocker list (A2) and the
+full A7/A8 tables are still open, as stated above.
+
 ---
 
 ## D. Suggested next steps (not taken)
