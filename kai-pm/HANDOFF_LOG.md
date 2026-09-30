@@ -779,3 +779,68 @@ python3 -B .claude/skills/kai-handoff/handoff.py due
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
 python3 -B .claude/skills/kai-handoff/handoff.py due
+
+## HANDOFF 2026-09-30T21:12:17Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-09-30T21:12:17Z  [CMD `date -u +%FT%TZ` → 2026-09-30T21:12:17Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: cb4d9867ab0207e951dba55eec5c015550b9da74  [CMD `git rev-parse HEAD` → cb4d9867ab0207e951dba55eec5c015550b9da74]
+- tree: 93022e3854a5203c9cc9ac69a3788bd1aea22862  [CMD `git rev-parse HEAD^{tree}` → 93022e3854a5203c9cc9ac69a3788bd1aea22862]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/project-rework-plan-pgvp35: cb4d9867ab0207e951dba55eec5c015550b9da74  [CMD `git ls-remote --heads origin` → cb4d9867ab0207e951dba55eec5c015550b9da74]
+- decisions_headings: 372  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 372]
+- decisions_distinct: 372  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 372]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D389  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D389]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 11  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 11]
+
+### 1. The four states
+
+- physical: HEAD `cb4d986`, the v4.5 preservation commit (3 new files, additions only); G is `77fdc37`  [GIT cb4d986]
+- authorised: D379 implementation — NONE; Kai's reconciliation says it is ready for Dainius's decision  [FILE kai-pm/D379_PLAN_V4_5_KAI_RECONCILIATION.md]
+- evidence: v4.5 plan, DeepSeek's final review ("NO DESIGN BLOCKER FOUND") and Kai's reconciliation are preserved byte for byte  [FILE kai-pm/D379_PLAN_V4_5.md] [FILE kai-pm/D379_PLAN_V4_5_DEEPSEEK_FINAL_REVIEW.md] [FILE kai-pm/D379_PLAN_V4_5_KAI_RECONCILIATION.md]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-09-30 · v4.5 "ACCEPTABLE FOR AN IMPLEMENTATION-AUTHORITY DECISION"; no implementation authority is created by the record ⚠ UNBANKED  [CONVERSATION 2026-09-30 Kai via Dainius] [FILE kai-pm/D379_PLAN_V4_5_KAI_RECONCILIATION.md:1]
+
+### 3. Authorised / Held / Forbidden
+
+- DONE: verbatim preservation of the three v4.5 records, as a commit separate from G  [GIT cb4d986]
+- HELD: R, the repair branch, E7a, CPython builds, B4 mutation, F, capture — until Dainius's explicit grant  [FILE kai-pm/D379_PLAN_V4_5_KAI_RECONCILIATION.md]
+- FORBIDDEN: production Stage A, candidate, holdout, blind 40, PR #122 merge; merging this handoff branch into the repair branch  [D387]
+
+### 4. Open questions
+
+- Kai verifies the saved bytes against what was supplied: sha256 v4.5 plan f1cf053f…5278, DeepSeek 4aec8fbc…0729, Kai 7aa04492…0e6d (full values in commit cb4d986) — owner: Kai  [GIT cb4d986]
+- Then: Dainius's implementation-authority decision on v4.5 — owner: Dainius  [FILE kai-pm/D379_PLAN_V4_5_KAI_RECONCILIATION.md]
+
+### 5. Incidents and corrections
+
+- Two marker mismatches caught before writing. "D379 REPAIR PLAN v4.5" also occurs inside "END OF …", and the Kai title reads "… OF D379 REPAIR PLAN v4.5". Both were resolved by whole-line matching with uniqueness asserted, not by guessing  [CMD `whole-line marker scan` → each boundary unique]
+
+### 6. Next authorised step
+
+- None for Orion beyond reporting. Kai verifies the hashes; Dainius decides implementation authority  [CONVERSATION 2026-09-30 Kai via Dainius, "Only after that should we discuss your implementation-authority questions"]
+
+### 7. What I am unsure of
+
+- The texts' fidelity to Kai's own originals rests on Dainius's paste; Orion verified saved == supplied, not supplied == Kai's source  [CONVERSATION 2026-09-30 Dainius]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
+python3 -B .claude/skills/kai-handoff/handoff.py due
