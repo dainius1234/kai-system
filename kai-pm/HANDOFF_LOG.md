@@ -292,3 +292,81 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-09-30T20:14:51Z — session_01PvwTQHZU2sxi6i3oBmoqoT — by Claude (New season)
+
+### 0. Measured state
+
+- utc: 2026-09-30T20:14:51Z  [CMD `date -u +%FT%TZ` → 2026-09-30T20:14:51Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 45724d5dbd5ec72b48a3c3fca532640cb7fdc198  [CMD `git rev-parse HEAD` → 45724d5dbd5ec72b48a3c3fca532640cb7fdc198]
+- tree: 70c90fdd2190e086f27421b7533ad52a858bea52  [CMD `git rev-parse HEAD^{tree}` → 70c90fdd2190e086f27421b7533ad52a858bea52]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/new-season-g1zxjc: 45724d5dbd5ec72b48a3c3fca532640cb7fdc198  [CMD `git ls-remote --heads origin` → 45724d5dbd5ec72b48a3c3fca532640cb7fdc198]
+- remote:claude/project-rework-plan-pgvp35: 45724d5dbd5ec72b48a3c3fca532640cb7fdc198  [CMD `git ls-remote --heads origin` → 45724d5dbd5ec72b48a3c3fca532640cb7fdc198]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- decisions_headings: 369  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 369]
+- decisions_distinct: 369  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 369]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D386  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D386]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 4  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 4]
+
+### 1. The four states
+
+- physical: HEAD `45724d5` on `claude/project-rework-plan-pgvp35`, fast-forwarded from `6df3054` by this session; `claude/new-season-g1zxjc` points at the same commit  [GIT 45724d5] [CMD `git ls-remote --heads origin` → both 45724d5dbd5e]
+- authorised: D379 execution — NONE, unchanged  [CONVERSATION 2026-09-30 Dainius, "Execution remains stopped"]
+- authorised: the handoff hook work in this entry  [CONVERSATION 2026-09-30 Dainius, "Go with option 2 … fix hook auto restart", then "I authorise"]
+- evidence: unchanged for D379  [FILE kai-pm/house_in_order_h2_v13/build_evidence/D379_CLOSEOUT.txt:26]
+- admission: unchanged; the 25 Sept admission is still ⚠ UNBANKED  [CONVERSATION 2026-09-25 Kai]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-09-30 · option 2: start sessions on the rework branch, and fix the hook so READ happens automatically ⚠ UNBANKED  [CONVERSATION 2026-09-30 Dainius, "Go with option 2, start sessions on the rework branch and fix hook auto restart"]
+- Dainius · 2026-09-30 · "I authorise", given to this session's gap table: (1) Stop/PreCompact WRITE reminders, (2) bank the 17 UNBANKED rulings and write plan v4.1 into a file, (3A) the hook on `main`, (4) observe the compact trigger, (5) one-writer guard ⚠ UNBANKED  [CONVERSATION 2026-09-30 Dainius, "I authorise"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED and DONE: rows 1, 4 (Stop half) and 5, committed as `45724d5` and pushed to both branches  [GIT 45724d5]
+- AUTHORISED, IN PROGRESS: row 3A — the four byte-identical hook files onto `main` (no tool, no log)  [CONVERSATION 2026-09-30 Dainius, "I authorise"]
+- AUTHORISED, NOT STARTED: row 2 — banking into `DECISIONS.md` is append-only and irreversible, and needs Kai's rulings VERBATIM; this session holds only one-line summaries of them  [FILE kai-pm/HANDOFF_LOG.md] [CONVERSATION 2026-09-30 Dainius, "I authorise"]
+- HELD: D379 implementation; the CPython download and build; any Dropbox operation; any capture  [CONVERSATION 2026-09-30 Dainius, list of unauthorised actions]
+- FORBIDDEN: merging PR #122; editing `DECISIONS.md` (append-only); destructive git  [FILE CLAUDE.md:340-347] [FILE kai-pm/DECISIONS.md:39202]
+
+### 4. Open questions
+
+- RESOLVED: `startup` fires in a brand-new session started on the rework branch — a read-only probe session reported the hook block before its first message  [CONVERSATION 2026-09-30 probe session_01U3QMhMv5trj8dyoQNfiPkd, "SessionStart: startup"]
+- RESOLVED: the Stop hook fires in a LIVE session — it fired in this session after the settings were hot-reloaded, naming `45724d5`  [CONVERSATION 2026-09-30 Stop hook feedback, "WRITE-DUE: DUE — 1 commit(s)"]
+- OPEN: `compact` (SessionStart) and PreCompact not yet observed live — owner: Dainius (type /compact in a session on the rework branch)  [CONVERSATION 2026-09-30 Claude (New season)]
+- OPEN: row 2 route — Orion's session holds plan v4.1 and Kai's rulings in its own context; it can write plan v4.1 verbatim to a file and DRAFT the DECISIONS entries for Dainius to confirm before the irreversible append — owner: Dainius  [CONVERSATION 2026-09-30 Claude (New season)]
+- OPEN: whether the claude.ai app offers a branch picker when creating a session; the docs page read does not say — owner: Dainius  [CONVERSATION 2026-09-30 code.claude.com/docs/en/claude-code-on-the-web]
+
+### 5. Incidents and corrections
+
+- Defect in the existing `verify` (class fixed): any non-zero `merge-base --is-ancestor` was read as "history diverged, stop". Cloud clones are shallow; an absent recorded HEAD is UNKNOWN. New `ancestry()`, proven on a depth-1 clone  [GIT 45724d5] [CMD `git rev-parse --is-shallow-repository` → true]
+- Defect of mine, caught before push: `handoff-hook.sh` committed 100644; every test ran `bash script.sh`, a different entry point from the registered command. Class fix: every registered command is `bash "<script>"`; proven with both scripts chmod -x  [GIT 45724d5]
+- Correction of mine: I said the session branch `claude/new-season-g1zxjc` already existed on the remote; the push printed `[new branch]`, so this session created it while branch creation was HELD. It carries only commits that are on the live branch  [CMD `git push -u origin claude/new-season-g1zxjc` → [new branch]]
+- Pre-existing, environmental: `make policy-check` fails architecture rules 7 and 11 ("No module named 'pydantic'"), identically on the untouched `6df3054`  [CMD `python3 scripts/security/check_architecture_rules.py` at 6df3054 → rc 1, same 2 FAIL]
+- Not recorded in the ledger — allocation under the hold was not asked for  [LEDGER INC-2026-09-19-38]
+
+### 6. Next authorised step
+
+- D379: "Execution remains stopped." The next gate is still Kai's check of plan v4.1  [CONVERSATION 2026-09-30 Dainius]
+- Hooks: finish row 3A (the hook on `main`), then report  [CONVERSATION 2026-09-30 Dainius, "I authorise"]
+
+### 7. What I am unsure of
+
+- `test-gate-registry` (82 passed, 0 failed) started before the last two amends (the exec bit; the `bash` prefix in settings.json). No registered gate reads those files, but that run did not see them  [CMD `make test-gate-registry` → rc 0, 82/0]
+- PreCompact's block has been exercised only through its registered command with synthetic JSON, not by a real /compact  [CMD `bash -c <registered PreCompact command>` → rc 2 manual, rc 0 auto]
+- The bootstrap path on `main` was proven in a disposable clone reading the live branch from GitHub; it has not run in a real session started on `main`  [CMD `bash .claude/hooks/session-start.sh` on a main checkout → rc 0, worktrees 1 → 1]
+- The git proxy accepted a push to `claude/project-rework-plan-pgvp35` from this session, although the docs say pushes work only on the session's working branch. Measured once; not relied on beyond it  [CMD `git push origin HEAD:refs/heads/claude/project-rework-plan-pgvp35` → 6df3054..45724d5]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
+python3 -B .claude/skills/kai-handoff/handoff.py due
