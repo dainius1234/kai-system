@@ -5,6 +5,18 @@ Every rule here exists because it was broken, and the incident is named
 so the rule is not mistaken for taste. The long form is in
 `kai-pm/ORION_FIELD_NOTES.md`; this file is the part that binds.
 
+**Session start — before any other work:** run the `kai-handoff` READ
+mode (`python3 -B .claude/skills/kai-handoff/handoff.py verify`, then
+read the last entry of `kai-pm/HANDOFF_LOG.md`) and report its
+differences, `⚠ UNBANKED` rulings and next authorised step. **Before a
+session ends or its context is compressed, and after any consequential
+ruling:** run WRITE mode (`.claude/skills/kai-handoff/SKILL.md`). The log
+is non-authoritative working memory with sources. It grants nothing, and
+it exists because a ruling made only in conversation was reversed on
+repository silence (the 2026-09-25 admission; a later cold-start thread
+reversed it; Kai withdrew that reversal on 2026-09-30).
+*Directed by Dainius, 2026-09-30.*
+
 ---
 
 ## R0. Stop signals — the tells, in one place
@@ -588,6 +600,7 @@ outlives the investigation that produced it.
 | `kai-pm/ORION_FIELD_NOTES.md` | **NON-AUTHORITATIVE WORKING MEMORY** — defect shapes, my failure modes and the tell for each. Creates no programme state, authority, acceptance criteria, closure or permission; a decision may cite it as a pointer but must re-earn the original evidence |
 | `kai-pm/FAILURE_PATTERN_LEDGER.md` | **AUTHORITATIVE, APPEND-ONLY** — verified incidents and confirmed failure mechanisms, with the control state of each. Consult it *before* consequential work (R18), not after. Distinct from the field notes: this one is governed |
 | `kai-pm/NEXT_STINT_PLAN.md` | current plan of work and its ordering |
+| `kai-pm/HANDOFF_LOG.md` | **NON-AUTHORITATIVE, APPEND-ONLY** session handoffs: measured state, sourced claims, and rulings marked `⚠ UNBANKED` until banked. Read and written with `.claude/skills/kai-handoff/` (`handoff.py verify` · `check` · `measure` · `selftest`) |
 | `scripts/security/` | the gates; `check_gate_registry.py --gate` audits them |
 
 ## Facts about this system worth not re-deriving

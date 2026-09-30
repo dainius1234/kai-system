@@ -102,3 +102,64 @@ Never edit or delete an entry. A correction is a new entry.
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-09-30T18:41:45Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-09-30T18:41:45Z  [CMD `date -u +%FT%TZ` → 2026-09-30T18:41:45Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 7123ec2211ec2c70e531c070351bc1cfde05e1ff  [CMD `git rev-parse HEAD` → 7123ec2211ec2c70e531c070351bc1cfde05e1ff]
+- tree: 5a92a278e507e688bff3fd4699b00066f9aa7a7e  [CMD `git rev-parse HEAD^{tree}` → 5a92a278e507e688bff3fd4699b00066f9aa7a7e]
+- uncommitted_paths: 1  [CMD `git status --porcelain | count lines` → 1]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 7123ec2211ec2c70e531c070351bc1cfde05e1ff  [CMD `git ls-remote --heads origin` → 7123ec2211ec2c70e531c070351bc1cfde05e1ff]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- decisions_headings: 369  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 369]
+- decisions_distinct: 369  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 369]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D386  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D386]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 1  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 1]
+
+### 1. The four states
+
+- physical: HEAD `7123ec2` (the kai-handoff commit), with the CLAUDE.md pointer uncommitted at measurement time  [GIT 7123ec2]
+- authorised: D379 execution — NONE, unchanged since the previous entry  [CONVERSATION 2026-09-30 Dainius, "Execution remains stopped"]
+- evidence: unchanged since the previous entry  [FILE kai-pm/house_in_order_h2_v13/build_evidence/D379_CLOSEOUT.txt:26]
+- admission: unchanged since the previous entry; the 25 Sept admission is still ⚠ UNBANKED  [CONVERSATION 2026-09-25 Kai]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-09-30 · add the kai-handoff pointer to CLAUDE.md ⚠ UNBANKED  [CONVERSATION 2026-09-30 Dainius, "add the pointer to CLAUDE.md"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: the CLAUDE.md pointer (a session-start line and one row in "Where things are"), committed to `claude/project-rework-plan-pgvp35`  [CONVERSATION 2026-09-30 Dainius]
+- HELD and FORBIDDEN: unchanged from the previous entry  [CONVERSATION 2026-09-30 Dainius]
+
+### 4. Open questions
+
+- RESOLVED from the previous entry: "add a CLAUDE.md pointer" — now done  [FILE CLAUDE.md:8-18]
+- All other open questions carry forward unchanged from the previous entry — owners as listed there  [CONVERSATION 2026-09-30 Orion]
+
+### 5. Incidents and corrections
+
+- The 7123ec2 commit message first said "14 known-positives". The measured count is 16 (12 check-rule cases plus 4 malformed tags); corrected before the push, with the tree hash unchanged  [GIT 7123ec2] [CMD `handoff.py selftest | count POS` → 16]
+
+### 6. Next authorised step
+
+- D379: "Execution remains stopped." The next gate is still Kai's check of plan v4.1  [CONVERSATION 2026-09-30 Dainius]
+
+### 7. What I am unsure of
+
+- Automatic discovery: during this session the harness listed `kai-handoff` among the available skills after 7123ec2. That shows discovery in a live session; a brand-new session has not yet been observed  [CONVERSATION 2026-09-30 harness skill list]
+- The CLAUDE.md pointer tells a session to run READ mode. Nothing enforces it; only a SessionStart hook would, and none is configured  [FILE CLAUDE.md:8-18]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
