@@ -340,8 +340,9 @@ findings of "Kai's 30 September adjudication". Findings verbatim:
 > 8. KAI‑V4‑08 — MAJOR: Authority calibration proves mapping completeness, but not that each authority mapping is correct.
 
 **Consequence.** Plan v4.1 (`kai-pm/D379_PLAN_V4_1.md`) was written in
-response. Kai has not yet checked v4.1, and DeepSeek has not attacked it.
-D379 execution remains stopped.
+response.
+
+At the time of these KAI-V4-01…08 findings, plan v4 was returned for revision and the resulting v4.1 had not yet completed Kai/DeepSeek review. This entry banks the historical findings only; it does not describe the later repair-plan review state. D379 execution remained stopped under that ruling.
 
 ### E.4 — Verification record
 

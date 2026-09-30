@@ -648,3 +648,68 @@ python3 -B .claude/skills/kai-handoff/handoff.py due
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
 python3 -B .claude/skills/kai-handoff/handoff.py due
+
+## HANDOFF 2026-09-30T20:58:09Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-09-30T20:58:09Z  [CMD `date -u +%FT%TZ` → 2026-09-30T20:58:09Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: f462502225355d7d0ee6d428ea3e852965d26455  [CMD `git rev-parse HEAD` → f462502225355d7d0ee6d428ea3e852965d26455]
+- tree: 142606c4dab72a8748595dc7207a96bf6a84b42a  [CMD `git rev-parse HEAD^{tree}` → 142606c4dab72a8748595dc7207a96bf6a84b42a]
+- uncommitted_paths: 1  [CMD `git status --porcelain | count lines` → 1]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/project-rework-plan-pgvp35: f462502225355d7d0ee6d428ea3e852965d26455  [CMD `git ls-remote --heads origin` → f462502225355d7d0ee6d428ea3e852965d26455]
+- decisions_headings: 369  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 369]
+- decisions_distinct: 369  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 369]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D386  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D386]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 9  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 9]
+
+### 1. The four states
+
+- physical: HEAD `f462502`; the E.3 correction is uncommitted at measurement time  [GIT f462502]
+- authorised: D379 execution — NONE; the DECISIONS.md append is NOT yet authorised  [CONVERSATION 2026-09-30 Kai via Dainius, "Do not append to DECISIONS.md yet."]
+- evidence: E.3's stale present-tense line is replaced with Kai's historical wording; 14 of 14 spans still verbatim  [FILE kai-pm/DECISIONS_DRAFT_UNBANKED.md]
+- admission: unchanged; ⚠ UNBANKED pending the append  [CONVERSATION 2026-09-25 Kai]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-09-30 · the three-entry banking structure is accepted in principle; one correction to E.3; append all three in one governance commit G after re-deriving the allocator (never assume D387–D389); DECISIONS.md is the only changed file, additions only; the repair branch starts from eb52f73 and its first commit R replays G, with diff(G^,G) == diff(R^,R); no merge from the handoff branch ⚠ UNBANKED  [CONVERSATION 2026-09-30 Kai, relayed by Dainius, "Your three-entry banking structure is accepted in principle"]
+- Kai · 2026-09-30 · states that v4.1 was recovered and checked, that plans progressed v4.2 → v4.5, and that DeepSeek returned "NO DESIGN BLOCKER FOUND" on v4.5 ⚠ UNBANKED  [CONVERSATION 2026-09-30 Kai, relayed by Dainius]
+
+### 3. Authorised / Held / Forbidden
+
+- DONE: the E.3 correction, exactly as worded by Kai  [FILE kai-pm/DECISIONS_DRAFT_UNBANKED.md]
+- HELD: the append (commit G) until Dainius says "confirmed, append"; v4.5 implementation until Dainius grants it  [CONVERSATION 2026-09-30 Kai via Dainius]
+- FORBIDDEN: merging the handoff branch into the repair branch; production Stage A, candidate, holdout, blind 40, capture, PR #122 merge  [CONVERSATION 2026-09-30 Kai via Dainius]
+
+### 4. Open questions
+
+- v4.2–v4.5 and DeepSeek's v4.5 result are not in the repository: `git grep -i 'v4\.[2-5]'` over kai-pm finds 0 files. Unless v4.5 is written to a file before implementation, it is the same continuity risk that v4.1 carried — owner: Dainius / Kai  [CMD `git grep -c -i -E 'v4\.[2-5]\b' origin/claude/project-rework-plan-pgvp35 -- kai-pm` → 0 files]
+
+### 5. Incidents and corrections
+
+- A stale present-tense claim in the candidate E.3 was caught by Kai before the append; fixed. No recurrence elsewhere in E.1–E.3 (present-tense status phrase scan → none)  [FILE kai-pm/DECISIONS_DRAFT_UNBANKED.md]
+
+### 6. Next authorised step
+
+- Dainius: "confirmed, append" → allocator re-derived → one governance commit G, DECISIONS.md only, additions only  [CONVERSATION 2026-09-30 Kai via Dainius]
+
+### 7. What I am unsure of
+
+- Kai's statements about v4.2–v4.5 and DeepSeek's v4.5 verdict are relayed; Orion has not seen those texts  [CONVERSATION 2026-09-30 Kai, relayed by Dainius]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
+python3 -B .claude/skills/kai-handoff/handoff.py due
