@@ -70,6 +70,7 @@ check before continuing.
 | The same rule has been broken again and I am about to restate it | R18 — do not reissue the reminder. Test whether the **control** failed |
 | I corrected it and am about to move on | R18 — if it was consequential, record the incident and check for recurrence first |
 | I am calling two mistakes the same pattern because they look alike | R18 / doctrine 37 — that is a locator. The mechanism has to be earned |
+| A ruling, plan or result exists only in this conversation, or a reset or session end is near | R19 — the repository is the memory. WRITE it (handoff log, banked or `⚠ UNBANKED`), commit and push before anything else |
 
 **The trigger is speed, not ignorance.** Every R1 breach on 2026-08-07
 happened while moving fast — a hard-coded image name, a guessed job id,
@@ -586,6 +587,43 @@ cited, and one of them quoted in the message that broke it.
 > rule 49. His instruction, which is the one to keep: *make the lesson
 > part of the engineering system so none of us has to remember to be
 > good at it next time.*
+
+## R19. The repository is the memory. Continuity is a prerequisite, not a repair. Directed by Dainius, 2026-09-30
+
+**Nothing that must outlive this conversation may live only in it.** A
+conversation is compressed, reset and cold-started; a model does not carry
+memory between threads. The only durable memory is Git: committed, pushed,
+and read back at the next start.
+
+* **Before work begins on any new project or stint, the continuity machinery
+  exists first:** a sourced, append-only handoff log, a READ step that runs
+  automatically at every session start, resume and compaction, and a WRITE
+  step. In this repository that is `.claude/skills/kai-handoff/`,
+  `.claude/hooks/` and `kai-pm/HANDOFF_LOG.md`. It is not optional tooling
+  to add later.
+* **A consequential ruling is not safe until it is in the repository.**
+  Until it is banked in `DECISIONS.md`, it is recorded in the handoff log
+  as `⚠ UNBANKED`, word for word, with its source and date.
+* **Plans, reviews and texts the programme depends on are preserved
+  byte for byte** in the repository and mechanically verified, not kept in
+  chat or retyped from memory.
+* **If you raise it, write it before the break.** When a reset or the
+  end of a session is near, run WRITE first. "Carried forward" means
+  committed and pushed.
+
+Earned over weeks, and named plainly: the "carry forward" list of
+2026-08-12 that existed nowhere (R1); hand-written field notes that went
+stale ("370" for 369); and the 2026-09-25 admission, made only in
+conversation, that a cold-started thread reversed on repository silence
+(D387). Each was fixed as an instance. The mechanism — **memory held
+anywhere but the repository** — stayed live until the machinery above was
+built on 2026-09-30. Orion should have proposed it long before (R12); the
+operator had to ask.
+
+> **Provenance:** directed by Dainius on 2026-09-30 ("do it as last task"),
+> after the kai-handoff machinery was built and the continuity record
+> banked as D387–D389. His words: *"it always should have been a pre
+> requisite."* Recorded rather than self-adopted.
 
 The full doctrine this serves, its standing rules and the specific
 failure that earned each one, is in `kai-pm/ENGINEERING_DOCTRINE.md`.

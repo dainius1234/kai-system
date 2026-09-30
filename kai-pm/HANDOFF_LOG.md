@@ -913,3 +913,67 @@ python3 -B .claude/skills/kai-handoff/handoff.py due
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
 python3 -B .claude/skills/kai-handoff/handoff.py due
+
+## HANDOFF 2026-09-30T21:24:03Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-09-30T21:24:03Z  [CMD `date -u +%FT%TZ` → 2026-09-30T21:24:03Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 962ef6b67433e15678dd6ceb562a5a3d49669a1e  [CMD `git rev-parse HEAD` → 962ef6b67433e15678dd6ceb562a5a3d49669a1e]
+- tree: 397e0fd9dc0cf6c66198781c0ee058c4e72bfa69  [CMD `git rev-parse HEAD^{tree}` → 397e0fd9dc0cf6c66198781c0ee058c4e72bfa69]
+- uncommitted_paths: 1  [CMD `git status --porcelain | count lines` → 1]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 962ef6b67433e15678dd6ceb562a5a3d49669a1e  [CMD `git ls-remote --heads origin` → 962ef6b67433e15678dd6ceb562a5a3d49669a1e]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- decisions_headings: 372  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 372]
+- decisions_distinct: 372  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 372]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D389  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D389]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 13  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 13]
+
+### 1. The four states
+
+- physical: HEAD `962ef6b`; the CLAUDE.md R19 addition is uncommitted at measurement time (+38/−0)  [GIT 962ef6b]
+- authorised: D379 implementation — NONE, unchanged  [FILE kai-pm/D379_PLAN_V4_5_KAI_RECONCILIATION.md]
+- evidence: CLAUDE.md gains R19 ("The repository is the memory") and one R0 tell row; doctrine-integrity PASS; check-docs output identical to before  [FILE CLAUDE.md:591]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-09-30 · make repository-held continuity a documented prerequisite, as the last task before the credit reset ⚠ UNBANKED  [CONVERSATION 2026-09-30 Dainius, "it always should have been a pre requisite" and "Ok Orion do it as last task"]
+
+### 3. Authorised / Held / Forbidden
+
+- DONE: R19 in CLAUDE.md, plus the R0 tell row  [FILE CLAUDE.md:591]
+- HELD: all D379 technical work until Dainius's grant, after his questions  [FILE kai-pm/D379_PLAN_V4_5_KAI_RECONCILIATION.md]
+
+### 4. Open questions
+
+- Whether R19 also enters kai-pm/ENGINEERING_DOCTRINE.md as a numbered doctrine rule (a governed file with its own provenance gate). Not done — owner: Dainius  [FILE kai-pm/ENGINEERING_DOCTRINE.md]
+- Carried from entry 13: Dainius's questions on v4.5, then the grant scope, network isolation, Dropbox E7a, checkpoints, housekeeping — owner: Dainius  [CONVERSATION 2026-09-30 Orion]
+
+### 5. Incidents and corrections
+
+- R19 names Orion's own omission: the repository-as-memory route should have been proposed long before (R12)  [FILE CLAUDE.md:591]
+
+### 6. Next authorised step
+
+- PAUSE for the credit reset. On resume: READ (automatic), then Dainius's questions on v4.5. No D379 technical work without his grant  [CONVERSATION 2026-09-30 Dainius, "we'll wait after for credit reset"]
+
+### 7. What I am unsure of
+
+- None beyond entry 13 §7  [GIT 962ef6b]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
+python3 -B .claude/skills/kai-handoff/handoff.py due
