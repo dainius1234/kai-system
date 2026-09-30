@@ -440,3 +440,79 @@ python3 -B .claude/skills/kai-handoff/handoff.py due
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
 python3 -B .claude/skills/kai-handoff/handoff.py due
+
+## HANDOFF 2026-09-30T20:44:25Z — session_01PvwTQHZU2sxi6i3oBmoqoT — by Claude (New season)
+
+### 0. Measured state
+
+- utc: 2026-09-30T20:44:25Z  [CMD `date -u +%FT%TZ` → 2026-09-30T20:44:25Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 3feea9e183ef68918001654d3f9045c0c2e8d5a9  [CMD `git rev-parse HEAD` → 3feea9e183ef68918001654d3f9045c0c2e8d5a9]
+- tree: 824377f2f5cd94205bd428d8ca719d6732f32404  [CMD `git rev-parse HEAD^{tree}` → 824377f2f5cd94205bd428d8ca719d6732f32404]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 3feea9e183ef68918001654d3f9045c0c2e8d5a9  [CMD `git ls-remote --heads origin` → 3feea9e183ef68918001654d3f9045c0c2e8d5a9]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- decisions_headings: 369  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 369]
+- decisions_distinct: 369  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 369]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D386  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D386]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 6  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 6]
+
+### 1. The four states
+
+- physical: HEAD `3feea9e` on the live branch (Orion's MAJOR fixed); this session stops after this entry  [GIT 3feea9e]
+- authorised: D379 execution — NONE, unchanged  [CONVERSATION 2026-09-30 Dainius, "Execution remains stopped"]
+- evidence: `main`'s own python-app is RED today on its exact commit `194db0a`: "Cross-file test isolation (A-05)", `scripts/test_audio_transcribe.py: added 0 -> 1`, inspected 44 files (0 replaced, 44 added, 36 env). The same commit was green on 2026-08-07  [CMD `python-app run 36773057632 on claude/main-baseline-probe` → failure, same step and file]
+- admission: unchanged; the 25 Sept admission is still ⚠ UNBANKED, drafted in Orion's file  [CONVERSATION 2026-09-25 Kai] [FILE kai-pm/DECISIONS_DRAFT_UNBANKED.md]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-09-30 · verbatim, his messages to this session in order (for draft C1–C2): "New season" · "Go with option 2, start sessions on the rework branch and fix hook auto restart" · "So  is it best you can do and is it all avenues explored to make sure hook works and you got long term memory" · "I authorise" · "Yes, send Orion the row 2 request" ⚠ UNBANKED  [CONVERSATION 2026-09-30 Dainius, messages to session_01PvwTQHZU2sxi6i3oBmoqoT]
+- Dainius · 2026-09-30 · handover: this session fixes the MAJOR, supplies the quotes above, finishes or closes PR #123, writes this entry, then STOPS; Orion continues all other work; one session per branch at a time ⚠ UNBANKED  [CONVERSATION 2026-09-30 Dainius, "Orion continues all other work" and "one session per branch at a time"]
+
+### 3. Authorised / Held / Forbidden
+
+- DONE: Orion's MAJOR fixed (`--depth` only on an already-shallow clone), with the two MINORs addressed  [GIT 3feea9e]
+- DONE: PR #123 CLOSED, not merged. Its branch `claude/handoff-hook-main` carries the fix (`011c29e`), byte- and mode-identical to `3feea9e`, so it can be reopened  [CMD `update_pull_request state=closed` → #123 closed] [GIT 011c29e]
+- HELD, for Orion and Dainius: `main`'s CI red (baseline update with a stated reason, or pinning CI dependencies), then the hook onto `main`  [CONVERSATION 2026-09-30 Dainius, "Orion continues all other work"]
+- HELD: any append to `DECISIONS.md`; D379 execution; Dropbox; capture  [CONVERSATION 2026-09-30 Dainius]
+- FORBIDDEN: merging PR #122  [FILE kai-pm/DECISIONS.md:39202]
+
+### 4. Open questions
+
+- Which fix for `main`'s red isolation ratchet: a `make test-isolation-baseline` commit with a reason, or pinned CI dependencies — owner: Dainius  [CMD `python-app run 36773057632` → A-05 failure on 194db0a]
+- Delete the probe branch `claude/main-baseline-probe` (it is `194db0a`, no new commits) and `claude/new-season-g1zxjc` (at a9b2693, all of it on the live branch; not updated past a9b2693 because a push to it was refused) — owner: Dainius  [CMD `git ls-remote --heads origin` → both present]
+- Archive this session after reading this entry — owner: Dainius  [CONVERSATION 2026-09-30 Dainius, "Archive it later, and only once it has handed over two things"]
+- `compact` (SessionStart) and PreCompact still not observed live — owner: Dainius  [CONVERSATION 2026-09-30 Claude (New season)]
+
+### 5. Incidents and corrections
+
+- Orion's MAJOR, reproduced before fixing (R16): a full synthetic clone went shallow=false → true and 60 → 50 commits under `git fetch --depth=50`; after the fix a full clone stays at 61 commits and not shallow, READ still runs, worktrees 1 → 1  [GIT 3feea9e] [CMD `git fetch --depth=50` on a full clone → shallow=true, 60 → 50]
+- Disputed MINOR, resolved by quoting the source: the hooks docs DO state the failure, conditionally — "If compaction was triggered to recover from a context-limit error already returned by the API, the underlying error surfaces and the current request fails." My earlier wording was wider than that condition; now it quotes it  [CMD `curl code.claude.com/docs/en/hooks.md` → line 3066]
+- An error of mine, stopped by the permission classifier: I chained a `git push -f` to my session branch although a plain fast-forward would have done; the whole command was refused and nothing ran. That branch is left for Dainius  [CMD `git status --porcelain; grep -c '^## HANDOFF '` → clean, 6 entries]
+- Live observation: `due` counted `3feea9e` and excluded Orion's `2817bd8` (a log-writing commit), as designed  [CMD `handoff.py due` → DUE, 1 commit, 3feea9e]
+- Live observation: the new `session-start.sh` fired on `resume` twice in this session, including after a fresh VM restore  [CONVERSATION 2026-09-30 SessionStart:resume hook output]
+
+### 6. Next authorised step
+
+- This session: none; it stops after this entry  [CONVERSATION 2026-09-30 Dainius, "write your handoff entry, then stop"]
+- Orion: Dainius's ruling-by-ruling decision on the banking draft, then plan v4.1 to Kai, then DeepSeek; D379 only after that  [CONVERSATION 2026-09-30 Dainius, Step 5 of the handover]
+
+### 7. What I am unsure of
+
+- The quotes in section 2 are copied from this session's own context; their exact send timestamps are not held here, only the date  [CONVERSATION 2026-09-30 Dainius]
+- The package or version that makes `test_audio_transcribe.py` add a module is not identified: the CI run uploads no isolation report artifact  [CMD `list_workflow_run_artifacts 36771454598` → total_count 0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
+python3 -B .claude/skills/kai-handoff/handoff.py due
