@@ -8,9 +8,12 @@
 #   stop        adds Stop-hook feedback ONCE per HEAD; never inside its own
 #               continuation (stop_hook_active), so it cannot loop
 #   precompact  blocks a MANUAL /compact ONCE per HEAD (a second /compact
-#               proceeds). An AUTO compaction is NEVER blocked: the hooks
-#               docs state that blocking it at the context limit makes the
-#               request fail. SessionStart:compact reports WRITE-DUE after.
+#               proceeds). An AUTO compaction is NEVER blocked. The hooks
+#               docs: "If compaction was triggered to recover from a
+#               context-limit error already returned by the API, the
+#               underlying error surfaces and the current request fails."
+#               A hook cannot tell that case from a proactive one, so it
+#               never blocks auto. SessionStart:compact reports WRITE-DUE.
 #
 # Blind spot, stated: a ruling made only in conversation leaves no trace
 # in Git. This hook cannot see it.
