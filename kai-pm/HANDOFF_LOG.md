@@ -1601,3 +1601,68 @@ X
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-01T17:17:34Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-01T17:17:34Z  [CMD `date -u +%FT%TZ` → 2026-10-01T17:17:34Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 55962cc2d7b65a134818625ee8f1f877af754040  [CMD `git rev-parse HEAD` → 55962cc2d7b65a134818625ee8f1f877af754040]
+- tree: 8110eb596b3327cd4223bf8432d9fa2885431826  [CMD `git rev-parse HEAD^{tree}` → 8110eb596b3327cd4223bf8432d9fa2885431826]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 55962cc2d7b65a134818625ee8f1f877af754040  [CMD `git ls-remote --heads origin` → 55962cc2d7b65a134818625ee8f1f877af754040]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d08f3ec5de4d823011e66261c84c98a76371428e  [CMD `git ls-remote --heads origin` → d08f3ec5de4d823011e66261c84c98a76371428e]
+- decisions_headings: 372  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 372]
+- decisions_distinct: 372  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 372]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D389  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D389]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 19  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 19]
+
+### 1. The four states
+
+- physical: repair branch d08f3ec unchanged; builds 0; Dropbox writes 0; E7a not run  [CMD `git ls-remote --heads origin claude/d379-repair-eb52f73` → d08f3ec5de4d]
+- authorised: as entry 19; Kai: "No further Kai design ruling required now."  [CONVERSATION 2026-10-01 Kai, "So there is no further Kai design ruling required now."]
+- evidence: Kai independently checked 55962cc (entry 19 appends only, records the authority and three corrections)  [CONVERSATION 2026-10-01 Kai, "I independently checked 55962cc2d7b65a134818625ee8f1f877af754040."]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-01 · token opacity, verbatim (transcribed from the conversation) ⚠ UNBANKED  [CONVERSATION 2026-10-01 Kai, "DROPBOX_ACCESS_TOKEN is opaque."]
+  DROPBOX_ACCESS_TOKEN is opaque. Do not parse it for expiry. If expiry metadata is explicitly supplied by the authorization mechanism, record that metadata; otherwise do not invent an expiry. Authentication failure during the authorised uninterrupted window is STOP.
+- Dainius · 2026-10-01 · commit this correction as entry 20 (R19), although Kai suggested no commit now ⚠ UNBANKED  [CONVERSATION 2026-10-01 Dainius, "Commit entry 20 (Recommended)"]
+
+### 3. Authorised / Held / Forbidden
+
+- NEXT, owner Dainius: provision the App Folder app + files.content.write + files.content.read, allowed domain content.dropboxapi.com only, secret DROPBOX_ACCESS_TOKEN generated immediately before the new session  [CONVERSATION 2026-10-01 Kai, "Next action: yours"]
+- Unchanged from entry 19: forbidden list and stop conditions  [CONVERSATION 2026-10-01 Dainius, "All existing stop conditions remain in force."]
+
+### 4. Open questions
+
+- None; "No more architecture discussion unless reality falsifies v4.5"  [CONVERSATION 2026-10-01 Kai, "After that: execute."]
+
+### 5. Incidents and corrections
+
+- CORRECTION to entry 19 §5: "measured from the token's own expiry" must not be read as decoding the token. Expiry is recorded only if the authorisation mechanism states it; authentication failure in the window is STOP  [CONVERSATION 2026-10-01 Kai, "Do not parse it for expiry."]
+
+### 6. Next authorised step
+
+- New session: recover → re-prove → E7a; only an actual E7a PASS opens the build gate  [CONVERSATION 2026-10-01 Kai, "In that new session Orion must recover → re-prove → E7a. Only an actual E7a PASS opens the build gate."]
+
+### 7. What I am unsure of
+
+- Nothing new beyond entries 18 and 19 §7  [GIT 55962cc2d7b65a134818625ee8f1f877af754040]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
