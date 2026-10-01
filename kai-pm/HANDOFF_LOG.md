@@ -1108,3 +1108,78 @@ python3 -B .claude/skills/kai-handoff/handoff.py due
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
 python3 -B .claude/skills/kai-handoff/handoff.py due
+
+## HANDOFF 2026-10-01T16:10:45Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-01T16:10:44Z  [CMD `date -u +%FT%TZ` → 2026-10-01T16:10:44Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 3e12faccfb86bf7ecfe4d950fabfd8ff7d1d81b7  [CMD `git rev-parse HEAD` → 3e12faccfb86bf7ecfe4d950fabfd8ff7d1d81b7]
+- tree: 6cf465a964b04e5db7f5c6f74c4a8d230e309d25  [CMD `git rev-parse HEAD^{tree}` → 6cf465a964b04e5db7f5c6f74c4a8d230e309d25]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/project-rework-plan-pgvp35: 3e12faccfb86bf7ecfe4d950fabfd8ff7d1d81b7  [CMD `git ls-remote --heads origin` → 3e12faccfb86bf7ecfe4d950fabfd8ff7d1d81b7]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d08f3ec5de4d823011e66261c84c98a76371428e  [CMD `git ls-remote --heads origin` → d08f3ec5de4d823011e66261c84c98a76371428e]
+- decisions_headings: 372  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 372]
+- decisions_distinct: 372  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 372]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D389  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D389]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 16  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 16]
+
+### 1. The four states
+
+- physical: repair branch `claude/d379-repair-eb52f73` unchanged at R `d08f3ec`; nothing built; build workspace `/home/user/d379-build` is untracked and ephemeral  [CMD `git ls-remote --heads origin claude/d379-repair-eb52f73` → d08f3ec5de4d]
+- authorised: the D379 v4.5 tranche, eb52f73 → F  [CONVERSATION 2026-10-01 Dainius, "I authorise:"]
+- evidence: MILESTONE 2 PARTIAL — network isolation PROVEN, CPython source identity VERIFIED, E derived; E7a NOT RUN (HOLD, section 3)  [CMD `netiso.sh python3 attack.py` → all BLOCKED]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- None  [CONVERSATION 2026-10-01 Dainius, "I authorise:"]
+
+### 3. Authorised / Held / Forbidden
+
+- DONE: M2 network isolation, CPython signed-source check, E fingerprint (section 5)  [CMD `env_fp.py` → E_SHA256 dc0e2884…7277]
+- HELD by Orion, pending Dainius/Kai: E7a and therefore both builds. The only Dropbox route makes the transcript bytes pass through the model's own output, and capacity T is bounded by model output size. Running E7a now would most likely end in S9 after the builds; every fix is a deviation from v4.5 §§26–28, which the grant returns to Dainius/Kai  [CONVERSATION 2026-10-01 Dainius, "Any v4.5 stop condition or required scope expansion stops execution and returns to Dainius/Kai."]
+- FORBIDDEN, unchanged: capture, production Stage A, candidate, holdout, blind 40, merge, out-of-scope mutation  [CONVERSATION 2026-10-01 Dainius, "I authorise:"]
+
+### 4. Open questions
+
+- E7a transport, owner Dainius/Kai. Option A (Orion recommends): the environment's network policy admits `content.dropboxapi.com` and `api.dropboxapi.com`, and a scoped Dropbox app token is provided as an environment secret. The upload is then mechanical, with `mode=add`, `autorename=false` (atomic create-if-absent) and download read-back; v4.5 is unchanged and Dropbox stays canonical. Cost: a Dainius settings action plus a token in the environment  [CMD `curl https://content.dropboxapi.com/` → proxy 403 on CONNECT]
+- Option B: the connector as-is. The model emits each transcript into `create_file`, and fidelity is checked mechanically against Dropbox's server-side size and `content_hash` (returned by `download_link`, recomputed locally). Fidelity is checkable, but T is small and unmeasured, and non-UTF-8 bytes need an envelope. A CPython build transcript larger than T means S9; splitting or compressing changes N=2 / "one complete transcript", which is a deviation  [FILE kai-pm/D379_PLAN_V4_5.md:1461]
+- Option C: a non-Dropbox canonical store. This conflicts with Kai's Dropbox choice and the ruling that size is no authority for committing logs  [FILE kai-pm/DECISIONS.md:39301]
+
+### 5. Incidents and corrections
+
+- Network isolation, wrapper `netiso.sh`: user+net+mount ns; empty tmpfs over /tmp and /run; nested user+mount ns locks those mounts. Known-positive outside: 8 distinct egress paths OPEN (proxy TCP, 1.1.1.1:443, DNS, both pathname unix sockets, both via /proc/<pid>/root, nsenter into outer netns). Known-negative inside: the same 8 BLOCKED, plus 2 umount attempts and the 102.sock re-check (11 BLOCKED lines); kernel ifaces ['lo']  [CMD `./netiso.sh python3 attack.py $$` → 11 BLOCKED lines]
+- Caught by R15, not shipped: plain `unshare --net` as root is ESCAPABLE — `nsenter -t <outer pid> -n` reached 1.1.1.1 from inside. My first escape test targeted pid 1, whose ns is unreadable even from outside, so its "denied" was uncalibrated; the control exposed it  [CMD `unshare --net nsenter -t 1301 -n …` → ESCAPED]
+- Socket-file population: 2 (`/tmp/cc-socks/102.sock` = Claude Code harness pid 102; `/run/sandbox-telemetry/ingest.sock` = sbx-telemetry-collector). 102.sock accepted unix connects from inside a plain user+net ns; protocol unknown (no SOCKS5 reply), so hidden rather than trusted  [CMD `find / -xdev -type s; find /tmp /run -type s` → 2]
+- Mount locking, calibrated with umount2(2): layer-1 only → umount /tmp and /run SUCCEEDED (102.sock visible again); full wrapper → EINVAL both, 102.sock not visible. umount(8) "not mounted" was an invalid test and is not counted  [CMD `um.py` → SUCCEEDED / EINVAL]
+- CPython v3.11.15: tag object 2323bfc7…5323, commit 2340a037…a312, tree 8c6959bc…cddd, all equal to §18. Signature VALIDSIG by signing subkey CFDCA245B1043CF2A5F97865FFE87404168BD847, primary-key fingerprint A035C8C19219BA821ECEA86B64E628F8D684696D == §18; tagger Pablo Galindo Salgado; signed 2026-03-03. Key from keyserver.ubuntu.com, sha256 e2df250d…5224 (keys.openpgp.org, github, python.org, pgp.mit.edu refused by proxy). Known-negative: payload altered one byte → BADSIG  [CMD `git verify-tag --raw v3.11.15` → VALIDSIG … A035C8C19219BA821ECEA86B64E628F8D684696D]
+- E (v4.5 §19), instrument `env_fp.py`: gcc 13.3.0 (Ubuntu 13.3.0-6ubuntu2~24.04.1), binutils 2.42 (as, ld.bfd, ar), make 4.3, glibc 2.39-0ubuntu8.7, kernel 6.18.44-fc-v50, prefix /opt/d379-py311, configure `--prefix=/opt/d379-py311 --without-ensurepip`; E_SHA256 dc0e28845af62511aad0f20e1044fcbe5618ace3a8b25edcccb957dd67c27277, identical on two runs. Known-negatives: CFLAGS=-O0 → 5286cf5c…; PATH changed → d3592701…  [CMD `python3 env_fp.py | tail -1` → E_SHA256 dc0e2884…7277]
+- Dropbox measurements: connector account = Dainius's personal account (root ns 862708159); `create_file` takes inline UTF-8 text only; `fetch` returns extracted text ≤ 5 MiB; all four Dropbox hosts are refused by the egress gateway (403 on CONNECT). No Dropbox write was made  [CMD `curl -w %{http_code} https://{content,api}.dropboxapi.com/ …` → 000, proxy log 403]
+
+### 6. Next authorised step
+
+- HOLD at E7a until Dainius/Kai rule on the transport (section 4). Then: E7a → re-derive E and re-verify the source → Build A → E → Build B → E7b, in one window  [FILE kai-pm/D379_PLAN_V4_5.md:1731]
+
+### 7. What I am unsure of
+
+- The size of a CPython 3.11.15 build transcript is UNMEASURED (no build is allowed before E7a). That it would exceed a model-emitted T is inference, not measurement  [FILE kai-pm/D379_PLAN_V4_5.md:1519]
+- The instruments exist only in the ephemeral container: netiso.sh 45f3a919…344d, attack.py 6b65d09a…c2a, um.py 26f898ec…d5, env_fp.py 6524d6e6…695b. They are not committed, because committing them would mutate a path outside the six B4 files; recreating them needs this entry's description  [CMD `sha256sum /home/user/d379-build/*` → 4 hashes]
+- E must be re-derived immediately before build 1; dc0e2884 is the M2 value, not the frozen one  [FILE kai-pm/D379_PLAN_V4_5.md:1211]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
+python3 -B .claude/skills/kai-handoff/handoff.py due
