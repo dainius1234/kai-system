@@ -1042,3 +1042,69 @@ python3 -B .claude/skills/kai-handoff/handoff.py due
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
 python3 -B .claude/skills/kai-handoff/handoff.py due
+
+## HANDOFF 2026-10-01T16:04:24Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-01T16:04:24Z  [CMD `date -u +%FT%TZ` → 2026-10-01T16:04:24Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 8c601cdf7086c96de8d692c921610ed71863101e  [CMD `git rev-parse HEAD` → 8c601cdf7086c96de8d692c921610ed71863101e]
+- tree: 94cf33e57a423a073801826ba4a88e012be10f2d  [CMD `git rev-parse HEAD^{tree}` → 94cf33e57a423a073801826ba4a88e012be10f2d]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 8c601cdf7086c96de8d692c921610ed71863101e  [CMD `git ls-remote --heads origin` → 8c601cdf7086c96de8d692c921610ed71863101e]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d08f3ec5de4d823011e66261c84c98a76371428e  [CMD `git ls-remote --heads origin` → d08f3ec5de4d823011e66261c84c98a76371428e]
+- decisions_headings: 372  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 372]
+- decisions_distinct: 372  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 372]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D389  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D389]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 15  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 15]
+
+### 1. The four states
+
+- physical: repair branch `claude/d379-repair-eb52f73` = R `d08f3ec` (parent eb52f73); handoff branch HEAD `8c601cd`  [GIT d08f3ec] [CMD `git ls-remote --heads origin claude/d379-repair-eb52f73` → d08f3ec5de4d]
+- authorised: the D379 v4.5 tranche, eb52f73 → F  [CONVERSATION 2026-10-01 Dainius, "I authorise:"]
+- evidence: MILESTONE 1 PASSED — lineage, replay and B0 (details in section 5)  [GIT d08f3ec]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- None; executing under the 2026-10-01 grant  [CONVERSATION 2026-10-01 Dainius, "I authorise:"]
+
+### 3. Authorised / Held / Forbidden
+
+- DONE: M1 (repair branch, R, B0)  [GIT d08f3ec]
+- NEXT: M2 (network-isolation measurement first; NO → STOP)  [CONVERSATION 2026-10-01 Dainius, "Orion must measure this first after grant."]
+
+### 4. Open questions
+
+- None new  [GIT d08f3ec]
+
+### 5. Incidents and corrections
+
+- M1 evidence: creation gate HEAD == eb52f73fa6485534ca7e28a42055861c69e94cc4. Replay precondition: DECISIONS.md blob at eb52f73 == at G^ (44e134e0). Replay gate: diff(R^,R) sha256 ba175463b2e18644c7eafa898c34294bdc59b6cb2a26b8f7ccea12c879c70a75 == diff(G^,G); patch-id 149f2dbd97a0a878af0a1c6f8d6239f2ae162c00 equal; resulting DECISIONS.md blob 6569dc97 == G's  [CMD `git diff R^ R -- kai-pm/DECISIONS.md | sha256sum` → ba175463…0a75]
+- B0 (v4.5 §7) at eb52f73, G 77fdc37 and R d08f3ec: population 32 (10 H2_SOURCES, Census MANIFEST plus 19 members, D367 contract, d379_controls.py), population digest c82f7b6519c072dda91c7adc7994dc9a25820b728d5096755dddef3d55292756 at all three; Census aggregate 29064d65…; contract sha256 == banked D380 §6.3; local import closure (AST including child-code strings) resolves only into governed members  [CMD `b0_closure.py <repo> <commit>` → identical digest at all 3]
+- B0 residuals, inspected rather than dismissed: 2 unresolved import names (`hostile_ext`, `extra_governed_module`) are synthetic hostile subjects the harness writes at runtime (d379_controls.py:1034 and :1561), not dependencies. Non-code inputs read from the working tree: 0. Content-addressed git inputs: 6 objects, all present in this shallow clone. 3 hex literals that look like OIDs are not objects (a split contract sha256, and 2 synthetic tokens)  [FILE kai-pm/house_in_order_h2_v13/build_evidence/d379_controls.py:1034]
+
+### 6. Next authorised step
+
+- M2: measure mechanical network isolation, then E fingerprint, CPython signed-source check, E7a  [CONVERSATION 2026-10-01 Dainius, "I authorise:"]
+
+### 7. What I am unsure of
+
+- The B0 derivation ran as an untracked scratch instrument; per v4.5 §29 the fixity version lives in d379_controls.py at M4. Only its result digest is durable here  [CMD `b0_closure.py` → scratchpad only]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
+python3 -B .claude/skills/kai-handoff/handoff.py due
