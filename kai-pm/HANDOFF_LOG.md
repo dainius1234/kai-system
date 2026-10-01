@@ -977,3 +977,68 @@ python3 -B .claude/skills/kai-handoff/handoff.py due
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
 python3 -B .claude/skills/kai-handoff/handoff.py due
+
+## HANDOFF 2026-10-01T16:01:20Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-01T16:01:20Z  [CMD `date -u +%FT%TZ` → 2026-10-01T16:01:20Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 2b8b81f2fc18b513fa799a19425ad5d03c87738c  [CMD `git rev-parse HEAD` → 2b8b81f2fc18b513fa799a19425ad5d03c87738c]
+- tree: 2734d0aa63e6b6ed28ad0001e515adc3780d4ae0  [CMD `git rev-parse HEAD^{tree}` → 2734d0aa63e6b6ed28ad0001e515adc3780d4ae0]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/project-rework-plan-pgvp35: 2b8b81f2fc18b513fa799a19425ad5d03c87738c  [CMD `git ls-remote --heads origin` → 2b8b81f2fc18b513fa799a19425ad5d03c87738c]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- decisions_headings: 372  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 372]
+- decisions_distinct: 372  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 372]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D389  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D389]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 14  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 14]
+
+### 1. The four states
+
+- physical: HEAD `2b8b81f` on the handoff branch; the repair branch does not exist yet  [GIT 2b8b81f]
+- authorised: the bounded D379 v4.5 implementation tranche, eb52f73 → F, STOP AT F ⚠ UNBANKED  [CONVERSATION 2026-10-01 Dainius, "I authorise:" + Kai's recommendation, received 2026-10-01T16:00:41Z]
+- evidence: D379 producer evidence unchanged at eb52f73 (cases 40, PASS 16, HELD 24)  [FILE kai-pm/house_in_order_h2_v13/build_evidence/D379_CLOSEOUT.txt:26]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-01 · grant, verbatim: "Authorise the bounded D379 v4.5 implementation tranche from admitted restart eb52f73 through fixity commit F, including R, B0, E7a, mechanically network-isolated CPython reproducibility builds, D380/D385 positive-runtime proof, the six-file B4 repair surface, full hostile calibration and creation of F. Stop at F for Kai review. No capture, production Stage A, candidate, holdout, blind 40, merge, or out-of-scope mutation is authorised. Any v4.5 stop condition or required scope expansion stops execution and returns to Dainius/Kai." ⚠ UNBANKED  [CONVERSATION 2026-10-01 Dainius, "I authorise:"]
+- Dainius · 2026-10-01 · practical rulings: measure network isolation first (NO → STOP, no workaround); the Dropbox E7a test is authorised inside the tranche (failure → NO BUILD); builds and E7b run in one uninterrupted window; four milestone REPORTS (1 R/lineage; 2 environment+E7a+network; 3 builds+D380/D385 proof; 4 B4+matrix+F); mandatory stop only on a v4.5 stop condition or a scope deviation ⚠ UNBANKED  [CONVERSATION 2026-10-01 Dainius, "FOUR PRACTICAL DECISIONS"]
+- Dainius · 2026-10-01 · no further DeepSeek design cycle; any material deviation from v4.5 is attacked before acceptance ⚠ UNBANKED  [CONVERSATION 2026-10-01 Dainius, "We do not send v4.5 back for another design review."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: R, repair branch from eb52f73, B0, E7a (Dropbox), network-isolation proof, CPython v4.5 §18 signed-source check, two isolated network-disabled builds, E7b, D380/D385 positive-runtime proof, six-file B4 repair, full hostile matrix, F  [CONVERSATION 2026-10-01 Dainius, "I authorise:"]
+- FORBIDDEN: production Stage A, real candidate, Pass-A production run, production classification/qualification evidence, holdout, blind 40, capture, PR #122 merge, mutation outside the six B4 files, architecture refactor, House/A-4/Kingsman work, merging the handoff branch into the repair branch  [CONVERSATION 2026-10-01 Dainius, "HARD BOUNDARY"] [FILE kai-pm/D379_PLAN_V4_5_KAI_RECONCILIATION.md:478]
+
+### 4. Open questions
+
+- Lineage reading (R14): v4.5 §34 step 10 says "Create repair branch from G"; Kai's reconciliation §18 sharpens it to eb52f73 → R (a replay of only G's DECISIONS.md diff), with no merge from the handoff branch. The grant says the same. Executing per §18 — owner: Orion  [FILE kai-pm/D379_PLAN_V4_5.md:1729] [FILE kai-pm/D379_PLAN_V4_5_KAI_RECONCILIATION.md:478]
+
+### 5. Incidents and corrections
+
+- None  [GIT 2b8b81f]
+
+### 6. Next authorised step
+
+- Milestone 1: create `claude/d379-repair-eb52f73` from eb52f73; R replays G; prove sha256 ba175463…0a75 and patch-id 149f2dbd…2c00; B0 closure equality  [CONVERSATION 2026-10-01 Dainius, "I authorise:"]
+
+### 7. What I am unsure of
+
+- Whether this container can mechanically disable outbound network for a build: unmeasured, and it is the first milestone-2 measurement  [FILE kai-pm/D379_PLAN_V4_5_KAI_RECONCILIATION.md]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
+python3 -B .claude/skills/kai-handoff/handoff.py due
