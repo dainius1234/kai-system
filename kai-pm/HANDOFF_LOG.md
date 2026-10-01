@@ -1490,3 +1490,114 @@ for n,b in re.findall(r"\n    BEGIN-INSTRUMENT (\S+)\n(.*?)\n    END-INSTRUMENT 
     d="\n".join(l[4:] for l in b.split("\n"))+"\n"; open("/home/user/d379-build/"+n,"w").write(d)
     print(hashlib.sha256(d.encode()).hexdigest(),n)
 X
+
+## HANDOFF 2026-10-01T16:22:50Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-01T16:22:50Z  [CMD `date -u +%FT%TZ` → 2026-10-01T16:22:50Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 81bc46cf7abe1a5e23a35298f7f3bc18e11284be  [CMD `git rev-parse HEAD` → 81bc46cf7abe1a5e23a35298f7f3bc18e11284be]
+- tree: 09c4ad71ca69868100c6acb3f9171ac4e14c76e4  [CMD `git rev-parse HEAD^{tree}` → 09c4ad71ca69868100c6acb3f9171ac4e14c76e4]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 81bc46cf7abe1a5e23a35298f7f3bc18e11284be  [CMD `git ls-remote --heads origin` → 81bc46cf7abe1a5e23a35298f7f3bc18e11284be]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d08f3ec5de4d823011e66261c84c98a76371428e  [CMD `git ls-remote --heads origin` → d08f3ec5de4d823011e66261c84c98a76371428e]
+- decisions_headings: 372  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 372]
+- decisions_distinct: 372  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 372]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D389  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D389]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 18  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 18]
+
+### 1. The four states
+
+- physical: unchanged since entry 18; no build, no Dropbox write  [CMD `git ls-remote --heads origin claude/d379-repair-eb52f73` → d08f3ec5de4d]
+- authorised: Option A external change, with Kai's corrections, relayed by Dainius (section 2). The operative act is Dainius's own provisioning; the new session measures whether it exists  [CONVERSATION 2026-10-01 Dainius, "I authorise the external Option A change required for D379 v4.5 E7a/E7b:"]
+- evidence: entry 18's mechanism unchanged; three of its sentences are corrected in section 5  [GIT 81bc46cf7abe1a5e23a35298f7f3bc18e11284be]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Dainius (Kai's text, relayed) · 2026-10-01 · Option A authority, entry-18 corrections and the execution order, verbatim, transcribed from the conversation ⚠ UNBANKED  [CONVERSATION 2026-10-01 Dainius, "I authorise the external Option A change required for D379 v4.5 E7a/E7b:"]
+  I authorise the external Option A change required for D379 v4.5 E7a/E7b:
+  
+  * provision a least-privilege Dropbox Scoped App using App Folder access;
+  * provision a fresh short-lived Dropbox access credential as an environment secret, never in chat or repository;
+  * allow only the Dropbox API hostname(s) mechanically demonstrated as necessary by the final E7 transport, starting from the minimum set;
+  * use that credential only in the outer E7 evidence-transfer process;
+  * the credential must remain excluded from Build A and Build B and from their readable filesystem/process environment;
+  * re-prove that exclusion and network isolation in the new session before E7a.
+  
+  Corrections to entry 18:
+  
+  1. netiso.sh explicitly supplies five environment variables via env -i, not six; PWD/SHLVL are shell-generated runtime variables.
+  2. Do not treat “about four hours” as a fixed Dropbox token lifetime. Treat actual token expiry as runtime state.
+  3. Do not assume files.metadata.read is implicitly granted. Enable only the scopes required by the actual E7 API calls.
+  
+  Proceed only:
+  
+  new-session recovery and instrument hash verification
+  → re-prove isolation and credential exclusion
+  → derive the actual minimum Dropbox hostname population
+  → E7a exactly per v4.5 §27
+  → if PASS, rederive E and reverify source
+  → Build A
+  → rederive E and require equality
+  → Build B
+  → E7b in the same uninterrupted window
+  → reproducibility comparison
+  → D380/D385 positive-runtime proof
+  → milestone report.
+  
+  All existing stop conditions remain in force.
+  
+  No silent fallback to connector-mediated transport.
+  No alternate canonical store.
+  No capture.
+  No production Stage A.
+  No candidate.
+  No holdout.
+  No blind 40.
+  No merge.
+  No out-of-scope repair mutation.
+- Kai · 2026-10-01 · after this authority: "we are no longer designing"; Orion returns only at the milestone or on a STOP ⚠ UNBANKED  [CONVERSATION 2026-10-01 Kai, "Orion should come back only at the milestone or if a STOP condition fires."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED, in the new session: the sequence in section 2, in that order  [CONVERSATION 2026-10-01 Dainius, "Proceed only:"]
+- FORBIDDEN: connector-mediated fallback; an alternate canonical store; capture; production Stage A; candidate; holdout; blind 40; merge; out-of-scope repair mutation  [CONVERSATION 2026-10-01 Dainius, "No silent fallback to connector-mediated transport."]
+
+### 4. Open questions
+
+- Dainius, provisioning, corrected: App Folder scoped app; enable files.content.write (upload) and files.content.read (download/readback) and nothing else unless the console forces it (if it does, the new session records which scope, and why); environment allowed domains start from `content.dropboxapi.com` ONLY; generate the token immediately before starting the new session; variable `DROPBOX_ACCESS_TOKEN`  [CONVERSATION 2026-10-01 Kai, "if upload + download/readback can be done entirely through content.dropboxapi.com, do not allow api.dropboxapi.com"]
+- Why one host should suffice, to be DEMONSTRATED not assumed: upload (/2/files/upload, mode=add, autorename=false) and download (/2/files/download) are content-host routes, and both return file metadata (size, content_hash) with the response. If the new session shows a required call needs api.dropboxapi.com → STOP and return for that host  [CONVERSATION 2026-10-01 Kai, "Add the second hostname only if the final E7 transport demonstrably requires an API route there."]
+
+### 5. Incidents and corrections
+
+- CORRECTION to entry 18 §5 (that entry stays as written, append-only): netiso.sh supplies 5 variables via env -i (PATH, LANG, LC_ALL, TZ, HOME); PWD and SHLVL are generated by the shell at runtime. "6-key allowlist" was wrong  [CMD `grep 'exec env -i' /home/user/d379-build/netiso.sh` → PATH LANG LC_ALL TZ HOME]
+- CORRECTION to entry 18 §4: "console tokens are short-lived (about 4 hours)" was unsourced; token expiry is runtime state, measured from the token's own expiry and treated as a stop condition if it lapses mid-window  [CONVERSATION 2026-10-01 Kai, "Treat actual token expiry as runtime state."]
+- CORRECTION to entry 18 §4: "files.metadata.read comes with them" was unsourced; scopes are configured independently and only the required ones are enabled  [CONVERSATION 2026-10-01 Kai, "Do not assume files.metadata.read is implicitly granted."]
+- Source of "a new session picks up the secret": the environment-settings documentation tool. It is platform documentation, not verified on this account; the new session re-proves everything regardless  [CONVERSATION 2026-10-01 Kai, "I have not independently verified Orion’s claim"]
+- PATTERN_CANDIDATE (R18), not a ledger entry (allocation is not in this tranche's scope): 3 count slips by Orion in this session, all of one shape — a number typed from memory beside the population it counts (R5): "14 known-positives" in a commit message, real 16 (amended before push); "10 paths OPEN" in entry 17, real 8 distinct (corrected before commit); "6-key allowlist" in entry 18, real 5 (shipped; corrected here). Control adopted now: counts in Orion's handoff entries are computed by the composing script from the counted object; this entry's 5 is so derived  [CONVERSATION 2026-10-01 Orion, R18 check]
+
+### 6. Next authorised step
+
+- New session, after Dainius provisions: READ → restore instruments from entry 18 §8 and match their sha256 → re-run attack.py, um.py, credprobe.py (with the REAL variable name present outside) and the socket population → token-FILE scan → minimum host demonstration → E7a → the window  [CONVERSATION 2026-10-01 Dainius, "Proceed only:"]
+
+### 7. What I am unsure of
+
+- Whether the console allows App Folder apps without other scopes being pre-checked; not inspected  [CONVERSATION 2026-10-01 Kai, "scopes are independently configured maxima/defaults"]
+- The CPython transcript size is still unmeasured  [FILE kai-pm/D379_PLAN_V4_5.md:1519]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
