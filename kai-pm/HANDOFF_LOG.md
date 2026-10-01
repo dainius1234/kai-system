@@ -1183,3 +1183,310 @@ python3 -B .claude/skills/kai-handoff/handoff.py due
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
 python3 -B .claude/skills/kai-handoff/handoff.py due
+
+## HANDOFF 2026-10-01T16:18:24Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-01T16:18:24Z  [CMD `date -u +%FT%TZ` → 2026-10-01T16:18:24Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 56e0e1ed1e0d057a8e994dd3a89f9d71d0f6695f  [CMD `git rev-parse HEAD` → 56e0e1ed1e0d057a8e994dd3a89f9d71d0f6695f]
+- tree: bb2644e909712780eba13a611bafb573a0bd640d  [CMD `git rev-parse HEAD^{tree}` → bb2644e909712780eba13a611bafb573a0bd640d]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 56e0e1ed1e0d057a8e994dd3a89f9d71d0f6695f  [CMD `git ls-remote --heads origin` → 56e0e1ed1e0d057a8e994dd3a89f9d71d0f6695f]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d08f3ec5de4d823011e66261c84c98a76371428e  [CMD `git ls-remote --heads origin` → d08f3ec5de4d823011e66261c84c98a76371428e]
+- decisions_headings: 372  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 372]
+- decisions_distinct: 372  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 372]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D389  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D389]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 17  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 17]
+
+### 1. The four states
+
+- physical: repair branch unchanged at R `d08f3ec`; no build, no Dropbox write; `/home/user/d379-build` is ephemeral, and its instruments are preserved verbatim in section 5  [CMD `git ls-remote --heads origin claude/d379-repair-eb52f73` → d08f3ec5de4d]
+- authorised: the D379 v4.5 tranche, eb52f73 → F; E7a transport = OPTION A, subject to Dainius's authority for the network-policy and credential change  [CONVERSATION 2026-10-01 Kai, "Proceed with OPTION A, subject to Dainius authorising the required external environment/credential change."]
+- evidence: M1 READ_VERIFIED by Kai. Network isolation, source identity and E are Orion execution evidence, not re-executed by Kai  [CONVERSATION 2026-10-01 Kai, "Milestone 1 is accepted as repository state."]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-01 · E7A TRANSPORT RULING, verbatim as relayed by Dainius (transcribed from the conversation; there is no original file to hash against) ⚠ UNBANKED  [CONVERSATION 2026-10-01 Kai, "KAI → ORION — E7A TRANSPORT RULING"]
+  KAI → ORION — E7A TRANSPORT RULING
+  
+  I have independently re-read v4.5 §§26–28, Kai reconciliation §§18–21, D387’s Dropbox ruling, and mechanically checked R against G.
+  
+  1. MILESTONE 1
+  
+  R d08f3ec5de4d823011e66261c84c98a76371428e is independently READ_VERIFIED by Kai:
+  
+  * parent = admitted eb52f73fa6485534ca7e28a42055861c69e94cc4;
+  * only kai-pm/DECISIONS.md changes;
+  * G and R each add 113 / delete 0;
+  * their GitHub patch bodies are byte-identical;
+  * resulting DECISIONS.md blob is identical: 6569dc97a218449e4a4d97fee69be717c979430f.
+  
+  Milestone 1 is accepted as repository state. This is not yet an adjudication of later execution evidence.
+  
+  2. E7A RULING
+  
+  Proceed with OPTION A, subject to Dainius authorising the required external environment/credential change.
+  
+  Dropbox remains the canonical E7 store.
+  
+  Permit a direct mechanical Dropbox upload path using only the minimum required Dropbox API hosts and a least-privilege Dropbox app credential.
+  
+  This is implementation of the already-selected v4.5 storage/transport requirement, not a redesign of v4.5.
+  
+  3. SECRET / BUILD BOUNDARY — MANDATORY
+  
+  The Dropbox credential MUST NOT enter Build A or Build B.
+  
+  The token belongs only to the outer evidence-transfer mechanism.
+  
+  Before either build:
+  
+  * prove the build child environment does not contain the Dropbox credential;
+  * run the build under the already-calibrated network-isolation wrapper;
+  * prove the build namespace cannot reach Dropbox or any other outbound network;
+  * do not add the token to E as a build input because it is not a build input;
+  * do not print, hash into public evidence, commit, or otherwise expose the credential.
+  
+  E7 upload/readback occurs outside the isolated build process.
+  
+  4. E7A MUST STILL SATISFY v4.5 §27 EXACTLY
+  
+  Before Build A, demonstrate through the actual final Dropbox transport:
+  
+  * N = 2 synthetic objects;
+  * each exactly T bytes;
+  * U >= 2 × T;
+  * LF;
+  * CRLF;
+  * non-ASCII;
+  * binary-safe envelope edge cases where applicable;
+  * unique destinations;
+  * atomic create-if-absent, or mechanically proven equivalent write-once behaviour;
+  * independent readback;
+  * exact byte count;
+  * exact SHA.
+  
+  Do not merely prove “Dropbox accepts a file”.
+  
+  The transport tested at E7a must be the same transport semantics used at E7b.
+  
+  Failure of any required predicate → NO BUILD.
+  
+  5. OPTIONS B AND C
+  
+  B — connector/model-output-mediated transport:
+  DO NOT use as the default route. It introduces an avoidable output-size/text-mediation dependency into the raw evidence path. Do not silently fall back to it if A fails. Return to Dainius/Kai.
+  
+  C — change canonical store:
+  NOT AUTHORISED. Dropbox remains canonical under D387. Any change requires a separate governance ruling.
+  
+  6. AFTER E7A PASSES
+  
+  Continue the already-authorised v4.5 sequence only:
+  
+  E7a PASS
+  → rederive E immediately before Build A
+  → reverify frozen CPython source/signature as required
+  → Build A under mechanical network isolation
+  → rederive E before Build B; require equality
+  → Build B under the same isolation
+  → E7b preserve/read back both complete raw transcripts in the same uninterrupted execution window
+  → compare executable SHA and H2_PY_STDLIB_V1
+  → prove actual D380/D385 known-positive runtime
+  → milestone report.
+  
+  No B4 repair begins unless all preceding predicates pass.
+  
+  7. STOP CONDITIONS
+  
+  No improvisation if:
+  
+  * the required Dropbox hosts cannot be narrowly enabled;
+  * the scoped credential cannot be supplied securely;
+  * credential leakage into the build environment cannot be mechanically excluded;
+  * E7a cannot establish T/U/fidelity/write-once/readback;
+  * actual transcript exceeds T or combined size exceeds U;
+  * E changes;
+  * reproducibility differs;
+  * D380/D385 positive runtime fails.
+  
+  In any such case: STOP and return.
+  
+  No capture.
+  No production Stage A.
+  No candidate.
+  No holdout.
+  No blind 40.
+  No merge.
+  No out-of-scope source mutation.
+  
+  Kai ruling: OPTION A is architecturally consistent with v4.5 and is the strongest justified E7 transport route. It still requires Dainius’s explicit authority for the external network-policy and Dropbox-credential provisioning.
+
+### 3. Authorised / Held / Forbidden
+
+- HELD, owner Dainius: the external authority — allow the minimum Dropbox API hosts and provide a least-privilege Dropbox app credential  [CONVERSATION 2026-10-01 Kai, "It still requires Dainius’s explicit authority for the external network-policy and Dropbox-credential provisioning."]
+- FORBIDDEN: Option B as default or silent fallback; Option C (change of canonical store)  [CONVERSATION 2026-10-01 Kai, "Do not silently fall back to it if A fails."]
+- FORBIDDEN, unchanged: capture, production Stage A, candidate, holdout, blind 40, merge, out-of-scope source mutation  [CONVERSATION 2026-10-01 Kai, "No out-of-scope source mutation."]
+
+### 4. Open questions
+
+- Dainius, Dropbox side: create a Scoped-access app with "App folder" access (least privilege: it reaches only /Apps/<app name>). Permissions: files.content.write and files.content.read (files.metadata.read comes with them). Generate an access token in the app's Settings tab IMMEDIATELY before starting the new session; console tokens are short-lived (about 4 hours), which also bounds exposure. Revoke it after E7b  [CONVERSATION 2026-10-01 Orion, proposal]
+- Dainius, environment side: Network access → allowed domains `api.dropboxapi.com` and `content.dropboxapi.com` (2 hosts: metadata and content). Environment variable `DROPBOX_ACCESS_TOKEN`. The token is never pasted into chat. Per the environment docs, a NEW session picks up the secret, so E7a runs in a new session on `claude/project-rework-plan-pgvp35`  [CONVERSATION 2026-10-01 Orion, environment settings docs]
+- New-session precondition, owner Orion: find every FILE holding the token (`grep -rlF` on the value, paths only, never the value) and hide each from the build namespace; the env path is already excluded (section 5). Any file that cannot be hidden → STOP  [CONVERSATION 2026-10-01 Kai, "credential leakage into the build environment cannot be mechanically excluded"]
+
+### 5. Incidents and corrections
+
+- Wrapper hardened per Kai §3: `netiso.sh` now starts from `env -i` with a 6-key allowlist (PATH=/usr/bin:/bin, LANG, LC_ALL=C.UTF-8, TZ=UTC, HOME=/nonexistent). Canary credential test: outside, DROPBOX_ACCESS_TOKEN is present and the canary is found in 1 readable /proc/*/environ. Inside: the variable is absent; keys are HOME LANG LC_ALL PATH PWD SHLVL TZ; the canary is in 0 of 2 readable environ files (75 denied)  [CMD `./netiso.sh python3 credprobe.py <canary>` → present False, containing canary=0]
+- Found by that test: the outer environment also carries GH_TOKEN, GITHUB_TOKEN, AWS_* and CLOUDSDK_AUTH_ACCESS_TOKEN. The pre-`env -i` wrapper would have passed them to the builds (with no network). `env -i` excludes them all  [CMD `credprobe.py` → env keys list]
+- Isolation re-verified under the hardened wrapper: 9 OPEN lines outside, the same suite all BLOCKED inside, kernel ifaces ['lo']; umount2 EINVAL x2. Instrument defect of mine, fixed: attack.py read the proxy port from the environment, which `env -i` emptied, so it crashed inside (not an isolation result); the port is now argv[2]  [CMD `./netiso.sh python3 attack.py $$ 41413` → 11 BLOCKED lines]
+- E is now derived INSIDE the wrapper, the environment the build actually sees: E_SHA256 ae37673ac5fed8890f9ff43b44876a8e338b4147ac0a7b22c8032a4b625d0751 on 2 runs. Entry 17's dc0e2884… was derived in the session environment and is superseded as the reference; the build E is frozen in the new session immediately before Build A  [CMD `./netiso.sh python3 env_fp.py | tail -1` → E_SHA256 ae37673a…0751]
+- INSTRUMENT netiso.sh sha256 3249417026988966ad6f3e7055577152bd9efe4e1465b0461d4217b0ab93d207 — verbatim below, each line indented 4 spaces; restore with the section 8 command  [CMD `sha256sum /home/user/d379-build/netiso.sh` → 32494170…]
+    BEGIN-INSTRUMENT netiso.sh
+    #!/bin/bash
+    # D379 v4.5 build isolation wrapper: netiso.sh <cmd...>
+    # Layer 1: new user+net+mount ns; empty tmpfs over /tmp and /run (hides every pathname socket found).
+    # Layer 2: nested user+mount ns, so layer-1 mounts are MNT_LOCKED and cannot be unmounted.
+    # Environment: emptied with env -i; only the fixed allowlist below enters (no credential can).
+    set -euo pipefail
+    exec env -i PATH=/usr/bin:/bin LANG=C.UTF-8 LC_ALL=C.UTF-8 TZ=UTC HOME=/nonexistent \
+      unshare --user --map-root-user --net --mount --fork -- bash -c '
+      set -euo pipefail
+      mount -t tmpfs -o mode=1777 tmpfs /tmp
+      mount -t tmpfs -o mode=755 tmpfs /run
+      exec unshare --user --map-root-user --mount --fork -- "$@"
+    ' netiso "$@"
+    END-INSTRUMENT netiso.sh
+- INSTRUMENT attack.py sha256 e55f74e252504f3ae5adff7054573526b7346f7451d02c8e703f242c8b50975c — verbatim below, each line indented 4 spaces; restore with the section 8 command  [CMD `sha256sum /home/user/d379-build/attack.py` → e55f74e2…]
+    BEGIN-INSTRUMENT attack.py
+    import os,socket,subprocess,sys
+    outer=sys.argv[1]; port=int(sys.argv[2])
+    def t(name,fn):
+        try: r=fn(); print("OPEN   ",name,r)
+        except Exception as e: print("BLOCKED",name,"->",type(e).__name__,getattr(e,"errno",""),str(e)[:70])
+    def tcp(a): s=socket.create_connection(a,4); s.close(); return "connected"
+    def ux(p): s=socket.socket(socket.AF_UNIX); s.settimeout(4); s.connect(p); return "connected"
+    t("tcp proxy 127.0.0.1:%d"%port, lambda: tcp(("127.0.0.1",port)))
+    t("tcp 1.1.1.1:443", lambda: tcp(("1.1.1.1",443)))
+    t("dns pypi.org", lambda: socket.gethostbyname("pypi.org"))
+    t("unix /tmp/cc-socks/102.sock", lambda: ux("/tmp/cc-socks/102.sock"))
+    t("unix /run/sandbox-telemetry/ingest.sock", lambda: ux("/run/sandbox-telemetry/ingest.sock"))
+    t("unix via /proc/%s/root/tmp/cc-socks/102.sock"%outer, lambda: ux("/proc/%s/root/tmp/cc-socks/102.sock"%outer))
+    t("unix via /proc/79/root/run/sandbox-telemetry/ingest.sock", lambda: ux("/proc/79/root/run/sandbox-telemetry/ingest.sock"))
+    def nse():
+        r=subprocess.run(["nsenter","-t",outer,"-n","python3","-c","import socket;socket.create_connection(('1.1.1.1',443),4)"],capture_output=True,text=True)
+        if r.returncode: raise OSError(r.stderr.strip()[:70])
+        return "ESCAPED"
+    t("nsenter outer netns -> 1.1.1.1", nse)
+    def um(p):
+        r=subprocess.run(["umount",p],capture_output=True,text=True)
+        if r.returncode: raise OSError(r.stderr.strip()[:70])
+        return "UNMOUNTED; now visible: "+str(os.path.exists("/tmp/cc-socks/102.sock" if p=="/tmp" else "/run/sandbox-telemetry/ingest.sock"))
+    t("umount /tmp", lambda: um("/tmp")); t("umount /run", lambda: um("/run"))
+    t("unix 102.sock after umount attempts", lambda: ux("/tmp/cc-socks/102.sock"))
+    print("ifaces(kernel):",[l.split(":")[0].strip() for l in open("/proc/net/dev").readlines()[2:]])
+    END-INSTRUMENT attack.py
+- INSTRUMENT um.py sha256 26f898ec042b749a627854fe8a9220f8de05ccfebce45c0462dd72901af18dd5 — verbatim below, each line indented 4 spaces; restore with the section 8 command  [CMD `sha256sum /home/user/d379-build/um.py` → 26f898ec…]
+    BEGIN-INSTRUMENT um.py
+    import ctypes,os,socket
+    libc=ctypes.CDLL(None,use_errno=True)
+    print("tmp is mountpoint:",any(l.split()[4]=="/tmp" for l in open("/proc/self/mountinfo")))
+    for p in (b"/tmp",b"/run"):
+        r=libc.umount2(p,0); e=ctypes.get_errno()
+        print("umount2",p.decode(),"->","SUCCEEDED" if r==0 else "FAILED errno=%d %s"%(e,os.strerror(e)))
+    print("102.sock visible after:",os.path.exists("/tmp/cc-socks/102.sock"))
+    END-INSTRUMENT um.py
+- INSTRUMENT env_fp.py sha256 6524d6e6d67ec1f96da47262765295e483857bf00d7cbf96d0815fe6d96a695b — verbatim below, each line indented 4 spaces; restore with the section 8 command  [CMD `sha256sum /home/user/d379-build/env_fp.py` → 6524d6e6…]
+    BEGIN-INSTRUMENT env_fp.py
+    #!/usr/bin/env python3
+    """D379 v4.5 §19 environment fingerprint E. Prints canonical JSON + its sha256.
+    Fails (exit 2) if any required field cannot be derived: no silent omission."""
+    import hashlib, json, os, shutil, subprocess, sys
+    PREFIX = "/opt/d379-py311"                     # logical install prefix <P>
+    CONFIGURE = ["./configure", f"--prefix={PREFIX}", "--without-ensurepip"]
+    def sha(p):
+        h = hashlib.sha256()
+        with open(p, "rb") as f:
+            for b in iter(lambda: f.read(1 << 20), b""): h.update(b)
+        return h.hexdigest()
+    def tool(name, vflag="--version"):
+        w = shutil.which(name)
+        if not w: sys.exit(f"E: required tool missing: {name}")
+        real = os.path.realpath(w)
+        v = subprocess.run([w, vflag], capture_output=True, text=True, timeout=30)
+        return {"which": w, "realpath": real, "sha256": sha(real), "version": (v.stdout or v.stderr).splitlines()[0]}
+    def gcc_helper(prog):
+        p = subprocess.run(["gcc", f"-print-prog-name={prog}"], capture_output=True, text=True).stdout.strip()
+        real = os.path.realpath(p if os.path.isabs(p) else shutil.which(p) or p)
+        if not os.path.isfile(real): sys.exit(f"E: compiler helper unresolved: {prog} -> {p}")
+        return {"name": prog, "realpath": real, "sha256": sha(real)}
+    E = {
+      "os_release": open("/etc/os-release").read(),
+      "kernel": os.uname().release,
+      "rootfs_dev": os.stat("/").st_dev,
+      "compiler": tool("gcc"),
+      "compiler_helpers": [gcc_helper(p) for p in ("cc1", "collect2", "lto-wrapper")],
+      "assembler": tool("as"), "linker": tool("ld"), "ar": tool("ar"), "make": tool("make"),
+      "libc": {"ldd_version": subprocess.run(["ldd", "--version"], capture_output=True, text=True).stdout.splitlines()[0],
+               "libc_so": (lambda r: {"realpath": r, "sha256": sha(r)})(os.path.realpath("/lib/x86_64-linux-gnu/libc.so.6"))},
+      "dpkg_selections_sha256": hashlib.sha256(subprocess.run(["dpkg-query", "-W", "-f=${Package} ${Version} ${Architecture}\n"],
+                                 capture_output=True).stdout).hexdigest(),
+      "PATH": os.environ.get("PATH"),
+      "build_env": {k: os.environ.get(k) for k in ("CC","CFLAGS","CPPFLAGS","LDFLAGS","LIBS","CPP","CXX","LANG","LC_ALL","TZ","SOURCE_DATE_EPOCH","MAKEFLAGS","PYTHONHASHSEED")},
+      "configure_args": CONFIGURE,
+      "cpython_source": {"tag": "v3.11.15", "tag_object": "2323bfc729b041c43b1e5e4c5f18c548fc345323",
+                         "commit": "2340a037f7450e70fccfe411e6531afb4d57a312", "tree": "8c6959bc70b201b477138f00c432a3bb2f1caddd",
+                         "signer_primary_fpr": "A035C8C19219BA821ECEA86B64E628F8D684696D"},
+      "install_prefix": PREFIX,
+    }
+    s = json.dumps(E, sort_keys=True, indent=1)
+    print(s); print("E_SHA256", hashlib.sha256(s.encode()).hexdigest())
+    END-INSTRUMENT env_fp.py
+- INSTRUMENT credprobe.py sha256 bf4e110a57affcd7a88131734f4ba707849f26851c8e8bec061841a39500a25c — verbatim below, each line indented 4 spaces; restore with the section 8 command  [CMD `sha256sum /home/user/d379-build/credprobe.py` → bf4e110a…]
+    BEGIN-INSTRUMENT credprobe.py
+    import os,glob,sys
+    c=sys.argv[1].encode(); name="DROPBOX_ACCESS_TOKEN"
+    print("env var present:", name in os.environ, "| canary in own environ:", c in open("/proc/self/environ","rb").read())
+    hit=read=denied=0
+    for p in glob.glob("/proc/[0-9]*/environ"):
+        try: b=open(p,"rb").read(); read+=1; hit+= c in b
+        except OSError: denied+=1
+    print(f"/proc/*/environ readable={read} denied={denied} containing canary={hit}")
+    print("env keys:", sorted(os.environ))
+    END-INSTRUMENT credprobe.py
+
+### 6. Next authorised step
+
+- Dainius grants and provisions the Option A external change (section 4) → new session → READ → restore and sha-check the instruments → token-file scan → E7a per v4.5 §27 and Kai §4 → the uninterrupted window of Kai §6  [CONVERSATION 2026-10-01 Kai, "If you grant that, Orion can continue without another design cycle"]
+
+### 7. What I am unsure of
+
+- Whether the environment UI allows exactly 2 allowed domains at the current access level, or needs a different level; not inspected (no access to the settings UI)  [CONVERSATION 2026-10-01 Orion, environment settings docs]
+- Whether a new container keeps the same host identity (kernel, socket population, tool hashes). The new session must re-run attack.py, um.py and credprobe.py before trusting this entry; E will differ if the toolchain differs, which is acceptable because E is frozen only immediately before Build A  [FILE kai-pm/D379_PLAN_V4_5.md:1211]
+- The CPython transcript size is still unmeasured  [FILE kai-pm/D379_PLAN_V4_5.md:1519]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
+# restore the instruments of this entry (exact bytes; then compare with section 5's sha256 lines):
+python3 - <<'X'
+import re,hashlib,os
+t=[e for e in open("kai-pm/HANDOFF_LOG.md").read().split("\n## HANDOFF ") if e.startswith("2026-10-01T16:18:24Z ")][0]
+os.makedirs("/home/user/d379-build",exist_ok=True)
+for n,b in re.findall(r"\n    BEGIN-INSTRUMENT (\S+)\n(.*?)\n    END-INSTRUMENT \1",t,re.S):
+    d="\n".join(l[4:] for l in b.split("\n"))+"\n"; open("/home/user/d379-build/"+n,"w").write(d)
+    print(hashlib.sha256(d.encode()).hexdigest(),n)
+X
