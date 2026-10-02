@@ -39360,3 +39360,94 @@ findings of "Kai's 30 September adjudication". Findings verbatim:
 response.
 
 At the time of these KAI-V4-01…08 findings, plan v4 was returned for revision and the resulting v4.1 had not yet completed Kai/DeepSeek review. This entry banks the historical findings only; it does not describe the later repair-plan review state. D379 execution remained stopped under that ruling.
+
+---
+
+## D390 — 2026-10-02 — D387 BUILD-EVIDENCE STORE AMENDMENT: DROPBOX WITHDRAWN; GIT-NATIVE IMMUTABLE EVIDENCE IDENTITY; CALIBRATION INTERPRETER RETAINED THROUGH CAPTURE. GOVERNANCE ONLY — BANKING IS NOT EXECUTION.
+
+**Allocator.** Derived structurally over `^## D[0-9]+( +—|$)` immediately before this append (2026-10-02T16:38:03Z): population **372**, distinct **372**, duplicates **none**, highest **D389**; D390 absent. **BANKING IS NOT EXECUTION.** No build, E7a execution, evidence-ref creation, repair mutation, capture, production Stage A, candidate, holdout, blind 40 or PR #122 merge authority follows from this entry.
+
+**Authority.** Kai's D387 store reconciliation ruling (received 2026-10-02T15:08:49Z; 18,747 bytes; sha256 `7cac4c9ba231027694522fe352d333f68acac938ad6a86197697e94ecfa61f3f`) and Kai's adjudication of Orion's return packet (received 2026-10-02T16:22:08Z; 6,341 bytes; sha256 `ac68e3e7a37328b7ad6c1d02cd66f9b95ac12be3ca7350aaf1fb7fc92b9e254b`), both relayed by Dainius and preserved byte for byte in `kai-pm/HANDOFF_LOG.md`. Banked at Dainius's explicit authorisation.
+
+**Kai's resolutions, verbatim:**
+
+> U1 RESOLVED: retain one successfully qualified D380 calibration interpreter artefact, byte-identical to the measured interpreter, through the separately authorised governed D379 capture or explicit retirement. Retention grants no capture authority and does not make it the eventual production candidate runtime.
+>
+> U2 RESOLVED: reject arbitrary T=16 MiB / U=32 MiB and reject publishing two 16 MiB synthetic objects merely to qualify Git. E7a-Git shall use minimal hostile synthetic objects sufficient to qualify exact-byte round-trip, binary/non-UTF8 handling, identity, wrong-object rejection, subject binding, publication/readback and failure semantics. Real transcript sizes are measured from the authorised builds. No truncation or evidence substitution is permitted. Transport incompatibility/size refusal = STOP.
+>
+> U5 RESOLVED: no forced ref-update test. Ref mutability is outside the relied-upon assurance property because the ref is locator only.
+>
+> U6 RESOLVED: build evidence remains immutable. Later qualification evidence is a separate append-only evidence object/record binding to the exact admitted build-evidence identity; do not rewrite the build object.
+>
+> U7 RESOLVED: canonical bounded evidence identity = exact Git commit object ID + SHA-256 of canonical MANIFEST.json. Locator refs carry zero admission authority.
+>
+> U3/U4 remain E7a-measured transport properties. Any incompatible actual behaviour = STOP.
+>
+> U8 confirmed: allocate the decision number and UTC date mechanically immediately before append.
+>
+> REPRESENTATION CORRECTION: replace “outside every branch tree” with the actual invariant: at admission the evidence object must not modify or be reachable through the D379 repair subject/fixity tree. A locator elsewhere does not enter F.
+
+### 1. D387 AMENDED — BUILD-LOG STORE ONLY
+
+D387's selection of Dropbox as the durable canonical store for the D379 interpreter build transcripts is **WITHDRAWN**. No other D387 ruling is amended.
+
+**The requirement is unchanged:** the two complete raw interpreter-build transcripts and their binding metadata must survive the ephemeral build environment, remain durably and independently retrievable, and be bound to the exact build subject and environment (R10; D379 plan v4.5 §§19–20, 26–28). Dropbox is not a D379 or KAI architectural dependency.
+
+**Origin, recorded.** Dropbox entered D387 from a two-option framing Orion presented on 2026-09-25 ("such as your Dropbox or a GitHub Actions artefact"). That framing did not evaluate the repository itself or a Git-native evidence object.
+
+### 2. CANONICAL EVIDENCE IDENTITY
+
+The build evidence is **one immutable Git commit** whose tree holds exactly: the complete Build A transcript, the complete Build B transcript, the frozen environment fingerprint E, the build-driver source, and `MANIFEST.json`.
+
+`MANIFEST.json` is canonical JSON (sorted keys, UTF-8, LF; schema `D379_E7_EVIDENCE_V1`) binding, for each of Build A and Build B: the transcript's SHA-256 and byte count; its source worktree, build directory and staging root; every command's return code; and the resulting interpreter's executable SHA-256 and `H2_PY_STDLIB_V1` identity. It also binds the SHA-256 of E, the §18 CPython source identity (tag object, commit, tree, signer fingerprint), the configure arguments and invocations, and the SHA-256 of the build-driver source.
+
+```
+ADMITTED EVIDENCE IDENTITY  =  ( Git commit object ID ,  SHA-256 of canonical MANIFEST.json )
+LOCATOR REF                 =  discovery only; ZERO admission authority
+```
+
+If a locator ref moves, the admitted identity is unchanged.
+
+### 3. PLACEMENT INVARIANT
+
+At admission the evidence object **must not modify, and must not be reachable through, the D379 repair subject or fixity tree.** A locator elsewhere does not enter F, nor the capture output population.
+
+### 4. E7a-GIT — REPLACES THE STORE-CAPACITY TEST BEFORE ANY BUILD
+
+E7a-Git qualifies the actual Git transport with **minimal hostile synthetic objects**: exact-byte round-trip; binary and non-UTF-8 content; object identity; wrong-object rejection; subject binding; publication and independent readback by commit ID; and failure semantics, including OUTCOME_UNKNOWN. No large synthetic capacity objects are published. **No forced ref-update test is performed.** Proxy and GitHub acceptance limits (U3/U4) are measured, not assumed. **Failure, or any incompatible actual behaviour → NO BUILD.**
+
+**At E7b** the real transcript sizes are measured from the authorised builds, and both exact transcript objects must be accepted by the qualified representation. A size refusal or transport incompatibility → **STOP**. No truncation, compression workaround, evidence substitution or alternate transport without adjudication.
+
+### 5. QUALIFICATION EVIDENCE IS APPEND-ONLY
+
+The build-evidence object is never rewritten. D380/D385 qualification evidence is a **separate** evidence object or record that binds to the exact admitted build-evidence identity.
+
+### 6. CALIBRATION INTERPRETER RETENTION
+
+One successfully qualified D380 calibration interpreter artefact, **byte-identical** to the interpreter whose identity was measured, is retained through the separately authorised governed D379 capture, or until it is explicitly retired. **Retention grants no capture authority** and does not make it the eventual production candidate runtime (D385 §§D–E unchanged).
+
+### 7. UNCHANGED
+
+D379 plan v4.5 is not rewritten; all other requirements of §§26–28 apply to this transport unchanged. D379, D380, D381, D385 and H2_STAGE_A_V2 are unchanged.
+
+### THREAD RECOVERY BLOCK — D390
+
+```
+ENTRY        D390, GOVERNANCE ONLY. Amends D387's build-log store ONLY.
+WITHDRAWN    Dropbox as the D379 build-evidence store.
+REQUIREMENT  UNCHANGED: complete raw transcripts survive, durably and
+             independently retrievable, bound to the exact subject/E.
+IDENTITY     (Git commit object ID, SHA-256 of canonical MANIFEST.json).
+LOCATOR      discovery only; zero admission authority.
+PLACEMENT    not modifying / not reachable through the D379 repair
+             subject or fixity tree at admission; never in F.
+E7a-GIT      minimal hostile synthetic objects; no large capacity
+             objects; no forced ref-update test; failure -> NO BUILD.
+E7b          real sizes measured; refusal/incompatibility -> STOP.
+QUALIFY      separate append-only evidence bound to the build identity.
+RETENTION    one byte-identical qualified calibration interpreter kept
+             through capture or explicit retirement; no capture
+             authority; not the production candidate runtime.
+NOT          build · E7a · evidence ref · repair · capture · Stage A ·
+AUTHORISED   candidate · holdout · blind 40 · PR #122 merge.
+```
