@@ -60,7 +60,6 @@ import pathlib
 import re
 import subprocess
 import sys
-import typing
 
 HERE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
@@ -119,9 +118,12 @@ class SubjectPolicyError(AssertionError):
     default AMBIGUOUS."""
 
 
-class Binding(typing.NamedTuple):
-    rationale: str
-    subject_policy: str
+# Kai, 2026-10-02 (B4 STOP adjudicated, Option A): a plain collections
+# namedtuple. Importing the typing module registered the pseudo-modules
+# typing.io/typing.re, which have no import-system origin, so the closed
+# D379 §5 classifier correctly refused every Pass-A production. The
+# classifier is unchanged.
+Binding = collections.namedtuple("Binding", ["rationale", "subject_policy"])
 
 
 BINDING_PREDICATES = {
