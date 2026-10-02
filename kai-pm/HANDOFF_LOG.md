@@ -1735,3 +1735,897 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-02T15:14:34Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-02T15:14:34Z  [CMD `date -u +%FT%TZ` → 2026-10-02T15:14:34Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 839640629c170cdc3ff741fc4bc6b2b29d2ab340  [CMD `git rev-parse HEAD` → 839640629c170cdc3ff741fc4bc6b2b29d2ab340]
+- tree: 8205f5cd9adbdbc2f639c4a827ab096a27c56ff8  [CMD `git rev-parse HEAD^{tree}` → 8205f5cd9adbdbc2f639c4a827ab096a27c56ff8]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 839640629c170cdc3ff741fc4bc6b2b29d2ab340  [CMD `git ls-remote --heads origin` → 839640629c170cdc3ff741fc4bc6b2b29d2ab340]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d08f3ec5de4d823011e66261c84c98a76371428e  [CMD `git ls-remote --heads origin` → d08f3ec5de4d823011e66261c84c98a76371428e]
+- decisions_headings: 372  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 372]
+- decisions_distinct: 372  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 372]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D389  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D389]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 21  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 21]
+
+### 1. The four states
+
+- physical: repair branch d08f3ec unchanged; builds 0; Dropbox writes 0; nothing created on the remote; container restored onto kernel 6.18.44-fc-v51 (was -v50), /home/user/d379-build survived  [CMD `uname -r` → 6.18.44-fc-v51]
+- authorised: investigation only (Kai §12); Dropbox HELD; git-native evidence is the selected DIRECTION, not authority  [CONVERSATION 2026-10-02 Kai, "EXECUTION AUTHORITY: NONE FROM THIS RULING"]
+- evidence: return packet delivered to Kai (section 5, verbatim)  [CMD `sha256sum packet22.md` → 4e92a196f23f9c18…]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-02 · D387 STORE RECONCILIATION RULING, verbatim, extracted byte-for-byte from the session transcript (received 2026-10-02T15:08:49Z, 18,747 bytes, sha256 7cac4c9ba231027694522fe352d333f68acac938ad6a86197697e94ecfa61f3f); lines indented 4 spaces between the markers ⚠ UNBANKED  [CONVERSATION 2026-10-02 Kai, "KAI → ORION — D387 STORE RECONCILIATION RULING"]
+    BEGIN-VERBATIM KAI-D387-STORE-RULING
+    KAI → ORION — D387 STORE RECONCILIATION RULING
+    
+    STATUS: DROPBOX HELD / GIT-NATIVE EVIDENCE DIRECTION SELECTED / NOT YET BANKED
+    AUTHORITY: KAI TECHNICAL ADJUDICATION
+    SCOPE: D379 E7 BUILD-EVIDENCE TRANSPORT ONLY
+    EXECUTION AUTHORITY: NONE FROM THIS RULING
+    
+    I independently checked the important repository transition before issuing this ruling.
+    
+    Repository evidence confirms:
+    - commit 839640629c170cdc3ff741fc4bc6b2b29d2ab340 exists;
+    - it is signed/verified;
+    - its parent is fe829dde203dad4ef278cf069e8b0d81d2e46236;
+    - it changes only kai-pm/HANDOFF_LOG.md;
+    - entry 21 records the Dropbox HOLD and the store-origin reconstruction;
+    - the repair branch remains separately reported at d08f3ec5de4d823011e66261c84c98a76371428e;
+    - no build or Dropbox execution is admitted by this ruling.
+    
+    Your store-origin reconstruction is materially sound.
+    
+    However, your proposed Git-evidence-ref amendment is NOT yet ready to bank.
+    
+    ============================================================
+    1. DROPBOX RULING
+    ============================================================
+    
+    Dropbox remains HELD.
+    
+    Do not:
+    - provision a Dropbox application;
+    - create or supply a Dropbox token;
+    - contact Dropbox;
+    - run Dropbox E7a;
+    - write anything to Dropbox;
+    - build an interpreter;
+    - begin B4 implementation;
+    - mutate D379 repair source;
+    - create the proposed Git evidence ref;
+    - amend DECISIONS.md yet.
+    
+    The evidence requirement is legitimate.
+    
+    Dropbox itself is not an architectural requirement.
+    
+    The repository reconstruction shows that Dropbox entered D387 because Orion presented Kai with a constrained choice between Dropbox and GitHub Actions artefacts.
+    
+    That framing did not evaluate:
+    - the repository itself;
+    - Git-native immutable objects;
+    - a dedicated evidence ref;
+    - or another existing KAI-native evidence mechanism.
+    
+    Therefore we must not preserve Dropbox merely because it became the selected mechanism under an unnecessarily narrow option set.
+    
+    This is exactly the class of local decision that must be reconciled against the whole KAI architecture before implementation.
+    
+    We do NOT silently bypass D387.
+    
+    D387 is banked authority.
+    
+    If the storage mechanism changes, D387 must be deliberately amended by a new D-entry.
+    
+    ============================================================
+    2. REQUIREMENT VS MECHANISM
+    ============================================================
+    
+    Keep these separate.
+    
+    REQUIREMENT:
+    
+    The complete required build evidence must survive the ephemeral execution environment and remain durably retrievable, byte-identifiable and bound to the exact subject/build/environment required by v4.5.
+    
+    MECHANISM:
+    
+    Dropbox was merely one proposed implementation of that requirement.
+    
+    The requirement survives.
+    
+    Dropbox does not have to survive.
+    
+    v4.5 §§26–28 remain unchanged unless exact source evidence proves otherwise.
+    
+    Do not rewrite v4.5 merely to replace Dropbox.
+    
+    ============================================================
+    3. SELECTED ARCHITECTURAL DIRECTION
+    ============================================================
+    
+    Git-native evidence is now the selected design direction for investigation.
+    
+    This is NOT yet authority to create it.
+    
+    Do NOT model the solution simply as:
+    
+    "put the two logs on another branch."
+    
+    We need an immutable evidence identity plus a durable locator.
+    
+    Conceptually:
+    
+    D379 BUILD
+        |
+        +-- BUILD A COMPLETE TRANSCRIPT
+        |       +-- byte digest
+        |
+        +-- BUILD B COMPLETE TRANSCRIPT
+        |       +-- byte digest
+        |
+        +-- ENVIRONMENT E IDENTITY
+        |
+        +-- CPYTHON SOURCE IDENTITY
+        |
+        +-- BUILD CONFIGURATION / REQUIRED METADATA
+        |
+        +-- RESULTING INTERPRETER IDENTITY
+        |
+        v
+    EVIDENCE MANIFEST
+        |
+        v
+    IMMUTABLE GIT OBJECT / COMMIT
+        |
+        +-- canonical object/commit identity
+        |
+        v
+    DEDICATED EVIDENCE REF
+        |
+        +-- locator/discoverability only unless separately proven otherwise
+    
+    The evidence representation must remain outside the D379 repair tree.
+    
+    It must not contaminate:
+    - repair mutation surface;
+    - repair fixity F;
+    - production source;
+    - Stage A;
+    - candidate;
+    - holdout;
+    - Census;
+    - or any other governed D379 subject population unless the governing contract explicitly requires otherwise.
+    
+    ============================================================
+    4. CRITICAL DISTINCTION — OBJECT IMMUTABILITY != REF IMMUTABILITY
+    ============================================================
+    
+    Do not claim "create-only Git ref" merely from Git semantics.
+    
+    A Git object's content identity is immutable in the relevant sense:
+    
+    different bytes -> different object identity.
+    
+    But a Git ref is a name pointing at an object.
+    
+    The ref may be movable depending on:
+    - server policy;
+    - credentials;
+    - proxy behaviour;
+    - branch/tag protection;
+    - API path;
+    - force/update permissions;
+    - or other controls.
+    
+    Therefore:
+    
+    DO NOT EQUATE
+    
+    immutable object identity
+    
+    with
+    
+    immutable ref name.
+    
+    The canonical evidence identity should preferentially be the exact immutable Git object/commit identity.
+    
+    The evidence ref may be only a locator.
+    
+    If the ref later moves, that must not change what exact evidence object was admitted.
+    
+    A banked decision can bind the admitted evidence to the exact object/commit identity.
+    
+    This gives us a stronger model than pretending a mutable name is itself the evidence.
+    
+    ============================================================
+    5. D385 §E — MUST BE RESOLVED BEFORE BUILD
+    ============================================================
+    
+    You identified a legitimate R15 issue:
+    
+    the constructed known-positive interpreter may itself be ephemeral.
+    
+    Do not resolve this from memory or inference.
+    
+    Retrieve the exact governing D385 §E text.
+    
+    Determine from that text whether the interpreter built during this exercise is:
+    
+    A. only a qualification/calibration subject;
+    
+    or
+    
+    B. an artefact that must itself survive because a later governed runtime is expected to use that exact built interpreter.
+    
+    These are materially different requirements.
+    
+    If A:
+    
+    preserving exact source identity, environment E, build recipe/configuration, complete transcripts, resulting interpreter identity and qualification evidence may be sufficient.
+    
+    If B:
+    
+    destroying the staged interpreter after qualification could break the later evidence/continuity chain.
+    
+    Do not decide between A and B by architectural preference.
+    
+    Quote the exact D385 §E governing language and report what it actually requires.
+    
+    Where the text does not decide the issue, label it UNRESOLVED.
+    
+    Do not silently strengthen or weaken D385.
+    
+    ============================================================
+    6. DETERMINE THE MINIMUM CORRECT GIT EVIDENCE REPRESENTATION
+    ============================================================
+    
+    Investigate, without creating the evidence ref.
+    
+    Determine the smallest representation that can durably preserve and bind:
+    
+    1. complete raw Build A transcript;
+    2. complete raw Build B transcript;
+    3. exact byte digest for each transcript;
+    4. frozen environment E identity/fingerprint;
+    5. CPython source identity;
+    6. upstream tag/commit/tree identity required by v4.5;
+    7. build configuration and relevant build invocation identity;
+    8. resulting interpreter identity;
+    9. qualification/result metadata required by D379/D380/D385/v4.5;
+    10. enough provenance to establish which evidence belongs to Build A versus Build B;
+    11. exact evidence-manifest identity;
+    12. any other item explicitly required by the governing source.
+    
+    Do not add attractive metadata merely because it might be useful.
+    
+    Do not omit required metadata merely to make the representation smaller.
+    
+    REQUIREMENT -> REPRESENTATION.
+    
+    Not:
+    
+    REPRESENTATION -> INVENTED REQUIREMENT.
+    
+    ============================================================
+    7. TRANSCRIPT SIZE / CAPACITY
+    ============================================================
+    
+    Transcript size is currently unmeasured.
+    
+    Do not assume Git can accept the evidence merely because normal text logs are usually small.
+    
+    Establish the relevant limits before committing to the representation.
+    
+    At minimum determine:
+    
+    - expected or safely bounded Build A transcript size;
+    - expected or safely bounded Build B transcript size;
+    - resulting manifest/object representation;
+    - applicable GitHub object/file constraints;
+    - actual proxy/transport constraints where knowable;
+    - whether the proposed representation can preserve the complete raw transcripts without truncation.
+    
+    R10 remains controlling:
+    
+    FULL DIAGNOSTIC OUTPUT SURVIVES.
+    
+    No:
+    - excerpts as substitutes;
+    - silent truncation;
+    - tail-only logs;
+    - "important lines only";
+    - compressed summary replacing source evidence;
+    - size-based evidence deletion.
+    
+    Compression may only be considered if it preserves exact recoverable bytes and the governing evidence identity is unambiguous.
+    
+    Do not introduce compression merely to avoid measuring the actual problem.
+    
+    ============================================================
+    8. E7a-GIT MUST BE DESIGNED BEFORE EXECUTION
+    ============================================================
+    
+    Return an E7a-Git protocol to Kai before running it.
+    
+    It must qualify the actual selected storage/transport mechanism, not generic Git theory.
+    
+    At minimum address:
+    
+    A. BYTE-FIDELITY POSITIVE
+    
+    Known bytes are stored and retrieved.
+    
+    Retrieved bytes must equal original bytes exactly.
+    
+    Do not rely solely on human inspection.
+    
+    B. OBJECT-IDENTITY POSITIVE
+    
+    Known bytes produce the expected governed object/content identity.
+    
+    The retrieved evidence must be demonstrably the object requested.
+    
+    C. WRONG-OBJECT NEGATIVE
+    
+    Request or substitute a neighbouring valid but wrong object/reference.
+    
+    The qualification must demonstrate that the wrong object cannot satisfy the expected evidence identity.
+    
+    D. REPLACEMENT / DUPLICATE CONTROL
+    
+    Determine what actually happens when an attempt is made to replace/update/recreate the evidence locator.
+    
+    Do not assume refusal.
+    
+    Measure it.
+    
+    If the ref is mutable, document that honestly and ensure canonical evidence identity does not depend on ref immutability.
+    
+    E. CAPACITY / SIZE
+    
+    Demonstrate that the mechanism can hold both complete transcripts and required manifest/evidence.
+    
+    Do not infer capacity from one tiny probe.
+    
+    F. READBACK
+    
+    The adjudicator must be able to retrieve the admitted evidence later using the recorded immutable identity.
+    
+    G. INTERRUPTED / FAILED PUBLICATION
+    
+    Define what happens if publication fails part-way.
+    
+    No state may falsely represent incomplete evidence as complete/admitted evidence.
+    
+    H. RETRY SEMANTICS
+    
+    If publication outcome is ambiguous, do not blindly retry in a way that could create conflicting evidence identities.
+    
+    Where applicable preserve:
+    
+    SUCCESS
+    FAILURE
+    OUTCOME_UNKNOWN
+    
+    and reconcile UNKNOWN before consequential retry.
+    
+    I. VISIBILITY
+    
+    Record the actual repository/evidence visibility at execution time.
+    
+    The repository is presently reported PUBLIC.
+    
+    Do NOT hard-code PUBLIC into the architecture.
+    
+    Visibility is deployment state, not an eternal invariant.
+    
+    J. CREDENTIAL / SECRET EXCLUSION
+    
+    Do not infer:
+    
+    "environment was cleared, therefore no secrets are in the transcript."
+    
+    Demonstrate credential/secret absence to the extent the actual execution environment permits.
+    
+    No token, credential or unrelated secret may be intentionally included in the evidence.
+    
+    Design the test/check before the real build.
+    
+    K. SUBJECT BINDING
+    
+    The manifest must bind evidence to the exact D379 build subject/environment required by the governing plan.
+    
+    A perfectly preserved transcript of the wrong build is not valid evidence.
+    
+    L. INDEPENDENT RETRIEVABILITY
+    
+    Kai/adjudication must be able to retrieve the exact evidence object independently using its recorded identity.
+    
+    A producer-only evidence store is insufficient for independent review.
+    
+    ============================================================
+    9. SECURITY / PUBLICATION CONSEQUENCE
+    ============================================================
+    
+    The repository is currently reported public.
+    
+    Treat that as a real operational consequence.
+    
+    Before publication of real build evidence, establish that the transcript cannot contain:
+    
+    - GitHub credentials;
+    - authorization tokens;
+    - secret environment values;
+    - unrelated KAI secrets;
+    - private keys;
+    - credentials inherited by subprocesses;
+    - accidental environment dumps containing secrets;
+    - other sensitive material outside the authorised evidence subject.
+    
+    Do not solve this by sanitising the transcript after the build if sanitisation would destroy its status as the complete raw transcript.
+    
+    The preferred control is:
+    
+    prevent the secret from entering the captured environment/output in the first place.
+    
+    Then demonstrate that property.
+    
+    If raw completeness and secret exclusion cannot simultaneously be satisfied under the proposed execution method:
+    
+    STOP.
+    
+    Do not redact evidence silently.
+    
+    ============================================================
+    10. RELATIONSHIP TO FUTURE KAI EVIDENCE PLANE
+    ============================================================
+    
+    Do not implement the future Evidence Plane as part of D379.
+    
+    However, the D379 evidence mechanism should not contradict its engineering principles.
+    
+    This means:
+    
+    - immutable evidence identity;
+    - explicit provenance;
+    - exact-subject binding;
+    - producer evidence distinguished from independent verification;
+    - locator distinguished from evidence authority;
+    - no self-certification;
+    - UNKNOWN remains UNKNOWN;
+    - no hidden fallback;
+    - no dual canonical writer;
+    - no evidence mutation disguised as metadata maintenance.
+    
+    This is forward architectural compatibility, not scope expansion.
+    
+    D379 remains bounded.
+    
+    ============================================================
+    11. PROPOSED D390 DIRECTION — NOT YET BANKED
+    ============================================================
+    
+    Prepare exact proposed D390 wording for Kai review.
+    
+    Do NOT append it to DECISIONS.md yet.
+    
+    The wording should follow this substance:
+    
+    D390 — D387 BUILD-EVIDENCE STORE AMENDMENT
+    
+    D387's Dropbox-specific build-evidence transport is withdrawn.
+    
+    The durable build-evidence requirement established for D379 remains unchanged.
+    
+    Dropbox is not a D379 architectural dependency.
+    
+    The canonical identity of the two D379 interpreter-build transcripts and their binding metadata shall be an immutable Git evidence object/commit containing or unambiguously binding an evidence manifest for:
+    
+    - complete Build A transcript;
+    - complete Build B transcript;
+    - exact transcript byte identities;
+    - frozen environment E identity;
+    - exact CPython source identity;
+    - required build configuration/provenance;
+    - resulting interpreter identity;
+    - and all other evidence required by D379/D380/D385/v4.5.
+    
+    A dedicated D379 evidence ref may be used for discovery, but the ref name itself does not constitute evidence identity or admission authority unless separately mechanically qualified.
+    
+    The canonical admitted evidence identity is the exact immutable Git object/commit identity.
+    
+    The evidence representation must remain outside the D379 repair tree and must not enter repair fixity F unless governing authority explicitly requires otherwise.
+    
+    Before either real interpreter build, E7a-Git must qualify the actual selected Git storage/transport path, including:
+    
+    - capacity;
+    - complete-byte preservation;
+    - readback;
+    - object identity;
+    - wrong-object rejection;
+    - replacement/ref behaviour;
+    - failure/interruption semantics;
+    - visibility;
+    - credential/secret exclusion;
+    - exact-subject binding;
+    - and independent retrievability.
+    
+    Failure of E7a-Git is NO BUILD.
+    
+    Dropbox is withdrawn from this D379 execution path.
+    
+    All applicable requirements of D379 plan v4.5 §§26–28 remain unchanged.
+    
+    NOTE:
+    This is proposed substance only.
+    Do not bank this wording until Kai reviews the exact governing sources and the E7a-Git design.
+    
+    ============================================================
+    12. CURRENT AUTHORITY BOUNDARY
+    ============================================================
+    
+    CURRENTLY AUTHORISED:
+    
+    - read governing repository evidence;
+    - retrieve exact D385 §E;
+    - inspect relevant Git/proxy capabilities without creating the real evidence ref;
+    - determine representation requirements;
+    - determine size/capacity constraints without performing the real builds;
+    - design E7a-Git;
+    - draft proposed D390;
+    - report findings to Kai.
+    
+    CURRENTLY HELD / NOT AUTHORISED:
+    
+    - Dropbox provisioning;
+    - Dropbox token creation/use;
+    - Dropbox E7a;
+    - real E7a-Git execution;
+    - creation of the real evidence ref;
+    - CPython source/build execution;
+    - Build A;
+    - Build B;
+    - B4 repair mutation;
+    - D379 repair implementation;
+    - fixity F;
+    - capture;
+    - production Stage A;
+    - candidate;
+    - holdout;
+    - blind 40;
+    - PR #122 merge;
+    - main mutation;
+    - DECISIONS.md mutation for D390.
+    
+    Do not infer authority from technical feasibility.
+    
+    ============================================================
+    13. RETURN PACKET
+    ============================================================
+    
+    Return ONE evidence-bound packet containing:
+    
+    1. exact D385 §E governing text and source location;
+    2. ruling analysis: qualification-only interpreter vs retained governed-runtime artefact vs UNRESOLVED;
+    3. proposed Git evidence representation;
+    4. exact distinction between canonical immutable evidence identity and locator ref;
+    5. actual known Git/proxy capabilities and all remaining unknowns;
+    6. transcript-size/capacity analysis;
+    7. complete proposed E7a-Git protocol including hostile controls;
+    8. credential/secret-exclusion method;
+    9. failure and OUTCOME_UNKNOWN handling;
+    10. exact proposed D390 text;
+    11. explicit list of unresolved questions;
+    12. explicit list of assumptions;
+    13. exact evidence supporting every material conclusion.
+    
+    Label material conclusions using:
+    
+    FACT
+    EVIDENCE
+    INFERENCE
+    ASSUMPTION
+    UNRESOLVED
+    
+    Do not convert an unmeasured property into FACT.
+    
+    Do not redesign D379 beyond this storage reconciliation.
+    
+    Do not implement anything.
+    
+    ============================================================
+    14. ENGINEERING RULE
+    ============================================================
+    
+    The reason for this hold is not administrative.
+    
+    We discovered that a local implementation mechanism — Dropbox — had been promoted into a banked programme decision after an unnecessarily narrow choice set.
+    
+    The correction must therefore preserve both sides:
+    
+    1. do not blindly execute accidental architecture;
+    2. do not casually discard the evidence requirement that architecture was intended to satisfy.
+    
+    We are correcting the mechanism while preserving the invariant.
+    
+    The target is not:
+    
+    "get rid of Dropbox."
+    
+    The target is:
+    
+    "preserve complete, durable, exact-subject build evidence using the smallest mechanism consistent with KAI's architecture, engineering doctrine and D379's bounded authority."
+    
+    Wide architectural awareness.
+    Narrow execution.
+    Evidence before assertion.
+    Authority before mutation.
+    
+    STOP after returning the packet to Kai.
+    END-VERBATIM KAI-D387-STORE-RULING
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED and DONE: read sources, D385 §E, local git inspection, size bounding without a build, E7a-Git design, D390 draft, report  [CONVERSATION 2026-10-02 Kai, "CURRENTLY AUTHORISED:"]
+- HELD: Dropbox in every form; real E7a-Git; creating any evidence ref; CPython build; B4; F; capture; DECISIONS.md change for D390  [CONVERSATION 2026-10-02 Kai, "CURRENTLY HELD / NOT AUTHORISED:"]
+
+### 4. Open questions
+
+- U1–U8 in the packet (section 5), owner Kai; U1 (interpreter survival to capture) and U2 (T, and permanent synthetic objects in the public repository) gate the build  [CONVERSATION 2026-10-02 Orion, return packet §11]
+
+### 5. Incidents and corrections
+
+- CORRECTION of Orion's 2026-10-02 chat wording "create-only behaviour": local calibration shows a branch ref accepts a plain fast-forward push with no force, so a branch name is not write-once; only the create command refuses an existing ref  [CMD `git push ../remote.git $C3:refs/heads/evidence/t` → rc=0, ref moved]
+- Citation slip caught before sending: packet cited DECISIONS.md:35107 for "NO OTHER TRACKED PATH"; measured 35106; fixed  [CMD `grep -n '^\*\*NO OTHER TRACKED PATH' kai-pm/DECISIONS.md` → 35106]
+- RETURN PACKET, verbatim, sha256 4e92a196f23f9c1829a9869283fd3ee151e2956e6b0b7fcb9a1cdd95809dc9d1  [CMD `sha256sum packet22.md` → 4e92a196f23f9c18…]
+    BEGIN-VERBATIM ORION-E7-STORE-PACKET
+    ORION → KAI — D379 E7 STORE RECONCILIATION PACKET (answer to "D387 STORE RECONCILIATION RULING")
+    
+    STATUS: INVESTIGATION ONLY. Nothing created on the remote. No Dropbox contact. No build. No DECISIONS.md change.
+    Universe inspected: kai-pm/DECISIONS.md (D379, D385, D387, D388), kai-pm/D379_PLAN_V4_5.md, kai-pm/D379_PLAN_V4_5_KAI_RECONCILIATION.md, d379_controls.py at R d08f3ec, CPython v3.11.15 tree objects (local, from the M2 tag fetch), git 2.43.0 in this container, a LOCAL throwaway bare repository. docs.github.com was refused by the egress proxy on both routes tried, so no GitHub documentation was read.
+    
+    --------------------------------------------------------------------
+    1. D385 §E — EXACT TEXT
+    --------------------------------------------------------------------
+    kai-pm/DECISIONS.md:38962-38966, verbatim:
+    
+      ### E. FUTURE PRODUCTION IMPLICATION
+    
+      The eventual real candidate must execute under a governed runtime
+      satisfying the same D380 conditions. **THAT IS A PRODUCTION-ENVIRONMENT
+      PREREQUISITE, NOT A REASON TO CHANGE THE IDENTITY SCHEMA.**
+    
+    Adjacent governing text, D385 §D, DECISIONS.md:38939-38950, verbatim:
+    
+      D379 §8 already permits synthetic and local calibration subjects. A local
+      temporary interpreter may therefore be used **solely** for STDLIB /
+      STAGE_A calibration **if it satisfies D380 byte-for-byte**.
+      **IT MUST NOT:** … silently substitute for the later real candidate runtime
+    
+    D385 recovery block, DECISIONS.md:39020-39026: "CALIBRATION RUNTIME   a local/synthetic interpreter is permitted for STDLIB/STAGE_A calibration ONLY … or substitute for the real candidate runtime."
+    D385 §G, DECISIONS.md:38987-38989: "INC-2026-09-18-34   OPEN. Closes when a D380-compliant known-positive interpreter is ACTUALLY MEASURED, not when one is described."
+    
+    --------------------------------------------------------------------
+    2. RULING ANALYSIS — A / B / UNRESOLVED
+    --------------------------------------------------------------------
+    FACT (D385 §D, recovery block): the tranche interpreter is category A. D385 calls it a "local temporary interpreter", permits it "solely" for calibration, and forbids it to substitute for the later candidate runtime.
+    FACT (D385 §E): §E governs the eventual real candidate's runtime. It does not say this interpreter must survive; read literally it points away from that, because the candidate runtime is a separate production prerequisite.
+    FACT (D385 §G): INC-34 closes on the interpreter being MEASURED. The durable thing D385 asks for is measurement evidence, not the artefact.
+    
+    UNRESOLVED (v4.5, not D385). v4.5 §1 (lines 29-41) orders "establish a D380-compliant known-positive interpreter → freeze → execute one governed evidence capture". The capture needs that interpreter: d379_controls.py at R (lines 46-59) holds four limbs because no compliant runtime exists. They are Q1a-6, DEP-2, the STAGE_A canonical-runtime positive limb, and STDLIB V2-ID-2a. The capture is a separate later grant (v4.5 §34 steps 39-43), quite possibly in a later container. If the built interpreter is gone by then, those four limbs cannot execute. v4.5 does not say whether the interpreter must persist from the build to the capture, or which interpreter the capture runs under.
+    That is a gap in v4.5's own sequencing, not a D385 retention requirement. I do not resolve it. It needs Kai's ruling before the build, because it decides whether the staged interpreter tree must also be preserved, or whether a later re-build would be required. A re-build is not authorised.
+    INFERENCE, not relied on: if Builds A and B are bit-reproducible (executable sha256 and H2_PY_STDLIB_V1 equal), a later rebuild under the same E would reproduce the same governed runtime identity. That would be a third build, which needs authority, and E already differs across hosts (see 5).
+    
+    --------------------------------------------------------------------
+    3. PROPOSED GIT EVIDENCE REPRESENTATION — minimum
+    --------------------------------------------------------------------
+    One ORPHAN commit (no parent; it shares no history with any branch) whose tree contains only:
+    
+      A.transcript     Build A complete combined transcript, raw bytes as produced by the driver   [v4.5 §26 item 1]
+      B.transcript     Build B, same                                                              [v4.5 §26 item 2]
+      E.json           the frozen environment fingerprint E, exact bytes                         [v4.5 §19; §26 "environment fingerprint reference"]
+      driver.py        the exact build-driver source that produced both transcripts              [INFERENCE: needed to interpret the "governed driver record" §26 requires; ~few KB]
+      MANIFEST.json    canonical JSON (sorted keys, UTF-8, LF), binding:
+                         schema = "D379_E7_EVIDENCE_V1"
+                         per build (label A|B): transcript path, sha256, byte_count, source worktree path, build dir, staging root, start/end UTC, every command's return code
+                         E: sha256 of E.json
+                         CPython source: tag v3.11.15, tag object 2323bfc7…5323, commit 2340a037…a312, tree 8c6959bc…cddd, signer primary fpr A035C8C1…696D, the VALIDSIG status line   [v4.5 §18]
+                         configure arguments, prefix <P>, make/install invocations   [v4.5 §19, §20]
+                         resulting interpreter per build: executable sha256, H2_PY_STDLIB_V1 digest, plus the repository commit whose stdlib-identity code computed it   [v4.5 §20 compare set]
+                         driver.py sha256
+    
+    Requirement → representation, per Kai's list:
+      items 1, 2, 3     A/B.transcript and MANIFEST sha256/byte_count
+      items 4, 5, 6     E.json and the MANIFEST source block
+      item 7            configure arguments and invocations
+      item 8            the interpreter block
+      item 10           A/B labels bound to their own paths and digests
+      item 11           sha256(MANIFEST.json), together with the commit id
+    
+    Deliberately NOT included:
+      * item 9, the D380/D385 qualification result. Kai's §6 order measures it AFTER E7b, and v4.5 §26 does not list it in E7. It belongs to the milestone report and the later capture. UNRESOLVED if Kai wants it in E7: that would add a second, child evidence commit, appended and never rewriting the first.
+      * the staged interpreter tree (see 2, UNRESOLVED).
+      * repository visibility. That is deployment state; it goes in the report (see 8.I).
+    
+    Placement: outside the D379 tree and outside every branch tree. It is never in the repair branch, never in F's population, and never in the capture's two-file diff.
+    
+    --------------------------------------------------------------------
+    4. CANONICAL IDENTITY vs LOCATOR
+    --------------------------------------------------------------------
+    CANONICAL EVIDENCE IDENTITY is the pair:
+      (a) the evidence commit object id, a SHA-1 name. FACT: `git rev-parse --show-object-format` → sha1; and
+      (b) sha256(MANIFEST.json), whose entries pin each file's sha256.
+    INFERENCE: the commit id alone is a SHA-1 name. The SHA-256 chain through the manifest is what carries collision resistance, so admission should bind both. That needs Kai's acceptance (U7).
+    
+    LOCATOR: a ref used for discovery only. Its content never carries authority.
+    EVIDENCE, local git 2.43.0, throwaway bare repository, calibrated:
+      1. create with an empty lease (`--force-with-lease=<ref>:`) on an absent ref → created
+      2. the same, with a different commit, on the existing ref → REFUSED (stale info)
+      3. plain push of an unrelated commit → REFUSED (non-fast-forward)
+      4. plain push of a DESCENDANT commit → ACCEPTED; the ref MOVED with no force
+      5. tag create → created
+      6. re-push the tag to another commit, without force → REFUSED (already exists)
+      7. fresh repository, fetch by commit id → bytes identical (cmp)
+      8. the neighbouring commit has no A.log → lookup fails; its file's sha256 differs
+    Result 4 proves a branch name is NOT write-once, even without force.
+    CORRECTION of mine: last turn I described a create that is refused if the ref exists as giving "create-only behaviour". That holds for the create command only; a later fast-forward moves the ref. Kai's §4 is right.
+    Tag refusal (6) was observed at the git client. Whether the server or proxy refuses a FORCED tag move is unmeasured (U5).
+    Recommended locator form: a tag, refs/tags/d379-e7-<first 16 hex of the manifest sha256>. It does not move on fast-forward, and its name is itself derived from the evidence. It is still only a locator.
+    
+    --------------------------------------------------------------------
+    5. GIT / PROXY CAPABILITIES — known and unknown
+    --------------------------------------------------------------------
+    FACT  git 2.43.0. The remote is https://github.com/dainius1234/kai-system through the egress proxy. Object format sha1. Commits are SSH-signed (commit.gpgsign true, gpg.format ssh).
+    FACT  this session pushed a new non-session branch (claude/d379-repair-eb52f73) under authority. A branch DELETE was refused 403 (handoff entry 1).
+    FACT  repository visibility at 2026-10-02: public (list_repos). That is deployment state.
+    FACT  the container was restored onto another host: kernel 6.18.44-fc-v50 → -fc-v51. E contains the kernel, so the M2 value ae37673a… is stale. The instruments in /home/user/d379-build survived.
+    UNKNOWN  proxy policy on tag pushes, on ref names outside claude/*, on forced updates, on push size, and on byte transparency.
+    UNKNOWN  GitHub per-file and per-push limits. The documentation is blocked here. My memory says 50 MiB warning, 100 MiB refusal, 2 GB push; that is a locator only, NOT evidence (R16).
+    ASSUMPTION  GitHub keeps objects reachable from any ref indefinitely.
+    
+    --------------------------------------------------------------------
+    6. TRANSCRIPT SIZE / CAPACITY
+    --------------------------------------------------------------------
+    Measured: nothing. No build is authorised.
+    Bounded from the source tree (git ls-tree v3.11.15^{tree}; read only):
+      4,695 files · 302 C units in Modules|Objects|Python|Parser|Programs · 1,828 Lib .py files (2,402 Lib files)
+      Makefile.pre.in libinstall: one echoed install line per Lib file, and 6 compileall passes (3 optimisation levels × 2 roots)
+    INFERENCE: about 1–3 MB per transcript. That is roughly 0.5 MB of compiler lines, 0.3 MB of install lines and 0.5–1 MB of compileall lines, plus configure. Warning volume is unbounded a priori.
+    Control, not estimate: v4.5 §28 already makes "size ≤ T, combined ≤ U" a hard predicate (S9). The estimate only chooses T; it is never evidence.
+    PROPOSED: T = 16 MiB per object (≥5× the high estimate, below the unverified 50 MiB warning). U = 32 MiB = 2T.
+    COST, needs Kai/Dainius (U2): E7a must push two synthetic T-byte objects to the real remote. Ref deletion is refused here, so they stay in the public repository's history permanently. Synthetic content: mostly compiler-like text, with every edge case below. That is honest about the per-file limit, but it does not test a worst-case incompressible pack.
+    R10: no compression, excerpt or truncation. The transcripts are stored as raw blobs. Git's zlib packing is transport encoding, and the blob identity is over the raw bytes.
+    
+    --------------------------------------------------------------------
+    7. E7a-GIT PROTOCOL — for review, NOT executed
+    --------------------------------------------------------------------
+    Code: one script, `e7git.py`, used UNCHANGED at E7a and at E7b (same transport semantics). Subcommands: compose · publish · verify.
+    Synthetic corpus: two objects S1 and S2, each exactly T bytes. Content: LF, CRLF, bare CR, no trailing newline, UTF-8 non-ASCII, invalid UTF-8 (0xFF, 0xC3 alone), NUL, a line ≥1 MiB, and a different random seed per object (S1 ≠ S2). Composed into an orphan commit with a manifest of the same schema marked "SYNTHETIC": true. Locator refs/tags/d379-e7a-synthetic-<manifest16>.
+    
+    A  BYTE FIDELITY+   Fresh empty directory, no alternates, no shared objects. `git init`, `git fetch <remote> <commit-oid>`, extract each blob. cmp, byte count and sha256 must equal the pre-push values. Machine comparison only.
+    B  IDENTITY+        Recompute blob ids (`git hash-object`), the tree id, the commit id and sha256(MANIFEST); all must equal the locally composed values.
+    C  WRONG-OBJECT−    The same `verify` code must FAIL when given (i) S2's blob as S1, (ii) a valid unrelated commit (R d08f3ec) as the evidence commit, (iii) a local copy with one byte flipped, (iv) a manifest whose A/B labels are swapped. Each must refuse; a pass is a control failure.
+    D  REPLACEMENT      Measured, not assumed, against the synthetic locator: (1) a second empty-lease create to another commit; (2) a plain push of a descendant; (3) a tag re-push without force. Record the literal outcomes. A FORCED update is a destructive git operation, so it is NOT run without Dainius's explicit permission; if not run, it is recorded as UNMEASURED. Canonical identity never depends on any of these.
+    E  CAPACITY         Both T-byte objects in ONE push, the shape E7b will use. Record the pack bytes sent and the outcome. U ≥ 2T by construction.
+    F  READBACK         As A. Plus the retrieval recipe recorded for Kai: `git fetch https://github.com/dainius1234/kai-system <oid>`, or the web tree at /tree/<oid>.
+    G  INTERRUPTION     Order: compose locally → record the oid and sha256s in a local pending record → push → `git ls-remote` shows locator == oid → fresh-fetch verify (A, B) → only then state PUBLISHED_VERIFIED. A pushed-but-unverified object is NOT evidence. ASSUMPTION A1: a server ref is updated only after the whole pack is received and checked; not tested remotely.
+    H  RETRY            The commit is composed ONCE and its raw object retained; a retry re-pushes the SAME oid, so there is no second identity. After any non-zero or ambiguous push: `git ls-remote <locator>` → == oid: SUCCESS, go to verify · absent: FAILURE, retry the same oid · a different oid: CONFLICT, STOP · ls-remote fails: OUTCOME_UNKNOWN, STOP and report, no recomposition.
+    I  VISIBILITY       Record the repository visibility (list_repos) at publish time in the report. It is not hard-coded anywhere.
+    J  SECRETS          See 8. Run on the synthetic objects, with a planted canary as a known-positive.
+    K  SUBJECT BINDING  `verify` checks that each manifest digest equals its file, that E.json's sha256 equals the E frozen before Build A, the §18 source identity, the interpreter identities measured from the staging roots, and A ≠ B paths. Known-negative: a transcript from an E with one field changed must FAIL.
+    L  INDEPENDENT      Kai retrieves by commit id without Orion's container. The test: Dainius or Kai opens /tree/<oid> on GitHub and compares one sha256 by hand.
+    Failure of any predicate → NO BUILD.
+    
+    --------------------------------------------------------------------
+    8. CREDENTIAL / SECRET EXCLUSION
+    --------------------------------------------------------------------
+    Prevent, before the build:
+      (1) netiso.sh `env -i` with 5 explicit variables. EVIDENCE: a canary was absent inside (entry 18).
+      (2) NEW: hide credential FILES from the build namespace. Collect the credential values from the outer environment by name: GH_TOKEN, GITHUB_TOKEN, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, CLOUDSDK_AUTH_ACCESS_TOKEN, CLAUDE_CODE_MESSAGING_TOKEN, the file named by CLAUDE_SESSION_INGRESS_TOKEN_FILE, and git proxy auth. Locate every file containing any of them (`grep -rlF`, paths only). Mount an empty tmpfs over each containing directory inside the build namespace (as /tmp and /run are now). Re-run with a canary file as the known-positive.
+      Reason: user-namespace root maps to real root, so without (2) the build could READ such files. FACT: the namespace maps to uid 0; the reading itself is not tested.
+    Detect, before publication, on the exact bytes to be published:
+      (3) a scanner OUTSIDE the namespace searches the transcripts, E.json and the manifest for every collected value, in raw, base64 and URL-encoded forms. It prints counts only, never values.
+      (4) a pattern layer looks for PEM private-key headers, ghp_/gho_/github_pat_, AKIA…, and "Authorization:".
+      Calibration: a synthetic transcript with a planted canary must → HIT; a clean one must → 0.
+      Any hit → STOP. NO redaction, because redaction would break "complete raw" (Kai §9).
+    Claim limit (R17): this proves "no collected credential value and no listed secret pattern is present". It cannot prove the absence of an unknown secret that has no known value or pattern.
+    
+    --------------------------------------------------------------------
+    9. FAILURE / OUTCOME_UNKNOWN
+    --------------------------------------------------------------------
+    See 7.G and 7.H. States: COMPOSED · PUSHED_UNVERIFIED · PUBLISHED_VERIFIED · FAILURE · CONFLICT · OUTCOME_UNKNOWN. Only PUBLISHED_VERIFIED satisfies E7b. CONFLICT and OUTCOME_UNKNOWN → STOP. Token expiry no longer applies: the transport uses the existing git proxy credential and holds no token of its own.
+    
+    --------------------------------------------------------------------
+    10. PROPOSED D390 TEXT — DRAFT, NOT FOR APPEND
+    --------------------------------------------------------------------
+    ## D390 — <measured UTC date> — D387 BUILD-EVIDENCE STORE AMENDMENT: DROPBOX WITHDRAWN; GIT-NATIVE IMMUTABLE EVIDENCE OBJECT. GOVERNANCE ONLY — BANKING IS NOT EXECUTION.
+    
+    **Allocator.** <derived structurally over `^## D[0-9]+( +—|$)` immediately before append>.
+    
+    **Amends D387, build-log store only.** D387's selection of Dropbox as the durable canonical store for the D379 interpreter build transcripts is WITHDRAWN. The durable build-evidence requirement is UNCHANGED: the two complete raw interpreter-build transcripts and their binding metadata must survive the ephemeral build environment, remain durably and independently retrievable, and be bound to the exact build subject and environment (R10; D379 plan v4.5 §§19–20, 26–28). Dropbox is not a D379 or KAI architectural dependency.
+    
+    **Origin, recorded.** Dropbox entered D387 from a two-option framing presented by Orion on 2026-09-25 ("such as your Dropbox or a GitHub Actions artefact"). That framing did not evaluate the repository itself or a Git-native evidence object.
+    
+    **Canonical evidence identity.** One immutable orphan Git commit containing exactly: the complete Build A transcript, the complete Build B transcript, the frozen environment fingerprint E, the build driver source, and an evidence manifest (schema D379_E7_EVIDENCE_V1). The manifest binds each transcript's SHA-256 and byte count, E's SHA-256, the §18 CPython source identity, the configure arguments and invocations with their return codes, and each resulting interpreter's executable SHA-256 and H2_PY_STDLIB_V1 identity. The admitted evidence identity is the PAIR: the commit object id, and the SHA-256 of the manifest.
+    
+    **Locator.** A dedicated evidence ref may be used for discovery. The ref name is not evidence identity and carries no admission authority; if it moves, the admitted identity is unchanged.
+    
+    **Placement.** The evidence object lies outside the D379 repair tree and every branch tree. It does not enter fixity F or the capture output population.
+    
+    **E7a-Git.** Before either real build, E7a-Git qualifies the actual transport, with known-positive and known-negative controls for: capacity (two objects of exactly T, U ≥ 2T); complete-byte preservation; independent readback by commit id; object identity; wrong-object refusal; measured ref-replacement behaviour; interruption and OUTCOME_UNKNOWN handling; visibility recorded as deployment state; credential exclusion by prevention, then detection, with no redaction; exact-subject binding; and independent retrievability. Failure → NO BUILD.
+    
+    **Unchanged.** All other requirements of D379 plan v4.5 §§26–28 apply to this transport unchanged. No other D387 ruling is amended.
+    
+    **Not authorised by this entry:** any build, capture, production Stage A, candidate, holdout, blind 40 or merge.
+    
+    --------------------------------------------------------------------
+    11. UNRESOLVED — needs ruling
+    --------------------------------------------------------------------
+    U1  Must the built interpreter persist from the build to the capture, and which interpreter runs the capture's four HELD limbs? (v4.5 is silent; see 2.)
+    U2  The value of T, and acceptance that E7a's synthetic objects stay permanently in the public repository (ref delete is refused 403).
+    U3  Proxy policy on tag pushes, on refs outside claude/*, and on push size. E7a measures these.
+    U4  GitHub size limits. The documentation is unreachable; E7a measures within T only.
+    U5  Whether a forced locator update may be attempted on the synthetic locator to measure server protection (destructive git: needs Dainius).
+    U6  Whether the D380/D385 qualification result belongs in the E7 object (proposed: no).
+    U7  Whether the (commit id, manifest sha256) pair is accepted as the admitted identity, given that the commit id is SHA-1.
+    U8  The D390 allocator date and number are derived at append time, not now.
+    
+    --------------------------------------------------------------------
+    12. ASSUMPTIONS
+    --------------------------------------------------------------------
+    A1  A remote ref is updated only after the full pack is received (git receive-pack semantics); not tested against GitHub.
+    A2  GitHub keeps ref-reachable objects indefinitely.
+    A3  Kai keeps independent read access (true while the repository is public).
+    A4  The proxy is byte-transparent for git pushes and fetches (E7a.A tests it).
+    A5  The transcript size estimate in 6 (INFERENCE only; §28's predicate is the control).
+    
+    --------------------------------------------------------------------
+    13. EVIDENCE INDEX
+    --------------------------------------------------------------------
+    D385 §§D, E, G and recovery block   DECISIONS.md:38939-38950, 38962-38966, 38987-38989, 39020-39026
+    D387 Dropbox line                   DECISIONS.md:39301
+    D388 Q9                             DECISIONS.md:39332
+    D379 "NO OTHER TRACKED PATH"        DECISIONS.md:35106
+    v4.5 purpose; F; capture outputs    D379_PLAN_V4_5.md:29-41, 1546-1613; 0 "Dropbox" mentions
+    HELD limbs                          d379_controls.py:46-59 at d08f3ec
+    origin of the two-option framing    session transcript 2026-09-25T16:00:30Z (Orion), Kai's choice 2026-09-25T16:18:17Z
+    git semantics                       local calibration, 8 results (section 4), this session 2026-10-02
+    size bound inputs                   git ls-tree v3.11.15^{tree}: 4,695 · 302 · 1,828 · 2,402; Makefile.pre.in libinstall
+    host change                         uname -r → 6.18.44-fc-v51
+    visibility                          list_repos → public
+    Kai ruling received                 2026-10-02T15:08:49Z, 18,747 bytes, sha256 7cac4c9b…1f3f, preserved verbatim in HANDOFF_LOG entry 22
+    
+    STOP. Returned to Kai. Nothing further executes.
+    END-VERBATIM ORION-E7-STORE-PACKET
+
+### 6. Next authorised step
+
+- None. STOP; Kai reviews the packet  [CONVERSATION 2026-10-02 Kai, "STOP after returning the packet to Kai."]
+
+### 7. What I am unsure of
+
+- GitHub size limits and proxy ref policy are unmeasured; docs.github.com refused by the egress proxy (curl 403 CONNECT; WebFetch EGRESS_BLOCKED)  [CMD `curl https://docs.github.com/…` → CONNECT 403]
+- Transcript size is an inference from file counts, not a measurement  [CMD `git ls-tree -r --name-only v3.11.15^{tree} | wc -l` → 4695]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
