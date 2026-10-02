@@ -1,0 +1,89 @@
+{
+ "SYNTHETIC": false,
+ "builds": {
+  "A": {
+   "build_dir": "/home/user/d379-build/bw/A/build",
+   "byte_count": 1009185,
+   "canonical": {
+    "build_dir": "/d379/build",
+    "source_worktree": "/d379/src",
+    "staging_root": "/d379/stage"
+   },
+   "end_utc": "2026-10-02T17:28:25Z",
+   "interpreter": {
+    "computed_by_commit": "d08f3ec5de4d823011e66261c84c98a76371428e",
+    "executable_sha256": "6068cf00c25bbe6b13b5ee09c831d7d4e385b63b84708a1b1b956bda1737c06f",
+    "h2_py_stdlib_v1": "cad0d3a5f02cf9c5112e1140b605cfb5078a5f18bf2bee276ddefadd7fdb8601",
+    "stage_identity_sha256": "25a8f274cbcb6a9b65872beac21437e129ee4ea7aa001b21c17b39197932b910"
+   },
+   "return_codes": {
+    "configure": 0,
+    "install": 0,
+    "make": 0
+   },
+   "sha256": "e8152fb3dcfe53807f4cec9a4610034496a7a36f3d3844f15f5839ae15fc5e78",
+   "source_worktree": "/home/user/d379-build/bw/A/src",
+   "staging_root": "/home/user/d379-build/bw/A/stage",
+   "start_utc": "2026-10-02T17:24:57Z",
+   "transcript": "A.transcript"
+  },
+  "B": {
+   "build_dir": "/home/user/d379-build/bw/B/build",
+   "byte_count": 1009185,
+   "canonical": {
+    "build_dir": "/d379/build",
+    "source_worktree": "/d379/src",
+    "staging_root": "/d379/stage"
+   },
+   "end_utc": "2026-10-02T17:32:20Z",
+   "interpreter": {
+    "computed_by_commit": "d08f3ec5de4d823011e66261c84c98a76371428e",
+    "executable_sha256": "6068cf00c25bbe6b13b5ee09c831d7d4e385b63b84708a1b1b956bda1737c06f",
+    "h2_py_stdlib_v1": "cad0d3a5f02cf9c5112e1140b605cfb5078a5f18bf2bee276ddefadd7fdb8601",
+    "stage_identity_sha256": "25a8f274cbcb6a9b65872beac21437e129ee4ea7aa001b21c17b39197932b910"
+   },
+   "return_codes": {
+    "configure": 0,
+    "install": 0,
+    "make": 0
+   },
+   "sha256": "29e5ac2ba88b8acad9ea7979fefcfaf6e5394db373372b16f57c9a53ca2cc073",
+   "source_worktree": "/home/user/d379-build/bw/B/src",
+   "staging_root": "/home/user/d379-build/bw/B/stage",
+   "start_utc": "2026-10-02T17:28:55Z",
+   "transcript": "B.transcript"
+  }
+ },
+ "configure": {
+  "args": [
+   "/d379/src/configure",
+   "--prefix=/opt/d379-py311",
+   "--without-ensurepip"
+  ],
+  "cwd": "/d379/build",
+  "install": [
+   "make",
+   "install",
+   "DESTDIR=/d379/stage"
+  ],
+  "make": [
+   "make"
+  ]
+ },
+ "cpython_source": {
+  "commit": "2340a037f7450e70fccfe411e6531afb4d57a312",
+  "signer_primary_fpr": "A035C8C19219BA821ECEA86B64E628F8D684696D",
+  "tag": "v3.11.15",
+  "tag_object": "2323bfc729b041c43b1e5e4c5f18c548fc345323",
+  "tree": "8c6959bc70b201b477138f00c432a3bb2f1caddd"
+ },
+ "driver": {
+  "path": "driver.py",
+  "sha256": "521c50d3c5e47893e743a5d90249fdb425cdf41f360ea900b3f3d49507d6be01"
+ },
+ "environment": {
+  "path": "E.json",
+  "sha256": "6cb9496368f2e5c5375463204a0b5e0a496195e48a52b7a20994018b5c17dd47"
+ },
+ "schema": "D379_E7_EVIDENCE_V1"
+}
