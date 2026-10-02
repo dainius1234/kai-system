@@ -3139,3 +3139,649 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-02T16:57:12Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-02T16:57:11Z  [CMD `date -u +%FT%TZ` → 2026-10-02T16:57:11Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: b1c6c6e567685cff1686bd63794e87c499a9722a  [CMD `git rev-parse HEAD` → b1c6c6e567685cff1686bd63794e87c499a9722a]
+- tree: 3ca5ca69fe7e000417fb7ab8fc4a341a2995f279  [CMD `git rev-parse HEAD^{tree}` → 3ca5ca69fe7e000417fb7ab8fc4a341a2995f279]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:claude/project-rework-plan-pgvp35: b1c6c6e567685cff1686bd63794e87c499a9722a  [CMD `git ls-remote --heads origin` → b1c6c6e567685cff1686bd63794e87c499a9722a]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d08f3ec5de4d823011e66261c84c98a76371428e  [CMD `git ls-remote --heads origin` → d08f3ec5de4d823011e66261c84c98a76371428e]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 25  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 25]
+
+### 1. The four states
+
+- physical: E7a-Git v2 EXECUTED and FAILED at item E; NO remote object or ref created (0 `d379-*` tags on the remote); repair branch d08f3ec unchanged; no build  [CMD `git ls-remote https://github.com/dainius1234/kai-system 'refs/tags/d379-*' | wc -l` → 0]
+- authorised: E7a-Git v2 only, STOP on any failure — STOPPED  [CONVERSATION 2026-10-02 Dainius, "Authorised: run E7a-Git v2"]
+- evidence: E7a verdict "STOP: publication outcome FAILURE" — NO BUILD  [CMD `python3 e7a_run.py` → rc=1]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-02 · authorises E7a-Git v2 only (entry 23), including one permanent synthetic commit and one tag push to the public repository, STOP on any failure and after reporting ⚠ UNBANKED  [CONVERSATION 2026-10-02 Dainius, "Authorised: run E7a-Git v2"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: any re-run, any other locator form (a branch ref would be a transport change: D390 forbids an alternate transport without adjudication), builds, D390 replay, repair, capture  [D390]
+
+### 4. Open questions
+
+- TRANSPORT ADJUDICATION, owner Kai/Dainius. MEASURED: the git egress path refused the tag create with HTTP 403 after the 7-object pack (9.30 KiB) was sent; ls-remote ABSENT both attempts. Prior facts: a new `claude/…` branch push SUCCEEDED (the repair branch, under authority); a branch DELETE was refused 403. INFERENCE (unmeasured): the proxy permits ref updates only under some branch policy such as refs/heads/claude/*. Option 1 (Orion recommends): amend protocol v2's locator to an orphan branch `refs/heads/claude/d379-e7-evidence-<manifest16>` — identity is unchanged under D390 (the locator carries zero authority; branch mobility is already accepted by U7/K2), and the run repeats exactly with only that one line changed. Option 2: provision a tag-capable route in the environment (unknown whether possible). Option 3: Dainius pushes from outside the proxy — rejected by Orion: E7b would then not use the qualified transport  [CMD `e7a_run.py publish` → HTTP 403, ls-remote ABSENT]
+
+### 5. Incidents and corrections
+
+- E7a items PASSED 2 of 4 before STOP: J-calibration, J-scan-objects. FAILED: D-locator-create, E-proxy-tag-push. Items A, B, C, K, K2 were NOT reached on the real remote (no subject: R11); a full DRY RUN against a local bare remote passed 15/15, including every negative control — runner calibration only, not E7a evidence  [CMD `python3 e7a_run.py` (dry remote) → VERDICT PUBLISHED_VERIFIED 15/15]
+- Composed (never published) synthetic object: commit 52aea6a4a379f51524a113b32e3792ec37ea2629, tree 05666108324b4b6a5abccc4640a8104051118ad4, manifest sha256 d1e5ccf4ac5535947ceb38bde36a13cef1a047efeec4b9b33e369c5e73ee6308; 5 files; byte values covered 256; commit not signed (commit-tree)  [CMD `cat e7a/pending.json` → commit 52aea6a4a379]
+- Visibility at publish time: public  [CMD `list_repos kai-system` → visibility public]
+- J PREVENT (new wrapper netiso2.sh): user+net+mount+PID ns with own /proc; empty tmpfs over /tmp /run /root /home /opt /var /mnt /etc/ssl/private; workspace bound back; env -i with 5 variables. Canary calibration: outside 8/8 canary files readable, env 1, /proc environ 1, FS grep 8; inside 0/0/0/0. Real credential values in the build-visible /etc + workspace: 0 files. Isolation re-calibrated under v2 with the socket population derived at run time: outside 8 OPEN, inside the same 8 BLOCKED, ifaces ['lo']; umount2 EINVAL ×2  [CMD `./netiso2.sh canary_probe.sh` → 0 of 8]
+- J DETECT: secretscan.py collects 7 credential values (6 env, 2 distinct, plus the ingress token file); calibration canary HIT, ghp_ pattern HIT, clean 0; the 5 evidence files 0 hits; the run log and all instruments 0 hits  [CMD `python3 secretscan.py e7a/run.log …` → TOTAL HITS 0]
+- Defect of mine, caught by R15: attack.py hard-coded `102.sock`; after the host restore the socket is `103.sock`, so the outside known-positive silently fell from 9 OPEN to 5. A list beside the thing (R5). Replaced by attack2.py, which derives the socket population at run time  [CMD `find /tmp /run -type s` → 103.sock, ingest.sock]
+- A first whole-filesystem credential-value search timed out (300 s) and was NOT counted as zero; replaced by prevention-by-construction plus a bounded search of the build-visible tree  [CMD `grep -rlF -f <values> /root /home /etc …` → Terminated]
+- Full E7a run log, base64 of the exact bytes (it contains CR progress meters), sha256 38d8e18ad58cd29a2934b53fcd0db9d334400086af433b455e7536efcf7f7009, 5479 bytes  [CMD `sha256sum e7a/run.log` → 38d8e18ad58cd29a…]
+    BEGIN-BASE64 e7a/run.log
+    RSBkZXJpdmVkIGluc2lkZSBuZXRpc28yOiAxNzcxZmNmMGVmYWRmZDRmMGRiYWZjZjU4ZGI0YzFj
+    M2FjZTAwYWYzN2UwNDViYzEwMDhiZjQ1OGM5YjhjZTBhIDMyNTYgYnl0ZXM7IEVfU0hBMjU2IDYy
+    YThlNWUwYmFhY2NhZjUyNzRmNDA1Nzk1MjU0MjQ4YTUzN2YxN2Y0NzY3MWVlOWYzNDQwOGM0MmVi
+    NjI3ZjUKY29ycHVzIEEudHJhbnNjcmlwdDogMzM2MyBieXRlcyBzaGEyNTYgZGQ1MzA0ODNiM2Iw
+    ZmFhODIwNzYzZjdjZmI1NDA1MjRjMzMzYmYyNDM2NTNlNjJjZWU3YTNiYTEyMWYxMjZiOQpjb3Jw
+    dXMgQi50cmFuc2NyaXB0OiAzMzYzIGJ5dGVzIHNoYTI1NiAzODBiMzQ5N2M5NDkxYTdiNTQ5Yzcw
+    MDUwYjA3MzgzY2VmZWRkZDJmNjk3MjM0OTFmODA2N2VmOGRjNmY0NzI5CmNvcnB1cyBFLmpzb246
+    IDMyNTYgYnl0ZXMgc2hhMjU2IDE3NzFmY2YwZWZhZGZkNGYwZGJhZmNmNThkYjRjMWMzYWNlMDBh
+    ZjM3ZTA0NWJjMTAwOGJmNDU4YzliOGNlMGEKY29ycHVzIE1BTklGRVNULmpzb246IDE4OTYgYnl0
+    ZXMgc2hhMjU2IGQxZTVjY2Y0YWM1NTM1OTQ3Y2ViMzhiZGUzNmExM2NlZjFhMDQ3ZWZlZWM0Yjli
+    MzNlMzY5YzVlNzNlZTYzMDgKY29ycHVzIGRyaXZlci5weTogNjcgYnl0ZXMgc2hhMjU2IDkxNTli
+    ZTk3MmYxMzhiYzQ1ZGQ5OTAzNjJiN2ExYTNjMGJkNWYzMzY2M2VhY2ViY2Q2MTg3NTZkNmUwM2U1
+    ZTMKYnl0ZSB2YWx1ZXMgY292ZXJlZDogMjU2IHwgQ1JMRiBUcnVlIHwgYmFyZSBDUiBUcnVlIHwg
+    TlVMIFRydWUgfCB0cmFpbGluZyBuZXdsaW5lIEZhbHNlCnNjYW5uZXIgcG9zLXZhbHVlIHJjPTEK
+    Y29sbGVjdGVkIGNyZWRlbnRpYWwgdmFsdWVzOiA4IChBV1NfQUNDRVNTX0tFWV9JRCwgQVdTX1NF
+    Q1JFVF9BQ0NFU1NfS0VZLCBDTEFVREVfQ09ERV9NRVNTQUdJTkdfVE9LRU4sIENMQVVERV9TRVNT
+    SU9OX0lOR1JFU1NfVE9LRU5fRklMRSwgQ0xPVURTREtfQVVUSF9BQ0NFU1NfVE9LRU4sIEQzNzlf
+    Q0FOQVJZX1RPS0VOLCBHSF9UT0tFTiwgR0lUSFVCX1RPS0VOKQovaG9tZS91c2VyL2QzNzktYnVp
+    bGQvZTdhL3NjYW5fcG9zX3ZhbHVlLmJpbjogMzkgYnl0ZXMsIGhpdHMgMSAtPiBEMzc5X0NBTkFS
+    WV9UT0tFTj0xClRPVEFMIEhJVFMgMQpzY2FubmVyIHBvcy1wYXR0ZXJuIHJjPTEKY29sbGVjdGVk
+    IGNyZWRlbnRpYWwgdmFsdWVzOiA3IChBV1NfQUNDRVNTX0tFWV9JRCwgQVdTX1NFQ1JFVF9BQ0NF
+    U1NfS0VZLCBDTEFVREVfQ09ERV9NRVNTQUdJTkdfVE9LRU4sIENMQVVERV9TRVNTSU9OX0lOR1JF
+    U1NfVE9LRU5fRklMRSwgQ0xPVURTREtfQVVUSF9BQ0NFU1NfVE9LRU4sIEdIX1RPS0VOLCBHSVRI
+    VUJfVE9LRU4pCi9ob21lL3VzZXIvZDM3OS1idWlsZC9lN2Evc2Nhbl9wb3NfcGF0dGVybi5iaW46
+    IDQ3IGJ5dGVzLCBoaXRzIDEgLT4gcGF0dGVybjpnaXRodWJfdG9rZW49MQpUT1RBTCBISVRTIDEK
+    c2Nhbm5lciBuZWctY2xlYW4gcmM9MApjb2xsZWN0ZWQgY3JlZGVudGlhbCB2YWx1ZXM6IDggKEFX
+    U19BQ0NFU1NfS0VZX0lELCBBV1NfU0VDUkVUX0FDQ0VTU19LRVksIENMQVVERV9DT0RFX01FU1NB
+    R0lOR19UT0tFTiwgQ0xBVURFX1NFU1NJT05fSU5HUkVTU19UT0tFTl9GSUxFLCBDTE9VRFNES19B
+    VVRIX0FDQ0VTU19UT0tFTiwgRDM3OV9DQU5BUllfVE9LRU4sIEdIX1RPS0VOLCBHSVRIVUJfVE9L
+    RU4pCi9ob21lL3VzZXIvZDM3OS1idWlsZC9lN2Evc2Nhbl9uZWcuYmluOiAyNiBieXRlcywgaGl0
+    cyAwClRPVEFMIEhJVFMgMApbUEFTU10gSi1jYWxpYnJhdGlvbjogY2FuYXJ5IHZhbHVlIEhJVCBy
+    Yz0xOyBnaHBfIHBhdHRlcm4gSElUIHJjPTE7IGNsZWFuIHJjPTAKY29sbGVjdGVkIGNyZWRlbnRp
+    YWwgdmFsdWVzOiA3IChBV1NfQUNDRVNTX0tFWV9JRCwgQVdTX1NFQ1JFVF9BQ0NFU1NfS0VZLCBD
+    TEFVREVfQ09ERV9NRVNTQUdJTkdfVE9LRU4sIENMQVVERV9TRVNTSU9OX0lOR1JFU1NfVE9LRU5f
+    RklMRSwgQ0xPVURTREtfQVVUSF9BQ0NFU1NfVE9LRU4sIEdIX1RPS0VOLCBHSVRIVUJfVE9LRU4p
+    Ci9ob21lL3VzZXIvZDM3OS1idWlsZC9lN2Evc2Nhbi9BLnRyYW5zY3JpcHQ6IDMzNjMgYnl0ZXMs
+    IGhpdHMgMAovaG9tZS91c2VyL2QzNzktYnVpbGQvZTdhL3NjYW4vQi50cmFuc2NyaXB0OiAzMzYz
+    IGJ5dGVzLCBoaXRzIDAKL2hvbWUvdXNlci9kMzc5LWJ1aWxkL2U3YS9zY2FuL0UuanNvbjogMzI1
+    NiBieXRlcywgaGl0cyAwCi9ob21lL3VzZXIvZDM3OS1idWlsZC9lN2Evc2Nhbi9NQU5JRkVTVC5q
+    c29uOiAxODk2IGJ5dGVzLCBoaXRzIDAKL2hvbWUvdXNlci9kMzc5LWJ1aWxkL2U3YS9zY2FuL2Ry
+    aXZlci5weTogNjcgYnl0ZXMsIGhpdHMgMApUT1RBTCBISVRTIDAKW1BBU1NdIEotc2Nhbi1vYmpl
+    Y3RzOiBzY2FubmVyIHJjPTAgb3ZlciB0aGUgNSBldmlkZW5jZSBmaWxlcwpDT01QT1NFRCBjb21t
+    aXQgNTJhZWE2YTRhMzc5ZjUxNTI0YTExM2IzMmUzNzkyZWMzN2VhMjYyOSB0cmVlIDA1NjY2MTA4
+    MzI0YjRiNmE1YWJjY2M0NjQwYTgxMDQwNTExMThhZDQgbWFuaWZlc3QgZDFlNWNjZjRhYzU1MzU5
+    NDdjZWIzOGJkZTM2YTEzY2VmMWEwNDdlZmVlYzRiOWIzM2UzNjljNWU3M2VlNjMwOCBsb2NhdG9y
+    IHJlZnMvdGFncy9kMzc5LWU3YS1zeW50aGV0aWMtZDFlNWNjZjRhYzU1MzU5NApjb21taXQgb2Jq
+    ZWN0IGJ5dGVzOiAyMzAgfCBzaWduZWQ6IEZhbHNlCnByZS1wdXNoIGxzLXJlbW90ZTogQUJTRU5U
+    IE5vbmUKcHVibGlzaCBhdHRlbXB0IDE6IG91dGNvbWUgRkFJTFVSRSBwdXNoX3JjIDEgbHNfcmVt
+    b3RlIFsnQUJTRU5UJywgTm9uZV0KcHVzaCBzdGRvdXQgKGZ1bGwpOgpEb25lCgpwdXNoIHN0ZGVy
+    ciAoZnVsbCk6CmZhdGFsOiBleHBlY3RlZCAnYWNrbm93bGVkZ21lbnRzJywgcmVjZWl2ZWQgJ3Bh
+    Y2tmaWxlJwp3YXJuaW5nOiBwdXNoIG5lZ290aWF0aW9uIGZhaWxlZDsgcHJvY2VlZGluZyBhbnl3
+    YXkgd2l0aCBwdXNoCkVudW1lcmF0aW5nIG9iamVjdHM6IDcsIGRvbmUuCkNvdW50aW5nIG9iamVj
+    dHM6ICAxNCUgKDEvNykNQ291bnRpbmcgb2JqZWN0czogIDI4JSAoMi83KQ1Db3VudGluZyBvYmpl
+    Y3RzOiAgNDIlICgzLzcpDUNvdW50aW5nIG9iamVjdHM6ICA1NyUgKDQvNykNQ291bnRpbmcgb2Jq
+    ZWN0czogIDcxJSAoNS83KQ1Db3VudGluZyBvYmplY3RzOiAgODUlICg2LzcpDUNvdW50aW5nIG9i
+    amVjdHM6IDEwMCUgKDcvNykNQ291bnRpbmcgb2JqZWN0czogMTAwJSAoNy83KSwgZG9uZS4KRGVs
+    dGEgY29tcHJlc3Npb24gdXNpbmcgdXAgdG8gNCB0aHJlYWRzCkNvbXByZXNzaW5nIG9iamVjdHM6
+    ICAxNCUgKDEvNykNQ29tcHJlc3Npbmcgb2JqZWN0czogIDI4JSAoMi83KQ1Db21wcmVzc2luZyBv
+    YmplY3RzOiAgNDIlICgzLzcpDUNvbXByZXNzaW5nIG9iamVjdHM6ICA1NyUgKDQvNykNQ29tcHJl
+    c3Npbmcgb2JqZWN0czogIDcxJSAoNS83KQ1Db21wcmVzc2luZyBvYmplY3RzOiAgODUlICg2Lzcp
+    DUNvbXByZXNzaW5nIG9iamVjdHM6IDEwMCUgKDcvNykNQ29tcHJlc3Npbmcgb2JqZWN0czogMTAw
+    JSAoNy83KSwgZG9uZS4KV3JpdGluZyBvYmplY3RzOiAgMTQlICgxLzcpDVdyaXRpbmcgb2JqZWN0
+    czogIDI4JSAoMi83KQ1Xcml0aW5nIG9iamVjdHM6ICA0MiUgKDMvNykNV3JpdGluZyBvYmplY3Rz
+    OiAgNTclICg0LzcpDVdyaXRpbmcgb2JqZWN0czogIDcxJSAoNS83KQ1Xcml0aW5nIG9iamVjdHM6
+    ICA4NSUgKDYvNykNV3JpdGluZyBvYmplY3RzOiAxMDAlICg3LzcpDVdyaXRpbmcgb2JqZWN0czog
+    MTAwJSAoNy83KSwgOS4zMCBLaUIgfCA5LjMwIE1pQi9zLCBkb25lLgpUb3RhbCA3IChkZWx0YSAw
+    KSwgcmV1c2VkIDAgKGRlbHRhIDApLCBwYWNrLXJldXNlZCAwCmVycm9yOiBSUEMgZmFpbGVkOyBI
+    VFRQIDQwMyBjdXJsIDIyIFRoZSByZXF1ZXN0ZWQgVVJMIHJldHVybmVkIGVycm9yOiA0MDMKc2Vu
+    ZC1wYWNrOiB1bmV4cGVjdGVkIGRpc2Nvbm5lY3Qgd2hpbGUgcmVhZGluZyBzaWRlYmFuZCBwYWNr
+    ZXQKZmF0YWw6IHRoZSByZW1vdGUgZW5kIGh1bmcgdXAgdW5leHBlY3RlZGx5CgpwdWJsaXNoIGF0
+    dGVtcHQgMjogb3V0Y29tZSBGQUlMVVJFIHB1c2hfcmMgMSBsc19yZW1vdGUgWydBQlNFTlQnLCBO
+    b25lXQpwdXNoIHN0ZG91dCAoZnVsbCk6CkRvbmUKCnB1c2ggc3RkZXJyIChmdWxsKToKZmF0YWw6
+    IGV4cGVjdGVkICdhY2tub3dsZWRnbWVudHMnLCByZWNlaXZlZCAncGFja2ZpbGUnCndhcm5pbmc6
+    IHB1c2ggbmVnb3RpYXRpb24gZmFpbGVkOyBwcm9jZWVkaW5nIGFueXdheSB3aXRoIHB1c2gKRW51
+    bWVyYXRpbmcgb2JqZWN0czogNywgZG9uZS4KQ291bnRpbmcgb2JqZWN0czogIDE0JSAoMS83KQ1D
+    b3VudGluZyBvYmplY3RzOiAgMjglICgyLzcpDUNvdW50aW5nIG9iamVjdHM6ICA0MiUgKDMvNykN
+    Q291bnRpbmcgb2JqZWN0czogIDU3JSAoNC83KQ1Db3VudGluZyBvYmplY3RzOiAgNzElICg1Lzcp
+    DUNvdW50aW5nIG9iamVjdHM6ICA4NSUgKDYvNykNQ291bnRpbmcgb2JqZWN0czogMTAwJSAoNy83
+    KQ1Db3VudGluZyBvYmplY3RzOiAxMDAlICg3LzcpLCBkb25lLgpEZWx0YSBjb21wcmVzc2lvbiB1
+    c2luZyB1cCB0byA0IHRocmVhZHMKQ29tcHJlc3Npbmcgb2JqZWN0czogIDE0JSAoMS83KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgMjglICgyLzcpDUNvbXByZXNzaW5nIG9iamVjdHM6ICA0MiUgKDMv
+    NykNQ29tcHJlc3Npbmcgb2JqZWN0czogIDU3JSAoNC83KQ1Db21wcmVzc2luZyBvYmplY3RzOiAg
+    NzElICg1LzcpDUNvbXByZXNzaW5nIG9iamVjdHM6ICA4NSUgKDYvNykNQ29tcHJlc3Npbmcgb2Jq
+    ZWN0czogMTAwJSAoNy83KQ1Db21wcmVzc2luZyBvYmplY3RzOiAxMDAlICg3LzcpLCBkb25lLgpX
+    cml0aW5nIG9iamVjdHM6ICAxNCUgKDEvNykNV3JpdGluZyBvYmplY3RzOiAgMjglICgyLzcpDVdy
+    aXRpbmcgb2JqZWN0czogIDQyJSAoMy83KQ1Xcml0aW5nIG9iamVjdHM6ICA1NyUgKDQvNykNV3Jp
+    dGluZyBvYmplY3RzOiAgNzElICg1LzcpDVdyaXRpbmcgb2JqZWN0czogIDg1JSAoNi83KQ1Xcml0
+    aW5nIG9iamVjdHM6IDEwMCUgKDcvNykNV3JpdGluZyBvYmplY3RzOiAxMDAlICg3LzcpLCA5LjMw
+    IEtpQiB8IDkuMzAgTWlCL3MsIGRvbmUuClRvdGFsIDcgKGRlbHRhIDApLCByZXVzZWQgMCAoZGVs
+    dGEgMCksIHBhY2stcmV1c2VkIDAKZXJyb3I6IFJQQyBmYWlsZWQ7IEhUVFAgNDAzIGN1cmwgMjIg
+    VGhlIHJlcXVlc3RlZCBVUkwgcmV0dXJuZWQgZXJyb3I6IDQwMwpzZW5kLXBhY2s6IHVuZXhwZWN0
+    ZWQgZGlzY29ubmVjdCB3aGlsZSByZWFkaW5nIHNpZGViYW5kIHBhY2tldApmYXRhbDogdGhlIHJl
+    bW90ZSBlbmQgaHVuZyB1cCB1bmV4cGVjdGVkbHkKCltGQUlMXSBELWxvY2F0b3ItY3JlYXRlOiBl
+    bXB0eS1sZWFzZSBjcmVhdGUgb2YgcmVmcy90YWdzL2QzNzktZTdhLXN5bnRoZXRpYy1kMWU1Y2Nm
+    NGFjNTUzNTk0OiBGQUlMVVJFIChhdHRlbXB0cyAyKQpbRkFJTF0gRS1wcm94eS10YWctcHVzaDog
+    dGFnIHB1c2ggcmM9MQpTVE9QIOKAlCBwdWJsaWNhdGlvbiBvdXRjb21lIEZBSUxVUkUg4oCUIE5P
+    IEJVSUxECg==
+    END-BASE64 e7a/run.log
+- INSTRUMENT e7git.py sha256 75845050a623ba56604b53e4467c9061ab043179bcb3177925dfb58ee7ba6a31, verbatim, 4-space indent  [CMD `sha256sum /home/user/d379-build/e7git.py` → 75845050a623ba56…]
+    BEGIN-INSTRUMENT e7git.py
+    #!/usr/bin/env python3
+    """D379 E7 Git-native evidence transport (D390). compose · publish · verify.
+    
+    The same unchanged module serves E7a (synthetic) and E7b (real).
+    Admitted identity = (commit object id, sha256 of canonical MANIFEST.json).
+    Locator refs carry no authority. verify() returns a list of failures; empty == PASS.
+    """
+    import hashlib, json, os, subprocess
+    
+    REMOTE = "https://github.com/dainius1234/kai-system"
+    SCHEMA = "D379_E7_EVIDENCE_V1"
+    FILES = ("A.transcript", "B.transcript", "E.json", "driver.py", "MANIFEST.json")
+    SOURCE_18 = {"tag": "v3.11.15",
+                 "tag_object": "2323bfc729b041c43b1e5e4c5f18c548fc345323",
+                 "commit": "2340a037f7450e70fccfe411e6531afb4d57a312",
+                 "tree": "8c6959bc70b201b477138f00c432a3bb2f1caddd",
+                 "signer_primary_fpr": "A035C8C19219BA821ECEA86B64E628F8D684696D"}
+    
+    
+    def sha256(b: bytes) -> str:
+        return hashlib.sha256(b).hexdigest()
+    
+    
+    def canonical(obj) -> bytes:
+        return (json.dumps(obj, sort_keys=True, ensure_ascii=True, indent=1) + "\n").encode()
+    
+    
+    def git(repo, *args, input=None, check=True):
+        p = subprocess.run(["git", "-C", repo, *args], input=input, capture_output=True)
+        if check and p.returncode:
+            raise RuntimeError(f"git {' '.join(args)} rc={p.returncode}: {p.stderr.decode(errors='replace')}")
+        return p
+    
+    
+    def build_manifest(files: dict, builds: dict, synthetic: bool) -> bytes:
+        """files: name -> bytes for the 4 non-manifest files. builds: label -> metadata."""
+        m = {"schema": SCHEMA, "SYNTHETIC": synthetic, "cpython_source": SOURCE_18,
+             "environment": {"path": "E.json", "sha256": sha256(files["E.json"])},
+             "driver": {"path": "driver.py", "sha256": sha256(files["driver.py"])},
+             "configure": {"args": ["./configure", "--prefix=/opt/d379-py311", "--without-ensurepip"],
+                           "make": ["make"], "install": ["make", "install", "DESTDIR=<staging-root>"]},
+             "builds": {}}
+        for label in ("A", "B"):
+            t = files[f"{label}.transcript"]
+            m["builds"][label] = dict(builds[label], transcript=f"{label}.transcript",
+                                      sha256=sha256(t), byte_count=len(t))
+        return canonical(m)
+    
+    
+    def compose(repo: str, files: dict, message: str) -> dict:
+        """Write blobs, tree and ONE orphan commit. Returns the pending record."""
+        assert set(files) == set(FILES), sorted(files)
+        entries = []
+        for name in sorted(files):
+            oid = git(repo, "hash-object", "-w", "--stdin", input=files[name]).stdout.decode().strip()
+            entries.append(f"100644 blob {oid}\t{name}")
+        tree = git(repo, "mktree", input=("\n".join(entries) + "\n").encode()).stdout.decode().strip()
+        commit = git(repo, "commit-tree", tree, "-m", message).stdout.decode().strip()
+        return {"commit": commit, "tree": tree, "manifest_sha256": sha256(files["MANIFEST.json"]),
+                "files": {n: {"sha256": sha256(b), "bytes": len(b)} for n, b in files.items()}}
+    
+    
+    def locator(manifest_sha256: str, synthetic: bool) -> str:
+        return f"refs/tags/d379-{'e7a-synthetic' if synthetic else 'e7'}-{manifest_sha256[:16]}"
+    
+    
+    def remote_ref(repo, ref):
+        """-> (state, oid). state: PRESENT / ABSENT / UNKNOWN."""
+        p = git(repo, "ls-remote", REMOTE, ref, check=False)
+        if p.returncode:
+            return "UNKNOWN", p.stderr.decode(errors="replace")
+        lines = [l.split("\t") for l in p.stdout.decode().splitlines() if l.strip()]
+        hits = [o for o, r in lines if r == ref]
+        return ("PRESENT", hits[0]) if hits else ("ABSENT", None)
+    
+    
+    def publish(repo: str, rec: dict, ref: str) -> dict:
+        """Create-only push of the already-composed commit; classify with ls-remote."""
+        p = git(repo, "push", "--porcelain", "--progress", f"--force-with-lease={ref}:",
+                REMOTE, f"{rec['commit']}:{ref}", check=False)
+        state, oid = remote_ref(repo, ref)
+        if state == "PRESENT" and oid == rec["commit"]:
+            outcome = "PUSHED_UNVERIFIED"
+        elif state == "PRESENT":
+            outcome = "CONFLICT"
+        elif state == "ABSENT":
+            outcome = "FAILURE"
+        else:
+            outcome = "OUTCOME_UNKNOWN"
+        return {"outcome": outcome, "push_rc": p.returncode, "push_stdout": p.stdout.decode(errors="replace"),
+                "push_stderr": p.stderr.decode(errors="replace"), "ls_remote": [state, oid]}
+    
+    
+    def fetch_fresh(workdir: str, oid: str) -> str:
+        """A fresh empty repository (no alternates) holding only what the remote serves for oid."""
+        os.makedirs(workdir)
+        git(workdir, "init", "-q")
+        git(workdir, "fetch", "-q", "--no-tags", REMOTE, oid)
+        return workdir
+    
+    
+    def verify(repo: str, oid: str, expect_manifest_sha256: str, frozen_e_sha256: str,
+               expect_interpreters: dict | None = None) -> list:
+        """Every check reads bytes from `repo`'s object store. Empty list == PASS."""
+        f = []
+        p = git(repo, "cat-file", "-t", oid, check=False)
+        if p.returncode or p.stdout.decode().strip() != "commit":
+            return [f"{oid} is not a commit in this repository"]
+        raw = git(repo, "cat-file", "commit", oid).stdout
+        if git(repo, "hash-object", "-t", "commit", "--stdin", input=raw).stdout.decode().strip() != oid:
+            f.append("commit object does not hash to its id")
+        if any(l.startswith(b"parent ") for l in raw.split(b"\n\n", 1)[0].split(b"\n")):
+            f.append("evidence commit is not an orphan")
+        tree = git(repo, "rev-parse", f"{oid}^{{tree}}").stdout.decode().strip()
+        ls = [l.split("\t") for l in git(repo, "ls-tree", tree).stdout.decode().splitlines()]
+        names = {n: meta.split() for meta, n in ls}
+        if set(names) != set(FILES):
+            return f + [f"tree members {sorted(names)} != {sorted(FILES)}"]
+        data = {}
+        for n, (mode, typ, boid) in names.items():
+            if mode != "100644" or typ != "blob":
+                f.append(f"{n}: mode/type {mode} {typ}")
+            b = git(repo, "cat-file", "blob", boid).stdout
+            if git(repo, "hash-object", "--stdin", input=b).stdout.decode().strip() != boid:
+                f.append(f"{n}: blob does not hash to its id")
+            data[n] = b
+        mb = data["MANIFEST.json"]
+        if sha256(mb) != expect_manifest_sha256:
+            f.append("MANIFEST.json sha256 != expected admitted manifest digest")
+        try:
+            m = json.loads(mb)
+        except ValueError:
+            return f + ["MANIFEST.json is not JSON"]
+        if canonical(m) != mb:
+            f.append("MANIFEST.json is not in canonical form")
+        if m.get("schema") != SCHEMA:
+            f.append("schema mismatch")
+        if m.get("cpython_source") != SOURCE_18:
+            f.append("CPython source identity != v4.5 §18")
+        env = m.get("environment", {})
+        if env.get("path") != "E.json" or env.get("sha256") != sha256(data["E.json"]):
+            f.append("E.json digest != manifest")
+        if sha256(data["E.json"]) != frozen_e_sha256:
+            f.append("E.json != the E frozen before Build A")
+        drv = m.get("driver", {})
+        if drv.get("path") != "driver.py" or drv.get("sha256") != sha256(data["driver.py"]):
+            f.append("driver.py digest != manifest")
+        builds = m.get("builds", {})
+        if set(builds) != {"A", "B"}:
+            return f + [f"build labels {sorted(builds)} != ['A', 'B']"]
+        for label in ("A", "B"):
+            b = builds[label]
+            if b.get("transcript") != f"{label}.transcript":
+                f.append(f"label {label} bound to {b.get('transcript')!r}, not {label}.transcript")
+                continue
+            t = data[b["transcript"]]
+            if b.get("sha256") != sha256(t) or b.get("byte_count") != len(t):
+                f.append(f"{label}: transcript digest/byte count != manifest")
+            if expect_interpreters is not None and b.get("interpreter") != expect_interpreters.get(label):
+                f.append(f"{label}: interpreter identity != measured")
+        for k in ("source_worktree", "build_dir", "staging_root"):
+            if builds["A"].get(k) == builds["B"].get(k):
+                f.append(f"A and B share {k}")
+        return f
+    
+    
+    def placement(repo: str, oid: str, subject: str) -> list:
+        """K2: evidence must not be reachable through, nor share a path with, `subject`."""
+        f = []
+        if git(repo, "merge-base", "--is-ancestor", oid, subject, check=False).returncode == 0:
+            f.append(f"evidence {oid[:12]} is reachable from {subject[:12]}")
+        ev = set(git(repo, "ls-tree", "-r", "--name-only", oid).stdout.decode().split("\n")) - {""}
+        sub = set(git(repo, "ls-tree", "-r", "--name-only", subject).stdout.decode().split("\n")) - {""}
+        if ev & sub:
+            f.append(f"evidence paths present in subject tree: {sorted(ev & sub)}")
+        return f
+    END-INSTRUMENT e7git.py
+- INSTRUMENT secretscan.py sha256 f8f36ad3b7543ceea3773e191c6f4c9008db0480d93336294b6cfc7aac7b727f, verbatim, 4-space indent  [CMD `sha256sum /home/user/d379-build/secretscan.py` → f8f36ad3b7543cee…]
+    BEGIN-INSTRUMENT secretscan.py
+    #!/usr/bin/env python3
+    """D379 E7 credential scan (protocol item J). Runs OUTSIDE the build namespace.
+    
+    Collects credential VALUES from the outer environment and token files, then
+    counts occurrences in the given files (raw, base64, urlsafe-base64, URL-encoded),
+    plus secret PATTERNS. Prints names and counts only; never a value.
+    Exit 0 = no hit; 1 = hit (STOP, no redaction); 2 = collection failure.
+    """
+    import base64, os, re, sys, urllib.parse
+    
+    NAME = re.compile(r"(TOKEN|SECRET|PASSWORD|PASSWD|API_KEY|ACCESS_KEY|PRIVATE_KEY|CREDENTIAL|AUTH)", re.I)
+    NOT_SECRET = {"MAX_THINKING_TOKENS"}
+    PATTERNS = {
+        "pem_private_key": re.compile(rb"-----BEGIN [A-Z ]*PRIVATE KEY-----"),
+        "github_token": re.compile(rb"\b(ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{30,}"),
+        "github_pat": re.compile(rb"github_pat_[A-Za-z0-9_]{20,}"),
+        "aws_access_key_id": re.compile(rb"\bAKIA[0-9A-Z]{16}\b"),
+        "authorization_header": re.compile(rb"(?i)authorization:\s*(basic|bearer|token)\s+\S"),
+    }
+    
+    
+    def collect():
+        vals = {}
+        for k, v in os.environ.items():
+            if not NAME.search(k) or k in NOT_SECRET:
+                continue
+            if k.endswith("_FILE") and v.startswith("/"):
+                try:
+                    v = open(v, "rb").read().strip().decode(errors="replace")
+                except OSError as e:
+                    print(f"COLLECT-FAIL {k}: {type(e).__name__}")
+                    sys.exit(2)
+            if len(v) >= 8:
+                vals[k] = v
+        return vals
+    
+    
+    def forms(v: str):
+        b = v.encode()
+        out = {b, base64.b64encode(b), base64.urlsafe_b64encode(b), urllib.parse.quote(v, safe="").encode()}
+        return {f for f in out if len(f) >= 8}
+    
+    
+    def scan(paths):
+        vals = collect()
+        print(f"collected credential values: {len(vals)} ({', '.join(sorted(vals))})")
+        total = 0
+        for p in paths:
+            data = open(p, "rb").read()
+            hits = {k: sum(data.count(f) for f in forms(v)) for k, v in vals.items()}
+            hits.update({f"pattern:{n}": len(r.findall(data)) for n, r in PATTERNS.items()})
+            n = sum(hits.values())
+            total += n
+            print(f"{p}: {len(data)} bytes, hits {n}" + ("" if not n else
+                  " -> " + ", ".join(f"{k}={c}" for k, c in sorted(hits.items()) if c)))
+        print(f"TOTAL HITS {total}")
+        return total
+    
+    
+    if __name__ == "__main__":
+        sys.exit(1 if scan(sys.argv[1:]) else 0)
+    END-INSTRUMENT secretscan.py
+- INSTRUMENT netiso2.sh sha256 30f8c76acf92f01839c9c5f6e5671bb58c065dcd4456da5d6d4a173594782720, verbatim, 4-space indent  [CMD `sha256sum /home/user/d379-build/netiso2.sh` → 30f8c76acf92f018…]
+    BEGIN-INSTRUMENT netiso2.sh
+    #!/bin/bash
+    # D379 build isolation wrapper v2: netiso2.sh <cmd...>   (v1 = netiso.sh, unchanged)
+    # Layer 1: new user+net+mount+pid ns with its own /proc. Empty tmpfs over every
+    #          credential-bearing root; the build workspace is bound back in.
+    # Layer 2: nested user+mount ns, so layer-1 mounts are MNT_LOCKED.
+    # Environment: env -i with 5 explicit variables.
+    set -euo pipefail
+    WS=/home/user/d379-build
+    exec env -i PATH=/usr/bin:/bin LANG=C.UTF-8 LC_ALL=C.UTF-8 TZ=UTC HOME=/nonexistent \
+      unshare --user --map-root-user --net --mount --pid --fork --mount-proc -- bash -c '
+      set -euo pipefail
+      WS="'"$WS"'"
+      mount -t tmpfs -o mode=755 tmpfs /srv
+      mkdir /srv/ws && mount --bind "$WS" /srv/ws
+      for d in /tmp /run /root /home /opt /var /mnt /etc/ssl/private; do
+        [ -d "$d" ] && mount -t tmpfs -o mode=1777 tmpfs "$d"
+      done
+      mkdir -p "$WS" && mount --move /srv/ws "$WS"
+      exec unshare --user --map-root-user --mount --fork -- "$@"
+    ' netiso2 "$@"
+    END-INSTRUMENT netiso2.sh
+- INSTRUMENT e7a_run.py sha256 de81835e6fa844a527459574abb24028701b8e86f86981555f708ba7fed65ef8, verbatim, 4-space indent  [CMD `sha256sum /home/user/d379-build/e7a_run.py` → de81835e6fa844a5…]
+    BEGIN-INSTRUMENT e7a_run.py
+    #!/usr/bin/env python3
+    """E7a-Git v2 runner (synthetic). Uses e7git.py unchanged. Full log -> e7a/run.log."""
+    import json, os, random, shutil, subprocess, sys
+    sys.path.insert(0, "/home/user/d379-build")
+    import e7git as G
+    if os.environ.get("D379_E7A_DRYRUN_REMOTE"):
+        G.REMOTE = os.environ["D379_E7A_DRYRUN_REMOTE"]  # dry run only; the real run never sets this
+    
+    W = os.environ.get("D379_E7A_DIR", "/home/user/d379-build/e7a")
+    LOG = open(f"{W}/run.log", "a")
+    RESULT = {"items": {}}
+    
+    
+    def log(*a):
+        s = " ".join(str(x) for x in a)
+        print(s); LOG.write(s + "\n"); LOG.flush()
+    
+    
+    def item(key, ok, detail):
+        RESULT["items"][key] = {"pass": bool(ok), "detail": detail}
+        log(f"[{'PASS' if ok else 'FAIL'}] {key}: {detail}")
+        return ok
+    
+    
+    def stop(reason):
+        RESULT["verdict"] = f"STOP: {reason}"
+        log("STOP —", reason, "— NO BUILD")
+        json.dump(RESULT, open(f"{W}/result.json", "w"), indent=1, sort_keys=True)
+        sys.exit(1)
+    
+    
+    def corpus(seed):
+        r = random.Random(seed)
+        edge = (b"LF line\nCRLF line\r\nbare CR\rUTF-8 \xc3\xa9\xe2\x82\xac\xf0\x9f\x90\x8d\n"
+                b"invalid \xff and lone \xc3 here\nNUL\x00inside\n" + bytes(range(256)) + b"\n")
+        rnd = bytes(r.getrandbits(8) for _ in range(3000))
+        return edge + rnd + f"seed={seed} no trailing newline".encode()
+    
+    
+    # 1. E derived inside the build wrapper, frozen for this run
+    e = subprocess.run(["/home/user/d379-build/netiso2.sh", "python3", "/home/user/d379-build/env_fp.py"],
+                       capture_output=True)
+    if e.returncode:
+        stop(f"E derivation failed rc={e.returncode}")
+    E_json = e.stdout
+    frozen_e = G.sha256(E_json)
+    log("E derived inside netiso2:", frozen_e, len(E_json), "bytes;", E_json.decode().splitlines()[-1])
+    
+    # 2. synthetic corpus + metadata
+    S1, S2 = corpus(1), corpus(2)
+    assert S1 != S2
+    drv = b"# SYNTHETIC driver placeholder for E7a-Git v2. Not a build driver.\n"
+    interp = {L: {"executable_sha256": f"SYNTHETIC-{L}", "h2_py_stdlib_v1": f"SYNTHETIC-{L}",
+                  "computed_by_commit": "SYNTHETIC"} for L in "AB"}
+    builds = {L: {"source_worktree": f"SYNTHETIC/{L}/src", "build_dir": f"SYNTHETIC/{L}/build",
+                  "staging_root": f"SYNTHETIC/{L}/stage", "start_utc": "SYNTHETIC", "end_utc": "SYNTHETIC",
+                  "return_codes": {"configure": 0, "make": 0, "install": 0}, "interpreter": interp[L]}
+              for L in "AB"}
+    files = {"A.transcript": S1, "B.transcript": S2, "E.json": E_json, "driver.py": drv}
+    files["MANIFEST.json"] = G.build_manifest(files, builds, synthetic=True)
+    for n, b in sorted(files.items()):
+        log(f"corpus {n}: {len(b)} bytes sha256 {G.sha256(b)}")
+    cover = set(S1) | set(S2)
+    log("byte values covered:", len(cover), "| CRLF", b"\r\n" in S1, "| bare CR", b"\r" in S1.replace(b"\r\n", b""),
+        "| NUL", b"\x00" in S1, "| trailing newline", S1.endswith(b"\n"))
+    
+    # 3. J detect: scanner calibration, then the real objects
+    os.makedirs(f"{W}/scan", exist_ok=True)
+    for n, b in files.items():
+        open(f"{W}/scan/{n}", "wb").write(b)
+    canary = "d379canary-" + os.urandom(12).hex()
+    open(f"{W}/scan_pos_value.bin", "wb").write(b"xx" + canary.encode() + b"yy")
+    open(f"{W}/scan_pos_pattern.bin", "wb").write(b"token ghp_" + b"A1" * 18 + b"\n")
+    open(f"{W}/scan_neg.bin", "wb").write(b"clean synthetic text only\n")
+    SC = ["python3", "/home/user/d379-build/secretscan.py"]
+    env_c = dict(os.environ, D379_CANARY_TOKEN=canary)
+    pv = subprocess.run(SC + [f"{W}/scan_pos_value.bin"], env=env_c, capture_output=True, text=True)
+    pp = subprocess.run(SC + [f"{W}/scan_pos_pattern.bin"], capture_output=True, text=True)
+    pn = subprocess.run(SC + [f"{W}/scan_neg.bin"], env=env_c, capture_output=True, text=True)
+    for tag, p in (("pos-value", pv), ("pos-pattern", pp), ("neg-clean", pn)):
+        log(f"scanner {tag} rc={p.returncode}\n" + p.stdout.strip())
+    item("J-calibration", pv.returncode == 1 and pp.returncode == 1 and pn.returncode == 0,
+         f"canary value HIT rc={pv.returncode}; ghp_ pattern HIT rc={pp.returncode}; clean rc={pn.returncode}")
+    sr = subprocess.run(SC + [f"{W}/scan/{n}" for n in sorted(files)], capture_output=True, text=True)
+    log(sr.stdout.strip())
+    if not item("J-scan-objects", sr.returncode == 0, f"scanner rc={sr.returncode} over the 5 evidence files"):
+        stop("credential/pattern hit in evidence; no redaction")
+    if not RESULT["items"]["J-calibration"]["pass"]:
+        stop("scanner calibration failed")
+    
+    # 4. compose ONCE; pending record
+    repo = f"{W}/compose"
+    os.makedirs(repo); G.git(repo, "init", "-q")
+    rec = G.compose(repo, files, "D379 E7a-Git v2 SYNTHETIC evidence object (D390). Not build evidence.")
+    ref = G.locator(rec["manifest_sha256"], synthetic=True)
+    rec["locator"] = ref
+    json.dump(rec, open(f"{W}/pending.json", "w"), indent=1, sort_keys=True)
+    log("COMPOSED commit", rec["commit"], "tree", rec["tree"], "manifest", rec["manifest_sha256"], "locator", ref)
+    raw = G.git(repo, "cat-file", "commit", rec["commit"]).stdout
+    log("commit object bytes:", len(raw), "| signed:", b"BEGIN SSH SIGNATURE" in raw)
+    
+    # 5. pre-check, publish (create-only), classify; retry SAME oid once on FAILURE
+    st, oid = G.remote_ref(repo, ref)
+    log("pre-push ls-remote:", st, oid)
+    if st != "ABSENT":
+        stop(f"locator pre-state {st} {oid}")
+    for attempt in (1, 2):
+        pub = G.publish(repo, rec, ref)
+        log(f"publish attempt {attempt}: outcome {pub['outcome']} push_rc {pub['push_rc']} ls_remote {pub['ls_remote']}")
+        log("push stdout (full):\n" + pub["push_stdout"]); log("push stderr (full):\n" + pub["push_stderr"])
+        if pub["outcome"] != "FAILURE":
+            break
+    item("D-locator-create", pub["outcome"] == "PUSHED_UNVERIFIED",
+         f"empty-lease create of {ref}: {pub['outcome']} (attempts {attempt})")
+    item("E-proxy-tag-push", pub["push_rc"] == 0, f"tag push rc={pub['push_rc']}")
+    RESULT["publish"] = {k: pub[k] for k in ("outcome", "push_rc", "ls_remote")}
+    if pub["outcome"] != "PUSHED_UNVERIFIED":
+        stop(f"publication outcome {pub['outcome']}")
+    
+    # 6. A/B/F/K on a FRESH fetch by commit id
+    rb = G.fetch_fresh(f"{W}/readback", rec["commit"])
+    alt = os.path.exists(f"{rb}/.git/objects/info/alternates")
+    ok_bytes = []
+    for n, b in files.items():
+        got = G.git(rb, "cat-file", "blob", f"{rec['commit']}:{n}").stdout
+        ok_bytes.append(got == b)
+        log(f"readback {n}: {len(got)} bytes sha256 {G.sha256(got)} identical={got == b}")
+    item("A-byte-fidelity", all(ok_bytes) and not alt, f"{sum(ok_bytes)}/{len(files)} files byte-identical; alternates={alt}")
+    rt = G.git(rb, "rev-parse", f"{rec['commit']}^{{tree}}").stdout.decode().strip()
+    item("B-identity", rt == rec["tree"], f"fetched tree {rt} == composed {rec['tree']}; commit id requested {rec['commit']}")
+    vf = G.verify(rb, rec["commit"], rec["manifest_sha256"], frozen_e, interp)
+    item("K-verify-positive", vf == [], f"verify failures: {vf}")
+    
+    # 7. C negatives + K negative: local-only commits in the readback repo, NEVER pushed
+    def local_commit(fs):
+        return G.compose(rb, fs, "LOCAL NEGATIVE CONTROL - never pushed")["commit"]
+    neg = {}
+    c_i = local_commit(dict(files, **{"A.transcript": S2}))
+    neg["C(i) S2 presented as S1"] = G.verify(rb, c_i, rec["manifest_sha256"], frozen_e, interp)
+    G.git(rb, "fetch", "-q", "--depth", "1", "--no-tags", G.REMOTE, "d08f3ec5de4d823011e66261c84c98a76371428e")
+    neg["C(ii) d08f3ec as evidence"] = G.verify(rb, "d08f3ec5de4d823011e66261c84c98a76371428e",
+                                                 rec["manifest_sha256"], frozen_e, interp)
+    flip = bytearray(S1); flip[100] ^= 0x01
+    c_iii = local_commit(dict(files, **{"A.transcript": bytes(flip)}))
+    neg["C(iii) one byte flipped"] = G.verify(rb, c_iii, rec["manifest_sha256"], frozen_e, interp)
+    m = json.loads(files["MANIFEST.json"]); m["builds"]["A"], m["builds"]["B"] = m["builds"]["B"], m["builds"]["A"]
+    swapped = G.canonical(m)
+    c_iv = local_commit(dict(files, **{"MANIFEST.json": swapped}))
+    neg["C(iv) labels swapped, original digest"] = G.verify(rb, c_iv, rec["manifest_sha256"], frozen_e, interp)
+    neg["C(iv) labels swapped, self-consistent digest"] = G.verify(rb, c_iv, G.sha256(swapped), frozen_e, interp)
+    E_bad = E_json.replace(b'"kernel"', b'"kernel_"', 1)
+    assert E_bad != E_json
+    fs_k = dict(files, **{"E.json": E_bad}); fs_k["MANIFEST.json"] = G.build_manifest(fs_k, builds, synthetic=True)
+    c_k = local_commit(fs_k)
+    neg["K E one field changed, self-consistent manifest"] = G.verify(rb, c_k, G.sha256(fs_k["MANIFEST.json"]), frozen_e, interp)
+    for k, f in neg.items():
+        item(f"NEG {k}", f != [], f"refused with {len(f)} failure(s): {f[:3]}")
+    
+    # 8. K2 placement against the repair HEAD, + known-negative scratch merge (local only)
+    pl = G.placement(rb, rec["commit"], "d08f3ec5de4d823011e66261c84c98a76371428e")
+    item("K2-placement", pl == [], f"vs repair HEAD d08f3ec: {pl}")
+    rt_sub = G.git(rb, "rev-parse", "d08f3ec5de4d823011e66261c84c98a76371428e^{tree}").stdout.decode().strip()
+    scratch = G.git(rb, "commit-tree", rt_sub, "-p", "d08f3ec5de4d823011e66261c84c98a76371428e",
+                    "-p", rec["commit"], "-m", "LOCAL scratch containing evidence - never pushed").stdout.decode().strip()
+    pln = G.placement(rb, rec["commit"], scratch)
+    item("NEG K2 scratch branch containing evidence", pln != [], f"detected: {pln}")
+    
+    # 9. verdict
+    allok = all(v["pass"] for v in RESULT["items"].values())
+    RESULT.update(verdict="PUBLISHED_VERIFIED / E7a PASS" if allok else "STOP: an item failed — NO BUILD",
+                  commit=rec["commit"], tree=rec["tree"], manifest_sha256=rec["manifest_sha256"],
+                  locator=ref, frozen_e_sha256=frozen_e)
+    json.dump(RESULT, open(f"{W}/result.json", "w"), indent=1, sort_keys=True)
+    log("VERDICT:", RESULT["verdict"], "| items", sum(v["pass"] for v in RESULT["items"].values()), "/", len(RESULT["items"]))
+    sys.exit(0 if allok else 1)
+    END-INSTRUMENT e7a_run.py
+- INSTRUMENT attack2.py sha256 2bff73b3c559f8a821fb57aee9176c4631b584df5285f82d4dbb89e670a7cbc3, verbatim, 4-space indent  [CMD `sha256sum /home/user/d379-build/attack2.py` → 2bff73b3c559f8a8…]
+    BEGIN-INSTRUMENT attack2.py
+    import os,socket,subprocess,sys
+    # Socket population is DERIVED at run time from a file list made OUTSIDE (argv[3]); never hard-coded.
+    outer=sys.argv[1]; port=int(sys.argv[2]); socks=[l.strip() for l in open(sys.argv[3]) if l.strip()]
+    def t(name,fn):
+        try: r=fn(); print("OPEN   ",name,r)
+        except Exception as e: print("BLOCKED",name,"->",type(e).__name__,getattr(e,"errno",""),str(e)[:70])
+    def tcp(a): s=socket.create_connection(a,4); s.close(); return "connected"
+    def ux(p): s=socket.socket(socket.AF_UNIX); s.settimeout(4); s.connect(p); return "connected"
+    t("tcp proxy 127.0.0.1:%d"%port, lambda: tcp(("127.0.0.1",port)))
+    t("tcp 1.1.1.1:443", lambda: tcp(("1.1.1.1",443)))
+    t("dns pypi.org", lambda: socket.gethostbyname("pypi.org"))
+    for p in socks:
+        t("unix "+p, lambda p=p: ux(p))
+        t("unix via /proc/%s/root%s"%(outer,p), lambda p=p: ux("/proc/%s/root%s"%(outer,p)))
+    def nse():
+        r=subprocess.run(["nsenter","-t",outer,"-n","python3","-c","import socket;socket.create_connection(('1.1.1.1',443),4)"],capture_output=True,text=True)
+        if r.returncode: raise OSError(r.stderr.strip()[:70])
+        return "ESCAPED"
+    t("nsenter outer netns -> 1.1.1.1", nse)
+    print("ifaces(kernel):",[l.split(":")[0].strip() for l in open("/proc/net/dev").readlines()[2:]])
+    END-INSTRUMENT attack2.py
+- INSTRUMENT canary_probe.sh sha256 c7524c0381e5eeb2dec85b23f4884fbd0922fd5e652accdd6644638bcfa0511a, verbatim, 4-space indent  [CMD `sha256sum /home/user/d379-build/canary_probe.sh` → c7524c0381e5eeb2…]
+    BEGIN-INSTRUMENT canary_probe.sh
+    #!/bin/bash
+    # usage: canary_probe.sh <canary> <roots...>  -> counts only
+    c=$1; shift; n=0; for d in "$@"; do [ -r "$d/d379-canary.txt" ] && n=$((n+1)); done
+    echo "canary files readable: $n of $#"
+    echo "canary in env: $(env | grep -c -F "$c")"
+    echo "canary in readable /proc/*/environ: $(cat /proc/[0-9]*/environ 2>/dev/null | grep -a -c -F "$c")"
+    echo "canary anywhere in visible FS (excl. /proc /sys /dev /usr /lib* /bin /sbin): $(grep -rlF "$c" / --exclude-dir={proc,sys,dev,usr,lib,lib32,lib64,libx32,bin,sbin} 2>/dev/null | wc -l)"
+    END-INSTRUMENT canary_probe.sh
+
+### 6. Next authorised step
+
+- None. STOP; return to Kai/Dainius for the transport ruling  [CONVERSATION 2026-10-02 Kai, "If any of Kai's stop conditions trips"]
+
+### 7. What I am unsure of
+
+- Which refs the git egress path permits is INFERRED from three observations (branch create ok, branch delete 403, tag create 403), not from documentation; the README documents no ref policy  [FILE /root/.ccr/README.md]
+- Whether the refused 9.30 KiB pack left unreferenced objects on GitHub: unknowable from here; nothing is reachable from any ref  [CMD `git ls-remote … 'refs/tags/d379-*'` → 0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
