@@ -3785,3 +3785,659 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-02T17:06:04Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-02T17:06:03Z  [CMD `date -u +%FT%TZ` → 2026-10-02T17:06:03Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: b224e1e88db324352c7137389454308010ac1803  [CMD `git rev-parse HEAD` → b224e1e88db324352c7137389454308010ac1803]
+- tree: aca6d8554434c59e3b872edf9e1746158c9c762e  [CMD `git rev-parse HEAD^{tree}` → aca6d8554434c59e3b872edf9e1746158c9c762e]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:claude/project-rework-plan-pgvp35: b224e1e88db324352c7137389454308010ac1803  [CMD `git ls-remote --heads origin` → b224e1e88db324352c7137389454308010ac1803]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d08f3ec5de4d823011e66261c84c98a76371428e  [CMD `git ls-remote --heads origin` → d08f3ec5de4d823011e66261c84c98a76371428e]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 26  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 26]
+
+### 1. The four states
+
+- physical: synthetic evidence branch `refs/heads/claude/d379-e7a-synthetic-d1e5ccf4ac553594` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660 exists on the remote (permanent, public); 0 `d379-*` tags; repair branch d08f3ec unchanged; no build  [CMD `git ls-remote … 'refs/heads/claude/d379-e7a-*' 'refs/tags/d379-*'` → 1 branch, 0 tags]
+- authorised: one E7a rerun with the claude/ branch locator; STOP before Build A — STOPPED  [CONVERSATION 2026-10-02 Dainius, "Authorised: rerun E7a"]
+- evidence: E7a-Git PASS — 15/15 items, verdict "PUBLISHED_VERIFIED / E7a PASS"  [CMD `D379_E7A_DIR=e7a2 python3 e7a_run.py` → rc=0]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-02 · E7a FAILURE ADJUDICATED / LOCATOR REFINEMENT AUTHORISED; D390 not amended; the new wrapper and the dynamic socket discovery are governed instrumentation. Verbatim, extracted byte-for-byte from the session transcript (received 2026-10-02T17:02:52.212Z, 4384 bytes, sha256 607e9207e7f4868bc08288a31ce9e8f6259c2b4460a4c54853a4a63ba29db726) ⚠ UNBANKED  [CONVERSATION 2026-10-02 Kai, "KAI → ORION — E7a-Git FAILURE ADJUDICATED / LOCATOR REFINEMENT AUTHORISED"]
+    BEGIN-VERBATIM KAI-E7A-FAILURE-RULING
+    Good failure. The control did exactly what it was supposed to do: reality contradicted the design assumption, Orion stopped instead of improvising, and no build occurred.
+    
+    I independently checked GitHub. Entry 26 is present at signed/verified commit b224e1e88db324352c7137389454308010ac1803, and GitHub currently returns no matching d379-* tag refs. That corroborates the important external state.
+    
+    My ruling
+    
+    I accept Option 1, with one precision correction.
+    
+    The tag was only a locator. D390 explicitly says the locator has zero admission authority. Therefore changing the locator from a tag to an allowed claude/... branch does not change the evidence identity or weaken the architecture:
+    
+    evidence identity = exact commit object ID + SHA-256(MANIFEST.json)
+    
+    The branch is simply a signpost pointing to that immutable identity.
+    
+    But Orion must not assume that a claude/... branch works merely because previous ones worked. The rerun itself must qualify that actual path.
+    
+    Also, I do not want D390 amended again for this. D390 deliberately says a dedicated evidence ref may be used; it does not constitutionally require a tag. This is an E7a transport/protocol refinement within the already-banked rule.
+    
+    One important point from the failed run: the new isolation wrapper and dynamic socket discovery are improvements discovered during qualification. They must be treated as part of the exact qualified instrumentation for the rerun/E7b—not casually reconstructed later.
+    
+    Send Orion:
+    
+    KAI → ORION — E7a-Git FAILURE ADJUDICATED / LOCATOR REFINEMENT AUTHORISED
+    
+    E7a v2 result is accepted as FAIL / NO BUILD for the attempted tag transport. The stop was correct.
+    
+    External repository state has been independently checked: handoff entry 26 exists at signed/verified commit b224e1e88db324352c7137389454308010ac1803, and no matching d379-* tag ref is presently exposed by GitHub.
+    
+    RULING: replace only the locator form:
+    
+    refs/tags/d379-e7a-synthetic-<manifest16>
+    
+    with
+    
+    refs/heads/claude/d379-e7a-synthetic-<manifest16>
+    
+    for E7a, with the corresponding claude/d379-e7-evidence-<manifest16> form for the later real evidence locator.
+    
+    The locator remains zero-authority. Canonical evidence identity remains exactly:
+    
+    Git commit object ID + SHA-256(canonical MANIFEST.json)
+    
+    Do not amend D390 for this locator refinement. D390 governs the immutable evidence identity and permits a dedicated evidence ref; it does not require that ref to be a tag.
+    
+    The rerun must qualify the actual claude/... branch transport. Do not infer success from earlier branch pushes.
+    
+    Preserve all other E7a v2 hostile controls and STOP semantics. Preserve the corrected dynamic socket discovery and the newly calibrated isolation wrapper/secret-exclusion controls as exact governed instrumentation. Do not revert to the stale hard-coded socket test.
+    
+    On the real rerun:
+    
+    * compose the synthetic evidence object;
+    * attempt the single authorised synthetic claude/... locator creation;
+    * independently read it back;
+    * verify exact bytes and identities;
+    * exercise wrong-object/manifest/subject-binding negatives;
+    * verify placement/non-contamination;
+    * run credential-exclusion controls;
+    * record actual visibility and transport behaviour;
+    * if any required control fails, STOP / NO BUILD;
+    * if all required controls pass, report E7a PASS and STOP before Build A.
+    
+    Do not force-update or delete the synthetic locator. Assume it may remain permanently public.
+    
+    This authority covers one E7a rerun using the refined claude/... branch locator only. It does not authorise Build A/B, real E7 evidence publication, interpreter retention publication, D390 replay, repair mutation, capture, Stage A, candidate, holdout, blind 40 or merge.
+    
+    Record the failed tag attempt and this refinement so we preserve the negative transport evidence rather than overwriting history.
+    
+    STOP after reporting E7a.
+    
+    There is one consequential external write in that instruction: creating the permanent synthetic claude/d379-e7a-synthetic-... branch. You need to authorize that rerun.
+    
+    If you’re ready, send Orion:
+    
+    Authorised. Execute the one E7a-Git rerun under Kai’s refined claude/... branch-locator ruling. Report the result and STOP before Build A.
+    
+    If it passes, we’ve finally qualified the evidence transport and the next gate becomes the two controlled interpreter builds—not more storage architecture.
+    
+    Confidence: 0.98.
+    END-VERBATIM KAI-E7A-FAILURE-RULING
+- Dainius · 2026-10-02 · authorises the one E7a rerun with the claude/ branch locator ⚠ UNBANKED  [CONVERSATION 2026-10-02 Dainius, "Authorised: rerun E7a"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: Build A/B; real E7 evidence publication; interpreter retention publication; D390 replay; repair; capture; Stage A; candidate; holdout; blind 40; merge  [CONVERSATION 2026-10-02 Kai, "It does not authorise Build A/B"]
+- FORBIDDEN: force-updating or deleting the synthetic locator  [CONVERSATION 2026-10-02 Kai, "Do not force-update or delete the synthetic locator."]
+
+### 4. Open questions
+
+- Next grant, owner Dainius: the build window (E re-derived and frozen → source re-verified → Build A → E equal → Build B → E7b, in one uninterrupted window)  [CONVERSATION 2026-10-02 Kai, "the next gate becomes the two controlled interpreter builds"]
+- L (human leg), owner Kai/Dainius: open https://github.com/dainius1234/kai-system/tree/dc09ad2a6f9b1c141147aae50aa03ead0b5c3660 and compare one sha256, e.g. MANIFEST.json = d1e5ccf4ac5535947ceb38bde36a13cef1a047efeec4b9b33e369c5e73ee6308  [CMD `cat e7a2/pending.json` → manifest d1e5ccf4ac553594]
+
+### 5. Incidents and corrections
+
+- The failed tag attempt (entry 26) stays as negative transport evidence: HTTP 403 on refs/tags; this run: a create on refs/heads/claude/… was ACCEPTED, push rc 0, first attempt  [CMD `e7a_run.py publish` → PUSHED_UNVERIFIED attempt 1]
+- Change set since entry 26, exactly 2 lines: e7git.locator() tag → `refs/heads/claude/d379-{e7a-synthetic|e7-evidence}-<manifest16>`; runner label "E-proxy-tag-push" → "E-proxy-locator-push". All other instruments byte-identical to entry 26 (sha256 -c: 7/7 OK before the change)  [CMD `diff -u e7git.v2 e7git.py` → 1 line]
+- Instruments at run time (sha256, path)  [CMD `cat e7a2/instruments.sha256` → 7 lines]
+  1dfe1321f82e8b17c9637d4af1652b6e3cc851d08a371b8693d108c372d5ecee  e7git.py
+  f8f36ad3b7543ceea3773e191c6f4c9008db0480d93336294b6cfc7aac7b727f  secretscan.py
+  30f8c76acf92f01839c9c5f6e5671bb58c065dcd4456da5d6d4a173594782720  netiso2.sh
+  6524d6e6d67ec1f96da47262765295e483857bf00d7cbf96d0815fe6d96a695b  env_fp.py
+  0d44ca8d6491bf8c03d204ed80ede15b928fc4f32a4e3495e9ea69dea483ae7d  e7a_run.py
+  2bff73b3c559f8a821fb57aee9176c4631b584df5285f82d4dbb89e670a7cbc3  attack2.py
+  c7524c0381e5eeb2dec85b23f4884fbd0922fd5e652accdd6644638bcfa0511a  canary_probe.sh
+- Items PASSED: A-byte-fidelity, B-identity, D-locator-create, E-proxy-locator-push, J-calibration, J-scan-objects, K-verify-positive, K2-placement, NEG C(i) S2 presented as S1, NEG C(ii) d08f3ec as evidence, NEG C(iii) one byte flipped, NEG C(iv) labels swapped, original digest, NEG C(iv) labels swapped, self-consistent digest, NEG K E one field changed, self-consistent manifest, NEG K2 scratch branch containing evidence  [CMD `cat e7a2/result.json` → 15/15]
+- Evidence object: commit dc09ad2a6f9b1c141147aae50aa03ead0b5c3660, tree 05666108324b4b6a5abccc4640a8104051118ad4, manifest sha256 d1e5ccf4ac5535947ceb38bde36a13cef1a047efeec4b9b33e369c5e73ee6308; E frozen for the run 1771fcf0efadfd4f0dbafcf58db4c1c3ace00af37e045bc1008bf458c9b8ce0a (inside netiso2); visibility public at publish time  [CMD `cat e7a2/pending.json` → commit dc09ad2a6f9b]
+- Independent route: the GitHub contents API (MCP, by commit sha) returned MANIFEST.json with git blob dc240aedfe54ae7ed1fae52f730afe3b581e041a, equal to the blob in the local compose and in the fresh readback  [CMD `git rev-parse dc09ad2a6f9b:MANIFEST.json` → dc240aedfe54]
+- Dry run before the real run (local bare remote): 15/15 — runner calibration only  [CMD `e7a_run.py` (dry2) → 15/15]
+- Full rerun log, base64 of the exact bytes, sha256 3de98f02dcc241c1fb8ac6e6e5ba00964c03870a5e02bf5e45416d599d75565e, 7706 bytes; secret scan 0 hits  [CMD `secretscan.py e7a2/run.log` → TOTAL HITS 0]
+    BEGIN-BASE64 e7a2/run.log
+    RSBkZXJpdmVkIGluc2lkZSBuZXRpc28yOiAxNzcxZmNmMGVmYWRmZDRmMGRiYWZjZjU4ZGI0YzFj
+    M2FjZTAwYWYzN2UwNDViYzEwMDhiZjQ1OGM5YjhjZTBhIDMyNTYgYnl0ZXM7IEVfU0hBMjU2IDYy
+    YThlNWUwYmFhY2NhZjUyNzRmNDA1Nzk1MjU0MjQ4YTUzN2YxN2Y0NzY3MWVlOWYzNDQwOGM0MmVi
+    NjI3ZjUKY29ycHVzIEEudHJhbnNjcmlwdDogMzM2MyBieXRlcyBzaGEyNTYgZGQ1MzA0ODNiM2Iw
+    ZmFhODIwNzYzZjdjZmI1NDA1MjRjMzMzYmYyNDM2NTNlNjJjZWU3YTNiYTEyMWYxMjZiOQpjb3Jw
+    dXMgQi50cmFuc2NyaXB0OiAzMzYzIGJ5dGVzIHNoYTI1NiAzODBiMzQ5N2M5NDkxYTdiNTQ5Yzcw
+    MDUwYjA3MzgzY2VmZWRkZDJmNjk3MjM0OTFmODA2N2VmOGRjNmY0NzI5CmNvcnB1cyBFLmpzb246
+    IDMyNTYgYnl0ZXMgc2hhMjU2IDE3NzFmY2YwZWZhZGZkNGYwZGJhZmNmNThkYjRjMWMzYWNlMDBh
+    ZjM3ZTA0NWJjMTAwOGJmNDU4YzliOGNlMGEKY29ycHVzIE1BTklGRVNULmpzb246IDE4OTYgYnl0
+    ZXMgc2hhMjU2IGQxZTVjY2Y0YWM1NTM1OTQ3Y2ViMzhiZGUzNmExM2NlZjFhMDQ3ZWZlZWM0Yjli
+    MzNlMzY5YzVlNzNlZTYzMDgKY29ycHVzIGRyaXZlci5weTogNjcgYnl0ZXMgc2hhMjU2IDkxNTli
+    ZTk3MmYxMzhiYzQ1ZGQ5OTAzNjJiN2ExYTNjMGJkNWYzMzY2M2VhY2ViY2Q2MTg3NTZkNmUwM2U1
+    ZTMKYnl0ZSB2YWx1ZXMgY292ZXJlZDogMjU2IHwgQ1JMRiBUcnVlIHwgYmFyZSBDUiBUcnVlIHwg
+    TlVMIFRydWUgfCB0cmFpbGluZyBuZXdsaW5lIEZhbHNlCnNjYW5uZXIgcG9zLXZhbHVlIHJjPTEK
+    Y29sbGVjdGVkIGNyZWRlbnRpYWwgdmFsdWVzOiA4IChBV1NfQUNDRVNTX0tFWV9JRCwgQVdTX1NF
+    Q1JFVF9BQ0NFU1NfS0VZLCBDTEFVREVfQ09ERV9NRVNTQUdJTkdfVE9LRU4sIENMQVVERV9TRVNT
+    SU9OX0lOR1JFU1NfVE9LRU5fRklMRSwgQ0xPVURTREtfQVVUSF9BQ0NFU1NfVE9LRU4sIEQzNzlf
+    Q0FOQVJZX1RPS0VOLCBHSF9UT0tFTiwgR0lUSFVCX1RPS0VOKQovaG9tZS91c2VyL2QzNzktYnVp
+    bGQvZTdhMi9zY2FuX3Bvc192YWx1ZS5iaW46IDM5IGJ5dGVzLCBoaXRzIDEgLT4gRDM3OV9DQU5B
+    UllfVE9LRU49MQpUT1RBTCBISVRTIDEKc2Nhbm5lciBwb3MtcGF0dGVybiByYz0xCmNvbGxlY3Rl
+    ZCBjcmVkZW50aWFsIHZhbHVlczogNyAoQVdTX0FDQ0VTU19LRVlfSUQsIEFXU19TRUNSRVRfQUND
+    RVNTX0tFWSwgQ0xBVURFX0NPREVfTUVTU0FHSU5HX1RPS0VOLCBDTEFVREVfU0VTU0lPTl9JTkdS
+    RVNTX1RPS0VOX0ZJTEUsIENMT1VEU0RLX0FVVEhfQUNDRVNTX1RPS0VOLCBHSF9UT0tFTiwgR0lU
+    SFVCX1RPS0VOKQovaG9tZS91c2VyL2QzNzktYnVpbGQvZTdhMi9zY2FuX3Bvc19wYXR0ZXJuLmJp
+    bjogNDcgYnl0ZXMsIGhpdHMgMSAtPiBwYXR0ZXJuOmdpdGh1Yl90b2tlbj0xClRPVEFMIEhJVFMg
+    MQpzY2FubmVyIG5lZy1jbGVhbiByYz0wCmNvbGxlY3RlZCBjcmVkZW50aWFsIHZhbHVlczogOCAo
+    QVdTX0FDQ0VTU19LRVlfSUQsIEFXU19TRUNSRVRfQUNDRVNTX0tFWSwgQ0xBVURFX0NPREVfTUVT
+    U0FHSU5HX1RPS0VOLCBDTEFVREVfU0VTU0lPTl9JTkdSRVNTX1RPS0VOX0ZJTEUsIENMT1VEU0RL
+    X0FVVEhfQUNDRVNTX1RPS0VOLCBEMzc5X0NBTkFSWV9UT0tFTiwgR0hfVE9LRU4sIEdJVEhVQl9U
+    T0tFTikKL2hvbWUvdXNlci9kMzc5LWJ1aWxkL2U3YTIvc2Nhbl9uZWcuYmluOiAyNiBieXRlcywg
+    aGl0cyAwClRPVEFMIEhJVFMgMApbUEFTU10gSi1jYWxpYnJhdGlvbjogY2FuYXJ5IHZhbHVlIEhJ
+    VCByYz0xOyBnaHBfIHBhdHRlcm4gSElUIHJjPTE7IGNsZWFuIHJjPTAKY29sbGVjdGVkIGNyZWRl
+    bnRpYWwgdmFsdWVzOiA3IChBV1NfQUNDRVNTX0tFWV9JRCwgQVdTX1NFQ1JFVF9BQ0NFU1NfS0VZ
+    LCBDTEFVREVfQ09ERV9NRVNTQUdJTkdfVE9LRU4sIENMQVVERV9TRVNTSU9OX0lOR1JFU1NfVE9L
+    RU5fRklMRSwgQ0xPVURTREtfQVVUSF9BQ0NFU1NfVE9LRU4sIEdIX1RPS0VOLCBHSVRIVUJfVE9L
+    RU4pCi9ob21lL3VzZXIvZDM3OS1idWlsZC9lN2EyL3NjYW4vQS50cmFuc2NyaXB0OiAzMzYzIGJ5
+    dGVzLCBoaXRzIDAKL2hvbWUvdXNlci9kMzc5LWJ1aWxkL2U3YTIvc2Nhbi9CLnRyYW5zY3JpcHQ6
+    IDMzNjMgYnl0ZXMsIGhpdHMgMAovaG9tZS91c2VyL2QzNzktYnVpbGQvZTdhMi9zY2FuL0UuanNv
+    bjogMzI1NiBieXRlcywgaGl0cyAwCi9ob21lL3VzZXIvZDM3OS1idWlsZC9lN2EyL3NjYW4vTUFO
+    SUZFU1QuanNvbjogMTg5NiBieXRlcywgaGl0cyAwCi9ob21lL3VzZXIvZDM3OS1idWlsZC9lN2Ey
+    L3NjYW4vZHJpdmVyLnB5OiA2NyBieXRlcywgaGl0cyAwClRPVEFMIEhJVFMgMApbUEFTU10gSi1z
+    Y2FuLW9iamVjdHM6IHNjYW5uZXIgcmM9MCBvdmVyIHRoZSA1IGV2aWRlbmNlIGZpbGVzCkNPTVBP
+    U0VEIGNvbW1pdCBkYzA5YWQyYTZmOWIxYzE0MTE0N2FhZTUwYWEwM2VhZDBiNWMzNjYwIHRyZWUg
+    MDU2NjYxMDgzMjRiNGI2YTVhYmNjYzQ2NDBhODEwNDA1MTExOGFkNCBtYW5pZmVzdCBkMWU1Y2Nm
+    NGFjNTUzNTk0N2NlYjM4YmRlMzZhMTNjZWYxYTA0N2VmZWVjNGI5YjMzZTM2OWM1ZTczZWU2MzA4
+    IGxvY2F0b3IgcmVmcy9oZWFkcy9jbGF1ZGUvZDM3OS1lN2Etc3ludGhldGljLWQxZTVjY2Y0YWM1
+    NTM1OTQKY29tbWl0IG9iamVjdCBieXRlczogMjMwIHwgc2lnbmVkOiBGYWxzZQpwcmUtcHVzaCBs
+    cy1yZW1vdGU6IEFCU0VOVCBOb25lCnB1Ymxpc2ggYXR0ZW1wdCAxOiBvdXRjb21lIFBVU0hFRF9V
+    TlZFUklGSUVEIHB1c2hfcmMgMCBsc19yZW1vdGUgWydQUkVTRU5UJywgJ2RjMDlhZDJhNmY5YjFj
+    MTQxMTQ3YWFlNTBhYTAzZWFkMGI1YzM2NjAnXQpwdXNoIHN0ZG91dCAoZnVsbCk6ClRvIGh0dHBz
+    Oi8vZ2l0aHViLmNvbS9kYWluaXVzMTIzNC9rYWktc3lzdGVtCioJZGMwOWFkMmE2ZjliMWMxNDEx
+    NDdhYWU1MGFhMDNlYWQwYjVjMzY2MDpyZWZzL2hlYWRzL2NsYXVkZS9kMzc5LWU3YS1zeW50aGV0
+    aWMtZDFlNWNjZjRhYzU1MzU5NAlbbmV3IGJyYW5jaF0KRG9uZQoKcHVzaCBzdGRlcnIgKGZ1bGwp
+    OgpmYXRhbDogZXhwZWN0ZWQgJ2Fja25vd2xlZGdtZW50cycsIHJlY2VpdmVkICdwYWNrZmlsZScK
+    d2FybmluZzogcHVzaCBuZWdvdGlhdGlvbiBmYWlsZWQ7IHByb2NlZWRpbmcgYW55d2F5IHdpdGgg
+    cHVzaApFbnVtZXJhdGluZyBvYmplY3RzOiA3LCBkb25lLgpDb3VudGluZyBvYmplY3RzOiAgMTQl
+    ICgxLzcpDUNvdW50aW5nIG9iamVjdHM6ICAyOCUgKDIvNykNQ291bnRpbmcgb2JqZWN0czogIDQy
+    JSAoMy83KQ1Db3VudGluZyBvYmplY3RzOiAgNTclICg0LzcpDUNvdW50aW5nIG9iamVjdHM6ICA3
+    MSUgKDUvNykNQ291bnRpbmcgb2JqZWN0czogIDg1JSAoNi83KQ1Db3VudGluZyBvYmplY3RzOiAx
+    MDAlICg3LzcpDUNvdW50aW5nIG9iamVjdHM6IDEwMCUgKDcvNyksIGRvbmUuCkRlbHRhIGNvbXBy
+    ZXNzaW9uIHVzaW5nIHVwIHRvIDQgdGhyZWFkcwpDb21wcmVzc2luZyBvYmplY3RzOiAgMTQlICgx
+    LzcpDUNvbXByZXNzaW5nIG9iamVjdHM6ICAyOCUgKDIvNykNQ29tcHJlc3Npbmcgb2JqZWN0czog
+    IDQyJSAoMy83KQ1Db21wcmVzc2luZyBvYmplY3RzOiAgNTclICg0LzcpDUNvbXByZXNzaW5nIG9i
+    amVjdHM6ICA3MSUgKDUvNykNQ29tcHJlc3Npbmcgb2JqZWN0czogIDg1JSAoNi83KQ1Db21wcmVz
+    c2luZyBvYmplY3RzOiAxMDAlICg3LzcpDUNvbXByZXNzaW5nIG9iamVjdHM6IDEwMCUgKDcvNyks
+    IGRvbmUuCldyaXRpbmcgb2JqZWN0czogIDE0JSAoMS83KQ1Xcml0aW5nIG9iamVjdHM6ICAyOCUg
+    KDIvNykNV3JpdGluZyBvYmplY3RzOiAgNDIlICgzLzcpDVdyaXRpbmcgb2JqZWN0czogIDU3JSAo
+    NC83KQ1Xcml0aW5nIG9iamVjdHM6ICA3MSUgKDUvNykNV3JpdGluZyBvYmplY3RzOiAgODUlICg2
+    LzcpDVdyaXRpbmcgb2JqZWN0czogMTAwJSAoNy83KQ1Xcml0aW5nIG9iamVjdHM6IDEwMCUgKDcv
+    NyksIDkuMzAgS2lCIHwgOS4zMCBNaUIvcywgZG9uZS4KVG90YWwgNyAoZGVsdGEgMCksIHJldXNl
+    ZCAwIChkZWx0YSAwKSwgcGFjay1yZXVzZWQgMApyZW1vdGU6IApyZW1vdGU6IENyZWF0ZSBhIHB1
+    bGwgcmVxdWVzdCBmb3IgJ2NsYXVkZS9kMzc5LWU3YS1zeW50aGV0aWMtZDFlNWNjZjRhYzU1MzU5
+    NCcgb24gR2l0SHViIGJ5IHZpc2l0aW5nOiAgICAgICAgCnJlbW90ZTogICAgICBodHRwczovL2dp
+    dGh1Yi5jb20vZGFpbml1czEyMzQva2FpLXN5c3RlbS9wdWxsL25ldy9jbGF1ZGUvZDM3OS1lN2Et
+    c3ludGhldGljLWQxZTVjY2Y0YWM1NTM1OTQgICAgICAgIApyZW1vdGU6IAoKW1BBU1NdIEQtbG9j
+    YXRvci1jcmVhdGU6IGVtcHR5LWxlYXNlIGNyZWF0ZSBvZiByZWZzL2hlYWRzL2NsYXVkZS9kMzc5
+    LWU3YS1zeW50aGV0aWMtZDFlNWNjZjRhYzU1MzU5NDogUFVTSEVEX1VOVkVSSUZJRUQgKGF0dGVt
+    cHRzIDEpCltQQVNTXSBFLXByb3h5LWxvY2F0b3ItcHVzaDogbG9jYXRvciBwdXNoIHJjPTAKcmVh
+    ZGJhY2sgQS50cmFuc2NyaXB0OiAzMzYzIGJ5dGVzIHNoYTI1NiBkZDUzMDQ4M2IzYjBmYWE4MjA3
+    NjNmN2NmYjU0MDUyNGMzMzNiZjI0MzY1M2U2MmNlZTdhM2JhMTIxZjEyNmI5IGlkZW50aWNhbD1U
+    cnVlCnJlYWRiYWNrIEIudHJhbnNjcmlwdDogMzM2MyBieXRlcyBzaGEyNTYgMzgwYjM0OTdjOTQ5
+    MWE3YjU0OWM3MDA1MGIwNzM4M2NlZmVkZGQyZjY5NzIzNDkxZjgwNjdlZjhkYzZmNDcyOSBpZGVu
+    dGljYWw9VHJ1ZQpyZWFkYmFjayBFLmpzb246IDMyNTYgYnl0ZXMgc2hhMjU2IDE3NzFmY2YwZWZh
+    ZGZkNGYwZGJhZmNmNThkYjRjMWMzYWNlMDBhZjM3ZTA0NWJjMTAwOGJmNDU4YzliOGNlMGEgaWRl
+    bnRpY2FsPVRydWUKcmVhZGJhY2sgZHJpdmVyLnB5OiA2NyBieXRlcyBzaGEyNTYgOTE1OWJlOTcy
+    ZjEzOGJjNDVkZDk5MDM2MmI3YTFhM2MwYmQ1ZjMzNjYzZWFjZWJjZDYxODc1NmQ2ZTAzZTVlMyBp
+    ZGVudGljYWw9VHJ1ZQpyZWFkYmFjayBNQU5JRkVTVC5qc29uOiAxODk2IGJ5dGVzIHNoYTI1NiBk
+    MWU1Y2NmNGFjNTUzNTk0N2NlYjM4YmRlMzZhMTNjZWYxYTA0N2VmZWVjNGI5YjMzZTM2OWM1ZTcz
+    ZWU2MzA4IGlkZW50aWNhbD1UcnVlCltQQVNTXSBBLWJ5dGUtZmlkZWxpdHk6IDUvNSBmaWxlcyBi
+    eXRlLWlkZW50aWNhbDsgYWx0ZXJuYXRlcz1GYWxzZQpbUEFTU10gQi1pZGVudGl0eTogZmV0Y2hl
+    ZCB0cmVlIDA1NjY2MTA4MzI0YjRiNmE1YWJjY2M0NjQwYTgxMDQwNTExMThhZDQgPT0gY29tcG9z
+    ZWQgMDU2NjYxMDgzMjRiNGI2YTVhYmNjYzQ2NDBhODEwNDA1MTExOGFkNDsgY29tbWl0IGlkIHJl
+    cXVlc3RlZCBkYzA5YWQyYTZmOWIxYzE0MTE0N2FhZTUwYWEwM2VhZDBiNWMzNjYwCltQQVNTXSBL
+    LXZlcmlmeS1wb3NpdGl2ZTogdmVyaWZ5IGZhaWx1cmVzOiBbXQpbUEFTU10gTkVHIEMoaSkgUzIg
+    cHJlc2VudGVkIGFzIFMxOiByZWZ1c2VkIHdpdGggMSBmYWlsdXJlKHMpOiBbJ0E6IHRyYW5zY3Jp
+    cHQgZGlnZXN0L2J5dGUgY291bnQgIT0gbWFuaWZlc3QnXQpbUEFTU10gTkVHIEMoaWkpIGQwOGYz
+    ZWMgYXMgZXZpZGVuY2U6IHJlZnVzZWQgd2l0aCAyIGZhaWx1cmUocyk6IFsnZXZpZGVuY2UgY29t
+    bWl0IGlzIG5vdCBhbiBvcnBoYW4nLCAidHJlZSBtZW1iZXJzIFsnLmNvdmVyYWdlcmMnLCAnLmRv
+    Y2tlcmlnbm9yZScsICcuZW52LmV4YW1wbGUnLCAnLmdpdGh1YicsICcuZ2l0aWdub3JlJywgJy5w
+    cmUtY29tbWl0LWNvbmZpZy55YW1sJywgJy52c2NvZGUnLCAnPTAuMi4wJywgJ0NIQU5HRUxPRy5t
+    ZCcsICdDTEFVREUubWQnLCAnTWFrZWZpbGUnLCAnTWFrZWZpbGUuYXJjaGl2ZScsICdQUk9KRUNU
+    X1NUQVRVUy5tZCcsICdSRUFETUUubWQnLCAnU0VTU0lPTl9CQUNLTE9HLm1kJywgJ2FnZW50aWMn
+    LCAnYWlycXVhbGl0eS1zZXJ2aWNlJywgJ2FsZXJ0LnJ1bGVzLnltbCcsICdhbGVydG1hbmFnZXIu
+    eW1sJywgJ2JhY2t1cC1zZXJ2aWNlJywgJ2Jvb3RzdHJhcCcsICdicm9rZXItYnJpZGdlJywgJ2Jy
+    b3dzZXItYWdlbnQnLCAnY2FsZW5kYXItc2VydmljZScsICdjYWxlbmRhci1zeW5jJywgJ2NvbW1v
+    bicsICdjb25mdGVzdC5weScsICdjb3J0ZXgnLCAnZGFzaGJvYXJkJywgJ2RhdGEnLCAnZG9ja2Vy
+    LWNvbXBvc2UuZnVsbC55bWwnLCAnZG9ja2VyLWNvbXBvc2UubWluaW1hbC55bWwnLCAnZG9ja2Vy
+    LWNvbXBvc2Uuc292ZXJlaWduLnltbCcsICdkb2NrZXItd2F0Y2hlcicsICdkb2NzJywgJ2RvY3Vt
+    ZW50LXBhcnNlcicsICdlbWFpbC1yZWFkZXInLCAnZXhlY3V0b3InLCAnZmluYW5jaWFsLWF3YXJl
+    bmVzcycsICdmdXNpb24tZW5naW5lJywgJ2dpdC13YXRjaGVyJywgJ2hlYXJ0YmVhdCcsICdob3Vz
+    ZS1kb2N0b3InLCAna2FpLWFkdmlzb3InLCAna2FpLXBtJywgJ2xlZGdlci13b3JrZXInLCAnbGV0
+    dGEtYWdlbnQnLCAnbWVtb3J5LWNvbXByZXNzb3InLCAnbWVtdS1jb3JlJywgJ21lbXUtZ3JhcGgn
+    LCAnbWV0cmljcy1nYXRld2F5JywgJ21vbml0b3Itc2VydmljZScsICduZXdzLWZlZWQnLCAnb3V0
+    cHV0JywgJ3BlcmNlcHRpb24nLCAncHJvbWV0aGV1cy55bWwnLCAncnVudGltZS1sb2dzJywgJ3Nh
+    bmRib3hlcycsICdzY3JlZW4tY2FwdHVyZScsICdzY3JlZW4td2F0Y2hlcicsICdzY3JpcHRzJywg
+    J3NlY3VyaXR5JywgJ3NraWxsLWh1bnRlcicsICdza2lsbHMnLCAnc3VwZXJ2aXNvcicsICdzeXNt
+    ZXRyaWNzJywgJ3RlbGVncmFtLWJvdCcsICd0b29sLWdhdGUnLCAndHJ1c3QtbGVkZ2VyJywgJ3Zh
+    dWx0LXN5bmMnLCAndmVyaWZpZXInLCAnd2VhdGhlci1zZXJ2aWNlJywgJ3dvcmtzcGFjZS1tYW5h
+    Z2VyJ10gIT0gWydBLnRyYW5zY3JpcHQnLCAnQi50cmFuc2NyaXB0JywgJ0UuanNvbicsICdNQU5J
+    RkVTVC5qc29uJywgJ2RyaXZlci5weSddIl0KW1BBU1NdIE5FRyBDKGlpaSkgb25lIGJ5dGUgZmxp
+    cHBlZDogcmVmdXNlZCB3aXRoIDEgZmFpbHVyZShzKTogWydBOiB0cmFuc2NyaXB0IGRpZ2VzdC9i
+    eXRlIGNvdW50ICE9IG1hbmlmZXN0J10KW1BBU1NdIE5FRyBDKGl2KSBsYWJlbHMgc3dhcHBlZCwg
+    b3JpZ2luYWwgZGlnZXN0OiByZWZ1c2VkIHdpdGggMyBmYWlsdXJlKHMpOiBbJ01BTklGRVNULmpz
+    b24gc2hhMjU2ICE9IGV4cGVjdGVkIGFkbWl0dGVkIG1hbmlmZXN0IGRpZ2VzdCcsICJsYWJlbCBB
+    IGJvdW5kIHRvICdCLnRyYW5zY3JpcHQnLCBub3QgQS50cmFuc2NyaXB0IiwgImxhYmVsIEIgYm91
+    bmQgdG8gJ0EudHJhbnNjcmlwdCcsIG5vdCBCLnRyYW5zY3JpcHQiXQpbUEFTU10gTkVHIEMoaXYp
+    IGxhYmVscyBzd2FwcGVkLCBzZWxmLWNvbnNpc3RlbnQgZGlnZXN0OiByZWZ1c2VkIHdpdGggMiBm
+    YWlsdXJlKHMpOiBbImxhYmVsIEEgYm91bmQgdG8gJ0IudHJhbnNjcmlwdCcsIG5vdCBBLnRyYW5z
+    Y3JpcHQiLCAibGFiZWwgQiBib3VuZCB0byAnQS50cmFuc2NyaXB0Jywgbm90IEIudHJhbnNjcmlw
+    dCJdCltQQVNTXSBORUcgSyBFIG9uZSBmaWVsZCBjaGFuZ2VkLCBzZWxmLWNvbnNpc3RlbnQgbWFu
+    aWZlc3Q6IHJlZnVzZWQgd2l0aCAxIGZhaWx1cmUocyk6IFsnRS5qc29uICE9IHRoZSBFIGZyb3pl
+    biBiZWZvcmUgQnVpbGQgQSddCltQQVNTXSBLMi1wbGFjZW1lbnQ6IHZzIHJlcGFpciBIRUFEIGQw
+    OGYzZWM6IFtdCltQQVNTXSBORUcgSzIgc2NyYXRjaCBicmFuY2ggY29udGFpbmluZyBldmlkZW5j
+    ZTogZGV0ZWN0ZWQ6IFsnZXZpZGVuY2UgZGMwOWFkMmE2ZjliIGlzIHJlYWNoYWJsZSBmcm9tIDgz
+    NWYwY2Q1ZDM2ZCddClZFUkRJQ1Q6IFBVQkxJU0hFRF9WRVJJRklFRCAvIEU3YSBQQVNTIHwgaXRl
+    bXMgMTUgLyAxNQo=
+    END-BASE64 e7a2/run.log
+- INSTRUMENT e7git.py (changed since entry 26) sha256 1dfe1321f82e8b17c9637d4af1652b6e3cc851d08a371b8693d108c372d5ecee, verbatim, 4-space indent  [CMD `sha256sum /home/user/d379-build/e7git.py` → 1dfe1321f82e8b17…]
+    BEGIN-INSTRUMENT e7git.py
+    #!/usr/bin/env python3
+    """D379 E7 Git-native evidence transport (D390). compose · publish · verify.
+    
+    The same unchanged module serves E7a (synthetic) and E7b (real).
+    Admitted identity = (commit object id, sha256 of canonical MANIFEST.json).
+    Locator refs carry no authority. verify() returns a list of failures; empty == PASS.
+    """
+    import hashlib, json, os, subprocess
+    
+    REMOTE = "https://github.com/dainius1234/kai-system"
+    SCHEMA = "D379_E7_EVIDENCE_V1"
+    FILES = ("A.transcript", "B.transcript", "E.json", "driver.py", "MANIFEST.json")
+    SOURCE_18 = {"tag": "v3.11.15",
+                 "tag_object": "2323bfc729b041c43b1e5e4c5f18c548fc345323",
+                 "commit": "2340a037f7450e70fccfe411e6531afb4d57a312",
+                 "tree": "8c6959bc70b201b477138f00c432a3bb2f1caddd",
+                 "signer_primary_fpr": "A035C8C19219BA821ECEA86B64E628F8D684696D"}
+    
+    
+    def sha256(b: bytes) -> str:
+        return hashlib.sha256(b).hexdigest()
+    
+    
+    def canonical(obj) -> bytes:
+        return (json.dumps(obj, sort_keys=True, ensure_ascii=True, indent=1) + "\n").encode()
+    
+    
+    def git(repo, *args, input=None, check=True):
+        p = subprocess.run(["git", "-C", repo, *args], input=input, capture_output=True)
+        if check and p.returncode:
+            raise RuntimeError(f"git {' '.join(args)} rc={p.returncode}: {p.stderr.decode(errors='replace')}")
+        return p
+    
+    
+    def build_manifest(files: dict, builds: dict, synthetic: bool) -> bytes:
+        """files: name -> bytes for the 4 non-manifest files. builds: label -> metadata."""
+        m = {"schema": SCHEMA, "SYNTHETIC": synthetic, "cpython_source": SOURCE_18,
+             "environment": {"path": "E.json", "sha256": sha256(files["E.json"])},
+             "driver": {"path": "driver.py", "sha256": sha256(files["driver.py"])},
+             "configure": {"args": ["./configure", "--prefix=/opt/d379-py311", "--without-ensurepip"],
+                           "make": ["make"], "install": ["make", "install", "DESTDIR=<staging-root>"]},
+             "builds": {}}
+        for label in ("A", "B"):
+            t = files[f"{label}.transcript"]
+            m["builds"][label] = dict(builds[label], transcript=f"{label}.transcript",
+                                      sha256=sha256(t), byte_count=len(t))
+        return canonical(m)
+    
+    
+    def compose(repo: str, files: dict, message: str) -> dict:
+        """Write blobs, tree and ONE orphan commit. Returns the pending record."""
+        assert set(files) == set(FILES), sorted(files)
+        entries = []
+        for name in sorted(files):
+            oid = git(repo, "hash-object", "-w", "--stdin", input=files[name]).stdout.decode().strip()
+            entries.append(f"100644 blob {oid}\t{name}")
+        tree = git(repo, "mktree", input=("\n".join(entries) + "\n").encode()).stdout.decode().strip()
+        commit = git(repo, "commit-tree", tree, "-m", message).stdout.decode().strip()
+        return {"commit": commit, "tree": tree, "manifest_sha256": sha256(files["MANIFEST.json"]),
+                "files": {n: {"sha256": sha256(b), "bytes": len(b)} for n, b in files.items()}}
+    
+    
+    def locator(manifest_sha256: str, synthetic: bool) -> str:
+        return f"refs/heads/claude/d379-{'e7a-synthetic' if synthetic else 'e7-evidence'}-{manifest_sha256[:16]}"
+    
+    
+    def remote_ref(repo, ref):
+        """-> (state, oid). state: PRESENT / ABSENT / UNKNOWN."""
+        p = git(repo, "ls-remote", REMOTE, ref, check=False)
+        if p.returncode:
+            return "UNKNOWN", p.stderr.decode(errors="replace")
+        lines = [l.split("\t") for l in p.stdout.decode().splitlines() if l.strip()]
+        hits = [o for o, r in lines if r == ref]
+        return ("PRESENT", hits[0]) if hits else ("ABSENT", None)
+    
+    
+    def publish(repo: str, rec: dict, ref: str) -> dict:
+        """Create-only push of the already-composed commit; classify with ls-remote."""
+        p = git(repo, "push", "--porcelain", "--progress", f"--force-with-lease={ref}:",
+                REMOTE, f"{rec['commit']}:{ref}", check=False)
+        state, oid = remote_ref(repo, ref)
+        if state == "PRESENT" and oid == rec["commit"]:
+            outcome = "PUSHED_UNVERIFIED"
+        elif state == "PRESENT":
+            outcome = "CONFLICT"
+        elif state == "ABSENT":
+            outcome = "FAILURE"
+        else:
+            outcome = "OUTCOME_UNKNOWN"
+        return {"outcome": outcome, "push_rc": p.returncode, "push_stdout": p.stdout.decode(errors="replace"),
+                "push_stderr": p.stderr.decode(errors="replace"), "ls_remote": [state, oid]}
+    
+    
+    def fetch_fresh(workdir: str, oid: str) -> str:
+        """A fresh empty repository (no alternates) holding only what the remote serves for oid."""
+        os.makedirs(workdir)
+        git(workdir, "init", "-q")
+        git(workdir, "fetch", "-q", "--no-tags", REMOTE, oid)
+        return workdir
+    
+    
+    def verify(repo: str, oid: str, expect_manifest_sha256: str, frozen_e_sha256: str,
+               expect_interpreters: dict | None = None) -> list:
+        """Every check reads bytes from `repo`'s object store. Empty list == PASS."""
+        f = []
+        p = git(repo, "cat-file", "-t", oid, check=False)
+        if p.returncode or p.stdout.decode().strip() != "commit":
+            return [f"{oid} is not a commit in this repository"]
+        raw = git(repo, "cat-file", "commit", oid).stdout
+        if git(repo, "hash-object", "-t", "commit", "--stdin", input=raw).stdout.decode().strip() != oid:
+            f.append("commit object does not hash to its id")
+        if any(l.startswith(b"parent ") for l in raw.split(b"\n\n", 1)[0].split(b"\n")):
+            f.append("evidence commit is not an orphan")
+        tree = git(repo, "rev-parse", f"{oid}^{{tree}}").stdout.decode().strip()
+        ls = [l.split("\t") for l in git(repo, "ls-tree", tree).stdout.decode().splitlines()]
+        names = {n: meta.split() for meta, n in ls}
+        if set(names) != set(FILES):
+            return f + [f"tree members {sorted(names)} != {sorted(FILES)}"]
+        data = {}
+        for n, (mode, typ, boid) in names.items():
+            if mode != "100644" or typ != "blob":
+                f.append(f"{n}: mode/type {mode} {typ}")
+            b = git(repo, "cat-file", "blob", boid).stdout
+            if git(repo, "hash-object", "--stdin", input=b).stdout.decode().strip() != boid:
+                f.append(f"{n}: blob does not hash to its id")
+            data[n] = b
+        mb = data["MANIFEST.json"]
+        if sha256(mb) != expect_manifest_sha256:
+            f.append("MANIFEST.json sha256 != expected admitted manifest digest")
+        try:
+            m = json.loads(mb)
+        except ValueError:
+            return f + ["MANIFEST.json is not JSON"]
+        if canonical(m) != mb:
+            f.append("MANIFEST.json is not in canonical form")
+        if m.get("schema") != SCHEMA:
+            f.append("schema mismatch")
+        if m.get("cpython_source") != SOURCE_18:
+            f.append("CPython source identity != v4.5 §18")
+        env = m.get("environment", {})
+        if env.get("path") != "E.json" or env.get("sha256") != sha256(data["E.json"]):
+            f.append("E.json digest != manifest")
+        if sha256(data["E.json"]) != frozen_e_sha256:
+            f.append("E.json != the E frozen before Build A")
+        drv = m.get("driver", {})
+        if drv.get("path") != "driver.py" or drv.get("sha256") != sha256(data["driver.py"]):
+            f.append("driver.py digest != manifest")
+        builds = m.get("builds", {})
+        if set(builds) != {"A", "B"}:
+            return f + [f"build labels {sorted(builds)} != ['A', 'B']"]
+        for label in ("A", "B"):
+            b = builds[label]
+            if b.get("transcript") != f"{label}.transcript":
+                f.append(f"label {label} bound to {b.get('transcript')!r}, not {label}.transcript")
+                continue
+            t = data[b["transcript"]]
+            if b.get("sha256") != sha256(t) or b.get("byte_count") != len(t):
+                f.append(f"{label}: transcript digest/byte count != manifest")
+            if expect_interpreters is not None and b.get("interpreter") != expect_interpreters.get(label):
+                f.append(f"{label}: interpreter identity != measured")
+        for k in ("source_worktree", "build_dir", "staging_root"):
+            if builds["A"].get(k) == builds["B"].get(k):
+                f.append(f"A and B share {k}")
+        return f
+    
+    
+    def placement(repo: str, oid: str, subject: str) -> list:
+        """K2: evidence must not be reachable through, nor share a path with, `subject`."""
+        f = []
+        if git(repo, "merge-base", "--is-ancestor", oid, subject, check=False).returncode == 0:
+            f.append(f"evidence {oid[:12]} is reachable from {subject[:12]}")
+        ev = set(git(repo, "ls-tree", "-r", "--name-only", oid).stdout.decode().split("\n")) - {""}
+        sub = set(git(repo, "ls-tree", "-r", "--name-only", subject).stdout.decode().split("\n")) - {""}
+        if ev & sub:
+            f.append(f"evidence paths present in subject tree: {sorted(ev & sub)}")
+        return f
+    END-INSTRUMENT e7git.py
+- INSTRUMENT e7a_run.py (changed since entry 26) sha256 0d44ca8d6491bf8c03d204ed80ede15b928fc4f32a4e3495e9ea69dea483ae7d, verbatim, 4-space indent  [CMD `sha256sum /home/user/d379-build/e7a_run.py` → 0d44ca8d6491bf8c…]
+    BEGIN-INSTRUMENT e7a_run.py
+    #!/usr/bin/env python3
+    """E7a-Git v2 runner (synthetic). Uses e7git.py unchanged. Full log -> e7a/run.log."""
+    import json, os, random, shutil, subprocess, sys
+    sys.path.insert(0, "/home/user/d379-build")
+    import e7git as G
+    if os.environ.get("D379_E7A_DRYRUN_REMOTE"):
+        G.REMOTE = os.environ["D379_E7A_DRYRUN_REMOTE"]  # dry run only; the real run never sets this
+    
+    W = os.environ.get("D379_E7A_DIR", "/home/user/d379-build/e7a")
+    LOG = open(f"{W}/run.log", "a")
+    RESULT = {"items": {}}
+    
+    
+    def log(*a):
+        s = " ".join(str(x) for x in a)
+        print(s); LOG.write(s + "\n"); LOG.flush()
+    
+    
+    def item(key, ok, detail):
+        RESULT["items"][key] = {"pass": bool(ok), "detail": detail}
+        log(f"[{'PASS' if ok else 'FAIL'}] {key}: {detail}")
+        return ok
+    
+    
+    def stop(reason):
+        RESULT["verdict"] = f"STOP: {reason}"
+        log("STOP —", reason, "— NO BUILD")
+        json.dump(RESULT, open(f"{W}/result.json", "w"), indent=1, sort_keys=True)
+        sys.exit(1)
+    
+    
+    def corpus(seed):
+        r = random.Random(seed)
+        edge = (b"LF line\nCRLF line\r\nbare CR\rUTF-8 \xc3\xa9\xe2\x82\xac\xf0\x9f\x90\x8d\n"
+                b"invalid \xff and lone \xc3 here\nNUL\x00inside\n" + bytes(range(256)) + b"\n")
+        rnd = bytes(r.getrandbits(8) for _ in range(3000))
+        return edge + rnd + f"seed={seed} no trailing newline".encode()
+    
+    
+    # 1. E derived inside the build wrapper, frozen for this run
+    e = subprocess.run(["/home/user/d379-build/netiso2.sh", "python3", "/home/user/d379-build/env_fp.py"],
+                       capture_output=True)
+    if e.returncode:
+        stop(f"E derivation failed rc={e.returncode}")
+    E_json = e.stdout
+    frozen_e = G.sha256(E_json)
+    log("E derived inside netiso2:", frozen_e, len(E_json), "bytes;", E_json.decode().splitlines()[-1])
+    
+    # 2. synthetic corpus + metadata
+    S1, S2 = corpus(1), corpus(2)
+    assert S1 != S2
+    drv = b"# SYNTHETIC driver placeholder for E7a-Git v2. Not a build driver.\n"
+    interp = {L: {"executable_sha256": f"SYNTHETIC-{L}", "h2_py_stdlib_v1": f"SYNTHETIC-{L}",
+                  "computed_by_commit": "SYNTHETIC"} for L in "AB"}
+    builds = {L: {"source_worktree": f"SYNTHETIC/{L}/src", "build_dir": f"SYNTHETIC/{L}/build",
+                  "staging_root": f"SYNTHETIC/{L}/stage", "start_utc": "SYNTHETIC", "end_utc": "SYNTHETIC",
+                  "return_codes": {"configure": 0, "make": 0, "install": 0}, "interpreter": interp[L]}
+              for L in "AB"}
+    files = {"A.transcript": S1, "B.transcript": S2, "E.json": E_json, "driver.py": drv}
+    files["MANIFEST.json"] = G.build_manifest(files, builds, synthetic=True)
+    for n, b in sorted(files.items()):
+        log(f"corpus {n}: {len(b)} bytes sha256 {G.sha256(b)}")
+    cover = set(S1) | set(S2)
+    log("byte values covered:", len(cover), "| CRLF", b"\r\n" in S1, "| bare CR", b"\r" in S1.replace(b"\r\n", b""),
+        "| NUL", b"\x00" in S1, "| trailing newline", S1.endswith(b"\n"))
+    
+    # 3. J detect: scanner calibration, then the real objects
+    os.makedirs(f"{W}/scan", exist_ok=True)
+    for n, b in files.items():
+        open(f"{W}/scan/{n}", "wb").write(b)
+    canary = "d379canary-" + os.urandom(12).hex()
+    open(f"{W}/scan_pos_value.bin", "wb").write(b"xx" + canary.encode() + b"yy")
+    open(f"{W}/scan_pos_pattern.bin", "wb").write(b"token ghp_" + b"A1" * 18 + b"\n")
+    open(f"{W}/scan_neg.bin", "wb").write(b"clean synthetic text only\n")
+    SC = ["python3", "/home/user/d379-build/secretscan.py"]
+    env_c = dict(os.environ, D379_CANARY_TOKEN=canary)
+    pv = subprocess.run(SC + [f"{W}/scan_pos_value.bin"], env=env_c, capture_output=True, text=True)
+    pp = subprocess.run(SC + [f"{W}/scan_pos_pattern.bin"], capture_output=True, text=True)
+    pn = subprocess.run(SC + [f"{W}/scan_neg.bin"], env=env_c, capture_output=True, text=True)
+    for tag, p in (("pos-value", pv), ("pos-pattern", pp), ("neg-clean", pn)):
+        log(f"scanner {tag} rc={p.returncode}\n" + p.stdout.strip())
+    item("J-calibration", pv.returncode == 1 and pp.returncode == 1 and pn.returncode == 0,
+         f"canary value HIT rc={pv.returncode}; ghp_ pattern HIT rc={pp.returncode}; clean rc={pn.returncode}")
+    sr = subprocess.run(SC + [f"{W}/scan/{n}" for n in sorted(files)], capture_output=True, text=True)
+    log(sr.stdout.strip())
+    if not item("J-scan-objects", sr.returncode == 0, f"scanner rc={sr.returncode} over the 5 evidence files"):
+        stop("credential/pattern hit in evidence; no redaction")
+    if not RESULT["items"]["J-calibration"]["pass"]:
+        stop("scanner calibration failed")
+    
+    # 4. compose ONCE; pending record
+    repo = f"{W}/compose"
+    os.makedirs(repo); G.git(repo, "init", "-q")
+    rec = G.compose(repo, files, "D379 E7a-Git v2 SYNTHETIC evidence object (D390). Not build evidence.")
+    ref = G.locator(rec["manifest_sha256"], synthetic=True)
+    rec["locator"] = ref
+    json.dump(rec, open(f"{W}/pending.json", "w"), indent=1, sort_keys=True)
+    log("COMPOSED commit", rec["commit"], "tree", rec["tree"], "manifest", rec["manifest_sha256"], "locator", ref)
+    raw = G.git(repo, "cat-file", "commit", rec["commit"]).stdout
+    log("commit object bytes:", len(raw), "| signed:", b"BEGIN SSH SIGNATURE" in raw)
+    
+    # 5. pre-check, publish (create-only), classify; retry SAME oid once on FAILURE
+    st, oid = G.remote_ref(repo, ref)
+    log("pre-push ls-remote:", st, oid)
+    if st != "ABSENT":
+        stop(f"locator pre-state {st} {oid}")
+    for attempt in (1, 2):
+        pub = G.publish(repo, rec, ref)
+        log(f"publish attempt {attempt}: outcome {pub['outcome']} push_rc {pub['push_rc']} ls_remote {pub['ls_remote']}")
+        log("push stdout (full):\n" + pub["push_stdout"]); log("push stderr (full):\n" + pub["push_stderr"])
+        if pub["outcome"] != "FAILURE":
+            break
+    item("D-locator-create", pub["outcome"] == "PUSHED_UNVERIFIED",
+         f"empty-lease create of {ref}: {pub['outcome']} (attempts {attempt})")
+    item("E-proxy-locator-push", pub["push_rc"] == 0, f"locator push rc={pub['push_rc']}")
+    RESULT["publish"] = {k: pub[k] for k in ("outcome", "push_rc", "ls_remote")}
+    if pub["outcome"] != "PUSHED_UNVERIFIED":
+        stop(f"publication outcome {pub['outcome']}")
+    
+    # 6. A/B/F/K on a FRESH fetch by commit id
+    rb = G.fetch_fresh(f"{W}/readback", rec["commit"])
+    alt = os.path.exists(f"{rb}/.git/objects/info/alternates")
+    ok_bytes = []
+    for n, b in files.items():
+        got = G.git(rb, "cat-file", "blob", f"{rec['commit']}:{n}").stdout
+        ok_bytes.append(got == b)
+        log(f"readback {n}: {len(got)} bytes sha256 {G.sha256(got)} identical={got == b}")
+    item("A-byte-fidelity", all(ok_bytes) and not alt, f"{sum(ok_bytes)}/{len(files)} files byte-identical; alternates={alt}")
+    rt = G.git(rb, "rev-parse", f"{rec['commit']}^{{tree}}").stdout.decode().strip()
+    item("B-identity", rt == rec["tree"], f"fetched tree {rt} == composed {rec['tree']}; commit id requested {rec['commit']}")
+    vf = G.verify(rb, rec["commit"], rec["manifest_sha256"], frozen_e, interp)
+    item("K-verify-positive", vf == [], f"verify failures: {vf}")
+    
+    # 7. C negatives + K negative: local-only commits in the readback repo, NEVER pushed
+    def local_commit(fs):
+        return G.compose(rb, fs, "LOCAL NEGATIVE CONTROL - never pushed")["commit"]
+    neg = {}
+    c_i = local_commit(dict(files, **{"A.transcript": S2}))
+    neg["C(i) S2 presented as S1"] = G.verify(rb, c_i, rec["manifest_sha256"], frozen_e, interp)
+    G.git(rb, "fetch", "-q", "--depth", "1", "--no-tags", G.REMOTE, "d08f3ec5de4d823011e66261c84c98a76371428e")
+    neg["C(ii) d08f3ec as evidence"] = G.verify(rb, "d08f3ec5de4d823011e66261c84c98a76371428e",
+                                                 rec["manifest_sha256"], frozen_e, interp)
+    flip = bytearray(S1); flip[100] ^= 0x01
+    c_iii = local_commit(dict(files, **{"A.transcript": bytes(flip)}))
+    neg["C(iii) one byte flipped"] = G.verify(rb, c_iii, rec["manifest_sha256"], frozen_e, interp)
+    m = json.loads(files["MANIFEST.json"]); m["builds"]["A"], m["builds"]["B"] = m["builds"]["B"], m["builds"]["A"]
+    swapped = G.canonical(m)
+    c_iv = local_commit(dict(files, **{"MANIFEST.json": swapped}))
+    neg["C(iv) labels swapped, original digest"] = G.verify(rb, c_iv, rec["manifest_sha256"], frozen_e, interp)
+    neg["C(iv) labels swapped, self-consistent digest"] = G.verify(rb, c_iv, G.sha256(swapped), frozen_e, interp)
+    E_bad = E_json.replace(b'"kernel"', b'"kernel_"', 1)
+    assert E_bad != E_json
+    fs_k = dict(files, **{"E.json": E_bad}); fs_k["MANIFEST.json"] = G.build_manifest(fs_k, builds, synthetic=True)
+    c_k = local_commit(fs_k)
+    neg["K E one field changed, self-consistent manifest"] = G.verify(rb, c_k, G.sha256(fs_k["MANIFEST.json"]), frozen_e, interp)
+    for k, f in neg.items():
+        item(f"NEG {k}", f != [], f"refused with {len(f)} failure(s): {f[:3]}")
+    
+    # 8. K2 placement against the repair HEAD, + known-negative scratch merge (local only)
+    pl = G.placement(rb, rec["commit"], "d08f3ec5de4d823011e66261c84c98a76371428e")
+    item("K2-placement", pl == [], f"vs repair HEAD d08f3ec: {pl}")
+    rt_sub = G.git(rb, "rev-parse", "d08f3ec5de4d823011e66261c84c98a76371428e^{tree}").stdout.decode().strip()
+    scratch = G.git(rb, "commit-tree", rt_sub, "-p", "d08f3ec5de4d823011e66261c84c98a76371428e",
+                    "-p", rec["commit"], "-m", "LOCAL scratch containing evidence - never pushed").stdout.decode().strip()
+    pln = G.placement(rb, rec["commit"], scratch)
+    item("NEG K2 scratch branch containing evidence", pln != [], f"detected: {pln}")
+    
+    # 9. verdict
+    allok = all(v["pass"] for v in RESULT["items"].values())
+    RESULT.update(verdict="PUBLISHED_VERIFIED / E7a PASS" if allok else "STOP: an item failed — NO BUILD",
+                  commit=rec["commit"], tree=rec["tree"], manifest_sha256=rec["manifest_sha256"],
+                  locator=ref, frozen_e_sha256=frozen_e)
+    json.dump(RESULT, open(f"{W}/result.json", "w"), indent=1, sort_keys=True)
+    log("VERDICT:", RESULT["verdict"], "| items", sum(v["pass"] for v in RESULT["items"].values()), "/", len(RESULT["items"]))
+    sys.exit(0 if allok else 1)
+    END-INSTRUMENT e7a_run.py
+
+### 6. Next authorised step
+
+- None. STOP before Build A; the build window needs Dainius's grant  [CONVERSATION 2026-10-02 Kai, "STOP after reporting E7a."]
+
+### 7. What I am unsure of
+
+- The refused 9.30 KiB pack of entry 26 may or may not have left unreferenced objects on GitHub; nothing references them  [CMD `git ls-remote … 'refs/tags/d379-*'` → 0]
+- E (1771fcf0…) was frozen for E7a only; per v4.5 §19 it is re-derived immediately before Build A, and the host may change again before then  [FILE kai-pm/D379_PLAN_V4_5.md:1211]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
