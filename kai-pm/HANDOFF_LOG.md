@@ -6757,3 +6757,72 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-02T18:30:31Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-02T18:30:30Z  [CMD `date -u +%FT%TZ` → 2026-10-02T18:30:30Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 603fdecfdfcb07347e719c9f96335dd7e9f4994e  [CMD `git rev-parse HEAD` → 603fdecfdfcb07347e719c9f96335dd7e9f4994e]
+- tree: 00814f2488e8ebb021ccdcea7a07c64a43ec63d5  [CMD `git rev-parse HEAD^{tree}` → 00814f2488e8ebb021ccdcea7a07c64a43ec63d5]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/d379-repair-eb52f73: 37bce4cd89eca2312c79d71ce150630ef866f47a  [CMD `git ls-remote --heads origin` → 37bce4cd89eca2312c79d71ce150630ef866f47a]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 603fdecfdfcb07347e719c9f96335dd7e9f4994e  [CMD `git ls-remote --heads origin` → 603fdecfdfcb07347e719c9f96335dd7e9f4994e]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 35  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 35]
+
+### 1. The four states
+
+- physical: repair branch claude/d379-repair-eb52f73 unchanged at 37bce4c (WIP 3/n), 0 uncommitted; d379_controls.py NOT changed; no repository file was modified by this entry's measurements  [CMD `git -C /home/user/kai-repair rev-parse HEAD; git status --short | wc -l` → 37bce4cd89eca2312c79d71ce150630ef866f47a, 0]
+- authorised: B4 six-file repair + full matrix, under "hostile-control failure → STOP. Do not improvise around it."  [CONVERSATION 2026-10-02 Kai, "Any material deviation from v4.5, unresolved dependency, weakening of D380/D385, unexpected authority path, context collapse, unaccounted launch mechanism, or hostile-control failure → STOP. Do not improvise around it."]
+- evidence: B4 STOPPED on a known-positive failure: under the qualified interpreter the repaired Pass A REFUSES every production, before output, because typing.io and typing.re are unclassifiable  [CMD `bash scratchpad/b4chain/chain.sh` (sha256 9fd3eaff…7b50) → "REFUSE (pre-production): … typing.io: REFUSE: typing.io has no filesystem source and its origin is neither 'built-in' nor 'frozen' … typing.re: REFUSE: …"]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- None  [GIT 37bce4c]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD by Orion (STOP): the rest of B4 (the d379_controls.py rebuild and the matrix run), pending Kai's ruling on the typing.io/typing.re blocker  [CONVERSATION 2026-10-02 Kai, "hostile-control failure → STOP. Do not improvise around it."]
+- FORBIDDEN unchanged: capture, D390 replay, fixity F, production Stage A, candidate, holdout, blind 40, Item 8, PR #122 merge  [CONVERSATION 2026-10-02 Kai, "DO NOT capture."]
+
+### 4. Open questions
+
+- How should the governed producer stop loading typing.io/typing.re? Option A (Orion recommends): passa.py replaces `import typing` / `class Binding(typing.NamedTuple)` with `Binding = collections.namedtuple("Binding", ["rationale", "subject_policy"])`. It stays inside the six files and weakens no D379/D380/D385 rule; it is a producer change v4.5 does not list. Option B: classify the pseudo-modules through their defining stdlib module. That is a new classification rule and an exception class, which INC-37 and D385 forbid; Orion does not recommend it — owner: Kai  [FILE kai-repair:kai-pm/house_in_order_h2_v13/passa.py:63] [LEDGER INC-2026-09-19-37]
+- Option A measured in a SCRATCH COPY ONLY (instrument root outside the repository; repository untouched): Pass A rc 0 (3 rows); binder; classification rc 0; binder; qualifier [6] observed 87, classified 87, refused 0; [7] "every slot closed"; qualifier exit 1 only on six Q1b FACT_CLASS_ABSENT findings (see the next bullet)  [CMD `bash scratchpad/b4chain/chain2.sh` (sha256 bc106c3a…c87e) → passa rc=0, run_h2 rc=0, refused 0, every slot closed, FINDINGS: 6]
+- R15 observation, not part of v4.5: the real classifier's rows omit two governed fact classes (NOMINAL_FUNCTION, SELF_ASSERTS_CURRENT) that ontology.EVIDENCE_FACTS declares, so Q1b reports FACT_CLASS_ABSENT on every real row (3 rows × 2 = 6). The matrix's qualifier ACCEPT cases use synthetic rows (D379 §8 Q1b), so this does not block them. Is it a known/accepted state or a separate finding? — owner: Kai  [CMD `qualify.q1b_denominators(result.json)` in scratch copy → 6 FACT_CLASS_ABSENT: SELF_ASSERTS_CURRENT, NOMINAL_FUNCTION per row]
+
+### 5. Incidents and corrections
+
+- Mechanism candidate, NOT recorded in the ledger (needs authority): the INC-37 repair correctly made typing.io/typing.re REFUSE. Nobody measured what that does to production, because INC-34 refused every production first and masked it. A held blocker hid a downstream defect in never-executed code (R8). This is a locator, not an earned mechanism (R18)  [LEDGER INC-2026-09-19-37] [LEDGER INC-2026-09-18-34]
+
+### 6. Next authorised step
+
+- None recorded beyond the STOP: Kai rules on the typing.io/typing.re blocker (Option A or another), then the B4 grant resumes at the d379_controls.py rebuild  [CONVERSATION 2026-10-02 Kai, "If Orion discovers any material deviation from v4.5 while implementing those six files, he must stop rather than improvise a new design."]
+
+### 7. What I am unsure of
+
+- Whether typing is loaded by anything else on a governed path once passa stops importing it: measured only for the Pass-A, classification and qualifier processes of the scratch chain (qualifier refused 0 of 87). Not measured for the binder process or for every control child  [CMD `bash scratchpad/b4chain/chain2.sh` → refused 0]
+- The scratch probe scripts and outputs live only in the session scratchpad (chain.sh, chain2.sh, chain_out.txt 595 bytes, chain2_out.txt 2,149 bytes). They are not durable; their decisive lines are quoted above  [CMD `wc -c chain_out.txt chain2_out.txt` → 595, 2149]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
