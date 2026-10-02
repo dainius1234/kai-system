@@ -4545,3 +4545,504 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-02T17:24:07Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-02T17:24:07Z  [CMD `date -u +%FT%TZ` → 2026-10-02T17:24:07Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 68aa79cb6800c352debf6afa90d3092481e57547  [CMD `git rev-parse HEAD` → 68aa79cb6800c352debf6afa90d3092481e57547]
+- tree: 9309ea7c3ad392772a355a8d36a68f7b5c27eee1  [CMD `git rev-parse HEAD^{tree}` → 9309ea7c3ad392772a355a8d36a68f7b5c27eee1]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 68aa79cb6800c352debf6afa90d3092481e57547  [CMD `git ls-remote --heads origin` → 68aa79cb6800c352debf6afa90d3092481e57547]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d08f3ec5de4d823011e66261c84c98a76371428e  [CMD `git ls-remote --heads origin` → d08f3ec5de4d823011e66261c84c98a76371428e]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 28  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 28]
+
+### 1. The four states
+
+- physical: build window about to start; no build yet  [CMD `ls /home/user/d379-build/bw` → absent]
+- authorised: the bounded build window with retention, resumed under C1/C2 and out-of-tree as adjudicated  [CONVERSATION 2026-10-02 Kai, "Existing bounded build-window authority, including qualified-interpreter retention, may resume under these controls."]
+- evidence: pre-window calibrations (section 5)  [CMD `qualify_interp.py` under /usr/bin/python3.11 → KNOWN_NEGATIVE]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-02 · PRE-BUILD REPRODUCIBILITY DEVIATION ADJUDICATED: C1 accepted subject to mechanical derivation; C2 accepted with an independence control; out-of-tree accepted; no pre-emptive PYTHONHASHSEED or prefix-map. Verbatim, extracted byte-for-byte (received 2026-10-02T17:19:52.626Z, 5466 bytes, sha256 825b43d4236d083b393a473258120ec1b06b9f75a245ebab75b18ce9110564aa) ⚠ UNBANKED  [CONVERSATION 2026-10-02 Kai, "KAI → ORION — PRE-BUILD REPRODUCIBILITY DEVIATION ADJUDICATED"]
+    BEGIN-VERBATIM KAI-C1-C2-RULING
+    Orion was right to stop. I independently checked the relevant CPython source and the reproducible-build mechanism rather than accepting C1/C2 on trust.
+    
+    C1 is technically sound. CPython 3.11.15’s getbuildinfo.c uses __DATE__ and __TIME__. GCC explicitly defines SOURCE_DATE_EPOCH as the mechanism for replacing those macros with a fixed timestamp for reproducible builds.  
+    
+    C2 addresses a real problem. Build paths commonly enter debug information, so physically separate build directories can produce different binaries. Canonicalising the paths visible inside two isolated build environments is a legitimate reproducibility technique.  
+    
+    But I want one refinement before execution: do not describe C2 as merely “same paths inside.” We need to ensure A and B remain genuinely independent physical builds. Otherwise we could accidentally weaken the very test we’re trying to perform.
+    
+    My ruling is:
+    
+    C1 ACCEPTED: set SOURCE_DATE_EPOCH=1772499177 for both A and B, provided Orion mechanically verifies immediately before Build A that 1772499177 is in fact derived from the already-governed signed v3.11.15 tag identity. Record the derivation in E. Do not treat the numeric value itself as a newly hand-entered constant.
+    
+    C2 ACCEPTED WITH CONTROL: Build A and Build B retain completely separate host-side source checkouts, build directories and staging roots. Each build runs in its own isolated namespace where those different physical directories are mounted at the identical canonical paths /d379/src, /d379/build, /d379/stage. No A filesystem state may be reused by B. The manifest records both physical roots and canonical namespace paths.
+    
+    OUT-OF-TREE BUILD ACCEPTED: execute /d379/src/configure --prefix=/opt/d379-py311 --without-ensurepip from /d379/build. This is preferable here because it keeps the source checkout separate from generated build state. CPython’s configure machinery explicitly handles out-of-tree builds.
+    
+    Before Build B, prove B’s build and staging roots are fresh/empty and its source checkout independently matches the frozen source identity. Do not copy A’s generated objects/configuration/cache into B.
+    
+    DO NOT add PYTHONHASHSEED, prefix-map compiler flags or any other reproducibility adjustment pre-emptively. C1 and C2 address defects we have evidence for. If another difference remains, A/B comparison discovers it and the window STOPS. We diagnose that actual difference rather than guessing ahead.
+    
+    The acceptance criterion remains unchanged: the required A/B artefacts must satisfy the v4.5 reproducibility comparison. C1/C2 normalize two identified environmental nondeterminisms; they do not lower the acceptance floor.
+    
+    There is also an important distinction: canonical paths are better here than adding -fdebug-prefix-map because Orion correctly said he isn’t changing compiler flags. Prefix mapping is a legitimate reproducible-build technique, but it would be an additional build-input change and can itself have subtleties.  
+    
+    So we have not redesigned the build. We’ve made the environment deterministic where the source/toolchain demonstrably depends on time and path.
+    
+    Where we stand
+    
+    Nothing bad happened. This is precisely why the pre-build attack existed. We caught a build that would have failed for an irrelevant reason before spending the two governed builds.
+    
+    The sequence is now:
+    
+    E7a PASS → reproducibility defect discovered pre-build → C1/C2 adjudicated → Build A/B window can resume.
+    
+    The existing build-window authority can resume only with these C1/C2 controls incorporated and recorded as part of frozen E. Retention remains included as you already authorised.
+    
+    Send Orion:
+    
+    KAI → ORION — PRE-BUILD REPRODUCIBILITY DEVIATION ADJUDICATED
+    
+    C1 ACCEPTED subject to mechanical derivation: derive SOURCE_DATE_EPOCH from the governed signed v3.11.15 tag immediately before freezing E; verify the resulting value rather than trusting the previously typed constant; record derivation and value in E.
+    
+    C2 ACCEPTED WITH INDEPENDENCE CONTROL: A and B use separate physical source checkouts, build roots and staging roots, but each isolated namespace mounts its own roots at canonical /d379/src, /d379/build, /d379/stage. No generated/configured/object state from A may enter B.
+    
+    OUT-OF-TREE BUILD ACCEPTED: from canonical /d379/build, invoke /d379/src/configure --prefix=/opt/d379-py311 --without-ensurepip.
+    
+    Before B, mechanically prove B build/stage roots are fresh and B source independently equals the frozen CPython source identity.
+    
+    Do not add PYTHONHASHSEED, prefix-map flags or another reproducibility control without measured evidence. Any remaining A/B difference = STOP and diagnose the first difference; do not weaken the comparison.
+    
+    C1/C2 and their derivations become part of frozen E. Existing bounded build-window authority, including qualified-interpreter retention, may resume under these controls.
+    
+    Any material deviation, source mismatch, E drift, isolation failure, Build A/B failure, reproducibility failure, D380/D385 qualification failure, E7b failure, retention publication/readback failure or credential-exclusion failure = STOP.
+    
+    No repair implementation, D390 replay, fixity F, capture, Stage A, candidate, holdout, blind 40 or merge is authorised.
+    
+    Report the completed build/evidence/retention result and STOP.
+    
+    Confidence: 0.98 on C1; 0.96 on C2/out-of-tree construction. The remaining uncertainty is exactly what the two real builds are designed to measure.
+    END-VERBATIM KAI-C1-C2-RULING
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED, starting: E freeze → source reverify → Build A → E → fresh-B proof → Build B → E → A/B comparison → D380/D385 measurement → E7b → readback → retention → report → STOP  [CONVERSATION 2026-10-02 Kai, "Report the completed build/evidence/retention result and STOP."]
+- FORBIDDEN: repair implementation, D390 replay, fixity F, capture, Stage A, candidate, holdout, blind 40, merge  [CONVERSATION 2026-10-02 Kai, "No repair implementation, D390 replay, fixity F, capture, Stage A, candidate, holdout, blind 40 or merge is authorised."]
+
+### 4. Open questions
+
+- FORESEEN for retention, not yet measured on the staged tree: the signed upstream source carries 15 files with a PEM private-key header (14 in Lib/test/certdata, 1 in Doc/library). `make install` installs the test suite, so the scanner's pattern layer will probably hit the staged interpreter. The rule "any hit → STOP, no redaction" will then be applied as written: retention publication STOPS for a ruling, and builds and E7b are unaffected  [CMD `git grep -l -E 'BEGIN [A-Z ]*PRIVATE KEY' v3.11.15 | wc -l` → 15]
+
+### 5. Incidents and corrections
+
+- Calibration: governed stage_identity.py extracted from d08f3ec (blob 714a2edc7fb101d0ccf755ff73fbd44589efc954, equal to the repair branch's); qualify_interp.py under the distro /usr/bin/python3.11 inside netiso2 → KNOWN_NEGATIVE, "symlink sitecustomize.py under stdlib resolves OUTSIDE the governed root set" (D385's banked negative reproduced); no bytecode written  [CMD `netiso2.sh /usr/bin/python3.11 -B -E -s qualify_interp.py gov` → KNOWN_NEGATIVE]
+- e7git.py changed in ONE metadata block only: the manifest's configure record now states the adjudicated out-of-tree invocation (/d379/src/configure, cwd /d379/build, DESTDIR=/d379/stage) instead of the superseded "./configure". The hostile E7a suite was re-run against a local remote with the changed module → 15/15. compose/publish/verify are unchanged  [CMD `e7a_run.py` (dry3) → VERDICT PUBLISHED_VERIFIED 15/15]
+- New window instruments (credential scan 0 hits): env_fp2.py (C1 derived from tag object 2323bfc7 and compared with the environment; C2 mountpoints; physical roots deliberately NOT in E), buildns.sh (netiso2 + C1/C2; hides both builds' physical roots), driver.py, qualify_interp.py  [CMD `secretscan.py env_fp2.py buildns.sh driver.py qualify_interp.py e7git.py` → TOTAL HITS 0]
+- INSTRUMENT env_fp2.py sha256 0bcb79c4c34ff8be05884ffafbee26f1a87bbee5ed4557369d848375b341599e, verbatim, 4-space indent  [CMD `sha256sum /home/user/d379-build/env_fp2.py` → 0bcb79c4c34ff8be…]
+    BEGIN-INSTRUMENT env_fp2.py
+    #!/usr/bin/env python3
+    """D379 v4.5 §19 environment fingerprint E, v2 (C1/C2 per Kai 2026-10-02). Prints canonical JSON + its sha256.
+    Fails (exit 2) if any required field cannot be derived: no silent omission."""
+    import hashlib, json, os, shutil, subprocess, sys
+    PREFIX = "/opt/d379-py311"                     # logical install prefix <P>
+    CONFIGURE = ["/d379/src/configure", f"--prefix={PREFIX}", "--without-ensurepip"]   # out-of-tree, cwd /d379/build
+    TAGREPO = "/home/user/d379-build/src/cpython-tagcheck"
+    TAG_OBJECT = "2323bfc729b041c43b1e5e4c5f18c548fc345323"
+    CANON = ("/d379/src", "/d379/build", "/d379/stage")
+    def sha(p):
+        h = hashlib.sha256()
+        with open(p, "rb") as f:
+            for b in iter(lambda: f.read(1 << 20), b""): h.update(b)
+        return h.hexdigest()
+    def tool(name, vflag="--version"):
+        w = shutil.which(name)
+        if not w: sys.exit(f"E: required tool missing: {name}")
+        real = os.path.realpath(w)
+        v = subprocess.run([w, vflag], capture_output=True, text=True, timeout=30)
+        return {"which": w, "realpath": real, "sha256": sha(real), "version": (v.stdout or v.stderr).splitlines()[0]}
+    def gcc_helper(prog):
+        p = subprocess.run(["gcc", f"-print-prog-name={prog}"], capture_output=True, text=True).stdout.strip()
+        real = os.path.realpath(p if os.path.isabs(p) else shutil.which(p) or p)
+        if not os.path.isfile(real): sys.exit(f"E: compiler helper unresolved: {prog} -> {p}")
+        return {"name": prog, "realpath": real, "sha256": sha(real)}
+    E = {
+      "os_release": open("/etc/os-release").read(),
+      "kernel": os.uname().release,
+      "rootfs_dev": os.stat("/").st_dev,
+      "compiler": tool("gcc"),
+      "compiler_helpers": [gcc_helper(p) for p in ("cc1", "collect2", "lto-wrapper")],
+      "assembler": tool("as"), "linker": tool("ld"), "ar": tool("ar"), "make": tool("make"),
+      "libc": {"ldd_version": subprocess.run(["ldd", "--version"], capture_output=True, text=True).stdout.splitlines()[0],
+               "libc_so": (lambda r: {"realpath": r, "sha256": sha(r)})(os.path.realpath("/lib/x86_64-linux-gnu/libc.so.6"))},
+      "dpkg_selections_sha256": hashlib.sha256(subprocess.run(["dpkg-query", "-W", "-f=${Package} ${Version} ${Architecture}\n"],
+                                 capture_output=True).stdout).hexdigest(),
+      "PATH": os.environ.get("PATH"),
+      "build_env": {k: os.environ.get(k) for k in ("CC","CFLAGS","CPPFLAGS","LDFLAGS","LIBS","CPP","CXX","LANG","LC_ALL","TZ","SOURCE_DATE_EPOCH","MAKEFLAGS","PYTHONHASHSEED")},
+      "configure_args": CONFIGURE,
+      "cpython_source": {"tag": "v3.11.15", "tag_object": "2323bfc729b041c43b1e5e4c5f18c548fc345323",
+                         "commit": "2340a037f7450e70fccfe411e6531afb4d57a312", "tree": "8c6959bc70b201b477138f00c432a3bb2f1caddd",
+                         "signer_primary_fpr": "A035C8C19219BA821ECEA86B64E628F8D684696D"},
+      "install_prefix": PREFIX,
+      "controls": None,
+    }
+    # C1: SOURCE_DATE_EPOCH derived from the governed signed tag object, compared with the environment
+    tag = subprocess.run(["git", "-C", TAGREPO, "cat-file", "tag", TAG_OBJECT], capture_output=True)
+    if tag.returncode: sys.exit("E: cannot read governed tag object")
+    tline = [l for l in tag.stdout.decode().splitlines() if l.startswith("tagger ")][0]
+    derived = tline.split()[-2]
+    if os.environ.get("SOURCE_DATE_EPOCH") != derived: sys.exit(f"E: SOURCE_DATE_EPOCH != derived {derived}")
+    # C2: canonical paths must be mountpoints in this namespace (physical roots are NOT recorded in E)
+    for c in CANON:
+        if not os.path.ismount(c): sys.exit(f"E: canonical path not a mountpoint: {c}")
+    E["controls"] = {"C1": {"tag_object": TAG_OBJECT, "tagger_line": tline, "derived": derived,
+                             "SOURCE_DATE_EPOCH": os.environ["SOURCE_DATE_EPOCH"]},
+                     "C2": {"canonical_paths": list(CANON), "out_of_tree": True, "configure_cwd": "/d379/build"}}
+    s = json.dumps(E, sort_keys=True, indent=1)
+    print(s); print("E_SHA256", hashlib.sha256(s.encode()).hexdigest())
+    END-INSTRUMENT env_fp2.py
+- INSTRUMENT buildns.sh sha256 208314f27db34cf3a934fe6624d23fb5a4c944db0cc9ad1b8641f44e7b399eb4, verbatim, 4-space indent  [CMD `sha256sum /home/user/d379-build/buildns.sh` → 208314f27db34cf3…]
+    BEGIN-INSTRUMENT buildns.sh
+    #!/bin/bash
+    # D379 build namespace (netiso2 + C1/C2 per Kai 2026-10-02): buildns.sh <A|B> <SOURCE_DATE_EPOCH> <cmd...>
+    # netiso2 controls unchanged: user+net+mount+pid ns, own /proc, empty tmpfs over credential roots,
+    # env -i, nested user+mount ns locking the mounts. Added: SOURCE_DATE_EPOCH in the env allowlist (C1);
+    # this build's OWN physical roots bind-mounted at canonical /d379/{src,build,stage,out} (C2); every
+    # build's physical roots (A and B) then hidden under an empty tmpfs.
+    set -euo pipefail
+    L=$1; SDE=$2; shift 2
+    [[ "$L" == A || "$L" == B ]] || { echo "label must be A or B" >&2; exit 2; }
+    [[ "$SDE" =~ ^[0-9]+$ ]] || { echo "SOURCE_DATE_EPOCH must be digits" >&2; exit 2; }
+    WS=/home/user/d379-build
+    [ -d /d379 ] || { echo "/d379 mountpoint dir missing on host" >&2; exit 2; }
+    exec env -i PATH=/usr/bin:/bin LANG=C.UTF-8 LC_ALL=C.UTF-8 TZ=UTC HOME=/nonexistent SOURCE_DATE_EPOCH="$SDE" \
+      unshare --user --map-root-user --net --mount --pid --fork --mount-proc -- bash -c '
+      set -euo pipefail
+      WS="'"$WS"'"; L="'"$L"'"
+      mount -t tmpfs -o mode=755 tmpfs /srv
+      mkdir /srv/ws && mount --bind "$WS" /srv/ws
+      mount -t tmpfs -o mode=755 tmpfs /d379
+      for d in src build stage out; do mkdir /d379/$d && mount --bind "/srv/ws/bw/$L/$d" /d379/$d; done
+      for d in /tmp /run /root /home /opt /var /mnt /etc/ssl/private; do
+        [ -d "$d" ] && mount -t tmpfs -o mode=1777 tmpfs "$d"
+      done
+      mkdir -p "$WS" && mount --move /srv/ws "$WS"
+      mount -t tmpfs -o mode=755 tmpfs "$WS/bw"
+      exec unshare --user --map-root-user --mount --fork -- "$@"
+    ' buildns "$@"
+    END-INSTRUMENT buildns.sh
+- INSTRUMENT driver.py sha256 521c50d3c5e47893e743a5d90249fdb425cdf41f360ea900b3f3d49507d6be01, verbatim, 4-space indent  [CMD `sha256sum /home/user/d379-build/driver.py` → 521c50d3c5e47893…]
+    BEGIN-INSTRUMENT driver.py
+    #!/usr/bin/env python3
+    """D379 v4.5 governed build driver (C1/C2 per Kai 2026-10-02). Runs INSIDE buildns.sh.
+    
+    usage: driver.py <A|B> <E_sha256>
+    One combined transcript /d379/out/<L>.transcript: driver framing lines plus the raw
+    stdout+stderr bytes of each command as produced, in order. Created exclusively (no
+    overwrite). Steps stop at the first non-zero return code. Meta -> /d379/out/<L>.meta.json.
+    """
+    import datetime, hashlib, json, os, subprocess, sys
+    
+    L, E_SHA = sys.argv[1], sys.argv[2]
+    assert L in ("A", "B")
+    SELF = hashlib.sha256(open(__file__, "rb").read()).hexdigest()
+    STEPS = [
+        ("configure", ["/d379/src/configure", "--prefix=/opt/d379-py311", "--without-ensurepip"]),
+        ("make", ["make"]),
+        ("install", ["make", "install", "DESTDIR=/d379/stage"]),
+    ]
+    utc = lambda: datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    meta = {"label": L, "driver_sha256": SELF, "E_sha256": E_SHA, "start_utc": utc(),
+            "cwd": "/d379/build", "env_keys": sorted(os.environ), "return_codes": {}}
+    with open(f"/d379/out/{L}.transcript", "xb") as t:
+        def frame(s):
+            t.write(f"=== D379 {s}\n".encode()); t.flush()
+        frame(f"BUILD {L} driver_sha256={SELF} E_sha256={E_SHA} start={meta['start_utc']} "
+              f"SOURCE_DATE_EPOCH={os.environ.get('SOURCE_DATE_EPOCH')}")
+        for name, argv in STEPS:
+            frame(f"CMD {name} {json.dumps(argv)} cwd=/d379/build start={utc()}")
+            p = subprocess.Popen(argv, cwd="/d379/build", stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            for chunk in iter(lambda: p.stdout.read(65536), b""):
+                t.write(chunk)
+            rc = p.wait()
+            meta["return_codes"][name] = rc
+            frame(f"RC {name} {rc} end={utc()}")
+            if rc:
+                break
+        meta["end_utc"] = utc()
+        frame(f"END {L} return_codes={json.dumps(meta['return_codes'], sort_keys=True)} end={meta['end_utc']}")
+    with open(f"/d379/out/{L}.meta.json", "x") as m:
+        json.dump(meta, m, indent=1, sort_keys=True)
+    ok = len(meta["return_codes"]) == len(STEPS) and not any(meta["return_codes"].values())
+    sys.exit(0 if ok else 1)
+    END-INSTRUMENT driver.py
+- INSTRUMENT qualify_interp.py sha256 c3ae517ddf9eaeee357e49cf687967224be73d6e5aa0c8e5a01ed2af223b61b6, verbatim, 4-space indent  [CMD `sha256sum /home/user/d379-build/qualify_interp.py` → c3ae517ddf9eaeee…]
+    BEGIN-INSTRUMENT qualify_interp.py
+    #!/usr/bin/env python3
+    """D380/D385 measurement of the RUNNING interpreter, using governed stage_identity at d08f3ec.
+    
+    Run as: <interpreter> -B -E -s qualify_interp.py <dir holding stage_identity.py>
+    Prints one JSON object. verdict: KNOWN_POSITIVE only if build_stdlib_identity() completes
+    (no REFUSE) and every D385 §C property checked here holds; else KNOWN_NEGATIVE / FAIL.
+    """
+    import json, os, sys
+    sys.path.insert(0, sys.argv[1])
+    import stage_identity as si
+    
+    out = {"executable": os.path.realpath(sys.executable), "dont_write_bytecode": sys.dont_write_bytecode,
+           "flags": {"no_user_site": sys.flags.no_user_site, "ignore_environment": sys.flags.ignore_environment},
+           "stage_identity_sha256": si.sha256_hex(open(si.__file__, "rb").read())}
+    fails = []
+    if not sys.dont_write_bytecode:
+        fails.append("dont_write_bytecode is False (-B missing)")
+    try:
+        roots, external = si._governed_roots()
+        ident, obj, _ = si.build_stdlib_identity()
+        rt = si.build_runtime()
+    except si.StageIdentityError as e:
+        out.update(verdict="KNOWN_NEGATIVE", refuse=str(e))
+        print(json.dumps(out, sort_keys=True)); sys.exit(1)
+    out.update(roots=roots, external=external, h2_py_stdlib_v1=ident, runtime=rt,
+               entries=len(obj["entries"]),
+               symlink_entries=sum(1 for e in obj["entries"] if e["type"] == "symlink"))
+    # D385 §C: external package roots excluded
+    ext_in = [e["path"] for e in obj["entries"]
+              if any(os.path.join(roots[e["root_id"]], e["path"]).startswith(x + os.sep) for x in external)]
+    if ext_in:
+        fails.append(f"external-root members present: {ext_in[:3]}")
+    # D385 §C: loaded filesystem-backed stdlib represented
+    have = {(e["root_id"], e["path"]) for e in obj["entries"] if e["type"] == "file"}
+    loaded, missing = 0, []
+    for name, m in sorted(sys.modules.items()):
+        f = getattr(m, "__file__", None)
+        if not f:
+            continue
+        rf = os.path.realpath(f)
+        own = si._owning_root(rf, roots)
+        if own is None or si._is_external(rf, external) or "__pycache__" in rf.split(os.sep):
+            continue
+        loaded += 1
+        key = (own[0], os.path.relpath(rf, own[1]).replace(os.sep, "/"))
+        if key not in have:
+            missing.append(key)
+    out.update(loaded_stdlib_modules=loaded, loaded_missing=missing)
+    if missing:
+        fails.append(f"{len(missing)} loaded stdlib files not represented")
+    if loaded == 0:
+        fails.append("no loaded filesystem-backed stdlib module observed")
+    out.update(failures=fails, verdict="KNOWN_POSITIVE" if not fails else "FAIL")
+    print(json.dumps(out, sort_keys=True))
+    sys.exit(0 if not fails else 1)
+    END-INSTRUMENT qualify_interp.py
+- INSTRUMENT e7git.py sha256 678a0cd4b76e6394806115ffba82b2da6750d5b343615f4a6c48077c4322e89a, verbatim, 4-space indent  [CMD `sha256sum /home/user/d379-build/e7git.py` → 678a0cd4b76e6394…]
+    BEGIN-INSTRUMENT e7git.py
+    #!/usr/bin/env python3
+    """D379 E7 Git-native evidence transport (D390). compose · publish · verify.
+    
+    The same unchanged module serves E7a (synthetic) and E7b (real).
+    Admitted identity = (commit object id, sha256 of canonical MANIFEST.json).
+    Locator refs carry no authority. verify() returns a list of failures; empty == PASS.
+    """
+    import hashlib, json, os, subprocess
+    
+    REMOTE = "https://github.com/dainius1234/kai-system"
+    SCHEMA = "D379_E7_EVIDENCE_V1"
+    FILES = ("A.transcript", "B.transcript", "E.json", "driver.py", "MANIFEST.json")
+    SOURCE_18 = {"tag": "v3.11.15",
+                 "tag_object": "2323bfc729b041c43b1e5e4c5f18c548fc345323",
+                 "commit": "2340a037f7450e70fccfe411e6531afb4d57a312",
+                 "tree": "8c6959bc70b201b477138f00c432a3bb2f1caddd",
+                 "signer_primary_fpr": "A035C8C19219BA821ECEA86B64E628F8D684696D"}
+    
+    
+    def sha256(b: bytes) -> str:
+        return hashlib.sha256(b).hexdigest()
+    
+    
+    def canonical(obj) -> bytes:
+        return (json.dumps(obj, sort_keys=True, ensure_ascii=True, indent=1) + "\n").encode()
+    
+    
+    def git(repo, *args, input=None, check=True):
+        p = subprocess.run(["git", "-C", repo, *args], input=input, capture_output=True)
+        if check and p.returncode:
+            raise RuntimeError(f"git {' '.join(args)} rc={p.returncode}: {p.stderr.decode(errors='replace')}")
+        return p
+    
+    
+    def build_manifest(files: dict, builds: dict, synthetic: bool) -> bytes:
+        """files: name -> bytes for the 4 non-manifest files. builds: label -> metadata."""
+        m = {"schema": SCHEMA, "SYNTHETIC": synthetic, "cpython_source": SOURCE_18,
+             "environment": {"path": "E.json", "sha256": sha256(files["E.json"])},
+             "driver": {"path": "driver.py", "sha256": sha256(files["driver.py"])},
+             "configure": {"args": ["/d379/src/configure", "--prefix=/opt/d379-py311", "--without-ensurepip"],
+                           "cwd": "/d379/build", "make": ["make"], "install": ["make", "install", "DESTDIR=/d379/stage"]},
+             "builds": {}}
+        for label in ("A", "B"):
+            t = files[f"{label}.transcript"]
+            m["builds"][label] = dict(builds[label], transcript=f"{label}.transcript",
+                                      sha256=sha256(t), byte_count=len(t))
+        return canonical(m)
+    
+    
+    def compose(repo: str, files: dict, message: str) -> dict:
+        """Write blobs, tree and ONE orphan commit. Returns the pending record."""
+        assert set(files) == set(FILES), sorted(files)
+        entries = []
+        for name in sorted(files):
+            oid = git(repo, "hash-object", "-w", "--stdin", input=files[name]).stdout.decode().strip()
+            entries.append(f"100644 blob {oid}\t{name}")
+        tree = git(repo, "mktree", input=("\n".join(entries) + "\n").encode()).stdout.decode().strip()
+        commit = git(repo, "commit-tree", tree, "-m", message).stdout.decode().strip()
+        return {"commit": commit, "tree": tree, "manifest_sha256": sha256(files["MANIFEST.json"]),
+                "files": {n: {"sha256": sha256(b), "bytes": len(b)} for n, b in files.items()}}
+    
+    
+    def locator(manifest_sha256: str, synthetic: bool) -> str:
+        return f"refs/heads/claude/d379-{'e7a-synthetic' if synthetic else 'e7-evidence'}-{manifest_sha256[:16]}"
+    
+    
+    def remote_ref(repo, ref):
+        """-> (state, oid). state: PRESENT / ABSENT / UNKNOWN."""
+        p = git(repo, "ls-remote", REMOTE, ref, check=False)
+        if p.returncode:
+            return "UNKNOWN", p.stderr.decode(errors="replace")
+        lines = [l.split("\t") for l in p.stdout.decode().splitlines() if l.strip()]
+        hits = [o for o, r in lines if r == ref]
+        return ("PRESENT", hits[0]) if hits else ("ABSENT", None)
+    
+    
+    def publish(repo: str, rec: dict, ref: str) -> dict:
+        """Create-only push of the already-composed commit; classify with ls-remote."""
+        p = git(repo, "push", "--porcelain", "--progress", f"--force-with-lease={ref}:",
+                REMOTE, f"{rec['commit']}:{ref}", check=False)
+        state, oid = remote_ref(repo, ref)
+        if state == "PRESENT" and oid == rec["commit"]:
+            outcome = "PUSHED_UNVERIFIED"
+        elif state == "PRESENT":
+            outcome = "CONFLICT"
+        elif state == "ABSENT":
+            outcome = "FAILURE"
+        else:
+            outcome = "OUTCOME_UNKNOWN"
+        return {"outcome": outcome, "push_rc": p.returncode, "push_stdout": p.stdout.decode(errors="replace"),
+                "push_stderr": p.stderr.decode(errors="replace"), "ls_remote": [state, oid]}
+    
+    
+    def fetch_fresh(workdir: str, oid: str) -> str:
+        """A fresh empty repository (no alternates) holding only what the remote serves for oid."""
+        os.makedirs(workdir)
+        git(workdir, "init", "-q")
+        git(workdir, "fetch", "-q", "--no-tags", REMOTE, oid)
+        return workdir
+    
+    
+    def verify(repo: str, oid: str, expect_manifest_sha256: str, frozen_e_sha256: str,
+               expect_interpreters: dict | None = None) -> list:
+        """Every check reads bytes from `repo`'s object store. Empty list == PASS."""
+        f = []
+        p = git(repo, "cat-file", "-t", oid, check=False)
+        if p.returncode or p.stdout.decode().strip() != "commit":
+            return [f"{oid} is not a commit in this repository"]
+        raw = git(repo, "cat-file", "commit", oid).stdout
+        if git(repo, "hash-object", "-t", "commit", "--stdin", input=raw).stdout.decode().strip() != oid:
+            f.append("commit object does not hash to its id")
+        if any(l.startswith(b"parent ") for l in raw.split(b"\n\n", 1)[0].split(b"\n")):
+            f.append("evidence commit is not an orphan")
+        tree = git(repo, "rev-parse", f"{oid}^{{tree}}").stdout.decode().strip()
+        ls = [l.split("\t") for l in git(repo, "ls-tree", tree).stdout.decode().splitlines()]
+        names = {n: meta.split() for meta, n in ls}
+        if set(names) != set(FILES):
+            return f + [f"tree members {sorted(names)} != {sorted(FILES)}"]
+        data = {}
+        for n, (mode, typ, boid) in names.items():
+            if mode != "100644" or typ != "blob":
+                f.append(f"{n}: mode/type {mode} {typ}")
+            b = git(repo, "cat-file", "blob", boid).stdout
+            if git(repo, "hash-object", "--stdin", input=b).stdout.decode().strip() != boid:
+                f.append(f"{n}: blob does not hash to its id")
+            data[n] = b
+        mb = data["MANIFEST.json"]
+        if sha256(mb) != expect_manifest_sha256:
+            f.append("MANIFEST.json sha256 != expected admitted manifest digest")
+        try:
+            m = json.loads(mb)
+        except ValueError:
+            return f + ["MANIFEST.json is not JSON"]
+        if canonical(m) != mb:
+            f.append("MANIFEST.json is not in canonical form")
+        if m.get("schema") != SCHEMA:
+            f.append("schema mismatch")
+        if m.get("cpython_source") != SOURCE_18:
+            f.append("CPython source identity != v4.5 §18")
+        env = m.get("environment", {})
+        if env.get("path") != "E.json" or env.get("sha256") != sha256(data["E.json"]):
+            f.append("E.json digest != manifest")
+        if sha256(data["E.json"]) != frozen_e_sha256:
+            f.append("E.json != the E frozen before Build A")
+        drv = m.get("driver", {})
+        if drv.get("path") != "driver.py" or drv.get("sha256") != sha256(data["driver.py"]):
+            f.append("driver.py digest != manifest")
+        builds = m.get("builds", {})
+        if set(builds) != {"A", "B"}:
+            return f + [f"build labels {sorted(builds)} != ['A', 'B']"]
+        for label in ("A", "B"):
+            b = builds[label]
+            if b.get("transcript") != f"{label}.transcript":
+                f.append(f"label {label} bound to {b.get('transcript')!r}, not {label}.transcript")
+                continue
+            t = data[b["transcript"]]
+            if b.get("sha256") != sha256(t) or b.get("byte_count") != len(t):
+                f.append(f"{label}: transcript digest/byte count != manifest")
+            if expect_interpreters is not None and b.get("interpreter") != expect_interpreters.get(label):
+                f.append(f"{label}: interpreter identity != measured")
+        for k in ("source_worktree", "build_dir", "staging_root"):
+            if builds["A"].get(k) == builds["B"].get(k):
+                f.append(f"A and B share {k}")
+        return f
+    
+    
+    def placement(repo: str, oid: str, subject: str) -> list:
+        """K2: evidence must not be reachable through, nor share a path with, `subject`."""
+        f = []
+        if git(repo, "merge-base", "--is-ancestor", oid, subject, check=False).returncode == 0:
+            f.append(f"evidence {oid[:12]} is reachable from {subject[:12]}")
+        ev = set(git(repo, "ls-tree", "-r", "--name-only", oid).stdout.decode().split("\n")) - {""}
+        sub = set(git(repo, "ls-tree", "-r", "--name-only", subject).stdout.decode().split("\n")) - {""}
+        if ev & sub:
+            f.append(f"evidence paths present in subject tree: {sorted(ev & sub)}")
+        return f
+    END-INSTRUMENT e7git.py
+
+### 6. Next authorised step
+
+- Execute the window now, then report and STOP  [CONVERSATION 2026-10-02 Kai, "Report the completed build/evidence/retention result and STOP."]
+
+### 7. What I am unsure of
+
+- Whether C1+C2 suffice for bit-identical executables; the builds measure it  [CONVERSATION 2026-10-02 Kai, "The remaining uncertainty is exactly what the two real builds are designed to measure."]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
