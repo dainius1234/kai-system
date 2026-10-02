@@ -5303,3 +5303,132 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-02T17:49:16Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-02T17:49:15Z  [CMD `date -u +%FT%TZ` → 2026-10-02T17:49:15Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 3e49cd9b28dfd1e6befa46a793c471b3040d6e32  [CMD `git rev-parse HEAD` → 3e49cd9b28dfd1e6befa46a793c471b3040d6e32]
+- tree: 30ed50dc1aaf15bb899bbc12e451af909b229e9f  [CMD `git rev-parse HEAD^{tree}` → 30ed50dc1aaf15bb899bbc12e451af909b229e9f]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/project-rework-plan-pgvp35: 3e49cd9b28dfd1e6befa46a793c471b3040d6e32  [CMD `git ls-remote --heads origin` → 3e49cd9b28dfd1e6befa46a793c471b3040d6e32]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d08f3ec5de4d823011e66261c84c98a76371428e  [CMD `git ls-remote --heads origin` → d08f3ec5de4d823011e66261c84c98a76371428e]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 30  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 30]
+
+### 1. The four states
+
+- physical: unchanged since entry 30; staged interpreter A intact (executable 6068cf00…) on kernel 6.18.44-fc-v51  [CMD `sha256sum bw/A/stage/opt/d379-py311/bin/python3.11` → 6068cf00c25bbe6b]
+- authorised: retention-only operation under Kai's ruling  [CONVERSATION 2026-10-02 Dainius, "Authorised: retention only"]
+- evidence: Kai ACCEPTED Builds A/B, the known-positive measurement and E7b; the dpkg field ruled INVALID/VACUOUS  [CONVERSATION 2026-10-02 Kai, "Builds A/B, reproducibility, D380/D385 known-positive measurement and E7b PUBLISHED_VERIFIED stand."]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-02 · BUILD WINDOW ADJUDICATED / RETENTION HOLD RESOLVED, verbatim, extracted byte-for-byte (received 2026-10-02T17:48:04.971Z, 6825 bytes, sha256 c43db9b5ee16576c43ee305ef84939c40423e082831079c55e9953db8c3fafd4) ⚠ UNBANKED  [CONVERSATION 2026-10-02 Kai, "KAI → ORION — BUILD WINDOW ADJUDICATED / RETENTION HOLD RESOLVED"]
+    BEGIN-VERBATIM KAI-WINDOW-ADJUDICATION
+    We have a successful build/qualification result with one retention hold, not a failed build window.
+    
+    I independently checked the repository again. Entry 30 exists at signed/verified commit 3e49cd9b28dfd1e6befa46a793c471b3040d6e32, and the real E7b evidence object exists at 2b3c034ca7794455e64de2aa2a09baad2155bf08. I also read the published E.json and the exact v4.5 controlled-environment requirements.
+    
+    My adjudication
+    
+    * Build A/B: ACCEPTED. Both independent builds produced the same executable SHA, same H2_PY_STDLIB_V1, and even the entire 8,403-entry staged trees were identical. This is stronger than v4.5 requires.
+    * D380/D385 known-positive: ACCEPTED AS MEASURED. Both governed interpreters passed while the distro interpreter still REFUSED, so the calibration condition has genuinely been demonstrated. This does not automatically close INC-34 in the register; that remains a separate controlled action.
+    * E7b: ACCEPTED / PUBLISHED_VERIFIED. The real transcripts and evidence have survived external publication and readback with the expected binding and negative control.
+    * The empty dpkg_selections_sha256 does NOT invalidate these builds. I checked v4.5 §19. Package inventory is not one of the minimum required E constituents. The required E population is compiler/helper/assembler/linker/ar/libc identities, PATH, relevant environment, configure arguments, source identity, install prefix and environment/rootfs identity where available. Those are present in the published E. v4.5 §21 also explicitly limits native dependency information to diagnostics rather than D380 identity.
+    * However, that dpkg_selections_sha256 field is INVALID AS EVIDENCE. It measured the empty string and must never be cited as proof that the package population was unchanged. Do not rewrite the published E. Record the field as vacuous. For any future use, env_fp must REFUSE an unavailable/empty package inventory instead of producing a plausible hash, or gather it from a qualified view where /var/lib/dpkg is actually visible.
+    * Retention pattern hits are not, by themselves, leaked secrets. The crucial distinction is between a detector matching a secret-shaped pattern and actual secret material. The scan found zero of the seven collected environment credential values. CPython deliberately ships public test certificates/private-key fixtures in its source tree—I independently confirmed the v3.11.15 public Lib/test/certdata population contains these fixture key files.
+    * But I will not authorize a generic “ignore CPython keys” whitelist. Before publication, Orion must mechanically classify the exact 22 hits. Each must be either byte-identical to a file in the governed CPython source tree, or a deterministic .pyc derivative of one of the specifically identified upstream files. The record must contain path, hit type, staged SHA-256, upstream identity/derivation source and classification. Any 23rd hit, unexplained hit, real credential-value hit or non-proven derivation = STOP.
+    * Once that exact-hit proof passes, those 22 items are authorised in-subject public fixture material, not “unintended sensitive material.” They may remain byte-for-byte in the retained interpreter. No redaction, deletion or modified interpreter tree.
+    * The retained artefact must still be separate from E7b and must bind the exact E7b evidence identity, executable SHA, stdlib identity, CPython source identity, frozen E, and qualification evidence identity. Entry 30 plus the exact Q_A/Q_B hash gives us the qualification record to bind.
+    
+    There is one authority point: the previous window STOPped, so I would not treat the old grant as silently restarting a permanent public write. Technically I have cleared the retention issue, but you should explicitly re-authorise the retention publication only.
+    
+    Send Orion this:
+    
+    KAI → ORION — BUILD WINDOW ADJUDICATED / RETENTION HOLD RESOLVED
+    
+    Builds A/B, reproducibility, D380/D385 known-positive measurement and E7b PUBLISHED_VERIFIED stand.
+    
+    The vacuous dpkg_selections_sha256=e3b0c442… is an instrument defect in an additional diagnostic field. It does not invalidate v4.5 §19 E because package inventory is not in the mandatory E minimum and the required environment/toolchain identities were populated and re-derived identically. Do not rewrite published E and do not use that field as evidence of package-population stability. Record it as INVALID/VACUOUS. Future instrumentation must REFUSE empty/unavailable package inventory if that diagnostic is retained.
+    
+    RETENTION: zero collected credential-value hits is accepted. Pattern matches are not automatically secrets.
+    
+    Before retention publication, produce an exact closed population of all 22 pattern hits. For every hit prove mechanically either:
+    
+    1. exact byte identity to a member of the governed signed CPython v3.11.15 source tree; or
+    2. for the six .pyc cases, exact derivation from one of those proven upstream source files under the qualified build.
+    
+    Record path, pattern class, staged SHA-256, upstream source identity/blob or derivation parent, and classification.
+    
+    No path-based blanket exemption and no generic scanner whitelist. Any additional, unmatched, non-proven or collected-credential hit = STOP.
+    
+    If and only if the exact 22-hit population closes, classify those items as authorised public CPython test-fixture material and preserve the retained interpreter byte-identically. No redaction, omission or rebuild.
+    
+    Retention remains a separate immutable Git artefact/object. Manifest-bind it to:
+    
+    E7b commit 2b3c034ca7794455e64de2aa2a09baad2155bf08
+    
+    E7b manifest be946634b89e0602a0b720c11727aa87269b0afe2a342d481f70f05e5764e500
+    
+    executable SHA 6068cf00c25bbe6b13b5ee09c831d7d4e385b63b84708a1b1b956bda1737c06f
+    
+    H2_PY_STDLIB_V1 cad0d3a5f02cf9c5112e1140b605cfb5078a5f18bf2bee276ddefadd7fdb8601
+    
+    exact CPython source identity, frozen E identity, and qualification record/Q hash from entry 30.
+    
+    Measure actual retained size, create the single authorised immutable retention object/ref, read it back independently, prove byte fidelity and manifest identity, then STOP.
+    
+    This does not authorise a third build, repair implementation, INC-34 register closure, D390 replay, fixity F, capture, Stage A, candidate, holdout, blind 40, Item 8 or merge.
+    
+    Then your authority can simply be:
+    
+    Authorised. Execute the retention-only operation under Kai’s ruling, publish only if the exact 22-hit classification closes, verify readback, report, and STOP.
+    
+    This is a very strong result from the build window. We now have the reproducible known-positive interpreter we were trying to create; the remaining problem is preserving that exact proven artefact without mistaking public CPython test fixtures for leaked environment secrets.
+    
+    Confidence: 0.99 on the build/E7b result; 0.97 on the retention classification ruling.
+    END-VERBATIM KAI-WINDOW-ADJUDICATION
+- Dainius · 2026-10-02 · authorises the retention-only operation (~329 MB permanent public object), publish only if the exact 22-hit classification closes ⚠ UNBANKED  [CONVERSATION 2026-10-02 Dainius, "Authorised: retention only"]
+
+### 3. Authorised / Held / Forbidden
+
+- FORBIDDEN: third build, repair implementation, INC-34 register closure, D390 replay, fixity F, capture, Stage A, candidate, holdout, blind 40, Item 8, merge  [CONVERSATION 2026-10-02 Kai, "This does not authorise a third build"]
+
+### 4. Open questions
+
+- None new  [CONVERSATION 2026-10-02 Kai, "BUILD WINDOW ADJUDICATED / RETENTION HOLD RESOLVED"]
+
+### 5. Incidents and corrections
+
+- E.dpkg_selections_sha256 (e3b0c442…b855) is recorded INVALID/VACUOUS: it must never be cited as package-population evidence; the published E is not rewritten  [CONVERSATION 2026-10-02 Kai, "Record it as INVALID/VACUOUS."]
+
+### 6. Next authorised step
+
+- Exact 22-hit classification → publish only if it closes → independent readback → report → STOP  [CONVERSATION 2026-10-02 Kai, "Measure actual retained size, create the single authorised immutable retention object/ref, read it back independently, prove byte fidelity and manifest identity, then STOP."]
+
+### 7. What I am unsure of
+
+- Proxy and GitHub acceptance of a ~329 MB push is unmeasured (U3/U4); refusal → STOP  [CONVERSATION 2026-10-02 Kai, "U3/U4 remain E7a-measured transport properties."]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
