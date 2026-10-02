@@ -5046,3 +5046,260 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-02T17:35:19Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-02T17:35:18Z  [CMD `date -u +%FT%TZ` → 2026-10-02T17:35:18Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 32d296a41eeed9d5a2495a61bd343e638481794d  [CMD `git rev-parse HEAD` → 32d296a41eeed9d5a2495a61bd343e638481794d]
+- tree: 2ef0025b4387ed0c620771664b234ef88ff4e0d1  [CMD `git rev-parse HEAD^{tree}` → 2ef0025b4387ed0c620771664b234ef88ff4e0d1]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/project-rework-plan-pgvp35: 32d296a41eeed9d5a2495a61bd343e638481794d  [CMD `git ls-remote --heads origin` → 32d296a41eeed9d5a2495a61bd343e638481794d]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d08f3ec5de4d823011e66261c84c98a76371428e  [CMD `git ls-remote --heads origin` → d08f3ec5de4d823011e66261c84c98a76371428e]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 29  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 29]
+
+### 1. The four states
+
+- physical: Builds A and B DONE; E7b PUBLISHED_VERIFIED at 2b3c034ca7794455e64de2aa2a09baad2155bf08 on `refs/heads/claude/d379-e7-evidence-be946634b89e0602`; both staged interpreters exist ONLY in this container (/home/user/d379-build/bw/{A,B}/stage); retention NOT published; repair branch d08f3ec unchanged  [CMD `git ls-remote … 'refs/heads/claude/d379-e7*'` → e7-evidence 2b3c034c, e7a-synthetic dc09ad2a]
+- authorised: the window (with retention), STOPPED at retention publication by the scan rule  [CONVERSATION 2026-10-02 Kai, "retention publication/readback failure or credential-exclusion failure = STOP."]
+- evidence: reproducible known-positive D380-compliant interpreter MEASURED (A and B identical); INC-34's closure condition ("ACTUALLY MEASURED") is met in fact, but closure is a separate register action (R7), not taken here  [D385]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- None; executing the window under entry 29's authority  [CONVERSATION 2026-10-02 Kai, "may resume under these controls"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: retention publication (scan rule hit); every later step (repair, D390 replay, F, capture, Stage A, candidate, holdout, blind 40, merge)  [CONVERSATION 2026-10-02 Kai, "Report the completed build/evidence/retention result and STOP."]
+
+### 4. Open questions
+
+- RETENTION SCAN RULING, owner Kai. Value layer: 0 hits (none of the 7 collected credential values in 8,069 files). Pattern layer: 22 files — 16 byte-identical to blobs of the signed upstream tree 2340a037 (14 Lib/test/certdata PEM fixture keys, 2 test sources with an `Authorization:` header) and 6 compiled .pyc of those 2 sources (3 optimisation levels each; derived, not upstream blobs). The rule "any hit → STOP, no redaction" was applied as written. Ruling needed: whether pattern hits in upstream-identical files and their deterministic bytecode are in-subject material (Kai §9: "sensitive material outside the authorised evidence subject") and may be published  [CMD `retention scan over bw/A/stage` → value 0, pattern 22 (16 upstream, 6 .pyc)]
+- RETENTION RISK, owner Dainius/Kai: until retention publishes, the qualified interpreter lives only in this container. Its builds are bit-reproducible from the published evidence (source, E, C1/C2, driver), but a rebuild would be a third build and needs authority  [CMD `full staged-tree diff A vs B` → 0 differing paths]
+- E INSTRUMENT DEFECT, owner Kai: E.dpkg_selections_sha256 is e3b0c442…b855, the sha256 of the EMPTY string — inside netiso2/buildns /var is hidden, `dpkg-query` finds no database, prints nothing and exits 0. The field has measured nothing since netiso2 (also in E7a's E). Independent mitigation: /var/lib/dpkg/status last modified 2026-10-01T15:39:10Z, before the window opened (17:24:57Z), so no package changed during the builds; the toolchain-hash fields of E held. The published E is immutable and is not rewritten  [CMD `netiso2.sh dpkg-query …; echo $?` → rc=0, /var/lib/dpkg absent]
+
+### 5. Incidents and corrections
+
+- Source re-verified immediately before Build A (17:24:22Z): tag 2323bfc7…, commit 2340a037…, tree 8c6959bc… all MATCH §18; VALIDSIG primary A035C8C19219BA821ECEA86B64E628F8D684696D; known-negative tampered payload → BADSIG; C1 derived from the tag object = 1772499177  [CMD `git verify-tag --raw v3.11.15` → VALIDSIG … A035C8C1…696D]
+- Instrument defect of mine, caught by the chain: under `set -o pipefail`, `gpg --verify … | grep -q BADSIG` "failed" because gpg exits 1 on a bad signature; re-measured by capturing gpg's output first. I also typed a `;` in that chain (R3); harmless, because the step after it failed  [CMD `gpg --status-fd 1 --verify t.sig t.bad` → BADSIG FFE87404168BD847]
+- E frozen INSIDE Build A's namespace: E.json sha256 6cb9496368f2e5c5375463204a0b5e0a496195e48a52b7a20994018b5c17dd47 (3,677 bytes; internal E_SHA256 39fe620c…); re-derived inside B's namespace before B and after B: byte-identical both times  [CMD `cmp E_preA.json E_preB.json && cmp E_preA.json E_postB.json` → identical]
+- Independence: A src tree id 8c6959bc… before AND after Build A (out-of-tree left the source pristine); B src checked out independently from git objects → 8c6959bc…, 4,695 files, distinct inode; B build/stage/out 0 entries before B; inside B's namespace bw/ shows 0 entries and A's transcript is invisible  [CMD `write-tree over bw/B/src` → 8c6959bc70b201b477138f00c432a3bb2f1caddd]
+- Build A 17:24:57Z–17:28:25Z, Build B 17:28:55Z–17:32:20Z; configure/make/install rc 0/0/0 both; transcripts 1,009,185 bytes each, NOT byte-identical (framing timestamps, and body order — consistent with parallel compileall, INFERENCE)  [CMD `grep -a '^=== D379 RC'` → all 0]
+- REPRODUCIBILITY (v4.5 §20): executable sha256 A = B = 6068cf00c25bbe6b13b5ee09c831d7d4e385b63b84708a1b1b956bda1737c06f (24,434,488 bytes); H2_PY_STDLIB_V1 A = B = cad0d3a5f02cf9c5112e1140b605cfb5078a5f18bf2bee276ddefadd7fdb8601; beyond the compare set, the full staged trees are identical: 8,403 entries (8,069 files, 326 dirs, 8 symlinks), 0 differing paths including .pyc  [CMD `sha256 of bw/{A,B}/stage/opt/d379-py311/bin/python3.11` → 6068cf00 both]
+- D380/D385 MEASUREMENT (governed stage_identity at d08f3ec, blob 714a2edc): A and B KNOWN_POSITIVE — build_stdlib_identity completes; 2,485 entries, 0 symlinks; external root site-packages excluded; 49 loaded stdlib modules all represented; dont_write_bytecode True; runtime version "3.11.15 (main, Mar  3 2026, 00:52:57) [GCC 13.3.0]". Known-negative under the same instrument: distro /usr/bin/python3.11 → REFUSE (sitecustomize.py). Q_A.json and Q_B.json are byte-identical (sha256 e071c5abddb0b338e91bfe3c8e2d7e2b5fa1109fd23534683a1713919a960ea2); this record is the qualification evidence bound to the build evidence identity below (U6)  [CMD `buildns.sh L … python3.11 -B -E -s qualify_interp.py gov` → KNOWN_POSITIVE ×2]
+- E7b: evidence commit 2b3c034ca7794455e64de2aa2a09baad2155bf08, tree 6345fe88bf0371a4eddec1cd08c886a3ebfb3100, manifest sha256 be946634b89e0602a0b720c11727aa87269b0afe2a342d481f70f05e5764e500, locator refs/heads/claude/d379-e7-evidence-be946634b89e0602; credential scan of the 5 files 0 hits; create-only push first attempt; fresh readback 5/5 byte-identical; tree identity; verify() with the measured interpreter identities → no failures; NEG B-transcript-as-A refused; placement vs d08f3ec clean. GitHub contents API (by commit sha) returned E.json with blob 6e58b5e35805454c6f5c8a7bc211d5287f7d07cd  [CMD `python3 e7b_run.py` → VERDICT E7b PUBLISHED_VERIFIED]
+- Qualification record Q_A.json (= Q_B.json), verbatim  [CMD `sha256sum win/Q_A.json` → e071c5abddb0b338…]
+    BEGIN-VERBATIM Q_A.json
+    {"dont_write_bytecode": true, "entries": 2485, "executable": "/d379/stage/opt/d379-py311/bin/python3.11", "external": ["/d379/stage/opt/d379-py311/lib/python3.11/site-packages", "/d379/stage/opt/d379-py311/lib/python3.11/site-packages"], "failures": [], "flags": {"ignore_environment": 1, "no_user_site": 1}, "h2_py_stdlib_v1": "cad0d3a5f02cf9c5112e1140b605cfb5078a5f18bf2bee276ddefadd7fdb8601", "loaded_missing": [], "loaded_stdlib_modules": 49, "roots": {"stdlib": "/d379/stage/opt/d379-py311/lib/python3.11"}, "runtime": {"cache_tag": "cpython-311", "dont_write_bytecode": true, "executable_sha256": "6068cf00c25bbe6b13b5ee09c831d7d4e385b63b84708a1b1b956bda1737c06f", "implementation_name": "cpython", "stdlib_identity": "cad0d3a5f02cf9c5112e1140b605cfb5078a5f18bf2bee276ddefadd7fdb8601", "version": "3.11.15 (main, Mar  3 2026, 00:52:57) [GCC 13.3.0]"}, "stage_identity_sha256": "25a8f274cbcb6a9b65872beac21437e129ee4ea7aa001b21c17b39197932b910", "symlink_entries": 0, "verdict": "KNOWN_POSITIVE"}
+    END-VERBATIM Q_A.json
+- INSTRUMENT e7b_run.py, verbatim, sha256 cdf9cc0b552a6315e91ec520772fd0103789956f72f6a91cbbddcb9bbc58fd45  [CMD `sha256sum e7b_run.py` → cdf9cc0b552a6315…]
+    BEGIN-VERBATIM e7b_run.py
+    #!/usr/bin/env python3
+    """E7b (real) for the D379 build window. Uses e7git.py unchanged since entry 29. Log -> win/e7b/run.log."""
+    import json, os, subprocess, sys
+    sys.path.insert(0, "/home/user/d379-build")
+    import e7git as G
+    
+    B = "/home/user/d379-build"; W = f"{B}/win/e7b"; os.makedirs(W)
+    LOG = open(f"{W}/run.log", "a"); RES = {"items": {}}
+    def log(*a):
+        s = " ".join(str(x) for x in a); print(s); LOG.write(s + "\n"); LOG.flush()
+    def item(k, ok, d):
+        RES["items"][k] = {"pass": bool(ok), "detail": d}; log(f"[{'PASS' if ok else 'FAIL'}] {k}: {d}"); return ok
+    def stop(r):
+        RES["verdict"] = f"STOP: {r}"; log("STOP —", r); json.dump(RES, open(f"{W}/result.json", "w"), indent=1, sort_keys=True); sys.exit(1)
+    
+    E = open(f"{B}/win/E_preA.json", "rb").read()
+    frozen = open(f"{B}/win/E_frozen.sha256").read().strip()
+    assert G.sha256(E) == frozen
+    files = {"A.transcript": open(f"{B}/bw/A/out/A.transcript", "rb").read(),
+             "B.transcript": open(f"{B}/bw/B/out/B.transcript", "rb").read(),
+             "E.json": E, "driver.py": open(f"{B}/driver.py", "rb").read()}
+    interp, builds = {}, {}
+    for L in "AB":
+        q = json.load(open(f"{B}/win/Q_{L}.json")); meta = json.load(open(f"{B}/bw/{L}/out/{L}.meta.json"))
+        if q["verdict"] != "KNOWN_POSITIVE":
+            stop(f"{L} not KNOWN_POSITIVE")
+        interp[L] = {"executable_sha256": q["runtime"]["executable_sha256"], "h2_py_stdlib_v1": q["h2_py_stdlib_v1"],
+                     "computed_by_commit": "d08f3ec5de4d823011e66261c84c98a76371428e",
+                     "stage_identity_sha256": q["stage_identity_sha256"]}
+        builds[L] = {"source_worktree": f"{B}/bw/{L}/src", "build_dir": f"{B}/bw/{L}/build",
+                     "staging_root": f"{B}/bw/{L}/stage",
+                     "canonical": {"source_worktree": "/d379/src", "build_dir": "/d379/build", "staging_root": "/d379/stage"},
+                     "start_utc": meta["start_utc"], "end_utc": meta["end_utc"],
+                     "return_codes": meta["return_codes"], "interpreter": interp[L]}
+        if meta["driver_sha256"] != G.sha256(files["driver.py"]) or meta["E_sha256"] != frozen:
+            stop(f"{L} meta does not bind this driver/E")
+    files["MANIFEST.json"] = G.build_manifest(files, builds, synthetic=False)
+    for n, b in sorted(files.items()):
+        log(f"evidence {n}: {len(b)} bytes sha256 {G.sha256(b)}")
+    log("A/B transcripts byte-identical:", files["A.transcript"] == files["B.transcript"])
+    
+    os.makedirs(f"{W}/scan")
+    for n, b in files.items():
+        open(f"{W}/scan/{n}", "wb").write(b)
+    sc = subprocess.run(["python3", f"{B}/secretscan.py"] + [f"{W}/scan/{n}" for n in sorted(files)], capture_output=True, text=True)
+    log(sc.stdout.strip())
+    if not item("J-scan-evidence", sc.returncode == 0, f"scanner rc={sc.returncode}"):
+        stop("credential/pattern hit in real evidence; no redaction")
+    
+    repo = f"{W}/compose"; os.makedirs(repo); G.git(repo, "init", "-q")
+    rec = G.compose(repo, files, "D379 E7b build evidence (D390): CPython v3.11.15 Builds A and B under frozen E.")
+    ref = G.locator(rec["manifest_sha256"], synthetic=False); rec["locator"] = ref
+    json.dump(rec, open(f"{W}/pending.json", "w"), indent=1, sort_keys=True)
+    log("COMPOSED commit", rec["commit"], "tree", rec["tree"], "manifest", rec["manifest_sha256"], "locator", ref)
+    st, oid = G.remote_ref(repo, ref); log("pre-push ls-remote:", st, oid)
+    if st != "ABSENT":
+        stop(f"locator pre-state {st}")
+    for attempt in (1, 2):
+        pub = G.publish(repo, rec, ref)
+        log(f"publish attempt {attempt}: {pub['outcome']} rc {pub['push_rc']} ls_remote {pub['ls_remote']}")
+        log("push stderr (full):\n" + pub["push_stderr"])
+        if pub["outcome"] != "FAILURE":
+            break
+    if not item("G-publish", pub["outcome"] == "PUSHED_UNVERIFIED", f"{pub['outcome']} attempts {attempt}"):
+        stop(f"publication {pub['outcome']}")
+    
+    rb = G.fetch_fresh(f"{W}/readback", rec["commit"])
+    same = all(G.git(rb, "cat-file", "blob", f"{rec['commit']}:{n}").stdout == b for n, b in files.items())
+    item("A-byte-fidelity", same and not os.path.exists(f"{rb}/.git/objects/info/alternates"), f"5/5 identical={same}")
+    rt = G.git(rb, "rev-parse", f"{rec['commit']}^{{tree}}").stdout.decode().strip()
+    item("B-identity", rt == rec["tree"], f"tree {rt}")
+    vf = G.verify(rb, rec["commit"], rec["manifest_sha256"], frozen, interp)
+    item("K-verify", vf == [], f"failures {vf}")
+    if files["A.transcript"] == files["B.transcript"]:
+        item("NEG C(i) B transcript as A", True, "NOT APPLICABLE: A and B transcripts are byte-identical")
+    else:
+        neg = G.verify(rb, G.compose(rb, dict(files, **{"A.transcript": files["B.transcript"]}), "LOCAL NEG")["commit"],
+                       rec["manifest_sha256"], frozen, interp)
+        item("NEG C(i) B transcript as A", neg != [], f"refused: {neg[:2]}")
+    G.git(rb, "fetch", "-q", "--depth", "1", "--no-tags", G.REMOTE, "d08f3ec5de4d823011e66261c84c98a76371428e")
+    pl = G.placement(rb, rec["commit"], "d08f3ec5de4d823011e66261c84c98a76371428e")
+    item("K2-placement", pl == [], f"vs repair HEAD: {pl}")
+    ok = all(v["pass"] for v in RES["items"].values())
+    RES.update(verdict="E7b PUBLISHED_VERIFIED" if ok else "STOP", commit=rec["commit"], tree=rec["tree"],
+               manifest_sha256=rec["manifest_sha256"], locator=ref)
+    json.dump(RES, open(f"{W}/result.json", "w"), indent=1, sort_keys=True)
+    log("VERDICT:", RES["verdict"]); sys.exit(0 if ok else 1)
+    END-VERBATIM e7b_run.py
+- E7b run log, base64 of exact bytes, sha256 bf1515be3f6d15f0f7ee370f2623f865592e069dd70f7a40d4fb8673b83d4e31  [CMD `sha256sum win/e7b/run.log` → bf1515be3f6d15f0…]
+    BEGIN-BASE64 win/e7b/run.log
+    ZXZpZGVuY2UgQS50cmFuc2NyaXB0OiAxMDA5MTg1IGJ5dGVzIHNoYTI1NiBlODE1MmZiM2RjZmU1
+    MzgwN2Y0Y2VjOWE0NjEwMDM0NDk2YTdhMzZmM2QzODQ0ZjE1ZjU4MzlhZTE1ZmM1ZTc4CmV2aWRl
+    bmNlIEIudHJhbnNjcmlwdDogMTAwOTE4NSBieXRlcyBzaGEyNTYgMjllNWFjMmJhODhiOGFjYWQ5
+    ZWE3OTc5ZmVmY2ZhZjZlNTM5NGRiMzczMzcyYjE2ZjU3YzlhNTNjYTJjYzA3MwpldmlkZW5jZSBF
+    Lmpzb246IDM2NzcgYnl0ZXMgc2hhMjU2IDZjYjk0OTYzNjhmMmU1YzUzNzU0NjMyMDRhMGI1ZTBh
+    NDk2MTk1ZTQ4YTUyYjdhMjA5OTQwMThiNWMxN2RkNDcKZXZpZGVuY2UgTUFOSUZFU1QuanNvbjog
+    Mjc4NiBieXRlcyBzaGEyNTYgYmU5NDY2MzRiODllMDYwMmEwYjcyMGMxMTcyN2FhODcyNjliMGFm
+    ZTJhMzQyZDQ4MWY3MGYwNWU1NzY0ZTUwMApldmlkZW5jZSBkcml2ZXIucHk6IDIwOTcgYnl0ZXMg
+    c2hhMjU2IDUyMWM1MGQzYzVlNDc4OTNlNzQzYTVkOTAyNDlmZGI0MjVjZGY0MWYzNjBlYTkwMGIz
+    ZjNkNDk1MDdkNmJlMDEKQS9CIHRyYW5zY3JpcHRzIGJ5dGUtaWRlbnRpY2FsOiBGYWxzZQpjb2xs
+    ZWN0ZWQgY3JlZGVudGlhbCB2YWx1ZXM6IDcgKEFXU19BQ0NFU1NfS0VZX0lELCBBV1NfU0VDUkVU
+    X0FDQ0VTU19LRVksIENMQVVERV9DT0RFX01FU1NBR0lOR19UT0tFTiwgQ0xBVURFX1NFU1NJT05f
+    SU5HUkVTU19UT0tFTl9GSUxFLCBDTE9VRFNES19BVVRIX0FDQ0VTU19UT0tFTiwgR0hfVE9LRU4s
+    IEdJVEhVQl9UT0tFTikKL2hvbWUvdXNlci9kMzc5LWJ1aWxkL3dpbi9lN2Ivc2Nhbi9BLnRyYW5z
+    Y3JpcHQ6IDEwMDkxODUgYnl0ZXMsIGhpdHMgMAovaG9tZS91c2VyL2QzNzktYnVpbGQvd2luL2U3
+    Yi9zY2FuL0IudHJhbnNjcmlwdDogMTAwOTE4NSBieXRlcywgaGl0cyAwCi9ob21lL3VzZXIvZDM3
+    OS1idWlsZC93aW4vZTdiL3NjYW4vRS5qc29uOiAzNjc3IGJ5dGVzLCBoaXRzIDAKL2hvbWUvdXNl
+    ci9kMzc5LWJ1aWxkL3dpbi9lN2Ivc2Nhbi9NQU5JRkVTVC5qc29uOiAyNzg2IGJ5dGVzLCBoaXRz
+    IDAKL2hvbWUvdXNlci9kMzc5LWJ1aWxkL3dpbi9lN2Ivc2Nhbi9kcml2ZXIucHk6IDIwOTcgYnl0
+    ZXMsIGhpdHMgMApUT1RBTCBISVRTIDAKW1BBU1NdIEotc2Nhbi1ldmlkZW5jZTogc2Nhbm5lciBy
+    Yz0wCkNPTVBPU0VEIGNvbW1pdCAyYjNjMDM0Y2E3Nzk0NDU1ZTY0ZGUyYWEyYTA5YmFhZDIxNTVi
+    ZjA4IHRyZWUgNjM0NWZlODhiZjAzNzFhNGVkZGVjMWNkMDhjODg2YTNlYmZiMzEwMCBtYW5pZmVz
+    dCBiZTk0NjYzNGI4OWUwNjAyYTBiNzIwYzExNzI3YWE4NzI2OWIwYWZlMmEzNDJkNDgxZjcwZjA1
+    ZTU3NjRlNTAwIGxvY2F0b3IgcmVmcy9oZWFkcy9jbGF1ZGUvZDM3OS1lNy1ldmlkZW5jZS1iZTk0
+    NjYzNGI4OWUwNjAyCnByZS1wdXNoIGxzLXJlbW90ZTogQUJTRU5UIE5vbmUKcHVibGlzaCBhdHRl
+    bXB0IDE6IFBVU0hFRF9VTlZFUklGSUVEIHJjIDAgbHNfcmVtb3RlIFsnUFJFU0VOVCcsICcyYjNj
+    MDM0Y2E3Nzk0NDU1ZTY0ZGUyYWEyYTA5YmFhZDIxNTViZjA4J10KcHVzaCBzdGRlcnIgKGZ1bGwp
+    OgpmYXRhbDogZXhwZWN0ZWQgJ2Fja25vd2xlZGdtZW50cycsIHJlY2VpdmVkICdwYWNrZmlsZScK
+    d2FybmluZzogcHVzaCBuZWdvdGlhdGlvbiBmYWlsZWQ7IHByb2NlZWRpbmcgYW55d2F5IHdpdGgg
+    cHVzaApFbnVtZXJhdGluZyBvYmplY3RzOiA3LCBkb25lLgpDb3VudGluZyBvYmplY3RzOiAgMTQl
+    ICgxLzcpDUNvdW50aW5nIG9iamVjdHM6ICAyOCUgKDIvNykNQ291bnRpbmcgb2JqZWN0czogIDQy
+    JSAoMy83KQ1Db3VudGluZyBvYmplY3RzOiAgNTclICg0LzcpDUNvdW50aW5nIG9iamVjdHM6ICA3
+    MSUgKDUvNykNQ291bnRpbmcgb2JqZWN0czogIDg1JSAoNi83KQ1Db3VudGluZyBvYmplY3RzOiAx
+    MDAlICg3LzcpDUNvdW50aW5nIG9iamVjdHM6IDEwMCUgKDcvNyksIGRvbmUuCkRlbHRhIGNvbXBy
+    ZXNzaW9uIHVzaW5nIHVwIHRvIDQgdGhyZWFkcwpDb21wcmVzc2luZyBvYmplY3RzOiAgMTQlICgx
+    LzcpDUNvbXByZXNzaW5nIG9iamVjdHM6ICAyOCUgKDIvNykNQ29tcHJlc3Npbmcgb2JqZWN0czog
+    IDQyJSAoMy83KQ1Db21wcmVzc2luZyBvYmplY3RzOiAgNTclICg0LzcpDUNvbXByZXNzaW5nIG9i
+    amVjdHM6ICA3MSUgKDUvNykNQ29tcHJlc3Npbmcgb2JqZWN0czogIDg1JSAoNi83KQ1Db21wcmVz
+    c2luZyBvYmplY3RzOiAxMDAlICg3LzcpDUNvbXByZXNzaW5nIG9iamVjdHM6IDEwMCUgKDcvNyks
+    IGRvbmUuCldyaXRpbmcgb2JqZWN0czogIDE0JSAoMS83KQ1Xcml0aW5nIG9iamVjdHM6ICAyOCUg
+    KDIvNykNV3JpdGluZyBvYmplY3RzOiAgNTclICg0LzcpDVdyaXRpbmcgb2JqZWN0czogIDcxJSAo
+    NS83KQ1Xcml0aW5nIG9iamVjdHM6ICA4NSUgKDYvNykNV3JpdGluZyBvYmplY3RzOiAxMDAlICg3
+    LzcpDVdyaXRpbmcgb2JqZWN0czogMTAwJSAoNy83KSwgOTIuMzMgS2lCIHwgMy44NSBNaUIvcywg
+    ZG9uZS4KVG90YWwgNyAoZGVsdGEgMSksIHJldXNlZCAwIChkZWx0YSAwKSwgcGFjay1yZXVzZWQg
+    MApyZW1vdGU6IFJlc29sdmluZyBkZWx0YXM6IDEwMCUgKDEvMSkgICAgICAgIA1yZW1vdGU6IFJl
+    c29sdmluZyBkZWx0YXM6IDEwMCUgKDEvMSksIGRvbmUuICAgICAgICAKcmVtb3RlOiAKcmVtb3Rl
+    OiBDcmVhdGUgYSBwdWxsIHJlcXVlc3QgZm9yICdjbGF1ZGUvZDM3OS1lNy1ldmlkZW5jZS1iZTk0
+    NjYzNGI4OWUwNjAyJyBvbiBHaXRIdWIgYnkgdmlzaXRpbmc6ICAgICAgICAKcmVtb3RlOiAgICAg
+    IGh0dHBzOi8vZ2l0aHViLmNvbS9kYWluaXVzMTIzNC9rYWktc3lzdGVtL3B1bGwvbmV3L2NsYXVk
+    ZS9kMzc5LWU3LWV2aWRlbmNlLWJlOTQ2NjM0Yjg5ZTA2MDIgICAgICAgIApyZW1vdGU6IAoKW1BB
+    U1NdIEctcHVibGlzaDogUFVTSEVEX1VOVkVSSUZJRUQgYXR0ZW1wdHMgMQpbUEFTU10gQS1ieXRl
+    LWZpZGVsaXR5OiA1LzUgaWRlbnRpY2FsPVRydWUKW1BBU1NdIEItaWRlbnRpdHk6IHRyZWUgNjM0
+    NWZlODhiZjAzNzFhNGVkZGVjMWNkMDhjODg2YTNlYmZiMzEwMApbUEFTU10gSy12ZXJpZnk6IGZh
+    aWx1cmVzIFtdCltQQVNTXSBORUcgQyhpKSBCIHRyYW5zY3JpcHQgYXMgQTogcmVmdXNlZDogWydB
+    OiB0cmFuc2NyaXB0IGRpZ2VzdC9ieXRlIGNvdW50ICE9IG1hbmlmZXN0J10KW1BBU1NdIEsyLXBs
+    YWNlbWVudDogdnMgcmVwYWlyIEhFQUQ6IFtdClZFUkRJQ1Q6IEU3YiBQVUJMSVNIRURfVkVSSUZJ
+    RUQK
+    END-BASE64 win/e7b/run.log
+- Retention scan output, verbatim, sha256 b3f3ab824db570eaa8e8221031f3cc5bc563f80f54931199d712a9b0bfaf280f  [CMD `sha256sum win/retention_scan.txt` → b3f3ab824db570ea…]
+    BEGIN-VERBATIM retention_scan.txt
+    collected credential values: 7
+    files scanned: 8069
+    VALUE-LAYER hits (our credentials): 0
+    PATTERN-LAYER hits: 22 files; of which byte-identical to a blob in the signed upstream tree: 16
+      P opt/d379-py311/lib/python3.11/test/test_urllib.py authorization_header 1 upstream-blob
+      P opt/d379-py311/lib/python3.11/test/test_httplib.py authorization_header 1 upstream-blob
+      P opt/d379-py311/lib/python3.11/test/certdata/nosan.pem pem_private_key 1 upstream-blob
+      P opt/d379-py311/lib/python3.11/test/certdata/keycertecc.pem pem_private_key 1 upstream-blob
+      P opt/d379-py311/lib/python3.11/test/certdata/keycert2.pem pem_private_key 1 upstream-blob
+      P opt/d379-py311/lib/python3.11/test/certdata/allsans.pem pem_private_key 1 upstream-blob
+      P opt/d379-py311/lib/python3.11/test/certdata/badcert.pem pem_private_key 2 upstream-blob
+      P opt/d379-py311/lib/python3.11/test/certdata/badkey.pem pem_private_key 2 upstream-blob
+      P opt/d379-py311/lib/python3.11/test/certdata/pycakey.pem pem_private_key 1 upstream-blob
+      P opt/d379-py311/lib/python3.11/test/certdata/keycert.passwd.pem pem_private_key 1 upstream-blob
+      P opt/d379-py311/lib/python3.11/test/certdata/ssl_key.pem pem_private_key 1 upstream-blob
+      P opt/d379-py311/lib/python3.11/test/certdata/idnsans.pem pem_private_key 1 upstream-blob
+      P opt/d379-py311/lib/python3.11/test/certdata/keycert4.pem pem_private_key 1 upstream-blob
+      P opt/d379-py311/lib/python3.11/test/certdata/keycert3.pem pem_private_key 1 upstream-blob
+      P opt/d379-py311/lib/python3.11/test/certdata/keycert.pem pem_private_key 1 upstream-blob
+      P opt/d379-py311/lib/python3.11/test/certdata/ssl_key.passwd.pem pem_private_key 1 upstream-blob
+      P opt/d379-py311/lib/python3.11/test/__pycache__/test_httplib.cpython-311.opt-2.pyc authorization_header 1 NOT-UPSTREAM
+      P opt/d379-py311/lib/python3.11/test/__pycache__/test_urllib.cpython-311.opt-2.pyc authorization_header 1 NOT-UPSTREAM
+      P opt/d379-py311/lib/python3.11/test/__pycache__/test_urllib.cpython-311.pyc authorization_header 1 NOT-UPSTREAM
+      P opt/d379-py311/lib/python3.11/test/__pycache__/test_urllib.cpython-311.opt-1.pyc authorization_header 1 NOT-UPSTREAM
+      P opt/d379-py311/lib/python3.11/test/__pycache__/test_httplib.cpython-311.pyc authorization_header 1 NOT-UPSTREAM
+      P opt/d379-py311/lib/python3.11/test/__pycache__/test_httplib.cpython-311.opt-1.pyc authorization_header 1 NOT-UPSTREAM
+    END-VERBATIM retention_scan.txt
+
+### 6. Next authorised step
+
+- None. STOP; Kai rules on the retention scan and the dpkg E defect  [CONVERSATION 2026-10-02 Kai, "Report the completed build/evidence/retention result and STOP."]
+
+### 7. What I am unsure of
+
+- Whether retained objects must be published before this container is reclaimed; container lifetime is not under Orion's control  [CMD `uname -r` → 6.18.44-fc-v51]
+- PYTHON_FOR_REGEN = system python3.11 was detected by configure; no regen target is expected in a normal build, but this record does not prove that none ran  [CMD `grep 'Python for regen' A.transcript` → Python 3.11.15]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
