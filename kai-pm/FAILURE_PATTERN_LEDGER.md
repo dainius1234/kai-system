@@ -6021,3 +6021,107 @@ NO D-NUMBER ALLOCATED    D387 remains free. D379 already grants the
                          stage_identity.py, d379_controls.py,
                          D379_CONTROLS.txt, D379_CLOSEOUT.txt.
 ```
+
+---
+
+# CLOSURE 2026-10-02 — `INC-2026-09-18-34` CLOSED: a D380-compliant
+#                      known-positive interpreter has been ACTUALLY MEASURED
+
+**Incident closure adjudication. No incident is allocated.**
+`INC-2026-09-18-34` and every prior entry are unedited; this records the
+measured evidence that meets its banked closure condition.
+
+**Adjudicator: Kai**, independent acceptance review of the D379 v4.5 build
+window, 2026-10-02 ("D380/D385 known-positive: ACCEPTED AS MEASURED"), and
+closure directed as a separate append-only register action, 2026-10-02.
+Relayed by Dainius; appended at Dainius's explicit authorisation. Both texts
+are preserved byte for byte in `kai-pm/HANDOFF_LOG.md` (entry 31 records
+the acceptance; the closure direction is quoted in the handoff entry that
+records this append).
+
+**The banked closure condition** — D385 §G, `kai-pm/DECISIONS.md`:
+
+```
+INC-2026-09-18-34   OPEN. Closes when a D380-compliant known-positive
+                    interpreter is ACTUALLY MEASURED, not when one is
+                    described.
+```
+
+```
+incident subject        stage_identity.py H2_PY_STDLIB_V1 builder, first
+                        executed at bf52445266354aaf9053ef30a72018d9c04cdc4d
+measurement code        governed stage_identity.py at repair HEAD
+                        d08f3ec5de4d823011e66261c84c98a76371428e
+                        (blob 714a2edc7fb101d0ccf755ff73fbd44589efc954)
+measured interpreter    CPython v3.11.15, signed tag 2323bfc7…5323 →
+                        commit 2340a037…a312 → tree 8c6959bc…cddd,
+                        signer primary A035C8C19219BA821ECEA86B64E628F8D684696D
+status                  CLOSED
+```
+
+### Fail-old / pass-new, identical instrument
+
+The same measurement (`build_stdlib_identity()` / `build_runtime()` of the
+governed module, run with `-B -E -s`) on both interpreters:
+
+```
+                          verdict          detail
+distribution CPython      REFUSE           symlink sitecustomize.py under stdlib
+/usr/bin/python3.11       (KNOWN_NEGATIVE) resolves OUTSIDE the governed root set
+                                           — D385 §B / D380-STDLIB-NEG-1, reproduced
+built v3.11.15  Build A   KNOWN_POSITIVE   H2_PY_STDLIB_V1 cad0d3a5…8601,
+built v3.11.15  Build B   KNOWN_POSITIVE   2,485 entries, 0 symlinks
+```
+
+D385 §C properties, measured on both builds: stdlib/platstdlib mechanically
+identified (one root, CASE A); external package root `site-packages`
+excluded; no symlink leaves the governed roots; no dangling link; single
+ownership and no duplicate member (the builder REFUSES otherwise and did
+not); all 49 loaded filesystem-backed stdlib modules represented;
+`dont_write_bytecode` True. The two qualification records are
+byte-identical, sha256 `e071c5abddb0b338e91bfe3c8e2d7e2b5fa1109fd23534683a1713919a960ea2`.
+
+### The interpreter is reproducible, published and retained
+
+```
+executable sha256         6068cf00c25bbe6b13b5ee09c831d7d4e385b63b84708a1b1b956bda1737c06f
+                          identical for two independent builds A and B
+H2_PY_STDLIB_V1           cad0d3a5f02cf9c5112e1140b605cfb5078a5f18bf2bee276ddefadd7fdb8601
+                          identical for A and B
+full staged trees         8,403 entries, 0 differing paths
+frozen environment E      6cb9496368f2e5c5375463204a0b5e0a496195e48a52b7a20994018b5c17dd47
+                          identical before A, before B and after B
+build evidence (E7b)      commit 2b3c034ca7794455e64de2aa2a09baad2155bf08
+                          manifest be946634b89e0602a0b720c11727aa87269b0afe2a342d481f70f05e5764e500
+retained interpreter      commit 78a31196402b6f8e1b770a6ca8bde214e4f2db21
+                          manifest 1f30fc923df4b4f823f7a56f292cf3b554d87d54b5728639163577d40d0023a3
+records                   HANDOFF_LOG entries 30 (3e49cd9b) and 32 (d07b3916)
+```
+
+### What this closure does NOT establish
+
+**The four D379_CONTROLS limbs held on INC-34 have NOT executed.** Q1a-6,
+DEP-2, the STAGE_A canonical-runtime positive limb and STDLIB V2-ID-2a remain
+HELD in `d379_controls.py` until the authorised v4.5 repair and hostile
+matrix run them under this interpreter. Closing the incident removes their
+blocker; it is not their result.
+
+**The built interpreter is a CALIBRATION runtime only** (D385 §D). It is not
+the eventual production candidate runtime (D385 §E), and retaining it grants
+no capture, candidate or production authority (D390 §6).
+
+**`E.dpkg_selections_sha256` is INVALID / VACUOUS** (the sha256 of the empty
+string; the package database was hidden from the measuring namespace). It is
+not evidence of package-population stability and is not relied on here.
+
+**No D380 or D385 rule was weakened** to produce this result. §7.6 is
+unchanged; the environment changed, as D385 §A directed.
+
+### Mechanism state — UNCHANGED BY THIS CLOSURE
+
+`INC-2026-09-18-34` remains `INCIDENT_ONLY` with no mechanism assigned. No
+mechanism's state or occurrence count is altered.
+
+**No incident allocated by this closure. Real incident population and
+highest allocated are unchanged. No new mechanism. Doctrine 49.6 not
+re-triggered. No D-number.**
