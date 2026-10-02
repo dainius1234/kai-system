@@ -6424,3 +6424,115 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-02T18:00:09Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-02T18:00:09Z  [CMD `date -u +%FT%TZ` → 2026-10-02T18:00:09Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 809fd72378c00e60cd3aef198326347169ba55dd  [CMD `git rev-parse HEAD` → 809fd72378c00e60cd3aef198326347169ba55dd]
+- tree: b67b898e3f7374706fcd0f02bc77e4f6747f7030  [CMD `git rev-parse HEAD^{tree}` → b67b898e3f7374706fcd0f02bc77e4f6747f7030]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 809fd72378c00e60cd3aef198326347169ba55dd  [CMD `git ls-remote --heads origin` → 809fd72378c00e60cd3aef198326347169ba55dd]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d08f3ec5de4d823011e66261c84c98a76371428e  [CMD `git ls-remote --heads origin` → d08f3ec5de4d823011e66261c84c98a76371428e]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 32  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 32]
+
+### 1. The four states
+
+- physical: INC-2026-09-18-34 CLOSED in the ledger at 809fd72378c00e60cd3aef198326347169ba55dd (ledger only, +104/−0); repair branch d08f3ec unchanged  [GIT 809fd72378c00e60cd3aef198326347169ba55dd]
+- authorised: step 1 only (INC-34 closure) — DONE; STOP before B4  [CONVERSATION 2026-10-02 Dainius, "Authorised: close INC-34"]
+- evidence: closure record cites D385 §G and the measured identities  [LEDGER INC-2026-09-18-34]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-02 · the D379 build/evidence side is closed; close INC-34 as a separate append-only register action; then a bounded B4 six-file repair + hostile matrix, STOP on deviation; PR #122 stays DO NOT MERGE. Verbatim, extracted byte-for-byte (received 2026-10-02T17:56:46.873Z, 2959 bytes, sha256 b646825f8ca253595ff7e2acf6b71711bbd87ec5172d14d1cd68b30cfd378913) ⚠ UNBANKED  [CONVERSATION 2026-10-02 Kai, "This is the point where I’m comfortable saying the build/evidence side of D379 is closed."]
+    BEGIN-VERBATIM KAI-D379-BUILD-SIDE-CLOSED
+    This is the point where I’m comfortable saying the build/evidence side of D379 is closed.
+    
+    I independently checked the repository again. The retention branch exists at 78a31196402b6f8e1b770a6ca8bde214e4f2db21, entry 32 is banked on the handoff line at signed/verified d07b3916539b8f5ec019d30fee51be712305ec87, and the published classification itself records 16 upstream-identical + 6 deterministically derived + 0 unproven + 0 credential-value hits. The repair branch is still untouched at d08f3ec5de4d823011e66261c84c98a76371428e.
+    
+    So in plain terms:
+    
+    We have now proved the measuring interpreter, proved we can reproduce it, stored the real build evidence, and preserved the exact qualified interpreter permanently. Container loss is no longer a programme risk.
+    
+    The D379 path now looks like this:
+    
+    E7a transport qualification — DONE
+    Build A/B — DONE
+    Reproducibility — DONE
+    D380/D385 known-positive qualification — DONE
+    E7b real build evidence — DONE
+    Qualified interpreter retention — DONE
+    Six-file v4.5 technical repair — NEXT
+    Hostile matrix — after repair
+    D390 exact replay at fixity boundary — later
+    Fixity F construction/review — later
+    Separate capture authority — later
+    Candidate / holdout / blind 40 — later
+    Item 8 — later
+    A-4 / Kingsman implementation — still downstream
+    
+    There is one housekeeping item I would do before technical repair: close INC-34 in the failure ledger, because its stated closure condition has now actually been demonstrated. That should be a separate append-only register action with the exact interpreter/evidence identities; it must not be bundled into the repair commit.
+    
+    Then the next consequential technical grant is the bounded B4 repair tranche against the six authorised files only, followed by the complete hostile matrix. No capture. No D390 replay yet. No fixity freeze yet.
+    
+    One important control: v4.5 itself has already had DeepSeek’s final adversarial review and my reconciliation, so we do not need to restart architecture review from scratch. But if Orion discovers any material deviation from v4.5 while implementing those six files, he must stop rather than improvise a new design.
+    
+    And PR #122 remains open, not merged. I checked it: its head is now d07b391..., while main is still the old baseline. So all of this work is accumulating on the programme branch, exactly as intended. Nothing we have just done changes the DO NOT MERGE position. #122 stays held until the programme gates say otherwise.
+    
+    The cleanest next sequence is therefore:
+    
+    1. Close INC-34 only, with exact evidence, STOP.
+    2. Authorize B4 six-file repair + hostile matrix only, STOP on any deviation/failure.
+    3. Review the resulting repair before we even discuss fixity F.
+    
+    That is a substantial milestone: the difficult prerequisite was not the repair code itself; it was proving that the instrument used to judge the repair is trustworthy. That prerequisite is now genuinely behind us.
+    
+    Confidence: 0.99.
+    END-VERBATIM KAI-D379-BUILD-SIDE-CLOSED
+- Dainius · 2026-10-02 · authorises step 1 only: the INC-34 closure append, then STOP ⚠ UNBANKED  [CONVERSATION 2026-10-02 Dainius, "Authorised: close INC-34"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: step 2 (B4 six-file repair + hostile matrix) until Dainius grants it; D390 replay; fixity F; capture; Stage A; candidate; holdout; blind 40; Item 8; merge; PR #122 DO NOT MERGE  [CONVERSATION 2026-10-02 Kai, "Authorize B4 six-file repair + hostile matrix only, STOP on any deviation/failure."]
+
+### 4. Open questions
+
+- Next grant, owner Dainius: step 2  [CONVERSATION 2026-10-02 Kai, "The cleanest next sequence is therefore:"]
+
+### 5. Incidents and corrections
+
+- Pre-append checks: working tree clean; FRESH; template sha256 == drafted bf5f4263…637d; only {APPEND_DATE} filled (2026-10-02); the old ledger an exact byte prefix; 5,143 bytes / 104 lines added; incident headings 38 → 38, distinct 38, highest INC-2026-09-19-38; 0 closure lines begin "### `INC"; both cited sources found in the files; diff --check clean  [CMD `git diff --numstat HEAD^ HEAD` → 104 0 kai-pm/FAILURE_PATTERN_LEDGER.md]
+- Draft error caught before the append: the draft said "entries 31 and 32 record the acceptance"; only entry 31 does (32 is the retention record); fixed in the draft  [GIT 3e49cd9b28dfd1e6befa46a793c471b3040d6e32]
+- Commit 809fd72378c00e60cd3aef198326347169ba55dd, tree b67b898e3f7374706fcd0f02bc77e4f6747f7030, FAILURE_PATTERN_LEDGER.md blob e7f48eb5ad0e169af7f7b8bcf6143b92494fa826; appended bytes sha256 868fc514429161bd42b35383d44ae751c70a56d575915a2b33a379944cf74b17  [GIT 809fd72378c00e60cd3aef198326347169ba55dd]
+
+### 6. Next authorised step
+
+- None. STOP after INC-34; step 2 needs Dainius's grant  [CONVERSATION 2026-10-02 Kai, "1. Close INC-34 only, with exact evidence, STOP."]
+
+### 7. What I am unsure of
+
+- None new  [GIT 809fd72378c00e60cd3aef198326347169ba55dd]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
