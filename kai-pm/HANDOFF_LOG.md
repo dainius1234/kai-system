@@ -2964,3 +2964,178 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-02T16:38:48Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-02T16:38:47Z  [CMD `date -u +%FT%TZ` → 2026-10-02T16:38:47Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 71704622188956bb092897d80947171b232c4f89  [CMD `git rev-parse HEAD` → 71704622188956bb092897d80947171b232c4f89]
+- tree: a06f01f6338aa53ae94184b0fbcc256e5ba343cf  [CMD `git rev-parse HEAD^{tree}` → a06f01f6338aa53ae94184b0fbcc256e5ba343cf]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 71704622188956bb092897d80947171b232c4f89  [CMD `git ls-remote --heads origin` → 71704622188956bb092897d80947171b232c4f89]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d08f3ec5de4d823011e66261c84c98a76371428e  [CMD `git ls-remote --heads origin` → d08f3ec5de4d823011e66261c84c98a76371428e]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 24  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 24]
+
+### 1. The four states
+
+- physical: D390 BANKED on claude/project-rework-plan-pgvp35 at 71704622188956bb092897d80947171b232c4f89 (DECISIONS.md only, +91/−0); repair branch UNCHANGED at d08f3ec (no R2, no merge)  [GIT 71704622188956bb092897d80947171b232c4f89]
+- authorised: nothing beyond banking; STOP before E7a  [CONVERSATION 2026-10-02 Dainius, "Authorised: bank D390"]
+- evidence: banking report (section 5)  [D390]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-02 · D390 BANKING LOCATION + INTERPRETER RETENTION, relayed by Dainius; verbatim, extracted byte-for-byte from the session transcript (received 2026-10-02T16:36:58Z, 6,109 bytes, sha256 1d9149fef2193380b35cb158894c31ff882bdb0a8bc28d1e15356077bb3c7627). NOT part of D390's text, so UNBANKED ⚠ UNBANKED  [CONVERSATION 2026-10-02 Kai, "KAI → ORION — D390 BANKING LOCATION + INTERPRETER RETENTION ADJUDICATED"]
+    BEGIN-VERBATIM KAI-D390-LOCATION-RETENTION
+    Authorised: I checked the latest repository evidence before ruling. cffaa782… exists, is signed/verified, and entry 24 is exactly the append-only correction Orion describes. The repair branch remains separately bounded; nothing in what I checked gives evidence of a D390 mutation.
+    
+    Two decisions remain, and I can close both now.
+    
+    1. Where D390 belongs
+    
+    Do not insert another repair commit R2 into the repair lineage.
+    
+    Orion’s M1-style suggestion is understandable, but it would unnecessarily alter the deliberately frozen lineage:
+    
+    eb52f73 → R → technical repairs
+    
+    D390 is governance authority, not technical repair content. We already established the proper pattern with G: governance is banked independently and its authoritative content is replayed where the repair needs it under a controlled equivalence proof.
+    
+    Therefore:
+    
+    * Bank D390 on the governance/handoff line first.
+    * Do not casually merge that branch into the repair branch.
+    * When D390 must become part of the repair’s governed fixity population, replay only the exact D390 DECISIONS.md addition onto the repair branch at the defined fixity boundary.
+    * Prove equivalence mechanically: source addition == replay addition, resulting decision population correct, no unrelated handoff/history files imported.
+    * That replay becomes part of F’s governed history/population at the point v4.5 requires it; it does not retrospectively redefine R or the technical restart.
+    
+    So we preserve both invariants: D390 is genuinely banked authority, and the admitted repair lineage is not polluted by the continuity branch.
+    
+    2. Interpreter retention mechanism
+    
+    Do not force the capture into the same container lifetime. That turns container survival into an undeclared availability dependency and would pressure us to rush capture simply because the machine might disappear.
+    
+    Also don’t decide now that the entire interpreter installation belongs inside the transcript evidence object. Build evidence and retained executable artefact are different evidence classes.
+    
+    The correct mechanism is:
+    
+    After a build has actually qualified as the retained D380 calibration interpreter, preserve its exact staged interpreter artefact durably as a separate immutable Git artefact/object, with a manifest binding it to the admitted Build A/B evidence identity, executable SHA-256, H2_PY_STDLIB_V1, source identity and E. The retained artefact receives no execution/admission authority merely by being stored.
+    
+    But do not publish it before measuring its size and checking it for unintended sensitive material. If Git cannot safely/faithfully retain it, STOP and return for transport adjudication. No third build and no same-container workaround.
+    
+    That closes U1 properly without conflating transcript evidence, qualification evidence and retained runtime artefact.
+    
+    Authority to move
+    
+    Send this to Orion:
+    
+    KAI → ORION — D390 BANKING LOCATION + INTERPRETER RETENTION ADJUDICATED
+    
+    BANKING LOCATION
+    
+    D390 is governance authority, not a technical repair mutation.
+    
+    Do NOT introduce an R2 governance commit into the admitted repair lineage merely to bank D390.
+    
+    Bank D390 first on the governance/handoff line as an append-only DECISIONS.md mutation, after immediately re-running the allocator and pre-append checks.
+    
+    The repair branch remains rooted in its admitted lineage. Do not merge the handoff branch into it.
+    
+    At the v4.5 fixity boundary, when D390 must be represented in the repair’s governed decision population, replay ONLY the exact D390 DECISIONS.md addition onto the repair branch under a mechanical equivalence proof. No HANDOFF_LOG or unrelated continuity history enters the repair branch.
+    
+    The replay must prove at minimum:
+    
+    * exact D390 textual addition equivalence;
+    * append-only DECISIONS prefix preservation;
+    * decision heading population/distinctness/no duplicates;
+    * source/replay patch equivalence by content and patch-id where applicable;
+    * resulting DECISIONS blob identity/equivalence where expected;
+    * no unrelated paths;
+    * F includes the resulting governed D390 state when F is eventually frozen.
+    
+    This does not retrospectively redefine R or the admitted technical restart.
+    
+    INTERPRETER RETENTION
+    
+    Do not make same-container survival a requirement.
+    
+    Do not add the retained interpreter tree to the transcript evidence object.
+    
+    After one interpreter is actually qualified as the retained D380 calibration interpreter, preserve that exact staged interpreter durably as a SEPARATE immutable artefact/object. Its manifest must bind it to:
+    
+    * the admitted Build A/B evidence identity;
+    * executable SHA-256;
+    * H2_PY_STDLIB_V1;
+    * exact CPython source identity;
+    * frozen environment E;
+    * qualification evidence identity when that exists.
+    
+    Storage grants zero capture, candidate or production-runtime authority.
+    
+    Before publication, measure the actual staged artefact size and perform the governed sensitive-material/credential exclusion checks. If the selected Git transport cannot safely and byte-faithfully preserve the artefact, STOP for transport adjudication. Do not rebuild a third interpreter, truncate the artefact, silently change transport, or rush capture to preserve container lifetime.
+    
+    D390 BANKING AUTHORITY
+    
+    Dainius still supplies the consequential banking authorization. If he authorizes banking, immediately before append:
+    
+    1. re-run allocator;
+    2. confirm D390 remains next free heading;
+    3. fill only mechanically derived date/timestamp fields;
+    4. re-run the pre/post gates and append-only checks;
+    5. append exact reviewed D390;
+    6. commit only kai-pm/DECISIONS.md;
+    7. push governance/handoff branch;
+    8. report commit SHA, tree, DECISIONS blob/hash, exact +/− diff, decision population and gate results;
+    9. STOP before E7a.
+    
+    No E7a, build, evidence-ref creation, repair mutation, capture, Stage A, candidate, holdout, blind 40 or merge is authorised by banking D390.
+    
+    Dainius: from my technical side, D390 is ready to bank with those two rulings. If you authorize it, the only instruction Orion needs from you now is:
+    
+    Authorised. Bank D390 exactly under Kai’s ruling, report the resulting evidence, then STOP before E
+    END-VERBATIM KAI-D390-LOCATION-RETENTION
+- Dainius · 2026-10-02 · banking authority for D390, exactly as reviewed, governance branch only, then STOP before E7a [D390]  [CONVERSATION 2026-10-02 Dainius, "Authorised: bank D390"]
+
+### 3. Authorised / Held / Forbidden
+
+- DONE: D390 banked  [GIT 71704622188956bb092897d80947171b232c4f89]
+- HELD: E7a-Git; builds; evidence-ref creation; the D390 replay onto the repair branch (it happens at the v4.5 fixity boundary, under the equivalence proof in Kai's ruling); repair; capture; Stage A; candidate; holdout; blind 40; merge  [CONVERSATION 2026-10-02 Kai, "9. STOP before E7a."]
+
+### 4. Open questions
+
+- Next grant, owner Dainius: E7a-Git execution (protocol v2, entry 23)  [CONVERSATION 2026-10-02 Kai, "No E7a, build, evidence-ref creation, repair mutation, capture, Stage A, candidate, holdout, blind 40 or merge is authorised by banking D390."]
+
+### 5. Incidents and corrections
+
+- Pre-append: working tree clean; FRESH; template sha256 == reviewed c5964f86…304b; allocator 372/372/none, highest D389, D390 free; gates check_item8_design rc=0 and check_item8_authority rc=1, outputs identical to the reviewed baseline  [CMD `sha256sum d390_template.md` → c5964f86…304b]
+- Append: TS 2026-10-02T16:38:03Z; only the two template fields changed; appended bytes == reviewed final render (sha256 256184a0…5091, 7,926 bytes); pre-file is an exact prefix; post allocator 373/373/none, highest D390, D390 ×1; gates rc 0 and 1, outputs identical pre/post; diff --check clean  [CMD `git diff --numstat HEAD^ HEAD` → 91 0 kai-pm/DECISIONS.md]
+- Commit 71704622188956bb092897d80947171b232c4f89, parent cffaa782, tree a06f01f6338aa53ae94184b0fbcc256e5ba343cf; DECISIONS.md blob 8d16459a1d5405ffeb4dfe5b29154144701dc6df, file sha256 d89343f83a1788cd6c15ab06e87fb21d4dd143e57866d400f48bd15fb36ed70d; diff sha256 01e95a6f2daa94e65acc5f79693f090b6fc10058062d65d11e182f4def5c2a7e; the commit carries 1 SSH signature block (this container cannot verify it: no allowedSignersFile)  [CMD `git cat-file commit HEAD | grep -c 'BEGIN SSH SIGNATURE'` → 1]
+- The diff and blob differ from entry 23's preview values (cda3ae25…, 6e84db29…) ONLY because the date/time fields were filled at 16:38:03Z instead of 16:23:59Z, as U8 requires; same byte count (7,926)  [CMD `sha256 of d390_final.md` → 256184a0…5091]
+
+### 6. Next authorised step
+
+- None. STOP before E7a; await Dainius's grant for E7a-Git  [CONVERSATION 2026-10-02 Kai, "9. STOP before E7a."]
+
+### 7. What I am unsure of
+
+- The retained-interpreter artefact's size and contents are unmeasured until a build qualifies; Kai's ruling makes Git unsuitability a STOP  [CONVERSATION 2026-10-02 Kai, "If the selected Git transport cannot safely and byte-faithfully preserve the artefact, STOP for transport adjudication."]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
