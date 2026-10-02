@@ -6536,3 +6536,153 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-02T18:03:46Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-02T18:03:45Z  [CMD `date -u +%FT%TZ` → 2026-10-02T18:03:45Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 38a660f3e8e796e02655fb42d794e5a75a5c23a1  [CMD `git rev-parse HEAD` → 38a660f3e8e796e02655fb42d794e5a75a5c23a1]
+- tree: 427bb5fb8a64680c583cac494d98168258c2a729  [CMD `git rev-parse HEAD^{tree}` → 427bb5fb8a64680c583cac494d98168258c2a729]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/project-rework-plan-pgvp35: 38a660f3e8e796e02655fb42d794e5a75a5c23a1  [CMD `git ls-remote --heads origin` → 38a660f3e8e796e02655fb42d794e5a75a5c23a1]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d08f3ec5de4d823011e66261c84c98a76371428e  [CMD `git ls-remote --heads origin` → d08f3ec5de4d823011e66261c84c98a76371428e]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 33  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 33]
+
+### 1. The four states
+
+- physical: repair branch at d08f3ec, clean; B4 not started  [CMD `git -C /home/user/kai-repair rev-parse HEAD` → d08f3ec5de4d]
+- authorised: bounded D379 v4.5 B4 six-file repair + full hostile matrix; evidence → this handoff log  [CONVERSATION 2026-10-02 Dainius, "Authorised: B4 + matrix"]
+- evidence: none yet  [CONVERSATION 2026-10-02 Dainius, "Authorised: B4 + matrix"]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-02 · B4 grant text (six files only; complete v4.5 repair; full hostile matrix incl. the four formerly INC-34-held limbs; STOP on any deviation; no D390 replay / F / capture). Verbatim, extracted byte-for-byte (received 2026-10-02T18:02:03.229Z, 3702 bytes, sha256 007f6413fa2fca50f1a8670682521afa8162ab18d76725da01ef391db250718e) ⚠ UNBANKED  [CONVERSATION 2026-10-02 Kai, "Authorised: execute the bounded D379 v4.5 B4 repair and full hostile matrix only."]
+    BEGIN-VERBATIM KAI-B4-GRANT
+    Verified. The INC-34 closure is clean.
+    
+    809fd72378c00e60cd3aef198326347169ba55dd is signed/verified and changes only kai-pm/FAILURE_PATTERN_LEDGER.md, +104/−0. Entry 33 is also signed/verified at 38a660f3e8e796e02655fb42d794e5a75a5c23a1. The repair branch is still untouched at d08f3ec5de4d823011e66261c84c98a76371428e, and PR #122 is still OPEN / UNMERGED / DO NOT MERGE.
+    
+    So we have genuinely reached the next technical stage:
+    
+    measurement/build prerequisite → closed
+    INC-34 → closed
+    B4 source repair → NEXT
+    full hostile matrix → immediately after repair
+    capture → NOT authorised
+    
+    For the next grant, I would make the boundary very explicit. Orion may modify only these six source files on claude/d379-repair-eb52f73:
+    
+    stage_identity.py
+    passa.py
+    run_h2_v12.py
+    qualify.py
+    holdout.py
+    build_evidence/d379_controls.py
+    
+    Before first mutation, he should prove the branch is exactly d08f3ec, clean, and record the starting hashes of all six files. Then implement the complete v4.5 repair—not a subset designed merely to turn tests green—and run the complete hostile matrix, including the four limbs previously blocked by INC-34.
+    
+    I would send this:
+    
+    Authorised: execute the bounded D379 v4.5 B4 repair and full hostile matrix only.
+    
+    Work only on claude/d379-repair-eb52f73, starting from exact HEAD d08f3ec5de4d823011e66261c84c98a76371428e.
+    
+    Before mutation, prove:
+    
+    * exact branch/HEAD;
+    * clean tree;
+    * exact starting identities of all six authorised files;
+    * v4.5 remains the governing repair subject;
+    * the retained qualified interpreter identity remains available and matches the admitted evidence.
+    
+    Authorised source mutation surface is exactly:
+    
+    * stage_identity.py
+    * passa.py
+    * run_h2_v12.py
+    * qualify.py
+    * holdout.py
+    * build_evidence/d379_controls.py
+    
+    No new tracked source file. Need any seventh source/config/governance mutation → STOP and return for authority.
+    
+    Implement the complete v4.5 repair requirements, including:
+    
+    * production Stage-A construction and full semantic rederivation;
+    * separation of instrument / subject / history / Census contexts;
+    * exact-byte Census execution and preload refusal;
+    * producer population-root repair;
+    * external Stage-B binding chain;
+    * Pass-A → classification → qualification binding;
+    * qualifier own-runtime verification;
+    * per-slot authority controls;
+    * holdout canonicality and independent uniqueness;
+    * stdlib fail-closed enumeration;
+    * bounded launch grammar and runtime launch observation.
+    
+    Then execute the full v4.5 hostile matrix, not only regression tests. Every material control requires the named predicate to fail/pass for the intended reason; a generic non-zero process is not sufficient.
+    
+    The four D379_CONTROLS limbs formerly held by INC-34 must now execute under the qualified interpreter and receive actual results.
+    
+    Any material deviation from v4.5, unresolved dependency, weakening of D380/D385, unexpected authority path, context collapse, unaccounted launch mechanism, or hostile-control failure → STOP. Do not improvise around it.
+    
+    At successful matrix completion: commit/push the bounded repair evidence and report exact changed paths, commits, matrix population and results, then STOP.
+    
+    DO NOT replay D390 yet.
+    DO NOT construct/freeze fixity F yet.
+    DO NOT capture.
+    DO NOT run production Stage A, candidate, holdout, blind 40 or Item 8.
+    DO NOT merge PR #122.
+    
+    One nuance: if the repair itself needs commits while progressing, that’s fine within the six-file surface, but I want the final repaired HEAD and complete hostile-matrix evidence reviewed before we allow the D390 replay/fixity-F boundary.
+    
+    We are now finally repairing the instrument itself rather than preparing to repair it.
+    
+    Confidence: 0.99.
+    END-VERBATIM KAI-B4-GRANT
+- Dainius · 2026-10-02 · authorises the B4 repair + full matrix exactly as Kai drafted ⚠ UNBANKED  [CONVERSATION 2026-10-02 Dainius, "Authorised: B4 + matrix"]
+- Dainius · 2026-10-02 · hostile-matrix evidence goes byte-exact into this handoff log on the programme branch; the repair branch changes only the six files; D379_CONTROLS.txt and D379_CLOSEOUT.txt (capture outputs) stay untouched ⚠ UNBANKED  [CONVERSATION 2026-10-02 Dainius, "Handoff log (Recommended)"]
+
+### 3. Authorised / Held / Forbidden
+
+- FORBIDDEN: any 7th tracked path; D390 replay; fixity F; capture (writing D379_CONTROLS.txt / D379_CLOSEOUT.txt); production Stage A; candidate; holdout; blind 40; Item 8; PR #122 merge  [CONVERSATION 2026-10-02 Kai, "DO NOT capture."]
+
+### 4. Open questions
+
+- None yet  [CONVERSATION 2026-10-02 Dainius, "Authorised: B4 + matrix"]
+
+### 5. Incidents and corrections
+
+- Measured before the grant: running d379_controls.py writes only to temporary fixture directories and prints its results; D379_CONTROLS.txt is produced by capture, not by a run  [FILE kai-pm/house_in_order_h2_v13/build_evidence/d379_controls.py:166]
+
+### 6. Next authorised step
+
+- Pre-mutation proofs (branch/HEAD, clean, six starting identities, governing v4.5, retained interpreter), then the repair  [CONVERSATION 2026-10-02 Kai, "Before mutation, prove:"]
+
+### 7. What I am unsure of
+
+- The size of the v4.5 §§8–33 implementation is large; context compaction during it is likely, so progress is written to this log at milestones  [FILE kai-pm/D379_PLAN_V4_5.md:313]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
