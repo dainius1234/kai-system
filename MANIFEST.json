@@ -1,0 +1,76 @@
+{
+ "SYNTHETIC": true,
+ "builds": {
+  "A": {
+   "build_dir": "SYNTHETIC/A/build",
+   "byte_count": 3363,
+   "end_utc": "SYNTHETIC",
+   "interpreter": {
+    "computed_by_commit": "SYNTHETIC",
+    "executable_sha256": "SYNTHETIC-A",
+    "h2_py_stdlib_v1": "SYNTHETIC-A"
+   },
+   "return_codes": {
+    "configure": 0,
+    "install": 0,
+    "make": 0
+   },
+   "sha256": "dd530483b3b0faa820763f7cfb540524c333bf243653e62cee7a3ba121f126b9",
+   "source_worktree": "SYNTHETIC/A/src",
+   "staging_root": "SYNTHETIC/A/stage",
+   "start_utc": "SYNTHETIC",
+   "transcript": "A.transcript"
+  },
+  "B": {
+   "build_dir": "SYNTHETIC/B/build",
+   "byte_count": 3363,
+   "end_utc": "SYNTHETIC",
+   "interpreter": {
+    "computed_by_commit": "SYNTHETIC",
+    "executable_sha256": "SYNTHETIC-B",
+    "h2_py_stdlib_v1": "SYNTHETIC-B"
+   },
+   "return_codes": {
+    "configure": 0,
+    "install": 0,
+    "make": 0
+   },
+   "sha256": "380b3497c9491a7b549c70050b07383cefeddd2f69723491f8067ef8dc6f4729",
+   "source_worktree": "SYNTHETIC/B/src",
+   "staging_root": "SYNTHETIC/B/stage",
+   "start_utc": "SYNTHETIC",
+   "transcript": "B.transcript"
+  }
+ },
+ "configure": {
+  "args": [
+   "./configure",
+   "--prefix=/opt/d379-py311",
+   "--without-ensurepip"
+  ],
+  "install": [
+   "make",
+   "install",
+   "DESTDIR=<staging-root>"
+  ],
+  "make": [
+   "make"
+  ]
+ },
+ "cpython_source": {
+  "commit": "2340a037f7450e70fccfe411e6531afb4d57a312",
+  "signer_primary_fpr": "A035C8C19219BA821ECEA86B64E628F8D684696D",
+  "tag": "v3.11.15",
+  "tag_object": "2323bfc729b041c43b1e5e4c5f18c548fc345323",
+  "tree": "8c6959bc70b201b477138f00c432a3bb2f1caddd"
+ },
+ "driver": {
+  "path": "driver.py",
+  "sha256": "9159be972f138bc45dd990362b7a1a3c0bd5f33663eacebcd618756d6e03e5e3"
+ },
+ "environment": {
+  "path": "E.json",
+  "sha256": "1771fcf0efadfd4f0dbafcf58db4c1c3ace00af37e045bc1008bf458c9b8ce0a"
+ },
+ "schema": "D379_E7_EVIDENCE_V1"
+}

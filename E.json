@@ -1,0 +1,90 @@
+{
+ "PATH": "/usr/bin:/bin",
+ "ar": {
+  "realpath": "/usr/bin/x86_64-linux-gnu-ar",
+  "sha256": "6452af2eea333b8c65e1adb92964fc8f97863ab003fa13f9d12bff5345cd7dbe",
+  "version": "GNU ar (GNU Binutils for Ubuntu) 2.42",
+  "which": "/usr/bin/ar"
+ },
+ "assembler": {
+  "realpath": "/usr/bin/x86_64-linux-gnu-as",
+  "sha256": "21aff249b692b5c31a44007491f922dcb49f41323e362c57d2ada3f52eddb7f0",
+  "version": "GNU assembler (GNU Binutils for Ubuntu) 2.42",
+  "which": "/usr/bin/as"
+ },
+ "build_env": {
+  "CC": null,
+  "CFLAGS": null,
+  "CPP": null,
+  "CPPFLAGS": null,
+  "CXX": null,
+  "LANG": "C.UTF-8",
+  "LC_ALL": "C.UTF-8",
+  "LDFLAGS": null,
+  "LIBS": null,
+  "MAKEFLAGS": null,
+  "PYTHONHASHSEED": null,
+  "SOURCE_DATE_EPOCH": null,
+  "TZ": "UTC"
+ },
+ "compiler": {
+  "realpath": "/usr/bin/x86_64-linux-gnu-gcc-13",
+  "sha256": "1b99826121ae6682a634e5efe09bd3e3df58ce58e0b28f849114ab5b89139c26",
+  "version": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "which": "/usr/bin/gcc"
+ },
+ "compiler_helpers": [
+  {
+   "name": "cc1",
+   "realpath": "/usr/libexec/gcc/x86_64-linux-gnu/13/cc1",
+   "sha256": "5d1679131184e2de4435b426eb264bf13472fe026db8e5c6bc97445814e8e2f4"
+  },
+  {
+   "name": "collect2",
+   "realpath": "/usr/libexec/gcc/x86_64-linux-gnu/13/collect2",
+   "sha256": "4d1f341ae5b763b513258ee2812422a45e063c30a2f1924a0cf63d3699f3a158"
+  },
+  {
+   "name": "lto-wrapper",
+   "realpath": "/usr/libexec/gcc/x86_64-linux-gnu/13/lto-wrapper",
+   "sha256": "f6d39bcfb1c2798c704e275a4ed2c1fe6374ebfb6aa0c5f3f3b6c669e1ff2e13"
+  }
+ ],
+ "configure_args": [
+  "./configure",
+  "--prefix=/opt/d379-py311",
+  "--without-ensurepip"
+ ],
+ "cpython_source": {
+  "commit": "2340a037f7450e70fccfe411e6531afb4d57a312",
+  "signer_primary_fpr": "A035C8C19219BA821ECEA86B64E628F8D684696D",
+  "tag": "v3.11.15",
+  "tag_object": "2323bfc729b041c43b1e5e4c5f18c548fc345323",
+  "tree": "8c6959bc70b201b477138f00c432a3bb2f1caddd"
+ },
+ "dpkg_selections_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+ "install_prefix": "/opt/d379-py311",
+ "kernel": "6.18.44-fc-v51",
+ "libc": {
+  "ldd_version": "ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39",
+  "libc_so": {
+   "realpath": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+   "sha256": "d8db8739a1633c972cec6a4fe0566bdcec6fd088f98723492ab0361f66238f75"
+  }
+ },
+ "linker": {
+  "realpath": "/usr/bin/x86_64-linux-gnu-ld.bfd",
+  "sha256": "e9ceb054c12207970f2726dfc07e9a66b411602748628baf27399f02a9bbb31b",
+  "version": "GNU ld (GNU Binutils for Ubuntu) 2.42",
+  "which": "/usr/bin/ld"
+ },
+ "make": {
+  "realpath": "/usr/bin/make",
+  "sha256": "d78b8f1d099fbcfb6f2f49ab87223b9b68fb3956642f92d6ec6de812e8afa965",
+  "version": "GNU Make 4.3",
+  "which": "/usr/bin/make"
+ },
+ "os_release": "PRETTY_NAME=\"Ubuntu 24.04.4 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.4 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo\n",
+ "rootfs_dev": 65024
+}
+E_SHA256 62a8e5e0baaccaf5274f405795254248a537f17f47671ee9f34408c42eb627f5
