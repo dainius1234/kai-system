@@ -6686,3 +6686,74 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-02T18:18:11Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-02T18:18:11Z  [CMD `date -u +%FT%TZ` → 2026-10-02T18:18:11Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: d6fcb3fee4e81e0fe63b435f71b46c543633022a  [CMD `git rev-parse HEAD` → d6fcb3fee4e81e0fe63b435f71b46c543633022a]
+- tree: 5c971ece26b5529c66b5da6aaf6a1ebab91d9c92  [CMD `git rev-parse HEAD^{tree}` → 5c971ece26b5529c66b5da6aaf6a1ebab91d9c92]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/d379-repair-eb52f73: 37bce4cd89eca2312c79d71ce150630ef866f47a  [CMD `git ls-remote --heads origin` → 37bce4cd89eca2312c79d71ce150630ef866f47a]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/project-rework-plan-pgvp35: d6fcb3fee4e81e0fe63b435f71b46c543633022a  [CMD `git ls-remote --heads origin` → d6fcb3fee4e81e0fe63b435f71b46c543633022a]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 34  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 34]
+
+### 1. The four states
+
+- physical: repair branch claude/d379-repair-eb52f73 at 37bce4c (WIP 3/n), on d08f3ec; five of six files repaired; d379_controls.py NOT yet changed; tree intermediate by design  [CMD `git -C /home/user/kai-repair log --oneline -4` → 37bce4c, 33eff94, 8978384, d08f3ec]
+- authorised: B4 six-file repair + full matrix (entry 34)  [CONVERSATION 2026-10-02 Dainius, "Authorised: B4 + matrix"]
+- evidence: fail-old baseline of the UNMODIFIED harness at d08f3ec under the qualified interpreter: 210 passed, 27 failed, EXIT GATE FAIL; output 56,245 bytes, sha256 9f1185a4f1f66fd0824ec0ed55ef792fcf17fa8696a8be8d23abc417d3f65f7f (scratch /home/user/d379-build/b4/baseline_d08f3ec.txt; preserved in the matrix entry later)  [CMD `python3.11 -B -E -s d379_controls.py` @ d08f3ec → 210 passed, 27 failed]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- None  [GIT 37bce4c]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD/FORBIDDEN unchanged from entry 34 (no capture files, no 7th path, no D390 replay, no F)  [CONVERSATION 2026-10-02 Kai, "DO NOT capture."]
+
+### 4. Open questions
+
+- None yet; d379_controls.py rebuild is next  [GIT 37bce4c]
+
+### 5. Incidents and corrections
+
+- Pre-mutation proofs (before 8978384): HEAD == origin == d08f3ec5de4d…; 0 uncommitted; starting blobs stage_identity 714a2edc, passa d7738d60, run_h2_v12 f065479d, qualify 2ebeeb45, holdout 342c2920, d379_controls 9b66d46e; v4.5 sha f1cf053f… matches; retained interpreter 6068cf00… local and on its remote branch  [CMD `git rev-parse HEAD:<six paths>` → 6 blobs]
+- WIP 8978384 stage_identity: §22/F9 fail-closed stdlib; F10 cycle vs dangling; F7 startup bytecode flag; §8.1 instrument root; §10 verified-byte Census loader (S19, pre-registration, exec of verified bytes, cleanup on failure, dependency-expansion refusal); §11 classify_origin without repo_root; F8 loaded-stdlib membership; C1 strict validation by mode + strict parse; §9 build_stage_a + S16; §13 binder CLI + consumer with held anchor; §16 per-slot authority, coverage 17/17/0  [GIT 8978384]
+- Calibration with an INDEPENDENT known answer: derive_tree_paths on frozen tree 3abc9e9d reproduces D380 §6.6's measured 272 / 3af69867813d336f014931e2cfbad8fa4dae14df66cf8df25a5efb1ec2110b40  [CMD `SI.derive_tree_paths(kai-repair, 3abc9e9d…)` → 272, 3af69867…]
+- History oldest_* derivation taken from the code that produced D380's values (kai-pm/validity_binding_audit.py:225-226, `git log --reverse --format='%H %ad' --date=short`), applied at the subject commit; D380 itself does not define it  [FILE kai-pm/validity_binding_audit.py:225]
+- WIP 33eff94 passa + run_h2_v12: Census boundary before first Census import, Pass A uses installed objects; S16 before output; observed provenance; classification consumes Pass A only via the original binding + held anchor; slot-complete verification; new CLI --passa-stage-b/--expected-passa-binding-sha256/--census-package  [GIT 33eff94]
+- WIP 37bce4c qualify + holdout: qualifier own-runtime at entry; --stage-b + anchors; referenced Pass-A binding closes input slots; holdout plan_selection with independent uniqueness — direct check 9/9 incl. F12 both-sides duplicate REFUSE, NFC+NFD twin refused as "not NFC" (never "duplicate")  [CMD `plan_selection` direct cases → 9/9 PASS]
+- Fail-old finding for the matrix design: under the qualified interpreter D380-STDLIB-NEG-1 FAILS because the harness assumed the AMBIENT interpreter is the known-negative; the negative must name /usr/bin/python3.11 as its subject (86-C9/C10 same assumption)  [CMD `baseline_d08f3ec.txt` → FAIL D380-STDLIB-NEG-1]
+
+### 6. Next authorised step
+
+- Rebuild d379_controls.py: governed launcher + audit hook at entry (F13), static launch grammar, runtime launch observation, temp-state finally, parent-held anchors, fixtures via build_stage_a/binder, the full v4.5 §32 + v4.1 B5 matrix incl. the four ex-INC-34 limbs; then run, preserve output here, report, STOP  [CONVERSATION 2026-10-02 Kai, "Then execute the full v4.5 hostile matrix"]
+
+### 7. What I am unsure of
+
+- Whether every existing harness section survives the interface changes unchanged in intent; each will be re-run, and any lowered/removed case must be named, never silent  [GIT 37bce4c]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
