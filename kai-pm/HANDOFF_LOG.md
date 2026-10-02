@@ -5432,3 +5432,995 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-02T17:54:10Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-02T17:54:10Z  [CMD `date -u +%FT%TZ` → 2026-10-02T17:54:10Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 42a2599048d863ff9919a039a48cc208e547fe3e  [CMD `git rev-parse HEAD` → 42a2599048d863ff9919a039a48cc208e547fe3e]
+- tree: 8f247232cf4201ee25268a3a00c41243f6d79bb2  [CMD `git rev-parse HEAD^{tree}` → 8f247232cf4201ee25268a3a00c41243f6d79bb2]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 42a2599048d863ff9919a039a48cc208e547fe3e  [CMD `git ls-remote --heads origin` → 42a2599048d863ff9919a039a48cc208e547fe3e]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d08f3ec5de4d823011e66261c84c98a76371428e  [CMD `git ls-remote --heads origin` → d08f3ec5de4d823011e66261c84c98a76371428e]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 31  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 31]
+
+### 1. The four states
+
+- physical: RETAINED interpreter published at 78a31196402b6f8e1b770a6ca8bde214e4f2db21 on `refs/heads/claude/d379-retained-interpreter-1f30fc923df4b4f8` (permanent, public); the remote now carries 4 D379 locators (repair, e7a-synthetic, e7-evidence, retained-interpreter); repair branch d08f3ec unchanged  [CMD `git ls-remote … 'refs/heads/claude/d379-*'` → 4 refs]
+- authorised: retention-only — DONE; STOP  [CONVERSATION 2026-10-02 Dainius, "Authorised: retention only"]
+- evidence: RETENTION PUBLISHED_VERIFIED, 9/9 items  [CMD `python3 retain.py` → VERDICT RETENTION PUBLISHED_VERIFIED]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- None; executed under entry 31's authority  [CONVERSATION 2026-10-02 Dainius, "Authorised: retention only"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: everything after retention — INC-34 register closure, repair implementation, D390 replay, fixity F, capture, Stage A, candidate, holdout, blind 40, Item 8, merge  [CONVERSATION 2026-10-02 Kai, "This does not authorise a third build, repair implementation, INC-34 register closure"]
+
+### 4. Open questions
+
+- Next grant, owner Dainius/Kai: the v4.5 B4 repair stage (M4) and, separately, the INC-34 closure register action  [FILE kai-pm/D379_PLAN_V4_5.md:1741]
+
+### 5. Incidents and corrections
+
+- 22-hit CLOSED classification (classify_retention.py): re-scan of 8,069 files gave the same 22 paths as entry 30 (sets equal), 0 credential-value hits; 16 UPSTREAM_IDENTICAL (staged git blob == blob at the mapped Lib/ path of signed tree 2340a037: 14 certdata PEMs + test_httplib.py + test_urllib.py); 6 DERIVED_FROM_UPSTREAM (recompiling each proven parent with the QUALIFIED interpreter inside buildns A, CHECKED_HASH, the same optimize level and dfile, reproduced the staged .pyc byte-for-byte); 0 UNPROVEN. Built-in sensitivity: opt-2 recompiles to 819ce2d3…, distinct from opt-0/opt-1 696e61b1…  [CMD `python3 classify_retention.py` → closed True, 16/6/0]
+- Defect of mine, caught before it mattered: my first enumeration used `grep -v pyc` and silently dropped `pycakey.pem` (its name contains "pyc"), giving 21; entry 30's 22 was right. Re-enumerated from the raw records  [CMD `grep '^  P' retention_scan.txt | awk '{print $2}' | sort -u | wc -l` → 22]
+- Retained artefact: Build A staged tree, 8,403 entries (8,069 files, 8 symlinks, 326 dirs; modes file 0644 ×7,937 / 0755 ×132, dir 0755, symlink 0777; 0 empty dirs), 328,945,803 file bytes; push pack 73.17 MiB, 6,251 objects; visibility public at publish time  [CMD `grep 'Writing objects' win/retain/run.log` → 73.17 MiB]
+- Identity: commit 78a31196402b6f8e1b770a6ca8bde214e4f2db21, tree 6a7d138e7f6fd4bf40034fd6718af2661e261779, RETENTION_MANIFEST.json sha256 1f30fc923df4b4f823f7a56f292cf3b554d87d54b5728639163577d40d0023a3 (1,943,087 bytes, canonical JSON; binds E7b commit 2b3c034c… + manifest be946634…, executable 6068cf00…, H2_PY_STDLIB_V1 cad0d3a5…, §18 source, frozen E 6cb94963…, Q sha256 e071c5ab… / entry 30 @ 3e49cd9b, classification sha256 e8874066…). The dry run's tree was identical (6a7d138e…): deterministic composition  [CMD `cat win/retain/pending.json` → tree 6a7d138e7f6f]
+- Readback from a FRESH repository: orphan commit hashes to its id; manifest and classification bytes identical; tree paths 8,079 == manifest files+symlinks+2; 8,077 files+symlinks matched BOTH the manifest digest/size/mode class AND the physical staged bytes, 0 mismatches; NEG one flipped byte refused by the same check; placement vs d08f3ec clean. Independent route: GitHub contents API returned RETENTION_HIT_CLASSIFICATION.json with blob d4fde6771db323799e3a159f7755354d6b5d78d2 = local  [CMD `python3 retain.py` → 9/9 PASS]
+- Dry run first against a local bare remote: same 9/9; the earlier draft's negative control was vacuous (compared a zeroed digest) and was replaced before any run  [CMD `retain.py` (dry4) → VERDICT RETENTION PUBLISHED_VERIFIED]
+- Classification record, verbatim, sha256 e8874066cbdd9822a40a95ae04027c99189d3222b6e150a5d3549ce1b33092a9  [CMD `sha256sum win/retention_classification.json` → e8874066cbdd9822…]
+    BEGIN-VERBATIM retention_classification.json
+    {
+     "closed": true,
+     "counts": {
+      "DERIVED_FROM_UPSTREAM": 6,
+      "UNPROVEN": 0,
+      "UPSTREAM_IDENTICAL": 16
+     },
+     "credential_value_hits": 0,
+     "failures": [],
+     "files_scanned": 8069,
+     "pattern_hit_paths": 22,
+     "qualified_interpreter_sha256": "6068cf00c25bbe6b13b5ee09c831d7d4e385b63b84708a1b1b956bda1737c06f",
+     "records": [
+      {
+       "classification": "DERIVED_FROM_UPSTREAM",
+       "derivation_parent": "opt/d379-py311/lib/python3.11/test/test_httplib.py",
+       "optimize": 1,
+       "path": "opt/d379-py311/lib/python3.11/test/__pycache__/test_httplib.cpython-311.opt-1.pyc",
+       "patterns": [
+        "authorization_header"
+       ],
+       "recompiled_sha256": "696e61b10720a8b6c5c86a6875bdb7d07cab57ddba00ff8a315cee13450255ed",
+       "staged_blob": "d86389d6abb7cb141b9fe276896ca5eacd51630d",
+       "staged_sha256": "696e61b10720a8b6c5c86a6875bdb7d07cab57ddba00ff8a315cee13450255ed"
+      },
+      {
+       "classification": "DERIVED_FROM_UPSTREAM",
+       "derivation_parent": "opt/d379-py311/lib/python3.11/test/test_httplib.py",
+       "optimize": 2,
+       "path": "opt/d379-py311/lib/python3.11/test/__pycache__/test_httplib.cpython-311.opt-2.pyc",
+       "patterns": [
+        "authorization_header"
+       ],
+       "recompiled_sha256": "819ce2d38ee8b700c1fede394e47a583b07b2902a7a6654d3474c0ce0ae99fd1",
+       "staged_blob": "f37209151a3c1759291e391fec5e5b8340c44dd7",
+       "staged_sha256": "819ce2d38ee8b700c1fede394e47a583b07b2902a7a6654d3474c0ce0ae99fd1"
+      },
+      {
+       "classification": "DERIVED_FROM_UPSTREAM",
+       "derivation_parent": "opt/d379-py311/lib/python3.11/test/test_httplib.py",
+       "optimize": 0,
+       "path": "opt/d379-py311/lib/python3.11/test/__pycache__/test_httplib.cpython-311.pyc",
+       "patterns": [
+        "authorization_header"
+       ],
+       "recompiled_sha256": "696e61b10720a8b6c5c86a6875bdb7d07cab57ddba00ff8a315cee13450255ed",
+       "staged_blob": "d86389d6abb7cb141b9fe276896ca5eacd51630d",
+       "staged_sha256": "696e61b10720a8b6c5c86a6875bdb7d07cab57ddba00ff8a315cee13450255ed"
+      },
+      {
+       "classification": "DERIVED_FROM_UPSTREAM",
+       "derivation_parent": "opt/d379-py311/lib/python3.11/test/test_urllib.py",
+       "optimize": 1,
+       "path": "opt/d379-py311/lib/python3.11/test/__pycache__/test_urllib.cpython-311.opt-1.pyc",
+       "patterns": [
+        "authorization_header"
+       ],
+       "recompiled_sha256": "936ffe6d3abfafcbb0c12fc5eb714e2f164fea024aed01ebe1076faefd8cc51c",
+       "staged_blob": "7fdc41fa5c118c2d6ef4bc4a82f67d11bc5d1f3a",
+       "staged_sha256": "936ffe6d3abfafcbb0c12fc5eb714e2f164fea024aed01ebe1076faefd8cc51c"
+      },
+      {
+       "classification": "DERIVED_FROM_UPSTREAM",
+       "derivation_parent": "opt/d379-py311/lib/python3.11/test/test_urllib.py",
+       "optimize": 2,
+       "path": "opt/d379-py311/lib/python3.11/test/__pycache__/test_urllib.cpython-311.opt-2.pyc",
+       "patterns": [
+        "authorization_header"
+       ],
+       "recompiled_sha256": "3b496734f9383e37f94e1c91042d5ccae02deb61ce60c779e36e757b50203263",
+       "staged_blob": "5a141d3bfbafefd78a7cc5c0835bc5044ebe5711",
+       "staged_sha256": "3b496734f9383e37f94e1c91042d5ccae02deb61ce60c779e36e757b50203263"
+      },
+      {
+       "classification": "DERIVED_FROM_UPSTREAM",
+       "derivation_parent": "opt/d379-py311/lib/python3.11/test/test_urllib.py",
+       "optimize": 0,
+       "path": "opt/d379-py311/lib/python3.11/test/__pycache__/test_urllib.cpython-311.pyc",
+       "patterns": [
+        "authorization_header"
+       ],
+       "recompiled_sha256": "936ffe6d3abfafcbb0c12fc5eb714e2f164fea024aed01ebe1076faefd8cc51c",
+       "staged_blob": "7fdc41fa5c118c2d6ef4bc4a82f67d11bc5d1f3a",
+       "staged_sha256": "936ffe6d3abfafcbb0c12fc5eb714e2f164fea024aed01ebe1076faefd8cc51c"
+      },
+      {
+       "classification": "UPSTREAM_IDENTICAL",
+       "path": "opt/d379-py311/lib/python3.11/test/certdata/allsans.pem",
+       "patterns": [
+        "pem_private_key"
+       ],
+       "staged_blob": "e400e178a1f59944f70b6aae3e9e21398aaf76fe",
+       "staged_sha256": "b6e7f6eeef758dd9f2f3f2645029471f09b8a8eb25670045d9d91fd24c597629",
+       "upstream_blob": "e400e178a1f59944f70b6aae3e9e21398aaf76fe",
+       "upstream_path": "Lib/test/certdata/allsans.pem"
+      },
+      {
+       "classification": "UPSTREAM_IDENTICAL",
+       "path": "opt/d379-py311/lib/python3.11/test/certdata/badcert.pem",
+       "patterns": [
+        "pem_private_key"
+       ],
+       "staged_blob": "c4191460f9e5e67b74a0cb8882b90e6751b065e6",
+       "staged_sha256": "262a107916641c7f211ac5898c0177535cd0bdc5aa872cc6e883842694d8f521",
+       "upstream_blob": "c4191460f9e5e67b74a0cb8882b90e6751b065e6",
+       "upstream_path": "Lib/test/certdata/badcert.pem"
+      },
+      {
+       "classification": "UPSTREAM_IDENTICAL",
+       "path": "opt/d379-py311/lib/python3.11/test/certdata/badkey.pem",
+       "patterns": [
+        "pem_private_key"
+       ],
+       "staged_blob": "1c8a9557193c31135e93dc199ad2ede2ede565e0",
+       "staged_sha256": "81a04af69c7f806ec39ab2cac5f0fa7fa8beb6802601105355fb3e606151405d",
+       "upstream_blob": "1c8a9557193c31135e93dc199ad2ede2ede565e0",
+       "upstream_path": "Lib/test/certdata/badkey.pem"
+      },
+      {
+       "classification": "UPSTREAM_IDENTICAL",
+       "path": "opt/d379-py311/lib/python3.11/test/certdata/idnsans.pem",
+       "patterns": [
+        "pem_private_key"
+       ],
+       "staged_blob": "cbcac7818ddc67a56e886c27e95c8b5d69188b65",
+       "staged_sha256": "e018176ceda72da4521485d8143cfbf610179b33d90c4734eebc701f4122f2b2",
+       "upstream_blob": "cbcac7818ddc67a56e886c27e95c8b5d69188b65",
+       "upstream_path": "Lib/test/certdata/idnsans.pem"
+      },
+      {
+       "classification": "UPSTREAM_IDENTICAL",
+       "path": "opt/d379-py311/lib/python3.11/test/certdata/keycert.passwd.pem",
+       "patterns": [
+        "pem_private_key"
+       ],
+       "staged_blob": "c330c36d8f9fde0d9d7235dc7069e75b6b4c84d5",
+       "staged_sha256": "aa64d5312536a9db635df3b591992eee4d6e535169943d30ec5da07efc607401",
+       "upstream_blob": "c330c36d8f9fde0d9d7235dc7069e75b6b4c84d5",
+       "upstream_path": "Lib/test/certdata/keycert.passwd.pem"
+      },
+      {
+       "classification": "UPSTREAM_IDENTICAL",
+       "path": "opt/d379-py311/lib/python3.11/test/certdata/keycert.pem",
+       "patterns": [
+        "pem_private_key"
+       ],
+       "staged_blob": "0d398633739a51e750d705bc6410fa243a3f5384",
+       "staged_sha256": "cfd723672e8205a30f93aa14e24ef5b0264c41db367b50cfa0b6fcb83d881947",
+       "upstream_blob": "0d398633739a51e750d705bc6410fa243a3f5384",
+       "upstream_path": "Lib/test/certdata/keycert.pem"
+      },
+      {
+       "classification": "UPSTREAM_IDENTICAL",
+       "path": "opt/d379-py311/lib/python3.11/test/certdata/keycert2.pem",
+       "patterns": [
+        "pem_private_key"
+       ],
+       "staged_blob": "e59d45439d4b6dfee4f4759827977db596195bc2",
+       "staged_sha256": "3772f8e0b1d195a925ea83650aa433b41fc60f47bebecfe4df029c13351a1183",
+       "upstream_blob": "e59d45439d4b6dfee4f4759827977db596195bc2",
+       "upstream_path": "Lib/test/certdata/keycert2.pem"
+      },
+      {
+       "classification": "UPSTREAM_IDENTICAL",
+       "path": "opt/d379-py311/lib/python3.11/test/certdata/keycert3.pem",
+       "patterns": [
+        "pem_private_key"
+       ],
+       "staged_blob": "f6887ba7a84e1a7a0712102b0105028cc271ae13",
+       "staged_sha256": "16285baf776fd9abe7c58c629db7f5a9dd4c8fb6a5a9da4c0631437dfe0156d3",
+       "upstream_blob": "f6887ba7a84e1a7a0712102b0105028cc271ae13",
+       "upstream_path": "Lib/test/certdata/keycert3.pem"
+      },
+      {
+       "classification": "UPSTREAM_IDENTICAL",
+       "path": "opt/d379-py311/lib/python3.11/test/certdata/keycert4.pem",
+       "patterns": [
+        "pem_private_key"
+       ],
+       "staged_blob": "1003d67fd075ec58bd1f5bc8fc92bc7fdefbe1a8",
+       "staged_sha256": "1663266778f115c4273bd59940d635b3c5779b39672d57b4e1847cb3a0718dc1",
+       "upstream_blob": "1003d67fd075ec58bd1f5bc8fc92bc7fdefbe1a8",
+       "upstream_path": "Lib/test/certdata/keycert4.pem"
+      },
+      {
+       "classification": "UPSTREAM_IDENTICAL",
+       "path": "opt/d379-py311/lib/python3.11/test/certdata/keycertecc.pem",
+       "patterns": [
+        "pem_private_key"
+       ],
+       "staged_blob": "81daa4ccb94217b9d49c6f9162c1efe294d9ecab",
+       "staged_sha256": "fede78d1ae0cafe988ca047250e56bdd0c876b9183336ca2220824d4279f40fc",
+       "upstream_blob": "81daa4ccb94217b9d49c6f9162c1efe294d9ecab",
+       "upstream_path": "Lib/test/certdata/keycertecc.pem"
+      },
+      {
+       "classification": "UPSTREAM_IDENTICAL",
+       "path": "opt/d379-py311/lib/python3.11/test/certdata/nosan.pem",
+       "patterns": [
+        "pem_private_key"
+       ],
+       "staged_blob": "ec10cdcabb9e3558a95b3e60c135e341af73019c",
+       "staged_sha256": "2f2a37492a063495fd3e8f26bda891940b1cd10b5739f945e396e4228c9d93a8",
+       "upstream_blob": "ec10cdcabb9e3558a95b3e60c135e341af73019c",
+       "upstream_path": "Lib/test/certdata/nosan.pem"
+      },
+      {
+       "classification": "UPSTREAM_IDENTICAL",
+       "path": "opt/d379-py311/lib/python3.11/test/certdata/pycakey.pem",
+       "patterns": [
+        "pem_private_key"
+       ],
+       "staged_blob": "819bdef1ff9bfc77ee08a6b31a3aa37c1684c484",
+       "staged_sha256": "71b0f37c6ee95d539931e93cd51951db6cf4b7857403067ebc85fe7626e97a94",
+       "upstream_blob": "819bdef1ff9bfc77ee08a6b31a3aa37c1684c484",
+       "upstream_path": "Lib/test/certdata/pycakey.pem"
+      },
+      {
+       "classification": "UPSTREAM_IDENTICAL",
+       "path": "opt/d379-py311/lib/python3.11/test/certdata/ssl_key.passwd.pem",
+       "patterns": [
+        "pem_private_key"
+       ],
+       "staged_blob": "46de61ab85b1369394d240a20c8449430acdc373",
+       "staged_sha256": "c337a7f092ff03d6341594b9250b1ec3e6d47af23fafc0a2c6a0a1175ff9395b",
+       "upstream_blob": "46de61ab85b1369394d240a20c8449430acdc373",
+       "upstream_path": "Lib/test/certdata/ssl_key.passwd.pem"
+      },
+      {
+       "classification": "UPSTREAM_IDENTICAL",
+       "path": "opt/d379-py311/lib/python3.11/test/certdata/ssl_key.pem",
+       "patterns": [
+        "pem_private_key"
+       ],
+       "staged_blob": "1ea4578d81ecc4c73bf83bd98fc2b03ce5477f0b",
+       "staged_sha256": "7c371f54360f268521754635e89e0181dc07da4954f1d451a1a6784ff8dc05e2",
+       "upstream_blob": "1ea4578d81ecc4c73bf83bd98fc2b03ce5477f0b",
+       "upstream_path": "Lib/test/certdata/ssl_key.pem"
+      },
+      {
+       "classification": "UPSTREAM_IDENTICAL",
+       "path": "opt/d379-py311/lib/python3.11/test/test_httplib.py",
+       "patterns": [
+        "authorization_header"
+       ],
+       "staged_blob": "55363413b3b1407c48b4e4c0847a2de810dcb82d",
+       "staged_sha256": "31be1938e46007f37decffb1074dfad5f1f2dbda4d968ec6d781b56b7567d033",
+       "upstream_blob": "55363413b3b1407c48b4e4c0847a2de810dcb82d",
+       "upstream_path": "Lib/test/test_httplib.py"
+      },
+      {
+       "classification": "UPSTREAM_IDENTICAL",
+       "path": "opt/d379-py311/lib/python3.11/test/test_urllib.py",
+       "patterns": [
+        "authorization_header"
+       ],
+       "staged_blob": "497372a38e392a14fd79fc3bf5af31f324bb3e47",
+       "staged_sha256": "59d2e2f0e4fa20e2067af32082179d8e67eff5824b9bac7a73eaf09ea306b596",
+       "upstream_blob": "497372a38e392a14fd79fc3bf5af31f324bb3e47",
+       "upstream_path": "Lib/test/test_urllib.py"
+      }
+     ],
+     "schema": "D379_RETENTION_HIT_CLASSIFICATION_V1",
+     "upstream_commit": "2340a037f7450e70fccfe411e6531afb4d57a312"
+    }
+    END-VERBATIM retention_classification.json
+- INSTRUMENT classify_retention.py, verbatim, sha256 3e97e1fcb5acc40aa0904b97889eb9c1c2211dc38c5594b5015a3afccbbe681e  [CMD `sha256sum classify_retention.py` → 3e97e1fcb5acc40a…]
+    BEGIN-VERBATIM classify_retention.py
+    #!/usr/bin/env python3
+    """Exact closed classification of the retention pattern hits (Kai 2026-10-02). Outside the namespace.
+    
+    1. Re-scan bw/A/stage with secretscan's value + pattern layers; the hit population must equal
+       EXACTLY the 22 paths recorded in win/retention_scan.txt (entry 30); value hits must be 0.
+    2. Non-.pyc hit: staged git blob id == blob at the mapped path in the signed upstream tree
+       2340a037 (opt/d379-py311/lib/python3.11/<rel> <-> Lib/<rel>)  -> UPSTREAM_IDENTICAL.
+    3. .pyc hit: parent source <rel>.py must itself be a proven UPSTREAM_IDENTICAL hit, and recompiling
+       that staged parent with the QUALIFIED interpreter inside buildns A (same optimize level,
+       CHECKED_HASH, dfile=/opt/d379-py311/lib/python3.11/<rel>.py) must reproduce the staged .pyc
+       byte-for-byte -> DERIVED_FROM_UPSTREAM.
+    Any other outcome -> exit 1 (STOP). Output: win/retention_classification.json
+    """
+    import hashlib, importlib.util, json, os, re, subprocess, sys
+    
+    B = "/home/user/d379-build"; ROOT = f"{B}/bw/A/stage"; PFX = "opt/d379-py311/lib/python3.11/"
+    UPSTREAM = "2340a037f7450e70fccfe411e6531afb4d57a312"
+    spec = importlib.util.spec_from_file_location("s", f"{B}/secretscan.py"); s = importlib.util.module_from_spec(spec); spec.loader.exec_module(s)
+    blob = lambda b: hashlib.sha1(b"blob %d\0" % len(b) + b).hexdigest()
+    
+    vals = s.collect(); forms = {k: s.forms(v) for k, v in vals.items()}
+    hits, vhits, nfiles = {}, [], 0
+    for d, _, fs in os.walk(ROOT):
+        for n in fs:
+            p = os.path.join(d, n)
+            if os.path.islink(p):
+                continue
+            b = open(p, "rb").read(); nfiles += 1
+            rel = os.path.relpath(p, ROOT)
+            for k, fset in forms.items():
+                if any(f in b for f in fset):
+                    vhits.append((rel, k))
+            for pn, r in s.PATTERNS.items():
+                if r.search(b):
+                    hits.setdefault(rel, []).append(pn)
+    prior = {l.split()[1] for l in open(f"{B}/win/retention_scan.txt") if l.startswith("  P ")}
+    print(f"files scanned {nfiles}; collected credential values {len(vals)}; value hits {len(vhits)}")
+    print(f"pattern-hit paths now {len(hits)}; recorded in entry 30 {len(prior)}; sets equal {set(hits) == prior}")
+    fail = []
+    if vhits:
+        fail.append(f"credential value hits: {vhits}")
+    if set(hits) != prior:
+        fail.append(f"population changed: new {sorted(set(hits) - prior)} missing {sorted(prior - set(hits))}")
+    
+    up = {}
+    for line in subprocess.run(["git", "-C", f"{B}/src/cpython-tagcheck", "ls-tree", "-r", UPSTREAM],
+                               capture_output=True, text=True, check=True).stdout.splitlines():
+        meta, path = line.split("\t", 1); up[path] = meta.split()[2]
+    
+    recs, proven_src = [], {}
+    for rel in sorted(hits):
+        b = open(f"{ROOT}/{rel}", "rb").read()
+        r = {"path": rel, "patterns": hits[rel], "staged_sha256": hashlib.sha256(b).hexdigest(),
+             "staged_blob": blob(b)}
+        if not rel.endswith(".pyc"):
+            upath = "Lib/" + rel[len(PFX):] if rel.startswith(PFX) else None
+            r["upstream_path"] = upath; r["upstream_blob"] = up.get(upath)
+            if upath and up.get(upath) == r["staged_blob"]:
+                r["classification"] = "UPSTREAM_IDENTICAL"; proven_src[rel] = r
+            else:
+                r["classification"] = "UNPROVEN"
+        recs.append(r)
+    
+    pyc = [r for r in recs if r["path"].endswith(".pyc")]
+    jobs = []
+    for r in pyc:
+        m = re.fullmatch(r"(.*)/__pycache__/([^/]+)\.cpython-311(?:\.opt-([12]))?\.pyc", r["path"])
+        if not m:
+            r["classification"] = "UNPROVEN"; continue
+        parent = f"{m.group(1)}/{m.group(2)}.py"; opt = int(m.group(3) or 0)
+        r["derivation_parent"] = parent; r["optimize"] = opt
+        if parent not in proven_src:
+            r["classification"] = "UNPROVEN"; continue
+        jobs.append((r["path"], parent, opt))
+    code = ("import py_compile,hashlib,json,sys\n"
+            "jobs=json.loads(sys.argv[1]); out={}\n"
+            "for i,(p,parent,opt) in enumerate(jobs):\n"
+            "    c=f'/tmp/re{i}.pyc'\n"
+            "    py_compile.compile('/d379/stage/'+parent, cfile=c, dfile='/'+parent, optimize=opt,"
+            " invalidation_mode=py_compile.PycInvalidationMode.CHECKED_HASH, doraise=True)\n"
+            "    out[p]=hashlib.sha256(open(c,'rb').read()).hexdigest()\n"
+            "print(json.dumps(out))\n")
+    pr = subprocess.run([f"{B}/buildns.sh", "A", "1772499177", "/d379/stage/opt/d379-py311/bin/python3.11",
+                         "-E", "-s", "-c", code, json.dumps(jobs)], capture_output=True, text=True)
+    if pr.returncode:
+        fail.append(f"recompile failed rc={pr.returncode}: {pr.stderr[-300:]}")
+    re_sha = json.loads(pr.stdout) if pr.returncode == 0 else {}
+    for r in pyc:
+        if r["path"] in re_sha:
+            r["recompiled_sha256"] = re_sha[r["path"]]
+            r["classification"] = ("DERIVED_FROM_UPSTREAM" if re_sha[r["path"]] == r["staged_sha256"]
+                                   else "UNPROVEN")
+    bad = [r["path"] for r in recs if r.get("classification") not in ("UPSTREAM_IDENTICAL", "DERIVED_FROM_UPSTREAM")]
+    if bad:
+        fail.append(f"unclassified: {bad}")
+    if len(recs) != 22:
+        fail.append(f"population size {len(recs)} != 22")
+    res = {"schema": "D379_RETENTION_HIT_CLASSIFICATION_V1", "upstream_commit": UPSTREAM,
+           "qualified_interpreter_sha256": hashlib.sha256(open(f"{ROOT}/opt/d379-py311/bin/python3.11", "rb").read()).hexdigest(),
+           "files_scanned": nfiles, "credential_value_hits": len(vhits), "pattern_hit_paths": len(recs),
+           "counts": {c: sum(1 for r in recs if r.get("classification") == c)
+                      for c in ("UPSTREAM_IDENTICAL", "DERIVED_FROM_UPSTREAM", "UNPROVEN")},
+           "records": recs, "failures": fail, "closed": not fail}
+    open(f"{B}/win/retention_classification.json", "w").write(json.dumps(res, indent=1, sort_keys=True) + "\n")
+    print(json.dumps(res["counts"]), "closed:", res["closed"]); [print("FAIL:", f) for f in fail]
+    sys.exit(0 if not fail else 1)
+    END-VERBATIM classify_retention.py
+- INSTRUMENT retain.py, verbatim, sha256 861111a360c6bd6d01fffdaf87eae3e3dac0a4be1120934c0d5016537817066f  [CMD `sha256sum retain.py` → 861111a360c6bd6d…]
+    BEGIN-VERBATIM retain.py
+    #!/usr/bin/env python3
+    """D379 retention of the qualified interpreter (D390 §6; Kai 2026-10-02). Separate immutable Git object.
+    
+    Tree:  stage/<exact staged tree of Build A>        (raw blobs: --no-filters, no ignore, no attributes)
+           RETENTION_MANIFEST.json                    (canonical JSON; per-entry type/mode/size/sha256|target)
+           RETENTION_HIT_CLASSIFICATION.json          (the closed 22-hit classification, exact bytes)
+    Identity = (commit object id, sha256 of RETENTION_MANIFEST.json). Locator carries no authority.
+    Uses e7git for canonical/publish/fetch_fresh/remote_ref (unchanged). Log -> win/retain/run.log
+    """
+    import hashlib, json, os, stat, subprocess, sys
+    sys.path.insert(0, "/home/user/d379-build")
+    import e7git as G
+    if os.environ.get("D379_RETAIN_DRYRUN_REMOTE"):
+        G.REMOTE = os.environ["D379_RETAIN_DRYRUN_REMOTE"]  # dry run only; the real run never sets this
+    
+    B = "/home/user/d379-build"; ROOT = f"{B}/bw/A/stage"; W = os.environ.get("D379_RETAIN_DIR", f"{B}/win/retain"); os.makedirs(W)
+    LOG = open(f"{W}/run.log", "a"); RES = {"items": {}}
+    def log(*a):
+        s = " ".join(str(x) for x in a); print(s); LOG.write(s + "\n"); LOG.flush()
+    def item(k, ok, d):
+        RES["items"][k] = {"pass": bool(ok), "detail": d}; log(f"[{'PASS' if ok else 'FAIL'}] {k}: {d}"); return ok
+    def stop(r):
+        RES["verdict"] = f"STOP: {r}"; log("STOP —", r); json.dump(RES, open(f"{W}/result.json", "w"), indent=1, sort_keys=True); sys.exit(1)
+    
+    cls_bytes = open(f"{B}/win/retention_classification.json", "rb").read()
+    cls = json.loads(cls_bytes)
+    if not cls["closed"] or cls["counts"] != {"UPSTREAM_IDENTICAL": 16, "DERIVED_FROM_UPSTREAM": 6, "UNPROVEN": 0}:
+        stop("classification not closed")
+    q_sha = G.sha256(open(f"{B}/win/Q_A.json", "rb").read())
+    e7b = json.load(open(f"{B}/win/e7b/pending.json"))
+    
+    # 1. exact entry population of the staged tree
+    entries, files, links = [], [], []
+    for d, dirs, fs in os.walk(ROOT):
+        for n in sorted(dirs + fs):
+            p = os.path.join(d, n); rel = os.path.relpath(p, ROOT); st = os.lstat(p)
+            mode = oct(stat.S_IMODE(st.st_mode))
+            if stat.S_ISLNK(st.st_mode):
+                entries.append({"path": rel, "type": "symlink", "mode": mode, "target": os.readlink(p)}); links.append(rel)
+            elif stat.S_ISDIR(st.st_mode):
+                entries.append({"path": rel, "type": "dir", "mode": mode})
+            elif stat.S_ISREG(st.st_mode):
+                b = open(p, "rb").read()
+                entries.append({"path": rel, "type": "file", "mode": mode, "size": len(b), "sha256": G.sha256(b)}); files.append(rel)
+            else:
+                stop(f"unsupported type at {rel}")
+    entries.sort(key=lambda e: e["path"])
+    total = sum(e["size"] for e in entries if e["type"] == "file")
+    modes = {}
+    for e in entries:
+        modes[(e["type"], e["mode"])] = modes.get((e["type"], e["mode"]), 0) + 1
+    log(f"staged population: {len(entries)} entries ({len(files)} files, {len(links)} symlinks, "
+        f"{sum(1 for e in entries if e['type']=='dir')} dirs), {total} file bytes; modes {sorted(modes.items())}")
+    exe = next(e for e in entries if e["path"] == "opt/d379-py311/bin/python3.11")
+    if exe["sha256"] != "6068cf00c25bbe6b13b5ee09c831d7d4e385b63b84708a1b1b956bda1737c06f":
+        stop("staged executable is not the measured interpreter")
+    
+    manifest = {"schema": "D379_RETENTION_V1", "retained_build": "A",
+                "e7b_evidence": {"commit": e7b["commit"], "manifest_sha256": e7b["manifest_sha256"]},
+                "executable_sha256": exe["sha256"],
+                "h2_py_stdlib_v1": "cad0d3a5f02cf9c5112e1140b605cfb5078a5f18bf2bee276ddefadd7fdb8601",
+                "cpython_source": G.SOURCE_18,
+                "frozen_E_sha256": open(f"{B}/win/E_frozen.sha256").read().strip(),
+                "qualification": {"Q_sha256": q_sha, "verdict": "KNOWN_POSITIVE",
+                                  "record": "kai-pm/HANDOFF_LOG.md entry 30",
+                                  "handoff_commit": "3e49cd9b28dfd1e6befa46a793c471b3040d6e32"},
+                "hit_classification": {"path": "RETENTION_HIT_CLASSIFICATION.json", "sha256": G.sha256(cls_bytes),
+                                       "authorised_as": "public CPython test-fixture material (Kai 2026-10-02)"},
+                "stage_prefix": "stage/", "physical_root": ROOT, "canonical_root": "/d379/stage",
+                "git_representation": {"file_mode": "100755 if any exec bit else 100644; exact mode in entries",
+                                       "dirs": "implied by paths; exact modes in entries", "empty_dirs": 0},
+                "totals": {"entries": len(entries), "files": len(files), "symlinks": len(links), "file_bytes": total},
+                "entries": entries}
+    mb = G.canonical(manifest)
+    open(f"{W}/RETENTION_MANIFEST.json", "wb").write(mb)
+    log("manifest", len(mb), "bytes sha256", G.sha256(mb))
+    sc = subprocess.run(["python3", f"{B}/secretscan.py", f"{W}/RETENTION_MANIFEST.json", f"{B}/win/retention_classification.json"],
+                        capture_output=True, text=True)
+    log(sc.stdout.strip())
+    if not item("J-scan-manifest", sc.returncode == 0, f"rc={sc.returncode}"):
+        stop("hit in manifest/classification")
+    
+    # 2. compose ONCE (raw blobs, explicit index; no filters, ignore rules or attributes)
+    repo = f"{W}/compose"; os.makedirs(repo); G.git(repo, "init", "-q")
+    oids = G.git(repo, "hash-object", "-w", "--no-filters", "--stdin-paths",
+                 input=("\n".join(f"{ROOT}/{f}" for f in files) + "\n").encode()).stdout.decode().split()
+    assert len(oids) == len(files)
+    fmode = {e["path"]: e["mode"] for e in entries}
+    lines = [f"{'100755' if int(fmode[f], 8) & 0o111 else '100644'} {o}\tstage/{f}" for f, o in zip(files, oids)]
+    for l in links:
+        o = G.git(repo, "hash-object", "-w", "--stdin", input=os.readlink(f"{ROOT}/{l}").encode()).stdout.decode().strip()
+        lines.append(f"120000 {o}\tstage/{l}")
+    for name, b in (("RETENTION_MANIFEST.json", mb), ("RETENTION_HIT_CLASSIFICATION.json", cls_bytes)):
+        o = G.git(repo, "hash-object", "-w", "--stdin", input=b).stdout.decode().strip()
+        lines.append(f"100644 {o}\t{name}")
+    env = dict(os.environ, GIT_INDEX_FILE=f"{W}/index")
+    subprocess.run(["git", "-C", repo, "update-index", "--index-info"], input=("\n".join(lines) + "\n").encode(), env=env, check=True)
+    tree = subprocess.run(["git", "-C", repo, "write-tree"], env=env, capture_output=True, check=True).stdout.decode().strip()
+    commit = G.git(repo, "commit-tree", tree, "-m", "D379 retained qualified calibration interpreter (D390 §6). "
+                   "Build A, CPython v3.11.15; not a production runtime; no capture authority.").stdout.decode().strip()
+    rec = {"commit": commit, "tree": tree, "manifest_sha256": G.sha256(mb),
+           "locator": f"refs/heads/claude/d379-retained-interpreter-{G.sha256(mb)[:16]}"}
+    json.dump(rec, open(f"{W}/pending.json", "w"), indent=1, sort_keys=True)
+    log("COMPOSED commit", commit, "tree", tree, "manifest", rec["manifest_sha256"], "locator", rec["locator"],
+        "| index entries", len(lines))
+    
+    # 3. publish once (create-only), classify; retry the SAME oid once on FAILURE
+    st, oid = G.remote_ref(repo, rec["locator"]); log("pre-push ls-remote:", st, oid)
+    if st != "ABSENT":
+        stop(f"locator pre-state {st}")
+    for attempt in (1, 2):
+        pub = G.publish(repo, rec, rec["locator"])
+        log(f"publish attempt {attempt}: {pub['outcome']} rc {pub['push_rc']} ls_remote {pub['ls_remote']}")
+        log("push stderr (full):\n" + pub["push_stderr"])
+        if pub["outcome"] != "FAILURE":
+            break
+    if not item("G-publish", pub["outcome"] == "PUSHED_UNVERIFIED", f"{pub['outcome']} attempts {attempt}"):
+        stop(f"publication {pub['outcome']}")
+    
+    # 4. independent readback from a FRESH repository, by commit id
+    rb = G.fetch_fresh(f"{W}/readback", commit)
+    raw = G.git(rb, "cat-file", "commit", commit).stdout
+    item("B-commit-identity", G.git(rb, "hash-object", "-t", "commit", "--stdin", input=raw).stdout.decode().strip() == commit
+         and not any(l.startswith(b"parent ") for l in raw.split(b"\n\n", 1)[0].split(b"\n")), "orphan commit hashes to its id")
+    ls = {}
+    for line in G.git(rb, "ls-tree", "-r", commit).stdout.decode().splitlines():
+        meta, path = line.split("\t", 1); m, t, o = meta.split(); ls[path] = (m, o)
+    rmb = G.git(rb, "cat-file", "blob", f"{commit}:RETENTION_MANIFEST.json").stdout
+    item("M-manifest-identity", rmb == mb and G.sha256(rmb) == rec["manifest_sha256"], f"sha256 {G.sha256(rmb)}")
+    rcl = G.git(rb, "cat-file", "blob", f"{commit}:RETENTION_HIT_CLASSIFICATION.json").stdout
+    item("C-classification-bytes", rcl == cls_bytes, f"sha256 {G.sha256(rcl)}")
+    m = json.loads(rmb)
+    want = {f"stage/{e['path']}" for e in m["entries"] if e["type"] in ("file", "symlink")} | {"RETENTION_MANIFEST.json", "RETENTION_HIT_CLASSIFICATION.json"}
+    item("P-population", set(ls) == want, f"tree paths {len(ls)} == manifest file+symlink+2 {len(want)}")
+    def entry_ok(e, gm, data):
+        if e["type"] == "file":
+            return (G.sha256(data) == e["sha256"] and len(data) == e["size"]
+                    and gm == ("100755" if int(e["mode"], 8) & 0o111 else "100644")
+                    and data == open(f"{ROOT}/{e['path']}", "rb").read())
+        return gm == "120000" and data.decode() == e["target"]
+    bad, first = [], None
+    cat = subprocess.Popen(["git", "-C", rb, "cat-file", "--batch"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    for e in m["entries"]:
+        if e["type"] == "dir":
+            continue
+        gm, go = ls.get(f"stage/{e['path']}", (None, None))
+        cat.stdin.write((go + "\n").encode()); cat.stdin.flush()
+        hdr = cat.stdout.readline().split(); data = cat.stdout.read(int(hdr[2])); cat.stdout.read(1)
+        if first is None and e["type"] == "file" and len(data) > 0:
+            first = (e, gm, data)
+        if not entry_ok(e, gm, data):
+            bad.append(e["path"])
+    cat.stdin.close(); cat.wait()
+    item("A-byte-fidelity", not bad, f"{len([e for e in m['entries'] if e['type'] != 'dir'])} files+symlinks checked "
+         f"against manifest AND the physical staged bytes; mismatches {len(bad)} {bad[:3]}")
+    fe, fgm, fdata = first
+    flipped = bytearray(fdata); flipped[0] ^= 0x01
+    item("NEG one flipped byte refused by the same check", entry_ok(fe, fgm, fdata) and not entry_ok(fe, fgm, bytes(flipped)),
+         f"{fe['path']}: genuine bytes pass, one-byte-flipped bytes refused")
+    pl = G.placement(rb, commit, "d08f3ec5de4d823011e66261c84c98a76371428e") if G.git(
+        rb, "fetch", "-q", "--depth", "1", "--no-tags", G.REMOTE, "d08f3ec5de4d823011e66261c84c98a76371428e") else ["fetch failed"]
+    item("K2-placement", pl == [], f"vs repair HEAD: {pl}")
+    ok = all(v["pass"] for v in RES["items"].values())
+    RES.update(verdict="RETENTION PUBLISHED_VERIFIED" if ok else "STOP", **rec)
+    json.dump(RES, open(f"{W}/result.json", "w"), indent=1, sort_keys=True)
+    log("VERDICT:", RES["verdict"]); sys.exit(0 if ok else 1)
+    END-VERBATIM retain.py
+- Retention run log, base64 of exact bytes, sha256 0c1ff78d73bdc46dbe0b93d8b73a630b4bcff69d581c8ddab3446bc907e951cb  [CMD `sha256sum win/retain/run.log` → 0c1ff78d73bdc46d…]
+    BEGIN-BASE64 win/retain/run.log
+    c3RhZ2VkIHBvcHVsYXRpb246IDg0MDMgZW50cmllcyAoODA2OSBmaWxlcywgOCBzeW1saW5rcywg
+    MzI2IGRpcnMpLCAzMjg5NDU4MDMgZmlsZSBieXRlczsgbW9kZXMgWygoJ2RpcicsICcwbzc1NScp
+    LCAzMjYpLCAoKCdmaWxlJywgJzBvNjQ0JyksIDc5MzcpLCAoKCdmaWxlJywgJzBvNzU1JyksIDEz
+    MiksICgoJ3N5bWxpbmsnLCAnMG83NzcnKSwgOCldCm1hbmlmZXN0IDE5NDMwODcgYnl0ZXMgc2hh
+    MjU2IDFmMzBmYzkyM2RmNGI0ZjgyM2Y3YTU2ZjI5MmNmM2I1NTRkODdkNTRiNTcyODYzOTE2MzU3
+    N2Q0MGQwMDIzYTMKY29sbGVjdGVkIGNyZWRlbnRpYWwgdmFsdWVzOiA3IChBV1NfQUNDRVNTX0tF
+    WV9JRCwgQVdTX1NFQ1JFVF9BQ0NFU1NfS0VZLCBDTEFVREVfQ09ERV9NRVNTQUdJTkdfVE9LRU4s
+    IENMQVVERV9TRVNTSU9OX0lOR1JFU1NfVE9LRU5fRklMRSwgQ0xPVURTREtfQVVUSF9BQ0NFU1Nf
+    VE9LRU4sIEdIX1RPS0VOLCBHSVRIVUJfVE9LRU4pCi9ob21lL3VzZXIvZDM3OS1idWlsZC93aW4v
+    cmV0YWluL1JFVEVOVElPTl9NQU5JRkVTVC5qc29uOiAxOTQzMDg3IGJ5dGVzLCBoaXRzIDAKL2hv
+    bWUvdXNlci9kMzc5LWJ1aWxkL3dpbi9yZXRlbnRpb25fY2xhc3NpZmljYXRpb24uanNvbjogMTA2
+    MDAgYnl0ZXMsIGhpdHMgMApUT1RBTCBISVRTIDAKW1BBU1NdIEotc2Nhbi1tYW5pZmVzdDogcmM9
+    MApDT01QT1NFRCBjb21taXQgNzhhMzExOTY0MDJiNmY4ZTFiNzcwYTZjYThiZGUyMTRlNGYyZGIy
+    MSB0cmVlIDZhN2QxMzhlN2Y2ZmQ0YmY0MDAzNGZkNjcxOGFmMjY2MWUyNjE3NzkgbWFuaWZlc3Qg
+    MWYzMGZjOTIzZGY0YjRmODIzZjdhNTZmMjkyY2YzYjU1NGQ4N2Q1NGI1NzI4NjM5MTYzNTc3ZDQw
+    ZDAwMjNhMyBsb2NhdG9yIHJlZnMvaGVhZHMvY2xhdWRlL2QzNzktcmV0YWluZWQtaW50ZXJwcmV0
+    ZXItMWYzMGZjOTIzZGY0YjRmOCB8IGluZGV4IGVudHJpZXMgODA3OQpwcmUtcHVzaCBscy1yZW1v
+    dGU6IEFCU0VOVCBOb25lCnB1Ymxpc2ggYXR0ZW1wdCAxOiBQVVNIRURfVU5WRVJJRklFRCByYyAw
+    IGxzX3JlbW90ZSBbJ1BSRVNFTlQnLCAnNzhhMzExOTY0MDJiNmY4ZTFiNzcwYTZjYThiZGUyMTRl
+    NGYyZGIyMSddCnB1c2ggc3RkZXJyIChmdWxsKToKZmF0YWw6IGV4cGVjdGVkICdhY2tub3dsZWRn
+    bWVudHMnLCByZWNlaXZlZCAncGFja2ZpbGUnCndhcm5pbmc6IHB1c2ggbmVnb3RpYXRpb24gZmFp
+    bGVkOyBwcm9jZWVkaW5nIGFueXdheSB3aXRoIHB1c2gKRW51bWVyYXRpbmcgb2JqZWN0czogNjI1
+    MSwgZG9uZS4KQ291bnRpbmcgb2JqZWN0czogICAwJSAoMS82MjUxKQ1Db3VudGluZyBvYmplY3Rz
+    OiAgIDElICg2My82MjUxKQ1Db3VudGluZyBvYmplY3RzOiAgIDIlICgxMjYvNjI1MSkNQ291bnRp
+    bmcgb2JqZWN0czogICAzJSAoMTg4LzYyNTEpDUNvdW50aW5nIG9iamVjdHM6ICAgNCUgKDI1MS82
+    MjUxKQ1Db3VudGluZyBvYmplY3RzOiAgIDUlICgzMTMvNjI1MSkNQ291bnRpbmcgb2JqZWN0czog
+    ICA2JSAoMzc2LzYyNTEpDUNvdW50aW5nIG9iamVjdHM6ICAgNyUgKDQzOC82MjUxKQ1Db3VudGlu
+    ZyBvYmplY3RzOiAgIDglICg1MDEvNjI1MSkNQ291bnRpbmcgb2JqZWN0czogICA5JSAoNTYzLzYy
+    NTEpDUNvdW50aW5nIG9iamVjdHM6ICAxMCUgKDYyNi82MjUxKQ1Db3VudGluZyBvYmplY3RzOiAg
+    MTElICg2ODgvNjI1MSkNQ291bnRpbmcgb2JqZWN0czogIDEyJSAoNzUxLzYyNTEpDUNvdW50aW5n
+    IG9iamVjdHM6ICAxMyUgKDgxMy82MjUxKQ1Db3VudGluZyBvYmplY3RzOiAgMTQlICg4NzYvNjI1
+    MSkNQ291bnRpbmcgb2JqZWN0czogIDE1JSAoOTM4LzYyNTEpDUNvdW50aW5nIG9iamVjdHM6ICAx
+    NiUgKDEwMDEvNjI1MSkNQ291bnRpbmcgb2JqZWN0czogIDE3JSAoMTA2My82MjUxKQ1Db3VudGlu
+    ZyBvYmplY3RzOiAgMTglICgxMTI2LzYyNTEpDUNvdW50aW5nIG9iamVjdHM6ICAxOSUgKDExODgv
+    NjI1MSkNQ291bnRpbmcgb2JqZWN0czogIDIwJSAoMTI1MS82MjUxKQ1Db3VudGluZyBvYmplY3Rz
+    OiAgMjElICgxMzEzLzYyNTEpDUNvdW50aW5nIG9iamVjdHM6ICAyMiUgKDEzNzYvNjI1MSkNQ291
+    bnRpbmcgb2JqZWN0czogIDIzJSAoMTQzOC82MjUxKQ1Db3VudGluZyBvYmplY3RzOiAgMjQlICgx
+    NTAxLzYyNTEpDUNvdW50aW5nIG9iamVjdHM6ICAyNSUgKDE1NjMvNjI1MSkNQ291bnRpbmcgb2Jq
+    ZWN0czogIDI2JSAoMTYyNi82MjUxKQ1Db3VudGluZyBvYmplY3RzOiAgMjclICgxNjg4LzYyNTEp
+    DUNvdW50aW5nIG9iamVjdHM6ICAyOCUgKDE3NTEvNjI1MSkNQ291bnRpbmcgb2JqZWN0czogIDI5
+    JSAoMTgxMy82MjUxKQ1Db3VudGluZyBvYmplY3RzOiAgMzAlICgxODc2LzYyNTEpDUNvdW50aW5n
+    IG9iamVjdHM6ICAzMSUgKDE5MzgvNjI1MSkNQ291bnRpbmcgb2JqZWN0czogIDMyJSAoMjAwMS82
+    MjUxKQ1Db3VudGluZyBvYmplY3RzOiAgMzMlICgyMDYzLzYyNTEpDUNvdW50aW5nIG9iamVjdHM6
+    ICAzNCUgKDIxMjYvNjI1MSkNQ291bnRpbmcgb2JqZWN0czogIDM1JSAoMjE4OC82MjUxKQ1Db3Vu
+    dGluZyBvYmplY3RzOiAgMzYlICgyMjUxLzYyNTEpDUNvdW50aW5nIG9iamVjdHM6ICAzNyUgKDIz
+    MTMvNjI1MSkNQ291bnRpbmcgb2JqZWN0czogIDM4JSAoMjM3Ni82MjUxKQ1Db3VudGluZyBvYmpl
+    Y3RzOiAgMzklICgyNDM4LzYyNTEpDUNvdW50aW5nIG9iamVjdHM6ICA0MCUgKDI1MDEvNjI1MSkN
+    Q291bnRpbmcgb2JqZWN0czogIDQxJSAoMjU2My82MjUxKQ1Db3VudGluZyBvYmplY3RzOiAgNDIl
+    ICgyNjI2LzYyNTEpDUNvdW50aW5nIG9iamVjdHM6ICA0MyUgKDI2ODgvNjI1MSkNQ291bnRpbmcg
+    b2JqZWN0czogIDQ0JSAoMjc1MS82MjUxKQ1Db3VudGluZyBvYmplY3RzOiAgNDUlICgyODEzLzYy
+    NTEpDUNvdW50aW5nIG9iamVjdHM6ICA0NiUgKDI4NzYvNjI1MSkNQ291bnRpbmcgb2JqZWN0czog
+    IDQ3JSAoMjkzOC82MjUxKQ1Db3VudGluZyBvYmplY3RzOiAgNDglICgzMDAxLzYyNTEpDUNvdW50
+    aW5nIG9iamVjdHM6ICA0OSUgKDMwNjMvNjI1MSkNQ291bnRpbmcgb2JqZWN0czogIDUwJSAoMzEy
+    Ni82MjUxKQ1Db3VudGluZyBvYmplY3RzOiAgNTElICgzMTg5LzYyNTEpDUNvdW50aW5nIG9iamVj
+    dHM6ICA1MiUgKDMyNTEvNjI1MSkNQ291bnRpbmcgb2JqZWN0czogIDUzJSAoMzMxNC82MjUxKQ1D
+    b3VudGluZyBvYmplY3RzOiAgNTQlICgzMzc2LzYyNTEpDUNvdW50aW5nIG9iamVjdHM6ICA1NSUg
+    KDM0MzkvNjI1MSkNQ291bnRpbmcgb2JqZWN0czogIDU2JSAoMzUwMS82MjUxKQ1Db3VudGluZyBv
+    YmplY3RzOiAgNTclICgzNTY0LzYyNTEpDUNvdW50aW5nIG9iamVjdHM6ICA1OCUgKDM2MjYvNjI1
+    MSkNQ291bnRpbmcgb2JqZWN0czogIDU5JSAoMzY4OS82MjUxKQ1Db3VudGluZyBvYmplY3RzOiAg
+    NjAlICgzNzUxLzYyNTEpDUNvdW50aW5nIG9iamVjdHM6ICA2MSUgKDM4MTQvNjI1MSkNQ291bnRp
+    bmcgb2JqZWN0czogIDYyJSAoMzg3Ni82MjUxKQ1Db3VudGluZyBvYmplY3RzOiAgNjMlICgzOTM5
+    LzYyNTEpDUNvdW50aW5nIG9iamVjdHM6ICA2NCUgKDQwMDEvNjI1MSkNQ291bnRpbmcgb2JqZWN0
+    czogIDY1JSAoNDA2NC82MjUxKQ1Db3VudGluZyBvYmplY3RzOiAgNjYlICg0MTI2LzYyNTEpDUNv
+    dW50aW5nIG9iamVjdHM6ICA2NyUgKDQxODkvNjI1MSkNQ291bnRpbmcgb2JqZWN0czogIDY4JSAo
+    NDI1MS82MjUxKQ1Db3VudGluZyBvYmplY3RzOiAgNjklICg0MzE0LzYyNTEpDUNvdW50aW5nIG9i
+    amVjdHM6ICA3MCUgKDQzNzYvNjI1MSkNQ291bnRpbmcgb2JqZWN0czogIDcxJSAoNDQzOS82MjUx
+    KQ1Db3VudGluZyBvYmplY3RzOiAgNzIlICg0NTAxLzYyNTEpDUNvdW50aW5nIG9iamVjdHM6ICA3
+    MyUgKDQ1NjQvNjI1MSkNQ291bnRpbmcgb2JqZWN0czogIDc0JSAoNDYyNi82MjUxKQ1Db3VudGlu
+    ZyBvYmplY3RzOiAgNzUlICg0Njg5LzYyNTEpDUNvdW50aW5nIG9iamVjdHM6ICA3NiUgKDQ3NTEv
+    NjI1MSkNQ291bnRpbmcgb2JqZWN0czogIDc3JSAoNDgxNC82MjUxKQ1Db3VudGluZyBvYmplY3Rz
+    OiAgNzglICg0ODc2LzYyNTEpDUNvdW50aW5nIG9iamVjdHM6ICA3OSUgKDQ5MzkvNjI1MSkNQ291
+    bnRpbmcgb2JqZWN0czogIDgwJSAoNTAwMS82MjUxKQ1Db3VudGluZyBvYmplY3RzOiAgODElICg1
+    MDY0LzYyNTEpDUNvdW50aW5nIG9iamVjdHM6ICA4MiUgKDUxMjYvNjI1MSkNQ291bnRpbmcgb2Jq
+    ZWN0czogIDgzJSAoNTE4OS82MjUxKQ1Db3VudGluZyBvYmplY3RzOiAgODQlICg1MjUxLzYyNTEp
+    DUNvdW50aW5nIG9iamVjdHM6ICA4NSUgKDUzMTQvNjI1MSkNQ291bnRpbmcgb2JqZWN0czogIDg2
+    JSAoNTM3Ni82MjUxKQ1Db3VudGluZyBvYmplY3RzOiAgODclICg1NDM5LzYyNTEpDUNvdW50aW5n
+    IG9iamVjdHM6ICA4OCUgKDU1MDEvNjI1MSkNQ291bnRpbmcgb2JqZWN0czogIDg5JSAoNTU2NC82
+    MjUxKQ1Db3VudGluZyBvYmplY3RzOiAgOTAlICg1NjI2LzYyNTEpDUNvdW50aW5nIG9iamVjdHM6
+    ICA5MSUgKDU2ODkvNjI1MSkNQ291bnRpbmcgb2JqZWN0czogIDkyJSAoNTc1MS82MjUxKQ1Db3Vu
+    dGluZyBvYmplY3RzOiAgOTMlICg1ODE0LzYyNTEpDUNvdW50aW5nIG9iamVjdHM6ICA5NCUgKDU4
+    NzYvNjI1MSkNQ291bnRpbmcgb2JqZWN0czogIDk1JSAoNTkzOS82MjUxKQ1Db3VudGluZyBvYmpl
+    Y3RzOiAgOTYlICg2MDAxLzYyNTEpDUNvdW50aW5nIG9iamVjdHM6ICA5NyUgKDYwNjQvNjI1MSkN
+    Q291bnRpbmcgb2JqZWN0czogIDk4JSAoNjEyNi82MjUxKQ1Db3VudGluZyBvYmplY3RzOiAgOTkl
+    ICg2MTg5LzYyNTEpDUNvdW50aW5nIG9iamVjdHM6IDEwMCUgKDYyNTEvNjI1MSkNQ291bnRpbmcg
+    b2JqZWN0czogMTAwJSAoNjI1MS82MjUxKSwgZG9uZS4KRGVsdGEgY29tcHJlc3Npb24gdXNpbmcg
+    dXAgdG8gNCB0aHJlYWRzCkNvbXByZXNzaW5nIG9iamVjdHM6ICAgMCUgKDEvNjEyNSkNQ29tcHJl
+    c3Npbmcgb2JqZWN0czogICAxJSAoNjIvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogICAyJSAo
+    MTIzLzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICAgMyUgKDE4NC82MTI1KQ1Db21wcmVzc2lu
+    ZyBvYmplY3RzOiAgIDQlICgyNDUvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogICA1JSAoMzA3
+    LzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICAgNiUgKDM2OC82MTI1KQ1Db21wcmVzc2luZyBv
+    YmplY3RzOiAgIDclICg0MjkvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogICA4JSAoNDkwLzYx
+    MjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICAgOSUgKDU1Mi82MTI1KQ1Db21wcmVzc2luZyBvYmpl
+    Y3RzOiAgMTAlICg2MTMvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDExJSAoNjc0LzYxMjUp
+    DUNvbXByZXNzaW5nIG9iamVjdHM6ICAxMiUgKDczNS82MTI1KQ1Db21wcmVzc2luZyBvYmplY3Rz
+    OiAgMTMlICg3OTcvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDE0JSAoODU4LzYxMjUpDUNv
+    bXByZXNzaW5nIG9iamVjdHM6ICAxNSUgKDkxOS82MTI1KQ1Db21wcmVzc2luZyBvYmplY3RzOiAg
+    MTYlICg5ODAvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDE3JSAoMTA0Mi82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgMTglICgxMTAzLzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICAx
+    OSUgKDExNjQvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDIwJSAoMTIyNS82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgMjElICgxMjg3LzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICAy
+    MiUgKDEzNDgvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDIzJSAoMTQwOS82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgMjQlICgxNDcwLzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICAy
+    NSUgKDE1MzIvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDI2JSAoMTU5My82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgMjclICgxNjU0LzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICAy
+    OCUgKDE3MTUvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDI5JSAoMTc3Ny82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgMzAlICgxODM4LzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICAz
+    MSUgKDE4OTkvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDMyJSAoMTk2MC82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgMzIlICgyMDEwLzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICAz
+    MyUgKDIwMjIvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDM0JSAoMjA4My82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgMzUlICgyMTQ0LzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICAz
+    NiUgKDIyMDUvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDM3JSAoMjI2Ny82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgMzglICgyMzI4LzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICAz
+    OSUgKDIzODkvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDQwJSAoMjQ1MC82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgNDElICgyNTEyLzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICA0
+    MiUgKDI1NzMvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDQzJSAoMjYzNC82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgNDQlICgyNjk1LzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICA0
+    NSUgKDI3NTcvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDQ2JSAoMjgxOC82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgNDclICgyODc5LzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICA0
+    OCUgKDI5NDAvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDQ5JSAoMzAwMi82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgNTAlICgzMDYzLzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICA1
+    MSUgKDMxMjQvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDUyJSAoMzE4NS82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgNTMlICgzMjQ3LzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICA1
+    NCUgKDMzMDgvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDU1JSAoMzM2OS82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgNTYlICgzNDMwLzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICA1
+    NyUgKDM0OTIvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDU4JSAoMzU1My82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgNTklICgzNjE0LzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICA2
+    MCUgKDM2NzUvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDYxJSAoMzczNy82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgNjIlICgzNzk4LzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICA2
+    MyUgKDM4NTkvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDY0JSAoMzkyMC82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgNjUlICgzOTgyLzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICA2
+    NiUgKDQwNDMvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDY2JSAoNDA3OC82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgNjclICg0MTA0LzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICA2
+    OCUgKDQxNjUvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDY5JSAoNDIyNy82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgNzAlICg0Mjg4LzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICA3
+    MSUgKDQzNDkvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDcyJSAoNDQxMC82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgNzMlICg0NDcyLzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICA3
+    NCUgKDQ1MzMvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDc1JSAoNDU5NC82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgNzYlICg0NjU1LzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICA3
+    NyUgKDQ3MTcvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDc4JSAoNDc3OC82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgNzklICg0ODM5LzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICA4
+    MCUgKDQ5MDAvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDgxJSAoNDk2Mi82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgODIlICg1MDIzLzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICA4
+    MyUgKDUwODQvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDg0JSAoNTE0NS82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgODUlICg1MjA3LzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICA4
+    NiUgKDUyNjgvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDg3JSAoNTMyOS82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgODglICg1MzkwLzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICA4
+    OSUgKDU0NTIvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDkwJSAoNTUxMy82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgOTElICg1NTc0LzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICA5
+    MiUgKDU2MzUvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDkzJSAoNTY5Ny82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgOTQlICg1NzU4LzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICA5
+    NSUgKDU4MTkvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDk2JSAoNTg4MC82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAgOTclICg1OTQyLzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6ICA5
+    OCUgKDYwMDMvNjEyNSkNQ29tcHJlc3Npbmcgb2JqZWN0czogIDk5JSAoNjA2NC82MTI1KQ1Db21w
+    cmVzc2luZyBvYmplY3RzOiAxMDAlICg2MTI1LzYxMjUpDUNvbXByZXNzaW5nIG9iamVjdHM6IDEw
+    MCUgKDYxMjUvNjEyNSksIGRvbmUuCldyaXRpbmcgb2JqZWN0czogICAwJSAoMS82MjUxKQ1Xcml0
+    aW5nIG9iamVjdHM6ICAgMCUgKDE2LzYyNTEpLCAzMjAuMDAgS2lCIHwgMTk5LjAwIEtpQi9zDVdy
+    aXRpbmcgb2JqZWN0czogICAwJSAoMTcvNjI1MSksIDMyMC4wMCBLaUIgfCAxOTkuMDAgS2lCL3MN
+    V3JpdGluZyBvYmplY3RzOiAgIDElICg2My82MjUxKSwgMzIwLjAwIEtpQiB8IDE5OS4wMCBLaUIv
+    cw1Xcml0aW5nIG9iamVjdHM6ICAgMiUgKDEyNi82MjUxKSwgMzIwLjAwIEtpQiB8IDE5OS4wMCBL
+    aUIvcw1Xcml0aW5nIG9iamVjdHM6ICAgMyUgKDE4OC82MjUxKSwgMzIwLjAwIEtpQiB8IDE5OS4w
+    MCBLaUIvcw1Xcml0aW5nIG9iamVjdHM6ICAgMyUgKDIxMi82MjUxKSwgOS44MCBNaUIgfCAyLjMw
+    IE1pQi9zICAgIA1Xcml0aW5nIG9iamVjdHM6ICAgNCUgKDI1MS82MjUxKSwgOS44MCBNaUIgfCAy
+    LjMwIE1pQi9zDVdyaXRpbmcgb2JqZWN0czogICA1JSAoMzEzLzYyNTEpLCA5LjgwIE1pQiB8IDIu
+    MzAgTWlCL3MNV3JpdGluZyBvYmplY3RzOiAgIDYlICgzNzYvNjI1MSksIDkuODAgTWlCIHwgMi4z
+    MCBNaUIvcw1Xcml0aW5nIG9iamVjdHM6ICAgNyUgKDQzOC82MjUxKSwgOS44MCBNaUIgfCAyLjMw
+    IE1pQi9zDVdyaXRpbmcgb2JqZWN0czogICA4JSAoNTAxLzYyNTEpLCA5LjgwIE1pQiB8IDIuMzAg
+    TWlCL3MNV3JpdGluZyBvYmplY3RzOiAgIDklICg1NjMvNjI1MSksIDkuODAgTWlCIHwgMi4zMCBN
+    aUIvcw1Xcml0aW5nIG9iamVjdHM6ICAxMCUgKDYyNi82MjUxKSwgMjYuNzggTWlCIHwgNS42MiBN
+    aUIvcw1Xcml0aW5nIG9iamVjdHM6ICAxMSUgKDY4OC82MjUxKSwgMjYuNzggTWlCIHwgNS42MiBN
+    aUIvcw1Xcml0aW5nIG9iamVjdHM6ICAxMiUgKDc1MS82MjUxKSwgMjYuNzggTWlCIHwgNS42MiBN
+    aUIvcw1Xcml0aW5nIG9iamVjdHM6ICAxMyUgKDgxMy82MjUxKSwgMjYuNzggTWlCIHwgNS42MiBN
+    aUIvcw1Xcml0aW5nIG9iamVjdHM6ICAxMyUgKDg1MC82MjUxKSwgMjYuNzggTWlCIHwgNS42MiBN
+    aUIvcw1Xcml0aW5nIG9iamVjdHM6ICAxNCUgKDg3Ni82MjUxKSwgMjYuNzggTWlCIHwgNS42MiBN
+    aUIvcw1Xcml0aW5nIG9iamVjdHM6ICAxNSUgKDkzOC82MjUxKSwgMjYuNzggTWlCIHwgNS42MiBN
+    aUIvcw1Xcml0aW5nIG9iamVjdHM6ICAxNiUgKDEwMDEvNjI1MSksIDI2Ljc4IE1pQiB8IDUuNjIg
+    TWlCL3MNV3JpdGluZyBvYmplY3RzOiAgMTclICgxMDYzLzYyNTEpLCAyNi43OCBNaUIgfCA1LjYy
+    IE1pQi9zDVdyaXRpbmcgb2JqZWN0czogIDE4JSAoMTEyNi82MjUxKSwgMjYuNzggTWlCIHwgNS42
+    MiBNaUIvcw1Xcml0aW5nIG9iamVjdHM6ICAxOSUgKDExODgvNjI1MSksIDI2Ljc4IE1pQiB8IDUu
+    NjIgTWlCL3MNV3JpdGluZyBvYmplY3RzOiAgMjAlICgxMjUxLzYyNTEpLCAyNi43OCBNaUIgfCA1
+    LjYyIE1pQi9zDVdyaXRpbmcgb2JqZWN0czogIDIxJSAoMTMxMy82MjUxKSwgMjYuNzggTWlCIHwg
+    NS42MiBNaUIvcw1Xcml0aW5nIG9iamVjdHM6ICAyMiUgKDEzNzYvNjI1MSksIDI2Ljc4IE1pQiB8
+    IDUuNjIgTWlCL3MNV3JpdGluZyBvYmplY3RzOiAgMjMlICgxNDM5LzYyNTEpLCAyNi43OCBNaUIg
+    fCA1LjYyIE1pQi9zDVdyaXRpbmcgb2JqZWN0czogIDI0JSAoMTUwMS82MjUxKSwgMjYuNzggTWlC
+    IHwgNS42MiBNaUIvcw1Xcml0aW5nIG9iamVjdHM6ICAyNSUgKDE1NjMvNjI1MSksIDI2Ljc4IE1p
+    QiB8IDUuNjIgTWlCL3MNV3JpdGluZyBvYmplY3RzOiAgMjYlICgxNjMwLzYyNTEpLCAyNi43OCBN
+    aUIgfCA1LjYyIE1pQi9zDVdyaXRpbmcgb2JqZWN0czogIDI3JSAoMTY4OC82MjUxKSwgMjYuNzgg
+    TWlCIHwgNS42MiBNaUIvcw1Xcml0aW5nIG9iamVjdHM6ICAyOCUgKDE3NTEvNjI1MSksIDMxLjE5
+    IE1pQiB8IDUuOTEgTWlCL3MNV3JpdGluZyBvYmplY3RzOiAgMjklICgxODEzLzYyNTEpLCAzMS4x
+    OSBNaUIgfCA1LjkxIE1pQi9zDVdyaXRpbmcgb2JqZWN0czogIDMwJSAoMTg3Ni82MjUxKSwgMzEu
+    MTkgTWlCIHwgNS45MSBNaUIvcw1Xcml0aW5nIG9iamVjdHM6ICAzMSUgKDE5MzgvNjI1MSksIDMx
+    LjE5IE1pQiB8IDUuOTEgTWlCL3MNV3JpdGluZyBvYmplY3RzOiAgMzIlICgyMDAxLzYyNTEpLCAz
+    MS4xOSBNaUIgfCA1LjkxIE1pQi9zDVdyaXRpbmcgb2JqZWN0czogIDMzJSAoMjA2My82MjUxKSwg
+    MzEuMTkgTWlCIHwgNS45MSBNaUIvcw1Xcml0aW5nIG9iamVjdHM6ICAzNCUgKDIxMjYvNjI1MSks
+    IDMxLjE5IE1pQiB8IDUuOTEgTWlCL3MNV3JpdGluZyBvYmplY3RzOiAgMzUlICgyMTg4LzYyNTEp
+    LCAzMS4xOSBNaUIgfCA1LjkxIE1pQi9zDVdyaXRpbmcgb2JqZWN0czogIDM2JSAoMjI1MS82MjUx
+    KSwgMzEuMTkgTWlCIHwgNS45MSBNaUIvcw1Xcml0aW5nIG9iamVjdHM6ICAzNyUgKDIzMTMvNjI1
+    MSksIDMxLjE5IE1pQiB8IDUuOTEgTWlCL3MNV3JpdGluZyBvYmplY3RzOiAgMzclICgyMzUwLzYy
+    NTEpLCAzOC42MSBNaUIgfCA2LjY3IE1pQi9zDVdyaXRpbmcgb2JqZWN0czogIDM4JSAoMjM3Ni82
+    MjUxKSwgMzguNjEgTWlCIHwgNi42NyBNaUIvcw1Xcml0aW5nIG9iamVjdHM6ICAzOSUgKDI0Mzgv
+    NjI1MSksIDQyLjI0IE1pQiB8IDYuNjggTWlCL3MNV3JpdGluZyBvYmplY3RzOiAgNDAlICgyNTAx
+    LzYyNTEpLCA0Mi4yNCBNaUIgfCA2LjY4IE1pQi9zDVdyaXRpbmcgb2JqZWN0czogIDQxJSAoMjU2
+    My82MjUxKSwgNDIuMjQgTWlCIHwgNi42OCBNaUIvcw1Xcml0aW5nIG9iamVjdHM6ICA0MiUgKDI2
+    MjYvNjI1MSksIDQyLjI0IE1pQiB8IDYuNjggTWlCL3MNV3JpdGluZyBvYmplY3RzOiAgNDMlICgy
+    Njg4LzYyNTEpLCA0Mi4yNCBNaUIgfCA2LjY4IE1pQi9zDVdyaXRpbmcgb2JqZWN0czogIDQ0JSAo
+    Mjc1MS82MjUxKSwgNDIuMjQgTWlCIHwgNi42OCBNaUIvcw1Xcml0aW5nIG9iamVjdHM6ICA0NSUg
+    KDI4MTMvNjI1MSksIDQyLjI0IE1pQiB8IDYuNjggTWlCL3MNV3JpdGluZyBvYmplY3RzOiAgNDYl
+    ICgyODc2LzYyNTEpLCA0Mi4yNCBNaUIgfCA2LjY4IE1pQi9zDVdyaXRpbmcgb2JqZWN0czogIDQ3
+    JSAoMjkzOC82MjUxKSwgNDIuMjQgTWlCIHwgNi42OCBNaUIvcw1Xcml0aW5nIG9iamVjdHM6ICA0
+    OCUgKDMwMDEvNjI1MSksIDQ3LjA4IE1pQiB8IDYuOTAgTWlCL3MNV3JpdGluZyBvYmplY3RzOiAg
+    NDglICgzMDEzLzYyNTEpLCA0Ny4wOCBNaUIgfCA2LjkwIE1pQi9zDVdyaXRpbmcgb2JqZWN0czog
+    IDQ5JSAoMzA2My82MjUxKSwgNDcuMDggTWlCIHwgNi45MCBNaUIvcw1Xcml0aW5nIG9iamVjdHM6
+    ICA1MCUgKDMxMjYvNjI1MSksIDQ3LjA4IE1pQiB8IDYuOTAgTWlCL3MNV3JpdGluZyBvYmplY3Rz
+    OiAgNTElICgzMTg5LzYyNTEpLCA1MS4wMiBNaUIgfCA2Ljk2IE1pQi9zDVdyaXRpbmcgb2JqZWN0
+    czogIDUyJSAoMzI1MS82MjUxKSwgNTEuMDIgTWlCIHwgNi45NiBNaUIvcw1Xcml0aW5nIG9iamVj
+    dHM6ICA1MyUgKDMzMTQvNjI1MSksIDUxLjAyIE1pQiB8IDYuOTYgTWlCL3MNV3JpdGluZyBvYmpl
+    Y3RzOiAgNTQlICgzMzc2LzYyNTEpLCA1MS4wMiBNaUIgfCA2Ljk2IE1pQi9zDVdyaXRpbmcgb2Jq
+    ZWN0czogIDU1JSAoMzQzOS82MjUxKSwgNTUuMzQgTWlCIHwgOC43OSBNaUIvcw1Xcml0aW5nIG9i
+    amVjdHM6ICA1NSUgKDM0NjgvNjI1MSksIDU1LjM0IE1pQiB8IDguNzkgTWlCL3MNV3JpdGluZyBv
+    YmplY3RzOiAgNTYlICgzNTAxLzYyNTEpLCA1NS4zNCBNaUIgfCA4Ljc5IE1pQi9zDVdyaXRpbmcg
+    b2JqZWN0czogIDU3JSAoMzU2NC82MjUxKSwgNTUuMzQgTWlCIHwgOC43OSBNaUIvcw1Xcml0aW5n
+    IG9iamVjdHM6ICA1OCUgKDM2MjYvNjI1MSksIDU5LjY2IE1pQiB8IDcuOTMgTWlCL3MNV3JpdGlu
+    ZyBvYmplY3RzOiAgNTklICgzNjg5LzYyNTEpLCA1OS42NiBNaUIgfCA3LjkzIE1pQi9zDVdyaXRp
+    bmcgb2JqZWN0czogIDYwJSAoMzc1MS82MjUxKSwgNTkuNjYgTWlCIHwgNy45MyBNaUIvcw1Xcml0
+    aW5nIG9iamVjdHM6ICA2MSUgKDM4MTQvNjI1MSksIDU5LjY2IE1pQiB8IDcuOTMgTWlCL3MNV3Jp
+    dGluZyBvYmplY3RzOiAgNjIlICgzODc2LzYyNTEpLCA1OS42NiBNaUIgfCA3LjkzIE1pQi9zDVdy
+    aXRpbmcgb2JqZWN0czogIDYzJSAoMzkzOS82MjUxKSwgNTkuNjYgTWlCIHwgNy45MyBNaUIvcw1X
+    cml0aW5nIG9iamVjdHM6ICA2NCUgKDQwMDEvNjI1MSksIDU5LjY2IE1pQiB8IDcuOTMgTWlCL3MN
+    V3JpdGluZyBvYmplY3RzOiAgNjUlICg0MDY0LzYyNTEpLCA1OS42NiBNaUIgfCA3LjkzIE1pQi9z
+    DVdyaXRpbmcgb2JqZWN0czogIDY2JSAoNDEyNi82MjUxKSwgNTkuNjYgTWlCIHwgNy45MyBNaUIv
+    cw1Xcml0aW5nIG9iamVjdHM6ICA2NyUgKDQxODkvNjI1MSksIDU5LjY2IE1pQiB8IDcuOTMgTWlC
+    L3MNV3JpdGluZyBvYmplY3RzOiAgNjglICg0MjUxLzYyNTEpLCA2My42NyBNaUIgfCAxMS43MyBN
+    aUIvcw1Xcml0aW5nIG9iamVjdHM6ICA2OCUgKDQzMTEvNjI1MSksIDYzLjY3IE1pQiB8IDExLjcz
+    IE1pQi9zDVdyaXRpbmcgb2JqZWN0czogIDY5JSAoNDMxNC82MjUxKSwgNjMuNjcgTWlCIHwgMTEu
+    NzMgTWlCL3MNV3JpdGluZyBvYmplY3RzOiAgNzAlICg0Mzc2LzYyNTEpLCA2My42NyBNaUIgfCAx
+    MS43MyBNaUIvcw1Xcml0aW5nIG9iamVjdHM6ICA3MSUgKDQ0MzkvNjI1MSksIDYzLjY3IE1pQiB8
+    IDExLjczIE1pQi9zDVdyaXRpbmcgb2JqZWN0czogIDcyJSAoNDUwMS82MjUxKSwgNjMuNjcgTWlC
+    IHwgMTEuNzMgTWlCL3MNV3JpdGluZyBvYmplY3RzOiAgNzMlICg0NTY0LzYyNTEpLCA2My42NyBN
+    aUIgfCAxMS43MyBNaUIvcw1Xcml0aW5nIG9iamVjdHM6ICA3NCUgKDQ2MjYvNjI1MSksIDYzLjY3
+    IE1pQiB8IDExLjczIE1pQi9zDVdyaXRpbmcgb2JqZWN0czogIDc1JSAoNDY4OS82MjUxKSwgNjMu
+    NjcgTWlCIHwgMTEuNzMgTWlCL3MNV3JpdGluZyBvYmplY3RzOiAgNzYlICg0NzUxLzYyNTEpLCA2
+    My42NyBNaUIgfCAxMS43MyBNaUIvcw1Xcml0aW5nIG9iamVjdHM6ICA3NyUgKDQ4MTQvNjI1MSks
+    IDYzLjY3IE1pQiB8IDExLjczIE1pQi9zDVdyaXRpbmcgb2JqZWN0czogIDc4JSAoNDg3Ni82MjUx
+    KSwgNjMuNjcgTWlCIHwgMTEuNzMgTWlCL3MNV3JpdGluZyBvYmplY3RzOiAgNzklICg0OTM5LzYy
+    NTEpLCA2My42NyBNaUIgfCAxMS43MyBNaUIvcw1Xcml0aW5nIG9iamVjdHM6ICA4MCUgKDUwMDEv
+    NjI1MSksIDYzLjY3IE1pQiB8IDExLjczIE1pQi9zDVdyaXRpbmcgb2JqZWN0czogIDgxJSAoNTA2
+    NC82MjUxKSwgNjMuNjcgTWlCIHwgMTEuNzMgTWlCL3MNV3JpdGluZyBvYmplY3RzOiAgODIlICg1
+    MTI2LzYyNTEpLCA2Ny4zNCBNaUIgfCA4LjgzIE1pQi9zIA1Xcml0aW5nIG9iamVjdHM6ICA4MyUg
+    KDUxODkvNjI1MSksIDY3LjM0IE1pQiB8IDguODMgTWlCL3MNV3JpdGluZyBvYmplY3RzOiAgODQl
+    ICg1MjUxLzYyNTEpLCA2Ny4zNCBNaUIgfCA4LjgzIE1pQi9zDVdyaXRpbmcgb2JqZWN0czogIDg1
+    JSAoNTMxNC82MjUxKSwgNjcuMzQgTWlCIHwgOC44MyBNaUIvcw1Xcml0aW5nIG9iamVjdHM6ICA4
+    NiUgKDUzNzYvNjI1MSksIDY3LjM0IE1pQiB8IDguODMgTWlCL3MNV3JpdGluZyBvYmplY3RzOiAg
+    ODclICg1NDM5LzYyNTEpLCA2Ny4zNCBNaUIgfCA4LjgzIE1pQi9zDVdyaXRpbmcgb2JqZWN0czog
+    IDg4JSAoNTUwMS82MjUxKSwgNjcuMzQgTWlCIHwgOC44MyBNaUIvcw1Xcml0aW5nIG9iamVjdHM6
+    ICA4OSUgKDU1NjQvNjI1MSksIDY3LjM0IE1pQiB8IDguODMgTWlCL3MNV3JpdGluZyBvYmplY3Rz
+    OiAgOTAlICg1NjI2LzYyNTEpLCA2Ny4zNCBNaUIgfCA4LjgzIE1pQi9zDVdyaXRpbmcgb2JqZWN0
+    czogIDkxJSAoNTY4OS82MjUxKSwgNjcuMzQgTWlCIHwgOC44MyBNaUIvcw1Xcml0aW5nIG9iamVj
+    dHM6ICA5MiUgKDU3NTEvNjI1MSksIDY3LjM0IE1pQiB8IDguODMgTWlCL3MNV3JpdGluZyBvYmpl
+    Y3RzOiAgOTMlICg1ODE0LzYyNTEpLCA2Ny4zNCBNaUIgfCA4LjgzIE1pQi9zDVdyaXRpbmcgb2Jq
+    ZWN0czogIDk0JSAoNTg3Ni82MjUxKSwgNjcuMzQgTWlCIHwgOC44MyBNaUIvcw1Xcml0aW5nIG9i
+    amVjdHM6ICA5NSUgKDU5MzkvNjI1MSksIDY3LjM0IE1pQiB8IDguODMgTWlCL3MNV3JpdGluZyBv
+    YmplY3RzOiAgOTYlICg2MDAxLzYyNTEpLCA3MS4yNyBNaUIgfCA4Ljc2IE1pQi9zDVdyaXRpbmcg
+    b2JqZWN0czogIDk3JSAoNjA2NC82MjUxKSwgNzEuMjcgTWlCIHwgOC43NiBNaUIvcw1Xcml0aW5n
+    IG9iamVjdHM6ICA5NyUgKDYwODQvNjI1MSksIDcxLjI3IE1pQiB8IDguNzYgTWlCL3MNV3JpdGlu
+    ZyBvYmplY3RzOiAgOTglICg2MTI2LzYyNTEpLCA3MS4yNyBNaUIgfCA4Ljc2IE1pQi9zDVdyaXRp
+    bmcgb2JqZWN0czogIDk5JSAoNjE4OS82MjUxKSwgNzEuMjcgTWlCIHwgOC43NiBNaUIvcw1Xcml0
+    aW5nIG9iamVjdHM6IDEwMCUgKDYyNTEvNjI1MSksIDcxLjI3IE1pQiB8IDguNzYgTWlCL3MNV3Jp
+    dGluZyBvYmplY3RzOiAxMDAlICg2MjUxLzYyNTEpLCA3My4xNyBNaUIgfCA3LjI1IE1pQi9zLCBk
+    b25lLgpUb3RhbCA2MjUxIChkZWx0YSA0ODEpLCByZXVzZWQgMCAoZGVsdGEgMCksIHBhY2stcmV1
+    c2VkIDAKcmVtb3RlOiBSZXNvbHZpbmcgZGVsdGFzOiAgIDAlICgwLzQ4MSkgICAgICAgIA1yZW1v
+    dGU6IFJlc29sdmluZyBkZWx0YXM6ICAgMSUgKDUvNDgxKSAgICAgICAgDXJlbW90ZTogUmVzb2x2
+    aW5nIGRlbHRhczogICAyJSAoMTAvNDgxKSAgICAgICAgDXJlbW90ZTogUmVzb2x2aW5nIGRlbHRh
+    czogICAzJSAoMTUvNDgxKSAgICAgICAgDXJlbW90ZTogUmVzb2x2aW5nIGRlbHRhczogICA0JSAo
+    MjAvNDgxKSAgICAgICAgDXJlbW90ZTogUmVzb2x2aW5nIGRlbHRhczogICA1JSAoMjUvNDgxKSAg
+    ICAgICAgDXJlbW90ZTogUmVzb2x2aW5nIGRlbHRhczogICA2JSAoMjkvNDgxKSAgICAgICAgDXJl
+    bW90ZTogUmVzb2x2aW5nIGRlbHRhczogICA3JSAoMzQvNDgxKSAgICAgICAgDXJlbW90ZTogUmVz
+    b2x2aW5nIGRlbHRhczogICA4JSAoMzkvNDgxKSAgICAgICAgDXJlbW90ZTogUmVzb2x2aW5nIGRl
+    bHRhczogICA5JSAoNDQvNDgxKSAgICAgICAgDXJlbW90ZTogUmVzb2x2aW5nIGRlbHRhczogIDEw
+    JSAoNDkvNDgxKSAgICAgICAgDXJlbW90ZTogUmVzb2x2aW5nIGRlbHRhczogIDExJSAoNTMvNDgx
+    KSAgICAgICAgDXJlbW90ZTogUmVzb2x2aW5nIGRlbHRhczogIDEyJSAoNTgvNDgxKSAgICAgICAg
+    DXJlbW90ZTogUmVzb2x2aW5nIGRlbHRhczogIDEzJSAoNjMvNDgxKSAgICAgICAgDXJlbW90ZTog
+    UmVzb2x2aW5nIGRlbHRhczogIDE0JSAoNjgvNDgxKSAgICAgICAgDXJlbW90ZTogUmVzb2x2aW5n
+    IGRlbHRhczogIDE1JSAoNzMvNDgxKSAgICAgICAgDXJlbW90ZTogUmVzb2x2aW5nIGRlbHRhczog
+    IDE2JSAoNzcvNDgxKSAgICAgICAgDXJlbW90ZTogUmVzb2x2aW5nIGRlbHRhczogIDE3JSAoODIv
+    NDgxKSAgICAgICAgDXJlbW90ZTogUmVzb2x2aW5nIGRlbHRhczogIDE4JSAoODcvNDgxKSAgICAg
+    ICAgDXJlbW90ZTogUmVzb2x2aW5nIGRlbHRhczogIDE5JSAoOTIvNDgxKSAgICAgICAgDXJlbW90
+    ZTogUmVzb2x2aW5nIGRlbHRhczogIDIwJSAoOTcvNDgxKSAgICAgICAgDXJlbW90ZTogUmVzb2x2
+    aW5nIGRlbHRhczogIDIxJSAoMTAyLzQ4MSkgICAgICAgIA1yZW1vdGU6IFJlc29sdmluZyBkZWx0
+    YXM6ICAyMiUgKDEwNi80ODEpICAgICAgICANcmVtb3RlOiBSZXNvbHZpbmcgZGVsdGFzOiAgMjMl
+    ICgxMTEvNDgxKSAgICAgICAgDXJlbW90ZTogUmVzb2x2aW5nIGRlbHRhczogIDI0JSAoMTE2LzQ4
+    MSkgICAgICAgIA1yZW1vdGU6IFJlc29sdmluZyBkZWx0YXM6ICAyNSUgKDEyMS80ODEpICAgICAg
+    ICANcmVtb3RlOiBSZXNvbHZpbmcgZGVsdGFzOiAgMjYlICgxMjYvNDgxKSAgICAgICAgDXJlbW90
+    ZTogUmVzb2x2aW5nIGRlbHRhczogIDI3JSAoMTMwLzQ4MSkgICAgICAgIA1yZW1vdGU6IFJlc29s
+    dmluZyBkZWx0YXM6ICAyOCUgKDEzNS80ODEpICAgICAgICANcmVtb3RlOiBSZXNvbHZpbmcgZGVs
+    dGFzOiAgMjklICgxNDAvNDgxKSAgICAgICAgDXJlbW90ZTogUmVzb2x2aW5nIGRlbHRhczogIDMw
+    JSAoMTQ1LzQ4MSkgICAgICAgIA1yZW1vdGU6IFJlc29sdmluZyBkZWx0YXM6ICAzMSUgKDE1MC80
+    ODEpICAgICAgICANcmVtb3RlOiBSZXNvbHZpbmcgZGVsdGFzOiAgMzIlICgxNTQvNDgxKSAgICAg
+    ICAgDXJlbW90ZTogUmVzb2x2aW5nIGRlbHRhczogIDMzJSAoMTU5LzQ4MSkgICAgICAgIA1yZW1v
+    dGU6IFJlc29sdmluZyBkZWx0YXM6ICAzNCUgKDE2NC80ODEpICAgICAgICANcmVtb3RlOiBSZXNv
+    bHZpbmcgZGVsdGFzOiAgMzUlICgxNjkvNDgxKSAgICAgICAgDXJlbW90ZTogUmVzb2x2aW5nIGRl
+    bHRhczogIDM2JSAoMTc0LzQ4MSkgICAgICAgIA1yZW1vdGU6IFJlc29sdmluZyBkZWx0YXM6ICAz
+    NyUgKDE3OC80ODEpICAgICAgICANcmVtb3RlOiBSZXNvbHZpbmcgZGVsdGFzOiAgMzglICgxODMv
+    NDgxKSAgICAgICAgDXJlbW90ZTogUmVzb2x2aW5nIGRlbHRhczogIDM5JSAoMTg4LzQ4MSkgICAg
+    ICAgIA1yZW1vdGU6IFJlc29sdmluZyBkZWx0YXM6ICA0MCUgKDE5My80ODEpICAgICAgICANcmVt
+    b3RlOiBSZXNvbHZpbmcgZGVsdGFzOiAgNDElICgxOTgvNDgxKSAgICAgICAgDXJlbW90ZTogUmVz
+    b2x2aW5nIGRlbHRhczogIDQyJSAoMjAzLzQ4MSkgICAgICAgIA1yZW1vdGU6IFJlc29sdmluZyBk
+    ZWx0YXM6ICA0MyUgKDIwNy80ODEpICAgICAgICANcmVtb3RlOiBSZXNvbHZpbmcgZGVsdGFzOiAg
+    NDQlICgyMTIvNDgxKSAgICAgICAgDXJlbW90ZTogUmVzb2x2aW5nIGRlbHRhczogIDQ1JSAoMjE3
+    LzQ4MSkgICAgICAgIA1yZW1vdGU6IFJlc29sdmluZyBkZWx0YXM6ICA0NiUgKDIyMi80ODEpICAg
+    ICAgICANcmVtb3RlOiBSZXNvbHZpbmcgZGVsdGFzOiAgNDclICgyMjcvNDgxKSAgICAgICAgDXJl
+    bW90ZTogUmVzb2x2aW5nIGRlbHRhczogIDQ4JSAoMjMxLzQ4MSkgICAgICAgIA1yZW1vdGU6IFJl
+    c29sdmluZyBkZWx0YXM6ICA0OSUgKDIzNi80ODEpICAgICAgICANcmVtb3RlOiBSZXNvbHZpbmcg
+    ZGVsdGFzOiAgNTAlICgyNDEvNDgxKSAgICAgICAgDXJlbW90ZTogUmVzb2x2aW5nIGRlbHRhczog
+    IDUxJSAoMjQ2LzQ4MSkgICAgICAgIA1yZW1vdGU6IFJlc29sdmluZyBkZWx0YXM6ICA1MiUgKDI1
+    MS80ODEpICAgICAgICANcmVtb3RlOiBSZXNvbHZpbmcgZGVsdGFzOiAgNTMlICgyNTUvNDgxKSAg
+    ICAgICAgDXJlbW90ZTogUmVzb2x2aW5nIGRlbHRhczogIDU0JSAoMjYwLzQ4MSkgICAgICAgIA1y
+    ZW1vdGU6IFJlc29sdmluZyBkZWx0YXM6ICA1NSUgKDI2NS80ODEpICAgICAgICANcmVtb3RlOiBS
+    ZXNvbHZpbmcgZGVsdGFzOiAgNTYlICgyNzAvNDgxKSAgICAgICAgDXJlbW90ZTogUmVzb2x2aW5n
+    IGRlbHRhczogIDU3JSAoMjc1LzQ4MSkgICAgICAgIA1yZW1vdGU6IFJlc29sdmluZyBkZWx0YXM6
+    ICA1OCUgKDI3OS80ODEpICAgICAgICANcmVtb3RlOiBSZXNvbHZpbmcgZGVsdGFzOiAgNTklICgy
+    ODQvNDgxKSAgICAgICAgDXJlbW90ZTogUmVzb2x2aW5nIGRlbHRhczogIDYwJSAoMjg5LzQ4MSkg
+    ICAgICAgIA1yZW1vdGU6IFJlc29sdmluZyBkZWx0YXM6ICA2MSUgKDI5NC80ODEpICAgICAgICAN
+    cmVtb3RlOiBSZXNvbHZpbmcgZGVsdGFzOiAgNjIlICgyOTkvNDgxKSAgICAgICAgDXJlbW90ZTog
+    UmVzb2x2aW5nIGRlbHRhczogIDYzJSAoMzA0LzQ4MSkgICAgICAgIA1yZW1vdGU6IFJlc29sdmlu
+    ZyBkZWx0YXM6ICA2NCUgKDMwOC80ODEpICAgICAgICANcmVtb3RlOiBSZXNvbHZpbmcgZGVsdGFz
+    OiAgNjUlICgzMTMvNDgxKSAgICAgICAgDXJlbW90ZTogUmVzb2x2aW5nIGRlbHRhczogIDY2JSAo
+    MzE4LzQ4MSkgICAgICAgIA1yZW1vdGU6IFJlc29sdmluZyBkZWx0YXM6ICA2NyUgKDMyMy80ODEp
+    ICAgICAgICANcmVtb3RlOiBSZXNvbHZpbmcgZGVsdGFzOiAgNjglICgzMjgvNDgxKSAgICAgICAg
+    DXJlbW90ZTogUmVzb2x2aW5nIGRlbHRhczogIDY5JSAoMzMyLzQ4MSkgICAgICAgIA1yZW1vdGU6
+    IFJlc29sdmluZyBkZWx0YXM6ICA3MCUgKDMzNy80ODEpICAgICAgICANcmVtb3RlOiBSZXNvbHZp
+    bmcgZGVsdGFzOiAgNzElICgzNDIvNDgxKSAgICAgICAgDXJlbW90ZTogUmVzb2x2aW5nIGRlbHRh
+    czogIDcyJSAoMzQ3LzQ4MSkgICAgICAgIA1yZW1vdGU6IFJlc29sdmluZyBkZWx0YXM6ICA3MyUg
+    KDM1Mi80ODEpICAgICAgICANcmVtb3RlOiBSZXNvbHZpbmcgZGVsdGFzOiAgNzQlICgzNTYvNDgx
+    KSAgICAgICAgDXJlbW90ZTogUmVzb2x2aW5nIGRlbHRhczogIDc1JSAoMzYxLzQ4MSkgICAgICAg
+    IA1yZW1vdGU6IFJlc29sdmluZyBkZWx0YXM6ICA3NiUgKDM2Ni80ODEpICAgICAgICANcmVtb3Rl
+    OiBSZXNvbHZpbmcgZGVsdGFzOiAgNzclICgzNzEvNDgxKSAgICAgICAgDXJlbW90ZTogUmVzb2x2
+    aW5nIGRlbHRhczogIDc4JSAoMzc2LzQ4MSkgICAgICAgIA1yZW1vdGU6IFJlc29sdmluZyBkZWx0
+    YXM6ICA3OSUgKDM4MC80ODEpICAgICAgICANcmVtb3RlOiBSZXNvbHZpbmcgZGVsdGFzOiAgODAl
+    ICgzODUvNDgxKSAgICAgICAgDXJlbW90ZTogUmVzb2x2aW5nIGRlbHRhczogIDgxJSAoMzkwLzQ4
+    MSkgICAgICAgIA1yZW1vdGU6IFJlc29sdmluZyBkZWx0YXM6ICA4MiUgKDM5NS80ODEpICAgICAg
+    ICANcmVtb3RlOiBSZXNvbHZpbmcgZGVsdGFzOiAgODMlICg0MDAvNDgxKSAgICAgICAgDXJlbW90
+    ZTogUmVzb2x2aW5nIGRlbHRhczogIDg0JSAoNDA1LzQ4MSkgICAgICAgIA1yZW1vdGU6IFJlc29s
+    dmluZyBkZWx0YXM6ICA4NSUgKDQwOS80ODEpICAgICAgICANcmVtb3RlOiBSZXNvbHZpbmcgZGVs
+    dGFzOiAgODYlICg0MTQvNDgxKSAgICAgICAgDXJlbW90ZTogUmVzb2x2aW5nIGRlbHRhczogIDg3
+    JSAoNDE5LzQ4MSkgICAgICAgIA1yZW1vdGU6IFJlc29sdmluZyBkZWx0YXM6ICA4OCUgKDQyNC80
+    ODEpICAgICAgICANcmVtb3RlOiBSZXNvbHZpbmcgZGVsdGFzOiAgODklICg0MjkvNDgxKSAgICAg
+    ICAgDXJlbW90ZTogUmVzb2x2aW5nIGRlbHRhczogIDkwJSAoNDMzLzQ4MSkgICAgICAgIA1yZW1v
+    dGU6IFJlc29sdmluZyBkZWx0YXM6ICA5MSUgKDQzOC80ODEpICAgICAgICANcmVtb3RlOiBSZXNv
+    bHZpbmcgZGVsdGFzOiAgOTIlICg0NDMvNDgxKSAgICAgICAgDXJlbW90ZTogUmVzb2x2aW5nIGRl
+    bHRhczogIDkzJSAoNDQ4LzQ4MSkgICAgICAgIA1yZW1vdGU6IFJlc29sdmluZyBkZWx0YXM6ICA5
+    NCUgKDQ1My80ODEpICAgICAgICANcmVtb3RlOiBSZXNvbHZpbmcgZGVsdGFzOiAgOTUlICg0NTcv
+    NDgxKSAgICAgICAgDXJlbW90ZTogUmVzb2x2aW5nIGRlbHRhczogIDk2JSAoNDYyLzQ4MSkgICAg
+    ICAgIA1yZW1vdGU6IFJlc29sdmluZyBkZWx0YXM6ICA5NyUgKDQ2Ny80ODEpICAgICAgICANcmVt
+    b3RlOiBSZXNvbHZpbmcgZGVsdGFzOiAgOTglICg0NzIvNDgxKSAgICAgICAgDXJlbW90ZTogUmVz
+    b2x2aW5nIGRlbHRhczogIDk5JSAoNDc3LzQ4MSkgICAgICAgIA1yZW1vdGU6IFJlc29sdmluZyBk
+    ZWx0YXM6IDEwMCUgKDQ4MS80ODEpICAgICAgICANcmVtb3RlOiBSZXNvbHZpbmcgZGVsdGFzOiAx
+    MDAlICg0ODEvNDgxKSwgZG9uZS4gICAgICAgIApyZW1vdGU6IApyZW1vdGU6IENyZWF0ZSBhIHB1
+    bGwgcmVxdWVzdCBmb3IgJ2NsYXVkZS9kMzc5LXJldGFpbmVkLWludGVycHJldGVyLTFmMzBmYzky
+    M2RmNGI0ZjgnIG9uIEdpdEh1YiBieSB2aXNpdGluZzogICAgICAgIApyZW1vdGU6ICAgICAgaHR0
+    cHM6Ly9naXRodWIuY29tL2RhaW5pdXMxMjM0L2thaS1zeXN0ZW0vcHVsbC9uZXcvY2xhdWRlL2Qz
+    NzktcmV0YWluZWQtaW50ZXJwcmV0ZXItMWYzMGZjOTIzZGY0YjRmOCAgICAgICAgCnJlbW90ZTog
+    CgpbUEFTU10gRy1wdWJsaXNoOiBQVVNIRURfVU5WRVJJRklFRCBhdHRlbXB0cyAxCltQQVNTXSBC
+    LWNvbW1pdC1pZGVudGl0eTogb3JwaGFuIGNvbW1pdCBoYXNoZXMgdG8gaXRzIGlkCltQQVNTXSBN
+    LW1hbmlmZXN0LWlkZW50aXR5OiBzaGEyNTYgMWYzMGZjOTIzZGY0YjRmODIzZjdhNTZmMjkyY2Yz
+    YjU1NGQ4N2Q1NGI1NzI4NjM5MTYzNTc3ZDQwZDAwMjNhMwpbUEFTU10gQy1jbGFzc2lmaWNhdGlv
+    bi1ieXRlczogc2hhMjU2IGU4ODc0MDY2Y2JkZDk4MjJhNDBhOTVhZTA0MDI3Yzk5MTg5ZDMyMjJi
+    NmUxNTBhNWQzNTQ5Y2UxYjMzMDkyYTkKW1BBU1NdIFAtcG9wdWxhdGlvbjogdHJlZSBwYXRocyA4
+    MDc5ID09IG1hbmlmZXN0IGZpbGUrc3ltbGluaysyIDgwNzkKW1BBU1NdIEEtYnl0ZS1maWRlbGl0
+    eTogODA3NyBmaWxlcytzeW1saW5rcyBjaGVja2VkIGFnYWluc3QgbWFuaWZlc3QgQU5EIHRoZSBw
+    aHlzaWNhbCBzdGFnZWQgYnl0ZXM7IG1pc21hdGNoZXMgMCBbXQpbUEFTU10gTkVHIG9uZSBmbGlw
+    cGVkIGJ5dGUgcmVmdXNlZCBieSB0aGUgc2FtZSBjaGVjazogb3B0L2QzNzktcHkzMTEvYmluLzJ0
+    bzMtMy4xMTogZ2VudWluZSBieXRlcyBwYXNzLCBvbmUtYnl0ZS1mbGlwcGVkIGJ5dGVzIHJlZnVz
+    ZWQKW1BBU1NdIEsyLXBsYWNlbWVudDogdnMgcmVwYWlyIEhFQUQ6IFtdClZFUkRJQ1Q6IFJFVEVO
+    VElPTiBQVUJMSVNIRURfVkVSSUZJRUQK
+    END-BASE64 win/retain/run.log
+
+### 6. Next authorised step
+
+- None. STOP after reporting  [CONVERSATION 2026-10-02 Kai, "read it back independently, prove byte fidelity and manifest identity, then STOP."]
+
+### 7. What I am unsure of
+
+- None beyond entry 30 §7 (PYTHON_FOR_REGEN not proven unused)  [GIT 3e49cd9b28dfd1e6befa46a793c471b3040d6e32]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
