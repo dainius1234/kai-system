@@ -6826,3 +6826,1674 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-02T23:13:28Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-02T23:13:27Z  [CMD `date -u +%FT%TZ` → 2026-10-02T23:13:27Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 5f19fc84b54479a5b6ce151e10d360be02f8bd01  [CMD `git rev-parse HEAD` → 5f19fc84b54479a5b6ce151e10d360be02f8bd01]
+- tree: a594dabcb3282f31d71b220a371892ec020df260  [CMD `git rev-parse HEAD^{tree}` → a594dabcb3282f31d71b220a371892ec020df260]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 5f19fc84b54479a5b6ce151e10d360be02f8bd01  [CMD `git ls-remote --heads origin` → 5f19fc84b54479a5b6ce151e10d360be02f8bd01]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: dbe692d9c3f83020176aeda00a0f399ce5f020f8  [CMD `git ls-remote --heads origin` → dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 36  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 36]
+
+### 1. The four states
+
+- physical: repair branch claude/d379-repair-eb52f73 at dbe692d (4/n: passa.py Option A), pushed; changed paths vs d08f3ec are exactly holdout.py, passa.py, qualify.py, run_h2_v12.py, stage_identity.py; d379_controls.py still untouched  [CMD `git -C /home/user/kai-repair diff --name-only d08f3ec HEAD` → 5 paths] [GIT dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- authorised: Option A only, its proof, then STOP before the controls rebuild and matrix; a bounded proposal for the two missing fact classes  [CONVERSATION 2026-10-02 Kai, "After the typing fix and clean-chain rerun, STOP."]
+- evidence: Option A fail-old/pass-new, registry-equality and loaded-origin evidence preserved verbatim in section 5 below  [CMD `python3 optA_proof.py` → rc 0]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-02 · B4 STOP ADJUDICATED: typing.io/typing.re Option A ACCEPTED, Option B REJECTED, classifier unchanged; NOMINAL_FUNCTION + SELF_ASSERTS_CURRENT FINDING UPHELD, BLOCKS B4 CLOSEOUT; after the typing fix STOP; bounded proposal first; no incident allocation yet. Verbatim below, 7001 bytes, sha256 eeb418d16a2b9f1e00db0459d8af7118f62a41e4998e793b8e1de4214d11d413, 4-space indent added ⚠ UNBANKED  [CONVERSATION 2026-10-02 Kai via Dainius, "KAI → ORION — B4 STOP ADJUDICATED"]
+    BEGIN-VERBATIM KAI-B4-STOP-RULING
+    I checked the live repository state before ruling.
+    
+    Entry 36 is present at signed/verified 5f19fc84b54479a5b6ce151e10d360be02f8bd01. The repair branch is exactly 37bce4cd89eca2312c79d71ce150630ef866f47a, three commits ahead of d08f3ec, and the only changed paths are five of the six authorised B4 files. d379_controls.py is still untouched. So Orion stopped at the right boundary.
+    
+    Ruling on the typing.io / typing.re blocker
+    
+    Option A is ACCEPTED. Option B is REJECTED.
+    
+    The accepted correction is deliberately minimal:
+    
+    remove the runtime typing dependency from passa.py and replace
+    class Binding(typing.NamedTuple)
+    with the already-available
+    Binding = collections.namedtuple("Binding", ["rationale", "subject_policy"]).
+    
+    collections is already imported, so this adds no new dependency.
+    
+    Why this is the correct fix: the two pseudo-modules are appearing only because Pass A imports typing to construct a two-field record. They are not part of the measurement subject. Removing an unnecessary dependency is preferable to weakening the origin classifier by teaching it a special exception for typing.io and typing.re.
+    
+    Do not modify the classification rule. The classifier is correct to refuse a loaded origin it cannot establish. Creating an exception for those pseudo-modules would reverse the INC-37/D385 fail-closed property.
+    
+    For the fix to close, Orion must prove all of these, not merely “Pass A now returns 0”:
+    
+    * the Binding registry still has exactly the same fields and values;
+    * validate_registry() still rejects malformed/non-Binding entries and unknown subject policies;
+    * no BINDING_PREDICATES semantics change;
+    * fail-old under the qualified interpreter reproduces the typing.io/typing.re refusal;
+    * pass-new executes the clean Pass-A chain;
+    * the producer, binder, classifier and qualifier processes have zero unexplained loaded origins after the correction.
+    
+    Preserve the full fail-old/pass-new output this time; do not leave the decisive evidence only in scratch space.
+    
+    The second finding is more serious than Orion framed it
+    
+    I do not accept the statement that the six FACT_CLASS_ABSENT findings are merely outside v4.5 or non-blocking because Q1b uses synthetic rows.
+    
+    This is a real correctness defect.
+    
+    The repository currently says all three of these things simultaneously:
+    
+    1. ontology.EVIDENCE_FACTS declares NOMINAL_FUNCTION and SELF_ASSERTS_CURRENT as governed evidence-fact classes.
+    2. qualify.q1b_denominators() deliberately derives its denominator from that governing schema and correctly reports a class missing from a real row as FACT_CLASS_ABSENT.
+    3. run_h2_v12.evidence_facts() emits only the other eight classes; those two are absent entirely.
+    
+    That means the real producer output is structurally incomplete. The qualifier is correct to exit 1.
+    
+    More importantly, the banked D367 contract explicitly requires both concepts: SELF_ASSERTS_CURRENT is part of the D5 validity evidence-fact set, and NOMINAL_FUNCTION is the evidence fact that replaces an unsupported FUNCTION verdict. D367 is banked authority and v4.5 itself says banked authority outranks the plan.
+    
+    So a synthetic Q1b fixture cannot excuse the real producer omitting two governed classes. Doing that would recreate the exact class of error this programme is trying to eliminate: the test passes while the actual producer violates the schema.
+    
+    Therefore B4 remains partially held
+    
+    Orion may now make only the approved typing correction, re-run the exact clean chain, preserve the evidence, and confirm the pseudo-module blocker is gone.
+    
+    Then STOP before rebuilding d379_controls.py or running the full hostile matrix.
+    
+    For the two missing evidence-fact classes, I want a very small source-backed repair proposal first. It must:
+    
+    * stay inside the existing authorised six-file surface;
+    * preferably touch run_h2_v12.py only for this defect;
+    * not modify classify.py, ontology.py, envelope.py or subjectbind.py;
+    * introduce no new predicate vocabulary or heuristic;
+    * derive both fact classes only from already-governed observations/predicates;
+    * produce a compliant D367 trace for any positive fact;
+    * emit the class explicitly as False when the governed observation is absent rather than omit the key;
+    * include fail-old/pass-new controls proving the real output has the complete evidence-fact population;
+    * show that adding the facts does not alter unrelated verdicts.
+    
+    I am deliberately not telling Orion to invent how SELF_ASSERTS_CURRENT or NOMINAL_FUNCTION should be detected. The existing code contains several related predicates, but choosing the wrong one would silently change semantics. He should trace their intended producers from D367 and the already-banked implementation history, then give me the exact mapping before changing those semantics.
+    
+    Also: do not allocate a new incident yet. Record this as a source-confirmed finding in the handoff. Once we have the exact root cause and correction boundary, we can decide whether the append-only ledger needs a separate incident.
+    
+    Send Orion:
+    
+    KAI → ORION — B4 STOP ADJUDICATED
+    
+    1. typing.io / typing.re: Option A ACCEPTED.
+    
+    In passa.py, remove the unnecessary runtime typing import and replace class Binding(typing.NamedTuple) with Binding = collections.namedtuple("Binding", ["rationale", "subject_policy"]). Do not change the origin classifier and do not add an exception for typing.io/typing.re.
+    
+    Prove fail-old/pass-new under the retained qualified interpreter, prove the Binding registry semantics are unchanged, and prove producer/binder/classifier/qualifier processes have no unexplained loaded origins. Preserve complete output durably.
+    
+    2. NOMINAL_FUNCTION + SELF_ASSERTS_CURRENT: FINDING UPHELD — BLOCKS B4 CLOSEOUT.
+    
+    They are governed evidence-fact classes in D367/ontology, while the real run_h2_v12.py producer omits them and the real qualifier correctly reports FACT_CLASS_ABSENT. Synthetic Q1b cases do not close a defect in real producer output.
+    
+    After the typing fix and clean-chain rerun, STOP. Do not rebuild d379_controls.py or execute the full hostile matrix yet.
+    
+    Prepare a bounded proposal showing, from banked D367 and existing governed code, the exact already-authorised observation that produces each missing fact and how its compliant trace is constructed. No new detector vocabulary, no classify.py/ontology.py/envelope.py/subjectbind.py mutation, no omitted false keys.
+    
+    Include fail-old/pass-new design proving every real row carries the complete governed evidence-fact schema without changing unrelated verdicts.
+    
+    No incident allocation, capture, D390 replay, fixity F, candidate, holdout, blind 40, Item 8 or PR #122 merge.
+    
+    Report and STOP for Kai.
+    
+    That keeps us moving on the mechanical dependency defect while preventing a second, semantics-bearing defect from being “fixed” by guesswork.
+    
+    Confidence: 0.99 on Option A; 0.99 that the two missing fact classes are a genuine blocker; 0.94 that their correction can remain inside run_h2_v12.py, pending the exact historical/contract mapping.
+    END-VERBATIM KAI-B4-STOP-RULING
+
+### 3. Authorised / Held / Forbidden
+
+- DONE: Option A in passa.py (one import removed; `Binding = collections.namedtuple("Binding", ["rationale", "subject_policy"])`), committed dbe692d and pushed  [GIT dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- HELD: d379_controls.py rebuild and the full hostile matrix, until Kai rules on the fact-class proposal  [CONVERSATION 2026-10-02 Kai, "Do not rebuild d379_controls.py or execute the full hostile matrix yet."]
+- FORBIDDEN: incident allocation, capture, D390 replay, fixity F, candidate, holdout, blind 40, Item 8, PR #122 merge  [CONVERSATION 2026-10-02 Kai, "No incident allocation, capture, D390 replay, fixity F, candidate, holdout, blind 40, Item 8 or PR #122 merge."]
+
+### 4. Open questions
+
+- PROPOSAL P1 NOMINAL_FUNCTION (run_h2_v12.py only). Observation: the existing governed predicate, cl.function(row, text)["observed"] starting "NOMINAL_FUNCTION=" (classify.py function(), the single-role branch; run_h2_v12.py:455 already tallies with this exact predicate). Positive only for one nominal role; no term, or the D11 >1-role ambiguity, emits False explicitly. Trace built from the SAME governed predicates classify used: the H1 line whose stripped text equals row title, else the cl.PURPOSE body line; witness_value = cl.term_match(...).group(0); selector L<n>; local_context = that whole line; scope SPAN; subject SELF; certainty OBSERVED. Needs ONE new TRACE_CLASS entry (a witness_type label, proposed "NOMINAL_FUNCTION_TERM", selector "L"): a trace-class name, not detector vocabulary, but new — owner: Kai  [FILE kai-repair:kai-pm/house_in_order_h2_v13/classify.py:404] [FILE kai-repair:kai-pm/house_in_order_h2_v13/run_h2_v12.py:455]
+- P1 calibration against a BANKED figure: on the frozen subject (Pass A f88e929b, tree 3abc9e9d, 272 rows) the existing predicate gives 207 positives = D368's banked "NOMINAL_FUNCTION (207 documents)"; 207 of 207 have a locatable trace (term in the cited line); 23 D11-ambiguous, 37 no term, 5 objective MARKER  [CMD `python3.11 -B -E -s facts_probe.py` → 207, traced 207, untraced 0] [D368]
+- PROPOSAL P2 SELF_ASSERTS_CURRENT — CANNOT meet "no new detector vocabulary" as stated: NO v1.3 governed module computes it (grep of the ten H2 sources for currentness finds no producer). Its only producer is v1.1 evidence.currentness_claims (CURRENT_POS 7 patterns, CURRENT_NEG 9, banked with D361 at 438007e). Options: (a) port that banked vocabulary verbatim into run_h2_v12.py with subject bound by the GOVERNED v1.3 subjectbind._sentences/bind_subject (D12-repaired), positive iff a SELF-bound positive and no SELF-bound negative (v1.1 conflict rule); trace = that sentence (selector L<n>, value = matched phrase, scope SPAN, subject SELF). (b) the governed currency-label DATE witness: a different proposition (dates, already CARRIES_DATE_STAMP/BINDING_CONTRADICTION). (c) emit False with no producer: asserts absence without observation. Orion recommends (a); the choice is Kai's — owner: Kai  [FILE /home/user/kai-system@438007e:kai-pm/house_in_order_h2_v11/evidence.py:31] [D361]
+- P2 calibration against a BANKED figure: option (a)-as-v1.1 (committed bytes) gives 6 = D364 §5 banked "SELF_ASSERTS_CURRENT (narrow, subject-bound) = 6"; option (a) with v1.3 bind_subject gives the SAME 6 documents (S1' only: [], S1 only: []); option (b) gives 154 (∩ S1 = 2). Not carried by (a): v1.1's quoted-vs-declaration rule (v1.3 _sentences has no quote flag); it changed nothing on this subject, and that is one subject  [CMD `python3.11 -B -E -s facts_probe.py` → S1 6, S1' 6, S2 154] [D364]
+- P3 shape: both keys ALWAYS emitted through the existing cand loop (False when not positive; A6-ii abstention if a trace is non-compliant). The FUNCTION cell is obtained by calling the same cl.function(row, text) inside run_h2_v12 before cl.classify recomputes it (deterministic; classify.py untouched). No change to classify.py, ontology.py, envelope.py, subjectbind.py; cal_fixtures.py does not read evidence_facts; qualify checks classes via run_h2_v12.TRACE_CLASS  [CMD `grep -n evidence_facts\|EVIDENCE_FACTS\|TRACE_CLASS cal_fixtures.py qualify.py classify.py holdout.py` → qualify only]
+- P4 controls (fail-old dbe692d / pass-new): FO real chain → qualifier FACT_CLASS_ABSENT = rows×2 (measured 6 on 3 rows); PN → 0, every row's evidence_facts key set == ont.EVIDENCE_FACTS (10); known-positive synthetic docs (single-role title; SELF "This document is the current …") → True with E1-compliant, class-ok traces; known-negatives (no term; two roles; "no longer current"; OTHER-bound "`X.md` is current"; conflicting self-claims) → False; corpus calibration 207 / 6 on the frozen subject; unrelated verdicts: all six axis cells and the other eight facts of all 272 frozen rows byte-identical pre vs post — owner: Kai  [CMD `facts_probe_out.txt` → 207, 6]
+
+### 5. Incidents and corrections
+
+- Option A proof, all under the retained qualified interpreter -B -E -s: registry semantics OLD(37bce4c)==NEW on all 10 compared keys (26 predicates, fields, lookups, 8 validate_registry probes incl. plain tuple and other namedtuple REFUSED, routes, policies); fail-old Pass A rc 1 on typing.io/typing.re; pass-new Pass A rc 0, binders rc 0, classification rc 0, qualifier [6] observed 87 classified 87 refused 0, [7] every slot closed, exit 1 only on 6 FACT_CLASS_ABSENT; origin-measured: producer, Pass-A binder, classifier, qualifier UNEXPLAINED LOADED ORIGINS 0 (classification binder not separately origin-measured)  [CMD `python3 optA_proof.py` → rc 0, see verbatim]
+- Own-instrument defect caught and corrected (R9 shape): the first measuring wrapper used runpy.run_path, which lazily imports pkgutil → functools.singledispatch → typing, so it planted typing.io/typing.re in every process it measured (run 2 showed 2 "unexplained" offenders even in the binder). Replaced by compile/exec into a fresh __main__; calibrated: empty script → only its own out-of-root __main__; typing script → __main__ + typing.io + typing.re. Run 2 output preserved below as superseded evidence; run 1 crashed on a directory-name collision in my orchestrator (FileExistsError), no measurement  [CMD `traceback of runpy.run_path` → pkgutil.py:184 → functools.py:842 `from typing import`]
+- Credential scan of all five evidence files: 0 hits  [CMD `secretscan.py <5 files>` → TOTAL HITS 0]
+- Verbatim evidence follows; each block adds a 4-space indent to every line; strip it to recover the file, which ends with a final LF where stated  [CMD `sha256sum` → as listed]
+- EVIDENCE OPTA-PROOF-INSTRUMENT optA_proof.py: 11962 bytes, sha256 643732525c67395589dd24377a9ad38382875e80d3997ae66c923678da59c77a, final LF True  [CMD `sha256sum optA_proof.py` → 643732525c673955…]
+    BEGIN-VERBATIM OPTA-PROOF-INSTRUMENT optA_proof.py
+    #!/usr/bin/env python3
+    """Option A proof (Kai 2026-10-02). Scratch orchestrator; every child runs
+    under the retained qualified interpreter with -B -E -s. Full child output is
+    printed (R10). OLD = passa.py etc. at 37bce4c, NEW = repair working tree."""
+    import hashlib, json, os, pathlib, shutil, subprocess, sys, tempfile
+    PY = "/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11"
+    R = pathlib.Path("/home/user/kai-repair")
+    H2 = "kai-pm/house_in_order_h2_v13"
+    CEN = R / "kai-pm/house_in_order_census_v11"
+    OLD_COMMIT = "37bce4cd89eca2312c79d71ce150630ef866f47a"
+    W = pathlib.Path(tempfile.mkdtemp(prefix="optA_"))
+    
+    def run(argv, label):
+        p = subprocess.run(argv, capture_output=True, text=True)
+        print(f"--- {label}  rc={p.returncode}  argv={' '.join(map(str, argv[:6]))}{' …' if len(argv) > 6 else ''}")
+        out = p.stdout + p.stderr
+        print(out, end="" if out.endswith("\n") or not out else "\n")
+        print(f"--- end {label} ({len(out.encode())} bytes)")
+        return p
+    
+    def git(*a, cwd=R):
+        return subprocess.run(["git", "-C", str(cwd), *a], capture_output=True, text=True, check=True).stdout
+    
+    # instrument trees: OLD from the committed blobs, NEW is the repository itself
+    old = W / "old"
+    for rel in [f"{H2}/{n}" for n in ("cal_fixtures.py","classify.py","envelope.py","holdout.py","ontology.py",
+                "passa.py","qualify.py","run_h2_v12.py","stage_identity.py","subjectbind.py")] + ["kai-pm/H2_REPAIR_CONTRACT_D367.md"]:
+        (old / rel).parent.mkdir(parents=True, exist_ok=True)
+        (old / rel).write_bytes(subprocess.run(["git", "-C", str(R), "show", f"{OLD_COMMIT}:{rel}"], capture_output=True, check=True).stdout)
+    TREES = {"OLD (37bce4c)": old, "NEW (working tree)": R}
+    print("instrument trees")
+    for k, t in TREES.items():
+        print(f"  {k:<20} {t}  passa.py sha256 {hashlib.sha256((t / H2 / 'passa.py').read_bytes()).hexdigest()}")
+    print(f"  repair HEAD {git('rev-parse', 'HEAD').strip()}; git diff --stat:\n{git('diff', '--stat')}")
+    
+    # ── 1. registry semantics, OLD vs NEW ────────────────────────────────
+    PROBE = r'''
+    import sys, json, collections
+    sys.path.insert(0, sys.argv[1])
+    import passa
+    B = passa.Binding
+    out = {"fields": list(B._fields), "is_tuple_subclass": issubclass(B, tuple),
+           "binding_predicates": [[k, v.rationale, v.subject_policy, isinstance(v, B), tuple(v) == (v.rationale, v.subject_policy)]
+                                  for k, v in passa.BINDING_PREDICATES.items()],
+           "contextual_predicates": [[k, (list(v) if isinstance(v, tuple) else v)] for k, v in passa.CONTEXTUAL_PREDICATES.items()],
+           "route_subject_policy": {str(k): v for k, v in passa.ROUTE_SUBJECT_POLICY.items()},
+           "subject_policies": list(passa.SUBJECT_POLICIES),
+           "validate_registry": passa.validate_registry(),
+           "lookups": {}, "rejections": {}}
+    for lab in ("audited snapshot", "findings-bearing snapshot", "subject", "acquisition commit", "validated checkpoint",
+                "snapshot", "measured at", "last updated", "reviewed", "date", "version", "created", "not a label"):
+        e = passa.registry_lookup(lab)
+        out["lookups"][lab] = None if e is None else [e.rationale, e.subject_policy]
+    Other = collections.namedtuple("Other", ["rationale", "subject_policy"])
+    cases = {"non-Binding string": "just a rationale string", "plain tuple": ("r", passa.POLICY_SELF),
+             "other namedtuple, same fields": Other("r", passa.POLICY_SELF),
+             "unknown policy": B("r", "NOT_A_POLICY"), "empty rationale": B("", passa.POLICY_SELF),
+             "None policy": B("r", None), "known-negative: well-formed": B("r", passa.POLICY_SELF),
+             "keyword construction": B(rationale="r", subject_policy=passa.POLICY_AMBIGUOUS)}
+    for name, entry in cases.items():
+        try:
+            passa.validate_registry({"x": entry}); out["rejections"][name] = "ACCEPTED"
+        except passa.SubjectPolicyError as e:
+            out["rejections"][name] = "REFUSED: " + str(e).split(" carries ")[0].split(" has ")[0][:40]
+    try:
+        passa._apply_policy("SOMETHING_ELSE"); out["unknown_apply_policy"] = "ACCEPTED"
+    except Exception as e:
+        out["unknown_apply_policy"] = "REFUSED " + type(e).__name__
+    out["typing_loaded"] = sorted(m for m in sys.modules if m == "typing" or m.startswith("typing."))
+    print(json.dumps(out, sort_keys=True))
+    '''
+    print("\n== 1. REGISTRY SEMANTICS — same probe, OLD vs NEW ==")
+    res = {}
+    for k, t in TREES.items():
+        p = run([PY, "-B", "-E", "-s", "-c", PROBE, str(t / H2)], f"registry probe {k}")
+        res[k] = json.loads(p.stdout)
+    o, n = res["OLD (37bce4c)"], res["NEW (working tree)"]
+    cmp_keys = [x for x in o if x != "typing_loaded"]
+    for key in cmp_keys:
+        print(f"  {key:<24} OLD==NEW {o[key] == n[key]}   sha256 {hashlib.sha256(json.dumps(o[key], sort_keys=True).encode()).hexdigest()[:16]} / {hashlib.sha256(json.dumps(n[key], sort_keys=True).encode()).hexdigest()[:16]}")
+    print(f"  binding_predicates entries {len(n['binding_predicates'])}, all isinstance Binding OLD {all(r[3] for r in o['binding_predicates'])} NEW {all(r[3] for r in n['binding_predicates'])}")
+    print(f"  rejections NEW: {json.dumps(n['rejections'], sort_keys=True)}")
+    print(f"  typing modules loaded after `import passa`: OLD {o['typing_loaded']}  NEW {n['typing_loaded']}")
+    REG_OK = all(o[k] == n[k] for k in cmp_keys)
+    print(f"  REGISTRY SEMANTICS UNCHANGED (every compared key equal): {REG_OK}")
+    
+    # ── 2. the clean chain, OLD vs NEW, plus loaded-origin measurement ────
+    WRAP = r'''
+    # MEASUREMENT WRAPPER v2. v1 used runpy.run_path, which lazily imports
+    # pkgutil -> functools.singledispatch -> typing, so the instrument itself
+    # loaded typing.io/typing.re into every process it measured (R9 shape).
+    # v2 imports nothing beyond what the interpreter has at startup plus `types`.
+    import sys, os, types
+    pre_typing = sorted(m for m in sys.modules if m == "typing" or m.startswith("typing."))
+    script = os.path.abspath(sys.argv[1]); sys.argv = sys.argv[1:]
+    sys.path[0] = os.path.dirname(script)          # what `python script.py` sets
+    m = types.ModuleType("__main__"); m.__file__ = script
+    sys.modules["__main__"] = m
+    rc = 0
+    try:
+        with open(script, "rb") as fh:
+            code = compile(fh.read(), script, "exec")
+        exec(code, m.__dict__)
+    except SystemExit as e:
+        rc = e.code if isinstance(e.code, int) else (0 if e.code is None else 1)
+        if not isinstance(e.code, int) and e.code is not None:
+            print(e.code, file=sys.stderr)
+    SI = sys.modules.get("stage_identity")
+    if SI is None:
+        import stage_identity as SI
+    members, offenders = SI.producer_population()
+    import collections
+    kinds = collections.Counter(c for c, _, _ in members)
+    print("ORIGIN MEASUREMENT (after the run, same process): members %d  %s" % (len(members), dict(sorted(kinds.items()))))
+    print("  typing modules present BEFORE the measured script ran: %s" % pre_typing)
+    for n, w in offenders:
+        print("  UNEXPLAINED offender %s: %s" % (n, w[:160]))
+    print("UNEXPLAINED LOADED ORIGINS: %d" % len(offenders))
+    sys.exit(rc)
+    '''
+    
+    
+    # ── wrapper calibration (I-8): known-negative and known-positive ─────
+    print("\n== 1b. MEASUREMENT WRAPPER CALIBRATION ==")
+    cw = W / "wrapcal"; cw.mkdir()
+    (cw / "empty_script.py").write_text(f"import sys; sys.path.insert(0, {str(R / H2)!r})\nx = 1\n")
+    (cw / "typing_script.py").write_text(f"import sys; sys.path.insert(0, {str(R / H2)!r})\nimport typing\nx = 1\n")
+    print("  expected: both report __main__ (the calibration script lies outside the instrument root);"
+          " ONLY typing_script.py additionally reports typing.io and typing.re")
+    for name in ("empty_script.py", "typing_script.py"):
+        run([PY, "-B", "-E", "-s", "-c", WRAP, str(cw / name)], f"wrapper calibration {name} (instrument root {R / H2})")
+    
+    def chain(label, tree):
+        print(f"\n== 2. CLEAN CHAIN — {label} ==")
+        d = W / ("chain_" + label.split()[0].lower())
+        d.mkdir()
+        S = d / "subj"; (S / "kai-pm").mkdir(parents=True)
+        subprocess.run(["git", "init", "-q", str(S)], check=True)
+        for i in range(3):
+            (S / f"kai-pm/SYNTH_{i}.md").write_text(f"# Synthetic {i}\n\n**Last updated:** 2026-07-21\n\nBody {i}.\n")
+        env = ["-c", "user.name=d", "-c", "user.email=d@l"]
+        subprocess.run(["git", "-C", str(S), "add", "-A"], check=True)
+        subprocess.run(["git", "-C", str(S), *env, "commit", "-qm", "one"], check=True)
+        with open(S / "kai-pm/SYNTH_0.md", "a") as fh: fh.write("more\n")
+        subprocess.run(["git", "-C", str(S), *env, "commit", "-qam", "two"], check=True)
+        V = tree / H2
+        run([PY, "-B", "-E", "-s", "-c",
+             f"import sys; sys.path.insert(0, {str(V)!r}); import stage_identity as SI\n"
+             f"SI.load_governed_census({str(CEN)!r})\n"
+             f"d = SI.build_stage_a('CALIBRATION', subject_repo={str(S)!r}, history_repo={str(S)!r})\n"
+             f"open({str(d / 'stage_a.json')!r}, 'xb').write(SI.canonical_bytes(d)); print('stage_a_identity', SI.stage_a_identity(d))"],
+            "Stage-A builder (calibration fixture)")
+        head = git("rev-parse", "HEAD", cwd=S).strip()
+        G = lambda script, *a: [PY, "-B", "-E", "-s", str(V / script), *a]
+        W_ = lambda script, *a: [PY, "-B", "-E", "-s", "-c", WRAP, str(V / script), *a]
+        pa_args = ["--subject-repo", str(S), "--history-repo", str(S), "--subject", head,
+                   "--census-package", str(CEN), "--stage-a", str(d / "stage_a.json")]
+        p = run(G("passa.py", *pa_args, "--out", str(d / "passA.json")), f"{label} PRODUCER passa.py")
+        run(W_("passa.py", *pa_args, "--out", str(d / "passA_measured.json")), f"{label} PRODUCER passa.py, origin-measured run")
+        if p.returncode != 0:
+            print(f"CHAIN STOPS: Pass A rc={p.returncode}; nothing downstream exists (R11)")
+            return {"passa_rc": p.returncode}
+        bind = lambda art, comp, out: G("stage_identity.py", "bind", "--artifact", str(art), "--component", comp,
+                                        "--stage-a", str(d / "stage_a.json"), "--producer-exit", "0", "--out", str(out))
+        pb = run(bind(d / "passA.json", "PASS_A", d / "passA.binding"), f"{label} BINDER Pass A")
+        PAB = pb.stdout.strip()
+        run([PY, "-B", "-E", "-s", "-c", WRAP, str(V / "stage_identity.py"), "bind", "--artifact", str(d / "passA.json"),
+             "--component", "PASS_A", "--stage-a", str(d / "stage_a.json"), "--producer-exit", "0",
+             "--out", str(d / "passA_measured.binding")], f"{label} BINDER Pass A, origin-measured run")
+        rh_args = ["--subject-repo", str(S), "--passa", str(d / "passA.json"), "--passa-stage-b", str(d / "passA.binding"),
+                   "--expected-passa-binding-sha256", PAB, "--census-package", str(CEN), "--stage-a", str(d / "stage_a.json")]
+        rc = run(G("run_h2_v12.py", *rh_args, "--out", str(d / "result.json")), f"{label} CLASSIFIER run_h2_v12.py")
+        run(W_("run_h2_v12.py", *rh_args, "--out", str(d / "result_measured.json")), f"{label} CLASSIFIER, origin-measured run")
+        cb = run(bind(d / "result.json", "CLASSIFICATION", d / "result.binding"), f"{label} BINDER classification")
+        CB = cb.stdout.strip()
+        desc = json.loads((d / "stage_a.json").read_bytes())
+        (d / "MANIFEST.sha256").write_text("".join(f"{m['sha256']}  {pathlib.Path(m['path']).name}\n" for m in desc["h2_sources"]))
+        q_args = ["--result", str(d / "result.json"), "--stage-a", str(d / "stage_a.json"), "--manifest", str(d / "MANIFEST.sha256"),
+                  "--stage-b", str(d / "result.binding"), "--expected-binding-sha256", CB, "--passa-stage-b", str(d / "passA.binding"),
+                  "--expected-passa-binding-sha256", PAB, "--census-package", str(CEN)]
+        q = run(G("qualify.py", *q_args), f"{label} QUALIFIER qualify.py")
+        run(W_("qualify.py", *q_args), f"{label} QUALIFIER, origin-measured run")
+        return {"passa_rc": p.returncode, "run_h2_rc": rc.returncode, "qualify_rc": q.returncode}
+    
+    summary = {}
+    for k, t in TREES.items():
+        summary[k] = chain(k, t)
+    print("\n== SUMMARY ==")
+    print(json.dumps(summary, indent=1))
+    shutil.rmtree(W)
+    print(f"temp root {W} removed")
+    END-VERBATIM OPTA-PROOF-INSTRUMENT optA_proof.py
+- EVIDENCE OPTA-PROOF-OUTPUT optA_proof_out.txt: 47646 bytes, sha256 53876371726bb15d39b5673c759681d9660f4da06be0b1e07e79f45b1b781c9b, final LF True  [CMD `sha256sum optA_proof_out.txt` → 53876371726bb15d…]
+    BEGIN-VERBATIM OPTA-PROOF-OUTPUT optA_proof_out.txt
+    instrument trees
+      OLD (37bce4c)        /tmp/optA_1ydlkq7g/old  passa.py sha256 00e4911e68acfdb52131d14b3daaf042bbde77e06d66c8a3bef8863b7de081f9
+      NEW (working tree)   /home/user/kai-repair  passa.py sha256 63cad38be0a38039621bf32baf3e5a41bda5f2b053a19da81af7f94812a60f50
+      repair HEAD 37bce4cd89eca2312c79d71ce150630ef866f47a; git diff --stat:
+     kai-pm/house_in_order_h2_v13/passa.py | 10 ++++++----
+     1 file changed, 6 insertions(+), 4 deletions(-)
+    
+    
+    == 1. REGISTRY SEMANTICS — same probe, OLD vs NEW ==
+    --- registry probe OLD (37bce4c)  rc=0  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s -c 
+    import sys, json, collections
+    sys.path.insert(0, sys.argv[1])
+    import passa
+    B = passa.Binding
+    out = {"fields": list(B._fields), "is_tuple_subclass": issubclass(B, tuple),
+           "binding_predicates": [[k, v.rationale, v.subject_policy, isinstance(v, B), tuple(v) == (v.rationale, v.subject_policy)]
+                                  for k, v in passa.BINDING_PREDICATES.items()],
+           "contextual_predicates": [[k, (list(v) if isinstance(v, tuple) else v)] for k, v in passa.CONTEXTUAL_PREDICATES.items()],
+           "route_subject_policy": {str(k): v for k, v in passa.ROUTE_SUBJECT_POLICY.items()},
+           "subject_policies": list(passa.SUBJECT_POLICIES),
+           "validate_registry": passa.validate_registry(),
+           "lookups": {}, "rejections": {}}
+    for lab in ("audited snapshot", "findings-bearing snapshot", "subject", "acquisition commit", "validated checkpoint",
+                "snapshot", "measured at", "last updated", "reviewed", "date", "version", "created", "not a label"):
+        e = passa.registry_lookup(lab)
+        out["lookups"][lab] = None if e is None else [e.rationale, e.subject_policy]
+    Other = collections.namedtuple("Other", ["rationale", "subject_policy"])
+    cases = {"non-Binding string": "just a rationale string", "plain tuple": ("r", passa.POLICY_SELF),
+             "other namedtuple, same fields": Other("r", passa.POLICY_SELF),
+             "unknown policy": B("r", "NOT_A_POLICY"), "empty rationale": B("", passa.POLICY_SELF),
+             "None policy": B("r", None), "known-negative: well-formed": B("r", passa.POLICY_SELF),
+             "keyword construction": B(rationale="r", subject_policy=passa.POLICY_AMBIGUOUS)}
+    for name, entry in cases.items():
+        try:
+            passa.validate_registry({"x": entry}); out["rejections"][name] = "ACCEPTED"
+        except passa.SubjectPolicyError as e:
+            out["rejections"][name] = "REFUSED: " + str(e).split(" carries ")[0].split(" has ")[0][:40]
+    try:
+        passa._apply_policy("SOMETHING_ELSE"); out["unknown_apply_policy"] = "ACCEPTED"
+    except Exception as e:
+        out["unknown_apply_policy"] = "REFUSED " + type(e).__name__
+    out["typing_loaded"] = sorted(m for m in sys.modules if m == "typing" or m.startswith("typing."))
+    print(json.dumps(out, sort_keys=True))
+     …
+    {"binding_predicates": [["audited snapshot", "the document states the snapshot it audits", "NONSELF_GIT_COMMIT", true, true], ["findings-bearing[^:]*snapshot", "the document states its findings base", "NONSELF_GIT_COMMIT", true, true], ["subject", "the document names its measurement subject", "NONSELF_GIT_COMMIT", true, true], ["acquisition commit", "the document states the commit it was taken at", "SELF", true, true], ["validated checkpoint", "the document states its validated point", "SELF", true, true], ["measured at", "the document states its measurement point", "AMBIGUOUS", true, true], ["snapshot", "the document states its snapshot", "AMBIGUOUS", true, true], ["last updated", "the document states its own currency", "SELF", true, true], ["last reviewed", "the document states its own review point", "SELF", true, true], ["reviewed", "the document states its own review point", "SELF", true, true], ["planning date", "the document states its own authoring date", "SELF", true, true], ["date", "the document states its own date", "SELF", true, true], ["version", "the document states its own version point", "SELF", true, true], ["created", "the document states its own creation point", "SELF", true, true], ["generated", "the document states its own generation point", "SELF", true, true], ["opened", "the document states when it was opened", "SELF", true, true], ["updated", "the document states its own currency", "SELF", true, true], ["finali[sz]ed", "the document states its own completion point", "SELF", true, true], ["report completed", "the document states its own completion point", "SELF", true, true], ["(?:log|register) started", "the document states when its record began", "SELF", true, true], ["started", "the document states when its record began", "SELF", true, true], ["prepared", "the document states its own preparation point", "SELF", true, true], ["review date", "the document states its own review point", "SELF", true, true], ["sent", "the document states when it was sent", "SELF", true, true], ["written", "the document states when it was written", "SELF", true, true], ["agreed", "the document states when it was agreed", "SELF", true, true]], "contextual_predicates": [["status", "document-level state, and ONLY inside the root metadata block of a document that has independently earned an intrinsic document-binding field"]], "fields": ["rationale", "subject_policy"], "is_tuple_subclass": true, "lookups": {"acquisition commit": ["the document states the commit it was taken at", "SELF"], "audited snapshot": ["the document states the snapshot it audits", "NONSELF_GIT_COMMIT"], "created": ["the document states its own creation point", "SELF"], "date": ["the document states its own date", "SELF"], "findings-bearing snapshot": ["the document states its findings base", "NONSELF_GIT_COMMIT"], "last updated": ["the document states its own currency", "SELF"], "measured at": ["the document states its measurement point", "AMBIGUOUS"], "not a label": null, "reviewed": ["the document states its own review point", "SELF"], "snapshot": ["the document states its snapshot", "AMBIGUOUS"], "subject": ["the document names its measurement subject", "NONSELF_GIT_COMMIT"], "validated checkpoint": ["the document states its validated point", "SELF"], "version": ["the document states its own version point", "SELF"]}, "rejections": {"None policy": "REFUSED: binding predicate 'x'", "empty rationale": "REFUSED: binding predicate 'x'", "keyword construction": "ACCEPTED", "known-negative: well-formed": "ACCEPTED", "non-Binding string": "REFUSED: binding predicate 'x'", "other namedtuple, same fields": "REFUSED: binding predicate 'x'", "plain tuple": "REFUSED: binding predicate 'x'", "unknown policy": "REFUSED: binding predicate 'x'"}, "route_subject_policy": {"IN_SECTION": "AMBIGUOUS", "LABELLED_REPEATED": "AMBIGUOUS", "LABELLED_UNBOUND": "AMBIGUOUS", "R1_H1": "AMBIGUOUS", "R2_SELF_SUBJECT": "SELF", "R3_LABELLED": "AMBIGUOUS", "R4_CONTEXTUAL": "SELF", "R5_ROOT_LIFECYCLE": "SELF", "R6_BARE_DATELINE": "SELF", "R7_SUPERSEDED_BY": "SELF", "TABLE_ROW": "AMBIGUOUS", "UNLABELLED": "AMBIGUOUS"}, "subject_policies": ["SELF", "AMBIGUOUS", "NONSELF_GIT_COMMIT"], "typing_loaded": ["typing", "typing.io", "typing.re"], "unknown_apply_policy": "REFUSED SubjectPolicyError", "validate_registry": 26}
+    --- end registry probe OLD (37bce4c) (4334 bytes)
+    --- registry probe NEW (working tree)  rc=0  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s -c 
+    import sys, json, collections
+    sys.path.insert(0, sys.argv[1])
+    import passa
+    B = passa.Binding
+    out = {"fields": list(B._fields), "is_tuple_subclass": issubclass(B, tuple),
+           "binding_predicates": [[k, v.rationale, v.subject_policy, isinstance(v, B), tuple(v) == (v.rationale, v.subject_policy)]
+                                  for k, v in passa.BINDING_PREDICATES.items()],
+           "contextual_predicates": [[k, (list(v) if isinstance(v, tuple) else v)] for k, v in passa.CONTEXTUAL_PREDICATES.items()],
+           "route_subject_policy": {str(k): v for k, v in passa.ROUTE_SUBJECT_POLICY.items()},
+           "subject_policies": list(passa.SUBJECT_POLICIES),
+           "validate_registry": passa.validate_registry(),
+           "lookups": {}, "rejections": {}}
+    for lab in ("audited snapshot", "findings-bearing snapshot", "subject", "acquisition commit", "validated checkpoint",
+                "snapshot", "measured at", "last updated", "reviewed", "date", "version", "created", "not a label"):
+        e = passa.registry_lookup(lab)
+        out["lookups"][lab] = None if e is None else [e.rationale, e.subject_policy]
+    Other = collections.namedtuple("Other", ["rationale", "subject_policy"])
+    cases = {"non-Binding string": "just a rationale string", "plain tuple": ("r", passa.POLICY_SELF),
+             "other namedtuple, same fields": Other("r", passa.POLICY_SELF),
+             "unknown policy": B("r", "NOT_A_POLICY"), "empty rationale": B("", passa.POLICY_SELF),
+             "None policy": B("r", None), "known-negative: well-formed": B("r", passa.POLICY_SELF),
+             "keyword construction": B(rationale="r", subject_policy=passa.POLICY_AMBIGUOUS)}
+    for name, entry in cases.items():
+        try:
+            passa.validate_registry({"x": entry}); out["rejections"][name] = "ACCEPTED"
+        except passa.SubjectPolicyError as e:
+            out["rejections"][name] = "REFUSED: " + str(e).split(" carries ")[0].split(" has ")[0][:40]
+    try:
+        passa._apply_policy("SOMETHING_ELSE"); out["unknown_apply_policy"] = "ACCEPTED"
+    except Exception as e:
+        out["unknown_apply_policy"] = "REFUSED " + type(e).__name__
+    out["typing_loaded"] = sorted(m for m in sys.modules if m == "typing" or m.startswith("typing."))
+    print(json.dumps(out, sort_keys=True))
+     …
+    {"binding_predicates": [["audited snapshot", "the document states the snapshot it audits", "NONSELF_GIT_COMMIT", true, true], ["findings-bearing[^:]*snapshot", "the document states its findings base", "NONSELF_GIT_COMMIT", true, true], ["subject", "the document names its measurement subject", "NONSELF_GIT_COMMIT", true, true], ["acquisition commit", "the document states the commit it was taken at", "SELF", true, true], ["validated checkpoint", "the document states its validated point", "SELF", true, true], ["measured at", "the document states its measurement point", "AMBIGUOUS", true, true], ["snapshot", "the document states its snapshot", "AMBIGUOUS", true, true], ["last updated", "the document states its own currency", "SELF", true, true], ["last reviewed", "the document states its own review point", "SELF", true, true], ["reviewed", "the document states its own review point", "SELF", true, true], ["planning date", "the document states its own authoring date", "SELF", true, true], ["date", "the document states its own date", "SELF", true, true], ["version", "the document states its own version point", "SELF", true, true], ["created", "the document states its own creation point", "SELF", true, true], ["generated", "the document states its own generation point", "SELF", true, true], ["opened", "the document states when it was opened", "SELF", true, true], ["updated", "the document states its own currency", "SELF", true, true], ["finali[sz]ed", "the document states its own completion point", "SELF", true, true], ["report completed", "the document states its own completion point", "SELF", true, true], ["(?:log|register) started", "the document states when its record began", "SELF", true, true], ["started", "the document states when its record began", "SELF", true, true], ["prepared", "the document states its own preparation point", "SELF", true, true], ["review date", "the document states its own review point", "SELF", true, true], ["sent", "the document states when it was sent", "SELF", true, true], ["written", "the document states when it was written", "SELF", true, true], ["agreed", "the document states when it was agreed", "SELF", true, true]], "contextual_predicates": [["status", "document-level state, and ONLY inside the root metadata block of a document that has independently earned an intrinsic document-binding field"]], "fields": ["rationale", "subject_policy"], "is_tuple_subclass": true, "lookups": {"acquisition commit": ["the document states the commit it was taken at", "SELF"], "audited snapshot": ["the document states the snapshot it audits", "NONSELF_GIT_COMMIT"], "created": ["the document states its own creation point", "SELF"], "date": ["the document states its own date", "SELF"], "findings-bearing snapshot": ["the document states its findings base", "NONSELF_GIT_COMMIT"], "last updated": ["the document states its own currency", "SELF"], "measured at": ["the document states its measurement point", "AMBIGUOUS"], "not a label": null, "reviewed": ["the document states its own review point", "SELF"], "snapshot": ["the document states its snapshot", "AMBIGUOUS"], "subject": ["the document names its measurement subject", "NONSELF_GIT_COMMIT"], "validated checkpoint": ["the document states its validated point", "SELF"], "version": ["the document states its own version point", "SELF"]}, "rejections": {"None policy": "REFUSED: binding predicate 'x'", "empty rationale": "REFUSED: binding predicate 'x'", "keyword construction": "ACCEPTED", "known-negative: well-formed": "ACCEPTED", "non-Binding string": "REFUSED: binding predicate 'x'", "other namedtuple, same fields": "REFUSED: binding predicate 'x'", "plain tuple": "REFUSED: binding predicate 'x'", "unknown policy": "REFUSED: binding predicate 'x'"}, "route_subject_policy": {"IN_SECTION": "AMBIGUOUS", "LABELLED_REPEATED": "AMBIGUOUS", "LABELLED_UNBOUND": "AMBIGUOUS", "R1_H1": "AMBIGUOUS", "R2_SELF_SUBJECT": "SELF", "R3_LABELLED": "AMBIGUOUS", "R4_CONTEXTUAL": "SELF", "R5_ROOT_LIFECYCLE": "SELF", "R6_BARE_DATELINE": "SELF", "R7_SUPERSEDED_BY": "SELF", "TABLE_ROW": "AMBIGUOUS", "UNLABELLED": "AMBIGUOUS"}, "subject_policies": ["SELF", "AMBIGUOUS", "NONSELF_GIT_COMMIT"], "typing_loaded": [], "unknown_apply_policy": "REFUSED SubjectPolicyError", "validate_registry": 26}
+    --- end registry probe NEW (working tree) (4300 bytes)
+      binding_predicates       OLD==NEW True   sha256 42c69d1faeff45c2 / 42c69d1faeff45c2
+      contextual_predicates    OLD==NEW True   sha256 8188677f1b1493e0 / 8188677f1b1493e0
+      fields                   OLD==NEW True   sha256 5cea0c901e36bc54 / 5cea0c901e36bc54
+      is_tuple_subclass        OLD==NEW True   sha256 b5bea41b6c623f7c / b5bea41b6c623f7c
+      lookups                  OLD==NEW True   sha256 f06ea702c65fa7c3 / f06ea702c65fa7c3
+      rejections               OLD==NEW True   sha256 e6580ca8ed85862e / e6580ca8ed85862e
+      route_subject_policy     OLD==NEW True   sha256 4270c43306c905cd / 4270c43306c905cd
+      subject_policies         OLD==NEW True   sha256 be0dca73158fbe93 / be0dca73158fbe93
+      unknown_apply_policy     OLD==NEW True   sha256 b195dd61cf9ca7fd / b195dd61cf9ca7fd
+      validate_registry        OLD==NEW True   sha256 5f9c4ab08cac7457 / 5f9c4ab08cac7457
+      binding_predicates entries 26, all isinstance Binding OLD True NEW True
+      rejections NEW: {"None policy": "REFUSED: binding predicate 'x'", "empty rationale": "REFUSED: binding predicate 'x'", "keyword construction": "ACCEPTED", "known-negative: well-formed": "ACCEPTED", "non-Binding string": "REFUSED: binding predicate 'x'", "other namedtuple, same fields": "REFUSED: binding predicate 'x'", "plain tuple": "REFUSED: binding predicate 'x'", "unknown policy": "REFUSED: binding predicate 'x'"}
+      typing modules loaded after `import passa`: OLD ['typing', 'typing.io', 'typing.re']  NEW []
+      REGISTRY SEMANTICS UNCHANGED (every compared key equal): True
+    
+    == 1b. MEASUREMENT WRAPPER CALIBRATION ==
+      expected: both report __main__ (the calibration script lies outside the instrument root); ONLY typing_script.py additionally reports typing.io and typing.re
+    --- wrapper calibration empty_script.py (instrument root /home/user/kai-repair/kai-pm/house_in_order_h2_v13)  rc=0  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s -c 
+    # MEASUREMENT WRAPPER v2. v1 used runpy.run_path, which lazily imports
+    # pkgutil -> functools.singledispatch -> typing, so the instrument itself
+    # loaded typing.io/typing.re into every process it measured (R9 shape).
+    # v2 imports nothing beyond what the interpreter has at startup plus `types`.
+    import sys, os, types
+    pre_typing = sorted(m for m in sys.modules if m == "typing" or m.startswith("typing."))
+    script = os.path.abspath(sys.argv[1]); sys.argv = sys.argv[1:]
+    sys.path[0] = os.path.dirname(script)          # what `python script.py` sets
+    m = types.ModuleType("__main__"); m.__file__ = script
+    sys.modules["__main__"] = m
+    rc = 0
+    try:
+        with open(script, "rb") as fh:
+            code = compile(fh.read(), script, "exec")
+        exec(code, m.__dict__)
+    except SystemExit as e:
+        rc = e.code if isinstance(e.code, int) else (0 if e.code is None else 1)
+        if not isinstance(e.code, int) and e.code is not None:
+            print(e.code, file=sys.stderr)
+    SI = sys.modules.get("stage_identity")
+    if SI is None:
+        import stage_identity as SI
+    members, offenders = SI.producer_population()
+    import collections
+    kinds = collections.Counter(c for c, _, _ in members)
+    print("ORIGIN MEASUREMENT (after the run, same process): members %d  %s" % (len(members), dict(sorted(kinds.items()))))
+    print("  typing modules present BEFORE the measured script ran: %s" % pre_typing)
+    for n, w in offenders:
+        print("  UNEXPLAINED offender %s: %s" % (n, w[:160]))
+    print("UNEXPLAINED LOADED ORIGINS: %d" % len(offenders))
+    sys.exit(rc)
+     …
+    ORIGIN MEASUREMENT (after the run, same process): members 71  {'BUILTIN': 20, 'FROZEN': 15, 'H2': 1, 'STDLIB': 35}
+      typing modules present BEFORE the measured script ran: []
+      UNEXPLAINED offender __main__: REFUSE: __main__ at /tmp/optA_1ydlkq7g/wrapcal/empty_script.py lies outside the governed H2 root, the governed Census registry and the governed Python stdlib cl
+    UNEXPLAINED LOADED ORIGINS: 1
+    --- end wrapper calibration empty_script.py (instrument root /home/user/kai-repair/kai-pm/house_in_order_h2_v13) (399 bytes)
+    --- wrapper calibration typing_script.py (instrument root /home/user/kai-repair/kai-pm/house_in_order_h2_v13)  rc=0  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s -c 
+    # MEASUREMENT WRAPPER v2. v1 used runpy.run_path, which lazily imports
+    # pkgutil -> functools.singledispatch -> typing, so the instrument itself
+    # loaded typing.io/typing.re into every process it measured (R9 shape).
+    # v2 imports nothing beyond what the interpreter has at startup plus `types`.
+    import sys, os, types
+    pre_typing = sorted(m for m in sys.modules if m == "typing" or m.startswith("typing."))
+    script = os.path.abspath(sys.argv[1]); sys.argv = sys.argv[1:]
+    sys.path[0] = os.path.dirname(script)          # what `python script.py` sets
+    m = types.ModuleType("__main__"); m.__file__ = script
+    sys.modules["__main__"] = m
+    rc = 0
+    try:
+        with open(script, "rb") as fh:
+            code = compile(fh.read(), script, "exec")
+        exec(code, m.__dict__)
+    except SystemExit as e:
+        rc = e.code if isinstance(e.code, int) else (0 if e.code is None else 1)
+        if not isinstance(e.code, int) and e.code is not None:
+            print(e.code, file=sys.stderr)
+    SI = sys.modules.get("stage_identity")
+    if SI is None:
+        import stage_identity as SI
+    members, offenders = SI.producer_population()
+    import collections
+    kinds = collections.Counter(c for c, _, _ in members)
+    print("ORIGIN MEASUREMENT (after the run, same process): members %d  %s" % (len(members), dict(sorted(kinds.items()))))
+    print("  typing modules present BEFORE the measured script ran: %s" % pre_typing)
+    for n, w in offenders:
+        print("  UNEXPLAINED offender %s: %s" % (n, w[:160]))
+    print("UNEXPLAINED LOADED ORIGINS: %d" % len(offenders))
+    sys.exit(rc)
+     …
+    ORIGIN MEASUREMENT (after the run, same process): members 75  {'BUILTIN': 20, 'FROZEN': 15, 'H2': 1, 'STDLIB': 39}
+      typing modules present BEFORE the measured script ran: []
+      UNEXPLAINED offender __main__: REFUSE: __main__ at /tmp/optA_1ydlkq7g/wrapcal/typing_script.py lies outside the governed H2 root, the governed Census registry and the governed Python stdlib c
+      UNEXPLAINED offender typing.io: REFUSE: typing.io has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origin=None). A missing __file__ is NOT an an
+      UNEXPLAINED offender typing.re: REFUSE: typing.re has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origin=None). A missing __file__ is NOT an an
+    UNEXPLAINED LOADED ORIGINS: 3
+    --- end wrapper calibration typing_script.py (instrument root /home/user/kai-repair/kai-pm/house_in_order_h2_v13) (789 bytes)
+    
+    == 2. CLEAN CHAIN — OLD (37bce4c) ==
+    --- Stage-A builder (calibration fixture)  rc=0  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s -c import sys; sys.path.insert(0, '/tmp/optA_1ydlkq7g/old/kai-pm/house_in_order_h2_v13'); import stage_identity as SI
+    SI.load_governed_census('/home/user/kai-repair/kai-pm/house_in_order_census_v11')
+    d = SI.build_stage_a('CALIBRATION', subject_repo='/tmp/optA_1ydlkq7g/chain_old/subj', history_repo='/tmp/optA_1ydlkq7g/chain_old/subj')
+    open('/tmp/optA_1ydlkq7g/chain_old/stage_a.json', 'xb').write(SI.canonical_bytes(d)); print('stage_a_identity', SI.stage_a_identity(d))
+    stage_a_identity b3d1b51949202807384d4da08182b2aa4f3d72df96623f24a76791d73456645b
+    --- end Stage-A builder (calibration fixture) (82 bytes)
+    --- OLD (37bce4c) PRODUCER passa.py  rc=1  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s /tmp/optA_1ydlkq7g/old/kai-pm/house_in_order_h2_v13/passa.py --subject-repo …
+    REFUSE (pre-production): the producer runtime population contains origins outside every governed Stage-A root, with no Stage-A dependency identity: typing.io: REFUSE: typing.io has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origi; typing.re: REFUSE: typing.re has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origi
+    --- end OLD (37bce4c) PRODUCER passa.py (413 bytes)
+    --- OLD (37bce4c) PRODUCER passa.py, origin-measured run  rc=1  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s -c 
+    # MEASUREMENT WRAPPER v2. v1 used runpy.run_path, which lazily imports
+    # pkgutil -> functools.singledispatch -> typing, so the instrument itself
+    # loaded typing.io/typing.re into every process it measured (R9 shape).
+    # v2 imports nothing beyond what the interpreter has at startup plus `types`.
+    import sys, os, types
+    pre_typing = sorted(m for m in sys.modules if m == "typing" or m.startswith("typing."))
+    script = os.path.abspath(sys.argv[1]); sys.argv = sys.argv[1:]
+    sys.path[0] = os.path.dirname(script)          # what `python script.py` sets
+    m = types.ModuleType("__main__"); m.__file__ = script
+    sys.modules["__main__"] = m
+    rc = 0
+    try:
+        with open(script, "rb") as fh:
+            code = compile(fh.read(), script, "exec")
+        exec(code, m.__dict__)
+    except SystemExit as e:
+        rc = e.code if isinstance(e.code, int) else (0 if e.code is None else 1)
+        if not isinstance(e.code, int) and e.code is not None:
+            print(e.code, file=sys.stderr)
+    SI = sys.modules.get("stage_identity")
+    if SI is None:
+        import stage_identity as SI
+    members, offenders = SI.producer_population()
+    import collections
+    kinds = collections.Counter(c for c, _, _ in members)
+    print("ORIGIN MEASUREMENT (after the run, same process): members %d  %s" % (len(members), dict(sorted(kinds.items()))))
+    print("  typing modules present BEFORE the measured script ran: %s" % pre_typing)
+    for n, w in offenders:
+        print("  UNEXPLAINED offender %s: %s" % (n, w[:160]))
+    print("UNEXPLAINED LOADED ORIGINS: %d" % len(offenders))
+    sys.exit(rc)
+     …
+    ORIGIN MEASUREMENT (after the run, same process): members 115  {'BUILTIN': 22, 'FROZEN': 18, 'H2': 3, 'STDLIB': 72}
+      typing modules present BEFORE the measured script ran: []
+      UNEXPLAINED offender typing.io: REFUSE: typing.io has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origin=None). A missing __file__ is NOT an an
+      UNEXPLAINED offender typing.re: REFUSE: typing.re has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origin=None). A missing __file__ is NOT an an
+    UNEXPLAINED LOADED ORIGINS: 2
+    REFUSE (pre-production): the producer runtime population contains origins outside every governed Stage-A root, with no Stage-A dependency identity: typing.io: REFUSE: typing.io has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origi; typing.re: REFUSE: typing.re has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origi
+    --- end OLD (37bce4c) PRODUCER passa.py, origin-measured run (1009 bytes)
+    CHAIN STOPS: Pass A rc=1; nothing downstream exists (R11)
+    
+    == 2. CLEAN CHAIN — NEW (working tree) ==
+    --- Stage-A builder (calibration fixture)  rc=0  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s -c import sys; sys.path.insert(0, '/home/user/kai-repair/kai-pm/house_in_order_h2_v13'); import stage_identity as SI
+    SI.load_governed_census('/home/user/kai-repair/kai-pm/house_in_order_census_v11')
+    d = SI.build_stage_a('CALIBRATION', subject_repo='/tmp/optA_1ydlkq7g/chain_new/subj', history_repo='/tmp/optA_1ydlkq7g/chain_new/subj')
+    open('/tmp/optA_1ydlkq7g/chain_new/stage_a.json', 'xb').write(SI.canonical_bytes(d)); print('stage_a_identity', SI.stage_a_identity(d))
+    stage_a_identity 173091243ee8259da657d5f54abf00e8b27e0f350b84fb3a48f78cebd16c4c76
+    --- end Stage-A builder (calibration fixture) (82 bytes)
+    --- NEW (working tree) PRODUCER passa.py  rc=0  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s /home/user/kai-repair/kai-pm/house_in_order_h2_v13/passa.py --subject-repo …
+    PASS A v1.2 COMPLETE — 3 rows == population 3
+      WITNESS KINDS DISCRIMINATED (D2/D4), not assumed from shape:
+        DATE                          3
+      scope determined: WHOLE_FILE 3 · SPAN 0
+      binding predicates declared closed-world: 26
+      contextual predicates declared closed-world: 1 (status)
+      NO VERDICT ASSIGNED IN PASS A.
+    --- end NEW (working tree) PRODUCER passa.py (328 bytes)
+    --- NEW (working tree) PRODUCER passa.py, origin-measured run  rc=0  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s -c 
+    # MEASUREMENT WRAPPER v2. v1 used runpy.run_path, which lazily imports
+    # pkgutil -> functools.singledispatch -> typing, so the instrument itself
+    # loaded typing.io/typing.re into every process it measured (R9 shape).
+    # v2 imports nothing beyond what the interpreter has at startup plus `types`.
+    import sys, os, types
+    pre_typing = sorted(m for m in sys.modules if m == "typing" or m.startswith("typing."))
+    script = os.path.abspath(sys.argv[1]); sys.argv = sys.argv[1:]
+    sys.path[0] = os.path.dirname(script)          # what `python script.py` sets
+    m = types.ModuleType("__main__"); m.__file__ = script
+    sys.modules["__main__"] = m
+    rc = 0
+    try:
+        with open(script, "rb") as fh:
+            code = compile(fh.read(), script, "exec")
+        exec(code, m.__dict__)
+    except SystemExit as e:
+        rc = e.code if isinstance(e.code, int) else (0 if e.code is None else 1)
+        if not isinstance(e.code, int) and e.code is not None:
+            print(e.code, file=sys.stderr)
+    SI = sys.modules.get("stage_identity")
+    if SI is None:
+        import stage_identity as SI
+    members, offenders = SI.producer_population()
+    import collections
+    kinds = collections.Counter(c for c, _, _ in members)
+    print("ORIGIN MEASUREMENT (after the run, same process): members %d  %s" % (len(members), dict(sorted(kinds.items()))))
+    print("  typing modules present BEFORE the measured script ran: %s" % pre_typing)
+    for n, w in offenders:
+        print("  UNEXPLAINED offender %s: %s" % (n, w[:160]))
+    print("UNEXPLAINED LOADED ORIGINS: %d" % len(offenders))
+    sys.exit(rc)
+     …
+    PASS A v1.2 COMPLETE — 3 rows == population 3
+      WITNESS KINDS DISCRIMINATED (D2/D4), not assumed from shape:
+        DATE                          3
+      scope determined: WHOLE_FILE 3 · SPAN 0
+      binding predicates declared closed-world: 26
+      contextual predicates declared closed-world: 1 (status)
+      NO VERDICT ASSIGNED IN PASS A.
+    ORIGIN MEASUREMENT (after the run, same process): members 116  {'BUILTIN': 22, 'CENSUS': 3, 'FROZEN': 18, 'H2': 3, 'STDLIB': 70}
+      typing modules present BEFORE the measured script ran: []
+    UNEXPLAINED LOADED ORIGINS: 0
+    --- end NEW (working tree) PRODUCER passa.py, origin-measured run (547 bytes)
+    --- NEW (working tree) BINDER Pass A  rc=0  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s /home/user/kai-repair/kai-pm/house_in_order_h2_v13/stage_identity.py bind …
+    e001e3125a904cca4a5f6b77c1eed8fb7c9822c16c7e410c881a429fcf3db00a
+    --- end NEW (working tree) BINDER Pass A (65 bytes)
+    --- NEW (working tree) BINDER Pass A, origin-measured run  rc=0  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s -c 
+    # MEASUREMENT WRAPPER v2. v1 used runpy.run_path, which lazily imports
+    # pkgutil -> functools.singledispatch -> typing, so the instrument itself
+    # loaded typing.io/typing.re into every process it measured (R9 shape).
+    # v2 imports nothing beyond what the interpreter has at startup plus `types`.
+    import sys, os, types
+    pre_typing = sorted(m for m in sys.modules if m == "typing" or m.startswith("typing."))
+    script = os.path.abspath(sys.argv[1]); sys.argv = sys.argv[1:]
+    sys.path[0] = os.path.dirname(script)          # what `python script.py` sets
+    m = types.ModuleType("__main__"); m.__file__ = script
+    sys.modules["__main__"] = m
+    rc = 0
+    try:
+        with open(script, "rb") as fh:
+            code = compile(fh.read(), script, "exec")
+        exec(code, m.__dict__)
+    except SystemExit as e:
+        rc = e.code if isinstance(e.code, int) else (0 if e.code is None else 1)
+        if not isinstance(e.code, int) and e.code is not None:
+            print(e.code, file=sys.stderr)
+    SI = sys.modules.get("stage_identity")
+    if SI is None:
+        import stage_identity as SI
+    members, offenders = SI.producer_population()
+    import collections
+    kinds = collections.Counter(c for c, _, _ in members)
+    print("ORIGIN MEASUREMENT (after the run, same process): members %d  %s" % (len(members), dict(sorted(kinds.items()))))
+    print("  typing modules present BEFORE the measured script ran: %s" % pre_typing)
+    for n, w in offenders:
+        print("  UNEXPLAINED offender %s: %s" % (n, w[:160]))
+    print("UNEXPLAINED LOADED ORIGINS: %d" % len(offenders))
+    sys.exit(rc)
+     …
+    e001e3125a904cca4a5f6b77c1eed8fb7c9822c16c7e410c881a429fcf3db00a
+    ORIGIN MEASUREMENT (after the run, same process): members 85  {'BUILTIN': 21, 'FROZEN': 15, 'H2': 1, 'STDLIB': 48}
+      typing modules present BEFORE the measured script ran: []
+    UNEXPLAINED LOADED ORIGINS: 0
+    --- end NEW (working tree) BINDER Pass A, origin-measured run (270 bytes)
+    --- NEW (working tree) CLASSIFIER run_h2_v12.py  rc=0  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s /home/user/kai-repair/kai-pm/house_in_order_h2_v13/run_h2_v12.py --subject-repo …
+    HOUSE_H2 v1.2 — 3 rows == population 3
+      subject 4aa0ca960d6f tree 56736a75499d
+    
+      LIFECYCLE    positives    0  UNKNOWN    3   
+      FUNCTION     positives    0  UNKNOWN    3   
+      AUTHORITY    positives    0  UNKNOWN    3   
+      GENERATION   positives    0  UNKNOWN    3   
+      VALIDITY     positives    0  UNKNOWN    3   
+      SCOPE        positives    3  UNKNOWN    0   {'WHOLE_FILE': 3}
+    
+      evidence facts (NOT verdicts):
+        MAINTENANCE_OBSERVED            1
+        CARRIES_DATE_STAMP              3
+        BINDING_CONTRADICTION           3
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 0
+        {}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end NEW (working tree) CLASSIFIER run_h2_v12.py (713 bytes)
+    --- NEW (working tree) CLASSIFIER, origin-measured run  rc=0  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s -c 
+    # MEASUREMENT WRAPPER v2. v1 used runpy.run_path, which lazily imports
+    # pkgutil -> functools.singledispatch -> typing, so the instrument itself
+    # loaded typing.io/typing.re into every process it measured (R9 shape).
+    # v2 imports nothing beyond what the interpreter has at startup plus `types`.
+    import sys, os, types
+    pre_typing = sorted(m for m in sys.modules if m == "typing" or m.startswith("typing."))
+    script = os.path.abspath(sys.argv[1]); sys.argv = sys.argv[1:]
+    sys.path[0] = os.path.dirname(script)          # what `python script.py` sets
+    m = types.ModuleType("__main__"); m.__file__ = script
+    sys.modules["__main__"] = m
+    rc = 0
+    try:
+        with open(script, "rb") as fh:
+            code = compile(fh.read(), script, "exec")
+        exec(code, m.__dict__)
+    except SystemExit as e:
+        rc = e.code if isinstance(e.code, int) else (0 if e.code is None else 1)
+        if not isinstance(e.code, int) and e.code is not None:
+            print(e.code, file=sys.stderr)
+    SI = sys.modules.get("stage_identity")
+    if SI is None:
+        import stage_identity as SI
+    members, offenders = SI.producer_population()
+    import collections
+    kinds = collections.Counter(c for c, _, _ in members)
+    print("ORIGIN MEASUREMENT (after the run, same process): members %d  %s" % (len(members), dict(sorted(kinds.items()))))
+    print("  typing modules present BEFORE the measured script ran: %s" % pre_typing)
+    for n, w in offenders:
+        print("  UNEXPLAINED offender %s: %s" % (n, w[:160]))
+    print("UNEXPLAINED LOADED ORIGINS: %d" % len(offenders))
+    sys.exit(rc)
+     …
+    HOUSE_H2 v1.2 — 3 rows == population 3
+      subject 4aa0ca960d6f tree 56736a75499d
+    
+      LIFECYCLE    positives    0  UNKNOWN    3   
+      FUNCTION     positives    0  UNKNOWN    3   
+      AUTHORITY    positives    0  UNKNOWN    3   
+      GENERATION   positives    0  UNKNOWN    3   
+      VALIDITY     positives    0  UNKNOWN    3   
+      SCOPE        positives    3  UNKNOWN    0   {'WHOLE_FILE': 3}
+    
+      evidence facts (NOT verdicts):
+        MAINTENANCE_OBSERVED            1
+        CARRIES_DATE_STAMP              3
+        BINDING_CONTRADICTION           3
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 0
+        {}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    ORIGIN MEASUREMENT (after the run, same process): members 117  {'BUILTIN': 22, 'FROZEN': 18, 'H2': 7, 'STDLIB': 70}
+      typing modules present BEFORE the measured script ran: []
+    UNEXPLAINED LOADED ORIGINS: 0
+    --- end NEW (working tree) CLASSIFIER, origin-measured run (919 bytes)
+    --- NEW (working tree) BINDER classification  rc=0  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s /home/user/kai-repair/kai-pm/house_in_order_h2_v13/stage_identity.py bind …
+    dfb46e86e1549f648938e9e4dd5b6a3a81d13436694070099dd42fc8b719e076
+    --- end NEW (working tree) BINDER classification (65 bytes)
+    --- NEW (working tree) QUALIFIER qualify.py  rc=1  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s /home/user/kai-repair/kai-pm/house_in_order_h2_v13/qualify.py --result …
+    HOUSE_H2 v1.2 — QUALIFICATION
+      subject 4aa0ca960d6f  tree 56736a75499d
+      history 2026-10-02 → 2026-10-02  shallow=false  ancestry=2
+      census  29064d650a612968…
+    
+      [1] GOVERNING INVARIANT — checked from the AXIS SET
+          UNKNOWN first-class on every axis: True
+      [1b] REMOVAL CALIBRATION — the gate proves it can fail, this run
+           remove UNKNOWN from LIFECYCLE   detected=True
+           remove UNKNOWN from FUNCTION    detected=True
+           remove UNKNOWN from AUTHORITY   detected=True
+           remove UNKNOWN from GENERATION  detected=True
+           remove UNKNOWN from VALIDITY    detected=True
+           remove UNKNOWN from SCOPE       detected=True
+    
+      [2] STATE DISPOSITIONS — checked from the ALPHABET
+          [LIFECYCLE]
+            ACTIVE            H2_NOT_EARNABLE        0  
+            HISTORICAL        H2_EMITTABLE           0  not observed on this subject
+            SUPERSEDED        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           3  
+          [FUNCTION]
+            GOVERNANCE        H2_EMITTABLE           0  not observed on this subject
+            STATUS            H2_EMITTABLE           0  not observed on this subject
+            PLAN              H2_EMITTABLE           0  not observed on this subject
+            EVIDENCE          H2_EMITTABLE           0  not observed on this subject
+            REFERENCE         H2_EMITTABLE           0  not observed on this subject
+            RUNTIME_INPUT     H2_EMITTABLE           0  not observed on this subject
+            TEMPLATE          H2_EMITTABLE           0  not observed on this subject
+            MARKER            H2_EMITTABLE           0  not observed on this subject
+            USER_GUIDE        H2_EMITTABLE           0  not observed on this subject
+            OTHER             H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           3  
+          [AUTHORITY]
+            AUTHORITATIVE     DEFERRED_TO_H3         0  
+            VERIFIED_DERIVED  DEFERRED_TO_H3         0  
+            ADVISORY          DEFERRED_TO_H3         0  
+            NON_AUTHORITY     DEFERRED_TO_H3         0  
+            UNKNOWN           H2_EMITTABLE           3  
+          [GENERATION]
+            MANUAL            H2_NOT_EARNABLE        0  
+            PARTIAL_DERIVED   H2_NOT_EARNABLE        0  
+            FULL_DERIVED      H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           3  
+          [VALIDITY]
+            CURRENT_TREE      H2_EMITTABLE           0  not observed on this subject
+            EXACT_SNAPSHOT    H2_EMITTABLE           0  not observed on this subject
+            RUN_ARTEFACT      H2_EMITTABLE           0  not observed on this subject
+            TIME_BOUND        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           3  
+          [SCOPE]
+            WHOLE_FILE        H2_EMITTABLE           3  
+            HEADING           H2_NOT_EARNABLE        0  
+            TABLE             H2_NOT_EARNABLE        0  
+            MANAGED_REGION    H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           0  not observed on this subject
+    
+      [3] OUTPUT-DERIVED — values emitted but unknown to the ontology: 0
+    
+      [4] population declared 3 == rows 3: True
+      [5] every non-abstention cell carries a source-bound witness: True  (0 missing)
+    
+      [6] §8(6) CLOSED ORIGIN CLASSIFICATION — every loaded origin
+          observed 87   classified 87   refused 0
+          H2                 3
+          CENSUS             0
+          GOVERNED_STDLIB    48
+          BUILTIN_OR_FROZEN  36
+    
+      [7] Q1a RECORDED PRODUCER PROVENANCE vs STAGE A
+          verified against stage_a_identity 173091243ee8259d…, every slot closed
+    
+      [8] Q1b / E1 — DERIVED denominators (D379 §8)
+          axis-cell denominator              3
+          positive-evidence-fact denominator 7
+          sum                                10
+    
+      UTILITY PROFILE — reported, never optimised (D367 11)
+          axis         positive  UNKNOWN  UNMEASURED
+          LIFECYCLE           0        3           0
+          FUNCTION            0        3           0
+          AUTHORITY           0        3           0
+          GENERATION          0        3           0
+          VALIDITY            0        3           0
+          SCOPE               3        0           0
+          Qualification asks: is the instrument TRUTHFUL?
+          A separate later decision asks: is it USEFUL enough for H3?
+    
+      FINDINGS: 6
+        FACT_CLASS_ABSENT::kai-pm/SYNTH_0.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SYNTH_0.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SYNTH_1.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SYNTH_1.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SYNTH_2.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SYNTH_2.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+    --- end NEW (working tree) QUALIFIER qualify.py (5295 bytes)
+    --- NEW (working tree) QUALIFIER, origin-measured run  rc=1  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s -c 
+    # MEASUREMENT WRAPPER v2. v1 used runpy.run_path, which lazily imports
+    # pkgutil -> functools.singledispatch -> typing, so the instrument itself
+    # loaded typing.io/typing.re into every process it measured (R9 shape).
+    # v2 imports nothing beyond what the interpreter has at startup plus `types`.
+    import sys, os, types
+    pre_typing = sorted(m for m in sys.modules if m == "typing" or m.startswith("typing."))
+    script = os.path.abspath(sys.argv[1]); sys.argv = sys.argv[1:]
+    sys.path[0] = os.path.dirname(script)          # what `python script.py` sets
+    m = types.ModuleType("__main__"); m.__file__ = script
+    sys.modules["__main__"] = m
+    rc = 0
+    try:
+        with open(script, "rb") as fh:
+            code = compile(fh.read(), script, "exec")
+        exec(code, m.__dict__)
+    except SystemExit as e:
+        rc = e.code if isinstance(e.code, int) else (0 if e.code is None else 1)
+        if not isinstance(e.code, int) and e.code is not None:
+            print(e.code, file=sys.stderr)
+    SI = sys.modules.get("stage_identity")
+    if SI is None:
+        import stage_identity as SI
+    members, offenders = SI.producer_population()
+    import collections
+    kinds = collections.Counter(c for c, _, _ in members)
+    print("ORIGIN MEASUREMENT (after the run, same process): members %d  %s" % (len(members), dict(sorted(kinds.items()))))
+    print("  typing modules present BEFORE the measured script ran: %s" % pre_typing)
+    for n, w in offenders:
+        print("  UNEXPLAINED offender %s: %s" % (n, w[:160]))
+    print("UNEXPLAINED LOADED ORIGINS: %d" % len(offenders))
+    sys.exit(rc)
+     …
+    HOUSE_H2 v1.2 — QUALIFICATION
+      subject 4aa0ca960d6f  tree 56736a75499d
+      history 2026-10-02 → 2026-10-02  shallow=false  ancestry=2
+      census  29064d650a612968…
+    
+      [1] GOVERNING INVARIANT — checked from the AXIS SET
+          UNKNOWN first-class on every axis: True
+      [1b] REMOVAL CALIBRATION — the gate proves it can fail, this run
+           remove UNKNOWN from LIFECYCLE   detected=True
+           remove UNKNOWN from FUNCTION    detected=True
+           remove UNKNOWN from AUTHORITY   detected=True
+           remove UNKNOWN from GENERATION  detected=True
+           remove UNKNOWN from VALIDITY    detected=True
+           remove UNKNOWN from SCOPE       detected=True
+    
+      [2] STATE DISPOSITIONS — checked from the ALPHABET
+          [LIFECYCLE]
+            ACTIVE            H2_NOT_EARNABLE        0  
+            HISTORICAL        H2_EMITTABLE           0  not observed on this subject
+            SUPERSEDED        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           3  
+          [FUNCTION]
+            GOVERNANCE        H2_EMITTABLE           0  not observed on this subject
+            STATUS            H2_EMITTABLE           0  not observed on this subject
+            PLAN              H2_EMITTABLE           0  not observed on this subject
+            EVIDENCE          H2_EMITTABLE           0  not observed on this subject
+            REFERENCE         H2_EMITTABLE           0  not observed on this subject
+            RUNTIME_INPUT     H2_EMITTABLE           0  not observed on this subject
+            TEMPLATE          H2_EMITTABLE           0  not observed on this subject
+            MARKER            H2_EMITTABLE           0  not observed on this subject
+            USER_GUIDE        H2_EMITTABLE           0  not observed on this subject
+            OTHER             H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           3  
+          [AUTHORITY]
+            AUTHORITATIVE     DEFERRED_TO_H3         0  
+            VERIFIED_DERIVED  DEFERRED_TO_H3         0  
+            ADVISORY          DEFERRED_TO_H3         0  
+            NON_AUTHORITY     DEFERRED_TO_H3         0  
+            UNKNOWN           H2_EMITTABLE           3  
+          [GENERATION]
+            MANUAL            H2_NOT_EARNABLE        0  
+            PARTIAL_DERIVED   H2_NOT_EARNABLE        0  
+            FULL_DERIVED      H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           3  
+          [VALIDITY]
+            CURRENT_TREE      H2_EMITTABLE           0  not observed on this subject
+            EXACT_SNAPSHOT    H2_EMITTABLE           0  not observed on this subject
+            RUN_ARTEFACT      H2_EMITTABLE           0  not observed on this subject
+            TIME_BOUND        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           3  
+          [SCOPE]
+            WHOLE_FILE        H2_EMITTABLE           3  
+            HEADING           H2_NOT_EARNABLE        0  
+            TABLE             H2_NOT_EARNABLE        0  
+            MANAGED_REGION    H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           0  not observed on this subject
+    
+      [3] OUTPUT-DERIVED — values emitted but unknown to the ontology: 0
+    
+      [4] population declared 3 == rows 3: True
+      [5] every non-abstention cell carries a source-bound witness: True  (0 missing)
+    
+      [6] §8(6) CLOSED ORIGIN CLASSIFICATION — every loaded origin
+          observed 87   classified 87   refused 0
+          H2                 3
+          CENSUS             0
+          GOVERNED_STDLIB    48
+          BUILTIN_OR_FROZEN  36
+    
+      [7] Q1a RECORDED PRODUCER PROVENANCE vs STAGE A
+          verified against stage_a_identity 173091243ee8259d…, every slot closed
+    
+      [8] Q1b / E1 — DERIVED denominators (D379 §8)
+          axis-cell denominator              3
+          positive-evidence-fact denominator 7
+          sum                                10
+    
+      UTILITY PROFILE — reported, never optimised (D367 11)
+          axis         positive  UNKNOWN  UNMEASURED
+          LIFECYCLE           0        3           0
+          FUNCTION            0        3           0
+          AUTHORITY           0        3           0
+          GENERATION          0        3           0
+          VALIDITY            0        3           0
+          SCOPE               3        0           0
+          Qualification asks: is the instrument TRUTHFUL?
+          A separate later decision asks: is it USEFUL enough for H3?
+    
+      FINDINGS: 6
+        FACT_CLASS_ABSENT::kai-pm/SYNTH_0.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SYNTH_0.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SYNTH_1.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SYNTH_1.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SYNTH_2.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SYNTH_2.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+    ORIGIN MEASUREMENT (after the run, same process): members 118  {'BUILTIN': 22, 'FROZEN': 18, 'H2': 8, 'STDLIB': 70}
+      typing modules present BEFORE the measured script ran: []
+    UNEXPLAINED LOADED ORIGINS: 0
+    --- end NEW (working tree) QUALIFIER, origin-measured run (5501 bytes)
+    
+    == SUMMARY ==
+    {
+     "OLD (37bce4c)": {
+      "passa_rc": 1
+     },
+     "NEW (working tree)": {
+      "passa_rc": 0,
+      "run_h2_rc": 0,
+      "qualify_rc": 1
+     }
+    }
+    temp root /tmp/optA_1ydlkq7g removed
+    END-VERBATIM OPTA-PROOF-OUTPUT optA_proof_out.txt
+- EVIDENCE OPTA-SUPERSEDED-RUN2-OUTPUT optA_proof_out_run2_runpy_wrapper.txt: 43282 bytes, sha256 75dfdcd8408e26d69c4fa2e52976d9dfa4b79caa31198ace98eb0cb5dd99168e, final LF True  [CMD `sha256sum optA_proof_out_run2_runpy_wrapper.txt` → 75dfdcd8408e26d6…]
+    BEGIN-VERBATIM OPTA-SUPERSEDED-RUN2-OUTPUT optA_proof_out_run2_runpy_wrapper.txt
+    instrument trees
+      OLD (37bce4c)        /tmp/optA_sgwi08sz/old  passa.py sha256 00e4911e68acfdb52131d14b3daaf042bbde77e06d66c8a3bef8863b7de081f9
+      NEW (working tree)   /home/user/kai-repair  passa.py sha256 63cad38be0a38039621bf32baf3e5a41bda5f2b053a19da81af7f94812a60f50
+      repair HEAD 37bce4cd89eca2312c79d71ce150630ef866f47a; git diff --stat:
+     kai-pm/house_in_order_h2_v13/passa.py | 10 ++++++----
+     1 file changed, 6 insertions(+), 4 deletions(-)
+    
+    
+    == 1. REGISTRY SEMANTICS — same probe, OLD vs NEW ==
+    --- registry probe OLD (37bce4c)  rc=0  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s -c 
+    import sys, json, collections
+    sys.path.insert(0, sys.argv[1])
+    import passa
+    B = passa.Binding
+    out = {"fields": list(B._fields), "is_tuple_subclass": issubclass(B, tuple),
+           "binding_predicates": [[k, v.rationale, v.subject_policy, isinstance(v, B), tuple(v) == (v.rationale, v.subject_policy)]
+                                  for k, v in passa.BINDING_PREDICATES.items()],
+           "contextual_predicates": [[k, (list(v) if isinstance(v, tuple) else v)] for k, v in passa.CONTEXTUAL_PREDICATES.items()],
+           "route_subject_policy": {str(k): v for k, v in passa.ROUTE_SUBJECT_POLICY.items()},
+           "subject_policies": list(passa.SUBJECT_POLICIES),
+           "validate_registry": passa.validate_registry(),
+           "lookups": {}, "rejections": {}}
+    for lab in ("audited snapshot", "findings-bearing snapshot", "subject", "acquisition commit", "validated checkpoint",
+                "snapshot", "measured at", "last updated", "reviewed", "date", "version", "created", "not a label"):
+        e = passa.registry_lookup(lab)
+        out["lookups"][lab] = None if e is None else [e.rationale, e.subject_policy]
+    Other = collections.namedtuple("Other", ["rationale", "subject_policy"])
+    cases = {"non-Binding string": "just a rationale string", "plain tuple": ("r", passa.POLICY_SELF),
+             "other namedtuple, same fields": Other("r", passa.POLICY_SELF),
+             "unknown policy": B("r", "NOT_A_POLICY"), "empty rationale": B("", passa.POLICY_SELF),
+             "None policy": B("r", None), "known-negative: well-formed": B("r", passa.POLICY_SELF),
+             "keyword construction": B(rationale="r", subject_policy=passa.POLICY_AMBIGUOUS)}
+    for name, entry in cases.items():
+        try:
+            passa.validate_registry({"x": entry}); out["rejections"][name] = "ACCEPTED"
+        except passa.SubjectPolicyError as e:
+            out["rejections"][name] = "REFUSED: " + str(e).split(" carries ")[0].split(" has ")[0][:40]
+    try:
+        passa._apply_policy("SOMETHING_ELSE"); out["unknown_apply_policy"] = "ACCEPTED"
+    except Exception as e:
+        out["unknown_apply_policy"] = "REFUSED " + type(e).__name__
+    out["typing_loaded"] = sorted(m for m in sys.modules if m == "typing" or m.startswith("typing."))
+    print(json.dumps(out, sort_keys=True))
+     …
+    {"binding_predicates": [["audited snapshot", "the document states the snapshot it audits", "NONSELF_GIT_COMMIT", true, true], ["findings-bearing[^:]*snapshot", "the document states its findings base", "NONSELF_GIT_COMMIT", true, true], ["subject", "the document names its measurement subject", "NONSELF_GIT_COMMIT", true, true], ["acquisition commit", "the document states the commit it was taken at", "SELF", true, true], ["validated checkpoint", "the document states its validated point", "SELF", true, true], ["measured at", "the document states its measurement point", "AMBIGUOUS", true, true], ["snapshot", "the document states its snapshot", "AMBIGUOUS", true, true], ["last updated", "the document states its own currency", "SELF", true, true], ["last reviewed", "the document states its own review point", "SELF", true, true], ["reviewed", "the document states its own review point", "SELF", true, true], ["planning date", "the document states its own authoring date", "SELF", true, true], ["date", "the document states its own date", "SELF", true, true], ["version", "the document states its own version point", "SELF", true, true], ["created", "the document states its own creation point", "SELF", true, true], ["generated", "the document states its own generation point", "SELF", true, true], ["opened", "the document states when it was opened", "SELF", true, true], ["updated", "the document states its own currency", "SELF", true, true], ["finali[sz]ed", "the document states its own completion point", "SELF", true, true], ["report completed", "the document states its own completion point", "SELF", true, true], ["(?:log|register) started", "the document states when its record began", "SELF", true, true], ["started", "the document states when its record began", "SELF", true, true], ["prepared", "the document states its own preparation point", "SELF", true, true], ["review date", "the document states its own review point", "SELF", true, true], ["sent", "the document states when it was sent", "SELF", true, true], ["written", "the document states when it was written", "SELF", true, true], ["agreed", "the document states when it was agreed", "SELF", true, true]], "contextual_predicates": [["status", "document-level state, and ONLY inside the root metadata block of a document that has independently earned an intrinsic document-binding field"]], "fields": ["rationale", "subject_policy"], "is_tuple_subclass": true, "lookups": {"acquisition commit": ["the document states the commit it was taken at", "SELF"], "audited snapshot": ["the document states the snapshot it audits", "NONSELF_GIT_COMMIT"], "created": ["the document states its own creation point", "SELF"], "date": ["the document states its own date", "SELF"], "findings-bearing snapshot": ["the document states its findings base", "NONSELF_GIT_COMMIT"], "last updated": ["the document states its own currency", "SELF"], "measured at": ["the document states its measurement point", "AMBIGUOUS"], "not a label": null, "reviewed": ["the document states its own review point", "SELF"], "snapshot": ["the document states its snapshot", "AMBIGUOUS"], "subject": ["the document names its measurement subject", "NONSELF_GIT_COMMIT"], "validated checkpoint": ["the document states its validated point", "SELF"], "version": ["the document states its own version point", "SELF"]}, "rejections": {"None policy": "REFUSED: binding predicate 'x'", "empty rationale": "REFUSED: binding predicate 'x'", "keyword construction": "ACCEPTED", "known-negative: well-formed": "ACCEPTED", "non-Binding string": "REFUSED: binding predicate 'x'", "other namedtuple, same fields": "REFUSED: binding predicate 'x'", "plain tuple": "REFUSED: binding predicate 'x'", "unknown policy": "REFUSED: binding predicate 'x'"}, "route_subject_policy": {"IN_SECTION": "AMBIGUOUS", "LABELLED_REPEATED": "AMBIGUOUS", "LABELLED_UNBOUND": "AMBIGUOUS", "R1_H1": "AMBIGUOUS", "R2_SELF_SUBJECT": "SELF", "R3_LABELLED": "AMBIGUOUS", "R4_CONTEXTUAL": "SELF", "R5_ROOT_LIFECYCLE": "SELF", "R6_BARE_DATELINE": "SELF", "R7_SUPERSEDED_BY": "SELF", "TABLE_ROW": "AMBIGUOUS", "UNLABELLED": "AMBIGUOUS"}, "subject_policies": ["SELF", "AMBIGUOUS", "NONSELF_GIT_COMMIT"], "typing_loaded": ["typing", "typing.io", "typing.re"], "unknown_apply_policy": "REFUSED SubjectPolicyError", "validate_registry": 26}
+    --- end registry probe OLD (37bce4c) (4334 bytes)
+    --- registry probe NEW (working tree)  rc=0  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s -c 
+    import sys, json, collections
+    sys.path.insert(0, sys.argv[1])
+    import passa
+    B = passa.Binding
+    out = {"fields": list(B._fields), "is_tuple_subclass": issubclass(B, tuple),
+           "binding_predicates": [[k, v.rationale, v.subject_policy, isinstance(v, B), tuple(v) == (v.rationale, v.subject_policy)]
+                                  for k, v in passa.BINDING_PREDICATES.items()],
+           "contextual_predicates": [[k, (list(v) if isinstance(v, tuple) else v)] for k, v in passa.CONTEXTUAL_PREDICATES.items()],
+           "route_subject_policy": {str(k): v for k, v in passa.ROUTE_SUBJECT_POLICY.items()},
+           "subject_policies": list(passa.SUBJECT_POLICIES),
+           "validate_registry": passa.validate_registry(),
+           "lookups": {}, "rejections": {}}
+    for lab in ("audited snapshot", "findings-bearing snapshot", "subject", "acquisition commit", "validated checkpoint",
+                "snapshot", "measured at", "last updated", "reviewed", "date", "version", "created", "not a label"):
+        e = passa.registry_lookup(lab)
+        out["lookups"][lab] = None if e is None else [e.rationale, e.subject_policy]
+    Other = collections.namedtuple("Other", ["rationale", "subject_policy"])
+    cases = {"non-Binding string": "just a rationale string", "plain tuple": ("r", passa.POLICY_SELF),
+             "other namedtuple, same fields": Other("r", passa.POLICY_SELF),
+             "unknown policy": B("r", "NOT_A_POLICY"), "empty rationale": B("", passa.POLICY_SELF),
+             "None policy": B("r", None), "known-negative: well-formed": B("r", passa.POLICY_SELF),
+             "keyword construction": B(rationale="r", subject_policy=passa.POLICY_AMBIGUOUS)}
+    for name, entry in cases.items():
+        try:
+            passa.validate_registry({"x": entry}); out["rejections"][name] = "ACCEPTED"
+        except passa.SubjectPolicyError as e:
+            out["rejections"][name] = "REFUSED: " + str(e).split(" carries ")[0].split(" has ")[0][:40]
+    try:
+        passa._apply_policy("SOMETHING_ELSE"); out["unknown_apply_policy"] = "ACCEPTED"
+    except Exception as e:
+        out["unknown_apply_policy"] = "REFUSED " + type(e).__name__
+    out["typing_loaded"] = sorted(m for m in sys.modules if m == "typing" or m.startswith("typing."))
+    print(json.dumps(out, sort_keys=True))
+     …
+    {"binding_predicates": [["audited snapshot", "the document states the snapshot it audits", "NONSELF_GIT_COMMIT", true, true], ["findings-bearing[^:]*snapshot", "the document states its findings base", "NONSELF_GIT_COMMIT", true, true], ["subject", "the document names its measurement subject", "NONSELF_GIT_COMMIT", true, true], ["acquisition commit", "the document states the commit it was taken at", "SELF", true, true], ["validated checkpoint", "the document states its validated point", "SELF", true, true], ["measured at", "the document states its measurement point", "AMBIGUOUS", true, true], ["snapshot", "the document states its snapshot", "AMBIGUOUS", true, true], ["last updated", "the document states its own currency", "SELF", true, true], ["last reviewed", "the document states its own review point", "SELF", true, true], ["reviewed", "the document states its own review point", "SELF", true, true], ["planning date", "the document states its own authoring date", "SELF", true, true], ["date", "the document states its own date", "SELF", true, true], ["version", "the document states its own version point", "SELF", true, true], ["created", "the document states its own creation point", "SELF", true, true], ["generated", "the document states its own generation point", "SELF", true, true], ["opened", "the document states when it was opened", "SELF", true, true], ["updated", "the document states its own currency", "SELF", true, true], ["finali[sz]ed", "the document states its own completion point", "SELF", true, true], ["report completed", "the document states its own completion point", "SELF", true, true], ["(?:log|register) started", "the document states when its record began", "SELF", true, true], ["started", "the document states when its record began", "SELF", true, true], ["prepared", "the document states its own preparation point", "SELF", true, true], ["review date", "the document states its own review point", "SELF", true, true], ["sent", "the document states when it was sent", "SELF", true, true], ["written", "the document states when it was written", "SELF", true, true], ["agreed", "the document states when it was agreed", "SELF", true, true]], "contextual_predicates": [["status", "document-level state, and ONLY inside the root metadata block of a document that has independently earned an intrinsic document-binding field"]], "fields": ["rationale", "subject_policy"], "is_tuple_subclass": true, "lookups": {"acquisition commit": ["the document states the commit it was taken at", "SELF"], "audited snapshot": ["the document states the snapshot it audits", "NONSELF_GIT_COMMIT"], "created": ["the document states its own creation point", "SELF"], "date": ["the document states its own date", "SELF"], "findings-bearing snapshot": ["the document states its findings base", "NONSELF_GIT_COMMIT"], "last updated": ["the document states its own currency", "SELF"], "measured at": ["the document states its measurement point", "AMBIGUOUS"], "not a label": null, "reviewed": ["the document states its own review point", "SELF"], "snapshot": ["the document states its snapshot", "AMBIGUOUS"], "subject": ["the document names its measurement subject", "NONSELF_GIT_COMMIT"], "validated checkpoint": ["the document states its validated point", "SELF"], "version": ["the document states its own version point", "SELF"]}, "rejections": {"None policy": "REFUSED: binding predicate 'x'", "empty rationale": "REFUSED: binding predicate 'x'", "keyword construction": "ACCEPTED", "known-negative: well-formed": "ACCEPTED", "non-Binding string": "REFUSED: binding predicate 'x'", "other namedtuple, same fields": "REFUSED: binding predicate 'x'", "plain tuple": "REFUSED: binding predicate 'x'", "unknown policy": "REFUSED: binding predicate 'x'"}, "route_subject_policy": {"IN_SECTION": "AMBIGUOUS", "LABELLED_REPEATED": "AMBIGUOUS", "LABELLED_UNBOUND": "AMBIGUOUS", "R1_H1": "AMBIGUOUS", "R2_SELF_SUBJECT": "SELF", "R3_LABELLED": "AMBIGUOUS", "R4_CONTEXTUAL": "SELF", "R5_ROOT_LIFECYCLE": "SELF", "R6_BARE_DATELINE": "SELF", "R7_SUPERSEDED_BY": "SELF", "TABLE_ROW": "AMBIGUOUS", "UNLABELLED": "AMBIGUOUS"}, "subject_policies": ["SELF", "AMBIGUOUS", "NONSELF_GIT_COMMIT"], "typing_loaded": [], "unknown_apply_policy": "REFUSED SubjectPolicyError", "validate_registry": 26}
+    --- end registry probe NEW (working tree) (4300 bytes)
+      binding_predicates       OLD==NEW True   sha256 42c69d1faeff45c2 / 42c69d1faeff45c2
+      contextual_predicates    OLD==NEW True   sha256 8188677f1b1493e0 / 8188677f1b1493e0
+      fields                   OLD==NEW True   sha256 5cea0c901e36bc54 / 5cea0c901e36bc54
+      is_tuple_subclass        OLD==NEW True   sha256 b5bea41b6c623f7c / b5bea41b6c623f7c
+      lookups                  OLD==NEW True   sha256 f06ea702c65fa7c3 / f06ea702c65fa7c3
+      rejections               OLD==NEW True   sha256 e6580ca8ed85862e / e6580ca8ed85862e
+      route_subject_policy     OLD==NEW True   sha256 4270c43306c905cd / 4270c43306c905cd
+      subject_policies         OLD==NEW True   sha256 be0dca73158fbe93 / be0dca73158fbe93
+      unknown_apply_policy     OLD==NEW True   sha256 b195dd61cf9ca7fd / b195dd61cf9ca7fd
+      validate_registry        OLD==NEW True   sha256 5f9c4ab08cac7457 / 5f9c4ab08cac7457
+      binding_predicates entries 26, all isinstance Binding OLD True NEW True
+      rejections NEW: {"None policy": "REFUSED: binding predicate 'x'", "empty rationale": "REFUSED: binding predicate 'x'", "keyword construction": "ACCEPTED", "known-negative: well-formed": "ACCEPTED", "non-Binding string": "REFUSED: binding predicate 'x'", "other namedtuple, same fields": "REFUSED: binding predicate 'x'", "plain tuple": "REFUSED: binding predicate 'x'", "unknown policy": "REFUSED: binding predicate 'x'"}
+      typing modules loaded after `import passa`: OLD ['typing', 'typing.io', 'typing.re']  NEW []
+      REGISTRY SEMANTICS UNCHANGED (every compared key equal): True
+    
+    == 2. CLEAN CHAIN — OLD (37bce4c) ==
+    --- Stage-A builder (calibration fixture)  rc=0  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s -c import sys; sys.path.insert(0, '/tmp/optA_sgwi08sz/old/kai-pm/house_in_order_h2_v13'); import stage_identity as SI
+    SI.load_governed_census('/home/user/kai-repair/kai-pm/house_in_order_census_v11')
+    d = SI.build_stage_a('CALIBRATION', subject_repo='/tmp/optA_sgwi08sz/chain_old/subj', history_repo='/tmp/optA_sgwi08sz/chain_old/subj')
+    open('/tmp/optA_sgwi08sz/chain_old/stage_a.json', 'xb').write(SI.canonical_bytes(d)); print('stage_a_identity', SI.stage_a_identity(d))
+    stage_a_identity 45607fa2d2af41de5027041a9ac9e17ba41a06e276ea89d4941149308b37ff35
+    --- end Stage-A builder (calibration fixture) (82 bytes)
+    --- OLD (37bce4c) PRODUCER passa.py  rc=1  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s /tmp/optA_sgwi08sz/old/kai-pm/house_in_order_h2_v13/passa.py --subject-repo …
+    REFUSE (pre-production): the producer runtime population contains origins outside every governed Stage-A root, with no Stage-A dependency identity: typing.io: REFUSE: typing.io has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origi; typing.re: REFUSE: typing.re has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origi
+    --- end OLD (37bce4c) PRODUCER passa.py (413 bytes)
+    --- OLD (37bce4c) PRODUCER passa.py, origin-measured run  rc=1  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s -c 
+    import sys, runpy, os
+    script = sys.argv[1]; sys.argv = sys.argv[1:]
+    rc = 0
+    try:
+        runpy.run_path(script, run_name="__main__")
+    except SystemExit as e:
+        rc = e.code if isinstance(e.code, int) else (0 if e.code is None else 1)
+        if not isinstance(e.code, int) and e.code is not None:
+            print(e.code, file=sys.stderr)
+    sys.path.insert(0, os.path.dirname(os.path.abspath(script)))
+    SI = sys.modules.get("stage_identity")
+    if SI is None:
+        import stage_identity as SI
+    members, offenders = SI.producer_population()
+    import collections
+    kinds = collections.Counter(c for c, _, _ in members)
+    print("ORIGIN MEASUREMENT (after the run, same process): members %d  %s" % (len(members), dict(sorted(kinds.items()))))
+    expl = [(n, w) for n, w in offenders if n == "__main__"]
+    unexpl = [(n, w) for n, w in offenders if n != "__main__"]
+    for n, w in expl:
+        print("  EXPLAINED offender %s: the measuring wrapper's own -c __main__ (restored by runpy after the run): %s" % (n, w[:100]))
+    for n, w in unexpl:
+        print("  UNEXPLAINED offender %s: %s" % (n, w[:160]))
+    print("UNEXPLAINED LOADED ORIGINS: %d" % len(unexpl))
+    sys.exit(rc)
+     …
+    ORIGIN MEASUREMENT (after the run, same process): members 118  {'BUILTIN': 22, 'FROZEN': 20, 'H2': 2, 'STDLIB': 74}
+      EXPLAINED offender __main__: the measuring wrapper's own -c __main__ (restored by runpy after the run): REFUSE: the executing entry point __main__ has no mechanically establishable source (spec_origin=Non
+      UNEXPLAINED offender typing.io: REFUSE: typing.io has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origin=None). A missing __file__ is NOT an an
+      UNEXPLAINED offender typing.re: REFUSE: typing.re has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origin=None). A missing __file__ is NOT an an
+    UNEXPLAINED LOADED ORIGINS: 2
+    REFUSE (pre-production): the producer runtime population contains origins outside every governed Stage-A root, with no Stage-A dependency identity: typing.io: REFUSE: typing.io has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origi; typing.re: REFUSE: typing.re has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origi
+    --- end OLD (37bce4c) PRODUCER passa.py, origin-measured run (1156 bytes)
+    CHAIN STOPS: Pass A rc=1; nothing downstream exists (R11)
+    
+    == 2. CLEAN CHAIN — NEW (working tree) ==
+    --- Stage-A builder (calibration fixture)  rc=0  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s -c import sys; sys.path.insert(0, '/home/user/kai-repair/kai-pm/house_in_order_h2_v13'); import stage_identity as SI
+    SI.load_governed_census('/home/user/kai-repair/kai-pm/house_in_order_census_v11')
+    d = SI.build_stage_a('CALIBRATION', subject_repo='/tmp/optA_sgwi08sz/chain_new/subj', history_repo='/tmp/optA_sgwi08sz/chain_new/subj')
+    open('/tmp/optA_sgwi08sz/chain_new/stage_a.json', 'xb').write(SI.canonical_bytes(d)); print('stage_a_identity', SI.stage_a_identity(d))
+    stage_a_identity 5dcdd09c2f2cf6e293c3079b5b1f656a33eedb2dae6c479830ee7205c52833ae
+    --- end Stage-A builder (calibration fixture) (82 bytes)
+    --- NEW (working tree) PRODUCER passa.py  rc=0  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s /home/user/kai-repair/kai-pm/house_in_order_h2_v13/passa.py --subject-repo …
+    PASS A v1.2 COMPLETE — 3 rows == population 3
+      WITNESS KINDS DISCRIMINATED (D2/D4), not assumed from shape:
+        DATE                          3
+      scope determined: WHOLE_FILE 3 · SPAN 0
+      binding predicates declared closed-world: 26
+      contextual predicates declared closed-world: 1 (status)
+      NO VERDICT ASSIGNED IN PASS A.
+    --- end NEW (working tree) PRODUCER passa.py (328 bytes)
+    --- NEW (working tree) PRODUCER passa.py, origin-measured run  rc=1  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s -c 
+    import sys, runpy, os
+    script = sys.argv[1]; sys.argv = sys.argv[1:]
+    rc = 0
+    try:
+        runpy.run_path(script, run_name="__main__")
+    except SystemExit as e:
+        rc = e.code if isinstance(e.code, int) else (0 if e.code is None else 1)
+        if not isinstance(e.code, int) and e.code is not None:
+            print(e.code, file=sys.stderr)
+    sys.path.insert(0, os.path.dirname(os.path.abspath(script)))
+    SI = sys.modules.get("stage_identity")
+    if SI is None:
+        import stage_identity as SI
+    members, offenders = SI.producer_population()
+    import collections
+    kinds = collections.Counter(c for c, _, _ in members)
+    print("ORIGIN MEASUREMENT (after the run, same process): members %d  %s" % (len(members), dict(sorted(kinds.items()))))
+    expl = [(n, w) for n, w in offenders if n == "__main__"]
+    unexpl = [(n, w) for n, w in offenders if n != "__main__"]
+    for n, w in expl:
+        print("  EXPLAINED offender %s: the measuring wrapper's own -c __main__ (restored by runpy after the run): %s" % (n, w[:100]))
+    for n, w in unexpl:
+        print("  UNEXPLAINED offender %s: %s" % (n, w[:160]))
+    print("UNEXPLAINED LOADED ORIGINS: %d" % len(unexpl))
+    sys.exit(rc)
+     …
+    ORIGIN MEASUREMENT (after the run, same process): members 118  {'BUILTIN': 22, 'FROZEN': 20, 'H2': 2, 'STDLIB': 74}
+      EXPLAINED offender __main__: the measuring wrapper's own -c __main__ (restored by runpy after the run): REFUSE: the executing entry point __main__ has no mechanically establishable source (spec_origin=Non
+      UNEXPLAINED offender typing.io: REFUSE: typing.io has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origin=None). A missing __file__ is NOT an an
+      UNEXPLAINED offender typing.re: REFUSE: typing.re has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origin=None). A missing __file__ is NOT an an
+    UNEXPLAINED LOADED ORIGINS: 2
+    REFUSE (pre-production): the producer runtime population contains origins outside every governed Stage-A root, with no Stage-A dependency identity: typing.io: REFUSE: typing.io has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origi; typing.re: REFUSE: typing.re has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origi
+    --- end NEW (working tree) PRODUCER passa.py, origin-measured run (1156 bytes)
+    --- NEW (working tree) BINDER Pass A  rc=0  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s /home/user/kai-repair/kai-pm/house_in_order_h2_v13/stage_identity.py bind …
+    3d98803945b0b7d0be8a4b0b60c491674ef60c04049519c2816d0655446a560a
+    --- end NEW (working tree) BINDER Pass A (65 bytes)
+    --- NEW (working tree) BINDER Pass A, origin-measured run  rc=0  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s -c 
+    import sys, runpy, os
+    script = sys.argv[1]; sys.argv = sys.argv[1:]
+    rc = 0
+    try:
+        runpy.run_path(script, run_name="__main__")
+    except SystemExit as e:
+        rc = e.code if isinstance(e.code, int) else (0 if e.code is None else 1)
+        if not isinstance(e.code, int) and e.code is not None:
+            print(e.code, file=sys.stderr)
+    sys.path.insert(0, os.path.dirname(os.path.abspath(script)))
+    SI = sys.modules.get("stage_identity")
+    if SI is None:
+        import stage_identity as SI
+    members, offenders = SI.producer_population()
+    import collections
+    kinds = collections.Counter(c for c, _, _ in members)
+    print("ORIGIN MEASUREMENT (after the run, same process): members %d  %s" % (len(members), dict(sorted(kinds.items()))))
+    expl = [(n, w) for n, w in offenders if n == "__main__"]
+    unexpl = [(n, w) for n, w in offenders if n != "__main__"]
+    for n, w in expl:
+        print("  EXPLAINED offender %s: the measuring wrapper's own -c __main__ (restored by runpy after the run): %s" % (n, w[:100]))
+    for n, w in unexpl:
+        print("  UNEXPLAINED offender %s: %s" % (n, w[:160]))
+    print("UNEXPLAINED LOADED ORIGINS: %d" % len(unexpl))
+    sys.exit(rc)
+     …
+    3d98803945b0b7d0be8a4b0b60c491674ef60c04049519c2816d0655446a560a
+    ORIGIN MEASUREMENT (after the run, same process): members 100  {'BUILTIN': 21, 'FROZEN': 20, 'H2': 1, 'STDLIB': 58}
+      EXPLAINED offender __main__: the measuring wrapper's own -c __main__ (restored by runpy after the run): REFUSE: the executing entry point __main__ has no mechanically establishable source (spec_origin=Non
+      UNEXPLAINED offender typing.io: REFUSE: typing.io has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origin=None). A missing __file__ is NOT an an
+      UNEXPLAINED offender typing.re: REFUSE: typing.re has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origin=None). A missing __file__ is NOT an an
+    UNEXPLAINED LOADED ORIGINS: 2
+    --- end NEW (working tree) BINDER Pass A, origin-measured run (808 bytes)
+    --- NEW (working tree) CLASSIFIER run_h2_v12.py  rc=0  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s /home/user/kai-repair/kai-pm/house_in_order_h2_v13/run_h2_v12.py --subject-repo …
+    HOUSE_H2 v1.2 — 3 rows == population 3
+      subject fe94f2994cbd tree 56736a75499d
+    
+      LIFECYCLE    positives    0  UNKNOWN    3   
+      FUNCTION     positives    0  UNKNOWN    3   
+      AUTHORITY    positives    0  UNKNOWN    3   
+      GENERATION   positives    0  UNKNOWN    3   
+      VALIDITY     positives    0  UNKNOWN    3   
+      SCOPE        positives    3  UNKNOWN    0   {'WHOLE_FILE': 3}
+    
+      evidence facts (NOT verdicts):
+        MAINTENANCE_OBSERVED            1
+        CARRIES_DATE_STAMP              3
+        BINDING_CONTRADICTION           3
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 0
+        {}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end NEW (working tree) CLASSIFIER run_h2_v12.py (713 bytes)
+    --- NEW (working tree) CLASSIFIER, origin-measured run  rc=1  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s -c 
+    import sys, runpy, os
+    script = sys.argv[1]; sys.argv = sys.argv[1:]
+    rc = 0
+    try:
+        runpy.run_path(script, run_name="__main__")
+    except SystemExit as e:
+        rc = e.code if isinstance(e.code, int) else (0 if e.code is None else 1)
+        if not isinstance(e.code, int) and e.code is not None:
+            print(e.code, file=sys.stderr)
+    sys.path.insert(0, os.path.dirname(os.path.abspath(script)))
+    SI = sys.modules.get("stage_identity")
+    if SI is None:
+        import stage_identity as SI
+    members, offenders = SI.producer_population()
+    import collections
+    kinds = collections.Counter(c for c, _, _ in members)
+    print("ORIGIN MEASUREMENT (after the run, same process): members %d  %s" % (len(members), dict(sorted(kinds.items()))))
+    expl = [(n, w) for n, w in offenders if n == "__main__"]
+    unexpl = [(n, w) for n, w in offenders if n != "__main__"]
+    for n, w in expl:
+        print("  EXPLAINED offender %s: the measuring wrapper's own -c __main__ (restored by runpy after the run): %s" % (n, w[:100]))
+    for n, w in unexpl:
+        print("  UNEXPLAINED offender %s: %s" % (n, w[:160]))
+    print("UNEXPLAINED LOADED ORIGINS: %d" % len(unexpl))
+    sys.exit(rc)
+     …
+    ORIGIN MEASUREMENT (after the run, same process): members 122  {'BUILTIN': 22, 'FROZEN': 20, 'H2': 6, 'STDLIB': 74}
+      EXPLAINED offender __main__: the measuring wrapper's own -c __main__ (restored by runpy after the run): REFUSE: the executing entry point __main__ has no mechanically establishable source (spec_origin=Non
+      UNEXPLAINED offender typing.io: REFUSE: typing.io has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origin=None). A missing __file__ is NOT an an
+      UNEXPLAINED offender typing.re: REFUSE: typing.re has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origin=None). A missing __file__ is NOT an an
+    UNEXPLAINED LOADED ORIGINS: 2
+    REFUSE (classification): the producer runtime population contains origins outside every governed Stage-A root, with no Stage-A dependency identity: typing.io: REFUSE: typing.io has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origi; typing.re: REFUSE: typing.re has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origi
+    --- end NEW (working tree) CLASSIFIER, origin-measured run (1156 bytes)
+    --- NEW (working tree) BINDER classification  rc=0  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s /home/user/kai-repair/kai-pm/house_in_order_h2_v13/stage_identity.py bind …
+    c0a69ccc2e06453f5ebabd412c2df8f9a5f32cdd352db1e699684727e1363c7d
+    --- end NEW (working tree) BINDER classification (65 bytes)
+    --- NEW (working tree) QUALIFIER qualify.py  rc=1  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s /home/user/kai-repair/kai-pm/house_in_order_h2_v13/qualify.py --result …
+    HOUSE_H2 v1.2 — QUALIFICATION
+      subject fe94f2994cbd  tree 56736a75499d
+      history 2026-10-02 → 2026-10-02  shallow=false  ancestry=2
+      census  29064d650a612968…
+    
+      [1] GOVERNING INVARIANT — checked from the AXIS SET
+          UNKNOWN first-class on every axis: True
+      [1b] REMOVAL CALIBRATION — the gate proves it can fail, this run
+           remove UNKNOWN from LIFECYCLE   detected=True
+           remove UNKNOWN from FUNCTION    detected=True
+           remove UNKNOWN from AUTHORITY   detected=True
+           remove UNKNOWN from GENERATION  detected=True
+           remove UNKNOWN from VALIDITY    detected=True
+           remove UNKNOWN from SCOPE       detected=True
+    
+      [2] STATE DISPOSITIONS — checked from the ALPHABET
+          [LIFECYCLE]
+            ACTIVE            H2_NOT_EARNABLE        0  
+            HISTORICAL        H2_EMITTABLE           0  not observed on this subject
+            SUPERSEDED        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           3  
+          [FUNCTION]
+            GOVERNANCE        H2_EMITTABLE           0  not observed on this subject
+            STATUS            H2_EMITTABLE           0  not observed on this subject
+            PLAN              H2_EMITTABLE           0  not observed on this subject
+            EVIDENCE          H2_EMITTABLE           0  not observed on this subject
+            REFERENCE         H2_EMITTABLE           0  not observed on this subject
+            RUNTIME_INPUT     H2_EMITTABLE           0  not observed on this subject
+            TEMPLATE          H2_EMITTABLE           0  not observed on this subject
+            MARKER            H2_EMITTABLE           0  not observed on this subject
+            USER_GUIDE        H2_EMITTABLE           0  not observed on this subject
+            OTHER             H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           3  
+          [AUTHORITY]
+            AUTHORITATIVE     DEFERRED_TO_H3         0  
+            VERIFIED_DERIVED  DEFERRED_TO_H3         0  
+            ADVISORY          DEFERRED_TO_H3         0  
+            NON_AUTHORITY     DEFERRED_TO_H3         0  
+            UNKNOWN           H2_EMITTABLE           3  
+          [GENERATION]
+            MANUAL            H2_NOT_EARNABLE        0  
+            PARTIAL_DERIVED   H2_NOT_EARNABLE        0  
+            FULL_DERIVED      H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           3  
+          [VALIDITY]
+            CURRENT_TREE      H2_EMITTABLE           0  not observed on this subject
+            EXACT_SNAPSHOT    H2_EMITTABLE           0  not observed on this subject
+            RUN_ARTEFACT      H2_EMITTABLE           0  not observed on this subject
+            TIME_BOUND        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           3  
+          [SCOPE]
+            WHOLE_FILE        H2_EMITTABLE           3  
+            HEADING           H2_NOT_EARNABLE        0  
+            TABLE             H2_NOT_EARNABLE        0  
+            MANAGED_REGION    H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           0  not observed on this subject
+    
+      [3] OUTPUT-DERIVED — values emitted but unknown to the ontology: 0
+    
+      [4] population declared 3 == rows 3: True
+      [5] every non-abstention cell carries a source-bound witness: True  (0 missing)
+    
+      [6] §8(6) CLOSED ORIGIN CLASSIFICATION — every loaded origin
+          observed 87   classified 87   refused 0
+          H2                 3
+          CENSUS             0
+          GOVERNED_STDLIB    48
+          BUILTIN_OR_FROZEN  36
+    
+      [7] Q1a RECORDED PRODUCER PROVENANCE vs STAGE A
+          verified against stage_a_identity 5dcdd09c2f2cf6e2…, every slot closed
+    
+      [8] Q1b / E1 — DERIVED denominators (D379 §8)
+          axis-cell denominator              3
+          positive-evidence-fact denominator 7
+          sum                                10
+    
+      UTILITY PROFILE — reported, never optimised (D367 11)
+          axis         positive  UNKNOWN  UNMEASURED
+          LIFECYCLE           0        3           0
+          FUNCTION            0        3           0
+          AUTHORITY           0        3           0
+          GENERATION          0        3           0
+          VALIDITY            0        3           0
+          SCOPE               3        0           0
+          Qualification asks: is the instrument TRUTHFUL?
+          A separate later decision asks: is it USEFUL enough for H3?
+    
+      FINDINGS: 6
+        FACT_CLASS_ABSENT::kai-pm/SYNTH_0.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SYNTH_0.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SYNTH_1.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SYNTH_1.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SYNTH_2.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SYNTH_2.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+    --- end NEW (working tree) QUALIFIER qualify.py (5295 bytes)
+    --- NEW (working tree) QUALIFIER, origin-measured run  rc=1  argv=/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11 -B -E -s -c 
+    import sys, runpy, os
+    script = sys.argv[1]; sys.argv = sys.argv[1:]
+    rc = 0
+    try:
+        runpy.run_path(script, run_name="__main__")
+    except SystemExit as e:
+        rc = e.code if isinstance(e.code, int) else (0 if e.code is None else 1)
+        if not isinstance(e.code, int) and e.code is not None:
+            print(e.code, file=sys.stderr)
+    sys.path.insert(0, os.path.dirname(os.path.abspath(script)))
+    SI = sys.modules.get("stage_identity")
+    if SI is None:
+        import stage_identity as SI
+    members, offenders = SI.producer_population()
+    import collections
+    kinds = collections.Counter(c for c, _, _ in members)
+    print("ORIGIN MEASUREMENT (after the run, same process): members %d  %s" % (len(members), dict(sorted(kinds.items()))))
+    expl = [(n, w) for n, w in offenders if n == "__main__"]
+    unexpl = [(n, w) for n, w in offenders if n != "__main__"]
+    for n, w in expl:
+        print("  EXPLAINED offender %s: the measuring wrapper's own -c __main__ (restored by runpy after the run): %s" % (n, w[:100]))
+    for n, w in unexpl:
+        print("  UNEXPLAINED offender %s: %s" % (n, w[:160]))
+    print("UNEXPLAINED LOADED ORIGINS: %d" % len(unexpl))
+    sys.exit(rc)
+     …
+    HOUSE_H2 v1.2 — QUALIFICATION
+      subject fe94f2994cbd  tree 56736a75499d
+      history 2026-10-02 → 2026-10-02  shallow=false  ancestry=2
+      census  29064d650a612968…
+    
+      [1] GOVERNING INVARIANT — checked from the AXIS SET
+          UNKNOWN first-class on every axis: True
+      [1b] REMOVAL CALIBRATION — the gate proves it can fail, this run
+           remove UNKNOWN from LIFECYCLE   detected=True
+           remove UNKNOWN from FUNCTION    detected=True
+           remove UNKNOWN from AUTHORITY   detected=True
+           remove UNKNOWN from GENERATION  detected=True
+           remove UNKNOWN from VALIDITY    detected=True
+           remove UNKNOWN from SCOPE       detected=True
+    
+      [2] STATE DISPOSITIONS — checked from the ALPHABET
+          [LIFECYCLE]
+            ACTIVE            H2_NOT_EARNABLE        0  
+            HISTORICAL        H2_EMITTABLE           0  not observed on this subject
+            SUPERSEDED        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           3  
+          [FUNCTION]
+            GOVERNANCE        H2_EMITTABLE           0  not observed on this subject
+            STATUS            H2_EMITTABLE           0  not observed on this subject
+            PLAN              H2_EMITTABLE           0  not observed on this subject
+            EVIDENCE          H2_EMITTABLE           0  not observed on this subject
+            REFERENCE         H2_EMITTABLE           0  not observed on this subject
+            RUNTIME_INPUT     H2_EMITTABLE           0  not observed on this subject
+            TEMPLATE          H2_EMITTABLE           0  not observed on this subject
+            MARKER            H2_EMITTABLE           0  not observed on this subject
+            USER_GUIDE        H2_EMITTABLE           0  not observed on this subject
+            OTHER             H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           3  
+          [AUTHORITY]
+            AUTHORITATIVE     DEFERRED_TO_H3         0  
+            VERIFIED_DERIVED  DEFERRED_TO_H3         0  
+            ADVISORY          DEFERRED_TO_H3         0  
+            NON_AUTHORITY     DEFERRED_TO_H3         0  
+            UNKNOWN           H2_EMITTABLE           3  
+          [GENERATION]
+            MANUAL            H2_NOT_EARNABLE        0  
+            PARTIAL_DERIVED   H2_NOT_EARNABLE        0  
+            FULL_DERIVED      H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           3  
+          [VALIDITY]
+            CURRENT_TREE      H2_EMITTABLE           0  not observed on this subject
+            EXACT_SNAPSHOT    H2_EMITTABLE           0  not observed on this subject
+            RUN_ARTEFACT      H2_EMITTABLE           0  not observed on this subject
+            TIME_BOUND        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           3  
+          [SCOPE]
+            WHOLE_FILE        H2_EMITTABLE           3  
+            HEADING           H2_NOT_EARNABLE        0  
+            TABLE             H2_NOT_EARNABLE        0  
+            MANAGED_REGION    H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           0  not observed on this subject
+    
+      [3] OUTPUT-DERIVED — values emitted but unknown to the ontology: 0
+    
+      [4] population declared 3 == rows 3: True
+      [5] every non-abstention cell carries a source-bound witness: True  (0 missing)
+    
+      [6] §8(6) CLOSED ORIGIN CLASSIFICATION — every loaded origin
+          observed 104   classified 102   refused 2
+          H2                 3
+          CENSUS             0
+          GOVERNED_STDLIB    58
+          BUILTIN_OR_FROZEN  41
+          REFUSED typing.io: REFUSE: typing.io has no filesystem source and its origin is neither built-in nor frozen (spec_origin=None).
+          REFUSED typing.re: REFUSE: typing.re has no filesystem source and its origin is neither built-in nor frozen (spec_origin=None).
+    
+      [7] Q1a RECORDED PRODUCER PROVENANCE vs STAGE A
+          verified against stage_a_identity 5dcdd09c2f2cf6e2…, every slot closed
+    
+      [8] Q1b / E1 — DERIVED denominators (D379 §8)
+          axis-cell denominator              3
+          positive-evidence-fact denominator 7
+          sum                                10
+    
+      UTILITY PROFILE — reported, never optimised (D367 11)
+          axis         positive  UNKNOWN  UNMEASURED
+          LIFECYCLE           0        3           0
+          FUNCTION            0        3           0
+          AUTHORITY           0        3           0
+          GENERATION          0        3           0
+          VALIDITY            0        3           0
+          SCOPE               3        0           0
+          Qualification asks: is the instrument TRUTHFUL?
+          A separate later decision asks: is it USEFUL enough for H3?
+    
+      FINDINGS: 8
+        RUNTIME_IDENTITY::typing.io — REFUSE: typing.io has no filesystem source and its origin is neither built-in nor frozen (spec_origin=None).
+        RUNTIME_IDENTITY::typing.re — REFUSE: typing.re has no filesystem source and its origin is neither built-in nor frozen (spec_origin=None).
+        FACT_CLASS_ABSENT::kai-pm/SYNTH_0.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SYNTH_0.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SYNTH_1.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SYNTH_1.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SYNTH_2.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SYNTH_2.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+    ORIGIN MEASUREMENT (after the run, same process): members 123  {'BUILTIN': 22, 'FROZEN': 20, 'H2': 7, 'STDLIB': 74}
+      EXPLAINED offender __main__: the measuring wrapper's own -c __main__ (restored by runpy after the run): REFUSE: the executing entry point __main__ has no mechanically establishable source (spec_origin=Non
+      UNEXPLAINED offender typing.io: REFUSE: typing.io has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origin=None). A missing __file__ is NOT an an
+      UNEXPLAINED offender typing.re: REFUSE: typing.re has no filesystem source and its origin is neither 'built-in' nor 'frozen' (has_spec=False, spec_origin=None). A missing __file__ is NOT an an
+    UNEXPLAINED LOADED ORIGINS: 2
+    --- end NEW (working tree) QUALIFIER, origin-measured run (6598 bytes)
+    
+    == SUMMARY ==
+    {
+     "OLD (37bce4c)": {
+      "passa_rc": 1
+     },
+     "NEW (working tree)": {
+      "passa_rc": 0,
+      "run_h2_rc": 0,
+      "qualify_rc": 1
+     }
+    }
+    temp root /tmp/optA_sgwi08sz removed
+    END-VERBATIM OPTA-SUPERSEDED-RUN2-OUTPUT optA_proof_out_run2_runpy_wrapper.txt
+- EVIDENCE FACTS-PROBE-INSTRUMENT facts_probe.py: 5385 bytes, sha256 7fe95f0b3e37abc902cad1f22f6aca4bd989d1d55161d62f863a74f94dca35f1, final LF True  [CMD `sha256sum facts_probe.py` → 7fe95f0b3e37abc9…]
+    BEGIN-VERBATIM FACTS-PROBE-INSTRUMENT facts_probe.py
+    """Read-only measurement for Kai's NOMINAL_FUNCTION / SELF_ASSERTS_CURRENT proposal.
+    Subject: frozen v1.2 Pass A blob f88e929b (272 rows) + frozen tree 3abc9e9d texts,
+    read from the repair clone's git objects. Instrument: the repair HEAD's classify.py
+    (dbe692d), and v1.1 evidence.py/subjectbind2.py from 438007e for option S1 only."""
+    import json, re, subprocess, sys, collections, pathlib, tempfile
+    R = "/home/user/kai-repair"; V = R + "/kai-pm/house_in_order_h2_v13"
+    sys.path.insert(0, V)
+    import classify as cl
+    def blob(spec):
+        p = subprocess.run(["git", "-C", R, "cat-file", "blob", spec], capture_output=True)
+        if p.returncode: raise SystemExit(f"R11 ABORT: cannot read {spec}")
+        return p.stdout
+    doc = json.loads(blob("f88e929b8c0f569dd7f730e12a8459b00f405595"))
+    rows = doc["rows"]; print("frozen Pass A rows", len(rows), "population", doc["population"])
+    texts = {r["path"]: blob(f"3abc9e9d8ca11966a6f996d5f0af68072ee5b117:{r['path']}").decode("utf-8") for r in rows}
+    
+    # ── NOMINAL_FUNCTION: the existing governed predicate ──
+    nom, amb, none_, marker, traced, untraced = [], [], 0, 0, 0, []
+    for r in rows:
+        out = cl.function(r, texts[r["path"]])
+        obs = out.get("observed", "") or ""
+        if out["value"] != "UNKNOWN": marker += 1; continue
+        if obs.startswith("NOMINAL_FUNCTION="):
+            role = obs.split("=", 1)[1].split()[0]; nom.append((r["path"], role))
+            # trace construction from the SAME governed predicates: title line first, then purpose body
+            text = texts[r["path"]]; lines = text.split("\n"); term = cl.FUNCTION_TERMS[role]
+            title = r.get("title") or ""; loc = None
+            if title and cl.term_match(term, title):
+                for i, ln in enumerate(lines):
+                    if ln.startswith("#") and ln.lstrip("#").strip()[:120] == title:
+                        m = cl.term_match(term, ln); loc = (i + 1, ln, m.group(0) if m else None); break
+            if loc is None:
+                pm = cl.PURPOSE.search(text[:6000])
+                if pm and cl.term_match(term, pm.group("body")):
+                    ln_no = text[:pm.start("body")].count("\n") + 1
+                    ln = lines[ln_no - 1]; m = cl.term_match(term, pm.group("body"))
+                    loc = (ln_no, ln, m.group(0))
+            if loc and loc[2] and loc[2] in loc[1]: traced += 1
+            else: untraced.append((r["path"], role, loc))
+        elif obs.startswith("nominal terms for"): amb.append(r["path"])
+        else: none_ += 1
+    print(f"NOMINAL_FUNCTION positive (existing predicate, same as run_h2_v12.py:455): {len(nom)}")
+    print(f"  ambiguous (>1 nominal term, classify abstains on D11): {len(amb)}; no nominal term: {none_}; objective MARKER verdicts: {marker}")
+    print(f"  roles: {dict(sorted(collections.Counter(x for _, x in nom).items()))}")
+    print(f"  positives with a locatable compliant trace (term in the cited line): {traced}; NOT locatable: {len(untraced)}")
+    for u in untraced[:10]: print("    UNTRACED", u)
+    
+    # ── SELF_ASSERTS_CURRENT option S2: governed currency-label DATE witnesses ──
+    CURRENCY = re.compile(r"last updated|last reviewed|^reviewed|last-updated", re.I)
+    s2 = [r["path"] for r in rows if any(w["applicability_scope"] == "WHOLE_FILE" and CURRENCY.search(w["local_context"].lstrip("*_>#-| "))
+                                         for w in r["witnesses"].get("DATE", []))]
+    s2b = [r["path"] for r in rows if any(CURRENCY.search(w["local_context"]) for w in r["witnesses"].get("DATE", []))]
+    print(f"SELF_ASSERTS_CURRENT option S2 (WHOLE_FILE DATE witness under the run_h2 CURRENCY label): {len(s2)} docs; any-scope currency-label DATE: {len(s2b)}")
+    
+    # ── option S1: the banked v1.1 detector, executed from its own committed bytes ──
+    d = pathlib.Path(tempfile.mkdtemp(prefix="v11_"))
+    for n in ("evidence.py", "subjectbind2.py"):
+        (d / n).write_bytes(subprocess.run(["git", "-C", "/home/user/kai-system", "show", f"438007e:kai-pm/house_in_order_h2_v11/{n}"],
+                                           capture_output=True, check=True).stdout)
+    sys.path.insert(0, str(d)); import evidence as ev11
+    s1 = [r["path"] for r in rows if ev11.facts(dict(r, readers=r.get("readers") or []), texts[r["path"]])["SELF_ASSERTS_CURRENT"]["present"]]
+    print(f"SELF_ASSERTS_CURRENT option S1 (v1.1 evidence.py@438007e, committed bytes): {len(s1)} docs")
+    for p in s1: print("    S1+", p)
+    print("S1 ∩ S2:", len(set(s1) & set(s2)))
+    
+    # ── option S1' : v1.1 CURRENT_POS/CURRENT_NEG polarity vocabulary (banked D361), subject bound by the
+    #    GOVERNED v1.3 subjectbind._sentences + bind_subject (D12-repaired). No v1.1 quoted-declaration rule.
+    import subjectbind as sb13
+    def s1p(path, text):
+        pos = neg = False; ev = None
+        for start, sent in sb13._sentences(text):
+            n = any(re.search(p, sent, re.I) for p in ev11.CURRENT_NEG)
+            p_ = (not n) and any(re.search(p, sent, re.I) for p in ev11.CURRENT_POS)
+            if not (n or p_): continue
+            subj, _why = sb13.bind_subject(text, start, sent, path)
+            if subj != "SELF": continue
+            if n: neg = True
+            else:
+                pos = True; ev = ev or (start, sent)
+        return pos and not neg, ev
+    s1p_hits = [r["path"] for r in rows if s1p(r["path"], texts[r["path"]])[0]]
+    print(f"SELF_ASSERTS_CURRENT option S1' (v1.1 polarity vocabulary + v1.3 bind_subject): {len(s1p_hits)} docs")
+    print("  S1' only:", sorted(set(s1p_hits) - set(s1))); print("  S1 only:", sorted(set(s1) - set(s1p_hits)))
+    END-VERBATIM FACTS-PROBE-INSTRUMENT facts_probe.py
+- EVIDENCE FACTS-PROBE-OUTPUT facts_probe_out.txt: 1087 bytes, sha256 1e03bbb2e3d1753a0d89b8a87dca4ca503f2b58535a10aab827d7b9229201425, final LF True  [CMD `sha256sum facts_probe_out.txt` → 1e03bbb2e3d1753a…]
+    BEGIN-VERBATIM FACTS-PROBE-OUTPUT facts_probe_out.txt
+    frozen Pass A rows 272 population 272
+    NOMINAL_FUNCTION positive (existing predicate, same as run_h2_v12.py:455): 207
+      ambiguous (>1 nominal term, classify abstains on D11): 23; no nominal term: 37; objective MARKER verdicts: 5
+      roles: {'EVIDENCE': 144, 'GOVERNANCE': 6, 'MARKER': 1, 'PLAN': 22, 'REFERENCE': 11, 'RUNTIME_INPUT': 9, 'STATUS': 4, 'USER_GUIDE': 10}
+      positives with a locatable compliant trace (term in the cited line): 207; NOT locatable: 0
+    SELF_ASSERTS_CURRENT option S2 (WHOLE_FILE DATE witness under the run_h2 CURRENCY label): 154 docs; any-scope currency-label DATE: 155
+    SELF_ASSERTS_CURRENT option S1 (v1.1 evidence.py@438007e, committed bytes): 6 docs
+        S1+ kai-pm/CODE_AUDIT_BATCH_COGNITIVE_STATE_STUBS.md
+        S1+ kai-pm/CODE_AUDIT_REGISTER.md
+        S1+ kai-pm/CODE_AUDIT_REGISTER_CONTINUED.md
+        S1+ kai-pm/CODE_AUDIT_REGISTER_CONTINUED_2.md
+        S1+ kai-pm/EMBEDDING_BACKEND_STATE.md
+        S1+ kai-pm/SERVICE_IDENTITY_MEASUREMENT.md
+    S1 ∩ S2: 2
+    SELF_ASSERTS_CURRENT option S1' (v1.1 polarity vocabulary + v1.3 bind_subject): 6 docs
+      S1' only: []
+      S1 only: []
+    END-VERBATIM FACTS-PROBE-OUTPUT facts_probe_out.txt
+
+### 6. Next authorised step
+
+- None beyond STOP: Kai rules on P1–P4 (in particular P2's vocabulary question); only then the run_h2_v12.py fact repair, and after that the controls rebuild  [CONVERSATION 2026-10-02 Kai, "Report and STOP for Kai."]
+
+### 7. What I am unsure of
+
+- The 207 and 6 calibrations are on ONE subject (the frozen 272-document tree via the frozen v1.2 Pass A rows, which predate D381's subject field); P2(a) without v1.1's quoted-declaration rule could differ on another subject  [CMD `facts_probe.py` → one subject]
+- Whether Kai regards a new trace witness_type label as "new vocabulary"  [CONVERSATION 2026-10-02 Kai, "introduce no new predicate vocabulary or heuristic"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
