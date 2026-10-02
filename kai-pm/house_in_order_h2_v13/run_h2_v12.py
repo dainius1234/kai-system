@@ -309,62 +309,69 @@ def evidence_facts(row, claims, contradiction, determining=(),
     return f, ac, traces, abstained
 
 
-def _classification_provenance(stage_a_path, repo_root, pa, pa_sha,
-                               pa_bytes):
-    """D379 §4 CLASSIFICATION in-band provenance + input_binding.
-
-    Consumes stage_identity.py. Defines no identity of its own. REFUSES on
-    missing, malformed or mismatched Pass-A provenance — no silent
-    inheritance.
-    """
+def _load_stage_a(stage_a_path):
+    """Strict Stage-A load (v4.1 C1, D380 §6.10) and DEP-3 runtime check,
+    BEFORE any work: the classifier verifies ITS OWN executing runtime."""
     import stage_identity as SI
-    sp = pathlib.Path(stage_a_path)
-    if not sp.is_file():
-        raise SystemExit(f"REFUSE: no Stage-A descriptor at {stage_a_path}")
-    desc = json.loads(sp.read_bytes().decode("utf-8"))
-    SI.validate_descriptor(desc)
-    ident = SI.stage_a_identity(desc)
-
-    pprov = pa.get("producer_provenance")
-    if pprov is None:
-        raise SystemExit(
-            "REFUSE: the Pass-A input carries no in-band producer_provenance "
-            "(D379 §4). Missing provenance: REFUSE, no silent inheritance.")
-    if not isinstance(pprov, dict) or "stage_a_identity" not in pprov:
-        raise SystemExit("REFUSE: malformed Pass-A producer_provenance")
-    if pprov["stage_a_identity"] != ident:
-        raise SystemExit(
-            f"REFUSE: Pass-A stage_a_identity {pprov['stage_a_identity'][:16]}… "
-            f"does not match the supplied Stage-A identity {ident[:16]}…. "
-            f"Stale input across two Stage As.")
-    # D379 §4 requires verification of the Pass-A PRODUCER BINDING, not
-    # merely that its identity string matches. A Pass A can carry the right
-    # identity while its recorded population is malformed, incomplete or
-    # byte-wrong. The existing authority does this; no second verifier is
-    # authored here.
     try:
-        # THE EXACT BYTES THAT WERE PARSED. `pa` came from json.loads of
-        # these same bytes (read-once binding), so the digest verified here
-        # is the digest of what actually became the input -- not of a
-        # second read that might differ.
-        SI.verify_provenance(pprov, desc, pass_a_bytes=pa_bytes)
+        desc = SI.parse_descriptor_bytes(SI._read_regular_once(stage_a_path))
+        observed_runtime = SI.verify_runtime_identity(desc)
     except SI.StageIdentityError as e:
-        raise SystemExit(f"REFUSE: Pass-A producer provenance does not "
-                         f"verify against Stage A: {e}")
+        raise SystemExit(f"REFUSE: {e}")
+    return desc, observed_runtime
 
-    # D379 DEP-3 — observe this producer's runtime, do not copy the
-    # expected value out of the descriptor.
-    observed_runtime = SI.verify_runtime_identity(desc)
-    # D379 Q1a-3. This producer must verify ITS OWN executing bytes against
-    # Stage A, exactly as the Pass-A producer does. It previously only
-    # collected the population and refused on unclassifiable origins, so a
-    # changed classification-producer byte was recorded faithfully and
-    # accepted -- the banked refusal had no implementation here.
+
+def _consume_pass_a(desc, a):
+    """v4.5 §15.2 — classification reads the exact Pass-A bytes ONCE, hashes
+    them, parses THE SAME bytes, and validates them against the ORIGINAL
+    Pass-A Stage-B binding whose digest must equal the independently held
+    anchor. Then the Pass-A provenance is verified SLOT BY SLOT, including
+    the Census member digests against the manifest bytes bound by the
+    Stage-A aggregate; any slot left unverified REFUSES (v4.1 C4)."""
+    import stage_identity as SI
+    _pa_path = pathlib.Path(a.passa)
+    if not _pa_path.is_file():
+        raise SystemExit(
+            f"R11 ABORT: no Pass-A artefact at {a.passa}. The subject of "
+            f"classification does not exist, so nothing downstream of it "
+            f"may be measured. Refusing before any work.")
     try:
-        members = SI.check_population(repo_root, desc, "classification")
+        pa_bytes, pa, _binding = SI.consume_bound_artifact(
+            a.passa, a.passa_stage_b, a.passa_binding_sha256,
+            stage_a_desc=desc, producer_component="PASS_A")
+        man = SI._read_regular_once(pathlib.Path(a.census_package) /
+                                    SI.CENSUS_MANIFEST)
+        pprov = pa.get("producer_provenance")
+        if pprov is None:
+            raise SI.StageIdentityError(
+                "the Pass-A input carries no in-band producer_provenance "
+                "(D379 §4). Missing provenance: REFUSE, no silent inheritance.")
+        _ident, _h2, unverified = SI.verify_provenance(
+            pprov, desc, census_manifest_bytes=man)
+        SI.require_complete(unverified, "classification consuming Pass A")
+    except SI.StageIdentityError as e:
+        raise SystemExit(f"REFUSE: Pass-A input does not verify: {e}")
+    return pa_bytes, pa, pprov
+
+
+def _classification_provenance(desc, observed_runtime, sr, pa_bytes, pprov):
+    """D379 §4 CLASSIFICATION in-band provenance + input_binding, from
+    OBSERVED values and the exact consumed bytes (v4.5 §16.1/§16.3)."""
+    import stage_identity as SI
+    ident = SI.stage_a_identity(desc)
+    try:
+        # D379 Q1a-3: this producer verifies ITS OWN executing bytes.
+        members = SI.check_population(desc, "classification")
+        commit = passa.git(sr, "rev-parse", "HEAD").stdout.strip()
+        tree = passa.git(sr, "rev-parse", f"{commit}^{{tree}}").stdout.strip()
+        _n, tp_ident, _p = SI.derive_tree_paths(sr, tree)
     except SI.StageIdentityError as e:
         raise SystemExit(str(e))
-
+    if (commit, tree, tp_ident) != (desc["subject"]["commit"],
+                                    desc["subject"]["tree"],
+                                    desc["tree_paths"]["tree_paths_identity"]):
+        raise SystemExit("REFUSE: the observed subject checkout is not the "
+                         "Stage-A subject (commit, tree, tree_paths)")
     return {
         "stage_a_identity": ident,
         "stage_a_descriptor_digest": SI.stage_a_descriptor_digest(desc),
@@ -373,14 +380,13 @@ def _classification_provenance(stage_a_path, repo_root, pa, pa_sha,
                                 for c, i, d in members],
         "producer_denominator": len(members),
         "runtime_identity": observed_runtime,
-        "subject_commit": desc["subject"]["commit"],
-        "subject_tree": desc["subject"]["tree"],
-        "tree_paths_identity": desc["tree_paths"]["tree_paths_identity"],
+        "subject_commit": commit,
+        "subject_tree": tree,
+        "tree_paths_identity": tp_ident,
         "input_binding": {
-            "pass_a_artifact_sha256": pa_sha,
+            "pass_a_artifact_sha256": SI.sha256_hex(pa_bytes),
             "pass_a_stage_a_identity": pprov["stage_a_identity"],
-            "pass_a_producer_provenance_digest":
-                SI.sha256_hex(SI._jcs(pprov)),
+            "pass_a_producer_provenance_digest": SI.provenance_digest(pprov),
         },
     }
 
@@ -389,6 +395,14 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--subject-repo", required=True)
     ap.add_argument("--passa", required=True)
+    ap.add_argument("--passa-stage-b", required=True, dest="passa_stage_b",
+                    help="the ORIGINAL Pass-A Stage-B binding (v4.5 §15.2)")
+    ap.add_argument("--expected-passa-binding-sha256", required=True,
+                    dest="passa_binding_sha256",
+                    help="the independently held anchor for that binding")
+    ap.add_argument("--census-package", required=True, dest="census_package",
+                    help="the governed Census package whose manifest bytes the "
+                         "Stage-A aggregate binds (Census member slots)")
     ap.add_argument("--out", required=True)
     ap.add_argument("--stage-a", required=True, dest="stage_a",
                     help="the Stage-A descriptor this producer consumes and "
@@ -396,31 +410,15 @@ def main():
                          "binding is checked (D379 §2/§4).")
     a = ap.parse_args()
 
-    # ── D379 §4 — READ ONCE, HASH THOSE BYTES, PARSE THOSE SAME BYTES ──
-    # The accepted S1 principle. Never read, then hash a second read, then
-    # assume they match.
-    # D379 §8 SB-1 -- "Pass A absent -> REFUSE, R11 abort". There was no
-    # gate here: the next line raised FileNotFoundError and the process
-    # died with a traceback. A crash is not a fail-closed governed
-    # refusal. It happens to be red, which is exactly why it passed for a
-    # governed refusal, and a red process without the governed predicate
-    # earns no calibration claim.
-    _pa_path = pathlib.Path(a.passa)
-    if not _pa_path.is_file():
-        raise SystemExit(
-            f"R11 ABORT: no Pass-A artefact at {a.passa}. The subject of "
-            f"classification does not exist, so nothing downstream of it "
-            f"may be measured. Refusing before any work.")
-    _pa_bytes = _pa_path.read_bytes()
-    _pa_sha = hashlib.sha256(_pa_bytes).hexdigest()
-    pa = json.loads(_pa_bytes.decode("utf-8"))
-    _cls_prov = _classification_provenance(a.stage_a, pathlib.Path(
-        a.subject_repo), pa, _pa_sha, _pa_bytes)
+    desc, observed_runtime = _load_stage_a(a.stage_a)
+    pa_bytes, pa, pprov = _consume_pass_a(desc, a)
     sr = pathlib.Path(a.subject_repo)
     head = passa.git(sr, "rev-parse", "HEAD").stdout.strip()
-    if head != pa["subject"]:
+    if head != pa["subject"] or head != desc["subject"]["commit"]:
         raise SystemExit(f"R11 ABORT: subject repo HEAD {head[:12]} != "
-                         f"Pass A subject {pa['subject'][:12]}")
+                         f"Pass A / Stage-A subject")
+    _cls_prov = _classification_provenance(desc, observed_runtime, sr,
+                                           pa_bytes, pprov)
 
     rows, facts_tally = [], collections.Counter()
     nominal = collections.Counter()

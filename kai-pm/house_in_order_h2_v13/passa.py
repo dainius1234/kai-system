@@ -1010,7 +1010,7 @@ def make_verified_reader(subject_repo, subject):
     return read_source
 
 
-def build(subject_repo, history_repo, subject, census_pkg):
+def build(subject_repo, history_repo, subject, census_pkg, *, census=None):
     # S1: THE GATE RUNS FIRST. Before the census import, before any
     # enumeration, before any filesystem read. If it returns, source
     # binding holds; if it does not, nothing is measured.
@@ -1025,8 +1025,17 @@ def build(subject_repo, history_repo, subject, census_pkg):
     # where Kai's fingerprint requirement puts it.
     _source_binding_gate(subject_repo, subject)
 
-    sys.path.insert(0, str(census_pkg))
-    import docgraph as G, opscan as O, claims as C     # frozen Census v1.1
+    # v4.5 §10 — the Census modules Pass A USES are the module objects the
+    # verified-byte loader installed from manifest-verified bytes. There is
+    # no sys.path insertion and no ordinary import here: a same-named module
+    # earlier on sys.path, or a preloaded one, can never be what executes.
+    import stage_identity as SI
+    if census is None:
+        census = SI.load_governed_census(census_pkg)
+    SI.census_assert_installed()
+    G = census["modules"]["docgraph"]["module"]
+    O = census["modules"]["opscan"]["module"]
+    C = census["modules"]["claims"]["module"]
 
     # S1 TOCTOU: one verifier, injected into every consumption boundary
     # on this path. The census decides everything it decided before; it
@@ -1090,51 +1099,47 @@ def build(subject_repo, history_repo, subject, census_pkg):
     return rows, tracked
 
 
-def _load_and_authorise(stage_a_path, repo_root):
+def _load_and_authorise(stage_a_path):
     """MOMENT 1 — D379 §2: verify the producer is AUTHORISED before it
     produces anything. Returns the validated descriptor.
 
-    This runs before `build()`, so no irreversible, output-producing work
-    happens above it. It deliberately does NOT record the final producer
-    population: `build()` subsequently imports the hardened Census modules,
-    and a population captured here would be stale before Pass A had done
-    its work. That is MOMENT 2, below.
+    The materialised descriptor is parsed STRICTLY (v4.1 C1, D380 §6.10:
+    duplicate keys refuse, and the file must be exactly its canonical
+    bytes). The runtime is OBSERVED (DEP-3). The full semantic rederivation
+    (S16) follows once the verified Census boundary exists, in main().
     """
     import stage_identity as SI
-    sp = pathlib.Path(stage_a_path)
-    if not sp.is_file():
-        raise SystemExit(f"REFUSE: no Stage-A descriptor at {stage_a_path}")
-    desc = json.loads(sp.read_bytes().decode("utf-8"))
-    SI.validate_descriptor(desc)
-    # D379 DEP-3 — OBSERVE the executing runtime and compare it against the
-    # identity Stage A expects. Copying desc["runtime"] would be attesting
-    # from the expected value and could never fail.
-    SI.verify_runtime_identity(desc)
-    _check_population(SI, desc, repo_root, "pre-production")
+    try:
+        desc = SI.parse_descriptor_bytes(SI._read_regular_once(stage_a_path))
+        # D379 DEP-3 — OBSERVE the executing runtime, never copy it.
+        SI.verify_runtime_identity(desc)
+    except SI.StageIdentityError as e:
+        raise SystemExit(str(e))
+    _check_population(SI, desc, "pre-production")
     return desc
 
 
-def _check_population(SI, desc, repo_root, when):
-    """Delegate to the ONE authority. Kept as a named local seam so the
-    call sites and their `when` labels read unchanged; the policy itself
-    is not defined here and is not duplicated here."""
+def _check_population(SI, desc, when):
+    """Delegate to the ONE authority (INC-38). The instrument root and the
+    Census authority are DERIVED inside stage_identity (v4.5 §§8.1, 11);
+    no caller-supplied repository can supply either."""
     try:
-        return SI.check_population(repo_root, desc, when)
+        return SI.check_population(desc, when)
     except SI.StageIdentityError as e:
         raise SystemExit(str(e))
 
 
-def _producer_provenance(desc, repo_root):
-    """MOMENT 2 — the D379 §4 in-band block, recorded from the population
-    observed AFTER the work and BEFORE the output is written.
-
-    Every identity is CONSUMED from stage_identity.py. No closure policy
-    and no runtime identity is defined here.
+def _producer_provenance(desc, rederived, census):
+    """MOMENT 2 — the D379 §4 in-band block, recorded from OBSERVED values
+    AFTER the work and BEFORE the output is written (v4.1 C2: provenance
+    records observed values only). `rederived` is the Stage A independently
+    reconstructed from the actual contexts and already required equal to
+    the supplied one (S16); `census` is the verified registry that EXECUTED.
     """
     import stage_identity as SI
     ident = SI.stage_a_identity(desc)
     observed_runtime = SI.verify_runtime_identity(desc)   # observed, not copied
-    members = _check_population(SI, desc, repo_root, "pre-write")
+    members = _check_population(SI, desc, "pre-write")
     prov = {
         "stage_a_identity": ident,
         "stage_a_descriptor_digest": SI.stage_a_descriptor_digest(desc),
@@ -1143,11 +1148,11 @@ def _producer_provenance(desc, repo_root):
                                 for c, i, d in members],
         "producer_denominator": len(members),
         "runtime_identity": observed_runtime,
-        "subject_commit": desc["subject"]["commit"],
-        "subject_tree": desc["subject"]["tree"],
-        "tree_paths_identity": desc["tree_paths"]["tree_paths_identity"],
-        "census_identity": desc["census"]["aggregate_sha256"],
-        "history_source_identity": desc["history"]["reachable_set_sha256"],
+        "subject_commit": rederived["subject"]["commit"],
+        "subject_tree": rederived["subject"]["tree"],
+        "tree_paths_identity": rederived["tree_paths"]["tree_paths_identity"],
+        "census_identity": census["aggregate"],
+        "history_source_identity": rederived["history"]["reachable_set_sha256"],
     }
     # D379 §5 — the emitted population must EQUAL the independently
     # observed one, checked BEFORE the output is written.
@@ -1171,10 +1176,13 @@ def main():
     # The order matters and is D379's own: a producer that writes evidence
     # first and checks afterwards has already emitted it. No irreversible,
     # output-producing work happens above this point.
-    _stage_a_desc = _load_and_authorise(a.stage_a,
-                                        pathlib.Path(a.subject_repo))
+    _stage_a_desc = _load_and_authorise(a.stage_a)
+    import stage_identity as SI
 
     sr, hr = pathlib.Path(a.subject_repo), pathlib.Path(a.history_repo)
+    if a.subject != _stage_a_desc["subject"]["commit"]:
+        raise SystemExit("REFUSE: --subject is not the Stage-A subject commit "
+                         "(v4.1 C2)")
     head = git(sr, "rev-parse", "HEAD").stdout.strip()
     if head != a.subject:
         raise SystemExit(f"R11 ABORT: subject repo HEAD {head[:12]} != "
@@ -1187,11 +1195,25 @@ def main():
             "queries -- it returns its graft boundary as a plausible date. "
             "Refusing to measure.")
 
-    rows, tracked = build(sr, hr, a.subject, pathlib.Path(a.census_package))
-    # MOMENT 2: the Census modules are loaded by build(), so the population
+    # v4.5 §10 — the verified-byte Census boundary BEFORE the first Census
+    # import (S19 refuses a preloaded governed module), then §9.11 / S16:
+    # the supplied Stage A must equal the one independently rederived from
+    # the actual instrument, subject, history, executed Census and runtime.
+    try:
+        census = SI.load_governed_census(
+            a.census_package,
+            expected_aggregate=_stage_a_desc["census"]["aggregate_sha256"])
+        rederived = SI.build_stage_a(_stage_a_desc["mode"], subject_repo=sr,
+                                     history_repo=hr)
+        SI.require_supplied_equals_rederived(_stage_a_desc, rederived)
+    except SI.StageIdentityError as e:
+        raise SystemExit(str(e))
+
+    rows, tracked = build(sr, hr, a.subject, pathlib.Path(a.census_package),
+                          census=census)
+    # MOMENT 2: the Census modules executed in build(), so the population
     # is observed HERE, after the work and before any byte is written.
-    prov = _producer_provenance(_stage_a_desc, pathlib.Path(a.subject_repo))
-    cm = pathlib.Path(a.census_package) / "MANIFEST.sha256"
+    prov = _producer_provenance(_stage_a_desc, rederived, census)
     payload = {
         "subject": a.subject,
         "subject_tree": git(sr, "rev-parse", f"{a.subject}^{{tree}}").stdout.strip(),
@@ -1207,8 +1229,7 @@ def main():
                                               a.subject).stdout.strip() or 0),
         },
         "census_dependency": {"package": str(a.census_package),
-                              "aggregate": hashlib.sha256(
-                                  cm.read_bytes()).hexdigest()},
+                              "aggregate": census["aggregate"]},
         "population": len(tracked), "rows": rows,
         # D379 §4 — IN-BAND, and NEVER the digest of these very bytes.
         "producer_provenance": prov,
