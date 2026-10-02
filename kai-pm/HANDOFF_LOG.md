@@ -4441,3 +4441,107 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-02T17:12:08Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-02T17:11:39Z  [CMD `date -u +%FT%TZ` → 2026-10-02T17:11:39Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 441599adaff264eccaf0a199caf6005fa1da51ab  [CMD `git rev-parse HEAD` → 441599adaff264eccaf0a199caf6005fa1da51ab]
+- tree: 615244ba01f5a86c83d100091d3692f09f19ba6a  [CMD `git rev-parse HEAD^{tree}` → 615244ba01f5a86c83d100091d3692f09f19ba6a]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 441599adaff264eccaf0a199caf6005fa1da51ab  [CMD `git ls-remote --heads origin` → 441599adaff264eccaf0a199caf6005fa1da51ab]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d08f3ec5de4d823011e66261c84c98a76371428e  [CMD `git ls-remote --heads origin` → d08f3ec5de4d823011e66261c84c98a76371428e]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 27  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 27]
+
+### 1. The four states
+
+- physical: NO build started; repair branch d08f3ec unchanged; E7a evidence branch unchanged  [CMD `git ls-remote --heads origin claude/d379-repair-eb52f73` → d08f3ec5de4d]
+- authorised: the bounded build window INCLUDING interpreter retention — HELD by Orion before Build A on a measured reproducibility deviation (section 4)  [CONVERSATION 2026-10-02 Dainius, "Authorised: build window"]
+- evidence: E7a-Git PASS independently confirmed by Kai, including the independent-retrieval leg  [CONVERSATION 2026-10-02 Kai, "E7a-Git = PASS. The evidence transport gate is closed."]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-02 · E7a-Git PASS; independent leg exercised from Kai's side; recommended build-window authority with a hard stop on non-reproducibility or failed D380/D385 measurement ("do not adjust the acceptance rule"). Verbatim, extracted byte-for-byte (received 2026-10-02T17:08:50.883Z, 2770 bytes, sha256 7ea8cf4112c068a1c38ec497909457f66c59c8b5dd01101856464b559a8dc9dd) ⚠ UNBANKED  [CONVERSATION 2026-10-02 Kai, "So: E7a-Git = PASS."]
+    BEGIN-VERBATIM KAI-BUILD-WINDOW-RECOMMENDATION
+    This is the result we needed. I independently checked it rather than just accepting Orion’s report.
+    
+    The synthetic evidence commit dc09ad2a6f9b1c141147aae50aa03ead0b5c3660 exists on GitHub with the reported tree, and I independently retrieved MANIFEST.json through GitHub. Its contents bind the synthetic A/B transcripts, environment, driver and the exact CPython source identities. Entry 27 is also present at signed/verified commit 441599adaff264eccaf0a199caf6005fa1da51ab.
+    
+    That satisfies the independent retrieval leg I wanted. I don’t need you manually opening GitHub and comparing the hash—the independent route has now been exercised from my side.
+    
+    So: E7a-Git = PASS. The evidence transport gate is closed.
+    
+    In programme terms, we have crossed an important boundary:
+    
+    D379 planning/storage correction → DONE
+    E7 transport qualification → DONE
+    Actual controlled interpreter construction → NEXT
+    
+    The next operation is consequential because we’re finally going to build rather than test the measuring equipment. I would authorize it as one uninterrupted bounded build window, not piecemeal permissions between A and B, because reproducibility depends on holding environment E constant.
+    
+    The authority should cover only:
+    
+    derive/freeze E → reverify CPython source/signature → Build A with network disabled → verify E unchanged → Build B independently with network disabled → verify E unchanged → compare A/B reproducibility → E7b publish/read-back exact real transcripts/evidence → report → STOP.
+    
+    It should not yet authorize repair implementation, D390 replay, fixity F, capture, Stage A, candidate, holdout, blind 40 or PR #122 merge.
+    
+    One additional hard stop: if A and B aren’t reproducible under the frozen E, or the resulting interpreter doesn’t actually satisfy the required D380/D385 measurement, do not adjust the acceptance rule to make it pass. Stop with the evidence.
+    
+    So the next message to Orion can be:
+    
+    Authorised: execute the bounded D379 interpreter build window under v4.5 — re-derive/freeze E, reverify the frozen CPython source identity/signature, Build A and Build B independently with outbound network disabled under the same E, perform the required reproducibility and D380/D385 measurements, execute E7b using the qualified Git evidence transport, independently read back the published evidence, report all results, then STOP. Any source, E, isolation, reproducibility, qualification, credential-exclusion or E7b failure = STOP. No repair implementation, D390 replay, fixity F, capture, Stage A, candidate, holdout, blind 40 or merge is authorised.
+    
+    That’s the point we’ve been working toward: the ruler is now qualified enough to start constructing the known-positive interpreter.
+    
+    Confidence: 0.98.
+    END-VERBATIM KAI-BUILD-WINDOW-RECOMMENDATION
+- Dainius · 2026-10-02 · authorises the build window exactly as Kai drafted ⚠ UNBANKED  [CONVERSATION 2026-10-02 Dainius, "Authorised: build window"]
+- Dainius · 2026-10-02 · the window also includes retaining the qualified interpreter (measure size, credential scan, separate immutable object on its own claude/ branch with a manifest, readback, STOP if git cannot hold it faithfully) ⚠ UNBANKED  [CONVERSATION 2026-10-02 Dainius, "Include retention (Recommended)"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD by Orion before Build A: the window, pending the deviation ruling below  [CONVERSATION 2026-10-01 Dainius, "Any material deviation from v4.5 must be attacked before it is accepted."]
+
+### 4. Open questions
+
+- REPRODUCIBILITY DEVIATION, owner Kai (attack) then Dainius.  [CMD `gcc probes 1–4` → differ / identical / differ / identical] Under v4.5 §20's literal form, A and B CANNOT have equal executable sha256: (i) Modules/getbuildinfo.c compiles __DATE__/__TIME__ into the interpreter; (ii) the default OPT is "-g $WRAP -O3 -Wall", and -g records absolute build paths, while §20 requires separate build directories. Orion proposes two environment controls, changing no command, flag or acceptance rule:
+  C1 SOURCE_DATE_EPOCH=1772499177 for both builds — the tagger timestamp of the signed v3.11.15 tag, derived from the authenticated source, not chosen; recorded in E.build_env.
+  C2 canonical in-namespace paths: each build's physically SEPARATE source worktree, build directory and staging root are bind-mounted at the same fixed paths (/d379/src, /d379/build, /d379/stage) inside that build's own netiso2 namespace; physical paths are recorded per build in the evidence manifest.
+  Sub-question for Kai: v4.5 writes `./configure` but also requires a separate source worktree and build directory. Orion recommends an out-of-tree build (`/d379/src/configure …` run in /d379/build) so the source stays pristine and is re-verified after the build; the alternative is an in-tree build in the build directory.
+  NOT proposed: PYTHONHASHSEED. Its necessity (frozen/deepfreeze set ordering) is INFERENCE only; per R4 the builds measure it, and any residual divergence → STOP and report the first divergence
+
+### 5. Incidents and corrections
+
+- Source evidence: Modules/getbuildinfo.c:8-17 defines DATE/TIME from __DATE__/__TIME__ (used at :48); configure.ac:2089 `OPT="-g $WRAP -O3 -Wall"`  [CMD `git show v3.11.15:Modules/getbuildinfo.c | grep -n __DATE__` → 8, 9]
+- Measured on this host's gcc 13.3 (trivial C file printing __DATE__ __TIME__): (1) same dir, 2 s apart → 900e5509 ≠ dfb6eac7; (2) SOURCE_DATE_EPOCH=1772499177 → f82544f5 = f82544f5, prints "Mar  3 2026 00:52:57"; (3) -g, two directories → 89388b7b ≠ 32371551; (4) -g, the same path reused in turn → e4755023 = e4755023  [CMD `gcc -g -O2 … in a/ and b/` → 89388b7b ≠ 32371551]
+- SOURCE_DATE_EPOCH value source: v3.11.15 tag object "tagger Pablo Galindo Salgado <pablogsal@gmail.com> 1772499177 +0000"  [CMD `git cat-file tag v3.11.15 | grep tagger` → 1772499177]
+
+### 6. Next authorised step
+
+- None until Kai attacks C1/C2 (and rules on out-of-tree) and Dainius accepts; the authorised window then runs unchanged otherwise  [CONVERSATION 2026-10-01 Dainius, "Any material deviation from v4.5 must be attacked before it is accepted."]
+
+### 7. What I am unsure of
+
+- Whether C1+C2 are SUFFICIENT for bit-identical executables is unmeasured: other nondeterminism (e.g. frozen-module set ordering, ar member order) can only be found by building  [CMD `gcc probes` → trivial C file only]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
