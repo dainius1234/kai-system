@@ -1666,3 +1666,72 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-02T11:49:51Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-02T11:49:50Z  [CMD `date -u +%FT%TZ` → 2026-10-02T11:49:50Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: fe829dde203dad4ef278cf069e8b0d81d2e46236  [CMD `git rev-parse HEAD` → fe829dde203dad4ef278cf069e8b0d81d2e46236]
+- tree: 673315ead035db9ca9a4a531a84b94901c4f3062  [CMD `git rev-parse HEAD^{tree}` → 673315ead035db9ca9a4a531a84b94901c4f3062]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d08f3ec5de4d823011e66261c84c98a76371428e  [CMD `git ls-remote --heads origin` → d08f3ec5de4d823011e66261c84c98a76371428e]
+- remote:claude/project-rework-plan-pgvp35: fe829dde203dad4ef278cf069e8b0d81d2e46236  [CMD `git ls-remote --heads origin` → fe829dde203dad4ef278cf069e8b0d81d2e46236]
+- decisions_headings: 372  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 372]
+- decisions_distinct: 372  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 372]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D389  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D389]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 20  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 20]
+
+### 1. The four states
+
+- physical: repair branch d08f3ec unchanged; builds 0; Dropbox writes 0; Dropbox provisioning NOT done  [CMD `git ls-remote --heads origin claude/d379-repair-eb52f73` → d08f3ec5de4d]
+- authorised: HOLD on every Dropbox action until the store question is adjudicated  [CONVERSATION 2026-10-02 Dainius, "So I would not provision Dropbox yet."]
+- evidence: store-origin reconstruction (section 5)  [FILE kai-pm/DECISIONS.md:39301]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-02 · no Dropbox action; re-open the repository evidence on D387/E7 and the existing KAI evidence and storage architecture, and adjudicate whether Dropbox belongs; a banked decision is changed deliberately by amendment, never bypassed ⚠ UNBANKED  [CONVERSATION 2026-10-02 Dainius, "Next: no Dropbox action."]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: Dropbox app, token, network host, E7a, builds  [CONVERSATION 2026-10-02 Dainius, "So I would not provision Dropbox yet."]
+- FORBIDDEN: replacing D387's store without a deliberate amendment  [CONVERSATION 2026-10-02 Dainius, "we don’t silently replace it"]
+
+### 4. Open questions
+
+- Store adjudication, owner Dainius/Kai: keep Dropbox (D387), or amend D387 to a git evidence ref in this repository (Orion's recommendation, section 5). If amended: which ref form, and acceptance that the transcripts are PUBLIC  [CONVERSATION 2026-10-02 Orion, store adjudication]
+
+### 5. Incidents and corrections
+
+- The REQUIREMENT is not Dropbox. D385 requires a D380-compliant interpreter ACTUALLY MEASURED; its block mentions no transcript or build log. Durable full transcripts come from R10 ("full diagnostic output survives") applied to Orion's local-build plan  [FILE kai-pm/DECISIONS.md:38987]
+- v4.5 is store-neutral: "Dropbox" occurs 0 times in D379_PLAN_V4_5.md; §26–28 say "external durable storage" and "the actual selected storage/transport mechanism". Only D387 names Dropbox. Changing the store amends D387 (a new D-entry), not v4.5  [CMD `grep -c -i dropbox kai-pm/D379_PLAN_V4_5.md` → 0]
+- ORIGIN, Orion's own (R18; I am in the denominator): on 2026-09-25 Orion framed the store as a two-option choice, "such as your Dropbox or a GitHub Actions artefact"; Kai chose between the two offered. Neither the repository itself nor any existing KAI mechanism was put to him. Kai's stated reason only excludes Actions (retention-governed)  [CONVERSATION 2026-09-25 Orion, "You need to choose a lasting store, such as your Dropbox or a GitHub Actions artefact."]
+- Why the repository was not offered: Kai Q9 ruled NO to "commit build log if ≤5 MB", reason "File size does not create repository authority … D379 says no arbitrary new tracked paths". That refuses size as AUTHORITY and the D379 repair tree as LOCATION; it does not evaluate a deliberately authorised evidence ref outside the D379 tree  [FILE kai-pm/DECISIONS.md:39332]
+- Existing KAI storage surveyed (universe: tracked files at fe829dd): the Evidence Plane is PLANNED, not built ("Evidence Plane last"); no object store (minio 0 files, s3:// 0); evidence today = git-tracked build_evidence (43 files in house_in_order_h2_v13) and Actions artifacts (7 workflows use upload-artifact). There is no built KAI evidence store to reuse beyond git and Actions  [CMD `git grep -l -i <term> | wc -l` → minio 0, s3:// 0, upload-artifact 7 workflows]
+- Git-store feasibility facts: repository is PUBLIC; this session pushed a new non-session ref (the repair branch) successfully under authority; a branch DELETE was refused 403 at the proxy. Git's push protocol carries the expected old id per ref, so a create-with-zero-old-id is a server-side create-if-absent; NOT yet demonstrated here (needs a known-negative: a second create must be refused)  [CMD `list_repos kai-system` → visibility public]
+
+### 6. Next authorised step
+
+- None to execute. Dainius/Kai adjudicate the store; then either D387 stands (Dropbox provisioning as entry 19/20) or a D-entry amends D387 and E7a is re-pointed to the new transport  [CONVERSATION 2026-10-02 Dainius, "I bring you the evidence and the precise amendment required."]
+
+### 7. What I am unsure of
+
+- CPython transcript size is unmeasured; GitHub refuses single files over 100 MB, and the git proxy's own limits are unmeasured  [FILE kai-pm/D379_PLAN_V4_5.md:1519]
+- R15 snag, flagged, not acted on: the built known-positive interpreter is itself ephemeral. v4.5 preserves the transcripts, not the staged interpreter tree; whether D385 §E's later governed runtime needs the artefact kept is not decided  [FILE kai-pm/DECISIONS.md:38962]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
