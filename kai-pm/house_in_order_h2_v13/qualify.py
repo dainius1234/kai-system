@@ -191,13 +191,14 @@ def _load_stage_a(stage_a_path):
         raise QualifierIdentityError(
             f"REFUSE: no Stage-A descriptor at {stage_a_path}. §8(6) cannot "
             f"be established from a manifest alone.")
-    desc = json.loads(sp.read_bytes().decode("utf-8"))
-    SI.validate_descriptor(desc)
-    return desc
+    try:
+        return SI.parse_descriptor_bytes(SI._read_regular_once(sp))
+    except SI.StageIdentityError as e:
+        raise QualifierIdentityError(str(e)) from None
 
 
 def classify_loaded_origin(name, mod, *, stage_h2, manifest, desc,
-                           repo, roots, external):
+                           repo, roots, external, snapshot=None):
     """ONE loaded origin -> exactly one governed class, or REFUSE.
 
     ORIGIN METADATA FIRST, and it outranks __file__ — a frozen module
@@ -264,8 +265,17 @@ def classify_loaded_origin(name, mod, *, stage_h2, manifest, desc,
         raise QualifierIdentityError(
             f"REFUSE: {name} is a loaded EXTERNAL module at {rp}, outside "
             f"every governed root, with no Stage-A dependency identity.")
-    if SI._owning_root(rp, roots) is not None:
-        return {"module": name, "class": QUAL_STDLIB, "identity": rp,
+    own = SI._owning_root(rp, roots)
+    if own is not None:
+        rel = _os.path.relpath(rp, own[1]).replace(_os.sep, "/")
+        # D380 §7.11 / v4.1 F8 applies to the qualifier's own process too.
+        if snapshot is not None and (own[0], rel) not in snapshot:
+            raise QualifierIdentityError(
+                f"REFUSE: loaded stdlib module {name} ({own[0]}:{rel}) is not "
+                f"represented in the governed H2_PY_STDLIB_V1 snapshot "
+                f"(D380 §7.11)")
+        return {"module": name, "class": QUAL_STDLIB,
+                "identity": f"{own[0]}:{rel}",
                 "stdlib_identity": desc["runtime"]["stdlib_identity"]}
     raise QualifierIdentityError(
         f"REFUSE: {name} at {rp} lies outside the governed H2 root, the "
@@ -289,8 +299,9 @@ def qualifier_population(stage_a_path, manifest_path):
     if not manifest:
         raise QualifierIdentityError(
             f"REFUSE: qualifier manifest {manifest_path} yielded no entries")
-    repo = HERE.parent.parent
+    repo = SI.instrument_root()            # v4.5 §8.1, never caller-supplied
     roots, external = SI._governed_roots()
+    snapshot = SI._snapshot_files()
     rows, refusals = [], []
     for name, mod in sorted(sys.modules.items()):
         if mod is None:
@@ -298,7 +309,7 @@ def qualifier_population(stage_a_path, manifest_path):
         try:
             rows.append(classify_loaded_origin(
                 name, mod, stage_h2=stage_h2, manifest=manifest, desc=desc,
-                repo=repo, roots=roots, external=external))
+                repo=repo, roots=roots, external=external, snapshot=snapshot))
         except QualifierIdentityError as e:
             refusals.append((name, str(e)))
     return rows, refusals
@@ -316,8 +327,43 @@ def main():
                     help="the candidate MANIFEST.sha256. REQUIRED: "
                          "D367 8(6) is fail-closed, and an omitted "
                          "manifest silently SKIPPED criterion [6]")
+    ap.add_argument("--stage-b", required=True, dest="stage_b",
+                    help="the ORIGINAL classification Stage-B binding "
+                         "(v4.5 §13.4)")
+    ap.add_argument("--expected-binding-sha256", required=True,
+                    dest="binding_sha256",
+                    help="the independently held anchor for --stage-b")
+    ap.add_argument("--passa-stage-b", required=True, dest="passa_stage_b",
+                    help="the REFERENCED Pass-A Stage-B binding (v4.5 §15.4)")
+    ap.add_argument("--expected-passa-binding-sha256", required=True,
+                    dest="passa_binding_sha256",
+                    help="the independently held anchor for --passa-stage-b")
+    ap.add_argument("--census-package", required=True, dest="census_package",
+                    help="the governed Census package (manifest bytes bound "
+                         "by the Stage-A aggregate)")
     a = ap.parse_args()
-    res = json.load(open(a.result))
+
+    # ── v4.5 §12.3 — the qualifier verifies ITS OWN executing runtime FIRST.
+    # It does not pretend to re-observe the terminated producer (R4).
+    # A stdlib/runtime refusal is a governed REFUSE, not a traceback (§22).
+    import stage_identity as SI
+    try:
+        desc = _load_stage_a(a.stage_a)
+        SI.verify_runtime_identity(desc)
+    except (QualifierIdentityError, SI.StageIdentityError) as e:
+        raise SystemExit(f"REFUSE: qualifier own-runtime / Stage-A check: {e}")
+    # ── v4.5 §13.4 / §15.4 — exact bytes, ORIGINAL bindings, held anchors.
+    try:
+        res_bytes, res, _cls_binding = SI.consume_bound_artifact(
+            a.result, a.stage_b, a.binding_sha256, stage_a_desc=desc,
+            producer_component="CLASSIFICATION")
+        pa_binding = SI.load_binding(
+            a.passa_stage_b, a.passa_binding_sha256, stage_a_desc=desc,
+            producer_component="PASS_A")
+        census_manifest = SI._read_regular_once(
+            pathlib.Path(a.census_package) / SI.CENSUS_MANIFEST)
+    except SI.StageIdentityError as e:
+        raise SystemExit(f"REFUSE: qualification input does not verify: {e}")
     findings = []
 
     print("HOUSE_H2 v1.2 — QUALIFICATION")
@@ -412,18 +458,17 @@ def main():
                          "producer_provenance (D379 §4)"))
     else:
         try:
-            desc = _load_stage_a(a.stage_a)
-            # The qualifier holds the RESULT and the DESCRIPTOR. It
-            # does not hold the Pass-A artefact, so the two
-            # byte-derived input_binding fields cannot be
-            # established here. They are NAMED, never skipped: an
-            # unstated gap reads exactly like a verified field.
-            ident, _seen, _unv = SI_verify(prov, desc)
-            for _f in sorted(_unv):
-                print(f'      NOT MECHANICALLY VERIFIED HERE: {_f} '
-                      f'(requires the exact Pass-A bytes; this '
-                      f'qualifier is not given them)')
-            print(f"      verified against stage_a_identity {ident[:16]}…")
+            # v4.5 §15.4: every slot closed. The two artefact-derived
+            # input_binding slots close against the REFERENCED Pass-A
+            # binding (anchored above); Census slots against the manifest
+            # bytes bound by Stage A. An unverified slot REFUSES.
+            ident, _seen, _unv = SI_verify(
+                prov, desc, artifact_bytes=res_bytes,
+                census_manifest_bytes=census_manifest,
+                pass_a_binding=pa_binding)
+            SI.require_complete(_unv, "qualifier")
+            print(f"      verified against stage_a_identity {ident[:16]}…, "
+                  f"every slot closed")
         except Exception as e:                        # noqa: BLE001
             print(f"      {str(e)[:150]}")
             findings.append(("Q1A_PROVENANCE", "-", "-", str(e)))

@@ -68,7 +68,10 @@ def final_candidate_aggregate(descriptor_path):
             f"REFUSE: no Stage-A descriptor at {descriptor_path}. The blind "
             f"selection seed is the validated Stage-A identity; there is no "
             f"fallback to a manifest, a package digest or result bytes.")
-    desc = json.loads(p.read_bytes().decode("utf-8"))
+    try:
+        desc = SI.parse_descriptor_bytes(SI._read_regular_once(p))
+    except SI.StageIdentityError as e:
+        raise HoldoutInputError(str(e)) from None
     if desc.get("mode") != "PRODUCTION":
         raise HoldoutInputError(
             f"REFUSE: Stage-A descriptor mode is {desc.get('mode')!r}. A "
@@ -78,21 +81,84 @@ def final_candidate_aggregate(descriptor_path):
 
 
 # ── I1-B — the universe is the FROZEN SUBJECT TREE ────────────────────
+def _validated_unique(paths, side):
+    """v4.1 C1 path order, then uniqueness, for ONE population, alone.
+
+    Each path must already be canonical (D380 §6.10; an NFD path REFUSES at
+    the NFC step and never reaches duplicate comparison). A duplicate on
+    this side REFUSES here, BEFORE any comparison with the other side, so a
+    duplicate present on BOTH sides can never cancel out (F12)."""
+    import stage_identity as SI
+    seen = set()
+    for p in paths:
+        try:
+            q = SI._norm_path(p)
+        except SI.StageIdentityError as e:
+            raise HoldoutInputError(f"REFUSE BEFORE SELECTION ({side}): {e}") from None
+        if q in seen:
+            raise HoldoutInputError(
+                f"REFUSE BEFORE SELECTION: duplicate {side} path {q!r} "
+                f"(F12 — refused independently, before reconciliation)")
+        seen.add(q)
+    return seen
+
+
+def plan_selection(tree_paths, output_paths, aggregate):
+    """THE single selection decision (v4.5 §17, v4.1 C5, Kai Q8).
+
+    1-4 validate canonical form and uniqueness of the TREE population;
+    5-6 the same, independently, for the OUTPUT population; 7-8 exact sets
+    and exact cardinalities; 9 only then select — from the TREE. Candidate
+    output decides only WHETHER reconciliation succeeds, never the
+    population or the seed. The aggregate is supplied, never derived here.
+    """
+    t = _validated_unique(tree_paths, "tree")
+    o = _validated_unique(output_paths, "output")
+    if t != o or len(tree_paths) != len(output_paths):
+        raise HoldoutInputError(
+            f"REFUSE BEFORE SELECTION: candidate output does not reconcile with "
+            f"the frozen subject tree. tree-only={sorted(t - o)[:5]} "
+            f"output-only={sorted(o - t)[:5]} "
+            f"(tree {len(tree_paths)} vs output {len(output_paths)})")
+    return select(sorted(tree_paths), aggregate)
+
+
 def reconcile(tree_paths, output_paths):
-    """The candidate output decides WHETHER reconciliation passes. It must
-    never decide WHAT POPULATION IS SELECTED. That distinction is the whole
-    I1 repair, so this compares MULTISETS and refuses on any divergence."""
-    t, o = collections.Counter(tree_paths), collections.Counter(output_paths)
-    if t == o:
-        return True
-    missing = sorted((t - o).elements())
-    extra = sorted((o - t).elements())
-    dup = sorted(p for p, n in o.items() if n > 1)
-    raise HoldoutInputError(
-        f"REFUSE BEFORE SELECTION: candidate output does not reconcile with "
-        f"the frozen subject tree. tree-only={missing[:5]} "
-        f"output-only={extra[:5]} duplicated={dup[:5]} "
-        f"(tree {sum(t.values())} vs output {sum(o.values())})")
+    """Kept as the pre-selection predicate only; it now delegates to the same
+    independent-uniqueness rule, so it cannot accept what plan_selection
+    refuses."""
+    _validated_unique(tree_paths, "tree")
+    _validated_unique(output_paths, "output")
+    if sorted(tree_paths) != sorted(output_paths):
+        raise HoldoutInputError("REFUSE BEFORE SELECTION: populations differ")
+    return True
+
+
+def read_tree_paths(path, desc):
+    """v4.1 C5 step 5: the EXACT --tree-paths bytes. No strip, no blank-skip.
+    The bytes must be exactly the D380 §6.6 construction, and their identity
+    and count must equal the Stage-A tree_paths block."""
+    import stage_identity as SI
+    try:
+        data = SI._read_regular_once(path)
+        text = data.decode("utf-8")
+    except (SI.StageIdentityError, UnicodeDecodeError) as e:
+        raise HoldoutInputError(f"REFUSE: --tree-paths unreadable or not UTF-8: {e}") from None
+    if not text.endswith("\n"):
+        raise HoldoutInputError("REFUSE: --tree-paths lacks the final LF (D380 §6.6)")
+    paths = text[:-1].split("\n")
+    _validated_unique(paths, "tree")
+    canon = "".join(p + "\n" for p in sorted(paths, key=lambda p: p.encode("utf-8")))
+    if canon.encode("utf-8") != data:
+        raise HoldoutInputError(
+            "REFUSE: --tree-paths bytes are not the exact D380 §6.6 construction "
+            "(order, CRLF, whitespace or blank line)")
+    if SI.sha256_hex(data) != desc["tree_paths"]["tree_paths_identity"] or \
+            len(paths) != desc["tree_paths"]["population"]:
+        raise HoldoutInputError(
+            "REFUSE: --tree-paths identity/count does not equal the Stage-A "
+            "tree_paths block")
+    return paths
 
 
 def main():
@@ -100,25 +166,33 @@ def main():
     ap.add_argument("--result", required=True)
     ap.add_argument("--stage-a", required=True, dest="stage_a",
                     help="the PRODUCTION Stage-A descriptor. Its VALIDATED "
-                         "identity is FINAL_CANDIDATE_AGGREGATE (D381 18). "
-                         "MANIFEST.sha256 is no longer accepted: it contains "
-                         "execution output, so it seeded the blind sample "
-                         "from the candidate's own result (I1-A).")
+                         "identity is FINAL_CANDIDATE_AGGREGATE (D381 18).")
+    ap.add_argument("--stage-b", required=True, dest="stage_b",
+                    help="the ORIGINAL classification Stage-B binding")
+    ap.add_argument("--expected-binding-sha256", required=True,
+                    dest="binding_sha256",
+                    help="the independently held anchor for --stage-b")
     ap.add_argument("--tree-paths", required=True, dest="tree_paths",
                     help="the immutable frozen subject tree path population "
                          "(I1-B). Selection is from THIS, never from output.")
     ap.add_argument("--out", required=True)
     a = ap.parse_args()
 
-    res = json.load(open(a.result))
-    aggregate = final_candidate_aggregate(a.stage_a)          # I1-A
-    tree_paths = [l.strip() for l in
-                  pathlib.Path(a.tree_paths).read_text().splitlines()
-                  if l.strip()]
+    import stage_identity as SI
+    aggregate = final_candidate_aggregate(a.stage_a)          # 1. I1-A
+    desc = SI.parse_descriptor_bytes(SI._read_regular_once(a.stage_a))
+    try:                                                      # 2-4. one read
+        _rb, res, _binding = SI.consume_bound_artifact(
+            a.result, a.stage_b, a.binding_sha256, stage_a_desc=desc,
+            producer_component="CLASSIFICATION")
+    except SI.StageIdentityError as e:
+        raise HoldoutInputError(f"REFUSE: result does not verify: {e}") from None
+    if res["subject"] != desc["subject"]["commit"]:
+        raise HoldoutInputError("REFUSE: result subject is not the Stage-A subject")
+    tree_paths = read_tree_paths(a.tree_paths, desc)          # 5.
     output_paths = [r["path"] for r in res["rows"]]
-    reconcile(tree_paths, output_paths)                       # I1-B, may REFUSE
+    chosen = plan_selection(tree_paths, output_paths, aggregate)   # 6.
     by_path = {r["path"]: r for r in res["rows"]}
-    chosen = select(sorted(tree_paths), aggregate)            # from the TREE
 
     payload = {
         "holdout": "H2FINAL-D367", "size": SIZE,

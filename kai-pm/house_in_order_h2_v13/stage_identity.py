@@ -1304,15 +1304,12 @@ def bind_artifact(artifact_path, *, producer_component, stage_a_desc,
     return binding, _jcs(binding)
 
 
-def consume_bound_artifact(artifact_path, binding_path, expected_binding_sha256,
-                           *, stage_a_desc, producer_component):
-    """THE CONSUMER (v4.5 §§13.4, 17; v4.1 C3). Refuses a symlink or
-    non-regular artefact or binding; reads each ONCE; the binding's digest
-    must equal the PARENT-HELD anchor, which never comes from the artefact,
-    the binding file or the artefact's directory (reconciliation §17); the
-    artefact digest, kind, component, Stage A and provenance digest must
-    all match the ORIGINAL binding. Returns (artifact_bytes, doc, binding).
-    """
+def load_binding(binding_path, expected_binding_sha256, *, stage_a_desc,
+                 producer_component):
+    """Read ONE Stage-B binding (regular file, once), require its digest to
+    equal the PARENT-HELD anchor, and validate it as a canonical binding for
+    this Stage A and producer role. Used alone by a consumer that holds a
+    REFERENCED binding but not its artefact (the qualifier, v4.5 §15.4)."""
     _fmt_hex64(expected_binding_sha256, "expected binding sha256 (anchor)")
     bb = _read_regular_once(binding_path)
     if sha256_hex(bb) != expected_binding_sha256:
@@ -1331,6 +1328,21 @@ def consume_bound_artifact(artifact_path, binding_path, expected_binding_sha256,
         raise StageIdentityError("REFUSE: Stage-B binding names a different Stage A")
     if binding["producer_exit_status"] != 0:
         raise StageIdentityError("REFUSE: Stage-B binding records a failed producer")
+    return binding
+
+
+def consume_bound_artifact(artifact_path, binding_path, expected_binding_sha256,
+                           *, stage_a_desc, producer_component):
+    """THE CONSUMER (v4.5 §§13.4, 17; v4.1 C3). Refuses a symlink or
+    non-regular artefact or binding; reads each ONCE; the binding's digest
+    must equal the PARENT-HELD anchor, which never comes from the artefact,
+    the binding file or the artefact's directory (reconciliation §17); the
+    artefact digest, kind, component, Stage A and provenance digest must
+    all match the ORIGINAL binding. Returns (artifact_bytes, doc, binding).
+    """
+    binding = load_binding(binding_path, expected_binding_sha256,
+                           stage_a_desc=stage_a_desc,
+                           producer_component=producer_component)
     data = _read_regular_once(artifact_path)
     if sha256_hex(data) != binding["artifact_sha256"]:
         raise StageIdentityError(
@@ -1485,7 +1497,8 @@ def _precommitted(descriptor, census_manifest_bytes):
 
 
 def verify_provenance(recorded, descriptor, *, pass_a_bytes=None,
-                      artifact_bytes=None, census_manifest_bytes=None):
+                      artifact_bytes=None, census_manifest_bytes=None,
+                      pass_a_binding=None):
     """Verify a RECORDED producer provenance, SLOT BY SLOT, against the
     authority each slot is mapped to, or REFUSE naming the slot.
 
@@ -1617,7 +1630,25 @@ def verify_provenance(recorded, descriptor, *, pass_a_bytes=None,
 
     if comp == "CLASSIFICATION":
         ib = recorded["input_binding"]
-        if pass_a_bytes is None:
+        if pass_a_bytes is None and pass_a_binding is not None:
+            # v4.5 §15.4: the qualifier closes both artefact-derived slots
+            # from the REFERENCED Pass-A Stage-B binding, which the caller
+            # has already verified against its independently held anchor.
+            if pass_a_binding.get("producer_component") != "PASS_A" or \
+                    pass_a_binding.get("stage_a_identity") != ident:
+                raise StageIdentityError(
+                    "REFUSE: the referenced Pass-A binding is not a PASS_A "
+                    "binding under this Stage A")
+            if ib["pass_a_artifact_sha256"] != pass_a_binding["artifact_sha256"]:
+                raise StageIdentityError(
+                    "REFUSE: slot input_binding.pass_a_artifact_sha256 does not "
+                    "match the referenced Pass-A Stage-B binding")
+            if ib["pass_a_producer_provenance_digest"] != \
+                    pass_a_binding["producer_provenance_digest"]:
+                raise StageIdentityError(
+                    "REFUSE: slot input_binding.pass_a_producer_provenance_digest "
+                    "does not match the referenced Pass-A Stage-B binding")
+        elif pass_a_bytes is None:
             unverified |= {"input_binding.pass_a_artifact_sha256",
                            "input_binding.pass_a_producer_provenance_digest"}
         else:
