@@ -2629,3 +2629,274 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-02T16:25:02Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-02T16:25:01Z  [CMD `date -u +%FT%TZ` → 2026-10-02T16:25:01Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: cf3fa65b8cf6d22a03978ce2b6b996b7d4c600d4  [CMD `git rev-parse HEAD` → cf3fa65b8cf6d22a03978ce2b6b996b7d4c600d4]
+- tree: cdd70b29b3a76e37500b048f206b115bed307559  [CMD `git rev-parse HEAD^{tree}` → cdd70b29b3a76e37500b048f206b115bed307559]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/project-rework-plan-pgvp35: cf3fa65b8cf6d22a03978ce2b6b996b7d4c600d4  [CMD `git ls-remote --heads origin` → cf3fa65b8cf6d22a03978ce2b6b996b7d4c600d4]
+- remote:claude/d379-repair-eb52f73: d08f3ec5de4d823011e66261c84c98a76371428e  [CMD `git ls-remote --heads origin` → d08f3ec5de4d823011e66261c84c98a76371428e]
+- decisions_headings: 372  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 372]
+- decisions_distinct: 372  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 372]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D389  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D389]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 22  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 22]
+
+### 1. The four states
+
+- physical: DECISIONS.md UNCHANGED on both branches (blob 6569dc97); repair branch d08f3ec; no build, no E7a, no evidence ref  [CMD `git hash-object kai-pm/DECISIONS.md` → 6569dc97a218449e4a4d97fee69be717c979430f]
+- authorised: prepare the pre-append banking packet only; STOP after presenting it  [CONVERSATION 2026-10-02 Kai, "STOP after presenting the pre-append banking packet."]
+- evidence: D390 pre-append packet (section 5)  [CMD `sha256sum d390_template.md` → c5964f86fad7e074…]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-02 · adjudication of U1–U8 and the representation correction, verbatim, extracted byte-for-byte from the session transcript (received 2026-10-02T16:22:08Z, 6,341 bytes, sha256 ac68e3e7a37328b7ad6c1d02cd66f9b95ac12be3ca7350aaf1fb7fc92b9e254b) ⚠ UNBANKED  [CONVERSATION 2026-10-02 Kai, "KAI → ORION — D387 STORE RECONCILIATION ADJUDICATED. PROCEED TO BANKING PACKET."]
+    BEGIN-VERBATIM KAI-U1-U8-ADJUDICATION
+    Yes. We have enough to adjudicate rather than create another review cycle.
+    
+    KAI adjudication
+    
+    U1 — retain the interpreter until governed capture: YES.
+    
+    Not because D385 §E requires permanent retention—it does not. Orion established that D385 deliberately calls this a temporary calibration interpreter.
+    
+    The reason is narrower: v4.5’s later governed capture still has four limbs held specifically because no compliant interpreter exists. If we destroy the successfully measured interpreter before capture, we create an unnecessary dependency on an unauthorised third build/rebuild.
+    
+    Therefore the rule should be:
+    
+    Preserve one successfully qualified build artefact, byte-identical to the interpreter whose identity was measured, until the separately authorised D379 capture has completed or the artefact is explicitly retired. Retention creates no authority to execute capture and does not convert the calibration interpreter into the eventual production candidate runtime.
+    
+    That closes the lifecycle hole without contradicting D385.
+    
+    U2 — T: do not choose 16 MiB by estimate.
+    
+    Orion’s 1–3 MB figure is useful planning information, but our own doctrine says measure the population before fixing the denominator/boundary. Picking 16 MiB now would be an arbitrary constant derived from an unexecuted build.
+    
+    More importantly, I don’t think E7a should permanently publish 32 MiB of synthetic garbage merely to prove capacity. That is test pollution and another consequence of carrying the old Dropbox E7a design mechanically into Git.
+    
+    For Git transport, capacity should be qualified differently: first prove the transport with small hostile byte-fidelity objects; then the real build transcripts themselves provide the measured sizes. Before publication, E7b checks that both exact transcript objects are accepted by the selected Git representation. If an actual transcript exceeds the transport’s verified/known acceptance boundary, STOP — no truncation, compression workaround or alternate transport without adjudication.
+    
+    So U2’s proposed T=16 MiB / U=32 MiB is rejected.
+    
+    Remaining rulings
+    
+    U5: no forced-ref-update experiment. It proves nothing we depend upon because the ref is only a locator. Don’t perform a destructive test merely to characterize an irrelevant property.
+    
+    U6: qualification result should not be retroactively inserted into the immutable E7 build-evidence object. Preserve the build evidence as one immutable object; qualification produces a separate child evidence object/record binding back to the exact build-evidence identity. Append evidence; don’t rewrite history.
+    
+    U7: accept the pair Git commit object ID + SHA-256(MANIFEST.json) as the admitted evidence identity for this bounded mechanism. The Git object ID locates/binds the Git object graph; SHA-256 gives us an independent modern content digest for the canonical manifest. Neither a tag nor branch name carries admission authority.
+    
+    U3/U4: remain measured transport properties. They don’t justify more pre-design. E7a should discover what the actual proxy accepts and STOP on incompatibility.
+    
+    U8: correct—derive D-number/date mechanically at banking time. Do not type D390 from memory if the allocator says otherwise.
+    
+    One correction to Orion’s proposed representation: I would not say the orphan commit is “outside every branch tree” as an invariant. That’s an incidental topology claim and can become false if somebody later points a branch at it. The invariant we care about is:
+    
+    It is not reachable from, and does not modify, the D379 repair subject/fixity tree at admission.
+    
+    That is measurable and relevant.
+    
+    Move now
+    
+    Send Orion this exact authority:
+    
+    KAI → ORION — D387 STORE RECONCILIATION ADJUDICATED. PROCEED TO BANKING PACKET.
+    
+    U1 RESOLVED: retain one successfully qualified D380 calibration interpreter artefact, byte-identical to the measured interpreter, through the separately authorised governed D379 capture or explicit retirement. Retention grants no capture authority and does not make it the eventual production candidate runtime.
+    
+    U2 RESOLVED: reject arbitrary T=16 MiB / U=32 MiB and reject publishing two 16 MiB synthetic objects merely to qualify Git. E7a-Git shall use minimal hostile synthetic objects sufficient to qualify exact-byte round-trip, binary/non-UTF8 handling, identity, wrong-object rejection, subject binding, publication/readback and failure semantics. Real transcript sizes are measured from the authorised builds. No truncation or evidence substitution is permitted. Transport incompatibility/size refusal = STOP.
+    
+    U5 RESOLVED: no forced ref-update test. Ref mutability is outside the relied-upon assurance property because the ref is locator only.
+    
+    U6 RESOLVED: build evidence remains immutable. Later qualification evidence is a separate append-only evidence object/record binding to the exact admitted build-evidence identity; do not rewrite the build object.
+    
+    U7 RESOLVED: canonical bounded evidence identity = exact Git commit object ID + SHA-256 of canonical MANIFEST.json. Locator refs carry zero admission authority.
+    
+    U3/U4 remain E7a-measured transport properties. Any incompatible actual behaviour = STOP.
+    
+    U8 confirmed: allocate the decision number and UTC date mechanically immediately before append.
+    
+    REPRESENTATION CORRECTION: replace “outside every branch tree” with the actual invariant: at admission the evidence object must not modify or be reachable through the D379 repair subject/fixity tree. A locator elsewhere does not enter F.
+    
+    Update the proposed amendment and E7a-Git protocol accordingly. Run the decision allocator/checkers and return the exact final decision text and resulting diff BEFORE append. Do not mutate DECISIONS.md yet.
+    
+    No build, E7a execution, evidence-ref creation, repair mutation, capture, Stage A, candidate, holdout, blind 40 or merge is authorised by this instruction.
+    
+    STOP after presenting the pre-append banking packet.
+    
+    This gets us moving without another architecture loop. Once Orion returns that exact pre-append packet, I check it; you authorize banking; then we can finally move into the qualified Git E7 path and onward to the builds.
+    
+    Confidence: 0.98 on U1/U5/U6/U7; 0.96 on replacing the arbitrary large-object E7a test with transport-specific hostile qualification plus exact real-transcript measurement.
+    END-VERBATIM KAI-U1-U8-ADJUDICATION
+
+### 3. Authorised / Held / Forbidden
+
+- DONE: allocator, D390 text, gates and diff in a THROWAWAY worktree, since removed  [CMD `git worktree list` → 2 worktrees, no scratch]
+- HELD: the DECISIONS.md append (needs Kai's check and Dainius's banking authority); build; E7a; evidence ref; repair; capture; Stage A; candidate; holdout; blind 40; merge  [CONVERSATION 2026-10-02 Kai, "Do not mutate DECISIONS.md yet."]
+
+### 4. Open questions
+
+- PLACEMENT of the banking commit, owner Dainius/Kai: Orion recommends the M1 pattern — G2 (D390) on claude/project-rework-plan-pgvp35, R2 replayed onto claude/d379-repair-eb52f73 with the same patch-sha/patch-id/blob gate — so that D390 is ancestral to F (as KAI-V4-07 required for Part D). This changes the v4.5 lineage "eb52f73 → R → repairs" to "eb52f73 → R → R2 → repairs", and so needs an explicit ruling (R14)  [FILE kai-pm/DECISIONS.md:]
+- RETENTION MECHANISM for D390 §6 (U1), owner Kai, before Build A, not before banking: the container is ephemeral (it was already restored onto another host, kernel -v50 → -v51). "Retained through capture" therefore needs a durable carrier that survives container loss, or capture inside the same container lifetime. D390 states the rule, not the mechanism. If the carrier is the git evidence path, the staged interpreter (binaries, size unmeasured) would become public  [CMD `uname -r` → 6.18.44-fc-v51]
+
+### 5. Incidents and corrections
+
+- Allocator before the append: population 372, distinct 372, duplicates none, highest D389, D390 headings 0, other D390 mentions 0. In the throwaway worktree after the append: 373/373/none, highest D390, D390 count 1  [CMD `re ^## D([0-9]+)( +—|$)` → 372 → 373]
+- Gates consuming DECISIONS.md (gate_registry inputs): check_item8_design rc=0 PASS before and after, output byte-identical; check_item8_authority rc=1 before and after, output byte-identical (it refuses Item-8 builds by design; pre-existing and unchanged)  [CMD `python3 -B scripts/security/check_item8_authority.py` → rc=1 both states]
+- Diff: kai-pm/DECISIONS.md +91 −0; the HEAD bytes are an exact prefix; 7,926 bytes added; diff --check clean; diff sha256 cda3ae2544d462e2e8cfef8a4c542ba6e72d989e5e7c5f531cb6c6b5cc1ac000 (99 lines); resulting blob 6e84db296d02be4bb35d14b599951b60bfc08446 — these four values are for a render at 2026-10-02T16:23:59Z and change ONLY through the two mechanical fields  [CMD `git diff --numstat -- kai-pm/DECISIONS.md` → 91 0]
+- Kai's quotations in D390: 8 quoted lines, 8 exact line matches against his message  [CMD `quote-line ⊆ kai23.txt lines` → 8/8]
+- D390 TEMPLATE, verbatim; sha256 c5964f86fad7e074f67b7c4e71ba76fbe0251bf140df31d350a8ac21fbb2304b; the only non-final fields are {APPEND_DATE} and {APPEND_TS}, each occurring once, filled mechanically immediately before the append (U8)  [CMD `sha256sum d390_template.md` → c5964f86fad7e074…]
+    BEGIN-VERBATIM D390-TEMPLATE
+    
+    ---
+    
+    ## D390 — {APPEND_DATE} — D387 BUILD-EVIDENCE STORE AMENDMENT: DROPBOX WITHDRAWN; GIT-NATIVE IMMUTABLE EVIDENCE IDENTITY; CALIBRATION INTERPRETER RETAINED THROUGH CAPTURE. GOVERNANCE ONLY — BANKING IS NOT EXECUTION.
+    
+    **Allocator.** Derived structurally over `^## D[0-9]+( +—|$)` immediately before this append ({APPEND_TS}): population **372**, distinct **372**, duplicates **none**, highest **D389**; D390 absent. **BANKING IS NOT EXECUTION.** No build, E7a execution, evidence-ref creation, repair mutation, capture, production Stage A, candidate, holdout, blind 40 or PR #122 merge authority follows from this entry.
+    
+    **Authority.** Kai's D387 store reconciliation ruling (received 2026-10-02T15:08:49Z; 18,747 bytes; sha256 `7cac4c9ba231027694522fe352d333f68acac938ad6a86197697e94ecfa61f3f`) and Kai's adjudication of Orion's return packet (received 2026-10-02T16:22:08Z; 6,341 bytes; sha256 `ac68e3e7a37328b7ad6c1d02cd66f9b95ac12be3ca7350aaf1fb7fc92b9e254b`), both relayed by Dainius and preserved byte for byte in `kai-pm/HANDOFF_LOG.md`. Banked at Dainius's explicit authorisation.
+    
+    **Kai's resolutions, verbatim:**
+    
+    > U1 RESOLVED: retain one successfully qualified D380 calibration interpreter artefact, byte-identical to the measured interpreter, through the separately authorised governed D379 capture or explicit retirement. Retention grants no capture authority and does not make it the eventual production candidate runtime.
+    >
+    > U2 RESOLVED: reject arbitrary T=16 MiB / U=32 MiB and reject publishing two 16 MiB synthetic objects merely to qualify Git. E7a-Git shall use minimal hostile synthetic objects sufficient to qualify exact-byte round-trip, binary/non-UTF8 handling, identity, wrong-object rejection, subject binding, publication/readback and failure semantics. Real transcript sizes are measured from the authorised builds. No truncation or evidence substitution is permitted. Transport incompatibility/size refusal = STOP.
+    >
+    > U5 RESOLVED: no forced ref-update test. Ref mutability is outside the relied-upon assurance property because the ref is locator only.
+    >
+    > U6 RESOLVED: build evidence remains immutable. Later qualification evidence is a separate append-only evidence object/record binding to the exact admitted build-evidence identity; do not rewrite the build object.
+    >
+    > U7 RESOLVED: canonical bounded evidence identity = exact Git commit object ID + SHA-256 of canonical MANIFEST.json. Locator refs carry zero admission authority.
+    >
+    > U3/U4 remain E7a-measured transport properties. Any incompatible actual behaviour = STOP.
+    >
+    > U8 confirmed: allocate the decision number and UTC date mechanically immediately before append.
+    >
+    > REPRESENTATION CORRECTION: replace “outside every branch tree” with the actual invariant: at admission the evidence object must not modify or be reachable through the D379 repair subject/fixity tree. A locator elsewhere does not enter F.
+    
+    ### 1. D387 AMENDED — BUILD-LOG STORE ONLY
+    
+    D387's selection of Dropbox as the durable canonical store for the D379 interpreter build transcripts is **WITHDRAWN**. No other D387 ruling is amended.
+    
+    **The requirement is unchanged:** the two complete raw interpreter-build transcripts and their binding metadata must survive the ephemeral build environment, remain durably and independently retrievable, and be bound to the exact build subject and environment (R10; D379 plan v4.5 §§19–20, 26–28). Dropbox is not a D379 or KAI architectural dependency.
+    
+    **Origin, recorded.** Dropbox entered D387 from a two-option framing Orion presented on 2026-09-25 ("such as your Dropbox or a GitHub Actions artefact"). That framing did not evaluate the repository itself or a Git-native evidence object.
+    
+    ### 2. CANONICAL EVIDENCE IDENTITY
+    
+    The build evidence is **one immutable Git commit** whose tree holds exactly: the complete Build A transcript, the complete Build B transcript, the frozen environment fingerprint E, the build-driver source, and `MANIFEST.json`.
+    
+    `MANIFEST.json` is canonical JSON (sorted keys, UTF-8, LF; schema `D379_E7_EVIDENCE_V1`) binding, for each of Build A and Build B: the transcript's SHA-256 and byte count; its source worktree, build directory and staging root; every command's return code; and the resulting interpreter's executable SHA-256 and `H2_PY_STDLIB_V1` identity. It also binds the SHA-256 of E, the §18 CPython source identity (tag object, commit, tree, signer fingerprint), the configure arguments and invocations, and the SHA-256 of the build-driver source.
+    
+    ```
+    ADMITTED EVIDENCE IDENTITY  =  ( Git commit object ID ,  SHA-256 of canonical MANIFEST.json )
+    LOCATOR REF                 =  discovery only; ZERO admission authority
+    ```
+    
+    If a locator ref moves, the admitted identity is unchanged.
+    
+    ### 3. PLACEMENT INVARIANT
+    
+    At admission the evidence object **must not modify, and must not be reachable through, the D379 repair subject or fixity tree.** A locator elsewhere does not enter F, nor the capture output population.
+    
+    ### 4. E7a-GIT — REPLACES THE STORE-CAPACITY TEST BEFORE ANY BUILD
+    
+    E7a-Git qualifies the actual Git transport with **minimal hostile synthetic objects**: exact-byte round-trip; binary and non-UTF-8 content; object identity; wrong-object rejection; subject binding; publication and independent readback by commit ID; and failure semantics, including OUTCOME_UNKNOWN. No large synthetic capacity objects are published. **No forced ref-update test is performed.** Proxy and GitHub acceptance limits (U3/U4) are measured, not assumed. **Failure, or any incompatible actual behaviour → NO BUILD.**
+    
+    **At E7b** the real transcript sizes are measured from the authorised builds, and both exact transcript objects must be accepted by the qualified representation. A size refusal or transport incompatibility → **STOP**. No truncation, compression workaround, evidence substitution or alternate transport without adjudication.
+    
+    ### 5. QUALIFICATION EVIDENCE IS APPEND-ONLY
+    
+    The build-evidence object is never rewritten. D380/D385 qualification evidence is a **separate** evidence object or record that binds to the exact admitted build-evidence identity.
+    
+    ### 6. CALIBRATION INTERPRETER RETENTION
+    
+    One successfully qualified D380 calibration interpreter artefact, **byte-identical** to the interpreter whose identity was measured, is retained through the separately authorised governed D379 capture, or until it is explicitly retired. **Retention grants no capture authority** and does not make it the eventual production candidate runtime (D385 §§D–E unchanged).
+    
+    ### 7. UNCHANGED
+    
+    D379 plan v4.5 is not rewritten; all other requirements of §§26–28 apply to this transport unchanged. D379, D380, D381, D385 and H2_STAGE_A_V2 are unchanged.
+    
+    ### THREAD RECOVERY BLOCK — D390
+    
+    ```
+    ENTRY        D390, GOVERNANCE ONLY. Amends D387's build-log store ONLY.
+    WITHDRAWN    Dropbox as the D379 build-evidence store.
+    REQUIREMENT  UNCHANGED: complete raw transcripts survive, durably and
+                 independently retrievable, bound to the exact subject/E.
+    IDENTITY     (Git commit object ID, SHA-256 of canonical MANIFEST.json).
+    LOCATOR      discovery only; zero admission authority.
+    PLACEMENT    not modifying / not reachable through the D379 repair
+                 subject or fixity tree at admission; never in F.
+    E7a-GIT      minimal hostile synthetic objects; no large capacity
+                 objects; no forced ref-update test; failure -> NO BUILD.
+    E7b          real sizes measured; refusal/incompatibility -> STOP.
+    QUALIFY      separate append-only evidence bound to the build identity.
+    RETENTION    one byte-identical qualified calibration interpreter kept
+                 through capture or explicit retirement; no capture
+                 authority; not the production candidate runtime.
+    NOT          build · E7a · evidence ref · repair · capture · Stage A ·
+    AUTHORISED   candidate · holdout · blind 40 · PR #122 merge.
+    ```
+    
+    END-VERBATIM D390-TEMPLATE
+- E7a-GIT PROTOCOL v2, verbatim; sha256 fc9e57b1622c239aaf1912ac17235acc0f1d7c00da309cc9f9eeaab65dc87900  [CMD `sha256sum e7agit_v2.md` → fc9e57b1622c239a…]
+    BEGIN-VERBATIM E7A-GIT-PROTOCOL-V2
+    E7a-GIT PROTOCOL v2 (updated per Kai's 2026-10-02 adjudication; NOT executed; not part of the D390 text)
+    
+    Code: `e7git.py` (compose · publish · verify). The same unchanged script serves E7a and E7b.
+    
+    CHANGED FROM v1
+      - T/U capacity objects REMOVED (U2). No large synthetic objects are published.
+      - Item D's forced-update test REMOVED (U5). The non-forced locator outcomes are observed only where they arise naturally; nothing relies on them.
+      - "outside every branch tree" REPLACED by the placement invariant (see K2).
+      - Qualification result is a separate child record (U6); it is not part of E7a.
+    
+    SYNTHETIC CORPUS (minimal, hostile)
+      S1 and S2, each a few KiB, different from each other. Together they cover: LF, CRLF, bare CR, no trailing newline, UTF-8 non-ASCII, invalid UTF-8 (0xFF, a lone 0xC3), NUL, and all 256 byte values. Composed with E.json, driver.py and MANIFEST.json ("SYNTHETIC": true) into one commit. Locator: refs/tags/d379-e7a-synthetic-<manifest16>.
+    
+    A  BYTE FIDELITY+   A fresh empty repository (no alternates) fetches by commit ID; every file compared by cmp, byte count and sha256.
+    B  IDENTITY+        The recomputed blob, tree and commit IDs and sha256(MANIFEST.json) equal the locally composed values.
+    C  WRONG-OBJECT−    `verify` must REFUSE: (i) S2 presented as S1; (ii) the valid unrelated commit d08f3ec as the evidence commit; (iii) a one-byte-flipped copy; (iv) a manifest with the A/B labels swapped. A pass is a control failure.
+    D  LOCATOR          Push with an empty lease, to create only. Record the outcome literally. NO forced-update test (U5).
+    E  PROXY/LIMITS     Record the outcomes for a tag push and the pack bytes sent (U3). Any refusal → STOP, NO BUILD. Real-size acceptance is decided at E7b on the real transcripts (U2/U4).
+    F  READBACK         As A, plus the recipe recorded for Kai: `git fetch https://github.com/dainius1234/kai-system <oid>`, or /tree/<oid>.
+    G  INTERRUPTION     compose → record the oid and digests locally → push → ls-remote(locator) == oid → fresh-fetch verify → only then PUBLISHED_VERIFIED.
+    H  RETRY            The commit is composed once; a retry re-pushes the same oid. ls-remote: same oid → SUCCESS → verify · absent → FAILURE, retry the same oid · other oid → CONFLICT, STOP · ls-remote fails → OUTCOME_UNKNOWN, STOP.
+    I  VISIBILITY       Recorded at publish time in the report (deployment state).
+    J  SECRETS          Prevent: env -i with 5 variables, and credential-bearing directories hidden by tmpfs in the build namespace (canary-proven). Detect: an outside scanner checks for collected credential values in raw, base64 and URL-encoded forms, plus secret patterns, printing counts only. Known-positive: planted canary → HIT. Known-negative: clean → 0. Any hit → STOP; no redaction.
+    K  SUBJECT BINDING  `verify` checks the manifest digests against the files, E against the value frozen before Build A, the §18 source identity, the interpreter identities measured from the staging roots, and that A and B are distinct. Known-negative: an E with one field changed → REFUSE.
+    K2 PLACEMENT        Mechanical check: the evidence commit is NOT an ancestor of, and no tree path of it appears in, the repair branch HEAD or F (`git merge-base --is-ancestor`, and a path-set intersection = ∅). Known-negative: a scratch branch that DOES contain it must be detected.
+    L  INDEPENDENT      Dainius or Kai opens /tree/<oid> on GitHub and compares one sha256 by hand.
+    Any failure → NO BUILD.
+    
+    E7b (real): both transcripts' sizes are measured and recorded; push is the same code path; refusal or incompatibility → STOP; then A, B, C(i), G, H, J, K and K2 on the real object.
+    END-VERBATIM E7A-GIT-PROTOCOL-V2
+
+### 6. Next authorised step
+
+- Kai checks this packet; Dainius authorises banking (and rules on placement); then the append is made exactly as the template, with the date and time filled mechanically  [CONVERSATION 2026-10-02 Kai, "Once Orion returns that exact pre-append packet, I check it; you authorize banking"]
+
+### 7. What I am unsure of
+
+- Nothing in D390 is executed; the E7a-Git protocol v2 is a design, and its proxy/GitHub behaviours (U3/U4) are unmeasured  [CONVERSATION 2026-10-02 Kai, "U3/U4 remain E7a-measured transport properties."]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
