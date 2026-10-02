@@ -2900,3 +2900,67 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-02T16:25:40Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-02T16:25:39Z  [CMD `date -u +%FT%TZ` → 2026-10-02T16:25:39Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 7d952a9c1d0a0f43830978746287d8c3a6e1db1f  [CMD `git rev-parse HEAD` → 7d952a9c1d0a0f43830978746287d8c3a6e1db1f]
+- tree: 46e1e06dba5ea085214a90b1f393fc917aa60e22  [CMD `git rev-parse HEAD^{tree}` → 46e1e06dba5ea085214a90b1f393fc917aa60e22]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 7d952a9c1d0a0f43830978746287d8c3a6e1db1f  [CMD `git ls-remote --heads origin` → 7d952a9c1d0a0f43830978746287d8c3a6e1db1f]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d08f3ec5de4d823011e66261c84c98a76371428e  [CMD `git ls-remote --heads origin` → d08f3ec5de4d823011e66261c84c98a76371428e]
+- decisions_headings: 372  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 372]
+- decisions_distinct: 372  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 372]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D389  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D389]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 23  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 23]
+
+### 1. The four states
+
+- physical: unchanged since entry 23; DECISIONS.md blob 6569dc97 on both branches  [CMD `git hash-object kai-pm/DECISIONS.md` → 6569dc97a218449e4a4d97fee69be717c979430f]
+- authorised: unchanged — waiting for Kai's check of the D390 packet  [CONVERSATION 2026-10-02 Kai, "STOP after presenting the pre-append banking packet."]
+- evidence: unchanged  [GIT 7d952a9c1d0a0f43830978746287d8c3a6e1db1f]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- None  [GIT 7d952a9c1d0a0f43830978746287d8c3a6e1db1f]
+
+### 3. Authorised / Held / Forbidden
+
+- Unchanged from entry 23  [GIT 7d952a9c1d0a0f43830978746287d8c3a6e1db1f]
+
+### 4. Open questions
+
+- None new  [GIT 7d952a9c1d0a0f43830978746287d8c3a6e1db1f]
+
+### 5. Incidents and corrections
+
+- CORRECTION to entry 23 §4: the placement question's source tag reads `[FILE kai-pm/DECISIONS.md:]`, with no line. The intended citation is DECISIONS.md:39356 (D389, "KAI‑V4‑07 — MAJOR: A Part D commit placed only on the old branch would not be ancestral to the repair branch")  [FILE kai-pm/DECISIONS.md:39356]
+- Cause, Orion's: the grep for that line used `V4.07`, but the source uses U+2011 non-breaking hyphens (3 bytes each), so it matched nothing; the empty line number went into sed, and a `grep -o` used as the guard still matched the stub, so the && chain did not stop. An R3-shaped defect: the guard was in the chain but tested the wrong thing  [CMD `python3 find 'A Part D commit placed only on the old branch'` → 39356]
+- Instrument gap, flagged not fixed: `handoff.py check` accepted `[FILE path:]` with an empty line number as a valid source tag (findings=0). Fixing the checker is outside the current instruction  [CMD `handoff.py check` at 7d952a9 → findings=0]
+
+### 6. Next authorised step
+
+- Unchanged: Kai checks the D390 packet; Dainius authorises banking and rules on placement  [CONVERSATION 2026-10-02 Kai, "I check it; you authorize banking"]
+
+### 7. What I am unsure of
+
+- None beyond entry 23 §7  [GIT 7d952a9c1d0a0f43830978746287d8c3a6e1db1f]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
