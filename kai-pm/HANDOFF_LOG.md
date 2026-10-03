@@ -20718,3 +20718,230 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-03T02:42:00Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-03T02:42:00Z  [CMD `date -u +%FT%TZ` → 2026-10-03T02:42:00Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 6025d9c30fd541b0acebd3b10f4c74c98ce439fe  [CMD `git rev-parse HEAD` → 6025d9c30fd541b0acebd3b10f4c74c98ce439fe]
+- tree: b95e8991a03a12faad551286eb0531441ac9e392  [CMD `git rev-parse HEAD^{tree}` → b95e8991a03a12faad551286eb0531441ac9e392]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 6025d9c30fd541b0acebd3b10f4c74c98ce439fe  [CMD `git ls-remote --heads origin` → 6025d9c30fd541b0acebd3b10f4c74c98ce439fe]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: dbe692d9c3f83020176aeda00a0f399ce5f020f8  [CMD `git ls-remote --heads origin` → dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 51  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 51]
+
+### 1. The four states
+
+- physical: repair branch unchanged at dbe692d; SB-01 v1 unchanged (composite a39359bc…); measurement read git objects only  [CMD `git ls-remote --heads origin` → claude/d379-repair-eb52f73 dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- authorised: the read-only strict UTF-8 population measurement and its known-negative; then STOP  [CONVERSATION 2026-10-03 Kai, "Then perform only the UTF-8 population measurement and its known-negative calibration. STOP and report the exact evidence."]
+- evidence: instruments and full outputs verbatim in section 5  [CMD `utf8_population.py` → VERDICT CLOSES]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- None; executed under entry 51's ruling  [CONVERSATION 2026-10-03 Kai, "Then perform only the UTF-8 population measurement"]
+
+### 3. Authorised / Held / Forbidden
+
+- DONE: V1-04 measurement. Subject: the frozen Pass-A object dbe692d:kai-pm/house_in_order_h2_v12/passA.json (blob f88e929b8c0f569dd7f730e12a8459b00f405595, sha256 0ea78096887ddbc60d3af147c1f808ded69faea825968643a470c0969d082d42, 359,173 bytes), pa["subject"] d8aac4d49e6ba997e3eb38062c0917186ee3f197 present, tree 3abc9e9d… equal to pa["subject_tree"]. P_DOC 272 rows, 272 distinct, 0 duplicates; P_READER 0 (5 rows carry readers, 0 carry reader_ops, so the composite's _reader_trace selects nothing); overlap 0; |P| 272. Over blob bytes at pa["subject"]: missing_blob 0, strict UTF-8 successes 272, invalid_utf8 0, accounted 272 of 272. Calibration: 5 in-memory invalid-UTF-8 known-negatives detected (and errors="ignore" shown lossy on each), 3 known-positives pass; P_READER derivation known-positive: with reader_ops the recorder captures the (src, line)-first source, without them it captures none  [CMD `utf8_population.py inst5 census repo; utf8_reader_selection_cal.py inst5` → CLOSES; 2/2]
+- HELD: implementation; Kai drafts a bounded grant for Dainius to approve  [CONVERSATION 2026-10-03 Kai, "If that measurement closes cleanly, I’ll give you the exact bounded implementation grant for you, Dainius, to approve."]
+- FORBIDDEN: repair-branch mutation, implementation, d379_controls.py rebuild/full hostile matrix, incident allocation, D390 replay, fixity F, capture, candidate, holdout, blind 40, Item 8, PR #122 merge  [CONVERSATION 2026-10-03 Kai, "No repair-branch mutation. No implementation."]
+
+### 4. Open questions
+
+- Scope of the closure: it covers the frozen v1.2 Pass-A object, which has no reader_ops, so the governed P_READER is empty. A future v13 Pass A on the same subject would carry reader_ops; every source it could select lies in opscan.source_population at pa["subject"], measured as a SUPPLEMENTARY superset with opscan's own rules: 615 files, missing_blob 0, invalid_utf8 0. Whether that superset suffices for a later production subject is Kai's — owner: Kai  [CMD `utf8_population.py` → SUPPLEMENTARY files 615 missing 0 invalid 0]
+
+### 5. Incidents and corrections
+
+- None this step; a credential scan of the four files found 0 hits and no raw line separators  [CMD `secretscan.py <4 files>` → TOTAL HITS 0]
+- Verbatim blocks: strip the 4-space indent; append a final LF only where the line says final LF True  [CMD `roundtrip.py` → all True]
+- EVIDENCE UTF8-POPULATION-INSTRUMENT utf8_population.py: 6239 bytes, sha256 0df5db9686f2fcf8325a46302010325cd8b84256c7562e80a2e09358edc10632, final LF True  [CMD `sha256sum utf8_population.py` → 0df5db9686f2fcf8…]
+    BEGIN-VERBATIM UTF8-POPULATION-INSTRUMENT
+    """Kai, SB-01 v1 V1-04: read-only exact-subject strict UTF-8 measurement. Child under the qualified interpreter.
+    argv: <composite H2 dir> <census dir> <repo>
+    SUBJECT: the frozen Pass-A object at repair HEAD dbe692d, kai-pm/house_in_order_h2_v12/passA.json, read as a GIT BLOB.
+    P_DOC    = every row["path"] the composite row loop classifies (main(): `for row in pa["rows"]`).
+    P_READER = every source the COMPOSITE's own _reader_trace selects for each row: _reader_trace is called with a
+               recording reader that serves the blob text, so the selection rule is the code's, not restated here.
+    P        = P_DOC | P_READER. Bytes for each p: `git cat-file blob <pa["subject"]>:<p>`, never the working tree.
+    Detector: bytes.decode("utf-8", errors="strict"). Known-negative / known-positive: in-memory byte sequences.
+    SUPPLEMENTARY (not the governed P): opscan.source_population at pa["subject"] -- the universe any reader source can be
+    drawn from -- measured with the same detector, because the frozen object carries no reader_ops."""
+    import sys, json, hashlib, subprocess, collections
+    H2, CEN, REPO = sys.argv[1:4]
+    sys.path.insert(0, H2)
+    import run_h2_v12 as R
+    def git(*a, inp=None):
+        p = subprocess.run(["git", "-C", REPO, *a], capture_output=True, input=inp)
+        return p.returncode, p.stdout
+    PA_SPEC = "dbe692d9c3f83020176aeda00a0f399ce5f020f8:kai-pm/house_in_order_h2_v12/passA.json"
+    rc, pab = git("cat-file", "blob", PA_SPEC); assert rc == 0, "PREREQUISITE: frozen Pass-A blob unreadable"
+    _, oid = git("rev-parse", PA_SPEC)
+    pa = json.loads(pab); subj = pa["subject"]
+    rc, tree = git("rev-parse", f"{subj}^{{tree}}")
+    print("SUBJECT")
+    print(f"  Pass-A object   {PA_SPEC}  blob {oid.decode().strip()}  sha256 {hashlib.sha256(pab).hexdigest()}  {len(pab)} bytes")
+    print(f"  pa['subject']   {subj}  commit present {rc == 0}  tree {tree.decode().strip()}  == pa['subject_tree'] {tree.decode().strip() == pa['subject_tree']}")
+    if rc != 0 or tree.decode().strip() != pa["subject_tree"]:
+        print("STOP: prerequisite failed (subject commit absent or tree mismatch); nothing measured"); sys.exit(2)
+    print(f"  pa['population'] {pa['population']}  len(rows) {len(pa['rows'])}")
+    def blob(p):
+        rc, b = git("cat-file", "blob", f"{subj}:{p}"); return b if rc == 0 else None
+    def strict(b):
+        try: b.decode("utf-8", errors="strict"); return True, None
+        except UnicodeDecodeError as e: return False, f"{e.reason} at byte {e.start}"
+    # ── calibration first: the detector must be able to fail ──
+    print("\nCALIBRATION (in-memory, repository untouched)")
+    CAL = [("known-negative lone 0xFF", b"This document is in force. \xff", False), ("known-negative truncated 2-byte", b"caf\xc3", False),
+           ("known-negative overlong '/'", b"\xc0\xaf", False), ("known-negative UTF-16 surrogate", b"\xed\xa0\x80", False),
+           ("known-negative bare continuation", b"a\x80b", False),
+           ("known-positive ASCII", b"This document is in force.\n", True), ("known-positive multibyte", "café — ✓".encode(), True),
+           ("known-positive CR/LF/NEL/LS", b"a\r\nb\rc\xc2\x85d\xe2\x80\xa8e", True)]
+    cal_ok = True
+    for label, b, want in CAL:
+        got, why = strict(b); ok = got == want; cal_ok &= ok
+        print(f"  {'PASS' if ok else 'FAIL'}  {label:<34} strict_ok={got}  expected {want}" + (f"  ({why})" if why else ""))
+        # and errors="ignore" really is lossy on the negatives (what V1-04 is about)
+        if not want: print(f"        errors='ignore' drops {len(b) - len(b.decode('utf-8', errors='ignore').encode())} byte(s)")
+    if not cal_ok:
+        print("STOP: detector calibration failed; population not measured"); sys.exit(2)
+    # ── P_DOC ──
+    P_DOC_list = [r["path"] for r in pa["rows"]]
+    dup_doc = [p for p, c in collections.Counter(P_DOC_list).items() if c > 1]
+    # ── P_READER via the composite's own _reader_trace ──
+    sel = []
+    def recorder(repo, rel):
+        sel.append(str(rel)); b = blob(rel)
+        if b is None: raise OSError(2, "absent from subject")
+        return b.decode(errors="ignore")
+    rows_ops = rows_readers = 0
+    for r in pa["rows"]:
+        row = dict(r, readers=r.get("readers") or [], reader_ops=r.get("reader_ops") or [])
+        rows_ops += bool(row["reader_ops"]); rows_readers += bool(row["readers"])
+        try: R._reader_trace(row, REPO, recorder)
+        except SystemExit as e: print(f"  reader selection REFUSED for {r['path']}: {e}")
+    P_READER_list = sel
+    P_DOC, P_READER = set(P_DOC_list), set(P_READER_list)
+    P = P_DOC | P_READER
+    print("\nPOPULATION")
+    print(f"  P_DOC     rows {len(P_DOC_list)}  distinct {len(P_DOC)}  duplicates {len(dup_doc)} {dup_doc[:5]}")
+    print(f"  P_READER  rows with readers {rows_readers}; rows with reader_ops {rows_ops}; selections {len(P_READER_list)}  distinct {len(P_READER)}")
+    print(f"  overlap |P_DOC & P_READER| {len(P_DOC & P_READER)}   |P| {len(P)}   reconciliation {len(P_DOC)} + {len(P_READER)} - {len(P_DOC & P_READER)} = {len(P_DOC) + len(P_READER) - len(P_DOC & P_READER)}")
+    missing, bad, good = [], [], 0
+    for p in sorted(P):
+        b = blob(p)
+        if b is None: missing.append(p); continue
+        ok, why = strict(b)
+        if ok: good += 1
+        else: bad.append((p, why))
+    print("\nRESULT over P (blob bytes at pa['subject'])")
+    print(f"  missing_blob {len(missing)} {missing[:10]}")
+    print(f"  strict UTF-8 successes {good}   failures (invalid_utf8) {len(bad)} {bad[:10]}")
+    print(f"  accounted {good + len(bad) + len(missing)} of |P| {len(P)}")
+    # ── supplementary superset ──
+    sys.path.insert(0, CEN); import opscan as O
+    _, ls = git("ls-tree", "-r", "--name-only", subj)
+    names = sorted(p for p in ls.decode().split("\n") if p)
+    O.tracked = lambda repo, suffix=None: [p for p in names if not suffix or p.endswith(suffix)]
+    SP = O.source_population(REPO)
+    sbad = [(p, strict(blob(p))[1]) for p in SP if blob(p) is not None and not strict(blob(p))[0]]
+    smiss = [p for p in SP if blob(p) is None]
+    print("\nSUPPLEMENTARY (not the governed P): opscan.source_population at pa['subject'] (opscan's own rules)")
+    print(f"  files {len(SP)}  missing_blob {len(smiss)}  invalid_utf8 {len(sbad)} {sbad[:10]}")
+    verdict = "CLOSES" if not missing and not bad else "STOP"
+    print(f"\nVERDICT over the governed P: missing_blob={len(missing)} invalid_utf8={len(bad)} -> {verdict}")
+    sys.exit(0 if verdict == "CLOSES" else 1)
+    END-VERBATIM UTF8-POPULATION-INSTRUMENT
+- EVIDENCE UTF8-POPULATION-OUTPUT utf8_population_out.txt: 2038 bytes, sha256 ebd1acc48c04783f48b724e3cb010b25eec4285380e28675c04f61a282a69742, final LF True  [CMD `sha256sum utf8_population_out.txt` → ebd1acc48c04783f…]
+    BEGIN-VERBATIM UTF8-POPULATION-OUTPUT
+    SUBJECT
+      Pass-A object   dbe692d9c3f83020176aeda00a0f399ce5f020f8:kai-pm/house_in_order_h2_v12/passA.json  blob f88e929b8c0f569dd7f730e12a8459b00f405595  sha256 0ea78096887ddbc60d3af147c1f808ded69faea825968643a470c0969d082d42  359173 bytes
+      pa['subject']   d8aac4d49e6ba997e3eb38062c0917186ee3f197  commit present True  tree 3abc9e9d8ca11966a6f996d5f0af68072ee5b117  == pa['subject_tree'] True
+      pa['population'] 272  len(rows) 272
+    
+    CALIBRATION (in-memory, repository untouched)
+      PASS  known-negative lone 0xFF           strict_ok=False  expected False  (invalid start byte at byte 27)
+            errors='ignore' drops 1 byte(s)
+      PASS  known-negative truncated 2-byte    strict_ok=False  expected False  (unexpected end of data at byte 3)
+            errors='ignore' drops 1 byte(s)
+      PASS  known-negative overlong '/'        strict_ok=False  expected False  (invalid start byte at byte 0)
+            errors='ignore' drops 2 byte(s)
+      PASS  known-negative UTF-16 surrogate    strict_ok=False  expected False  (invalid continuation byte at byte 0)
+            errors='ignore' drops 3 byte(s)
+      PASS  known-negative bare continuation   strict_ok=False  expected False  (invalid start byte at byte 1)
+            errors='ignore' drops 1 byte(s)
+      PASS  known-positive ASCII               strict_ok=True  expected True
+      PASS  known-positive multibyte           strict_ok=True  expected True
+      PASS  known-positive CR/LF/NEL/LS        strict_ok=True  expected True
+    
+    POPULATION
+      P_DOC     rows 272  distinct 272  duplicates 0 []
+      P_READER  rows with readers 5; rows with reader_ops 0; selections 0  distinct 0
+      overlap |P_DOC & P_READER| 0   |P| 272   reconciliation 272 + 0 - 0 = 272
+    
+    RESULT over P (blob bytes at pa['subject'])
+      missing_blob 0 []
+      strict UTF-8 successes 272   failures (invalid_utf8) 0 []
+      accounted 272 of |P| 272
+    
+    SUPPLEMENTARY (not the governed P): opscan.source_population at pa['subject'] (opscan's own rules)
+      files 615  missing_blob 0  invalid_utf8 0 []
+    
+    VERDICT over the governed P: missing_blob=0 invalid_utf8=0 -> CLOSES
+    END-VERBATIM UTF8-POPULATION-OUTPUT
+- EVIDENCE UTF8-READER-SELECTION-CAL-INSTRUMENT utf8_reader_selection_cal.py: 1382 bytes, sha256 81d7e9ab25945516bc1d78cb75414dc13195199032e486c0af147793c7089087, final LF True  [CMD `sha256sum utf8_reader_selection_cal.py` → 81d7e9ab25945516…]
+    BEGIN-VERBATIM UTF8-READER-SELECTION-CAL-INSTRUMENT
+    """Known-positive for the P_READER derivation in utf8_population.py: the composite's own _reader_trace, driven by the
+    same recording-reader pattern, MUST record exactly one selection -- the (src, line)-first op -- when reader_ops exist.
+    In-memory rows only; the reader serves fixed text, no repository access. argv: <composite H2 dir>"""
+    import sys
+    sys.path.insert(0, sys.argv[1]); import run_h2_v12 as R
+    sel = []
+    def recorder(repo, rel): sel.append(rel); return 'DOC = "kai-pm/DOC.md"\ndata = open(DOC).read()\n'
+    ops = [{"src": "tools/z.py", "line": 2, "expr": "Name(id='DOC', ctx=Load())", "mode": "R"},
+           {"src": "tools/a.py", "line": 2, "expr": "Name(id='DOC', ctx=Load())", "mode": "R"}]
+    t = R._reader_trace({"path": "kai-pm/DOC.md", "readers": ["tools/a.py", "tools/z.py"], "reader_ops": ops}, ".", recorder)
+    ok1 = sel == ["tools/a.py"] and t is not None and t["source_path"] == "tools/a.py"
+    print(f"  {'PASS' if ok1 else 'FAIL'}  rows WITH reader_ops -> selections {sel} (expected ['tools/a.py']); trace source {t and t['source_path']}")
+    sel.clear()
+    t2 = R._reader_trace({"path": "kai-pm/DOC.md", "readers": ["tools/a.py"], "reader_ops": []}, ".", recorder)
+    ok2 = sel == [] and t2 is None
+    print(f"  {'PASS' if ok2 else 'FAIL'}  readers but NO reader_ops (the frozen object's shape) -> selections {sel}, trace {t2} (expected [], None)")
+    sys.exit(0 if ok1 and ok2 else 1)
+    END-VERBATIM UTF8-READER-SELECTION-CAL-INSTRUMENT
+- EVIDENCE UTF8-READER-SELECTION-CAL-OUTPUT utf8_reader_selection_cal_out.txt: 220 bytes, sha256 2d163c20ccaa265f26fc95dc017d2b0011645aabf79bdbdcdf24a3f3cd339e69, final LF True  [CMD `sha256sum utf8_reader_selection_cal_out.txt` → 2d163c20ccaa265f…]
+    BEGIN-VERBATIM UTF8-READER-SELECTION-CAL-OUTPUT
+      PASS  rows WITH reader_ops -> selections ['tools/a.py'] (expected ['tools/a.py']); trace source tools/a.py
+      PASS  readers but NO reader_ops (the frozen object's shape) -> selections [], trace None (expected [], None)
+    END-VERBATIM UTF8-READER-SELECTION-CAL-OUTPUT
+
+### 6. Next authorised step
+
+- STOP. Report to Dainius and Kai; await Kai's bounded implementation grant and Dainius's approval  [CONVERSATION 2026-10-03 Kai, "STOP and report the exact evidence."]
+
+### 7. What I am unsure of
+
+- Nothing beyond the scope question in section 4  [CMD `utf8_population.py` → exit 0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
