@@ -12914,3 +12914,208 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-03T01:11:06Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-03T01:11:06Z  [CMD `date -u +%FT%TZ` → 2026-10-03T01:11:06Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: e1484941a051a74f4b0d5c18ecab47f0912aedac  [CMD `git rev-parse HEAD` → e1484941a051a74f4b0d5c18ecab47f0912aedac]
+- tree: 28957d052a5600b914a090e7881c6a0d03e6bdd5  [CMD `git rev-parse HEAD^{tree}` → 28957d052a5600b914a090e7881c6a0d03e6bdd5]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: dbe692d9c3f83020176aeda00a0f399ce5f020f8  [CMD `git ls-remote --heads origin` → dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- remote:claude/project-rework-plan-pgvp35: e1484941a051a74f4b0d5c18ecab47f0912aedac  [CMD `git ls-remote --heads origin` → e1484941a051a74f4b0d5c18ecab47f0912aedac]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 41  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 41]
+
+### 1. The four states
+
+- physical: repair branch unchanged at dbe692d; packet v3 unchanged at sha256 bdf6f2e1b381f723294d4ffcc182e1d970128dcb63d029960b76d01a8ec1d93c  [CMD `git -C /home/user/kai-repair rev-parse HEAD; sha256sum DEEPSEEK_PACKET_TWO_FACT_v3.md` → dbe692d9c3f83020176aeda00a0f399ce5f020f8, bdf6f2e1…d93c]
+- authorised: transport-only retry of the unchanged v3 as four base64-encoded chunks; no v4, no diff change  [CONVERSATION 2026-10-03 Kai, "Retransmit the existing v3 subject as the four already-frozen exact-byte chunks, but encode each chunk as base64 before transmission."]
+- evidence: base64 transport built and self-verified: each block decodes to its frozen chunk, and the four decode and reassemble to bdf6f2e1…d93c  [CMD `base64 decode of the 4 transport blocks, concatenate` → bdf6f2e1…d93c, equal]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-03 · V3 SUBJECT NOT REVIEWED; TRANSPORT FALLBACK AUTHORISED: DeepSeek correctly refused (SENTINEL 1 corrupted in transit again); entry 40's preserved v3 has the correct bytes; no v4; no DeepSeek finding against v3 exists; classified as another review-channel integrity failure; base64 chunk transport with decode-then-quote receipt. Verbatim below, 3576 bytes, sha256 0609475db45690349924d7be8268b1990939ae39760bdef2f38cd11e98e2377a, 4-space indent added ⚠ UNBANKED  [CONVERSATION 2026-10-03 Kai via Dainius, "KAI → ORION — V3 SUBJECT NOT REVIEWED; TRANSPORT FALLBACK AUTHORISED"]
+    BEGIN-VERBATIM KAI-TRANSPORT-RULING
+    DeepSeek did exactly the right thing: NO REVIEW. The receipt gate caught the same transport corruption again.
+    
+    I independently checked entry 40 on GitHub. The preserved v3 packet contains the correct line:
+    
+    self_pos = [c for c in cl_ if c[1] == "SELF" and c[0] == "CURRENT_POSITIVE"]
+    
+    and the corresponding self_neg line also contains both == operators. So this is not a v3 code defect. It is now a reproduced review-channel integrity defect.
+    
+    Do not create packet v4. The review subject has not changed. Keep v3 at SHA-256:
+    
+    bdf6f2e1b381f723294d4ffcc182e1d970128dcb63d029960b76d01a8ec1d93c
+    
+    The next move is a transport-only retry using an encoding that cannot reinterpret Python punctuation. I would use the four already-prepared chunks, but transmit their base64 representation, not their raw Markdown.
+    
+    Send Orion this:
+    
+    KAI → ORION — V3 SUBJECT NOT REVIEWED; TRANSPORT FALLBACK AUTHORISED
+    
+    DeepSeek correctly refused review because SENTINEL 1 was corrupted in transit again.
+    
+    Independent repository check confirms entry 40’s preserved packet contains the correct exact bytes:
+    
+    self_pos = [c for c in cl_ if c[1] == "SELF" and c[0] == "CURRENT_POSITIVE"]
+    
+    Therefore:
+    
+    * v3 itself is unchanged;
+    * do not make v4;
+    * do not alter the diff;
+    * no DeepSeek finding exists against v3 yet;
+    * classify this as another review-channel integrity failure.
+    
+    Retransmit the existing v3 subject as the four already-frozen exact-byte chunks, but encode each chunk as base64 before transmission.
+    
+    For each chunk provide:
+    
+    CHUNK n/4
+    original decoded-byte length
+    SHA-256 of original decoded chunk
+    SHA-256 of transmitted base64 text
+    BEGIN BASE64
+    <base64 payload>
+    END BASE64
+    
+    DeepSeek must:
+    
+    1. decode all four chunks;
+    2. verify every decoded chunk SHA;
+    3. concatenate decoded chunks strictly 1→4;
+    4. verify reassembled SHA-256 equals
+        bdf6f2e1b381f723294d4ffcc182e1d970128dcb63d029960b76d01a8ec1d93c;
+    5. only then read the decoded packet;
+    6. reproduce the six receipt lines from the decoded bytes, including both sentinels;
+    7. begin substantive review only after all checks pass.
+    
+    DeepSeek must not review the base64 text itself and must not use the earlier corrupted render as the subject.
+    
+    If base64 padding or message formatting is altered such that any transmitted/base64 or decoded hash fails: STOP, NO REVIEW.
+    
+    Preserve the failed receipt as evidence of the transport failure.
+    
+    No repair-branch mutation, no source-binding repair, no d379_controls.py rebuild, no matrix, no D390 replay, no fixity F and no capture.
+    
+    One refinement: have DeepSeek quote the sentinels after decoding, not from the transport message. That separates transport correctness from subject correctness. The previous protocol still exposed the sentinel to the rendering layer before it had proved the bytes.
+    
+    The receipt should therefore finish with something like:
+    
+    REASSEMBLED SHA256: bdf6f2e1...
+    DECODED PACKET: PASS
+    SENTINEL 1: +    self_pos = [c for c in cl_ if c[1] == "SELF" and c[0] == "CURRENT_POSITIVE"]
+    SENTINEL 2: +        lead = (len(ln) - len(s)) + (len(s) - len(s2)) + (len(s2) - len(s2.lstrip()))
+    END OF PACKET SEEN: YES
+    
+    Only after that should DeepSeek issue DS-B4-V3-* findings.
+    
+    This failure is actually useful: the receipt control has now caught corruption twice, which demonstrates that it is not decorative. We should preserve both failures because this is exactly the kind of evidence-chain degradation D379 is meant to prevent.
+    
+    State remains: v3 unreviewed; repair branch unchanged at dbe692d; KAI-B4-SB-01 remains separately open; implementation still held.
+    
+    Confidence: 0.995.
+    END-VERBATIM KAI-TRANSPORT-RULING
+
+### 3. Authorised / Held / Forbidden
+
+- DONE: four base64 transport blocks (decoded 7,030 / 7,060 / 7,037 / 3,511 bytes; decoded sha256 80a43c61…, 92d7a5e6…, 2611491b…, 1ca04705…; base64 lines wrapped at 76 characters, transmitted-text hash defined over the base64 characters with all whitespace removed) and a cover message; complete message file sha256 6bf45315cd0b8e58f81db6c067f826fe7c6d37c5e02ac67ae698ca73f94fb43d  [CMD `sha256sum v3_b64/*` → as stated]
+- HELD: repair-branch mutation, the KAI-B4-SB-01 source-binding proposal, d379_controls.py rebuild, matrix  [CONVERSATION 2026-10-03 Kai, "No repair-branch mutation, no source-binding repair, no d379_controls.py rebuild, no matrix"]
+- FORBIDDEN: packet v4; any diff change; D390 replay; fixity F; capture  [CONVERSATION 2026-10-03 Kai, "Do not create packet v4."]
+
+### 4. Open questions
+
+- DeepSeek's FAILED v3 receipt is not in this session or the repository: it was relayed only as Kai's summary ("SENTINEL 1 was corrupted in transit again"). Kai directed it be preserved as evidence; Dainius to paste the exact reply so it can be recorded verbatim — owner: Dainius  [CONVERSATION 2026-10-03 Kai, "Preserve the failed receipt as evidence of the transport failure."]
+- DeepSeek: decode, verify, reassemble, receipt from decoded bytes, then the v3 review — owner: DeepSeek via Dainius  [CONVERSATION 2026-10-03 Kai, "begin substantive review only after all checks pass"]
+- KAI-B4-SB-01 remains OPEN / BLOCKS B4 CLOSEOUT  [CONVERSATION 2026-10-03 Kai, "KAI-B4-SB-01 remains separately open"]
+
+### 5. Incidents and corrections
+
+- Review-channel integrity failures, now counted: v1 truncated; v2 "==" lost (DeepSeek reviewed it and raised a false BLOCKER); v3 first transmission: SENTINEL 1 corrupted, receipt gate refused. Same symptom twice in the same line class; recorded, not allocated (no incident authority)  [CONVERSATION 2026-10-03 Kai, "classify this as another review-channel integrity failure"]
+- Cover message for the base64 retry, verbatim (2804 bytes, sha256 7b71b00720a6de53bb66d76dad89b46b0fca45da8489d1d466972eda11a8a7e3); it names the sentinels by their leading prefix only, never their full text  [CMD `grep -c sentinel prefixes DEEPSEEK_COVER_v3_BASE64.txt` → 2 prefix descriptions]
+    BEGIN-VERBATIM DEEPSEEK-COVER-V3-BASE64
+    To: DeepSeek (adversarial reviewer)
+    From: Orion, for Kai and Dainius
+    Subject: D379 B4 two-fact repair, packet v3, transport retry in base64 (subject unchanged)
+    
+    Your refusal was correct. The repository copy of packet v3 is intact, so the corruption
+    happened in transit. This is a transport-only retry of the SAME, UNCHANGED packet v3.
+    There is no v4 and no change to the diff.
+    
+    Packet v3 SHA-256 (the subject you must reconstruct):
+    bdf6f2e1b381f723294d4ffcc182e1d970128dcb63d029960b76d01a8ec1d93c
+    
+    The packet follows as four base64 blocks, CHUNK 1/4 to CHUNK 4/4. Each block states:
+      - its original decoded-byte length;
+      - the SHA-256 of the original decoded chunk;
+      - the SHA-256 of the transmitted base64 text, computed over the base64 characters
+        with ALL whitespace and line breaks removed.
+    
+    Do these steps in order. If any check fails, STOP and send NO REVIEW, saying which
+    check failed.
+    
+    1. For each block, take the text between BEGIN BASE64 and END BASE64 and remove all
+       whitespace. Verify its SHA-256 against the stated transmitted-text hash.
+    2. Base64-decode it. Verify the decoded length and the decoded SHA-256.
+    3. Concatenate the decoded chunks strictly in order 1, 2, 3, 4.
+    4. Verify that the SHA-256 of the result equals
+       bdf6f2e1b381f723294d4ffcc182e1d970128dcb63d029960b76d01a8ec1d93c
+    5. Only then read the decoded packet. That is the review subject. Do not review the
+       base64 text, and do not use any earlier rendering of this packet.
+    6. Reply with this receipt, built from the DECODED bytes. Copy SENTINEL 1 and SENTINEL 2
+       character for character from the decoded diff (section 4): SENTINEL 1 is the single
+       added line that begins "+    self_pos =", and SENTINEL 2 is the single added line that
+       begins "+        lead =". Do not retype or reformat them.
+    
+         CHUNK 1/4: transmitted PASS, decoded PASS
+         CHUNK 2/4: transmitted PASS, decoded PASS
+         CHUNK 3/4: transmitted PASS, decoded PASS
+         CHUNK 4/4: transmitted PASS, decoded PASS
+         REASSEMBLED SHA256: <the hash you computed>
+         DECODED PACKET: PASS
+         BASE BLOB: <from section 0 of the decoded packet>
+         FIRST DIFF HUNK: <the first @@ line of the decoded diff>
+         SENTINEL 1: <copied from the decoded diff>
+         SENTINEL 2: <copied from the decoded diff>
+         END OF PACKET SEEN: YES
+    
+    7. Only after a fully passing receipt, review exactly as the packet's sections 1 and 7
+       describe. Attack only the two-fact repair. Give each finding an ID (DS-B4-V3-nn), a
+       severity (BLOCKER / MAJOR / MINOR), the exact diff line(s) or packet section, a
+       concrete failing input where possible, and a remedy. If you find nothing, say so
+       explicitly. A PASS is not implementation authority: Kai reconciles every finding.
+       Section 6 of the packet (KAI-B4-SB-01, working-tree reads) is out of scope.
+    END-VERBATIM DEEPSEEK-COVER-V3-BASE64
+
+### 6. Next authorised step
+
+- Dainius transmits the cover message plus the four base64 blocks; accept a review only after the decoded receipt passes in full; then Kai reconciles  [CONVERSATION 2026-10-03 Kai, "Only after that should DeepSeek issue DS-B4-V3-* findings."]
+
+### 7. What I am unsure of
+
+- Whether the channel preserves long base64 lines and "=" padding; the per-block transmitted-text hash will show any alteration  [CMD `base64 block format` → wrapped at 76, whitespace-insensitive hash]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
