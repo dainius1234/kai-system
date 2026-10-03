@@ -21767,3 +21767,1161 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-03T03:25:52Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-03T03:25:52Z  [CMD `date -u +%FT%TZ` → 2026-10-03T03:25:52Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 12be41756a0ba9cc545f2c010ca2847ed35c280f  [CMD `git rev-parse HEAD` → 12be41756a0ba9cc545f2c010ca2847ed35c280f]
+- tree: f57d8b24cd5a712355c62e1befb7cb666e74b7ae  [CMD `git rev-parse HEAD^{tree}` → f57d8b24cd5a712355c62e1befb7cb666e74b7ae]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/project-rework-plan-pgvp35: 12be41756a0ba9cc545f2c010ca2847ed35c280f  [CMD `git ls-remote --heads origin` → 12be41756a0ba9cc545f2c010ca2847ed35c280f]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: dbe692d9c3f83020176aeda00a0f399ce5f020f8  [CMD `git ls-remote --heads origin` → dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 56  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 56]
+
+### 1. The four states
+
+- physical: repair worktree identical to its pre-retry snapshot (HEAD dbe692d, one uncommitted path, run_h2_v12.py a39359bc…, gitdir config and shallow file unchanged); local and remote repair ref dbe692d; nothing committed or pushed  [CMD `diff repair_snapshot_before/after; git ls-remote` → identical; dbe692d9c3f8…]
+- authorised: entry 56's scratch full-history retry; STOP on any failure, evidence to Kai  [CONVERSATION 2026-10-03 Kai, "Pass A refuses for any other reason, or any downstream result differs unexpectedly: STOP. Do not commit or push. Return to Kai with exact evidence."]
+- evidence: chains, comparison and snapshots verbatim in section 5  [CMD `as listed` → as stated]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- None  [CONVERSATION 2026-10-03 Dainius, "Choose Fetch full history (scratch)."]
+
+### 3. Authorised / Held / Forbidden
+
+- DONE (scratch full history): git clone of https://github.com/dainius1234/kai-system into scratch; is-shallow false; d8aac4d4… is a commit, tree 3abc9e9d… exactly, 986 commits reachable; detached at that commit; status 0 lines  [CMD `git clone; rev-parse --is-shallow-repository; cat-file -t; rev-parse ^{tree}; rev-list | wc -l` → false; commit; 3abc9e9d…; 986]
+- DONE (real-subject chain, NEW = the uncommitted composite): Stage A CALIBRATION rc 0; fresh Pass A rc 0 (272 rows); Pass-A binding ba3598587ace0946…; classification rc 0, consuming run_h2_v12.py sha256 a39359bc… per its producer_provenance; classification binding e2daa7aec437c125…; qualifier rc 1, FINDINGS 5, all AXIS_WITNESS, on data/self-emp/{Accounting,Coding,Engineering,Legal,Social}/README.md; every other qualifier section passes (UNKNOWN invariant + removal calibration, dispositions, 0 output-derived values, population 272 == rows, origins 87/87 classified, provenance verified against Stage A, denominators 216 + 529)  [CMD `impl_chain.py impl/full` → qualifier rc=1 FINDINGS 5 AXIS_WITNESS]
+- STOPPED: the qualifier did not exit clean, so the chain is not a pass; nothing committed or pushed  [CONVERSATION 2026-10-03 Kai, "any downstream result differs unexpectedly: STOP"]
+- DIAGNOSIS (read-only, scratch): the identical chain with the dbe692d classifier (run_h2_v12.py 24ecd782…, own Stage A, second full-history clone) gives qualifier rc 1 with the SAME 5 AXIS_WITNESS findings on the same 5 rows plus 544 FACT_CLASS_ABSENT (272 rows x 2 missing classes). NEW vs OLD on the real subject: Pass-A rows identical; axis cells differing 0 (whole cell incl. witness); other-8-fact values, traces and abstentions differing 0; key sets NEW 10 x 272, OLD 8 x 272; tallies identical except NEW adds NOMINAL_FUNCTION 207 and SELF_ASSERTS_CURRENT 6. The 5 cells are FUNCTION=MARKER with witness SIZE_AND_ROLE, witness_value e.g. '114 bytes', local_context '(no title)'; run_h2_v12._compliant -> False because the value is not in the context; each cell is identical in OLD. The FUNCTION cell is produced by classify.py (not in the delta)  [CMD `real_compare.py impl/full impl/fullold repair-H2` → as stated]
+- DONE (reader and UTF-8 confirmation on the fresh real Pass A): rows with readers 5, rows with reader_ops 5, reader_ops entries 8, distinct op sources 4; the composite's _reader_trace selects 5 times, 4 distinct (scripts/auto_changelog.py, scripts/auto_session_log.py, scripts/security/check_gate_registry.py, scripts/sync_docs.py); members 4/4, strict UTF-8 4/4; classified documents 272: members 272/272, strict UTF-8 272/272; STATIC_REFERENCE_AT_SUBJECT positive 5, traced 5  [CMD `real_compare.py` → as stated]
+- HELD: commit/push; Kai adjudicates the 5 pre-existing AXIS_WITNESS findings against "qualifier exits clean … no unexplained finding"  [CONVERSATION 2026-10-03 Kai, "return the evidence to Kai before committing"]
+
+### 4. Open questions
+
+- The 5 AXIS_WITNESS findings: pre-existing (identical under dbe692d), produced by classify.py's FUNCTION=MARKER witness, outside the six-file surface? classify.py is NOT in the six-file surface; whether they block this commit, and where they are repaired, is Kai's — owner: Kai  [CMD `real_compare.py` → same in OLD=True for all 5]
+- Ignored bytecode in the repair worktree: kai-pm/house_in_order_h2_v13/__pycache__/ (7 .pyc, mtimes 2026-10-02 18:05, gitignored by .gitignore:2) predates this grant and was not created this session; with run_h2_v12.py changed its .pyc no longer matches the source — owner: Kai  [CMD `ls -la --time-style=full-iso __pycache__; git check-ignore -v` → 2026-10-02 18:05; .gitignore:2]
+
+### 5. Incidents and corrections
+
+- None new; the earlier harness errors are in entry 55  [CMD `handoff.py check` → findings=0]
+- Credential scan of the nine evidence files: 0 hits; raw line separators: none  [CMD `secretscan.py <9 files>` → TOTAL HITS 0]
+- Verbatim blocks: strip the 4-space indent; append a final LF only where the line says final LF True  [CMD `roundtrip.py` → all True]
+- EVIDENCE REAL-NEW-CHAIN-OUTPUT impl_chain_full_out.txt: 967 bytes, sha256 46cf69b926b0d7d393061f629c9316821d98523236d6a4c726423c726c198e79, final LF True  [CMD `sha256sum impl_chain_full_out.txt` → 46cf69b926b0d7d3…]
+    BEGIN-VERBATIM REAL-NEW-CHAIN-OUTPUT
+      subject HEAD                 rc=0  d8aac4d49e6ba997e3eb38062c0917186ee3f197
+      subject tree                 rc=0  3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+      subject status               rc=0  
+      subject HEAD == d8aac4d49e6b True; tree == 3abc9e9d8ca1 True; status lines 0
+      Stage A (CALIBRATION)        rc=0  
+      fresh Pass A                 rc=0    NO VERDICT ASSIGNED IN PASS A.
+      Pass-A binding               rc=0  ba3598587ace094655f245d8632595d6a30ebe139dc95611ec83605b48fb3d2e
+      classification (composite)   rc=0    self_approval: NONE
+      classification binding       rc=0  e2daa7aec437c1257d4f62222219d9396ffd74a5ff74c83cfbe18dd5af84a02d
+      qualifier                    rc=1      AXIS_WITNESS::data/self-emp/Social/README.md — non-abstaining cell carries no compliant witness
+    ABORT at 'qualifier': every later stage NOT MEASURED. Full log /tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/twofact/impl/full/chain_full_log.txt
+    END-VERBATIM REAL-NEW-CHAIN-OUTPUT
+- EVIDENCE REAL-NEW-CHAIN-FULL-LOG real_full_chain_log.txt: 7395 bytes, sha256 aacdfb140fa29bb54bdb24ebfe42114d987ab3c0117d270e5184f2c0e2351ce4, final LF True  [CMD `sha256sum real_full_chain_log.txt` → aacdfb140fa29bb5…]
+    BEGIN-VERBATIM REAL-NEW-CHAIN-FULL-LOG
+    --- subject HEAD rc=0 (41 bytes)
+    d8aac4d49e6ba997e3eb38062c0917186ee3f197
+    --- end subject HEAD
+    --- subject tree rc=0 (41 bytes)
+    3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+    --- end subject tree
+    --- subject status rc=0 (0 bytes)
+    --- end subject status
+    --- Stage A (CALIBRATION) rc=0 (0 bytes)
+    --- end Stage A (CALIBRATION)
+    --- fresh Pass A rc=0 (516 bytes)
+    PASS A v1.2 COMPLETE — 272 rows == population 272
+      WITNESS KINDS DISCRIMINATED (D2/D4), not assumed from shape:
+        DATE                        353
+        COMMIT                      110
+        RUN_ID                       12
+        HEX_SHAPED_UNRESOLVED         9
+        DECIMAL_TOKEN                 5
+        DIGEST_FRAGMENT               3
+      scope determined: WHOLE_FILE 201 · SPAN 291
+      binding predicates declared closed-world: 26
+      contextual predicates declared closed-world: 1 (status)
+      NO VERDICT ASSIGNED IN PASS A.
+    --- end fresh Pass A
+    --- Pass-A binding rc=0 (65 bytes)
+    ba3598587ace094655f245d8632595d6a30ebe139dc95611ec83605b48fb3d2e
+    --- end Pass-A binding
+    --- classification (composite) rc=0 (1356 bytes)
+    HOUSE_H2 v1.2 — 272 rows == population 272
+      subject d8aac4d49e6b tree 3abc9e9d8ca1
+    
+      LIFECYCLE    positives    8  UNKNOWN  264   {'HISTORICAL': 8}
+      FUNCTION     positives    5  UNKNOWN  267   {'MARKER': 5}
+      AUTHORITY    positives    0  UNKNOWN  272   
+      GENERATION   positives    0  UNKNOWN  272   
+      VALIDITY     positives    9  UNKNOWN  263   {'TIME_BOUND': 7, 'EXACT_SNAPSHOT': 2}
+      SCOPE        positives  194  UNKNOWN   78   {'WHOLE_FILE': 194}
+    
+      evidence facts (NOT verdicts):
+        MAINTENANCE_OBSERVED           71
+        SELF_ASSERTS_CURRENT            6
+        STATIC_REFERENCE_AT_SUBJECT     5
+        CITES_COMMIT                   21
+        CITES_RUN                       3
+        CARRIES_DATE_STAMP            206
+        BINDING_CONTRADICTION           5
+        NOMINAL_FUNCTION              207
+        SELF_ASSERTS_AUTHORITY          4
+        SELF_ASSERTS_NON_AUTHORITY      1
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 207
+        {'GOVERNANCE from self-description': 6, 'STATUS from self-description': 4, 'PLAN from self-description': 22, 'RUNTIME_INPUT from self-description': 9, 'USER_GUIDE from self-description': 10, 'REFERENCE from self-description': 11, 'EVIDENCE from self-description': 144, 'MARKER from self-description': 1}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end classification (composite)
+    --- classification binding rc=0 (65 bytes)
+    e2daa7aec437c1257d4f62222219d9396ffd74a5ff74c83cfbe18dd5af84a02d
+    --- end classification binding
+    --- qualifier rc=1 (4754 bytes)
+    HOUSE_H2 v1.2 — QUALIFICATION
+      subject d8aac4d49e6b  tree 3abc9e9d8ca1
+      history 2025-06-18 → 2026-08-23  shallow=false  ancestry=986
+      census  29064d650a612968…
+    
+      [1] GOVERNING INVARIANT — checked from the AXIS SET
+          UNKNOWN first-class on every axis: True
+      [1b] REMOVAL CALIBRATION — the gate proves it can fail, this run
+           remove UNKNOWN from LIFECYCLE   detected=True
+           remove UNKNOWN from FUNCTION    detected=True
+           remove UNKNOWN from AUTHORITY   detected=True
+           remove UNKNOWN from GENERATION  detected=True
+           remove UNKNOWN from VALIDITY    detected=True
+           remove UNKNOWN from SCOPE       detected=True
+    
+      [2] STATE DISPOSITIONS — checked from the ALPHABET
+          [LIFECYCLE]
+            ACTIVE            H2_NOT_EARNABLE        0  
+            HISTORICAL        H2_EMITTABLE           8  
+            SUPERSEDED        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE         264  
+          [FUNCTION]
+            GOVERNANCE        H2_EMITTABLE           0  not observed on this subject
+            STATUS            H2_EMITTABLE           0  not observed on this subject
+            PLAN              H2_EMITTABLE           0  not observed on this subject
+            EVIDENCE          H2_EMITTABLE           0  not observed on this subject
+            REFERENCE         H2_EMITTABLE           0  not observed on this subject
+            RUNTIME_INPUT     H2_EMITTABLE           0  not observed on this subject
+            TEMPLATE          H2_EMITTABLE           0  not observed on this subject
+            MARKER            H2_EMITTABLE           5  
+            USER_GUIDE        H2_EMITTABLE           0  not observed on this subject
+            OTHER             H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE         267  
+          [AUTHORITY]
+            AUTHORITATIVE     DEFERRED_TO_H3         0  
+            VERIFIED_DERIVED  DEFERRED_TO_H3         0  
+            ADVISORY          DEFERRED_TO_H3         0  
+            NON_AUTHORITY     DEFERRED_TO_H3         0  
+            UNKNOWN           H2_EMITTABLE         272  
+          [GENERATION]
+            MANUAL            H2_NOT_EARNABLE        0  
+            PARTIAL_DERIVED   H2_NOT_EARNABLE        0  
+            FULL_DERIVED      H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE         272  
+          [VALIDITY]
+            CURRENT_TREE      H2_EMITTABLE           0  not observed on this subject
+            EXACT_SNAPSHOT    H2_EMITTABLE           2  
+            RUN_ARTEFACT      H2_EMITTABLE           0  not observed on this subject
+            TIME_BOUND        H2_EMITTABLE           7  
+            UNKNOWN           H2_EMITTABLE         263  
+          [SCOPE]
+            WHOLE_FILE        H2_EMITTABLE         194  
+            HEADING           H2_NOT_EARNABLE        0  
+            TABLE             H2_NOT_EARNABLE        0  
+            MANAGED_REGION    H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE          78  
+    
+      [3] OUTPUT-DERIVED — values emitted but unknown to the ontology: 0
+    
+      [4] population declared 272 == rows 272: True
+      [5] every non-abstention cell carries a source-bound witness: True  (0 missing)
+    
+      [6] §8(6) CLOSED ORIGIN CLASSIFICATION — every loaded origin
+          observed 87   classified 87   refused 0
+          H2                 3
+          CENSUS             0
+          GOVERNED_STDLIB    48
+          BUILTIN_OR_FROZEN  36
+    
+      [7] Q1a RECORDED PRODUCER PROVENANCE vs STAGE A
+          verified against stage_a_identity 8c1f7a8138f828af…, every slot closed
+    
+      [8] Q1b / E1 — DERIVED denominators (D379 §8)
+          axis-cell denominator              216
+          positive-evidence-fact denominator 529
+          sum                                745
+    
+      UTILITY PROFILE — reported, never optimised (D367 11)
+          axis         positive  UNKNOWN  UNMEASURED
+          LIFECYCLE           8      264           0
+          FUNCTION            5      267           0
+          AUTHORITY           0      272           0
+          GENERATION          0      272           0
+          VALIDITY            9      263           0
+          SCOPE             194       78           0
+          Qualification asks: is the instrument TRUTHFUL?
+          A separate later decision asks: is it USEFUL enough for H3?
+    
+      FINDINGS: 5
+        AXIS_WITNESS::data/self-emp/Accounting/README.md — non-abstaining cell carries no compliant witness
+        AXIS_WITNESS::data/self-emp/Coding/README.md — non-abstaining cell carries no compliant witness
+        AXIS_WITNESS::data/self-emp/Engineering/README.md — non-abstaining cell carries no compliant witness
+        AXIS_WITNESS::data/self-emp/Legal/README.md — non-abstaining cell carries no compliant witness
+        AXIS_WITNESS::data/self-emp/Social/README.md — non-abstaining cell carries no compliant witness
+    --- end qualifier
+    END-VERBATIM REAL-NEW-CHAIN-FULL-LOG
+- EVIDENCE REAL-OLD-CHAIN-INSTRUMENT impl_chain_old.py: 7399 bytes, sha256 d9b8e1d822c2815c7b5209e74d403864cc1657f6487bc26ba090f4dc7203371d, final LF True  [CMD `sha256sum impl_chain_old.py` → d9b8e1d822c2815c…]
+    BEGIN-VERBATIM REAL-OLD-CHAIN-INSTRUMENT
+    """Clean real chain on the REAL frozen subject (grant step), CALIBRATION mode, scratch clone. Orchestrator (system python3).
+    argv: <work dir>. Instrument = the repair worktree with the applied composite. Subject = d8aac4d4 (pa["subject"] of the
+    frozen Pass-A object), checked out detached in a scratch clone of the repair repository. Every stage must exit 0;
+    the first failure aborts (R11) and names what was not measured."""
+    import json, os, pathlib, subprocess, sys, hashlib
+    PY = "/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11"
+    CEN = "/home/user/kai-repair/kai-pm/house_in_order_census_v11"
+    V = pathlib.Path("/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/twofact/instOld/kai-pm/house_in_order_h2_v13")
+    SUBJ = "d8aac4d49e6ba997e3eb38062c0917186ee3f197"; TREE = "3abc9e9d8ca11966a6f996d5f0af68072ee5b117"
+    W = pathlib.Path(sys.argv[1]); W.mkdir(parents=True, exist_ok=True); L = W / "chain_full_log.txt"; log = open(L, "w")
+    def run(argv, label, must=True):
+        p = subprocess.run(argv, capture_output=True, text=True)
+        out = p.stdout + p.stderr
+        log.write(f"--- {label} rc={p.returncode} ({len(out.encode())} bytes)\n{out}--- end {label}\n"); log.flush()
+        tail = out.strip().splitlines()[-1] if out.strip() else ""
+        print(f"  {label:<28} rc={p.returncode}  {tail[:150]}")
+        if must and p.returncode != 0:
+            print(f"ABORT at '{label}': every later stage NOT MEASURED. Full log {L}"); sys.exit(2)
+        return p
+    R = W / "subj"
+    if not R.exists():
+        run(["git", "clone", "-q", "/home/user/kai-repair", str(R)], "clone repair repo")
+        run(["git", "-C", str(R), "checkout", "-q", "--detach", SUBJ], "checkout subject")
+    head = run(["git", "-C", str(R), "rev-parse", "HEAD"], "subject HEAD").stdout.strip()
+    tree = run(["git", "-C", str(R), "rev-parse", "HEAD^{tree}"], "subject tree").stdout.strip()
+    st = run(["git", "-C", str(R), "status", "--porcelain=v1", "--untracked-files=all"], "subject status").stdout
+    print(f"  subject HEAD == {SUBJ[:12]} {head == SUBJ}; tree == {TREE[:12]} {tree == TREE}; status lines {len(st.splitlines())}")
+    if head != SUBJ or tree != TREE or st.strip():
+        print("ABORT: subject prerequisite not met; nothing measured"); sys.exit(2)
+    sa = W / "stage_a.json"
+    for f in ("stage_a.json", "passA.json", "pa.b", "result.json", "r.b"):
+        if (W / f).exists(): (W / f).unlink()
+    run([PY, "-B", "-E", "-s", "-c", f"import sys; sys.path.insert(0, {str(V)!r}); import stage_identity as SI\nSI.load_governed_census({CEN!r})\n"
+         f"d = SI.build_stage_a('CALIBRATION', subject_repo={str(R)!r}, history_repo={str(R)!r})\nopen({str(sa)!r}, 'xb').write(SI.canonical_bytes(d))"], "Stage A (CALIBRATION)")
+    C = lambda s, *a: [PY, "-B", "-E", "-s", str(V / s), *a]
+    run(C("passa.py", "--subject-repo", str(R), "--history-repo", str(R), "--subject", SUBJ, "--census-package", CEN, "--stage-a", str(sa), "--out", str(W / "passA.json")), "fresh Pass A")
+    pab = run(C("stage_identity.py", "bind", "--artifact", str(W / "passA.json"), "--component", "PASS_A", "--stage-a", str(sa), "--producer-exit", "0", "--out", str(W / "pa.b")), "Pass-A binding").stdout.strip()
+    run(C("run_h2_v12.py", "--subject-repo", str(R), "--passa", str(W / "passA.json"), "--passa-stage-b", str(W / "pa.b"), "--expected-passa-binding-sha256", pab,
+          "--census-package", CEN, "--stage-a", str(sa), "--out", str(W / "result.json")), "classification (OLD dbe692d)")
+    cb = run(C("stage_identity.py", "bind", "--artifact", str(W / "result.json"), "--component", "CLASSIFICATION", "--stage-a", str(sa), "--producer-exit", "0", "--out", str(W / "r.b")), "classification binding").stdout.strip()
+    desc = json.loads(sa.read_bytes())
+    (W / "M").write_text("".join(f"{m['sha256']}  {pathlib.Path(m['path']).name}\n" for m in desc["h2_sources"]))
+    q = run(C("qualify.py", "--result", str(W / "result.json"), "--stage-a", str(sa), "--manifest", str(W / "M"), "--stage-b", str(W / "r.b"), "--expected-binding-sha256", cb,
+              "--passa-stage-b", str(W / "pa.b"), "--expected-passa-binding-sha256", pab, "--census-package", CEN), "qualifier")
+    print(f"  qualifier findings (lines with '::'): {sum('::' in l for l in q.stdout.splitlines())}")
+    st2 = subprocess.run(["git", "-C", str(R), "status", "--porcelain=v1", "--untracked-files=all"], capture_output=True, text=True).stdout
+    print(f"  subject status after chain: {len(st2.splitlines())} lines")
+    # ── fresh Pass A reader_ops population (grant: confirmation, not permission) ──
+    pa = json.loads((W / "passA.json").read_bytes()); res = json.loads((W / "result.json").read_bytes())
+    rows_ops = [r for r in pa["rows"] if r.get("reader_ops")]
+    all_srcs = sorted({o["src"] for r in rows_ops for o in r["reader_ops"]})
+    print(f"\nFRESH PASS A  subject {pa['subject'][:12]}  rows {len(pa['rows'])}  rows with readers {sum(bool(r.get('readers')) for r in pa['rows'])}  rows with reader_ops {len(rows_ops)}  reader_ops entries {sum(len(r['reader_ops']) for r in rows_ops)}  distinct op sources {len(all_srcs)}")
+    child = r'''
+    import sys, json, subprocess
+    sys.path.insert(0, sys.argv[1]); import run_h2_v12 as R
+    repo, subj, pa = sys.argv[2], sys.argv[3], json.load(open(sys.argv[4]))
+    sel = []
+    def rec(r, rel):
+        sel.append(str(rel)); p = subprocess.run(["git", "-C", repo, "cat-file", "blob", f"{subj}:{rel}"], capture_output=True)
+        if p.returncode: raise OSError(2, "absent")
+        return p.stdout.decode(errors="ignore")
+    for row in pa["rows"]:
+        R._reader_trace(dict(row, readers=row.get("readers") or [], reader_ops=row.get("reader_ops") or []), repo, rec)
+    print(json.dumps(sel))
+    '''
+    p = subprocess.run([PY, "-B", "-E", "-s", "-c", child, str(V), str(R), SUBJ, str(W / "passA.json")], capture_output=True, text=True)
+    if p.returncode: print("ABORT: reader selection probe failed:", p.stderr[-400:]); sys.exit(2)
+    sel = json.loads(p.stdout)
+    names = set(subprocess.run(["git", "-C", str(R), "ls-tree", "-r", "--name-only", SUBJ], capture_output=True, text=True).stdout.split("\n"))
+    def strict(rel):
+        b = subprocess.run(["git", "-C", str(R), "cat-file", "blob", f"{SUBJ}:{rel}"], capture_output=True).stdout
+        try: b.decode("utf-8", errors="strict"); return True
+        except UnicodeDecodeError: return False
+    SEL = sorted(set(sel)); ALL = sorted(set(all_srcs))
+    print(f"  selected reader sources (composite _reader_trace): {len(sel)} selections, {len(SEL)} distinct: {SEL}")
+    print(f"  member of frozen subject: {sum(s in names for s in SEL)}/{len(SEL)}   strict UTF-8: {sum(strict(s) for s in SEL if s in names)}/{len(SEL)}")
+    print(f"  (all op sources, superset of selected) member: {sum(s in names for s in ALL)}/{len(ALL)}   strict UTF-8: {sum(strict(s) for s in ALL if s in names)}/{len(ALL)}")
+    srt = [r for r in res["rows"] if r["evidence_facts"].get("STATIC_REFERENCE_AT_SUBJECT")]
+    print(f"  result: STATIC_REFERENCE_AT_SUBJECT positive {len(srt)}; traces {sum('STATIC_REFERENCE_AT_SUBJECT' in r['evidence_fact_traces'] for r in srt)}; abstained {sum('STATIC_REFERENCE_AT_SUBJECT' in r.get('evidence_facts_abstained_no_compliant_trace', []) for r in res['rows'])}")
+    print(f"  result tallies: {json.dumps(res['evidence_fact_tally'], sort_keys=True)}")
+    ok = all(s in names for s in SEL) and all(strict(s) for s in SEL)
+    json.dump({"selected": sel, "all_op_sources": ALL}, open(W / "reader_population.json", "w"), indent=1)
+    print(f"\nREADER CONFIRMATION: {'PASS' if ok else 'STOP'}")
+    sys.exit(0 if ok else 1)
+    END-VERBATIM REAL-OLD-CHAIN-INSTRUMENT
+- EVIDENCE REAL-OLD-CHAIN-OUTPUT impl_chain_old_out.txt: 1021 bytes, sha256 9a9a0f16d3f8f98874c12eaca6825bfc22449098099ac46512a14bbe0170a47c, final LF True  [CMD `sha256sum impl_chain_old_out.txt` → 9a9a0f16d3f8f988…]
+    BEGIN-VERBATIM REAL-OLD-CHAIN-OUTPUT
+      subject HEAD                 rc=0  d8aac4d49e6ba997e3eb38062c0917186ee3f197
+      subject tree                 rc=0  3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+      subject status               rc=0  
+      subject HEAD == d8aac4d49e6b True; tree == 3abc9e9d8ca1 True; status lines 0
+      Stage A (CALIBRATION)        rc=0  
+      fresh Pass A                 rc=0    NO VERDICT ASSIGNED IN PASS A.
+      Pass-A binding               rc=0  562b26319be30eb2c27e511513ffc5515af6d67e426b0734c32d1ebe64f335a9
+      classification (OLD dbe692d) rc=0    self_approval: NONE
+      classification binding       rc=0  efb9653f95b44c69c1716089d012064f3deeb1e40f787c2ba50d021cbcbc59ef
+      qualifier                    rc=1      FACT_CLASS_ABSENT::vault-sync/templates/soul-mirror.md — a governed evidence-fact class is missing from the emitted result; the denominator does N
+    ABORT at 'qualifier': every later stage NOT MEASURED. Full log /tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/twofact/impl/fullold/chain_full_log.txt
+    END-VERBATIM REAL-OLD-CHAIN-OUTPUT
+- EVIDENCE REAL-OLD-CHAIN-FULL-LOG real_old_chain_log.txt: 103603 bytes, sha256 0dae90b09ad277fbda1a033c7ff7e28563d1086158ad682e5dcc78eb4ed1de8a, final LF True  [CMD `sha256sum real_old_chain_log.txt` → 0dae90b09ad277fb…]
+    BEGIN-VERBATIM REAL-OLD-CHAIN-FULL-LOG
+    --- subject HEAD rc=0 (41 bytes)
+    d8aac4d49e6ba997e3eb38062c0917186ee3f197
+    --- end subject HEAD
+    --- subject tree rc=0 (41 bytes)
+    3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+    --- end subject tree
+    --- subject status rc=0 (0 bytes)
+    --- end subject status
+    --- Stage A (CALIBRATION) rc=0 (0 bytes)
+    --- end Stage A (CALIBRATION)
+    --- fresh Pass A rc=0 (516 bytes)
+    PASS A v1.2 COMPLETE — 272 rows == population 272
+      WITNESS KINDS DISCRIMINATED (D2/D4), not assumed from shape:
+        DATE                        353
+        COMMIT                      110
+        RUN_ID                       12
+        HEX_SHAPED_UNRESOLVED         9
+        DECIMAL_TOKEN                 5
+        DIGEST_FRAGMENT               3
+      scope determined: WHOLE_FILE 201 · SPAN 291
+      binding predicates declared closed-world: 26
+      contextual predicates declared closed-world: 1 (status)
+      NO VERDICT ASSIGNED IN PASS A.
+    --- end fresh Pass A
+    --- Pass-A binding rc=0 (65 bytes)
+    562b26319be30eb2c27e511513ffc5515af6d67e426b0734c32d1ebe64f335a9
+    --- end Pass-A binding
+    --- classification (OLD dbe692d) rc=0 (1280 bytes)
+    HOUSE_H2 v1.2 — 272 rows == population 272
+      subject d8aac4d49e6b tree 3abc9e9d8ca1
+    
+      LIFECYCLE    positives    8  UNKNOWN  264   {'HISTORICAL': 8}
+      FUNCTION     positives    5  UNKNOWN  267   {'MARKER': 5}
+      AUTHORITY    positives    0  UNKNOWN  272   
+      GENERATION   positives    0  UNKNOWN  272   
+      VALIDITY     positives    9  UNKNOWN  263   {'TIME_BOUND': 7, 'EXACT_SNAPSHOT': 2}
+      SCOPE        positives  194  UNKNOWN   78   {'WHOLE_FILE': 194}
+    
+      evidence facts (NOT verdicts):
+        MAINTENANCE_OBSERVED           71
+        STATIC_REFERENCE_AT_SUBJECT     5
+        CITES_COMMIT                   21
+        CITES_RUN                       3
+        CARRIES_DATE_STAMP            206
+        BINDING_CONTRADICTION           5
+        SELF_ASSERTS_AUTHORITY          4
+        SELF_ASSERTS_NON_AUTHORITY      1
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 207
+        {'GOVERNANCE from self-description': 6, 'STATUS from self-description': 4, 'PLAN from self-description': 22, 'RUNTIME_INPUT from self-description': 9, 'USER_GUIDE from self-description': 10, 'REFERENCE from self-description': 11, 'EVIDENCE from self-description': 144, 'MARKER from self-description': 1}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end classification (OLD dbe692d)
+    --- classification binding rc=0 (65 bytes)
+    efb9653f95b44c69c1716089d012064f3deeb1e40f787c2ba50d021cbcbc59ef
+    --- end classification binding
+    --- qualifier rc=1 (101032 bytes)
+    HOUSE_H2 v1.2 — QUALIFICATION
+      subject d8aac4d49e6b  tree 3abc9e9d8ca1
+      history 2025-06-18 → 2026-08-23  shallow=false  ancestry=986
+      census  29064d650a612968…
+    
+      [1] GOVERNING INVARIANT — checked from the AXIS SET
+          UNKNOWN first-class on every axis: True
+      [1b] REMOVAL CALIBRATION — the gate proves it can fail, this run
+           remove UNKNOWN from LIFECYCLE   detected=True
+           remove UNKNOWN from FUNCTION    detected=True
+           remove UNKNOWN from AUTHORITY   detected=True
+           remove UNKNOWN from GENERATION  detected=True
+           remove UNKNOWN from VALIDITY    detected=True
+           remove UNKNOWN from SCOPE       detected=True
+    
+      [2] STATE DISPOSITIONS — checked from the ALPHABET
+          [LIFECYCLE]
+            ACTIVE            H2_NOT_EARNABLE        0  
+            HISTORICAL        H2_EMITTABLE           8  
+            SUPERSEDED        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE         264  
+          [FUNCTION]
+            GOVERNANCE        H2_EMITTABLE           0  not observed on this subject
+            STATUS            H2_EMITTABLE           0  not observed on this subject
+            PLAN              H2_EMITTABLE           0  not observed on this subject
+            EVIDENCE          H2_EMITTABLE           0  not observed on this subject
+            REFERENCE         H2_EMITTABLE           0  not observed on this subject
+            RUNTIME_INPUT     H2_EMITTABLE           0  not observed on this subject
+            TEMPLATE          H2_EMITTABLE           0  not observed on this subject
+            MARKER            H2_EMITTABLE           5  
+            USER_GUIDE        H2_EMITTABLE           0  not observed on this subject
+            OTHER             H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE         267  
+          [AUTHORITY]
+            AUTHORITATIVE     DEFERRED_TO_H3         0  
+            VERIFIED_DERIVED  DEFERRED_TO_H3         0  
+            ADVISORY          DEFERRED_TO_H3         0  
+            NON_AUTHORITY     DEFERRED_TO_H3         0  
+            UNKNOWN           H2_EMITTABLE         272  
+          [GENERATION]
+            MANUAL            H2_NOT_EARNABLE        0  
+            PARTIAL_DERIVED   H2_NOT_EARNABLE        0  
+            FULL_DERIVED      H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE         272  
+          [VALIDITY]
+            CURRENT_TREE      H2_EMITTABLE           0  not observed on this subject
+            EXACT_SNAPSHOT    H2_EMITTABLE           2  
+            RUN_ARTEFACT      H2_EMITTABLE           0  not observed on this subject
+            TIME_BOUND        H2_EMITTABLE           7  
+            UNKNOWN           H2_EMITTABLE         263  
+          [SCOPE]
+            WHOLE_FILE        H2_EMITTABLE         194  
+            HEADING           H2_NOT_EARNABLE        0  
+            TABLE             H2_NOT_EARNABLE        0  
+            MANAGED_REGION    H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE          78  
+    
+      [3] OUTPUT-DERIVED — values emitted but unknown to the ontology: 0
+    
+      [4] population declared 272 == rows 272: True
+      [5] every non-abstention cell carries a source-bound witness: True  (0 missing)
+    
+      [6] §8(6) CLOSED ORIGIN CLASSIFICATION — every loaded origin
+          observed 87   classified 87   refused 0
+          H2                 3
+          CENSUS             0
+          GOVERNED_STDLIB    48
+          BUILTIN_OR_FROZEN  36
+    
+      [7] Q1a RECORDED PRODUCER PROVENANCE vs STAGE A
+          verified against stage_a_identity 0e4a99694e1756e1…, every slot closed
+    
+      [8] Q1b / E1 — DERIVED denominators (D379 §8)
+          axis-cell denominator              216
+          positive-evidence-fact denominator 316
+          sum                                532
+    
+      UTILITY PROFILE — reported, never optimised (D367 11)
+          axis         positive  UNKNOWN  UNMEASURED
+          LIFECYCLE           8      264           0
+          FUNCTION            5      267           0
+          AUTHORITY           0      272           0
+          GENERATION          0      272           0
+          VALIDITY            9      263           0
+          SCOPE             194       78           0
+          Qualification asks: is the instrument TRUTHFUL?
+          A separate later decision asks: is it USEFUL enough for H3?
+    
+      FINDINGS: 549
+        AXIS_WITNESS::data/self-emp/Accounting/README.md — non-abstaining cell carries no compliant witness
+        AXIS_WITNESS::data/self-emp/Coding/README.md — non-abstaining cell carries no compliant witness
+        AXIS_WITNESS::data/self-emp/Engineering/README.md — non-abstaining cell carries no compliant witness
+        AXIS_WITNESS::data/self-emp/Legal/README.md — non-abstaining cell carries no compliant witness
+        AXIS_WITNESS::data/self-emp/Social/README.md — non-abstaining cell carries no compliant witness
+        FACT_CLASS_ABSENT::.github/PULL_REQUEST_TEMPLATE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::.github/PULL_REQUEST_TEMPLATE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::.github/copilot-instructions.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::.github/copilot-instructions.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::CHANGELOG.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::CHANGELOG.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::CLAUDE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::CLAUDE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::PROJECT_STATUS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::PROJECT_STATUS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::README.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::README.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::SESSION_BACKLOG.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::SESSION_BACKLOG.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::bootstrap/README.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::bootstrap/README.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::bootstrap/master_plan.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::bootstrap/master_plan.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/AGENTS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/AGENTS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/SOUL.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/SOUL.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/self-emp/Accounting/README.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/self-emp/Accounting/README.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/self-emp/Coding/README.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/self-emp/Coding/README.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/self-emp/Engineering/README.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/self-emp/Engineering/README.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/self-emp/Legal/README.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/self-emp/Legal/README.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/self-emp/Social/README.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/self-emp/Social/README.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/skills/daily_brief.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/skills/daily_brief.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/skills/invoice.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/skills/invoice.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/teammates/auditor.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/teammates/auditor.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/teammates/doctor.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/teammates/doctor.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/teammates/oracle.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/teammates/oracle.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/teammates/sage.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/teammates/sage.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/teammates/scout.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::data/teammates/scout.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/DEMO.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/DEMO.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/ERROR_LOG.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/ERROR_LOG.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/PHONE_SETUP.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/PHONE_SETUP.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/PROJECT_BACKLOG.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/PROJECT_BACKLOG.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/agentic_patterns_spec.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/agentic_patterns_spec.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/ara_review_status.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/ara_review_status.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/architecture.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/architecture.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/design_system.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/design_system.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/first_implementation_plan.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/first_implementation_plan.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/gaps_and_hardening.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/gaps_and_hardening.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/gpu_integration_phase0.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/gpu_integration_phase0.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/hmac_rotation_runbook.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/hmac_rotation_runbook.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/known_issues.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/known_issues.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/next_level_roadmap.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/next_level_roadmap.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/operator-journal/_template.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/operator-journal/_template.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/personality_and_proactive.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/personality_and_proactive.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/phase1_patch_set.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/phase1_patch_set.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/production_hardening_plan.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/production_hardening_plan.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/sovereign_ai_spec.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/sovereign_ai_spec.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/unfair_advantages.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/unfair_advantages.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/wake_intent_j2.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::docs/wake_intent_j2.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/BASELINE_RESPONSES_0.5B.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/BASELINE_RESPONSES_0.5B.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CLEANUP_TODO.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CLEANUP_TODO.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_AGENTIC_API.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_AGENTIC_API.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_AGENTIC_INTROSPECTION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_AGENTIC_INTROSPECTION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_AIRQUALITY_SERVICE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_AIRQUALITY_SERVICE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_ANALOGY_STUB.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_ANALOGY_STUB.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_ARCHITECTURE_INTERACTION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_ARCHITECTURE_INTERACTION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_AUDIO_PERCEPTION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_AUDIO_PERCEPTION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_AUDIO_PERCEPTION_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_AUDIO_PERCEPTION_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_AUTONOMOUS_STATE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_AUTONOMOUS_STATE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_AVATAR_SERVICE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_AVATAR_SERVICE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_AVATAR_SERVICE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_AVATAR_SERVICE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_BACKUP_SERVICE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_BACKUP_SERVICE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_BACKUP_SERVICE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_BACKUP_SERVICE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_BEHAVIOURAL_FEEDBACK_TOOLS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_BEHAVIOURAL_FEEDBACK_TOOLS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_BOOTSTRAP_CLOSURE_SMOKE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_BOOTSTRAP_CLOSURE_SMOKE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_BROKER_BRIDGE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_BROKER_BRIDGE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_BROKER_BRIDGE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_BROKER_BRIDGE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_BROWSER_AGENT.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_BROWSER_AGENT.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_BROWSER_AGENT_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_BROWSER_AGENT_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_BUSINESS_SAFETY_ADVISORS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_BUSINESS_SAFETY_ADVISORS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_CALENDAR_SERVICE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_CALENDAR_SERVICE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_CALENDAR_SYNC_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_CALENDAR_SYNC_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_CAMERA_SERVICE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_CAMERA_SERVICE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_CAMERA_SERVICE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_CAMERA_SERVICE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_CHAOS_GONOGO_TEST_BOOTSTRAP.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_CHAOS_GONOGO_TEST_BOOTSTRAP.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_CI_BACKUP.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_CI_BACKUP.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_CI_WORKFLOWS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_CI_WORKFLOWS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_CI_WORKFLOW_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_CI_WORKFLOW_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_CLIPBOARD_SERVICE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_CLIPBOARD_SERVICE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_CLIPBOARD_SERVICE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_CLIPBOARD_SERVICE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_COGNITIVE_FOUNDATIONS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_COGNITIVE_FOUNDATIONS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_COGNITIVE_GOVERNANCE_FOUNDATIONS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_COGNITIVE_GOVERNANCE_FOUNDATIONS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_COGNITIVE_STATE_STUBS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_COGNITIVE_STATE_STUBS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_COMMON_AUTH.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_COMMON_AUTH.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_COMMON_CONTROL_PLANE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_COMMON_CONTROL_PLANE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_COMMON_MODEL_RUNTIME.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_COMMON_MODEL_RUNTIME.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_COMMON_RESILIENCE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_COMMON_RESILIENCE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_COMMON_RUNTIME.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_COMMON_RUNTIME.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_CONVICTION_PLANNING_FORECASTING.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_CONVICTION_PLANNING_FORECASTING.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_CORTEX.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_CORTEX.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_CROSS_SERVICE_ATTACK_CHAINS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_CROSS_SERVICE_ATTACK_CHAINS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_DASHBOARD_FRONTEND.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_DASHBOARD_FRONTEND.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_DASHBOARD_GATEWAY.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_DASHBOARD_GATEWAY.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_DOCKER_WATCHER.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_DOCKER_WATCHER.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_DOCUMENT_PARSER.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_DOCUMENT_PARSER.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_DOCUMENT_PARSER_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_DOCUMENT_PARSER_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_DREAM_EVOLVER_CHECKPOINTS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_DREAM_EVOLVER_CHECKPOINTS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_EMAIL_READER.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_EMAIL_READER.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_EMAIL_READER_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_EMAIL_READER_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_ENVIRONMENTAL_SENSORS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_ENVIRONMENTAL_SENSORS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_ENVIRONMENTAL_SENSORS_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_ENVIRONMENTAL_SENSORS_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_EXECUTOR.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_EXECUTOR.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_FEATURE_FLAGS_EPISODES.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_FEATURE_FLAGS_EPISODES.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_FILES_SERVICE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_FILES_SERVICE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_FILES_SERVICE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_FILES_SERVICE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_FINANCIAL_AUTONOMY_MARKET_INTELLIGENCE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_FINANCIAL_AUTONOMY_MARKET_INTELLIGENCE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_FINANCIAL_AWARENESS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_FINANCIAL_AWARENESS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_FINANCIAL_AWARENESS_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_FINANCIAL_AWARENESS_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_FUSION_ENGINE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_FUSION_ENGINE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_FUSION_ENGINE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_FUSION_ENGINE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_GIT_WATCHER.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_GIT_WATCHER.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_GPU_FOUNDATION_STUBS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_GPU_FOUNDATION_STUBS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_GPU_UTILITIES.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_GPU_UTILITIES.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_HEARTBEAT.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_HEARTBEAT.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_HEARTBEAT_SELF_MODEL.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_HEARTBEAT_SELF_MODEL.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_HMAC_ROTATION_DRILL.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_HMAC_ROTATION_DRILL.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_HOST_SETUP_HARDENING_SHELL.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_HOST_SETUP_HARDENING_SHELL.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_HOST_WATCHERS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_HOST_WATCHERS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_HOST_WATCHERS_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_HOST_WATCHERS_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_HOUSE_DOCTOR.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_HOUSE_DOCTOR.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_INTROSPECTION_IDENTITY.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_INTROSPECTION_IDENTITY.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_KAI_ADVISOR.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_KAI_ADVISOR.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_KAI_ADVISOR_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_KAI_ADVISOR_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_KEY_ROTATION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_KEY_ROTATION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_KEY_ROTATION_MIGRATION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_KEY_ROTATION_MIGRATION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_LEDGER_WORKER.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_LEDGER_WORKER.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_LEDGER_WORKER_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_LEDGER_WORKER_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_LETTA_AGENT.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_LETTA_AGENT.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_LETTA_AGENT_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_LETTA_AGENT_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_LIVE_SUPERVISOR.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_LIVE_SUPERVISOR.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_MEMORY_COMPRESSOR.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_MEMORY_COMPRESSOR.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_MEMORY_COMPRESSOR_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_MEMORY_COMPRESSOR_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_MEMORY_GRAPH.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_MEMORY_GRAPH.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_MEMORY_GRAPH_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_MEMORY_GRAPH_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_MEMU_CORE_HOT_PATH.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_MEMU_CORE_HOT_PATH.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_MEMU_INTROSPECTION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_MEMU_INTROSPECTION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_MEMU_PERSONALITY_AUTONOMY.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_MEMU_PERSONALITY_AUTONOMY.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_METRICS_GATEWAY.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_METRICS_GATEWAY.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_METRICS_GATEWAY_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_METRICS_GATEWAY_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_MODEL_DECISION_CONTROLS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_MODEL_DECISION_CONTROLS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_MONITOR_SERVICE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_MONITOR_SERVICE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_MONITOR_SERVICE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_MONITOR_SERVICE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_NEWS_FEED.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_NEWS_FEED.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_NEWS_FEED_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_NEWS_FEED_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_NEWS_FEED_INTEGRATION_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_NEWS_FEED_INTEGRATION_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_NOTIFY_SERVICE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_NOTIFY_SERVICE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_NOTIFY_SERVICE_BUILD_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_NOTIFY_SERVICE_BUILD_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_NOTIFY_SERVICE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_NOTIFY_SERVICE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_OPERATIONAL_ASSURANCE_SCRIPTS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_OPERATIONAL_ASSURANCE_SCRIPTS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_OPERATIONAL_STATE_EPISODE_RECOVERY.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_OPERATIONAL_STATE_EPISODE_RECOVERY.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_OPERATOR_CONTROL_DRILLS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_OPERATOR_CONTROL_DRILLS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_ORCHESTRATION_ARCHITECTURE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_ORCHESTRATION_ARCHITECTURE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_ORCHESTRATION_STUBS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_ORCHESTRATION_STUBS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_PERSISTENCE_1.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_PERSISTENCE_1.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_QUESTIONER_TEAMMATES_WATCHDOG.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_QUESTIONER_TEAMMATES_WATCHDOG.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_RECOVERY_OPERATIONAL_SCRIPTS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_RECOVERY_OPERATIONAL_SCRIPTS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_RELEASE_BOOTSTRAP_TOOLING.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_RELEASE_BOOTSTRAP_TOOLING.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_REPOSITORY_QUALITY_DOCS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_REPOSITORY_QUALITY_DOCS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_ROUTING_LLM_DISPATCH.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_ROUTING_LLM_DISPATCH.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SCREEN_CAPTURE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SCREEN_CAPTURE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SCREEN_CAPTURE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SCREEN_CAPTURE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SCREEN_WATCHER.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SCREEN_WATCHER.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SCREEN_WATCHER_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SCREEN_WATCHER_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SELF_AUDIT_SUPERVISOR.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SELF_AUDIT_SUPERVISOR.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SHARED_RUNTIME_CONTROLS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SHARED_RUNTIME_CONTROLS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SHELL_HEALTH_ROTATION_WRAPPERS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SHELL_HEALTH_ROTATION_WRAPPERS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SHELL_SANDBOX.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SHELL_SANDBOX.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SHELL_SANDBOX_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SHELL_SANDBOX_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SKILL_HUNTER.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SKILL_HUNTER.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SWARM_ORCHESTRATION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SWARM_ORCHESTRATION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SYSMETRICS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SYSMETRICS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SYSMETRICS_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SYSMETRICS_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SYSMETRICS_WORLD_ANCHOR.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_SYSMETRICS_WORLD_ANCHOR.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_TEAMMATES_FSM_POLICY_MEMORY.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_TEAMMATES_FSM_POLICY_MEMORY.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_TELEGRAM_BOT.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_TELEGRAM_BOT.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_TELEGRAM_BOT_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_TELEGRAM_BOT_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_TELEGRAM_PERCEPTION_BRIDGE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_TELEGRAM_PERCEPTION_BRIDGE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_TEST_HARNESSES_MARKET_CACHE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_TEST_HARNESSES_MARKET_CACHE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_TEST_STUBS_EXTERNAL_MODEL_OCR_FUZZ.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_TEST_STUBS_EXTERNAL_MODEL_OCR_FUZZ.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_TOOL_GATE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_TOOL_GATE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_TRUST_GOVERNANCE_AUTHORITY.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_TRUST_GOVERNANCE_AUTHORITY.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_TRUST_LEDGER_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_TRUST_LEDGER_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_TTS_SERVICE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_TTS_SERVICE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_TTS_SERVICE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_TTS_SERVICE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_VAULT_BRIDGE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_VAULT_BRIDGE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_VAULT_SYNC.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_VAULT_SYNC.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_VERIFIER.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_VERIFIER.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_VISION_SERVICE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_VISION_SERVICE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_VISION_SERVICE_DEPLOYMENT_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_VISION_SERVICE_DEPLOYMENT_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_VISION_SERVICE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_VISION_SERVICE_EXTENSION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_WAKE_SERVICE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_WAKE_SERVICE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_WATCHDOG_RECOVERY.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_WATCHDOG_RECOVERY.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_WEATHER_SERVICE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_WEATHER_SERVICE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_WEB_SCOUT.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_WEB_SCOUT.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_WORLD_ANCHOR.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_BATCH_WORLD_ANCHOR.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_CONTINUATION_LOG.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_CONTINUATION_LOG.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_FINAL_REPORT.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_FINAL_REPORT.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_IMPLEMENTATION_SEQUENCE_AND_CLOSURE_MATRIX.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_IMPLEMENTATION_SEQUENCE_AND_CLOSURE_MATRIX.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_MASTER.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_MASTER.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_P0_CONTAINMENT_PLAN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_P0_CONTAINMENT_PLAN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_P1_SECURITY_FOUNDATION_PLAN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_P1_SECURITY_FOUNDATION_PLAN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_P2_ISOLATION_AND_INTEGRITY_PLAN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_P2_ISOLATION_AND_INTEGRITY_PLAN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_P3_RELIABILITY_AUDIT_PRIVACY_RECOVERY_PLAN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_P3_RELIABILITY_AUDIT_PRIVACY_RECOVERY_PLAN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_P4_CAPABILITY_REQUALIFICATION_PLAN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_P4_CAPABILITY_REQUALIFICATION_PLAN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_PLANNING_PACKAGE_QA.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_PLANNING_PACKAGE_QA.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_REGISTER.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_REGISTER.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_REGISTER_CONTINUED.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_REGISTER_CONTINUED.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_REGISTER_CONTINUED_2.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_REGISTER_CONTINUED_2.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_REMEDIATION_BACKLOG.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CODE_AUDIT_REMEDIATION_BACKLOG.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/COMPOSE_DRIFT.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/COMPOSE_DRIFT.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CONVICTION_SCENARIOS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/CONVICTION_SCENARIOS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/DECISIONS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/DECISIONS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/DEEPSEEK_BRIEF_2026-08-07_EMBEDDINGS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/DEEPSEEK_BRIEF_2026-08-07_EMBEDDINGS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/DEEPSEEK_BRIEF_2026-08-07_METHOD.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/DEEPSEEK_BRIEF_2026-08-07_METHOD.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/DEEPSEEK_BRIEF_2026-08-07_TOPOLOGY.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/DEEPSEEK_BRIEF_2026-08-07_TOPOLOGY.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/EMBEDDING_BACKEND_STATE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/EMBEDDING_BACKEND_STATE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/ENGINEERING_DOCTRINE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/ENGINEERING_DOCTRINE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/EQ_BASELINE_SAMPLES.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/EQ_BASELINE_SAMPLES.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/EVIDENCE_PLANE_RESEARCH_LINEAGE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/EVIDENCE_PLANE_RESEARCH_LINEAGE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/GPU_ARRIVAL_RUNBOOK.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/GPU_ARRIVAL_RUNBOOK.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/INSTRUMENTATION_ARCHITECTURE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/INSTRUMENTATION_ARCHITECTURE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/KAI_ORION_CONTINUITY.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/KAI_ORION_CONTINUITY.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/LETTA_INTEGRATION_PLAN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/LETTA_INTEGRATION_PLAN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/MAKEFILE_AUDIT.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/MAKEFILE_AUDIT.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/MAKEFILE_TARGETS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/MAKEFILE_TARGETS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/MEMORY_GRAPH_DESIGN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/MEMORY_GRAPH_DESIGN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/METRICS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/METRICS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/NAVIGATION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/NAVIGATION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/NEXT_STINT_PLAN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/NEXT_STINT_PLAN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/ORION_FIELD_NOTES.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/ORION_FIELD_NOTES.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/PHASE1_READINESS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/PHASE1_READINESS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/PHASE_0_5_BACKLOG.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/PHASE_0_5_BACKLOG.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/PLAYBOOKS/dispatch_jewel.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/PLAYBOOKS/dispatch_jewel.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/PLAYBOOKS/parallel_dispatch.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/PLAYBOOKS/parallel_dispatch.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/PLAYBOOKS/post_merge_checklist.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/PLAYBOOKS/post_merge_checklist.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/PLAYBOOKS/resume_session.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/PLAYBOOKS/resume_session.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/PLAYBOOKS/tech_evaluation.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/PLAYBOOKS/tech_evaluation.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/POSTMORTEM_2026-08-06_RUNNER_STARVATION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/POSTMORTEM_2026-08-06_RUNNER_STARVATION.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/REALITY_CHECK_2026-05-10.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/REALITY_CHECK_2026-05-10.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/REALITY_CHECK_2026-06-18.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/REALITY_CHECK_2026-06-18.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/REPO_HEALTH_AUDIT_2026-05-10.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/REPO_HEALTH_AUDIT_2026-05-10.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/RISKS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/RISKS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/RUNTIME_TOPOLOGY_CENSUS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/RUNTIME_TOPOLOGY_CENSUS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SEQUENCE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SEQUENCE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SERVICE_IDENTITY_MEASUREMENT.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SERVICE_IDENTITY_MEASUREMENT.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SERVICE_IDENTITY_STATE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SERVICE_IDENTITY_STATE.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SERVICE_IDENTITY_TRUST_BOUNDARIES.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SERVICE_IDENTITY_TRUST_BOUNDARIES.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SESSION_BOOTSTRAP.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SESSION_BOOTSTRAP.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SHOPPING_LIST_PLAN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/SHOPPING_LIST_PLAN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/STATUS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/STATUS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/STRATEGIC_PLAN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/STRATEGIC_PLAN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/STUBS_AND_PLACEHOLDERS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/STUBS_AND_PLACEHOLDERS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/TECH_DEBT_E402.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/TECH_DEBT_E402.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/TECH_WATCH.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/TECH_WATCH.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/TEST_WRITING_REVIEW.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/TEST_WRITING_REVIEW.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/UH0_EVIDENCE_MANIFEST.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/UH0_EVIDENCE_MANIFEST.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/UH2_INTAKE_REBUILD_ANALYSIS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/UH2_INTAKE_REBUILD_ANALYSIS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/UH2_INTAKE_REDESIGN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/UH2_INTAKE_REDESIGN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/UH2_SENSOR_INGRESS_PLAN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/UH2_SENSOR_INGRESS_PLAN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/UH_PROGRESS_TRACKER.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/UH_PROGRESS_TRACKER.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/VERIFICATION_ARCHITECTURE_REVIEW.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/VERIFICATION_ARCHITECTURE_REVIEW.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/W1_DASHBOARD_REMEDIATION_PLAN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/W1_DASHBOARD_REMEDIATION_PLAN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/WAYPOINTS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/WAYPOINTS.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/house_in_order_instrument/AUTHORITY_ONTOLOGY.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/house_in_order_instrument/AUTHORITY_ONTOLOGY.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/house_in_order_instrument/README.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/house_in_order_instrument/README.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::skills/_template.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::skills/_template.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::skills/cis-deductions.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::skills/cis-deductions.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::skills/ladder-safety.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::skills/ladder-safety.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::skills/mtd-vat.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::skills/mtd-vat.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::vault-sync/templates/daily-note.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::vault-sync/templates/daily-note.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::vault-sync/templates/kai-inbox.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::vault-sync/templates/kai-inbox.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::vault-sync/templates/lesson-learned.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::vault-sync/templates/lesson-learned.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::vault-sync/templates/soul-mirror.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::vault-sync/templates/soul-mirror.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+    --- end qualifier
+    END-VERBATIM REAL-OLD-CHAIN-FULL-LOG
+- EVIDENCE REAL-COMPARE-INSTRUMENT real_compare.py: 5146 bytes, sha256 f956351598aa5894065df8cfe5e6c00d6f89e7f5083fe917e1a63f5b2d34884f, final LF True  [CMD `sha256sum real_compare.py` → f956351598aa5894…]
+    BEGIN-VERBATIM REAL-COMPARE-INSTRUMENT
+    """Read-only diagnosis of the real-subject STOP (child, qualified interpreter). argv: <NEW work dir> <OLD work dir> <NEW H2 dir>
+    NEW = composite classifier (repair worktree), OLD = dbe692d classifier; same subject d8aac4d4 (separate full-history clones,
+    separate Stage A / Pass A). Compares rows, reports the 5 AXIS_WITNESS cells' compliance, the consumed composite hash,
+    the fresh Pass A reader_ops population, and strict UTF-8 over every classified document and every selected reader source."""
+    import sys, json, subprocess, collections, hashlib
+    NW, OW, H = sys.argv[1:4]
+    sys.path.insert(0, H); import run_h2_v12 as R
+    n, o = json.load(open(NW + "/result.json")), json.load(open(OW + "/result.json"))
+    pn, po = json.load(open(NW + "/passA.json")), json.load(open(OW + "/passA.json"))
+    AX = ("SCOPE", "VALIDITY", "LIFECYCLE", "FUNCTION", "AUTHORITY", "GENERATION")
+    NEW2 = {"NOMINAL_FUNCTION", "SELF_ASSERTS_CURRENT"}
+    print(f"subjects NEW {n['subject'][:12]} OLD {o['subject'][:12]}  trees {n['subject_tree'][:12]} {o['subject_tree'][:12]}  populations {n['population']} {o['population']}")
+    print(f"Pass-A rows identical NEW vs OLD (rows field, all keys): {pn['rows'] == po['rows']}")
+    on = {r["path"]: r for r in o["rows"]}; nn = {r["path"]: r for r in n["rows"]}
+    print(f"row paths equal: {set(on) == set(nn)}  ({len(nn)})")
+    ax_diff = [(p, a) for p in nn for a in AX if nn[p][a] != on[p][a]]
+    f8 = [p for p in nn if {k: v for k, v in nn[p]["evidence_facts"].items() if k not in NEW2} != on[p]["evidence_facts"]]
+    t8 = [p for p in nn if {k: v for k, v in nn[p]["evidence_fact_traces"].items() if k not in NEW2} != on[p]["evidence_fact_traces"]]
+    ab = [p for p in nn if [x for x in nn[p].get("evidence_facts_abstained_no_compliant_trace", []) if x not in NEW2] != on[p].get("evidence_facts_abstained_no_compliant_trace", [])]
+    print(f"axis cells differing (whole cell incl. witness): {len(ax_diff)} {ax_diff[:5]}")
+    print(f"rows whose other 8 facts differ: {len(f8)}; their traces differ: {len(t8)}; abstentions differ: {len(ab)}")
+    print(f"key-set sizes NEW {dict(collections.Counter(len(r['evidence_facts']) for r in n['rows']))} OLD {dict(collections.Counter(len(r['evidence_facts']) for r in o['rows']))}")
+    print(f"NEW tally {json.dumps(n['evidence_fact_tally'], sort_keys=True)}")
+    print(f"OLD tally {json.dumps(o['evidence_fact_tally'], sort_keys=True)}")
+    mk = [r for r in n["rows"] if r["FUNCTION"]["value"] == "MARKER"]
+    print(f"\nFUNCTION=MARKER rows: {len(mk)}")
+    for r in mk:
+        w = r["FUNCTION"]["witness"]
+        print(f"  {r['path']:<40} witness_value {w['witness_value']!r:<12} local_context {w['local_context']!r}  R._compliant={R._compliant(w)}  value-in-context={w['witness_value'] in w['local_context']}  same in OLD={on[r['path']]['FUNCTION'] == r['FUNCTION']}")
+    pp = n["producer_provenance"]
+    rh = [m for m in pp["producer_population"] if m["identity"].endswith("run_h2_v12.py")]
+    print(f"\nconsumed classifier (NEW producer_provenance): {rh}")
+    print(f"  == composite a39359bc…: {bool(rh) and rh[0]['sha256'] == 'a39359bc383c8f6f6ca4540c10474fcb094c990f7b8e8091792262436c7a4cfe'}")
+    SUBJ = n["subject"]; repo = NW + "/subj"
+    names = set(subprocess.run(["git", "-C", repo, "ls-tree", "-r", "--name-only", SUBJ], capture_output=True, text=True).stdout.split("\n"))
+    def blob(p):
+        q = subprocess.run(["git", "-C", repo, "cat-file", "blob", f"{SUBJ}:{p}"], capture_output=True); return q.stdout if q.returncode == 0 else None
+    def strict(b):
+        try: b.decode("utf-8", errors="strict"); return True
+        except UnicodeDecodeError: return False
+    sel = []
+    def rec(rr, rel):
+        sel.append(str(rel)); b = blob(rel)
+        if b is None: raise OSError(2, "absent")
+        return b.decode(errors="ignore")
+    for row in pn["rows"]:
+        R._reader_trace(dict(row, readers=row.get("readers") or [], reader_ops=row.get("reader_ops") or []), repo, rec)
+    rows_ops = [r for r in pn["rows"] if r.get("reader_ops")]
+    ALL = sorted({op["src"] for r in rows_ops for op in r["reader_ops"]})
+    PD = [r["path"] for r in pn["rows"]]
+    print(f"\nFRESH PASS A (NEW chain) rows {len(pn['rows'])}; rows with readers {sum(bool(r.get('readers')) for r in pn['rows'])}; rows with reader_ops {len(rows_ops)}; reader_ops entries {sum(len(r['reader_ops']) for r in rows_ops)}; distinct op sources {len(ALL)}")
+    print(f"  selected by composite _reader_trace: {len(sel)} selections, {len(set(sel))} distinct: {sorted(set(sel))}")
+    for label, pop in (("classified documents P_DOC", PD), ("selected reader sources", sorted(set(sel))), ("all op sources (superset)", ALL)):
+        miss = [p for p in pop if p not in names]; bad = [p for p in pop if p in names and not strict(blob(p))]
+        print(f"  {label:<30} {len(pop):>4}  member {len(pop) - len(miss)}/{len(pop)}  strict UTF-8 {len(pop) - len(miss) - len(bad)}/{len(pop)}  missing {miss[:5]}  invalid {bad[:5]}")
+    srt = [r for r in n["rows"] if r["evidence_facts"].get("STATIC_REFERENCE_AT_SUBJECT")]
+    print(f"  NEW STATIC_REFERENCE_AT_SUBJECT positive {len(srt)}, traced {sum('STATIC_REFERENCE_AT_SUBJECT' in r['evidence_fact_traces'] for r in srt)}; OLD positive {sum(bool(r['evidence_facts'].get('STATIC_REFERENCE_AT_SUBJECT')) for r in o['rows'])}")
+    END-VERBATIM REAL-COMPARE-INSTRUMENT
+- EVIDENCE REAL-COMPARE-OUTPUT real_compare_out.txt: 2597 bytes, sha256 257715831d1219fd8f5288aec758988a0fdacddbba75599214207771ab9f38b1, final LF True  [CMD `sha256sum real_compare_out.txt` → 257715831d1219fd…]
+    BEGIN-VERBATIM REAL-COMPARE-OUTPUT
+    subjects NEW d8aac4d49e6b OLD d8aac4d49e6b  trees 3abc9e9d8ca1 3abc9e9d8ca1  populations 272 272
+    Pass-A rows identical NEW vs OLD (rows field, all keys): True
+    row paths equal: True  (272)
+    axis cells differing (whole cell incl. witness): 0 []
+    rows whose other 8 facts differ: 0; their traces differ: 0; abstentions differ: 0
+    key-set sizes NEW {10: 272} OLD {8: 272}
+    NEW tally {"BINDING_CONTRADICTION": 5, "CARRIES_DATE_STAMP": 206, "CITES_COMMIT": 21, "CITES_RUN": 3, "MAINTENANCE_OBSERVED": 71, "NOMINAL_FUNCTION": 207, "SELF_ASSERTS_AUTHORITY": 4, "SELF_ASSERTS_CURRENT": 6, "SELF_ASSERTS_NON_AUTHORITY": 1, "STATIC_REFERENCE_AT_SUBJECT": 5}
+    OLD tally {"BINDING_CONTRADICTION": 5, "CARRIES_DATE_STAMP": 206, "CITES_COMMIT": 21, "CITES_RUN": 3, "MAINTENANCE_OBSERVED": 71, "SELF_ASSERTS_AUTHORITY": 4, "SELF_ASSERTS_NON_AUTHORITY": 1, "STATIC_REFERENCE_AT_SUBJECT": 5}
+    
+    FUNCTION=MARKER rows: 5
+      data/self-emp/Accounting/README.md       witness_value '114 bytes'  local_context '(no title)'  R._compliant=False  value-in-context=False  same in OLD=True
+      data/self-emp/Coding/README.md           witness_value '44 bytes'   local_context '(no title)'  R._compliant=False  value-in-context=False  same in OLD=True
+      data/self-emp/Engineering/README.md      witness_value '35 bytes'   local_context '(no title)'  R._compliant=False  value-in-context=False  same in OLD=True
+      data/self-emp/Legal/README.md            witness_value '71 bytes'   local_context '(no title)'  R._compliant=False  value-in-context=False  same in OLD=True
+      data/self-emp/Social/README.md           witness_value '58 bytes'   local_context '(no title)'  R._compliant=False  value-in-context=False  same in OLD=True
+    
+    consumed classifier (NEW producer_provenance): [{'class': 'H2', 'identity': 'kai-pm/house_in_order_h2_v13/run_h2_v12.py', 'sha256': 'a39359bc383c8f6f6ca4540c10474fcb094c990f7b8e8091792262436c7a4cfe'}]
+      == composite a39359bc…: True
+    
+    FRESH PASS A (NEW chain) rows 272; rows with readers 5; rows with reader_ops 5; reader_ops entries 8; distinct op sources 4
+      selected by composite _reader_trace: 5 selections, 4 distinct: ['scripts/auto_changelog.py', 'scripts/auto_session_log.py', 'scripts/security/check_gate_registry.py', 'scripts/sync_docs.py']
+      classified documents P_DOC      272  member 272/272  strict UTF-8 272/272  missing []  invalid []
+      selected reader sources           4  member 4/4  strict UTF-8 4/4  missing []  invalid []
+      all op sources (superset)         4  member 4/4  strict UTF-8 4/4  missing []  invalid []
+      NEW STATIC_REFERENCE_AT_SUBJECT positive 5, traced 5; OLD positive 5
+    END-VERBATIM REAL-COMPARE-OUTPUT
+- EVIDENCE REPAIR-SNAPSHOT-BEFORE repair_snapshot_before.txt: 556 bytes, sha256 9d5ed7854effe7ef7d54282a36158257044d71b88ef533ace3bb9fc819ee18c3, final LF True  [CMD `sha256sum repair_snapshot_before.txt` → 9d5ed7854effe7ef…]
+    BEGIN-VERBATIM REPAIR-SNAPSHOT-BEFORE
+    HEAD dbe692d9c3f83020176aeda00a0f399ce5f020f8
+    branch claude/d379-repair-eb52f73
+    status:
+     M kai-pm/house_in_order_h2_v13/run_h2_v12.py
+    run_h2 a39359bc383c8f6f6ca4540c10474fcb094c990f7b8e8091792262436c7a4cfe
+    common-dir /home/user/kai-system/.git
+    config sha 6aec529d446f67fe41a5c240bfc93cb9935140143f3c8eb38ba57d38861a3b3e
+    shallow sha b49902bad2cf6def598168ec382f55b9be95a129066a88e07d6ecaf0b2c40eca
+    refs: f8b1beed66036f2576d41fa4f9366d9a84aa7170b0fc4e4c14ab5737c176f72a
+    packs: c2b828bfcb8cbf53fcf44eb3eb59e4541da2600d78b54287b4ebb803de320dde loose-dirs: 217
+    END-VERBATIM REPAIR-SNAPSHOT-BEFORE
+- EVIDENCE REPAIR-SNAPSHOT-AFTER repair_snapshot_after.txt: 397 bytes, sha256 697170f0fd93d75152562c7e33d503e02fd2c40bd0ff5c54de637bc7bfae397b, final LF True  [CMD `sha256sum repair_snapshot_after.txt` → 697170f0fd93d751…]
+    BEGIN-VERBATIM REPAIR-SNAPSHOT-AFTER
+    HEAD dbe692d9c3f83020176aeda00a0f399ce5f020f8
+    branch claude/d379-repair-eb52f73
+    status:
+     M kai-pm/house_in_order_h2_v13/run_h2_v12.py
+    run_h2 a39359bc383c8f6f6ca4540c10474fcb094c990f7b8e8091792262436c7a4cfe
+    common-dir /home/user/kai-system/.git
+    config sha 6aec529d446f67fe41a5c240bfc93cb9935140143f3c8eb38ba57d38861a3b3e
+    shallow sha b49902bad2cf6def598168ec382f55b9be95a129066a88e07d6ecaf0b2c40eca
+    END-VERBATIM REPAIR-SNAPSHOT-AFTER
+
+### 6. Next authorised step
+
+- STOP. Evidence to Kai; no commit or push until Kai rules  [CONVERSATION 2026-10-03 Kai, "Do not infer that the earlier implementation grant automatically permits commit after this environmental detour."]
+
+### 7. What I am unsure of
+
+- Whether the frozen v1.2 corpus already carried these 5 MARKER cells; the frozen 272-row regression compared axes OLD vs NEW only and never ran the qualifier  [CMD `regression_compare.py` → axis cells differing 0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
