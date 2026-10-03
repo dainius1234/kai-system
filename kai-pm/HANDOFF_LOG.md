@@ -16341,3 +16341,363 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-03T01:49:58Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-03T01:49:58Z  [CMD `date -u +%FT%TZ` → 2026-10-03T01:49:58Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: cb4170f6c098b18aee9250a13fc88fa71be71254  [CMD `git rev-parse HEAD` → cb4170f6c098b18aee9250a13fc88fa71be71254]
+- tree: 531d216b0c71c3e3a97c61d5fe44d93b80f14d06  [CMD `git rev-parse HEAD^{tree}` → 531d216b0c71c3e3a97c61d5fe44d93b80f14d06]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/project-rework-plan-pgvp35: cb4170f6c098b18aee9250a13fc88fa71be71254  [CMD `git ls-remote --heads origin` → cb4170f6c098b18aee9250a13fc88fa71be71254]
+- remote:claude/d379-repair-eb52f73: dbe692d9c3f83020176aeda00a0f399ce5f020f8  [CMD `git ls-remote --heads origin` → dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 45  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 45]
+
+### 1. The four states
+
+- physical: repair branch unchanged at dbe692d; v4 exists only in scratch (inst4 run_h2_v12.py sha256 d3ee165f706e9f4048434031e003e6c7a97159ae2e2217d0c8cdd7ebd69861b6)  [CMD `git ls-remote --heads origin` → claude/d379-repair-eb52f73 dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- authorised: preserve DeepSeek's v4 reply; await Kai's reconciliation; no implementation  [CONVERSATION 2026-10-03 Dainius, "Deep seek:( gpt message next will follow)"]
+- evidence: DeepSeek v4 receipt and review verbatim in section 5; receipt check and three read-only probes verbatim in section 5  [CMD `sha256sum deepseek_v4_receipt_and_review.txt` → b23fb901bd44cbde…]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- None. DeepSeek's v4 receipt and review arrived via Dainius; DeepSeek is a reviewer, not an adjudicator, so nothing below is a ruling. Kai's reconciliation is announced, not yet received  [CONVERSATION 2026-10-03 Dainius, "Deep seek:( gpt message next will follow)"]
+### 3. Authorised / Held / Forbidden
+
+- HELD: any source mutation, including v4 application to the repair branch, until Kai reconciles V4-01..V4-06  [CONVERSATION 2026-10-03 Kai, "No implementation until reconciliation."]
+- HELD: KAI-B4-SB-01 source-binding packet, next after v4 is reconciled  [CONVERSATION 2026-10-03 Kai, "KAI-B4-SB-01 is next after v4"]
+- FORBIDDEN: d379_controls.py rebuild, full hostile matrix, incident allocation, D390 replay, fixity F, capture, candidate, holdout, blind 40, Item 8, PR #122 merge  [CONVERSATION 2026-10-03 Kai, "Still forbidden: d379_controls.py rebuild, full hostile matrix, incident allocation, D390 replay, fixity F, capture, candidate, holdout, blind 40, Item 8 or PR #122 merge."]
+
+### 4. Open questions
+
+- RECEIPT: decoded transmitted chunks equal the packet (13,996 bytes, sha256 242a554855679d519739bb08673832dcc95c9e0f4e56de174c2004a9db88a955); FIRST DELTA HUNK, SENTINEL A and SENTINEL B reproduced exactly. Deviations: PACKET HASH not computed and not copied, although the cover gave it ("as given by the sender"); V3 BASE copied correctly (bdf6f2e1…d93c); end line reads "END OF PACKET SENT: YES" where the template says "END OF PACKET SEEN: YES". Whether the receipt is sufficient is Kai's — owner: Kai  [CMD `python3 -B receipt_check_v4.py` → decoded == packet True; 3 exact; PACKET HASH "Cannot compute"; END OF PACKET SENT]
+- QUOTE FIDELITY: of 20 '+'/'-' diff lines DeepSeek quoted, 14 are byte-identical to the delta and 6 are not: 2 are CONTEXT lines (the "never widened" comment, pre-existing in v3) quoted as '+' additions; 3 are '+' lines with different indentation; 1 has text absent from the delta: DeepSeek quoted f"REUSE: ontology.EVIDENCE_FACTS …" where the sent bytes say "REFUSE:" (sent bytes: 'REUSE' 0, 'REFUSE: ontology.EVIDENCE_FACTS' 1). The reviewed-text alteration is on DeepSeek's side, not the transport — owner: Kai  [CMD `python3 -B receipt_check_v4.py` → 20 quoted, 14 identical, 6 not]
+- V4-01 (arity 5 → 7) callers: currentness_claims does not exist in v13 at repair HEAD; at HEAD the only Python mention is the separate v1.1 module kai-pm/house_in_order_h2_v11/evidence.py (own definition :50, own caller :99). In the v4 tree the only call site is _currentness_fact (run_h2_v12.py:354), which unpacks 7. Importers of run_h2_v12 at HEAD (cal_fixtures.py x2, d379_controls.py, e2_controls.py, e2_investigation.py, qualify.py) contain no currentness_claims reference. Scratch controls mention it (semantics.py :137, failure message only). Scope: repair HEAD .py files, the v4 tree, and scratch — owner: Kai  [CMD `git grep -n currentness_claims HEAD -- '*.py'` → h2_v11/evidence.py:50,:99 only]
+- V4-02 (context widened): measured on the frozen corpus, 3 of 6 SAC-positive traces now carry a local_context wider than the v1.1 sentence (CODE_AUDIT_BATCH_COGNITIVE_STATE_STUBS 171→233, EMBEDDING_BACKEND_STATE 49→69, SERVICE_IDENTITY_MEASUREMENT 29→54 chars); 3 equal; sentence contained in context 6/6. The widening is the intended consequence of KAI-B4-V3-10's canonical passa._context (disclosed in entry 45 and in packet v4 line 91); the comment DeepSeek cites sits above "applicability_scope": "SPAN" and predates v4. Whether the comment or the context needs change is Kai's — owner: Kai  [CMD `v4_02_probe.py inst4 new.json` → equal 3 wider 3 (of 6)]
+- V4-03 (splitlines twice): confirmed at inst4 run_h2_v12.py:303 and :439 — `raw.splitlines()[0] if raw.splitlines() else ""`; no behavioural effect claimed or measured — owner: Kai  [FILE /tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/twofact/inst4/kai-pm/house_in_order_h2_v13/run_h2_v12.py:303]
+- V4-04 (duplicate-check message): the message text is unchanged by this entry; DeepSeek quoted it with "REUSE:" (see QUOTE FIDELITY) — owner: Kai  [CMD `python3 -B receipt_check_v4.py` → sent 'REFUSE: ontology.EVIDENCE_FACTS' 1]
+- V4-05 (title span unverified): confirmed in source, title_at is derived (:451) and only the token at the derived offset is checked (:459). Measured on the frozen corpus: all 207 NF title-channel rows satisfy text[title_at:title_at+len(title)] == title (0 not exact). Hostile documents were not measured for this invariant — owner: Kai  [CMD `v4_05_probe.py inst4` → rows 272, title-channel 207, exact 207, not exact 0]
+- V4-06 (phrase_start assumes sent is an exact slice): the v4 semantics control asserts text[start:start+len(sentence)] == sentence for every segment (25 hostile texts + 272 frozen documents, 80,736 segments); not a runtime assertion in run_h2_v12.py — owner: Kai  [CMD `semantics.py inst4` → 92 passed, 0 failed]
+
+### 5. Incidents and corrections
+
+- R15 check this step: a stale scratch file sem_v4_probe.txt (01:28:20) reads "91 passed, 1 failed"; it predates the last edit to semantics.py (01:28:34) — the failing case was the old expectation local_context == sentence, i.e. the ruled expectation change entry 45 already discloses. Re-run now on the unchanged v4 tree: 92/0, byte-identical to banked SEMANTICS-OUTPUT-V4 (sha256 fa38fa35…). No new finding  [CMD `semantics.py inst4 > sem_v4_rerun_20261003.txt; cmp semantics_out.txt` → identical]
+- Own-instrument correction: my first caller grep matched the JSON field "ambiguous_currentness_claims" (34 KB of hits); narrowed to '*.py'  [CMD `git grep -n currentness_claims HEAD -- '*.py'` → 2 lines]
+- Credential scan of the DeepSeek reply and the four probe files: 0 hits; raw line separators in all five: none  [CMD `secretscan.py <5 files>` → TOTAL HITS 0]
+- EVIDENCE DEEPSEEK-V4-RECEIPT-AND-REVIEW, byte-exact from the transcript user message beginning "Deep seek:( gpt message next will follow) Receipt (section 0)": 6067 bytes, sha256 b23fb901bd44cbde91c0871ceac44a66c67a1cec3a0efc789e97e38007444535, 4-space indent added; findings V4-01 MAJOR, V4-02..V4-06 MINOR, no BLOCKER  [CMD `transcript extraction by prefix; sha256` → b23fb901bd44cbde…]
+    BEGIN-VERBATIM DEEPSEEK-V4-RECEIPT-AND-REVIEW
+    Deep seek:( gpt message next will follow) Receipt (section 0)
+    
+    PACKET HASH: Cannot compute SHA-256 (no hashing tool available).
+    V3 BASE (reviewed subject) SHA-256: Cannot compute SHA-256; value copied from decoded section 1: bdf6f2e1b381f723294d4ffcc182e1d970128dcb63d029960b76d01a8ec1d93c.
+    FIRST DELTA HUNK: @@ -326,7 +326,8 @@
+    SENTINEL A: +    if len(ont.EVIDENCE_FACTS) != len(set(ont.EVIDENCE_FACTS)):
+    SENTINEL B: +        title_at = line_start + (len(ln) - len(after_hash)) + \
+    END OF PACKET SENT: YES
+    
+    Section 5 is out of scope and not reviewed below.
+    
+    ---
+    
+    Review of v3 -> v4 delta
+    
+    DS-B4-V4-01 — MAJOR — currentness_claims return-arity change is a breaking API change
+    
+    Delta lines:
+    
+    ```diff
+    +    Returns [(polarity, subject, line_no, sentence, phrase, sentence_start,
+    +    phrase_start)], both starts ABSOLUTE offsets into `text`."""
+    ...
+    +        hit = neg or pos
+    +        claims.append((pol, subject, line_no, sent, hit.group(0),
+    +                       start, start + hit.start()))
+    ```
+    
+    Only the in-delta caller _currentness_fact is updated to unpack 7 values:
+    
+    ```diff
+    +        _pol, _subj, _ln, sent, phrase, s_start, p_start = self_pos[0]
+    ```
+    
+    Any unchanged caller still doing pol, subject, line_no, sent, phrase = currentness_claims(...) will raise ValueError: too many values to unpack. The delta does not show an audit of all callers.
+    
+    Concrete failure: if any other function in run_h2_v12.py or another module imports currentness_claims and unpacks the old 5-tuple, it breaks at runtime on the first call.
+    
+    Remedy: audit every call site of currentness_claims; update all unpackers, or return a namedtuple/dataclass with backward-compatible accessors.
+    
+    ---
+    
+    DS-B4-V4-02 — MINOR — SAC local_context is widened to the whole LF line, contradicting the inline comment
+    
+    Delta lines:
+    
+    ```diff
+    +        # the sentence is the evidence: SPAN, never widened because
+    +        # its semantic subject is the document (Kai P2)
+    ...
+    +                "local_context": passa._context(text, s_start,
+    +                                             s_start + len(sent)),
+    ```
+    
+    The comment says the sentence is the evidence and is “never widened”, but passa._context(...) returns the canonical LF line. If that LF line contains multiple sentences, local_context now includes text outside the determining sentence.
+    
+    Concrete failure: a document with a long LF line containing several v1.1 sentences before the currentness sentence will produce a local_context larger than the evidence sentence. If downstream code assumes local_context equals the sentence, it may over-report or mis-scope the witness.
+    
+    Remedy: either keep local_context as sent, or update the comment and all downstream expectations to make clear that the SAC context is intentionally the LF line.
+    
+    ---
+    
+    DS-B4-V4-03 — MINOR — Redundant raw.splitlines() call in first-heading reconstruction
+    
+    Delta lines:
+    
+    ```diff
+    +            ln = raw.splitlines()[0] if raw.splitlines() else ""
+    ```
+    
+    raw.splitlines() is called twice per line. This is not a correctness bug, but it is avoidable work in a loop that may run over every line of the document.
+    
+    Concrete failure: none functional; performance-only on very large documents.
+    
+    Remedy:
+    
+    ```python
+    parts = raw.splitlines()
+    ln = parts[0] if parts else ""
+    ```
+    
+    ---
+    
+    DS-B4-V4-04 — MINOR — Duplicate-check message overstates what is checked
+    
+    Delta lines:
+    
+    ```diff
+    +    if len(ont.EVIDENCE_FACTS) != len(set(ont.EVIDENCE_FACTS)):
+    +        raise FactDispositionError(
+    +            f"REUSE: ontology.EVIDENCE_FACTS names a governed class more than "
+    +            f"once; the evidence-fact population cannot be reconciled "
+    +            f"(Kai, V3-07)")
+    ```
+    
+    The check detects any exact duplicate string in ont.EVIDENCE_FACTS, not specifically “a governed class”. If a non-governed or malformed string is duplicated, the error message is misleading.
+    
+    Concrete failure: ont.EVIDENCE_FACTS = ["NOT_A_GOVERNED_CLASS", "NOT_A_GOVERNED_CLASS"] raises with a message about a governed class, even though no governed class is duplicated.
+    
+    Remedy: either narrow the check to governed classes, or reword the message to “ontology.EVIDENCE_FACTS contains a duplicate entry”.
+    
+    ---
+    
+    DS-B4-V4-05 — MINOR — Final token check does not verify the reconstructed title span
+    
+    Delta lines:
+    
+    ```diff
+    +        if not channels or any(text[at:at + len(tok)] != tok
+    +                               for at, tok in channels):
+    ```
+    
+    The code verifies that each final token occurs at its computed absolute offset, but it never verifies that the whole reconstructed title span text[title_at:title_at+len(title)] actually equals title. A bug in title_at could still pass if the final token happens to land correctly by coincidence.
+    
+    Concrete failure: contrived line where title_at is off by one but the matched token still appears at the wrong offset? Unlikely but possible with repeated characters.
+    
+    Remedy: add an assertion before appending:
+    
+    ```python
+    if text[title_at:title_at + len(title)] != title:
+        raise NominalTraceError(...)
+    ```
+    
+    ---
+    
+    DS-B4-V4-06 — MINOR — phrase_start assumes sent is an exact slice of text
+    
+    Delta lines:
+    
+    ```diff
+    +        claims.append((pol, subject, line_no, sent, hit.group(0),
+    +                       start, start + hit.start()))
+    ```
+    
+    phrase_start = start + hit.start() is correct only if sent is exactly text[start:start + len(sent)]. The delta does not prove that invariant for _segments. If _segments ever returns a normalized or stripped sentence, phrase_start and the later passa._selector/_context calls will use the wrong absolute offset.
+    
+    Concrete failure: if _segments strips leading whitespace from sent, then start + hit.start() points before the actual phrase in text.
+    
+    Remedy: assert the slice invariant inside _segments or derive s_start by locating the returned sent in text (e.g. text.index(sent, start) with bounds checks).
+    
+    ---
+    
+    No BLOCKER-level defect was found in the v3 -> v4 delta. The two intended code changes appear directionally correct, but DS-B4-V4-01 should be reconciled before treating v4 as safe to integrate.
+    END-VERBATIM DEEPSEEK-V4-RECEIPT-AND-REVIEW
+
+- Verbatim blocks: strip the 4-space indent to recover each file  [CMD `sha256sum` → as listed]
+- EVIDENCE RECEIPT-CHECK-V4-INSTRUMENT receipt_check_v4.py: 1973 bytes, sha256 b013f510bfcabcea14b8336ce4e9b9e31f27313f4c973f11e5b448cd214f420c, final LF True  [CMD `sha256sum receipt_check_v4.py` → b013f510bfcabcea…]
+    BEGIN-VERBATIM RECEIPT-CHECK-V4-INSTRUMENT
+    """Read-only: DeepSeek v4 reply vs the bytes actually sent. (1) decode the two transmitted base64 chunks and compare
+    with the packet; (2) receipt sentinels exact; (3) every '+'/'-' diff line DeepSeek quoted, byte-compared with v3_to_v4.diff."""
+    import base64, hashlib, re, pathlib
+    S = pathlib.Path(__file__).parent
+    dec = b"".join(base64.b64decode(re.sub(r"\s", "", re.search(r"BEGIN BASE64\n(.*?)\nEND BASE64", (S / f"v4_b64/v4_b64_chunk_{i}_of_2.txt").read_text(), re.S).group(1))) for i in (1, 2))
+    pkt = (S / "DEEPSEEK_PACKET_TWO_FACT_v4.md").read_bytes()
+    print("decoded", len(dec), hashlib.sha256(dec).hexdigest(), "== packet", dec == pkt)
+    s = dec.decode(); print("sent bytes: 'REUSE' count", s.count("REUSE"), "| 'REFUSE: ontology.EVIDENCE_FACTS' count", s.count("REFUSE: ontology.EVIDENCE_FACTS"))
+    rep = (S / "deepseek_v4_receipt_and_review.txt").read_text()
+    exp = {"FIRST DELTA HUNK": "@@ -326,7 +326,8 @@", "SENTINEL A": "+    if len(ont.EVIDENCE_FACTS) != len(set(ont.EVIDENCE_FACTS)):",
+           "SENTINEL B": "+        title_at = line_start + (len(ln) - len(after_hash)) + \\"}
+    for l in rep.splitlines():
+        k = l.split(":", 1)[0]
+        if k in exp: print(f"receipt {k}: exact={l == k + ': ' + exp[k]}")
+        if k.startswith(("PACKET HASH", "V3 BASE", "END OF PACKET")): print("receipt line:", l)
+    delta = (S / "v3_to_v4.diff").read_text(); dl = delta.splitlines(); ds = set(dl)
+    q = [l for l in rep.splitlines() if re.match(r"^[+-]\s", l) and not l.startswith(("+++", "---"))]
+    bad = [l for l in q if l not in ds]
+    print(f"quoted diff lines: {len(q)}; byte-identical to a delta line: {len(q) - len(bad)}; not: {len(bad)}")
+    for l in bad:
+        body = l[1:].strip()
+        hits = [d for d in dl if d[1:].strip() == body]
+        kind = ("SAME TEXT, delta line is " + ("CONTEXT (' ')" if hits[0][0] == " " else f"'{hits[0][0]}' with different indentation")) if hits else "TEXT NOT IN DELTA"
+        print(f"  {kind}\n    quoted: {l!r}" + (f"\n    actual: {hits[0]!r}" if hits else ""))
+    END-VERBATIM RECEIPT-CHECK-V4-INSTRUMENT
+- EVIDENCE RECEIPT-CHECK-V4-OUTPUT receipt_check_v4_out.txt: 1775 bytes, sha256 224980f11a3afde32052d1bb9e46172253d841a2424aca99232219dfb6907e33, final LF True  [CMD `sha256sum receipt_check_v4_out.txt` → 224980f11a3afde3…]
+    BEGIN-VERBATIM RECEIPT-CHECK-V4-OUTPUT
+    decoded 13996 242a554855679d519739bb08673832dcc95c9e0f4e56de174c2004a9db88a955 == packet True
+    sent bytes: 'REUSE' count 0 | 'REFUSE: ontology.EVIDENCE_FACTS' count 1
+    receipt line: PACKET HASH: Cannot compute SHA-256 (no hashing tool available).
+    receipt line: V3 BASE (reviewed subject) SHA-256: Cannot compute SHA-256; value copied from decoded section 1: bdf6f2e1b381f723294d4ffcc182e1d970128dcb63d029960b76d01a8ec1d93c.
+    receipt FIRST DELTA HUNK: exact=True
+    receipt SENTINEL A: exact=True
+    receipt SENTINEL B: exact=True
+    receipt line: END OF PACKET SENT: YES
+    quoted diff lines: 20; byte-identical to a delta line: 14; not: 6
+      SAME TEXT, delta line is CONTEXT (' ')
+        quoted: '+        # the sentence is the evidence: SPAN, never widened because'
+        actual: '                 # the sentence is the evidence: SPAN, never widened because'
+      SAME TEXT, delta line is CONTEXT (' ')
+        quoted: '+        # its semantic subject is the document (Kai P2)'
+        actual: '                 # its semantic subject is the document (Kai P2)'
+      SAME TEXT, delta line is '+' with different indentation
+        quoted: '+                                             s_start + len(sent)),'
+        actual: '+                                                s_start + len(sent)),'
+      TEXT NOT IN DELTA
+        quoted: '+            f"REUSE: ontology.EVIDENCE_FACTS names a governed class more than "'
+      SAME TEXT, delta line is '+' with different indentation
+        quoted: '+        if not channels or any(text[at:at + len(tok)] != tok'
+        actual: '+    if not channels or any(text[at:at + len(tok)] != tok'
+      SAME TEXT, delta line is '+' with different indentation
+        quoted: '+                               for at, tok in channels):'
+        actual: '+                           for at, tok in channels):'
+    END-VERBATIM RECEIPT-CHECK-V4-OUTPUT
+- EVIDENCE V4-02-PROBE-INSTRUMENT v4_02_probe.py: 1205 bytes, sha256 39fded7a1eb64c37b58a7bfa3452479588c3530fe5e46baaf8be8e0a846b5506, final LF True  [CMD `sha256sum v4_02_probe.py` → 39fded7a1eb64c37…]
+    BEGIN-VERBATIM V4-02-PROBE-INSTRUMENT
+    """V4-02 read-only probe: SAC trace local_context (v4 canonical LF line) vs the v1.1 sentence v3 emitted. Frozen corpus."""
+    import json, sys, subprocess
+    sys.path.insert(0, sys.argv[1])
+    import run_h2_v12 as R
+    REPO = "/home/user/kai-repair"
+    def blob(spec): return subprocess.run(["git","-C",REPO,"cat-file","blob",spec],capture_output=True,check=True).stdout
+    new = {r["path"]: r for r in json.load(open(sys.argv[2]))}
+    pos = [p for p, r in new.items() if r["facts"].get("SELF_ASSERTS_CURRENT") is True]
+    print("SAC positive rows:", len(pos))
+    same = wider = 0
+    for p in sorted(pos):
+        text = blob(f"3abc9e9d8ca11966a6f996d5f0af68072ee5b117:{p}").decode("utf-8")
+        tr = new[p]["traces"]["SELF_ASSERTS_CURRENT"]
+        c = [x for x in R.currentness_claims(p, text) if x[1] == "SELF" and x[0] == "CURRENT_POSITIVE"][0]
+        sent = c[3]; ctx = tr["local_context"]
+        eq = ctx == sent.strip() or ctx == sent
+        same += eq; wider += (not eq)
+        print(f"  {p}\n    sentence len {len(sent)}  context len {len(ctx)}  equal={eq}  sentence-in-context={sent.strip() in ctx}")
+        if not eq: print("    SENT:", repr(sent)[:300]); print("    CTX :", repr(ctx)[:300])
+    print(f"equal {same}  wider {wider}  (of {len(pos)})")
+    END-VERBATIM V4-02-PROBE-INSTRUMENT
+- EVIDENCE V4-02-PROBE-OUTPUT v4_02_probe_out.txt: 1428 bytes, sha256 b4a62a563c637516122ac033e4d0c08cc6a81f6accde3fe4bfdb756e24b29a08, final LF True  [CMD `sha256sum v4_02_probe_out.txt` → b4a62a563c637516…]
+    BEGIN-VERBATIM V4-02-PROBE-OUTPUT
+    SAC positive rows: 6
+      kai-pm/CODE_AUDIT_BATCH_COGNITIVE_STATE_STUBS.md
+        sentence len 171  context len 233  equal=False  sentence-in-context=True
+        SENT: 'It currently returns false later, but the pattern makes missing governance infrastructure non-fatal at the capability boundary and is unsafe for future activation changes.'
+        CTX : '**Issue:** `can_operate` catches `ImportError` and continues. It currently returns false later, but the pattern makes missing governance infrastructure non-fatal at the capability boundary and is unsafe for future activation changes.'
+      kai-pm/CODE_AUDIT_REGISTER.md
+        sentence len 14  context len 14  equal=True  sentence-in-context=True
+      kai-pm/CODE_AUDIT_REGISTER_CONTINUED.md
+        sentence len 27  context len 27  equal=True  sentence-in-context=True
+      kai-pm/CODE_AUDIT_REGISTER_CONTINUED_2.md
+        sentence len 27  context len 27  equal=True  sentence-in-context=True
+      kai-pm/EMBEDDING_BACKEND_STATE.md
+        sentence len 49  context len 69  equal=False  sentence-in-context=True
+        SENT: 'It currently stands at **1 of 3** — memu-core via'
+        CTX : 'all three services. It currently stands at **1 of 3** — memu-core via'
+      kai-pm/SERVICE_IDENTITY_MEASUREMENT.md
+        sentence len 29  context len 54  equal=False  sentence-in-context=True
+        SENT: 'It is currently unanswerable.'
+        CTX : 'question in this system. It is currently unanswerable.'
+    equal 3  wider 3  (of 6)
+    END-VERBATIM V4-02-PROBE-OUTPUT
+- EVIDENCE V4-05-PROBE-INSTRUMENT v4_05_probe.py: 1524 bytes, sha256 f47675c8430837c3d9e56c861277db6986e28a379fb631994e061c88705427a5, final LF True  [CMD `sha256sum v4_05_probe.py` → f47675c8430837c3…]
+    BEGIN-VERBATIM V4-05-PROBE-INSTRUMENT
+    """V4-05 read-only probe: does text[title_at:title_at+len(title)] == title hold for every frozen row whose
+    NF title channel fires? Re-derives title_at with the v4 code's own arithmetic (copied from _nominal_fact)."""
+    import json, sys, subprocess
+    sys.path.insert(0, sys.argv[1])
+    import classify as cl
+    REPO = "/home/user/kai-repair"
+    def blob(spec): return subprocess.run(["git","-C",REPO,"cat-file","blob",spec],capture_output=True,check=True).stdout
+    doc = json.loads(blob("f88e929b8c0f569dd7f730e12a8459b00f405595"))
+    n_rows = n_title = n_ok = 0; bad = []
+    for row in doc["rows"]:
+        n_rows += 1
+        text = blob(f"3abc9e9d8ca11966a6f996d5f0af68072ee5b117:{row['path']}").decode("utf-8")
+        obs = (cl.function(row, text) or {}).get("observed") or ""
+        if not obs.startswith("NOMINAL_FUNCTION="): continue
+        term = cl.FUNCTION_TERMS[obs.split("=")[1].split()[0]]
+        title = row.get("title") or ""
+        if not (title and cl.term_match(term, title)): continue
+        n_title += 1
+        first, off = None, 0
+        for raw in text.splitlines(keepends=True):
+            ln = raw.splitlines()[0] if raw.splitlines() else ""
+            if ln.startswith("#"): first = (off, ln); break
+            off += len(raw)
+        line_start, ln = first; ah = ln.lstrip("#")
+        title_at = line_start + (len(ln) - len(ah)) + (len(ah) - len(ah.lstrip()))
+        if text[title_at:title_at + len(title)] == title: n_ok += 1
+        else: bad.append(row["path"])
+    print(f"rows {n_rows}  NF title-channel rows {n_title}  title span exact {n_ok}  not exact {len(bad)} {bad}")
+    END-VERBATIM V4-05-PROBE-INSTRUMENT
+- EVIDENCE V4-05-PROBE-OUTPUT v4_05_probe_out.txt: 74 bytes, sha256 efb630f66e72647b9999fdacbc53648a73f76b93b475bbe0acf8ba323c820c35, final LF True  [CMD `sha256sum v4_05_probe_out.txt` → efb630f66e72647b…]
+    BEGIN-VERBATIM V4-05-PROBE-OUTPUT
+    rows 272  NF title-channel rows 207  title span exact 207  not exact 0 []
+    END-VERBATIM V4-05-PROBE-OUTPUT
+
+### 6. Next authorised step
+
+- Wait for Kai's reconciliation of DeepSeek's v4 review (V4-01..V4-06, receipt deviations, quote fidelity); implement nothing before it  [CONVERSATION 2026-10-03 Dainius, "Deep seek:( gpt message next will follow)"]
+
+### 7. What I am unsure of
+
+- Whether the two-fact delta should carry a runtime assertion for the V4-05 and V4-06 invariants, or rely on the controls; both hold on every case measured, and I have no hostile counterexample for either  [CMD `v4_05_probe.py; semantics.py` → 207/207; 92/0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
