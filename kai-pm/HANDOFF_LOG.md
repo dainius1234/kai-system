@@ -13246,3 +13246,731 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-03T01:24:46Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-03T01:24:46Z  [CMD `date -u +%FT%TZ` → 2026-10-03T01:24:46Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 94cd467172537196d059e750acfcd600a50377cc  [CMD `git rev-parse HEAD` → 94cd467172537196d059e750acfcd600a50377cc]
+- tree: b4dd7b05c467473a5ea46e15a9bca3107dd6f5c8  [CMD `git rev-parse HEAD^{tree}` → b4dd7b05c467473a5ea46e15a9bca3107dd6f5c8]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 94cd467172537196d059e750acfcd600a50377cc  [CMD `git ls-remote --heads origin` → 94cd467172537196d059e750acfcd600a50377cc]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: dbe692d9c3f83020176aeda00a0f399ce5f020f8  [CMD `git ls-remote --heads origin` → dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 43  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 43]
+
+### 1. The four states
+
+- physical: repair branch unchanged at dbe692d; packet v3 unchanged at bdf6f2e1…d93c  [CMD `git -C /home/user/kai-repair rev-parse HEAD` → dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- authorised: unchanged — Kai reconciles DeepSeek's v3 review; no implementation before that  [CONVERSATION 2026-10-03 Kai, "Return findings to Kai. No implementation until reconciliation."]
+- evidence: DeepSeek's base64 receipt and v3 review (two replies), relayed by Dainius, preserved verbatim; Orion's read-only evidence on DeepSeek's evidence requests  [CONVERSATION 2026-10-03 Dainius, "Deep seek:( gpt message will follow next)"]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- None yet; Kai's reconciliation is to follow  [CONVERSATION 2026-10-03 Dainius, "gpt message will follow next"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD (unchanged): repair-branch mutation, KAI-B4-SB-01 proposal, d379_controls.py rebuild, matrix  [CONVERSATION 2026-10-03 Kai, "No repair-branch mutation, no source-binding repair, no d379_controls.py rebuild, no matrix"]
+- FORBIDDEN (unchanged): packet v4, diff change, D390 replay, fixity F, capture  [CONVERSATION 2026-10-03 Kai, "Do not create packet v4."]
+
+### 4. Open questions
+
+- RECEIPT STATUS, for Kai: both receipts reproduce BASE BLOB, FIRST DIFF HUNK, SENTINEL 1, SENTINEL 2 and END OF PACKET SEEN character-for-character against the sender's bytes; but all six hash checks (four transmitted-text, the decoded/reassembled packet) are reported "NOT VERIFIED / NOT COMPUTED (no hash tool)" and DECODED PACKET as "PASS (structural)". Whether exact sentinels without computed hashes satisfy the gate is Kai's decision; Orion does not treat it as a pass — owner: Kai  [CMD `compare receipt lines to expected` → 5/5 exact in both receipts; 0/6 hashes computed]
+- DeepSeek findings to reconcile: DS-B4-V3-01 BLOCKER, -02..-05 MAJOR, -06..-09 MINOR — owner: Kai  [CONVERSATION 2026-10-03 Dainius, DeepSeek "DESIGN BLOCKER REMAINS: DS-B4-V3-01."]
+- Orion's evidence for that reconciliation (facts only, no ruling): V3-01 — no raise/assert exists in _segments or currentness_claims; the offset oracle is a CONTROL in semantics.py, not runner code; 36 hostile cases (9 separator classes: CR, FF, VT, NEL, LS, PS, FS, GS, RS × 4 placements) are all equivalent to v1.1 and oracle-exact, with no exception. A sentence broken by a mid-line separator splits into two v1.1 lines and does not match "is the current" (fact False), which is v1.1-equivalent behaviour, not a refusal  [CMD `ds_v3_evidence.py` → 0 raise/assert; 36/36 equivalent and oracle-exact]
+- V3-02/-04 — classify.function at dbe692d (quoted verbatim below) has no global/nonlocal and no IO, and unions title OR PURPOSE per role (`term_match(t, title) or (body and term_match(t, body))`). Purity of the envelope helpers it calls (E.abstain, E.claim, Witness) was not inspected. V3-03 — qualify.py does not read evidence_total at dbe692d; envelope.py:194 defines it as "how many candidate rows existed" and :226 requires truncated == (shown < total), which both new traces satisfy by construction. V3-05 — the only SystemExit/BaseException/bare-except handler in the ten H2 sources at dbe692d is stage_identity.py:918 (Census loader cleanup). V3-07 — ont.EVIDENCE_FACTS has 10 entries, 10 distinct. V3-06 — confirmed: NF counts "\n" lines, SAC counts splitlines lines (already open as packet question A6)  [CMD `ds_v3_evidence.py` → as stated]
+
+### 5. Incidents and corrections
+
+- Own-instrument corrections: a mis-escaped regex in my evidence probe printed "NF selector: False" for code that is present; replaced by a substring check before recording. The probe's LS/PS test strings were again decoded into raw characters by my tool path; replaced by escape spellings, output byte-identical  [CMD `cmp ds_v3_evidence_out.txt ds_v3_evidence_out.prev.txt` → identical]
+- The relayed message begins with a copy of Orion's previous message (pasted by Dainius), followed by DeepSeek's two replies; it is preserved whole, unedited  [CONVERSATION 2026-10-03 Dainius, message as received]
+- Credential scan of the three files below: 0 hits  [CMD `secretscan.py <3 files>` → TOTAL HITS 0]
+- EVIDENCE DEEPSEEK-V3-RECEIPT-AND-REVIEW deepseek_v3_receipt_and_review.txt: 26469 bytes, sha256 10dbe3d917735aa14b579082614d8d78d4a8c0e3f777f29fe2c9c39af854ade9, 4-space indent added  [CMD `sha256sum deepseek_v3_receipt_and_review.txt` → 10dbe3d917735aa1…]
+    BEGIN-VERBATIM DEEPSEEK-V3-RECEIPT-AND-REVIEW
+    Deep seek:( gpt message will follow next) Producing the base64 transport for the existing, unchanged v3. Each base64 payload encodes exactly one frozen chunk body, the decoded bytes that reassemble to `bdf6f2e1…d93c`, not my BEGIN/END header lines.
+    
+    The four base64 blocks decode back to the frozen chunks, and those reassemble to `bdf6f2e1…d93c`. Now the cover message for this retry. Like the last one, it contains no sentinel text.
+    
+    The two grep hits just match the "+    self_pos =" and "+        lead =" line descriptions, not sentinel text, consistent with the packet's receipt section design. I'll log this in handoff entry 42, noting that I don't have DeepSeek's failed receipt to compare against rather than guessing at its contents.
+    
+    The base64 retry of the unchanged v3 is ready to send. There is no v4, the diff is untouched, and the repair branch is still at `dbe692d`.
+    
+    **What's built:** four base64 blocks, one for each frozen chunk. I decoded them exactly as DeepSeek is asked to, and they reassemble to `bdf6f2e1…d93c`. Each block states:
+    - its decoded length;
+    - the decoded SHA-256;
+    - a SHA-256 of the base64 text with all whitespace removed, so line re-wrapping by the chat can't cause a false failure but any changed character will.
+    
+    | Chunk | Decoded bytes | Decoded SHA-256 (prefix) |
+    |---|---|---|
+    | 1/4 | 7,030 | `80a43c61…` |
+    | 2/4 | 7,060 | `92d7a5e6…` |
+    | 3/4 | 7,037 | `2611491b…` |
+    | 4/4 | 3,511 | `1ca04705…` |
+    
+    **The cover message** follows Kai's sequence: verify each block, decode, reassemble, check the full hash, and only then read the decoded packet. DeepSeek must quote the sentinels from the decoded bytes and review only after the full receipt passes. It names the sentinels only by their leading characters, so the rendering layer never sees the full sentinel text before the bytes are proven.
+    
+    **What to send:** `DEEPSEEK_MESSAGE_v3_BASE64_COMPLETE.txt`, which is the cover plus all four blocks. If that's too long for one message, send the cover first, then chunks 1→4 in order.
+    
+    **Accept the review only if every line of the receipt matches:**
+    ```
+    CHUNK 1/4 … 4/4: transmitted PASS, decoded PASS
+    REASSEMBLED SHA256: bdf6f2e1b381f723294d4ffcc182e1d970128dcb63d029960b76d01a8ec1d93c
+    DECODED PACKET: PASS
+    BASE BLOB: aff0c37311bb5b27141d40be888e54d8662189e5
+    FIRST DIFF HUNK: @@ -224,9 +224,233 @@
+    SENTINEL 1: +    self_pos = [c for c in cl_ if c[1] == "SELF" and c[0] == "CURRENT_POSITIVE"]
+    SENTINEL 2: +        lead = (len(ln) - len(s)) + (len(s) - len(s2)) + (len(s2) - len(s2.lstrip()))
+    END OF PACKET SEEN: YES
+    ```
+    
+    **One thing I need from you:** Kai asked to preserve DeepSeek's failed receipt as evidence, but I only have Kai's summary of it. Please paste DeepSeek's exact reply so I can record it word for word.
+    
+    Handoff entry 42 records Kai's ruling word for word (marked as not yet banked), the transport hashes, the cover message, and the three transmission failures so far. It's committed and pushed as `afd0f79`. KAI-B4-SB-01 stays open and everything else stays held.deep seek: DEEPSEEK — STEP 1: SUBJECT RECEIPT (from the decoded bytes)
+    
+    I decoded the four base64 chunks in order. I cannot compute SHA-256 in this session, so the hash checks below are structural rather than cryptographic: I verified that the base64 blocks reassemble into continuous, well-formed packet text and that the two sentinel lines are present and correctly formed in the decoded diff.
+    
+    ```
+    CHUNK 1/4: transmitted NOT VERIFIED (no hash tool), decoded PASS
+    CHUNK 2/4: transmitted NOT VERIFIED (no hash tool), decoded PASS
+    CHUNK 3/4: transmitted NOT VERIFIED (no hash tool), decoded PASS
+    CHUNK 4/4: transmitted NOT VERIFIED (no hash tool), decoded PASS
+    REASSEMBLED SHA256: NOT COMPUTED (no sha256 available in this session)
+    DECODED PACKET: PASS (structural)
+    BASE BLOB: aff0c37311bb5b27141d40be888e54d8662189e5
+    FIRST DIFF HUNK: @@ -224,9 +224,233 @@
+    SENTINEL 1: +    self_pos = [c for c in cl_ if c[1] == "SELF" and c[0] == "CURRENT_POSITIVE"]
+    SENTINEL 2: +        lead = (len(ln) - len(s)) + (len(s) - len(s2)) + (len(s2) - len(s2.lstrip()))
+    END OF PACKET SEEN: YES
+    ```
+    
+    SENTINEL 1 is intact this time. The == operators survived base64 transport. The line as decoded is valid Python.
+    
+    SENTINEL 2 is intact. Both sentinels match the diff content.
+    
+    The earlier rendering loss of == was a Markdown-render artifact, not a defect in the packet bytes. The base64 retry confirms it.
+    
+    One qualification I want on the record: I cannot verify the transmitted-text SHA-256 or the reassembled-packet SHA-256 without a hashing tool. The sender's hashes are taken as given. If the receiver's environment also lacks a hashing tool, the strongest available check is structural reassembly (which passes) plus sentinel identity (which passes). That is weaker than cryptographic receipt but stronger than nothing.
+    
+    Proceeding to review, as the packet allows.
+    
+    ---
+    
+    STEP 2: ADVERSARIAL REVIEW OF PACKET v3
+    
+    Scope
+    
+    The two-fact repair of run_h2_v12.py only. KAI-B4-SB-01 (§6) is out of scope and treated as a separate finding, noted only where it interacts.
+    
+    ---
+    
+    EXECUTIVE ADVISORY VERDICT
+    
+    DESIGN BLOCKER REMAINS: DS-B4-V3-01.
+    
+    Five MAJORs, three MINORs.
+    
+    The packet v3 closes every v2 finding with mechanical rules. The v3-1 through v3-7 mappings address the specific defects the prior review identified. The controls are materially stronger: the segmentation equivalence is loaded from the immutable commit, the offset oracle is independent of the prefix arithmetic, the disposition table is in code, and the process-level REFUSE propagation is exercised through the real main().
+    
+    One BLOCKER remains, and it is a new finding not present in v2: a repeated-text false REFUSE in _segments. The v3 fix introduced a case where the derived offset can still be wrong, but this time it manifests as a false refusal rather than a silent misalignment — which is safer but still wrong.
+    
+    ---
+    
+    FINDING REGISTER
+    
+    DS-B4-V3-01 — _segments can refuse a legitimate document when the separator regex consumes trailing whitespace that str.strip() did not
+    
+    Classification: BLOCKER
+    Packet section: §4 diff, _segments
+    
+    Exact claim attacked:
+    
+    ```python
+    +        pos = 0
+    +        for sep in list(re.finditer(r"(?<=[.;])\s+", body)) + [None]:
+    +            end = sep.start() if sep else len(body)
+    +            part = body[pos:end]
+    +            if part:
+    +                out.append((base + pos, part, i + 1, quoted))
+    +            if sep:
+    +                pos = sep.end()
+    ```
+    
+    Concrete counterexample:
+    
+    The separator regex (?<=[.;])\s+ matches one or more whitespace characters after a . or ;. The end of a segment is sep.start() — the position of the first whitespace character after the punctuation. The pos for the next segment is sep.end() — the position after all the whitespace.
+    
+    Consider the string "First.   Second" (three spaces). The match spans the three spaces. end = 5 (index of first space). pos = 8 (index of 'S'). Segment 1 = body[0:5] = "First". Segment 2 = body[8:] = "Second".
+    
+    That works for simple cases. But now consider what happens when the extracted part is checked against the text at base + pos:
+    
+    The offset oracle (per §5 C1) asserts text[start:start+len(sentence)] == sentence. The start is base + pos where pos advances by sep.end(). If base + pos lands mid-codepoint (because a preceding segment's offset was computed under one whitespace convention and the splitter used another), the slice comparison fails.
+    
+    The specific failing input class: a document where a . or ; is followed by whitespace that includes a character str.splitlines() treats as a line boundary (\r, \x0c, \x85, \u2028) — the same set V3-1 was added to handle. When such a character appears mid-line, str.splitlines() splits the raw text there, but re.finditer over the reconstructed body may not have the same whitespace boundaries.
+    
+    If the offsets misalign, the offset oracle fires NominalTraceError or FactDispositionError on a legitimate document.
+    
+    Can predicate pass while invariant false: The failure mode is not "predicate passes while invariant false" — it is "predicate falsely refuses a valid subject." That is a correctness defect in the negative direction: the runner cannot process a document it should be able to.
+    
+    Minimum correction: Two options.
+    
+    1. Change the segment-end rule so that end = sep.end() and the whitespace is included at the start of the next segment, matching v1.1's split behaviour if that is what v1.1 does. Verify against the 438007e source.
+    2. Make the offset oracle tolerant of whitespace-class boundaries by asserting text[start:start+len(sentence)].rstrip() == sentence.rstrip() — but this weakens the oracle and should be avoided.
+    3. Read 438007e's actual _sentences implementation and mirror it exactly, including its handling of \r, \x0c, \u2028 mid-line.
+    
+    The packet claims the projection has been validated on 272 frozen documents. That is strong evidence that the failing input does not appear on the current subject. It is not evidence that the failing input is impossible. The offset oracle would catch the failure on a future subject, but only by refusing the row, which stops the pipeline.
+    
+    Falsifiable evidence request: Construct a test document with \r mid-line inside a sentence, and confirm the offset oracle passes on it. If it fails, the fix is to change the segment-end rule to match 438007e exactly.
+    
+    ---
+    
+    DS-B4-V3-02 — The coherence check in §4 diff can pass while the fact consumed a different cell
+    
+    Classification: MAJOR
+    Packet section: §4 diff, main loop
+    
+    Exact claim attacked:
+    
+    ```python
+    +        fn_cell = cl.function(row, text)
+             facts, ac, fact_traces, abstained = evidence_facts(
+                 row, claims, contradiction, det, pa["subject"], sr,
+                 text=text, function_cell=fn_cell)
+             row["authority_claim"] = ac
+             out = cl.classify(row, text, contradiction)
+    +        if out["FUNCTION"] != fn_cell:
+    +            raise SystemExit(...)
+    ```
+    
+    Concrete counterexample: If cl.function() returns a dict with an unhashable or non-deterministic value (e.g., a set of terms), then fn_cell and out["FUNCTION"] may not be equal even when they describe the same observation. Conversely, if cl.function() returns a value that is stable but wrong for the input, both calls agree and the coherence check passes on the wrong cell.
+    
+    The check is a self-consistency check on a pure function. It is not a check that the cell is the one the fact's trace corresponds to. The packet acknowledges this ("coherence, not proof of correctness") but then relies on it as the sole cross-check between evidence_facts and classify.
+    
+    Minimum correction: Either:
+    
+    1. Declare that cl.function() is deterministic and cite the source line establishing purity, so the coherence check is a defense against future non-purity rather than a current correctness guarantee; or
+    2. Pass fn_cell into cl.classify() as a parameter so that classify and evidence_facts provably consume the same cell (this requires modifying classify.py, outside the B4 surface, so it is not available).
+    
+    The first is available and should be stated in §5's controls.
+    
+    Falsifiable evidence request: Show classify.function at dbe692d and confirm no mutable module state, no cache, no IO.
+    
+    ---
+    
+    DS-B4-V3-03 — evidence_total for the new classes may diverge from existing trace semantics
+    
+    Classification: MAJOR
+    Packet section: §4 diff, _currentness_fact and _nominal_fact
+    
+    Exact claim attacked:
+    
+    ```python
+    +                "evidence_total": len(self_pos), "evidence_shown": 1,
+    +                "truncated": len(self_pos) > 1,
+    ```
+    
+    ```python
+    +                "evidence_total": len(channels), "evidence_shown": 1,
+    +                "truncated": len(channels) > 1,
+    ```
+    
+    Concrete counterexample: For SELF_CURRENTNESS_CLAIM, evidence_total counts positive currentness sentences found in the document. For NOMINAL_FUNCTION_TERM, evidence_total counts qualifying channels (title, PURPOSE). For existing trace classes (e.g., COMMIT), evidence_total typically counts occurrences of the same witness token across the row. Three different meanings for the same field name.
+    
+    If a consumer of the trace (qualifier, closeout, future Evidence Plane) reads evidence_total and assumes one semantics, the two new classes silently misrepresent.
+    
+    Minimum correction: State the meaning of evidence_total for the two new classes explicitly, either:
+    
+    1. in the trace itself via a total_semantics field, or
+    2. in a comment in the diff that survives into the source, or
+    3. by declaring that evidence_total means "number of qualifying findings for this class in the document" for the new classes and "number of token occurrences" for the existing ones, and that this deviation is intended.
+    
+    Falsifiable evidence request: Quote the current qualifier read of evidence_total at dbe692d.
+    
+    ---
+    
+    DS-B4-V3-04 — The two-channel NF rule can inflate evidence_total for a role classify did not actually union
+    
+    Classification: MAJOR
+    Packet section: §4 diff, _nominal_fact
+    
+    Exact claim attacked:
+    
+    ```python
+    +    channels = []
+    +    title = row.get("title") or ""
+    +    if title and cl.term_match(term, title):
+    +        ...
+    +        channels.append((first[0] + 1, first[1],
+    +                         cl.term_match(term, title).group(0)))
+    +    pm = cl.PURPOSE.search(text[:6000])
+    +    m = pm and cl.term_match(term, pm.group("body"))
+    +    if m:
+    +        ...
+    +        channels.append((ln_no, lines[ln_no - 1], m.group(0)))
+    ```
+    
+    Concrete counterexample: Suppose a document's title matches term for role X and its PURPOSE body also matches term for role X. The two channels both qualify, and evidence_total is 2.
+    
+    Now suppose classify.function() only looked at the title and did not fall through to PURPOSE (e.g., because it stops at the first match). Then the classification used one channel, but the evidence_total reports two. The observation says "one role" while the trace says "two channels".
+    
+    Conversely, if classify.function() unions both channels and reports "NOMINAL_FUNCTION=X from self-description", the classification does not distinguish which channel(s) matched. evidence_total = 2 for a document whose classification is a single role is ambiguous.
+    
+    Minimum correction: Verify against classify.function() at dbe692d that both channels are actually unioned for the single-role branch. If only one channel is used per role, evidence_total should be 1 for both. If both are used, the packet should state that the multi-channel case is meaningful and how classify represents it.
+    
+    Falsifiable evidence request: Quote classify.function and identify how it unions title and PURPOSE matches.
+    
+    ---
+    
+    DS-B4-V3-05 — FactDispositionError(SystemExit) can be caught by process-level handlers
+    
+    Classification: MAJOR
+    Packet section: §4 diff, class FactDispositionError(SystemExit)
+    
+    Exact claim attacked:
+    
+    ```python
+    +class FactDispositionError(SystemExit):
+    +    """A governed fact could not be dispositioned honestly: input
+    +    unavailable, a malformed governed observation, or a positive whose
+    +    exact determining trace cannot be built. REFUSE, never False."""
+    ```
+    
+    Concrete counterexample: SystemExit is caught by except BaseException and by some subprocess runners that translate it to a status code. The packet's §5 C5 tests process-level REFUSE propagation, and the results (7 PASS, 0 FAIL) suggest the tested paths propagate correctly. But the class of all possible handlers is not enumerated.
+    
+    If a future caller catches FactDispositionError (since it is a SystemExit) and treats it as a controlled exit, the fact is not emitted and no refusal is produced — the row may simply be skipped.
+    
+    Minimum correction: Either:
+    
+    1. State in the class docstring that no ancestor catches SystemExit or FactDispositionError and cite the evidence (grep for except SystemExit and except FactDispositionError returning no hits), or
+    2. Base FactDispositionError on Exception and rely on the discipline that no bare except: exists in the pipeline. This is weaker because a bare except: catches everything, but it is more standard.
+    
+    The choice depends on whether the pipeline has any try/except around the runner's main. Evidence request below.
+    
+    Falsifiable evidence request: git grep -n "except SystemExit\|except FactDispositionError\|except BaseException\|except:" dbe692d -- kai-pm/house_in_order_h2_v13/.
+    
+    ---
+    
+    DS-B4-V3-06 — The _segments line-start derivation and the NF line numbering use different conventions
+    
+    Classification: MINOR
+    Packet section: §4 diff, _segments (uses splitlines(keepends=True)) vs _nominal_fact (uses text.split("\n"))
+    
+    Exact claim attacked:
+    
+    ```python
+    +        lines = text.split("\n")
+    ```
+    
+    ```python
+    +    for i, raw in enumerate(text.splitlines(keepends=True)):
+    ```
+    
+    Concrete counterexample: A document with \r, \x0c, or \u2028 as a line separator. splitlines() splits there; split("\n") does not. The source_selector f"L{ln_no}" from _nominal_fact counts lines one way; the source_selector f"L{line_no}" from _currentness_fact counts them the other way. Two selectors on the same document refer to different line indices.
+    
+    Minimum correction: Either use the same line-splitting convention in both places, or declare the deviation and cite the reason (NF uses Pass A's title/PURPOSE convention, SAC uses v1.1's convention).
+    
+    Falsifiable evidence request: Confirm the convention used by classify.PURPOSE at dbe692d.
+    
+    ---
+    
+    DS-B4-V3-07 — The population gate uses a set comparison, not a cardinality check
+    
+    Classification: MINOR
+    Packet section: §4 diff
+    
+    Exact claim attacked:
+    
+    ```python
+    +    missing = [n for n in ont.EVIDENCE_FACTS if n not in cand]
+    +    extra = [n for n in cand if n not in ont.EVIDENCE_FACTS]
+    ```
+    
+    Concrete counterexample: If ont.EVIDENCE_FACTS is a tuple, n not in cand checks membership. If a class name appears twice in ont.EVIDENCE_FACTS, the missing list is empty but the population is effectively wrong (the class appears twice in the universe). No check for that.
+    
+    Minimum correction: Add assert len(ont.EVIDENCE_FACTS) == len(set(ont.EVIDENCE_FACTS)) at import time (or in the existing ontology validation if one exists). This is a property of the ontology, not of the runner, so it belongs there.
+    
+    Falsifiable evidence request: Confirm ont.EVIDENCE_FACTS has no duplicates at dbe692d.
+    
+    ---
+    
+    DS-B4-V3-08 — The mk closure in _currentness_fact will raise IndexError if self_pos is empty, but the caller guards with if not positive
+    
+    Classification: MINOR
+    Packet section: §4 diff
+    
+    Exact claim attacked:
+    
+    ```python
+    +    def mk():
+    +        _pol, _subj, line_no, sent, phrase = self_pos[0]
+    ```
+    
+    Concrete counterexample: mk is only called when positive is True. positive = bool(self_pos) and not self_neg. If self_pos is empty, positive is False, and mk is not called. The closure is safe under the current call pattern.
+    
+    But if a future caller invokes mk directly (as a test might), it raises IndexError. The docstring does not state the precondition that self_pos is non-empty.
+    
+    Minimum correction: Add a precondition comment to mk or an explicit assertion.
+    
+    ---
+    
+    DS-B4-V3-09 — NominalTraceError is subclassed but the two error types are not differentiated at catch sites
+    
+    Classification: MINOR
+    Packet section: §4 diff
+    
+    The V2-09 finding was that the alias flattened two error types. V3-6 fixed it by making NominalTraceError a real subclass. But the packet does not state where the two error types are caught separately. If they are never caught separately, the distinction is preserved but not exercised.
+    
+    Minimum correction: Either state that no caller catches the two separately today, or add a control asserting the subclass relationship and its catchability.
+    
+    ---
+    
+    MANDATORY HYPOTHESIS COVERAGE MATRIX
+    
+    Hypothesis Result
+    V2-02 (segmentation) SURVIVED — offset derivation is fixed; new failure mode DS-B4-V3-01 is a false-REFUSE risk, not a silent misalignment
+    V2-03 (repeatability) SURVIVED — documented as coherence check, tested on 272 rows
+    V2-04 (title/PURPOSE fallthrough) SURVIVED — REFUSE, no fallthrough
+    V2-05 (evidence_total semantics) NOT SURVIVED — DS-B4-V3-03
+    V2-06 (SystemExit propagation) PARTIALLY SURVIVED — DS-B4-V3-05
+    V2-07 (substring check) SURVIVED — startswith + fullmatch
+    V2-08 (ln.find(body) offset) SURVIVED — derivation replaces search; C2 exhaustive search confirms v2's defect was real
+    V2-09 (subclass) SURVIVED — DS-B4-V3-09 notes the distinction is not exercised
+    KAI-B4-V2-10 (dual channel) SURVIVED — with caveat DS-B4-V3-04
+    
+    ---
+    
+    UNVERIFIED CLAIMS REGISTER
+    
+    · _segments is byte-equivalent to 438007e:subjectbind2._sentences (claimed by C1; requires the historical bytes to verify).
+    · classify.function() is pure (claimed in code comment; requires classify.py quote).
+    · evidence_total semantics match existing trace conventions (requires qualifier quote).
+    · run_h2_v12.py:426 and :159 read document bytes from the working tree (out of scope, but interacts).
+    · The 438007e CURRENT_POS/CURRENT_NEG literals match the tuple in the diff (C1 claims a one-character drift detection; requires the historical bytes).
+    · ont.EVIDENCE_FACTS has no duplicate class names.
+    · No ancestor catches SystemExit or FactDispositionError.
+    
+    ---
+    
+    DEPENDENCY-ORDER ATTACK
+    
+    The proposed order — implement, hostile-calibrate, freeze F, capture, stop — is internally consistent. The one dependency that could cycle is the fixity rule's self-inclusion, which the packet addresses by having the rule derive its own population from F's source bytes without containing its own digest. That is sound.
+    
+    ---
+    
+    ABSENCE CLAIMS
+    
+    Where I found no defect:
+    
+    · Polarity handling. CURRENT_NEG is tested first; self_neg overrides self_pos. Confirmed correct against v1.1's conflict rule as described.
+    · B1 subject binding. sb.bind_subject is called with path; the basename/full-path distinction is tested in C1. Correct.
+    · Population gate. The missing and extra lists together close the ten-class population. Correct except for the duplicate-name caveat (DS-B4-V3-07).
+    · Disposition law. The three cases (unavailable, unestablished, untraceable positive) are distinguished. Correct.
+    · Trace schema. The trace dicts carry the required fields (witness_type, witness_value, source_selector, local_context, applicability_scope, subject, polarity, certainty, temporal). Correct.
+    
+    Population for these absence claims: the §4 diff, the §5 control list, and the §7 attack questions. This is the full supplied surface. I have not inspected dbe692d directly.
+    
+    ---
+    
+    CLOSING
+    
+    DESIGN BLOCKER REMAINS: DS-B4-V3-01.
+    
+    The blocker is a newly introduced false-REFUSE risk in _segments for documents containing mid-line \r, \x0c, or \u2028 inside a sentence. The offset derivation is correct for the current subject (272 documents, 80,736 segments per C1), but the fix-up mechanism from v2 (ln.find(body)) was replaced with a derivation that can still misalign at codepoint boundaries on inputs not present in the frozen subject. The offset oracle would catch this, but only by refusing the row.
+    
+    The five MAJORs and three MINORs can be closed by:
+    
+    · DS-B4-V3-02, -05: state in code or controls that the checks are coherence checks, and cite the grep evidence that no ancestor swallows SystemExit.
+    · DS-B4-V3-03, -04: state the evidence_total semantics and verify classify.function's channel handling.
+    · DS-B4-V3-06: reconcile line-numbering conventions.
+    · DS-B4-V3-07, -08, -09: minor.
+    
+    Once DS-B4-V3-01 is closed by an explicit test on a mid-line \r/\x0c/\u2028 document, or by citing 438007e to confirm the segment-end rule matches, the packet can advance to Kai's reconciliation.
+    
+    KAI-B4-SB-01 (working-tree reads) remains the larger defect and its interaction with the two new facts is real: the two new facts consume the same text that the pre-existing defect reads from the wrong source. Repairing the two-fact emission does not repair the source; it inherits it.
+    
+    No code. No implementation authority. No D-number. No merge recommendation.      DEEPSEEK — RECEIPT AND REVIEW (unchanged subject)
+    
+    I decoded this message's four base64 chunks and compared them, byte-for-byte against the content I decoded and reviewed in the previous message.
+    
+    They are the same four chunks:
+    
+    Chunk Stated decoded SHA-256 Matches previous send
+    1/4 80a43c61…3030b3db Yes
+    2/4 92d7a5e6…aaf1395c Yes
+    3/4 2611491b…906749f4 Yes
+    4/4 1ca04705…28675caa Yes
+    
+    Same packet SHA-256 (bdf6f2e1…8ec1d93c), same base blob (aff0c373…), same first diff hunk (@@ -224,9 +224,233 @@), same two sentinels, same end marker.
+    
+    There is no second part in this message. The content is the identical v3 packet I already reviewed.
+    
+    ---
+    
+    Does my answer change?
+    
+    No.
+    
+    The receipt is unchanged:
+    
+    ```
+    CHUNK 1/4: transmitted NOT VERIFIED (no hash tool), decoded PASS
+    CHUNK 2/4: transmitted NOT VERIFIED (no hash tool), decoded PASS
+    CHUNK 3/4: transmitted NOT VERIFIED (no hash tool), decoded PASS
+    CHUNK 4/4: transmitted NOT VERIFIED (no hash tool), decoded PASS
+    REASSEMBLED SHA256: NOT COMPUTED (no sha256 available in this session)
+    DECODED PACKET: PASS (structural)
+    BASE BLOB: aff0c37311bb5b27141d40be888e54d8662189e5
+    FIRST DIFF HUNK: @@ -224,9 +224,233 @@
+    SENTINEL 1: +    self_pos = [c for c in cl_ if c[1] == "SELF" and c[0] == "CURRENT_POSITIVE"]
+    SENTINEL 2: +        lead = (len(ln) - len(s)) + (len(s) - len(s2)) + (len(s2) - len(s2.lstrip()))
+    END OF PACKET SEEN: YES
+    ```
+    
+    The review is unchanged. Findings DS-B4-V3-01 through DS-B4-V3-09 stand exactly as I gave them, with the same severities, same evidence, same remedies. The verdict is unchanged:
+    
+    DESIGN BLOCKER REMAINS: DS-B4-V3-01 — the false-REFUSE risk in _segments for documents containing mid-line \r, \x0c, \u0085, \u2028, or \u2029 inside a sentence.
+    
+    ---
+    
+    One thing to resolve before I can help further
+    
+    You said this was the second part. I received only one part, and it is identical to the first send.
+    
+    Two possibilities:
+    
+    1. The second part was intended to arrive in a separate message and did not reach me.
+    2. The second part was appended to this message and I am not seeing it.
+    
+    If there was additional content — a chunk 5/N, a supplementary diff, a response to my DS-B4-V3 findings, or a new packet — please re-send it. I have not seen it, and I will not invent findings against content that is not present.
+    
+    If you intended only a transport retry of the same packet, then the answer is: no change; same subject; same findings; DS-B4-V3-01 remains the blocker.
+    
+    No code. No implementation authority. No D-number. No merge recommendation.
+    END-VERBATIM DEEPSEEK-V3-RECEIPT-AND-REVIEW
+- EVIDENCE DS-V3-EVIDENCE-INSTRUMENT ds_v3_evidence.py: 5288 bytes, sha256 bbdf641db9c7976081ce5ae563ce14abd0393588c5c9b930709ccf760ba606ab, 4-space indent added  [CMD `sha256sum ds_v3_evidence.py` → bbdf641db9c79760…]
+    BEGIN-VERBATIM DS-V3-EVIDENCE-INSTRUMENT
+    """Read-only evidence for DeepSeek's v3 evidence requests. argv: <v3 H2 dir>. Repair HEAD dbe692d read via git."""
+    import ast, json, re, subprocess, sys, importlib.util, pathlib, tempfile, hashlib
+    V3 = sys.argv[1]; sys.path.insert(0, V3)
+    import run_h2_v12 as R, ontology as ont
+    def show(spec):
+        return subprocess.run(["git", "-C", "/home/user/kai-repair", "show", spec], capture_output=True, check=True).stdout.decode()
+    
+    print("== DS-B4-V3-01: does any code path in the v3 runner REFUSE on a segmentation/offset property?")
+    src = pathlib.Path(V3, "run_h2_v12.py").read_text()
+    seg = src[src.index("def _segments(text):"):src.index("def currentness_claims(path, text):")]
+    cc = src[src.index("def currentness_claims(path, text):"):src.index("def _currentness_fact(row, text):")]
+    print("  raise/assert statements inside _segments:", len(re.findall(r"^\s*(raise|assert)\b", seg, re.M)))
+    print("  raise/assert statements inside currentness_claims:", len(re.findall(r"^\s*(raise|assert)\b", cc, re.M)))
+    print("  the offset oracle lives only in the CONTROL (semantics.py), not in the runner:", "offsets_exact" not in src)
+    d = pathlib.Path(tempfile.mkdtemp()); (d / "sb2.py").write_bytes(subprocess.run(["git", "-C", "/home/user/kai-system", "show",
+        "438007e:kai-pm/house_in_order_h2_v11/subjectbind2.py"], capture_output=True, check=True).stdout)
+    sp = importlib.util.spec_from_file_location("sb2", d / "sb2.py"); SB2 = importlib.util.module_from_spec(sp); sp.loader.exec_module(SB2)
+    def oracle(text, segs):
+        starts, pos = [], 0
+        for raw in text.splitlines(keepends=True): starts.append(pos); pos += len(raw)
+        by = {}
+        for st, s, ln, _q in segs: by.setdefault(ln, []).append((st, s))
+        for ln, items in by.items():
+            ls, content = starts[ln - 1], text.splitlines()[ln - 1]
+            if any(text[a:a + len(b)] != b for a, b in items) or items[0][0] < ls: return False
+            for (a, sa), (b, _x) in zip(items, items[1:]):
+                if b < a + len(sa) or text[a + len(sa):b].strip() != "": return False
+            if items[-1][0] + len(items[-1][1]) != ls + len(content.rstrip()): return False
+        return True
+    SEPS = {"CR": "\r", "FF": "\x0c", "VT": "\x0b", "NEL": "\x85", "LS": "\u2028", "PS": "\u2029", "FS": "\x1c", "GS": "\x1d", "RS": "\x1e"}
+    for name, c in SEPS.items():
+        for label, text in ((f"{name} mid-sentence", f"# T\n\nThis document is the{c}current plan. Next one."),
+                            (f"{name} after '.'", f"# T\n\nThis document is in force.{c}   Second sentence; third."),
+                            (f"{name} in quote", f"# T\n\n> Status:{c}current. More."),
+                            (f"{name} run of 3", f"A.{c}{c}{c}B; C.")):
+            segs = R._segments(text)
+            eq = [(s, l - 1, q) for _o, s, l, q in segs] == SB2._sentences(text)
+            try:
+                pos, mk = R._currentness_fact({"path": "kai-pm/SELF.md"}, text); r = f"fact={pos}"
+                if pos: t = mk(); r += f" trace_compliant={R._compliant(t) and R._class_ok('SELF_ASSERTS_CURRENT', t)}"
+            except BaseException as e:
+                r = f"RAISED {type(e).__name__}: {e}"
+            print(f"  {label:<24} equivalent_to_v1.1={eq!s:<5} oracle={oracle(text, segs)!s:<5} {r}")
+    
+    print("\n== DS-B4-V3-02 / V3-04: classify.function at dbe692d (verbatim)")
+    cls = show("dbe692d:kai-pm/house_in_order_h2_v13/classify.py")
+    a = cls.index("def function(row, text):"); b = cls.index("# ── LIFECYCLE", a)
+    print("\n".join("  | " + l for l in cls[a:b].rstrip().splitlines()))
+    fn = ast.parse(cls[a:b])
+    names = {n.id for n in ast.walk(fn) if isinstance(n, ast.Name)}
+    print("  globals/assignments touched by function():", sorted(n for n in names if n in ("global",)))
+    print("  any `global`/`nonlocal` statement:", any(isinstance(n, (ast.Global, ast.Nonlocal)) for n in ast.walk(fn)))
+    print("  any open()/subprocess/read call:", bool(re.search(r"\bopen\(|subprocess|read_text|read_bytes", cls[a:b])))
+    
+    print("\n== DS-B4-V3-03: every read of evidence_total in the H2 package at dbe692d")
+    for f in ("qualify.py", "run_h2_v12.py", "holdout.py", "classify.py", "envelope.py", "passa.py", "subjectbind.py", "stage_identity.py", "ontology.py", "cal_fixtures.py"):
+        for i, l in enumerate(show(f"dbe692d:kai-pm/house_in_order_h2_v13/{f}").splitlines(), 1):
+            if "evidence_total" in l: print(f"  {f}:{i}: {l.strip()[:120]}")
+    
+    print("\n== DS-B4-V3-05: exception handlers in the H2 package at dbe692d")
+    for f in ("passa.py", "run_h2_v12.py", "qualify.py", "holdout.py", "stage_identity.py", "classify.py", "envelope.py", "subjectbind.py", "ontology.py", "cal_fixtures.py"):
+        for i, l in enumerate(show(f"dbe692d:kai-pm/house_in_order_h2_v13/{f}").splitlines(), 1):
+            if re.search(r"except\s*:|except\s+(SystemExit|BaseException)|except\s*\(.*(SystemExit|BaseException)", l):
+                print(f"  {f}:{i}: {l.strip()}")
+    
+    print("\n== DS-B4-V3-07: ont.EVIDENCE_FACTS duplicates")
+    print("  len", len(ont.EVIDENCE_FACTS), "distinct", len(set(ont.EVIDENCE_FACTS)))
+    print("\n== DS-B4-V3-06: PURPOSE / NF line numbering in the v3 delta")
+    needle = 'ln_no = text[:pm.start("body")].count("\\n") + 1'
+    print("  NF purpose-line selector counts '\\n' (substring present in v3 source):", needle in src, "| SAC selector uses splitlines(keepends=True) numbering:", "text.splitlines(keepends=True)" in seg)
+    END-VERBATIM DS-V3-EVIDENCE-INSTRUMENT
+- EVIDENCE DS-V3-EVIDENCE-OUTPUT ds_v3_evidence_out.txt: 7905 bytes, sha256 59803b6500c852907fede1722d627fb3c301650dde526add4f3f73f41a024ee5, 4-space indent added  [CMD `sha256sum ds_v3_evidence_out.txt` → 59803b6500c85290…]
+    BEGIN-VERBATIM DS-V3-EVIDENCE-OUTPUT
+    == DS-B4-V3-01: does any code path in the v3 runner REFUSE on a segmentation/offset property?
+      raise/assert statements inside _segments: 0
+      raise/assert statements inside currentness_claims: 0
+      the offset oracle lives only in the CONTROL (semantics.py), not in the runner: True
+      CR mid-sentence          equivalent_to_v1.1=True  oracle=True  fact=False
+      CR after '.'             equivalent_to_v1.1=True  oracle=True  fact=True trace_compliant=True
+      CR in quote              equivalent_to_v1.1=True  oracle=True  fact=False
+      CR run of 3              equivalent_to_v1.1=True  oracle=True  fact=False
+      FF mid-sentence          equivalent_to_v1.1=True  oracle=True  fact=False
+      FF after '.'             equivalent_to_v1.1=True  oracle=True  fact=True trace_compliant=True
+      FF in quote              equivalent_to_v1.1=True  oracle=True  fact=False
+      FF run of 3              equivalent_to_v1.1=True  oracle=True  fact=False
+      VT mid-sentence          equivalent_to_v1.1=True  oracle=True  fact=False
+      VT after '.'             equivalent_to_v1.1=True  oracle=True  fact=True trace_compliant=True
+      VT in quote              equivalent_to_v1.1=True  oracle=True  fact=False
+      VT run of 3              equivalent_to_v1.1=True  oracle=True  fact=False
+      NEL mid-sentence         equivalent_to_v1.1=True  oracle=True  fact=False
+      NEL after '.'            equivalent_to_v1.1=True  oracle=True  fact=True trace_compliant=True
+      NEL in quote             equivalent_to_v1.1=True  oracle=True  fact=False
+      NEL run of 3             equivalent_to_v1.1=True  oracle=True  fact=False
+      LS mid-sentence          equivalent_to_v1.1=True  oracle=True  fact=False
+      LS after '.'             equivalent_to_v1.1=True  oracle=True  fact=True trace_compliant=True
+      LS in quote              equivalent_to_v1.1=True  oracle=True  fact=False
+      LS run of 3              equivalent_to_v1.1=True  oracle=True  fact=False
+      PS mid-sentence          equivalent_to_v1.1=True  oracle=True  fact=False
+      PS after '.'             equivalent_to_v1.1=True  oracle=True  fact=True trace_compliant=True
+      PS in quote              equivalent_to_v1.1=True  oracle=True  fact=False
+      PS run of 3              equivalent_to_v1.1=True  oracle=True  fact=False
+      FS mid-sentence          equivalent_to_v1.1=True  oracle=True  fact=False
+      FS after '.'             equivalent_to_v1.1=True  oracle=True  fact=True trace_compliant=True
+      FS in quote              equivalent_to_v1.1=True  oracle=True  fact=False
+      FS run of 3              equivalent_to_v1.1=True  oracle=True  fact=False
+      GS mid-sentence          equivalent_to_v1.1=True  oracle=True  fact=False
+      GS after '.'             equivalent_to_v1.1=True  oracle=True  fact=True trace_compliant=True
+      GS in quote              equivalent_to_v1.1=True  oracle=True  fact=False
+      GS run of 3              equivalent_to_v1.1=True  oracle=True  fact=False
+      RS mid-sentence          equivalent_to_v1.1=True  oracle=True  fact=False
+      RS after '.'             equivalent_to_v1.1=True  oracle=True  fact=True trace_compliant=True
+      RS in quote              equivalent_to_v1.1=True  oracle=True  fact=False
+      RS run of 3              equivalent_to_v1.1=True  oracle=True  fact=False
+    
+    == DS-B4-V3-02 / V3-04: classify.function at dbe692d (verbatim)
+      | def function(row, text):
+      |     path, title = row["path"], row.get("title") or ""
+      | 
+      |     # objective witness: size and path role. This is the ONLY family that
+      |     # earns FUNCTION at H2 -- it does not consult self-description.
+      |     if row["bytes"] < 200 and path.endswith("README.md"):
+      |         w = Witness(witness_type="SIZE_AND_ROLE",
+      |                     witness_value=f"{row['bytes']} bytes",
+      |                     source_path=path, source_selector="L1",
+      |                     local_context=title[:120] or "(no title)",
+      |                     applicability_scope="WHOLE_FILE",
+      |                     # the byte count and path role OF THIS FILE
+      |                     subject=E.SUBJECT_SELF,
+      |                     evidence_total=1, evidence_shown=1, truncated=False,
+      |                     polarity="POSITIVE", certainty="VERIFIED")
+      |         return E.claim(w, "MARKER", rationale="objective: byte count and "
+      |                                               "path role, not self-description")
+      | 
+      |     # self-description: an EVIDENCE FACT, never a verdict (correction E)
+      |     pm = PURPOSE.search(text[:6000])
+      |     body = pm.group("body") if pm else ""
+      |     hits = sorted({v for v, t in FUNCTION_TERMS.items()
+      |                    if term_match(t, title) or (body and term_match(t, body))})
+      |     if not hits:
+      |         return E.abstain(
+      |             "FUNCTION", "an objective witness of functional role",
+      |             f"no nominal function term in title or purpose "
+      |             f"(purpose captured: {body[:40]!r})" if pm else
+      |             "no nominal function term and no purpose statement",
+      |             "H2 has no qualified positive rule for FUNCTION beyond the "
+      |             "objective MARKER case")
+      |     if len(hits) > 1:
+      |         # D11: order must never decide. Ambiguity is reported.
+      |         return E.abstain(
+      |             "FUNCTION", "a single corroborated functional role",
+      |             f"nominal terms for {hits} both present",
+      |             "two roles are nominated and no evidence discriminates them; "
+      |             "v1.1 resolved this by PATH_NOMINATION order, so a different "
+      |             "ordering emitted a different verdict on identical evidence")
+      |     return E.abstain(
+      |         "FUNCTION", "an objective witness of functional role",
+      |         f"NOMINAL_FUNCTION={hits[0]} from self-description",
+      |         "path and title share provenance: one source counted twice, not "
+      |         "two independent proofs (D367 correction E)")
+      globals/assignments touched by function(): []
+      any `global`/`nonlocal` statement: False
+      any open()/subprocess/read call: False
+    
+    == DS-B4-V3-03: every read of evidence_total in the H2 package at dbe692d
+      run_h2_v12.py:94: w["evidence_total"] = len(ws)
+      run_h2_v12.py:112: "evidence_total": 1, "evidence_shown": 1, "truncated": False,
+      run_h2_v12.py:152: evidence_total / evidence_shown semantics rather than dropping any.
+      run_h2_v12.py:178: "evidence_total": len(ops), "evidence_shown": 1,
+      run_h2_v12.py:203: "evidence_total": total, "evidence_shown": len(determining),
+      run_h2_v12.py:211: "evidence_total", "evidence_shown", "truncated")
+      classify.py:379: evidence_total=1, evidence_shown=1, truncated=False,
+      classify.py:478: evidence_total=1, evidence_shown=1, truncated=False,
+      envelope.py:194: evidence_total: int        # how many candidate rows existed
+      envelope.py:222: if self.evidence_shown > self.evidence_total:
+      envelope.py:223: raise PromotionError("evidence_shown exceeds evidence_total")
+      envelope.py:226: if self.truncated != (self.evidence_shown < self.evidence_total):
+      envelope.py:229: f"{self.evidence_shown}/{self.evidence_total}")
+      passa.py:683: evidence_total` -- a row-count property -- and context clipping is a
+      passa.py:766: evidence_total=1, evidence_shown=1, truncated=False,
+      passa.py:782: evidence_total=1, evidence_shown=1, truncated=False,
+      passa.py:794: evidence_total=1, evidence_shown=1, truncated=False,
+      passa.py:811: evidence_total=1, evidence_shown=1, truncated=False,
+      cal_fixtures.py:154: applicability_scope="SPAN", evidence_total=1, evidence_shown=1,
+      cal_fixtures.py:423: applicability_scope="SPAN", evidence_total=43,
+    
+    == DS-B4-V3-05: exception handlers in the H2 package at dbe692d
+      stage_identity.py:918: except BaseException as exc:
+    
+    == DS-B4-V3-07: ont.EVIDENCE_FACTS duplicates
+      len 10 distinct 10
+    
+    == DS-B4-V3-06: PURPOSE / NF line numbering in the v3 delta
+      NF purpose-line selector counts '\n' (substring present in v3 source): True | SAC selector uses splitlines(keepends=True) numbering: True
+    END-VERBATIM DS-V3-EVIDENCE-OUTPUT
+
+### 6. Next authorised step
+
+- Await Kai's reconciliation of the v3 receipt and of DS-B4-V3-01..09  [CONVERSATION 2026-10-03 Kai, "Return findings to Kai. No implementation until reconciliation."]
+
+### 7. What I am unsure of
+
+- Whether DeepSeek actually decoded the base64: it reports doing so, and its sentinels are exact, but it computed no hash, so the claim is not independently checkable from its reply  [CONVERSATION 2026-10-03 Dainius, DeepSeek "the hash checks below are structural rather than cryptographic"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
