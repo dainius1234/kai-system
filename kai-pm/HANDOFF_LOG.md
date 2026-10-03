@@ -20522,3 +20522,199 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-03T02:40:06Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-03T02:40:06Z  [CMD `date -u +%FT%TZ` → 2026-10-03T02:40:06Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 86253e28665bfdcbbbc39687821b798da478f6fa  [CMD `git rev-parse HEAD` → 86253e28665bfdcbbbc39687821b798da478f6fa]
+- tree: 2ad5e049c46aa61154dd41396470fac3ad94d2a1  [CMD `git rev-parse HEAD^{tree}` → 2ad5e049c46aa61154dd41396470fac3ad94d2a1]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 86253e28665bfdcbbbc39687821b798da478f6fa  [CMD `git ls-remote --heads origin` → 86253e28665bfdcbbbc39687821b798da478f6fa]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: dbe692d9c3f83020176aeda00a0f399ce5f020f8  [CMD `git ls-remote --heads origin` → dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 50  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 50]
+
+### 1. The four states
+
+- physical: repair branch unchanged at dbe692d; SB-01 v1 unchanged in scratch (v4 base d3ee165f…, delta ba61127d…, composite a39359bc…)  [CMD `git ls-remote --heads origin` → claude/d379-repair-eb52f73 dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- authorised: preserve this reconciliation; then ONLY the read-only exact-subject strict UTF-8 population measurement with a known-negative calibration; STOP and report  [CONVERSATION 2026-10-03 Kai, "Then perform only the UTF-8 population measurement and its known-negative calibration. STOP and report the exact evidence."]
+- evidence: Kai's reconciliation verbatim in section 2  [CMD `sha256sum kai_sb01_final_reconciliation.txt` → 4cc9d60ed6fe9ef9…]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-03 · SB-01 v1 FINAL RECONCILIATION AFTER ENTRY 50: DS-SB01-V1-01/02/08 CLOSED, no code change, no broad except Exception; V1-03 bounded residual; V1-04 pre-existing text-model boundary, closure conditional on a read-only exact-subject strict UTF-8 measurement of P = P_DOC ∪ P_READER derived from the frozen Pass-A object (missing_blob 0, invalid_utf8 0, plus an in-memory known-negative; any failure STOP); V1-05 closed; V1-06 separate qualification-layer observation; V1-07 closed; V1-09 no change; V1-10 closed; V1-11 closed for SB-01, stale-output attack preserved for the full matrix; V1-12 review limitation. No DeepSeek MAJOR or BLOCKER survives. SB-01 v1 ACCEPTED and frozen (base d3ee165f…, delta ba61127d…, composite a39359bc…) conditional only on that measurement; no SB-01 v2; handoff preservation, not a D-number. Verbatim below, 7828 bytes, sha256 4cc9d60ed6fe9ef999a471367ed5dc71d73c2b3e601a6a3b8f16b2f172a297e4, final LF False, 4-space indent added ⚠ UNBANKED  [CONVERSATION 2026-10-03 Kai via Dainius, "KAI → ORION — SB-01 v1 FINAL RECONCILIATION AFTER ENTRY 50"]
+    BEGIN-VERBATIM KAI-SB01-V1-FINAL-RECONCILIATION
+    Good. Do not send Orion my previous message now. His entry 50 gives stronger evidence than I had when I wrote it, so use the updated ruling below instead.
+    
+    I independently checked 86253e28665bfdcbbbc39687821b798da478f6fa: signed/verified, handoff-only +467/−0; the repair branch is still exactly dbe692d9c3f83020176aeda00a0f399ce5f020f8. His exception injection and calibrated swallowing mutant materially close DeepSeek’s two MAJOR hypotheses rather than merely arguing against them.
+    
+    Send Orion this:
+    
+    KAI → ORION — SB-01 v1 FINAL RECONCILIATION AFTER ENTRY 50
+    
+    Entry 50 86253e28665bfdcbbbc39687821b798da478f6fa independently checked. Repair branch remains unchanged at:
+    
+    dbe692d9c3f83020176aeda00a0f399ce5f020f8
+    
+    DeepSeek receipt is accepted. Your additional read-only evidence strengthens the reconciliation.
+    
+    DS-SB01-V1-01 / V1-02 / V1-08 — CLOSED, no code change.
+    
+    The real composite has no ancestor catching SystemExit, BaseException, or a bare exception around the subject-read/evidence path. More importantly, your governed injection probe establishes the consequence rather than merely inspecting syntax:
+    
+    * ValueError / KeyError / UnicodeError / RuntimeError on the main document → rc 1, no artefact.
+    * ValueError / TypeError on the reader-source path → rc 1, no artefact.
+    * no-fault control → rc 0, artefact.
+    
+    The separately governed mutant, with the reader-source read moved back inside the abstaining try, swallowed the two reader-path injections and was detected. That is a valid can-fail calibration of the exact concern.
+    
+    Therefore the invariant we care about is satisfied: an unexpected non-OSError may produce an ordinary traceback rather than the named SourceBindingError, but it does not become success, abstention or written evidence. Do not add a broad except Exception; that would hide programming faults behind a source-binding label.
+    
+    V1-03 — BOUNDED RESIDUAL, not SB-01 blocker.
+    
+    _reader_trace/opscan line-model divergence for exotic separators remains a pre-existing latent locator issue. The frozen subject measurement found 0/615 applicable source files containing the relevant separators. Preserve the observation; do not alter SB-01.
+    
+    V1-04 — PRE-EXISTING TEXT-MODEL BOUNDARY; one final exact-subject measurement required.
+    
+    passa.make_verified_reader() first verifies the exact filesystem bytes against the frozen blob and then performs:
+    
+    data.decode(errors="ignore")
+    
+    SB-01 deliberately reuses that existing Pass-A text model. However, invalid UTF-8 could theoretically remove bytes and create a text token/context not contiguous in the underlying blob. We therefore require one exact, read-only population measurement before Dainius is asked for implementation authority.
+    
+    Derive the actual classification subject-read population mechanically from the frozen Pass-A object and accepted composite semantics, not from a hand-maintained path list:
+    
+    * P_DOC = every row["path"] classified by the row loop.
+    * P_READER = every reader source that _reader_trace can actually select under the frozen Pass-A rows: for rows with reader_ops, apply the same deterministic ordering used by _reader_trace and take the selected source.
+    * P = P_DOC ∪ P_READER.
+    
+    Report:
+    
+    |P_DOC|, |P_READER|, overlap, |P|, duplicate reconciliation, paths absent from frozen subject, strict UTF-8 successes/failures.
+    
+    For each p ∈ P, read the Git blob bytes at pa["subject"], not working-tree text, and execute strict UTF-8 decoding:
+    
+    blob.decode("utf-8", errors="strict")
+    
+    Expected for closure:
+    
+    missing_blob = 0
+    invalid_utf8 = 0
+    
+    Add a known-negative calibration without modifying the repository: feed the same detector an in-memory byte sequence containing invalid UTF-8 and prove it reports failure. Do not alter an expectation or source file to obtain green.
+    
+    If any actual frozen member fails strict UTF-8 or is missing: STOP and return to Kai.
+    
+    If all pass, errors="ignore" is mechanically inert for the exact D379 classification consumption population, and V1-04 is closed for this subject.
+    
+    V1-05 — CLOSED, no change.
+    
+    Raw CR in local_context is legitimate exact-subject content. JSON serialisation escapes it and deserialisation restores it; no current qualification rule requires LF-only context. Display normalisation, if ever needed, must remain presentation-only.
+    
+    V1-06 — SEPARATE QUALIFICATION-LAYER OBSERVATION, not SB-01.
+    
+    The qualifier checks the D367 trace schema/class; it does not independently Git-resolve every selector/context. SB-01 repairs the demonstrated producer-side false locator. Do not expand this tranche into qualify.py. Preserve Q8 for later architecture/qualification review.
+    
+    V1-07 — CLOSED.
+    
+    Production main always passes the verified reader. The three old external evidence-script callers you found do not pass the already-required v4 text= input and therefore refuse before this new reader path becomes relevant. They do not establish an SB-01 bypass.
+    
+    V1-09 — NO CHANGE.
+    
+    A truthy non-callable reader is a programming error. The production reader is the locally-created make_verified_reader closure. A TypeError aborts rather than generating evidence.
+    
+    V1-10 — CLOSED.
+    
+    pa is consumed from exact Pass-A artifact bytes through the original Stage-B binding and independently supplied binding digest; its provenance is verified and required complete before use. Main then requires:
+    
+    HEAD == pa["subject"] == desc["subject"]["commit"]
+    
+    The frozen subject is therefore not defined by an untrusted free pa["subject"] value.
+    
+    V1-11 — CLOSED for SB-01 refusal; preserve stale-output attack for full matrix.
+    
+    The sole classification result write occurs after the complete row loop. A subject-binding refusal before/during any row cannot create a partial result from that invocation.
+    
+    This does not prove that orchestration can never mistake a stale result left from an earlier invocation for a new one. Preserve that as a later full D379 stop-chain hostile case; do not widen SB-01.
+    
+    V1-12 — REVIEW LIMITATION ONLY.
+    
+    The scanner/probe/harness evidence remains producer evidence with zero admission weight. Its calibrated failures are useful defect evidence, but it does not replace the later governed d379_controls.py matrix.
+    
+    ⸻
+    
+    KAI RULING
+    
+    No DeepSeek MAJOR or BLOCKER survives reconciliation.
+    
+    SB-01 v1 is accepted and frozen as the source-binding design/code subject, conditional only on the read-only exact-subject UTF-8 population measurement above.
+    
+    Do not create SB-01 v2.
+    
+    Freeze unchanged:
+    
+    accepted v4 base
+    d3ee165f706e9f4048434031e003e6c7a97159ae2e2217d0c8cdd7ebd69861b6
+    
+    SB-01 v1 delta
+    ba61127dacdcc140e157ce6ce36b5907686ad52384b6476ae3319606771127ed
+    
+    proposed composite
+    a39359bc383c8f6f6ca4540c10474fcb094c990f7b8e8091792262436c7a4cfe
+    
+    First preserve this reconciliation in the append-only handoff under R19, explicitly marked ⚠ UNBANKED. This is handoff preservation, not a new D-number / DECISIONS.md authority.
+    
+    Then perform only the UTF-8 population measurement and its known-negative calibration. STOP and report the exact evidence.
+    
+    No repair-branch mutation. No implementation. No d379_controls.py rebuild/full hostile matrix, no incident allocation, no D390 replay, no fixity F, no capture, candidate, holdout, blind 40, Item 8 or PR #122 merge.
+    
+    One useful thing Orion’s new work proved is that DeepSeek’s strongest objection was real as an attack hypothesis: when Orion deliberately moved the reader back inside the abstaining try, the failure was swallowed. The accepted composite survives because the read is outside that boundary. That is much stronger than merely saying “I inspected it and it looks fine.”
+    
+    After Orion returns the UTF-8 population result, do not let him implement automatically. If that measurement closes cleanly, I’ll give you the exact bounded implementation grant for you, Dainius, to approve.
+    END-VERBATIM KAI-SB01-V1-FINAL-RECONCILIATION
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: read-only exact-subject strict UTF-8 population measurement and its in-memory known-negative calibration; STOP and report  [CONVERSATION 2026-10-03 Kai, "Then perform only the UTF-8 population measurement and its known-negative calibration."]
+- HELD: implementation; Kai will draft a bounded implementation grant for Dainius only after the measurement closes cleanly  [CONVERSATION 2026-10-03 Kai, "After Orion returns the UTF-8 population result, do not let him implement automatically."]
+- FORBIDDEN: repair-branch mutation, implementation, d379_controls.py rebuild/full hostile matrix, incident allocation, D390 replay, fixity F, capture, candidate, holdout, blind 40, Item 8, PR #122 merge  [CONVERSATION 2026-10-03 Kai, "No repair-branch mutation. No implementation."]
+
+### 4. Open questions
+
+- Kai's premise "signed/verified" for 86253e2 is not verifiable here (git reports gpg.ssh.allowedSignersFile is not configured); his "+467/−0, handoff-only" premise matches: bf608b8..86253e2 changes kai-pm/HANDOFF_LOG.md only, 467 added, 0 removed — owner: Kai  [CMD `git diff --numstat bf608b8 86253e2` → 467 0 kai-pm/HANDOFF_LOG.md]
+
+### 5. Incidents and corrections
+
+- None this step  [CMD `handoff.py check` → findings=0]
+
+### 6. Next authorised step
+
+- The strict UTF-8 measurement over P derived from the frozen Pass-A object, blob bytes at pa["subject"], with an in-memory invalid-UTF-8 known-negative; STOP and report  [CONVERSATION 2026-10-03 Kai, "For each p ∈ P, read the Git blob bytes at pa[\"subject\"], not working-tree text"]
+
+### 7. What I am unsure of
+
+- Which artefact is "the frozen Pass-A object": no production Pass A exists for D379 (production Stage A is forbidden); the available frozen Pass A is the v1.2 object used by the frozen regression; to be stated with its identity in the measurement  [CONVERSATION 2026-10-03 Kai, "Derive the actual classification subject-read population mechanically from the frozen Pass-A object"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
