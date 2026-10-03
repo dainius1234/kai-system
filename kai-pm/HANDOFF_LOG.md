@@ -20055,3 +20055,470 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-03T02:31:54Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-03T02:31:54Z  [CMD `date -u +%FT%TZ` → 2026-10-03T02:31:54Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: bf608b8314275632859ae11388da659281a63b90  [CMD `git rev-parse HEAD` → bf608b8314275632859ae11388da659281a63b90]
+- tree: fa740803a1bccfea68845439119ac5c186300323  [CMD `git rev-parse HEAD^{tree}` → fa740803a1bccfea68845439119ac5c186300323]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/project-rework-plan-pgvp35: bf608b8314275632859ae11388da659281a63b90  [CMD `git ls-remote --heads origin` → bf608b8314275632859ae11388da659281a63b90]
+- remote:claude/d379-repair-eb52f73: dbe692d9c3f83020176aeda00a0f399ce5f020f8  [CMD `git ls-remote --heads origin` → dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 49  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 49]
+
+### 1. The four states
+
+- physical: repair branch unchanged at dbe692d; SB-01 v1 unchanged in scratch (composite a39359bc…); a calibration mutant (inst5mut) exists in scratch only  [CMD `git ls-remote --heads origin; sha256sum inst5/…/run_h2_v12.py` → dbe692d9c3f8…; a39359bc…]
+- authorised: preserve DeepSeek's SB-01 review; await Kai's reconciliation; no implementation  [CONVERSATION 2026-10-03 Dainius, "Deep seek ( gpt message will follow next)"]
+- evidence: DeepSeek's receipt and review verbatim, plus read-only exception-propagation evidence, in section 5  [CMD `sha256sum deepseek_sb01_v1_review.txt` → f3df08eb6305ea12…]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- None; DeepSeek is a reviewer, and Kai's reconciliation is announced, not received  [CONVERSATION 2026-10-03 Dainius, "Deep seek ( gpt message will follow next)"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: any source mutation, composite implementation, d379_controls.py and the full matrix, until Kai reconciles DS-SB01-V1-01..12  [CONVERSATION 2026-10-03 Kai, "implementation = HELD"]
+- FORBIDDEN: unchanged from entry 48  [CONVERSATION 2026-10-03 Kai, "No repair-branch mutation. No d379_controls.py rebuild, full hostile matrix, incident allocation, D390 replay, fixity F, capture, candidate, holdout, blind 40, Item 8 or PR #122 merge."]
+
+### 4. Open questions
+
+- RECEIPT: all six lines exact (packet hash d5b1d0f1…3f05 copied, base v4, first hunk, both sentinels, END OF PACKET SEEN: YES). Quote fidelity: 29 quoted diff lines, 24 byte-identical to a packet line; 4 abbreviate with an explicit "(...)"; 1 (`text = _read_bound(read_source, sr, row["path"])`) differs only in indentation (4 spaces quoted, 8 in the packet) — owner: Kai  [CMD `receipt and quote check vs DEEPSEEK_PACKET_SB01_v1.md` → 6/6 exact; 24 of 29]
+- DS-SB01-V1-01/02/08 (exception population, ancestors, SystemExit masking): the composite has exactly 6 except handlers — :70 contradiction_of `except Exception: continue`; :140 _read_bound `except OSError`; :196 _reader_trace `except Exception: return None` around the indexing only; :635, :668, :684 `except SI.StageIdentityError` -> SystemExit. None catches SystemExit, BaseException or bare; the module ends `if __name__ == "__main__": main()` with no wrapper. passa's gate, _frozen_blobs and verified reader raise only SystemExit explicitly; passa.git raises nothing itself. Injection through the REAL verified reader (real main, real population check): ValueError, KeyError, UnicodeError, RuntimeError on the document and ValueError, TypeError on the reader source each give rc 1, no artefact, the class name in the output; no-fault known-negative rc 0 with artefact: 7/7. Known-positive: a mutant with the reader-source read moved inside the try (as in v4), on its own governed chain, SWALLOWS both reader-path injections (rc 0, artefact) and the probe fails exactly those 2 (5/2). Residual for Kai: a non-OSError failure ends as an uncaught traceback (rc 1, no artefact), not a named SourceBindingError — owner: Kai  [CMD `sb01_exc_probe.py inst5; sb01_exc_probe.py inst5mut MUT` → 7 passed 0 failed; 5 passed 2 failed]
+- DS-SB01-V1-11 (artefact atomicity): exactly one artefact write in the composite, :818 `pathlib.Path(a.out).write_text(...)`, after the row loop; every REFUSE and every injected exception occurs before it (measured: no artefact in all refusing cases). Path.write_text is not atomic: an interruption during that write could leave a partial file; pre-existing, unchanged by SB-01 — owner: Kai  [FILE /tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/twofact/inst5/kai-pm/house_in_order_h2_v13/run_h2_v12.py:818]
+- DS-SB01-V1-10 (pa integrity): pa comes from _consume_pass_a (:640), which reads the Pass-A bytes once through SI.consume_bound_artifact with the original Pass-A Stage-B binding and an independently supplied anchor (:655-656, --expected-passa-binding-sha256), then verifies provenance slot by slot; the HEAD check then ties HEAD, pa["subject"] and the Stage-A commit — owner: Kai  [FILE /tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/twofact/inst5/kai-pm/house_in_order_h2_v13/run_h2_v12.py:655]
+- DS-SB01-V1-07 (other callers): outside the composite, evidence_facts is called at 3 sites in build_evidence/e2_controls.py (:101, :121) and build_evidence/e2_investigation.py (:234), none passing text=, so each already REFUSES under the accepted v4 ("needs the document text") before any reader trace; _reader_trace has no caller outside the module — owner: Kai  [CMD `git grep -nE "evidence_facts\(|_reader_trace\(" dbe692d -- '*.py'` → as stated]
+- DS-SB01-V1-03/04/05/06: the line-vocabulary residual, the lossy errors="ignore" decode, raw CR in local_context and the qualifier non-detection were disclosed by the packet (Q6, section 2, Q7, Q8); unchanged; no new measurement — owner: Kai  [FILE /tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/twofact/DEEPSEEK_PACKET_SB01_v1.md:1]
+- DS-SB01-V1-09 (non-callable reader): not measured directly; a TypeError from the reader call follows the injection path measured above (TypeError on the reader source: rc 1, no artefact) — owner: Kai  [CMD `sb01_exc_probe.py inst5` → TypeError at tools/rd.py rc=1 artefact=False]
+- DS-SB01-V1-12 (instrument validity): the scanner, probe, harness and full outputs were banked verbatim in entry 48 — owner: Kai  [GIT 29c3c48464928c86e0a4dea33bd8171d1cc10543]
+
+### 5. Incidents and corrections
+
+- Invalid first calibration run: the mutant was first run against the composite's chain; the producer REFUSED it ("loaded H2 source … byte mismatch against Stage A") before any subject byte, so all 7 rows measured nothing (R11). Re-run on a governed chain built for the mutant (Stage A, Pass A, binding)  [CMD `sb01_exc_probe.py inst5mut` → 0 passed 7 failed, all by the Stage-A byte-mismatch REFUSE]
+- Credential scan of the five evidence files: 0 hits; raw line separators: none  [CMD `secretscan.py <5 files>` → TOTAL HITS 0]
+- Verbatim blocks: strip the 4-space indent; append a final LF only where the line says final LF True  [CMD `roundtrip.py` → all True]
+- EVIDENCE DEEPSEEK-SB01-V1-RECEIPT-AND-REVIEW deepseek_sb01_v1_review.txt: 17671 bytes, sha256 f3df08eb6305ea124269ba3be98df369af9be3b7a073f31fdab2d3ab77f21d12, final LF False  [CMD `sha256sum deepseek_sb01_v1_review.txt` → f3df08eb6305ea12…]
+    BEGIN-VERBATIM DEEPSEEK-SB01-V1-RECEIPT-AND-REVIEW
+    Deep seek ( gpt message will follow next) PACKET HASH: d5b1d0f15f80b9c6483ec28bd656c011d94b9df75510dfe542341a5f063d3f05
+    BASE (accepted two-fact v4) run_h2_v12.py SHA-256: d3ee165f706e9f4048434031e003e6c7a97159ae2e2217d0c8cdd7ebd69861b6
+    FIRST DELTA HUNK: @@ -114,7 +114,38 @@
+    SENTINEL A: +    passa._source_binding_gate(sr, pa["subject"])
+    SENTINEL B: +    lines = _read_bound(read_source, subject_repo, o["src"]).splitlines()
+    END OF PACKET SEEN: YES
+    
+    ---
+    
+    Finding register — KAI-B4-SB-01 v1
+    
+    DS-SB01-V1-01 — MAJOR — _read_bound catches only OSError, but the verified reader can fail in other exception classes
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked construct:
+    
+    ```diff
+    +def _read_bound(read_source, subject_repo, rel):
+    +    if read_source is None:
+    +        raise SourceBindingError(...)
+    +    try:
+    +        return read_source(subject_repo, rel)
+    +    except OSError as e:
+    +        raise SourceBindingError(...) from None
+    ```
+    
+    Invariant attacked: every source-binding failure must become a REFUSE (SystemExit-class abort), never an abstention, fallback, or artefact.
+    
+    The packet says the underlying verified reader can raise SystemExit for path-not-in-subject or byte divergence. That path is not caught here and will propagate, which is correct. But the delta does not show that make_verified_reader and _source_binding_gate are limited to OSError and SystemExit. If any binding failure raises another exception class — e.g. ValueError, KeyError, UnicodeError, RuntimeError — _read_bound will not wrap it. If an ancestor catches Exception (not BaseException) around candidate evaluation or row processing, that failure could be swallowed as an abstention or fallback.
+    
+    Concrete failure sequence: read_source raises ValueError("path not in subject") rather than SystemExit. _read_bound does not catch it. If evidence_facts or an outer loop has except Exception: abstain, the run continues without the verified bytes. The predicate “binding failure became REFUSE” is false.
+    
+    Current controls would detect it only if the runtime probe or hostile matrix exercises that exact exception class. The supplied matrix does not name the full exception population.
+    
+    Minimum correction: either make every source-binding failure in make_verified_reader/gate a SourceBindingError/SystemExit, or widen _read_bound to wrap any non-SystemExit, non-KeyboardInterrupt exception into SourceBindingError while preserving SystemExit propagation.
+    
+    Exact evidence request: list every exception class passa._source_binding_gate and passa.make_verified_reader can raise, and show that no ancestor catches SystemExit/BaseException and converts it to success or abstention.
+    
+    ---
+    
+    DS-SB01-V1-02 — MAJOR — Full exception-propagation path for SourceBindingError is not supplied
+    
+    Evidence status: UNVERIFIED
+    Attacked construct:
+    
+    ```diff
+    +class SourceBindingError(SystemExit):
+    ...
+    +    lines = _read_bound(read_source, subject_repo, o["src"]).splitlines()
+    ...
+    +    text = _read_bound(read_source, sr, row["path"])
+    ```
+    
+    Invariant attacked: a SourceBindingError must abort the run and prevent any artefact. The delta places the read in _reader_trace outside the local try, which is correct locally. But _reader_trace is called through a lambda inside evidence_facts candidate evaluation. The supplied delta does not show the surrounding evidence_facts dispatch, main-loop exception handling, artefact writer, or top-level __main__ wrapper.
+    
+    Concrete failure sequence: an ancestor catches SystemExit (or BaseException) during candidate evaluation, logs a warning, and continues to write an artefact. The local delta looks correct, but the invariant is false at run scope.
+    
+    Current controls: the packet claims T1–T4 and C1–C6 produce no artefact, but the artefact-writing code is not reproduced. This is producer evidence with zero admission weight.
+    
+    Minimum correction: none in the delta itself unless the ancestor is shown to swallow SystemExit; if it does, propagate or re-raise after cleanup.
+    
+    Exact evidence request: reproduce the full evidence_facts candidate-evaluation loop, the main row loop, the artefact write site, and the top-level __main__/main() exception handling. Show that no except SystemExit or except BaseException turns a binding failure into success or abstention.
+    
+    ---
+    
+    DS-SB01-V1-03 — MINOR — _reader_trace line indexing uses splitlines(), while opscan line numbers may use a different model
+    
+    Evidence status: SUPPLIED-EVIDENCE / UNVERIFIED residual
+    Attacked construct:
+    
+    ```diff
+    +    lines = _read_bound(read_source, subject_repo, o["src"]).splitlines()
+         try:
+    -        line = (pathlib.Path(subject_repo) / o["src"]).read_text(
+    -            errors="ignore").splitlines()[o["line"] - 1].strip()
+    +        line = lines[o["line"] - 1].strip()
+    ```
+    
+    Invariant attacked: _reader_trace must locate the same source line that opscan numbered. The packet discloses Q6: splitlines() may disagree with opscan line numbering for CR, VT, FF, NEL, LS, PS. It also says 0 of 615 frozen suffix-matched source files contain those separators, so the frozen subject is currently safe.
+    
+    The SB-01 delta changes the underlying string from universal-newline-translated text to exact-byte-decoded text. For lone CR, the old text translated CR to LF; the new text preserves CR. splitlines() still treats CR as a boundary, but the content around it differs. For the frozen subject this is measured safe. For any future subject, this is a pre-existing bounded residual, not a new SB-01 blocker.
+    
+    Concrete failure sequence: a future frozen subject contains a lone CR in a source file. splitlines() and opscan disagree on line count; _reader_trace returns None (abstention) or the wrong line. This is not a REFUSE.
+    
+    Minimum correction: if the subject population can ever contain non-LF separators, align _reader_trace line selection with opscan’s numbering model, or refuse on non-LF separators in source files. Otherwise document the bounded residual.
+    
+    Exact evidence request: provide the opscan line-numbering algorithm and confirm whether it is LF-only or Python universal-newline. Also confirm whether the frozen subject population is immutable for SB-01.
+    
+    ---
+    
+    DS-SB01-V1-04 — MINOR — Lossy invalid-UTF-8 decoding remains, so “USE those verified bytes” is not byte-exact at the string layer
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked construct:
+    
+    ```diff
+    +        return read_source(subject_repo, rel)
+    ```
+    
+    The packet states the verified reader returns data.decode(errors="ignore"). The verifier compares exact bytes, but the returned string drops invalid UTF-8 bytes. Classification then operates on a lossy view.
+    
+    Invariant attacked: classification measures the frozen subject’s bytes. It measures the frozen subject’s byte sequence for verification, but the text consumed by regex/string logic can differ from the blob if the blob contains invalid UTF-8.
+    
+    Concrete failure sequence: committed blob contains byte \xff in a sentence. decode(errors="ignore") removes it. The verifier passes. Classification sees a sentence the blob does not contain as a string. This is pre-existing from v1.2 and Pass A, but SB-01’s claim “READ → VERIFY THOSE SAME BYTES → USE” should be read as “verify bytes, use lossy decode.”
+    
+    Minimum correction: document the residual explicitly, or use surrogateescape/byte-aware matching if downstream can handle it. Do not treat this as an SB-01 blocker.
+    
+    Exact evidence request: confirm that Pass A and all downstream fact/witness consumers already accept lossy errors="ignore" decoding as the accepted boundary.
+    
+    ---
+    
+    DS-SB01-V1-05 — QUESTION — Raw CR in local_context is a correct consequence but may violate downstream assumptions
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked construct:
+    
+    ```diff
+    +    lines = _read_bound(read_source, subject_repo, o["src"]).splitlines()
+    ...
+    +        line = lines[o["line"] - 1].strip()
+    ```
+    
+    Packet Q7: for a lone-CR document, local_context can now be 'lead\rThis document is in force.'. The selector changes from L4 to L3 because the canonical locator now sits over committed bytes.
+    
+    This is the correct consequence of preserving subject bytes. But if the qualifier, JSON serializers, or UI assume LF-only context, raw CR may be mis-rendered or rejected.
+    
+    Concrete failure sequence: a witness consumer splits local_context on \n and assumes no \r; it sees a single line with an embedded CR and misreports the sentence.
+    
+    Minimum correction: none if downstream handles CR. If not, normalize only for display, never for resolution.
+    
+    Exact evidence request: show the qualifier and any witness consumers handle raw CR in local_context without loss or mis-scoping.
+    
+    ---
+    
+    DS-SB01-V1-06 — QUESTION — Qualifier non-detection of a non-resolving trace is outside SB-01 but interacts with it
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Packet Q8: the qualifier reported 0 findings for v4’s lone-CR trace even though that trace did not resolve against committed bytes. SB-01 makes that trace resolve, but the qualification-layer gap may remain for other non-resolving traces.
+    
+    This is not an SB-01 repair defect unless SB-01 cannot be correct without a qualifier fix. The supplied evidence does not prove that dependency.
+    
+    Minimum correction: none in SB-01. Track as separate qualifier-layer finding.
+    
+    Exact evidence request: confirm whether any SB-01 invariant depends on the qualifier detecting non-resolving traces.
+    
+    ---
+    
+    DS-SB01-V1-07 — MINOR — Lazy read_source=None refusal is safe in main but depends on every subject-byte path being through _read_bound
+    
+    Evidence status: SUPPLIED-EVIDENCE / UNVERIFIED
+    Attacked construct:
+    
+    ```diff
+    +def _read_bound(read_source, subject_repo, rel):
+    +    if read_source is None:
+    +        raise SourceBindingError(...)
+    ```
+    
+    In main, read_source is always supplied before any row text read. In _reader_trace, read_source is supplied by evidence_facts, which receives it from main. So lazy refusal is not a hole in the shown flow.
+    
+    The residual risk is an external or future caller of evidence_facts that does not pass read_source and whose row has no readers. No reading document is consumed, so no subject bytes are read. That is safe. If the row does have readers, _reader_trace refuses. So the predicate “no unverified subject bytes” remains true.
+    
+    Concrete failure sequence: an external caller invokes evidence_facts without read_source, and some future fact path reads a subject file other than through _reader_trace. That path would need to be audited separately.
+    
+    Minimum correction: document that evidence_facts must receive read_source whenever any subject-repo read is possible, and keep the AST/runtime population scan as a control.
+    
+    Exact evidence request: list all call sites of evidence_facts and _reader_trace outside the supplied delta.
+    
+    ---
+    
+    DS-SB01-V1-08 — MINOR — SourceBindingError inherits SystemExit, so cleanup handlers could mask REFUSE
+    
+    Evidence status: UNVERIFIED
+    Attacked construct:
+    
+    ```diff
+    +class SourceBindingError(SystemExit):
+    +    """A subject byte could not be bound to the frozen commit. REFUSE."""
+    ```
+    
+    Inheriting SystemExit is intentional so the abort is not caught by except Exception. But SystemExit is sometimes caught by cleanup/atexit/test harness code. If any such handler exits 0 or writes an artefact after catching it, the REFUSE becomes success.
+    
+    Concrete failure sequence: a top-level try/except SystemExit: sys.exit(0) around main() swallows the abort.
+    
+    Minimum correction: ensure no ancestor catches SystemExit without re-raising or exiting nonzero.
+    
+    Exact evidence request: reproduce all except SystemExit / except BaseException handlers reachable from the classification path.
+    
+    ---
+    
+    DS-SB01-V1-09 — MINOR — _read_bound does not validate that read_source is callable
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked construct:
+    
+    ```diff
+    +    if read_source is None:
+    +        raise SourceBindingError(...)
+    +    try:
+    +        return read_source(subject_repo, rel)
+    +    except OSError as e:
+    ```
+    
+    If read_source is a truthy non-callable, TypeError propagates uncaught. This is a programming error, not a hostile subject condition, but it bypasses the intended SourceBindingError wrapper.
+    
+    Minimum correction: check callable(read_source) and raise SourceBindingError if not.
+    
+    Exact evidence request: none; low priority.
+    
+    ---
+    
+    DS-SB01-V1-10 — UNVERIFIED — Frozen-subject identity binding of pa["subject"]
+    
+    Evidence status: UNVERIFIED
+    Attacked construct:
+    
+    ```diff
+    +    passa._source_binding_gate(sr, pa["subject"])
+    +    read_source = passa.make_verified_reader(sr, pa["subject"])
+    ```
+    
+    The delta uses pa["subject"] as the frozen subject. The supplied base excerpt shows a HEAD check:
+    
+    ```python
+    if head != pa["subject"] or head != desc["subject"]["commit"]:
+        raise SystemExit(...)
+    ```
+    
+    That ties pa["subject"], desc["subject"]["commit"], and HEAD together at the shown point. But the packet does not reproduce how pa is loaded, how desc is loaded, or whether pa["subject"] can be tampered before this check.
+    
+    Minimum correction: none if the base already guarantees pa integrity. Otherwise bind pa["subject"] to the Stage-A/PASS-A artefact by cryptographic digest before use.
+    
+    Exact evidence request: show the loading and verification of pa and desc before the HEAD check.
+    
+    ---
+    
+    DS-SB01-V1-11 — UNVERIFIED — Artefact atomicity on every REFUSE path
+    
+    Evidence status: UNVERIFIED
+    Attacked construct: all _read_bound and SourceBindingError paths. The packet claims C1/C2/C4/C6/T1–T4 produce “no artefact.” The artefact writer is not reproduced.
+    
+    Concrete failure sequence: SourceBindingError aborts, but a partially written artefact from an earlier row remains on disk and is later trusted.
+    
+    Minimum correction: if the writer is not transactional, make the write occur only after all reads and verification complete, or delete partial artefacts on abort.
+    
+    Exact evidence request: reproduce the artefact write path and show it cannot leave a trusted partial artefact after any SystemExit/SourceBindingError.
+    
+    ---
+    
+    DS-SB01-V1-12 — UNVERIFIED — Control-validity of the static scanner and runtime probe
+    
+    Evidence status: UNVERIFIED
+    Attacked constructs: packet section 4, “Static read-path population (AST, every call in the module)” and “PROBE 4/4 subject opens inside pass a.read_source.” These are producer measurements. We cannot inspect the scanner, the probe, or the hostile harness.
+    
+    Concrete failure sequence: the static scanner is name-based and misses an aliased read; the runtime probe only covers the paths it was instrumented for. The packet says runtime PROBE covers aliasing, but we cannot verify.
+    
+    Minimum correction: none in the delta; keep as evidence request.
+    
+    Exact evidence request: provide the scanner/probe source and exact command lines, or rerun with an independent audit.
+    
+    ---
+    
+    Executive advisory verdict
+    
+    NO DESIGN BLOCKER FOUND, MAJOR/MINOR FINDINGS REMAIN
+    
+    The core SB-01 shape — one verified reader, gate before measurement, both primary document and _reader_trace routed through _read_bound, no read_text fallback — is directionally correct. The delta closes the two historically known raw-read sites and moves the _reader_trace read outside the local try, which correctly prevents source-binding failure from becoming an abstention at that call site.
+    
+    The unresolved MAJOR risk is exception-population completeness: _read_bound only wraps OSError, and the full set of binding-failure exception classes from passa.make_verified_reader / _source_binding_gate is not supplied. If any binding failure raises a non-SystemExit, non-OSError exception that an ancestor catches as Exception, the REFUSE invariant can be violated. This must be reconciled against the actual Pass-A machinery before implementation.
+    
+    ---
+    
+    Unverified claims register
+    
+    1. That passa._source_binding_gate and passa.make_verified_reader raise only OSError and SystemExit for all source-binding failures.
+    2. That no ancestor of main() or evidence_facts() catches SystemExit / BaseException and converts REFUSE into success, abstention, or an artefact.
+    3. That the artefact writer cannot leave a trusted partial artefact after a SourceBindingError.
+    4. That pa["subject"] is independently bound to the consumed Pass-A artefact / Stage-A chain before the HEAD check.
+    5. That the static AST read-path scanner is complete for dynamic/aliased reads.
+    6. That the runtime PROBE actually proves all subject reads transit the verified reader for every hostile case.
+    7. That evidence_facts and _reader_trace have no other call sites outside the supplied delta that bypass read_source.
+    8. That raw CR in local_context is accepted by all downstream consumers.
+    9. That the qualifier’s non-detection of v4’s lone-CR trace is independent of SB-01 correctness.
+    
+    ---
+    
+    Evidence requests
+    
+    1. Full exception taxonomy for passa._source_binding_gate and passa.make_verified_reader, including every failure mode: path not in subject, byte divergence, symlink, unreadable, deleted, directory, permission, malformed blob.
+    2. Full reachable exception-handling stack from main() through row loop, evidence_facts, candidate evaluation, and artefact write, showing every except SystemExit, except BaseException, and except Exception.
+    3. Artefact write site and whether it is transactional/atomic on abort.
+    4. Loader and integrity check for pa and desc before pa["subject"] is used.
+    5. Static scanner and runtime probe source, plus exact hostile-matrix commands and outputs.
+    6. All call sites of evidence_facts and _reader_trace in the composite module and any importers.
+    7. Confirmation of downstream handling of raw CR in local_context.
+    8. Confirmation of whether SB-01 correctness depends on qualifier changes.
+    END-VERBATIM DEEPSEEK-SB01-V1-RECEIPT-AND-REVIEW
+- EVIDENCE SB01-EXC-PROBE-INSTRUMENT sb01_exc_probe.py: 3477 bytes, sha256 30c6bc6e9bcc4166344fbf807155f1ea74fbee52ae2f10bda410ca6f35964a62, final LF True  [CMD `sha256sum sb01_exc_probe.py` → 30c6bc6e9bcc4166…]
+    BEGIN-VERBATIM SB01-EXC-PROBE-INSTRUMENT
+    """Read-only probe for DS-SB01-V1-01/02/08/11 (orchestrator, system python3). argv: <twofact dir>
+    Reuses the NEW chain built by sb01_e2e.py (Stage A, Pass A, Pass-A binding on the clean template subject).
+    The REAL composite main() runs in a child whose __main__ is the script file (refuse_e2e pattern; the producer's
+    runtime-population check runs unmodified). Faults replace passa.make_verified_reader with a wrapper around the REAL
+    reader that raises a NON-OSError, NON-SystemExit exception for one path. Expected, declared here: rc != 0, no artefact,
+    and the exception class visible in the output. Known-negative: the same wrapper with no fault -> rc 0 and an artefact."""
+    import pathlib, shutil, subprocess, sys
+    PY = "/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11"
+    CEN = "/home/user/kai-repair/kai-pm/house_in_order_census_v11"
+    D = pathlib.Path(sys.argv[1]); W = D / "sb01_work"; N = W / (sys.argv[3] if len(sys.argv) > 3 else "NEW"); V = D / (sys.argv[2] if len(sys.argv) > 2 else "inst5") / "kai-pm/house_in_order_h2_v13"
+    PAB = subprocess.run(["sha256sum", str(N / "pa.b")], capture_output=True, text=True).stdout.split()[0]
+    HARNESS = r'''
+    import sys, os, types
+    script, fault, target = sys.argv[1], sys.argv[2], sys.argv[3]
+    sys.argv = [script] + sys.argv[4:]
+    sys.path[0] = os.path.dirname(script)
+    m = types.ModuleType("__main__"); m.__file__ = script
+    sys.modules["__main__"] = m
+    ns = m.__dict__; ns["__name__"] = "__d379_under_test__"
+    with open(script, "rb") as fh:
+        exec(compile(fh.read(), script, "exec"), ns)
+    ns["__name__"] = "__main__"
+    passa = ns["passa"]; real = passa.make_verified_reader
+    EXC = {"ValueError": ValueError, "KeyError": KeyError, "UnicodeError": UnicodeError, "RuntimeError": RuntimeError, "TypeError": TypeError}
+    def mvr(repo, subject):
+        rs = real(repo, subject)
+        def wrapped(r, rel):
+            data = rs(r, rel)                       # the REAL verified read runs first
+            if fault != "none" and str(rel) == target:
+                raise EXC[fault](f"injected {fault} after verified read of {rel}")
+            return data
+        return wrapped
+    passa.make_verified_reader = mvr
+    ns["main"]()
+    '''
+    CASES = [("none", "-"), ("ValueError", "kai-pm/DOC.md"), ("KeyError", "kai-pm/DOC.md"), ("UnicodeError", "kai-pm/DOC.md"),
+             ("RuntimeError", "kai-pm/DOC.md"), ("ValueError", "tools/rd.py"), ("TypeError", "tools/rd.py")]
+    P = F = 0
+    for fault, target in CASES:
+        case = f"X_{fault}_{target.replace('/', '_')}"; cs = W / "exc" / case / "subj"
+        if cs.parent.exists(): shutil.rmtree(cs.parent)
+        shutil.copytree(W / "template", cs, symlinks=True); out = cs.parent / "result.json"
+        p = subprocess.run([PY, "-B", "-E", "-s", "-c", HARNESS, str(V / "run_h2_v12.py"), fault, target, "--subject-repo", str(cs),
+                            "--passa", str(N / "passA.json"), "--passa-stage-b", str(N / "pa.b"), "--expected-passa-binding-sha256", PAB,
+                            "--census-package", CEN, "--stage-a", str(N / "stage_a.json"), "--out", str(out)], capture_output=True, text=True)
+        o = (p.stdout + p.stderr).strip().splitlines()
+        ok = (p.returncode == 0 and out.exists()) if fault == "none" else (p.returncode != 0 and not out.exists() and any(l.startswith(fault + ":") for l in o))
+        P += ok; F += not ok
+        print(f"  {'PASS' if ok else 'FAIL'}  fault={fault:<13} at {target:<14} rc={p.returncode} artefact={out.exists()}  last: {o[-1][:110] if o else ''}")
+    print(f"\n{P} passed, {F} failed")
+    sys.exit(1 if F else 0)
+    END-VERBATIM SB01-EXC-PROBE-INSTRUMENT
+- EVIDENCE SB01-EXC-PROBE-OUTPUT-COMPOSITE sb01_exc_probe_out.txt: 966 bytes, sha256 28c2dc4b0ffd0699598387009caf8159251d49495aaed1287d0f92008e9ad547, final LF True  [CMD `sha256sum sb01_exc_probe_out.txt` → 28c2dc4b0ffd0699…]
+    BEGIN-VERBATIM SB01-EXC-PROBE-OUTPUT-COMPOSITE
+      PASS  fault=none          at -              rc=0 artefact=True  last:   self_approval: NONE
+      PASS  fault=ValueError    at kai-pm/DOC.md  rc=1 artefact=False  last: ValueError: injected ValueError after verified read of kai-pm/DOC.md
+      PASS  fault=KeyError      at kai-pm/DOC.md  rc=1 artefact=False  last: KeyError: 'injected KeyError after verified read of kai-pm/DOC.md'
+      PASS  fault=UnicodeError  at kai-pm/DOC.md  rc=1 artefact=False  last: UnicodeError: injected UnicodeError after verified read of kai-pm/DOC.md
+      PASS  fault=RuntimeError  at kai-pm/DOC.md  rc=1 artefact=False  last: RuntimeError: injected RuntimeError after verified read of kai-pm/DOC.md
+      PASS  fault=ValueError    at tools/rd.py    rc=1 artefact=False  last: ValueError: injected ValueError after verified read of tools/rd.py
+      PASS  fault=TypeError     at tools/rd.py    rc=1 artefact=False  last: TypeError: injected TypeError after verified read of tools/rd.py
+    
+    7 passed, 0 failed
+    END-VERBATIM SB01-EXC-PROBE-OUTPUT-COMPOSITE
+- EVIDENCE SB01-EXC-MUTANT-DIFF sb01_exc_mutant.diff: 598 bytes, sha256 df556f660379f985f7c70e0273c9f8b0ab1b6b8201156fb5cc05ed20e660dff8, final LF True  [CMD `sha256sum sb01_exc_mutant.diff` → df556f660379f985…]
+    BEGIN-VERBATIM SB01-EXC-MUTANT-DIFF
+    --- composite/run_h2_v12.py
+    +++ mutant/run_h2_v12.py
+    @@ -190,8 +190,8 @@
+         # verified reader as the classified document, so they are the frozen
+         # blob's bytes or the run REFUSES. The read sits OUTSIDE the try: a
+         # binding failure or an unreadable source is never an abstention.
+    -    lines = _read_bound(read_source, subject_repo, o["src"]).splitlines()
+         try:
+    +        lines = _read_bound(read_source, subject_repo, o["src"]).splitlines()
+             line = lines[o["line"] - 1].strip()
+         except Exception:
+             return None                      # no locator -> no certification
+    END-VERBATIM SB01-EXC-MUTANT-DIFF
+- EVIDENCE SB01-EXC-PROBE-OUTPUT-MUTANT sb01_exc_probe_mutant_out.txt: 876 bytes, sha256 9d5cd28ed925ed8843fc23709128be6669c186ed3d695af4f859fd00067af5cd, final LF True  [CMD `sha256sum sb01_exc_probe_mutant_out.txt` → 9d5cd28ed925ed88…]
+    BEGIN-VERBATIM SB01-EXC-PROBE-OUTPUT-MUTANT
+      PASS  fault=none          at -              rc=0 artefact=True  last:   self_approval: NONE
+      PASS  fault=ValueError    at kai-pm/DOC.md  rc=1 artefact=False  last: ValueError: injected ValueError after verified read of kai-pm/DOC.md
+      PASS  fault=KeyError      at kai-pm/DOC.md  rc=1 artefact=False  last: KeyError: 'injected KeyError after verified read of kai-pm/DOC.md'
+      PASS  fault=UnicodeError  at kai-pm/DOC.md  rc=1 artefact=False  last: UnicodeError: injected UnicodeError after verified read of kai-pm/DOC.md
+      PASS  fault=RuntimeError  at kai-pm/DOC.md  rc=1 artefact=False  last: RuntimeError: injected RuntimeError after verified read of kai-pm/DOC.md
+      FAIL  fault=ValueError    at tools/rd.py    rc=0 artefact=True  last:   self_approval: NONE
+      FAIL  fault=TypeError     at tools/rd.py    rc=0 artefact=True  last:   self_approval: NONE
+    
+    5 passed, 2 failed
+    END-VERBATIM SB01-EXC-PROBE-OUTPUT-MUTANT
+
+### 6. Next authorised step
+
+- Wait for Kai's reconciliation of DS-SB01-V1-01..12; implement nothing before it  [CONVERSATION 2026-10-03 Dainius, "Deep seek ( gpt message will follow next)"]
+
+### 7. What I am unsure of
+
+- Whether a named SourceBindingError for every non-OSError reader failure is worth widening _read_bound; the invariant (no abstention, no artefact) already holds for every class injected  [CMD `sb01_exc_probe.py inst5` → 7/7]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
