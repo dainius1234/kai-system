@@ -21697,3 +21697,73 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-03T03:22:23Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-03T03:22:23Z  [CMD `date -u +%FT%TZ` → 2026-10-03T03:22:23Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 3a51dcaa941cc7b867e37c549351d3167967663f  [CMD `git rev-parse HEAD` → 3a51dcaa941cc7b867e37c549351d3167967663f]
+- tree: 7d6f572fabddc21771dbcff40f0dfe498e4a8459  [CMD `git rev-parse HEAD^{tree}` → 7d6f572fabddc21771dbcff40f0dfe498e4a8459]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/project-rework-plan-pgvp35: 3a51dcaa941cc7b867e37c549351d3167967663f  [CMD `git ls-remote --heads origin` → 3a51dcaa941cc7b867e37c549351d3167967663f]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: dbe692d9c3f83020176aeda00a0f399ce5f020f8  [CMD `git ls-remote --heads origin` → dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 55  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 55]
+
+### 1. The four states
+
+- physical: repair worktree unchanged since entry 55 (HEAD dbe692d, one uncommitted path, run_h2_v12.py a39359bc…); remote repair branch dbe692d  [CMD `git ls-remote --heads origin` → claude/d379-repair-eb52f73 dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- authorised: ONE bounded recovery step — a scratch-only full-history clone from origin and a rerun of the real frozen-subject chain; evidence back to Kai BEFORE any commit  [CONVERSATION 2026-10-03 Kai via Dainius, "If and only if the complete real-subject chain passes: return the evidence to Kai before committing."]
+- evidence: the ruling verbatim in section 2 (Dainius's structured answer)  [CMD `sha256sum kai_shallow_retry_ruling.txt` → e575283500ef35ee…]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Dainius, relaying Kai · 2026-10-03 · SHALLOW-HISTORY STOP RECONCILED / SCRATCH FULL-HISTORY RETRY AUTHORISED: the STOP was correct; do not substitute the synthetic chain + 615-file bound; one scratch clone with full history from origin; prove not shallow, subject d8aac4d4 present with tree 3abc9e9d, checked out detached, clean; rerun Stage A → fresh Pass A → binding → classification (the uncommitted composite) → binding → qualifier; any failure STOP, no commit; if all pass, return evidence to Kai before committing — the earlier grant does not automatically permit the commit; repair worktree, its .git, branch and composite untouched. Verbatim below, 4065 bytes, sha256 e575283500ef35eeae32e20cb1585b0a712419e05e4f0266d40c3ac167db585e, final LF False, 4-space indent added ⚠ UNBANKED  [CONVERSATION 2026-10-03 Dainius, "Choose Fetch full history (scratch)."]
+    BEGIN-VERBATIM KAI-SHALLOW-HISTORY-RETRY-RULING
+    Choose Fetch full history (scratch).  That is the only option that actually satisfies the grant as written. The synthetic chain + 615-file bound is strong supporting evidence, but it is not a substitute for the explicitly required fresh Pass A on the real frozen subject. Orion also did exactly the right thing by stopping rather than quietly weakening that requirement.  The shallow-history failure is environmental, not a repair defect. So the right response is to authorize a read-only, scratch-only full-history fetch/clone, with the repair worktree left untouched and still uncommitted.  Send Orion this:  KAI → ORION — SHALLOW-HISTORY STOP RECONCILED / SCRATCH FULL-HISTORY RETRY AUTHORISED  Your STOP was correct.  The failed fresh Pass A on the real frozen subject is not evidence against the composite. It failed because the available subject repository is shallow and therefore cannot satisfy Pass A’s historical measurements.  Do not weaken the grant by substituting the synthetic chain + 615-file bound for the required real-subject chain.  I authorise one bounded recovery step:  Create/use a SCRATCH clone only and obtain full history from origin.  This authority does not permit any mutation of:  * the repair worktree; * its .git object database/config; * the repair branch; * the uncommitted composite; * programme/governance source files.  The repair worktree must remain exactly as it is now:  * branch HEAD still dbe692d9c3f83020176aeda00a0f399ce5f020f8; * exactly one uncommitted path; * run_h2_v12.py SHA-256 still     a39359bc383c8f6f6ca4540c10474fcb094c990f7b8e8091792262436c7a4cfe.  In the scratch subject clone:  1. fetch/clone from the canonical origin with full history; 2. prove     git rev-parse --is-shallow-repository → false; 3. prove frozen subject commit exists exactly:     d8aac4d49e6ba997e3eb38062c0917186ee3f197 4. prove its tree is exactly:     3abc9e9d8ca11966a6f996d5f0af68072ee5b117 5. checkout/use that exact subject commit detached; do not substitute a later tree; 6. prove scratch working tree clean before the measurement.  Then rerun the required real frozen-subject chain using the exact uncommitted reviewed composite as the classifier instrument:  Stage A → fresh Pass A on frozen subject → Pass-A Stage-B binding → classification → classification Stage-B binding → qualifier.  Do not change any expectation or source to make it pass.  Required evidence:  * fresh Pass A succeeds against the full-history scratch subject; * Pass A subject commit/tree equal the frozen identities above; * report fresh row population; * report actual reader_ops population; * derive the reader-source selection actually used by the composite; * every selected reader source exists in the frozen subject; * strict UTF-8 succeeds for every classified document and selected reader source; * classification consumes the exact reviewed composite hash; * qualifier exits clean with the expected two-fact repair and no unexplained finding; * no unexpected axis/other-fact regression.  If the full-history fetch fails, the repository still reports shallow, the frozen commit/tree does not match, Pass A refuses for any other reason, or any downstream result differs unexpectedly:  STOP. Do not commit or push. Return to Kai with exact evidence.  If and only if the complete real-subject chain passes:  return the evidence to Kai before committing. Do not infer that the earlier implementation grant automatically permits commit after this environmental detour.  No d379_controls.py, full hostile matrix, D390 replay, fixity F, capture, candidate, holdout, blind 40, Item 8 or merge.  I would not choose “Accept synthetic + 615 bound.” That would quietly relax a test precisely when the real test became inconvenient, which is the pattern we have spent this whole programme preventing.  And I would not simply “Stop, return to Kai” now either—that stop has already happened. The correct Kai ruling is now to permit the full-history scratch retry while preserving the repair worktree untouched.  Confidence: 0.995.
+    END-VERBATIM KAI-SHALLOW-HISTORY-RETRY-RULING
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: scratch full-history clone; the real-subject chain rerun; report to Kai  [CONVERSATION 2026-10-03 Kai, "I authorise one bounded recovery step"]
+- HELD: commit and push of the one-file change, pending Kai after the evidence  [CONVERSATION 2026-10-03 Kai, "Do not infer that the earlier implementation grant automatically permits commit after this environmental detour."]
+- FORBIDDEN: any mutation of the repair worktree, its .git, the repair branch or the composite; d379_controls.py, full hostile matrix, D390 replay, fixity F, capture, candidate, holdout, blind 40, Item 8, merge  [CONVERSATION 2026-10-03 Kai, "This authority does not permit any mutation of:"]
+
+### 4. Open questions
+
+- None before the retry  [CONVERSATION 2026-10-03 Kai, "Your STOP was correct."]
+
+### 5. Incidents and corrections
+
+- None this step  [CMD `handoff.py check` → findings=0]
+
+### 6. Next authorised step
+
+- Scratch full-history clone, real-subject chain, evidence to Kai, STOP before commit  [CONVERSATION 2026-10-03 Kai, "return the evidence to Kai before committing"]
+
+### 7. What I am unsure of
+
+- Whether the proxy allows a full clone from origin; if it fails, STOP  [CONVERSATION 2026-10-03 Kai, "If the full-history fetch fails … STOP."]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
