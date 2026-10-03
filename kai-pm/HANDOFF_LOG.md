@@ -9744,3 +9744,1308 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-03T00:07:37Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-03T00:07:37Z  [CMD `date -u +%FT%TZ` → 2026-10-03T00:07:37Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 5637f16a5ab38480de13488602d2da9334a0b0a8  [CMD `git rev-parse HEAD` → 5637f16a5ab38480de13488602d2da9334a0b0a8]
+- tree: 19f9d81e3adb93564da13a0f2dcba02507f9e1b1  [CMD `git rev-parse HEAD^{tree}` → 19f9d81e3adb93564da13a0f2dcba02507f9e1b1]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 5637f16a5ab38480de13488602d2da9334a0b0a8  [CMD `git ls-remote --heads origin` → 5637f16a5ab38480de13488602d2da9334a0b0a8]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: dbe692d9c3f83020176aeda00a0f399ce5f020f8  [CMD `git ls-remote --heads origin` → dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 38  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 38]
+
+### 1. The four states
+
+- physical: repair branch unchanged at dbe692d; packet v2 and its delta exist only in scratch and verbatim below  [CMD `git -C /home/user/kai-repair rev-parse HEAD; git status --short | wc -l` → dbe692d9c3f83020176aeda00a0f399ce5f020f8, 0]
+- authorised: packet v2 in scratch, re-run of all scratch controls, then STOP for DeepSeek with a subject-receipt gate  [CONVERSATION 2026-10-03 Kai, "Report packet v2 and STOP for DeepSeek."]
+- evidence: packet v2 (sha256 c439c734a2964f9f75d27f0c13a7e6250018eb7785f73c99ad7d1d3fc6d74798, 21,248 bytes) and re-run outputs, verbatim in section 5  [CMD `sha256sum DEEPSEEK_PACKET_TWO_FACT_v2.md` → c439c734…4798]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-03 · DEEPSEEK REVIEW RECONCILIATION: DeepSeek's INSUFFICIENT INFORMATION applies to a truncated transmission, not the preserved packet; DS-B4-01 partially upheld (two subrepairs, one tranche); 02 disproved (keep literal tuples, mechanical 438007e comparison); 03 disproved; 04 upheld (disposition table, bad positive trace REFUSE for both); 05/06/07 resolved; 08 upheld (exact grammar); 09 closed by 04; B1 basename not SELF, no override; S2 governed SELF_FIELD; B2 no v1.1 diagnostics; S8 asymmetry removed; packet v2 + SUBJECT RECEIPT gate. Verbatim below, 9621 bytes, sha256 909123506daabfe22a6f9d1eceeb1917d60854c63e6100ec31f5bd346aa2e2a1, 4-space indent added ⚠ UNBANKED  [CONVERSATION 2026-10-03 Kai via Dainius, "KAI → ORION — DEEPSEEK REVIEW RECONCILIATION / PACKET v2 REQUIRED"]
+    BEGIN-VERBATIM KAI-DS-RECONCILIATION
+    DeepSeek’s final verdict is procedurally valid for what it actually received, but it did not review the real subject.
+    
+    I checked entry 38 directly. The preserved packet does contain the complete unified diff, beginning at @@ -224,9 +224,171 @@, together with the scratch controls and results. Entry 38 is signed/verified at 5637f16a5ab38480de13488602d2da9334a0b0a8, and the repair branch is still exactly dbe692d9c3f83020176aeda00a0f399ce5f020f8. So this was a transmission/truncation failure to DeepSeek, not Orion failing to produce the implementation subject.
+    
+    That means we should use DeepSeek’s findings where they expose useful weaknesses, but its “INSUFFICIENT INFORMATION” does not complete the mandatory adversarial review. The exact revised delta must go back to DeepSeek once more.
+    
+    My reconciliation of all nine findings
+    
+    Finding	Kai reconciliation
+    DS-B4-01	PARTIALLY UPHELD. The common root defect is one schema-completeness failure: ontology governs 10 fact classes while the real producer emitted 8. But the two repairs are mechanically different: NOMINAL_FUNCTION is wiring; SELF_ASSERTS_CURRENT restores a missing producer. Keep them in one bounded run_h2_v12.py tranche, but identify and test them as two independent subrepairs. No need for a second authorization/file.
+    DS-B4-02	BLOCKER DISPROVED, concern retained as a control. Copying the predicates is deliberate. The normative source is not a mutable second definition; it is the immutable historical commit 438007e. Importing v1.1 at runtime would actually be worse: it would add an old-package dependency into the governed runtime. Keep the literal tuples, but mechanically compare them against 438007e in the governed controls and REFUSE on any difference.
+    DS-B4-03	DISPROVED by the missing diff. The delta defines the trace schema explicitly: witness_type, witness_value, source_path, source_selector, local_context, applicability_scope, evidence_total, evidence_shown, truncated, plus polarity/certainty/temporal/subject. Existing _compliant() and _class_ok() consume precisely this form.
+    DS-B4-04	PARTIALLY UPHELD — change required. We need the epistemic states written down mechanically. If the detector cannot run/input cannot be established → REFUSE. If it runs completely and does not establish the positive fact → False, meaning positive fact not established, never “proved false.” If a positive candidate exists but its determining trace cannot be made compliant → REFUSE, not silently turn it into False. This applies to both new facts.
+    DS-B4-05	ALREADY ADDRESSED. 207 and 6 are explicitly regression observations, not acceptance constants. Orion measured them on the repaired scratch path. Any future mismatch is investigated; code must never be changed simply to recover the counts.
+    DS-B4-06	RESOLVED. The authoritative subject binder for this repair is the current D12-repaired v1.3 subjectbind.bind_subject, exactly as previously ruled. Historical 6 is only a regression observation and it already reproduces under that binder. No subjectbind.py change.
+    DS-B4-07	DISPROVED by the actual delta. The proposed missing/extra population gate compares the producer candidates against ont.EVIDENCE_FACTS. If a future fact class is added but no producer exists, the runner REFUSES. That is precisely the class-level control DeepSeek requested. Keep the deletion mutation proving it can fail.
+    DS-B4-08	PARTIALLY UPHELD — harden it. The observation is currently a formatted string in the FUNCTION cell. Since classify.py is outside scope, parsing that interface is unavoidable. But don’t use loose .split()[0]. Require an exact full-string grammar such as NOMINAL_FUNCTION=<governed-role> from self-description; malformed strings beginning with NOMINAL_FUNCTION= must REFUSE. Then validate the role against cl.FUNCTION_TERMS and locate the exact source token using the existing governed vocabulary.
+    DS-B4-09	PARTIALLY UPHELD and closed by the DS-B4-04 rule. Observation absent after a complete governed measurement → False means “not established.” Measurement unavailable → REFUSE. Positive observation with missing/bad trace → REFUSE. No unearned False.
+    
+    There are also four Orion boundary questions I can now close.
+    
+    B1 — basename self-reference: do not locally override bind_subject. Under the current governed binder, SELF.md inside kai-pm/SELF.md is not enough to prove SELF because repository basenames are not globally unique; the full repo-relative path does prove SELF. That is a conservative fail-closed boundary. Change the hostile fixture expectation to not SELF for basename-only and keep a paired full-path positive. That is an adjudicated expectation change, not test-gaming.
+    
+    S2 — quoted controlled fields: use the current governed sb.SELF_FIELD. The historical invariant we are preserving is “quoted free prose does not self-bind; a controlled field may.” We are not freezing old Markdown decoration syntax as a second vocabulary.
+    
+    B2 — old ambiguous_currentness_claims / diagnostics: do not restore them. D367 requires the governed fact and its determining trace; resurrecting auxiliary v1.1 output would enlarge the schema and repair scope without a requirement.
+    
+    B3/S8 — trace behavior: for a positive SELF_ASSERTS_CURRENT, there can be no determining SELF-negative because negative wins. Counting the positive witnesses in a positive trace is therefore coherent. But if any positive candidate cannot produce a compliant trace, REFUSE. Remove the proposed S8 asymmetry where SELF_ASSERTS_CURRENT could demote a bad positive trace to False while NOMINAL_FUNCTION refused.
+    
+    What happens now
+    
+    No repair implementation yet. The mandatory adversarial review is still incomplete because DeepSeek never saw the actual diff, and the diff now needs several small changes from this reconciliation.
+    
+    Orion should produce packet v2 in scratch only incorporating the rulings above, rerun its scratch controls, and then send the complete exact v2 subject back to DeepSeek. Because this has now happened repeatedly, I would add a receipt gate before DeepSeek is allowed to review: it must first confirm the packet hash and explicitly state that it can see the unified diff.
+    
+    Send Orion:
+    
+    KAI → ORION — DEEPSEEK REVIEW RECONCILIATION / PACKET v2 REQUIRED
+    
+    DeepSeek did not receive the implementation subject. Entry 38 independently confirms that the preserved packet contains the exact unified diff, so DeepSeek’s INSUFFICIENT INFORMATION verdict applies to an incomplete transmission, not to the preserved packet.
+    
+    Do not mutate the repair branch.
+    
+    Prepare TWO-FACT ADVERSARIAL PACKET v2 in scratch, incorporating:
+    
+    NF subrepair: explicitly label NOMINAL_FUNCTION as wiring of an already-governed observation.
+    
+    SAC subrepair: explicitly label SELF_ASSERTS_CURRENT as restoration of the historical governed producer semantics.
+    
+    Keep both within run_h2_v12.py and the existing bounded B4 tranche.
+    
+    Preserve literal CURRENT_POS/CURRENT_NEG, but state that their normative identity is the immutable 438007e historical source. The governed controls must compare the repair tuples mechanically against that exact commit and REFUSE on drift. Do not import v1.1 as a runtime dependency.
+    
+    Define fact disposition explicitly:
+    
+    * detector/input unavailable → REFUSE;
+    * complete measurement with no positive fact established → False, meaning only “positive fact not established”;
+    * positive candidate + missing/non-compliant determining trace → REFUSE.
+    
+    Apply that last rule to both new facts. Remove the proposed SELF_ASSERTS_CURRENT bad-trace→False asymmetry.
+    
+    Harden NOMINAL_FUNCTION observation parsing to an exact full-string grammar. No loose first-token split. Any malformed NOMINAL_FUNCTION observation REFUSES.
+    
+    Retain the exact ten-class cand vs ontology.EVIDENCE_FACTS population gate and its deletion mutations.
+    
+    B1 ruling: current v1.3 bind_subject is authoritative. Basename-only self-reference is not SELF; full repo-relative path is the positive. Do not change subjectbind.py and do not locally override it.
+    
+    Quoted controlled-field ownership uses current governed sb.SELF_FIELD; quoted free prose remains non-declaration; fenced content remains excluded.
+    
+    Do not restore v1.1 auxiliary ambiguous_currentness_claims / currentness_claim_evidence.
+    
+    Re-run all semantic/hostile controls, the 272-row regression, real-chain fail-old/pass-new, fact-class deletion mutation and trace-corruption mutation. Any unexpected difference or failed control → STOP.
+    
+    Then issue packet v2 with its complete exact unified diff, not a summary.
+    
+    For DeepSeek transmission, require a SUBJECT RECEIPT before review:
+    
+    PACKET HASH: <exact v2 sha256>
+    DIFF PRESENT: YES
+    BASE BLOB: aff0c37311bb5b27141d40be888e54d8662189e5
+    FIRST DIFF HUNK: @@ -224,9 +224,...
+    END OF PACKET SEEN: YES
+    
+    If DeepSeek cannot state all five, do not accept a review. Re-transmit the packet as a file or split exact-byte chunks with explicit BEGIN/END markers.
+    
+    No source mutation, no d379_controls.py rebuild, no full hostile matrix, no incident allocation, no D390 replay, no fixity F, no capture, no candidate/holdout/blind 40, no Item 8 and no PR #122 merge.
+    
+    Report packet v2 and STOP for DeepSeek.
+    
+    The important outcome is that DeepSeek did uncover useful specification weaknesses despite not seeing the implementation. We use those to strengthen v2, but we do not mistake that partial review for the mandatory attack on the exact code delta.
+    
+    Confidence: 0.99 on findings 02/03/05/06/07; 0.98 on the DS-B4-04/09 disposition model; 0.97 on accepting current full-path subject binding as the correct B1 boundary.
+    END-VERBATIM KAI-DS-RECONCILIATION
+
+### 3. Authorised / Held / Forbidden
+
+- DONE: packet v2 (5 hunks, 231 added / 2 removed lines, header lines excluded; first hunk @@ -224,9 +224,207 @@; base blob aff0c37311bb5b27141d40be888e54d8662189e5) and the receipt gate at its head; a fallback split into 4 exact-byte chunks with BEGIN/END markers and per-chunk sha256 (reassembly verified equal)  [CMD `grep -c '^@@' DEEPSEEK_PACKET_TWO_FACT_v2.md` → 5]
+- HELD: any source mutation; the d379_controls.py rebuild; the full hostile matrix — until DeepSeek gives the five-line receipt, reviews v2, and Kai reconciles  [CONVERSATION 2026-10-03 Kai, "If DeepSeek cannot state all five, do not accept a review."]
+- FORBIDDEN: incident allocation, D390 replay, fixity F, capture, candidate/holdout/blind 40, Item 8, PR #122 merge  [CONVERSATION 2026-10-03 Kai, "no incident allocation, no D390 replay, no fixity F, no capture"]
+
+### 4. Open questions
+
+- DeepSeek: SUBJECT RECEIPT (PACKET HASH c439c734…4798, DIFF PRESENT, BASE BLOB aff0c373…, FIRST DIFF HUNK @@ -224,9 +224,207 @@, END OF PACKET SEEN), then the attack on v2 — owner: DeepSeek via Kai  [CONVERSATION 2026-10-03 Kai, "require a SUBJECT RECEIPT before review"]
+- A6 in the packet: v2 refuses any observation containing "NOMINAL_FUNCTION" that does not fullmatch the grammar, which is stricter than the leading-prefix rule Kai stated; 0 refusals on the frozen subject — owner: Kai  [CMD `regression_out.txt` → NOMINAL_FUNCTION positive 207 abstained 0]
+
+### 5. Incidents and corrections
+
+- Re-run on v2, qualified interpreter -B -E -s, repository unchanged: fixtures 58 PASS 0 FAIL (B1 expectation changed by Kai's ruling, paired with a full-path positive); frozen 272 rows: 0 axis cells and 0 other-eight-fact rows differ, 272/272 ten keys, NF 207 traced 207, SAC 6 traced 6; real chain: OLD qualifier rc 1 with 8 FACT_CLASS_ABSENT, NEW run_h2 rc 0 and qualifier rc 0 with 0 findings, axes and other eight facts identical. No unexpected difference, no failed control  [CMD `semantics.py; rowdump.py+regression_compare.py; chain_e2e.py` → as stated]
+- v1 → v2 delta changes, all from Kai's reconciliation: subrepair labels and disposition table in code; NOMINAL_OBSERVATION fullmatch grammar replaces split()[0]; REFUSE_ON_UNTRACEABLE_POSITIVE for both new facts (v1's SAC bad-trace→False removed); FactDispositionError for every refusal; normative-identity comment for the 438007e tuples  [CMD `count of + and - body lines, ---/+++ headers excluded` → v1 184/2 in 4 hunks, v2 231/2 in 5 hunks]
+- CORRECTION to entry 38: its "185 added / 3 removed lines" counted the ---/+++ header lines; the v1 delta is 184 added / 2 removed lines in 4 hunks. The same over-count was caught in packet v2's own receipt section before transmission and fixed (its hash moved from 461534f2… to c439c734…)  [CMD `count of + and - body lines, headers excluded` → v1 184/2]
+- Credential scan of packet v2 and re-run evidence: 0 hits  [CMD `secretscan.py <5 files>` → TOTAL HITS 0]
+- Verbatim blocks: strip the 4-space indent to recover each file  [CMD `sha256sum` → as listed]
+- EVIDENCE DEEPSEEK-PACKET-V2 DEEPSEEK_PACKET_TWO_FACT_v2.md: 21248 bytes, sha256 c439c734a2964f9f75d27f0c13a7e6250018eb7785f73c99ad7d1d3fc6d74798, final LF True  [CMD `sha256sum DEEPSEEK_PACKET_TWO_FACT_v2.md` → c439c734a2964f9f…]
+    BEGIN-VERBATIM DEEPSEEK-PACKET-V2 DEEPSEEK_PACKET_TWO_FACT_v2.md
+    # D379 B4 — TWO-FACT REPAIR: ADVERSARIAL-REVIEW PACKET v2 FOR DEEPSEEK
+    
+    Producer: Orion. Date: 2026-10-03. Evidence class: PRODUCER MEASUREMENT, SIGHTED, ZERO ADMISSION WEIGHT.
+    Status: PROPOSAL ONLY, scratch. Nothing is applied to the repository. Repair branch
+    claude/d379-repair-eb52f73 is at dbe692d9c3f83020176aeda00a0f399ce5f020f8 and unchanged.
+    
+    ## 0. SUBJECT RECEIPT — REQUIRED BEFORE ANY REVIEW (Kai, 2026-10-03)
+    
+    v1 of this packet reached the reviewer truncated: the review was made without the diff. Before
+    reviewing anything, reply with exactly these five lines. If you cannot state all five, say so
+    and do not review; the packet will be re-sent as a file or in exact-byte chunks.
+    
+        PACKET HASH: <sha256 of this exact file, as given by the sender>
+        DIFF PRESENT: YES
+        BASE BLOB: aff0c37311bb5b27141d40be888e54d8662189e5
+        FIRST DIFF HUNK: @@ -224,9 +224,207 @@
+        END OF PACKET SEEN: YES
+    
+    The diff in §4 has 5 hunks, 231 added lines and 2 removed lines (excluding the ---/+++ header lines). The last line of this file is
+    "END OF PACKET v2 — D379 TWO-FACT REPAIR".
+    
+    ## 1. Scope
+    
+    Attack ONLY this two-fact repair of run_h2_v12.py. Do not reopen unrelated v4.5 design. Every
+    finding returns to Kai for independent source reconciliation; a PASS is not implementation authority.
+    
+    ## 2. The defect, and the two independent subrepairs (Kai, DS-B4-01)
+    
+    One schema-completeness defect: ontology.EVIDENCE_FACTS governs ten evidence-fact classes
+    (ontology.py:62-65); run_h2_v12.evidence_facts() emitted eight; qualify.q1b_denominators()
+    correctly reports FACT_CLASS_ABSENT for each missing class on every real row. D367 §6 requires both
+    (H2_REPAIR_CONTRACT_D367.md:169, :203). Two mechanically different subrepairs, one tranche, one file:
+    
+      NF   NOMINAL_FUNCTION — WIRING of an already-governed observation: classify.function() emits
+           "NOMINAL_FUNCTION=<ROLE> from self-description" (single-role branch); run_h2_v12.py:455 already
+           tallied it but never emitted the fact. No detector is added.
+      SAC  SELF_ASSERTS_CURRENT — RESTORATION of the historical governed producer: v1.1
+           evidence.currentness_claims (D361, immutable commit 438007e). No v1.2/v1.3 module computes it.
+    
+    ## 3. Rulings this delta implements (Kai, P1–P4 and the DS-B4 reconciliation)
+    
+    R1  run_h2_v12.py only. No classify.py / ontology.py / envelope.py / subjectbind.py / seventh path.
+    R2  NF from the existing classify.function() observation only; exact token located with the existing
+        cl.FUNCTION_TERMS, cl.PURPOSE, cl.term_match. Exact full-string observation grammar
+        "NOMINAL_FUNCTION=<ROLE> from self-description"; any malformed observation REFUSES (DS-B4-08).
+    R3  SAC: CURRENT_POS / CURRENT_NEG are literal copies; their NORMATIVE identity is commit 438007e,
+        kai-pm/house_in_order_h2_v11/evidence.py. Governed controls compare them mechanically with that
+        commit and REFUSE on drift. v1.1 is not imported at runtime (DS-B4-02).
+    R4  Negative polarity wins. Subject ownership is the D12-repaired v1.3 subjectbind.bind_subject.
+        B1: a basename alone is NOT SELF; the full repo-relative path is SELF. No override (DS-B4-06).
+    R5  Boundary: fenced content excluded; quoted free prose is not a declaration; a quoted controlled
+        field may be one, tested with the GOVERNED v1.3 sb.SELF_FIELD (not v1.1's decoration syntax).
+    R6  FACT DISPOSITION, both new facts (DS-B4-04/09):
+          detector or input unavailable              -> REFUSE
+          complete measurement, nothing established  -> False = "positive fact not established" only
+          positive candidate, trace missing/non-compliant -> REFUSE (v1's SAC bad-trace->False removed)
+    R7  Every real row carries all ten keys; the candidate population must equal ont.EVIDENCE_FACTS
+        exactly or REFUSE (DS-B4-07).
+    R8  Trace: exact matched phrase/token, actual source line (selector), full determining sentence or
+        line, subject SELF, applicability SPAN (subject and applicability are separate dimensions).
+    R9  v1.1 auxiliary outputs (ambiguous_currentness_claims, currentness_claim_evidence) are NOT
+        restored (B2).
+    R10 207 (NF) and 6 (SAC) are frozen-subject regression observations, never acceptance constants or
+        definitions (DS-B4-05).
+    
+    ## 4. The exact proposed delta (unified diff against run_h2_v12.py at dbe692d, blob aff0c373)
+    
+    ```diff
+    --- a/kai-pm/house_in_order_h2_v13/run_h2_v12.py
+    +++ b/kai-pm/house_in_order_h2_v13/run_h2_v12.py
+    @@ -224,9 +224,207 @@
+         "BINDING_CONTRADICTION":      ("DATE_STAMP", "L"),
+         "SELF_ASSERTS_AUTHORITY":     ("SELF_AUTHORITY_CLAIM", "L"),
+         "SELF_ASSERTS_NON_AUTHORITY": ("SELF_AUTHORITY_CLAIM", "L"),
+    +    # Kai P1-P4, 2026-10-02: the two governed classes the runner omitted.
+    +    "NOMINAL_FUNCTION":           ("NOMINAL_FUNCTION_TERM", "L"),
+    +    "SELF_ASSERTS_CURRENT":       ("SELF_CURRENTNESS_CLAIM", "L"),
+     }
+     
+     
+    +# ── TWO INDEPENDENT SUBREPAIRS of one schema-completeness defect ──────
+    +# ontology.EVIDENCE_FACTS governs ten classes; this runner emitted eight,
+    +# and the qualifier correctly reported FACT_CLASS_ABSENT (Kai, DS-B4-01).
+    +#
+    +#   NF   NOMINAL_FUNCTION: WIRING of an already-governed observation,
+    +#        classify.function()'s "NOMINAL_FUNCTION=<role> from
+    +#        self-description". No detector is added.
+    +#   SAC  SELF_ASSERTS_CURRENT: RESTORATION of the historical governed
+    +#        producer, v1.1 evidence.currentness_claims (D361, 438007e).
+    +#
+    +# FACT DISPOSITION, both subrepairs (Kai, DS-B4-04/09):
+    +#   detector or input unavailable            -> REFUSE
+    +#   complete measurement, nothing established -> False ("positive fact
+    +#                                               not established", never
+    +#                                               "proved false")
+    +#   positive candidate, determining trace
+    +#   missing or non-compliant                  -> REFUSE (never False)
+    +
+    +# ── SAC — SELF_ASSERTS_CURRENT, historical restoration (Kai P2(a)) ────
+    +#
+    +# NORMATIVE IDENTITY. CURRENT_POS / CURRENT_NEG below are literal copies
+    +# of the tuples in the IMMUTABLE commit 438007e,
+    +# kai-pm/house_in_order_h2_v11/evidence.py. That commit, not this file,
+    +# is their authority; the governed controls compare these tuples with it
+    +# mechanically and REFUSE on any drift. v1.1 is deliberately NOT imported
+    +# at runtime (that would add an old package to the governed population).
+    +# Subject ownership is the D12-repaired subjectbind.bind_subject (full
+    +# repo-relative path; a basename alone is not SELF -- Kai, B1). The v1.1
+    +# boundary is restored here because subjectbind._sentences does not
+    +# carry it: fenced code is not evidence; quoted free prose is not a
+    +# declaration; a quoted CONTROLLED FIELD (governed sb.SELF_FIELD) may be
+    +# one. Negative polarity wins. v1.1's auxiliary diagnostics are NOT
+    +# restored (Kai, B2).
+    +
+    +# POSITIVE currentness predicates. Bound forms only -- never a bare
+    +# token. "current phase", not "current".
+    +CURRENT_POS = (
+    +    r"\bis (?:the )?current\b", r"\bcurrently\b", r"\bcurrent (?:phase|"
+    +    r"focus|state|status|master|authority)\b", r"\bstatus\s*:\s*active\b",
+    +    r"\bstatus\s*:\s*current\b", r"\bin force\b", r"\bstill (?:in force|"
+    +    r"current|active)\b",
+    +)
+    +# NEGATIVE polarity must be tested FIRST: "no longer current" contains
+    +# "current", and a polarity-blind matcher would read it as the opposite
+    +# of what it says.
+    +CURRENT_NEG = (
+    +    r"\bno longer\b", r"\bnot current\b", r"\bsuperseded\b",
+    +    r"\bdeprecated\b", r"\bobsolete\b", r"\bstale\b", r"\bhistorical\b",
+    +    r"\barchived\b", r"\bwithdrawn\b",
+    +)
+    +
+    +
+    +def _segments(text):
+    +    """v1.1 subjectbind2._sentences, restored with absolute offsets:
+    +    (start, sentence, line_no, quoted). Fenced lines are skipped
+    +    entirely; a blockquote marker is stripped but remembered; the split
+    +    is v1.1's `(?<=[.;])\s+` (never ':', which binds a field to its
+    +    value)."""
+    +    out, fence, off = [], False, 0
+    +    for i, ln in enumerate(text.split("\n")):
+    +        line_start, off = off, off + len(ln) + 1
+    +        s = ln.lstrip()
+    +        if s.startswith("```") or s.startswith("~~~"):
+    +            fence = not fence
+    +            continue
+    +        if fence:
+    +            continue
+    +        quoted = s.startswith(">")
+    +        body = s.lstrip("> ").strip()
+    +        base = line_start + ln.find(body) if body else line_start
+    +        pos = 0
+    +        for part in re.split(r"(?<=[.;])\s+", body):
+    +            if part:
+    +                j = body.find(part, pos)
+    +                out.append((base + j, part, i + 1, quoted))
+    +                pos = j + len(part)
+    +    return out
+    +
+    +
+    +def currentness_claims(path, text):
+    +    """Every polarity-bearing currentness sentence with its OWNER.
+    +    Returns [(polarity, subject, line_no, sentence, phrase)]."""
+    +    claims = []
+    +    for start, sent, line_no, quoted in _segments(text):
+    +        neg = next((m for m in (re.search(p, sent, re.I) for p in CURRENT_NEG)
+    +                    if m), None)
+    +        pos = None if neg else next(
+    +            (m for m in (re.search(p, sent, re.I) for p in CURRENT_POS) if m),
+    +            None)
+    +        if not (neg or pos):
+    +            continue
+    +        pol = "CURRENT_NEGATIVE" if neg else "CURRENT_POSITIVE"
+    +        if quoted and not sb.SELF_FIELD.match(sent):
+    +            subject = "QUOTED_NOT_DECLARATION"
+    +        else:
+    +            subject, _why = sb.bind_subject(text, start, sent, path)
+    +        claims.append((pol, subject, line_no, sent,
+    +                       (neg or pos).group(0)))
+    +    return claims
+    +
+    +
+    +def _currentness_fact(row, text):
+    +    """(positive, trace-maker). SELF positive and no SELF negative; a
+    +    SELF negative anywhere wins (v1.1 conflict rule)."""
+    +    cl_ = currentness_claims(row["path"], text)
+    +    self_pos = [c for c in cl_ if c[1] == "SELF" and c[0] == "CURRENT_POSITIVE"]
+    +    self_neg = [c for c in cl_ if c[1] == "SELF" and c[0] == "CURRENT_NEGATIVE"]
+    +    positive = bool(self_pos) and not self_neg
+    +
+    +    def mk():
+    +        _pol, _subj, line_no, sent, phrase = self_pos[0]
+    +        return {"witness_type": "SELF_CURRENTNESS_CLAIM",
+    +                "witness_value": phrase, "source_path": row["path"],
+    +                "source_selector": f"L{line_no}", "local_context": sent,
+    +                # the sentence is the evidence: SPAN, never widened because
+    +                # its semantic subject is the document (Kai P2)
+    +                "applicability_scope": "SPAN",
+    +                "evidence_total": len(self_pos), "evidence_shown": 1,
+    +                "truncated": len(self_pos) > 1,
+    +                "polarity": "POSITIVE", "certainty": "OBSERVED",
+    +                "temporal": "AT_COMMIT", "subject": "SELF"}
+    +    return positive, mk
+    +
+    +
+    +# ── NF — NOMINAL_FUNCTION, wiring of the classify.function() observation
+    +class FactDispositionError(SystemExit):
+    +    """A governed fact could not be dispositioned honestly: input
+    +    unavailable, a malformed governed observation, or a positive whose
+    +    exact determining trace cannot be built. REFUSE, never False."""
+    +
+    +
+    +NominalTraceError = FactDispositionError
+    +
+    +# The EXACT governed observation grammar emitted by classify.function()
+    +# (classify.py, single-role branch). Nothing looser is accepted
+    +# (Kai, DS-B4-08).
+    +NOMINAL_OBSERVATION = re.compile(
+    +    r"NOMINAL_FUNCTION=(?P<role>[A-Z][A-Z_]*) from self-description")
+    +
+    +
+    +def _nominal_fact(row, text, function_cell):
+    +    """(positive, trace-maker) from classify.function()'s own observation
+    +    `NOMINAL_FUNCTION=<role> from self-description`. The token is located
+    +    with the SAME governed cl.FUNCTION_TERMS / cl.PURPOSE / cl.term_match
+    +    and the same title-then-purpose order classify uses; no second
+    +    vocabulary exists here."""
+    +    obs = (function_cell or {}).get("observed") or ""
+    +    if "NOMINAL_FUNCTION" not in obs:
+    +        return False, None              # complete measurement, not established
+    +    om = NOMINAL_OBSERVATION.fullmatch(obs)
+    +    if om is None:
+    +        raise NominalTraceError(
+    +            f"REFUSE: {row['path']}: malformed NOMINAL_FUNCTION observation "
+    +            f"{obs!r}; the governed grammar is "
+    +            f"'NOMINAL_FUNCTION=<ROLE> from self-description'")
+    +    role = om.group("role")
+    +    if role not in cl.FUNCTION_TERMS:
+    +        raise NominalTraceError(
+    +            f"REFUSE: {row['path']}: NOMINAL_FUNCTION role {role!r} is not a "
+    +            f"governed FUNCTION_TERMS key")
+    +    term = cl.FUNCTION_TERMS[role]
+    +    lines = text.split("\n")
+    +    title = row.get("title") or ""
+    +    hit = None
+    +    if title and cl.term_match(term, title):
+    +        # Pass A's title rule: the FIRST line starting with '#'
+    +        for i, ln in enumerate(lines):
+    +            if ln.startswith("#"):
+    +                if ln.lstrip("#").strip()[:120] == title:
+    +                    m = cl.term_match(term, title)
+    +                    hit = (i + 1, ln, m.group(0))
+    +                break
+    +    else:
+    +        pm = cl.PURPOSE.search(text[:6000])
+    +        m = pm and cl.term_match(term, pm.group("body"))
+    +        if m:
+    +            ln_no = text[:pm.start("body")].count("\n") + 1
+    +            hit = (ln_no, lines[ln_no - 1], m.group(0))
+    +    if hit is None or hit[2] not in hit[1]:
+    +        raise NominalTraceError(
+    +            f"REFUSE: {row['path']}: classify observed NOMINAL_FUNCTION={role} "
+    +            f"but no exact determining source token could be located")
+    +
+    +    def mk():
+    +        ln_no, line, token = hit
+    +        return {"witness_type": "NOMINAL_FUNCTION_TERM",
+    +                "witness_value": token, "source_path": row["path"],
+    +                "source_selector": f"L{ln_no}", "local_context": line,
+    +                "applicability_scope": "SPAN",
+    +                "evidence_total": 1, "evidence_shown": 1, "truncated": False,
+    +                "polarity": "POSITIVE", "certainty": "OBSERVED",
+    +                "temporal": "AT_COMMIT", "subject": "SELF"}
+    +    return True, mk
+    +
+    +
+     def _class_ok(name, tr):
+         want = TRACE_CLASS.get(name)
+         if not want:
+    @@ -246,8 +444,14 @@
+         return str(t["witness_value"]) in str(t["local_context"])
+     
+     
+    +# The two classes repaired here. The existing eight keep their A6-ii
+    +# behaviour unchanged; that is outside this repair (Kai: bounded tranche).
+    +REFUSE_ON_UNTRACEABLE_POSITIVE = ("NOMINAL_FUNCTION", "SELF_ASSERTS_CURRENT")
+    +
+    +
+     def evidence_facts(row, claims, contradiction, determining=(),
+    -                   subject="", subject_repo="."):
+    +                   subject="", subject_repo=".", *, text=None,
+    +                   function_cell=None):
+         """FACTS, each bound to the trace that DETERMINED it. None is a
+         verdict (D360 5).
+     
+    @@ -294,6 +498,20 @@
+                           (lambda d=determining, n=len(claims): _claim_trace(
+                               row, d, n) if d else None))
+     
+    +    # Kai P3: every governed class is MEASURED on every row. No default:
+    +    # a caller that cannot supply the inputs does not get a False.
+    +    if text is None or function_cell is None:
+    +        raise FactDispositionError("REFUSE: evidence_facts needs the document text and "
+    +                         "the governed FUNCTION cell (Kai P3: no unmeasured "
+    +                         "False)")
+    +    cand["NOMINAL_FUNCTION"] = _nominal_fact(row, text, function_cell)
+    +    cand["SELF_ASSERTS_CURRENT"] = _currentness_fact(row, text)
+    +    missing = [n for n in ont.EVIDENCE_FACTS if n not in cand]
+    +    extra = [n for n in cand if n not in ont.EVIDENCE_FACTS]
+    +    if missing or extra:
+    +        raise FactDispositionError(f"REFUSE: evidence-fact producer population != the "
+    +                         f"governed schema; missing={missing} extra={extra}")
+    +
+         f, abstained = {}, []
+         for name, (positive, mk) in cand.items():
+             if not positive:
+    @@ -303,6 +521,12 @@
+             if _compliant(t) and _class_ok(name, t):
+                 f[name] = True
+                 traces[name] = t
+    +        elif name in REFUSE_ON_UNTRACEABLE_POSITIVE:
+    +            # Kai DS-B4-04: a positive candidate without a compliant
+    +            # determining trace is never demoted to False for these two.
+    +            raise FactDispositionError(
+    +                f"REFUSE: {row['path']}: positive {name} candidate has no "
+    +                f"compliant determining trace")
+             else:                       # A6-ii: no compliant trace, no positive
+                 f[name] = False
+                 abstained.append(name)
+    @@ -430,10 +654,15 @@
+             # E1 needs them BEFORE the facts, because a SELF-authority fact
+             # must bind to the row that determined it.
+             det = sb.determining_claims(claims)
+    +        fn_cell = cl.function(row, text)          # the governed observation
+             facts, ac, fact_traces, abstained = evidence_facts(
+    -            row, claims, contradiction, det, pa["subject"], sr)
+    +            row, claims, contradiction, det, pa["subject"], sr,
+    +            text=text, function_cell=fn_cell)
+             row["authority_claim"] = ac
+             out = cl.classify(row, text, contradiction)
+    +        if out["FUNCTION"] != fn_cell:
+    +            raise SystemExit(f"REFUSE: {row['path']}: classify's FUNCTION cell "
+    +                             f"differs from the observation the fact used")
+             out["evidence_facts"] = facts
+             # E1: every POSITIVE fact carries the trace that determined it.
+             out["evidence_fact_traces"] = fact_traces
+    ```
+    
+    ## 5. Changes from v1 (all from Kai's reconciliation)
+    
+    * Comments label NF as wiring and SAC as restoration; the disposition table is stated in code.
+    * NOMINAL_OBSERVATION exact grammar (fullmatch); malformed -> FactDispositionError (REFUSE).
+      v1's `obs.split("=", 1)[1].split()[0]` is gone.
+    * REFUSE_ON_UNTRACEABLE_POSITIVE = (NOMINAL_FUNCTION, SELF_ASSERTS_CURRENT): a positive candidate
+      of either class without a compliant trace REFUSES. The existing eight classes keep their A6-ii
+      behaviour unchanged (outside this repair).
+    * All refusals raise FactDispositionError (a SystemExit); NominalTraceError is kept as an alias.
+    * Normative-identity comment for CURRENT_POS / CURRENT_NEG (438007e); no runtime import.
+    * Fixture B1 expectation changed BY KAI'S RULING (basename-only -> not SELF) and paired with a
+      full-path positive. This is an adjudicated expectation, not a green-making edit.
+    
+    ## 6. Controls and Orion's scratch results (qualified interpreter, -B -E -s; repository unchanged)
+    
+    C1 semantics / hostile / grammar / disposition / population / calibration fixtures (semantics.py):
+       58 PASS, 0 FAIL. Includes: vocabulary identity vs 438007e (and a one-character drift detected);
+       explicit SELF positive; SELF negative; positive+negative conflict; another-document claim; bare
+       pronoun with and without an antecedent (D12); quoted free prose; quoted controlled field (positive
+       and negative); unquoted controlled field; ``` and ~~~ fences; unclosed fence; text after a closed
+       fence; subjectless prose; bare token "current"; B1 basename (not SELF) and full path (SELF);
+       negative-wins within one sentence; NF single role (title, purpose body), D11 two roles, no term,
+       D8 sub-word; seven malformed observation strings -> REFUSE; exact grammar accepted; untraceable
+       NF and SAC positives -> REFUSE; population gate with an added, and each removed, governed class ->
+       REFUSE, intact -> runs; qualifier calibration: deletion of either class -> FACT_CLASS_ABSENT,
+       trace removal and context corruption -> FACT_TRACE, wrong class -> FACT_TRACE_CLASS.
+    C2 frozen 272-row regression (frozen v1.2 Pass A f88e929b + tree 3abc9e9d; OLD dbe692d vs NEW):
+       0 axis cells differ; 0 rows differ on the other eight facts, their traces, abstentions or
+       authority_claim; 272/272 rows carry exactly the ten governed keys; NF 207 traced 207; SAC 6 traced
+       6 (the same six documents v1.1's committed bytes give).
+    C3 real chain, 4 synthetic documents, qualified interpreter: OLD run_h2 rc 0, qualifier rc 1 with
+       8 FACT_CLASS_ABSENT; NEW run_h2 rc 0, qualifier rc 0, 0 findings; six axes and the other eight
+       facts identical OLD vs NEW.
+    C4 not yet built: the same as governed d379_controls.py child cases with fail-old/pass-new and the
+       deletion/corruption mutations through the real qualifier CLI — only after Kai reconciles this
+       review.
+    
+    ## 7. Attack questions (suggested; not exhaustive)
+    
+    A1 Does `_segments` reproduce v1.1's boundary exactly? Indented fences, ">" in list items, ">>",
+       table rows, HTML comments, a line that is only ">".
+    A2 Is `base + j` always the true absolute sentence start for bind_subject's 400-character
+       antecedent window (repeated text on a line, lstrip/strip interactions)?
+    A3 Polarity and the `;` split: "This document is current; the old one is deprecated."
+    A4 NF: can the located token differ from the occurrence classify used (title truncated at 120
+       characters, term in both title and body, the 6000-character PURPOSE window)? Can a REFUSE fire on
+       a legitimate row and stop production? (0 on the frozen subject.)
+    A5 Can the FUNCTION-cell equality check or the population gate pass vacuously?
+    A6 Does "NOMINAL_FUNCTION" appearing anywhere in a non-matching observation (stricter than the
+       leading-prefix rule Kai named) over-refuse?
+    A7 Do the two new trace classes collide with any existing qualifier class check?
+    
+    END OF PACKET v2 — D379 TWO-FACT REPAIR
+    END-VERBATIM DEEPSEEK-PACKET-V2 DEEPSEEK_PACKET_TWO_FACT_v2.md
+- EVIDENCE SEMANTICS-INSTRUMENT-V2 semantics.py: 10846 bytes, sha256 5fa4ac317dd76bf9d58e9cbfcb56f45ac221ea6b1159b0f44e12ccf381c47303, final LF True  [CMD `sha256sum semantics.py` → 5fa4ac317dd76bf9…]
+    BEGIN-VERBATIM SEMANTICS-INSTRUMENT-V2 semantics.py
+    """Child under the qualified interpreter. argv: <new H2 dir>. Expected answers are written HERE, before running."""
+    import ast, json, subprocess, sys, copy
+    sys.path.insert(0, sys.argv[1])
+    import run_h2_v12 as R, classify as cl, qualify as Q, ontology as ont
+    P = F = 0
+    def chk(label, ok, detail=""):
+        global P, F
+        P += ok; F += (not ok); print(f"  {'PASS' if ok else 'FAIL'}  {label}" + ("" if ok else f"   -> {detail}"))
+    
+    print("V. VOCABULARY IDENTITY vs committed v1.1 bytes (438007e:kai-pm/house_in_order_h2_v11/evidence.py)")
+    src = subprocess.run(["git", "-C", "/home/user/kai-system", "show", "438007e:kai-pm/house_in_order_h2_v11/evidence.py"], capture_output=True, check=True).stdout
+    lit = {t.id: ast.literal_eval(n.value) for n in ast.parse(src).body if isinstance(n, ast.Assign) for t in n.targets if getattr(t, "id", "") in ("CURRENT_POS", "CURRENT_NEG")}
+    chk("CURRENT_POS identical to v1.1 (7 patterns)", R.CURRENT_POS == lit["CURRENT_POS"] and len(lit["CURRENT_POS"]) == 7)
+    chk("CURRENT_NEG identical to v1.1 (9 patterns)", R.CURRENT_NEG == lit["CURRENT_NEG"] and len(lit["CURRENT_NEG"]) == 9)
+    mut = list(lit["CURRENT_POS"]); mut[0] = mut[0] + "x"
+    chk("known-negative: a one-character mutated copy is NOT identical", tuple(mut) != R.CURRENT_POS)
+    
+    def sac(text, path="kai-pm/SELF.md"):
+        pos, mk = R._currentness_fact({"path": path}, text)
+        return pos, (mk() if pos else None)
+    print("\nS. SELF_ASSERTS_CURRENT semantics (expected value declared per case)")
+    CASES = [
+     ("explicit SELF positive", "# T\n\nThis document is the current plan.\n", True),
+     ("explicit SELF negative (negative wins)", "# T\n\nThis document is no longer current.\n", False),
+     ("SELF positive + SELF negative conflict", "# T\n\nThis document is the current plan.\n\nThis document is deprecated.\n", False),
+     ("another document is current", "# T\n\n`OTHER.md` is the current plan.\n", False),
+     ("bare pronoun, antecedent names another doc (D12)", "# T\n\nSee `OTHER.md` for details. It is currently maintained.\n", False),
+     ("bare pronoun, no antecedent", "# T\n\nIt is currently maintained.\n", True),
+     ("quoted free prose is not a declaration", "# T\n\n> This document is the current authority.\n", False),
+     ("quoted CONTROLLED FIELD is a declaration", "# T\n\n> Status: current\n", True),
+     ("unquoted controlled field", "Status: active\n", True),
+     ("fenced code is not evidence (```)", "# T\n\n```\nThis document is the current plan.\n```\n", False),
+     ("fenced code is not evidence (~~~)", "# T\n\n~~~\nStatus: current\n~~~\n", False),
+     ("text after a closed fence still counts", "# T\n\n```\nx\n```\n\nThis document is in force.\n", True),
+     ("subjectless prose", "# T\n\nThe system is currently running.\n", False),
+     ("bare token 'current' is not a claim", "# T\n\nThis document describes current events.\n", False),
+     ("no claim at all", "# T\n\nNothing here.\n", False),
+     # Kai B1 (2026-10-03): the governed v1.3 bind_subject is authoritative. A basename alone
+     # is not SELF (repository basenames are not unique); the full repo-relative path is.
+     ("B1 basename-only self-reference is NOT SELF (Kai)", "# T\n\n`SELF.md` is still current.\n", False),
+     ("B1 full repo-relative self-reference is SELF", "# T\n\n`kai-pm/SELF.md` is still current.\n", True),
+     ("negative polarity wins inside one SELF sentence", "# T\n\nThis document is currently deprecated.\n", False),
+     ("quoted controlled field, negative", "# T\n\n> Status: superseded\n", False),
+     ("unclosed fence swallows the rest", "# T\n\n```\nThis document is the current plan.\n", False),
+    ]
+    for label, text, want in CASES:
+        got, tr = sac(text)
+        chk(f"{label:<52} expect {want}", got == want, f"got {got}; claims {R.currentness_claims('kai-pm/SELF.md', text)}")
+    got, tr = sac("# T\n\nIntro line.\nThis document is the current plan; it governs.\n")
+    chk("trace: exact phrase, actual source line, full sentence, SPAN, SELF",
+        tr["witness_value"] == "is the current" and tr["source_selector"] == "L4"
+        and tr["local_context"] == "This document is the current plan;" and tr["applicability_scope"] == "SPAN"
+        and tr["subject"] == "SELF" and R._compliant(tr) and R._class_ok("SELF_ASSERTS_CURRENT", tr), tr)
+    got, tr = sac("# T\n\nThis document is the current plan.\n\nThis document is currently live.\n")
+    chk("two SELF positives: total 2, shown 1, truncated declared", tr["evidence_total"] == 2 and tr["evidence_shown"] == 1 and tr["truncated"] is True, tr)
+    
+    print("\nN. NOMINAL_FUNCTION semantics")
+    def nom(title_line, body=""):
+        text = f"{title_line}\n\n{body}\n"
+        row = {"path": "kai-pm/X.md", "title": title_line.lstrip("#").strip()[:120], "bytes": 5000, "witnesses": {}}
+        cell = cl.function(row, text)
+        return R._nominal_fact(row, text, cell), cell, row, text
+    for label, title, body, want in (
+        ("single role in title", "# Project Plan", "", True),
+        ("single role in purpose body only", "# Notes", "This document defines the deployment roadmap for the next quarter.", True),
+        ("two roles: D11 ambiguity", "# Audit Plan", "", False),
+        ("no nominal term", "# Notes", "", False),
+        ("term inside another word is not a match (D8)", "# Planning notes", "", False)):
+        (pos, mk), cell, row, text = nom(title, body)
+        tr = mk() if pos else None
+        ok = pos == want and (not pos or (R._compliant(tr) and R._class_ok("NOMINAL_FUNCTION", tr) and tr["witness_value"] in tr["local_context"]))
+        chk(f"{label:<52} expect {want}", ok, f"got {pos}, cell {cell.get('observed')}, trace {tr}")
+    (pos, mk), cell, row, text = nom("# Project Plan")
+    tr = mk()
+    chk("trace: token 'Plan' at L1, whole title line", tr["witness_value"] == "Plan" and tr["source_selector"] == "L1" and tr["local_context"] == "# Project Plan", tr)
+    row2 = dict(row, title="Something else entirely about a Plan")
+    try:
+        R._nominal_fact(row2, text, {"observed": "NOMINAL_FUNCTION=PLAN from self-description"}); refused = False
+    except R.FactDispositionError as e:
+        refused = "REFUSE" in str(e)
+    chk("observation present but no exact locatable trace -> REFUSE (not False)", refused)
+    try:
+        R._nominal_fact(row, text, {"observed": "NOMINAL_FUNCTION=NOT_A_ROLE from self-description"}); refused = False
+    except R.NominalTraceError:
+        refused = True
+    chk("observation names an ungoverned role -> REFUSE", refused)
+    try:
+        R.evidence_facts({"path": "x", "commits_in_window": 1, "readers": [], "witnesses": {}}, [], None); refused = False
+    except SystemExit as e:
+        refused = "no unmeasured False" in str(e)
+    chk("evidence_facts without text/function_cell REFUSES (no unmeasured False)", refused)
+    
+    print("\nG. GRAMMAR, DISPOSITION AND POPULATION GATES (Kai DS-B4-04/07/08)")
+    (pos, mk), cell, row, text = nom("# Project Plan")
+    for bad in ("NOMINAL_FUNCTION=PLAN", "NOMINAL_FUNCTION=plan from self-description",
+                "NOMINAL_FUNCTION=PLAN from self-description extra", "NOMINAL_FUNCTION=PLAN,STATUS from self-description",
+                " NOMINAL_FUNCTION=PLAN from self-description", "NOMINAL_FUNCTION= from self-description",
+                "prefix NOMINAL_FUNCTION=PLAN from self-description"):
+        try:
+            R._nominal_fact(row, text, {"observed": bad}); refused = False
+        except R.FactDispositionError as e:
+            refused = "REFUSE" in str(e)
+        chk(f"malformed observation {bad!r:<56} -> REFUSE", refused)
+    chk("exact grammar accepted: 'NOMINAL_FUNCTION=PLAN from self-description'",
+        R._nominal_fact(row, text, {"observed": "NOMINAL_FUNCTION=PLAN from self-description"})[0] is True)
+    chk("no NOMINAL_FUNCTION in a complete observation -> False (not established)",
+        R._nominal_fact(row, text, {"observed": "no nominal function term and no purpose statement"}) == (False, None))
+    base_row = {"path": "kai-pm/SYNTH.md", "commits_in_window": 1, "readers": [], "witnesses": {}, "title": "Project Plan", "bytes": 5000}
+    base_text = "# Project Plan\n\nThis document is the current plan.\n"
+    def ef():
+        return R.evidence_facts(dict(base_row), [], None, (), "", ".", text=base_text, function_cell=cl.function(base_row, base_text))
+    bad_trace = lambda: {"witness_type": "X"}
+    for name, attr in (("NOMINAL_FUNCTION", "_nominal_fact"), ("SELF_ASSERTS_CURRENT", "_currentness_fact")):
+        orig = getattr(R, attr)
+        setattr(R, attr, lambda *a, **k: (True, bad_trace))
+        try:
+            ef(); refused = False
+        except R.FactDispositionError as e:
+            refused = name in str(e)
+        finally:
+            setattr(R, attr, orig)
+        chk(f"positive {name} candidate with non-compliant trace -> REFUSE (never False)", refused)
+    orig_ef = ont.EVIDENCE_FACTS
+    for label, patched in (("governed schema gains an unproduced class", orig_ef + ("FUTURE_FACT",)),
+                           ("governed schema loses SELF_ASSERTS_CURRENT", tuple(x for x in orig_ef if x != "SELF_ASSERTS_CURRENT")),
+                           ("governed schema loses NOMINAL_FUNCTION", tuple(x for x in orig_ef if x != "NOMINAL_FUNCTION"))):
+        ont.EVIDENCE_FACTS = patched
+        try:
+            ef(); refused = False
+        except R.FactDispositionError as e:
+            refused = "producer population" in str(e)
+        finally:
+            ont.EVIDENCE_FACTS = orig_ef
+        chk(f"population gate: {label} -> REFUSE", refused)
+    chk("population gate known-negative: governed schema intact -> runs", isinstance(ef()[0], dict))
+    
+    print("\nM. QUALIFIER CALIBRATION — deletion and trace corruption on a real-shaped row")
+    row = {"path": "kai-pm/SYNTH.md", "commits_in_window": 1, "readers": [], "witnesses": {}, "title": "Project Plan", "bytes": 5000}
+    text = "# Project Plan\n\nThis document is the current plan.\n"
+    f, ac, tr, ab = R.evidence_facts(row, [], None, (), "", ".", text=text, function_cell=cl.function(row, text))
+    cells = {a: {"value": ont.ABSTENTION, "abstention": True, "witness": None} for a in ont.ALPHABETS}
+    base = dict(path=row["path"], **cells, evidence_facts=f, evidence_fact_traces=tr)
+    def q1b(r):
+        return [x[:3] for x in Q.q1b_denominators({"population": 1, "rows": [r]})[3]]
+    chk("clean row: both facts positive, Q1b clean", f["NOMINAL_FUNCTION"] and f["SELF_ASSERTS_CURRENT"] and q1b(base) == [], q1b(base))
+    for k in ("NOMINAL_FUNCTION", "SELF_ASSERTS_CURRENT"):
+        r = copy.deepcopy(base); r["evidence_facts"].pop(k)
+        chk(f"delete class {k} -> FACT_CLASS_ABSENT naming it", ("FACT_CLASS_ABSENT", r["path"], k) in q1b(r), q1b(r))
+        r = copy.deepcopy(base); r["evidence_fact_traces"].pop(k)
+        chk(f"remove {k} trace -> FACT_TRACE", ("FACT_TRACE", r["path"], k) in q1b(r), q1b(r))
+        r = copy.deepcopy(base); r["evidence_fact_traces"][k]["local_context"] = "unrelated"
+        chk(f"corrupt {k} trace context -> FACT_TRACE", ("FACT_TRACE", r["path"], k) in q1b(r), q1b(r))
+        r = copy.deepcopy(base); r["evidence_fact_traces"][k]["witness_type"] = "DATE_STAMP"
+        chk(f"wrong {k} trace class -> FACT_TRACE_CLASS", ("FACT_TRACE_CLASS", r["path"], k) in q1b(r), q1b(r))
+    print(f"\n{P} passed, {F} failed")
+    sys.exit(1 if F else 0)
+    END-VERBATIM SEMANTICS-INSTRUMENT-V2 semantics.py
+- EVIDENCE SEMANTICS-OUTPUT-V2 semantics_out.txt: 4672 bytes, sha256 1f8ea5a11c6d2d7f30c8194e18f5e27351320e59217731283cfcf298a99d71d3, final LF True  [CMD `sha256sum semantics_out.txt` → 1f8ea5a11c6d2d7f…]
+    BEGIN-VERBATIM SEMANTICS-OUTPUT-V2 semantics_out.txt
+    V. VOCABULARY IDENTITY vs committed v1.1 bytes (438007e:kai-pm/house_in_order_h2_v11/evidence.py)
+      PASS  CURRENT_POS identical to v1.1 (7 patterns)
+      PASS  CURRENT_NEG identical to v1.1 (9 patterns)
+      PASS  known-negative: a one-character mutated copy is NOT identical
+    
+    S. SELF_ASSERTS_CURRENT semantics (expected value declared per case)
+      PASS  explicit SELF positive                               expect True
+      PASS  explicit SELF negative (negative wins)               expect False
+      PASS  SELF positive + SELF negative conflict               expect False
+      PASS  another document is current                          expect False
+      PASS  bare pronoun, antecedent names another doc (D12)     expect False
+      PASS  bare pronoun, no antecedent                          expect True
+      PASS  quoted free prose is not a declaration               expect False
+      PASS  quoted CONTROLLED FIELD is a declaration             expect True
+      PASS  unquoted controlled field                            expect True
+      PASS  fenced code is not evidence (```)                    expect False
+      PASS  fenced code is not evidence (~~~)                    expect False
+      PASS  text after a closed fence still counts               expect True
+      PASS  subjectless prose                                    expect False
+      PASS  bare token 'current' is not a claim                  expect False
+      PASS  no claim at all                                      expect False
+      PASS  B1 basename-only self-reference is NOT SELF (Kai)    expect False
+      PASS  B1 full repo-relative self-reference is SELF         expect True
+      PASS  negative polarity wins inside one SELF sentence      expect False
+      PASS  quoted controlled field, negative                    expect False
+      PASS  unclosed fence swallows the rest                     expect False
+      PASS  trace: exact phrase, actual source line, full sentence, SPAN, SELF
+      PASS  two SELF positives: total 2, shown 1, truncated declared
+    
+    N. NOMINAL_FUNCTION semantics
+      PASS  single role in title                                 expect True
+      PASS  single role in purpose body only                     expect True
+      PASS  two roles: D11 ambiguity                             expect False
+      PASS  no nominal term                                      expect False
+      PASS  term inside another word is not a match (D8)         expect False
+      PASS  trace: token 'Plan' at L1, whole title line
+      PASS  observation present but no exact locatable trace -> REFUSE (not False)
+      PASS  observation names an ungoverned role -> REFUSE
+      PASS  evidence_facts without text/function_cell REFUSES (no unmeasured False)
+    
+    G. GRAMMAR, DISPOSITION AND POPULATION GATES (Kai DS-B4-04/07/08)
+      PASS  malformed observation 'NOMINAL_FUNCTION=PLAN'                                  -> REFUSE
+      PASS  malformed observation 'NOMINAL_FUNCTION=plan from self-description'            -> REFUSE
+      PASS  malformed observation 'NOMINAL_FUNCTION=PLAN from self-description extra'      -> REFUSE
+      PASS  malformed observation 'NOMINAL_FUNCTION=PLAN,STATUS from self-description'     -> REFUSE
+      PASS  malformed observation ' NOMINAL_FUNCTION=PLAN from self-description'           -> REFUSE
+      PASS  malformed observation 'NOMINAL_FUNCTION= from self-description'                -> REFUSE
+      PASS  malformed observation 'prefix NOMINAL_FUNCTION=PLAN from self-description'     -> REFUSE
+      PASS  exact grammar accepted: 'NOMINAL_FUNCTION=PLAN from self-description'
+      PASS  no NOMINAL_FUNCTION in a complete observation -> False (not established)
+      PASS  positive NOMINAL_FUNCTION candidate with non-compliant trace -> REFUSE (never False)
+      PASS  positive SELF_ASSERTS_CURRENT candidate with non-compliant trace -> REFUSE (never False)
+      PASS  population gate: governed schema gains an unproduced class -> REFUSE
+      PASS  population gate: governed schema loses SELF_ASSERTS_CURRENT -> REFUSE
+      PASS  population gate: governed schema loses NOMINAL_FUNCTION -> REFUSE
+      PASS  population gate known-negative: governed schema intact -> runs
+    
+    M. QUALIFIER CALIBRATION — deletion and trace corruption on a real-shaped row
+      PASS  clean row: both facts positive, Q1b clean
+      PASS  delete class NOMINAL_FUNCTION -> FACT_CLASS_ABSENT naming it
+      PASS  remove NOMINAL_FUNCTION trace -> FACT_TRACE
+      PASS  corrupt NOMINAL_FUNCTION trace context -> FACT_TRACE
+      PASS  wrong NOMINAL_FUNCTION trace class -> FACT_TRACE_CLASS
+      PASS  delete class SELF_ASSERTS_CURRENT -> FACT_CLASS_ABSENT naming it
+      PASS  remove SELF_ASSERTS_CURRENT trace -> FACT_TRACE
+      PASS  corrupt SELF_ASSERTS_CURRENT trace context -> FACT_TRACE
+      PASS  wrong SELF_ASSERTS_CURRENT trace class -> FACT_TRACE_CLASS
+    
+    58 passed, 0 failed
+    END-VERBATIM SEMANTICS-OUTPUT-V2 semantics_out.txt
+- EVIDENCE REGRESSION-OUTPUT-V2 regression_out.txt: 751 bytes, sha256 c4542a7d1f791b54d2c931d9f20fde446fb6ff1a48719721d350cb0462c20a1c, final LF True  [CMD `sha256sum regression_out.txt` → c4542a7d1f791b54…]
+    BEGIN-VERBATIM REGRESSION-OUTPUT-V2 regression_out.txt
+    subject: frozen v1.2 Pass A f88e929b rows + frozen tree 3abc9e9d texts; OLD = repair HEAD dbe692d run_h2_v12.py, NEW = proposed delta
+    rows 272
+    axis cells differing OLD vs NEW: 0
+    rows whose other 8 facts / their traces / abstentions / authority_claim differ: 0
+    OLD key-set sizes {8: 272} NEW {10: 272}
+    NEW rows whose key set == ont.EVIDENCE_FACTS (10): 272
+    NOMINAL_FUNCTION positive 207 abstained 0 traced 207
+    SELF_ASSERTS_CURRENT positive 6 abstained 0 traced 6
+    SELF_ASSERTS_CURRENT positive rows: ['kai-pm/CODE_AUDIT_BATCH_COGNITIVE_STATE_STUBS.md', 'kai-pm/CODE_AUDIT_REGISTER.md', 'kai-pm/CODE_AUDIT_REGISTER_CONTINUED.md', 'kai-pm/CODE_AUDIT_REGISTER_CONTINUED_2.md', 'kai-pm/EMBEDDING_BACKEND_STATE.md', 'kai-pm/SERVICE_IDENTITY_MEASUREMENT.md']
+    END-VERBATIM REGRESSION-OUTPUT-V2 regression_out.txt
+- EVIDENCE E2E-OUTPUT-V2 chain_e2e_out.txt: 19394 bytes, sha256 66e4ce5eddb1fa9cd8916a5d52ffee2854d5430169611e622d53be648a7818c8, final LF True  [CMD `sha256sum chain_e2e_out.txt` → 66e4ce5eddb1fa9c…]
+    BEGIN-VERBATIM E2E-OUTPUT-V2 chain_e2e_out.txt
+    
+    == OLD dbe692d ==
+    --- stage A rc=0
+    --- end stage A (0 bytes)
+    --- passa rc=0
+    PASS A v1.2 COMPLETE — 4 rows == population 4
+      WITNESS KINDS DISCRIMINATED (D2/D4), not assumed from shape:
+        DATE                          1
+      scope determined: WHOLE_FILE 1 · SPAN 0
+      binding predicates declared closed-world: 26
+      contextual predicates declared closed-world: 1 (status)
+      NO VERDICT ASSIGNED IN PASS A.
+    --- end passa (328 bytes)
+    --- bind A rc=0
+    6215cd8dc0528b9ec80b1f34f9395cbd92e7b2602c09ef27add19f779ba4aba6
+    --- end bind A (65 bytes)
+    --- run_h2_v12 rc=0
+    HOUSE_H2 v1.2 — 4 rows == population 4
+      subject 5caef20da1af tree d5b89bef71c9
+    
+      LIFECYCLE    positives    0  UNKNOWN    4   
+      FUNCTION     positives    0  UNKNOWN    4   
+      AUTHORITY    positives    0  UNKNOWN    4   
+      GENERATION   positives    0  UNKNOWN    4   
+      VALIDITY     positives    0  UNKNOWN    4   
+      SCOPE        positives    1  UNKNOWN    3   {'WHOLE_FILE': 1}
+    
+      evidence facts (NOT verdicts):
+        CARRIES_DATE_STAMP              1
+        BINDING_CONTRADICTION           1
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 2
+        {'PLAN from self-description': 2}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end run_h2_v12 (706 bytes)
+    --- bind C rc=0
+    068029a0747b8b684a3a2c10120a82118909ba932dd0a9345baebf5f22eb7456
+    --- end bind C (65 bytes)
+    --- qualify rc=1
+    HOUSE_H2 v1.2 — QUALIFICATION
+      subject 5caef20da1af  tree d5b89bef71c9
+      history 2026-10-03 → 2026-10-03  shallow=false  ancestry=1
+      census  29064d650a612968…
+    
+      [1] GOVERNING INVARIANT — checked from the AXIS SET
+          UNKNOWN first-class on every axis: True
+      [1b] REMOVAL CALIBRATION — the gate proves it can fail, this run
+           remove UNKNOWN from LIFECYCLE   detected=True
+           remove UNKNOWN from FUNCTION    detected=True
+           remove UNKNOWN from AUTHORITY   detected=True
+           remove UNKNOWN from GENERATION  detected=True
+           remove UNKNOWN from VALIDITY    detected=True
+           remove UNKNOWN from SCOPE       detected=True
+    
+      [2] STATE DISPOSITIONS — checked from the ALPHABET
+          [LIFECYCLE]
+            ACTIVE            H2_NOT_EARNABLE        0  
+            HISTORICAL        H2_EMITTABLE           0  not observed on this subject
+            SUPERSEDED        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           4  
+          [FUNCTION]
+            GOVERNANCE        H2_EMITTABLE           0  not observed on this subject
+            STATUS            H2_EMITTABLE           0  not observed on this subject
+            PLAN              H2_EMITTABLE           0  not observed on this subject
+            EVIDENCE          H2_EMITTABLE           0  not observed on this subject
+            REFERENCE         H2_EMITTABLE           0  not observed on this subject
+            RUNTIME_INPUT     H2_EMITTABLE           0  not observed on this subject
+            TEMPLATE          H2_EMITTABLE           0  not observed on this subject
+            MARKER            H2_EMITTABLE           0  not observed on this subject
+            USER_GUIDE        H2_EMITTABLE           0  not observed on this subject
+            OTHER             H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           4  
+          [AUTHORITY]
+            AUTHORITATIVE     DEFERRED_TO_H3         0  
+            VERIFIED_DERIVED  DEFERRED_TO_H3         0  
+            ADVISORY          DEFERRED_TO_H3         0  
+            NON_AUTHORITY     DEFERRED_TO_H3         0  
+            UNKNOWN           H2_EMITTABLE           4  
+          [GENERATION]
+            MANUAL            H2_NOT_EARNABLE        0  
+            PARTIAL_DERIVED   H2_NOT_EARNABLE        0  
+            FULL_DERIVED      H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           4  
+          [VALIDITY]
+            CURRENT_TREE      H2_EMITTABLE           0  not observed on this subject
+            EXACT_SNAPSHOT    H2_EMITTABLE           0  not observed on this subject
+            RUN_ARTEFACT      H2_EMITTABLE           0  not observed on this subject
+            TIME_BOUND        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           4  
+          [SCOPE]
+            WHOLE_FILE        H2_EMITTABLE           1  
+            HEADING           H2_NOT_EARNABLE        0  
+            TABLE             H2_NOT_EARNABLE        0  
+            MANAGED_REGION    H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           3  
+    
+      [3] OUTPUT-DERIVED — values emitted but unknown to the ontology: 0
+    
+      [4] population declared 4 == rows 4: True
+      [5] every non-abstention cell carries a source-bound witness: True  (0 missing)
+    
+      [6] §8(6) CLOSED ORIGIN CLASSIFICATION — every loaded origin
+          observed 87   classified 87   refused 0
+          H2                 3
+          CENSUS             0
+          GOVERNED_STDLIB    48
+          BUILTIN_OR_FROZEN  36
+    
+      [7] Q1a RECORDED PRODUCER PROVENANCE vs STAGE A
+          verified against stage_a_identity 9e97417229123bcb…, every slot closed
+    
+      [8] Q1b / E1 — DERIVED denominators (D379 §8)
+          axis-cell denominator              1
+          positive-evidence-fact denominator 2
+          sum                                3
+    
+      UTILITY PROFILE — reported, never optimised (D367 11)
+          axis         positive  UNKNOWN  UNMEASURED
+          LIFECYCLE           0        4           0
+          FUNCTION            0        4           0
+          AUTHORITY           0        4           0
+          GENERATION          0        4           0
+          VALIDITY            0        4           0
+          SCOPE               1        3           0
+          Qualification asks: is the instrument TRUTHFUL?
+          A separate later decision asks: is it USEFUL enough for H3?
+    
+      FINDINGS: 8
+        FACT_CLASS_ABSENT::kai-pm/AUDIT_PLAN_C.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/AUDIT_PLAN_C.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/MISC_D.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/MISC_D.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/NOTES_B.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/NOTES_B.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/PLAN_A.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/PLAN_A.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+    --- end qualify (5582 bytes)
+    
+    == NEW proposed ==
+    --- stage A rc=0
+    --- end stage A (0 bytes)
+    --- passa rc=0
+    PASS A v1.2 COMPLETE — 4 rows == population 4
+      WITNESS KINDS DISCRIMINATED (D2/D4), not assumed from shape:
+        DATE                          1
+      scope determined: WHOLE_FILE 1 · SPAN 0
+      binding predicates declared closed-world: 26
+      contextual predicates declared closed-world: 1 (status)
+      NO VERDICT ASSIGNED IN PASS A.
+    --- end passa (328 bytes)
+    --- bind A rc=0
+    c34ca3bc0a14d20b535940a8110e94884c1e48e7f89082e4129b10f836e85031
+    --- end bind A (65 bytes)
+    --- run_h2_v12 rc=0
+    HOUSE_H2 v1.2 — 4 rows == population 4
+      subject cdc7847c7c77 tree d5b89bef71c9
+    
+      LIFECYCLE    positives    0  UNKNOWN    4   
+      FUNCTION     positives    0  UNKNOWN    4   
+      AUTHORITY    positives    0  UNKNOWN    4   
+      GENERATION   positives    0  UNKNOWN    4   
+      VALIDITY     positives    0  UNKNOWN    4   
+      SCOPE        positives    1  UNKNOWN    3   {'WHOLE_FILE': 1}
+    
+      evidence facts (NOT verdicts):
+        SELF_ASSERTS_CURRENT            1
+        CARRIES_DATE_STAMP              1
+        BINDING_CONTRADICTION           1
+        NOMINAL_FUNCTION                2
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 2
+        {'PLAN from self-description': 2}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end run_h2_v12 (782 bytes)
+    --- bind C rc=0
+    039a975cbc2207dc9fa812fa1430e042e148318c1083a1e495862dc4bab1acc2
+    --- end bind C (65 bytes)
+    --- qualify rc=0
+    HOUSE_H2 v1.2 — QUALIFICATION
+      subject cdc7847c7c77  tree d5b89bef71c9
+      history 2026-10-03 → 2026-10-03  shallow=false  ancestry=1
+      census  29064d650a612968…
+    
+      [1] GOVERNING INVARIANT — checked from the AXIS SET
+          UNKNOWN first-class on every axis: True
+      [1b] REMOVAL CALIBRATION — the gate proves it can fail, this run
+           remove UNKNOWN from LIFECYCLE   detected=True
+           remove UNKNOWN from FUNCTION    detected=True
+           remove UNKNOWN from AUTHORITY   detected=True
+           remove UNKNOWN from GENERATION  detected=True
+           remove UNKNOWN from VALIDITY    detected=True
+           remove UNKNOWN from SCOPE       detected=True
+    
+      [2] STATE DISPOSITIONS — checked from the ALPHABET
+          [LIFECYCLE]
+            ACTIVE            H2_NOT_EARNABLE        0  
+            HISTORICAL        H2_EMITTABLE           0  not observed on this subject
+            SUPERSEDED        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           4  
+          [FUNCTION]
+            GOVERNANCE        H2_EMITTABLE           0  not observed on this subject
+            STATUS            H2_EMITTABLE           0  not observed on this subject
+            PLAN              H2_EMITTABLE           0  not observed on this subject
+            EVIDENCE          H2_EMITTABLE           0  not observed on this subject
+            REFERENCE         H2_EMITTABLE           0  not observed on this subject
+            RUNTIME_INPUT     H2_EMITTABLE           0  not observed on this subject
+            TEMPLATE          H2_EMITTABLE           0  not observed on this subject
+            MARKER            H2_EMITTABLE           0  not observed on this subject
+            USER_GUIDE        H2_EMITTABLE           0  not observed on this subject
+            OTHER             H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           4  
+          [AUTHORITY]
+            AUTHORITATIVE     DEFERRED_TO_H3         0  
+            VERIFIED_DERIVED  DEFERRED_TO_H3         0  
+            ADVISORY          DEFERRED_TO_H3         0  
+            NON_AUTHORITY     DEFERRED_TO_H3         0  
+            UNKNOWN           H2_EMITTABLE           4  
+          [GENERATION]
+            MANUAL            H2_NOT_EARNABLE        0  
+            PARTIAL_DERIVED   H2_NOT_EARNABLE        0  
+            FULL_DERIVED      H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           4  
+          [VALIDITY]
+            CURRENT_TREE      H2_EMITTABLE           0  not observed on this subject
+            EXACT_SNAPSHOT    H2_EMITTABLE           0  not observed on this subject
+            RUN_ARTEFACT      H2_EMITTABLE           0  not observed on this subject
+            TIME_BOUND        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           4  
+          [SCOPE]
+            WHOLE_FILE        H2_EMITTABLE           1  
+            HEADING           H2_NOT_EARNABLE        0  
+            TABLE             H2_NOT_EARNABLE        0  
+            MANAGED_REGION    H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           3  
+    
+      [3] OUTPUT-DERIVED — values emitted but unknown to the ontology: 0
+    
+      [4] population declared 4 == rows 4: True
+      [5] every non-abstention cell carries a source-bound witness: True  (0 missing)
+    
+      [6] §8(6) CLOSED ORIGIN CLASSIFICATION — every loaded origin
+          observed 87   classified 87   refused 0
+          H2                 3
+          CENSUS             0
+          GOVERNED_STDLIB    48
+          BUILTIN_OR_FROZEN  36
+    
+      [7] Q1a RECORDED PRODUCER PROVENANCE vs STAGE A
+          verified against stage_a_identity 78911ba0190df36c…, every slot closed
+    
+      [8] Q1b / E1 — DERIVED denominators (D379 §8)
+          axis-cell denominator              1
+          positive-evidence-fact denominator 5
+          sum                                6
+    
+      UTILITY PROFILE — reported, never optimised (D367 11)
+          axis         positive  UNKNOWN  UNMEASURED
+          LIFECYCLE           0        4           0
+          FUNCTION            0        4           0
+          AUTHORITY           0        4           0
+          GENERATION          0        4           0
+          VALIDITY            0        4           0
+          SCOPE               1        3           0
+          Qualification asks: is the instrument TRUTHFUL?
+          A separate later decision asks: is it USEFUL enough for H3?
+    
+      FINDINGS: 0
+    --- end qualify (4336 bytes)
+    
+    == SUMMARY ==
+    {
+     "NEW proposed": {
+      "axes": {
+       "kai-pm/AUDIT_PLAN_C.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "UNKNOWN",
+        "VALIDITY": "UNKNOWN"
+       },
+       "kai-pm/MISC_D.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "UNKNOWN",
+        "VALIDITY": "UNKNOWN"
+       },
+       "kai-pm/NOTES_B.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "UNKNOWN",
+        "VALIDITY": "UNKNOWN"
+       },
+       "kai-pm/PLAN_A.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "WHOLE_FILE",
+        "VALIDITY": "UNKNOWN"
+       }
+      },
+      "facts": {
+       "kai-pm/AUDIT_PLAN_C.md": {
+        "NOMINAL_FUNCTION": false,
+        "SELF_ASSERTS_CURRENT": false
+       },
+       "kai-pm/MISC_D.md": {
+        "NOMINAL_FUNCTION": false,
+        "SELF_ASSERTS_CURRENT": false
+       },
+       "kai-pm/NOTES_B.md": {
+        "NOMINAL_FUNCTION": true,
+        "SELF_ASSERTS_CURRENT": false
+       },
+       "kai-pm/PLAN_A.md": {
+        "NOMINAL_FUNCTION": true,
+        "SELF_ASSERTS_CURRENT": true
+       }
+      },
+      "findings": [],
+      "key_counts": [
+       10
+      ],
+      "other8": {
+       "kai-pm/AUDIT_PLAN_C.md": {
+        "BINDING_CONTRADICTION": false,
+        "CARRIES_DATE_STAMP": false,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       },
+       "kai-pm/MISC_D.md": {
+        "BINDING_CONTRADICTION": false,
+        "CARRIES_DATE_STAMP": false,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       },
+       "kai-pm/NOTES_B.md": {
+        "BINDING_CONTRADICTION": false,
+        "CARRIES_DATE_STAMP": false,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       },
+       "kai-pm/PLAN_A.md": {
+        "BINDING_CONTRADICTION": true,
+        "CARRIES_DATE_STAMP": true,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       }
+      },
+      "qualify_rc": 0,
+      "run_h2_rc": 0
+     },
+     "OLD dbe692d": {
+      "axes": {
+       "kai-pm/AUDIT_PLAN_C.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "UNKNOWN",
+        "VALIDITY": "UNKNOWN"
+       },
+       "kai-pm/MISC_D.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "UNKNOWN",
+        "VALIDITY": "UNKNOWN"
+       },
+       "kai-pm/NOTES_B.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "UNKNOWN",
+        "VALIDITY": "UNKNOWN"
+       },
+       "kai-pm/PLAN_A.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "WHOLE_FILE",
+        "VALIDITY": "UNKNOWN"
+       }
+      },
+      "facts": {
+       "kai-pm/AUDIT_PLAN_C.md": {
+        "NOMINAL_FUNCTION": "ABSENT",
+        "SELF_ASSERTS_CURRENT": "ABSENT"
+       },
+       "kai-pm/MISC_D.md": {
+        "NOMINAL_FUNCTION": "ABSENT",
+        "SELF_ASSERTS_CURRENT": "ABSENT"
+       },
+       "kai-pm/NOTES_B.md": {
+        "NOMINAL_FUNCTION": "ABSENT",
+        "SELF_ASSERTS_CURRENT": "ABSENT"
+       },
+       "kai-pm/PLAN_A.md": {
+        "NOMINAL_FUNCTION": "ABSENT",
+        "SELF_ASSERTS_CURRENT": "ABSENT"
+       }
+      },
+      "findings": [
+       "FACT_CLASS_ABSENT::kai-pm/AUDIT_PLAN_C.md \u2014 a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it",
+       "FACT_CLASS_ABSENT::kai-pm/AUDIT_PLAN_C.md \u2014 a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it",
+       "FACT_CLASS_ABSENT::kai-pm/MISC_D.md \u2014 a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it",
+       "FACT_CLASS_ABSENT::kai-pm/MISC_D.md \u2014 a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it",
+       "FACT_CLASS_ABSENT::kai-pm/NOTES_B.md \u2014 a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it",
+       "FACT_CLASS_ABSENT::kai-pm/NOTES_B.md \u2014 a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it",
+       "FACT_CLASS_ABSENT::kai-pm/PLAN_A.md \u2014 a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it",
+       "FACT_CLASS_ABSENT::kai-pm/PLAN_A.md \u2014 a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it"
+      ],
+      "key_counts": [
+       8
+      ],
+      "other8": {
+       "kai-pm/AUDIT_PLAN_C.md": {
+        "BINDING_CONTRADICTION": false,
+        "CARRIES_DATE_STAMP": false,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       },
+       "kai-pm/MISC_D.md": {
+        "BINDING_CONTRADICTION": false,
+        "CARRIES_DATE_STAMP": false,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       },
+       "kai-pm/NOTES_B.md": {
+        "BINDING_CONTRADICTION": false,
+        "CARRIES_DATE_STAMP": false,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       },
+       "kai-pm/PLAN_A.md": {
+        "BINDING_CONTRADICTION": true,
+        "CARRIES_DATE_STAMP": true,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       }
+      },
+      "qualify_rc": 1,
+      "run_h2_rc": 0
+     }
+    }
+    axes identical OLD vs NEW: True | other eight facts identical: True
+    END-VERBATIM E2E-OUTPUT-V2 chain_e2e_out.txt
+
+### 6. Next authorised step
+
+- Transmit packet v2 to DeepSeek; accept a review only after the five-line SUBJECT RECEIPT; then Kai reconciles; no source mutation before that  [CONVERSATION 2026-10-03 Kai, "Report packet v2 and STOP for DeepSeek."]
+
+### 7. What I am unsure of
+
+- v2 was exercised on one frozen subject and synthetic fixtures; the quote/fence edge forms in packet questions A1–A3 remain untested  [CMD `grep -n '^A[1-3]' DEEPSEEK_PACKET_TWO_FACT_v2.md` → A1, A2, A3 open]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
