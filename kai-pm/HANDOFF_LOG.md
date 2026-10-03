@@ -21213,3 +21213,487 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-03T03:18:42Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-03T03:18:42Z  [CMD `date -u +%FT%TZ` → 2026-10-03T03:18:42Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: a941897d0f5dae51d607daa9c9b2eee1adb76577  [CMD `git rev-parse HEAD` → a941897d0f5dae51d607daa9c9b2eee1adb76577]
+- tree: 9f3e7be8ce3af7f0d36bcbf6545291b36cce5a82  [CMD `git rev-parse HEAD^{tree}` → 9f3e7be8ce3af7f0d36bcbf6545291b36cce5a82]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: a941897d0f5dae51d607daa9c9b2eee1adb76577  [CMD `git ls-remote --heads origin` → a941897d0f5dae51d607daa9c9b2eee1adb76577]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: dbe692d9c3f83020176aeda00a0f399ce5f020f8  [CMD `git ls-remote --heads origin` → dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 54  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 54]
+
+### 1. The four states
+
+- physical: repair worktree at HEAD dbe692d with ONE uncommitted modification, kai-pm/house_in_order_h2_v13/run_h2_v12.py = sha256 a39359bc…; NOT committed, NOT pushed; remote repair branch still dbe692d  [CMD `git -C /home/user/kai-repair status --porcelain; sha256sum …/run_h2_v12.py; git ls-remote` → " M …run_h2_v12.py"; a39359bc…; dbe692d9c3f8…]
+- authorised: the entry-54 grant; its commit step requires ALL narrow verification to pass, and one grant step (fresh Pass A on the real frozen subject) has hit an environmental prerequisite, so the grant is paused at STOP pending Dainius  [CONVERSATION 2026-10-03 Kai, "Any unexpected failure, hash difference, semantic difference, new traceback class that produces output, missing reader source, invalid UTF-8 member or changed expectation → STOP. Do not repair around it."]
+- evidence: verification outputs verbatim in section 5  [CMD `as listed` → as stated]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- None  [CONVERSATION 2026-10-03 Dainius, "Approve exactly as drafted"]
+
+### 3. Authorised / Held / Forbidden
+
+- DONE (grant pre-checks): branch claude/d379-repair-eb52f73, HEAD dbe692d9c3f8…, status 0 lines incl. untracked, origin == HEAD, ahead/behind 0/0, current run_h2_v12.py sha256 24ecd782… = blob aff0c373… at HEAD  [CMD `git rev-parse; git status --porcelain=v1 --untracked-files=all; git fetch; git rev-list --left-right --count` → as stated]
+- DONE (apply): composite bytes copied (source verified a39359bc… in inst5 AND in the dbe692d + banked-v4-diff + SB-01 reconstruction); applied file sha256 a39359bc383c8f6f6ca4540c10474fcb094c990f7b8e8091792262436c7a4cfe, mode 644 (HEAD 100644); git diff --name-only = exactly kai-pm/house_in_order_h2_v13/run_h2_v12.py, numstat 342/7  [CMD `sha256sum; git diff --name-only; git diff --numstat` → as stated]
+- DONE (narrow verification, all on the repair worktree): compile + import OK under -B -E -s; semantics 92/0 and locators 37/0, both outputs byte-identical to banked v4 (fa38fa35…, e6fa762a…); frozen 272-row dump byte-identical to the v4 dump, regression 0 axis / 0 other-eight-fact differences, 272/272 rows with all 10 keys; process REFUSE 7/7; SB-01 harness with NEW = the repair worktree: NEW 13/13, OLD 13/13 as declared; full real-CLI chain on the synthetic SB-01 subject (Stage A CALIBRATION -> fresh Pass A -> binding -> classification -> binding -> qualifier) all rc 0, qualifier FINDINGS 0; fresh Pass A reader_ops: 1 row, selected source tools/rd.py, member 1/1, strict UTF-8 1/1, reader trace positive and traced  [CMD `semantics.py; loc_controls.py; rowdump.py + regression_compare.py; refuse_e2e.py /home/user kai-repair; sb01_e2e_impl.py + sb01_verdict.py; impl_chain_synth.py` → as stated]
+- STOPPED: the clean real chain on the REAL frozen subject d8aac4d4. Stage A (CALIBRATION) rc 0; fresh Pass A REFUSED: "R11 ABORT: history source is SHALLOW. … Refusing to measure." This environment holds only a shallow history (280 commits reachable, graft boundary d6e5d8cf…), so no fresh Pass A, binding, classification, qualifier or reader_ops population exists for the real subject; NOT MEASURED  [CMD `impl_chain.py impl/chain` → fresh Pass A rc=1, R11 ABORT shallow]
+- HELD: commit and push of the one-file change until Dainius rules on the real-subject step  [CONVERSATION 2026-10-03 Kai, "If any observed repository state conflicts with this grant, STOP rather than infer permission."]
+
+### 4. Open questions
+
+- Real-subject fresh Pass A (grant step): options for Dainius — (a) fetch full history into a SCRATCH clone from origin (read-only network fetch; no repository change) and rerun the real-subject chain; (b) accept the synthetic full chain plus entry 52's 615-file bound as satisfying the step; (c) stop here, leave the change uncommitted, return to Kai — owner: Dainius  [CMD `impl_chain.py` → shallow REFUSE]
+
+### 5. Incidents and corrections
+
+- Two harness errors, both before any measurement, both disclosed: (1) the first compile check passed cfile=/dev/null and py_compile refused it; replaced by the builtin compile() (no bytecode written), which passed; (2) the first real-subject run cloned the shallow repository locally without its shallow boundary (the repair checkout is a worktree whose shallow file lives in /home/user/kai-system/.git), so Stage A REFUSED "Failed to traverse parents of commit d6e5d8cf…"; the clone was rebuilt with --no-local (shallow, 280 commits, same as the source) and Stage A then passed; its log was overwritten by the rerun, the abort text is quoted here  [CMD `git -C clone rev-parse --is-shallow-repository; rev-list | wc -l` → false then true; 280]
+- Credential scan of the 11 evidence files: 0 hits; raw line separators: none  [CMD `secretscan.py <11 files>` → TOTAL HITS 0]
+- Verbatim blocks: strip the 4-space indent; append a final LF only where the line says final LF True  [CMD `roundtrip.py` → all True]
+- EVIDENCE IMPL-COMPILE-OUTPUT compile_out.txt: 161 bytes, sha256 2305e11eaa69b4d8e275bb5b2277412410fa7e9f178f8a6a8828356ba6fca14a, final LF True  [CMD `sha256sum compile_out.txt` → 2305e11eaa69b4d8…]
+    BEGIN-VERBATIM IMPL-COMPILE-OUTPUT
+    compile OK a39359bc383c8f6f6ca4540c10474fcb094c990f7b8e8091792262436c7a4cfe
+    import OK /home/user/kai-repair/kai-pm/house_in_order_h2_v13/run_h2_v12.py True True
+    END-VERBATIM IMPL-COMPILE-OUTPUT
+- EVIDENCE IMPL-REGRESSION-COMPARE-OUTPUT regression_compare_out.txt: 751 bytes, sha256 c4542a7d1f791b54d2c931d9f20fde446fb6ff1a48719721d350cb0462c20a1c, final LF True  [CMD `sha256sum regression_compare_out.txt` → c4542a7d1f791b54…]
+    BEGIN-VERBATIM IMPL-REGRESSION-COMPARE-OUTPUT
+    subject: frozen v1.2 Pass A f88e929b rows + frozen tree 3abc9e9d texts; OLD = repair HEAD dbe692d run_h2_v12.py, NEW = proposed delta
+    rows 272
+    axis cells differing OLD vs NEW: 0
+    rows whose other 8 facts / their traces / abstentions / authority_claim differ: 0
+    OLD key-set sizes {8: 272} NEW {10: 272}
+    NEW rows whose key set == ont.EVIDENCE_FACTS (10): 272
+    NOMINAL_FUNCTION positive 207 abstained 0 traced 207
+    SELF_ASSERTS_CURRENT positive 6 abstained 0 traced 6
+    SELF_ASSERTS_CURRENT positive rows: ['kai-pm/CODE_AUDIT_BATCH_COGNITIVE_STATE_STUBS.md', 'kai-pm/CODE_AUDIT_REGISTER.md', 'kai-pm/CODE_AUDIT_REGISTER_CONTINUED.md', 'kai-pm/CODE_AUDIT_REGISTER_CONTINUED_2.md', 'kai-pm/EMBEDDING_BACKEND_STATE.md', 'kai-pm/SERVICE_IDENTITY_MEASUREMENT.md']
+    END-VERBATIM IMPL-REGRESSION-COMPARE-OUTPUT
+- EVIDENCE IMPL-REFUSE-OUTPUT refuse_out.txt: 1546 bytes, sha256 8e6b465d941d7b36db5bedeb5f7aabf824469ebefefff8bfc34a6ce395b10bf4, final LF True  [CMD `sha256sum refuse_out.txt` → 8e6b465d941d7b36…]
+    BEGIN-VERBATIM IMPL-REFUSE-OUTPUT
+      PASS  fault=none                       rc=0 artefact_written=True  last line:   self_approval: NONE
+      PASS  fault=input-unavailable          rc=1 artefact_written=False  last line: REFUSE: evidence_facts needs the document text and the governed FUNCTION cell (Kai P3: no unmeasured False)
+      PASS  fault=malformed-NF-observation   rc=1 artefact_written=False  last line: REFUSE: kai-pm/NOTES_B.md: malformed NOMINAL_FUNCTION observation 'NOMINAL_FUNCTION=plan from self-description'; the governed grammar is 'NOMINAL_FUNC
+      PASS  fault=NF-untraceable-positive    rc=1 artefact_written=False  last line: REFUSE: kai-pm/NOTES_B.md: positive NOMINAL_FUNCTION candidate has no compliant determining trace
+      PASS  fault=SAC-untraceable-positive   rc=1 artefact_written=False  last line: REFUSE: kai-pm/NOTES_B.md: positive SELF_ASSERTS_CURRENT candidate has no compliant determining trace
+      PASS  fault=population-gate            rc=1 artefact_written=False  last line: REFUSE: evidence-fact producer population != the governed schema; missing=['FUTURE_FACT'] extra=[]
+      PASS  fault=FUNCTION-coherence         rc=1 artefact_written=False  last line: REFUSE: kai-pm/NOTES_B.md: classify's FUNCTION cell differs from the observation the fact used
+      OBSERVATION  working-tree heading edited after Pass A (HEAD unchanged): rc=1 artefact_written=False  last line: R11 ABORT [SOURCE BINDING / WORKTREE IDENTITY]: 1 tracked path(s) diverge from the frozen subject. Pass A would read the WORKING TREE bytes and stamp them with the subjec
+    
+    7 passed, 0 failed
+    END-VERBATIM IMPL-REFUSE-OUTPUT
+- EVIDENCE IMPL-SB01-HARNESS-DIFF sb01_e2e_impl.diff: 136 bytes, sha256 88775b27264b1a6ae08f1458590b26c7d055e4364489be63167b43f2c6307f91, final LF True  [CMD `sha256sum sb01_e2e_impl.diff` → 88775b27264b1a6a…]
+    BEGIN-VERBATIM IMPL-SB01-HARNESS-DIFF
+    9c9
+    < TREES = {"OLD": D / "inst4", "NEW": D / "inst5"}
+    ---
+    > TREES = {"OLD": D / "inst4", "NEW": pathlib.Path("/home/user/kai-repair")}
+    END-VERBATIM IMPL-SB01-HARNESS-DIFF
+- EVIDENCE IMPL-SB01-VERDICT-OUTPUT sb01_verdict_out.txt: 285 bytes, sha256 a2470bb70bbd8174ccb08de4b1005d920680ddcd6c54a88eb57ecdde9a3eb0f3, final LF True  [CMD `sha256sum sb01_verdict_out.txt` → a2470bb70bbd8174…]
+    BEGIN-VERBATIM IMPL-SB01-VERDICT-OUTPUT
+    NEW: 13/13 as declared
+    OLD: 13/13 as declared
+    fail-old cases (OLD rc0 with foreign bytes, or untranslated-newline unresolved): ['C0_CLEAN', 'C1_DIRTY_DOC', 'C1b_STAGED_DOC', 'C2_DIRTY_READER', 'C6_SYMLINK_SWAP', 'PROBE', 'T1_POST_GATE_DOC', 'T2_CHANGE_RESTORE', 'T3_POST_GATE_READER']
+    END-VERBATIM IMPL-SB01-VERDICT-OUTPUT
+- EVIDENCE IMPL-REAL-CHAIN-INSTRUMENT impl_chain.py: 7319 bytes, sha256 2cde06b905b8d35e4d3f31cf14a2f2dfd2bafc0c16c7e40e436c6976e453671a, final LF True  [CMD `sha256sum impl_chain.py` → 2cde06b905b8d35e…]
+    BEGIN-VERBATIM IMPL-REAL-CHAIN-INSTRUMENT
+    """Clean real chain on the REAL frozen subject (grant step), CALIBRATION mode, scratch clone. Orchestrator (system python3).
+    argv: <work dir>. Instrument = the repair worktree with the applied composite. Subject = d8aac4d4 (pa["subject"] of the
+    frozen Pass-A object), checked out detached in a scratch clone of the repair repository. Every stage must exit 0;
+    the first failure aborts (R11) and names what was not measured."""
+    import json, os, pathlib, subprocess, sys, hashlib
+    PY = "/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11"
+    CEN = "/home/user/kai-repair/kai-pm/house_in_order_census_v11"
+    V = pathlib.Path("/home/user/kai-repair/kai-pm/house_in_order_h2_v13")
+    SUBJ = "d8aac4d49e6ba997e3eb38062c0917186ee3f197"; TREE = "3abc9e9d8ca11966a6f996d5f0af68072ee5b117"
+    W = pathlib.Path(sys.argv[1]); W.mkdir(parents=True, exist_ok=True); L = W / "chain_full_log.txt"; log = open(L, "w")
+    def run(argv, label, must=True):
+        p = subprocess.run(argv, capture_output=True, text=True)
+        out = p.stdout + p.stderr
+        log.write(f"--- {label} rc={p.returncode} ({len(out.encode())} bytes)\n{out}--- end {label}\n"); log.flush()
+        tail = out.strip().splitlines()[-1] if out.strip() else ""
+        print(f"  {label:<28} rc={p.returncode}  {tail[:150]}")
+        if must and p.returncode != 0:
+            print(f"ABORT at '{label}': every later stage NOT MEASURED. Full log {L}"); sys.exit(2)
+        return p
+    R = W / "subj"
+    if not R.exists():
+        run(["git", "clone", "-q", "/home/user/kai-repair", str(R)], "clone repair repo")
+        run(["git", "-C", str(R), "checkout", "-q", "--detach", SUBJ], "checkout subject")
+    head = run(["git", "-C", str(R), "rev-parse", "HEAD"], "subject HEAD").stdout.strip()
+    tree = run(["git", "-C", str(R), "rev-parse", "HEAD^{tree}"], "subject tree").stdout.strip()
+    st = run(["git", "-C", str(R), "status", "--porcelain=v1", "--untracked-files=all"], "subject status").stdout
+    print(f"  subject HEAD == {SUBJ[:12]} {head == SUBJ}; tree == {TREE[:12]} {tree == TREE}; status lines {len(st.splitlines())}")
+    if head != SUBJ or tree != TREE or st.strip():
+        print("ABORT: subject prerequisite not met; nothing measured"); sys.exit(2)
+    sa = W / "stage_a.json"
+    for f in ("stage_a.json", "passA.json", "pa.b", "result.json", "r.b"):
+        if (W / f).exists(): (W / f).unlink()
+    run([PY, "-B", "-E", "-s", "-c", f"import sys; sys.path.insert(0, {str(V)!r}); import stage_identity as SI\nSI.load_governed_census({CEN!r})\n"
+         f"d = SI.build_stage_a('CALIBRATION', subject_repo={str(R)!r}, history_repo={str(R)!r})\nopen({str(sa)!r}, 'xb').write(SI.canonical_bytes(d))"], "Stage A (CALIBRATION)")
+    C = lambda s, *a: [PY, "-B", "-E", "-s", str(V / s), *a]
+    run(C("passa.py", "--subject-repo", str(R), "--history-repo", str(R), "--subject", SUBJ, "--census-package", CEN, "--stage-a", str(sa), "--out", str(W / "passA.json")), "fresh Pass A")
+    pab = run(C("stage_identity.py", "bind", "--artifact", str(W / "passA.json"), "--component", "PASS_A", "--stage-a", str(sa), "--producer-exit", "0", "--out", str(W / "pa.b")), "Pass-A binding").stdout.strip()
+    run(C("run_h2_v12.py", "--subject-repo", str(R), "--passa", str(W / "passA.json"), "--passa-stage-b", str(W / "pa.b"), "--expected-passa-binding-sha256", pab,
+          "--census-package", CEN, "--stage-a", str(sa), "--out", str(W / "result.json")), "classification (composite)")
+    cb = run(C("stage_identity.py", "bind", "--artifact", str(W / "result.json"), "--component", "CLASSIFICATION", "--stage-a", str(sa), "--producer-exit", "0", "--out", str(W / "r.b")), "classification binding").stdout.strip()
+    desc = json.loads(sa.read_bytes())
+    (W / "M").write_text("".join(f"{m['sha256']}  {pathlib.Path(m['path']).name}\n" for m in desc["h2_sources"]))
+    q = run(C("qualify.py", "--result", str(W / "result.json"), "--stage-a", str(sa), "--manifest", str(W / "M"), "--stage-b", str(W / "r.b"), "--expected-binding-sha256", cb,
+              "--passa-stage-b", str(W / "pa.b"), "--expected-passa-binding-sha256", pab, "--census-package", CEN), "qualifier")
+    print(f"  qualifier findings (lines with '::'): {sum('::' in l for l in q.stdout.splitlines())}")
+    st2 = subprocess.run(["git", "-C", str(R), "status", "--porcelain=v1", "--untracked-files=all"], capture_output=True, text=True).stdout
+    print(f"  subject status after chain: {len(st2.splitlines())} lines")
+    # ── fresh Pass A reader_ops population (grant: confirmation, not permission) ──
+    pa = json.loads((W / "passA.json").read_bytes()); res = json.loads((W / "result.json").read_bytes())
+    rows_ops = [r for r in pa["rows"] if r.get("reader_ops")]
+    all_srcs = sorted({o["src"] for r in rows_ops for o in r["reader_ops"]})
+    print(f"\nFRESH PASS A  subject {pa['subject'][:12]}  rows {len(pa['rows'])}  rows with readers {sum(bool(r.get('readers')) for r in pa['rows'])}  rows with reader_ops {len(rows_ops)}  reader_ops entries {sum(len(r['reader_ops']) for r in rows_ops)}  distinct op sources {len(all_srcs)}")
+    child = r'''
+    import sys, json, subprocess
+    sys.path.insert(0, sys.argv[1]); import run_h2_v12 as R
+    repo, subj, pa = sys.argv[2], sys.argv[3], json.load(open(sys.argv[4]))
+    sel = []
+    def rec(r, rel):
+        sel.append(str(rel)); p = subprocess.run(["git", "-C", repo, "cat-file", "blob", f"{subj}:{rel}"], capture_output=True)
+        if p.returncode: raise OSError(2, "absent")
+        return p.stdout.decode(errors="ignore")
+    for row in pa["rows"]:
+        R._reader_trace(dict(row, readers=row.get("readers") or [], reader_ops=row.get("reader_ops") or []), repo, rec)
+    print(json.dumps(sel))
+    '''
+    p = subprocess.run([PY, "-B", "-E", "-s", "-c", child, str(V), str(R), SUBJ, str(W / "passA.json")], capture_output=True, text=True)
+    if p.returncode: print("ABORT: reader selection probe failed:", p.stderr[-400:]); sys.exit(2)
+    sel = json.loads(p.stdout)
+    names = set(subprocess.run(["git", "-C", str(R), "ls-tree", "-r", "--name-only", SUBJ], capture_output=True, text=True).stdout.split("\n"))
+    def strict(rel):
+        b = subprocess.run(["git", "-C", str(R), "cat-file", "blob", f"{SUBJ}:{rel}"], capture_output=True).stdout
+        try: b.decode("utf-8", errors="strict"); return True
+        except UnicodeDecodeError: return False
+    SEL = sorted(set(sel)); ALL = sorted(set(all_srcs))
+    print(f"  selected reader sources (composite _reader_trace): {len(sel)} selections, {len(SEL)} distinct: {SEL}")
+    print(f"  member of frozen subject: {sum(s in names for s in SEL)}/{len(SEL)}   strict UTF-8: {sum(strict(s) for s in SEL if s in names)}/{len(SEL)}")
+    print(f"  (all op sources, superset of selected) member: {sum(s in names for s in ALL)}/{len(ALL)}   strict UTF-8: {sum(strict(s) for s in ALL if s in names)}/{len(ALL)}")
+    srt = [r for r in res["rows"] if r["evidence_facts"].get("STATIC_REFERENCE_AT_SUBJECT")]
+    print(f"  result: STATIC_REFERENCE_AT_SUBJECT positive {len(srt)}; traces {sum('STATIC_REFERENCE_AT_SUBJECT' in r['evidence_fact_traces'] for r in srt)}; abstained {sum('STATIC_REFERENCE_AT_SUBJECT' in r.get('evidence_facts_abstained_no_compliant_trace', []) for r in res['rows'])}")
+    print(f"  result tallies: {json.dumps(res['evidence_fact_tally'], sort_keys=True)}")
+    ok = all(s in names for s in SEL) and all(strict(s) for s in SEL)
+    json.dump({"selected": sel, "all_op_sources": ALL}, open(W / "reader_population.json", "w"), indent=1)
+    print(f"\nREADER CONFIRMATION: {'PASS' if ok else 'STOP'}")
+    sys.exit(0 if ok else 1)
+    END-VERBATIM IMPL-REAL-CHAIN-INSTRUMENT
+- EVIDENCE IMPL-REAL-CHAIN-OUTPUT impl_chain_out.txt: 683 bytes, sha256 b331c10050ed5714f286b264577ddd95a4830adffff497e6976c54434d02260c, final LF True  [CMD `sha256sum impl_chain_out.txt` → b331c10050ed5714…]
+    BEGIN-VERBATIM IMPL-REAL-CHAIN-OUTPUT
+      subject HEAD                 rc=0  d8aac4d49e6ba997e3eb38062c0917186ee3f197
+      subject tree                 rc=0  3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+      subject status               rc=0  
+      subject HEAD == d8aac4d49e6b True; tree == 3abc9e9d8ca1 True; status lines 0
+      Stage A (CALIBRATION)        rc=0  
+      fresh Pass A                 rc=1  R11 ABORT: history source is SHALLOW. It does not fail on these queries -- it returns its graft boundary as a plausible date. Refusing to measure.
+    ABORT at 'fresh Pass A': every later stage NOT MEASURED. Full log /tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/twofact/impl/chain/chain_full_log.txt
+    END-VERBATIM IMPL-REAL-CHAIN-OUTPUT
+- EVIDENCE IMPL-REAL-CHAIN-FULL-LOG real_chain_full_log.txt: 520 bytes, sha256 2ea69b9adabd9337ad63f8bee5a8f8435cf0ddfd331b74171f4602c1be3ab6c4, final LF True  [CMD `sha256sum real_chain_full_log.txt` → 2ea69b9adabd9337…]
+    BEGIN-VERBATIM IMPL-REAL-CHAIN-FULL-LOG
+    --- subject HEAD rc=0 (41 bytes)
+    d8aac4d49e6ba997e3eb38062c0917186ee3f197
+    --- end subject HEAD
+    --- subject tree rc=0 (41 bytes)
+    3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+    --- end subject tree
+    --- subject status rc=0 (0 bytes)
+    --- end subject status
+    --- Stage A (CALIBRATION) rc=0 (0 bytes)
+    --- end Stage A (CALIBRATION)
+    --- fresh Pass A rc=1 (147 bytes)
+    R11 ABORT: history source is SHALLOW. It does not fail on these queries -- it returns its graft boundary as a plausible date. Refusing to measure.
+    --- end fresh Pass A
+    END-VERBATIM IMPL-REAL-CHAIN-FULL-LOG
+- EVIDENCE IMPL-SYNTH-CHAIN-INSTRUMENT impl_chain_synth.py: 7360 bytes, sha256 de2efaeade960912d921da74b69b8e2c32a4a474e891cb6944b4af9a76f0b09f, final LF True  [CMD `sha256sum impl_chain_synth.py` → de2efaeade960912…]
+    BEGIN-VERBATIM IMPL-SYNTH-CHAIN-INSTRUMENT
+    """Clean real chain on the SYNTHETIC SB-01 subject (argv[2]); same stages, CALIBRATION mode, scratch clone. Orchestrator (system python3).
+    argv: <work dir>. Instrument = the repair worktree with the applied composite. Subject = d8aac4d4 (pa["subject"] of the
+    frozen Pass-A object), checked out detached in a scratch clone of the repair repository. Every stage must exit 0;
+    the first failure aborts (R11) and names what was not measured."""
+    import json, os, pathlib, subprocess, sys, hashlib
+    PY = "/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11"
+    CEN = "/home/user/kai-repair/kai-pm/house_in_order_census_v11"
+    V = pathlib.Path("/home/user/kai-repair/kai-pm/house_in_order_h2_v13")
+    SUBJ = "0e18e1138c39b232f0373a1845b8d2d5434ee259"; TREE = "e9f14d623c080479221a89a01f54b8cd136647f2"
+    W = pathlib.Path(sys.argv[1]); W.mkdir(parents=True, exist_ok=True); L = W / "chain_full_log.txt"; log = open(L, "w")
+    def run(argv, label, must=True):
+        p = subprocess.run(argv, capture_output=True, text=True)
+        out = p.stdout + p.stderr
+        log.write(f"--- {label} rc={p.returncode} ({len(out.encode())} bytes)\n{out}--- end {label}\n"); log.flush()
+        tail = out.strip().splitlines()[-1] if out.strip() else ""
+        print(f"  {label:<28} rc={p.returncode}  {tail[:150]}")
+        if must and p.returncode != 0:
+            print(f"ABORT at '{label}': every later stage NOT MEASURED. Full log {L}"); sys.exit(2)
+        return p
+    R = W / "subj"
+    if not R.exists():
+        run(["git", "clone", "-q", "--no-local", str(pathlib.Path(sys.argv[2])), str(R)], "clone synthetic subject")
+        run(["git", "-C", str(R), "checkout", "-q", "--detach", SUBJ], "checkout subject")
+    head = run(["git", "-C", str(R), "rev-parse", "HEAD"], "subject HEAD").stdout.strip()
+    tree = run(["git", "-C", str(R), "rev-parse", "HEAD^{tree}"], "subject tree").stdout.strip()
+    st = run(["git", "-C", str(R), "status", "--porcelain=v1", "--untracked-files=all"], "subject status").stdout
+    print(f"  subject HEAD == {SUBJ[:12]} {head == SUBJ}; tree == {TREE[:12]} {tree == TREE}; status lines {len(st.splitlines())}")
+    if head != SUBJ or tree != TREE or st.strip():
+        print("ABORT: subject prerequisite not met; nothing measured"); sys.exit(2)
+    sa = W / "stage_a.json"
+    for f in ("stage_a.json", "passA.json", "pa.b", "result.json", "r.b"):
+        if (W / f).exists(): (W / f).unlink()
+    run([PY, "-B", "-E", "-s", "-c", f"import sys; sys.path.insert(0, {str(V)!r}); import stage_identity as SI\nSI.load_governed_census({CEN!r})\n"
+         f"d = SI.build_stage_a('CALIBRATION', subject_repo={str(R)!r}, history_repo={str(R)!r})\nopen({str(sa)!r}, 'xb').write(SI.canonical_bytes(d))"], "Stage A (CALIBRATION)")
+    C = lambda s, *a: [PY, "-B", "-E", "-s", str(V / s), *a]
+    run(C("passa.py", "--subject-repo", str(R), "--history-repo", str(R), "--subject", SUBJ, "--census-package", CEN, "--stage-a", str(sa), "--out", str(W / "passA.json")), "fresh Pass A")
+    pab = run(C("stage_identity.py", "bind", "--artifact", str(W / "passA.json"), "--component", "PASS_A", "--stage-a", str(sa), "--producer-exit", "0", "--out", str(W / "pa.b")), "Pass-A binding").stdout.strip()
+    run(C("run_h2_v12.py", "--subject-repo", str(R), "--passa", str(W / "passA.json"), "--passa-stage-b", str(W / "pa.b"), "--expected-passa-binding-sha256", pab,
+          "--census-package", CEN, "--stage-a", str(sa), "--out", str(W / "result.json")), "classification (composite)")
+    cb = run(C("stage_identity.py", "bind", "--artifact", str(W / "result.json"), "--component", "CLASSIFICATION", "--stage-a", str(sa), "--producer-exit", "0", "--out", str(W / "r.b")), "classification binding").stdout.strip()
+    desc = json.loads(sa.read_bytes())
+    (W / "M").write_text("".join(f"{m['sha256']}  {pathlib.Path(m['path']).name}\n" for m in desc["h2_sources"]))
+    q = run(C("qualify.py", "--result", str(W / "result.json"), "--stage-a", str(sa), "--manifest", str(W / "M"), "--stage-b", str(W / "r.b"), "--expected-binding-sha256", cb,
+              "--passa-stage-b", str(W / "pa.b"), "--expected-passa-binding-sha256", pab, "--census-package", CEN), "qualifier")
+    print(f"  qualifier findings (lines with '::'): {sum('::' in l for l in q.stdout.splitlines())}")
+    st2 = subprocess.run(["git", "-C", str(R), "status", "--porcelain=v1", "--untracked-files=all"], capture_output=True, text=True).stdout
+    print(f"  subject status after chain: {len(st2.splitlines())} lines")
+    # ── fresh Pass A reader_ops population (grant: confirmation, not permission) ──
+    pa = json.loads((W / "passA.json").read_bytes()); res = json.loads((W / "result.json").read_bytes())
+    rows_ops = [r for r in pa["rows"] if r.get("reader_ops")]
+    all_srcs = sorted({o["src"] for r in rows_ops for o in r["reader_ops"]})
+    print(f"\nFRESH PASS A  subject {pa['subject'][:12]}  rows {len(pa['rows'])}  rows with readers {sum(bool(r.get('readers')) for r in pa['rows'])}  rows with reader_ops {len(rows_ops)}  reader_ops entries {sum(len(r['reader_ops']) for r in rows_ops)}  distinct op sources {len(all_srcs)}")
+    child = r'''
+    import sys, json, subprocess
+    sys.path.insert(0, sys.argv[1]); import run_h2_v12 as R
+    repo, subj, pa = sys.argv[2], sys.argv[3], json.load(open(sys.argv[4]))
+    sel = []
+    def rec(r, rel):
+        sel.append(str(rel)); p = subprocess.run(["git", "-C", repo, "cat-file", "blob", f"{subj}:{rel}"], capture_output=True)
+        if p.returncode: raise OSError(2, "absent")
+        return p.stdout.decode(errors="ignore")
+    for row in pa["rows"]:
+        R._reader_trace(dict(row, readers=row.get("readers") or [], reader_ops=row.get("reader_ops") or []), repo, rec)
+    print(json.dumps(sel))
+    '''
+    p = subprocess.run([PY, "-B", "-E", "-s", "-c", child, str(V), str(R), SUBJ, str(W / "passA.json")], capture_output=True, text=True)
+    if p.returncode: print("ABORT: reader selection probe failed:", p.stderr[-400:]); sys.exit(2)
+    sel = json.loads(p.stdout)
+    names = set(subprocess.run(["git", "-C", str(R), "ls-tree", "-r", "--name-only", SUBJ], capture_output=True, text=True).stdout.split("\n"))
+    def strict(rel):
+        b = subprocess.run(["git", "-C", str(R), "cat-file", "blob", f"{SUBJ}:{rel}"], capture_output=True).stdout
+        try: b.decode("utf-8", errors="strict"); return True
+        except UnicodeDecodeError: return False
+    SEL = sorted(set(sel)); ALL = sorted(set(all_srcs))
+    print(f"  selected reader sources (composite _reader_trace): {len(sel)} selections, {len(SEL)} distinct: {SEL}")
+    print(f"  member of frozen subject: {sum(s in names for s in SEL)}/{len(SEL)}   strict UTF-8: {sum(strict(s) for s in SEL if s in names)}/{len(SEL)}")
+    print(f"  (all op sources, superset of selected) member: {sum(s in names for s in ALL)}/{len(ALL)}   strict UTF-8: {sum(strict(s) for s in ALL if s in names)}/{len(ALL)}")
+    srt = [r for r in res["rows"] if r["evidence_facts"].get("STATIC_REFERENCE_AT_SUBJECT")]
+    print(f"  result: STATIC_REFERENCE_AT_SUBJECT positive {len(srt)}; traces {sum('STATIC_REFERENCE_AT_SUBJECT' in r['evidence_fact_traces'] for r in srt)}; abstained {sum('STATIC_REFERENCE_AT_SUBJECT' in r.get('evidence_facts_abstained_no_compliant_trace', []) for r in res['rows'])}")
+    print(f"  result tallies: {json.dumps(res['evidence_fact_tally'], sort_keys=True)}")
+    ok = all(s in names for s in SEL) and all(strict(s) for s in SEL)
+    json.dump({"selected": sel, "all_op_sources": ALL}, open(W / "reader_population.json", "w"), indent=1)
+    print(f"\nREADER CONFIRMATION: {'PASS' if ok else 'STOP'}")
+    sys.exit(0 if ok else 1)
+    END-VERBATIM IMPL-SYNTH-CHAIN-INSTRUMENT
+- EVIDENCE IMPL-SYNTH-CHAIN-OUTPUT impl_chain_synth_out.txt: 1407 bytes, sha256 fcfac6b34ea7d5776e52676b617b49bddcb59e5f50046611d2f4c6920692ffd9, final LF True  [CMD `sha256sum impl_chain_synth_out.txt` → fcfac6b34ea7d577…]
+    BEGIN-VERBATIM IMPL-SYNTH-CHAIN-OUTPUT
+      clone synthetic subject      rc=0  
+      checkout subject             rc=0  
+      subject HEAD                 rc=0  0e18e1138c39b232f0373a1845b8d2d5434ee259
+      subject tree                 rc=0  e9f14d623c080479221a89a01f54b8cd136647f2
+      subject status               rc=0  
+      subject HEAD == 0e18e1138c39 True; tree == e9f14d623c08 True; status lines 0
+      Stage A (CALIBRATION)        rc=0  
+      fresh Pass A                 rc=0    NO VERDICT ASSIGNED IN PASS A.
+      Pass-A binding               rc=0  b17601f168f2dd2beb4d8c6d6d866ad68992c092f2f187aa4adf274f3462f09b
+      classification (composite)   rc=0    self_approval: NONE
+      classification binding       rc=0  16d4f3d169fd1df4a3503d1aed6a07e79844ffe591db27bf2e11bc6d10a0e5cc
+      qualifier                    rc=0    FINDINGS: 0
+      qualifier findings (lines with '::'): 0
+      subject status after chain: 0 lines
+    
+    FRESH PASS A  subject 0e18e1138c39  rows 3  rows with readers 1  rows with reader_ops 1  reader_ops entries 1  distinct op sources 1
+      selected reader sources (composite _reader_trace): 1 selections, 1 distinct: ['tools/rd.py']
+      member of frozen subject: 1/1   strict UTF-8: 1/1
+      (all op sources, superset of selected) member: 1/1   strict UTF-8: 1/1
+      result: STATIC_REFERENCE_AT_SUBJECT positive 1; traces 1; abstained 0
+      result tallies: {"NOMINAL_FUNCTION": 1, "SELF_ASSERTS_CURRENT": 3, "STATIC_REFERENCE_AT_SUBJECT": 1}
+    
+    READER CONFIRMATION: PASS
+    END-VERBATIM IMPL-SYNTH-CHAIN-OUTPUT
+- EVIDENCE IMPL-SYNTH-CHAIN-FULL-LOG synth_chain_full_log.txt: 6287 bytes, sha256 49ff54e7ab97c9dedffa53148dbad8aa0f00fb4fa699c8d776f445ededbbe85d, final LF True  [CMD `sha256sum synth_chain_full_log.txt` → 49ff54e7ab97c9de…]
+    BEGIN-VERBATIM IMPL-SYNTH-CHAIN-FULL-LOG
+    --- clone synthetic subject rc=0 (0 bytes)
+    --- end clone synthetic subject
+    --- checkout subject rc=0 (0 bytes)
+    --- end checkout subject
+    --- subject HEAD rc=0 (41 bytes)
+    0e18e1138c39b232f0373a1845b8d2d5434ee259
+    --- end subject HEAD
+    --- subject tree rc=0 (41 bytes)
+    e9f14d623c080479221a89a01f54b8cd136647f2
+    --- end subject tree
+    --- subject status rc=0 (0 bytes)
+    --- end subject status
+    --- Stage A (CALIBRATION) rc=0 (0 bytes)
+    --- end Stage A (CALIBRATION)
+    --- fresh Pass A rc=0 (292 bytes)
+    PASS A v1.2 COMPLETE — 3 rows == population 3
+      WITNESS KINDS DISCRIMINATED (D2/D4), not assumed from shape:
+      scope determined: WHOLE_FILE 0 · SPAN 0
+      binding predicates declared closed-world: 26
+      contextual predicates declared closed-world: 1 (status)
+      NO VERDICT ASSIGNED IN PASS A.
+    --- end fresh Pass A
+    --- Pass-A binding rc=0 (65 bytes)
+    b17601f168f2dd2beb4d8c6d6d866ad68992c092f2f187aa4adf274f3462f09b
+    --- end Pass-A binding
+    --- classification (composite) rc=0 (727 bytes)
+    HOUSE_H2 v1.2 — 3 rows == population 3
+      subject 0e18e1138c39 tree e9f14d623c08
+    
+      LIFECYCLE    positives    0  UNKNOWN    3   
+      FUNCTION     positives    0  UNKNOWN    3   
+      AUTHORITY    positives    0  UNKNOWN    3   
+      GENERATION   positives    0  UNKNOWN    3   
+      VALIDITY     positives    0  UNKNOWN    3   
+      SCOPE        positives    0  UNKNOWN    3   
+    
+      evidence facts (NOT verdicts):
+        SELF_ASSERTS_CURRENT            3
+        STATIC_REFERENCE_AT_SUBJECT     1
+        NOMINAL_FUNCTION                1
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 1
+        {'PLAN from self-description': 1}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end classification (composite)
+    --- classification binding rc=0 (65 bytes)
+    16d4f3d169fd1df4a3503d1aed6a07e79844ffe591db27bf2e11bc6d10a0e5cc
+    --- end classification binding
+    --- qualifier rc=0 (4364 bytes)
+    HOUSE_H2 v1.2 — QUALIFICATION
+      subject 0e18e1138c39  tree e9f14d623c08
+      history 2026-10-03 → 2026-10-03  shallow=false  ancestry=1
+      census  29064d650a612968…
+    
+      [1] GOVERNING INVARIANT — checked from the AXIS SET
+          UNKNOWN first-class on every axis: True
+      [1b] REMOVAL CALIBRATION — the gate proves it can fail, this run
+           remove UNKNOWN from LIFECYCLE   detected=True
+           remove UNKNOWN from FUNCTION    detected=True
+           remove UNKNOWN from AUTHORITY   detected=True
+           remove UNKNOWN from GENERATION  detected=True
+           remove UNKNOWN from VALIDITY    detected=True
+           remove UNKNOWN from SCOPE       detected=True
+    
+      [2] STATE DISPOSITIONS — checked from the ALPHABET
+          [LIFECYCLE]
+            ACTIVE            H2_NOT_EARNABLE        0  
+            HISTORICAL        H2_EMITTABLE           0  not observed on this subject
+            SUPERSEDED        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           3  
+          [FUNCTION]
+            GOVERNANCE        H2_EMITTABLE           0  not observed on this subject
+            STATUS            H2_EMITTABLE           0  not observed on this subject
+            PLAN              H2_EMITTABLE           0  not observed on this subject
+            EVIDENCE          H2_EMITTABLE           0  not observed on this subject
+            REFERENCE         H2_EMITTABLE           0  not observed on this subject
+            RUNTIME_INPUT     H2_EMITTABLE           0  not observed on this subject
+            TEMPLATE          H2_EMITTABLE           0  not observed on this subject
+            MARKER            H2_EMITTABLE           0  not observed on this subject
+            USER_GUIDE        H2_EMITTABLE           0  not observed on this subject
+            OTHER             H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           3  
+          [AUTHORITY]
+            AUTHORITATIVE     DEFERRED_TO_H3         0  
+            VERIFIED_DERIVED  DEFERRED_TO_H3         0  
+            ADVISORY          DEFERRED_TO_H3         0  
+            NON_AUTHORITY     DEFERRED_TO_H3         0  
+            UNKNOWN           H2_EMITTABLE           3  
+          [GENERATION]
+            MANUAL            H2_NOT_EARNABLE        0  
+            PARTIAL_DERIVED   H2_NOT_EARNABLE        0  
+            FULL_DERIVED      H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           3  
+          [VALIDITY]
+            CURRENT_TREE      H2_EMITTABLE           0  not observed on this subject
+            EXACT_SNAPSHOT    H2_EMITTABLE           0  not observed on this subject
+            RUN_ARTEFACT      H2_EMITTABLE           0  not observed on this subject
+            TIME_BOUND        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           3  
+          [SCOPE]
+            WHOLE_FILE        H2_EMITTABLE           0  not observed on this subject
+            HEADING           H2_NOT_EARNABLE        0  
+            TABLE             H2_NOT_EARNABLE        0  
+            MANAGED_REGION    H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           3  
+    
+      [3] OUTPUT-DERIVED — values emitted but unknown to the ontology: 0
+    
+      [4] population declared 3 == rows 3: True
+      [5] every non-abstention cell carries a source-bound witness: True  (0 missing)
+    
+      [6] §8(6) CLOSED ORIGIN CLASSIFICATION — every loaded origin
+          observed 87   classified 87   refused 0
+          H2                 3
+          CENSUS             0
+          GOVERNED_STDLIB    48
+          BUILTIN_OR_FROZEN  36
+    
+      [7] Q1a RECORDED PRODUCER PROVENANCE vs STAGE A
+          verified against stage_a_identity f11684998c665bde…, every slot closed
+    
+      [8] Q1b / E1 — DERIVED denominators (D379 §8)
+          axis-cell denominator              0
+          positive-evidence-fact denominator 5
+          sum                                5
+    
+      UTILITY PROFILE — reported, never optimised (D367 11)
+          axis         positive  UNKNOWN  UNMEASURED
+          LIFECYCLE           0        3           0
+          FUNCTION            0        3           0
+          AUTHORITY           0        3           0
+          GENERATION          0        3           0
+          VALIDITY            0        3           0
+          SCOPE               0        3           0
+          Qualification asks: is the instrument TRUTHFUL?
+          A separate later decision asks: is it USEFUL enough for H3?
+    
+      FINDINGS: 0
+    --- end qualifier
+    END-VERBATIM IMPL-SYNTH-CHAIN-FULL-LOG
+
+### 6. Next authorised step
+
+- Dainius chooses (a), (b) or (c) for the real-subject step; no commit before that  [CONVERSATION 2026-10-03 Kai, "If all narrow verification passes, commit the exact one-file implementation on the repair branch and push it."]
+
+### 7. What I am unsure of
+
+- Whether "clean real chain" in the grant meant the established real-CLI chain on a synthetic subject or a run on the real frozen subject; the reader_ops clause points at the real subject  [CONVERSATION 2026-10-03 Kai, "on that fresh Pass A, report the actual reader_ops population and prove every selected reader source is a member of the frozen subject and strict UTF-8."]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
