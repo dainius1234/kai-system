@@ -21147,3 +21147,69 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-03T03:13:27Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-03T03:13:27Z  [CMD `date -u +%FT%TZ` → 2026-10-03T03:13:27Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 1e191fe54785e0b037dec3873f428b5b6b5f5cfc  [CMD `git rev-parse HEAD` → 1e191fe54785e0b037dec3873f428b5b6b5f5cfc]
+- tree: 2252e28d9ba72f030108fff687e30e8562a45f3a  [CMD `git rev-parse HEAD^{tree}` → 2252e28d9ba72f030108fff687e30e8562a45f3a]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/project-rework-plan-pgvp35: 1e191fe54785e0b037dec3873f428b5b6b5f5cfc  [CMD `git ls-remote --heads origin` → 1e191fe54785e0b037dec3873f428b5b6b5f5cfc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: dbe692d9c3f83020176aeda00a0f399ce5f020f8  [CMD `git ls-remote --heads origin` → dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 53  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 53]
+
+### 1. The four states
+
+- physical: repair branch still at dbe692d; nothing applied yet  [CMD `git ls-remote --heads origin` → claude/d379-repair-eb52f73 dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- authorised: the entry-53 drafted grant, exactly as drafted (sha256 d73ec1eb2bd2b722… of Kai's message), now approved by Dainius  [CONVERSATION 2026-10-03 Dainius, "Approve exactly as drafted"]
+- evidence: the approval is a structured answer to the question quoted in section 2  [CONVERSATION 2026-10-03 Dainius, "Approve exactly as drafted"]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-03 · APPROVES the D379 B4 frozen composite implementation grant exactly as drafted in entry 53: one file kai-pm/house_in_order_h2_v13/run_h2_v12.py to sha256 a39359bc383c8f6f6ca4540c10474fcb094c990f7b8e8091792262436c7a4cfe from HEAD dbe692d; pre-checks; narrow verification; commit and push that one file; report; STOP for Kai. Question asked: "Kai drafted a one-file implementation grant for you to approve: apply the frozen composite (run_h2_v12.py → sha256 a39359bc…) to the repair branch from dbe692d, run the narrow verification, then commit, push and STOP for Kai. It's banked as a held draft in entry 53 (1e191fe). Do you, Dainius, approve that exact grant?" Answer: "Approve exactly as drafted" ⚠ UNBANKED  [CONVERSATION 2026-10-03 Dainius, "Approve exactly as drafted"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: the entry-53 grant, word for word  [CONVERSATION 2026-10-03 Dainius, "Approve exactly as drafted"]
+- FORBIDDEN: everything the grant lists as NOT AUTHORISED (d379_controls.py, full hostile matrix, a second path, incident allocation, D390 replay, fixity F, capture, candidate, holdout/blind 40, Item 8, merge/PR #122, DECISIONS.md)  [CONVERSATION 2026-10-03 Kai, "If any observed repository state conflicts with this grant, STOP rather than infer permission."]
+
+### 4. Open questions
+
+- None before execution  [CONVERSATION 2026-10-03 Dainius, "Approve exactly as drafted"]
+
+### 5. Incidents and corrections
+
+- None this step  [CMD `handoff.py check` → findings=0]
+
+### 6. Next authorised step
+
+- Execute the grant: pre-checks, apply exact bytes, narrow verification, commit and push one file, report, STOP  [CONVERSATION 2026-10-03 Kai, "Then STOP for Kai adjudication."]
+
+### 7. What I am unsure of
+
+- Nothing yet  [CONVERSATION 2026-10-03 Dainius, "Approve exactly as drafted"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
