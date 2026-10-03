@@ -13119,3 +13119,130 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-03T01:20:47Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-03T01:20:47Z  [CMD `date -u +%FT%TZ` → 2026-10-03T01:20:47Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: afd0f79f0d969f544850704537c1b5f9083d7954  [CMD `git rev-parse HEAD` → afd0f79f0d969f544850704537c1b5f9083d7954]
+- tree: bc354680df893e8b578f7f9e08ec30620d99fb26  [CMD `git rev-parse HEAD^{tree}` → bc354680df893e8b578f7f9e08ec30620d99fb26]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:claude/project-rework-plan-pgvp35: afd0f79f0d969f544850704537c1b5f9083d7954  [CMD `git ls-remote --heads origin` → afd0f79f0d969f544850704537c1b5f9083d7954]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: dbe692d9c3f83020176aeda00a0f399ce5f020f8  [CMD `git ls-remote --heads origin` → dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 42  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 42]
+
+### 1. The four states
+
+- physical: repair branch unchanged at dbe692d; packet v3 unchanged at bdf6f2e1…d93c; base64 transport (entry 42) unchanged and not yet answered  [CMD `sha256sum DEEPSEEK_PACKET_TWO_FACT_v3.md` → bdf6f2e1b381f723294d4ffcc182e1d970128dcb63d029960b76d01a8ec1d93c]
+- authorised: unchanged from entry 42 (base64 transport retry; everything else held)  [CONVERSATION 2026-10-03 Kai, "Retransmit the existing v3 subject as the four already-frozen exact-byte chunks, but encode each chunk as base64 before transmission."]
+- evidence: DeepSeek's failed receipt for the FIRST v3 transmission, now supplied by Dainius and preserved verbatim below, as Kai directed  [CONVERSATION 2026-10-03 Dainius, DeepSeek reply "DEEPSEEK — STEP 1: SUBJECT RECEIPT"]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- None  [CONVERSATION 2026-10-03 Dainius, relayed DeepSeek receipt only]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED (unchanged): send the base64 transport of the unchanged v3; accept a review only on a fully passing decoded receipt  [CONVERSATION 2026-10-03 Kai, "begin substantive review only after all checks pass"]
+- HELD (unchanged): repair-branch mutation, KAI-B4-SB-01 proposal, d379_controls.py rebuild, matrix  [CONVERSATION 2026-10-03 Kai, "No repair-branch mutation, no source-binding repair, no d379_controls.py rebuild, no matrix"]
+- FORBIDDEN (unchanged): packet v4; diff change; D390 replay; fixity F; capture  [CONVERSATION 2026-10-03 Kai, "Do not create packet v4."]
+
+### 4. Open questions
+
+- DeepSeek offered two fallbacks: exact-byte chunks with base64-encoded payload (what entry 42 already built, per Kai), or a written confirmation that the file bytes contain `c[1] == "SELF"`. Orion has verified the bytes (below), but whether a written confirmation may substitute for a byte-proven receipt is Kai's call; Orion recommends the base64 route Kai already authorised, because it proves the bytes rather than asserting them — owner: Kai  [CONVERSATION 2026-10-03 Dainius, DeepSeek "Or confirm in writing that the file bytes at that hash contain c[1] == \"SELF\" on that line"]
+
+### 5. Incidents and corrections
+
+- FAILED RECEIPT, first v3 transmission: BASE BLOB, FIRST DIFF HUNK, SENTINEL 2 and END marker correct; PACKET HASH quoted "as given by sender; not independently verified"; SENTINEL 1 received without both "==" (`c[1]  "SELF" and c[0]  "CURRENT_POSITIVE"`); DeepSeek returned NO REVIEW. The receipt gate worked as designed  [CONVERSATION 2026-10-03 Dainius, DeepSeek "NO REVIEW."]
+- Byte check of the sender's file (sha256 bdf6f2e1…d93c): the `self_pos` and `self_neg` lines each contain two "=="; they are the ONLY two lines in the packet with two or more "==" on one line, and they are exactly the lines lost in v2 and v3. Consistent with DeepSeek's hypothesis that a renderer treats `== … ==` as a highlight span and strips the markers; that renderer behaviour is INFERRED, not measured (the render is not observable here)  [CMD `count lines with >=2 '==' in DEEPSEEK_PACKET_TWO_FACT_v3.md` → 2: self_pos, self_neg]
+- DeepSeek's reply, verbatim as pasted by Dainius (2703 bytes, sha256 ec2ec94ca97204e271ff8afeb7c67138d913f04769f5f75f96493b298c255a6c, 4-space indent added). The paste itself travelled the same channel, so it records what DeepSeek's reply looked like on arrival here  [CONVERSATION 2026-10-03 Dainius, "DEEPSEEK — STEP 1: SUBJECT RECEIPT"]
+    BEGIN-VERBATIM DEEPSEEK-FAILED-RECEIPT-V3-FIRST
+    DEEPSEEK — STEP 1: SUBJECT RECEIPT
+    
+    ```
+    PACKET HASH: bdf6f2e1b381f723294d4ffcc182e1d970128dcb63d029960b76d01a8ec1d93c (as given by sender; not independently verified)
+    BASE BLOB: aff0c37311bb5b27141d40be888e54d8662189e5
+    FIRST DIFF HUNK: @@ -224,9 +224,233 @@
+    SENTINEL 1: +    self_pos = [c for c in cl_ if c[1]  "SELF" and c[0]  "CURRENT_POSITIVE"]
+    SENTINEL 2: +        lead = (len(ln) - len(s)) + (len(s) - len(s2)) + (len(s2) - len(s2.lstrip()))
+    END OF PACKET SEEN: YES
+    ```
+    
+    ---
+    
+    Subject-corruption finding
+    
+    SENTINEL 1 as received is corrupted. The line I see reads:
+    
+    ```
+    +    self_pos = [c for c in cl_ if c[1]  "SELF" and c[0]  "CURRENT_POSITIVE"]
+    ```
+    
+    c[1]  "SELF" is two adjacent expressions with no operator. It should be c[1] == "SELF". Same in the c[0] clause. As rendered, this line is not valid Python and would raise SyntaxError on import.
+    
+    This is the exact defect the packet reports for v2:
+    
+    "v2 reached it with the two == operators of one line lost in rendering."
+    
+    The same two operators are missing from SENTINEL 1 in v3 as I receive it.
+    
+    The most likely cause is the rendering pipeline: == adjacent to non-whitespace is highlighter syntax in some Markdown dialects (==highlighted==), and a chat renderer can strip the marker. The file itself may be byte-perfect. But I cannot distinguish that from a real defect in the bytes.
+    
+    SENTINEL 2 is complete and well-formed as rendered.
+    
+    Per the protocol:
+    
+    "If any item cannot be stated, or a sentinel differs from the sender's bytes, the subject is corrupted: NO REVIEW."
+    
+    The sentinel as I see it is malformed. I cannot honestly claim clean receipt. NO REVIEW.
+    
+    ---
+    
+    Requested fallback
+    
+    Send v3 as four exact-byte chunks, each with BEGIN CHUNK n/4 and END CHUNK n/4 markers and its own sha256, and confirm reassembly matches bdf6f2e1b381f723294d4ffcc182e1d970128dcb63d029960b76d01a8ec1d93c. Or confirm in writing that the file bytes at that hash contain c[1] == "SELF" on that line and that the render is the only place == was lost — in which case I will proceed with the file as the subject and treat the rendered sentinel as a display artifact.
+    
+    I will not begin the substantive review until one of those two arrives.
+    
+    ---
+    
+    Note for the operator (Kai/Orion)
+    
+    This is the same failure class the packet itself flags: an artifact whose transmission path silently degrades its bytes. The packet's own receipt gate was designed to catch exactly this. It caught it.
+    
+    For the fallback chunks, base64-encoding the payload lines and decoding after reassembly will eliminate the == stripping entirely, because base64 has no ambiguous markers.
+    
+    No findings are recorded against v3 in this message. No code, no implementation authority, no D-number.
+    END-VERBATIM DEEPSEEK-FAILED-RECEIPT-V3-FIRST
+
+### 6. Next authorised step
+
+- Unchanged: Dainius sends the base64 transport (entry 42) and returns DeepSeek's decoded receipt and review for Kai  [CONVERSATION 2026-10-03 Kai, "Only after that should DeepSeek issue DS-B4-V3-* findings."]
+
+### 7. What I am unsure of
+
+- Whether the base64 route fully avoids the renderer. Measured on the complete transmission file: three blocks end in "==" padding (chunk lengths mod 3 = 1, 1, 2, 1), each in a separate blank-line-delimited paragraph; no paragraph holds two "==", so no highlight span can pair within one. Cross-paragraph pairing is not excluded by measurement; the per-block transmitted-text hash would expose any alteration  [CMD `count '==' per paragraph in DEEPSEEK_MESSAGE_v3_BASE64_COMPLETE.txt` → 3 paragraphs with 1 each, 0 with 2+]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
