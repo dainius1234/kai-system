@@ -16701,3 +16701,180 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-03T01:52:39Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-03T01:52:39Z  [CMD `date -u +%FT%TZ` → 2026-10-03T01:52:39Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: cfd8aa952ae62f86f64f8b991df17bcb5aa2c5e8  [CMD `git rev-parse HEAD` → cfd8aa952ae62f86f64f8b991df17bcb5aa2c5e8]
+- tree: 4d49cbe6d13f1c56082f936e9ce78e6f38b3efca  [CMD `git rev-parse HEAD^{tree}` → 4d49cbe6d13f1c56082f936e9ce78e6f38b3efca]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/project-rework-plan-pgvp35: cfd8aa952ae62f86f64f8b991df17bcb5aa2c5e8  [CMD `git ls-remote --heads origin` → cfd8aa952ae62f86f64f8b991df17bcb5aa2c5e8]
+- remote:claude/d379-repair-eb52f73: dbe692d9c3f83020176aeda00a0f399ce5f020f8  [CMD `git ls-remote --heads origin` → dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 46  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 46]
+
+### 1. The four states
+
+- physical: repair branch unchanged at dbe692d; accepted two-fact v4 frozen read-only in scratch (frozen_v4/, mode 444)  [CMD `git ls-remote --heads origin; sha256sum frozen_v4/*` → dbe692d9c3f8…; d3ee165f…, bbe42e3f…, 242a5548…]
+- authorised: SB-01 packet v1 in scratch only, on the exact v4 base; then DeepSeek review of the SB-01 delta only; no implementation  [CONVERSATION 2026-10-03 Kai, "No implementation yet. Prepare KAI-B4-SB-01 packet v1 in scratch only, using exact v4 as its base."]
+- evidence: Kai's v4 reconciliation verbatim in section 2  [CMD `sha256sum kai_reconciliation_v4.txt` → 951118847ad1a23a…]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-03 · TWO-FACT v4 RECONCILED / KAI-B4-SB-01 NEXT: DS-B4-V4-01 DISPROVED; V4-02 DISPROVED (canonical passa._context, applicability stays SPAN); V4-03 true but immaterial, NO CHANGE; V4-04 DISPROVED (packet says REFUSE); V4-05 DISPROVED; V4-06 DISPROVED (do not replace arithmetic offsets with text.index()). Two-fact v4 ACCEPTED as the design/code subject for composition, not implementation authority; frozen as run_h2_v12.py sha256 d3ee165f706e9f4048434031e003e6c7a97159ae2e2217d0c8cdd7ebd69861b6 and diff vs dbe692d sha256 bbe42e3fbf2ecb690a93f9945b335ff4cc4a4b716c79d87255e195ee678e8aab; no cosmetic, performance or documentation edits to it. KAI-B4-SB-01 OPEN BLOCKER, including read_text universal-newline translation; packet v1 in scratch on exact v4 reusing passa._source_binding_gate and passa.make_verified_reader; no git-show ad hoc reads. Verbatim below, 8866 bytes, sha256 951118847ad1a23ab6c79ca10738c3d638e0d8b4f79f9239f40e00151c150973, final LF False, 4-space indent added ⚠ UNBANKED  [CONVERSATION 2026-10-03 Kai via Dainius, "KAI → ORION — TWO-FACT v4 RECONCILED / KAI-B4-SB-01 NEXT"]
+    BEGIN-VERBATIM KAI-DS-V4-RECONCILIATION
+    GPT: I checked DeepSeek’s v4 review against the exact packet preserved in signed entry 45 (cb4170f6…), the complete proposed v4 subject, and the live dbe692d source. The repair branch remains unchanged.
+    
+    The receipt is usable with the same limitation as the v3 review: DeepSeek did not independently compute the hashes, so it is not cryptographically independent verification. But both sentinels and the delta hunk match the repository-preserved packet, whose recorded identity is:
+    
+    * packet v4: 242a554855679d519739bb08673832dcc95c9e0f4e56de174c2004a9db88a955
+    * complete proposed run_h2_v12.py: d3ee165f706e9f4048434031e003e6c7a97159ae2e2217d0c8cdd7ebd69861b6
+    * complete diff vs dbe692d: bbe42e3fbf2ecb690a93f9945b335ff4cc4a4b716c79d87255e195ee678e8aab
+    
+    For a zero-admission-weight adversarial reviewer, that is enough to use the findings as hypotheses and reconcile them ourselves.
+    
+    Finding	Kai reconciliation
+    DS-B4-V4-01 — currentness tuple arity	DISPROVED. currentness_claims() does not exist at dbe692d; it is introduced by this repair. The complete v4 diff contains exactly two occurrences: its definition and the sole governed call from _currentness_fact(), whose unpacker is changed to seven fields. There is no pre-existing external API/caller to break.
+    V4-02 — SAC context widened to LF line	DISPROVED. This is intentional and exactly what KAI-B4-V3-10 required. passa._context() is the established canonical context mechanism and returns surrounding LF-line context. The determining evidence remains the exact phrase/sentence and applicability_scope=SPAN; local_context being larger does not widen applicability. The immediately preceding source comment explicitly says the canonical context is the complete LF line.
+    V4-03 — duplicate raw.splitlines()	VALID MICRO-OPTIMISATION, NOT A DEFECT. NO CHANGE. Calling the pure method twice is unnecessary, but it has no correctness, evidence or material performance consequence. Changing the exact reviewed subject solely for this would add assurance surface for no meaningful gain.
+    V4-04 — duplicate-message wording	DISPROVED. First, the exact preserved packet says REFUSE:, not the review’s REUSE:—the review quotation is not byte-exact. Second, ontology.EVIDENCE_FACTS is the governing fact-class population. An entry placed there is governed for reconciliation purposes; a unique unknown entry is separately caught by missing/extra. The message is accurate.
+    V4-05 — whole title span not rechecked	DISPROVED as a required control. Before calculating the offset, v4 already requires first_heading.lstrip("#").strip()[:120] == row["title"]. title_at then removes exactly those same leading hashes and whitespace, and the final check requires the matched token to exist at the calculated absolute offset. A second whole-title slice assertion proves no additional authority or identity property.
+    V4-06 — phrase_start assumes exact slice	DISPROVED. This invariant is already mechanically established by the _segments controls: text[start:start+len(sentence)] == sentence, historical equivalence against 438007e, hostile separators, and all 80,736 frozen-subject segments. v4 does not alter _segments. Using text.index() would actually be inferior because repeated identical sentences could resolve to the wrong occurrence.
+    
+    So DeepSeek found no surviving MAJOR or BLOCKER in the v3→v4 correction. Its V4-01 concern was reasonable to ask, but source population closes it.
+    
+    Two-fact v4 ruling
+    
+    Two-fact repair v4 is ACCEPTED as the design/code subject for composition.
+    
+    That is not implementation authority yet.
+    
+    I would preserve v4 exactly as hashed above. Do not make v4.1 for cosmetic or micro-performance edits. We now have a stable, reviewed two-fact subject and should stop moving it.
+    
+    The remaining blocker is the more consequential one already separated from this review:
+    
+    KAI-B4-SB-01 — classification subject-byte binding failure — OPEN BLOCKER.
+    
+    Entry 45 also sharpened it further: Path.read_text() performs universal-newline translation, while Pass A’s verified reader consumes exact blob bytes. So even with a completely clean worktree, classification can currently operate on a transformed text model—for example lone CR becomes LF. The same repair mechanism closes both the uncommitted-edit problem and the newline-translation problem.
+    
+    The next packet should therefore be KAI-B4-SB-01 packet v1, based on exact accepted v4—not “two-fact v5”.
+    
+    Send Orion this:
+    
+    KAI → ORION — TWO-FACT v4 RECONCILED / KAI-B4-SB-01 NEXT
+    
+    DeepSeek v4 review is reconciled against the exact preserved subject.
+    
+    DS-B4-V4-01 DISPROVED: currentness_claims() is introduced by this repair and has exactly one governed caller, _currentness_fact(), which is updated to the seven-field return.
+    
+    V4-02 DISPROVED: canonical passa._context() deliberately carries surrounding LF-line context; the determining evidence remains the exact phrase/span and applicability remains SPAN.
+    
+    V4-03 is a true but immaterial micro-optimisation. No source change.
+    
+    V4-04 DISPROVED. Exact packet says REFUSE, not REUSE; ontology.EVIDENCE_FACTS is itself the governing population.
+    
+    V4-05 DISPROVED: exact Pass-A title reconstruction + arithmetic offset derivation + exact token-at-offset verification already closes the locator.
+    
+    V4-06 DISPROVED: _segments exact-slice identity is already hostile-calibrated and proven across all 80,736 frozen segments. Do not replace arithmetic offsets with text.index().
+    
+    Freeze the accepted two-fact v4 subject exactly:
+    
+    run_h2_v12.py sha256 d3ee165f706e9f4048434031e003e6c7a97159ae2e2217d0c8cdd7ebd69861b6
+    
+    full diff vs dbe692d sha256 bbe42e3fbf2ecb690a93f9945b335ff4cc4a4b716c79d87255e195ee678e8aab
+    
+    Do not make cosmetic, performance or documentation edits to that frozen v4 subject.
+    
+    No implementation yet. Prepare KAI-B4-SB-01 packet v1 in scratch only, using exact v4 as its base.
+    
+    The source-binding correction must stay in run_h2_v12.py and reuse the already-governed Pass-A mechanisms rather than inventing another source identity system:
+    
+    passa._source_binding_gate(subject_repo, subject)
+    
+    and
+    
+    passa.make_verified_reader(subject_repo, subject).
+    
+    Required shape:
+    
+    * establish the Pass-A source-binding gate before classification subject measurement;
+    * create one verified reader for the frozen pa["subject"];
+    * replace the main classification document Path.read_text() with that verified reader;
+    * thread the same verified reader into _reader_trace() so its reader-source bytes cannot bypass subject binding;
+    * no fallback to ordinary Path.read_text();
+    * enumerate mechanically every subject-repository byte-read path in run_h2_v12.py and prove every one either uses the verified reader or is not a subject-byte read;
+    * add no provenance field merely to self-certify the correction.
+    
+    The hostile controls must exercise at least: tracked dirty document before gate; tracked dirty reader-source file; mutation after gate but before consumption; change-and-restore/TOCTOU attempt; HEAD mismatch; tracked symlink; disappeared/unreadable source; clean exact subject; and CRLF/lone-CR preservation proving no read_text() universal-newline translation survives.
+    
+    For every hostile source-binding failure: real classification CLI non-zero, correct failure reason, and no classification artefact written.
+    
+    For clean cases: consumed decoded text must derive from the exact bytes that matched the frozen Git blob, and v4’s NF/SAC traces must resolve against those exact consumed/committed bytes.
+    
+    Preserve v4’s existing CR/FF/NEL/LS/PS locator controls and rerun them under the verified-reader path; do not silently alter expectations to recover green.
+    
+    Produce:
+    
+    1. SB-01 delta against exact v4;
+    2. complete composite proposed run_h2_v12.py hash;
+    3. source-read population evidence;
+    4. hostile/fail-old/pass-new evidence.
+    
+    Then send only the SB-01 delta for narrow DeepSeek adversarial review, with exact composite subject identity preserved for Kai.
+    
+    No repair-branch mutation. No d379_controls.py rebuild, full hostile matrix, incident allocation, D390 replay, fixity F, capture, candidate, holdout, blind 40, Item 8 or PR #122 merge.
+    
+    One thing I would explicitly not do is replace the classification reads with git show ad hoc. We already have a calibrated mechanism in Pass A that establishes the correct order: READ → VERIFY THOSE EXACT BYTES AGAINST THE FROZEN BLOB → USE. Reusing it keeps one source-binding model rather than creating a second one beside it.
+    
+    Once SB-01 survives its own adversarial review, we can authorize the composite run_h2_v12.py implementation. Only then should Orion finish d379_controls.py and run the full v4.5 hostile matrix.
+    
+    Confidence: 0.995 on V4-01/02/04/06; 0.99 on V4-05; 0.99 that two-fact v4 is ready to freeze as the accepted base; 0.995 that KAI-B4-SB-01 remains the sole blocker before implementation of this tranche.
+    END-VERBATIM KAI-DS-V4-RECONCILIATION
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: KAI-B4-SB-01 packet v1 in scratch: SB-01 delta against exact v4; composite run_h2_v12.py hash; source-read population evidence; hostile, fail-old and pass-new evidence; then the SB-01 delta alone to DeepSeek, composite identity preserved for Kai  [CONVERSATION 2026-10-03 Kai, "Then send only the SB-01 delta for narrow DeepSeek adversarial review, with exact composite subject identity preserved for Kai."]
+- HELD: composite run_h2_v12.py implementation until SB-01 survives its adversarial review; then d379_controls.py and the full v4.5 hostile matrix  [CONVERSATION 2026-10-03 Kai, "Once SB-01 survives its own adversarial review, we can authorize the composite run_h2_v12.py implementation."]
+- FORBIDDEN: repair-branch mutation, d379_controls.py rebuild, full hostile matrix, incident allocation, D390 replay, fixity F, capture, candidate, holdout, blind 40, Item 8, PR #122 merge  [CONVERSATION 2026-10-03 Kai, "No repair-branch mutation. No d379_controls.py rebuild, full hostile matrix, incident allocation, D390 replay, fixity F, capture, candidate, holdout, blind 40, Item 8 or PR #122 merge."]
+
+### 4. Open questions
+
+- None new; SB-01 design questions will be listed in the packet — owner: Orion  [CONVERSATION 2026-10-03 Kai, "Prepare KAI-B4-SB-01 packet v1 in scratch only"]
+
+### 5. Incidents and corrections
+
+- Premise check of Kai's ruling (R16): the three frozen identities re-hashed and the v4 diff regenerated from dbe692d both match; Kai's "exactly two occurrences" of currentness_claims holds for code: the literal string occurs 3 times in twofact.v4.diff, the third is a comment line (diff :21, "v1.1 evidence.currentness_claims (D361, 438007e)"); the conclusion is unaffected  [CMD `grep -c currentness_claims twofact.v4.diff; diff -u <(git show HEAD:…run_h2_v12.py) v4 | sha256sum` → 3; bbe42e3f…]
+- Correction to entry 46: the DEEPSEEK-V4-RECEIPT-AND-REVIEW file has NO final LF (6067 bytes, sha256 b23fb901bd44cbde91c0871ceac44a66c67a1cec3a0efc789e97e38007444535); entry 46 did not say so. Strip the 4-space indent and do not append LF to recover it  [CMD `recover block from cfd8aa9; sha256` → b23fb901…, equal to source]
+- Process slip, R3: entry 46's commit chain ran a round-trip check that printed True/False but could not fail, so the chain committed while it printed False for that block. The False was my check's error (it appended an LF the source lacks); the committed block is byte-recoverable. Remedy: round-trip checks now exit non-zero on mismatch and gate the commit with &&. Not allocated in the ledger (incident allocation is forbidden in this tranche); raised to the operator  [CMD `round-trip on cfd8aa9 without appended LF` → True]
+
+### 6. Next authorised step
+
+- Prepare KAI-B4-SB-01 packet v1 in scratch on frozen v4: Pass-A gate before classification; one passa.make_verified_reader for pa["subject"] used for the main document read and inside _reader_trace; no read_text fallback; mechanical read-path population; hostile controls (dirty doc, dirty reader source, post-gate mutation, change-and-restore, HEAD mismatch, tracked symlink, disappeared source, clean, CRLF/lone CR); rerun v4 locator controls  [CONVERSATION 2026-10-03 Kai, "Required shape:"]
+
+### 7. What I am unsure of
+
+- Whether passa._source_binding_gate and make_verified_reader, as they stand at dbe692d, cover reader-source paths outside the Pass-A row population (files _reader_trace opens that are not themselves rows); to be measured in the read-path population  [FILE /home/user/kai-repair/kai-pm/house_in_order_h2_v13/run_h2_v12.py:159]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
