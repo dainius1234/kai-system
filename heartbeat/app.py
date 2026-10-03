@@ -5,7 +5,7 @@ import shutil
 import subprocess
 import time
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import httpx
 from fastapi import FastAPI, Request
@@ -62,9 +62,37 @@ def _send_notification(message: str) -> None:
         logger.warning("Notification send failed")
 
 
-def _scan_executor_log() -> int:
+def _scan_executor_log() -> Optional[int]:
+    """Executor intrusion hits, or None when the log cannot be read.
+
+    This used to `return 0` when the file was absent, so "I checked and
+    found nothing wrong" and "I could not look" were the same answer —
+    and `/status` published the first one. It watches for `timeout`,
+    `blocked` and `injection`, so the reassurance was about security.
+
+    It had never been able to look. Verified 2026-08-07:
+
+      * `/var/log/sovereign` is a bind mount of a host path that exists
+        on one machine. Docker silently creates an empty directory for a
+        missing bind-mount source rather than failing, so on a CI runner
+        or any other host the mount succeeds and the directory is empty.
+      * `executor` — which is supposed to write that log — has never been
+        started by anything, declares **no volumes at all**, and its code
+        contains no reference to the path. There is no writer.
+
+    Four layers of nothing, and the sovereign profile boots green.
+
+    None is not "no alerts". The caller must render it as unknown, and
+    the difference has to survive into the response, because a monitor
+    that cannot distinguish silence from safety is worse than absent —
+    absent invites a check, silence invites trust.
+    """
     if not EXECUTOR_LOG_PATH.exists():
-        return 0
+        logger.warning(
+            "executor log %s is absent — intrusion scanning is NOT running. "
+            "This is unknown, not clear. Check that the log path is mounted "
+            "from somewhere the executor actually writes.", EXECUTOR_LOG_PATH)
+        return None
     data = EXECUTOR_LOG_PATH.read_text(encoding="utf-8", errors="ignore")
     patterns = ["timeout", "blocked", "injection"]
     hits = sum(data.lower().count(p) for p in patterns)
@@ -206,7 +234,13 @@ async def status() -> Dict[str, Any]:
     watchdog = await _watchdog_check()
     elapsed = time.time() - last_tick
     state = "healthy" if elapsed <= ALERT_WINDOW else "stale"
-    return {"status": state, "elapsed_seconds": f"{elapsed:.1f}", "check_interval": str(CHECK_INTERVAL), "alert_window": str(ALERT_WINDOW), "intrusion_hits": str(_scan_executor_log()), "watchdog": watchdog}
+    # `intrusion_hits` used to be str(0) whether the scan found nothing or
+    # could not run. Both are reported now, and they are different words:
+    # "0" means looked and clear, "unknown" means could not look. A reader
+    # who sees "unknown" should not be reassured, which was the whole
+    # defect.
+    hits = _scan_executor_log()
+    return {"status": state, "elapsed_seconds": f"{elapsed:.1f}", "check_interval": str(CHECK_INTERVAL), "alert_window": str(ALERT_WINDOW), "intrusion_hits": "unknown" if hits is None else str(hits), "intrusion_scan": "unavailable" if hits is None else "active", "watchdog": watchdog}
 
 
 # ═══════════════════════════════════════════════════════════════════════

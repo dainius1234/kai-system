@@ -1,0 +1,425 @@
+D379 / D381 / D382 TRANCHE — CLOSE-OUT
+EVIDENCE CLASS: PRODUCER MEASUREMENT - SIGHTED - ZERO ADMISSION WEIGHT.
+Orion self-adjudication carries no admission weight and none is claimed.
+
+DERIVED RECORD. Every figure below is computed from the SAME
+captured result state that produced D379_CONTROLS.txt,
+in the same run. Nothing here is maintained by hand, so no figure
+in this file can be brought into agreement with reality by
+retyping it.
+
+THIS TRANCHE IS NOT CLOSED. The exit gate is FAIL and says so.
+
+STATUS PROVENANCE (D386): every status below is
+subprocess.CompletedProcess.returncode, read from the child that
+produced the captured output. No shell status, no pipeline status,
+no parsed text, no supplied value.
+
+  D379 control process exit status    1     (204 passed, 33 failed)
+  cal_fixtures process exit status    1
+  capture parent returns              1
+  D379_CONTROLS.txt size                57819 bytes
+
+======================================================================
+D379 §8 BANKED CASES — EACH AGAINST ITS OWN CONSTRUCTED SUBJECT
+======================================================================
+  cases 40   PASS 16   FAIL 0   HELD 24   (of FAIL: 0 CONTROL FAILURE)
+  verdict vocabulary PASS / FAIL / HELD — closed; any other value raises
+
+  STEP 1 OF EVERY CASE IS RAW EVIDENCE, NOT A FLAG. Each case
+  carries the measured facts that establish its hostile subject,
+  and the harness DERIVES whether the subject holds. A case whose
+  proof does not derive is a FAIL whose reason is CONTROL FAILURE. It is not
+  a PASS, and it is not a HELD on the intended predicate.
+
+  PASS — blocker-free, intended predicate first-effective:
+    Q1a-4    D379 §4 stale input across two Stage As
+    Q1a-9    D379 §4 self-hash prohibition (both limbs)
+    86-3     D367 §8(6) fail-closed qualifier identity
+    86-4     D367 §8(6) fail-closed qualifier identity
+    86-5     D367 §8(6) fail-closed qualifier identity
+    I1A-1    D379 §7 I1-A one member byte -> identity moves
+    I1A-2    D379 §7 mutate evidence -> only Stage-B moves
+    M2-1     D379 §8 FAIL-OLD: the three false COMMIT routes classify HISTORICAL against committed pre-repair bytes
+    M2-2     D379 §8 PASS-NEW: the three false COMMIT routes no longer classify HISTORICAL
+    M2-3     D379 §8 the same-route positive STILL classifies HISTORICAL
+    D14-A    D379 §8 straddling token: admitted WHOLE
+    D14-B    D379 §8 cut below the recogniser minimum: fail-old loses it, pass-new carries it whole
+    D14-C    D379 §8 token starting at or after the boundary: NOT ADMITTED ON EITHER SIDE
+    SB-1     D379 §8 Pass A absent -> REFUSE, R11 abort
+    SB-3     D379 §8 Pass A unbound -> REFUSE
+    SB-2     D379 §8 Pass A altered -> Stage-B CHANGES, Stage-A unchanged
+
+  These are NARROW OBSERVATIONS of these exact invocations.
+  They do not validate the harness, do not make their section
+  green, and close nothing (R7).
+
+  HELD 24 — by FIRST-EFFECTIVE BLOCKER, counted from
+  the recorded blocker of each case, not assigned by hand:
+     18  sitecustomize [INC-34 ungoverned runtime]
+         Q1a-1, Q1a-2, DEP-2, DEP-3, Q1a-8, Q1a-3, Q1a-5, Q1a-6, Q1a-7, Q1b-1, Q1b-2, Q1b-3, Q1b-4, Q1b-5, Q1b-6, 86-1, 86-2, 86-6
+      5  carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+         I1B-1, I1B-2, I1B-3, I1B-4, I1A-3
+      1  lies outside the governed H2 root [INC-34 ungoverned runtime]
+         DEP-1
+
+  OVER-DETERMINED 6: the intended finding IS present AND an
+  independent blocker is present. Finding observed;
+  consequentiality NOT PROVEN without a clean comparator:
+    DEP-1, Q1a-5, Q1a-6, Q1b-3, Q1b-4, Q1b-5
+
+======================================================================
+PER-CASE RECORD — subject proof, target, status, verdict
+======================================================================
+  Q1a-1    HELD     rc=1    passa.py
+           clause: D379 §8 clean chain on one Stage A
+           proof:  stage_a_recorded[passa.py] = 9d2788893765523367d7d4979ca831c3e48495c9c9ecf052baa62232e89985a6
+           proof:  actual_sha256(passa.py) = 9d2788893765523367d7d4979ca831c3e48495c9c9ecf052baa62232e89985a6
+           why:    the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+  Q1a-2    HELD     rc=1    passa.py
+           clause: D379 §8 Pass-A producer byte changed AFTER Stage A fixed
+           proof:  disposable_tree = /tmp/d379_tree_q1a2_5ik50irv
+           proof:  mutated_member = kai-pm/house_in_order_h2_v13/passa.py
+           proof:  stage_a_records_sha = 9d2788893765523367d7d4979ca831c3e48495c9c9ecf052baa62232e89985a6
+           proof:  sha_when_stage_a_was_fixed = 9d2788893765523367d7d4979ca831c3e48495c9c9ecf052baa62232e89985a6
+           proof:  sha_of_bytes_now_on_disk = 0083733b87a3c023fba8712fefb34c689c21ae432305b00d3d2c32a79b7d9ec0
+           why:    an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  DEP-2    HELD     rc=1    passa.py
+           clause: D379 §8 ordinary stdlib under a governed interpreter
+           proof:  stage_a_recorded[passa.py] = 9d2788893765523367d7d4979ca831c3e48495c9c9ecf052baa62232e89985a6
+           proof:  actual_sha256(passa.py) = 9d2788893765523367d7d4979ca831c3e48495c9c9ecf052baa62232e89985a6
+           proof:  stdlib_modules_loaded_sample = __future__,_bz2,_collections_abc
+           proof:  stdlib_modules_loaded_count = 88
+           proof:  stage_a_h2_source_count = 10
+           proof:  stage_a_members_under_a_stdlib_prefix = 0
+           why:    the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+  DEP-3    HELD     rc=1    passa.py
+           clause: D379 §8 runtime identity mismatch
+           proof:  stage_a_expects_stdlib_identity = 2222222222222222222222222222222222222222222222222222222222222222
+           proof:  baseline_stage_a_stdlib_identity = 1111111111111111111111111111111111111111111111111111111111111111
+           why:    an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  Q1a-8    HELD     rc=1    child:governed-function
+           clause: D379 §5 no silent runtime expansion
+           proof:  disposable_tree = /tmp/d379_tree_q1a8_lxbpq76i
+           proof:  stage_a_member_paths = ['kai-pm/house_in_order_h2_v13/cal_fixtures.py', 'kai-pm/house_in_order_h2_v13/classify.py', 'kai-pm/house_in_
+           proof:  stage_a_member_count = 10
+           proof:  validate_descriptor_accepted = True
+           proof:  extra_module_rel = kai-pm/house_in_order_h2_v13/extra_governed_module.py
+           proof:  extra_module_resolved = /tmp/d379_tree_q1a8_lxbpq76i/kai-pm/house_in_order_h2_v13/extra_governed_module.py
+           proof:  governed_h2_root = /tmp/d379_tree_q1a8_lxbpq76i/kai-pm/house_in_order_h2_v13
+           proof:  governed_target = stage_identity.check_population
+           why:    an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  DEP-1    HELD     rc=1    child:governed-function
+           clause: D379 §8 synthetic producer, external dep
+           proof:  external_module_path = /tmp/d379_exec_vv3jd9pw/ext_pkg/hostile_ext.py
+           proof:  file_exists = True
+           proof:  governed_roots = ['/home/user/kai-system/kai-pm/house_in_order_h2_v13', '/home/user/kai-system/kai-pm/house_in_order_census_v11
+           proof:  governed_target = stage_identity.producer_population
+           why:    OVER-DETERMINED: the intended finding IS present and so is an independent blocker (lies outside the governed H2 root [INC-34 ungoverned runtime]); rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
+  Q1a-3    HELD     rc=1    run_h2_v12.py
+           clause: D379 §8 classification-producer byte changed AFTER Stage A fixed
+           proof:  disposable_tree = /tmp/d379_tree_q1a3_9uhspjm6
+           proof:  mutated_member = kai-pm/house_in_order_h2_v13/classify.py
+           proof:  stage_a_records_sha = 226873676c2373faaf29f4709bb1bb62d1d22f3c56cbdc0e594314cb6e5df9e8
+           proof:  sha_when_stage_a_was_fixed = 226873676c2373faaf29f4709bb1bb62d1d22f3c56cbdc0e594314cb6e5df9e8
+           proof:  sha_of_bytes_now_on_disk = 6f6094debb1b3bb28a254965f2d7c21659789b7827b30e8287ee5e75cefee21f
+           proof:  pass_a_recorded_identity = 4cfce74a1aa21c696c977606a7d0ced3f845b8e3d5840cd12884800fee4329be
+           proof:  stage_a_identity = 4cfce74a1aa21c696c977606a7d0ced3f845b8e3d5840cd12884800fee4329be
+           why:    an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  Q1a-4    PASS     rc=1    run_h2_v12.py
+           clause: D379 §4 stale input across two Stage As
+           proof:  pass_a_recorded_identity = 4cfce74a1aa21c696c977606a7d0ced3f845b8e3d5840cd12884800fee4329be
+           proof:  classification_given_identity = 6e8d8089c8446eed72996624451c8946a07c8b0cf9c5eeb91b649445a08d3c4b
+  Q1a-9    PASS     rc=0    child:governed-function
+           clause: D379 §4 self-hash prohibition (both limbs)
+           proof:  artifact = /tmp/d379_exec_vv3jd9pw/q1a9_artifact.json
+           proof:  planted_value = 033cc16a6f5015bedc9c4145687ccadfbff8e0e870a7d51522be6039ac83afe9
+           proof:  digest_of_written_artifact_minus_provenance = 033cc16a6f5015bedc9c4145687ccadfbff8e0e870a7d51522be6039ac83afe9
+           proof:  digest_of_written_artifact_as_a_whole = 8153575a0b2063de53963216f6b426aed5ec273eb6133db8d68c6b6af071f931
+           proof:  governed_target = stage_identity.verify_provenance + stage_b_binding
+  Q1a-5    HELD     rc=1    qualify.py
+           clause: D379 §8 tampered recorded Stage-A identity
+           proof:  result_records_identity = 0000000000000000000000000000000000000000000000000000000000000000
+           proof:  stage_a_actual_identity = 4cfce74a1aa21c696c977606a7d0ced3f845b8e3d5840cd12884800fee4329be
+           why:    OVER-DETERMINED: the intended finding IS present and so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]); rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
+  Q1a-6    HELD     rc=1    qualify.py
+           clause: D379 §8 producer provenance VALID, qualifier qualification bytes differ -> §8(6)
+           proof:  disposable_tree = /tmp/d379_tree_q1a6_mts9xjpo
+           proof:  producer_provenance_verifies_under_this_stage_a = True
+           proof:  producer_population_identities = ['kai-pm/house_in_order_h2_v13/cal_fixtures.py', 'kai-pm/house_in_order_h2_v13/classify.py', 'kai-pm/house_in_
+           proof:  mutated_member = kai-pm/house_in_order_h2_v13/qualify.py
+           proof:  stage_a_records_sha = f7ff84f6e6c0aa81e0c475b7ce66a7456a1d4c87669c124ea1d84f47c80a6485
+           proof:  sha_when_stage_a_was_fixed = f7ff84f6e6c0aa81e0c475b7ce66a7456a1d4c87669c124ea1d84f47c80a6485
+           proof:  sha_of_bytes_now_on_disk = 5da241b592fed670eaaf51e9426f6d5d0bb7f637d20f666a4d8b2986d85d0398
+           why:    OVER-DETERMINED: the intended finding IS present and so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]); rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
+  Q1a-7    HELD     rc=1    qualify.py
+           clause: D379 §8 member deleted from OUTPUT provenance, independent binding unchanged
+           proof:  original_population = ['kai-pm/house_in_order_h2_v13/cal_fixtures.py', 'kai-pm/house_in_order_h2_v13/classify.py', 'kai-pm/house_in_
+           proof:  tampered_population = ['kai-pm/house_in_order_h2_v13/cal_fixtures.py', 'kai-pm/house_in_order_h2_v13/classify.py', 'kai-pm/house_in_
+           proof:  original_denominator = 10
+           proof:  tampered_denominator = 9
+           proof:  binding_file = /tmp/d379_exec_vv3jd9pw/q1a7/stage_b_binding.json
+           proof:  binding_producer_provenance_digest = a901e17e57e6e0e0e2d7854b25504860d37600d7206699441532355dd63071a8
+           proof:  digest_of_original_provenance = a901e17e57e6e0e0e2d7854b25504860d37600d7206699441532355dd63071a8
+           proof:  digest_of_tampered_provenance = 3a171e0d5c08096cc87c8ea2d48b5e44db19d550cff9e9c12c8371ff6806b12f
+           proof:  in_object_verifier_on_tampered = ACCEPTED
+           proof:  qualifier_cli_flags = ['--help', '--manifest', '--result', '--stage-a']
+           why:    an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  Q1b-1    HELD     rc=1    qualify.py
+           clause: D379 §8 Q1b clean complete result
+           proof:  result_digest = 90df7768fd23f003734d4f63b166e47d92aeb23510acd9876853fa1e1de9cb78
+           proof:  clean_digest = 90df7768fd23f003734d4f63b166e47d92aeb23510acd9876853fa1e1de9cb78
+           proof:  rows = 3
+           proof:  positive_fact_names = ['CARRIES_DATE_STAMP', 'CITES_COMMIT']
+           proof:  rows_with_traces = 3
+           why:    the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+  Q1b-2    HELD     rc=1    qualify.py
+           clause: D379 §8 Q1b positive fact missing its trace
+           proof:  row = kai-pm/SYNTH_0.md
+           proof:  fact = CITES_COMMIT
+           proof:  fact_value_in_clean_row = True
+           proof:  fact_value_in_mutated_row = True
+           proof:  traces_in_clean_row = ['CARRIES_DATE_STAMP', 'CITES_COMMIT']
+           proof:  traces_in_mutated_row = ['CARRIES_DATE_STAMP']
+           proof:  untouched_rows_clean = ['2c44b14cd1c0d60ec96c393be0cede0990e698293a65abcc8fc97033a096e379', '37a33e1f05fdab1d1ea5b8df9fbdaa00b82e35ec
+           proof:  untouched_rows_mutated = ['2c44b14cd1c0d60ec96c393be0cede0990e698293a65abcc8fc97033a096e379', '37a33e1f05fdab1d1ea5b8df9fbdaa00b82e35ec
+           why:    an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  Q1b-3    HELD     rc=1    qualify.py
+           clause: D379 §8 Q1b axis-cell witness failure
+           proof:  row = kai-pm/SYNTH_1.md
+           proof:  axis = SCOPE
+           proof:  field = local_context
+           proof:  clean_value = **Audited:** `2026-07-21` line
+           proof:  mutated_value = unrelated text
+           proof:  clean_axis_value = WHOLE_FILE
+           proof:  mutated_axis_value = WHOLE_FILE
+           proof:  untouched_rows_clean = ['2b6edb2f6b9d6aaec3383a2fb73108bc8dccc9d6e6ad4e77fa9476cf1ead93a0', '37a33e1f05fdab1d1ea5b8df9fbdaa00b82e35ec
+           proof:  untouched_rows_mutated = ['2b6edb2f6b9d6aaec3383a2fb73108bc8dccc9d6e6ad4e77fa9476cf1ead93a0', '37a33e1f05fdab1d1ea5b8df9fbdaa00b82e35ec
+           why:    OVER-DETERMINED: the intended finding IS present and so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]); rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
+  Q1b-4    HELD     rc=1    qualify.py
+           clause: D379 §8 Q1b abstention inconsistent with the emitted positives
+           proof:  row = kai-pm/SYNTH_2.md
+           proof:  fact = CITES_COMMIT
+           proof:  abstention_list_in_clean_row = []
+           proof:  abstention_list_in_mutated_row = ['CITES_COMMIT']
+           proof:  fact_value_in_mutated_row = True
+           proof:  untouched_rows_clean = ['2b6edb2f6b9d6aaec3383a2fb73108bc8dccc9d6e6ad4e77fa9476cf1ead93a0', '2c44b14cd1c0d60ec96c393be0cede0990e69829
+           proof:  untouched_rows_mutated = ['2b6edb2f6b9d6aaec3383a2fb73108bc8dccc9d6e6ad4e77fa9476cf1ead93a0', '2c44b14cd1c0d60ec96c393be0cede0990e69829
+           why:    OVER-DETERMINED: the intended finding IS present and so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]); rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
+  Q1b-5    HELD     rc=1    qualify.py
+           clause: D379 §8 Q1b denominator shrink, fact class removed
+           proof:  fact_class = BINDING_CONTRADICTION
+           proof:  fact_classes_in_clean = ['BINDING_CONTRADICTION', 'CARRIES_DATE_STAMP', 'CITES_COMMIT', 'CITES_RUN', 'MAINTENANCE_OBSERVED', 'NOMINAL_
+           proof:  fact_classes_in_mutated = ['CARRIES_DATE_STAMP', 'CITES_COMMIT', 'CITES_RUN', 'MAINTENANCE_OBSERVED', 'NOMINAL_FUNCTION', 'SELF_ASSERTS_
+           proof:  rows_in_clean = 3
+           proof:  rows_in_mutated = 3
+           why:    OVER-DETERMINED: the intended finding IS present and so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]); rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
+  Q1b-6    HELD     rc=1    qualify.py
+           clause: D379 §8 Q1b opposite-side known-negative
+           proof:  positive_facts_in_clean = ['CARRIES_DATE_STAMP', 'CITES_COMMIT']
+           proof:  positive_facts_in_mutated = []
+           proof:  fact_classes_in_clean = ['BINDING_CONTRADICTION', 'CARRIES_DATE_STAMP', 'CITES_COMMIT', 'CITES_RUN', 'MAINTENANCE_OBSERVED', 'NOMINAL_
+           proof:  fact_classes_in_mutated = ['BINDING_CONTRADICTION', 'CARRIES_DATE_STAMP', 'CITES_COMMIT', 'CITES_RUN', 'MAINTENANCE_OBSERVED', 'NOMINAL_
+           proof:  rows_with_traces_in_mutated = 0
+           proof:  rows_in_mutated = 3
+           why:    the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+  86-1     HELD     rc=1    qualify.py
+           clause: D367 §8(6) fail-closed qualifier identity
+           proof:  manifest_path = /tmp/d379_exec_vv3jd9pw/MANIFEST.sha256
+           proof:  manifest_entries = 10
+           proof:  manifest_pairs = [['19f295d731183bf672061d60b17b0f7d01ce9d1aa3d340bdb2854b0bda4352fb', 'subjectbind.py'], ['226873676c2373faaf2
+           proof:  stage_a_pairs = [['19f295d731183bf672061d60b17b0f7d01ce9d1aa3d340bdb2854b0bda4352fb', 'subjectbind.py'], ['226873676c2373faaf2
+           why:    the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+  86-3     PASS     rc=2    qualify.py
+           clause: D367 §8(6) fail-closed qualifier identity
+           proof:  argv_flags = ['--result', '--stage-a']
+           proof:  argv_as_passed = ['--result', '/tmp/d379_exec_vv3jd9pw/result.json', '--stage-a', '/tmp/d379_exec_vv3jd9pw/stage_a.json']
+  86-4     PASS     rc=1    qualify.py
+           clause: D367 §8(6) fail-closed qualifier identity
+           proof:  manifest_path = /nonexistent/MANIFEST.sha256
+           proof:  path_exists = False
+  86-5     PASS     rc=1    qualify.py
+           clause: D367 §8(6) fail-closed qualifier identity
+           proof:  manifest_path = /tmp/d379_exec_vv3jd9pw/EMPTY.sha256
+           proof:  path_exists = True
+           proof:  byte_size = 0
+  86-2     HELD     rc=1    qualify.py
+           clause: D367 §8(6) fail-closed qualifier identity
+           proof:  module = envelope.py
+           proof:  manifest_declares = eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+           proof:  bytes_on_disk = fdcc1b73d7cd32e540c63ca926d5393901ea63b357fbf339819f07256e6a5a3f
+           proof:  modules_loaded_by_this_process = ['envelope']
+           why:    an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  86-6     HELD     rc=1    qualify.py
+           clause: D367 §8(6) fail-closed qualifier identity
+           proof:  omitted_module = classify.py
+           proof:  full_manifest_entries = 10
+           proof:  omitting_manifest_entries = 9
+           proof:  names_in_full_manifest = ['cal_fixtures.py', 'classify.py', 'envelope.py', 'holdout.py', 'ontology.py', 'passa.py', 'qualify.py', 'run_
+           proof:  names_in_omitting_manifest = ['cal_fixtures.py', 'envelope.py', 'holdout.py', 'ontology.py', 'passa.py', 'qualify.py', 'run_h2_v12.py', 'st
+           proof:  modules_loaded_by_this_process = ['classify']
+           why:    an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  I1B-1    HELD     rc=1    holdout.py
+           clause: D379 §7 I1-B tree/output reconciliation
+           proof:  construction = tree and output populations equal
+           proof:  tree_path_population = 3
+           proof:  output_row_population = 3
+           why:    the governed positive cannot be measured while an independent blocker forces refusal: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+  I1B-2    HELD     rc=1    holdout.py
+           clause: D379 §7 I1-B tree/output reconciliation
+           proof:  construction = drop one output row
+           proof:  tree_path_population = 3
+           proof:  output_row_population = 2
+           why:    an earlier independent blocker decided the outcome: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+  I1B-3    HELD     rc=1    holdout.py
+           clause: D379 §7 I1-B tree/output reconciliation
+           proof:  construction = add one tree path
+           proof:  tree_path_population = 4
+           proof:  output_row_population = 3
+           why:    an earlier independent blocker decided the outcome: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+  I1B-4    HELD     rc=1    holdout.py
+           clause: D379 §7 I1-B tree/output reconciliation
+           proof:  construction = duplicate one tree path
+           proof:  tree_path_population = 4
+           proof:  output_row_population = 3
+           why:    an earlier independent blocker decided the outcome: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+  I1A-1    PASS     rc=0    child:governed-function
+           clause: D379 §7 I1-A one member byte -> identity moves
+           proof:  member = kai-pm/house_in_order_h2_v13/passa.py
+           proof:  descriptor_A_members = [['kai-pm/house_in_order_h2_v13/cal_fixtures.py', '4299bd58bd34705d044056d03901f3d674f09e2afde1fff5811a55dfca5
+           proof:  descriptor_B_members = [['kai-pm/house_in_order_h2_v13/cal_fixtures.py', '4299bd58bd34705d044056d03901f3d674f09e2afde1fff5811a55dfca5
+           proof:  governed_target = stage_identity.stage_a_identity
+  I1A-2    PASS     rc=0    child:governed-function
+           clause: D379 §7 mutate evidence -> only Stage-B moves
+           proof:  stage_a_held_constant = /tmp/d379_exec_vv3jd9pw/stage_a.json
+           proof:  clean_evidence = /tmp/d379_exec_vv3jd9pw/result.json
+           proof:  mutated_evidence = /tmp/d379_exec_vv3jd9pw/result_evidence_mutated.json
+           proof:  clean_evidence_sha256 = 90df7768fd23f003734d4f63b166e47d92aeb23510acd9876853fa1e1de9cb78
+           proof:  mutated_evidence_sha256 = 36a2e9bff7901bcd8fe5bf1069018b9a2a346a1cb11e2e3c83d89890f5012986
+           proof:  governed_target = stage_identity.stage_b_binding
+  I1A-3    HELD     rc=2    child:governed-function
+           clause: D379 §7 I1-A holdout seed independence
+           proof:  stage_a_held_constant = /tmp/d379_exec_vv3jd9pw/stage_a.json
+           proof:  tree_paths_held_constant = 3
+           proof:  clean_evidence_sha256 = 90df7768fd23f003734d4f63b166e47d92aeb23510acd9876853fa1e1de9cb78
+           proof:  mutated_evidence_sha256 = 36a2e9bff7901bcd8fe5bf1069018b9a2a346a1cb11e2e3c83d89890f5012986
+           proof:  governed_target = holdout.py, executed twice
+           why:    the governed positive cannot be measured while an independent blocker forces refusal: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+  M2-1     PASS     rc=0    child:governed-function
+           clause: D379 §8 FAIL-OLD: the three false COMMIT routes classify HISTORICAL against committed pre-repair bytes
+           proof:  false_route_count = 3
+           proof:  false_route_predicates = ['audited snapshot', 'findings-bearing snapshot', 'subject']
+           proof:  false_route_sha256 = {'audited snapshot': '00f09abf46eab6a7a531b8df590156274826b29dee523870636d462a807e4f77', 'findings-bearing sna
+           proof:  genuine_route_sha256 = 0569cc2e729937e095dc6f6cb18c1cf7f2006fb0e9ceb2ce13b3fe1679b9a8b0
+           proof:  route_paths = {'audited snapshot': 'SYNTHETIC_CODE_AUDIT_AUDITED_SNAPSHOT.md', 'findings-bearing snapshot': 'SYNTHETIC_CODE_
+           proof:  route_paths_matching_AUDIT_PATH = ['audited snapshot', 'findings-bearing snapshot', 'subject']
+           proof:  commit_token_present_in = ['audited snapshot', 'findings-bearing snapshot', 'subject']
+           proof:  pre_repair_commit = 838b7637
+           proof:  pre_repair_package_dir = /tmp/pre_repair_u7ns1ihr
+           proof:  pre_repair_passa_defs_of_subject_of = 0
+           proof:  current_passa_defs_of_subject_of = 1
+  M2-2     PASS     rc=0    child:governed-function
+           clause: D379 §8 PASS-NEW: the three false COMMIT routes no longer classify HISTORICAL
+           proof:  false_route_count = 3
+           proof:  false_route_predicates = ['audited snapshot', 'findings-bearing snapshot', 'subject']
+           proof:  false_route_sha256 = {'audited snapshot': '00f09abf46eab6a7a531b8df590156274826b29dee523870636d462a807e4f77', 'findings-bearing sna
+           proof:  genuine_route_sha256 = 0569cc2e729937e095dc6f6cb18c1cf7f2006fb0e9ceb2ce13b3fe1679b9a8b0
+           proof:  route_paths = {'audited snapshot': 'SYNTHETIC_CODE_AUDIT_AUDITED_SNAPSHOT.md', 'findings-bearing snapshot': 'SYNTHETIC_CODE_
+           proof:  route_paths_matching_AUDIT_PATH = ['audited snapshot', 'findings-bearing snapshot', 'subject']
+           proof:  commit_token_present_in = ['audited snapshot', 'findings-bearing snapshot', 'subject']
+           proof:  pre_repair_commit = 838b7637
+           proof:  pre_repair_package_dir = /tmp/pre_repair_u7ns1ihr
+           proof:  pre_repair_passa_defs_of_subject_of = 0
+           proof:  current_passa_defs_of_subject_of = 1
+  M2-3     PASS     rc=0    child:governed-function
+           clause: D379 §8 the same-route positive STILL classifies HISTORICAL
+           proof:  false_route_count = 3
+           proof:  false_route_predicates = ['audited snapshot', 'findings-bearing snapshot', 'subject']
+           proof:  false_route_sha256 = {'audited snapshot': '00f09abf46eab6a7a531b8df590156274826b29dee523870636d462a807e4f77', 'findings-bearing sna
+           proof:  genuine_route_sha256 = 0569cc2e729937e095dc6f6cb18c1cf7f2006fb0e9ceb2ce13b3fe1679b9a8b0
+           proof:  route_paths = {'audited snapshot': 'SYNTHETIC_CODE_AUDIT_AUDITED_SNAPSHOT.md', 'findings-bearing snapshot': 'SYNTHETIC_CODE_
+           proof:  route_paths_matching_AUDIT_PATH = ['audited snapshot', 'findings-bearing snapshot', 'subject']
+           proof:  commit_token_present_in = ['audited snapshot', 'findings-bearing snapshot', 'subject']
+           proof:  pre_repair_commit = 838b7637
+           proof:  pre_repair_package_dir = /tmp/pre_repair_u7ns1ihr
+           proof:  pre_repair_passa_defs_of_subject_of = 0
+           proof:  current_passa_defs_of_subject_of = 1
+  D14-A    PASS     rc=0    child:governed-function
+           clause: D379 §8 straddling token: admitted WHOLE
+           proof:  HEAD_BYTES = 6000
+           proof:  token_length = 40
+           proof:  token_start_offset = 5990
+           proof:  token_end_offset = 6030
+           proof:  governed_target = passa.HEX + passa._eligible
+  D14-B    PASS     rc=0    child:governed-function
+           clause: D379 §8 cut below the recogniser minimum: fail-old loses it, pass-new carries it whole
+           proof:  HEAD_BYTES = 6000
+           proof:  token_start_offset = 5996
+           proof:  characters_inside_window = 4
+           proof:  recogniser_minimum = 7
+           proof:  governed_target = passa.HEX + passa._eligible
+  D14-C    PASS     rc=0    child:governed-function
+           clause: D379 §8 token starting at or after the boundary: NOT ADMITTED ON EITHER SIDE
+           proof:  HEAD_BYTES = 6000
+           proof:  token_start_offset = 6000
+           proof:  governed_target = passa._eligible
+  SB-1     PASS     rc=1    run_h2_v12.py
+           clause: D379 §8 Pass A absent -> REFUSE, R11 abort
+           proof:  passa_path = /tmp/d379_exec_vv3jd9pw/no_such_passA.json
+           proof:  path_exists = False
+           proof:  governed_target = run_h2_v12.py
+  SB-3     PASS     rc=1    run_h2_v12.py
+           clause: D379 §8 Pass A unbound -> REFUSE
+           proof:  passa_path = /tmp/d379_exec_vv3jd9pw/passA_unbound.json
+           proof:  path_exists = True
+           proof:  top_level_keys = ['census_dependency', 'history_identity', 'population', 'rows', 'subject', 'subject_tree']
+           proof:  governed_target = run_h2_v12.py
+  SB-2     PASS     rc=0    child:governed-function
+           clause: D379 §8 Pass A altered -> Stage-B CHANGES, Stage-A unchanged
+           proof:  original = /tmp/d379_exec_vv3jd9pw/passA.json
+           proof:  altered = /tmp/d379_exec_vv3jd9pw/passA_altered.json
+           proof:  original_sha256 = ab0fd930f49b3679f07c29efe70f53dab1c00f8d8368dad1a5e7f0d7b5c1c0ad
+           proof:  altered_sha256 = 8d83869420fed425ac67d83de008bf8163ff914c0eb04f7439470d4136fa7cd0
+           proof:  stage_a_untouched = /tmp/d379_exec_vv3jd9pw/stage_a.json
+           proof:  governed_target = stage_identity.stage_b_binding
+
+======================================================================
+GATE FAILURES — verbatim from the same run
+======================================================================
+  Q1a-1 (D379 §8 clean chain on one Stage A) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+  Q1a-2 (D379 §8 Pass-A producer byte changed AFTER Stage A fixed) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  DEP-2 (D379 §8 ordinary stdlib under a governed interpreter) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+  DEP-3 (D379 §8 runtime identity mismatch) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  Q1a-8 (D379 §5 no silent runtime expansion) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  DEP-1 (D379 §8 synthetic producer, external dep) verdict PASS: HELD: OVER-DETERMINED: the intended finding IS present and so is an independent blocker (lies outside the governed H2 root [INC-34 ungoverned runtime]); rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
+  Q1a-3 (D379 §8 classification-producer byte changed AFTER Stage A fixed) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  Q1a-5 (D379 §8 tampered recorded Stage-A identity) verdict PASS: HELD: OVER-DETERMINED: the intended finding IS present and so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]); rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
+  Q1a-6 (D379 §8 producer provenance VALID, qualifier qualification bytes differ -> §8(6)) verdict PASS: HELD: OVER-DETERMINED: the intended finding IS present and so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]); rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
+  Q1a-7 (D379 §8 member deleted from OUTPUT provenance, independent binding unchanged) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  Q1a-7 product gap: the shipped qualifier exposes an input path for the independent Stage-B anchor: of 4 flags ['--help', '--manifest', '--result', '--stage-a'], none names stage-b or a binding. The anchor exists on disk and cannot reach the qualifier. Remedy widens a production CLI contract: Kai's call.
+  Q1b-1 (D379 §8 Q1b clean complete result) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+  Q1b-2 (D379 §8 Q1b positive fact missing its trace) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  Q1b-3 (D379 §8 Q1b axis-cell witness failure) verdict PASS: HELD: OVER-DETERMINED: the intended finding IS present and so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]); rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
+  Q1b-4 (D379 §8 Q1b abstention inconsistent with the emitted positives) verdict PASS: HELD: OVER-DETERMINED: the intended finding IS present and so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]); rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
+  Q1b-5 (D379 §8 Q1b denominator shrink, fact class removed) verdict PASS: HELD: OVER-DETERMINED: the intended finding IS present and so is an independent blocker (sitecustomize [INC-34 ungoverned runtime]); rc is not attributable to this predicate without a clean comparator. Finding observed; consequentiality NOT PROVEN
+  Q1b-6 (D379 §8 Q1b opposite-side known-negative) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+  86-1 (D367 §8(6) fail-closed qualifier identity) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: sitecustomize [INC-34 ungoverned runtime]
+  86-2 (D367 §8(6) fail-closed qualifier identity) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  86-6 (D367 §8(6) fail-closed qualifier identity) verdict PASS: HELD: an earlier independent blocker decided the outcome: sitecustomize [INC-34 ungoverned runtime]
+  I1B-1 (D379 §7 I1-B tree/output reconciliation) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+  I1B-2 (D379 §7 I1-B tree/output reconciliation) verdict PASS: HELD: an earlier independent blocker decided the outcome: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+  I1B-3 (D379 §7 I1-B tree/output reconciliation) verdict PASS: HELD: an earlier independent blocker decided the outcome: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+  I1B-4 (D379 §7 I1-B tree/output reconciliation) verdict PASS: HELD: an earlier independent blocker decided the outcome: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+  I1A-3 (D379 §7 I1-A holdout seed independence) verdict PASS: HELD: the governed positive cannot be measured while an independent blocker forces refusal: carries ZERO holdout weight [D381 §13 Stage-A prerequisite]
+  section Q1a is implemented and executed: HELD (executable) — 2 PASS, 7 HELD of 9: Q1a-1, Q1a-2, Q1a-8, Q1a-3, Q1a-5, Q1a-6
+  section Q1b is implemented and executed: HELD (executable) — 0 PASS, 6 HELD of 6: Q1b-1, Q1b-2, Q1b-3, Q1b-4, Q1b-5, Q1b-6
+  section 86 is implemented and executed: HELD (executable) — 3 PASS, 3 HELD of 6: 86-1, 86-2, 86-6
+  section I1A is implemented and executed: HELD (executable) — 2 PASS, 1 HELD of 3: I1A-3
+  section I1B is implemented and executed: HELD (executable) — 0 PASS, 4 HELD of 4: I1B-1, I1B-2, I1B-3, I1B-4
+  section DEP is implemented and executed: HELD (executable) — 0 PASS, 3 HELD of 3: DEP-2, DEP-3, DEP-1
+  section STAGE_A is implemented and executed: HELD — subject is stage_identity Stage-A construction, not a CLI; the canonical-runtime positive limb ONLY (INC-34). The V2 governance and identity matrix EXECUTES.
+  section STDLIB is implemented and executed: HELD — subject is stage_identity stdlib construction (D380 §7), not a CLI; V2-ID-2a, the canonical positive derivation ONLY (INC-34). The D380-STDLIB-NEG-1 negative control EXECUTES.
+
+HELD IS NOT A PASS AND NOT A SKIP. Every HELD case FAILS the exit
+gate above and names the predicate that could not be measured.
+

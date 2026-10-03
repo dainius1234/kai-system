@@ -1,0 +1,141 @@
+{
+ "baseline_tally": {
+  "NO_PROVEN_WRITER": 267,
+  "PROVEN_WRITE_RELATION": 5
+ },
+ "checks": [
+  {
+   "detail": "",
+   "expectation": "the mutant source differs from baseline",
+   "id": "A0-APPLIED",
+   "mutation": "A",
+   "result": "PASS"
+  },
+  {
+   "detail": "[('scripts/sync_docs.py', 292, 'RESOLVED_WRITE')]",
+   "expectation": "injected op is admitted, RESOLVED_WRITE, target docs/DEMO.md",
+   "id": "A5-REACHABLE",
+   "mutation": "A",
+   "result": "PASS"
+  },
+  {
+   "detail": "{'NO_PROVEN_WRITER': 266, 'PROVEN_WRITE_RELATION': 6}",
+   "expectation": "PROVEN_WRITE_RELATION 5 -> 6",
+   "id": "A1",
+   "mutation": "A",
+   "result": "PASS"
+  },
+  {
+   "detail": "({'claim': 'NO_PROVEN_WRITER', 'sources': None}, {'claim': 'PROVEN_WRITE_RELATION', 'sources': ['scripts/sync_docs.py']})",
+   "expectation": "docs/DEMO.md NO_PROVEN_WRITER -> PROVEN_WRITE_RELATION",
+   "id": "A2",
+   "mutation": "A",
+   "result": "PASS"
+  },
+  {
+   "detail": "['scripts/sync_docs.py']",
+   "expectation": "docs/DEMO.md sources == [\"scripts/sync_docs.py\"]",
+   "id": "A3",
+   "mutation": "A",
+   "result": "PASS"
+  },
+  {
+   "detail": "['docs/DEMO.md']",
+   "expectation": "no unrelated document changed claim",
+   "id": "A4-TARGETED",
+   "mutation": "A",
+   "result": "PASS"
+  },
+  {
+   "detail": "({'NO_PROVEN_WRITER': 267, 'PROVEN_WRITE_RELATION': 5}, {'NO_PROVEN_WRITER': 266, 'PROVEN_WRITE_RELATION': 6})",
+   "expectation": "baseline and mutant claim tables differ",
+   "id": "A6-DISCRIMINATING",
+   "mutation": "A",
+   "result": "PASS"
+  },
+  {
+   "detail": "CHANGELOG.write_text(new_text)",
+   "expectation": "line 139 is the expected write statement",
+   "id": "B0-ANCHOR",
+   "mutation": "B",
+   "result": "PASS"
+  },
+  {
+   "detail": "",
+   "expectation": "the write statement is gone from the mutant",
+   "id": "B0-APPLIED",
+   "mutation": "B",
+   "result": "PASS"
+  },
+  {
+   "detail": "(0, 2)",
+   "expectation": "no WRITE op resolves to CHANGELOG.md; the two READs survive",
+   "id": "B5-APPLIED",
+   "mutation": "B",
+   "result": "PASS"
+  },
+  {
+   "detail": "{'NO_PROVEN_WRITER': 268, 'PROVEN_WRITE_RELATION': 4}",
+   "expectation": "PROVEN_WRITE_RELATION 5 -> 4",
+   "id": "B1",
+   "mutation": "B",
+   "result": "PASS"
+  },
+  {
+   "detail": "({'claim': 'PROVEN_WRITE_RELATION', 'sources': ['scripts/auto_changelog.py']}, {'claim': 'NO_PROVEN_WRITER', 'sources': None})",
+   "expectation": "CHANGELOG.md PROVEN_WRITE_RELATION -> NO_PROVEN_WRITER",
+   "id": "B2",
+   "mutation": "B",
+   "result": "PASS"
+  },
+  {
+   "detail": "{'claim': 'NO_PROVEN_WRITER', 'sources': None}",
+   "expectation": "CHANGELOG.md must NOT become NO_WRITER_WITHIN_ANALYZED_SCOPE",
+   "id": "B3",
+   "mutation": "B",
+   "result": "PASS"
+  },
+  {
+   "detail": "['CHANGELOG.md']",
+   "expectation": "no unrelated document changed claim",
+   "id": "B4-TARGETED",
+   "mutation": "B",
+   "result": "PASS"
+  },
+  {
+   "detail": "({'NO_PROVEN_WRITER': 267, 'PROVEN_WRITE_RELATION': 5}, {'NO_PROVEN_WRITER': 268, 'PROVEN_WRITE_RELATION': 4})",
+   "expectation": "baseline and mutant claim tables differ",
+   "id": "B6-DISCRIMINATING",
+   "mutation": "B",
+   "result": "PASS"
+  }
+ ],
+ "failures": [],
+ "mutations": {
+  "A": {
+   "demo": {
+    "claim": "PROVEN_WRITE_RELATION",
+    "sources": [
+     "scripts/sync_docs.py"
+    ]
+   },
+   "tally": {
+    "NO_PROVEN_WRITER": 266,
+    "PROVEN_WRITE_RELATION": 6
+   }
+  },
+  "B": {
+   "changelog": {
+    "claim": "NO_PROVEN_WRITER",
+    "sources": null
+   },
+   "tally": {
+    "NO_PROVEN_WRITER": 268,
+    "PROVEN_WRITE_RELATION": 4
+   }
+  }
+ },
+ "precommit_sha": "a89bb9cc2f6aa9bf66096ebf424a9d6fd50dd328b04c39b7ea54bd7430efd5a0",
+ "subject": "d8aac4d49e6ba997e3eb38062c0917186ee3f197",
+ "verdict": "ALL EXPECTATIONS MET"
+}

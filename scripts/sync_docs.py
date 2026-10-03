@@ -203,6 +203,53 @@ def sync_readme(metrics: dict, check_only: bool = False) -> bool:
     return True
 
 
+# The whole existing representation of the individual-tests metric: the
+# label, the count, and **every** `+` after it. `\+*` is deliberate and
+# load-bearing — the previous pattern matched at most one, so a slice taken
+# at the numeric boundary left any accumulated run in place.
+BACKLOG_TESTS_RE = re.compile(r"\| Individual tests \| \d+\+*")
+
+# The canonical form. Exactly one `+`, which is what the row has always
+# meant: a measured floor that is still rising. Not zero, not two.
+# README carries the same metric as an exact count with no `+`; these are
+# two separate output contracts and neither derives from the other.
+BACKLOG_TESTS_CANONICAL = "| Individual tests | {tests}+"
+
+
+def backlog_tests_row(text: str, tests: int):
+    """Return `(canonical_text, is_current, observed)` for the tests row.
+
+    One function, used by **both** the check path and the write path, so
+    there is exactly one declaration of what a canonical row is. Two
+    declarations of one format is how the formats drift apart.
+
+    The order is the point, and it is the half of DOC-1 that the previous
+    code got wrong twice over:
+
+      1. **observe the source** — `observed` is read out of the ORIGINAL
+         text, before anything is written;
+      2. **then replace** — the canonical string is substituted for the
+         whole matched span.
+
+    Nothing here inspects text it has just inserted, and no offset taken
+    from the pre-mutation string is reused after mutation. The old code
+    appended a `+` unconditionally, then asked whether `text[m.end(1)]`
+    was a `+` — which it always was, because that was the character it had
+    just written — and then rebuilt from the already-mutated string. The
+    guard could not remove the `+` it had added, so the row grew by one on
+    every metric change, reaching 129 before this was repaired.
+
+    Returns `None` when the row is absent, which is not a defect: the
+    caller treats a missing row as nothing to patch.
+    """
+    m = BACKLOG_TESTS_RE.search(text)
+    if m is None:
+        return None
+    observed = m.group(0)
+    canonical = BACKLOG_TESTS_CANONICAL.format(tests=tests)
+    return text[:m.start()] + canonical + text[m.end():], observed == canonical, observed
+
+
 def sync_backlog(metrics: dict, check_only: bool = False) -> bool:
     """Patch the 'Test targets' and 'Individual tests' rows in PROJECT_BACKLOG.md."""
     backlog_path = ROOT / "docs" / "PROJECT_BACKLOG.md"
@@ -221,18 +268,19 @@ def sync_backlog(metrics: dict, check_only: bool = False) -> bool:
         text = text[:m.start(1)] + str(metrics["targets"]) + text[m.end(1):]
         changed = True
 
-    # Patch individual tests row
-    m2 = re.search(r"\| Individual tests \| (\d+)\+?", text)
-    if m2:
-        current = int(m2.group(1))
-        if current != metrics["tests"]:
+    # Patch individual tests row. Stale means "not the canonical form" —
+    # a wrong count, a missing `+`, or a plus-run of any length. All of
+    # them are repaired by writing the canonical form once.
+    row = backlog_tests_row(text, metrics["tests"])
+    if row is not None:
+        canonical_text, is_current, observed = row
+        if not is_current:
             if check_only:
-                print(f"docs-sync: PROJECT_BACKLOG.md stale — tests {current} → {metrics['tests']}")
+                print(f"docs-sync: PROJECT_BACKLOG.md stale — tests row "
+                      f"{observed!r} → "
+                      f"{BACKLOG_TESTS_CANONICAL.format(tests=metrics['tests'])!r}")
                 return False
-            text = text[:m2.start(1)] + str(metrics["tests"]) + "+" + text[m2.end(1):]
-            if text[m2.end(1)] == "+":
-                # Don't double the +
-                text = text[:m2.start(1)] + str(metrics["tests"]) + text[m2.end(1):]
+            text = canonical_text
             changed = True
 
     if changed:

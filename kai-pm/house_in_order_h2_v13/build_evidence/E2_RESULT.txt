@@ -1,0 +1,84 @@
+E2 — RESULT. PRODUCED BY ORION. ZERO ADJUDICATION WEIGHT.
+NOT AN ANSWER KEY. NO TARGET COUNT WAS USED.
+subject      d8aac4d49e6ba997e3eb38062c0917186ee3f197
+subject tree 3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+predecessor  a766493, run_h2_v12.py + ontology.py from the git object
+production files changed: run_h2_v12.py, ontology.py
+only those two differ between the runs; asserted, not assumed
+
+1. CONSERVATION
+   rows in 272 · predecessor 272 · E2 272 · identical path set True
+   Pass A witnesses 492 · M3 scope 201/291 (ruled 201/291: True)
+
+2. THE FACT DELTA
+   predecessor CONSUMED_AT_SUBJECT           5
+   E2          STATIC_REFERENCE_AT_SUBJECT   5
+   OLD name present in the E2 tally : False
+   NEW name present in the old tally: False
+   positive identities identical    : True
+   the identities:
+     CHANGELOG.md
+       opscan:scripts/auto_changelog.py:L55  value='CHANGELOG'  total=2 shown=1 truncated=True
+     README.md
+       opscan:scripts/sync_docs.py:L139  value='readme_path'  total=1 shown=1 truncated=False
+     SESSION_BACKLOG.md
+       opscan:scripts/auto_session_log.py:L28  value='SESSION_LOG'  total=3 shown=1 truncated=True
+     docs/PROJECT_BACKLOG.md
+       opscan:scripts/sync_docs.py:L212  value='backlog_path'  total=1 shown=1 truncated=False
+     kai-pm/INSTRUMENTATION_ARCHITECTURE.md
+       opscan:scripts/security/check_gate_registry.py:L742  value='ARCHITECTURE_DOC'  total=1 shown=1 truncated=False
+
+3. TRACE IDENTITY across the whole corpus
+   rows whose trace content changed : 0   (must be 0)
+
+4. THE OLD NAME MUST NOT SURVIVE ANYWHERE IN THE OUTPUT
+   'CONSUMED_AT_SUBJECT' anywhere in the E2 record : False
+   'consumed'     anywhere in the E2 record : False
+   'executable'   anywhere in the E2 record : False
+   'executed'     anywhere in the E2 record : False
+   'runtime'      anywhere in the E2 record : True
+   'reachab'      anywhere in the E2 record : True
+   'invoc'        anywhere in the E2 record : False
+
+5. EVERY OTHER EVIDENCE FACT — must be unchanged
+   BINDING_CONTRADICTION               5 -> 5    
+   CARRIES_DATE_STAMP                206 -> 206  
+   CITES_COMMIT                       21 -> 21   
+   CITES_RUN                           3 -> 3    
+   MAINTENANCE_OBSERVED               71 -> 71   
+   SELF_ASSERTS_AUTHORITY              4 -> 4    
+   SELF_ASSERTS_NON_AUTHORITY          1 -> 1    
+   NOMINAL_FUNCTION tally unchanged: True
+   A6-ii abstention lists unchanged: True
+
+6. ALL SIX AXES — must be unchanged, and M1/M3 must hold
+   AUTHORITY   UNCHANGED   {'UNKNOWN': 272}
+   FUNCTION    UNCHANGED   {'UNKNOWN': 267, 'MARKER': 5}
+   GENERATION  UNCHANGED   {'UNKNOWN': 272}
+   LIFECYCLE   UNCHANGED   {'UNKNOWN': 262, 'HISTORICAL': 10}
+   SCOPE       UNCHANGED   {'UNKNOWN': 78, 'WHOLE_FILE': 194}
+   VALIDITY    UNCHANGED   {'UNKNOWN': 260, 'TIME_BOUND': 7, 'EXACT_SNAPSHOT': 5}
+   VALIDITY == the M1 ruled result  : True
+
+7. PER-ROW VERDICT DIFF, all six axes
+   rows x axes differing            : 0   (must be 0)
+
+8. READER IDENTITIES — unchanged by construction, verified anyway
+   rows with readers                : 5
+   rows with reader_ops             : 5
+   passa.py is byte-identical to the predecessor, so these come from the same Pass A for both runs.
+
+9. INPUT DIGESTS
+   passA.json                  24fb1f555560277fd4555087f22ed06ef4a72efee845a339bbc87b925730f51c
+   run_h2_v12.py (E2)          ab6f54c54c5bdd82c83f9de013311c5771d7eaabad2cec91dd46521d881f7ec7
+   run_h2_v12.py (pred)        0e3d4289fc958e40390f8d2f390119a33cf3ca75df630bc29d580a97eb2cc3a6
+   ontology.py (E2)            a92e68c7518578e177c6c67d95efdc1e8b4a92c4406aa2778678119babb721bc
+   ontology.py (pred)          5568d3277dd706c023258ddaa5a859b039f272d8cf47b7f9b6d326c97bbad688
+   passa.py (both)             ab2d98d030f61ba12b8280e1639da92b2726bf7b91c12941336dceefb12f5a6e
+   classify.py (both)          1cd4503361dfdb8b522a31ad92de51989e07b383b5177b1fea1f0cac52b351a2
+
+10. WHAT THIS IS NOT
+   Not a correctness reference, not an answer key, not an
+   adjudication. A delta is not automatically correct and no delta
+   has been repaired. The five was used as a locator only, never
+   as a target.

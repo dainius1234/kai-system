@@ -1,0 +1,377 @@
+# P1 — is a captured request complete enough to replay it faithfully?
+#
+# D247 froze a two-stage ownership-separation experiment whose Stage 1 is
+# an "exact-request replay". D248 split the prerequisite into two axes
+# that may never substitute for one another:
+#
+#   A  keyword arguments — measured from the capture run's own artifact.
+#      The probe records extra kwargs as NAMES ONLY, so a non-empty
+#      `other_params` means values are gone.
+#   B  positional arguments — from the call path's SOURCE, taken out of
+#      the image that ran it, AND from the count the probe records at
+#      runtime (D250). Neither substitutes for the other: source says
+#      what the code can do, the record says what arrived. Before D250
+#      the probe recorded nothing here, so a clean axis A said nothing
+#      whatsoever about axis B — the substitution this job refuses.
+#
+# D250 also requires the capture to be certifiable at all: machine rows
+# only, a manifest whose declared count must equal the parsed rows, and
+# ABSENT/NULL/VALUE kept apart. Captures written before that format keep
+# their historical meaning and are NOT retroactively upgraded — they are
+# simply not certifiable under this standard, and the census says so.
+#
+# NO MODEL CALL. No stack bring-up. This workflow reads bytes that already
+# exist and source that is already pinned, so it cannot produce evidence
+# about the LLM and does not claim to.
+#
+# IT IS A SEPARATE FILE ON PURPOSE. Putting this job in
+# memu-graph-startup-proof.yml would have placed the P1 census and its
+# calibration inside that workflow's paths filter, so editing a static
+# analyser would have triggered a live model capture nobody authorised.
+# A gate's trigger conditions are part of the gate.
+name: P1 replay completeness (KAI-GATE-048 C)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - claude/project-rework-plan-pgvp35
+    # EVERY INPUT THIS JOB READS: the census, its calibration, this file,
+    # and the image inputs — because the job builds that image and audits
+    # the source inside it, so a Dockerfile change changes the subject.
+    paths:
+      - .github/workflows/p1-replay-completeness.yml
+      - scripts/security/p1_replay_completeness.py
+      - scripts/test_p1_replay_completeness.py
+      # The census's calibration asserts against the probe's own source —
+      # what it records by value, what it records as a name, and that it
+      # keeps ABSENT/NULL/VALUE apart. So the probe is an input to THIS
+      # job too, and a format change here must re-run this census.
+      - scripts/security/probe_llm_contract.py
+      - memu-graph/Dockerfile
+      - memu-graph/requirements.txt
+      - docker-compose.full.yml
+
+permissions:
+  contents: read
+
+jobs:
+  p1-replay-completeness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      actions: read          # to read the capture run's artifact
+    env:
+      # The capture whose completeness is being certified, named rather
+      # than discovered — a moving "latest" would silently change the
+      # subject between runs. Taken from an authoritative run listing,
+      # never from memory.
+      P1_CAPTURE_RUN_ID: "31894868473"
+      P1_CAPTURE_COMMIT: "1d79b145a04f1bc35a9bc9d0a31251153f6e6a10"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0     # the capture commit must be diffable
+
+      # I-8. The instrument proves it can tell the five verdicts apart,
+      # and proves a clean axis A cannot imply a clean axis B, BEFORE it
+      # is allowed to pronounce on anything.
+      - name: The P1 instrument must pass its calibration first
+        run: python3 scripts/test_p1_replay_completeness.py
+
+      # D239: blob identity proves repository-input equivalence, and that
+      # is all it proves. Name exactly which inputs were compared, so a
+      # green line here cannot be read as "identical runtime".
+      - name: Bind the audited image to the capture's tree
+        run: |
+          set -euo pipefail
+          git cat-file -e "${P1_CAPTURE_COMMIT}^{commit}"
+          echo "capture run   : ${P1_CAPTURE_RUN_ID}"
+          echo "capture commit: ${P1_CAPTURE_COMMIT}"
+          echo "this commit   : ${GITHUB_SHA}"
+          echo
+          echo "image inputs compared: memu-graph/ docker-compose.full.yml"
+          CHANGED=$(git diff --name-only \
+            "${P1_CAPTURE_COMMIT}" "${GITHUB_SHA}" \
+            -- memu-graph docker-compose.full.yml)
+          if [ -n "$CHANGED" ]; then
+            echo "REFUSED: image inputs changed since the capture, so the"
+            echo "  source audited below is not the source that ran:"
+            echo "$CHANGED"
+            exit 2
+          fi
+          echo "  no image input changed between those two commits."
+          echo
+          echo "NOT PROVEN by the above: that every runtime dependency"
+          echo "  resolved identically. python:3.11-slim is a moving tag"
+          echo "  and pip re-resolves cognee's transitive dependencies at"
+          echo "  build time. The probe records openai's version and NOT"
+          echo "  instructor's or cognee's, so run ${P1_CAPTURE_RUN_ID}'s"
+          echo "  exact instructor version is UNKNOWN. The versions printed"
+          echo "  below are this build's, and axis B's forwarder evidence"
+          echo "  is bound to them."
+
+      - name: Free up runner disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc || true
+          df -h /
+
+      # ci-toleration: documented-skip
+      - name: Fetch the capture from run ${{ env.P1_CAPTURE_RUN_ID }}
+        id: fetch
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: memu-graph-llm-contract
+          run-id: ${{ env.P1_CAPTURE_RUN_ID }}
+          github-token: ${{ github.token }}
+          path: p1-evidence
+
+      - name: Build the image whose site-packages are the call path
+        run: docker compose -f docker-compose.full.yml build memu-graph
+
+      - name: P1 verdict — two axes, no collapsing, no "probably complete"
+        run: |
+          set -euo pipefail
+          CAP=p1-evidence/llm-contract-logs/capture.jsonl
+          if [ ! -f "$CAP" ]; then
+            # R11: no subject, no observation. Say which prerequisite
+            # failed, and do not let it read as a verdict.
+            echo "P1 NOT PERFORMED: run ${P1_CAPTURE_RUN_ID}'s artifact was"
+            echo "  not retrievable, so there was nothing to certify. This"
+            echo "  is an availability failure, NOT a P1 verdict, and"
+            echo "  Stage 1 stays blocked."
+            if [ -d p1-evidence ]; then
+              echo "  what WAS downloaded:"
+              ls -R p1-evidence | head -40
+            else
+              echo "  nothing was downloaded at all."
+            fi
+            exit 2
+          fi
+          echo "capture: $(wc -c < "$CAP") bytes, $(grep -c . "$CAP") record(s)"
+          # The image name comes from compose's OWN resolution, not from a
+          # guessed "<dir>-<service>" convention (R5). `docker compose
+          # images` needs a container, and this job creates none.
+          IMG=$(docker compose -f docker-compose.full.yml \
+                  --profile introspection config --format json \
+                | python3 -c "import json,sys; d=json.load(sys.stdin); s=d['services']['memu-graph']; print(s.get('image') or d['name']+'-memu-graph')")
+          echo "image: ${IMG}"
+          docker image inspect "$IMG" >/dev/null   # fail loudly, not later
+          # The package roots and versions are DERIVED from the image's own
+          # interpreter, never from a hard-coded site-packages path (R5),
+          # and the audited source is then copied OUT of that image so the
+          # census runs as a plain, visible invocation.
+          docker run --rm "$IMG" python3 -c "import importlib, pathlib; [print(n, getattr(importlib.import_module(n), '__version__', 'unrecorded'), pathlib.Path(importlib.import_module(n).__file__).parent) for n in ('cognee', 'instructor', 'openai')]" | tee p1-resolved.txt
+          COGNEE_ROOT=$(awk '$1=="cognee"{print $3}' p1-resolved.txt)
+          INSTRUCTOR_ROOT=$(awk '$1=="instructor"{print $3}' p1-resolved.txt)
+          test -n "$COGNEE_ROOT" && test -n "$INSTRUCTOR_ROOT"
+          CID=$(docker create "$IMG")
+          mkdir -p p1-src
+          docker cp "$CID:$COGNEE_ROOT" p1-src/cognee
+          docker cp "$CID:$INSTRUCTOR_ROOT" p1-src/instructor
+          docker rm "$CID" >/dev/null
+          echo "audited source copied out of ${IMG}:"
+          echo "  cognee     <- $COGNEE_ROOT"
+          echo "  instructor <- $INSTRUCTOR_ROOT"
+          echo
+          set +e
+          python3 scripts/security/p1_replay_completeness.py \
+            --capture "$CAP" \
+            --call-site-root p1-src/cognee \
+            --forwarder-root p1-src/instructor
+          RC=$?
+          set -e
+          # LAST, so it lands inside the Actions log's fixed byte window.
+          # Run 1 printed these before a long call-site listing and they
+          # fell outside it, leaving the audited instructor version — the
+          # version axis B's forwarder evidence is bound to — unreadable
+          # from the log. A provenance line nobody can read is not one.
+          echo
+          echo "RESOLVED IN THE AUDITED IMAGE (name version root):"
+          sed 's/^/  /' p1-resolved.txt
+          exit "$RC"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p1-replay-completeness
+          path: |
+            p1-evidence/
+            p1-resolved.txt
+          if-no-files-found: warn
+
+  # S1 (D255/D256/D257). Which captured request becomes the Stage-1
+  # replay subject — published as a REQUEST-SIDE PROJECTION and nothing
+  # more.
+  #
+  # `needs:` is load-bearing, not tidiness. S1's first precondition is
+  # "P1 returned REQUEST_REPLAYABLE over the whole population", and only
+  # REQUEST_REPLAYABLE exits 0, so this job structurally cannot run
+  # unless that verdict was reached. The precondition is enforced by the
+  # DAG rather than asserted by the tool that would benefit from it.
+  #
+  # It publishes the subject's identity. It does NOT authorise the
+  # replay, and it reads no response field: D257 established that an
+  # llm-call row carries the outcome in the same dict as the request, so
+  # the projection is an allow-list and every outcome-derived value —
+  # including elapsed_s, wall, and any hash of the complete stored row —
+  # is withheld until Stage-1 use is authorised.
+  s1-replay-subject:
+    needs: p1-replay-completeness
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+    env:
+      P1_CAPTURE_RUN_ID: "31894868473"
+      P1_CAPTURE_COMMIT: "1d79b145a04f1bc35a9bc9d0a31251153f6e6a10"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: The selector must pass its calibration first
+        run: python3 scripts/test_replay_subject_selection.py
+
+      # ci-toleration: documented-skip
+      - name: Fetch the capture from run ${{ env.P1_CAPTURE_RUN_ID }}
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: memu-graph-llm-contract
+          run-id: ${{ env.P1_CAPTURE_RUN_ID }}
+          github-token: ${{ github.token }}
+          path: s1-evidence
+
+      - name: S1 — publish the replay subject's request-side identity
+        run: |
+          set -euo pipefail
+          python3 scripts/security/select_replay_subject.py \
+            --capture s1-evidence/llm-contract-logs/capture.jsonl \
+            --p1-run-id "${GITHUB_RUN_ID}" \
+            --capture-run-id "${P1_CAPTURE_RUN_ID}" \
+            --capture-commit "${P1_CAPTURE_COMMIT}"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: s1-replay-subject
+          path: s1-evidence/
+          if-no-files-found: warn
+
+  # D251. Was the capture written in the D250 format? That question, and
+  # nothing else.
+  #
+  # The subject is an automatic CI SIDE EFFECT of the authorised capture
+  # repair, not an authorised ownership experiment. It is admitted for
+  # format validation ONLY: not for Q2, not for Q6, not for ownership
+  # attribution, and not into the closed sampling campaign, which stays
+  # CLOSED at 1/5. `--format-check` reads no response field, so this job
+  # cannot inspect the model outcomes it is validating even by accident.
+  #
+  # It emits no P1 verdict and cannot: a green run here says the FILE is
+  # well-formed, never that its contents are a certified replay subject.
+  # P1 against the legacy capture stays UNRESOLVED regardless — item 5 of
+  # the frozen sequence is that job's verdict, not a re-enactment.
+  p1-format-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+    env:
+      P1_FORMAT_RUN_ID: "31894868473"
+      P1_FORMAT_COMMIT: "1d79b145a04f1bc35a9bc9d0a31251153f6e6a10"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: The instruments must pass their calibration first
+        run: |
+          python3 scripts/test_p1_replay_completeness.py
+          python3 scripts/test_artifact_fetch_states.py
+
+      # ci-toleration: documented-skip
+      - name: Fetch the capture from run ${{ env.P1_FORMAT_RUN_ID }}
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: memu-graph-llm-contract
+          run-id: ${{ env.P1_FORMAT_RUN_ID }}
+          github-token: ${{ github.token }}
+          path: fmt-evidence
+
+      # "Not performed" was absorbing five different causes. A run still
+      # going, a permissions failure here, a network failure, an artifact
+      # that never existed after a COMPLETED run, and one that downloaded
+      # malformed are five different facts demanding five different
+      # actions — and two of them are findings about the subject rather
+      # than availability problems here.
+      - name: Why did the artifact arrive, or not — five states, not one
+        id: fetch_state
+        run: |
+          set -uo pipefail
+          API="https://api.github.com/repos/${GITHUB_REPOSITORY}"
+          HTTP=$(curl -sS -o run.json -w '%{http_code}' \
+            -H "Authorization: Bearer ${{ github.token }}" \
+            -H "Accept: application/vnd.github+json" \
+            "${API}/actions/runs/${P1_FORMAT_RUN_ID}" || echo "")
+          curl -sS -o artifacts.json \
+            -H "Authorization: Bearer ${{ github.token }}" \
+            -H "Accept: application/vnd.github+json" \
+            "${API}/actions/runs/${P1_FORMAT_RUN_ID}/artifacts"
+          # No `|| true`: this step runs without `set -e`, so a failed
+          # curl leaves artifacts.json absent or unparseable and the
+          # classifier reads that as NETWORK_FAILURE — which is the
+          # honest answer. Swallowing the exit code would have made an
+          # unreachable API indistinguishable from an empty artifact list.
+          python3 scripts/security/classify_artifact_fetch.py \
+            ${HTTP:+--http-status "$HTTP"} \
+            --run-json run.json --artifacts-json artifacts.json \
+            --artifact-name memu-graph-llm-contract \
+            --expected-file fmt-evidence/llm-contract-logs/capture.jsonl
+          echo "rc=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Capture format validation — the file's shape, nothing else
+        run: |
+          set -euo pipefail
+          CAP=fmt-evidence/llm-contract-logs/capture.jsonl
+          # TWO IDENTITIES, KEPT APART. The subject produced the artifact;
+          # this run measures it. A result belongs to the measurer's tree
+          # and says something about the subject's — conflating them is how
+          # "the analyser is this commit's, the evidence is that run's"
+          # stops being visible.
+          echo "SUBJECT  (produced the artifact): run ${P1_FORMAT_RUN_ID}, "\
+               "commit ${P1_FORMAT_COMMIT}"
+          echo "MEASURER (measures the artifact): run ${GITHUB_RUN_ID}, "\
+               "commit ${GITHUB_SHA}"
+          echo "The verdict below belongs to the MEASURER's tree and is"
+          echo "about the SUBJECT's artifact. Neither identity may be read"
+          echo "off the other."
+          echo
+          if [ ! -f "$CAP" ]; then
+            # R11: no subject, no observation. The state was already
+            # named above; this step refuses rather than restating it as
+            # a single undifferentiated "not performed".
+            echo "NO FORMAT VERDICT: the expected capture file is absent."
+            echo "  The fetch state printed by the previous step says WHY,"
+            echo "  and that state is the report — not a format result."
+            if [ -d fmt-evidence ]; then
+              echo "  what WAS downloaded:"
+              ls -R fmt-evidence | head -40
+            else
+              echo "  nothing was downloaded at all."
+            fi
+            exit 2
+          fi
+          echo "capture: $(wc -c < "$CAP") bytes, $(grep -c . "$CAP") line(s)"
+          echo
+          python3 scripts/security/p1_replay_completeness.py \
+            --capture "$CAP" --format-check "${P1_FORMAT_RUN_ID}"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p1-format-validation
+          path: fmt-evidence/
+          if-no-files-found: warn

@@ -241,31 +241,113 @@ def test_the_allowlist_constant_is_actually_used():
 
 
 def run_all() -> None:
-    test_a_bare_reference_is_allowed()
-    test_an_explicitly_empty_default_is_allowed()
-    test_a_weak_default_fails()
-    test_a_strong_looking_default_fails()
-    test_a_hardcoded_secret_fails()
-    test_a_secret_hiding_under_a_non_secret_key_fails()
-    test_a_tokenizer_is_not_a_token()
-    test_a_path_to_a_secret_is_not_a_secret()
-    test_a_switch_that_mentions_a_secret_is_not_a_secret()
-    test_a_directory_is_not_a_secret()
-    test_dev_hmac_in_a_deployment_fails()
-    test_a_declared_exception_is_exempt_and_reported()
-    test_the_exception_list_is_narrow()
-    test_the_denominator_counts_values_not_files()
-    test_a_missing_compose_file_is_refused()
-    test_restart_always_still_fails()
-    test_allowed_restart_values_pass()
-    test_an_unrecognised_restart_value_now_fails()
-    test_the_allowlist_constant_is_actually_used()
+    """Run every test_* in this module, DERIVED, not listed.
 
-    check(f"all {EXPECTED_SCENARIOS} scenarios ran",
-          len(executed) == EXPECTED_SCENARIOS,
-          f"{len(executed)} ran: {executed}")
+    This was a hand-written list of calls, and it behaved exactly as R5
+    predicts a list kept beside the thing behaves: five tests for the
+    key-identifier exception were added below and none of them ran. The
+    suite reported 28 passed and had not executed a single new
+    assertion — a test that runs nothing reads precisely like a test
+    that passes.
+
+    The count check below stays, and is now the independent evidence
+    (I-8): every test must call `scenario()` exactly once, so the number
+    of scenarios executed must equal the number of test functions found.
+    Discovery and the tally come from different places, so neither can
+    quietly excuse the other.
+    """
+    tests = sorted((name, fn) for name, fn in globals().items()
+                   if name.startswith("test_") and callable(fn))
+    for _, fn in tests:
+        fn()
+
+    check("every discovered test ran exactly one scenario",
+          len(executed) == len(tests),
+          f"{len(executed)} scenario(s) from {len(tests)} test(s): {executed}")
+    check(f"at least the {EXPECTED_SCENARIOS} historical scenarios remain — "
+          f"a ratchet, so deleting tests cannot make this pass",
+          len(executed) >= EXPECTED_SCENARIOS, str(len(executed)))
     check("no scenario ran twice", len(set(executed)) == len(executed),
           str(executed))
+
+
+# ── Public key IDENTIFIER vs secret key MATERIAL ─────────────────────
+#
+# The distinction this section exists to encode:
+#
+#   KAI_SERVICE_KEY_ID is an identiFIER. It travels in the
+#   X-Kai-Signature header of every signed request and is listed in the
+#   receiver's key map, which looks the identity up BY it. It is public
+#   by construction.
+#
+#   The private key is the secret, and it is mounted from a file.
+#
+# The risk in encoding that is obvious and is what these tests guard:
+# a detector taught to ignore "KEY_ID" would stop seeing real key
+# material. So each of these asserts the exception is narrow AND that
+# sensitivity is unchanged, which is the property that matters.
+
+def test_the_declared_key_id_is_allowed_for_its_declared_service():
+    scenario("key-id-allowed")
+    violations, declared, _ = secrets.check_file(compose(
+        '      KAI_SERVICE_KEY_ID: agentic-v1\n', service="agentic"))
+    check("KAI_SERVICE_KEY_ID=agentic-v1 does not trigger the gate",
+          not violations)
+    check("and it is REPORTED as a declared exception, not hidden",
+          any("KAI_SERVICE_KEY_ID" in d for d in declared))
+
+
+def test_the_exception_is_scoped_to_one_service():
+    scenario("key-id-scoped")
+    check("the SAME variable in another service still triggers the gate",
+          secret_violations('      KAI_SERVICE_KEY_ID: agentic-v1\n',
+                            service="not-agentic"))
+
+
+def test_no_broad_key_id_heuristic_was_created():
+    scenario("no-key-id-heuristic")
+    # If a "KEY_ID means safe" rule had been invented, these would pass
+    # silently. They must not: the exception is a typed (service, name)
+    # pair, not a word the detector now trusts everywhere.
+    for name in ("SIGNING_KEY_ID", "PRIVATE_KEY_ID", "API_KEY_ID",
+                 "AWS_SECRET_KEY_ID"):
+        check(f"{name} with a literal value is still a violation",
+              secret_violations(f'      {name}: some-literal-value\n'))
+
+
+def test_real_key_material_is_still_caught():
+    scenario("key-material-still-caught")
+    # Sensitivity, asserted rather than assumed. Every one of these is a
+    # secret carrying a value, and each must still be refused — in the
+    # SAME service the narrow exception applies to.
+    material = (
+        ("KAI_SERVICE_PRIVATE_KEY", "ed25519:" + "ab" * 32),
+        ("PRIVATE_KEY", "ed25519:" + "cd" * 32),
+        ("KAI_SERVICE_TOKEN", "77c50e67f9f0e144a373f262da548d38"),
+        ("INTERSERVICE_HMAC_SECRET", "not-a-reference"),
+        ("API_KEY", "sk-literal"),
+        ("DB_PASSWORD", "hunter2"),
+    )
+    for name, value in material:
+        check(f"{name} carrying a value is STILL refused",
+              secret_violations(f'      {name}: "{value}"\n',
+                                service="agentic"))
+
+
+def test_the_declared_exception_is_a_typed_pair():
+    scenario("exception-is-typed")
+    # Encoded in the gate, not in someone's head — and narrow enough to
+    # name both halves.
+    check("the exception is keyed by (service, variable)",
+          ("agentic", "KAI_SERVICE_KEY_ID") in secrets.DECLARED_NON_SECRETS)
+    reason = secrets.DECLARED_NON_SECRETS[("agentic", "KAI_SERVICE_KEY_ID")]
+    check("and it records WHY it is public — the header and the key map, "
+          "not merely an assurance that it is fine",
+          "X-Kai-Signature" in reason and "key map" in reason)
+    check("and it names where the actual secret lives",
+          "private key" in reason.lower())
+    check("the exception list has not grown into a habit",
+          len(secrets.DECLARED_NON_SECRETS) <= 2)
 
 
 if __name__ == "__main__":
