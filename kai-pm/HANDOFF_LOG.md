@@ -19942,3 +19942,116 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-03T02:24:46Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-03T02:24:46Z  [CMD `date -u +%FT%TZ` → 2026-10-03T02:24:46Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 29c3c48464928c86e0a4dea33bd8171d1cc10543  [CMD `git rev-parse HEAD` → 29c3c48464928c86e0a4dea33bd8171d1cc10543]
+- tree: caed12098d749ddee8bd9a32c084abc055129ced  [CMD `git rev-parse HEAD^{tree}` → caed12098d749ddee8bd9a32c084abc055129ced]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/project-rework-plan-pgvp35: 29c3c48464928c86e0a4dea33bd8171d1cc10543  [CMD `git ls-remote --heads origin` → 29c3c48464928c86e0a4dea33bd8171d1cc10543]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: dbe692d9c3f83020176aeda00a0f399ce5f020f8  [CMD `git ls-remote --heads origin` → dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 48  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 48]
+
+### 1. The four states
+
+- physical: repair branch unchanged at dbe692d; SB-01 v1 frozen in scratch, transport files unchanged since entry 48 (chunk 1 sha256 14e1862578a08389…, chunk 2 938e100871561e0c…, each matching its stated decoded length, decoded hash and base64 hash; reassembly d5b1d0f15f80b9c6…)  [CMD `sha256sum sb01_b64/*; decode and verify both chunks` → all True; packet d5b1d0f15f80b9c6483ec28bd656c011d94b9df75510dfe542341a5f063d3f05]
+- authorised: hand the two frozen base64 chunks to Dainius for a self-contained message Kai assembles; no change to SB-01  [CONVERSATION 2026-10-03 Kai, "have Orion give you the already-frozen SB-01 base64 transport exactly as two complete chunks"]
+- evidence: Kai's classification verbatim in section 2  [CMD `sha256sum kai_sb01_transport_ruling.txt` → e784a4a9e1823d77…]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-03 · SB-01 REVIEW TRANSPORT/AVAILABILITY FAILURE: DeepSeek (a new chat, zero prior context) received the review instructions but not the SB-01 packet payload; NO REVIEW is a failed delivery attempt with zero substantive findings; not a defect in SB-01, no SB-01 v2, no change to the repair; the next transmission must be self-contained in one chat with the base64 chunks inline; state: two-fact v4 frozen/accepted, SB-01 v1 frozen/proposed, DeepSeek SB-01 review NOT STARTED, repair branch unchanged, implementation HELD. Verbatim below, 2353 bytes, sha256 e784a4a9e1823d776c65928c3446c26598a9584b84e8e3762215d9c63684feed, final LF False, 4-space indent added ⚠ UNBANKED  [CONVERSATION 2026-10-03 Kai via Dainius, "SB-01 REVIEW TRANSPORT/AVAILABILITY FAILURE — packet payload not available to DeepSeek in the new chat."]
+    BEGIN-VERBATIM KAI-SB01-TRANSPORT-RULING
+    Yes — that clarification matters.
+    
+    Because you opened a new DeepSeek chat, I should treat DeepSeek as having zero prior context: no v3/v4 history, no earlier packet, no repository state, no knowledge of Orion, and no memory of our receipt protocol unless we include it in that same chat.
+    
+    And you’re right about what happened: you did send the review request I wrote, and DeepSeek’s response shows it received that request. Its NO REVIEW means something narrower:
+    
+    the instructions arrived, but DeepSeek did not receive/read the SB-01 packet payload that the instructions referred to.
+    
+    So my wording that it was simply “not sent” was too strong. The correct classification is:
+    
+    SB-01 REVIEW TRANSPORT/AVAILABILITY FAILURE — packet payload not available to DeepSeek in the new chat.
+    
+    It does not mean:
+    
+    * DeepSeek forgot the packet;
+    * SB-01 is defective;
+    * Orion needs to regenerate SB-01;
+    * we need SB-01 v2;
+    * anything needs changing in the repair.
+    
+    For a completely fresh DeepSeek chat, the next transmission must be 100% self-contained in that one conversation. DeepSeek needs, in the same chat:
+    
+    1. the reviewer role/evidence boundary — “you have no repo access; rely only on supplied material”;
+    2. the exact review instructions;
+    3. the actual SB-01 packet payload, preferably Orion’s base64 chunks inline rather than relying on an attachment;
+    4. the decode/reassembly/hash procedure;
+    5. the receipt template;
+    6. only after the receipt passes, the adversarial-review instructions.
+    
+    That removes both memory dependency and attachment dependency.
+    
+    The safest next move is therefore: have Orion give you the already-frozen SB-01 base64 transport exactly as two complete chunks, and paste those chunks directly into the new DeepSeek chat underneath the review cover. Nothing should refer to “the packet from before” or “as previously supplied.”
+    
+    And DeepSeek’s current NO REVIEW should be preserved as a failed delivery attempt, zero substantive findings.
+    
+    So current technical state is unchanged:
+    
+    two-fact v4 = frozen/accepted
+    SB-01 v1 = frozen/proposed
+    DeepSeek SB-01 review = NOT STARTED
+    repair branch = unchanged
+    implementation = HELD
+    
+    When Orion gives you the two base64 chunks, send them here and I’ll assemble the single self-contained DeepSeek message so there is nothing whatsoever for the new chat to remember.
+    END-VERBATIM KAI-SB01-TRANSPORT-RULING
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: give Dainius the two frozen chunks exactly; Kai assembles the self-contained DeepSeek message  [CONVERSATION 2026-10-03 Kai, "When Orion gives you the two base64 chunks, send them here and I’ll assemble the single self-contained DeepSeek message"]
+- HELD: composite implementation, d379_controls.py, the full matrix, until DeepSeek reviews SB-01 and Kai reconciles  [CONVERSATION 2026-10-03 Kai, "implementation = HELD"]
+- FORBIDDEN: unchanged from entry 48 (repair-branch mutation, d379_controls.py rebuild, full hostile matrix, incident allocation, D390 replay, fixity F, capture, candidate, holdout, blind 40, Item 8, PR #122 merge)  [CONVERSATION 2026-10-03 Kai, "No repair-branch mutation. No d379_controls.py rebuild, full hostile matrix, incident allocation, D390 replay, fixity F, capture, candidate, holdout, blind 40, Item 8 or PR #122 merge."]
+
+### 4. Open questions
+
+- NOT PRESERVED: DeepSeek's SB-01 NO REVIEW reply and the review request Kai wrote for that chat are not in this conversation's transcript, so they cannot be preserved byte-exact here; Kai directed the reply be preserved as a failed delivery attempt — owner: Dainius (paste the reply)  [CMD `user messages after Kai's v4 ruling in the session transcript` → 1, Kai's classification only]
+
+### 5. Incidents and corrections
+
+- Own-search correction: a transcript search for "NO REVIEW" with "SB-01" matched an older message (the v3 failed receipt, entry 43), not an SB-01 reply; enumerating every user message after Kai's v4 ruling found only Kai's classification  [CMD `print user messages after 'GPT: I checked DeepSeek’s v4 review'` → 1 message, 2353 bytes]
+
+### 6. Next authorised step
+
+- Deliver the two frozen chunks to Dainius unchanged; await DeepSeek's receipt and review via Kai's self-contained message; Kai reconciles; no implementation  [CONVERSATION 2026-10-03 Kai, "the safest next move is therefore: have Orion give you the already-frozen SB-01 base64 transport exactly as two complete chunks"]
+
+### 7. What I am unsure of
+
+- Whether pasting about 19 KB of base64 into a chat survives its renderer unchanged; each chunk carries the hash of its whitespace-stripped base64, so any alteration is detectable at receipt  [CMD `grep stated hashes in sb01_b64_chunk_*` → present in both]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
