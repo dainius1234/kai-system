@@ -16878,3 +16878,3067 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-03T02:06:50Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-03T02:06:50Z  [CMD `date -u +%FT%TZ` → 2026-10-03T02:06:50Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: ea63ef5d32d4c4d5662544354f5d49bbbb480bb0  [CMD `git rev-parse HEAD` → ea63ef5d32d4c4d5662544354f5d49bbbb480bb0]
+- tree: 51e03f9e7abce4b005b9b67807fded8c79dcad49  [CMD `git rev-parse HEAD^{tree}` → 51e03f9e7abce4b005b9b67807fded8c79dcad49]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: dbe692d9c3f83020176aeda00a0f399ce5f020f8  [CMD `git ls-remote --heads origin` → dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- remote:claude/project-rework-plan-pgvp35: ea63ef5d32d4c4d5662544354f5d49bbbb480bb0  [CMD `git ls-remote --heads origin` → ea63ef5d32d4c4d5662544354f5d49bbbb480bb0]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 47  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 47]
+
+### 1. The four states
+
+- physical: repair branch unchanged at dbe692d; SB-01 v1 exists only in scratch (inst5); composite run_h2_v12.py sha256 a39359bc383c8f6f6ca4540c10474fcb094c990f7b8e8091792262436c7a4cfe, reconstructable from banked text: dbe692d blob + COMPLETE-V4-DIFF-VS-DBE692D (entry 45) -> d3ee165f… + SB01-V1-DELTA (below) -> a39359bc…  [CMD `git show dbe692d:…run_h2_v12.py; patch < v4_from_log.diff; patch < sb01.v1.diff; sha256sum` → d3ee165f…, a39359bc…]
+- authorised: SB-01 packet v1 in scratch on exact v4; SB-01 delta only to DeepSeek; no implementation  [CONVERSATION 2026-10-03 Kai, "Then send only the SB-01 delta for narrow DeepSeek adversarial review, with exact composite subject identity preserved for Kai."]
+- evidence: delta, packet, cover, every instrument and its full output verbatim in section 5  [CMD `sha256sum DEEPSEEK_PACKET_SB01_v1.md` → d5b1d0f15f80b9c6…]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- None; executed under entry 47's ruling  [CONVERSATION 2026-10-03 Kai, "Prepare KAI-B4-SB-01 packet v1 in scratch only, using exact v4 as its base."]
+
+### 3. Authorised / Held / Forbidden
+
+- DONE: SB-01 v1 delta (6 hunks, 49 added / 7 removed, header lines excluded; first hunk @@ -114,7 +114,38 @@), sha256 ba61127dacdcc140e157ce6ce36b5907686ad52384b6476ae3319606771127ed; packet v1 sha256 d5b1d0f15f80b9c6483ec28bd656c011d94b9df75510dfe542341a5f063d3f05, 13,535 bytes, embedded delta equal to the file; base64 transport 2 chunks (6,732 / 6,803 bytes), message round-trip equal to the packet  [CMD `gen_sb01_packet.py; gen_sb01_b64.py` → embedded == delta; round-trip True]
+- HELD: composite implementation until DeepSeek reviews the SB-01 delta and Kai reconciles; then d379_controls.py and the full v4.5 hostile matrix  [CONVERSATION 2026-10-03 Kai, "Once SB-01 survives its own adversarial review, we can authorize the composite run_h2_v12.py implementation."]
+- FORBIDDEN: repair-branch mutation, d379_controls.py rebuild, full hostile matrix, incident allocation, D390 replay, fixity F, capture, candidate, holdout, blind 40, Item 8, PR #122 merge  [CONVERSATION 2026-10-03 Kai, "No repair-branch mutation. No d379_controls.py rebuild, full hostile matrix, incident allocation, D390 replay, fixity F, capture, candidate, holdout, blind 40, Item 8 or PR #122 merge."]
+
+### 4. Open questions
+
+- Reader-trace line vocabulary (packet Q6): _reader_trace picks the line by str.splitlines() over the verified text, while opscan numbers Python lines by AST lineno and shell lines by LF count; a source file containing CR, VT, FF, FS, GS, RS, NEL, LS or PS could select a different line. Unchanged by SB-01 (same in v4); latent in the frozen subject: 0 of 615 suffix-matched source files at 3abc9e9d contain any of them (EXCLUDE_DIRS not applied, so a superset of opscan's population) — owner: Kai  [CMD `git cat-file over 615 suffix-matched paths at 3abc9e9d` → 0 files for every separator]
+- Raw CR in local_context (packet Q7): on the lone-CR separator document, the composite's SAC trace is L3 with context 'lead' + CR + 'This document is in force.' (canonical complete-LF-line context over committed bytes); v4 gave L4 'This document is in force.' over read_text-translated text, which does not resolve against the commit — owner: Kai  [CMD `loc_e2e_v5.py` → exactly 2 fields differ, both on CR_SAC.md]
+- Qualifier non-detection (packet Q8): qualify.py reported 0 findings for v4's lone-CR trace that does not resolve against the committed bytes; measured on that one case only — owner: Kai  [CMD `loc_e2e_v5.py` → findings [] for V4 and V5]
+- Lazy reader refusal (packet Q3): evidence_facts REFUSES a missing read_source only when a reader trace is needed; text/function_cell are refused up front — owner: Kai  [FILE /tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/twofact/inst5/kai-pm/house_in_order_h2_v13/run_h2_v12.py:132]
+
+### 5. Incidents and corrections
+
+- Results, qualified interpreter -B -E -s: hostile real chain NEW 13/13 and OLD 13/13 as declared (machine verdict), 9 fail-old cases (C0, C1, C1b, C2, C6, T1, T2, T3, PROBE); C3 HEAD mismatch refuses in both (not fail-old); C4/T4 OLD non-zero only by uncaught FileNotFoundError; PROBE NEW consumed == committed blob 3/3 and 4/4 subject opens inside passa.read_source, OLD 2/3 differ and 4/4 opens outside it; committed tracked symlink: Pass A REFUSES TRACKED SYMLINK, so no classification input exists; static read paths OLD 2 raw subject reads (exit 1), NEW 0 (exit 0); preserved v4 controls on the composite: semantics 92/0, locators 37/0, frozen 272-row dump, all byte-identical to v4; process REFUSE 7/7; chain OLD dbe692d vs composite: axes and other eight facts identical  [CMD `sb01_e2e.py; sb01_verdict.py; sb01_readpaths.py; semantics.py; loc_controls.py; rowdump.py; refuse_e2e.py inst5; chain_e2e.py inst5; loc_e2e_v5.py` → as stated]
+- Harness history, all three runs disclosed: run 1 executed the in-process T/PROBE cases with my harness as __main__; the producer's runtime-population check REFUSED it before any subject byte was read, so those rows were NOT MEASURED (R11), not results. Run 2 stubbed _classification_provenance (harness sb01_child.stub_version.py, sha256 2e1efbde7c23fed3db03d7abd761c9994b51c0e6bdb2cfcd287b5b8d468afde4); superseded. Run 3 (the evidence) uses the refuse_e2e pattern, __main__ = the real script file, real provenance check called, 0 stubbed runs, plus a harness known-negative T0  [CMD `grep -l '"provenance_stubbed": true' sb01_work/**/child.json | wc -l` → 0]
+- Own-instrument corrections: (1) I told the operator the delta had 45 added lines; the true count is 49 (my pattern skipped 4 added blank lines); (2) the read-path scanner first labelled internal calls VERIFIED by name, which made v4's raw _reader_trace call read VERIFIED; relabelled DELEGATES; (3) a packet self-check reported False because my comparison omitted the separating LF after the embedded delta; the packet was correct; (4) an orchestrator KeyError after removing a field from the child; fixed, re-run  [CMD `count + / - body lines of sb01.v1.diff` → 49 / 7]
+- Credential scan of the packet, the transport files and all 19 evidence files: 0 hits; raw line separators: none  [CMD `secretscan.py <files>` → TOTAL HITS 0]
+- Verbatim blocks: strip the 4-space indent; append a final LF only where the evidence line says final LF True  [CMD `roundtrip.py` → all True]
+- EVIDENCE SB01-V1-DELTA sb01.v1.diff: 5484 bytes, sha256 ba61127dacdcc140e157ce6ce36b5907686ad52384b6476ae3319606771127ed, final LF True  [CMD `sha256sum sb01.v1.diff` → ba61127dacdcc140…]
+    BEGIN-VERBATIM SB01-V1-DELTA
+    --- a/kai-pm/house_in_order_h2_v13/run_h2_v12.py
+    +++ b/kai-pm/house_in_order_h2_v13/run_h2_v12.py
+    @@ -114,7 +114,38 @@
+                 "temporal": "AT_COMMIT", "subject": "SELF"}
+     
+     
+    -def _reader_trace(row, subject_repo):
+    +# ── KAI-B4-SB-01: CLASSIFICATION READS THE BOUND SUBJECT'S BYTES ─────
+    +# v1.2 read every subject document with Path.read_text(): WORKING-TREE
+    +# bytes, never checked against the frozen commit, and decoded with
+    +# universal-newline translation (a lone CR became LF), so classification
+    +# could measure text the subject does not contain while stamping it with
+    +# the subject's identity. There is no second source-identity system here:
+    +# the Pass-A gate (passa._source_binding_gate) runs before measurement and
+    +# every subject byte arrives through passa.make_verified_reader -- READ ->
+    +# VERIFY THOSE BYTES AGAINST THE FROZEN BLOB -> USE -- which decodes the
+    +# exact bytes with no newline translation. There is no fallback reader.
+    +class SourceBindingError(SystemExit):
+    +    """A subject byte could not be bound to the frozen commit. REFUSE."""
+    +
+    +
+    +def _read_bound(read_source, subject_repo, rel):
+    +    """The verified bytes of `rel`, decoded, or REFUSE. Never Path.read_text."""
+    +    if read_source is None:
+    +        raise SourceBindingError(
+    +            f"REFUSE: {rel}: no verified subject reader was supplied; "
+    +            f"classification never reads subject bytes any other way "
+    +            f"(KAI-B4-SB-01)")
+    +    try:
+    +        return read_source(subject_repo, rel)
+    +    except OSError as e:
+    +        raise SourceBindingError(
+    +            f"R11 ABORT [SOURCE BINDING / UNREADABLE SOURCE]: {rel}: "
+    +            f"{type(e).__name__}: {e.strerror or e}. A subject file vanished "
+    +            f"or became unreadable during measurement. Refusing to "
+    +            f"measure.") from None
+    +
+    +
+    +def _reader_trace(row, subject_repo, read_source):
+         """STATIC_REFERENCE_AT_SUBJECT. The determining evidence is a STATIC
+         READER REFERENCE produced by the Census opscan -- NOT history. v1.3a
+         labelled it `history:`, which named the wrong evidence class entirely.
+    @@ -155,9 +186,13 @@
+         if not ops:
+             return None                      # A6-ii will abstain, correctly
+         o = sorted(ops, key=lambda x: (x["src"], x["line"]))[0]
+    +    # KAI-B4-SB-01: the READING document's bytes come through the same
+    +    # verified reader as the classified document, so they are the frozen
+    +    # blob's bytes or the run REFUSES. The read sits OUTSIDE the try: a
+    +    # binding failure or an unreadable source is never an abstention.
+    +    lines = _read_bound(read_source, subject_repo, o["src"]).splitlines()
+         try:
+    -        line = (pathlib.Path(subject_repo) / o["src"]).read_text(
+    -            errors="ignore").splitlines()[o["line"] - 1].strip()
+    +        line = lines[o["line"] - 1].strip()
+         except Exception:
+             return None                      # no locator -> no certification
+         # The Census stores `expr` as an AST DUMP -- "Name(id='CHANGELOG',
+    @@ -503,7 +538,7 @@
+     
+     def evidence_facts(row, claims, contradiction, determining=(),
+                        subject="", subject_repo=".", *, text=None,
+    -                   function_cell=None):
+    +                   function_cell=None, read_source=None):
+         """FACTS, each bound to the trace that DETERMINED it. None is a
+         verdict (D360 5).
+     
+    @@ -531,7 +566,7 @@
+         # claim the name makes is corrected.
+         cand["STATIC_REFERENCE_AT_SUBJECT"] = (
+             bool(row["readers"]),
+    -        lambda: _reader_trace(row, subject_repo))
+    +        lambda: _reader_trace(row, subject_repo, read_source))
+         cand["CITES_COMMIT"] = (bool(row["witnesses"].get("COMMIT")),
+                                 lambda: _witness_trace(row, "COMMIT"))
+         cand["CITES_RUN"] = (bool(row["witnesses"].get("RUN_ID")),
+    @@ -698,13 +733,20 @@
+         if head != pa["subject"] or head != desc["subject"]["commit"]:
+             raise SystemExit(f"R11 ABORT: subject repo HEAD {head[:12]} != "
+                              f"Pass A / Stage-A subject")
+    +    # KAI-B4-SB-01: the Pass-A source-binding gate (subject identity,
+    +    # tracked divergence, tracked symlinks) runs BEFORE any subject byte is
+    +    # measured, and ONE verified reader for the frozen subject supplies
+    +    # every subject byte this producer consumes: the classified document
+    +    # here and the reading document inside _reader_trace.
+    +    passa._source_binding_gate(sr, pa["subject"])
+    +    read_source = passa.make_verified_reader(sr, pa["subject"])
+         _cls_prov = _classification_provenance(desc, observed_runtime, sr,
+                                                pa_bytes, pprov)
+     
+         rows, facts_tally = [], collections.Counter()
+         nominal = collections.Counter()
+         for row in pa["rows"]:
+    -        text = (sr / row["path"]).read_text(errors="ignore")
+    +        text = _read_bound(read_source, sr, row["path"])
+             claims, stats = sb.bind_claims(row["path"], text)
+             contradiction = contradiction_of(row)
+             # D14/D15: the DETERMINING rows are always carried, with counts.
+    @@ -721,7 +763,7 @@
+             fn_cell = cl.function(row, text)
+             facts, ac, fact_traces, abstained = evidence_facts(
+                 row, claims, contradiction, det, pa["subject"], sr,
+    -            text=text, function_cell=fn_cell)
+    +            text=text, function_cell=fn_cell, read_source=read_source)
+             row["authority_claim"] = ac
+             out = cl.classify(row, text, contradiction)
+             if out["FUNCTION"] != fn_cell:
+    END-VERBATIM SB01-V1-DELTA
+- EVIDENCE DEEPSEEK-PACKET-SB01-V1 DEEPSEEK_PACKET_SB01_v1.md: 13535 bytes, sha256 d5b1d0f15f80b9c6483ec28bd656c011d94b9df75510dfe542341a5f063d3f05, final LF True  [CMD `sha256sum DEEPSEEK_PACKET_SB01_v1.md` → d5b1d0f15f80b9c6…]
+    BEGIN-VERBATIM DEEPSEEK-PACKET-SB01-V1
+    # D379 B4 — KAI-B4-SB-01 SOURCE-BINDING REPAIR: ADVERSARIAL-REVIEW PACKET v1 (SB-01 DELTA ONLY)
+    
+    Producer: Orion. Date: 2026-10-03. Evidence class: PRODUCER MEASUREMENT, SIGHTED, ZERO ADMISSION WEIGHT.
+    Status: PROPOSAL ONLY, scratch. Nothing is applied to the repair branch (unchanged at dbe692d).
+    
+    ## 0. RECEIPT — reply with these lines FIRST, each copied exactly
+    
+        PACKET HASH: <sha256 of this decoded packet, as given by the sender>
+        BASE (accepted two-fact v4) run_h2_v12.py SHA-256: <from section 1>
+        FIRST DELTA HUNK: <the first line beginning with @@ in section 3>
+        SENTINEL A: <the added line in section 3 that calls passa._source_binding_gate>
+        SENTINEL B: <the added line in section 3 that assigns `lines`>
+        END OF PACKET SEEN: YES
+    
+    If either sentinel cannot be reproduced exactly, reply NO REVIEW. The diff in section 3 is 107 lines (6 hunks, 49 added /
+    7 removed, header lines excluded). The last line of this file is "END OF PACKET SB-01 v1 — D379 SOURCE BINDING".
+    
+    ## 1. Identities
+    
+        BASE  accepted two-fact v4 run_h2_v12.py   sha256 d3ee165f706e9f4048434031e003e6c7a97159ae2e2217d0c8cdd7ebd69861b6
+              (v4 full diff vs dbe692d             sha256 bbe42e3fbf2ecb690a93f9945b335ff4cc4a4b716c79d87255e195ee678e8aab)
+        DELTA SB-01 v1 (section 3)                 sha256 ba61127dacdcc140e157ce6ce36b5907686ad52384b6476ae3319606771127ed
+        COMPOSITE proposed run_h2_v12.py           sha256 a39359bc383c8f6f6ca4540c10474fcb094c990f7b8e8091792262436c7a4cfe
+    
+    You review ONLY the delta. The base is frozen and already reconciled; do not re-review it.
+    
+    ## 2. The defect and the shape of the repair
+    
+    At dbe692d (and in v4) classification read every subject document with Path.read_text() — working-tree bytes, never
+    checked against the bound commit, decoded with universal-newline translation (lone CR -> LF). The reader trace
+    (_reader_trace) read its reading-source file the same way. Measured: an uncommitted edit with HEAD unchanged produced
+    rc 0 and positive facts traced to text absent from the commit.
+    
+    The repair reuses the two governed Pass-A mechanisms and adds no source-identity system:
+      * passa._source_binding_gate(sr, subject) — HEAD == subject; no tracked divergence (git status, untracked recorded
+        not aborting); no tracked symlink anywhere in the subject (git mode 120000) — runs before any subject byte is read;
+      * passa.make_verified_reader(sr, subject) — READ -> sha256 of THOSE bytes vs the frozen blob's bytes -> USE; refuses
+        a path not in the subject or divergent bytes; returns data.decode(errors="ignore") (no newline translation; the
+        lossy errors="ignore" decoding of invalid UTF-8 is unchanged from v1.2 and Pass A);
+      * one reader instance feeds the classified document read in main() and the reading-source read in _reader_trace();
+      * _read_bound() is the only call site of the reader in this module: it REFUSES when no reader is supplied (no
+        read_text fallback exists) and turns an OSError (file vanished / unreadable / replaced by a directory) into a named
+        R11 ABORT instead of an uncaught traceback or, in _reader_trace, a silent abstention;
+      * no output or provenance field is added.
+    
+    ## 3. THE DELTA (base = accepted v4; unified diff)
+    
+    --- a/kai-pm/house_in_order_h2_v13/run_h2_v12.py
+    +++ b/kai-pm/house_in_order_h2_v13/run_h2_v12.py
+    @@ -114,7 +114,38 @@
+                 "temporal": "AT_COMMIT", "subject": "SELF"}
+     
+     
+    -def _reader_trace(row, subject_repo):
+    +# ── KAI-B4-SB-01: CLASSIFICATION READS THE BOUND SUBJECT'S BYTES ─────
+    +# v1.2 read every subject document with Path.read_text(): WORKING-TREE
+    +# bytes, never checked against the frozen commit, and decoded with
+    +# universal-newline translation (a lone CR became LF), so classification
+    +# could measure text the subject does not contain while stamping it with
+    +# the subject's identity. There is no second source-identity system here:
+    +# the Pass-A gate (passa._source_binding_gate) runs before measurement and
+    +# every subject byte arrives through passa.make_verified_reader -- READ ->
+    +# VERIFY THOSE BYTES AGAINST THE FROZEN BLOB -> USE -- which decodes the
+    +# exact bytes with no newline translation. There is no fallback reader.
+    +class SourceBindingError(SystemExit):
+    +    """A subject byte could not be bound to the frozen commit. REFUSE."""
+    +
+    +
+    +def _read_bound(read_source, subject_repo, rel):
+    +    """The verified bytes of `rel`, decoded, or REFUSE. Never Path.read_text."""
+    +    if read_source is None:
+    +        raise SourceBindingError(
+    +            f"REFUSE: {rel}: no verified subject reader was supplied; "
+    +            f"classification never reads subject bytes any other way "
+    +            f"(KAI-B4-SB-01)")
+    +    try:
+    +        return read_source(subject_repo, rel)
+    +    except OSError as e:
+    +        raise SourceBindingError(
+    +            f"R11 ABORT [SOURCE BINDING / UNREADABLE SOURCE]: {rel}: "
+    +            f"{type(e).__name__}: {e.strerror or e}. A subject file vanished "
+    +            f"or became unreadable during measurement. Refusing to "
+    +            f"measure.") from None
+    +
+    +
+    +def _reader_trace(row, subject_repo, read_source):
+         """STATIC_REFERENCE_AT_SUBJECT. The determining evidence is a STATIC
+         READER REFERENCE produced by the Census opscan -- NOT history. v1.3a
+         labelled it `history:`, which named the wrong evidence class entirely.
+    @@ -155,9 +186,13 @@
+         if not ops:
+             return None                      # A6-ii will abstain, correctly
+         o = sorted(ops, key=lambda x: (x["src"], x["line"]))[0]
+    +    # KAI-B4-SB-01: the READING document's bytes come through the same
+    +    # verified reader as the classified document, so they are the frozen
+    +    # blob's bytes or the run REFUSES. The read sits OUTSIDE the try: a
+    +    # binding failure or an unreadable source is never an abstention.
+    +    lines = _read_bound(read_source, subject_repo, o["src"]).splitlines()
+         try:
+    -        line = (pathlib.Path(subject_repo) / o["src"]).read_text(
+    -            errors="ignore").splitlines()[o["line"] - 1].strip()
+    +        line = lines[o["line"] - 1].strip()
+         except Exception:
+             return None                      # no locator -> no certification
+         # The Census stores `expr` as an AST DUMP -- "Name(id='CHANGELOG',
+    @@ -503,7 +538,7 @@
+     
+     def evidence_facts(row, claims, contradiction, determining=(),
+                        subject="", subject_repo=".", *, text=None,
+    -                   function_cell=None):
+    +                   function_cell=None, read_source=None):
+         """FACTS, each bound to the trace that DETERMINED it. None is a
+         verdict (D360 5).
+     
+    @@ -531,7 +566,7 @@
+         # claim the name makes is corrected.
+         cand["STATIC_REFERENCE_AT_SUBJECT"] = (
+             bool(row["readers"]),
+    -        lambda: _reader_trace(row, subject_repo))
+    +        lambda: _reader_trace(row, subject_repo, read_source))
+         cand["CITES_COMMIT"] = (bool(row["witnesses"].get("COMMIT")),
+                                 lambda: _witness_trace(row, "COMMIT"))
+         cand["CITES_RUN"] = (bool(row["witnesses"].get("RUN_ID")),
+    @@ -698,13 +733,20 @@
+         if head != pa["subject"] or head != desc["subject"]["commit"]:
+             raise SystemExit(f"R11 ABORT: subject repo HEAD {head[:12]} != "
+                              f"Pass A / Stage-A subject")
+    +    # KAI-B4-SB-01: the Pass-A source-binding gate (subject identity,
+    +    # tracked divergence, tracked symlinks) runs BEFORE any subject byte is
+    +    # measured, and ONE verified reader for the frozen subject supplies
+    +    # every subject byte this producer consumes: the classified document
+    +    # here and the reading document inside _reader_trace.
+    +    passa._source_binding_gate(sr, pa["subject"])
+    +    read_source = passa.make_verified_reader(sr, pa["subject"])
+         _cls_prov = _classification_provenance(desc, observed_runtime, sr,
+                                                pa_bytes, pprov)
+     
+         rows, facts_tally = [], collections.Counter()
+         nominal = collections.Counter()
+         for row in pa["rows"]:
+    -        text = (sr / row["path"]).read_text(errors="ignore")
+    +        text = _read_bound(read_source, sr, row["path"])
+             claims, stats = sb.bind_claims(row["path"], text)
+             contradiction = contradiction_of(row)
+             # D14/D15: the DETERMINING rows are always carried, with counts.
+    @@ -721,7 +763,7 @@
+             fn_cell = cl.function(row, text)
+             facts, ac, fact_traces, abstained = evidence_facts(
+                 row, claims, contradiction, det, pa["subject"], sr,
+    -            text=text, function_cell=fn_cell)
+    +            text=text, function_cell=fn_cell, read_source=read_source)
+             row["authority_claim"] = ac
+             out = cl.classify(row, text, contradiction)
+             if out["FUNCTION"] != fn_cell:
+    
+    ## 4. Evidence (producer measurement; all under the qualified interpreter -B -E -s)
+    
+    Real chain: Stage A, Pass A and its Stage-B binding built on a CLEAN synthetic subject (DOC.md with NF+SAC, a CRLF doc,
+    a lone-CR doc, tools/rd.py which statically reads DOC.md); each case perturbs a private copy, then classification runs.
+    OLD = base v4, NEW = composite. Expected outcomes were declared in the harness before running; a machine verdict
+    compares them: NEW 13/13 as declared, OLD 13/13 as declared.
+    
+        case                  NEW (composite)                                   OLD (v4)
+        C0 clean              rc0; 5/5 traces resolve vs committed blobs        rc0; 4/5 — lone-CR SAC trace L4 does not resolve
+        C1 dirty doc          REFUSE WORKTREE IDENTITY, no artefact             rc0, artefact carries the foreign sentence
+        C1b staged dirty doc  REFUSE WORKTREE IDENTITY, no artefact             rc0, foreign
+        C2 dirty reader src   REFUSE WORKTREE IDENTITY, no artefact             rc0, reader trace carries the foreign line
+        C3 HEAD mismatch      REFUSE (pre-existing HEAD check), no artefact      same — NOT a fail-old case
+        C4 deleted doc        REFUSE WORKTREE IDENTITY, no artefact             rc1 by uncaught FileNotFoundError
+        C6 doc -> symlink     REFUSE WORKTREE IDENTITY, no artefact             rc0, follows the link, foreign
+        T1 post-gate edit     REFUSE CONSUMED BYTES DIVERGE, no artefact        rc0, foreign
+        T2 change+restore     REFUSE CONSUMED BYTES DIVERGE; tree clean after   rc0, foreign; tree clean after
+        T3 post-gate reader   REFUSE CONSUMED BYTES DIVERGE at tools/rd.py      rc0, foreign reader line
+        T4 vanish post-gate   REFUSE UNREADABLE SOURCE, no artefact             rc1 by uncaught FileNotFoundError
+        T0 harness, no fault  rc0, artefact, 5/5 resolve                        rc0, artefact
+        PROBE                 consumed text == committed blob for 3/3 docs;     CRLF and lone-CR consumed != blob;
+                              4/4 subject opens inside passa.read_source         4/4 opens outside it (main:707, _reader_trace:159)
+    
+    T-cases run main() in process with __main__ = the real script file, so the producer's own runtime-population check runs
+    unmodified; the perturbation only decides WHEN a write lands. Committed tracked symlink (C5): Pass A itself REFUSES
+    TRACKED SYMLINK, so no classification input can exist for such a subject; classification calls the same gate.
+    
+    Static read-path population (AST, every call in the module): OLD 2 RAW subject reads (:159, :707), exit 1 (known
+    positive); NEW 0 raw reads, every subject-repo site is the passa gate/reader, git object plumbing, or an internal
+    function whose own body is scanned; exit 0. Name-based; the runtime PROBE covers aliasing.
+    
+    Preserved v4 controls on the composite: semantics 92/0, locators 37/0, frozen 272-row regression dump — all three
+    byte-identical to v4; process REFUSE 7/7 (its working-tree-tamper observation now REFUSES); real-chain separator
+    documents: one difference, on the lone-CR document only — selector L4 -> L3 and local_context now the complete LF line
+    'lead\rThis document is in force.' (the canonical locator over the committed bytes; v4's L4 is the locator over
+    translated text). No expectation was edited.
+    
+    ## 5. Attack these
+    
+      Q1  Is there any subject-byte read in the composite that does not pass through _read_bound / the verified reader?
+      Q2  _read_bound converts only OSError. Is any other exception from the reader (or from the decode) able to escape as
+          an abstention, a False, or an artefact?
+      Q3  read_source=None REFUSES lazily — only if a reader trace is actually needed. Is lazy refusal sufficient, or must
+          evidence_facts refuse up front (as it does for text / function_cell)?
+      Q4  The gate runs after the existing HEAD check and before _classification_provenance. Is any subject byte consumed
+          before the gate?
+      Q5  _reader_trace keeps `except Exception: return None` around the indexing only. Can a binding failure still reach it?
+      Q6  The reader-trace line is chosen with str.splitlines() over the verified text, while opscan numbers Python lines by
+          the AST and shell lines by LF count. Unchanged by this delta; latent in the frozen subject (0 of 615 suffix-matched
+          source files contain CR, VT, FF, FS, GS, RS, NEL, LS or PS). Is it in scope here or a separate finding?
+      Q7  local_context can now carry a raw CR (canonical complete-LF-line context over committed bytes). Defect or correct?
+      Q8  The qualifier reported 0 findings for v4's non-resolving lone-CR trace. Out of this delta's scope — flag only?
+    
+    ## 6. Out of scope
+    
+    The accepted v4 base; d379_controls.py; the full hostile matrix; any other file. The repair branch is not mutated.
+    
+    END OF PACKET SB-01 v1 — D379 SOURCE BINDING
+    END-VERBATIM DEEPSEEK-PACKET-SB01-V1
+- EVIDENCE DEEPSEEK-COVER-SB01-V1 sb01_b64/DEEPSEEK_COVER_SB01_v1.txt: 1564 bytes, sha256 280013396141bc36334d1cfb9ce86f0ebe94f2ec5c55d45ebec3745955f96d4f, final LF True  [CMD `sha256sum sb01_b64/DEEPSEEK_COVER_SB01_v1.txt` → 280013396141bc36…]
+    BEGIN-VERBATIM DEEPSEEK-COVER-SB01-V1
+    To: DeepSeek (adversarial reviewer)
+    From: Orion, for Kai and Dainius
+    Subject: D379 B4 KAI-B4-SB-01 source-binding repair, packet v1, review of the SB-01 delta only
+    
+    Kai accepted and froze the two-fact v4 subject. The remaining blocker is KAI-B4-SB-01: classification
+    read subject documents from the working tree, with newline translation, instead of the bound commit.
+    Packet v1 contains ONLY the SB-01 delta on top of the frozen v4 base for you to attack.
+    
+    Packet SB-01 v1 SHA-256 (the subject you must reconstruct):
+    d5b1d0f15f80b9c6483ec28bd656c011d94b9df75510dfe542341a5f063d3f05
+    
+    It follows as 2 base64 blocks. Same protocol as before:
+    1. For each block, remove all whitespace from the base64 text and check its stated hash.
+    2. Decode it; check the stated decoded length and decoded hash.
+    3. Concatenate the decoded chunks strictly in order 1 to 2; check the packet hash above.
+    4. Read ONLY the decoded packet, then reply with the receipt in its section 0, copying the packet
+       hash given above on the PACKET HASH line, and both sentinels from the DECODED delta. If you
+       cannot compute SHA-256, say so, but still copy the given packet hash.
+    5. Only after the receipt, review the delta as section 5 suggests. Give each finding an ID
+       (DS-B4-SB-nn), a severity (BLOCKER / MAJOR / MINOR), the exact delta lines copied from the
+       decoded packet, a concrete failing input where possible, and a remedy. If you find nothing,
+       say so explicitly. A PASS is not implementation authority: Kai reconciles every finding.
+    The frozen two-fact v4 base is out of scope.
+    END-VERBATIM DEEPSEEK-COVER-SB01-V1
+- EVIDENCE SB01-E2E-INSTRUMENT sb01_e2e.py: 10690 bytes, sha256 15797193f85ecee2104132f54bf64616f2624506c27bd123060571ebf6f88659, final LF True  [CMD `sha256sum sb01_e2e.py` → 15797193f85ecee2…]
+    BEGIN-VERBATIM SB01-E2E-INSTRUMENT
+    """Orchestrator (system python3) for KAI-B4-SB-01 packet v1. argv: <twofact dir> <work dir>
+    OLD = frozen two-fact v4 (inst4), NEW = v4 + SB-01 (inst5). Real chain under the qualified interpreter: Stage A, Pass A
+    and its Stage-B binding are built on the CLEAN subject; each case then perturbs a private copy and runs classification.
+    Expected outcomes are DECLARED HERE, before anything runs."""
+    import json, os, pathlib, shutil, subprocess, sys
+    PY = "/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11"
+    CEN = "/home/user/kai-repair/kai-pm/house_in_order_census_v11"
+    D, W = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])
+    TREES = {"OLD": D / "inst4", "NEW": D / "inst5"}
+    FOREIGN = ("single source of truth", "FOREIGN")
+    DOCS = {"kai-pm/DOC.md": b"# Project Plan\n\nThis document is the current plan.\n",
+            "kai-pm/CRLF.md": b"# Notes\r\n\r\nThis document is in force.\r\n",
+            "kai-pm/LONECR.md": b"# Notes\r\rlead\rThis document is in force.\n",
+            "tools/rd.py": b'DOC = "kai-pm/DOC.md"\ndata = open(DOC).read()\n'}
+    ENV = dict(os.environ, GIT_AUTHOR_DATE="2026-10-03T00:00:00Z", GIT_COMMITTER_DATE="2026-10-03T00:00:00Z")
+    G = ["-c", "user.name=d", "-c", "user.email=d@l", "-c", "core.autocrlf=false"]
+    def sh(*a, **k): return subprocess.run(a, capture_output=True, text=True, env=ENV, **k)
+    def mk_subject(path, docs, link=None):
+        (path).mkdir(parents=True); sh("git", "init", "-q", str(path), check=True)
+        for p, b in docs.items(): (path / p).parent.mkdir(parents=True, exist_ok=True); (path / p).write_bytes(b)
+        if link: os.symlink(link[1], path / link[0])
+        sh("git", "-C", str(path), *G, "add", "-A", check=True); sh("git", "-C", str(path), *G, "commit", "-qm", "one", check=True)
+        return sh("git", "-C", str(path), "rev-parse", "HEAD").stdout.strip()
+    def tail(p): o = (p.stdout + p.stderr).strip().splitlines(); return o[-1] if o else ""
+    LOG = []
+    def run(argv, label):
+        p = sh(*argv); LOG.append(f"--- {label} rc={p.returncode} ({len((p.stdout+p.stderr).encode())} bytes)\n{p.stdout}{p.stderr}--- end {label}")
+        return p
+    EXPECT = {  # case: (NEW expectation, OLD expectation)  -- declared before running
+     "C0_CLEAN":            ("rc0, all traces resolve against committed blobs", "rc0; LONECR trace does NOT resolve (read_text translated lone CR)"),
+     "C1_DIRTY_DOC":        ("REFUSE WORKTREE IDENTITY, no artefact", "rc0, artefact carries foreign text"),
+     "C1b_STAGED_DOC":      ("REFUSE WORKTREE IDENTITY, no artefact", "rc0, artefact carries foreign text"),
+     "C2_DIRTY_READER":     ("REFUSE WORKTREE IDENTITY, no artefact", "rc0, reader trace carries foreign line"),
+     "C3_HEAD_MISMATCH":    ("REFUSE subject HEAD, no artefact", "REFUSE subject HEAD (pre-existing check; NOT a fail-old case)"),
+     "C4_DELETED_DOC":      ("REFUSE WORKTREE IDENTITY, no artefact", "non-zero by uncaught FileNotFoundError, no artefact"),
+     "C6_SYMLINK_SWAP":     ("REFUSE WORKTREE IDENTITY, no artefact", "rc0, follows the symlink, foreign text"),
+     "T1_POST_GATE_DOC":    ("REFUSE CONSUMED BYTES DIVERGE, no artefact", "rc0, foreign text"),
+     "T2_CHANGE_RESTORE":   ("REFUSE CONSUMED BYTES DIVERGE, no artefact; tree clean afterwards", "rc0, foreign text; tree clean afterwards"),
+     "T3_POST_GATE_READER": ("REFUSE CONSUMED BYTES DIVERGE in the reader path, no artefact", "rc0, reader trace carries foreign line"),
+     "T4_VANISH":           ("REFUSE UNREADABLE SOURCE, no artefact", "non-zero by uncaught FileNotFoundError, no artefact"),
+     "T0_HARNESS_NONE":     ("rc0, artefact, all traces resolve (harness known-negative)", "rc0, artefact (harness known-negative)"),
+     "PROBE":               ("rc0; every consumed text == committed blob decoded; every subject open via passa.read_source", "rc0; CRLF/LONECR consumed != blob; opens outside the verified reader"),
+    }
+    TAGS = {"WORKTREE IDENTITY": "[SOURCE BINDING / WORKTREE IDENTITY]", "CONSUMED BYTES DIVERGE": "[SOURCE BINDING / CONSUMED BYTES DIVERGE]",
+            "UNREADABLE SOURCE": "[SOURCE BINDING / UNREADABLE SOURCE]", "subject HEAD": "R11 ABORT: subject repo HEAD"}
+    if W.exists(): shutil.rmtree(W)
+    W.mkdir(parents=True)
+    outside = W / "outside.md"; outside.write_bytes(b"# Project Plan\n\nThis document is the single source of truth.\n")
+    T0 = W / "template"; head = mk_subject(T0, DOCS)
+    print("subject", head)
+    summary = {}
+    for tn, tree in TREES.items():
+        V = tree / "kai-pm/house_in_order_h2_v13"; d = W / tn; d.mkdir(); sa = str(d / "stage_a.json")
+        run([PY, "-B", "-E", "-s", "-c", f"import sys; sys.path.insert(0, {str(V)!r}); import stage_identity as SI\nSI.load_governed_census({CEN!r})\n"
+             f"d = SI.build_stage_a('CALIBRATION', subject_repo={str(T0)!r}, history_repo={str(T0)!r})\nopen({sa!r}, 'xb').write(SI.canonical_bytes(d))"], f"{tn} stage A")
+        C = lambda s, *a: [PY, "-B", "-E", "-s", str(V / s), *a]
+        pa_ = run(C("passa.py", "--subject-repo", str(T0), "--history-repo", str(T0), "--subject", head, "--census-package", CEN, "--stage-a", sa, "--out", str(d / "passA.json")), f"{tn} passa")
+        pab = run(C("stage_identity.py", "bind", "--artifact", str(d / "passA.json"), "--component", "PASS_A", "--stage-a", sa, "--producer-exit", "0", "--out", str(d / "pa.b")), f"{tn} bind A").stdout.strip()
+        if pa_.returncode != 0 or not pab:
+            print(f"{tn}: PREREQUISITE FAILED (Pass A rc {pa_.returncode}); no case measured for this tree"); summary[tn] = "PREREQ FAILED"; continue
+        def args(subj, out): return ["--subject-repo", str(subj), "--passa", str(d / "passA.json"), "--passa-stage-b", str(d / "pa.b"),
+                                     "--expected-passa-binding-sha256", pab, "--census-package", CEN, "--stage-a", sa, "--out", str(out)]
+        res = {}
+        for case in EXPECT:
+            cs = d / case / "subj"; shutil.copytree(T0, cs, symlinks=True); out = d / case / "result.json"
+            if case in ("C1_DIRTY_DOC", "C1b_STAGED_DOC"):
+                (cs / "kai-pm/DOC.md").write_bytes(DOCS["kai-pm/DOC.md"] + b"\nThis document is the single source of truth.\n")
+                if case == "C1b_STAGED_DOC": sh("git", "-C", str(cs), "add", "kai-pm/DOC.md", check=True)
+            elif case == "C2_DIRTY_READER":
+                (cs / "tools/rd.py").write_bytes(DOCS["tools/rd.py"].replace(b"data = open(DOC).read()", b"data = open(DOC).read()  # FOREIGN"))
+            elif case == "C3_HEAD_MISMATCH":
+                (cs / "kai-pm/NEW.md").write_bytes(b"# New\n"); sh("git", "-C", str(cs), *G, "add", "-A", check=True); sh("git", "-C", str(cs), *G, "commit", "-qm", "two", check=True)
+            elif case == "C4_DELETED_DOC":
+                (cs / "kai-pm/DOC.md").unlink()
+            elif case == "C6_SYMLINK_SWAP":
+                (cs / "kai-pm/DOC.md").unlink(); os.symlink(outside, cs / "kai-pm/DOC.md")
+            if case.startswith(("T", "PROBE")):
+                j = d / case / "child.json"
+                p = run([PY, "-B", "-E", "-s", "-c", (D / "sb01_child.py").read_text(), str(V / "run_h2_v12.py"), case, str(cs), str(j), *args(cs, out)], f"{tn} {case}")
+                rec = json.loads(j.read_text()) if j.exists() else {"rc": p.returncode, "reason": f"CHILD FAILED: {tail(p)}"}
+                rc, reason = rec["rc"], rec["reason"]
+            else:
+                p = run([PY, "-B", "-E", "-s", str(V / "run_h2_v12.py"), *args(cs, out)], f"{tn} {case}"); rc, reason, rec = p.returncode, tail(p), {}
+            r = {"rc": rc, "artefact": out.exists(), "reason": reason[:240],
+                 "tag": next((k for k, v in TAGS.items() if v in reason), None),
+                 "tree_clean_after": sh("git", "-C", str(cs), "status", "--porcelain").stdout == "" if cs.exists() else None}
+            if out.exists():
+                body = out.read_text(); r["foreign_in_artefact"] = [f for f in FOREIGN if f in body]
+                rv = sh(PY, "-B", "-E", "-s", str(D / "sb01_resolve.py"), str(V), str(cs), str(out)); r["resolve"] = json.loads(rv.stdout) if rv.returncode == 0 else tail(rv)
+                rr = json.loads(body)["rows"]; r["facts"] = {x["path"]: sorted(k for k, v in x["evidence_facts"].items() if v) for x in rr}
+            if case == "PROBE" and rec:
+                blobs = {p_: sh("git", "-C", str(cs), "cat-file", "blob", f"{head}:{p_}").stdout for p_ in rec["consumed"]}
+                import hashlib
+                r["consumed_eq_blob"] = {p_: rec["consumed"][p_] == hashlib.sha256(subprocess.run(["git", "-C", str(cs), "cat-file", "blob", f"{head}:{p_}"], capture_output=True).stdout.decode(errors="ignore").encode("utf-8", "surrogatepass")).hexdigest() for p_ in rec["consumed"]}
+                r["subject_opens"] = rec["opens"]
+            res[case] = r
+        summary[tn] = res
+    for tn in TREES:
+        print(f"\n== {tn} ==")
+        if not isinstance(summary[tn], dict): print(summary[tn]); continue
+        for case, r in summary[tn].items():
+            print(f"{case:<20} expect: {EXPECT[case][0 if tn == 'NEW' else 1]}")
+            print(f"{'':<20} got:    rc={r['rc']} artefact={r['artefact']} tag={r['tag']} clean_after={r['tree_clean_after']}" +
+                  (f" foreign={r.get('foreign_in_artefact')} resolve={r.get('resolve')}" if r['artefact'] else "") + (f"\n{'':<20} reason: {r['reason']}" if r['rc'] else ""))
+            if case == "PROBE":
+                print(f"{'':<20} consumed==blob: {r.get('consumed_eq_blob')}")
+                from collections import Counter
+                print(f"{'':<20} subject opens: {len(r.get('subject_opens', []))}; by (via, caller): {dict(Counter((o['via'], o['caller']) for o in r.get('subject_opens', [])))}")
+            if case == "C0_CLEAN" and r["artefact"]: print(f"{'':<20} facts: {r['facts']}")
+    # chain-level: a COMMITTED tracked symlink
+    print("\n== C5 committed tracked symlink (chain level, NEW tree) ==")
+    L = W / "linksubj"; lh = mk_subject(L, DOCS, link=("kai-pm/LINK.md", "../outside_target.md"))
+    V = TREES["NEW"] / "kai-pm/house_in_order_h2_v13"; d = W / "C5"; d.mkdir(); sa = str(d / "stage_a.json")
+    p1 = run([PY, "-B", "-E", "-s", "-c", f"import sys; sys.path.insert(0, {str(V)!r}); import stage_identity as SI\nSI.load_governed_census({CEN!r})\n"
+              f"d = SI.build_stage_a('CALIBRATION', subject_repo={str(L)!r}, history_repo={str(L)!r})\nopen({sa!r}, 'xb').write(SI.canonical_bytes(d))"], "C5 stage A")
+    print("stage A rc", p1.returncode, tail(p1)[:200])
+    if p1.returncode == 0:
+        p2 = run([PY, "-B", "-E", "-s", str(V / "passa.py"), "--subject-repo", str(L), "--history-repo", str(L), "--subject", lh, "--census-package", CEN, "--stage-a", sa, "--out", str(d / "passA.json")], "C5 passa")
+        print("passa rc", p2.returncode, "artefact", (d / "passA.json").exists(), tail(p2)[:240])
+    (W / "full_log.txt").write_text("\n".join(LOG))
+    json.dump(summary, open(W / "summary.json", "w"), indent=1, sort_keys=True)
+    print(f"\nfull log: {W / 'full_log.txt'} ({(W / 'full_log.txt').stat().st_size} bytes)")
+    END-VERBATIM SB01-E2E-INSTRUMENT
+- EVIDENCE SB01-CHILD-HARNESS sb01_child.py: 3782 bytes, sha256 c534138e957e1e0cce8f2c8257ec1cd7d619aa1f8553a6a6db23c71c90128881, final LF True  [CMD `sha256sum sb01_child.py` → c534138e957e1e0c…]
+    BEGIN-VERBATIM SB01-CHILD-HARNESS
+    # Harness TEXT, passed with -c (refuse_e2e.py pattern): __main__ IS the run_h2_v12.py script file, so the producer's
+    # own runtime-population check sees governed source and runs UNMODIFIED. argv: <script> <mode> <subject> <rec.json> <CLI...>
+    # Each mode perturbs only WHEN a subject write lands, or observes; nothing the producer decides is altered.
+    import sys, os, types, json, pathlib, hashlib
+    script, MODE, SUBJ, OUT = sys.argv[1], sys.argv[2], pathlib.Path(sys.argv[3]), sys.argv[4]
+    sys.argv = [script] + sys.argv[5:]
+    sys.path[0] = os.path.dirname(script)
+    m = types.ModuleType("__main__"); m.__file__ = script
+    sys.modules["__main__"] = m
+    ns = m.__dict__; ns["__name__"] = "__d379_under_test__"
+    with open(script, "rb") as fh:
+        exec(compile(fh.read(), script, "exec"), ns)
+    ns["__name__"] = "__main__"
+    rec = {"mode": MODE, "opens": [], "consumed": {}, "provenance_stubbed": False}
+    DOC, RD = SUBJ / "kai-pm/DOC.md", SUBJ / "tools/rd.py"
+    def after_provenance(fn):
+        orig = ns["_classification_provenance"]          # the REAL check, called, not stubbed
+        def w(*a, **k):
+            r = orig(*a, **k); fn(); return r
+        ns["_classification_provenance"] = w
+    if MODE == "T1_POST_GATE_DOC":
+        after_provenance(lambda: DOC.write_bytes(DOC.read_bytes() + b"\nThis document is the single source of truth.\n"))
+    elif MODE == "T3_POST_GATE_READER":
+        after_provenance(lambda: RD.write_bytes(RD.read_bytes().replace(b"data = open(DOC).read()", b"data = open(DOC).read()  # FOREIGN")))
+    elif MODE == "T4_VANISH":
+        after_provenance(lambda: DOC.unlink())
+    elif MODE == "T2_CHANGE_RESTORE":
+        rb, rt = pathlib.Path.read_bytes, pathlib.Path.read_text
+        def swap(orig):
+            def w(self, *a, **k):
+                if self.resolve() == DOC.resolve():
+                    keep = rb(self); self.write_bytes(keep + b"\nThis document is the single source of truth.\n")
+                    try: return orig(self, *a, **k)
+                    finally: self.write_bytes(keep)
+                return orig(self, *a, **k)
+            return w
+        pathlib.Path.read_bytes, pathlib.Path.read_text = swap(rb), swap(rt)
+    elif MODE == "PROBE":
+        cl = ns["cl"]; oc = cl.classify
+        def wc(row, text, *a, **k):
+            rec["consumed"][row["path"]] = hashlib.sha256(text.encode("utf-8", "surrogatepass")).hexdigest()
+            return oc(row, text, *a, **k)
+        cl.classify = wc
+        root = str(SUBJ.resolve())
+        def hook(ev, args):
+            if ev == "open" and isinstance(args[0], (str, bytes, os.PathLike)):
+                p = os.fsdecode(args[0])
+                if os.path.isabs(p) and os.path.realpath(p).startswith(root + "/") and "/.git/" not in p:
+                    f, via = sys._getframe(1), None
+                    while f:
+                        if f.f_code.co_name == "read_source" and f.f_code.co_filename.endswith("passa.py"): via = "passa.read_source"; break
+                        f = f.f_back
+                    g = sys._getframe(1)
+                    while g and not g.f_code.co_filename.endswith(("run_h2_v12.py", "passa.py")): g = g.f_back
+                    rec["opens"].append({"path": os.path.relpath(p, root), "via": via,
+                                         "caller": f"{os.path.basename(g.f_code.co_filename)}:{g.f_code.co_name}:{g.f_lineno}" if g else None})
+        sys.addaudithook(hook)
+    elif MODE != "T0_HARNESS_NONE":
+        raise SystemExit("harness: unknown mode " + MODE)
+    try:
+        ns["main"](); rec["rc"] = 0; rec["reason"] = ""
+    except SystemExit as e:
+        rec["rc"] = 0 if e.code in (None, 0) else (e.code if isinstance(e.code, int) else 1)
+        rec["reason"] = "" if isinstance(e.code, int) or e.code is None else str(e.code); rec["exc"] = type(e).__name__
+    except BaseException as e:
+        rec["rc"] = 1; rec["reason"] = f"UNCAUGHT {type(e).__name__}: {e}"; rec["exc"] = type(e).__name__
+    json.dump(rec, open(OUT, "w"), indent=1)
+    END-VERBATIM SB01-CHILD-HARNESS
+- EVIDENCE SB01-RESOLVE-INSTRUMENT sb01_resolve.py: 1560 bytes, sha256 600175f38714f9cfc85a19bfa450b0c83844746232c9dd42a984f4f256c2734e, final LF True  [CMD `sha256sum sb01_resolve.py` → 600175f38714f9cf…]
+    BEGIN-VERBATIM SB01-RESOLVE-INSTRUMENT
+    """Child (qualified interpreter). argv: <H2 dir> <subject> <result.json>
+    Every NF/SAC/'L'-selector trace and every opscan trace in the result is re-resolved against the COMMITTED blob bytes
+    (git cat-file at the result's subject) -- an expected answer independent of whichever reader produced the result."""
+    import sys, json, subprocess
+    sys.path.insert(0, sys.argv[1]); import passa
+    S, r = sys.argv[2], json.load(open(sys.argv[3]))
+    def blob(p): return subprocess.run(["git", "-C", S, "cat-file", "blob", f"{r['subject']}:{p}"], capture_output=True, check=True).stdout.decode(errors="ignore")
+    res = {"checked": 0, "resolved": 0, "unresolved": [], "skipped_other_selector": 0}
+    for row in r["rows"]:
+        for fact, t in sorted(row.get("evidence_fact_traces", {}).items()):
+            sel, wv, ctx = t["source_selector"], t["witness_value"], t["local_context"]
+            if sel.startswith("opscan:"):
+                n = int(sel.rsplit(":L", 1)[1]); ls = blob(t["source_path"]).splitlines()
+                ok = 1 <= n <= len(ls) and ls[n - 1].strip() == ctx and wv in ctx
+            elif sel.startswith("L") and sel[1:].isdigit():
+                b = blob(t["source_path"]); ok = False; i = b.find(wv)
+                while i >= 0 and not ok:
+                    ok = passa._selector(b, i) == sel and passa._context(b, i, i + len(wv)) == ctx; i = b.find(wv, i + 1)
+            else:
+                res["skipped_other_selector"] += 1; continue
+            res["checked"] += 1; res["resolved"] += ok
+            if not ok: res["unresolved"].append(f"{row['path']} {fact} {sel} {ctx!r}")
+    print(json.dumps(res))
+    END-VERBATIM SB01-RESOLVE-INSTRUMENT
+- EVIDENCE SB01-VERDICT-INSTRUMENT sb01_verdict.py: 2991 bytes, sha256 cdec2554f9a305a7f78a23e49ada7e457623b8b74c781a5b8f0105ce1af40025, final LF True  [CMD `sha256sum sb01_verdict.py` → cdec2554f9a305a7…]
+    BEGIN-VERBATIM SB01-VERDICT-INSTRUMENT
+    """Machine verdict over sb01_work/summary.json. Predicates are written HERE, mirroring the EXPECT table in sb01_e2e.py."""
+    import json, sys
+    s = json.load(open(sys.argv[1]))
+    def refuse(r, tag): return r["rc"] != 0 and not r["artefact"] and r["tag"] == tag
+    def foreign_rc0(r): return r["rc"] == 0 and r["artefact"] and bool(r.get("foreign_in_artefact"))
+    def all_resolve(r): return r["rc"] == 0 and r["artefact"] and r["resolve"]["checked"] > 0 and r["resolve"]["resolved"] == r["resolve"]["checked"]
+    NEW = {"C0_CLEAN": all_resolve,
+           "C1_DIRTY_DOC": lambda r: refuse(r, "WORKTREE IDENTITY"), "C1b_STAGED_DOC": lambda r: refuse(r, "WORKTREE IDENTITY"),
+           "C2_DIRTY_READER": lambda r: refuse(r, "WORKTREE IDENTITY"), "C3_HEAD_MISMATCH": lambda r: refuse(r, "subject HEAD"),
+           "C4_DELETED_DOC": lambda r: refuse(r, "WORKTREE IDENTITY"), "C6_SYMLINK_SWAP": lambda r: refuse(r, "WORKTREE IDENTITY"),
+           "T1_POST_GATE_DOC": lambda r: refuse(r, "CONSUMED BYTES DIVERGE"),
+           "T2_CHANGE_RESTORE": lambda r: refuse(r, "CONSUMED BYTES DIVERGE") and r["tree_clean_after"],
+           "T3_POST_GATE_READER": lambda r: refuse(r, "CONSUMED BYTES DIVERGE") and "tools/rd.py" in r["reason"],
+           "T4_VANISH": lambda r: refuse(r, "UNREADABLE SOURCE"),
+           "T0_HARNESS_NONE": all_resolve,
+           "PROBE": lambda r: all_resolve(r) and all(r["consumed_eq_blob"].values()) and len(r["consumed_eq_blob"]) == 3
+                    and r["subject_opens"] and all(o["via"] == "passa.read_source" for o in r["subject_opens"])}
+    OLD = {"C0_CLEAN": lambda r: r["rc"] == 0 and r["resolve"]["resolved"] < r["resolve"]["checked"],
+           "C1_DIRTY_DOC": foreign_rc0, "C1b_STAGED_DOC": foreign_rc0, "C2_DIRTY_READER": foreign_rc0,
+           "C3_HEAD_MISMATCH": lambda r: refuse(r, "subject HEAD"),
+           "C4_DELETED_DOC": lambda r: r["rc"] != 0 and not r["artefact"] and "FileNotFoundError" in r["reason"] and r["tag"] is None,
+           "C6_SYMLINK_SWAP": foreign_rc0, "T1_POST_GATE_DOC": foreign_rc0,
+           "T2_CHANGE_RESTORE": lambda r: foreign_rc0(r) and r["tree_clean_after"], "T3_POST_GATE_READER": foreign_rc0,
+           "T4_VANISH": lambda r: r["rc"] != 0 and not r["artefact"] and "FileNotFoundError" in r["reason"] and r["tag"] is None,
+           "T0_HARNESS_NONE": lambda r: r["rc"] == 0 and r["artefact"],
+           "PROBE": lambda r: r["rc"] == 0 and not all(r["consumed_eq_blob"].values()) and any(o["via"] is None for o in r["subject_opens"])}
+    bad = 0
+    for tn, P in (("NEW", NEW), ("OLD", OLD)):
+        ok = {c: bool(P[c](s[tn][c])) for c in P}
+        assert set(ok) == set(s[tn]), (set(ok) ^ set(s[tn]))
+        bad += sum(not v for v in ok.values())
+        print(f"{tn}: {sum(ok.values())}/{len(ok)} as declared" + "".join(f"\n   NOT AS DECLARED: {c}" for c, v in ok.items() if not v))
+    print("fail-old cases (OLD rc0 with foreign bytes, or untranslated-newline unresolved):",
+          sorted(c for c in OLD if c not in ("C3_HEAD_MISMATCH", "C4_DELETED_DOC", "T4_VANISH", "T0_HARNESS_NONE")))
+    sys.exit(1 if bad else 0)
+    END-VERBATIM SB01-VERDICT-INSTRUMENT
+- EVIDENCE SB01-READPATHS-INSTRUMENT sb01_readpaths.py: 3069 bytes, sha256 bf08ca42f292a951851c3583aa55c3107ca5b0972e7cf1524860b513a142e8a5, final LF True  [CMD `sha256sum sb01_readpaths.py` → bf08ca42f292a951…]
+    BEGIN-VERBATIM SB01-READPATHS-INSTRUMENT
+    """Static read-path population over one run_h2_v12.py. argv: <file> [<label>]
+    Universe: EVERY ast.Call in the module. I/O-capable calls are those whose final name is in IO (file, git, subprocess,
+    Stage-identity readers, the Pass-A gate/reader). A call REACHES THE SUBJECT REPO when its receiver or any argument
+    mentions a subject-repo name (SUBJ). Classification per site: VERIFIED(passa) (the Pass-A gate / verified reader), DELEGATES (an internal function whose own body is scanned),
+    GIT_OBJECT (git plumbing: object store, not working-tree bytes), or RAW_SUBJECT_READ (a direct filesystem read).
+    LIMIT: name-based reach; an alias of the subject path under another name is not seen here -- the runtime audit (PROBE) covers that."""
+    import ast, sys
+    IO = {"read_text", "read_bytes", "readlines", "read", "open", "write_text", "write_bytes", "git", "run", "Popen",
+          "check_output", "_read_regular_once", "consume_bound_artifact", "derive_tree_paths", "check_population",
+          "_source_binding_gate", "make_verified_reader", "read_source", "_read_bound", "_reader_trace", "evidence_facts",
+          "_classification_provenance", "is_file", "exists"}
+    SUBJ = {"sr", "subject_repo"}
+    src = open(sys.argv[1]).read(); tree = ast.parse(src)
+    parents = {c: p for p in ast.walk(tree) for c in ast.iter_child_nodes(p)}
+    def fn_of(n):
+        while n in parents:
+            n = parents[n]
+            if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)): return n.name
+        return "<module>"
+    def name(f): return f.attr if isinstance(f, ast.Attribute) else f.id if isinstance(f, ast.Name) else type(f).__name__
+    calls = [n for n in ast.walk(tree) if isinstance(n, ast.Call)]
+    io = [n for n in calls if name(n.func) in IO]
+    rows = []
+    for n in sorted(io, key=lambda n: (n.lineno, n.col_offset)):
+        nm = name(n.func); txt = ast.unparse(n)
+        ids = {x.id for x in ast.walk(n) if isinstance(x, ast.Name)}
+        reach = bool(ids & SUBJ)
+        if not reach: kind = "-"
+        elif nm in ("read_text", "read_bytes", "readlines", "read", "open"): kind = "RAW_SUBJECT_READ"
+        elif nm in ("_source_binding_gate", "make_verified_reader", "read_source"): kind = "VERIFIED(passa)"
+        elif nm in ("_read_bound", "_reader_trace", "evidence_facts"): kind = "DELEGATES(body scanned on its own lines)"
+        elif nm in ("git", "derive_tree_paths"): kind = "GIT_OBJECT"
+        elif nm == "_classification_provenance": kind = "WRAPPER(git: see its body)"
+        else: kind = "UNCLASSIFIED"
+        rows.append((n.lineno, fn_of(n), nm, kind, txt[:90]))
+    print(f"{sys.argv[2] if len(sys.argv) > 2 else sys.argv[1]}: calls in module {len(calls)}; I/O-capable {len(io)}; reaching subject repo {sum(r[3] != '-' for r in rows)}")
+    for r in rows:
+        if r[3] != "-": print(f"  L{r[0]:<4} {r[1]:<28} {r[2]:<26} {r[3]:<26} {r[4]}")
+    from collections import Counter
+    print("  by kind:", dict(Counter(r[3] for r in rows if r[3] != "-")))
+    print("  I/O sites NOT reaching subject repo:", sorted({f"{r[2]}@{r[1]}" for r in rows if r[3] == "-"}))
+    raw = [r for r in rows if r[3] in ("RAW_SUBJECT_READ", "UNCLASSIFIED")]
+    sys.exit(1 if raw else 0)
+    END-VERBATIM SB01-READPATHS-INSTRUMENT
+- EVIDENCE LOC-E2E-V5-INSTRUMENT loc_e2e_v5.py: 4698 bytes, sha256 d0add7e2a16f1f9eacbdcbb46fb66b65b7714d070de7a4d4d376431a8c3b6a87, final LF True  [CMD `sha256sum loc_e2e_v5.py` → d0add7e2a16f1f9e…]
+    BEGIN-VERBATIM LOC-E2E-V5-INSTRUMENT
+    """Orchestrator (system python3): the real chain under the qualified interpreter, OLD = repair HEAD dbe692d
+    working tree, this copy: V4 = frozen two-fact v4, V5 = v4 + SB-01. Subject: 4 synthetic docs incl. both facts."""
+    import json, pathlib, subprocess, tempfile, shutil, sys
+    PY = "/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11"
+    CEN = "/home/user/kai-repair/kai-pm/house_in_order_census_v11"
+    D = pathlib.Path(sys.argv[1])
+    TREES = {"V4 inst4": D / "inst4", "V5 inst5": D / "inst5"}
+    DOCS = {"kai-pm/LS_HEAD.md": "intro\u2028# Project Plan\n\nThis document is the current plan.\n",
+            "kai-pm/CR_SAC.md": "# Notes\n\nlead\rThis document is in force.\n",
+            "kai-pm/NEL_PURPOSE.md": "# Notes\n\nThis document defines the deployment roadmap\x85for the quarter.\n"}
+    W = pathlib.Path(tempfile.mkdtemp(prefix="twofact_e2e_"))
+    def run(argv, label):
+        p = subprocess.run(argv, capture_output=True, text=True)
+        out = p.stdout + p.stderr
+        print(f"--- {label} rc={p.returncode}\n{out}--- end {label} ({len(out.encode())} bytes)")
+        return p
+    res = {}
+    for label, tree in TREES.items():
+        print(f"\n== {label} ==")
+        d = W / label.split()[0]; S = d / "subj"; (S / "kai-pm").mkdir(parents=True)
+        subprocess.run(["git", "init", "-q", str(S)], check=True)
+        for p_, t in DOCS.items(): (S / p_).write_text(t)
+        g = ["-c", "user.name=d", "-c", "user.email=d@l"]
+        subprocess.run(["git", "-C", str(S), "add", "-A"], check=True); subprocess.run(["git", "-C", str(S), *g, "commit", "-qm", "one"], check=True)
+        V = tree / "kai-pm/house_in_order_h2_v13"
+        run([PY, "-B", "-E", "-s", "-c", f"import sys; sys.path.insert(0, {str(V)!r}); import stage_identity as SI\nSI.load_governed_census({CEN!r})\n"
+             f"d = SI.build_stage_a('CALIBRATION', subject_repo={str(S)!r}, history_repo={str(S)!r})\nopen({str(d / 'stage_a.json')!r}, 'xb').write(SI.canonical_bytes(d))"], "stage A")
+        head = subprocess.run(["git", "-C", str(S), "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
+        G = lambda s, *a: [PY, "-B", "-E", "-s", str(V / s), *a]
+        sa = str(d / "stage_a.json")
+        run(G("passa.py", "--subject-repo", str(S), "--history-repo", str(S), "--subject", head, "--census-package", CEN, "--stage-a", sa, "--out", str(d / "passA.json")), "passa")
+        pab = run(G("stage_identity.py", "bind", "--artifact", str(d / "passA.json"), "--component", "PASS_A", "--stage-a", sa, "--producer-exit", "0", "--out", str(d / "pa.b")), "bind A").stdout.strip()
+        rh = run(G("run_h2_v12.py", "--subject-repo", str(S), "--passa", str(d / "passA.json"), "--passa-stage-b", str(d / "pa.b"), "--expected-passa-binding-sha256", pab,
+                   "--census-package", CEN, "--stage-a", sa, "--out", str(d / "result.json")), "run_h2_v12")
+        cb = run(G("stage_identity.py", "bind", "--artifact", str(d / "result.json"), "--component", "CLASSIFICATION", "--stage-a", sa, "--producer-exit", "0", "--out", str(d / "r.b")), "bind C").stdout.strip()
+        desc = json.loads((d / "stage_a.json").read_bytes())
+        (d / "M").write_text("".join(f"{m['sha256']}  {pathlib.Path(m['path']).name}\n" for m in desc["h2_sources"]))
+        q = run(G("qualify.py", "--result", str(d / "result.json"), "--stage-a", sa, "--manifest", str(d / "M"), "--stage-b", str(d / "r.b"), "--expected-binding-sha256", cb,
+                  "--passa-stage-b", str(d / "pa.b"), "--expected-passa-binding-sha256", pab, "--census-package", CEN), "qualify")
+        if not (d / "result.json").exists():
+            res[label] = {"run_h2_rc": rh.returncode, "refused": rh.stdout.strip().splitlines()[-1] if rh.stdout.strip() else ""}; continue
+        r = json.loads((d / "result.json").read_bytes())
+        res[label] = {"run_h2_rc": rh.returncode, "qualify_rc": q.returncode,
+                      "facts": {row["path"]: {k: row["evidence_facts"].get(k, "ABSENT") for k in ("NOMINAL_FUNCTION", "SELF_ASSERTS_CURRENT")} for row in r["rows"]},
+                      "key_counts": sorted({len(row["evidence_facts"]) for row in r["rows"]}),
+                      "axes": {row["path"]: {a: row[a]["value"] for a in ("SCOPE", "VALIDITY", "LIFECYCLE", "FUNCTION", "AUTHORITY", "GENERATION") if a in row} for row in r["rows"]},
+                      "other8": {row["path"]: {k: v for k, v in row["evidence_facts"].items() if k not in ("NOMINAL_FUNCTION", "SELF_ASSERTS_CURRENT")} for row in r["rows"]},
+                      "findings": [l.strip() for l in q.stdout.splitlines() if "::" in l], "traces": {row["path"]: row["evidence_fact_traces"] for row in r["rows"]}}
+    print("\n== SUMMARY ==")
+    print(json.dumps(res, indent=1, sort_keys=True))
+    o, n = res["V4 inst4"], res["V5 inst5"]
+    print("V4 == V5 (all recorded fields):", o == n)
+    shutil.rmtree(W)
+    END-VERBATIM LOC-E2E-V5-INSTRUMENT
+- EVIDENCE SB01-PACKET-GENERATOR gen_sb01_packet.py: 8583 bytes, sha256 e62b3600d7c16d753733bab9695ea1a9e004f2ca8b96b31c7e67956602ba4a83, final LF True  [CMD `sha256sum gen_sb01_packet.py` → e62b3600d7c16d75…]
+    BEGIN-VERBATIM SB01-PACKET-GENERATOR
+    import hashlib, pathlib
+    S = pathlib.Path("/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/twofact")
+    h = lambda p: hashlib.sha256((S / p).read_bytes()).hexdigest()
+    delta = (S / "sb01.v1.diff").read_text()
+    P = f"""# D379 B4 — KAI-B4-SB-01 SOURCE-BINDING REPAIR: ADVERSARIAL-REVIEW PACKET v1 (SB-01 DELTA ONLY)
+    
+    Producer: Orion. Date: 2026-10-03. Evidence class: PRODUCER MEASUREMENT, SIGHTED, ZERO ADMISSION WEIGHT.
+    Status: PROPOSAL ONLY, scratch. Nothing is applied to the repair branch (unchanged at dbe692d).
+    
+    ## 0. RECEIPT — reply with these lines FIRST, each copied exactly
+    
+        PACKET HASH: <sha256 of this decoded packet, as given by the sender>
+        BASE (accepted two-fact v4) run_h2_v12.py SHA-256: <from section 1>
+        FIRST DELTA HUNK: <the first line beginning with @@ in section 3>
+        SENTINEL A: <the added line in section 3 that calls passa._source_binding_gate>
+        SENTINEL B: <the added line in section 3 that assigns `lines`>
+        END OF PACKET SEEN: YES
+    
+    If either sentinel cannot be reproduced exactly, reply NO REVIEW. The diff in section 3 is 107 lines (6 hunks, 49 added /
+    7 removed, header lines excluded). The last line of this file is "END OF PACKET SB-01 v1 — D379 SOURCE BINDING".
+    
+    ## 1. Identities
+    
+        BASE  accepted two-fact v4 run_h2_v12.py   sha256 d3ee165f706e9f4048434031e003e6c7a97159ae2e2217d0c8cdd7ebd69861b6
+              (v4 full diff vs dbe692d             sha256 bbe42e3fbf2ecb690a93f9945b335ff4cc4a4b716c79d87255e195ee678e8aab)
+        DELTA SB-01 v1 (section 3)                 sha256 {h("sb01.v1.diff")}
+        COMPOSITE proposed run_h2_v12.py           sha256 {h("inst5/kai-pm/house_in_order_h2_v13/run_h2_v12.py")}
+    
+    You review ONLY the delta. The base is frozen and already reconciled; do not re-review it.
+    
+    ## 2. The defect and the shape of the repair
+    
+    At dbe692d (and in v4) classification read every subject document with Path.read_text() — working-tree bytes, never
+    checked against the bound commit, decoded with universal-newline translation (lone CR -> LF). The reader trace
+    (_reader_trace) read its reading-source file the same way. Measured: an uncommitted edit with HEAD unchanged produced
+    rc 0 and positive facts traced to text absent from the commit.
+    
+    The repair reuses the two governed Pass-A mechanisms and adds no source-identity system:
+      * passa._source_binding_gate(sr, subject) — HEAD == subject; no tracked divergence (git status, untracked recorded
+        not aborting); no tracked symlink anywhere in the subject (git mode 120000) — runs before any subject byte is read;
+      * passa.make_verified_reader(sr, subject) — READ -> sha256 of THOSE bytes vs the frozen blob's bytes -> USE; refuses
+        a path not in the subject or divergent bytes; returns data.decode(errors="ignore") (no newline translation; the
+        lossy errors="ignore" decoding of invalid UTF-8 is unchanged from v1.2 and Pass A);
+      * one reader instance feeds the classified document read in main() and the reading-source read in _reader_trace();
+      * _read_bound() is the only call site of the reader in this module: it REFUSES when no reader is supplied (no
+        read_text fallback exists) and turns an OSError (file vanished / unreadable / replaced by a directory) into a named
+        R11 ABORT instead of an uncaught traceback or, in _reader_trace, a silent abstention;
+      * no output or provenance field is added.
+    
+    ## 3. THE DELTA (base = accepted v4; unified diff)
+    
+    {delta}
+    ## 4. Evidence (producer measurement; all under the qualified interpreter -B -E -s)
+    
+    Real chain: Stage A, Pass A and its Stage-B binding built on a CLEAN synthetic subject (DOC.md with NF+SAC, a CRLF doc,
+    a lone-CR doc, tools/rd.py which statically reads DOC.md); each case perturbs a private copy, then classification runs.
+    OLD = base v4, NEW = composite. Expected outcomes were declared in the harness before running; a machine verdict
+    compares them: NEW 13/13 as declared, OLD 13/13 as declared.
+    
+        case                  NEW (composite)                                   OLD (v4)
+        C0 clean              rc0; 5/5 traces resolve vs committed blobs        rc0; 4/5 — lone-CR SAC trace L4 does not resolve
+        C1 dirty doc          REFUSE WORKTREE IDENTITY, no artefact             rc0, artefact carries the foreign sentence
+        C1b staged dirty doc  REFUSE WORKTREE IDENTITY, no artefact             rc0, foreign
+        C2 dirty reader src   REFUSE WORKTREE IDENTITY, no artefact             rc0, reader trace carries the foreign line
+        C3 HEAD mismatch      REFUSE (pre-existing HEAD check), no artefact      same — NOT a fail-old case
+        C4 deleted doc        REFUSE WORKTREE IDENTITY, no artefact             rc1 by uncaught FileNotFoundError
+        C6 doc -> symlink     REFUSE WORKTREE IDENTITY, no artefact             rc0, follows the link, foreign
+        T1 post-gate edit     REFUSE CONSUMED BYTES DIVERGE, no artefact        rc0, foreign
+        T2 change+restore     REFUSE CONSUMED BYTES DIVERGE; tree clean after   rc0, foreign; tree clean after
+        T3 post-gate reader   REFUSE CONSUMED BYTES DIVERGE at tools/rd.py      rc0, foreign reader line
+        T4 vanish post-gate   REFUSE UNREADABLE SOURCE, no artefact             rc1 by uncaught FileNotFoundError
+        T0 harness, no fault  rc0, artefact, 5/5 resolve                        rc0, artefact
+        PROBE                 consumed text == committed blob for 3/3 docs;     CRLF and lone-CR consumed != blob;
+                              4/4 subject opens inside passa.read_source         4/4 opens outside it (main:707, _reader_trace:159)
+    
+    T-cases run main() in process with __main__ = the real script file, so the producer's own runtime-population check runs
+    unmodified; the perturbation only decides WHEN a write lands. Committed tracked symlink (C5): Pass A itself REFUSES
+    TRACKED SYMLINK, so no classification input can exist for such a subject; classification calls the same gate.
+    
+    Static read-path population (AST, every call in the module): OLD 2 RAW subject reads (:159, :707), exit 1 (known
+    positive); NEW 0 raw reads, every subject-repo site is the passa gate/reader, git object plumbing, or an internal
+    function whose own body is scanned; exit 0. Name-based; the runtime PROBE covers aliasing.
+    
+    Preserved v4 controls on the composite: semantics 92/0, locators 37/0, frozen 272-row regression dump — all three
+    byte-identical to v4; process REFUSE 7/7 (its working-tree-tamper observation now REFUSES); real-chain separator
+    documents: one difference, on the lone-CR document only — selector L4 -> L3 and local_context now the complete LF line
+    'lead\\rThis document is in force.' (the canonical locator over the committed bytes; v4's L4 is the locator over
+    translated text). No expectation was edited.
+    
+    ## 5. Attack these
+    
+      Q1  Is there any subject-byte read in the composite that does not pass through _read_bound / the verified reader?
+      Q2  _read_bound converts only OSError. Is any other exception from the reader (or from the decode) able to escape as
+          an abstention, a False, or an artefact?
+      Q3  read_source=None REFUSES lazily — only if a reader trace is actually needed. Is lazy refusal sufficient, or must
+          evidence_facts refuse up front (as it does for text / function_cell)?
+      Q4  The gate runs after the existing HEAD check and before _classification_provenance. Is any subject byte consumed
+          before the gate?
+      Q5  _reader_trace keeps `except Exception: return None` around the indexing only. Can a binding failure still reach it?
+      Q6  The reader-trace line is chosen with str.splitlines() over the verified text, while opscan numbers Python lines by
+          the AST and shell lines by LF count. Unchanged by this delta; latent in the frozen subject (0 of 615 suffix-matched
+          source files contain CR, VT, FF, FS, GS, RS, NEL, LS or PS). Is it in scope here or a separate finding?
+      Q7  local_context can now carry a raw CR (canonical complete-LF-line context over committed bytes). Defect or correct?
+      Q8  The qualifier reported 0 findings for v4's non-resolving lone-CR trace. Out of this delta's scope — flag only?
+    
+    ## 6. Out of scope
+    
+    The accepted v4 base; d379_controls.py; the full hostile matrix; any other file. The repair branch is not mutated.
+    
+    END OF PACKET SB-01 v1 — D379 SOURCE BINDING
+    """
+    (S / "DEEPSEEK_PACKET_SB01_v1.md").write_text(P)
+    emb = P[P.index("## 3. THE DELTA (base = accepted v4; unified diff)\n\n") + len("## 3. THE DELTA (base = accepted v4; unified diff)\n\n"):P.index("## 4. Evidence")]
+    print("embedded delta == sb01.v1.diff:", emb == delta, len(P.encode()), hashlib.sha256(P.encode()).hexdigest())
+    END-VERBATIM SB01-PACKET-GENERATOR
+- EVIDENCE SB01-B64-GENERATOR gen_sb01_b64.py: 3115 bytes, sha256 8d4a5beb1d16a8e5eb6e42b6ec72751b0a46d050a577d8f9f0cb8b779f997099, final LF True  [CMD `sha256sum gen_sb01_b64.py` → 8d4a5beb1d16a8e5…]
+    BEGIN-VERBATIM SB01-B64-GENERATOR
+    import base64, hashlib, pathlib, textwrap, re
+    S = pathlib.Path("/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/twofact")
+    O = S / "sb01_b64"; O.mkdir(exist_ok=True)
+    pkt = (S / "DEEPSEEK_PACKET_SB01_v1.md").read_bytes(); H = hashlib.sha256(pkt).hexdigest()
+    mid = pkt.rfind(b"\n", 0, len(pkt) // 2) + 1          # split at a line boundary near the middle
+    chunks = [pkt[:mid], pkt[mid:]]
+    cover = f"""To: DeepSeek (adversarial reviewer)
+    From: Orion, for Kai and Dainius
+    Subject: D379 B4 KAI-B4-SB-01 source-binding repair, packet v1, review of the SB-01 delta only
+    
+    Kai accepted and froze the two-fact v4 subject. The remaining blocker is KAI-B4-SB-01: classification
+    read subject documents from the working tree, with newline translation, instead of the bound commit.
+    Packet v1 contains ONLY the SB-01 delta on top of the frozen v4 base for you to attack.
+    
+    Packet SB-01 v1 SHA-256 (the subject you must reconstruct):
+    {H}
+    
+    It follows as {len(chunks)} base64 blocks. Same protocol as before:
+    1. For each block, remove all whitespace from the base64 text and check its stated hash.
+    2. Decode it; check the stated decoded length and decoded hash.
+    3. Concatenate the decoded chunks strictly in order 1 to {len(chunks)}; check the packet hash above.
+    4. Read ONLY the decoded packet, then reply with the receipt in its section 0, copying the packet
+       hash given above on the PACKET HASH line, and both sentinels from the DECODED delta. If you
+       cannot compute SHA-256, say so, but still copy the given packet hash.
+    5. Only after the receipt, review the delta as section 5 suggests. Give each finding an ID
+       (DS-B4-SB-nn), a severity (BLOCKER / MAJOR / MINOR), the exact delta lines copied from the
+       decoded packet, a concrete failing input where possible, and a remedy. If you find nothing,
+       say so explicitly. A PASS is not implementation authority: Kai reconciles every finding.
+    The frozen two-fact v4 base is out of scope.
+    """
+    assert "SENTINEL" not in cover and "_source_binding_gate" not in cover
+    parts = []
+    for i, c in enumerate(chunks, 1):
+        b64 = base64.b64encode(c).decode(); wrapped = "\n".join(textwrap.wrap(b64, 76))
+        block = (f"CHUNK {i}/{len(chunks)}\noriginal decoded-byte length: {len(c)}\nSHA-256 of original decoded chunk: {hashlib.sha256(c).hexdigest()}\n"
+                 f"SHA-256 of transmitted base64 text (all whitespace removed): {hashlib.sha256(b64.encode()).hexdigest()}\nBEGIN BASE64\n{wrapped}\nEND BASE64\n")
+        (O / f"sb01_b64_chunk_{i}_of_{len(chunks)}.txt").write_text(block); parts.append(block)
+    (O / "DEEPSEEK_COVER_SB01_v1.txt").write_text(cover)
+    msg = cover + "\n" + "\n".join(parts); (O / "DEEPSEEK_MESSAGE_SB01_v1_BASE64_COMPLETE.txt").write_text(msg)
+    # independent round trip from the message file alone
+    dec = b"".join(base64.b64decode(re.sub(r"\s", "", b)) for b in re.findall(r"BEGIN BASE64\n(.*?)\nEND BASE64", msg, re.S))
+    print("chunks", [len(c) for c in chunks], "| message round-trip == packet:", dec == pkt, "| packet", H)
+    for f in sorted(O.iterdir()): print(f.name, len(f.read_bytes()), hashlib.sha256(f.read_bytes()).hexdigest())
+    END-VERBATIM SB01-B64-GENERATOR
+- EVIDENCE SB01-E2E-OUTPUT sb01_e2e_out.txt: 11328 bytes, sha256 c49aa0b08bc5d4fd7f43ace8d7bbed263a8ef8e16a8592b996ff49af9a602d02, final LF True  [CMD `sha256sum sb01_e2e_out.txt` → c49aa0b08bc5d4fd…]
+    BEGIN-VERBATIM SB01-E2E-OUTPUT
+    subject 0e18e1138c39b232f0373a1845b8d2d5434ee259
+    
+    == OLD ==
+    C0_CLEAN             expect: rc0; LONECR trace does NOT resolve (read_text translated lone CR)
+                         got:    rc=0 artefact=True tag=None clean_after=True foreign=[] resolve={'checked': 5, 'resolved': 4, 'unresolved': ["kai-pm/LONECR.md SELF_ASSERTS_CURRENT L4 'This document is in force.'"], 'skipped_other_selector': 0}
+                         facts: {'kai-pm/CRLF.md': ['SELF_ASSERTS_CURRENT'], 'kai-pm/DOC.md': ['NOMINAL_FUNCTION', 'SELF_ASSERTS_CURRENT', 'STATIC_REFERENCE_AT_SUBJECT'], 'kai-pm/LONECR.md': ['SELF_ASSERTS_CURRENT']}
+    C1_DIRTY_DOC         expect: rc0, artefact carries foreign text
+                         got:    rc=0 artefact=True tag=None clean_after=False foreign=['single source of truth'] resolve={'checked': 6, 'resolved': 4, 'unresolved': ["kai-pm/DOC.md SELF_ASSERTS_AUTHORITY L5 'This document is the single source of truth.'", "kai-pm/LONECR.md SELF_ASSERTS_CURRENT L4 'This document is in force.'"], 'skipped_other_selector': 0}
+    C1b_STAGED_DOC       expect: rc0, artefact carries foreign text
+                         got:    rc=0 artefact=True tag=None clean_after=False foreign=['single source of truth'] resolve={'checked': 6, 'resolved': 4, 'unresolved': ["kai-pm/DOC.md SELF_ASSERTS_AUTHORITY L5 'This document is the single source of truth.'", "kai-pm/LONECR.md SELF_ASSERTS_CURRENT L4 'This document is in force.'"], 'skipped_other_selector': 0}
+    C2_DIRTY_READER      expect: rc0, reader trace carries foreign line
+                         got:    rc=0 artefact=True tag=None clean_after=False foreign=['FOREIGN'] resolve={'checked': 5, 'resolved': 3, 'unresolved': ["kai-pm/DOC.md STATIC_REFERENCE_AT_SUBJECT opscan:tools/rd.py:L2 'data = open(DOC).read()  # FOREIGN'", "kai-pm/LONECR.md SELF_ASSERTS_CURRENT L4 'This document is in force.'"], 'skipped_other_selector': 0}
+    C3_HEAD_MISMATCH     expect: REFUSE subject HEAD (pre-existing check; NOT a fail-old case)
+                         got:    rc=1 artefact=False tag=subject HEAD clean_after=True
+                         reason: R11 ABORT: subject repo HEAD 8f10c87ba9e5 != Pass A / Stage-A subject
+    C4_DELETED_DOC       expect: non-zero by uncaught FileNotFoundError, no artefact
+                         got:    rc=1 artefact=False tag=None clean_after=False
+                         reason: FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/twofact/sb01_work/OLD/C4_DELETED_DOC/subj/kai-pm/DOC.md'
+    C6_SYMLINK_SWAP      expect: rc0, follows the symlink, foreign text
+                         got:    rc=0 artefact=True tag=None clean_after=False foreign=['single source of truth'] resolve={'checked': 5, 'resolved': 3, 'unresolved': ["kai-pm/DOC.md SELF_ASSERTS_AUTHORITY L3 'This document is the single source of truth.'", "kai-pm/LONECR.md SELF_ASSERTS_CURRENT L4 'This document is in force.'"], 'skipped_other_selector': 0}
+    T1_POST_GATE_DOC     expect: rc0, foreign text
+                         got:    rc=0 artefact=True tag=None clean_after=False foreign=['single source of truth'] resolve={'checked': 6, 'resolved': 4, 'unresolved': ["kai-pm/DOC.md SELF_ASSERTS_AUTHORITY L5 'This document is the single source of truth.'", "kai-pm/LONECR.md SELF_ASSERTS_CURRENT L4 'This document is in force.'"], 'skipped_other_selector': 0}
+    T2_CHANGE_RESTORE    expect: rc0, foreign text; tree clean afterwards
+                         got:    rc=0 artefact=True tag=None clean_after=True foreign=['single source of truth'] resolve={'checked': 6, 'resolved': 4, 'unresolved': ["kai-pm/DOC.md SELF_ASSERTS_AUTHORITY L5 'This document is the single source of truth.'", "kai-pm/LONECR.md SELF_ASSERTS_CURRENT L4 'This document is in force.'"], 'skipped_other_selector': 0}
+    T3_POST_GATE_READER  expect: rc0, reader trace carries foreign line
+                         got:    rc=0 artefact=True tag=None clean_after=False foreign=['FOREIGN'] resolve={'checked': 5, 'resolved': 3, 'unresolved': ["kai-pm/DOC.md STATIC_REFERENCE_AT_SUBJECT opscan:tools/rd.py:L2 'data = open(DOC).read()  # FOREIGN'", "kai-pm/LONECR.md SELF_ASSERTS_CURRENT L4 'This document is in force.'"], 'skipped_other_selector': 0}
+    T4_VANISH            expect: non-zero by uncaught FileNotFoundError, no artefact
+                         got:    rc=1 artefact=False tag=None clean_after=False
+                         reason: UNCAUGHT FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/twofact/sb01_work/OLD/T4_VANISH/subj/kai-pm/DOC.md'
+    T0_HARNESS_NONE      expect: rc0, artefact (harness known-negative)
+                         got:    rc=0 artefact=True tag=None clean_after=True foreign=[] resolve={'checked': 5, 'resolved': 4, 'unresolved': ["kai-pm/LONECR.md SELF_ASSERTS_CURRENT L4 'This document is in force.'"], 'skipped_other_selector': 0}
+    PROBE                expect: rc0; CRLF/LONECR consumed != blob; opens outside the verified reader
+                         got:    rc=0 artefact=True tag=None clean_after=True foreign=[] resolve={'checked': 5, 'resolved': 4, 'unresolved': ["kai-pm/LONECR.md SELF_ASSERTS_CURRENT L4 'This document is in force.'"], 'skipped_other_selector': 0}
+                         consumed==blob: {'kai-pm/CRLF.md': False, 'kai-pm/DOC.md': True, 'kai-pm/LONECR.md': False}
+                         subject opens: 4; by (via, caller): {(None, 'run_h2_v12.py:main:707'): 3, (None, 'run_h2_v12.py:_reader_trace:159'): 1}
+    
+    == NEW ==
+    C0_CLEAN             expect: rc0, all traces resolve against committed blobs
+                         got:    rc=0 artefact=True tag=None clean_after=True foreign=[] resolve={'checked': 5, 'resolved': 5, 'unresolved': [], 'skipped_other_selector': 0}
+                         facts: {'kai-pm/CRLF.md': ['SELF_ASSERTS_CURRENT'], 'kai-pm/DOC.md': ['NOMINAL_FUNCTION', 'SELF_ASSERTS_CURRENT', 'STATIC_REFERENCE_AT_SUBJECT'], 'kai-pm/LONECR.md': ['SELF_ASSERTS_CURRENT']}
+    C1_DIRTY_DOC         expect: REFUSE WORKTREE IDENTITY, no artefact
+                         got:    rc=1 artefact=False tag=WORKTREE IDENTITY clean_after=False
+                         reason: R11 ABORT [SOURCE BINDING / WORKTREE IDENTITY]: 1 tracked path(s) diverge from the frozen subject. Pass A would read the WORKING TREE bytes and stamp them with the subject's identity. `git status --porcelain=v1 --untracked-files=all` report
+    C1b_STAGED_DOC       expect: REFUSE WORKTREE IDENTITY, no artefact
+                         got:    rc=1 artefact=False tag=WORKTREE IDENTITY clean_after=False
+                         reason: R11 ABORT [SOURCE BINDING / WORKTREE IDENTITY]: 1 tracked path(s) diverge from the frozen subject. Pass A would read the WORKING TREE bytes and stamp them with the subject's identity. `git status --porcelain=v1 --untracked-files=all` report
+    C2_DIRTY_READER      expect: REFUSE WORKTREE IDENTITY, no artefact
+                         got:    rc=1 artefact=False tag=WORKTREE IDENTITY clean_after=False
+                         reason: R11 ABORT [SOURCE BINDING / WORKTREE IDENTITY]: 1 tracked path(s) diverge from the frozen subject. Pass A would read the WORKING TREE bytes and stamp them with the subject's identity. `git status --porcelain=v1 --untracked-files=all` report
+    C3_HEAD_MISMATCH     expect: REFUSE subject HEAD, no artefact
+                         got:    rc=1 artefact=False tag=subject HEAD clean_after=True
+                         reason: R11 ABORT: subject repo HEAD 8f10c87ba9e5 != Pass A / Stage-A subject
+    C4_DELETED_DOC       expect: REFUSE WORKTREE IDENTITY, no artefact
+                         got:    rc=1 artefact=False tag=WORKTREE IDENTITY clean_after=False
+                         reason: R11 ABORT [SOURCE BINDING / WORKTREE IDENTITY]: 1 tracked path(s) diverge from the frozen subject. Pass A would read the WORKING TREE bytes and stamp them with the subject's identity. `git status --porcelain=v1 --untracked-files=all` report
+    C6_SYMLINK_SWAP      expect: REFUSE WORKTREE IDENTITY, no artefact
+                         got:    rc=1 artefact=False tag=WORKTREE IDENTITY clean_after=False
+                         reason: R11 ABORT [SOURCE BINDING / WORKTREE IDENTITY]: 1 tracked path(s) diverge from the frozen subject. Pass A would read the WORKING TREE bytes and stamp them with the subject's identity. `git status --porcelain=v1 --untracked-files=all` report
+    T1_POST_GATE_DOC     expect: REFUSE CONSUMED BYTES DIVERGE, no artefact
+                         got:    rc=1 artefact=False tag=CONSUMED BYTES DIVERGE clean_after=False
+                         reason: R11 ABORT [SOURCE BINDING / CONSUMED BYTES DIVERGE]: kai-pm/DOC.md — the bytes returned by this read do not match the frozen subject. sha256(consumed)=eaecff1cc3177a0d sha256(frozen blob)=a52b56a0ef502b9e. The working tree changed after the
+    T2_CHANGE_RESTORE    expect: REFUSE CONSUMED BYTES DIVERGE, no artefact; tree clean afterwards
+                         got:    rc=1 artefact=False tag=CONSUMED BYTES DIVERGE clean_after=True
+                         reason: R11 ABORT [SOURCE BINDING / CONSUMED BYTES DIVERGE]: kai-pm/DOC.md — the bytes returned by this read do not match the frozen subject. sha256(consumed)=eaecff1cc3177a0d sha256(frozen blob)=a52b56a0ef502b9e. The working tree changed after the
+    T3_POST_GATE_READER  expect: REFUSE CONSUMED BYTES DIVERGE in the reader path, no artefact
+                         got:    rc=1 artefact=False tag=CONSUMED BYTES DIVERGE clean_after=False
+                         reason: R11 ABORT [SOURCE BINDING / CONSUMED BYTES DIVERGE]: tools/rd.py — the bytes returned by this read do not match the frozen subject. sha256(consumed)=6129cbb7110b723b sha256(frozen blob)=092dada42f083443. The working tree changed after the s
+    T4_VANISH            expect: REFUSE UNREADABLE SOURCE, no artefact
+                         got:    rc=1 artefact=False tag=UNREADABLE SOURCE clean_after=False
+                         reason: R11 ABORT [SOURCE BINDING / UNREADABLE SOURCE]: kai-pm/DOC.md: FileNotFoundError: No such file or directory. A subject file vanished or became unreadable during measurement. Refusing to measure.
+    T0_HARNESS_NONE      expect: rc0, artefact, all traces resolve (harness known-negative)
+                         got:    rc=0 artefact=True tag=None clean_after=True foreign=[] resolve={'checked': 5, 'resolved': 5, 'unresolved': [], 'skipped_other_selector': 0}
+    PROBE                expect: rc0; every consumed text == committed blob decoded; every subject open via passa.read_source
+                         got:    rc=0 artefact=True tag=None clean_after=True foreign=[] resolve={'checked': 5, 'resolved': 5, 'unresolved': [], 'skipped_other_selector': 0}
+                         consumed==blob: {'kai-pm/CRLF.md': True, 'kai-pm/DOC.md': True, 'kai-pm/LONECR.md': True}
+                         subject opens: 4; by (via, caller): {('passa.read_source', 'passa.py:read_source:992'): 4}
+    
+    == C5 committed tracked symlink (chain level, NEW tree) ==
+    stage A rc 0 
+    passa rc 1 artefact False R11 ABORT [SOURCE BINDING / TRACKED SYMLINK]: 1 tracked symlink(s) in the frozen subject: kai-pm/LINK.md. git stores a symlink as a blob holding its TARGET PATH, and a filesystem read follows it instead, so the bytes analysed need not be re
+    
+    full log: /tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/twofact/sb01_work/full_log.txt (15522 bytes)
+    END-VERBATIM SB01-E2E-OUTPUT
+- EVIDENCE SB01-E2E-FULL-LOG sb01_full_log.txt: 15522 bytes, sha256 7241239e7a8da32146e1bdcf1d36188b9bc12c71125a6b5100f9775ccd75c4e2, final LF False  [CMD `sha256sum sb01_full_log.txt` → 7241239e7a8da321…]
+    BEGIN-VERBATIM SB01-E2E-FULL-LOG
+    --- OLD stage A rc=0 (0 bytes)
+    --- end OLD stage A
+    --- OLD passa rc=0 (292 bytes)
+    PASS A v1.2 COMPLETE — 3 rows == population 3
+      WITNESS KINDS DISCRIMINATED (D2/D4), not assumed from shape:
+      scope determined: WHOLE_FILE 0 · SPAN 0
+      binding predicates declared closed-world: 26
+      contextual predicates declared closed-world: 1 (status)
+      NO VERDICT ASSIGNED IN PASS A.
+    --- end OLD passa
+    --- OLD bind A rc=0 (65 bytes)
+    bfcb4a5e3b5047f756a3582db2b18b927178eed5245c4348b08f027601a0c91c
+    --- end OLD bind A
+    --- OLD C0_CLEAN rc=0 (727 bytes)
+    HOUSE_H2 v1.2 — 3 rows == population 3
+      subject 0e18e1138c39 tree e9f14d623c08
+    
+      LIFECYCLE    positives    0  UNKNOWN    3   
+      FUNCTION     positives    0  UNKNOWN    3   
+      AUTHORITY    positives    0  UNKNOWN    3   
+      GENERATION   positives    0  UNKNOWN    3   
+      VALIDITY     positives    0  UNKNOWN    3   
+      SCOPE        positives    0  UNKNOWN    3   
+    
+      evidence facts (NOT verdicts):
+        SELF_ASSERTS_CURRENT            3
+        STATIC_REFERENCE_AT_SUBJECT     1
+        NOMINAL_FUNCTION                1
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 1
+        {'PLAN from self-description': 1}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end OLD C0_CLEAN
+    --- OLD C1_DIRTY_DOC rc=0 (765 bytes)
+    HOUSE_H2 v1.2 — 3 rows == population 3
+      subject 0e18e1138c39 tree e9f14d623c08
+    
+      LIFECYCLE    positives    0  UNKNOWN    3   
+      FUNCTION     positives    0  UNKNOWN    3   
+      AUTHORITY    positives    0  UNKNOWN    3   
+      GENERATION   positives    0  UNKNOWN    3   
+      VALIDITY     positives    0  UNKNOWN    3   
+      SCOPE        positives    0  UNKNOWN    3   
+    
+      evidence facts (NOT verdicts):
+        SELF_ASSERTS_CURRENT            3
+        STATIC_REFERENCE_AT_SUBJECT     1
+        NOMINAL_FUNCTION                1
+        SELF_ASSERTS_AUTHORITY          1
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 1
+        {'PLAN from self-description': 1}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end OLD C1_DIRTY_DOC
+    --- OLD C1b_STAGED_DOC rc=0 (765 bytes)
+    HOUSE_H2 v1.2 — 3 rows == population 3
+      subject 0e18e1138c39 tree e9f14d623c08
+    
+      LIFECYCLE    positives    0  UNKNOWN    3   
+      FUNCTION     positives    0  UNKNOWN    3   
+      AUTHORITY    positives    0  UNKNOWN    3   
+      GENERATION   positives    0  UNKNOWN    3   
+      VALIDITY     positives    0  UNKNOWN    3   
+      SCOPE        positives    0  UNKNOWN    3   
+    
+      evidence facts (NOT verdicts):
+        SELF_ASSERTS_CURRENT            3
+        STATIC_REFERENCE_AT_SUBJECT     1
+        NOMINAL_FUNCTION                1
+        SELF_ASSERTS_AUTHORITY          1
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 1
+        {'PLAN from self-description': 1}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end OLD C1b_STAGED_DOC
+    --- OLD C2_DIRTY_READER rc=0 (727 bytes)
+    HOUSE_H2 v1.2 — 3 rows == population 3
+      subject 0e18e1138c39 tree e9f14d623c08
+    
+      LIFECYCLE    positives    0  UNKNOWN    3   
+      FUNCTION     positives    0  UNKNOWN    3   
+      AUTHORITY    positives    0  UNKNOWN    3   
+      GENERATION   positives    0  UNKNOWN    3   
+      VALIDITY     positives    0  UNKNOWN    3   
+      SCOPE        positives    0  UNKNOWN    3   
+    
+      evidence facts (NOT verdicts):
+        SELF_ASSERTS_CURRENT            3
+        STATIC_REFERENCE_AT_SUBJECT     1
+        NOMINAL_FUNCTION                1
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 1
+        {'PLAN from self-description': 1}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end OLD C2_DIRTY_READER
+    --- OLD C3_HEAD_MISMATCH rc=1 (70 bytes)
+    R11 ABORT: subject repo HEAD 8f10c87ba9e5 != Pass A / Stage-A subject
+    --- end OLD C3_HEAD_MISMATCH
+    --- OLD C4_DELETED_DOC rc=1 (1181 bytes)
+    Traceback (most recent call last):
+      File "/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/twofact/inst4/kai-pm/house_in_order_h2_v13/run_h2_v12.py", line 799, in <module>
+        main()
+      File "/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/twofact/inst4/kai-pm/house_in_order_h2_v13/run_h2_v12.py", line 707, in main
+        text = (sr / row["path"]).read_text(errors="ignore")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/user/d379-build/bw/A/stage/opt/d379-py311/lib/python3.11/pathlib.py", line 1058, in read_text
+        with self.open(mode='r', encoding=encoding, errors=errors) as f:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/user/d379-build/bw/A/stage/opt/d379-py311/lib/python3.11/pathlib.py", line 1044, in open
+        return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/twofact/sb01_work/OLD/C4_DELETED_DOC/subj/kai-pm/DOC.md'
+    --- end OLD C4_DELETED_DOC
+    --- OLD C6_SYMLINK_SWAP rc=0 (765 bytes)
+    HOUSE_H2 v1.2 — 3 rows == population 3
+      subject 0e18e1138c39 tree e9f14d623c08
+    
+      LIFECYCLE    positives    0  UNKNOWN    3   
+      FUNCTION     positives    0  UNKNOWN    3   
+      AUTHORITY    positives    0  UNKNOWN    3   
+      GENERATION   positives    0  UNKNOWN    3   
+      VALIDITY     positives    0  UNKNOWN    3   
+      SCOPE        positives    0  UNKNOWN    3   
+    
+      evidence facts (NOT verdicts):
+        SELF_ASSERTS_CURRENT            2
+        STATIC_REFERENCE_AT_SUBJECT     1
+        NOMINAL_FUNCTION                1
+        SELF_ASSERTS_AUTHORITY          1
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 1
+        {'PLAN from self-description': 1}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end OLD C6_SYMLINK_SWAP
+    --- OLD T1_POST_GATE_DOC rc=0 (765 bytes)
+    HOUSE_H2 v1.2 — 3 rows == population 3
+      subject 0e18e1138c39 tree e9f14d623c08
+    
+      LIFECYCLE    positives    0  UNKNOWN    3   
+      FUNCTION     positives    0  UNKNOWN    3   
+      AUTHORITY    positives    0  UNKNOWN    3   
+      GENERATION   positives    0  UNKNOWN    3   
+      VALIDITY     positives    0  UNKNOWN    3   
+      SCOPE        positives    0  UNKNOWN    3   
+    
+      evidence facts (NOT verdicts):
+        SELF_ASSERTS_CURRENT            3
+        STATIC_REFERENCE_AT_SUBJECT     1
+        NOMINAL_FUNCTION                1
+        SELF_ASSERTS_AUTHORITY          1
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 1
+        {'PLAN from self-description': 1}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end OLD T1_POST_GATE_DOC
+    --- OLD T2_CHANGE_RESTORE rc=0 (765 bytes)
+    HOUSE_H2 v1.2 — 3 rows == population 3
+      subject 0e18e1138c39 tree e9f14d623c08
+    
+      LIFECYCLE    positives    0  UNKNOWN    3   
+      FUNCTION     positives    0  UNKNOWN    3   
+      AUTHORITY    positives    0  UNKNOWN    3   
+      GENERATION   positives    0  UNKNOWN    3   
+      VALIDITY     positives    0  UNKNOWN    3   
+      SCOPE        positives    0  UNKNOWN    3   
+    
+      evidence facts (NOT verdicts):
+        SELF_ASSERTS_CURRENT            3
+        STATIC_REFERENCE_AT_SUBJECT     1
+        NOMINAL_FUNCTION                1
+        SELF_ASSERTS_AUTHORITY          1
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 1
+        {'PLAN from self-description': 1}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end OLD T2_CHANGE_RESTORE
+    --- OLD T3_POST_GATE_READER rc=0 (727 bytes)
+    HOUSE_H2 v1.2 — 3 rows == population 3
+      subject 0e18e1138c39 tree e9f14d623c08
+    
+      LIFECYCLE    positives    0  UNKNOWN    3   
+      FUNCTION     positives    0  UNKNOWN    3   
+      AUTHORITY    positives    0  UNKNOWN    3   
+      GENERATION   positives    0  UNKNOWN    3   
+      VALIDITY     positives    0  UNKNOWN    3   
+      SCOPE        positives    0  UNKNOWN    3   
+    
+      evidence facts (NOT verdicts):
+        SELF_ASSERTS_CURRENT            3
+        STATIC_REFERENCE_AT_SUBJECT     1
+        NOMINAL_FUNCTION                1
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 1
+        {'PLAN from self-description': 1}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end OLD T3_POST_GATE_READER
+    --- OLD T4_VANISH rc=0 (0 bytes)
+    --- end OLD T4_VANISH
+    --- OLD T0_HARNESS_NONE rc=0 (727 bytes)
+    HOUSE_H2 v1.2 — 3 rows == population 3
+      subject 0e18e1138c39 tree e9f14d623c08
+    
+      LIFECYCLE    positives    0  UNKNOWN    3   
+      FUNCTION     positives    0  UNKNOWN    3   
+      AUTHORITY    positives    0  UNKNOWN    3   
+      GENERATION   positives    0  UNKNOWN    3   
+      VALIDITY     positives    0  UNKNOWN    3   
+      SCOPE        positives    0  UNKNOWN    3   
+    
+      evidence facts (NOT verdicts):
+        SELF_ASSERTS_CURRENT            3
+        STATIC_REFERENCE_AT_SUBJECT     1
+        NOMINAL_FUNCTION                1
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 1
+        {'PLAN from self-description': 1}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end OLD T0_HARNESS_NONE
+    --- OLD PROBE rc=0 (727 bytes)
+    HOUSE_H2 v1.2 — 3 rows == population 3
+      subject 0e18e1138c39 tree e9f14d623c08
+    
+      LIFECYCLE    positives    0  UNKNOWN    3   
+      FUNCTION     positives    0  UNKNOWN    3   
+      AUTHORITY    positives    0  UNKNOWN    3   
+      GENERATION   positives    0  UNKNOWN    3   
+      VALIDITY     positives    0  UNKNOWN    3   
+      SCOPE        positives    0  UNKNOWN    3   
+    
+      evidence facts (NOT verdicts):
+        SELF_ASSERTS_CURRENT            3
+        STATIC_REFERENCE_AT_SUBJECT     1
+        NOMINAL_FUNCTION                1
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 1
+        {'PLAN from self-description': 1}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end OLD PROBE
+    --- NEW stage A rc=0 (0 bytes)
+    --- end NEW stage A
+    --- NEW passa rc=0 (292 bytes)
+    PASS A v1.2 COMPLETE — 3 rows == population 3
+      WITNESS KINDS DISCRIMINATED (D2/D4), not assumed from shape:
+      scope determined: WHOLE_FILE 0 · SPAN 0
+      binding predicates declared closed-world: 26
+      contextual predicates declared closed-world: 1 (status)
+      NO VERDICT ASSIGNED IN PASS A.
+    --- end NEW passa
+    --- NEW bind A rc=0 (65 bytes)
+    b17601f168f2dd2beb4d8c6d6d866ad68992c092f2f187aa4adf274f3462f09b
+    --- end NEW bind A
+    --- NEW C0_CLEAN rc=0 (727 bytes)
+    HOUSE_H2 v1.2 — 3 rows == population 3
+      subject 0e18e1138c39 tree e9f14d623c08
+    
+      LIFECYCLE    positives    0  UNKNOWN    3   
+      FUNCTION     positives    0  UNKNOWN    3   
+      AUTHORITY    positives    0  UNKNOWN    3   
+      GENERATION   positives    0  UNKNOWN    3   
+      VALIDITY     positives    0  UNKNOWN    3   
+      SCOPE        positives    0  UNKNOWN    3   
+    
+      evidence facts (NOT verdicts):
+        SELF_ASSERTS_CURRENT            3
+        STATIC_REFERENCE_AT_SUBJECT     1
+        NOMINAL_FUNCTION                1
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 1
+        {'PLAN from self-description': 1}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end NEW C0_CLEAN
+    --- NEW C1_DIRTY_DOC rc=1 (281 bytes)
+    R11 ABORT [SOURCE BINDING / WORKTREE IDENTITY]: 1 tracked path(s) diverge from the frozen subject. Pass A would read the WORKING TREE bytes and stamp them with the subject's identity. `git status --porcelain=v1 --untracked-files=all` reports: M kai-pm/DOC.md. Refusing to measure.
+    --- end NEW C1_DIRTY_DOC
+    --- NEW C1b_STAGED_DOC rc=1 (282 bytes)
+    R11 ABORT [SOURCE BINDING / WORKTREE IDENTITY]: 1 tracked path(s) diverge from the frozen subject. Pass A would read the WORKING TREE bytes and stamp them with the subject's identity. `git status --porcelain=v1 --untracked-files=all` reports: M  kai-pm/DOC.md. Refusing to measure.
+    --- end NEW C1b_STAGED_DOC
+    --- NEW C2_DIRTY_READER rc=1 (279 bytes)
+    R11 ABORT [SOURCE BINDING / WORKTREE IDENTITY]: 1 tracked path(s) diverge from the frozen subject. Pass A would read the WORKING TREE bytes and stamp them with the subject's identity. `git status --porcelain=v1 --untracked-files=all` reports: M tools/rd.py. Refusing to measure.
+    --- end NEW C2_DIRTY_READER
+    --- NEW C3_HEAD_MISMATCH rc=1 (70 bytes)
+    R11 ABORT: subject repo HEAD 8f10c87ba9e5 != Pass A / Stage-A subject
+    --- end NEW C3_HEAD_MISMATCH
+    --- NEW C4_DELETED_DOC rc=1 (281 bytes)
+    R11 ABORT [SOURCE BINDING / WORKTREE IDENTITY]: 1 tracked path(s) diverge from the frozen subject. Pass A would read the WORKING TREE bytes and stamp them with the subject's identity. `git status --porcelain=v1 --untracked-files=all` reports: D kai-pm/DOC.md. Refusing to measure.
+    --- end NEW C4_DELETED_DOC
+    --- NEW C6_SYMLINK_SWAP rc=1 (281 bytes)
+    R11 ABORT [SOURCE BINDING / WORKTREE IDENTITY]: 1 tracked path(s) diverge from the frozen subject. Pass A would read the WORKING TREE bytes and stamp them with the subject's identity. `git status --porcelain=v1 --untracked-files=all` reports: T kai-pm/DOC.md. Refusing to measure.
+    --- end NEW C6_SYMLINK_SWAP
+    --- NEW T1_POST_GATE_DOC rc=0 (0 bytes)
+    --- end NEW T1_POST_GATE_DOC
+    --- NEW T2_CHANGE_RESTORE rc=0 (0 bytes)
+    --- end NEW T2_CHANGE_RESTORE
+    --- NEW T3_POST_GATE_READER rc=0 (0 bytes)
+    --- end NEW T3_POST_GATE_READER
+    --- NEW T4_VANISH rc=0 (0 bytes)
+    --- end NEW T4_VANISH
+    --- NEW T0_HARNESS_NONE rc=0 (727 bytes)
+    HOUSE_H2 v1.2 — 3 rows == population 3
+      subject 0e18e1138c39 tree e9f14d623c08
+    
+      LIFECYCLE    positives    0  UNKNOWN    3   
+      FUNCTION     positives    0  UNKNOWN    3   
+      AUTHORITY    positives    0  UNKNOWN    3   
+      GENERATION   positives    0  UNKNOWN    3   
+      VALIDITY     positives    0  UNKNOWN    3   
+      SCOPE        positives    0  UNKNOWN    3   
+    
+      evidence facts (NOT verdicts):
+        SELF_ASSERTS_CURRENT            3
+        STATIC_REFERENCE_AT_SUBJECT     1
+        NOMINAL_FUNCTION                1
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 1
+        {'PLAN from self-description': 1}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end NEW T0_HARNESS_NONE
+    --- NEW PROBE rc=0 (727 bytes)
+    HOUSE_H2 v1.2 — 3 rows == population 3
+      subject 0e18e1138c39 tree e9f14d623c08
+    
+      LIFECYCLE    positives    0  UNKNOWN    3   
+      FUNCTION     positives    0  UNKNOWN    3   
+      AUTHORITY    positives    0  UNKNOWN    3   
+      GENERATION   positives    0  UNKNOWN    3   
+      VALIDITY     positives    0  UNKNOWN    3   
+      SCOPE        positives    0  UNKNOWN    3   
+    
+      evidence facts (NOT verdicts):
+        SELF_ASSERTS_CURRENT            3
+        STATIC_REFERENCE_AT_SUBJECT     1
+        NOMINAL_FUNCTION                1
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 1
+        {'PLAN from self-description': 1}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end NEW PROBE
+    --- C5 stage A rc=0 (0 bytes)
+    --- end C5 stage A
+    --- C5 passa rc=1 (344 bytes)
+    R11 ABORT [SOURCE BINDING / TRACKED SYMLINK]: 1 tracked symlink(s) in the frozen subject: kai-pm/LINK.md. git stores a symlink as a blob holding its TARGET PATH, and a filesystem read follows it instead, so the bytes analysed need not be represented by the subject at all. This candidate neither follows nor resolves them. Refusing to measure.
+    --- end C5 passa
+    END-VERBATIM SB01-E2E-FULL-LOG
+- EVIDENCE SB01-E2E-SUMMARY sb01_summary.json: 14378 bytes, sha256 11087d0949bb4b709cddc4d80f5e5bbaa20b3bc7f605c9a9f2fdfeceebb2375b, final LF False  [CMD `sha256sum sb01_summary.json` → 11087d0949bb4b70…]
+    BEGIN-VERBATIM SB01-E2E-SUMMARY
+    {
+     "NEW": {
+      "C0_CLEAN": {
+       "artefact": true,
+       "facts": {
+        "kai-pm/CRLF.md": [
+         "SELF_ASSERTS_CURRENT"
+        ],
+        "kai-pm/DOC.md": [
+         "NOMINAL_FUNCTION",
+         "SELF_ASSERTS_CURRENT",
+         "STATIC_REFERENCE_AT_SUBJECT"
+        ],
+        "kai-pm/LONECR.md": [
+         "SELF_ASSERTS_CURRENT"
+        ]
+       },
+       "foreign_in_artefact": [],
+       "rc": 0,
+       "reason": "  self_approval: NONE",
+       "resolve": {
+        "checked": 5,
+        "resolved": 5,
+        "skipped_other_selector": 0,
+        "unresolved": []
+       },
+       "tag": null,
+       "tree_clean_after": true
+      },
+      "C1_DIRTY_DOC": {
+       "artefact": false,
+       "rc": 1,
+       "reason": "R11 ABORT [SOURCE BINDING / WORKTREE IDENTITY]: 1 tracked path(s) diverge from the frozen subject. Pass A would read the WORKING TREE bytes and stamp them with the subject's identity. `git status --porcelain=v1 --untracked-files=all` report",
+       "tag": "WORKTREE IDENTITY",
+       "tree_clean_after": false
+      },
+      "C1b_STAGED_DOC": {
+       "artefact": false,
+       "rc": 1,
+       "reason": "R11 ABORT [SOURCE BINDING / WORKTREE IDENTITY]: 1 tracked path(s) diverge from the frozen subject. Pass A would read the WORKING TREE bytes and stamp them with the subject's identity. `git status --porcelain=v1 --untracked-files=all` report",
+       "tag": "WORKTREE IDENTITY",
+       "tree_clean_after": false
+      },
+      "C2_DIRTY_READER": {
+       "artefact": false,
+       "rc": 1,
+       "reason": "R11 ABORT [SOURCE BINDING / WORKTREE IDENTITY]: 1 tracked path(s) diverge from the frozen subject. Pass A would read the WORKING TREE bytes and stamp them with the subject's identity. `git status --porcelain=v1 --untracked-files=all` report",
+       "tag": "WORKTREE IDENTITY",
+       "tree_clean_after": false
+      },
+      "C3_HEAD_MISMATCH": {
+       "artefact": false,
+       "rc": 1,
+       "reason": "R11 ABORT: subject repo HEAD 8f10c87ba9e5 != Pass A / Stage-A subject",
+       "tag": "subject HEAD",
+       "tree_clean_after": true
+      },
+      "C4_DELETED_DOC": {
+       "artefact": false,
+       "rc": 1,
+       "reason": "R11 ABORT [SOURCE BINDING / WORKTREE IDENTITY]: 1 tracked path(s) diverge from the frozen subject. Pass A would read the WORKING TREE bytes and stamp them with the subject's identity. `git status --porcelain=v1 --untracked-files=all` report",
+       "tag": "WORKTREE IDENTITY",
+       "tree_clean_after": false
+      },
+      "C6_SYMLINK_SWAP": {
+       "artefact": false,
+       "rc": 1,
+       "reason": "R11 ABORT [SOURCE BINDING / WORKTREE IDENTITY]: 1 tracked path(s) diverge from the frozen subject. Pass A would read the WORKING TREE bytes and stamp them with the subject's identity. `git status --porcelain=v1 --untracked-files=all` report",
+       "tag": "WORKTREE IDENTITY",
+       "tree_clean_after": false
+      },
+      "PROBE": {
+       "artefact": true,
+       "consumed_eq_blob": {
+        "kai-pm/CRLF.md": true,
+        "kai-pm/DOC.md": true,
+        "kai-pm/LONECR.md": true
+       },
+       "facts": {
+        "kai-pm/CRLF.md": [
+         "SELF_ASSERTS_CURRENT"
+        ],
+        "kai-pm/DOC.md": [
+         "NOMINAL_FUNCTION",
+         "SELF_ASSERTS_CURRENT",
+         "STATIC_REFERENCE_AT_SUBJECT"
+        ],
+        "kai-pm/LONECR.md": [
+         "SELF_ASSERTS_CURRENT"
+        ]
+       },
+       "foreign_in_artefact": [],
+       "rc": 0,
+       "reason": "",
+       "resolve": {
+        "checked": 5,
+        "resolved": 5,
+        "skipped_other_selector": 0,
+        "unresolved": []
+       },
+       "subject_opens": [
+        {
+         "caller": "passa.py:read_source:992",
+         "path": "kai-pm/CRLF.md",
+         "via": "passa.read_source"
+        },
+        {
+         "caller": "passa.py:read_source:992",
+         "path": "kai-pm/DOC.md",
+         "via": "passa.read_source"
+        },
+        {
+         "caller": "passa.py:read_source:992",
+         "path": "tools/rd.py",
+         "via": "passa.read_source"
+        },
+        {
+         "caller": "passa.py:read_source:992",
+         "path": "kai-pm/LONECR.md",
+         "via": "passa.read_source"
+        }
+       ],
+       "tag": null,
+       "tree_clean_after": true
+      },
+      "T0_HARNESS_NONE": {
+       "artefact": true,
+       "facts": {
+        "kai-pm/CRLF.md": [
+         "SELF_ASSERTS_CURRENT"
+        ],
+        "kai-pm/DOC.md": [
+         "NOMINAL_FUNCTION",
+         "SELF_ASSERTS_CURRENT",
+         "STATIC_REFERENCE_AT_SUBJECT"
+        ],
+        "kai-pm/LONECR.md": [
+         "SELF_ASSERTS_CURRENT"
+        ]
+       },
+       "foreign_in_artefact": [],
+       "rc": 0,
+       "reason": "",
+       "resolve": {
+        "checked": 5,
+        "resolved": 5,
+        "skipped_other_selector": 0,
+        "unresolved": []
+       },
+       "tag": null,
+       "tree_clean_after": true
+      },
+      "T1_POST_GATE_DOC": {
+       "artefact": false,
+       "rc": 1,
+       "reason": "R11 ABORT [SOURCE BINDING / CONSUMED BYTES DIVERGE]: kai-pm/DOC.md \u2014 the bytes returned by this read do not match the frozen subject. sha256(consumed)=eaecff1cc3177a0d sha256(frozen blob)=a52b56a0ef502b9e. The working tree changed after the",
+       "tag": "CONSUMED BYTES DIVERGE",
+       "tree_clean_after": false
+      },
+      "T2_CHANGE_RESTORE": {
+       "artefact": false,
+       "rc": 1,
+       "reason": "R11 ABORT [SOURCE BINDING / CONSUMED BYTES DIVERGE]: kai-pm/DOC.md \u2014 the bytes returned by this read do not match the frozen subject. sha256(consumed)=eaecff1cc3177a0d sha256(frozen blob)=a52b56a0ef502b9e. The working tree changed after the",
+       "tag": "CONSUMED BYTES DIVERGE",
+       "tree_clean_after": true
+      },
+      "T3_POST_GATE_READER": {
+       "artefact": false,
+       "rc": 1,
+       "reason": "R11 ABORT [SOURCE BINDING / CONSUMED BYTES DIVERGE]: tools/rd.py \u2014 the bytes returned by this read do not match the frozen subject. sha256(consumed)=6129cbb7110b723b sha256(frozen blob)=092dada42f083443. The working tree changed after the s",
+       "tag": "CONSUMED BYTES DIVERGE",
+       "tree_clean_after": false
+      },
+      "T4_VANISH": {
+       "artefact": false,
+       "rc": 1,
+       "reason": "R11 ABORT [SOURCE BINDING / UNREADABLE SOURCE]: kai-pm/DOC.md: FileNotFoundError: No such file or directory. A subject file vanished or became unreadable during measurement. Refusing to measure.",
+       "tag": "UNREADABLE SOURCE",
+       "tree_clean_after": false
+      }
+     },
+     "OLD": {
+      "C0_CLEAN": {
+       "artefact": true,
+       "facts": {
+        "kai-pm/CRLF.md": [
+         "SELF_ASSERTS_CURRENT"
+        ],
+        "kai-pm/DOC.md": [
+         "NOMINAL_FUNCTION",
+         "SELF_ASSERTS_CURRENT",
+         "STATIC_REFERENCE_AT_SUBJECT"
+        ],
+        "kai-pm/LONECR.md": [
+         "SELF_ASSERTS_CURRENT"
+        ]
+       },
+       "foreign_in_artefact": [],
+       "rc": 0,
+       "reason": "  self_approval: NONE",
+       "resolve": {
+        "checked": 5,
+        "resolved": 4,
+        "skipped_other_selector": 0,
+        "unresolved": [
+         "kai-pm/LONECR.md SELF_ASSERTS_CURRENT L4 'This document is in force.'"
+        ]
+       },
+       "tag": null,
+       "tree_clean_after": true
+      },
+      "C1_DIRTY_DOC": {
+       "artefact": true,
+       "facts": {
+        "kai-pm/CRLF.md": [
+         "SELF_ASSERTS_CURRENT"
+        ],
+        "kai-pm/DOC.md": [
+         "NOMINAL_FUNCTION",
+         "SELF_ASSERTS_AUTHORITY",
+         "SELF_ASSERTS_CURRENT",
+         "STATIC_REFERENCE_AT_SUBJECT"
+        ],
+        "kai-pm/LONECR.md": [
+         "SELF_ASSERTS_CURRENT"
+        ]
+       },
+       "foreign_in_artefact": [
+        "single source of truth"
+       ],
+       "rc": 0,
+       "reason": "  self_approval: NONE",
+       "resolve": {
+        "checked": 6,
+        "resolved": 4,
+        "skipped_other_selector": 0,
+        "unresolved": [
+         "kai-pm/DOC.md SELF_ASSERTS_AUTHORITY L5 'This document is the single source of truth.'",
+         "kai-pm/LONECR.md SELF_ASSERTS_CURRENT L4 'This document is in force.'"
+        ]
+       },
+       "tag": null,
+       "tree_clean_after": false
+      },
+      "C1b_STAGED_DOC": {
+       "artefact": true,
+       "facts": {
+        "kai-pm/CRLF.md": [
+         "SELF_ASSERTS_CURRENT"
+        ],
+        "kai-pm/DOC.md": [
+         "NOMINAL_FUNCTION",
+         "SELF_ASSERTS_AUTHORITY",
+         "SELF_ASSERTS_CURRENT",
+         "STATIC_REFERENCE_AT_SUBJECT"
+        ],
+        "kai-pm/LONECR.md": [
+         "SELF_ASSERTS_CURRENT"
+        ]
+       },
+       "foreign_in_artefact": [
+        "single source of truth"
+       ],
+       "rc": 0,
+       "reason": "  self_approval: NONE",
+       "resolve": {
+        "checked": 6,
+        "resolved": 4,
+        "skipped_other_selector": 0,
+        "unresolved": [
+         "kai-pm/DOC.md SELF_ASSERTS_AUTHORITY L5 'This document is the single source of truth.'",
+         "kai-pm/LONECR.md SELF_ASSERTS_CURRENT L4 'This document is in force.'"
+        ]
+       },
+       "tag": null,
+       "tree_clean_after": false
+      },
+      "C2_DIRTY_READER": {
+       "artefact": true,
+       "facts": {
+        "kai-pm/CRLF.md": [
+         "SELF_ASSERTS_CURRENT"
+        ],
+        "kai-pm/DOC.md": [
+         "NOMINAL_FUNCTION",
+         "SELF_ASSERTS_CURRENT",
+         "STATIC_REFERENCE_AT_SUBJECT"
+        ],
+        "kai-pm/LONECR.md": [
+         "SELF_ASSERTS_CURRENT"
+        ]
+       },
+       "foreign_in_artefact": [
+        "FOREIGN"
+       ],
+       "rc": 0,
+       "reason": "  self_approval: NONE",
+       "resolve": {
+        "checked": 5,
+        "resolved": 3,
+        "skipped_other_selector": 0,
+        "unresolved": [
+         "kai-pm/DOC.md STATIC_REFERENCE_AT_SUBJECT opscan:tools/rd.py:L2 'data = open(DOC).read()  # FOREIGN'",
+         "kai-pm/LONECR.md SELF_ASSERTS_CURRENT L4 'This document is in force.'"
+        ]
+       },
+       "tag": null,
+       "tree_clean_after": false
+      },
+      "C3_HEAD_MISMATCH": {
+       "artefact": false,
+       "rc": 1,
+       "reason": "R11 ABORT: subject repo HEAD 8f10c87ba9e5 != Pass A / Stage-A subject",
+       "tag": "subject HEAD",
+       "tree_clean_after": true
+      },
+      "C4_DELETED_DOC": {
+       "artefact": false,
+       "rc": 1,
+       "reason": "FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/twofact/sb01_work/OLD/C4_DELETED_DOC/subj/kai-pm/DOC.md'",
+       "tag": null,
+       "tree_clean_after": false
+      },
+      "C6_SYMLINK_SWAP": {
+       "artefact": true,
+       "facts": {
+        "kai-pm/CRLF.md": [
+         "SELF_ASSERTS_CURRENT"
+        ],
+        "kai-pm/DOC.md": [
+         "NOMINAL_FUNCTION",
+         "SELF_ASSERTS_AUTHORITY",
+         "STATIC_REFERENCE_AT_SUBJECT"
+        ],
+        "kai-pm/LONECR.md": [
+         "SELF_ASSERTS_CURRENT"
+        ]
+       },
+       "foreign_in_artefact": [
+        "single source of truth"
+       ],
+       "rc": 0,
+       "reason": "  self_approval: NONE",
+       "resolve": {
+        "checked": 5,
+        "resolved": 3,
+        "skipped_other_selector": 0,
+        "unresolved": [
+         "kai-pm/DOC.md SELF_ASSERTS_AUTHORITY L3 'This document is the single source of truth.'",
+         "kai-pm/LONECR.md SELF_ASSERTS_CURRENT L4 'This document is in force.'"
+        ]
+       },
+       "tag": null,
+       "tree_clean_after": false
+      },
+      "PROBE": {
+       "artefact": true,
+       "consumed_eq_blob": {
+        "kai-pm/CRLF.md": false,
+        "kai-pm/DOC.md": true,
+        "kai-pm/LONECR.md": false
+       },
+       "facts": {
+        "kai-pm/CRLF.md": [
+         "SELF_ASSERTS_CURRENT"
+        ],
+        "kai-pm/DOC.md": [
+         "NOMINAL_FUNCTION",
+         "SELF_ASSERTS_CURRENT",
+         "STATIC_REFERENCE_AT_SUBJECT"
+        ],
+        "kai-pm/LONECR.md": [
+         "SELF_ASSERTS_CURRENT"
+        ]
+       },
+       "foreign_in_artefact": [],
+       "rc": 0,
+       "reason": "",
+       "resolve": {
+        "checked": 5,
+        "resolved": 4,
+        "skipped_other_selector": 0,
+        "unresolved": [
+         "kai-pm/LONECR.md SELF_ASSERTS_CURRENT L4 'This document is in force.'"
+        ]
+       },
+       "subject_opens": [
+        {
+         "caller": "run_h2_v12.py:main:707",
+         "path": "kai-pm/CRLF.md",
+         "via": null
+        },
+        {
+         "caller": "run_h2_v12.py:main:707",
+         "path": "kai-pm/DOC.md",
+         "via": null
+        },
+        {
+         "caller": "run_h2_v12.py:_reader_trace:159",
+         "path": "tools/rd.py",
+         "via": null
+        },
+        {
+         "caller": "run_h2_v12.py:main:707",
+         "path": "kai-pm/LONECR.md",
+         "via": null
+        }
+       ],
+       "tag": null,
+       "tree_clean_after": true
+      },
+      "T0_HARNESS_NONE": {
+       "artefact": true,
+       "facts": {
+        "kai-pm/CRLF.md": [
+         "SELF_ASSERTS_CURRENT"
+        ],
+        "kai-pm/DOC.md": [
+         "NOMINAL_FUNCTION",
+         "SELF_ASSERTS_CURRENT",
+         "STATIC_REFERENCE_AT_SUBJECT"
+        ],
+        "kai-pm/LONECR.md": [
+         "SELF_ASSERTS_CURRENT"
+        ]
+       },
+       "foreign_in_artefact": [],
+       "rc": 0,
+       "reason": "",
+       "resolve": {
+        "checked": 5,
+        "resolved": 4,
+        "skipped_other_selector": 0,
+        "unresolved": [
+         "kai-pm/LONECR.md SELF_ASSERTS_CURRENT L4 'This document is in force.'"
+        ]
+       },
+       "tag": null,
+       "tree_clean_after": true
+      },
+      "T1_POST_GATE_DOC": {
+       "artefact": true,
+       "facts": {
+        "kai-pm/CRLF.md": [
+         "SELF_ASSERTS_CURRENT"
+        ],
+        "kai-pm/DOC.md": [
+         "NOMINAL_FUNCTION",
+         "SELF_ASSERTS_AUTHORITY",
+         "SELF_ASSERTS_CURRENT",
+         "STATIC_REFERENCE_AT_SUBJECT"
+        ],
+        "kai-pm/LONECR.md": [
+         "SELF_ASSERTS_CURRENT"
+        ]
+       },
+       "foreign_in_artefact": [
+        "single source of truth"
+       ],
+       "rc": 0,
+       "reason": "",
+       "resolve": {
+        "checked": 6,
+        "resolved": 4,
+        "skipped_other_selector": 0,
+        "unresolved": [
+         "kai-pm/DOC.md SELF_ASSERTS_AUTHORITY L5 'This document is the single source of truth.'",
+         "kai-pm/LONECR.md SELF_ASSERTS_CURRENT L4 'This document is in force.'"
+        ]
+       },
+       "tag": null,
+       "tree_clean_after": false
+      },
+      "T2_CHANGE_RESTORE": {
+       "artefact": true,
+       "facts": {
+        "kai-pm/CRLF.md": [
+         "SELF_ASSERTS_CURRENT"
+        ],
+        "kai-pm/DOC.md": [
+         "NOMINAL_FUNCTION",
+         "SELF_ASSERTS_AUTHORITY",
+         "SELF_ASSERTS_CURRENT",
+         "STATIC_REFERENCE_AT_SUBJECT"
+        ],
+        "kai-pm/LONECR.md": [
+         "SELF_ASSERTS_CURRENT"
+        ]
+       },
+       "foreign_in_artefact": [
+        "single source of truth"
+       ],
+       "rc": 0,
+       "reason": "",
+       "resolve": {
+        "checked": 6,
+        "resolved": 4,
+        "skipped_other_selector": 0,
+        "unresolved": [
+         "kai-pm/DOC.md SELF_ASSERTS_AUTHORITY L5 'This document is the single source of truth.'",
+         "kai-pm/LONECR.md SELF_ASSERTS_CURRENT L4 'This document is in force.'"
+        ]
+       },
+       "tag": null,
+       "tree_clean_after": true
+      },
+      "T3_POST_GATE_READER": {
+       "artefact": true,
+       "facts": {
+        "kai-pm/CRLF.md": [
+         "SELF_ASSERTS_CURRENT"
+        ],
+        "kai-pm/DOC.md": [
+         "NOMINAL_FUNCTION",
+         "SELF_ASSERTS_CURRENT",
+         "STATIC_REFERENCE_AT_SUBJECT"
+        ],
+        "kai-pm/LONECR.md": [
+         "SELF_ASSERTS_CURRENT"
+        ]
+       },
+       "foreign_in_artefact": [
+        "FOREIGN"
+       ],
+       "rc": 0,
+       "reason": "",
+       "resolve": {
+        "checked": 5,
+        "resolved": 3,
+        "skipped_other_selector": 0,
+        "unresolved": [
+         "kai-pm/DOC.md STATIC_REFERENCE_AT_SUBJECT opscan:tools/rd.py:L2 'data = open(DOC).read()  # FOREIGN'",
+         "kai-pm/LONECR.md SELF_ASSERTS_CURRENT L4 'This document is in force.'"
+        ]
+       },
+       "tag": null,
+       "tree_clean_after": false
+      },
+      "T4_VANISH": {
+       "artefact": false,
+       "rc": 1,
+       "reason": "UNCAUGHT FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/twofact/sb01_work/OLD/T4_VANISH/subj/kai-pm/DOC.md'",
+       "tag": null,
+       "tree_clean_after": false
+      }
+     }
+    }
+    END-VERBATIM SB01-E2E-SUMMARY
+- EVIDENCE SB01-VERDICT-OUTPUT sb01_verdict_out.txt: 285 bytes, sha256 a2470bb70bbd8174ccb08de4b1005d920680ddcd6c54a88eb57ecdde9a3eb0f3, final LF True  [CMD `sha256sum sb01_verdict_out.txt` → a2470bb70bbd8174…]
+    BEGIN-VERBATIM SB01-VERDICT-OUTPUT
+    NEW: 13/13 as declared
+    OLD: 13/13 as declared
+    fail-old cases (OLD rc0 with foreign bytes, or untranslated-newline unresolved): ['C0_CLEAN', 'C1_DIRTY_DOC', 'C1b_STAGED_DOC', 'C2_DIRTY_READER', 'C6_SYMLINK_SWAP', 'PROBE', 'T1_POST_GATE_DOC', 'T2_CHANGE_RESTORE', 'T3_POST_GATE_READER']
+    END-VERBATIM SB01-VERDICT-OUTPUT
+- EVIDENCE SB01-READPATHS-OUTPUT sb01_readpaths_out.txt: 3931 bytes, sha256 9ffc81b797707753114e59e8fac862ad06653beb6fe569e5bfcb90828b4de94e, final LF True  [CMD `sha256sum sb01_readpaths_out.txt` → 9ffc81b797707753…]
+    BEGIN-VERBATIM SB01-READPATHS-OUTPUT
+    OLD: calls in module 270; I/O-capable 15; reaching subject repo 9
+      L159  _reader_trace                read_text                  RAW_SUBJECT_READ           (pathlib.Path(subject_repo) / o['src']).read_text(errors='ignore')
+      L534  evidence_facts               _reader_trace              DELEGATES(body scanned on its own lines) _reader_trace(row, subject_repo)
+      L646  _classification_provenance   git                        GIT_OBJECT                 passa.git(sr, 'rev-parse', 'HEAD')
+      L647  _classification_provenance   git                        GIT_OBJECT                 passa.git(sr, 'rev-parse', f'{commit}^{{tree}}')
+      L648  _classification_provenance   derive_tree_paths          GIT_OBJECT                 SI.derive_tree_paths(sr, tree)
+      L697  main                         git                        GIT_OBJECT                 passa.git(sr, 'rev-parse', 'HEAD')
+      L701  main                         _classification_provenance WRAPPER(git: see its body) _classification_provenance(desc, observed_runtime, sr, pa_bytes, pprov)
+      L707  main                         read_text                  RAW_SUBJECT_READ           (sr / row['path']).read_text(errors='ignore')
+      L722  main                         evidence_facts             DELEGATES(body scanned on its own lines) evidence_facts(row, claims, contradiction, det, pa['subject'], sr, text=text, function_cel
+      by kind: {'RAW_SUBJECT_READ': 2, 'DELEGATES(body scanned on its own lines)': 2, 'GIT_OBJECT': 4, 'WRAPPER(git: see its body)': 1}
+      I/O sites NOT reaching subject repo: ['_read_regular_once@_consume_pass_a', '_read_regular_once@_load_stage_a', 'check_population@_classification_provenance', 'consume_bound_artifact@_consume_pass_a', 'is_file@_consume_pass_a', 'write_text@main']
+    rc=1
+    NEW: calls in module 275; I/O-capable 18; reaching subject repo 12
+      L139  _read_bound                  read_source                VERIFIED(passa)            read_source(subject_repo, rel)
+      L193  _reader_trace                _read_bound                DELEGATES(body scanned on its own lines) _read_bound(read_source, subject_repo, o['src'])
+      L569  evidence_facts               _reader_trace              DELEGATES(body scanned on its own lines) _reader_trace(row, subject_repo, read_source)
+      L681  _classification_provenance   git                        GIT_OBJECT                 passa.git(sr, 'rev-parse', 'HEAD')
+      L682  _classification_provenance   git                        GIT_OBJECT                 passa.git(sr, 'rev-parse', f'{commit}^{{tree}}')
+      L683  _classification_provenance   derive_tree_paths          GIT_OBJECT                 SI.derive_tree_paths(sr, tree)
+      L732  main                         git                        GIT_OBJECT                 passa.git(sr, 'rev-parse', 'HEAD')
+      L741  main                         _source_binding_gate       VERIFIED(passa)            passa._source_binding_gate(sr, pa['subject'])
+      L742  main                         make_verified_reader       VERIFIED(passa)            passa.make_verified_reader(sr, pa['subject'])
+      L743  main                         _classification_provenance WRAPPER(git: see its body) _classification_provenance(desc, observed_runtime, sr, pa_bytes, pprov)
+      L749  main                         _read_bound                DELEGATES(body scanned on its own lines) _read_bound(read_source, sr, row['path'])
+      L764  main                         evidence_facts             DELEGATES(body scanned on its own lines) evidence_facts(row, claims, contradiction, det, pa['subject'], sr, text=text, function_cel
+      by kind: {'VERIFIED(passa)': 3, 'DELEGATES(body scanned on its own lines)': 4, 'GIT_OBJECT': 4, 'WRAPPER(git: see its body)': 1}
+      I/O sites NOT reaching subject repo: ['_read_regular_once@_consume_pass_a', '_read_regular_once@_load_stage_a', 'check_population@_classification_provenance', 'consume_bound_artifact@_consume_pass_a', 'is_file@_consume_pass_a', 'write_text@main']
+    rc=0
+    END-VERBATIM SB01-READPATHS-OUTPUT
+- EVIDENCE LOC-E2E-V5-OUTPUT loc_e2e_v5_out.txt: 19508 bytes, sha256 694ff144a92c443956d5d98806f9faa43f70fc2dd153a569456405ae5ea93c43, final LF True  [CMD `sha256sum loc_e2e_v5_out.txt` → 694ff144a92c4439…]
+    BEGIN-VERBATIM LOC-E2E-V5-OUTPUT
+    
+    == V4 inst4 ==
+    --- stage A rc=0
+    --- end stage A (0 bytes)
+    --- passa rc=0
+    PASS A v1.2 COMPLETE — 3 rows == population 3
+      WITNESS KINDS DISCRIMINATED (D2/D4), not assumed from shape:
+      scope determined: WHOLE_FILE 0 · SPAN 0
+      binding predicates declared closed-world: 26
+      contextual predicates declared closed-world: 1 (status)
+      NO VERDICT ASSIGNED IN PASS A.
+    --- end passa (292 bytes)
+    --- bind A rc=0
+    1d4488cda45f0d8e5ab60d7e50c5b4f7f9e38922286aefd70b5c63e92c145e2f
+    --- end bind A (65 bytes)
+    --- run_h2_v12 rc=0
+    HOUSE_H2 v1.2 — 3 rows == population 3
+      subject 080780d8c50c tree afaf83ed53e3
+    
+      LIFECYCLE    positives    0  UNKNOWN    3   
+      FUNCTION     positives    0  UNKNOWN    3   
+      AUTHORITY    positives    0  UNKNOWN    3   
+      GENERATION   positives    0  UNKNOWN    3   
+      VALIDITY     positives    0  UNKNOWN    3   
+      SCOPE        positives    0  UNKNOWN    3   
+    
+      evidence facts (NOT verdicts):
+        SELF_ASSERTS_CURRENT            2
+        NOMINAL_FUNCTION                2
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 2
+        {'PLAN from self-description': 2}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end run_h2_v12 (689 bytes)
+    --- bind C rc=0
+    81d64313435dd7074bd640c2e8c1853c79144764b5b389508447e5d5aa22b0fd
+    --- end bind C (65 bytes)
+    --- qualify rc=0
+    HOUSE_H2 v1.2 — QUALIFICATION
+      subject 080780d8c50c  tree afaf83ed53e3
+      history 2026-10-03 → 2026-10-03  shallow=false  ancestry=1
+      census  29064d650a612968…
+    
+      [1] GOVERNING INVARIANT — checked from the AXIS SET
+          UNKNOWN first-class on every axis: True
+      [1b] REMOVAL CALIBRATION — the gate proves it can fail, this run
+           remove UNKNOWN from LIFECYCLE   detected=True
+           remove UNKNOWN from FUNCTION    detected=True
+           remove UNKNOWN from AUTHORITY   detected=True
+           remove UNKNOWN from GENERATION  detected=True
+           remove UNKNOWN from VALIDITY    detected=True
+           remove UNKNOWN from SCOPE       detected=True
+    
+      [2] STATE DISPOSITIONS — checked from the ALPHABET
+          [LIFECYCLE]
+            ACTIVE            H2_NOT_EARNABLE        0  
+            HISTORICAL        H2_EMITTABLE           0  not observed on this subject
+            SUPERSEDED        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           3  
+          [FUNCTION]
+            GOVERNANCE        H2_EMITTABLE           0  not observed on this subject
+            STATUS            H2_EMITTABLE           0  not observed on this subject
+            PLAN              H2_EMITTABLE           0  not observed on this subject
+            EVIDENCE          H2_EMITTABLE           0  not observed on this subject
+            REFERENCE         H2_EMITTABLE           0  not observed on this subject
+            RUNTIME_INPUT     H2_EMITTABLE           0  not observed on this subject
+            TEMPLATE          H2_EMITTABLE           0  not observed on this subject
+            MARKER            H2_EMITTABLE           0  not observed on this subject
+            USER_GUIDE        H2_EMITTABLE           0  not observed on this subject
+            OTHER             H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           3  
+          [AUTHORITY]
+            AUTHORITATIVE     DEFERRED_TO_H3         0  
+            VERIFIED_DERIVED  DEFERRED_TO_H3         0  
+            ADVISORY          DEFERRED_TO_H3         0  
+            NON_AUTHORITY     DEFERRED_TO_H3         0  
+            UNKNOWN           H2_EMITTABLE           3  
+          [GENERATION]
+            MANUAL            H2_NOT_EARNABLE        0  
+            PARTIAL_DERIVED   H2_NOT_EARNABLE        0  
+            FULL_DERIVED      H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           3  
+          [VALIDITY]
+            CURRENT_TREE      H2_EMITTABLE           0  not observed on this subject
+            EXACT_SNAPSHOT    H2_EMITTABLE           0  not observed on this subject
+            RUN_ARTEFACT      H2_EMITTABLE           0  not observed on this subject
+            TIME_BOUND        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           3  
+          [SCOPE]
+            WHOLE_FILE        H2_EMITTABLE           0  not observed on this subject
+            HEADING           H2_NOT_EARNABLE        0  
+            TABLE             H2_NOT_EARNABLE        0  
+            MANAGED_REGION    H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           3  
+    
+      [3] OUTPUT-DERIVED — values emitted but unknown to the ontology: 0
+    
+      [4] population declared 3 == rows 3: True
+      [5] every non-abstention cell carries a source-bound witness: True  (0 missing)
+    
+      [6] §8(6) CLOSED ORIGIN CLASSIFICATION — every loaded origin
+          observed 87   classified 87   refused 0
+          H2                 3
+          CENSUS             0
+          GOVERNED_STDLIB    48
+          BUILTIN_OR_FROZEN  36
+    
+      [7] Q1a RECORDED PRODUCER PROVENANCE vs STAGE A
+          verified against stage_a_identity 64a1ec5eaafa6984…, every slot closed
+    
+      [8] Q1b / E1 — DERIVED denominators (D379 §8)
+          axis-cell denominator              0
+          positive-evidence-fact denominator 4
+          sum                                4
+    
+      UTILITY PROFILE — reported, never optimised (D367 11)
+          axis         positive  UNKNOWN  UNMEASURED
+          LIFECYCLE           0        3           0
+          FUNCTION            0        3           0
+          AUTHORITY           0        3           0
+          GENERATION          0        3           0
+          VALIDITY            0        3           0
+          SCOPE               0        3           0
+          Qualification asks: is the instrument TRUTHFUL?
+          A separate later decision asks: is it USEFUL enough for H3?
+    
+      FINDINGS: 0
+    --- end qualify (4364 bytes)
+    
+    == V5 inst5 ==
+    --- stage A rc=0
+    --- end stage A (0 bytes)
+    --- passa rc=0
+    PASS A v1.2 COMPLETE — 3 rows == population 3
+      WITNESS KINDS DISCRIMINATED (D2/D4), not assumed from shape:
+      scope determined: WHOLE_FILE 0 · SPAN 0
+      binding predicates declared closed-world: 26
+      contextual predicates declared closed-world: 1 (status)
+      NO VERDICT ASSIGNED IN PASS A.
+    --- end passa (292 bytes)
+    --- bind A rc=0
+    a40a0118245e282031e04aa90055a351df4528c505694810cf1931e7b86bc967
+    --- end bind A (65 bytes)
+    --- run_h2_v12 rc=0
+    HOUSE_H2 v1.2 — 3 rows == population 3
+      subject 65dda40815d8 tree afaf83ed53e3
+    
+      LIFECYCLE    positives    0  UNKNOWN    3   
+      FUNCTION     positives    0  UNKNOWN    3   
+      AUTHORITY    positives    0  UNKNOWN    3   
+      GENERATION   positives    0  UNKNOWN    3   
+      VALIDITY     positives    0  UNKNOWN    3   
+      SCOPE        positives    0  UNKNOWN    3   
+    
+      evidence facts (NOT verdicts):
+        SELF_ASSERTS_CURRENT            2
+        NOMINAL_FUNCTION                2
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 2
+        {'PLAN from self-description': 2}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end run_h2_v12 (689 bytes)
+    --- bind C rc=0
+    cd4ed37a1d23199be717d1e651531d55e72923b94d09e03b8d539beeb19223d4
+    --- end bind C (65 bytes)
+    --- qualify rc=0
+    HOUSE_H2 v1.2 — QUALIFICATION
+      subject 65dda40815d8  tree afaf83ed53e3
+      history 2026-10-03 → 2026-10-03  shallow=false  ancestry=1
+      census  29064d650a612968…
+    
+      [1] GOVERNING INVARIANT — checked from the AXIS SET
+          UNKNOWN first-class on every axis: True
+      [1b] REMOVAL CALIBRATION — the gate proves it can fail, this run
+           remove UNKNOWN from LIFECYCLE   detected=True
+           remove UNKNOWN from FUNCTION    detected=True
+           remove UNKNOWN from AUTHORITY   detected=True
+           remove UNKNOWN from GENERATION  detected=True
+           remove UNKNOWN from VALIDITY    detected=True
+           remove UNKNOWN from SCOPE       detected=True
+    
+      [2] STATE DISPOSITIONS — checked from the ALPHABET
+          [LIFECYCLE]
+            ACTIVE            H2_NOT_EARNABLE        0  
+            HISTORICAL        H2_EMITTABLE           0  not observed on this subject
+            SUPERSEDED        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           3  
+          [FUNCTION]
+            GOVERNANCE        H2_EMITTABLE           0  not observed on this subject
+            STATUS            H2_EMITTABLE           0  not observed on this subject
+            PLAN              H2_EMITTABLE           0  not observed on this subject
+            EVIDENCE          H2_EMITTABLE           0  not observed on this subject
+            REFERENCE         H2_EMITTABLE           0  not observed on this subject
+            RUNTIME_INPUT     H2_EMITTABLE           0  not observed on this subject
+            TEMPLATE          H2_EMITTABLE           0  not observed on this subject
+            MARKER            H2_EMITTABLE           0  not observed on this subject
+            USER_GUIDE        H2_EMITTABLE           0  not observed on this subject
+            OTHER             H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           3  
+          [AUTHORITY]
+            AUTHORITATIVE     DEFERRED_TO_H3         0  
+            VERIFIED_DERIVED  DEFERRED_TO_H3         0  
+            ADVISORY          DEFERRED_TO_H3         0  
+            NON_AUTHORITY     DEFERRED_TO_H3         0  
+            UNKNOWN           H2_EMITTABLE           3  
+          [GENERATION]
+            MANUAL            H2_NOT_EARNABLE        0  
+            PARTIAL_DERIVED   H2_NOT_EARNABLE        0  
+            FULL_DERIVED      H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           3  
+          [VALIDITY]
+            CURRENT_TREE      H2_EMITTABLE           0  not observed on this subject
+            EXACT_SNAPSHOT    H2_EMITTABLE           0  not observed on this subject
+            RUN_ARTEFACT      H2_EMITTABLE           0  not observed on this subject
+            TIME_BOUND        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           3  
+          [SCOPE]
+            WHOLE_FILE        H2_EMITTABLE           0  not observed on this subject
+            HEADING           H2_NOT_EARNABLE        0  
+            TABLE             H2_NOT_EARNABLE        0  
+            MANAGED_REGION    H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           3  
+    
+      [3] OUTPUT-DERIVED — values emitted but unknown to the ontology: 0
+    
+      [4] population declared 3 == rows 3: True
+      [5] every non-abstention cell carries a source-bound witness: True  (0 missing)
+    
+      [6] §8(6) CLOSED ORIGIN CLASSIFICATION — every loaded origin
+          observed 87   classified 87   refused 0
+          H2                 3
+          CENSUS             0
+          GOVERNED_STDLIB    48
+          BUILTIN_OR_FROZEN  36
+    
+      [7] Q1a RECORDED PRODUCER PROVENANCE vs STAGE A
+          verified against stage_a_identity 4cc80cf6f282a169…, every slot closed
+    
+      [8] Q1b / E1 — DERIVED denominators (D379 §8)
+          axis-cell denominator              0
+          positive-evidence-fact denominator 4
+          sum                                4
+    
+      UTILITY PROFILE — reported, never optimised (D367 11)
+          axis         positive  UNKNOWN  UNMEASURED
+          LIFECYCLE           0        3           0
+          FUNCTION            0        3           0
+          AUTHORITY           0        3           0
+          GENERATION          0        3           0
+          VALIDITY            0        3           0
+          SCOPE               0        3           0
+          Qualification asks: is the instrument TRUTHFUL?
+          A separate later decision asks: is it USEFUL enough for H3?
+    
+      FINDINGS: 0
+    --- end qualify (4364 bytes)
+    
+    == SUMMARY ==
+    {
+     "V4 inst4": {
+      "axes": {
+       "kai-pm/CR_SAC.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "UNKNOWN",
+        "VALIDITY": "UNKNOWN"
+       },
+       "kai-pm/LS_HEAD.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "UNKNOWN",
+        "VALIDITY": "UNKNOWN"
+       },
+       "kai-pm/NEL_PURPOSE.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "UNKNOWN",
+        "VALIDITY": "UNKNOWN"
+       }
+      },
+      "facts": {
+       "kai-pm/CR_SAC.md": {
+        "NOMINAL_FUNCTION": false,
+        "SELF_ASSERTS_CURRENT": true
+       },
+       "kai-pm/LS_HEAD.md": {
+        "NOMINAL_FUNCTION": true,
+        "SELF_ASSERTS_CURRENT": true
+       },
+       "kai-pm/NEL_PURPOSE.md": {
+        "NOMINAL_FUNCTION": true,
+        "SELF_ASSERTS_CURRENT": false
+       }
+      },
+      "findings": [],
+      "key_counts": [
+       10
+      ],
+      "other8": {
+       "kai-pm/CR_SAC.md": {
+        "BINDING_CONTRADICTION": false,
+        "CARRIES_DATE_STAMP": false,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       },
+       "kai-pm/LS_HEAD.md": {
+        "BINDING_CONTRADICTION": false,
+        "CARRIES_DATE_STAMP": false,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       },
+       "kai-pm/NEL_PURPOSE.md": {
+        "BINDING_CONTRADICTION": false,
+        "CARRIES_DATE_STAMP": false,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       }
+      },
+      "qualify_rc": 0,
+      "run_h2_rc": 0,
+      "traces": {
+       "kai-pm/CR_SAC.md": {
+        "SELF_ASSERTS_CURRENT": {
+         "applicability_scope": "SPAN",
+         "certainty": "OBSERVED",
+         "evidence_shown": 1,
+         "evidence_total": 1,
+         "local_context": "This document is in force.",
+         "polarity": "POSITIVE",
+         "source_path": "kai-pm/CR_SAC.md",
+         "source_selector": "L4",
+         "subject": "SELF",
+         "temporal": "AT_COMMIT",
+         "truncated": false,
+         "witness_type": "SELF_CURRENTNESS_CLAIM",
+         "witness_value": "in force"
+        }
+       },
+       "kai-pm/LS_HEAD.md": {
+        "NOMINAL_FUNCTION": {
+         "applicability_scope": "SPAN",
+         "certainty": "OBSERVED",
+         "evidence_shown": 1,
+         "evidence_total": 2,
+         "local_context": "intro\u2028# Project Plan",
+         "polarity": "POSITIVE",
+         "source_path": "kai-pm/LS_HEAD.md",
+         "source_selector": "L1",
+         "subject": "SELF",
+         "temporal": "AT_COMMIT",
+         "truncated": true,
+         "witness_type": "NOMINAL_FUNCTION_TERM",
+         "witness_value": "Plan"
+        },
+        "SELF_ASSERTS_CURRENT": {
+         "applicability_scope": "SPAN",
+         "certainty": "OBSERVED",
+         "evidence_shown": 1,
+         "evidence_total": 1,
+         "local_context": "This document is the current plan.",
+         "polarity": "POSITIVE",
+         "source_path": "kai-pm/LS_HEAD.md",
+         "source_selector": "L3",
+         "subject": "SELF",
+         "temporal": "AT_COMMIT",
+         "truncated": false,
+         "witness_type": "SELF_CURRENTNESS_CLAIM",
+         "witness_value": "is the current"
+        }
+       },
+       "kai-pm/NEL_PURPOSE.md": {
+        "NOMINAL_FUNCTION": {
+         "applicability_scope": "SPAN",
+         "certainty": "OBSERVED",
+         "evidence_shown": 1,
+         "evidence_total": 1,
+         "local_context": "This document defines the deployment roadmap\u0085for the quarter.",
+         "polarity": "POSITIVE",
+         "source_path": "kai-pm/NEL_PURPOSE.md",
+         "source_selector": "L3",
+         "subject": "SELF",
+         "temporal": "AT_COMMIT",
+         "truncated": false,
+         "witness_type": "NOMINAL_FUNCTION_TERM",
+         "witness_value": "roadmap"
+        }
+       }
+      }
+     },
+     "V5 inst5": {
+      "axes": {
+       "kai-pm/CR_SAC.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "UNKNOWN",
+        "VALIDITY": "UNKNOWN"
+       },
+       "kai-pm/LS_HEAD.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "UNKNOWN",
+        "VALIDITY": "UNKNOWN"
+       },
+       "kai-pm/NEL_PURPOSE.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "UNKNOWN",
+        "VALIDITY": "UNKNOWN"
+       }
+      },
+      "facts": {
+       "kai-pm/CR_SAC.md": {
+        "NOMINAL_FUNCTION": false,
+        "SELF_ASSERTS_CURRENT": true
+       },
+       "kai-pm/LS_HEAD.md": {
+        "NOMINAL_FUNCTION": true,
+        "SELF_ASSERTS_CURRENT": true
+       },
+       "kai-pm/NEL_PURPOSE.md": {
+        "NOMINAL_FUNCTION": true,
+        "SELF_ASSERTS_CURRENT": false
+       }
+      },
+      "findings": [],
+      "key_counts": [
+       10
+      ],
+      "other8": {
+       "kai-pm/CR_SAC.md": {
+        "BINDING_CONTRADICTION": false,
+        "CARRIES_DATE_STAMP": false,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       },
+       "kai-pm/LS_HEAD.md": {
+        "BINDING_CONTRADICTION": false,
+        "CARRIES_DATE_STAMP": false,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       },
+       "kai-pm/NEL_PURPOSE.md": {
+        "BINDING_CONTRADICTION": false,
+        "CARRIES_DATE_STAMP": false,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       }
+      },
+      "qualify_rc": 0,
+      "run_h2_rc": 0,
+      "traces": {
+       "kai-pm/CR_SAC.md": {
+        "SELF_ASSERTS_CURRENT": {
+         "applicability_scope": "SPAN",
+         "certainty": "OBSERVED",
+         "evidence_shown": 1,
+         "evidence_total": 1,
+         "local_context": "lead\rThis document is in force.",
+         "polarity": "POSITIVE",
+         "source_path": "kai-pm/CR_SAC.md",
+         "source_selector": "L3",
+         "subject": "SELF",
+         "temporal": "AT_COMMIT",
+         "truncated": false,
+         "witness_type": "SELF_CURRENTNESS_CLAIM",
+         "witness_value": "in force"
+        }
+       },
+       "kai-pm/LS_HEAD.md": {
+        "NOMINAL_FUNCTION": {
+         "applicability_scope": "SPAN",
+         "certainty": "OBSERVED",
+         "evidence_shown": 1,
+         "evidence_total": 2,
+         "local_context": "intro\u2028# Project Plan",
+         "polarity": "POSITIVE",
+         "source_path": "kai-pm/LS_HEAD.md",
+         "source_selector": "L1",
+         "subject": "SELF",
+         "temporal": "AT_COMMIT",
+         "truncated": true,
+         "witness_type": "NOMINAL_FUNCTION_TERM",
+         "witness_value": "Plan"
+        },
+        "SELF_ASSERTS_CURRENT": {
+         "applicability_scope": "SPAN",
+         "certainty": "OBSERVED",
+         "evidence_shown": 1,
+         "evidence_total": 1,
+         "local_context": "This document is the current plan.",
+         "polarity": "POSITIVE",
+         "source_path": "kai-pm/LS_HEAD.md",
+         "source_selector": "L3",
+         "subject": "SELF",
+         "temporal": "AT_COMMIT",
+         "truncated": false,
+         "witness_type": "SELF_CURRENTNESS_CLAIM",
+         "witness_value": "is the current"
+        }
+       },
+       "kai-pm/NEL_PURPOSE.md": {
+        "NOMINAL_FUNCTION": {
+         "applicability_scope": "SPAN",
+         "certainty": "OBSERVED",
+         "evidence_shown": 1,
+         "evidence_total": 1,
+         "local_context": "This document defines the deployment roadmap\u0085for the quarter.",
+         "polarity": "POSITIVE",
+         "source_path": "kai-pm/NEL_PURPOSE.md",
+         "source_selector": "L3",
+         "subject": "SELF",
+         "temporal": "AT_COMMIT",
+         "truncated": false,
+         "witness_type": "NOMINAL_FUNCTION_TERM",
+         "witness_value": "roadmap"
+        }
+       }
+      }
+     }
+    }
+    V4 == V5 (all recorded fields): False
+    END-VERBATIM LOC-E2E-V5-OUTPUT
+- EVIDENCE CHAIN-E2E-V5-OUTPUT chain_e2e_v5_out.txt: 19394 bytes, sha256 8d1b1eda8bb5d6a5407b1e5b5925808a939034ea1d750cec67028fcb079c3ee9, final LF True  [CMD `sha256sum chain_e2e_v5_out.txt` → 8d1b1eda8bb5d6a5…]
+    BEGIN-VERBATIM CHAIN-E2E-V5-OUTPUT
+    
+    == OLD dbe692d ==
+    --- stage A rc=0
+    --- end stage A (0 bytes)
+    --- passa rc=0
+    PASS A v1.2 COMPLETE — 4 rows == population 4
+      WITNESS KINDS DISCRIMINATED (D2/D4), not assumed from shape:
+        DATE                          1
+      scope determined: WHOLE_FILE 1 · SPAN 0
+      binding predicates declared closed-world: 26
+      contextual predicates declared closed-world: 1 (status)
+      NO VERDICT ASSIGNED IN PASS A.
+    --- end passa (328 bytes)
+    --- bind A rc=0
+    53f18052dc852cc52501cc1de4a54ac25ccb2318ad37a28c8837a90e53f713fd
+    --- end bind A (65 bytes)
+    --- run_h2_v12 rc=0
+    HOUSE_H2 v1.2 — 4 rows == population 4
+      subject 87a339cf8ba6 tree d5b89bef71c9
+    
+      LIFECYCLE    positives    0  UNKNOWN    4   
+      FUNCTION     positives    0  UNKNOWN    4   
+      AUTHORITY    positives    0  UNKNOWN    4   
+      GENERATION   positives    0  UNKNOWN    4   
+      VALIDITY     positives    0  UNKNOWN    4   
+      SCOPE        positives    1  UNKNOWN    3   {'WHOLE_FILE': 1}
+    
+      evidence facts (NOT verdicts):
+        CARRIES_DATE_STAMP              1
+        BINDING_CONTRADICTION           1
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 2
+        {'PLAN from self-description': 2}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end run_h2_v12 (706 bytes)
+    --- bind C rc=0
+    4c240895724007c2a45cf45cdcb25cd6af20c9e83be9aa6b09aae882ef9f9de6
+    --- end bind C (65 bytes)
+    --- qualify rc=1
+    HOUSE_H2 v1.2 — QUALIFICATION
+      subject 87a339cf8ba6  tree d5b89bef71c9
+      history 2026-10-03 → 2026-10-03  shallow=false  ancestry=1
+      census  29064d650a612968…
+    
+      [1] GOVERNING INVARIANT — checked from the AXIS SET
+          UNKNOWN first-class on every axis: True
+      [1b] REMOVAL CALIBRATION — the gate proves it can fail, this run
+           remove UNKNOWN from LIFECYCLE   detected=True
+           remove UNKNOWN from FUNCTION    detected=True
+           remove UNKNOWN from AUTHORITY   detected=True
+           remove UNKNOWN from GENERATION  detected=True
+           remove UNKNOWN from VALIDITY    detected=True
+           remove UNKNOWN from SCOPE       detected=True
+    
+      [2] STATE DISPOSITIONS — checked from the ALPHABET
+          [LIFECYCLE]
+            ACTIVE            H2_NOT_EARNABLE        0  
+            HISTORICAL        H2_EMITTABLE           0  not observed on this subject
+            SUPERSEDED        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           4  
+          [FUNCTION]
+            GOVERNANCE        H2_EMITTABLE           0  not observed on this subject
+            STATUS            H2_EMITTABLE           0  not observed on this subject
+            PLAN              H2_EMITTABLE           0  not observed on this subject
+            EVIDENCE          H2_EMITTABLE           0  not observed on this subject
+            REFERENCE         H2_EMITTABLE           0  not observed on this subject
+            RUNTIME_INPUT     H2_EMITTABLE           0  not observed on this subject
+            TEMPLATE          H2_EMITTABLE           0  not observed on this subject
+            MARKER            H2_EMITTABLE           0  not observed on this subject
+            USER_GUIDE        H2_EMITTABLE           0  not observed on this subject
+            OTHER             H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           4  
+          [AUTHORITY]
+            AUTHORITATIVE     DEFERRED_TO_H3         0  
+            VERIFIED_DERIVED  DEFERRED_TO_H3         0  
+            ADVISORY          DEFERRED_TO_H3         0  
+            NON_AUTHORITY     DEFERRED_TO_H3         0  
+            UNKNOWN           H2_EMITTABLE           4  
+          [GENERATION]
+            MANUAL            H2_NOT_EARNABLE        0  
+            PARTIAL_DERIVED   H2_NOT_EARNABLE        0  
+            FULL_DERIVED      H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           4  
+          [VALIDITY]
+            CURRENT_TREE      H2_EMITTABLE           0  not observed on this subject
+            EXACT_SNAPSHOT    H2_EMITTABLE           0  not observed on this subject
+            RUN_ARTEFACT      H2_EMITTABLE           0  not observed on this subject
+            TIME_BOUND        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           4  
+          [SCOPE]
+            WHOLE_FILE        H2_EMITTABLE           1  
+            HEADING           H2_NOT_EARNABLE        0  
+            TABLE             H2_NOT_EARNABLE        0  
+            MANAGED_REGION    H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           3  
+    
+      [3] OUTPUT-DERIVED — values emitted but unknown to the ontology: 0
+    
+      [4] population declared 4 == rows 4: True
+      [5] every non-abstention cell carries a source-bound witness: True  (0 missing)
+    
+      [6] §8(6) CLOSED ORIGIN CLASSIFICATION — every loaded origin
+          observed 87   classified 87   refused 0
+          H2                 3
+          CENSUS             0
+          GOVERNED_STDLIB    48
+          BUILTIN_OR_FROZEN  36
+    
+      [7] Q1a RECORDED PRODUCER PROVENANCE vs STAGE A
+          verified against stage_a_identity 03ea862366f0876d…, every slot closed
+    
+      [8] Q1b / E1 — DERIVED denominators (D379 §8)
+          axis-cell denominator              1
+          positive-evidence-fact denominator 2
+          sum                                3
+    
+      UTILITY PROFILE — reported, never optimised (D367 11)
+          axis         positive  UNKNOWN  UNMEASURED
+          LIFECYCLE           0        4           0
+          FUNCTION            0        4           0
+          AUTHORITY           0        4           0
+          GENERATION          0        4           0
+          VALIDITY            0        4           0
+          SCOPE               1        3           0
+          Qualification asks: is the instrument TRUTHFUL?
+          A separate later decision asks: is it USEFUL enough for H3?
+    
+      FINDINGS: 8
+        FACT_CLASS_ABSENT::kai-pm/AUDIT_PLAN_C.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/AUDIT_PLAN_C.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/MISC_D.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/MISC_D.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/NOTES_B.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/NOTES_B.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/PLAN_A.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/PLAN_A.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+    --- end qualify (5582 bytes)
+    
+    == NEW proposed ==
+    --- stage A rc=0
+    --- end stage A (0 bytes)
+    --- passa rc=0
+    PASS A v1.2 COMPLETE — 4 rows == population 4
+      WITNESS KINDS DISCRIMINATED (D2/D4), not assumed from shape:
+        DATE                          1
+      scope determined: WHOLE_FILE 1 · SPAN 0
+      binding predicates declared closed-world: 26
+      contextual predicates declared closed-world: 1 (status)
+      NO VERDICT ASSIGNED IN PASS A.
+    --- end passa (328 bytes)
+    --- bind A rc=0
+    5c6284d2ef61a7ae85966c7468ed2dfd2771d17541995d9b52d217c2f813b1c3
+    --- end bind A (65 bytes)
+    --- run_h2_v12 rc=0
+    HOUSE_H2 v1.2 — 4 rows == population 4
+      subject a2b996b4d516 tree d5b89bef71c9
+    
+      LIFECYCLE    positives    0  UNKNOWN    4   
+      FUNCTION     positives    0  UNKNOWN    4   
+      AUTHORITY    positives    0  UNKNOWN    4   
+      GENERATION   positives    0  UNKNOWN    4   
+      VALIDITY     positives    0  UNKNOWN    4   
+      SCOPE        positives    1  UNKNOWN    3   {'WHOLE_FILE': 1}
+    
+      evidence facts (NOT verdicts):
+        SELF_ASSERTS_CURRENT            1
+        CARRIES_DATE_STAMP              1
+        BINDING_CONTRADICTION           1
+        NOMINAL_FUNCTION                2
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 2
+        {'PLAN from self-description': 2}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end run_h2_v12 (782 bytes)
+    --- bind C rc=0
+    8c20c05f407fcdc7f3db01191c49c2e35d50592b262b6e07bfb67c58429a3a2d
+    --- end bind C (65 bytes)
+    --- qualify rc=0
+    HOUSE_H2 v1.2 — QUALIFICATION
+      subject a2b996b4d516  tree d5b89bef71c9
+      history 2026-10-03 → 2026-10-03  shallow=false  ancestry=1
+      census  29064d650a612968…
+    
+      [1] GOVERNING INVARIANT — checked from the AXIS SET
+          UNKNOWN first-class on every axis: True
+      [1b] REMOVAL CALIBRATION — the gate proves it can fail, this run
+           remove UNKNOWN from LIFECYCLE   detected=True
+           remove UNKNOWN from FUNCTION    detected=True
+           remove UNKNOWN from AUTHORITY   detected=True
+           remove UNKNOWN from GENERATION  detected=True
+           remove UNKNOWN from VALIDITY    detected=True
+           remove UNKNOWN from SCOPE       detected=True
+    
+      [2] STATE DISPOSITIONS — checked from the ALPHABET
+          [LIFECYCLE]
+            ACTIVE            H2_NOT_EARNABLE        0  
+            HISTORICAL        H2_EMITTABLE           0  not observed on this subject
+            SUPERSEDED        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           4  
+          [FUNCTION]
+            GOVERNANCE        H2_EMITTABLE           0  not observed on this subject
+            STATUS            H2_EMITTABLE           0  not observed on this subject
+            PLAN              H2_EMITTABLE           0  not observed on this subject
+            EVIDENCE          H2_EMITTABLE           0  not observed on this subject
+            REFERENCE         H2_EMITTABLE           0  not observed on this subject
+            RUNTIME_INPUT     H2_EMITTABLE           0  not observed on this subject
+            TEMPLATE          H2_EMITTABLE           0  not observed on this subject
+            MARKER            H2_EMITTABLE           0  not observed on this subject
+            USER_GUIDE        H2_EMITTABLE           0  not observed on this subject
+            OTHER             H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           4  
+          [AUTHORITY]
+            AUTHORITATIVE     DEFERRED_TO_H3         0  
+            VERIFIED_DERIVED  DEFERRED_TO_H3         0  
+            ADVISORY          DEFERRED_TO_H3         0  
+            NON_AUTHORITY     DEFERRED_TO_H3         0  
+            UNKNOWN           H2_EMITTABLE           4  
+          [GENERATION]
+            MANUAL            H2_NOT_EARNABLE        0  
+            PARTIAL_DERIVED   H2_NOT_EARNABLE        0  
+            FULL_DERIVED      H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           4  
+          [VALIDITY]
+            CURRENT_TREE      H2_EMITTABLE           0  not observed on this subject
+            EXACT_SNAPSHOT    H2_EMITTABLE           0  not observed on this subject
+            RUN_ARTEFACT      H2_EMITTABLE           0  not observed on this subject
+            TIME_BOUND        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           4  
+          [SCOPE]
+            WHOLE_FILE        H2_EMITTABLE           1  
+            HEADING           H2_NOT_EARNABLE        0  
+            TABLE             H2_NOT_EARNABLE        0  
+            MANAGED_REGION    H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           3  
+    
+      [3] OUTPUT-DERIVED — values emitted but unknown to the ontology: 0
+    
+      [4] population declared 4 == rows 4: True
+      [5] every non-abstention cell carries a source-bound witness: True  (0 missing)
+    
+      [6] §8(6) CLOSED ORIGIN CLASSIFICATION — every loaded origin
+          observed 87   classified 87   refused 0
+          H2                 3
+          CENSUS             0
+          GOVERNED_STDLIB    48
+          BUILTIN_OR_FROZEN  36
+    
+      [7] Q1a RECORDED PRODUCER PROVENANCE vs STAGE A
+          verified against stage_a_identity d766186b0ae942ba…, every slot closed
+    
+      [8] Q1b / E1 — DERIVED denominators (D379 §8)
+          axis-cell denominator              1
+          positive-evidence-fact denominator 5
+          sum                                6
+    
+      UTILITY PROFILE — reported, never optimised (D367 11)
+          axis         positive  UNKNOWN  UNMEASURED
+          LIFECYCLE           0        4           0
+          FUNCTION            0        4           0
+          AUTHORITY           0        4           0
+          GENERATION          0        4           0
+          VALIDITY            0        4           0
+          SCOPE               1        3           0
+          Qualification asks: is the instrument TRUTHFUL?
+          A separate later decision asks: is it USEFUL enough for H3?
+    
+      FINDINGS: 0
+    --- end qualify (4336 bytes)
+    
+    == SUMMARY ==
+    {
+     "NEW proposed": {
+      "axes": {
+       "kai-pm/AUDIT_PLAN_C.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "UNKNOWN",
+        "VALIDITY": "UNKNOWN"
+       },
+       "kai-pm/MISC_D.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "UNKNOWN",
+        "VALIDITY": "UNKNOWN"
+       },
+       "kai-pm/NOTES_B.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "UNKNOWN",
+        "VALIDITY": "UNKNOWN"
+       },
+       "kai-pm/PLAN_A.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "WHOLE_FILE",
+        "VALIDITY": "UNKNOWN"
+       }
+      },
+      "facts": {
+       "kai-pm/AUDIT_PLAN_C.md": {
+        "NOMINAL_FUNCTION": false,
+        "SELF_ASSERTS_CURRENT": false
+       },
+       "kai-pm/MISC_D.md": {
+        "NOMINAL_FUNCTION": false,
+        "SELF_ASSERTS_CURRENT": false
+       },
+       "kai-pm/NOTES_B.md": {
+        "NOMINAL_FUNCTION": true,
+        "SELF_ASSERTS_CURRENT": false
+       },
+       "kai-pm/PLAN_A.md": {
+        "NOMINAL_FUNCTION": true,
+        "SELF_ASSERTS_CURRENT": true
+       }
+      },
+      "findings": [],
+      "key_counts": [
+       10
+      ],
+      "other8": {
+       "kai-pm/AUDIT_PLAN_C.md": {
+        "BINDING_CONTRADICTION": false,
+        "CARRIES_DATE_STAMP": false,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       },
+       "kai-pm/MISC_D.md": {
+        "BINDING_CONTRADICTION": false,
+        "CARRIES_DATE_STAMP": false,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       },
+       "kai-pm/NOTES_B.md": {
+        "BINDING_CONTRADICTION": false,
+        "CARRIES_DATE_STAMP": false,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       },
+       "kai-pm/PLAN_A.md": {
+        "BINDING_CONTRADICTION": true,
+        "CARRIES_DATE_STAMP": true,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       }
+      },
+      "qualify_rc": 0,
+      "run_h2_rc": 0
+     },
+     "OLD dbe692d": {
+      "axes": {
+       "kai-pm/AUDIT_PLAN_C.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "UNKNOWN",
+        "VALIDITY": "UNKNOWN"
+       },
+       "kai-pm/MISC_D.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "UNKNOWN",
+        "VALIDITY": "UNKNOWN"
+       },
+       "kai-pm/NOTES_B.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "UNKNOWN",
+        "VALIDITY": "UNKNOWN"
+       },
+       "kai-pm/PLAN_A.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "WHOLE_FILE",
+        "VALIDITY": "UNKNOWN"
+       }
+      },
+      "facts": {
+       "kai-pm/AUDIT_PLAN_C.md": {
+        "NOMINAL_FUNCTION": "ABSENT",
+        "SELF_ASSERTS_CURRENT": "ABSENT"
+       },
+       "kai-pm/MISC_D.md": {
+        "NOMINAL_FUNCTION": "ABSENT",
+        "SELF_ASSERTS_CURRENT": "ABSENT"
+       },
+       "kai-pm/NOTES_B.md": {
+        "NOMINAL_FUNCTION": "ABSENT",
+        "SELF_ASSERTS_CURRENT": "ABSENT"
+       },
+       "kai-pm/PLAN_A.md": {
+        "NOMINAL_FUNCTION": "ABSENT",
+        "SELF_ASSERTS_CURRENT": "ABSENT"
+       }
+      },
+      "findings": [
+       "FACT_CLASS_ABSENT::kai-pm/AUDIT_PLAN_C.md \u2014 a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it",
+       "FACT_CLASS_ABSENT::kai-pm/AUDIT_PLAN_C.md \u2014 a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it",
+       "FACT_CLASS_ABSENT::kai-pm/MISC_D.md \u2014 a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it",
+       "FACT_CLASS_ABSENT::kai-pm/MISC_D.md \u2014 a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it",
+       "FACT_CLASS_ABSENT::kai-pm/NOTES_B.md \u2014 a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it",
+       "FACT_CLASS_ABSENT::kai-pm/NOTES_B.md \u2014 a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it",
+       "FACT_CLASS_ABSENT::kai-pm/PLAN_A.md \u2014 a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it",
+       "FACT_CLASS_ABSENT::kai-pm/PLAN_A.md \u2014 a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it"
+      ],
+      "key_counts": [
+       8
+      ],
+      "other8": {
+       "kai-pm/AUDIT_PLAN_C.md": {
+        "BINDING_CONTRADICTION": false,
+        "CARRIES_DATE_STAMP": false,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       },
+       "kai-pm/MISC_D.md": {
+        "BINDING_CONTRADICTION": false,
+        "CARRIES_DATE_STAMP": false,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       },
+       "kai-pm/NOTES_B.md": {
+        "BINDING_CONTRADICTION": false,
+        "CARRIES_DATE_STAMP": false,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       },
+       "kai-pm/PLAN_A.md": {
+        "BINDING_CONTRADICTION": true,
+        "CARRIES_DATE_STAMP": true,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       }
+      },
+      "qualify_rc": 1,
+      "run_h2_rc": 0
+     }
+    }
+    axes identical OLD vs NEW: True | other eight facts identical: True
+    END-VERBATIM CHAIN-E2E-V5-OUTPUT
+- EVIDENCE REFUSE-E2E-V5-OUTPUT refuse_e2e_v5_out.txt: 1546 bytes, sha256 8e6b465d941d7b36db5bedeb5f7aabf824469ebefefff8bfc34a6ce395b10bf4, final LF True  [CMD `sha256sum refuse_e2e_v5_out.txt` → 8e6b465d941d7b36…]
+    BEGIN-VERBATIM REFUSE-E2E-V5-OUTPUT
+      PASS  fault=none                       rc=0 artefact_written=True  last line:   self_approval: NONE
+      PASS  fault=input-unavailable          rc=1 artefact_written=False  last line: REFUSE: evidence_facts needs the document text and the governed FUNCTION cell (Kai P3: no unmeasured False)
+      PASS  fault=malformed-NF-observation   rc=1 artefact_written=False  last line: REFUSE: kai-pm/NOTES_B.md: malformed NOMINAL_FUNCTION observation 'NOMINAL_FUNCTION=plan from self-description'; the governed grammar is 'NOMINAL_FUNC
+      PASS  fault=NF-untraceable-positive    rc=1 artefact_written=False  last line: REFUSE: kai-pm/NOTES_B.md: positive NOMINAL_FUNCTION candidate has no compliant determining trace
+      PASS  fault=SAC-untraceable-positive   rc=1 artefact_written=False  last line: REFUSE: kai-pm/NOTES_B.md: positive SELF_ASSERTS_CURRENT candidate has no compliant determining trace
+      PASS  fault=population-gate            rc=1 artefact_written=False  last line: REFUSE: evidence-fact producer population != the governed schema; missing=['FUTURE_FACT'] extra=[]
+      PASS  fault=FUNCTION-coherence         rc=1 artefact_written=False  last line: REFUSE: kai-pm/NOTES_B.md: classify's FUNCTION cell differs from the observation the fact used
+      OBSERVATION  working-tree heading edited after Pass A (HEAD unchanged): rc=1 artefact_written=False  last line: R11 ABORT [SOURCE BINDING / WORKTREE IDENTITY]: 1 tracked path(s) diverge from the frozen subject. Pass A would read the WORKING TREE bytes and stamp them with the subjec
+    
+    7 passed, 0 failed
+    END-VERBATIM REFUSE-E2E-V5-OUTPUT
+
+### 6. Next authorised step
+
+- Transmit SB-01 packet v1 to DeepSeek as the base64 message (sb01_b64/DEEPSEEK_MESSAGE_SB01_v1_BASE64_COMPLETE.txt); accept a review only with both sentinels reproduced exactly; Kai reconciles; no implementation before that  [CONVERSATION 2026-10-03 Kai, "Then send only the SB-01 delta for narrow DeepSeek adversarial review"]
+
+### 7. What I am unsure of
+
+- Whether the in-process TOCTOU timing point (after _classification_provenance returns, before the first document read) is the strongest window; Pass A's own controls key mutations on a counted read instead; T2 does hook the read itself  [CMD `sb01_e2e.py` → T1/T3/T4 after provenance; T2 inside read]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
