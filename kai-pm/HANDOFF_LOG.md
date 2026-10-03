@@ -20945,3 +20945,205 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-03T03:12:11Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-03T03:12:11Z  [CMD `date -u +%FT%TZ` → 2026-10-03T03:12:11Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: fa34048f7e43c12c2d33a625a6b10507028eb376  [CMD `git rev-parse HEAD` → fa34048f7e43c12c2d33a625a6b10507028eb376]
+- tree: 5883144eea9dc2236887257a147c25d0f81041ab  [CMD `git rev-parse HEAD^{tree}` → 5883144eea9dc2236887257a147c25d0f81041ab]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: dbe692d9c3f83020176aeda00a0f399ce5f020f8  [CMD `git ls-remote --heads origin` → dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- remote:claude/project-rework-plan-pgvp35: fa34048f7e43c12c2d33a625a6b10507028eb376  [CMD `git ls-remote --heads origin` → fa34048f7e43c12c2d33a625a6b10507028eb376]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 52  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 52]
+
+### 1. The four states
+
+- physical: repair branch unchanged at dbe692d; nothing applied  [CMD `git ls-remote --heads origin` → claude/d379-repair-eb52f73 dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- authorised: NOTHING NEW until Dainius approves the drafted grant in his own words; Kai's text reserves that authority to him  [CONVERSATION 2026-10-03 Kai, "What I cannot do is exercise your consequential authority for you. If you approve, send Orion the following exact grant."]
+- evidence: Kai's closure and the drafted grant verbatim in section 2  [CMD `sha256sum kai_impl_grant_draft.txt` → d73ec1eb2bd2b722…]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-03 · UTF-8 CLOSURE SATISFIED; SB-01 v1 + two-fact v4 composite ready for bounded implementation; P_READER=0 does not reopen the condition (the 615-file opscan population at the same subject covers any future reader set). A DRAFT one-file exact-byte implementation grant (run_h2_v12.py -> sha256 a39359bc…, from HEAD dbe692d, narrow verification, commit, push, STOP) is written for DAINIUS to approve; it is NOT in force until he approves it. Verbatim below, 5117 bytes, sha256 d73ec1eb2bd2b722c9326562528874b3b4d329dd95a45a71082d9dea90c06c3f, final LF False, 4-space indent added ⚠ UNBANKED  [CONVERSATION 2026-10-03 Kai via Dainius, "If you approve, send Orion the following exact grant."]
+    BEGIN-VERBATIM KAI-UTF8-CLOSURE-AND-DRAFT-IMPLEMENTATION-GRANT
+    The UTF-8 closure condition is satisfied. I independently checked both new commits, and GitHub reports valid verified signatures for 6025d9c30fd541b0acebd3b10f4c74c98ce439fe and fa34048f7e43c12c2d33a625a6b10507028eb376. The repair branch remains exactly dbe692d9c3f83020176aeda00a0f399ce5f020f8.
+    
+    The P_READER=0 result does not reopen the condition. It is correct for the frozen historical Pass-A object. More importantly, Orion separately measured the governing opscan source universe at the same frozen subject: 615 files, 0 missing, 0 invalid UTF-8. Any reader source emitted by a fresh Pass A for this same subject must come from that population. So the possible future reader set is also covered.
+    
+    I am satisfied that SB-01 v1 and the two-fact v4 composite are ready for bounded implementation.
+    
+    What I cannot do is exercise your consequential authority for you. If you approve, send Orion the following exact grant.
+    
+    DAINIUS → ORION — D379 B4 FROZEN COMPOSITE IMPLEMENTATION AUTHORITY
+    
+    I explicitly approve the following bounded implementation, under Kai’s reconciled design and evidence.
+    
+    AUTHORISED SUBJECT
+    
+    Repair branch:
+    
+    claude/d379-repair-eb52f73
+    
+    Required starting HEAD:
+    
+    dbe692d9c3f83020176aeda00a0f399ce5f020f8
+    
+    Authorised source file — one file only:
+    
+    kai-pm/house_in_order_h2_v13/run_h2_v12.py
+    
+    Authorised final file bytes:
+    
+    sha256 a39359bc383c8f6f6ca4540c10474fcb094c990f7b8e8091792262436c7a4cfe
+    
+    These bytes are the already-reviewed composition of:
+    
+    accepted two-fact v4 base
+    d3ee165f706e9f4048434031e003e6c7a97159ae2e2217d0c8cdd7ebd69861b6
+    
+    plus SB-01 v1 delta
+    ba61127dacdcc140e157ce6ce36b5907686ad52384b6476ae3319606771127ed
+    
+    AUTHORITY
+    
+    You may now apply exactly those frozen composite bytes to run_h2_v12.py on the repair branch, commit that one-file source change, and push the repair branch.
+    
+    This is exact-byte implementation authority, not authority to reinterpret, clean up, optimise, refactor or improve the reviewed code.
+    
+    Before mutation, prove:
+    
+    repair branch HEAD == dbe692d9c3f83020176aeda00a0f399ce5f020f8
+    
+    working tree clean
+    
+    current run_h2_v12.py is the expected pre-composite source
+    
+    no unexpected branch divergence.
+    
+    After mutation and before commit, prove:
+    
+    sha256(run_h2_v12.py) == a39359bc383c8f6f6ca4540c10474fcb094c990f7b8e8091792262436c7a4cfe
+    
+    git diff --name-only contains only
+    
+    kai-pm/house_in_order_h2_v13/run_h2_v12.py
+    
+    Any second source/config/governance path → STOP, do not commit.
+    
+    Then run only the already-established narrow verification needed to prove that the frozen composite survived application:
+    
+    * Python compile/import under the retained qualified interpreter -B -E -s;
+    * two-fact semantics controls: expected 92/0;
+    * locator controls: expected 37/0;
+    * frozen 272-row regression: no unexplained verdict-axis or previous-eight-fact changes; all ten governed fact keys present;
+    * process REFUSE controls: expected 7/7;
+    * SB-01 hostile/integration evidence: expected declared 13/13 behavior;
+    * clean real chain through Stage A → fresh Pass A → Pass-A binding → classification → classification binding → qualifier;
+    * on that fresh Pass A, report the actual reader_ops population and prove every selected reader source is a member of the frozen subject and strict UTF-8. This is confirmation of the already-closed population argument, not permission to change code.
+    
+    Any unexpected failure, hash difference, semantic difference, new traceback class that produces output, missing reader source, invalid UTF-8 member or changed expectation → STOP. Do not repair around it.
+    
+    If all narrow verification passes, commit the exact one-file implementation on the repair branch and push it.
+    
+    After push, report:
+    
+    new repair commit SHA and signature status;
+    
+    parent SHA;
+    
+    tree SHA;
+    
+    exact changed-path population;
+    
+    final run_h2_v12.py SHA-256;
+    
+    all narrow verification results;
+    
+    fresh Pass-A reader_ops population and UTF-8 confirmation;
+    
+    remote readback proving the pushed branch points at the same commit.
+    
+    Then STOP for Kai adjudication.
+    
+    NOT AUTHORISED
+    
+    No modification of d379_controls.py yet.
+    
+    No full hostile matrix yet.
+    
+    No seventh source/config/governance path.
+    
+    No incident allocation.
+    
+    No D390 replay.
+    
+    No fixity F.
+    
+    No capture.
+    
+    No candidate package.
+    
+    No holdout or blind 40.
+    
+    No Item 8.
+    
+    No merge, and PR #122 remains DO NOT MERGE.
+    
+    No DECISIONS.md mutation unless separately authorised.
+    
+    Handoff logging remains append-only on the programme/handoff branch and does not alter the repair subject.
+    
+    If any observed repository state conflicts with this grant, STOP rather than infer permission.
+    
+    That is the point where I am comfortable moving from design/review into actual source implementation.
+    
+    The important boundary is that this authorization is not yet the remainder of B4. It installs exactly the reviewed composite and proves we installed what we reviewed. Once Orion returns that committed evidence, I will independently inspect the new repair commit. Only after that will I release the hold on d379_controls.py and the full hostile matrix.
+    
+    Kai confidence: 0.995 that the composite is ready for this bounded implementation step.
+    END-VERBATIM KAI-UTF8-CLOSURE-AND-DRAFT-IMPLEMENTATION-GRANT
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: the drafted implementation grant, pending Dainius's explicit approval  [CONVERSATION 2026-10-03 Kai, "What I cannot do is exercise your consequential authority for you."]
+- FORBIDDEN until then: repair-branch mutation, implementation, d379_controls.py, full hostile matrix, incident allocation, D390 replay, fixity F, capture, candidate, holdout, blind 40, Item 8, PR #122 merge  [CONVERSATION 2026-10-03 Kai, "No repair-branch mutation. No implementation."]
+
+### 4. Open questions
+
+- Dainius: approve the drafted grant (or not), in his own words — owner: Dainius  [CONVERSATION 2026-10-03 Kai, "If you approve, send Orion the following exact grant."]
+
+### 5. Incidents and corrections
+
+- None this step  [CMD `handoff.py check` → findings=0]
+
+### 6. Next authorised step
+
+- Ask Dainius for explicit approval; on approval, execute the grant exactly and STOP for Kai  [CONVERSATION 2026-10-03 Kai, "Then STOP for Kai adjudication."]
+
+### 7. What I am unsure of
+
+- Nothing beyond the pending approval  [CMD `git ls-remote --heads origin` → repair dbe692d]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
