@@ -12772,3 +12772,145 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-03T00:45:56Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-03T00:45:56Z  [CMD `date -u +%FT%TZ` → 2026-10-03T00:45:56Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: dd758f097f1b6c4d4f53e5d741cdbe8e3b48f41c  [CMD `git rev-parse HEAD` → dd758f097f1b6c4d4f53e5d741cdbe8e3b48f41c]
+- tree: 387a6db9b73821a7fabcadc7b76e8e932eaaf143  [CMD `git rev-parse HEAD^{tree}` → 387a6db9b73821a7fabcadc7b76e8e932eaaf143]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: dbe692d9c3f83020176aeda00a0f399ce5f020f8  [CMD `git ls-remote --heads origin` → dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- remote:claude/project-rework-plan-pgvp35: dd758f097f1b6c4d4f53e5d741cdbe8e3b48f41c  [CMD `git ls-remote --heads origin` → dd758f097f1b6c4d4f53e5d741cdbe8e3b48f41c]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 40  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 40]
+
+### 1. The four states
+
+- physical: repair branch unchanged at dbe692d; packet v3 frozen in scratch, sha256 bdf6f2e1b381f723294d4ffcc182e1d970128dcb63d029960b76d01a8ec1d93c, re-verified unchanged; its 4 chunks each match their declared size and sha256 and reassemble to it  [CMD `sha256sum DEEPSEEK_PACKET_TWO_FACT_v3.md; chunk verification` → bdf6f2e1…d93c, 4/4 ok, reassembly equal]
+- authorised: transmit packet v3 unchanged through the exact-byte channel; review accepted only with the full receipt and both sentinels character-for-character; no repository mutation  [CONVERSATION 2026-10-03 Kai, "Send the exact v3 file/chunks now, not pasted prose."]
+- evidence: KAI-B4-SB-01 read sites re-confirmed at the repair HEAD: run_h2_v12.py:426 `text = (sr / row["path"]).read_text(errors="ignore")` and :159 `(pathlib.Path(subject_repo) / o["src"]).read_text(`  [FILE kai-repair:kai-pm/house_in_order_h2_v13/run_h2_v12.py:426] [FILE kai-repair:kai-pm/house_in_order_h2_v13/run_h2_v12.py:159]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-03 · KAI-B4-SB-01 CLASSIFICATION SUBJECT-BYTE BINDING FAILURE — SOURCE-CONFIRMED, BLOCKER to B4 closeout; correction to stay inside run_h2_v12.py reusing Pass A's _source_binding_gate and make_verified_reader (no passa.py change justified); do NOT amend packet v3; sequence v3 review → reconciliation → separate source-binding packet → review/reconciliation → implementation; no incident allocation yet. Verbatim below, 4977 bytes, sha256 935f2314ad42fc79360a66b9a38765a708f137cc3cd78000afa7a4614c394ab4, 4-space indent added ⚠ UNBANKED  [CONVERSATION 2026-10-03 Kai via Dainius, "KAI-B4-SB-01 — CLASSIFICATION SUBJECT-BYTE BINDING FAILURE — BLOCKER."]
+    BEGIN-VERBATIM KAI-B4-SB-01-RULING
+    I checked the live state before ruling.
+    
+    Entry 40 is signed/verified at dd758f097f1b6c4d4f53e5d741cdbe8e3b48f41c, and the repair branch is still exactly dbe692d9c3f83020176aeda00a0f399ce5f020f8. So Orion respected the STOP: v3 exists only as reviewed scratch evidence; no source mutation occurred.
+    
+    The v3 work is materially stronger. In particular, Orion did exactly the right thing by proving the v2 offset weakness could actually fail rather than merely accepting our concern. The historical-segmentation equivalence over all 272 documents plus hostile separators, the NF dual-channel evidence accounting, process-level REFUSE propagation, and sentinel-based review receipt are the right controls.
+    
+    Ruling on the newly discovered working-tree defect
+    
+    This is SOURCE-CONFIRMED and a BLOCKER to B4 closeout.
+    
+    It is not merely an unrelated historical imperfection.
+    
+    The current classification producer does this:
+    
+    head = passa.git(sr, "rev-parse", "HEAD").stdout.strip()
+    ...
+    text = (sr / row["path"]).read_text(errors="ignore")
+    
+    So it proves only that HEAD names the frozen commit, then consumes working-tree bytes. An unstaged tracked edit does not alter HEAD. Classification can therefore emit verdicts, evidence facts and traces from bytes that are not in the subject commit, while the resulting provenance still names the frozen commit/tree.
+    
+    Orion’s execution probe demonstrates exactly that failure mode.
+    
+    This is especially significant because Pass A has already solved the same class correctly. passa.py contains both:
+    
+    * _source_binding_gate() — refuses tracked worktree divergence and tracked symlinks before measurement;
+    * make_verified_reader() — performs READ → compare those exact consumed bytes to the frozen Git blob → USE, closing the TOCTOU window.
+    
+    So we do not need to invent another source-identity mechanism.
+    
+    I also found a second classification-time live read in _reader_trace():
+    
+    (pathlib.Path(subject_repo) / o["src"]).read_text(...)
+    
+    Fixing only the main document read would therefore fix an instance, not the class.
+    
+    My ruling is:
+    
+    KAI-B4-SB-01 — CLASSIFICATION SUBJECT-BYTE BINDING FAILURE — BLOCKER.
+    
+    The eventual correction should remain inside run_h2_v12.py and reuse Pass A’s already-governed source-binding machinery. No passa.py change is currently justified.
+    
+    But do not amend packet v3 now.
+    
+    That would move the subject after DeepSeek’s packet was frozen. The disciplined sequence is:
+    
+    v3 two-fact packet → exact-byte DeepSeek review → Kai reconciliation → then separate narrow source-binding repair packet → adversarial review/reconciliation → only then implementation.
+    
+    That keeps the two evidence trails independent. DeepSeek’s v3 review remains useful because it is reviewing the two-fact semantics exactly as frozen; the source-binding failure is a different pre-existing mechanism which v3 inherits.
+    
+    Send the exact v3 file/chunks now, not pasted prose. Accept the review only if DeepSeek reproduces the required hash/base/hunk/end marker and both sentinel lines character-for-character. If even one character differs, reject the review as SUBJECT CORRUPTED.
+    
+    After DeepSeek returns, I will reconcile its v3 findings. Then Orion should prepare a separate source-binding proposal whose minimum shape is:
+    
+    * call the existing Pass-A source-binding gate before classification measurement;
+    * create one passa.make_verified_reader(sr, pa["subject"]);
+    * use that reader for the document bytes consumed by sb.bind_claims() and cl.classify();
+    * use the same verified reader inside _reader_trace() instead of direct Path.read_text();
+    * mechanically enumerate every subject-repository byte-read path in run_h2_v12.py and prove none bypasses the verified reader;
+    * hostile controls for dirty tracked document, dirty reader-source file, post-gate/pre-consumption mutation, tracked symlink, and clean exact-subject pass;
+    * every hostile source mutation must REFUSE before classification artefact creation.
+    
+    One detail matters: do not “fix” this simply with git status --porcelain. Pass A already documents why that is insufficient: a mutation after the clean-tree check and before a read is a TOCTOU hole. The consumption-time blob comparison is the actual proof.
+    
+    No incident allocation yet. We have established the mechanism and severity, but the ledger decision can wait until the correction boundary and controls are settled.
+    
+    So the immediate next action remains exactly:
+    
+    Send packet v3 to DeepSeek through the exact-byte channel, require the sentinel receipt, obtain the v3 adversarial review, and return it to Kai. No repository mutation.
+    
+    And separately, record the working-tree finding as KAI-B4-SB-01 — OPEN / BLOCKS B4 CLOSEOUT.
+    
+    Confidence: 0.99 that the working-tree finding is genuine and materially violates subject binding; 0.99 that reusing Pass A’s gate + verified reader is the correct architectural direction; 0.98 that v3 should be reviewed unchanged before opening that separate repair.
+    END-VERBATIM KAI-B4-SB-01-RULING
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: send packet v3 (file, or the 4 chunks) to DeepSeek; accept only a receipt reproducing PACKET HASH, BASE BLOB, FIRST DIFF HUNK, END marker and both SENTINEL lines character-for-character; one differing character = SUBJECT CORRUPTED, review rejected  [CONVERSATION 2026-10-03 Kai, "If even one character differs, reject the review as SUBJECT CORRUPTED."]
+- HELD: the KAI-B4-SB-01 source-binding proposal until Kai has reconciled DeepSeek's v3 findings; any source mutation; d379_controls.py rebuild; full hostile matrix  [CONVERSATION 2026-10-03 Kai, "After DeepSeek returns, I will reconcile its v3 findings. Then Orion should prepare a separate source-binding proposal"]
+- FORBIDDEN: amending packet v3; incident allocation; D390 replay; fixity F; capture; candidate/holdout/blind 40; Item 8; PR #122 merge  [CONVERSATION 2026-10-03 Kai, "But do not amend packet v3 now."]
+
+### 4. Open questions
+
+- KAI-B4-SB-01 — OPEN / BLOCKS B4 CLOSEOUT. Minimum shape of the later proposal, as ruled: Pass-A source-binding gate before classification; one passa.make_verified_reader(sr, pa["subject"]); that reader for the bytes consumed by sb.bind_claims() and cl.classify() and inside _reader_trace(); a mechanical enumeration of every subject-repository byte-read path in run_h2_v12.py; hostile controls (dirty tracked document, dirty reader-source file, post-gate/pre-consumption mutation, tracked symlink, clean exact-subject pass), each REFUSING before artefact creation; `git status --porcelain` alone is not the proof — owner: Orion (after reconciliation), then DeepSeek, then Kai  [CONVERSATION 2026-10-03 Kai, "The consumption-time blob comparison is the actual proof."]
+- DeepSeek's v3 receipt and review — owner: DeepSeek via Dainius/Kai  [CONVERSATION 2026-10-03 Kai, "obtain the v3 adversarial review, and return it to Kai"]
+
+### 5. Incidents and corrections
+
+- None this step; the ruling explicitly defers any ledger decision  [CONVERSATION 2026-10-03 Kai, "No incident allocation yet."]
+
+### 6. Next authorised step
+
+- "Send packet v3 to DeepSeek through the exact-byte channel, require the sentinel receipt, obtain the v3 adversarial review, and return it to Kai. No repository mutation."  [CONVERSATION 2026-10-03 Kai, "So the immediate next action remains exactly"]
+
+### 7. What I am unsure of
+
+- Transmission is done by Dainius, not by this session; I cannot observe what DeepSeek receives — only the receipt it returns  [CONVERSATION 2026-10-03 Kai, "Send the exact v3 file/chunks now"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
