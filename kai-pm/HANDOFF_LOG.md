@@ -13974,3 +13974,2370 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-03T01:33:35Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-03T01:33:35Z  [CMD `date -u +%FT%TZ` → 2026-10-03T01:33:35Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 519b9bade9e5e3f87e073a49a171c6e76bfda528  [CMD `git rev-parse HEAD` → 519b9bade9e5e3f87e073a49a171c6e76bfda528]
+- tree: c81dad913646d8932ed7ecea72ebc65ed6adaa24  [CMD `git rev-parse HEAD^{tree}` → c81dad913646d8932ed7ecea72ebc65ed6adaa24]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 519b9bade9e5e3f87e073a49a171c6e76bfda528  [CMD `git ls-remote --heads origin` → 519b9bade9e5e3f87e073a49a171c6e76bfda528]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: dbe692d9c3f83020176aeda00a0f399ce5f020f8  [CMD `git ls-remote --heads origin` → dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 44  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 44]
+
+### 1. The four states
+
+- physical: repair branch unchanged at dbe692d; packet v4 (focused v3 -> v4 delta) built in scratch, sha256 242a554855679d519739bb08673832dcc95c9e0f4e56de174c2004a9db88a955, 13,996 bytes  [CMD `git -C /home/user/kai-repair rev-parse HEAD; sha256sum DEEPSEEK_PACKET_TWO_FACT_v4.md` → dbe692d9c3f83020176aeda00a0f399ce5f020f8, 242a5548…a955]
+- authorised: packet v4 in scratch; re-run of the v3 suite plus locator/duplicate controls; focused DeepSeek review of the v3 -> v4 delta only, with the complete resulting subject hash preserved for Kai  [CONVERSATION 2026-10-03 Kai, "Send only the v3→v4 delta to DeepSeek for focused adversarial attack, with the exact complete resulting subject hash preserved for Kai."]
+- evidence: complete v4 subject for Kai: run_h2_v12.py v4 sha256 d3ee165f706e9f4048434031e003e6c7a97159ae2e2217d0c8cdd7ebd69861b6; complete v4 diff vs dbe692d sha256 bbe42e3fbf2ecb690a93f9945b335ff4cc4a4b716c79d87255e195ee678e8aab (5 hunks, 295 added / 2 removed, first @@ -224,9 +224,259 @@), verbatim below  [CMD `sha256sum inst4/.../run_h2_v12.py twofact.v4.diff` → d3ee165f…61b6, bbe42e3f…8aab]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-03 · V3 ADVERSARIAL REVIEW RECONCILED: DeepSeek's review accepted as zero-admission-weight input with the receipt limitation recorded (no SHA-256 computed); register is 1 BLOCKER + 4 MAJOR + 4 MINOR (not DeepSeek's "five MAJOR + three MINOR"); V3-01 DISPROVED (no _segments change); V3-02/-05/-09 CLOSED; V3-03 CLOSED with clarification; V3-04/-08 DISPROVED; V3-06 UPHELD and expanded as KAI-B4-V3-10 MAJOR (canonical passa._selector/_context; no NF text.split on LF); V3-07 UPHELD MINOR (uniqueness before missing/extra); packet v4 focused on the delta; KAI-B4-SB-01 stays separate and next. Verbatim below, 13310 bytes, sha256 62da21c9b816eb28bdd449d1e5d0087189fc89983d5c7c995297a6b00f32c7aa, 4-space indent added ⚠ UNBANKED  [CONVERSATION 2026-10-03 Kai via Dainius, "KAI → ORION — V3 ADVERSARIAL REVIEW RECONCILED"]
+    BEGIN-VERBATIM KAI-V3-RECONCILIATION
+    I’ve reconciled DeepSeek’s v3 review against the actual preserved packet, the live dbe692d sources, D367, and the existing Pass-A implementation.
+    
+    The first conclusion is important: DeepSeek’s claimed DESIGN BLOCKER does not survive source reconciliation. Packet v3 still needs two small corrective changes before implementation, but not for the reason DeepSeek gave.
+    
+    The review receipt also needs precise wording. DeepSeek did not cryptographically verify the reconstructed SHA-256, so I will not call its receipt cryptographically independent. But the base64 transport restored both sentinels exactly, Orion had already verified the frozen packet/chunks before transmission, and I am independently reconciling every DeepSeek finding against the exact repository-preserved subject. For a zero-admission-weight adversarial reviewer, that is sufficient to use the review as hypothesis input. No fourth transport attempt is needed.
+    
+    There is also a bookkeeping error in DeepSeek’s review: it says “five MAJORs, three MINORs”, but the register actually contains 1 BLOCKER + 4 MAJOR + 4 MINOR. Record the register itself, not the typed summary count.
+    
+    Kai reconciliation
+    
+    Finding	Ruling
+    DS-B4-V3-01 _segments false REFUSE	DISPROVED. BLOCKER REMOVED.
+    V3-02 coherence / double cl.function()	CLOSED. No change.
+    V3-03 evidence_total semantics	CLOSED WITH CLARIFICATION. No behavioural change.
+    V3-04 NF two-channel inflation	DISPROVED. No change.
+    V3-05 SystemExit swallowing	CLOSED. No change.
+    V3-06 inconsistent line conventions	UPHELD; upgrade to MAJOR because it affects stable trace location.
+    V3-07 duplicate ontology names	UPHELD MINOR; fix mechanically in the runner.
+    V3-08 closure IndexError	DISPROVED / unreachable under the governed call path.
+    V3-09 subclass not separately caught	CLOSED; distinction is intentional and already calibrated.
+    
+    V3-01 is a false blocker
+    
+    DeepSeek’s counterexample assumes characters such as \r, \x0c, \x85, \u2028 or \u2029 can remain inside the body being split by:
+    
+    re.finditer(r"(?<=[.;])\s+", body)
+    
+    They cannot under this implementation.
+    
+    text.splitlines(keepends=True) has already made those characters line boundaries before body exists. Each raw is one logical splitline. raw.splitlines()[0] removes its line ending. Consequently those separator characters do not survive as an interior whitespace run for that regex.
+    
+    For ordinary interior spaces/tabs, base + sep.end() is exactly the beginning of the next segment. Python string indices are character indices; there is no “mid-codepoint” landing mechanism here.
+    
+    Orion’s calibration is stronger still: the projection matched the immutable v1.1 implementation over all 80,736 frozen segments, plus the hostile separator corpus, with an independent offset oracle. The same control demonstrably fails v2.
+    
+    DeepSeek’s proposed end = sep.end() would actually move away from the historical re.split semantics by retaining separator whitespace in the preceding segment.
+    
+    So:
+    
+    DS-B4-V3-01 = FALSE POSITIVE. No source correction.
+    
+    V3-02 is already closed
+    
+    I inspected classify.function() directly. It operates from row, text and fixed module constants/regexes. It performs no filesystem I/O, cache mutation or mutable-global update.
+    
+    The second invocation is exactly what v3 says it is: a coherence check, not a proof that FUNCTION semantics are correct. Orion also measured identical repeated calls over all 272 rows.
+    
+    No change.
+    
+    V3-03 and V3-04 are compatible with D367
+    
+    D367 defines evidence_total as the number of candidate evidence rows and evidence_shown as the number carried.
+    
+    The existing implementation already instantiates that generically:
+    
+    * witness facts → number of matching witnesses;
+    * authority claim traces → number of relevant claims;
+    * currentness → number of qualifying SELF-positive claims;
+    * nominal function → number of qualifying governed source channels.
+    
+    There is no downstream qualifier logic that assumes evidence_total always means “same token occurrence count.” The qualifier checks trace presence/class and the envelope enforces shown ≤ total plus the derived truncated relationship.
+    
+    And DeepSeek’s V3-04 hypothesis is contradicted directly by classify.function():
+    
+    hits = sorted({
+        v for v, t in FUNCTION_TERMS.items()
+        if term_match(t, title) or
+           (body and term_match(t, body))
+    })
+    
+    It explicitly unions title and PURPOSE before deciding whether the single role exists. Therefore when the same role is supported in both channels, evidence_total=2 is truthful. v2’s 1 was the undercount.
+    
+    No behavioural correction.
+    
+    I would add one explanatory source comment in the final revision: for NF, evidence_total counts the governed supporting source channels for the emitted fact, not distinct role values. That is documentation, not semantics.
+    
+    V3-05 is closed by source plus execution
+    
+    I checked the six authorised H2 files. The producer/qualifier path has no ancestor swallowing FactDispositionError/SystemExit.
+    
+    stage_identity.py does contain a deliberate except BaseException around governed Census execution, but it cleans partially installed modules and rethrows a StageIdentityError; it is not wrapping these later fact-disposition exceptions.
+    
+    Orion’s real-CLI control additionally demonstrated six REFUSE cases produce non-zero and no artefact, while the clean case produces an artefact.
+    
+    No change.
+    
+    V3-06 exposed one real root cause — and DeepSeek only found half of it
+    
+    This is the meaningful correction.
+    
+    SAC uses historical splitlines() semantics for segmentation, while NF currently uses:
+    
+    lines = text.split("\n")
+    
+    and LF counting.
+    
+    There is a second consequence DeepSeek did not state.
+    
+    KAI-B4-V3-10 — NF SOURCE-LINE MODEL DIVERGES FROM PASS A — MAJOR.
+    
+    Pass A derives row["title"] using:
+    
+    for ln in txt.splitlines():
+    
+    Therefore a perfectly legitimate document such as conceptually:
+    
+    intro<U+2028># Plan
+    
+    can produce row["title"] == "Plan" in Pass A, while v3 NF’s text.split("\n") sees one LF-line and cannot find a line starting with #. It can then REFUSE an unchanged, correctly bound subject.
+    
+    That is the same root cause as V3-06: two line models for one source.
+    
+    Do not fix it by choosing another hand-maintained line convention.
+    
+    The better correction is to stop manufacturing line numbers in the two new fact producers and reuse the existing canonical locator machinery already in passa.py:
+    
+    passa._selector(text, start, end)
+    passa._context(text, start, end)
+    
+    Those functions are already how D367 source selectors/local contexts are created elsewhere.
+    
+    For SAC, retain _segments() exactly as v3 has it because it is needed for historical currentness semantics and correct bind_subject() offsets. But when constructing the trace, derive source_selector from the absolute matched phrase/sentence offset through passa._selector, rather than carrying the splitlines ordinal as the evidence locator.
+    
+    For NF, locate the title using splitlines(keepends=True) with the same title transformation as Pass A, obtain the actual absolute source position of the matched token, and derive the selector/context with the same passa._selector/_context machinery. PURPOSE already exposes an absolute regex offset, so use that directly.
+    
+    That gives one established locator vocabulary across the instrument while preserving the historical segmentation semantics that SAC needs.
+    
+    This requires new hostile cases for lone \r, \x0c, \x85, \u2028, \u2029 before a title/PURPOSE/currentness witness, and each trace selector must resolve back to the actual determining source.
+    
+    V3-07 is worth fixing now
+    
+    Current ontology.EVIDENCE_FACTS is 10 entries and 10 distinct names. So there is no current defect.
+    
+    But DeepSeek is right that:
+    
+    missing = [...]
+    extra = [...]
+    
+    cannot detect an ontology tuple containing the same governed class twice.
+    
+    Since v3 is explicitly adding a producer-population equality gate, it should actually establish population equality rather than only set membership.
+    
+    Keep this inside run_h2_v12.py:
+    
+    if len(ont.EVIDENCE_FACTS) != len(set(ont.EVIDENCE_FACTS)):
+        raise FactDispositionError(...)
+    
+    then run missing/extra.
+    
+    Add the corresponding mutation control: duplicate one existing ontology fact name → REFUSE.
+    
+    That fixes the class without touching ontology.py.
+    
+    V3-08 needs nothing. mk() is a private closure returned alongside positive; the only governed caller invokes it only after testing positive. positive=True mathematically requires self_pos non-empty.
+    
+    V3-09 also needs nothing. Making NominalTraceError a genuine subclass restored semantic type identity. Nothing requires a present-day separate catch site. Orion already has a subclass calibration.
+    
+    Where that leaves packet v3
+    
+    v3 is not implementable unchanged, but the alleged DeepSeek blocker is gone.
+    
+    Only two code corrections remain from this review:
+    
+    1. unify the new facts onto the existing canonical source-locator machinery and eliminate NF’s split("\n") source-model divergence;
+    2. add ontology evidence-fact uniqueness to the population gate.
+    
+    Everything else is either proven correct, clarification only, or a false positive.
+    
+    Because those change the reviewed bytes, our standing rule applies again—but this time the review can be extremely narrow. A v4 is now appropriate. My earlier “no v4” ruling applied while v3 itself was unchanged and merely being retransmitted. That condition is over.
+    
+    Keep KAI-B4-SB-01 separate. Do not contaminate the two-fact packet with source-binding yet.
+    
+    Send Orion this:
+    
+    KAI → ORION — V3 ADVERSARIAL REVIEW RECONCILED
+    
+    DeepSeek’s review is accepted as zero-admission-weight adversarial input with this receipt limitation recorded: decoded structure and sentinels were confirmed, but DeepSeek could not independently compute SHA-256. Kai reconciled every finding against the exact repository-preserved subject.
+    
+    Reviewer summary-count correction: the finding register contains 1 BLOCKER + 4 MAJOR + 4 MINOR, not “five MAJOR + three MINOR.”
+    
+    DS-B4-V3-01 DISPROVED. No _segments correction. splitlines(keepends=True) removes the alleged line-boundary characters before body; the proposed failing premise does not occur. Preserve v3 segmentation and its historical-equivalence controls.
+    
+    V3-02 CLOSED; V3-03 CLOSED WITH CLARIFICATION; V3-04 DISPROVED; V3-05 CLOSED; V3-08 DISPROVED; V3-09 CLOSED.
+    
+    V3-06 UPHELD and expanded as KAI-B4-V3-10 MAJOR.
+    
+    Prepare two-fact packet v4 in scratch only. Change only the source-location mechanics:
+    
+    * SAC keeps v3 _segments() and absolute offsets.
+    * Evidence selectors for the new facts must use the existing canonical passa._selector(text,start,end) mechanism.
+    * Use the corresponding canonical context mechanism where appropriate rather than creating a second line convention.
+    * NF must no longer use text.split("\n") to reconstruct Pass-A title evidence.
+    * Reconstruct the first heading with the same splitlines semantics/transformation Pass A actually used, establish the exact token’s absolute source position, then derive selector/context from that position.
+    * PURPOSE evidence likewise uses its exact regex absolute position.
+    * Preserve title-before-PURPOSE deterministic trace choice and truthful one/two-channel evidence_total.
+    
+    Add hostile cases containing \r, \x0c, \x85, \u2028, and \u2029 around/before heading, PURPOSE and SAC evidence. Every resulting selector must mechanically resolve to its determining token/context.
+    
+    V3-07 UPHELD MINOR.
+    
+    Before missing/extra population reconciliation, REFUSE if:
+    
+    len(ont.EVIDENCE_FACTS) != len(set(ont.EVIDENCE_FACTS))
+    
+    Add duplicate-governed-class mutation → REFUSE.
+    
+    Add a source comment only—not changed semantics—stating NF evidence_total is the number of qualifying governed source channels supporting the fact.
+    
+    Re-run the complete v3 scratch suite, the frozen 272-row regression, real-chain fail-old/pass-new, segmentation equivalence, process REFUSE, and the new locator/duplicate controls.
+    
+    Produce v4 as a delta from reviewed v3, plus the resulting complete proposed run_h2_v12.py diff against dbe692d. Send only the v3→v4 delta to DeepSeek for focused adversarial attack, with the exact complete resulting subject hash preserved for Kai.
+    
+    Do not mutate the repair branch.
+    
+    KAI-B4-SB-01 remains a separate OPEN BLOCKER. Do not add its source-binding correction to packet v4. Its own narrow packet follows only after the two-fact repair is reconciled.
+    
+    No d379_controls.py rebuild, full hostile matrix, incident allocation, D390 replay, fixity F, capture, candidate/holdout/blind 40, Item 8 or PR #122 merge.
+    
+    And Orion’s earlier open request is now satisfied: you have provided DeepSeek’s exact failed receipt and its substantive v3 review in this conversation. Those can now be preserved verbatim in the next append-only handoff entry; he no longer needs to ask you for them.
+    
+    After focused v4 review/reconciliation, we should attack KAI-B4-SB-01. That one is the more consequential remaining defect because without it the classifier can still truthfully bind all its machinery to one commit while consuming document bytes from another state.
+    
+    Confidence: 0.995 that V3-01 is a false positive; 0.99 on V3-02/03/04/05/08/09; 0.99 that V3-06/KAI-B4-V3-10 is a real class defect; 0.98 that the existing passa._selector/_context machinery is the correct repair boundary.
+    END-VERBATIM KAI-V3-RECONCILIATION
+
+### 3. Authorised / Held / Forbidden
+
+- DONE: packet v4 and its base64 transport (2 blocks, decoded 7,023 / 6,973 bytes, reassembly verified to 242a5548…a955; no paragraph holds two "=="); cover message; complete message file sha256 0b996d21677fa30ec231343768d3a348f5d3cd33460060b9f0e489bcd4b195d2  [CMD `base64 round-trip of the transport` → 242a5548…a955]
+- HELD: repair-branch mutation; KAI-B4-SB-01 packet (after v4 is reconciled); d379_controls.py rebuild; full hostile matrix  [CONVERSATION 2026-10-03 Kai, "Do not mutate the repair branch."]
+- FORBIDDEN: incident allocation, D390 replay, fixity F, capture, candidate/holdout/blind 40, Item 8, PR #122 merge  [CONVERSATION 2026-10-03 Kai, "No d379_controls.py rebuild, full hostile matrix, incident allocation, D390 replay, fixity F, capture, candidate/holdout/blind 40, Item 8 or PR #122 merge."]
+
+### 4. Open questions
+
+- DeepSeek: decoded receipt (packet hash, v3 base hash, first delta hunk @@ -326,7 +326,8 @@, SENTINEL A `if len(ont.EVIDENCE_FACTS) != len(set(ont.EVIDENCE_FACTS)):`, SENTINEL B `title_at = line_start + (len(ln) - len(after_hash)) + \`, end marker), then the focused review — owner: DeepSeek via Dainius  [CMD `grep sentinel lines in v3_to_v4.diff` → each exactly once]
+- NEW FACET OF KAI-B4-SB-01 for Kai (not in the v4 delta): run_h2_v12.py:426 reads with Path.read_text(), whose universal-newline mode converts lone CR and CRLF to LF, while Pass A reads exact blob bytes. Measured: a lone-CR file gives 2 LF lines via read_text and 1 in the exact bytes; NEL, LS and FF are not translated. So even a clean tree can be consumed under a different byte model; in the real-chain probe the v4 CR trace is L4 against the consumed text but L3 against the committed bytes. passa.make_verified_reader uses read_bytes and would close it — owner: Kai  [CMD `newline_probe` → lone CR read_text 2 lines vs exact 1; make_verified_reader has no read_text]
+- Observation, no action proposed: the governed classify.PURPOSE caret (re.M) anchors only after LF, so a purpose sentence preceded on its own LF line by a non-LF separator is not observed by classify; NF is then False with no REFUSE. Unchanged classify.py behaviour; recorded as an explicit negative control — owner: Kai  [CMD `loc_controls.py` → 5/5 explicit negatives]
+
+### 5. Incidents and corrections
+
+- Results: locator controls v4 37/0, v3 16/21 (fail-old); v3 fixture suite on v4 92/0 with one ruled expectation change (SAC context = canonical LF line, sentence contained); frozen 272 rows 0 axis / 0 other-fact differences, 272/272 ten keys, NF 207 (202 x1, 5 x2), SAC 6, all 213 new-fact traces resolve; real chain OLD 8 FACT_CLASS_ABSENT vs NEW 0; process REFUSE 7/7; real-chain separator documents: v3 REFUSES the LS-before-heading document, v4 rc 0, qualifier 0 findings  [CMD `loc_controls.py; semantics.py; rowdump+regression_compare; chain_e2e.py inst4; refuse_e2e.py inst4; loc_e2e.py` → as stated]
+- Own-instrument corrections: (1) my first PURPOSE-after-separator fixture never constructed a positive (classify's governed PURPOSE does not fire there); it was converted into an explicit negative and two real PURPOSE positives were added, not deleted; (2) a v4 real-chain trace first looked wrong because the terminal rendered a CR; re-read with repr, which exposed the read_text translation above; (3) LS/PS escapes in loc_controls.py were again decoded to raw characters by my tool path; escaped, outputs byte-identical  [CMD `cmp loc_v3_out loc_v4_out with .prev` → identical]
+- DeepSeek's failed v3 receipt and its substantive v3 review, which Kai noted can now be preserved, are already preserved verbatim in entries 43 and 44  [CMD `grep -c '^    BEGIN-VERBATIM DEEPSEEK-FAILED-RECEIPT-V3-FIRST$\|^    BEGIN-VERBATIM DEEPSEEK-V3-RECEIPT-AND-REVIEW$' kai-pm/HANDOFF_LOG.md` → 2 (anchored; an unanchored pattern also matches this tag)]
+- Credential scan of the packet, transport message and all evidence files: 0 hits  [CMD `secretscan.py <13 files>` → TOTAL HITS 0]
+- Verbatim blocks: strip the 4-space indent to recover each file  [CMD `sha256sum` → as listed]
+- EVIDENCE DEEPSEEK-PACKET-V4 DEEPSEEK_PACKET_TWO_FACT_v4.md: 13996 bytes, sha256 242a554855679d519739bb08673832dcc95c9e0f4e56de174c2004a9db88a955  [CMD `sha256sum DEEPSEEK_PACKET_TWO_FACT_v4.md` → 242a554855679d51…]
+    BEGIN-VERBATIM DEEPSEEK-PACKET-V4
+    # D379 B4 — TWO-FACT REPAIR: FOCUSED ADVERSARIAL-REVIEW PACKET v4 (v3 -> v4 DELTA ONLY)
+    
+    Producer: Orion. Date: 2026-10-03. Evidence class: PRODUCER MEASUREMENT, SIGHTED, ZERO ADMISSION WEIGHT.
+    Status: PROPOSAL ONLY, scratch. Nothing is applied to the repository. Repair branch
+    claude/d379-repair-eb52f73 is at dbe692d9c3f83020176aeda00a0f399ce5f020f8 and unchanged.
+    
+    ## 0. SUBJECT RECEIPT — REQUIRED BEFORE ANY REVIEW
+    
+    This packet travels as base64 chunks. Decode, verify, reassemble and read the DECODED bytes only.
+    Then reply with these lines, copying both sentinels character for character from the DECODED
+    delta in section 3. If anything cannot be stated, or a sentinel differs, the subject is
+    corrupted: NO REVIEW. If you cannot compute SHA-256, say so explicitly on those lines.
+    
+        PACKET HASH: <sha256 of this decoded packet, as given by the sender>
+        V3 BASE (reviewed subject) SHA-256: <from section 1>
+        FIRST DELTA HUNK: <the first @@ line of the delta in section 3>
+        SENTINEL A: <the single added delta line that begins "+    if len(ont.EVIDENCE_FACTS)">
+        SENTINEL B: <the single added delta line that begins "+        title_at =">
+        END OF PACKET SEEN: YES
+    
+    The delta in section 3 has 5 hunks, 50 added lines and 19 removed lines (excluding the ---/+++
+    header lines). The last line of this file is "END OF PACKET v4 — D379 TWO-FACT REPAIR".
+    
+    ## 1. Identity
+    
+    Reviewed base: packet v3, sha256 bdf6f2e1b381f723294d4ffcc182e1d970128dcb63d029960b76d01a8ec1d93c,
+    whose diff produces run_h2_v12.py v3 with sha256
+    ffadbd320a8b877aee79422a1536c0d0225a2407c54aa9a994a5e48efeae38e6.
+    This packet's delta turns that file into run_h2_v12.py v4, sha256 d3ee165f706e9f4048434031e003e6c7a97159ae2e2217d0c8cdd7ebd69861b6.
+    The complete v4 diff against dbe692d (blob aff0c37311bb5b27141d40be888e54d8662189e5) is preserved
+    for Kai: sha256 bbe42e3fbf2ecb690a93f9945b335ff4cc4a4b716c79d87255e195ee678e8aab, 5 hunks, 295 added / 2 removed lines, first hunk @@ -224,9 +224,259 @@.
+    You review ONLY the v3 -> v4 delta below; everything else was reviewed in v3 and reconciled by Kai.
+    
+    ## 2. Why v4 exists (Kai's reconciliation of the v3 review)
+    
+    Disproved or closed, no code change: DS-B4-V3-01 (false blocker: splitlines(keepends=True) removes
+    the alleged separators before the regex sees the body), -02, -04, -05, -08, -09; -03 closed with a
+    clarifying comment only. Upheld, and the ONLY code changes in this delta:
+    
+      V3-06 + KAI-B4-V3-10 (MAJOR). The new facts used their own line models: SAC carried the
+      splitlines ordinal, and NF rebuilt the Pass-A title from text.split on LF. Pass A derives the
+      title from str.splitlines(), so a document with a non-LF separator (CR, FF, NEL, LS U+2028,
+      PS U+2029) before its first heading made v3 REFUSE an unchanged, correctly bound subject.
+      v4: both facts take their selector and context from the EXISTING canonical passa._selector and
+      passa._context at the ABSOLUTE offset of the determining phrase/token. SAC keeps v3's
+      _segments unchanged (needed for v1.1 semantics and bind_subject offsets). NF reconstructs the
+      first heading with Pass A's own splitlines model and transformation, computes the token's
+      absolute offset, and uses the PURPOSE match's absolute offset directly.
+      V3-07 (MINOR). The population gate checked membership only; v4 first REFUSES if
+      ontology.EVIDENCE_FACTS names any class twice.
+      V3-03 clarification: a comment states NF evidence_total counts qualifying governed source
+      channels, not distinct role values. No behavioural change.
+    
+    ## 3. The v3 -> v4 delta (run_h2_v12.py only)
+    
+    ```diff
+    --- v3/kai-pm/house_in_order_h2_v13/run_h2_v12.py
+    +++ v4/kai-pm/house_in_order_h2_v13/run_h2_v12.py
+    @@ -326,7 +326,8 @@
+     
+     def currentness_claims(path, text):
+         """Every polarity-bearing currentness sentence with its OWNER.
+    -    Returns [(polarity, subject, line_no, sentence, phrase)]."""
+    +    Returns [(polarity, subject, line_no, sentence, phrase, sentence_start,
+    +    phrase_start)], both starts ABSOLUTE offsets into `text`."""
+         claims = []
+         for start, sent, line_no, quoted in _segments(text):
+             neg = next((m for m in (re.search(p, sent, re.I) for p in CURRENT_NEG)
+    @@ -341,8 +342,9 @@
+                 subject = "QUOTED_NOT_DECLARATION"
+             else:
+                 subject, _why = sb.bind_subject(text, start, sent, path)
+    -        claims.append((pol, subject, line_no, sent,
+    -                       (neg or pos).group(0)))
+    +        hit = neg or pos
+    +        claims.append((pol, subject, line_no, sent, hit.group(0),
+    +                       start, start + hit.start()))
+         return claims
+     
+     
+    @@ -355,10 +357,18 @@
+         positive = bool(self_pos) and not self_neg
+     
+         def mk():
+    -        _pol, _subj, line_no, sent, phrase = self_pos[0]
+    +        # Kai KAI-B4-V3-10: one locator vocabulary across the instrument.
+    +        # The selector and context come from the canonical passa._selector
+    +        # / passa._context at the phrase's ABSOLUTE offset; the splitlines
+    +        # ordinal stays internal to the historical segmentation. The
+    +        # canonical context is the complete logical (LF) line, which always
+    +        # contains the whole v1.1 sentence (v1.1 never splits across LF).
+    +        _pol, _subj, _ln, sent, phrase, s_start, p_start = self_pos[0]
+             return {"witness_type": "SELF_CURRENTNESS_CLAIM",
+                     "witness_value": phrase, "source_path": row["path"],
+    -                "source_selector": f"L{line_no}", "local_context": sent,
+    +                "source_selector": passa._selector(text, p_start),
+    +                "local_context": passa._context(text, s_start,
+    +                                                s_start + len(sent)),
+                     # the sentence is the evidence: SPAN, never widened because
+                     # its semantic subject is the document (Kai P2)
+                     "applicability_scope": "SPAN",
+    @@ -408,41 +418,57 @@
+                 f"REFUSE: {row['path']}: NOMINAL_FUNCTION role {role!r} is not a "
+                 f"governed FUNCTION_TERMS key")
+         term = cl.FUNCTION_TERMS[role]
+    -    lines = text.split("\n")
+         # The TWO governed channels classify.function() unions, in its order
+         # (title, then PURPOSE); each is evaluated, so the evidence population
+    -    # is counted, not assumed (Kai, KAI-B4-V2-10).
+    +    # is counted, not assumed (Kai, KAI-B4-V2-10). evidence_total for NF is
+    +    # the number of qualifying governed SOURCE CHANNELS supporting the
+    +    # emitted fact -- not a count of distinct role values (Kai, V3-03).
+    +    # Each channel carries the ABSOLUTE offset of its exact token; the
+    +    # selector and context are derived from it with the canonical
+    +    # passa._selector / passa._context (Kai, KAI-B4-V3-10).
+         channels = []
+         title = row.get("title") or ""
+         if title and cl.term_match(term, title):
+    -        # Pass A's title rule: the FIRST line starting with '#'. If the
+    -        # source cannot reconstruct the bound Pass-A title, the row and the
+    -        # source disagree: REFUSE, never fall through to PURPOSE (V2-04).
+    -        first = next(((i, ln) for i, ln in enumerate(lines)
+    -                      if ln.startswith("#")), None)
+    +        # Pass A's title rule, on Pass A's own line model: the FIRST
+    +        # str.splitlines() line starting with '#', title =
+    +        # ln.lstrip("#").strip()[:120]. If the source cannot reconstruct
+    +        # the bound Pass-A title, the row and the source disagree: REFUSE,
+    +        # never fall through to PURPOSE (V2-04).
+    +        first, off = None, 0
+    +        for raw in text.splitlines(keepends=True):
+    +            ln = raw.splitlines()[0] if raw.splitlines() else ""
+    +            if ln.startswith("#"):
+    +                first = (off, ln)
+    +                break
+    +            off += len(raw)
+             if first is None or first[1].lstrip("#").strip()[:120] != title:
+                 raise NominalTraceError(
+                     f"REFUSE: {row['path']}: the Pass-A title {title!r} carries the "
+                     f"nominal term but the source's first heading does not "
+                     f"reconstruct it")
+    -        channels.append((first[0] + 1, first[1],
+    -                         cl.term_match(term, title).group(0)))
+    +        line_start, ln = first
+    +        after_hash = ln.lstrip("#")
+    +        title_at = line_start + (len(ln) - len(after_hash)) + \
+    +            (len(after_hash) - len(after_hash.lstrip()))
+    +        m = cl.term_match(term, title)
+    +        channels.append((title_at + m.start(), m.group(0)))
+         pm = cl.PURPOSE.search(text[:6000])
+         m = pm and cl.term_match(term, pm.group("body"))
+         if m:
+    -        ln_no = text[:pm.start("body")].count("\n") + 1
+    -        channels.append((ln_no, lines[ln_no - 1], m.group(0)))
+    -    if not channels or any(tok not in line for _n, line, tok in channels):
+    +        channels.append((pm.start("body") + m.start(), m.group(0)))
+    +    if not channels or any(text[at:at + len(tok)] != tok
+    +                           for at, tok in channels):
+             raise NominalTraceError(
+                 f"REFUSE: {row['path']}: classify observed NOMINAL_FUNCTION={role} "
+                 f"but no exact determining source token could be located")
+         hit = channels[0]                   # deterministic: classify's order
+     
+         def mk():
+    -        ln_no, line, token = hit
+    +        at, token = hit
+             return {"witness_type": "NOMINAL_FUNCTION_TERM",
+                     "witness_value": token, "source_path": row["path"],
+    -                "source_selector": f"L{ln_no}", "local_context": line,
+    +                "source_selector": passa._selector(text, at),
+    +                "local_context": passa._context(text, at, at + len(token)),
+                     "applicability_scope": "SPAN",
+                     "evidence_total": len(channels), "evidence_shown": 1,
+                     "truncated": len(channels) > 1,
+    @@ -532,6 +558,11 @@
+                              "False)")
+         cand["NOMINAL_FUNCTION"] = _nominal_fact(row, text, function_cell)
+         cand["SELF_ASSERTS_CURRENT"] = _currentness_fact(row, text)
+    +    if len(ont.EVIDENCE_FACTS) != len(set(ont.EVIDENCE_FACTS)):
+    +        raise FactDispositionError(
+    +            f"REFUSE: ontology.EVIDENCE_FACTS names a governed class more than "
+    +            f"once; the evidence-fact population cannot be reconciled "
+    +            f"(Kai, V3-07)")
+         missing = [n for n in ont.EVIDENCE_FACTS if n not in cand]
+         extra = [n for n in cand if n not in ont.EVIDENCE_FACTS]
+         if missing or extra:
+    ```
+    
+    ## 4. Controls and Orion's scratch results (qualified interpreter, -B -E -s; repository unchanged)
+    
+    L1 Locator controls (new, loc_controls.py): v4 37 PASS, 0 FAIL; v3 16 PASS, 21 FAIL (fail-old).
+       For each of CR, FF, NEL, LS, PS: NF heading after the separator; NF title + PURPOSE with
+       separators (evidence_total 2); NF PURPOSE with the separator on the preceding line and inside the
+       body; SAC after the separator; SAC sentence then separator. Every trace is positive, compliant,
+       class-correct, and its selector RESOLVES: the canonical LF line it names, stripped, equals the
+       local_context and contains the witness value. Explicit negative, 5 cases: a PURPOSE sentence
+       preceded ON ITS OWN LF LINE by a non-LF separator is not observed by the governed
+       classify.PURPOSE (its re.M caret anchors only after LF), so NF is False with no REFUSE; that is
+       unchanged classify.py behaviour. Duplicate governed class in ontology -> REFUSE; intact -> runs.
+    L2 The full v3 fixture suite on v4: 92 PASS, 0 FAIL. Exactly one expectation changed, by Kai's
+       ruling: the SAC trace context is now the canonical complete LF line, which still contains the
+       determining sentence (asserted). Segmentation equivalence with 438007e on all 272 frozen
+       documents (80,736 segments) unchanged.
+    L3 Frozen 272-row regression (OLD dbe692d vs NEW v4): 0 axis cells differ; 0 rows differ on the
+       other eight facts, their traces, abstentions or authority_claim; 272/272 rows carry the ten keys;
+       NF 207 (evidence_total 1: 202, 2: 5), SAC 6. All 213 new-fact traces resolve to their canonical
+       line, context and token.
+    L4 Real chain, 4 synthetic documents: OLD qualifier rc 1 with 8 FACT_CLASS_ABSENT; NEW v4 run_h2
+       rc 0, qualifier rc 0, 0 findings; axes and the other eight facts identical.
+    L5 Process-level REFUSE through the real run_h2_v12.py main(): 7 PASS, 0 FAIL on v4.
+    L6 Real chain with separator documents committed to Git (LS before the heading; CR before a SAC
+       sentence; NEL inside a PURPOSE body), real Pass A then classification: v3 REFUSES the LS
+       document ("the Pass-A title 'Project Plan' ... does not reconstruct it"); v4 run_h2 rc 0,
+       qualifier rc 0, 0 findings, ten keys per row; the LS and NEL traces resolve against the committed
+       bytes.
+    
+    ## 5. Disclosed interaction with KAI-B4-SB-01 (out of scope here; reported to Kai)
+    
+    run_h2_v12.py reads documents with Path.read_text(), whose universal-newline mode converts lone CR
+    and CRLF to LF; Pass A reads the exact blob bytes. Measured: for a lone-CR file, read_text yields 2
+    LF lines where the exact bytes have 1. So, even with a clean tree, classification can consume a
+    different byte model from the committed blob, and the v4 CR trace in L6 is correct for the text
+    classification consumed (selector L4) but not for the committed bytes (L3). That is the same read
+    site KAI-B4-SB-01 already covers; reusing passa.make_verified_reader (read_bytes, no translation)
+    would close it. Not addressed in this delta.
+    
+    ## 6. Attack questions (suggested; not exhaustive)
+    
+    Q1 Can title_at disagree with where Pass A's title text actually sits (multiple leading hashes,
+       hash-only line, whitespace classes str.strip removes, the 120-character truncation)?
+    Q2 Can the canonical _selector/_context for SAC ever name a line whose context does not contain the
+       whole determining sentence?
+    Q3 Is ordering the duplicate check before missing/extra correct, and can any other population
+       defect still pass?
+    Q4 Does the delta change any trace other than the two new facts?
+    
+    END OF PACKET v4 — D379 TWO-FACT REPAIR
+    END-VERBATIM DEEPSEEK-PACKET-V4
+- EVIDENCE COMPLETE-V4-DIFF-VS-DBE692D twofact.v4.diff: 16992 bytes, sha256 bbe42e3fbf2ecb690a93f9945b335ff4cc4a4b716c79d87255e195ee678e8aab  [CMD `sha256sum twofact.v4.diff` → bbe42e3fbf2ecb69…]
+    BEGIN-VERBATIM COMPLETE-V4-DIFF-VS-DBE692D
+    --- a/kai-pm/house_in_order_h2_v13/run_h2_v12.py
+    +++ b/kai-pm/house_in_order_h2_v13/run_h2_v12.py
+    @@ -224,9 +224,259 @@
+         "BINDING_CONTRADICTION":      ("DATE_STAMP", "L"),
+         "SELF_ASSERTS_AUTHORITY":     ("SELF_AUTHORITY_CLAIM", "L"),
+         "SELF_ASSERTS_NON_AUTHORITY": ("SELF_AUTHORITY_CLAIM", "L"),
+    +    # Kai P1-P4, 2026-10-02: the two governed classes the runner omitted.
+    +    "NOMINAL_FUNCTION":           ("NOMINAL_FUNCTION_TERM", "L"),
+    +    "SELF_ASSERTS_CURRENT":       ("SELF_CURRENTNESS_CLAIM", "L"),
+     }
+     
+     
+    +# ── TWO INDEPENDENT SUBREPAIRS of one schema-completeness defect ──────
+    +# ontology.EVIDENCE_FACTS governs ten classes; this runner emitted eight,
+    +# and the qualifier correctly reported FACT_CLASS_ABSENT (Kai, DS-B4-01).
+    +#
+    +#   NF   NOMINAL_FUNCTION: WIRING of an already-governed observation,
+    +#        classify.function()'s "NOMINAL_FUNCTION=<role> from
+    +#        self-description". No detector is added.
+    +#   SAC  SELF_ASSERTS_CURRENT: RESTORATION of the historical governed
+    +#        producer, v1.1 evidence.currentness_claims (D361, 438007e).
+    +#
+    +# FACT DISPOSITION, both subrepairs (Kai, DS-B4-04/09):
+    +#   detector or input unavailable            -> REFUSE
+    +#   complete measurement, nothing established -> False ("positive fact
+    +#                                               not established", never
+    +#                                               "proved false")
+    +#   positive candidate, determining trace
+    +#   missing or non-compliant                  -> REFUSE (never False)
+    +
+    +# ── SAC — SELF_ASSERTS_CURRENT, historical restoration (Kai P2(a)) ────
+    +#
+    +# NORMATIVE IDENTITY. CURRENT_POS / CURRENT_NEG below are literal copies
+    +# of the tuples in the IMMUTABLE commit 438007e,
+    +# kai-pm/house_in_order_h2_v11/evidence.py. That commit, not this file,
+    +# is their authority; the governed controls compare these tuples with it
+    +# mechanically and REFUSE on any drift. v1.1 is deliberately NOT imported
+    +# at runtime (that would add an old package to the governed population).
+    +# Subject ownership is the D12-repaired subjectbind.bind_subject (full
+    +# repo-relative path; a basename alone is not SELF -- Kai, B1). The v1.1
+    +# boundary is restored here because subjectbind._sentences does not
+    +# carry it: fenced code is not evidence; quoted free prose is not a
+    +# declaration; a quoted CONTROLLED FIELD (governed sb.SELF_FIELD) may be
+    +# one. Negative polarity wins. v1.1's auxiliary diagnostics are NOT
+    +# restored (Kai, B2).
+    +
+    +# POSITIVE currentness predicates. Bound forms only -- never a bare
+    +# token. "current phase", not "current".
+    +CURRENT_POS = (
+    +    r"\bis (?:the )?current\b", r"\bcurrently\b", r"\bcurrent (?:phase|"
+    +    r"focus|state|status|master|authority)\b", r"\bstatus\s*:\s*active\b",
+    +    r"\bstatus\s*:\s*current\b", r"\bin force\b", r"\bstill (?:in force|"
+    +    r"current|active)\b",
+    +)
+    +# NEGATIVE polarity must be tested FIRST: "no longer current" contains
+    +# "current", and a polarity-blind matcher would read it as the opposite
+    +# of what it says.
+    +CURRENT_NEG = (
+    +    r"\bno longer\b", r"\bnot current\b", r"\bsuperseded\b",
+    +    r"\bdeprecated\b", r"\bobsolete\b", r"\bstale\b", r"\bhistorical\b",
+    +    r"\barchived\b", r"\bwithdrawn\b",
+    +)
+    +
+    +
+    +def _segments(text):
+    +    """v1.1 subjectbind2._sentences (438007e), restored with absolute
+    +    offsets: (start, sentence, line_no, quoted).
+    +
+    +    SEMANTICS ARE v1.1's, and a governed control compares the projection
+    +    (sentence, line_no - 1, quoted) with the historical function over a
+    +    hostile corpus: lines are v1.1's `str.splitlines()` lines; ``` and ~~~
+    +    toggle a fence and fenced lines are dropped; a blockquote marker is
+    +    stripped but remembered; the split is `(?<=[.;])\\s+` (never ':').
+    +
+    +    OFFSETS ARE DERIVED, NEVER SEARCHED (Kai, DS-B4-V2-08): the line start
+    +    is the running sum of the splitlines(keepends=True) lengths; the body
+    +    start adds exactly the characters each v1.1 strip step removed; each
+    +    sentence start is the end of the previous separator match. The control
+    +    asserts text[start:start+len(sentence)] == sentence for every segment.
+    +    """
+    +    out, fence, line_start = [], False, 0
+    +    for i, raw in enumerate(text.splitlines(keepends=True)):
+    +        ln = raw.splitlines()[0] if raw.splitlines() else ""
+    +        here, line_start = line_start, line_start + len(raw)
+    +        s = ln.lstrip()
+    +        if s.startswith("```") or s.startswith("~~~"):
+    +            fence = not fence
+    +            continue
+    +        if fence:
+    +            continue
+    +        quoted = s.startswith(">")
+    +        s2 = s.lstrip("> ")
+    +        body = s2.strip()
+    +        lead = (len(ln) - len(s)) + (len(s) - len(s2)) + (len(s2) - len(s2.lstrip()))
+    +        base = here + lead
+    +        pos = 0
+    +        for sep in list(re.finditer(r"(?<=[.;])\s+", body)) + [None]:
+    +            end = sep.start() if sep else len(body)
+    +            part = body[pos:end]
+    +            if part:
+    +                out.append((base + pos, part, i + 1, quoted))
+    +            if sep:
+    +                pos = sep.end()
+    +    return out
+    +
+    +
+    +def currentness_claims(path, text):
+    +    """Every polarity-bearing currentness sentence with its OWNER.
+    +    Returns [(polarity, subject, line_no, sentence, phrase, sentence_start,
+    +    phrase_start)], both starts ABSOLUTE offsets into `text`."""
+    +    claims = []
+    +    for start, sent, line_no, quoted in _segments(text):
+    +        neg = next((m for m in (re.search(p, sent, re.I) for p in CURRENT_NEG)
+    +                    if m), None)
+    +        pos = None if neg else next(
+    +            (m for m in (re.search(p, sent, re.I) for p in CURRENT_POS) if m),
+    +            None)
+    +        if not (neg or pos):
+    +            continue
+    +        pol = "CURRENT_NEGATIVE" if neg else "CURRENT_POSITIVE"
+    +        if quoted and not sb.SELF_FIELD.match(sent):
+    +            subject = "QUOTED_NOT_DECLARATION"
+    +        else:
+    +            subject, _why = sb.bind_subject(text, start, sent, path)
+    +        hit = neg or pos
+    +        claims.append((pol, subject, line_no, sent, hit.group(0),
+    +                       start, start + hit.start()))
+    +    return claims
+    +
+    +
+    +def _currentness_fact(row, text):
+    +    """(positive, trace-maker). SELF positive and no SELF negative; a
+    +    SELF negative anywhere wins (v1.1 conflict rule)."""
+    +    cl_ = currentness_claims(row["path"], text)
+    +    self_pos = [c for c in cl_ if c[1] == "SELF" and c[0] == "CURRENT_POSITIVE"]
+    +    self_neg = [c for c in cl_ if c[1] == "SELF" and c[0] == "CURRENT_NEGATIVE"]
+    +    positive = bool(self_pos) and not self_neg
+    +
+    +    def mk():
+    +        # Kai KAI-B4-V3-10: one locator vocabulary across the instrument.
+    +        # The selector and context come from the canonical passa._selector
+    +        # / passa._context at the phrase's ABSOLUTE offset; the splitlines
+    +        # ordinal stays internal to the historical segmentation. The
+    +        # canonical context is the complete logical (LF) line, which always
+    +        # contains the whole v1.1 sentence (v1.1 never splits across LF).
+    +        _pol, _subj, _ln, sent, phrase, s_start, p_start = self_pos[0]
+    +        return {"witness_type": "SELF_CURRENTNESS_CLAIM",
+    +                "witness_value": phrase, "source_path": row["path"],
+    +                "source_selector": passa._selector(text, p_start),
+    +                "local_context": passa._context(text, s_start,
+    +                                                s_start + len(sent)),
+    +                # the sentence is the evidence: SPAN, never widened because
+    +                # its semantic subject is the document (Kai P2)
+    +                "applicability_scope": "SPAN",
+    +                "evidence_total": len(self_pos), "evidence_shown": 1,
+    +                "truncated": len(self_pos) > 1,
+    +                "polarity": "POSITIVE", "certainty": "OBSERVED",
+    +                "temporal": "AT_COMMIT", "subject": "SELF"}
+    +    return positive, mk
+    +
+    +
+    +# ── NF — NOMINAL_FUNCTION, wiring of the classify.function() observation
+    +class FactDispositionError(SystemExit):
+    +    """A governed fact could not be dispositioned honestly: input
+    +    unavailable, a malformed governed observation, or a positive whose
+    +    exact determining trace cannot be built. REFUSE, never False."""
+    +
+    +
+    +class NominalTraceError(FactDispositionError):
+    +    """The NOMINAL_FUNCTION-specific fact-disposition REFUSE (Kai, V2-09:
+    +    a real subclass, not a second name for the same class)."""
+    +
+    +# The EXACT governed observation grammar emitted by classify.function()
+    +# (classify.py, single-role branch). Nothing looser is accepted
+    +# (Kai, DS-B4-08).
+    +NOMINAL_OBSERVATION = re.compile(
+    +    r"NOMINAL_FUNCTION=(?P<role>[A-Z][A-Z_]*) from self-description")
+    +
+    +
+    +def _nominal_fact(row, text, function_cell):
+    +    """(positive, trace-maker) from classify.function()'s own observation
+    +    `NOMINAL_FUNCTION=<role> from self-description`. The token is located
+    +    with the SAME governed cl.FUNCTION_TERMS / cl.PURPOSE / cl.term_match
+    +    and the same title-then-purpose order classify uses; no second
+    +    vocabulary exists here."""
+    +    obs = (function_cell or {}).get("observed") or ""
+    +    if not obs.startswith("NOMINAL_FUNCTION="):
+    +        return False, None              # complete measurement, not established
+    +    om = NOMINAL_OBSERVATION.fullmatch(obs)
+    +    if om is None:
+    +        raise NominalTraceError(
+    +            f"REFUSE: {row['path']}: malformed NOMINAL_FUNCTION observation "
+    +            f"{obs!r}; the governed grammar is "
+    +            f"'NOMINAL_FUNCTION=<ROLE> from self-description'")
+    +    role = om.group("role")
+    +    if role not in cl.FUNCTION_TERMS:
+    +        raise NominalTraceError(
+    +            f"REFUSE: {row['path']}: NOMINAL_FUNCTION role {role!r} is not a "
+    +            f"governed FUNCTION_TERMS key")
+    +    term = cl.FUNCTION_TERMS[role]
+    +    # The TWO governed channels classify.function() unions, in its order
+    +    # (title, then PURPOSE); each is evaluated, so the evidence population
+    +    # is counted, not assumed (Kai, KAI-B4-V2-10). evidence_total for NF is
+    +    # the number of qualifying governed SOURCE CHANNELS supporting the
+    +    # emitted fact -- not a count of distinct role values (Kai, V3-03).
+    +    # Each channel carries the ABSOLUTE offset of its exact token; the
+    +    # selector and context are derived from it with the canonical
+    +    # passa._selector / passa._context (Kai, KAI-B4-V3-10).
+    +    channels = []
+    +    title = row.get("title") or ""
+    +    if title and cl.term_match(term, title):
+    +        # Pass A's title rule, on Pass A's own line model: the FIRST
+    +        # str.splitlines() line starting with '#', title =
+    +        # ln.lstrip("#").strip()[:120]. If the source cannot reconstruct
+    +        # the bound Pass-A title, the row and the source disagree: REFUSE,
+    +        # never fall through to PURPOSE (V2-04).
+    +        first, off = None, 0
+    +        for raw in text.splitlines(keepends=True):
+    +            ln = raw.splitlines()[0] if raw.splitlines() else ""
+    +            if ln.startswith("#"):
+    +                first = (off, ln)
+    +                break
+    +            off += len(raw)
+    +        if first is None or first[1].lstrip("#").strip()[:120] != title:
+    +            raise NominalTraceError(
+    +                f"REFUSE: {row['path']}: the Pass-A title {title!r} carries the "
+    +                f"nominal term but the source's first heading does not "
+    +                f"reconstruct it")
+    +        line_start, ln = first
+    +        after_hash = ln.lstrip("#")
+    +        title_at = line_start + (len(ln) - len(after_hash)) + \
+    +            (len(after_hash) - len(after_hash.lstrip()))
+    +        m = cl.term_match(term, title)
+    +        channels.append((title_at + m.start(), m.group(0)))
+    +    pm = cl.PURPOSE.search(text[:6000])
+    +    m = pm and cl.term_match(term, pm.group("body"))
+    +    if m:
+    +        channels.append((pm.start("body") + m.start(), m.group(0)))
+    +    if not channels or any(text[at:at + len(tok)] != tok
+    +                           for at, tok in channels):
+    +        raise NominalTraceError(
+    +            f"REFUSE: {row['path']}: classify observed NOMINAL_FUNCTION={role} "
+    +            f"but no exact determining source token could be located")
+    +    hit = channels[0]                   # deterministic: classify's order
+    +
+    +    def mk():
+    +        at, token = hit
+    +        return {"witness_type": "NOMINAL_FUNCTION_TERM",
+    +                "witness_value": token, "source_path": row["path"],
+    +                "source_selector": passa._selector(text, at),
+    +                "local_context": passa._context(text, at, at + len(token)),
+    +                "applicability_scope": "SPAN",
+    +                "evidence_total": len(channels), "evidence_shown": 1,
+    +                "truncated": len(channels) > 1,
+    +                "polarity": "POSITIVE", "certainty": "OBSERVED",
+    +                "temporal": "AT_COMMIT", "subject": "SELF"}
+    +    return True, mk
+    +
+    +
+     def _class_ok(name, tr):
+         want = TRACE_CLASS.get(name)
+         if not want:
+    @@ -246,8 +496,14 @@
+         return str(t["witness_value"]) in str(t["local_context"])
+     
+     
+    +# The two classes repaired here. The existing eight keep their A6-ii
+    +# behaviour unchanged; that is outside this repair (Kai: bounded tranche).
+    +REFUSE_ON_UNTRACEABLE_POSITIVE = ("NOMINAL_FUNCTION", "SELF_ASSERTS_CURRENT")
+    +
+    +
+     def evidence_facts(row, claims, contradiction, determining=(),
+    -                   subject="", subject_repo="."):
+    +                   subject="", subject_repo=".", *, text=None,
+    +                   function_cell=None):
+         """FACTS, each bound to the trace that DETERMINED it. None is a
+         verdict (D360 5).
+     
+    @@ -294,6 +550,25 @@
+                           (lambda d=determining, n=len(claims): _claim_trace(
+                               row, d, n) if d else None))
+     
+    +    # Kai P3: every governed class is MEASURED on every row. No default:
+    +    # a caller that cannot supply the inputs does not get a False.
+    +    if text is None or function_cell is None:
+    +        raise FactDispositionError("REFUSE: evidence_facts needs the document text and "
+    +                         "the governed FUNCTION cell (Kai P3: no unmeasured "
+    +                         "False)")
+    +    cand["NOMINAL_FUNCTION"] = _nominal_fact(row, text, function_cell)
+    +    cand["SELF_ASSERTS_CURRENT"] = _currentness_fact(row, text)
+    +    if len(ont.EVIDENCE_FACTS) != len(set(ont.EVIDENCE_FACTS)):
+    +        raise FactDispositionError(
+    +            f"REFUSE: ontology.EVIDENCE_FACTS names a governed class more than "
+    +            f"once; the evidence-fact population cannot be reconciled "
+    +            f"(Kai, V3-07)")
+    +    missing = [n for n in ont.EVIDENCE_FACTS if n not in cand]
+    +    extra = [n for n in cand if n not in ont.EVIDENCE_FACTS]
+    +    if missing or extra:
+    +        raise FactDispositionError(f"REFUSE: evidence-fact producer population != the "
+    +                         f"governed schema; missing={missing} extra={extra}")
+    +
+         f, abstained = {}, []
+         for name, (positive, mk) in cand.items():
+             if not positive:
+    @@ -303,6 +578,12 @@
+             if _compliant(t) and _class_ok(name, t):
+                 f[name] = True
+                 traces[name] = t
+    +        elif name in REFUSE_ON_UNTRACEABLE_POSITIVE:
+    +            # Kai DS-B4-04: a positive candidate without a compliant
+    +            # determining trace is never demoted to False for these two.
+    +            raise FactDispositionError(
+    +                f"REFUSE: {row['path']}: positive {name} candidate has no "
+    +                f"compliant determining trace")
+             else:                       # A6-ii: no compliant trace, no positive
+                 f[name] = False
+                 abstained.append(name)
+    @@ -430,10 +711,22 @@
+             # E1 needs them BEFORE the facts, because a SELF-authority fact
+             # must bind to the row that determined it.
+             det = sb.determining_claims(claims)
+    +        # The governed observation the NOMINAL_FUNCTION fact consumes.
+    +        # classify.function() is a pure calculation over (row, text) and
+    +        # fixed constants -- no cache, mutation or IO -- so cl.classify()
+    +        # below recomputes the identical cell. The equality check after
+    +        # classify is a COHERENCE check, not a proof of correctness; it is
+    +        # kept because authority_claim must be set before classify runs
+    +        # (Kai, DS-B4-V2-03).
+    +        fn_cell = cl.function(row, text)
+             facts, ac, fact_traces, abstained = evidence_facts(
+    -            row, claims, contradiction, det, pa["subject"], sr)
+    +            row, claims, contradiction, det, pa["subject"], sr,
+    +            text=text, function_cell=fn_cell)
+             row["authority_claim"] = ac
+             out = cl.classify(row, text, contradiction)
+    +        if out["FUNCTION"] != fn_cell:
+    +            raise SystemExit(f"REFUSE: {row['path']}: classify's FUNCTION cell "
+    +                             f"differs from the observation the fact used")
+             out["evidence_facts"] = facts
+             # E1: every POSITIVE fact carries the trace that determined it.
+             out["evidence_fact_traces"] = fact_traces
+    END-VERBATIM COMPLETE-V4-DIFF-VS-DBE692D
+- EVIDENCE DEEPSEEK-COVER-V4 DEEPSEEK_COVER_v4.txt: 1349 bytes, sha256 d0702468ab38cea49d091696b7e69a9136f98c10cdd21cb532fa8eb190cc483a  [CMD `sha256sum DEEPSEEK_COVER_v4.txt` → d0702468ab38cea4…]
+    BEGIN-VERBATIM DEEPSEEK-COVER-V4
+    To: DeepSeek (adversarial reviewer)
+    From: Orion, for Kai and Dainius
+    Subject: D379 B4 two-fact repair, packet v4, focused review of the v3 -> v4 delta
+    
+    Kai reconciled your v3 review. Most findings were closed or disproved; two produced small code
+    changes. Packet v4 contains ONLY that v3 -> v4 delta for you to attack.
+    
+    Packet v4 SHA-256 (the subject you must reconstruct):
+    242a554855679d519739bb08673832dcc95c9e0f4e56de174c2004a9db88a955
+    
+    It follows as 2 base64 blocks. Same protocol as v3:
+    1. For each block, remove all whitespace from the base64 text and check its stated hash.
+    2. Decode it; check the stated decoded length and decoded hash.
+    3. Concatenate the decoded chunks strictly in order 1 to 2; check the packet hash above.
+    4. Read ONLY the decoded packet, then reply with the receipt in its section 0, copying both
+       sentinels from the DECODED delta. If you cannot compute SHA-256, say so on those lines.
+    5. Only after the receipt, review the delta as section 6 suggests. Give each finding an ID
+       (DS-B4-V4-nn), a severity (BLOCKER / MAJOR / MINOR), the exact delta lines, a concrete failing
+       input where possible, and a remedy. If you find nothing, say so explicitly. A PASS is not
+       implementation authority: Kai reconciles every finding.
+    Section 5 (KAI-B4-SB-01, the working-tree and newline-translation reads) is out of scope.
+    
+    END-VERBATIM DEEPSEEK-COVER-V4
+- EVIDENCE LOC-CONTROLS-INSTRUMENT loc_controls.py: 4759 bytes, sha256 53738d03a9629ab315c9ba8d66da192f1e46f48233574dc8833498703c90bb05  [CMD `sha256sum loc_controls.py` → 53738d03a9629ab3…]
+    BEGIN-VERBATIM LOC-CONTROLS-INSTRUMENT
+    """Locator controls (Kai KAI-B4-V3-10, V3-07). argv: <H2 dir under test>. Expected answers are declared here.
+    A selector RESOLVES iff: it is "L<n>"; the canonical logical line text.split("\\n")[n-1], stripped, EQUALS local_context;
+    and witness_value occurs in that line. Pass A's title is derived with Pass A's own rule (first str.splitlines() line
+    starting with '#', ln.lstrip("#").strip()[:120]), copied from passa.py build()."""
+    import sys, re, json
+    sys.path.insert(0, sys.argv[1])
+    import run_h2_v12 as R, classify as cl, ontology as ont
+    P = F = 0
+    def chk(label, ok, detail=""):
+        global P, F
+        P += bool(ok); F += (not ok); print(f"  {'PASS' if ok else 'FAIL'}  {label}" + ("" if ok else f"   -> {detail}"))
+    def passa_title(txt):
+        for ln in txt.splitlines():
+            if ln.startswith("#"):
+                return ln.lstrip("#").strip()[:120]
+        return ""
+    def resolves(text, tr):
+        m = re.fullmatch(r"L(\d+)", tr["source_selector"])
+        if not m: return False
+        lines = text.split("\n"); n = int(m.group(1))
+        if not 1 <= n <= len(lines): return False
+        line = lines[n - 1].strip()
+        return line == tr["local_context"] and tr["witness_value"] in line
+    SEPS = {"CR": "\r", "FF": "\x0c", "NEL": "\x85", "LS": "\u2028", "PS": "\u2029"}
+    print("L. LOCATOR CONTROLS")
+    for name, c in SEPS.items():
+        cases = {
+            "NF heading after separator": f"intro{c}# Project Plan\nBody text.\n",
+            "NF purpose, separator on line before": f"# Notes\n\nlead{c}tail\nThis document defines the deployment roadmap for the quarter.\n",
+            "NF purpose, separator inside body": f"# Notes\n\nThis document defines the deployment roadmap{c}for the quarter.\n",
+            "NF title+purpose, separators": f"pre{c}# Project Plan\n\nThis document defines the deployment roadmap for the quarter.{c}tail\n",
+            "SAC after separator": f"# T\n\nlead{c}This document is the current plan.\n",
+            "SAC sentence then separator": f"# T\n\nThis document is in force.{c}Next part.\n",
+        }
+        for label, text in cases.items():
+            row = {"path": "kai-pm/X.md", "title": passa_title(text), "bytes": 5000, "witnesses": {}}
+            try:
+                if label.startswith("NF"):
+                    cell = cl.function(row, text)
+                    pos, mk = R._nominal_fact(row, text, cell)
+                    want_pos = cell.get("observed", "").startswith("NOMINAL_FUNCTION=")
+                else:
+                    pos, mk = R._currentness_fact({"path": "kai-pm/X.md"}, text); want_pos = True
+                tr = mk() if pos else None
+                ok = pos == want_pos and pos and R._compliant(tr) and R._class_ok(
+                    "NOMINAL_FUNCTION" if label.startswith("NF") else "SELF_ASSERTS_CURRENT", tr) and resolves(text, tr)
+                extra = ""
+                if label == "NF title+purpose, separators" and pos:
+                    ok = ok and tr["evidence_total"] == 2 and tr["truncated"] is True
+                    extra = f" total={tr['evidence_total']}"
+                chk(f"{name:<4} {label:<30} positive, compliant, selector resolves{extra}", ok,
+                    f"pos={pos} want={want_pos} tr={tr}")
+            except SystemExit as e:
+                chk(f"{name:<4} {label:<30} positive, compliant, selector resolves", False, f"REFUSED: {e}")
+    print("\nN. EXPLICIT NEGATIVE: a purpose sentence preceded on its LF line by a non-LF separator")
+    for name, c in SEPS.items():
+        text = f"# Notes\n\nx{c}This document defines the deployment roadmap for the quarter.\n"
+        row = {"path": "kai-pm/X.md", "title": passa_title(text), "bytes": 5000, "witnesses": {}}
+        cell = cl.function(row, text)
+        try:
+            pos, _mk = R._nominal_fact(row, text, cell); r = pos
+        except SystemExit as e:
+            r = "REFUSED"
+        chk(f"{name:<4} governed PURPOSE (re.M '^' is LF-anchored) observes no role -> NF False, no REFUSE",
+            cell.get("observed", "").startswith("NOMINAL_FUNCTION=") is False and r is False, (cell.get("observed"), r))
+    print("\nD. DUPLICATE GOVERNED CLASS (V3-07)")
+    base_row = {"path": "kai-pm/SYNTH.md", "commits_in_window": 1, "readers": [], "witnesses": {}, "title": "Project Plan", "bytes": 5000}
+    base_text = "# Project Plan\n\nThis document is the current plan.\n"
+    def ef():
+        return R.evidence_facts(dict(base_row), [], None, (), "", ".", text=base_text, function_cell=cl.function(base_row, base_text))
+    orig = ont.EVIDENCE_FACTS
+    ont.EVIDENCE_FACTS = tuple(orig) + (orig[0],)
+    try:
+        ef(); refused = False
+    except SystemExit as e:
+        refused = "more than once" in str(e); detail = str(e)
+    finally:
+        ont.EVIDENCE_FACTS = orig
+    chk("ontology names a governed class twice -> REFUSE (population equality)", refused, locals().get("detail", "accepted"))
+    chk("known-negative: intact ontology -> runs", isinstance(ef()[0], dict))
+    print(f"\n{P} passed, {F} failed")
+    END-VERBATIM LOC-CONTROLS-INSTRUMENT
+- EVIDENCE LOC-CONTROLS-V4-OUTPUT loc_v4_out.txt: 3347 bytes, sha256 e6fa762ae059d55428b03d015c097f5298062ed7fad9299fe8101f064fb6954c  [CMD `sha256sum loc_v4_out.txt` → e6fa762ae059d554…]
+    BEGIN-VERBATIM LOC-CONTROLS-V4-OUTPUT
+    L. LOCATOR CONTROLS
+      PASS  CR   NF heading after separator     positive, compliant, selector resolves
+      PASS  CR   NF purpose, separator on line before positive, compliant, selector resolves
+      PASS  CR   NF purpose, separator inside body positive, compliant, selector resolves
+      PASS  CR   NF title+purpose, separators   positive, compliant, selector resolves total=2
+      PASS  CR   SAC after separator            positive, compliant, selector resolves
+      PASS  CR   SAC sentence then separator    positive, compliant, selector resolves
+      PASS  FF   NF heading after separator     positive, compliant, selector resolves
+      PASS  FF   NF purpose, separator on line before positive, compliant, selector resolves
+      PASS  FF   NF purpose, separator inside body positive, compliant, selector resolves
+      PASS  FF   NF title+purpose, separators   positive, compliant, selector resolves total=2
+      PASS  FF   SAC after separator            positive, compliant, selector resolves
+      PASS  FF   SAC sentence then separator    positive, compliant, selector resolves
+      PASS  NEL  NF heading after separator     positive, compliant, selector resolves
+      PASS  NEL  NF purpose, separator on line before positive, compliant, selector resolves
+      PASS  NEL  NF purpose, separator inside body positive, compliant, selector resolves
+      PASS  NEL  NF title+purpose, separators   positive, compliant, selector resolves total=2
+      PASS  NEL  SAC after separator            positive, compliant, selector resolves
+      PASS  NEL  SAC sentence then separator    positive, compliant, selector resolves
+      PASS  LS   NF heading after separator     positive, compliant, selector resolves
+      PASS  LS   NF purpose, separator on line before positive, compliant, selector resolves
+      PASS  LS   NF purpose, separator inside body positive, compliant, selector resolves
+      PASS  LS   NF title+purpose, separators   positive, compliant, selector resolves total=2
+      PASS  LS   SAC after separator            positive, compliant, selector resolves
+      PASS  LS   SAC sentence then separator    positive, compliant, selector resolves
+      PASS  PS   NF heading after separator     positive, compliant, selector resolves
+      PASS  PS   NF purpose, separator on line before positive, compliant, selector resolves
+      PASS  PS   NF purpose, separator inside body positive, compliant, selector resolves
+      PASS  PS   NF title+purpose, separators   positive, compliant, selector resolves total=2
+      PASS  PS   SAC after separator            positive, compliant, selector resolves
+      PASS  PS   SAC sentence then separator    positive, compliant, selector resolves
+    
+    N. EXPLICIT NEGATIVE: a purpose sentence preceded on its LF line by a non-LF separator
+      PASS  CR   governed PURPOSE (re.M '^' is LF-anchored) observes no role -> NF False, no REFUSE
+      PASS  FF   governed PURPOSE (re.M '^' is LF-anchored) observes no role -> NF False, no REFUSE
+      PASS  NEL  governed PURPOSE (re.M '^' is LF-anchored) observes no role -> NF False, no REFUSE
+      PASS  LS   governed PURPOSE (re.M '^' is LF-anchored) observes no role -> NF False, no REFUSE
+      PASS  PS   governed PURPOSE (re.M '^' is LF-anchored) observes no role -> NF False, no REFUSE
+    
+    D. DUPLICATE GOVERNED CLASS (V3-07)
+      PASS  ontology names a governed class twice -> REFUSE (population equality)
+      PASS  known-negative: intact ontology -> runs
+    
+    37 passed, 0 failed
+    END-VERBATIM LOC-CONTROLS-V4-OUTPUT
+- EVIDENCE LOC-CONTROLS-V3-FAILOLD-OUTPUT loc_v3_out.txt: 8732 bytes, sha256 748c7689d3c07514cc4d87880946c7e32cc413d6d3ecc6890b00401211f7255d  [CMD `sha256sum loc_v3_out.txt` → 748c7689d3c07514…]
+    BEGIN-VERBATIM LOC-CONTROLS-V3-FAILOLD-OUTPUT
+    L. LOCATOR CONTROLS
+      FAIL  CR   NF heading after separator     positive, compliant, selector resolves   -> REFUSED: REFUSE: kai-pm/X.md: the Pass-A title 'Project Plan' carries the nominal term but the source's first heading does not reconstruct it
+      PASS  CR   NF purpose, separator on line before positive, compliant, selector resolves
+      PASS  CR   NF purpose, separator inside body positive, compliant, selector resolves
+      FAIL  CR   NF title+purpose, separators   positive, compliant, selector resolves   -> REFUSED: REFUSE: kai-pm/X.md: the Pass-A title 'Project Plan' carries the nominal term but the source's first heading does not reconstruct it
+      FAIL  CR   SAC after separator            positive, compliant, selector resolves   -> pos=True want=True tr={'witness_type': 'SELF_CURRENTNESS_CLAIM', 'witness_value': 'is the current', 'source_path': 'kai-pm/X.md', 'source_selector': 'L4', 'local_context': 'This document is the current plan.', 'applicability_scope': 'SPAN', 'evidence_total': 1, 'evidence_shown': 1, 'truncated': False, 'polarity': 'POSITIVE', 'certainty': 'OBSERVED', 'temporal': 'AT_COMMIT', 'subject': 'SELF'}
+      FAIL  CR   SAC sentence then separator    positive, compliant, selector resolves   -> pos=True want=True tr={'witness_type': 'SELF_CURRENTNESS_CLAIM', 'witness_value': 'in force', 'source_path': 'kai-pm/X.md', 'source_selector': 'L3', 'local_context': 'This document is in force.', 'applicability_scope': 'SPAN', 'evidence_total': 1, 'evidence_shown': 1, 'truncated': False, 'polarity': 'POSITIVE', 'certainty': 'OBSERVED', 'temporal': 'AT_COMMIT', 'subject': 'SELF'}
+      FAIL  FF   NF heading after separator     positive, compliant, selector resolves   -> REFUSED: REFUSE: kai-pm/X.md: the Pass-A title 'Project Plan' carries the nominal term but the source's first heading does not reconstruct it
+      PASS  FF   NF purpose, separator on line before positive, compliant, selector resolves
+      PASS  FF   NF purpose, separator inside body positive, compliant, selector resolves
+      FAIL  FF   NF title+purpose, separators   positive, compliant, selector resolves   -> REFUSED: REFUSE: kai-pm/X.md: the Pass-A title 'Project Plan' carries the nominal term but the source's first heading does not reconstruct it
+      FAIL  FF   SAC after separator            positive, compliant, selector resolves   -> pos=True want=True tr={'witness_type': 'SELF_CURRENTNESS_CLAIM', 'witness_value': 'is the current', 'source_path': 'kai-pm/X.md', 'source_selector': 'L4', 'local_context': 'This document is the current plan.', 'applicability_scope': 'SPAN', 'evidence_total': 1, 'evidence_shown': 1, 'truncated': False, 'polarity': 'POSITIVE', 'certainty': 'OBSERVED', 'temporal': 'AT_COMMIT', 'subject': 'SELF'}
+      FAIL  FF   SAC sentence then separator    positive, compliant, selector resolves   -> pos=True want=True tr={'witness_type': 'SELF_CURRENTNESS_CLAIM', 'witness_value': 'in force', 'source_path': 'kai-pm/X.md', 'source_selector': 'L3', 'local_context': 'This document is in force.', 'applicability_scope': 'SPAN', 'evidence_total': 1, 'evidence_shown': 1, 'truncated': False, 'polarity': 'POSITIVE', 'certainty': 'OBSERVED', 'temporal': 'AT_COMMIT', 'subject': 'SELF'}
+      FAIL  NEL  NF heading after separator     positive, compliant, selector resolves   -> REFUSED: REFUSE: kai-pm/X.md: the Pass-A title 'Project Plan' carries the nominal term but the source's first heading does not reconstruct it
+      PASS  NEL  NF purpose, separator on line before positive, compliant, selector resolves
+      PASS  NEL  NF purpose, separator inside body positive, compliant, selector resolves
+      FAIL  NEL  NF title+purpose, separators   positive, compliant, selector resolves   -> REFUSED: REFUSE: kai-pm/X.md: the Pass-A title 'Project Plan' carries the nominal term but the source's first heading does not reconstruct it
+      FAIL  NEL  SAC after separator            positive, compliant, selector resolves   -> pos=True want=True tr={'witness_type': 'SELF_CURRENTNESS_CLAIM', 'witness_value': 'is the current', 'source_path': 'kai-pm/X.md', 'source_selector': 'L4', 'local_context': 'This document is the current plan.', 'applicability_scope': 'SPAN', 'evidence_total': 1, 'evidence_shown': 1, 'truncated': False, 'polarity': 'POSITIVE', 'certainty': 'OBSERVED', 'temporal': 'AT_COMMIT', 'subject': 'SELF'}
+      FAIL  NEL  SAC sentence then separator    positive, compliant, selector resolves   -> pos=True want=True tr={'witness_type': 'SELF_CURRENTNESS_CLAIM', 'witness_value': 'in force', 'source_path': 'kai-pm/X.md', 'source_selector': 'L3', 'local_context': 'This document is in force.', 'applicability_scope': 'SPAN', 'evidence_total': 1, 'evidence_shown': 1, 'truncated': False, 'polarity': 'POSITIVE', 'certainty': 'OBSERVED', 'temporal': 'AT_COMMIT', 'subject': 'SELF'}
+      FAIL  LS   NF heading after separator     positive, compliant, selector resolves   -> REFUSED: REFUSE: kai-pm/X.md: the Pass-A title 'Project Plan' carries the nominal term but the source's first heading does not reconstruct it
+      PASS  LS   NF purpose, separator on line before positive, compliant, selector resolves
+      PASS  LS   NF purpose, separator inside body positive, compliant, selector resolves
+      FAIL  LS   NF title+purpose, separators   positive, compliant, selector resolves   -> REFUSED: REFUSE: kai-pm/X.md: the Pass-A title 'Project Plan' carries the nominal term but the source's first heading does not reconstruct it
+      FAIL  LS   SAC after separator            positive, compliant, selector resolves   -> pos=True want=True tr={'witness_type': 'SELF_CURRENTNESS_CLAIM', 'witness_value': 'is the current', 'source_path': 'kai-pm/X.md', 'source_selector': 'L4', 'local_context': 'This document is the current plan.', 'applicability_scope': 'SPAN', 'evidence_total': 1, 'evidence_shown': 1, 'truncated': False, 'polarity': 'POSITIVE', 'certainty': 'OBSERVED', 'temporal': 'AT_COMMIT', 'subject': 'SELF'}
+      FAIL  LS   SAC sentence then separator    positive, compliant, selector resolves   -> pos=True want=True tr={'witness_type': 'SELF_CURRENTNESS_CLAIM', 'witness_value': 'in force', 'source_path': 'kai-pm/X.md', 'source_selector': 'L3', 'local_context': 'This document is in force.', 'applicability_scope': 'SPAN', 'evidence_total': 1, 'evidence_shown': 1, 'truncated': False, 'polarity': 'POSITIVE', 'certainty': 'OBSERVED', 'temporal': 'AT_COMMIT', 'subject': 'SELF'}
+      FAIL  PS   NF heading after separator     positive, compliant, selector resolves   -> REFUSED: REFUSE: kai-pm/X.md: the Pass-A title 'Project Plan' carries the nominal term but the source's first heading does not reconstruct it
+      PASS  PS   NF purpose, separator on line before positive, compliant, selector resolves
+      PASS  PS   NF purpose, separator inside body positive, compliant, selector resolves
+      FAIL  PS   NF title+purpose, separators   positive, compliant, selector resolves   -> REFUSED: REFUSE: kai-pm/X.md: the Pass-A title 'Project Plan' carries the nominal term but the source's first heading does not reconstruct it
+      FAIL  PS   SAC after separator            positive, compliant, selector resolves   -> pos=True want=True tr={'witness_type': 'SELF_CURRENTNESS_CLAIM', 'witness_value': 'is the current', 'source_path': 'kai-pm/X.md', 'source_selector': 'L4', 'local_context': 'This document is the current plan.', 'applicability_scope': 'SPAN', 'evidence_total': 1, 'evidence_shown': 1, 'truncated': False, 'polarity': 'POSITIVE', 'certainty': 'OBSERVED', 'temporal': 'AT_COMMIT', 'subject': 'SELF'}
+      FAIL  PS   SAC sentence then separator    positive, compliant, selector resolves   -> pos=True want=True tr={'witness_type': 'SELF_CURRENTNESS_CLAIM', 'witness_value': 'in force', 'source_path': 'kai-pm/X.md', 'source_selector': 'L3', 'local_context': 'This document is in force.', 'applicability_scope': 'SPAN', 'evidence_total': 1, 'evidence_shown': 1, 'truncated': False, 'polarity': 'POSITIVE', 'certainty': 'OBSERVED', 'temporal': 'AT_COMMIT', 'subject': 'SELF'}
+    
+    N. EXPLICIT NEGATIVE: a purpose sentence preceded on its LF line by a non-LF separator
+      PASS  CR   governed PURPOSE (re.M '^' is LF-anchored) observes no role -> NF False, no REFUSE
+      PASS  FF   governed PURPOSE (re.M '^' is LF-anchored) observes no role -> NF False, no REFUSE
+      PASS  NEL  governed PURPOSE (re.M '^' is LF-anchored) observes no role -> NF False, no REFUSE
+      PASS  LS   governed PURPOSE (re.M '^' is LF-anchored) observes no role -> NF False, no REFUSE
+      PASS  PS   governed PURPOSE (re.M '^' is LF-anchored) observes no role -> NF False, no REFUSE
+    
+    D. DUPLICATE GOVERNED CLASS (V3-07)
+      FAIL  ontology names a governed class twice -> REFUSE (population equality)   -> accepted
+      PASS  known-negative: intact ontology -> runs
+    
+    16 passed, 21 failed
+    END-VERBATIM LOC-CONTROLS-V3-FAILOLD-OUTPUT
+- EVIDENCE LOC-E2E-INSTRUMENT loc_e2e.py: 4734 bytes, sha256 5da9ed88652f5cbaaf736acd0b506b742138361ee8c80ddbd0a33814712de3ec  [CMD `sha256sum loc_e2e.py` → 5da9ed88652f5cba…]
+    BEGIN-VERBATIM LOC-E2E-INSTRUMENT
+    """Orchestrator (system python3): the real chain under the qualified interpreter, OLD = repair HEAD dbe692d
+    working tree, NEW = scratch instrument with the proposed delta. Subject: 4 synthetic docs incl. both facts."""
+    import json, pathlib, subprocess, tempfile, shutil, sys
+    PY = "/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11"
+    CEN = "/home/user/kai-repair/kai-pm/house_in_order_census_v11"
+    D = pathlib.Path(sys.argv[1])
+    TREES = {"V3 inst": D / "inst", "V4 inst4": D / "inst4"}
+    DOCS = {"kai-pm/LS_HEAD.md": "intro\u2028# Project Plan\n\nThis document is the current plan.\n",
+            "kai-pm/CR_SAC.md": "# Notes\n\nlead\rThis document is in force.\n",
+            "kai-pm/NEL_PURPOSE.md": "# Notes\n\nThis document defines the deployment roadmap\x85for the quarter.\n"}
+    W = pathlib.Path(tempfile.mkdtemp(prefix="twofact_e2e_"))
+    def run(argv, label):
+        p = subprocess.run(argv, capture_output=True, text=True)
+        out = p.stdout + p.stderr
+        print(f"--- {label} rc={p.returncode}\n{out}--- end {label} ({len(out.encode())} bytes)")
+        return p
+    res = {}
+    for label, tree in TREES.items():
+        print(f"\n== {label} ==")
+        d = W / label.split()[0]; S = d / "subj"; (S / "kai-pm").mkdir(parents=True)
+        subprocess.run(["git", "init", "-q", str(S)], check=True)
+        for p_, t in DOCS.items(): (S / p_).write_text(t)
+        g = ["-c", "user.name=d", "-c", "user.email=d@l"]
+        subprocess.run(["git", "-C", str(S), "add", "-A"], check=True); subprocess.run(["git", "-C", str(S), *g, "commit", "-qm", "one"], check=True)
+        V = tree / "kai-pm/house_in_order_h2_v13"
+        run([PY, "-B", "-E", "-s", "-c", f"import sys; sys.path.insert(0, {str(V)!r}); import stage_identity as SI\nSI.load_governed_census({CEN!r})\n"
+             f"d = SI.build_stage_a('CALIBRATION', subject_repo={str(S)!r}, history_repo={str(S)!r})\nopen({str(d / 'stage_a.json')!r}, 'xb').write(SI.canonical_bytes(d))"], "stage A")
+        head = subprocess.run(["git", "-C", str(S), "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
+        G = lambda s, *a: [PY, "-B", "-E", "-s", str(V / s), *a]
+        sa = str(d / "stage_a.json")
+        run(G("passa.py", "--subject-repo", str(S), "--history-repo", str(S), "--subject", head, "--census-package", CEN, "--stage-a", sa, "--out", str(d / "passA.json")), "passa")
+        pab = run(G("stage_identity.py", "bind", "--artifact", str(d / "passA.json"), "--component", "PASS_A", "--stage-a", sa, "--producer-exit", "0", "--out", str(d / "pa.b")), "bind A").stdout.strip()
+        rh = run(G("run_h2_v12.py", "--subject-repo", str(S), "--passa", str(d / "passA.json"), "--passa-stage-b", str(d / "pa.b"), "--expected-passa-binding-sha256", pab,
+                   "--census-package", CEN, "--stage-a", sa, "--out", str(d / "result.json")), "run_h2_v12")
+        cb = run(G("stage_identity.py", "bind", "--artifact", str(d / "result.json"), "--component", "CLASSIFICATION", "--stage-a", sa, "--producer-exit", "0", "--out", str(d / "r.b")), "bind C").stdout.strip()
+        desc = json.loads((d / "stage_a.json").read_bytes())
+        (d / "M").write_text("".join(f"{m['sha256']}  {pathlib.Path(m['path']).name}\n" for m in desc["h2_sources"]))
+        q = run(G("qualify.py", "--result", str(d / "result.json"), "--stage-a", sa, "--manifest", str(d / "M"), "--stage-b", str(d / "r.b"), "--expected-binding-sha256", cb,
+                  "--passa-stage-b", str(d / "pa.b"), "--expected-passa-binding-sha256", pab, "--census-package", CEN), "qualify")
+        if not (d / "result.json").exists():
+            res[label] = {"run_h2_rc": rh.returncode, "refused": rh.stdout.strip().splitlines()[-1] if rh.stdout.strip() else ""}; continue
+        r = json.loads((d / "result.json").read_bytes())
+        res[label] = {"run_h2_rc": rh.returncode, "qualify_rc": q.returncode,
+                      "facts": {row["path"]: {k: row["evidence_facts"].get(k, "ABSENT") for k in ("NOMINAL_FUNCTION", "SELF_ASSERTS_CURRENT")} for row in r["rows"]},
+                      "key_counts": sorted({len(row["evidence_facts"]) for row in r["rows"]}),
+                      "axes": {row["path"]: {a: row[a]["value"] for a in ("SCOPE", "VALIDITY", "LIFECYCLE", "FUNCTION", "AUTHORITY", "GENERATION") if a in row} for row in r["rows"]},
+                      "other8": {row["path"]: {k: v for k, v in row["evidence_facts"].items() if k not in ("NOMINAL_FUNCTION", "SELF_ASSERTS_CURRENT")} for row in r["rows"]},
+                      "findings": [l.strip() for l in q.stdout.splitlines() if "::" in l], "traces": {row["path"]: row["evidence_fact_traces"] for row in r["rows"]}}
+    print("\n== SUMMARY ==")
+    print(json.dumps(res, indent=1, sort_keys=True))
+    o, n = res["V3 inst"], res["V4 inst4"]
+    print("V3:", json.dumps(o)[:400]); print("V4 traces:", json.dumps(n.get("traces"))[:1500])
+    shutil.rmtree(W)
+    END-VERBATIM LOC-E2E-INSTRUMENT
+- EVIDENCE LOC-E2E-OUTPUT loc_e2e_out.txt: 12338 bytes, sha256 0610fbc3b1b5e7d35c7aa7725419e925d91ec78556cda99f27fb4de4be6061f0  [CMD `sha256sum loc_e2e_out.txt` → 0610fbc3b1b5e7d3…]
+    BEGIN-VERBATIM LOC-E2E-OUTPUT
+    
+    == V3 inst ==
+    --- stage A rc=0
+    --- end stage A (0 bytes)
+    --- passa rc=0
+    PASS A v1.2 COMPLETE — 3 rows == population 3
+      WITNESS KINDS DISCRIMINATED (D2/D4), not assumed from shape:
+      scope determined: WHOLE_FILE 0 · SPAN 0
+      binding predicates declared closed-world: 26
+      contextual predicates declared closed-world: 1 (status)
+      NO VERDICT ASSIGNED IN PASS A.
+    --- end passa (292 bytes)
+    --- bind A rc=0
+    93851e2bc7263a20713b30e36fafba623fe7d9c7ffdc3ccc6848046b86d5c82c
+    --- end bind A (65 bytes)
+    --- run_h2_v12 rc=1
+    REFUSE: kai-pm/LS_HEAD.md: the Pass-A title 'Project Plan' carries the nominal term but the source's first heading does not reconstruct it
+    --- end run_h2_v12 (139 bytes)
+    --- bind C rc=3
+    BIND REFUSED: REFUSE: /tmp/twofact_e2e_ffhv0agp/V3/result.json cannot be stat'ed (FileNotFoundError)
+    --- end bind C (101 bytes)
+    --- qualify rc=1
+    REFUSE: qualification input does not verify: REFUSE: expected binding sha256 (anchor) is not a lower-case 64-hex digest
+    --- end qualify (120 bytes)
+    
+    == V4 inst4 ==
+    --- stage A rc=0
+    --- end stage A (0 bytes)
+    --- passa rc=0
+    PASS A v1.2 COMPLETE — 3 rows == population 3
+      WITNESS KINDS DISCRIMINATED (D2/D4), not assumed from shape:
+      scope determined: WHOLE_FILE 0 · SPAN 0
+      binding predicates declared closed-world: 26
+      contextual predicates declared closed-world: 1 (status)
+      NO VERDICT ASSIGNED IN PASS A.
+    --- end passa (292 bytes)
+    --- bind A rc=0
+    df4a218c971e66d02416424feb9696a8238fb39b58b7a6d933f335dd4fc22028
+    --- end bind A (65 bytes)
+    --- run_h2_v12 rc=0
+    HOUSE_H2 v1.2 — 3 rows == population 3
+      subject 90da00abb3a6 tree afaf83ed53e3
+    
+      LIFECYCLE    positives    0  UNKNOWN    3   
+      FUNCTION     positives    0  UNKNOWN    3   
+      AUTHORITY    positives    0  UNKNOWN    3   
+      GENERATION   positives    0  UNKNOWN    3   
+      VALIDITY     positives    0  UNKNOWN    3   
+      SCOPE        positives    0  UNKNOWN    3   
+    
+      evidence facts (NOT verdicts):
+        SELF_ASSERTS_CURRENT            2
+        NOMINAL_FUNCTION                2
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 2
+        {'PLAN from self-description': 2}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end run_h2_v12 (689 bytes)
+    --- bind C rc=0
+    15fb1846718899ae582d212aa4a0a6b05d14862f5942621ea88b1c47d0d21224
+    --- end bind C (65 bytes)
+    --- qualify rc=0
+    HOUSE_H2 v1.2 — QUALIFICATION
+      subject 90da00abb3a6  tree afaf83ed53e3
+      history 2026-10-03 → 2026-10-03  shallow=false  ancestry=1
+      census  29064d650a612968…
+    
+      [1] GOVERNING INVARIANT — checked from the AXIS SET
+          UNKNOWN first-class on every axis: True
+      [1b] REMOVAL CALIBRATION — the gate proves it can fail, this run
+           remove UNKNOWN from LIFECYCLE   detected=True
+           remove UNKNOWN from FUNCTION    detected=True
+           remove UNKNOWN from AUTHORITY   detected=True
+           remove UNKNOWN from GENERATION  detected=True
+           remove UNKNOWN from VALIDITY    detected=True
+           remove UNKNOWN from SCOPE       detected=True
+    
+      [2] STATE DISPOSITIONS — checked from the ALPHABET
+          [LIFECYCLE]
+            ACTIVE            H2_NOT_EARNABLE        0  
+            HISTORICAL        H2_EMITTABLE           0  not observed on this subject
+            SUPERSEDED        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           3  
+          [FUNCTION]
+            GOVERNANCE        H2_EMITTABLE           0  not observed on this subject
+            STATUS            H2_EMITTABLE           0  not observed on this subject
+            PLAN              H2_EMITTABLE           0  not observed on this subject
+            EVIDENCE          H2_EMITTABLE           0  not observed on this subject
+            REFERENCE         H2_EMITTABLE           0  not observed on this subject
+            RUNTIME_INPUT     H2_EMITTABLE           0  not observed on this subject
+            TEMPLATE          H2_EMITTABLE           0  not observed on this subject
+            MARKER            H2_EMITTABLE           0  not observed on this subject
+            USER_GUIDE        H2_EMITTABLE           0  not observed on this subject
+            OTHER             H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           3  
+          [AUTHORITY]
+            AUTHORITATIVE     DEFERRED_TO_H3         0  
+            VERIFIED_DERIVED  DEFERRED_TO_H3         0  
+            ADVISORY          DEFERRED_TO_H3         0  
+            NON_AUTHORITY     DEFERRED_TO_H3         0  
+            UNKNOWN           H2_EMITTABLE           3  
+          [GENERATION]
+            MANUAL            H2_NOT_EARNABLE        0  
+            PARTIAL_DERIVED   H2_NOT_EARNABLE        0  
+            FULL_DERIVED      H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           3  
+          [VALIDITY]
+            CURRENT_TREE      H2_EMITTABLE           0  not observed on this subject
+            EXACT_SNAPSHOT    H2_EMITTABLE           0  not observed on this subject
+            RUN_ARTEFACT      H2_EMITTABLE           0  not observed on this subject
+            TIME_BOUND        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           3  
+          [SCOPE]
+            WHOLE_FILE        H2_EMITTABLE           0  not observed on this subject
+            HEADING           H2_NOT_EARNABLE        0  
+            TABLE             H2_NOT_EARNABLE        0  
+            MANAGED_REGION    H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           3  
+    
+      [3] OUTPUT-DERIVED — values emitted but unknown to the ontology: 0
+    
+      [4] population declared 3 == rows 3: True
+      [5] every non-abstention cell carries a source-bound witness: True  (0 missing)
+    
+      [6] §8(6) CLOSED ORIGIN CLASSIFICATION — every loaded origin
+          observed 87   classified 87   refused 0
+          H2                 3
+          CENSUS             0
+          GOVERNED_STDLIB    48
+          BUILTIN_OR_FROZEN  36
+    
+      [7] Q1a RECORDED PRODUCER PROVENANCE vs STAGE A
+          verified against stage_a_identity ae19cfebbb883b0e…, every slot closed
+    
+      [8] Q1b / E1 — DERIVED denominators (D379 §8)
+          axis-cell denominator              0
+          positive-evidence-fact denominator 4
+          sum                                4
+    
+      UTILITY PROFILE — reported, never optimised (D367 11)
+          axis         positive  UNKNOWN  UNMEASURED
+          LIFECYCLE           0        3           0
+          FUNCTION            0        3           0
+          AUTHORITY           0        3           0
+          GENERATION          0        3           0
+          VALIDITY            0        3           0
+          SCOPE               0        3           0
+          Qualification asks: is the instrument TRUTHFUL?
+          A separate later decision asks: is it USEFUL enough for H3?
+    
+      FINDINGS: 0
+    --- end qualify (4364 bytes)
+    
+    == SUMMARY ==
+    {
+     "V3 inst": {
+      "refused": "",
+      "run_h2_rc": 1
+     },
+     "V4 inst4": {
+      "axes": {
+       "kai-pm/CR_SAC.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "UNKNOWN",
+        "VALIDITY": "UNKNOWN"
+       },
+       "kai-pm/LS_HEAD.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "UNKNOWN",
+        "VALIDITY": "UNKNOWN"
+       },
+       "kai-pm/NEL_PURPOSE.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "UNKNOWN",
+        "VALIDITY": "UNKNOWN"
+       }
+      },
+      "facts": {
+       "kai-pm/CR_SAC.md": {
+        "NOMINAL_FUNCTION": false,
+        "SELF_ASSERTS_CURRENT": true
+       },
+       "kai-pm/LS_HEAD.md": {
+        "NOMINAL_FUNCTION": true,
+        "SELF_ASSERTS_CURRENT": true
+       },
+       "kai-pm/NEL_PURPOSE.md": {
+        "NOMINAL_FUNCTION": true,
+        "SELF_ASSERTS_CURRENT": false
+       }
+      },
+      "findings": [],
+      "key_counts": [
+       10
+      ],
+      "other8": {
+       "kai-pm/CR_SAC.md": {
+        "BINDING_CONTRADICTION": false,
+        "CARRIES_DATE_STAMP": false,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       },
+       "kai-pm/LS_HEAD.md": {
+        "BINDING_CONTRADICTION": false,
+        "CARRIES_DATE_STAMP": false,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       },
+       "kai-pm/NEL_PURPOSE.md": {
+        "BINDING_CONTRADICTION": false,
+        "CARRIES_DATE_STAMP": false,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       }
+      },
+      "qualify_rc": 0,
+      "run_h2_rc": 0,
+      "traces": {
+       "kai-pm/CR_SAC.md": {
+        "SELF_ASSERTS_CURRENT": {
+         "applicability_scope": "SPAN",
+         "certainty": "OBSERVED",
+         "evidence_shown": 1,
+         "evidence_total": 1,
+         "local_context": "This document is in force.",
+         "polarity": "POSITIVE",
+         "source_path": "kai-pm/CR_SAC.md",
+         "source_selector": "L4",
+         "subject": "SELF",
+         "temporal": "AT_COMMIT",
+         "truncated": false,
+         "witness_type": "SELF_CURRENTNESS_CLAIM",
+         "witness_value": "in force"
+        }
+       },
+       "kai-pm/LS_HEAD.md": {
+        "NOMINAL_FUNCTION": {
+         "applicability_scope": "SPAN",
+         "certainty": "OBSERVED",
+         "evidence_shown": 1,
+         "evidence_total": 2,
+         "local_context": "intro\u2028# Project Plan",
+         "polarity": "POSITIVE",
+         "source_path": "kai-pm/LS_HEAD.md",
+         "source_selector": "L1",
+         "subject": "SELF",
+         "temporal": "AT_COMMIT",
+         "truncated": true,
+         "witness_type": "NOMINAL_FUNCTION_TERM",
+         "witness_value": "Plan"
+        },
+        "SELF_ASSERTS_CURRENT": {
+         "applicability_scope": "SPAN",
+         "certainty": "OBSERVED",
+         "evidence_shown": 1,
+         "evidence_total": 1,
+         "local_context": "This document is the current plan.",
+         "polarity": "POSITIVE",
+         "source_path": "kai-pm/LS_HEAD.md",
+         "source_selector": "L3",
+         "subject": "SELF",
+         "temporal": "AT_COMMIT",
+         "truncated": false,
+         "witness_type": "SELF_CURRENTNESS_CLAIM",
+         "witness_value": "is the current"
+        }
+       },
+       "kai-pm/NEL_PURPOSE.md": {
+        "NOMINAL_FUNCTION": {
+         "applicability_scope": "SPAN",
+         "certainty": "OBSERVED",
+         "evidence_shown": 1,
+         "evidence_total": 1,
+         "local_context": "This document defines the deployment roadmap\u0085for the quarter.",
+         "polarity": "POSITIVE",
+         "source_path": "kai-pm/NEL_PURPOSE.md",
+         "source_selector": "L3",
+         "subject": "SELF",
+         "temporal": "AT_COMMIT",
+         "truncated": false,
+         "witness_type": "NOMINAL_FUNCTION_TERM",
+         "witness_value": "roadmap"
+        }
+       }
+      }
+     }
+    }
+    V3: {"run_h2_rc": 1, "refused": ""}
+    V4 traces: {"kai-pm/CR_SAC.md": {"SELF_ASSERTS_CURRENT": {"witness_type": "SELF_CURRENTNESS_CLAIM", "witness_value": "in force", "source_path": "kai-pm/CR_SAC.md", "source_selector": "L4", "local_context": "This document is in force.", "applicability_scope": "SPAN", "evidence_total": 1, "evidence_shown": 1, "truncated": false, "polarity": "POSITIVE", "certainty": "OBSERVED", "temporal": "AT_COMMIT", "subject": "SELF"}}, "kai-pm/LS_HEAD.md": {"NOMINAL_FUNCTION": {"witness_type": "NOMINAL_FUNCTION_TERM", "witness_value": "Plan", "source_path": "kai-pm/LS_HEAD.md", "source_selector": "L1", "local_context": "intro\u2028# Project Plan", "applicability_scope": "SPAN", "evidence_total": 2, "evidence_shown": 1, "truncated": true, "polarity": "POSITIVE", "certainty": "OBSERVED", "temporal": "AT_COMMIT", "subject": "SELF"}, "SELF_ASSERTS_CURRENT": {"witness_type": "SELF_CURRENTNESS_CLAIM", "witness_value": "is the current", "source_path": "kai-pm/LS_HEAD.md", "source_selector": "L3", "local_context": "This document is the current plan.", "applicability_scope": "SPAN", "evidence_total": 1, "evidence_shown": 1, "truncated": false, "polarity": "POSITIVE", "certainty": "OBSERVED", "temporal": "AT_COMMIT", "subject": "SELF"}}, "kai-pm/NEL_PURPOSE.md": {"NOMINAL_FUNCTION": {"witness_type": "NOMINAL_FUNCTION_TERM", "witness_value": "roadmap", "source_path": "kai-pm/NEL_PURPOSE.md", "source_selector": "L3", "local_context": "This document defines the deployment roadmap\u0085for the quarter.", "applicabil
+    END-VERBATIM LOC-E2E-OUTPUT
+- EVIDENCE NEWLINE-PROBE-OUTPUT newline_probe_out.txt: 730 bytes, sha256 a3d193131f556dba155420d5f17c81defd99b9ccd42c8593a3bd791c86151d15  [CMD `sha256sum newline_probe_out.txt` → a3d193131f556dba…]
+    BEGIN-VERBATIM NEWLINE-PROBE-OUTPUT
+    lone CR  read_text==exact_bytes_decoded: False read_text='lead\nThis document is in force.\n' exact='lead\rThis document is in force.\n' LF-lines read_text=2 exact=1
+    CRLF     read_text==exact_bytes_decoded: False read_text='a\nb.\n' exact='a\r\nb.\r\n' LF-lines read_text=2 exact=2
+    NEL      read_text==exact_bytes_decoded: True  read_text='x\x85y\n' exact='x\x85y\n' LF-lines read_text=1 exact=1
+    LS       read_text==exact_bytes_decoded: True  read_text='x\u2028y\n' exact='x\u2028y\n' LF-lines read_text=1 exact=1
+    FF       read_text==exact_bytes_decoded: True  read_text='x\x0cy\n' exact='x\x0cy\n' LF-lines read_text=1 exact=1
+    passa.make_verified_reader decodes without newline translation (no read_text/open in text mode): True
+    END-VERBATIM NEWLINE-PROBE-OUTPUT
+- EVIDENCE SEMANTICS-INSTRUMENT-V4 semantics.py: 17719 bytes, sha256 171b64515795c996a47165fbf9d179e0e14ec2d106369758375156457932c1a1  [CMD `sha256sum semantics.py` → 171b64515795c996…]
+    BEGIN-VERBATIM SEMANTICS-INSTRUMENT-V4
+    """Child under the qualified interpreter. argv: <new H2 dir>. Expected answers are written HERE, before running."""
+    import ast, json, subprocess, sys, copy
+    sys.path.insert(0, sys.argv[1])
+    import run_h2_v12 as R, classify as cl, qualify as Q, ontology as ont
+    P = F = 0
+    def chk(label, ok, detail=""):
+        global P, F
+        P += ok; F += (not ok); print(f"  {'PASS' if ok else 'FAIL'}  {label}" + ("" if ok else f"   -> {detail}"))
+    
+    print("V. VOCABULARY IDENTITY vs committed v1.1 bytes (438007e:kai-pm/house_in_order_h2_v11/evidence.py)")
+    src = subprocess.run(["git", "-C", "/home/user/kai-system", "show", "438007e:kai-pm/house_in_order_h2_v11/evidence.py"], capture_output=True, check=True).stdout
+    lit = {t.id: ast.literal_eval(n.value) for n in ast.parse(src).body if isinstance(n, ast.Assign) for t in n.targets if getattr(t, "id", "") in ("CURRENT_POS", "CURRENT_NEG")}
+    chk("CURRENT_POS identical to v1.1 (7 patterns)", R.CURRENT_POS == lit["CURRENT_POS"] and len(lit["CURRENT_POS"]) == 7)
+    chk("CURRENT_NEG identical to v1.1 (9 patterns)", R.CURRENT_NEG == lit["CURRENT_NEG"] and len(lit["CURRENT_NEG"]) == 9)
+    mut = list(lit["CURRENT_POS"]); mut[0] = mut[0] + "x"
+    chk("known-negative: a one-character mutated copy is NOT identical", tuple(mut) != R.CURRENT_POS)
+    
+    print("\nE. SEGMENTATION EQUIVALENCE vs immutable 438007e:house_in_order_h2_v11/subjectbind2.py (Kai V2-02)")
+    import tempfile, pathlib, importlib.util, hashlib
+    _d = pathlib.Path(tempfile.mkdtemp(prefix="sb2_"))
+    _src = subprocess.run(["git", "-C", "/home/user/kai-system", "show", "438007e:kai-pm/house_in_order_h2_v11/subjectbind2.py"],
+                          capture_output=True, check=True).stdout
+    (_d / "subjectbind2.py").write_bytes(_src)
+    _spec = importlib.util.spec_from_file_location("subjectbind2_438007e", _d / "subjectbind2.py")
+    SB2 = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(SB2)
+    print(f"  historical subjectbind2.py: {len(_src)} bytes, sha256 {hashlib.sha256(_src).hexdigest()}")
+    HOSTILE = {
+     "plain": "A first. A second; a third.\nNext line.",
+     "backtick fence": "x.\n```\nin fence.\n```\ny.",
+     "tilde fence": "x.\n~~~py\nin fence.\n~~~\ny.",
+     "indented fence": "x.\n    ```\n    in fence.\n    ```\ny.",
+     "unclosed fence": "x.\n```\nnever closed.\nstill fenced.",
+     "fence marker mid-line": "text ``` not a fence.\n",
+     "quote": "> Quoted. Second.\nNot quoted.",
+     "nested quote": ">> Nested quote. Two.\n> > Spaced nested.",
+     "empty quote lines": ">\n> \n>    \nafter.",
+     "quote then indent": ">\t\tTabbed body. Here.",
+     "repeated text on a line": "same. same. same.\nsame; same.",
+     "repeated body-in-prefix": "  > >  > x > x. x.",
+     "semicolon split": "a; b;c; d.e. f",
+     "colon not split": "Status: current. Authority: none.",
+     "CRLF": "Line one. Two.\r\n> Quoted. Three.\r\nEnd.\r\n",
+     "lone CR": "One.\rTwo.\rThree.",
+     "form feed and VT": "One.\x0cTwo.\x0bThree.",
+     "unicode separators": "One.\u2028Two.\u2029Three.\x85Four.",
+     "trailing whitespace": "Sentence.   \n   \n\t",
+     "only separators": ".;.;",
+     "empty": "",
+     "list item with quote": "- > not a blockquote. x\n* item; two.",
+     "table row": "| Status: current | x. |",
+     "v2 find-offset counterexample 1 (exhaustive search)": ">\t>",
+     "v2 find-offset counterexample 2": "x.\n>>\t>\nafter.",
+    }
+    def proj(text):
+        return [(sent, ln - 1, q) for _st, sent, ln, q in R._segments(text)]
+    def offsets_exact(text, segs=None):
+        """Offset oracle independent of the segmenter's prefix arithmetic: per line, every segment's
+        slice equals its sentence, gaps between consecutive segments are whitespace only, the first
+        start is not before the line start, and the LAST segment ends exactly where the line's
+        right-stripped content ends. With the sentences fixed, that pins every start."""
+        segs = R._segments(text) if segs is None else segs
+        starts, pos = [], 0
+        for raw in text.splitlines(keepends=True):
+            starts.append(pos); pos += len(raw)
+        by = {}
+        for st, sent, ln, _q in segs:
+            by.setdefault(ln, []).append((st, sent))
+        for ln, items in by.items():
+            line_start = starts[ln - 1]
+            content = text.splitlines()[ln - 1]
+            if any(text[st:st + len(se)] != se for st, se in items):
+                return False
+            if items[0][0] < line_start:
+                return False
+            for (a, sa), (b, _sb) in zip(items, items[1:]):
+                if b < a + len(sa) or text[a + len(sa):b].strip() != "":
+                    return False
+            last_st, last_se = items[-1]
+            if last_st + len(last_se) != line_start + len(content.rstrip()):
+                return False
+        return True
+    for name, text in HOSTILE.items():
+        hist = SB2._sentences(text)
+        chk(f"segments == v1.1 _sentences, and offsets exact: {name:<26}", proj(text) == hist and offsets_exact(text),
+            f"new {proj(text)} hist {hist}")
+    REPO = "/home/user/kai-repair"
+    def blob(spec):
+        return subprocess.run(["git", "-C", REPO, "cat-file", "blob", spec], capture_output=True, check=True).stdout
+    FROZEN = json.loads(blob("f88e929b8c0f569dd7f730e12a8459b00f405595"))["rows"]
+    FTEXT = {r["path"]: blob(f"3abc9e9d8ca11966a6f996d5f0af68072ee5b117:{r['path']}").decode("utf-8") for r in FROZEN}
+    mism = [p for p, t in FTEXT.items() if proj(t) != SB2._sentences(t) or not offsets_exact(t)]
+    nseg = sum(len(SB2._sentences(t)) for t in FTEXT.values())
+    chk(f"frozen corpus: all {len(FTEXT)} documents ({nseg} historical segments) equivalent and offset-exact", not mism, mism[:5])
+    _bad = lambda text: [(s_, l, q) for s_, l, q in SB2._sentences(text)][1:]
+    chk("equivalence known-negative: a projection dropping one segment is detected",
+        proj(HOSTILE["plain"]) != _bad(HOSTILE["plain"]))
+    
+    print("\nP. classify.function() PURITY / REPEATABILITY on the frozen corpus (Kai V2-03)")
+    import copy as _copy
+    nonrep = []
+    for r in FROZEN:
+        r0, t0 = _copy.deepcopy(r), FTEXT[r["path"]]
+        a_ = json.dumps(cl.function(r, t0), sort_keys=True); b_ = json.dumps(cl.function(r, t0), sort_keys=True)
+        if a_ != b_ or r != r0: nonrep.append(r["path"])
+    chk(f"two calls give identical cells and leave the row unmutated: {len(FROZEN)} rows", not nonrep, nonrep[:5])
+    
+    def sac(text, path="kai-pm/SELF.md"):
+        pos, mk = R._currentness_fact({"path": path}, text)
+        return pos, (mk() if pos else None)
+    print("\nS. SELF_ASSERTS_CURRENT semantics (expected value declared per case)")
+    CASES = [
+     ("explicit SELF positive", "# T\n\nThis document is the current plan.\n", True),
+     ("explicit SELF negative (negative wins)", "# T\n\nThis document is no longer current.\n", False),
+     ("SELF positive + SELF negative conflict", "# T\n\nThis document is the current plan.\n\nThis document is deprecated.\n", False),
+     ("another document is current", "# T\n\n`OTHER.md` is the current plan.\n", False),
+     ("bare pronoun, antecedent names another doc (D12)", "# T\n\nSee `OTHER.md` for details. It is currently maintained.\n", False),
+     ("bare pronoun, no antecedent", "# T\n\nIt is currently maintained.\n", True),
+     ("quoted free prose is not a declaration", "# T\n\n> This document is the current authority.\n", False),
+     ("quoted CONTROLLED FIELD is a declaration", "# T\n\n> Status: current\n", True),
+     ("unquoted controlled field", "Status: active\n", True),
+     ("fenced code is not evidence (```)", "# T\n\n```\nThis document is the current plan.\n```\n", False),
+     ("fenced code is not evidence (~~~)", "# T\n\n~~~\nStatus: current\n~~~\n", False),
+     ("text after a closed fence still counts", "# T\n\n```\nx\n```\n\nThis document is in force.\n", True),
+     ("subjectless prose", "# T\n\nThe system is currently running.\n", False),
+     ("bare token 'current' is not a claim", "# T\n\nThis document describes current events.\n", False),
+     ("no claim at all", "# T\n\nNothing here.\n", False),
+     # Kai B1 (2026-10-03): the governed v1.3 bind_subject is authoritative. A basename alone
+     # is not SELF (repository basenames are not unique); the full repo-relative path is.
+     ("B1 basename-only self-reference is NOT SELF (Kai)", "# T\n\n`SELF.md` is still current.\n", False),
+     ("B1 full repo-relative self-reference is SELF", "# T\n\n`kai-pm/SELF.md` is still current.\n", True),
+     ("negative polarity wins inside one SELF sentence", "# T\n\nThis document is currently deprecated.\n", False),
+     ("quoted controlled field, negative", "# T\n\n> Status: superseded\n", False),
+     ("unclosed fence swallows the rest", "# T\n\n```\nThis document is the current plan.\n", False),
+    ]
+    for label, text, want in CASES:
+        got, tr = sac(text)
+        chk(f"{label:<52} expect {want}", got == want, f"got {got}; claims {R.currentness_claims('kai-pm/SELF.md', text)}")
+    got, tr = sac("# T\n\nIntro line.\nThis document is the current plan; it governs.\n")
+    chk("trace: exact phrase, actual source line, full sentence, SPAN, SELF",
+        tr["witness_value"] == "is the current" and tr["source_selector"] == "L4"
+        # Kai KAI-B4-V3-10: context is the canonical passa._context (the complete LF line), which
+        # contains the full determining sentence; the selector is the canonical passa._selector.
+        and tr["local_context"] == "This document is the current plan; it governs."
+        and "This document is the current plan;" in tr["local_context"] and tr["applicability_scope"] == "SPAN"
+        and tr["subject"] == "SELF" and R._compliant(tr) and R._class_ok("SELF_ASSERTS_CURRENT", tr), tr)
+    got, tr = sac("# T\n\nThis document is the current plan.\n\nThis document is currently live.\n")
+    chk("two SELF positives: total 2, shown 1, truncated declared", tr["evidence_total"] == 2 and tr["evidence_shown"] == 1 and tr["truncated"] is True, tr)
+    
+    print("\nN. NOMINAL_FUNCTION semantics")
+    def nom(title_line, body=""):
+        text = f"{title_line}\n\n{body}\n"
+        row = {"path": "kai-pm/X.md", "title": title_line.lstrip("#").strip()[:120], "bytes": 5000, "witnesses": {}}
+        cell = cl.function(row, text)
+        return R._nominal_fact(row, text, cell), cell, row, text
+    for label, title, body, want in (
+        ("single role in title", "# Project Plan", "", True),
+        ("single role in purpose body only", "# Notes", "This document defines the deployment roadmap for the next quarter.", True),
+        ("two roles: D11 ambiguity", "# Audit Plan", "", False),
+        ("no nominal term", "# Notes", "", False),
+        ("term inside another word is not a match (D8)", "# Planning notes", "", False)):
+        (pos, mk), cell, row, text = nom(title, body)
+        tr = mk() if pos else None
+        ok = pos == want and (not pos or (R._compliant(tr) and R._class_ok("NOMINAL_FUNCTION", tr) and tr["witness_value"] in tr["local_context"]))
+        chk(f"{label:<52} expect {want}", ok, f"got {pos}, cell {cell.get('observed')}, trace {tr}")
+    (pos, mk), cell, row, text = nom("# Project Plan")
+    tr = mk()
+    (p2, mk2), cell2, row2_, text2 = nom("# Project Plan", "This document defines the deployment roadmap for the next quarter.")
+    t2 = mk2() if p2 else None
+    chk("dual channel (title AND purpose, same role): total 2, shown 1, truncated, title trace first (KAI-B4-V2-10)",
+        p2 and cell2.get("observed") == "NOMINAL_FUNCTION=PLAN from self-description" and t2["evidence_total"] == 2
+        and t2["evidence_shown"] == 1 and t2["truncated"] is True and t2["source_selector"] == "L1", (cell2, t2))
+    (p1, mk1), cell1, _r, _t = nom("# Notes", "This document defines the deployment roadmap for the next quarter.")
+    t1 = mk1()
+    chk("single purpose channel: total 1, not truncated, trace on the purpose line",
+        t1["evidence_total"] == 1 and t1["truncated"] is False and t1["source_selector"] == "L3" and t1["witness_value"] == "roadmap", t1)
+    _text_t = "# Something Else\n\nThis document defines the deployment roadmap for the next quarter.\n"
+    _row_t = {"path": "kai-pm/X.md", "title": "Project Plan", "bytes": 5000, "witnesses": {}}
+    try:
+        R._nominal_fact(_row_t, _text_t, cl.function(_row_t, _text_t)); refused = False
+    except R.NominalTraceError as e:
+        refused = "does not reconstruct" in str(e)
+    chk("tampered title: row claims title evidence the source cannot reconstruct -> REFUSE, no PURPOSE fallback (V2-04)", refused)
+    chk("NominalTraceError is a real subclass, not an alias (V2-09)",
+        issubclass(R.NominalTraceError, R.FactDispositionError) and R.NominalTraceError is not R.FactDispositionError)
+    chk("trace: token 'Plan' at L1, whole title line", tr["witness_value"] == "Plan" and tr["source_selector"] == "L1" and tr["local_context"] == "# Project Plan", tr)
+    row2 = dict(row, title="Something else entirely about a Plan")
+    try:
+        R._nominal_fact(row2, text, {"observed": "NOMINAL_FUNCTION=PLAN from self-description"}); refused = False
+    except R.FactDispositionError as e:
+        refused = "REFUSE" in str(e)
+    chk("observation present but no exact locatable trace -> REFUSE (not False)", refused)
+    try:
+        R._nominal_fact(row, text, {"observed": "NOMINAL_FUNCTION=NOT_A_ROLE from self-description"}); refused = False
+    except R.NominalTraceError:
+        refused = True
+    chk("observation names an ungoverned role -> REFUSE", refused)
+    try:
+        R.evidence_facts({"path": "x", "commits_in_window": 1, "readers": [], "witnesses": {}}, [], None); refused = False
+    except SystemExit as e:
+        refused = "no unmeasured False" in str(e)
+    chk("evidence_facts without text/function_cell REFUSES (no unmeasured False)", refused)
+    
+    print("\nG. GRAMMAR, DISPOSITION AND POPULATION GATES (Kai DS-B4-04/07/08)")
+    (pos, mk), cell, row, text = nom("# Project Plan")
+    for bad in ("NOMINAL_FUNCTION=PLAN", "NOMINAL_FUNCTION=plan from self-description",
+                "NOMINAL_FUNCTION=PLAN from self-description extra", "NOMINAL_FUNCTION=PLAN,STATUS from self-description",
+                "NOMINAL_FUNCTION= from self-description", "NOMINAL_FUNCTION=PLAN from  self-description"):
+        try:
+            R._nominal_fact(row, text, {"observed": bad}); refused = False
+        except R.FactDispositionError as e:
+            refused = "REFUSE" in str(e)
+        chk(f"malformed observation {bad!r:<56} -> REFUSE", refused)
+    for other in (" NOMINAL_FUNCTION=PLAN from self-description", "prefix NOMINAL_FUNCTION=PLAN from self-description",
+                  "nominal terms for ['PLAN', 'STATUS'] both present"):
+        chk(f"non-leading token {other!r:<56} -> False, not REFUSE (Kai V2-07)",
+            R._nominal_fact(row, text, {"observed": other}) == (False, None))
+    chk("exact grammar accepted: 'NOMINAL_FUNCTION=PLAN from self-description'",
+        R._nominal_fact(row, text, {"observed": "NOMINAL_FUNCTION=PLAN from self-description"})[0] is True)
+    chk("no NOMINAL_FUNCTION in a complete observation -> False (not established)",
+        R._nominal_fact(row, text, {"observed": "no nominal function term and no purpose statement"}) == (False, None))
+    base_row = {"path": "kai-pm/SYNTH.md", "commits_in_window": 1, "readers": [], "witnesses": {}, "title": "Project Plan", "bytes": 5000}
+    base_text = "# Project Plan\n\nThis document is the current plan.\n"
+    def ef():
+        return R.evidence_facts(dict(base_row), [], None, (), "", ".", text=base_text, function_cell=cl.function(base_row, base_text))
+    bad_trace = lambda: {"witness_type": "X"}
+    for name, attr in (("NOMINAL_FUNCTION", "_nominal_fact"), ("SELF_ASSERTS_CURRENT", "_currentness_fact")):
+        orig = getattr(R, attr)
+        setattr(R, attr, lambda *a, **k: (True, bad_trace))
+        try:
+            ef(); refused = False
+        except R.FactDispositionError as e:
+            refused = name in str(e)
+        finally:
+            setattr(R, attr, orig)
+        chk(f"positive {name} candidate with non-compliant trace -> REFUSE (never False)", refused)
+    orig_ef = ont.EVIDENCE_FACTS
+    for label, patched in (("governed schema gains an unproduced class", orig_ef + ("FUTURE_FACT",)),
+                           ("governed schema loses SELF_ASSERTS_CURRENT", tuple(x for x in orig_ef if x != "SELF_ASSERTS_CURRENT")),
+                           ("governed schema loses NOMINAL_FUNCTION", tuple(x for x in orig_ef if x != "NOMINAL_FUNCTION"))):
+        ont.EVIDENCE_FACTS = patched
+        try:
+            ef(); refused = False
+        except R.FactDispositionError as e:
+            refused = "producer population" in str(e)
+        finally:
+            ont.EVIDENCE_FACTS = orig_ef
+        chk(f"population gate: {label} -> REFUSE", refused)
+    chk("population gate known-negative: governed schema intact -> runs", isinstance(ef()[0], dict))
+    
+    print("\nM. QUALIFIER CALIBRATION — deletion and trace corruption on a real-shaped row")
+    row = {"path": "kai-pm/SYNTH.md", "commits_in_window": 1, "readers": [], "witnesses": {}, "title": "Project Plan", "bytes": 5000}
+    text = "# Project Plan\n\nThis document is the current plan.\n"
+    f, ac, tr, ab = R.evidence_facts(row, [], None, (), "", ".", text=text, function_cell=cl.function(row, text))
+    cells = {a: {"value": ont.ABSTENTION, "abstention": True, "witness": None} for a in ont.ALPHABETS}
+    base = dict(path=row["path"], **cells, evidence_facts=f, evidence_fact_traces=tr)
+    def q1b(r):
+        return [x[:3] for x in Q.q1b_denominators({"population": 1, "rows": [r]})[3]]
+    chk("clean row: both facts positive, Q1b clean", f["NOMINAL_FUNCTION"] and f["SELF_ASSERTS_CURRENT"] and q1b(base) == [], q1b(base))
+    for k in ("NOMINAL_FUNCTION", "SELF_ASSERTS_CURRENT"):
+        r = copy.deepcopy(base); r["evidence_facts"].pop(k)
+        chk(f"delete class {k} -> FACT_CLASS_ABSENT naming it", ("FACT_CLASS_ABSENT", r["path"], k) in q1b(r), q1b(r))
+        r = copy.deepcopy(base); r["evidence_fact_traces"].pop(k)
+        chk(f"remove {k} trace -> FACT_TRACE", ("FACT_TRACE", r["path"], k) in q1b(r), q1b(r))
+        r = copy.deepcopy(base); r["evidence_fact_traces"][k]["local_context"] = "unrelated"
+        chk(f"corrupt {k} trace context -> FACT_TRACE", ("FACT_TRACE", r["path"], k) in q1b(r), q1b(r))
+        r = copy.deepcopy(base); r["evidence_fact_traces"][k]["witness_type"] = "DATE_STAMP"
+        chk(f"wrong {k} trace class -> FACT_TRACE_CLASS", ("FACT_TRACE_CLASS", r["path"], k) in q1b(r), q1b(r))
+    print(f"\n{P} passed, {F} failed")
+    sys.exit(1 if F else 0)
+    END-VERBATIM SEMANTICS-INSTRUMENT-V4
+- EVIDENCE SEMANTICS-OUTPUT-V4 semantics_out.txt: 7961 bytes, sha256 fa38fa35917793daa34ca710c86ae92393b02e64f42e1139a0c7bee79f6bdb56  [CMD `sha256sum semantics_out.txt` → fa38fa35917793da…]
+    BEGIN-VERBATIM SEMANTICS-OUTPUT-V4
+    V. VOCABULARY IDENTITY vs committed v1.1 bytes (438007e:kai-pm/house_in_order_h2_v11/evidence.py)
+      PASS  CURRENT_POS identical to v1.1 (7 patterns)
+      PASS  CURRENT_NEG identical to v1.1 (9 patterns)
+      PASS  known-negative: a one-character mutated copy is NOT identical
+    
+    E. SEGMENTATION EQUIVALENCE vs immutable 438007e:house_in_order_h2_v11/subjectbind2.py (Kai V2-02)
+      historical subjectbind2.py: 6240 bytes, sha256 d6e8035e717bfbd911af2a37fbb96a7ab7c4f0d4af80cc65314d16ca940eb055
+      PASS  segments == v1.1 _sentences, and offsets exact: plain                     
+      PASS  segments == v1.1 _sentences, and offsets exact: backtick fence            
+      PASS  segments == v1.1 _sentences, and offsets exact: tilde fence               
+      PASS  segments == v1.1 _sentences, and offsets exact: indented fence            
+      PASS  segments == v1.1 _sentences, and offsets exact: unclosed fence            
+      PASS  segments == v1.1 _sentences, and offsets exact: fence marker mid-line     
+      PASS  segments == v1.1 _sentences, and offsets exact: quote                     
+      PASS  segments == v1.1 _sentences, and offsets exact: nested quote              
+      PASS  segments == v1.1 _sentences, and offsets exact: empty quote lines         
+      PASS  segments == v1.1 _sentences, and offsets exact: quote then indent         
+      PASS  segments == v1.1 _sentences, and offsets exact: repeated text on a line   
+      PASS  segments == v1.1 _sentences, and offsets exact: repeated body-in-prefix   
+      PASS  segments == v1.1 _sentences, and offsets exact: semicolon split           
+      PASS  segments == v1.1 _sentences, and offsets exact: colon not split           
+      PASS  segments == v1.1 _sentences, and offsets exact: CRLF                      
+      PASS  segments == v1.1 _sentences, and offsets exact: lone CR                   
+      PASS  segments == v1.1 _sentences, and offsets exact: form feed and VT          
+      PASS  segments == v1.1 _sentences, and offsets exact: unicode separators        
+      PASS  segments == v1.1 _sentences, and offsets exact: trailing whitespace       
+      PASS  segments == v1.1 _sentences, and offsets exact: only separators           
+      PASS  segments == v1.1 _sentences, and offsets exact: empty                     
+      PASS  segments == v1.1 _sentences, and offsets exact: list item with quote      
+      PASS  segments == v1.1 _sentences, and offsets exact: table row                 
+      PASS  segments == v1.1 _sentences, and offsets exact: v2 find-offset counterexample 1 (exhaustive search)
+      PASS  segments == v1.1 _sentences, and offsets exact: v2 find-offset counterexample 2
+      PASS  frozen corpus: all 272 documents (80736 historical segments) equivalent and offset-exact
+      PASS  equivalence known-negative: a projection dropping one segment is detected
+    
+    P. classify.function() PURITY / REPEATABILITY on the frozen corpus (Kai V2-03)
+      PASS  two calls give identical cells and leave the row unmutated: 272 rows
+    
+    S. SELF_ASSERTS_CURRENT semantics (expected value declared per case)
+      PASS  explicit SELF positive                               expect True
+      PASS  explicit SELF negative (negative wins)               expect False
+      PASS  SELF positive + SELF negative conflict               expect False
+      PASS  another document is current                          expect False
+      PASS  bare pronoun, antecedent names another doc (D12)     expect False
+      PASS  bare pronoun, no antecedent                          expect True
+      PASS  quoted free prose is not a declaration               expect False
+      PASS  quoted CONTROLLED FIELD is a declaration             expect True
+      PASS  unquoted controlled field                            expect True
+      PASS  fenced code is not evidence (```)                    expect False
+      PASS  fenced code is not evidence (~~~)                    expect False
+      PASS  text after a closed fence still counts               expect True
+      PASS  subjectless prose                                    expect False
+      PASS  bare token 'current' is not a claim                  expect False
+      PASS  no claim at all                                      expect False
+      PASS  B1 basename-only self-reference is NOT SELF (Kai)    expect False
+      PASS  B1 full repo-relative self-reference is SELF         expect True
+      PASS  negative polarity wins inside one SELF sentence      expect False
+      PASS  quoted controlled field, negative                    expect False
+      PASS  unclosed fence swallows the rest                     expect False
+      PASS  trace: exact phrase, actual source line, full sentence, SPAN, SELF
+      PASS  two SELF positives: total 2, shown 1, truncated declared
+    
+    N. NOMINAL_FUNCTION semantics
+      PASS  single role in title                                 expect True
+      PASS  single role in purpose body only                     expect True
+      PASS  two roles: D11 ambiguity                             expect False
+      PASS  no nominal term                                      expect False
+      PASS  term inside another word is not a match (D8)         expect False
+      PASS  dual channel (title AND purpose, same role): total 2, shown 1, truncated, title trace first (KAI-B4-V2-10)
+      PASS  single purpose channel: total 1, not truncated, trace on the purpose line
+      PASS  tampered title: row claims title evidence the source cannot reconstruct -> REFUSE, no PURPOSE fallback (V2-04)
+      PASS  NominalTraceError is a real subclass, not an alias (V2-09)
+      PASS  trace: token 'Plan' at L1, whole title line
+      PASS  observation present but no exact locatable trace -> REFUSE (not False)
+      PASS  observation names an ungoverned role -> REFUSE
+      PASS  evidence_facts without text/function_cell REFUSES (no unmeasured False)
+    
+    G. GRAMMAR, DISPOSITION AND POPULATION GATES (Kai DS-B4-04/07/08)
+      PASS  malformed observation 'NOMINAL_FUNCTION=PLAN'                                  -> REFUSE
+      PASS  malformed observation 'NOMINAL_FUNCTION=plan from self-description'            -> REFUSE
+      PASS  malformed observation 'NOMINAL_FUNCTION=PLAN from self-description extra'      -> REFUSE
+      PASS  malformed observation 'NOMINAL_FUNCTION=PLAN,STATUS from self-description'     -> REFUSE
+      PASS  malformed observation 'NOMINAL_FUNCTION= from self-description'                -> REFUSE
+      PASS  malformed observation 'NOMINAL_FUNCTION=PLAN from  self-description'           -> REFUSE
+      PASS  non-leading token ' NOMINAL_FUNCTION=PLAN from self-description'           -> False, not REFUSE (Kai V2-07)
+      PASS  non-leading token 'prefix NOMINAL_FUNCTION=PLAN from self-description'     -> False, not REFUSE (Kai V2-07)
+      PASS  non-leading token "nominal terms for ['PLAN', 'STATUS'] both present"      -> False, not REFUSE (Kai V2-07)
+      PASS  exact grammar accepted: 'NOMINAL_FUNCTION=PLAN from self-description'
+      PASS  no NOMINAL_FUNCTION in a complete observation -> False (not established)
+      PASS  positive NOMINAL_FUNCTION candidate with non-compliant trace -> REFUSE (never False)
+      PASS  positive SELF_ASSERTS_CURRENT candidate with non-compliant trace -> REFUSE (never False)
+      PASS  population gate: governed schema gains an unproduced class -> REFUSE
+      PASS  population gate: governed schema loses SELF_ASSERTS_CURRENT -> REFUSE
+      PASS  population gate: governed schema loses NOMINAL_FUNCTION -> REFUSE
+      PASS  population gate known-negative: governed schema intact -> runs
+    
+    M. QUALIFIER CALIBRATION — deletion and trace corruption on a real-shaped row
+      PASS  clean row: both facts positive, Q1b clean
+      PASS  delete class NOMINAL_FUNCTION -> FACT_CLASS_ABSENT naming it
+      PASS  remove NOMINAL_FUNCTION trace -> FACT_TRACE
+      PASS  corrupt NOMINAL_FUNCTION trace context -> FACT_TRACE
+      PASS  wrong NOMINAL_FUNCTION trace class -> FACT_TRACE_CLASS
+      PASS  delete class SELF_ASSERTS_CURRENT -> FACT_CLASS_ABSENT naming it
+      PASS  remove SELF_ASSERTS_CURRENT trace -> FACT_TRACE
+      PASS  corrupt SELF_ASSERTS_CURRENT trace context -> FACT_TRACE
+      PASS  wrong SELF_ASSERTS_CURRENT trace class -> FACT_TRACE_CLASS
+    
+    92 passed, 0 failed
+    END-VERBATIM SEMANTICS-OUTPUT-V4
+- EVIDENCE REGRESSION-OUTPUT-V4 regression_out.txt: 887 bytes, sha256 8374df18f534265a45ba7056ab7dcc393e15b9aa127e52667e34908a8f0755fd  [CMD `sha256sum regression_out.txt` → 8374df18f534265a…]
+    BEGIN-VERBATIM REGRESSION-OUTPUT-V4
+    subject: frozen v1.2 Pass A f88e929b rows + frozen tree 3abc9e9d texts; OLD = repair HEAD dbe692d run_h2_v12.py, NEW = proposed delta
+    rows 272
+    axis cells differing OLD vs NEW: 0
+    rows whose other 8 facts / their traces / abstentions / authority_claim differ: 0
+    OLD key-set sizes {8: 272} NEW {10: 272}
+    NEW rows whose key set == ont.EVIDENCE_FACTS (10): 272
+    NOMINAL_FUNCTION positive 207 abstained 0 traced 207
+    SELF_ASSERTS_CURRENT positive 6 abstained 0 traced 6
+    SELF_ASSERTS_CURRENT positive rows: ['kai-pm/CODE_AUDIT_BATCH_COGNITIVE_STATE_STUBS.md', 'kai-pm/CODE_AUDIT_REGISTER.md', 'kai-pm/CODE_AUDIT_REGISTER_CONTINUED.md', 'kai-pm/CODE_AUDIT_REGISTER_CONTINUED_2.md', 'kai-pm/EMBEDDING_BACKEND_STATE.md', 'kai-pm/SERVICE_IDENTITY_MEASUREMENT.md']
+    NF evidence_total distribution: {1: 202, 2: 5}
+    frozen-corpus new-fact traces whose selector does not resolve to its context/token: 0 []
+    END-VERBATIM REGRESSION-OUTPUT-V4
+- EVIDENCE E2E-OUTPUT-V4 chain_e2e_out.txt: 19394 bytes, sha256 60da7f084d83f645546222f8569e5842a751e58293da1b2204096434273b5527  [CMD `sha256sum chain_e2e_out.txt` → 60da7f084d83f645…]
+    BEGIN-VERBATIM E2E-OUTPUT-V4
+    
+    == OLD dbe692d ==
+    --- stage A rc=0
+    --- end stage A (0 bytes)
+    --- passa rc=0
+    PASS A v1.2 COMPLETE — 4 rows == population 4
+      WITNESS KINDS DISCRIMINATED (D2/D4), not assumed from shape:
+        DATE                          1
+      scope determined: WHOLE_FILE 1 · SPAN 0
+      binding predicates declared closed-world: 26
+      contextual predicates declared closed-world: 1 (status)
+      NO VERDICT ASSIGNED IN PASS A.
+    --- end passa (328 bytes)
+    --- bind A rc=0
+    f5ccdd4395763c0f3e55656c5e70eeb5208ce7e82f78479b973f2a47f2602817
+    --- end bind A (65 bytes)
+    --- run_h2_v12 rc=0
+    HOUSE_H2 v1.2 — 4 rows == population 4
+      subject 136f1da1daba tree d5b89bef71c9
+    
+      LIFECYCLE    positives    0  UNKNOWN    4   
+      FUNCTION     positives    0  UNKNOWN    4   
+      AUTHORITY    positives    0  UNKNOWN    4   
+      GENERATION   positives    0  UNKNOWN    4   
+      VALIDITY     positives    0  UNKNOWN    4   
+      SCOPE        positives    1  UNKNOWN    3   {'WHOLE_FILE': 1}
+    
+      evidence facts (NOT verdicts):
+        CARRIES_DATE_STAMP              1
+        BINDING_CONTRADICTION           1
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 2
+        {'PLAN from self-description': 2}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end run_h2_v12 (706 bytes)
+    --- bind C rc=0
+    6085cc869c1d26631503bd309e35532a199d58149dc7bdc8980eb31741731a53
+    --- end bind C (65 bytes)
+    --- qualify rc=1
+    HOUSE_H2 v1.2 — QUALIFICATION
+      subject 136f1da1daba  tree d5b89bef71c9
+      history 2026-10-03 → 2026-10-03  shallow=false  ancestry=1
+      census  29064d650a612968…
+    
+      [1] GOVERNING INVARIANT — checked from the AXIS SET
+          UNKNOWN first-class on every axis: True
+      [1b] REMOVAL CALIBRATION — the gate proves it can fail, this run
+           remove UNKNOWN from LIFECYCLE   detected=True
+           remove UNKNOWN from FUNCTION    detected=True
+           remove UNKNOWN from AUTHORITY   detected=True
+           remove UNKNOWN from GENERATION  detected=True
+           remove UNKNOWN from VALIDITY    detected=True
+           remove UNKNOWN from SCOPE       detected=True
+    
+      [2] STATE DISPOSITIONS — checked from the ALPHABET
+          [LIFECYCLE]
+            ACTIVE            H2_NOT_EARNABLE        0  
+            HISTORICAL        H2_EMITTABLE           0  not observed on this subject
+            SUPERSEDED        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           4  
+          [FUNCTION]
+            GOVERNANCE        H2_EMITTABLE           0  not observed on this subject
+            STATUS            H2_EMITTABLE           0  not observed on this subject
+            PLAN              H2_EMITTABLE           0  not observed on this subject
+            EVIDENCE          H2_EMITTABLE           0  not observed on this subject
+            REFERENCE         H2_EMITTABLE           0  not observed on this subject
+            RUNTIME_INPUT     H2_EMITTABLE           0  not observed on this subject
+            TEMPLATE          H2_EMITTABLE           0  not observed on this subject
+            MARKER            H2_EMITTABLE           0  not observed on this subject
+            USER_GUIDE        H2_EMITTABLE           0  not observed on this subject
+            OTHER             H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           4  
+          [AUTHORITY]
+            AUTHORITATIVE     DEFERRED_TO_H3         0  
+            VERIFIED_DERIVED  DEFERRED_TO_H3         0  
+            ADVISORY          DEFERRED_TO_H3         0  
+            NON_AUTHORITY     DEFERRED_TO_H3         0  
+            UNKNOWN           H2_EMITTABLE           4  
+          [GENERATION]
+            MANUAL            H2_NOT_EARNABLE        0  
+            PARTIAL_DERIVED   H2_NOT_EARNABLE        0  
+            FULL_DERIVED      H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           4  
+          [VALIDITY]
+            CURRENT_TREE      H2_EMITTABLE           0  not observed on this subject
+            EXACT_SNAPSHOT    H2_EMITTABLE           0  not observed on this subject
+            RUN_ARTEFACT      H2_EMITTABLE           0  not observed on this subject
+            TIME_BOUND        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           4  
+          [SCOPE]
+            WHOLE_FILE        H2_EMITTABLE           1  
+            HEADING           H2_NOT_EARNABLE        0  
+            TABLE             H2_NOT_EARNABLE        0  
+            MANAGED_REGION    H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           3  
+    
+      [3] OUTPUT-DERIVED — values emitted but unknown to the ontology: 0
+    
+      [4] population declared 4 == rows 4: True
+      [5] every non-abstention cell carries a source-bound witness: True  (0 missing)
+    
+      [6] §8(6) CLOSED ORIGIN CLASSIFICATION — every loaded origin
+          observed 87   classified 87   refused 0
+          H2                 3
+          CENSUS             0
+          GOVERNED_STDLIB    48
+          BUILTIN_OR_FROZEN  36
+    
+      [7] Q1a RECORDED PRODUCER PROVENANCE vs STAGE A
+          verified against stage_a_identity 9239898769649872…, every slot closed
+    
+      [8] Q1b / E1 — DERIVED denominators (D379 §8)
+          axis-cell denominator              1
+          positive-evidence-fact denominator 2
+          sum                                3
+    
+      UTILITY PROFILE — reported, never optimised (D367 11)
+          axis         positive  UNKNOWN  UNMEASURED
+          LIFECYCLE           0        4           0
+          FUNCTION            0        4           0
+          AUTHORITY           0        4           0
+          GENERATION          0        4           0
+          VALIDITY            0        4           0
+          SCOPE               1        3           0
+          Qualification asks: is the instrument TRUTHFUL?
+          A separate later decision asks: is it USEFUL enough for H3?
+    
+      FINDINGS: 8
+        FACT_CLASS_ABSENT::kai-pm/AUDIT_PLAN_C.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/AUDIT_PLAN_C.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/MISC_D.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/MISC_D.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/NOTES_B.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/NOTES_B.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/PLAN_A.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+        FACT_CLASS_ABSENT::kai-pm/PLAN_A.md — a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it
+    --- end qualify (5582 bytes)
+    
+    == NEW proposed ==
+    --- stage A rc=0
+    --- end stage A (0 bytes)
+    --- passa rc=0
+    PASS A v1.2 COMPLETE — 4 rows == population 4
+      WITNESS KINDS DISCRIMINATED (D2/D4), not assumed from shape:
+        DATE                          1
+      scope determined: WHOLE_FILE 1 · SPAN 0
+      binding predicates declared closed-world: 26
+      contextual predicates declared closed-world: 1 (status)
+      NO VERDICT ASSIGNED IN PASS A.
+    --- end passa (328 bytes)
+    --- bind A rc=0
+    8edfb542748f5c3e46bc539ebcf0993e9a8cd6bf4c8a310d02aa38329f8949c6
+    --- end bind A (65 bytes)
+    --- run_h2_v12 rc=0
+    HOUSE_H2 v1.2 — 4 rows == population 4
+      subject e3edef178b1d tree d5b89bef71c9
+    
+      LIFECYCLE    positives    0  UNKNOWN    4   
+      FUNCTION     positives    0  UNKNOWN    4   
+      AUTHORITY    positives    0  UNKNOWN    4   
+      GENERATION   positives    0  UNKNOWN    4   
+      VALIDITY     positives    0  UNKNOWN    4   
+      SCOPE        positives    1  UNKNOWN    3   {'WHOLE_FILE': 1}
+    
+      evidence facts (NOT verdicts):
+        SELF_ASSERTS_CURRENT            1
+        CARRIES_DATE_STAMP              1
+        BINDING_CONTRADICTION           1
+        NOMINAL_FUNCTION                2
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 2
+        {'PLAN from self-description': 2}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end run_h2_v12 (782 bytes)
+    --- bind C rc=0
+    cb96055a0f374e23a8b844e94fdd1ac07f9a1c35c25a31d2cdb8e075023ceabe
+    --- end bind C (65 bytes)
+    --- qualify rc=0
+    HOUSE_H2 v1.2 — QUALIFICATION
+      subject e3edef178b1d  tree d5b89bef71c9
+      history 2026-10-03 → 2026-10-03  shallow=false  ancestry=1
+      census  29064d650a612968…
+    
+      [1] GOVERNING INVARIANT — checked from the AXIS SET
+          UNKNOWN first-class on every axis: True
+      [1b] REMOVAL CALIBRATION — the gate proves it can fail, this run
+           remove UNKNOWN from LIFECYCLE   detected=True
+           remove UNKNOWN from FUNCTION    detected=True
+           remove UNKNOWN from AUTHORITY   detected=True
+           remove UNKNOWN from GENERATION  detected=True
+           remove UNKNOWN from VALIDITY    detected=True
+           remove UNKNOWN from SCOPE       detected=True
+    
+      [2] STATE DISPOSITIONS — checked from the ALPHABET
+          [LIFECYCLE]
+            ACTIVE            H2_NOT_EARNABLE        0  
+            HISTORICAL        H2_EMITTABLE           0  not observed on this subject
+            SUPERSEDED        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           4  
+          [FUNCTION]
+            GOVERNANCE        H2_EMITTABLE           0  not observed on this subject
+            STATUS            H2_EMITTABLE           0  not observed on this subject
+            PLAN              H2_EMITTABLE           0  not observed on this subject
+            EVIDENCE          H2_EMITTABLE           0  not observed on this subject
+            REFERENCE         H2_EMITTABLE           0  not observed on this subject
+            RUNTIME_INPUT     H2_EMITTABLE           0  not observed on this subject
+            TEMPLATE          H2_EMITTABLE           0  not observed on this subject
+            MARKER            H2_EMITTABLE           0  not observed on this subject
+            USER_GUIDE        H2_EMITTABLE           0  not observed on this subject
+            OTHER             H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           4  
+          [AUTHORITY]
+            AUTHORITATIVE     DEFERRED_TO_H3         0  
+            VERIFIED_DERIVED  DEFERRED_TO_H3         0  
+            ADVISORY          DEFERRED_TO_H3         0  
+            NON_AUTHORITY     DEFERRED_TO_H3         0  
+            UNKNOWN           H2_EMITTABLE           4  
+          [GENERATION]
+            MANUAL            H2_NOT_EARNABLE        0  
+            PARTIAL_DERIVED   H2_NOT_EARNABLE        0  
+            FULL_DERIVED      H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           4  
+          [VALIDITY]
+            CURRENT_TREE      H2_EMITTABLE           0  not observed on this subject
+            EXACT_SNAPSHOT    H2_EMITTABLE           0  not observed on this subject
+            RUN_ARTEFACT      H2_EMITTABLE           0  not observed on this subject
+            TIME_BOUND        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE           4  
+          [SCOPE]
+            WHOLE_FILE        H2_EMITTABLE           1  
+            HEADING           H2_NOT_EARNABLE        0  
+            TABLE             H2_NOT_EARNABLE        0  
+            MANAGED_REGION    H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE           3  
+    
+      [3] OUTPUT-DERIVED — values emitted but unknown to the ontology: 0
+    
+      [4] population declared 4 == rows 4: True
+      [5] every non-abstention cell carries a source-bound witness: True  (0 missing)
+    
+      [6] §8(6) CLOSED ORIGIN CLASSIFICATION — every loaded origin
+          observed 87   classified 87   refused 0
+          H2                 3
+          CENSUS             0
+          GOVERNED_STDLIB    48
+          BUILTIN_OR_FROZEN  36
+    
+      [7] Q1a RECORDED PRODUCER PROVENANCE vs STAGE A
+          verified against stage_a_identity d244046a8e3cafd4…, every slot closed
+    
+      [8] Q1b / E1 — DERIVED denominators (D379 §8)
+          axis-cell denominator              1
+          positive-evidence-fact denominator 5
+          sum                                6
+    
+      UTILITY PROFILE — reported, never optimised (D367 11)
+          axis         positive  UNKNOWN  UNMEASURED
+          LIFECYCLE           0        4           0
+          FUNCTION            0        4           0
+          AUTHORITY           0        4           0
+          GENERATION          0        4           0
+          VALIDITY            0        4           0
+          SCOPE               1        3           0
+          Qualification asks: is the instrument TRUTHFUL?
+          A separate later decision asks: is it USEFUL enough for H3?
+    
+      FINDINGS: 0
+    --- end qualify (4336 bytes)
+    
+    == SUMMARY ==
+    {
+     "NEW proposed": {
+      "axes": {
+       "kai-pm/AUDIT_PLAN_C.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "UNKNOWN",
+        "VALIDITY": "UNKNOWN"
+       },
+       "kai-pm/MISC_D.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "UNKNOWN",
+        "VALIDITY": "UNKNOWN"
+       },
+       "kai-pm/NOTES_B.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "UNKNOWN",
+        "VALIDITY": "UNKNOWN"
+       },
+       "kai-pm/PLAN_A.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "WHOLE_FILE",
+        "VALIDITY": "UNKNOWN"
+       }
+      },
+      "facts": {
+       "kai-pm/AUDIT_PLAN_C.md": {
+        "NOMINAL_FUNCTION": false,
+        "SELF_ASSERTS_CURRENT": false
+       },
+       "kai-pm/MISC_D.md": {
+        "NOMINAL_FUNCTION": false,
+        "SELF_ASSERTS_CURRENT": false
+       },
+       "kai-pm/NOTES_B.md": {
+        "NOMINAL_FUNCTION": true,
+        "SELF_ASSERTS_CURRENT": false
+       },
+       "kai-pm/PLAN_A.md": {
+        "NOMINAL_FUNCTION": true,
+        "SELF_ASSERTS_CURRENT": true
+       }
+      },
+      "findings": [],
+      "key_counts": [
+       10
+      ],
+      "other8": {
+       "kai-pm/AUDIT_PLAN_C.md": {
+        "BINDING_CONTRADICTION": false,
+        "CARRIES_DATE_STAMP": false,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       },
+       "kai-pm/MISC_D.md": {
+        "BINDING_CONTRADICTION": false,
+        "CARRIES_DATE_STAMP": false,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       },
+       "kai-pm/NOTES_B.md": {
+        "BINDING_CONTRADICTION": false,
+        "CARRIES_DATE_STAMP": false,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       },
+       "kai-pm/PLAN_A.md": {
+        "BINDING_CONTRADICTION": true,
+        "CARRIES_DATE_STAMP": true,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       }
+      },
+      "qualify_rc": 0,
+      "run_h2_rc": 0
+     },
+     "OLD dbe692d": {
+      "axes": {
+       "kai-pm/AUDIT_PLAN_C.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "UNKNOWN",
+        "VALIDITY": "UNKNOWN"
+       },
+       "kai-pm/MISC_D.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "UNKNOWN",
+        "VALIDITY": "UNKNOWN"
+       },
+       "kai-pm/NOTES_B.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "UNKNOWN",
+        "VALIDITY": "UNKNOWN"
+       },
+       "kai-pm/PLAN_A.md": {
+        "AUTHORITY": "UNKNOWN",
+        "FUNCTION": "UNKNOWN",
+        "GENERATION": "UNKNOWN",
+        "LIFECYCLE": "UNKNOWN",
+        "SCOPE": "WHOLE_FILE",
+        "VALIDITY": "UNKNOWN"
+       }
+      },
+      "facts": {
+       "kai-pm/AUDIT_PLAN_C.md": {
+        "NOMINAL_FUNCTION": "ABSENT",
+        "SELF_ASSERTS_CURRENT": "ABSENT"
+       },
+       "kai-pm/MISC_D.md": {
+        "NOMINAL_FUNCTION": "ABSENT",
+        "SELF_ASSERTS_CURRENT": "ABSENT"
+       },
+       "kai-pm/NOTES_B.md": {
+        "NOMINAL_FUNCTION": "ABSENT",
+        "SELF_ASSERTS_CURRENT": "ABSENT"
+       },
+       "kai-pm/PLAN_A.md": {
+        "NOMINAL_FUNCTION": "ABSENT",
+        "SELF_ASSERTS_CURRENT": "ABSENT"
+       }
+      },
+      "findings": [
+       "FACT_CLASS_ABSENT::kai-pm/AUDIT_PLAN_C.md \u2014 a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it",
+       "FACT_CLASS_ABSENT::kai-pm/AUDIT_PLAN_C.md \u2014 a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it",
+       "FACT_CLASS_ABSENT::kai-pm/MISC_D.md \u2014 a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it",
+       "FACT_CLASS_ABSENT::kai-pm/MISC_D.md \u2014 a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it",
+       "FACT_CLASS_ABSENT::kai-pm/NOTES_B.md \u2014 a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it",
+       "FACT_CLASS_ABSENT::kai-pm/NOTES_B.md \u2014 a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it",
+       "FACT_CLASS_ABSENT::kai-pm/PLAN_A.md \u2014 a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it",
+       "FACT_CLASS_ABSENT::kai-pm/PLAN_A.md \u2014 a governed evidence-fact class is missing from the emitted result; the denominator does NOT shrink to hide it"
+      ],
+      "key_counts": [
+       8
+      ],
+      "other8": {
+       "kai-pm/AUDIT_PLAN_C.md": {
+        "BINDING_CONTRADICTION": false,
+        "CARRIES_DATE_STAMP": false,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       },
+       "kai-pm/MISC_D.md": {
+        "BINDING_CONTRADICTION": false,
+        "CARRIES_DATE_STAMP": false,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       },
+       "kai-pm/NOTES_B.md": {
+        "BINDING_CONTRADICTION": false,
+        "CARRIES_DATE_STAMP": false,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       },
+       "kai-pm/PLAN_A.md": {
+        "BINDING_CONTRADICTION": true,
+        "CARRIES_DATE_STAMP": true,
+        "CITES_COMMIT": false,
+        "CITES_RUN": false,
+        "MAINTENANCE_OBSERVED": false,
+        "SELF_ASSERTS_AUTHORITY": false,
+        "SELF_ASSERTS_NON_AUTHORITY": false,
+        "STATIC_REFERENCE_AT_SUBJECT": false
+       }
+      },
+      "qualify_rc": 1,
+      "run_h2_rc": 0
+     }
+    }
+    axes identical OLD vs NEW: True | other eight facts identical: True
+    END-VERBATIM E2E-OUTPUT-V4
+- EVIDENCE REFUSE-E2E-OUTPUT-V4 refuse_e2e_out.txt: 1513 bytes, sha256 d642dce8d6acac196da35e37baa0eb0468adae1b8d0eb9492fd99c3a7f3d4caf  [CMD `sha256sum refuse_e2e_out.txt` → d642dce8d6acac19…]
+    BEGIN-VERBATIM REFUSE-E2E-OUTPUT-V4
+      PASS  fault=none                       rc=0 artefact_written=True  last line:   self_approval: NONE
+      PASS  fault=input-unavailable          rc=1 artefact_written=False  last line: REFUSE: evidence_facts needs the document text and the governed FUNCTION cell (Kai P3: no unmeasured False)
+      PASS  fault=malformed-NF-observation   rc=1 artefact_written=False  last line: REFUSE: kai-pm/NOTES_B.md: malformed NOMINAL_FUNCTION observation 'NOMINAL_FUNCTION=plan from self-description'; the governed grammar is 'NOMINAL_FUNC
+      PASS  fault=NF-untraceable-positive    rc=1 artefact_written=False  last line: REFUSE: kai-pm/NOTES_B.md: positive NOMINAL_FUNCTION candidate has no compliant determining trace
+      PASS  fault=SAC-untraceable-positive   rc=1 artefact_written=False  last line: REFUSE: kai-pm/NOTES_B.md: positive SELF_ASSERTS_CURRENT candidate has no compliant determining trace
+      PASS  fault=population-gate            rc=1 artefact_written=False  last line: REFUSE: evidence-fact producer population != the governed schema; missing=['FUTURE_FACT'] extra=[]
+      PASS  fault=FUNCTION-coherence         rc=1 artefact_written=False  last line: REFUSE: kai-pm/NOTES_B.md: classify's FUNCTION cell differs from the observation the fact used
+      OBSERVATION  working-tree heading edited after Pass A (HEAD unchanged): rc=1 artefact_written=False  last line: REFUSE: kai-pm/PLAN_A.md: the Pass-A title 'Project Plan' carries the nominal term but the source's first heading does not reconstruct it
+    
+    7 passed, 0 failed
+    END-VERBATIM REFUSE-E2E-OUTPUT-V4
+
+### 6. Next authorised step
+
+- Dainius sends the v4 cover plus the two base64 blocks; DeepSeek returns a decoded receipt and the focused review; Kai reconciles; then the separate KAI-B4-SB-01 packet  [CONVERSATION 2026-10-03 Kai, "After focused v4 review/reconciliation, we should attack KAI-B4-SB-01."]
+
+### 7. What I am unsure of
+
+- The locator evidence is on synthetic documents and the one frozen subject; whether any real corpus document contains a non-LF separator before its first heading was not measured (the frozen 272 produced no REFUSE under v3 or v4)  [CMD `regression_out.txt` → NF 207 traced, 0 abstained]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
