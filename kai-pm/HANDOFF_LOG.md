@@ -23054,3 +23054,73 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-04T00:49:44Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-04T00:49:44Z  [CMD `date -u +%FT%TZ` → 2026-10-04T00:49:44Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 5696a3432880553e3ee5dab664e3a6fd1a93ac62  [CMD `git rev-parse HEAD` → 5696a3432880553e3ee5dab664e3a6fd1a93ac62]
+- tree: cdc4947a33d1d1b79ff1b4fcc1c224d9f38f3fe3  [CMD `git rev-parse HEAD^{tree}` → cdc4947a33d1d1b79ff1b4fcc1c224d9f38f3fe3]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 5696a3432880553e3ee5dab664e3a6fd1a93ac62  [CMD `git ls-remote --heads origin` → 5696a3432880553e3ee5dab664e3a6fd1a93ac62]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d0c08a4da85a447e0729fdb83d201cccc0af395a  [CMD `git ls-remote --heads origin` → d0c08a4da85a447e0729fdb83d201cccc0af395a]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 58  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 58]
+
+### 1. The four states
+
+- physical: repair branch claude/d379-repair-eb52f73 at d0c08a4da85a447e0729fdb83d201cccc0af395a (parent dbe692d9c3f83020176aeda00a0f399ce5f020f8, tree 4995f6db9a80123f98bc625e65eeb94edbb317a0), local and remote; repair worktree status 0 lines  [CMD `git log -1 --format='%H %P %T'; git ls-remote origin refs/heads/claude/d379-repair-eb52f73; git status --porcelain` → d0c08a4… dbe692d… 4995f6db…; d0c08a4…; 0]
+- authorised: entry 58's one-file commit and push — DONE; now STOP for Kai  [CONVERSATION 2026-10-04 Dainius, "Then STOP for Kai."]
+- evidence: commit identity, signature and readback in section 3  [CMD `gh api repos/dainius1234/kai-system/commits/d0c08a4…` → verified true, reason valid]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- None; executed entry 58's grant  [CONVERSATION 2026-10-04 Dainius, "COMMIT + PUSH AUTHORISED"]
+
+### 3. Authorised / Held / Forbidden
+
+- DONE (pre-commit re-checks, one && chain): branch claude/d379-repair-eb52f73; HEAD dbe692d; origin dbe692d; tracked changed paths exactly kai-pm/house_in_order_h2_v13/run_h2_v12.py; untracked non-ignored 0; index empty before staging; sha256 a39359bc…; staged exactly that path  [CMD `pre-commit chain` → all OK]
+- DONE (commit): d0c08a4da85a447e0729fdb83d201cccc0af395a, "D379 v4.5 B4 (5/n): run_h2_v12.py — two-fact v4 + KAI-B4-SB-01 source binding (frozen composite)"; 1 file, +342/−7; committed blob sha256 a39359bc383c8f6f6ca4540c10474fcb094c990f7b8e8091792262436c7a4cfe; SSH signature header present; local verification unavailable (gpg.ssh.allowedSignersFile not configured); GitHub verification: verified true, reason valid  [CMD `git cat-file blob HEAD:…run_h2_v12.py | sha256sum; gh api …/commits/d0c08a4…` → a39359bc…; verified true valid]
+- DONE (push and readback): dbe692d..d0c08a4 pushed; remote refs/heads/claude/d379-repair-eb52f73 = d0c08a4…; GitHub file list: run_h2_v12.py modified +342/−7, nothing else  [CMD `git ls-remote https://github.com/dainius1234/kai-system refs/heads/claude/d379-repair-eb52f73` → d0c08a4da85a447e0729fdb83d201cccc0af395a]
+- OPEN BLOCKER to B4 closeout: the 5 pre-existing classify.py AXIS_WITNESS findings  [CONVERSATION 2026-10-04 Dainius, "The five pre-existing AXIS_WITNESS findings remain a separate open blocker to B4 closeout"]
+- HELD: d379_controls.py rebuild and the full v4.5 hostile matrix, until Kai inspects d0c08a4  [CONVERSATION 2026-10-03 Kai, "Once Orion returns that committed evidence, I will independently inspect the new repair commit. Only after that will I release the hold on d379_controls.py and the full hostile matrix."]
+- FORBIDDEN: classify.py, d379_controls.py, any other path; D390 replay, fixity F, capture, candidate, holdout, blind 40, Item 8, merge  [CONVERSATION 2026-10-04 Dainius, "Do not touch:"]
+
+### 4. Open questions
+
+- Kai: adjudicate d0c08a4; rule on the 5 AXIS_WITNESS findings (classify.py is outside the six-file surface) — owner: Kai  [CONVERSATION 2026-10-04 Dainius, "Then STOP for Kai."]
+
+### 5. Incidents and corrections
+
+- None this step  [CMD `handoff.py check` → findings=0]
+
+### 6. Next authorised step
+
+- STOP for Kai's adjudication of d0c08a4  [CONVERSATION 2026-10-04 Dainius, "Then STOP for Kai."]
+
+### 7. What I am unsure of
+
+- Nothing beyond Kai's pending rulings  [GIT d0c08a4da85a447e0729fdb83d201cccc0af395a]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
