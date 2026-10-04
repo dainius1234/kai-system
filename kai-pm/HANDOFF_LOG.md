@@ -24439,3 +24439,304 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-04T01:13:32Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-04T01:13:32Z  [CMD `date -u +%FT%TZ` → 2026-10-04T01:13:32Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: bfa5fa8a17124413cb0beee405fcbb8e81a0c032  [CMD `git rev-parse HEAD` → bfa5fa8a17124413cb0beee405fcbb8e81a0c032]
+- tree: 343562942273971ac482641309532567a6ad7928  [CMD `git rev-parse HEAD^{tree}` → 343562942273971ac482641309532567a6ad7928]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/project-rework-plan-pgvp35: bfa5fa8a17124413cb0beee405fcbb8e81a0c032  [CMD `git ls-remote --heads origin` → bfa5fa8a17124413cb0beee405fcbb8e81a0c032]
+- remote:claude/d379-repair-eb52f73: d0c08a4da85a447e0729fdb83d201cccc0af395a  [CMD `git ls-remote --heads origin` → d0c08a4da85a447e0729fdb83d201cccc0af395a]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 61  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 61]
+
+### 1. The four states
+
+- physical: repair branch at d0c08a4; classify.py unchanged outside scratch  [CMD `git ls-remote --heads origin` → claude/d379-repair-eb52f73 d0c08a4da85a447e0729fdb83d201cccc0af395a]
+- authorised: preserve DeepSeek's AW-01 review; await Kai's reconciliation; no implementation  [CONVERSATION 2026-10-04 Dainius, "Deep seek : ( gpt currently reviewing and will send answer)"]
+- evidence: DeepSeek's reply verbatim and a read-only probe in section 5  [CMD `sha256sum deepseek_aw01_v1_review.txt` → e9669c739612b788…]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- None; DeepSeek is a reviewer and Kai's reconciliation is announced, not received  [CONVERSATION 2026-10-04 Dainius, "gpt currently reviewing and will send answer"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: any classify.py mutation, d379_controls.py, full matrix, D390 replay, fixity F, capture, candidate, holdout, blind 40, Item 8, merge  [CONVERSATION 2026-10-04 Kai, "HELD: any classify.py mutation"]
+
+### 4. Open questions
+
+- RECEIPT: hash lines carry the correct values plus "(cannot compute SHA-256)" as the cover instructed; first hunk, both sentinels and END OF PACKET SEEN exact; 7 of 7 quoted diff lines byte-identical; of 3 other quoted code lines 2 identical and 1 a fragment of the excerpt's longer line — owner: Kai  [CMD `receipt and quote check vs DEEPSEEK_PACKET_AW01_v1.md` → 4 exact + 2 values-with-note; 7/7]
+- DS-AW01-V1-01 (MAJOR, substring _compliant): mechanism CONFIRMED with the real _compliant — a MARKER witness with its bytes field removed or wrong still passes when the path contains the value's digits (data/114/README.md, value 11); DeepSeek's "bytes first" remedy does NOT close it (bytes=99; path=data/114/README.md -> True), because the test is substring over the whole context; a path without the digits is caught (control False). AW-01's own output always carries the correct field; the exposure is to a CORRUPTED witness passing the qualifier, which entry 61's corruption control (value 999) could not exercise. Subject exposure: 8 tracked paths end README.md, 0 contain a digit; the 5 MARKER paths contain none — owner: Kai  [CMD `aw01_v1_probe.py` → True, True, True, True, False]
+- DS-AW01-V1-05 (context ambiguity): tracked paths at d8aac4d4 containing '; bytes=' 0, ';' 0, '=' 1 — owner: Kai  [CMD `aw01_v1_probe.py` → 0, 0, 1]
+- DS-AW01-V1-02/03/06 (selector contract, unit, self-description): parsers of source_selector at d0c08a4 in v13 .py: build_evidence/m1_investigation.py:148 (historical investigation script, lstrip('L')), classify.py:198 (date-witness ordering key, ValueError handled), run_h2_v12.py:521 (fact-trace class check), build_evidence/e2_controls.py:282 (opscan prefix); none reads a FUNCTION witness; no parser of witness_value's unit found. Bounded to that grep — owner: Kai  [CMD `git grep -nE <selector/value parsers> d0c08a4 -- v13 *.py, build_evidence/*.py` → 4 lines]
+- DS-AW01-V1-04 (bytes vs blob size): as entry 61 — equal for 272/272 at this subject (all valid UTF-8, entry 52) — owner: Kai  [CMD `aw01_diff.py` → 272/272]
+- DS-AW01-V1-07: the qualifier's missing[:5] cap, already flagged (entry 61 Q8) — owner: Kai  [FILE /home/user/kai-repair/kai-pm/house_in_order_h2_v13/qualify.py:427]
+
+### 5. Incidents and corrections
+
+- Process slip, R3, recurrence of entry 47's record: entry 61's commit chain ran `roundtrip.py … | grep -c True`, so the pipeline's exit status was grep's and a failed round-trip could not stop the commit. All 18 blocks did round-trip (18 True printed, 18 blocks). Same mechanism as entry 46 (a check that cannot fail the chain); this is its second occurrence. Control from now on: roundtrip.py is never piped inside a gated chain. Not allocated in the ledger (incident allocation is held in this tranche); raised to the operator  [GIT bfa5fa8a17124413cb0beee405fcbb8e81a0c032]
+- Credential scan of the three files: 0 hits; raw line separators: none  [CMD `secretscan.py <3 files>` → TOTAL HITS 0]
+- Verbatim blocks: strip the 4-space indent; append a final LF only where the line says final LF True  [CMD `roundtrip.py` → all True]
+- EVIDENCE DEEPSEEK-AW01-V1-RECEIPT-AND-REVIEW deepseek_aw01_v1_review.txt: 10604 bytes, sha256 e9669c739612b788fb07cbbfe7348d69e1110b1cf3108c35a7f99d175a813ff5, final LF False  [CMD `sha256sum deepseek_aw01_v1_review.txt` → e9669c739612b788…]
+    BEGIN-VERBATIM DEEPSEEK-AW01-V1-RECEIPT-AND-REVIEW
+    Deep seek : ( gpt currently reviewing and will send answer): PACKET HASH: 8eb022092cb01806b619d88b274ef9ce25876ddb25bc0c71a96fd05c4e958d6d (cannot compute SHA-256)
+    BASE classify.py SHA-256: 226873676c2373faaf29f4709bb1bb62d1d22f3c56cbdc0e594314cb6e5df9e8 (cannot compute SHA-256)
+    FIRST DELTA HUNK: @@ -369,10 +369,18 @@
+    SENTINEL A: +                    source_path=path, source_selector="META:bytes",
+    SENTINEL B: +                    local_context=f"path={path}; bytes={row['bytes']}",
+    END OF PACKET SEEN: YES
+    
+    ---
+    
+    Finding register — KAI-B4-AW-01 v1
+    
+    DS-AW01-V1-01 — MAJOR — _compliant substring check can be satisfied by the path component of the new local_context
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked delta lines:
+    
+    ```diff
+    +                    witness_value=str(row["bytes"]),
+    +                    source_path=path, source_selector="META:bytes",
+    +                    local_context=f"path={path}; bytes={row['bytes']}",
+    ```
+    
+    Invariant attacked: witness_value must be the exact value matched, and local_context must actually contain the value it claims to evidence. The existing _compliant check is:
+    
+    ```python
+    return str(t["witness_value"]) in str(t["local_context"])
+    ```
+    
+    The new local_context includes the full path before the bytes= field. Because _compliant uses substring containment, a path that contains the byte-count digits can satisfy the check even if the bytes= field is absent, truncated, or wrong.
+    
+    Concrete failing input:
+    
+    · path = "data/114/README.md"
+    · row["bytes"] = 11
+    · witness_value = "11"
+    · local_context = "path=data/114/README.md; bytes=11"
+      _compliant returns True because "11" is a substring of "114" in the path. If an attacker removes the bytes= field entirely, leaving local_context = "path=data/114/README.md", _compliant still returns True for witness_value="11".
+    
+    The current proposed controls do not detect this: the independent git adjudication checks context bytes == witness_value, but the code-level _compliant remains spoofable. The predicate _compliant(w) can pass while the witness does not actually carry the byte count in a labeled field.
+    
+    Minimum correction:
+    
+    · Change _compliant to require the value in a labeled field (e.g., parse bytes=<value> and compare exactly), or
+    · Format local_context so the path cannot satisfy the check, e.g. put bytes={row['bytes']} first, or use a structured representation ({"bytes": 11, "path": "..."}) and exact field comparison.
+    
+    ---
+    
+    DS-AW01-V1-02 — MINOR — source_selector="META:bytes" is not documented in the Witness contract
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked delta line:
+    
+    ```diff
+    +                    source_path=path, source_selector="META:bytes",
+    ```
+    
+    The supplied envelope.py excerpt documents:
+    
+    ```python
+        source_selector: str       # stable selector: "L<line>" or "L<a>-L<b>"
+    ```
+    
+    The new selector "META:bytes" is neither a line nor a line span. It is an equivalent stable selector in spirit, and the delta comment explains it, but the class contract itself still only names line-based selectors.
+    
+    Concrete failing input: an independent adjudicator or downstream validator that enforces the documented L<line>/L<a>-L<b> pattern will reject every AW witness as malformed.
+    
+    Current controls: the packet’s independent git adjudication does not enforce the class docstring; it checks the semantic content. The code-level contract is inconsistent.
+    
+    Minimum correction: update the Witness docstring to admit documented metadata selectors, or use a selector format that is already documented.
+    
+    ---
+    
+    DS-AW01-V1-03 — MINOR — witness_value drops the unit from the old "{N} bytes" form
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked delta line:
+    
+    ```diff
+    +                    witness_value=str(row["bytes"]),
+    ```
+    
+    The old witness value was f"{row['bytes']} bytes", which explicitly named the unit. The new value is a bare integer string such as "114". The selector "META:bytes" disambiguates, but the witness value itself no longer carries the unit.
+    
+    Concrete failing input: a generic witness consumer that expects witness_value to be self-describing (as the old value was) will now see "114" and cannot tell whether it is bytes, lines, or characters without reading the selector.
+    
+    Current controls: _compliant and the independent adjudication both know the selector, so this is not a correctness failure for the current pipeline.
+    
+    Minimum correction: either keep the unit in witness_value (e.g., f"{row['bytes']} bytes") or ensure every consumer reads the selector before interpreting the value.
+    
+    ---
+    
+    DS-AW01-V1-04 — QUESTION — row["bytes"] is not guaranteed to equal the committed blob size for invalid UTF-8
+    
+    Evidence status: SUPPLIED-EVIDENCE / UNVERIFIED residual
+    Attacked construct: witness_value=str(row["bytes"]) together with the supplied Pass-A excerpt:
+    
+    ```python
+    "bytes": len(txt.encode()),
+    ```
+    
+    txt is produced by read_source, which the packet says decodes with errors="ignore". For a valid UTF-8 blob, len(txt.encode()) equals the blob size. For a blob containing invalid UTF-8, the lossy decode drops bytes, so row["bytes"] may be smaller than the git blob size. The witness named "META:bytes" would then not match the committed byte count.
+    
+    The packet says 272/272 current subject documents are valid UTF-8, so the current frozen subject is safe. This is a pre-existing residual from the v1.2/Pass-A boundary, not introduced by this delta.
+    
+    Concrete failing input: a future subject with a README.md containing an invalid UTF-8 byte. git cat-file -s returns 115, but row["bytes"] is 114. The witness says bytes=114, and the independent adjudication git size == witness_value fails.
+    
+    Minimum correction: none in this delta if the subject population is guaranteed valid UTF-8; otherwise, compute row["bytes"] from the verified raw bytes, not from the re-encoded decoded text.
+    
+    Evidence request: confirm whether AW-01 is allowed to assume all subject documents are valid UTF-8, or whether the byte count must be the exact committed blob size for all subjects.
+    
+    ---
+    
+    DS-AW01-V1-05 — MINOR — Context format can be ambiguous if a path contains ; bytes=
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked delta line:
+    
+    ```diff
+    +                    local_context=f"path={path}; bytes={row['bytes']}",
+    ```
+    
+    The context uses ;  as a delimiter. If a path contains the literal substring ; bytes=, the context becomes ambiguous. The packet notes that no path in the current five-row subject contains it, but the format itself is not escaped.
+    
+    Concrete failing input: path = "data/foo; bytes=999/README.md", row["bytes"] = 11. The context becomes path=data/foo; bytes=999/README.md; bytes=11, which is ambiguous to a parser looking for the bytes= field.
+    
+    Current controls: the independent adjudication compares context path == source_path and context bytes == witness_value; without a robust parser, it could misread the field.
+    
+    Minimum correction: use a structured format (e.g., JSON) or escape the path.
+    
+    ---
+    
+    DS-AW01-V1-06 — QUESTION — Is META:bytes sufficiently self-describing for independent adjudication without the code comment?
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked delta line:
+    
+    ```diff
+    +                    source_path=path, source_selector="META:bytes",
+    ```
+    
+    The selector relies on the inline comment to explain that META:bytes means row["bytes"] from Pass A and that it is the UTF-8 byte length of the verified document text. The selector string itself does not name the measurement procedure or the fact that it is file metadata rather than source text.
+    
+    Concrete failing input: an adjudicator who receives only the witness record (not the code comment) sees source_selector="META:bytes" and may not know whether this is git cat-file -s, len(text.encode()), or some other byte count.
+    
+    Current controls: the packet’s independent adjudication uses git objects and compares to witness_value; it does not rely on the selector string alone.
+    
+    Minimum correction: either make the selector self-describing (e.g., "META:git-blob-bytes") or require the adjudication procedure to be part of the standing control.
+    
+    ---
+    
+    DS-AW01-V1-07 — MINOR — Qualifier WITNESS check still emits only first five missing cells (Q8)
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked construct: packet section 6, Q8, notes that qualify.py emits findings for only the first five missing cells (missing[:5]) while printing the full count. This is out of scope for the AW-01 delta itself, but the delta changes the MARKER witness content for five rows, which are exactly the rows the qualifier checks.
+    
+    Concrete failing input: if more than five MARKER rows ever become non-compliant, the qualifier will report only five findings and silently under-report the rest.
+    
+    Minimum correction: none in this delta. Track as a separate qualifier-layer finding.
+    
+    ---
+    
+    Executive advisory verdict
+    
+    NO DESIGN BLOCKER FOUND, MAJOR/MINOR FINDINGS REMAIN
+    
+    The AW-01 delta correctly changes the MARKER witness from a misleading “line of prose” witness to a metadata witness that carries the exact byte count and path. The predicate is unchanged, and the supplied evidence says the five frozen-subject MARKER rows remain identical in population. The main code-level risk is that the new local_context includes the path before the bytes= field, and the existing _compliant substring check can be satisfied by digits in the path even if the byte field is missing or wrong. That should be reconciled before implementation.
+    
+    ---
+    
+    Unverified claims register
+    
+    1. That row["bytes"] equals the committed git blob size for every subject document AW-01 may ever classify.
+    2. That the independent git adjudication described in packet section 5 is an enforced standing control, not a one-off measurement.
+    3. That no downstream consumer relies on witness_value carrying the " bytes" unit.
+    4. That no downstream validator enforces the Witness docstring’s L<line>/L<a>-L<b> selector pattern.
+    5. That the qualifier’s missing[:5] limitation is truly out of scope and does not interact with the five MARKER rows.
+    
+    ---
+    
+    Evidence requests
+    
+    1. Confirm whether AW-01 may assume all subject documents are valid UTF-8, or whether row["bytes"] must be the exact committed blob size for all subjects.
+    2. Provide the exact enforcement point for the independent git adjudication (is it a standing test, a CI check, or a manual procedure?).
+    3. Provide the implementation of _compliant if it differs from the supplied excerpt, and confirm whether any exact-field parsing is already planned.
+    4. Confirm whether any downstream consumer parses local_context with a delimiter-based parser that could be confused by ; bytes= in a path.
+    END-VERBATIM DEEPSEEK-AW01-V1-RECEIPT-AND-REVIEW
+- EVIDENCE AW01-V1-PROBE-INSTRUMENT aw01_v1_probe.py: 2494 bytes, sha256 4e20c016a91ab2508570dc631a1d18c3d38f6d3705a0a097b61b166dfb9e3630, final LF True  [CMD `sha256sum aw01_v1_probe.py` → 4e20c016a91ab250…]
+    BEGIN-VERBATIM AW01-V1-PROBE-INSTRUMENT
+    """Read-only probe of DS-AW01-V1-01/05 (child, qualified interpreter). argv: <AW H2 dir> <full-history subject clone>
+    Uses the REAL run_h2_v12._compliant (unchanged by AW-01) and the AW classify.function; in-memory rows only, plus git paths."""
+    import sys, subprocess, re
+    sys.path.insert(0, sys.argv[1]); import run_h2_v12 as R, classify as cl
+    def w(value, ctx, sel="META:bytes"):
+        return {"witness_type": "SIZE_AND_ROLE", "witness_value": value, "source_path": "p", "source_selector": sel, "local_context": ctx,
+                "applicability_scope": "WHOLE_FILE", "evidence_total": 1, "evidence_shown": 1, "truncated": False}
+    print("V1-01 (_compliant is a substring test over the whole context):")
+    cases = [("AW as produced: data/114/README.md, 11 bytes", w("11", "path=data/114/README.md; bytes=11"), True),
+             ("bytes field REMOVED, path digits remain", w("11", "path=data/114/README.md"), None),
+             ("bytes field WRONG (bytes=99), path digits remain", w("11", "path=data/114/README.md; bytes=99"), None),
+             ("DeepSeek remedy 'bytes first', field wrong", w("11", "bytes=99; path=data/114/README.md"), None),
+             ("bytes field wrong, path without the digits (control)", w("11", "path=data/x/README.md; bytes=99"), False)]
+    for label, x, _ in cases:
+        print(f"  _compliant={R._compliant(x)!s:<5}  {label}")
+    row = {"path": "data/114/README.md", "bytes": 11, "title": ""}
+    cell = cl.function(row, "")
+    print(f"  AW function() on that row -> value {cell['value']}, witness_value {cell['witness']['witness_value']!r}, context {cell['witness']['local_context']!r}")
+    repo = sys.argv[2]; subj = "d8aac4d49e6ba997e3eb38062c0917186ee3f197"
+    names = [p for p in subprocess.run(["git", "-C", repo, "ls-tree", "-r", "--name-only", subj], capture_output=True, text=True).stdout.split("\n") if p]
+    readme = [p for p in names if p.endswith("README.md")]
+    print(f"\nsubject d8aac4d4: tracked paths {len(names)}; ending README.md {len(readme)}; README.md paths containing a digit {sum(bool(re.search(r'[0-9]', p)) for p in readme)}")
+    print(f"  the 5 MARKER paths containing a digit: {sum(bool(re.search(r'[0-9]', p)) for p in ['data/self-emp/Accounting/README.md','data/self-emp/Coding/README.md','data/self-emp/Engineering/README.md','data/self-emp/Legal/README.md','data/self-emp/Social/README.md'])}")
+    print(f"V1-05: tracked paths containing '; bytes=' {sum('; bytes=' in p for p in names)}; containing ';' {sum(';' in p for p in names)}; containing '=' {sum('=' in p for p in names)}")
+    END-VERBATIM AW01-V1-PROBE-INSTRUMENT
+- EVIDENCE AW01-V1-PROBE-OUTPUT aw01_v1_probe_out.txt: 722 bytes, sha256 22880691e5969ef2ce677d926a0ad649d9549d340af776dba986136c0677ae8b, final LF True  [CMD `sha256sum aw01_v1_probe_out.txt` → 22880691e5969ef2…]
+    BEGIN-VERBATIM AW01-V1-PROBE-OUTPUT
+    V1-01 (_compliant is a substring test over the whole context):
+      _compliant=True   AW as produced: data/114/README.md, 11 bytes
+      _compliant=True   bytes field REMOVED, path digits remain
+      _compliant=True   bytes field WRONG (bytes=99), path digits remain
+      _compliant=True   DeepSeek remedy 'bytes first', field wrong
+      _compliant=False  bytes field wrong, path without the digits (control)
+      AW function() on that row -> value MARKER, witness_value '11', context 'path=data/114/README.md; bytes=11'
+    
+    subject d8aac4d4: tracked paths 1032; ending README.md 8; README.md paths containing a digit 0
+      the 5 MARKER paths containing a digit: 0
+    V1-05: tracked paths containing '; bytes=' 0; containing ';' 0; containing '=' 1
+    END-VERBATIM AW01-V1-PROBE-OUTPUT
+
+### 6. Next authorised step
+
+- Wait for Kai's reconciliation of DS-AW01-V1-01..07; no classify.py mutation  [CONVERSATION 2026-10-04 Kai, "Return DeepSeek’s findings to Kai for repository reconciliation."]
+
+### 7. What I am unsure of
+
+- Which repair Kai prefers for V1-01 within his invariant "no change to _compliant()": a witness_value/context format whose substring match cannot be satisfied by the path, or a standing exact-field check outside _compliant; not designed here  [CMD `aw01_v1_probe.py` → bytes-first remedy insufficient]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
