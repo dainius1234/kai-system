@@ -28653,3 +28653,295 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-04T02:09:53Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-04T02:09:53Z  [CMD `date -u +%FT%TZ` → 2026-10-04T02:09:53Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 0c398663478819f33e0cad3f6b51f756542be080  [CMD `git rev-parse HEAD` → 0c398663478819f33e0cad3f6b51f756542be080]
+- tree: 3994373c19d01cecee9875e839b061fbc609815c  [CMD `git rev-parse HEAD^{tree}` → 3994373c19d01cecee9875e839b061fbc609815c]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/project-rework-plan-pgvp35: 0c398663478819f33e0cad3f6b51f756542be080  [CMD `git ls-remote --heads origin` → 0c398663478819f33e0cad3f6b51f756542be080]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d0c08a4da85a447e0729fdb83d201cccc0af395a  [CMD `git ls-remote --heads origin` → d0c08a4da85a447e0729fdb83d201cccc0af395a]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 68  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 68]
+
+### 1. The four states
+
+- physical: repair branch at d0c08a4; classify.py and d379_controls.py unchanged outside scratch  [CMD `git ls-remote --heads origin` → claude/d379-repair-eb52f73 d0c08a4da85a447e0729fdb83d201cccc0af395a]
+- authorised: preserve DeepSeek's closure review; Kai reconciles; no source mutation  [CONVERSATION 2026-10-04 Kai, "STOP after DeepSeek review for Kai."]
+- evidence: DeepSeek's reply verbatim and a read-only probe in section 5  [CMD `sha256sum deepseek_aw01_closure_review.txt` → 4c006f6d20bde7f9…]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- None; DeepSeek is a reviewer  [CONVERSATION 2026-10-04 Dainius, "Deep seek : PACKET HASH: 8acd00cb…"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: implementation of classify.py and d379_controls.py, the rest of the matrix, D390 replay, F, capture, candidate, holdout, blind 40, Item 8, merge  [CONVERSATION 2026-10-04 Kai, "NO SOURCE MUTATION."]
+
+### 4. Open questions
+
+- RECEIPT DEVIATION: SENTINEL B as received is '+AW01_TOKEN = _re.compile(r"passa.bytes=(0|[1-9][0-9]*) bytes;")'; the packet line has 'passa\.bytes' (one backslash). The received reply contains 0 backslashes anywhere; DeepSeek's previous (v2) reply, relayed the same way, kept its one backslash in 'passa\.bytes'. Whether the backslash was lost by DeepSeek or by the copy/render path is UNVERIFIED; under the receipt rule an inexact sentinel means NO REVIEW — acceptance is Kai's. All other receipt lines exact (hash values with the instructed note); 6/6 quoted diff lines byte-identical — owner: Kai  [CMD `receipt check vs DEEPSEEK_PACKET_AW01_CLOSURE.md; backslash count per reply` → SENTINEL B NOT EXACT; 0 / 1 / 0]
+- DS-AW01-C-01 (population-first early return): behaviour confirmed — a bare '11' forgery plus an extra MARKER reports only AW01_MARKER_EXTRA (witnesses_checked 0); with the population corrected the same forgery reports TOKEN_GRAMMAR + CONTEXT_NOT_TOKEN. The early return implements Kai's instruction "Require exact population equality before inspecting individual witnesses"; whether to keep it as a hard stop or continue to witness checks is Kai's — owner: Kai  [CMD `aw01c_review_probe.py` → ['AW01_MARKER_EXTRA'] then ['AW01_TOKEN_GRAMMAR', 'AW01_CONTEXT_NOT_TOKEN']]
+- DS-AW01-C-03 (negative byte counts): DISPROVED by measurement — Pass-A bytes=-1 with token 'passa.bytes=-1 bytes;' yields AW01_TOKEN_GRAMMAR (the grammar admits no sign) — owner: Kai  [CMD `aw01c_review_probe.py` → AW01_TOKEN_GRAMMAR]
+- DS-AW01-C-04 (git corroboration optional): fact — --aw01-subject-repo is optional; when supplied, a failed git lookup (None) fails closed with AW01_N_NOT_GIT_SIZE — owner: Kai  [CMD `aw01c_review_probe.py` → AW01_N_NOT_GIT_SIZE, git blob size=None]
+- DS-AW01-C-05 (CLI): CONFIRMED — a missing argument or a missing --aw01-subject-repo value raises IndexError, exit 1 (fails closed, not a usage message). My first measurement printed exit 0 because it read the status of `| tail -1`; re-measured unpiped — owner: Kai  [CMD `d379_controls.py --aw01-candidate RESULT (unpiped)` → IndexError, exit 1]
+- DS-AW01-C-06 (comment word "LEGITIMATE"): DeepSeek's proposed wording "no other string matching the canonical token grammar" — wording is Kai's — owner: Kai  [CONVERSATION 2026-10-04 DeepSeek via Dainius, "Remedy: replace “no other LEGITIMATE canonical token”"]
+- DS-AW01-C-07 (IMPLEMENTED a closed set?): no code consumer found — in *.py/*.sh/*.yml/*.yaml at d0c08a4 the 3 hits outside d379_controls.py are comment words; inside it the state JSON key "implemented" is written once (:3970) and read nowhere — owner: Kai  [CMD `git grep IMPLEMENTED / "implemented" d0c08a4 -- code globs` → 3 comment hits; writer only]
+- DS-AW01-C-02: withdrawn by DeepSeek in its own text — owner: Kai  [CONVERSATION 2026-10-04 DeepSeek via Dainius, "So this is not a real defect. Withdraw."]
+
+### 5. Incidents and corrections
+
+- Own-measurement slip, caught before reporting: the C-05 probe piped the CLI through `tail -1` and printed the pipe's exit status (0); re-measured unpiped (1). This is the same mechanism the R18 control addresses, here in a probe rather than a commit chain (the commit gate does not cover probes)  [CMD `unpiped re-run` → exit 1]
+- Credential scan of the three files: 0 hits; raw line separators: none  [CMD `secretscan.py <3 files>` → TOTAL HITS 0]
+- EVIDENCE DEEPSEEK-AW01-CLOSURE-RECEIPT-AND-REVIEW deepseek_aw01_closure_review.txt: 8604 bytes, sha256 4c006f6d20bde7f934b1c23201871e122c8f3cc90829c8ea45eee991f804ce3a, final LF False  [CMD `sha256sum deepseek_aw01_closure_review.txt` → 4c006f6d20bde7f9…]
+    BEGIN-VERBATIM DEEPSEEK-AW01-CLOSURE-RECEIPT-AND-REVIEW
+    Deep seek : PACKET HASH: 8acd00cbdeaa64c01a448a6c5533b662d5969eee9390a6408f187723142c2007 (cannot compute SHA-256)
+    BASE d379_controls.py SHA-256: 59952df66850fd30ade8dc75ee409f88ef644ca197af03a78e1a5cba1eb2359f (cannot compute SHA-256)
+    FIRST HUNK OF DELTA B: @@ -36,8 +36,8 @@
+    SENTINEL A: +        # This is NOT an authenticity check. The generic _compliant() is a
+    SENTINEL B: +AW01_TOKEN = _re.compile(r"passa.bytes=(0|[1-9][0-9]*) bytes;")
+    END OF PACKET SEEN: YES
+    
+    ---
+    
+    Finding register — KAI-B4-AW-01 closure
+    
+    DS-AW01-C-01 — MINOR — Population-first early return suppresses witness-level findings when population mismatches
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked construct:
+    
+    ```python
+    if expected != emitted:
+        ...
+        return findings, counts          # population first (Kai, AW-01)
+    ```
+    
+    Invariant attacked: the control should report every material defect it can detect. When expected and emitted MARKER populations differ, the function returns before checking any witness. A forged witness on a row that is present in both populations is not reported in that run.
+    
+    Concrete failing input: a result row has the correct MARKER population but one witness value is "11" instead of "passa.bytes=114 bytes;". If the population also has an extra MARKER elsewhere, the control reports only the population defect and hides the witness forgery until the population is fixed.
+    
+    Remedy: either document that population mismatch is a hard stop, or continue to witness checks after recording population findings.
+    
+    ---
+    
+    DS-AW01-C-02 — MINOR — Missing bytes key raises KeyError instead of producing a finding
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked construct:
+    
+    ```python
+    expected = sorted(p for p, r in pa.items()
+                      if isinstance(p, str) and _aw01_is_int(r.get("bytes"))
+                      and r["bytes"] < 200 and p.endswith("README.md"))
+    ```
+    
+    and later:
+    
+    ```python
+    if n is not None and n != row["bytes"]:
+    ```
+    
+    r.get("bytes") is used in the expected comprehension, but row["bytes"] is used directly in the witness loop. A Pass-A row that passes the expected filter must have an int bytes key, so the direct access is safe for those rows. However, if pa is malformed or a row is added later without bytes, the control can raise instead of failing closed.
+    
+    Concrete failing input: pa = {"a/README.md": {"path": "a/README.md"}}; aw01_check raises KeyError: 'bytes' while computing expected? Actually _aw01_is_int(r.get("bytes")) returns False, so it is excluded; then no witness check. So the direct row["bytes"] is only reached for rows that passed expected, which requires _aw01_is_int(r.get("bytes")). Thus the key must exist. So this is not a real defect. Withdraw.
+    
+    ---
+    
+    DS-AW01-C-03 — MINOR — Negative byte counts pass the < 200 check
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked construct:
+    
+    ```python
+    if n is not None and not n < 200:
+        findings.append(("AW01_N_NOT_BELOW_200", p, str(n)))
+    ```
+    
+    Invariant attacked: byte counts are non-negative. The predicate bytes < 200 is satisfied by negative integers, so a token such as passa.bytes=-1 bytes; would pass the < 200 rule if the bound row also has bytes=-1.
+    
+    Concrete failing input: Pass-A row {"path": "a/README.md", "bytes": -1}; witness token passa.bytes=-1 bytes;. The control reports no AW01_N_NOT_BELOW_200 finding.
+    
+    Remedy: add n >= 0 to the check, or document that negative byte counts are impossible and outside the control’s threat model.
+    
+    ---
+    
+    DS-AW01-C-04 — QUESTION — Git-size corroboration is optional
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked construct:
+    
+    ```python
+    def aw01_candidate(result_path, passa_path, subject_repo=None):
+        ...
+        if subject_repo:
+            ...
+            git_size = ...
+        findings, counts = aw01_check(pa["rows"], res["rows"], git_size=git_size)
+    ```
+    
+    When --aw01-subject-repo is omitted, git_size remains None, and aw01_check skips the N == git blob size check. The packet states the git-size check is used only when the relevant population is measured strict UTF-8.
+    
+    Question: Is a standing control acceptable when its strongest independent corroboration is optional? If the control is meant to be run in CI without a subject repo, the token’s byte count is checked only against Pass-A bytes, not against the committed blob.
+    
+    Remedy: document the required invocation for admission-grade runs, or make --aw01-subject-repo mandatory for the standing control when the subject is available.
+    
+    ---
+    
+    DS-AW01-C-05 — MINOR — CLI argument parsing can raise IndexError on missing value
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked construct:
+    
+    ```python
+    if "--aw01-candidate" in sys.argv:
+        _i = sys.argv.index("--aw01-candidate")
+        sys.exit(aw01_candidate(
+            sys.argv[_i + 1], sys.argv[_i + 2],
+            sys.argv[sys.argv.index("--aw01-subject-repo") + 1]
+            if "--aw01-subject-repo" in sys.argv else None))
+    ```
+    
+    If --aw01-candidate is present without two following arguments, or --aw01-subject-repo is present without a value, the code raises IndexError instead of printing a usage error.
+    
+    Concrete failing input: python d379_controls.py --aw01-candidate result.json → IndexError.
+    
+    Remedy: use argparse, or validate len(sys.argv) before indexing.
+    
+    ---
+    
+    DS-AW01-C-06 — MINOR — Comment wording “no other LEGITIMATE canonical token” is still subjective
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked delta A line:
+    
+    ```diff
+    +        # its unit and a terminator, so no other LEGITIMATE canonical token
+    +        # is a substring of it; the path is carried by source_path alone, so
+    ```
+    
+    The actual property is: no other string that fully matches AW01_TOKEN is a substring of the genuine token. The word “LEGITIMATE” is not defined in the comment, and the packet itself notes that a bare number like "11" is a substring of the genuine token but is not a legitimate canonical token. The comment is directionally correct but could be misread.
+    
+    Remedy: replace “no other LEGITIMATE canonical token” with “no other string matching the canonical token grammar” or equivalent.
+    
+    ---
+    
+    DS-AW01-C-07 — QUESTION — Adding AW01 to IMPLEMENTED changes the hostile-matrix coverage report
+    
+    Evidence status: SUPPLIED-EVIDENCE / UNVERIFIED
+    Attacked delta B lines:
+    
+    ```diff
+    -            "I1B", "DEP", "STAGE_A", "STDLIB"]
+    -IMPLEMENTED = {"M2", "SB", "D14", "I1A", "I1B", "PPOP", "86", "Q1b"}
+    +            "I1B", "DEP", "STAGE_A", "STDLIB", "AW01"]
+    +IMPLEMENTED = {"M2", "SB", "D14", "I1A", "I1B", "PPOP", "86", "Q1b", "AW01"}
+    ```
+    
+    The control file’s own coverage gate now treats AW01 as implemented. If section_AW01() fails, check() records a failure, so the gate still fails. But the coverage calculation for AW01 now follows the NON_CLI_SUBJECTS branch, not the executable-case branch. The packet says no other section’s behavior changes, but the coverage report itself gains a new implemented section.
+    
+    Question: Does adding AW01 to IMPLEMENTED interact with any external consumer that parses the state JSON and assumes only the original eight sections can be implemented?
+    
+    Remedy: confirm no external consumer treats IMPLEMENTED as a closed set.
+    
+    ---
+    
+    Executive advisory verdict
+    
+    NO DESIGN BLOCKER FOUND, MAJOR/MINOR FINDINGS REMAIN
+    
+    Delta A is comment-only and correctly states the real boundary: _compliant() remains a structural substring check and does not authenticate. Delta B adds a plausible standing semantic control with population-first checks, grammar validation, field checks, and optional git-size corroboration. The main residual risks are the optional git-size check, the population-first early return, and minor CLI/comment issues. No BLOCKER-level defect was found in either delta.
+    
+    ---
+    
+    Unverified claims register
+    
+    1. That Pass-A rows always contain an integer bytes key for every path considered by the control.
+    2. That --aw01-subject-repo is always supplied in admission-grade runs.
+    3. That no external consumer treats IMPLEMENTED in d379_controls.py as a closed set of eight sections.
+    4. That the control’s git_size callable cannot return a non-int without triggering a finding.
+    5. That negative byte counts cannot occur in the governed Pass-A population.
+    
+    ---
+    
+    Evidence requests
+    
+    1. Confirm whether aw01_check is required to run with git_size in the standing control, or whether the optional form is sufficient for the gate.
+    2. Confirm whether IMPLEMENTED is consumed by any tool outside d379_controls.py.
+    3. Confirm whether Pass-A rows are schema-validated for bytes as a non-negative integer before aw01_check runs.
+    4. Confirm whether the population-first early return is intentional and documented for the standing control.
+    END-VERBATIM DEEPSEEK-AW01-CLOSURE-RECEIPT-AND-REVIEW
+- EVIDENCE AW01C-REVIEW-PROBE-INSTRUMENT aw01c_review_probe.py: 2088 bytes, sha256 113e51b868aad705706fbdf98a5eed40265cfd98a91b2fd67de3824959c48170, final LF True  [CMD `sha256sum aw01c_review_probe.py` → 113e51b868aad705…]
+    BEGIN-VERBATIM AW01C-REVIEW-PROBE-INSTRUMENT
+    """Read-only probe of DS-AW01-C-01/03/04/05 (child, qualified interpreter). argv: <build_evidence dir>"""
+    import sys, copy, importlib.util
+    spec = importlib.util.spec_from_file_location("d379_controls", sys.argv[1] + "/d379_controls.py")
+    C = importlib.util.module_from_spec(spec); spec.loader.exec_module(C)
+    T = "passa.bytes={} bytes;".format
+    def wit(p, n, **kw):
+        w = {"witness_type": "SIZE_AND_ROLE", "witness_value": T(n), "source_path": p, "source_selector": "META:passa.bytes",
+             "local_context": T(n), "applicability_scope": "WHOLE_FILE", "evidence_total": 1, "evidence_shown": 1, "truncated": False,
+             "subject": "SELF", "polarity": "POSITIVE", "certainty": "VERIFIED", "temporal": "AT_COMMIT"}; w.update(kw); return w
+    print("C-03 negative byte count: Pass-A row bytes=-1, witness token 'passa.bytes=-1 bytes;'")
+    rows = [{"path": "a/README.md", "bytes": -1}]
+    f, c = C.aw01_check(rows, [{"path": "a/README.md", "FUNCTION": {"value": "MARKER", "witness": wit("a/README.md", -1)}}])
+    print("   findings:", [(x[0], x[2]) for x in f], "| counts:", c)
+    print("C-01 population-first: correct-population witness forged to bare '11' PLUS an extra MARKER elsewhere")
+    rows = [{"path": "a/README.md", "bytes": 114}, {"path": "d/NOTES.md", "bytes": 150}]
+    res = [{"path": "a/README.md", "FUNCTION": {"value": "MARKER", "witness": wit("a/README.md", 114, witness_value="11")}},
+           {"path": "d/NOTES.md", "FUNCTION": {"value": "MARKER", "witness": wit("d/NOTES.md", 150)}}]
+    f, c = C.aw01_check(rows, res); print("   findings:", [x[0] for x in f], "| witnesses_checked:", c["witnesses_checked"])
+    f2, _ = C.aw01_check(rows, res[:1] + [{"path": "d/NOTES.md", "FUNCTION": {"value": "UNKNOWN"}}])
+    print("   same forgery once the population is correct:", [x[0] for x in f2])
+    print("C-04 git lookup failure (git_size returns None) on a genuine witness:")
+    f, _ = C.aw01_check([{"path": "a/README.md", "bytes": 114}], [{"path": "a/README.md", "FUNCTION": {"value": "MARKER", "witness": wit("a/README.md", 114)}}], git_size=lambda p: None)
+    print("   findings:", [(x[0], x[2]) for x in f])
+    END-VERBATIM AW01C-REVIEW-PROBE-INSTRUMENT
+- EVIDENCE AW01C-REVIEW-PROBE-OUTPUT aw01c_review_probe_out_final.txt: 964 bytes, sha256 8798ac3c3f9c15cf53d7dd7e77a63bc2493682334fb071f09e32adcafbb5984a, final LF True  [CMD `sha256sum aw01c_review_probe_out_final.txt` → 8798ac3c3f9c15cf…]
+    BEGIN-VERBATIM AW01C-REVIEW-PROBE-OUTPUT
+    C-03 negative byte count: Pass-A row bytes=-1, witness token 'passa.bytes=-1 bytes;'
+       findings: [('AW01_TOKEN_GRAMMAR', "'passa.bytes=-1 bytes;'")] | counts: {'passa_rows': 1, 'result_rows': 1, 'expected_marker': 1, 'emitted_marker': 1, 'witnesses_checked': 1}
+    C-01 population-first: correct-population witness forged to bare '11' PLUS an extra MARKER elsewhere
+       findings: ['AW01_MARKER_EXTRA'] | witnesses_checked: 0
+       same forgery once the population is correct: ['AW01_TOKEN_GRAMMAR', 'AW01_CONTEXT_NOT_TOKEN']
+    C-04 git lookup failure (git_size returns None) on a genuine witness:
+       findings: [('AW01_N_NOT_GIT_SIZE', 'token N=114, git blob size=None')]
+    C-05 CLI with a missing argument:
+    IndexError: list index out of range
+       exit=0
+    C-05 unpiped re-measure: IndexError: list index out of range — exit 1 (the 'exit=0' above was the pipe's status, not the program's)
+    C-05 missing --aw01-subject-repo value: IndexError: list index out of range — exit 1
+    END-VERBATIM AW01C-REVIEW-PROBE-OUTPUT
+
+### 6. Next authorised step
+
+- Wait for Kai's reconciliation of DS-AW01-C-01..07 and of the SENTINEL B deviation; no source mutation  [CONVERSATION 2026-10-04 Kai, "STOP after DeepSeek review for Kai."]
+
+### 7. What I am unsure of
+
+- The cause of the missing backslash (DeepSeek vs relay path) — UNVERIFIED  [CMD `backslash count per reply` → 0 / 1 / 0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
