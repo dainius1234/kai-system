@@ -114,7 +114,38 @@ def _history_trace(row, subject, count):
             "temporal": "AT_COMMIT", "subject": "SELF"}
 
 
-def _reader_trace(row, subject_repo):
+# ── KAI-B4-SB-01: CLASSIFICATION READS THE BOUND SUBJECT'S BYTES ─────
+# v1.2 read every subject document with Path.read_text(): WORKING-TREE
+# bytes, never checked against the frozen commit, and decoded with
+# universal-newline translation (a lone CR became LF), so classification
+# could measure text the subject does not contain while stamping it with
+# the subject's identity. There is no second source-identity system here:
+# the Pass-A gate (passa._source_binding_gate) runs before measurement and
+# every subject byte arrives through passa.make_verified_reader -- READ ->
+# VERIFY THOSE BYTES AGAINST THE FROZEN BLOB -> USE -- which decodes the
+# exact bytes with no newline translation. There is no fallback reader.
+class SourceBindingError(SystemExit):
+    """A subject byte could not be bound to the frozen commit. REFUSE."""
+
+
+def _read_bound(read_source, subject_repo, rel):
+    """The verified bytes of `rel`, decoded, or REFUSE. Never Path.read_text."""
+    if read_source is None:
+        raise SourceBindingError(
+            f"REFUSE: {rel}: no verified subject reader was supplied; "
+            f"classification never reads subject bytes any other way "
+            f"(KAI-B4-SB-01)")
+    try:
+        return read_source(subject_repo, rel)
+    except OSError as e:
+        raise SourceBindingError(
+            f"R11 ABORT [SOURCE BINDING / UNREADABLE SOURCE]: {rel}: "
+            f"{type(e).__name__}: {e.strerror or e}. A subject file vanished "
+            f"or became unreadable during measurement. Refusing to "
+            f"measure.") from None
+
+
+def _reader_trace(row, subject_repo, read_source):
     """STATIC_REFERENCE_AT_SUBJECT. The determining evidence is a STATIC
     READER REFERENCE produced by the Census opscan -- NOT history. v1.3a
     labelled it `history:`, which named the wrong evidence class entirely.
@@ -155,9 +186,13 @@ def _reader_trace(row, subject_repo):
     if not ops:
         return None                      # A6-ii will abstain, correctly
     o = sorted(ops, key=lambda x: (x["src"], x["line"]))[0]
+    # KAI-B4-SB-01: the READING document's bytes come through the same
+    # verified reader as the classified document, so they are the frozen
+    # blob's bytes or the run REFUSES. The read sits OUTSIDE the try: a
+    # binding failure or an unreadable source is never an abstention.
+    lines = _read_bound(read_source, subject_repo, o["src"]).splitlines()
     try:
-        line = (pathlib.Path(subject_repo) / o["src"]).read_text(
-            errors="ignore").splitlines()[o["line"] - 1].strip()
+        line = lines[o["line"] - 1].strip()
     except Exception:
         return None                      # no locator -> no certification
     # The Census stores `expr` as an AST DUMP -- "Name(id='CHANGELOG',
@@ -224,7 +259,257 @@ TRACE_CLASS = {
     "BINDING_CONTRADICTION":      ("DATE_STAMP", "L"),
     "SELF_ASSERTS_AUTHORITY":     ("SELF_AUTHORITY_CLAIM", "L"),
     "SELF_ASSERTS_NON_AUTHORITY": ("SELF_AUTHORITY_CLAIM", "L"),
+    # Kai P1-P4, 2026-10-02: the two governed classes the runner omitted.
+    "NOMINAL_FUNCTION":           ("NOMINAL_FUNCTION_TERM", "L"),
+    "SELF_ASSERTS_CURRENT":       ("SELF_CURRENTNESS_CLAIM", "L"),
 }
+
+
+# ── TWO INDEPENDENT SUBREPAIRS of one schema-completeness defect ──────
+# ontology.EVIDENCE_FACTS governs ten classes; this runner emitted eight,
+# and the qualifier correctly reported FACT_CLASS_ABSENT (Kai, DS-B4-01).
+#
+#   NF   NOMINAL_FUNCTION: WIRING of an already-governed observation,
+#        classify.function()'s "NOMINAL_FUNCTION=<role> from
+#        self-description". No detector is added.
+#   SAC  SELF_ASSERTS_CURRENT: RESTORATION of the historical governed
+#        producer, v1.1 evidence.currentness_claims (D361, 438007e).
+#
+# FACT DISPOSITION, both subrepairs (Kai, DS-B4-04/09):
+#   detector or input unavailable            -> REFUSE
+#   complete measurement, nothing established -> False ("positive fact
+#                                               not established", never
+#                                               "proved false")
+#   positive candidate, determining trace
+#   missing or non-compliant                  -> REFUSE (never False)
+
+# ── SAC — SELF_ASSERTS_CURRENT, historical restoration (Kai P2(a)) ────
+#
+# NORMATIVE IDENTITY. CURRENT_POS / CURRENT_NEG below are literal copies
+# of the tuples in the IMMUTABLE commit 438007e,
+# kai-pm/house_in_order_h2_v11/evidence.py. That commit, not this file,
+# is their authority; the governed controls compare these tuples with it
+# mechanically and REFUSE on any drift. v1.1 is deliberately NOT imported
+# at runtime (that would add an old package to the governed population).
+# Subject ownership is the D12-repaired subjectbind.bind_subject (full
+# repo-relative path; a basename alone is not SELF -- Kai, B1). The v1.1
+# boundary is restored here because subjectbind._sentences does not
+# carry it: fenced code is not evidence; quoted free prose is not a
+# declaration; a quoted CONTROLLED FIELD (governed sb.SELF_FIELD) may be
+# one. Negative polarity wins. v1.1's auxiliary diagnostics are NOT
+# restored (Kai, B2).
+
+# POSITIVE currentness predicates. Bound forms only -- never a bare
+# token. "current phase", not "current".
+CURRENT_POS = (
+    r"\bis (?:the )?current\b", r"\bcurrently\b", r"\bcurrent (?:phase|"
+    r"focus|state|status|master|authority)\b", r"\bstatus\s*:\s*active\b",
+    r"\bstatus\s*:\s*current\b", r"\bin force\b", r"\bstill (?:in force|"
+    r"current|active)\b",
+)
+# NEGATIVE polarity must be tested FIRST: "no longer current" contains
+# "current", and a polarity-blind matcher would read it as the opposite
+# of what it says.
+CURRENT_NEG = (
+    r"\bno longer\b", r"\bnot current\b", r"\bsuperseded\b",
+    r"\bdeprecated\b", r"\bobsolete\b", r"\bstale\b", r"\bhistorical\b",
+    r"\barchived\b", r"\bwithdrawn\b",
+)
+
+
+def _segments(text):
+    """v1.1 subjectbind2._sentences (438007e), restored with absolute
+    offsets: (start, sentence, line_no, quoted).
+
+    SEMANTICS ARE v1.1's, and a governed control compares the projection
+    (sentence, line_no - 1, quoted) with the historical function over a
+    hostile corpus: lines are v1.1's `str.splitlines()` lines; ``` and ~~~
+    toggle a fence and fenced lines are dropped; a blockquote marker is
+    stripped but remembered; the split is `(?<=[.;])\\s+` (never ':').
+
+    OFFSETS ARE DERIVED, NEVER SEARCHED (Kai, DS-B4-V2-08): the line start
+    is the running sum of the splitlines(keepends=True) lengths; the body
+    start adds exactly the characters each v1.1 strip step removed; each
+    sentence start is the end of the previous separator match. The control
+    asserts text[start:start+len(sentence)] == sentence for every segment.
+    """
+    out, fence, line_start = [], False, 0
+    for i, raw in enumerate(text.splitlines(keepends=True)):
+        ln = raw.splitlines()[0] if raw.splitlines() else ""
+        here, line_start = line_start, line_start + len(raw)
+        s = ln.lstrip()
+        if s.startswith("```") or s.startswith("~~~"):
+            fence = not fence
+            continue
+        if fence:
+            continue
+        quoted = s.startswith(">")
+        s2 = s.lstrip("> ")
+        body = s2.strip()
+        lead = (len(ln) - len(s)) + (len(s) - len(s2)) + (len(s2) - len(s2.lstrip()))
+        base = here + lead
+        pos = 0
+        for sep in list(re.finditer(r"(?<=[.;])\s+", body)) + [None]:
+            end = sep.start() if sep else len(body)
+            part = body[pos:end]
+            if part:
+                out.append((base + pos, part, i + 1, quoted))
+            if sep:
+                pos = sep.end()
+    return out
+
+
+def currentness_claims(path, text):
+    """Every polarity-bearing currentness sentence with its OWNER.
+    Returns [(polarity, subject, line_no, sentence, phrase, sentence_start,
+    phrase_start)], both starts ABSOLUTE offsets into `text`."""
+    claims = []
+    for start, sent, line_no, quoted in _segments(text):
+        neg = next((m for m in (re.search(p, sent, re.I) for p in CURRENT_NEG)
+                    if m), None)
+        pos = None if neg else next(
+            (m for m in (re.search(p, sent, re.I) for p in CURRENT_POS) if m),
+            None)
+        if not (neg or pos):
+            continue
+        pol = "CURRENT_NEGATIVE" if neg else "CURRENT_POSITIVE"
+        if quoted and not sb.SELF_FIELD.match(sent):
+            subject = "QUOTED_NOT_DECLARATION"
+        else:
+            subject, _why = sb.bind_subject(text, start, sent, path)
+        hit = neg or pos
+        claims.append((pol, subject, line_no, sent, hit.group(0),
+                       start, start + hit.start()))
+    return claims
+
+
+def _currentness_fact(row, text):
+    """(positive, trace-maker). SELF positive and no SELF negative; a
+    SELF negative anywhere wins (v1.1 conflict rule)."""
+    cl_ = currentness_claims(row["path"], text)
+    self_pos = [c for c in cl_ if c[1] == "SELF" and c[0] == "CURRENT_POSITIVE"]
+    self_neg = [c for c in cl_ if c[1] == "SELF" and c[0] == "CURRENT_NEGATIVE"]
+    positive = bool(self_pos) and not self_neg
+
+    def mk():
+        # Kai KAI-B4-V3-10: one locator vocabulary across the instrument.
+        # The selector and context come from the canonical passa._selector
+        # / passa._context at the phrase's ABSOLUTE offset; the splitlines
+        # ordinal stays internal to the historical segmentation. The
+        # canonical context is the complete logical (LF) line, which always
+        # contains the whole v1.1 sentence (v1.1 never splits across LF).
+        _pol, _subj, _ln, sent, phrase, s_start, p_start = self_pos[0]
+        return {"witness_type": "SELF_CURRENTNESS_CLAIM",
+                "witness_value": phrase, "source_path": row["path"],
+                "source_selector": passa._selector(text, p_start),
+                "local_context": passa._context(text, s_start,
+                                                s_start + len(sent)),
+                # the sentence is the evidence: SPAN, never widened because
+                # its semantic subject is the document (Kai P2)
+                "applicability_scope": "SPAN",
+                "evidence_total": len(self_pos), "evidence_shown": 1,
+                "truncated": len(self_pos) > 1,
+                "polarity": "POSITIVE", "certainty": "OBSERVED",
+                "temporal": "AT_COMMIT", "subject": "SELF"}
+    return positive, mk
+
+
+# ── NF — NOMINAL_FUNCTION, wiring of the classify.function() observation
+class FactDispositionError(SystemExit):
+    """A governed fact could not be dispositioned honestly: input
+    unavailable, a malformed governed observation, or a positive whose
+    exact determining trace cannot be built. REFUSE, never False."""
+
+
+class NominalTraceError(FactDispositionError):
+    """The NOMINAL_FUNCTION-specific fact-disposition REFUSE (Kai, V2-09:
+    a real subclass, not a second name for the same class)."""
+
+# The EXACT governed observation grammar emitted by classify.function()
+# (classify.py, single-role branch). Nothing looser is accepted
+# (Kai, DS-B4-08).
+NOMINAL_OBSERVATION = re.compile(
+    r"NOMINAL_FUNCTION=(?P<role>[A-Z][A-Z_]*) from self-description")
+
+
+def _nominal_fact(row, text, function_cell):
+    """(positive, trace-maker) from classify.function()'s own observation
+    `NOMINAL_FUNCTION=<role> from self-description`. The token is located
+    with the SAME governed cl.FUNCTION_TERMS / cl.PURPOSE / cl.term_match
+    and the same title-then-purpose order classify uses; no second
+    vocabulary exists here."""
+    obs = (function_cell or {}).get("observed") or ""
+    if not obs.startswith("NOMINAL_FUNCTION="):
+        return False, None              # complete measurement, not established
+    om = NOMINAL_OBSERVATION.fullmatch(obs)
+    if om is None:
+        raise NominalTraceError(
+            f"REFUSE: {row['path']}: malformed NOMINAL_FUNCTION observation "
+            f"{obs!r}; the governed grammar is "
+            f"'NOMINAL_FUNCTION=<ROLE> from self-description'")
+    role = om.group("role")
+    if role not in cl.FUNCTION_TERMS:
+        raise NominalTraceError(
+            f"REFUSE: {row['path']}: NOMINAL_FUNCTION role {role!r} is not a "
+            f"governed FUNCTION_TERMS key")
+    term = cl.FUNCTION_TERMS[role]
+    # The TWO governed channels classify.function() unions, in its order
+    # (title, then PURPOSE); each is evaluated, so the evidence population
+    # is counted, not assumed (Kai, KAI-B4-V2-10). evidence_total for NF is
+    # the number of qualifying governed SOURCE CHANNELS supporting the
+    # emitted fact -- not a count of distinct role values (Kai, V3-03).
+    # Each channel carries the ABSOLUTE offset of its exact token; the
+    # selector and context are derived from it with the canonical
+    # passa._selector / passa._context (Kai, KAI-B4-V3-10).
+    channels = []
+    title = row.get("title") or ""
+    if title and cl.term_match(term, title):
+        # Pass A's title rule, on Pass A's own line model: the FIRST
+        # str.splitlines() line starting with '#', title =
+        # ln.lstrip("#").strip()[:120]. If the source cannot reconstruct
+        # the bound Pass-A title, the row and the source disagree: REFUSE,
+        # never fall through to PURPOSE (V2-04).
+        first, off = None, 0
+        for raw in text.splitlines(keepends=True):
+            ln = raw.splitlines()[0] if raw.splitlines() else ""
+            if ln.startswith("#"):
+                first = (off, ln)
+                break
+            off += len(raw)
+        if first is None or first[1].lstrip("#").strip()[:120] != title:
+            raise NominalTraceError(
+                f"REFUSE: {row['path']}: the Pass-A title {title!r} carries the "
+                f"nominal term but the source's first heading does not "
+                f"reconstruct it")
+        line_start, ln = first
+        after_hash = ln.lstrip("#")
+        title_at = line_start + (len(ln) - len(after_hash)) + \
+            (len(after_hash) - len(after_hash.lstrip()))
+        m = cl.term_match(term, title)
+        channels.append((title_at + m.start(), m.group(0)))
+    pm = cl.PURPOSE.search(text[:6000])
+    m = pm and cl.term_match(term, pm.group("body"))
+    if m:
+        channels.append((pm.start("body") + m.start(), m.group(0)))
+    if not channels or any(text[at:at + len(tok)] != tok
+                           for at, tok in channels):
+        raise NominalTraceError(
+            f"REFUSE: {row['path']}: classify observed NOMINAL_FUNCTION={role} "
+            f"but no exact determining source token could be located")
+    hit = channels[0]                   # deterministic: classify's order
+
+    def mk():
+        at, token = hit
+        return {"witness_type": "NOMINAL_FUNCTION_TERM",
+                "witness_value": token, "source_path": row["path"],
+                "source_selector": passa._selector(text, at),
+                "local_context": passa._context(text, at, at + len(token)),
+                "applicability_scope": "SPAN",
+                "evidence_total": len(channels), "evidence_shown": 1,
+                "truncated": len(channels) > 1,
+                "polarity": "POSITIVE", "certainty": "OBSERVED",
+                "temporal": "AT_COMMIT", "subject": "SELF"}
+    return True, mk
 
 
 def _class_ok(name, tr):
@@ -246,8 +531,14 @@ def _compliant(t):
     return str(t["witness_value"]) in str(t["local_context"])
 
 
+# The two classes repaired here. The existing eight keep their A6-ii
+# behaviour unchanged; that is outside this repair (Kai: bounded tranche).
+REFUSE_ON_UNTRACEABLE_POSITIVE = ("NOMINAL_FUNCTION", "SELF_ASSERTS_CURRENT")
+
+
 def evidence_facts(row, claims, contradiction, determining=(),
-                   subject="", subject_repo="."):
+                   subject="", subject_repo=".", *, text=None,
+                   function_cell=None, read_source=None):
     """FACTS, each bound to the trace that DETERMINED it. None is a
     verdict (D360 5).
 
@@ -275,7 +566,7 @@ def evidence_facts(row, claims, contradiction, determining=(),
     # claim the name makes is corrected.
     cand["STATIC_REFERENCE_AT_SUBJECT"] = (
         bool(row["readers"]),
-        lambda: _reader_trace(row, subject_repo))
+        lambda: _reader_trace(row, subject_repo, read_source))
     cand["CITES_COMMIT"] = (bool(row["witnesses"].get("COMMIT")),
                             lambda: _witness_trace(row, "COMMIT"))
     cand["CITES_RUN"] = (bool(row["witnesses"].get("RUN_ID")),
@@ -294,6 +585,25 @@ def evidence_facts(row, claims, contradiction, determining=(),
                       (lambda d=determining, n=len(claims): _claim_trace(
                           row, d, n) if d else None))
 
+    # Kai P3: every governed class is MEASURED on every row. No default:
+    # a caller that cannot supply the inputs does not get a False.
+    if text is None or function_cell is None:
+        raise FactDispositionError("REFUSE: evidence_facts needs the document text and "
+                         "the governed FUNCTION cell (Kai P3: no unmeasured "
+                         "False)")
+    cand["NOMINAL_FUNCTION"] = _nominal_fact(row, text, function_cell)
+    cand["SELF_ASSERTS_CURRENT"] = _currentness_fact(row, text)
+    if len(ont.EVIDENCE_FACTS) != len(set(ont.EVIDENCE_FACTS)):
+        raise FactDispositionError(
+            f"REFUSE: ontology.EVIDENCE_FACTS names a governed class more than "
+            f"once; the evidence-fact population cannot be reconciled "
+            f"(Kai, V3-07)")
+    missing = [n for n in ont.EVIDENCE_FACTS if n not in cand]
+    extra = [n for n in cand if n not in ont.EVIDENCE_FACTS]
+    if missing or extra:
+        raise FactDispositionError(f"REFUSE: evidence-fact producer population != the "
+                         f"governed schema; missing={missing} extra={extra}")
+
     f, abstained = {}, []
     for name, (positive, mk) in cand.items():
         if not positive:
@@ -303,6 +613,12 @@ def evidence_facts(row, claims, contradiction, determining=(),
         if _compliant(t) and _class_ok(name, t):
             f[name] = True
             traces[name] = t
+        elif name in REFUSE_ON_UNTRACEABLE_POSITIVE:
+            # Kai DS-B4-04: a positive candidate without a compliant
+            # determining trace is never demoted to False for these two.
+            raise FactDispositionError(
+                f"REFUSE: {row['path']}: positive {name} candidate has no "
+                f"compliant determining trace")
         else:                       # A6-ii: no compliant trace, no positive
             f[name] = False
             abstained.append(name)
@@ -417,23 +733,42 @@ def main():
     if head != pa["subject"] or head != desc["subject"]["commit"]:
         raise SystemExit(f"R11 ABORT: subject repo HEAD {head[:12]} != "
                          f"Pass A / Stage-A subject")
+    # KAI-B4-SB-01: the Pass-A source-binding gate (subject identity,
+    # tracked divergence, tracked symlinks) runs BEFORE any subject byte is
+    # measured, and ONE verified reader for the frozen subject supplies
+    # every subject byte this producer consumes: the classified document
+    # here and the reading document inside _reader_trace.
+    passa._source_binding_gate(sr, pa["subject"])
+    read_source = passa.make_verified_reader(sr, pa["subject"])
     _cls_prov = _classification_provenance(desc, observed_runtime, sr,
                                            pa_bytes, pprov)
 
     rows, facts_tally = [], collections.Counter()
     nominal = collections.Counter()
     for row in pa["rows"]:
-        text = (sr / row["path"]).read_text(errors="ignore")
+        text = _read_bound(read_source, sr, row["path"])
         claims, stats = sb.bind_claims(row["path"], text)
         contradiction = contradiction_of(row)
         # D14/D15: the DETERMINING rows are always carried, with counts.
         # E1 needs them BEFORE the facts, because a SELF-authority fact
         # must bind to the row that determined it.
         det = sb.determining_claims(claims)
+        # The governed observation the NOMINAL_FUNCTION fact consumes.
+        # classify.function() is a pure calculation over (row, text) and
+        # fixed constants -- no cache, mutation or IO -- so cl.classify()
+        # below recomputes the identical cell. The equality check after
+        # classify is a COHERENCE check, not a proof of correctness; it is
+        # kept because authority_claim must be set before classify runs
+        # (Kai, DS-B4-V2-03).
+        fn_cell = cl.function(row, text)
         facts, ac, fact_traces, abstained = evidence_facts(
-            row, claims, contradiction, det, pa["subject"], sr)
+            row, claims, contradiction, det, pa["subject"], sr,
+            text=text, function_cell=fn_cell, read_source=read_source)
         row["authority_claim"] = ac
         out = cl.classify(row, text, contradiction)
+        if out["FUNCTION"] != fn_cell:
+            raise SystemExit(f"REFUSE: {row['path']}: classify's FUNCTION cell "
+                             f"differs from the observation the fact used")
         out["evidence_facts"] = facts
         # E1: every POSITIVE fact carries the trace that determined it.
         out["evidence_fact_traces"] = fact_traces
