@@ -26336,3 +26336,310 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-04T01:40:53Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-04T01:40:53Z  [CMD `date -u +%FT%TZ` → 2026-10-04T01:40:53Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 8b276c6730113faccaeb36f23e134ba054d11b27  [CMD `git rev-parse HEAD` → 8b276c6730113faccaeb36f23e134ba054d11b27]
+- tree: 1f0542ff08ff9ab4ee09bed95409a7228830f80f  [CMD `git rev-parse HEAD^{tree}` → 1f0542ff08ff9ab4ee09bed95409a7228830f80f]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 8b276c6730113faccaeb36f23e134ba054d11b27  [CMD `git ls-remote --heads origin` → 8b276c6730113faccaeb36f23e134ba054d11b27]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d0c08a4da85a447e0729fdb83d201cccc0af395a  [CMD `git ls-remote --heads origin` → d0c08a4da85a447e0729fdb83d201cccc0af395a]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 65  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 65]
+
+### 1. The four states
+
+- physical: repair branch at d0c08a4; classify.py unchanged outside scratch  [CMD `git ls-remote --heads origin` → claude/d379-repair-eb52f73 d0c08a4da85a447e0729fdb83d201cccc0af395a]
+- authorised: preserve DeepSeek's AW-01 v2 review; Kai reconciles; no implementation  [CONVERSATION 2026-10-04 Kai, "stop after its DeepSeek review"]
+- evidence: DeepSeek's reply verbatim and a read-only probe in section 5  [CMD `sha256sum deepseek_aw01_v2_review.txt` → 889f586c09005a87…]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- None; DeepSeek is a reviewer  [CONVERSATION 2026-10-04 Dainius, "Deep seek: PACKET HASH: 8a8f1d1f…"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: classify.py implementation, d379_controls.py, full matrix, D390 replay, fixity F, capture, candidate, holdout, blind 40, Item 8, merge  [CONVERSATION 2026-10-04 Kai, "HELD"]
+
+### 4. Open questions
+
+- RECEIPT: both hash lines carry the correct values plus the instructed "(cannot compute SHA-256)" note; first hunk, both sentinels and END OF PACKET SEEN exact; 7 of 7 quoted diff lines byte-identical; of 6 quoted adjudicator lines 3 identical and 3 re-wrapped or abbreviated ("fails.append(...)") — owner: Kai  [CMD `receipt and quote check vs DEEPSEEK_PACKET_AW01_v2.md` → 4 exact + 2 values-with-note; 7/7]
+- DS-AW01-V2-01 (MAJOR): restates the producer's own disclosure (entry 65): the frozen _compliant accepts bare-number substrings of the token and the coordinated tamper; only the scratch adjudicator rejects them; DeepSeek's remedy is a standing control outside the frozen files — owner: Kai  [CMD `aw01v2_corrupt.py` → qualifier 0 findings, adjudicator 0/5 on both forgeries]
+- DS-AW01-V2-04 (MINOR): CONFIRMED — DeepSeek's exact input (evidence_total 999, evidence_shown 0, truncated True, temporal NEUTRAL) is accepted by BOTH _compliant and the scratch adjudicator; the genuine witness carries 1 / 1 / False / AT_COMMIT  [CMD `aw01v2_review_probe.py` → _compliant True, adjudicator accepts True]
+- DS-AW01-V2-02 (selector contract): of 745 witnesses in the real v2 result (axis cells + fact traces), 89 use non-line selectors in the accepted pipeline — 71 COMMIT_COUNT_IN_WINDOW 'git:…', 8 DATED_ARTEFACT_PATH 'path' (classify.py:474 at d0c08a4), 5 STATIC_READER_REFERENCE 'opscan:…', and the 5 new SIZE_AND_ROLE 'META:…'; 656 use L<n>. Selector parsers in v13 .py at d0c08a4 (bounded grep): build_evidence/e2_controls.py:282, build_evidence/m1_investigation.py:148, classify.py:198, run_h2_v12.py:521 — none reads a FUNCTION witness — owner: Kai  [CMD `aw01v2_review_probe.py; git grep selector parsers d0c08a4` → as stated]
+- DS-AW01-V2-03 (context == value): precedent in the accepted pipeline: 8 DATED_ARTEFACT_PATH axis witnesses and 1 SELF_CURRENTNESS_CLAIM trace already have local_context == witness_value, besides the 5 v2 cells — owner: Kai  [CMD `aw01v2_review_probe.py` → 8 + 1 + 5]
+- DS-AW01-V2-05 (composite value): first-seen witness_value per witness_type in the real v2 result shows plain tokens (e.g. '39c677c', '21', a path, '2026-07-24', 'Operating rules', '31570714150', 'currently', 'CHANGELOG'); 'passa.bytes=114 bytes;' is the only composite field=value-unit token — owner: Kai  [CMD `aw01v2_review_probe.py` → samples as stated]
+- DS-AW01-V2-06 / V2-07: suffix predicate and the qualifier's missing[:5] cap — already flagged; Kai ruled both outside AW-01 (entry 64) — owner: Kai  [CONVERSATION 2026-10-04 Kai, "V1-07 — OUTSIDE AW-01"]
+
+### 5. Incidents and corrections
+
+- None this step; credential scan of the three files: 0 hits; raw line separators: none  [CMD `secretscan.py <3 files>` → TOTAL HITS 0]
+- EVIDENCE DEEPSEEK-AW01-V2-RECEIPT-AND-REVIEW deepseek_aw01_v2_review.txt: 8846 bytes, sha256 889f586c09005a87c0062a79d1e843956c86619f50bb49726a975641cc6cc197, final LF False  [CMD `sha256sum deepseek_aw01_v2_review.txt` → 889f586c09005a87…]
+    BEGIN-VERBATIM DEEPSEEK-AW01-V2-RECEIPT-AND-REVIEW
+    Deep seek: PACKET HASH: 8a8f1d1f08a3acac82153676265aa9e5496e06feb5ec0606ff411c547faccfd5 (cannot compute SHA-256)
+    BASE classify.py SHA-256: 226873676c2373faaf29f4709bb1bb62d1d22f3c56cbdc0e594314cb6e5df9e8 (cannot compute SHA-256)
+    FIRST DELTA HUNK: @@ -369,10 +369,19 @@
+    SENTINEL A: +        token = f"passa.bytes={row['bytes']} bytes;"
+    SENTINEL B: +                    source_path=path, source_selector="META:passa.bytes",
+    END OF PACKET SEEN: YES
+    
+    ---
+    
+    Finding register — KAI-B4-AW-01 v2
+    
+    DS-AW01-V2-01 — MAJOR — Frozen _compliant() still accepts bare-number substrings of the self-delimiting token; v2 is sound only if the out-of-delta adjudicator becomes a standing control
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked delta lines:
+    
+    ```diff
+    +        token = f"passa.bytes={row['bytes']} bytes;"
+    ...
+    +                    witness_value=token,
+    +                    source_path=path, source_selector="META:passa.bytes",
+    +                    local_context=token,
+    ```
+    
+    Invariant attacked: the witness must be sufficient for independent adjudication, and the frozen qualifier must not accept a witness whose value was forged to a bare substring.
+    
+    The supplied _compliant() is a substring test:
+    
+    ```python
+    return str(t["witness_value"]) in str(t["local_context"])
+    ```
+    
+    v2 makes the genuine token self-delimiting, but _compliant() still accepts any substring. The packet itself discloses this in section 6: bare-number forgeries "11", "4", "14" vs genuine T(114) yield _compliant TRUE; only the section-4 adjudicator rejects them.
+    
+    Concrete failing input:
+    
+    · genuine token = passa.bytes=114 bytes;
+    · forged witness: witness_value="11", local_context="passa.bytes=114 bytes;"
+    · _compliant(w) returns True because "11" is a substring of the token.
+    · qualify.py is frozen and calls only _compliant; it emits 0 AXIS_WITNESS findings.
+    · The section-4 adjudicator rejects the forgery because "11" fails the grammar ^passa\.bytes=(0|[1-9][0-9]*) bytes;$, but the packet says that adjudicator is scratch/not part of the delta.
+    
+    If the adjudicator is not promoted to a standing control in the frozen pipeline, v2 remains spoofable at the qualifier layer for bare-number substrings. The predicate “qualifier accepts only compliant witnesses” is false.
+    
+    Remedy: make the section-4 adjudicator, or an equivalent grammar/exact-match check, a standing control that runs on every emitted witness. If _compliant() and qualify.py are truly frozen, the standing control must live outside them and must be enforced by the producer/qualification pipeline.
+    
+    ---
+    
+    DS-AW01-V2-02 — MINOR — source_selector="META:passa.bytes" is still not admitted by the Witness contract in envelope.py
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked delta line:
+    
+    ```diff
+    +                    source_path=path, source_selector="META:passa.bytes",
+    ```
+    
+    The supplied envelope.py excerpt documents:
+    
+    ```python
+        source_selector: str       # stable selector: "L<line>" or "L<a>-L<b>"
+    ```
+    
+    The new selector is neither a line nor a line span. The delta does not change envelope.py (section 2 says envelope.py is not changed). A downstream validator that enforces the documented selector pattern will reject every AW-01 v2 MARKER witness as malformed.
+    
+    Concrete failing input: any consumer that validates source_selector against L<line> / L<a>-L<b> will reject "META:passa.bytes".
+    
+    Remedy: update the Witness docstring to admit documented metadata selectors, or use a selector format already documented.
+    
+    ---
+    
+    DS-AW01-V2-03 — MINOR — local_context equals the token, not surrounding text
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked delta line:
+    
+    ```diff
+    +                    local_context=token,
+    ```
+    
+    D367 §5 says local_context is “surrounding text sufficient to judge the match”. v2 sets local_context equal to witness_value, so there is no surrounding text; the context is the value itself. This may be acceptable for a self-delimiting metadata token, but it is a semantic change from the documented field meaning.
+    
+    Concrete failing input: an independent adjudicator or UI that expects local_context to show surrounding document text sees only passa.bytes=114 bytes;.
+    
+    Remedy: either document that metadata witnesses may use a self-delimiting token as context, or include a minimal surrounding field description (e.g., Pass-A row field bytes).
+    
+    ---
+    
+    DS-AW01-V2-04 — MINOR — The section-4 adjudicator does not check all nine mandatory witness fields
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked construct: packet section 4 adjudicator:
+    
+    ```python
+    for k, want in (("witness_type", "SIZE_AND_ROLE"), ("applicability_scope", "WHOLE_FILE"),
+                    ("subject", "SELF"), ("certainty", "VERIFIED"), ("polarity", "POSITIVE")):
+        if witness.get(k) != want:
+            fails.append(...)
+    ```
+    
+    The adjudicator checks grammar, local_context == witness_value, selector, source_path, N == row["bytes"], path suffix, N < 200, optional git size, and five envelope fields. It does not check evidence_total, evidence_shown, truncated, or temporal.
+    
+    Concrete failing input: a witness with evidence_total=999, evidence_shown=0, truncated=True, temporal="NEUTRAL" passes the adjudicator while violating the nine-field contract.
+    
+    If the adjudicator becomes a standing control (see DS-AW01-V2-01), this omission allows non-compliant witnesses to pass.
+    
+    Remedy: extend the adjudicator to check all nine mandatory fields, including evidence_total, evidence_shown, truncated, and temporal.
+    
+    ---
+    
+    DS-AW01-V2-05 — QUESTION — witness_value is a composite token, not the bare exact value matched
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked delta line:
+    
+    ```diff
+    +                    witness_value=token,
+    ```
+    
+    D367 §5 says witness_value is “the exact token or value matched”. The exact value matched by the predicate is row["bytes"] (e.g., 114). v2 sets witness_value to passa.bytes=114 bytes;, which includes the field name and unit.
+    
+    Concrete failing input: an independent adjudicator expecting witness_value to be the bare matched value may treat the composite token as a different kind of evidence.
+    
+    Remedy: clarify the contract to admit self-delimiting canonical tokens as witness_value, or split the token into witness_value="114" and a separate unit/field descriptor.
+    
+    ---
+    
+    DS-AW01-V2-06 — QUESTION — Q6 suffix-match latent condition remains out of scope
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked construct: packet section 7 Q6: the predicate is a suffix match x/XREADME.md; the packet says 0 tracked paths at the subject end in README.md with a basename other than README.md. This is unchanged and frozen.
+    
+    No action in this delta. Flag only for the record.
+    
+    ---
+    
+    DS-AW01-V2-07 — QUESTION — Q8 qualifier missing[:5] limitation remains out of scope
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked construct: packet section 7 Q8: qualify.py emits findings for only the first five missing cells while printing the full count. This is outside the AW-01 v2 delta but interacts with the five MARKER rows.
+    
+    No action in this delta. Flag only for the record.
+    
+    ---
+    
+    Executive advisory verdict
+    
+    NO DESIGN BLOCKER FOUND, MAJOR/MINOR FINDINGS REMAIN
+    
+    v2 fixes the v1 path-digit substring spoof by making the genuine witness a self-delimiting token and removing the path from local_context. However, the frozen _compliant() substring test still accepts bare-number substrings of the token, so v2’s soundness depends on the section-4 adjudicator becoming a standing control. That must be reconciled before v2 can be treated as sufficient for independent adjudication. The selector-contract inconsistency and the adjudicator’s incomplete nine-field check are additional reconciliation items.
+    
+    ---
+    
+    Unverified claims register
+    
+    1. That the section-4 adjudicator is or will become a standing control in the frozen pipeline.
+    2. That no downstream validator enforces the Witness docstring’s L<line> / L<a>-L<b> selector pattern.
+    3. That local_context being equal to witness_value is acceptable under D367 §5 for metadata witnesses.
+    4. That witness_value as a composite token is acceptable under D367 §5’s “exact token or value matched”.
+    5. That the qualifier’s missing[:5] limitation does not interact with the five MARKER rows.
+    6. That the suffix-match latent condition (Q6) remains out of scope and does not need repair in AW-01.
+    
+    ---
+    
+    Evidence requests
+    
+    1. Confirm whether the section-4 adjudicator is a standing control or only scratch evidence.
+    2. Confirm whether any validator enforces the Witness docstring selector pattern.
+    3. Confirm whether D367 §5 permits local_context == witness_value for metadata witnesses.
+    4. Confirm whether D367 §5 permits a composite token as witness_value.
+    5. Confirm whether the qualifier’s missing[:5] limitation is truly out of scope for AW-01.
+    6. Confirm whether the suffix-match latent condition (Q6) is frozen and out of scope.
+    END-VERBATIM DEEPSEEK-AW01-V2-RECEIPT-AND-REVIEW
+- EVIDENCE AW01-V2-REVIEW-PROBE-INSTRUMENT aw01v2_review_probe.py: 2015 bytes, sha256 938354ecfd902526dcc63bd323b43a11bc194c88c993421e6c05530bb7edcb1f, final LF True  [CMD `sha256sum aw01v2_review_probe.py` → 938354ecfd902526…]
+    BEGIN-VERBATIM AW01-V2-REVIEW-PROBE-INSTRUMENT
+    """Read-only probe of DS-AW01-V2-02/03/04/05 (child, qualified interpreter). argv: <AW2 H2 dir> <impl dir> <v2 result.json>"""
+    import sys, json, collections, copy, re
+    sys.path.insert(0, sys.argv[1]); sys.path.insert(0, sys.argv[2])
+    import run_h2_v12 as R, classify as cl, aw01v2_adjudicator as ADJ
+    ROW = {"path": "data/self-emp/Accounting/README.md", "bytes": 114, "title": ""}
+    g = cl.function(ROW, "")["witness"]
+    print("V2-04 (DeepSeek's exact input: evidence_total=999, evidence_shown=0, truncated=True, temporal='NEUTRAL'):")
+    w = copy.deepcopy(g); w.update(evidence_total=999, evidence_shown=0, truncated=True, temporal="NEUTRAL")
+    print(f"  _compliant={R._compliant(w)}  adjudicator accepts={not ADJ.adjudicate(w, ROW, 114)}  (genuine: evidence_total={g['evidence_total']} shown={g['evidence_shown']} truncated={g['truncated']} temporal={g['temporal']})")
+    r = json.load(open(sys.argv[3]))
+    ws = []
+    for row in r["rows"]:
+        for ax in ("SCOPE", "VALIDITY", "LIFECYCLE", "FUNCTION", "AUTHORITY", "GENERATION"):
+            c = row[ax]
+            if isinstance(c.get("witness"), dict): ws.append(("axis:" + ax, c["witness"]))
+        for f, t in row.get("evidence_fact_traces", {}).items(): ws.append(("fact:" + f, t))
+    print(f"\nwitnesses in the real v2 result: {len(ws)} (axis cells + fact traces)")
+    sel = collections.Counter((k.split(':')[0], w["witness_type"], re.sub(r"\d+", "N", str(w["source_selector"]))) for k, w in ws if not re.fullmatch(r"L\d+(-L\d+)?", str(w["source_selector"])))
+    print("V2-02 non-line selectors (kind, witness_type, selector with digits as N):", dict(sel))
+    eq = collections.Counter((k.split(':')[0], w["witness_type"]) for k, w in ws if w["local_context"] == str(w["witness_value"]))
+    print("V2-03 witnesses whose local_context == witness_value:", dict(eq))
+    print("V2-05 witness_value samples per witness_type (first seen):")
+    seen = {}
+    for k, w in ws:
+        seen.setdefault(w["witness_type"], (k, str(w["witness_value"])[:60]))
+    for t, (k, v) in sorted(seen.items()): print(f"  {t:<28} {k:<36} {v!r}")
+    END-VERBATIM AW01-V2-REVIEW-PROBE-INSTRUMENT
+- EVIDENCE AW01-V2-REVIEW-PROBE-OUTPUT aw01v2_review_probe_out.txt: 10923 bytes, sha256 02fb928f2e405d199533805e0f9b9921dfa15f0773b2924e67de02a61f643102, final LF True  [CMD `sha256sum aw01v2_review_probe_out.txt` → 02fb928f2e405d19…]
+    BEGIN-VERBATIM AW01-V2-REVIEW-PROBE-OUTPUT
+    V2-04 (DeepSeek's exact input: evidence_total=999, evidence_shown=0, truncated=True, temporal='NEUTRAL'):
+      _compliant=True  adjudicator accepts=True  (genuine: evidence_total=1 shown=1 truncated=False temporal=AT_COMMIT)
+    
+    witnesses in the real v2 result: 745 (axis cells + fact traces)
+    V2-02 non-line selectors (kind, witness_type, selector with digits as N): {('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- .github/copilot-instructions.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- CHANGELOG.md'): 1, ('fact', 'STATIC_READER_REFERENCE', 'opscan:scripts/auto_changelog.py:LN'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- CLAUDE.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- README.md'): 1, ('fact', 'STATIC_READER_REFERENCE', 'opscan:scripts/sync_docs.py:LN'): 2, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- SESSION_BACKLOG.md'): 1, ('fact', 'STATIC_READER_REFERENCE', 'opscan:scripts/auto_session_log.py:LN'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- data/AGENTS.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- data/SOUL.md'): 1, ('axis', 'SIZE_AND_ROLE', 'META:passa.bytes'): 5, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- data/teammates/doctor.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- data/teammates/oracle.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- data/teammates/scout.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- docs/ERROR_LOG.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- docs/PROJECT_BACKLOG.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- docs/agentic_patterns_spec.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- docs/ara_review_status.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- docs/architecture.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- docs/first_implementation_plan.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- docs/gaps_and_hardening.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- docs/hmac_rotation_runbook.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- docs/known_issues.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- docs/next_level_roadmap.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- docs/personality_and_proactive.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- docs/sovereign_ai_spec.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- docs/unfair_advantages.md'): 1, ('axis', 'DATED_ARTEFACT_PATH', 'path'): 8, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/CLEANUP_TODO.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/CODE_AUDIT_BATCH_EMAIL_READER.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/CODE_AUDIT_BATCH_HOUSE_DOCTOR.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/CODE_AUDIT_BATCH_NEWS_FEED.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/CODE_AUDIT_BATCH_SKILL_HUNTER.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/CODE_AUDIT_BATCH_VAULT_SYNC.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/CODE_AUDIT_CONTINUATION_LOG.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/CODE_AUDIT_FINAL_REPORT.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/CODE_AUDIT_IMPLEMENTATION_SEQUENCE_AND_CLOSURE_MATRIX.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/CODE_AUDIT_MASTER.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/CODE_AUDIT_REGISTER.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/CODE_AUDIT_REGISTER_CONTINUED.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/CODE_AUDIT_REMEDIATION_BACKLOG.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/COMPOSE_DRIFT.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/DECISIONS.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/EMBEDDING_BACKEND_STATE.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/ENGINEERING_DOCTRINE.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/GPU_ARRIVAL_RUNBOOK.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/INSTRUMENTATION_ARCHITECTURE.md'): 1, ('fact', 'STATIC_READER_REFERENCE', 'opscan:scripts/security/check_gate_registry.py:LN'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/MAKEFILE_TARGETS.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/METRICS.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/NAVIGATION.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/NEXT_STINT_PLAN.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/ORION_FIELD_NOTES.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/PHASEN_READINESS.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/PHASE_N_N_BACKLOG.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/PLAYBOOKS/dispatch_jewel.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/PLAYBOOKS/post_merge_checklist.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/PLAYBOOKS/tech_evaluation.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/POSTMORTEM_N-N-N_RUNNER_STARVATION.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/REPO_HEALTH_AUDIT_N-N-N.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/RISKS.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/RUNTIME_TOPOLOGY_CENSUS.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/SEQUENCE.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/SERVICE_IDENTITY_MEASUREMENT.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/SERVICE_IDENTITY_STATE.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/SESSION_BOOTSTRAP.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/STATUS.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/STRATEGIC_PLAN.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/STUBS_AND_PLACEHOLDERS.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/TECH_WATCH.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/TEST_WRITING_REVIEW.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/UHN_INTAKE_REDESIGN.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/UHN_SENSOR_INGRESS_PLAN.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/UH_PROGRESS_TRACKER.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/WN_DASHBOARD_REMEDIATION_PLAN.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/WN_GLOBAL_HYGIENE_SUBPLAN.md'): 1, ('fact', 'COMMIT_COUNT_IN_WINDOW', 'git:rev-list --count dNaacNdNeNbaNeNebNcNeeNfN -- kai-pm/WAYPOINTS.md'): 1}
+    V2-03 witnesses whose local_context == witness_value: {('axis', 'SIZE_AND_ROLE'): 5, ('axis', 'DATED_ARTEFACT_PATH'): 8, ('fact', 'SELF_CURRENTNESS_CLAIM'): 1}
+    V2-05 witness_value samples per witness_type (first seen):
+      COMMIT                       fact:CITES_COMMIT                    '39c677c'
+      COMMIT_COUNT_IN_WINDOW       fact:MAINTENANCE_OBSERVED            '21'
+      DATED_ARTEFACT_PATH          axis:LIFECYCLE                       'kai-pm/ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md'
+      DATE_STAMP                   fact:CARRIES_DATE_STAMP              '2026-07-24'
+      NOMINAL_FUNCTION_TERM        fact:NOMINAL_FUNCTION                'Operating rules'
+      RUN_ID                       fact:CITES_RUN                       '31570714150'
+      SELF_AUTHORITY_CLAIM         fact:SELF_ASSERTS_AUTHORITY          'SINGLE SOURCE OF TRUTH'
+      SELF_CURRENTNESS_CLAIM       fact:SELF_ASSERTS_CURRENT            'currently'
+      SIZE_AND_ROLE                axis:FUNCTION                        'passa.bytes=114 bytes;'
+      STATIC_READER_REFERENCE      fact:STATIC_REFERENCE_AT_SUBJECT     'CHANGELOG'
+    
+    SUMMARY by (witness_type, selector form), all 745 witnesses in the real v2 result:
+        28  ('COMMIT', 'L<n>')
+        71  ('COMMIT_COUNT_IN_WINDOW', 'git:…')
+         8  ('DATED_ARTEFACT_PATH', 'path')
+       407  ('DATE_STAMP', 'L<n>')
+       207  ('NOMINAL_FUNCTION_TERM', 'L<n>')
+         3  ('RUN_ID', 'L<n>')
+         5  ('SELF_AUTHORITY_CLAIM', 'L<n>')
+         6  ('SELF_CURRENTNESS_CLAIM', 'L<n>')
+         5  ('SIZE_AND_ROLE', 'META:…')
+         5  ('STATIC_READER_REFERENCE', 'opscan:…')
+    END-VERBATIM AW01-V2-REVIEW-PROBE-OUTPUT
+
+### 6. Next authorised step
+
+- Wait for Kai's reconciliation of DS-AW01-V2-01..07; no classify.py mutation  [CONVERSATION 2026-10-04 Kai, "stop after its DeepSeek review"]
+
+### 7. What I am unsure of
+
+- Where a standing AW adjudicator could live without touching the frozen _compliant() and qualify.py; not designed here  [CMD `aw01v2_corrupt.py` → two forgeries pass the qualifier]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
