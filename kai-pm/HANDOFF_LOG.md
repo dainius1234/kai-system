@@ -28945,3 +28945,387 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-04T02:19:28Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-04T02:19:28Z  [CMD `date -u +%FT%TZ` → 2026-10-04T02:19:28Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: d3e06921ace5cff2f3fe49c21dea124f17275b8a  [CMD `git rev-parse HEAD` → d3e06921ace5cff2f3fe49c21dea124f17275b8a]
+- tree: 566a45d49fe4bb98f47d69179dff9fe487440aca  [CMD `git rev-parse HEAD^{tree}` → 566a45d49fe4bb98f47d69179dff9fe487440aca]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d0c08a4da85a447e0729fdb83d201cccc0af395a  [CMD `git ls-remote --heads origin` → d0c08a4da85a447e0729fdb83d201cccc0af395a]
+- remote:claude/project-rework-plan-pgvp35: d3e06921ace5cff2f3fe49c21dea124f17275b8a  [CMD `git ls-remote --heads origin` → d3e06921ace5cff2f3fe49c21dea124f17275b8a]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 69  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 69]
+
+### 1. The four states
+
+- physical: repair branch at d0c08a4; classify.py and d379_controls.py unchanged outside scratch  [CMD `git ls-remote --heads origin` → claude/d379-repair-eb52f73 d0c08a4da85a447e0729fdb83d201cccc0af395a]
+- authorised: a scratch-only FINAL CLOSURE PACKET v2 (C-01 hard-stop clarified, C-04 mandatory subject repo, C-05 deterministic CLI, C-06 exact wording, C-08 Stage-B-bound candidate inputs, Pass-A denominator input checks, [.] regex, hostile controls 1–11), a fresh DeepSeek review, return to Kai  [CONVERSATION 2026-10-04 Kai, "FINAL CLOSURE PACKET v2 REQUIRED"]
+- evidence: Kai's reconciliation verbatim in section 2  [CMD `sha256sum kai_aw01_closure_reconciliation.txt` → 3c49a5100ca0f7ac…]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-04 · AW-01 CLOSURE REVIEW RECONCILED / FINAL CLOSURE PACKET v2 REQUIRED: DeepSeek closure review NOT admitted (SENTINEL B not byte-exact; NO REVIEW), retained as hypothesis material; C-01 KEEP population-first hard stop, clarify in code/output; C-02 withdrawn; C-03 disproved; C-04 UPHELD (subject repo mandatory in candidate mode); C-05 UPHELD MINOR (deterministic CLI refusal; --capture undisturbed); C-06 UPHELD (exact grammar wording); C-07 CLOSED; NEW KAI-AW01-C-08 MAJOR: candidate inputs must be consumed through Stage-A + Stage-B bindings with parent-held digests, provenance input_binding == consumed Pass-A binding, subject/tree equality incl. <subject>^{tree} in the subject repo; git size `type is int and ==`; Pass-A denominator rows must be usable (str path, non-bool int bytes >= 0); regex spelled passa[.]bytes; hostile controls 1–11; fresh DeepSeek review with byte-exact receipt; R18 commit-gate subclass controlled, R18 evidence-pipeline subclass OPEN (exit-status evidence unpiped). Verbatim below, 12022 bytes, sha256 3c49a5100ca0f7ac4257ec8c27058b9abc2eafd021ec549703ee56c2cf48ec69, final LF True, 4-space indent added ⚠ UNBANKED  [CONVERSATION 2026-10-04 Kai via Dainius, "KAI → ORION — AW-01 CLOSURE REVIEW RECONCILED / FINAL CLOSURE PACKET v2 REQUIRED"]
+    BEGIN-VERBATIM KAI-AW01-CLOSURE-RECONCILIATION
+    I would not accept this as the final DeepSeek closure review yet.
+    
+    I checked the live repository: entry 69 d3e06921… is signed/verified, handoff-only, and the repair branch is still exactly d0c08a4…. More importantly, Orion was correct about the receipt: Sentinel B is not byte-exact. Our protocol explicitly says an inexact sentinel means NO REVIEW. Waiving that now would make the receipt gate meaningless.
+    
+    That does not make DeepSeek’s findings useless. I am treating them as adversarial hypotheses and reconciling them against the actual source. Doing that exposed one issue more important than anything DeepSeek reported.
+    
+    Kai reconciliation
+    
+    Finding	Ruling
+    C-01 population-first return	KEEP. This is intentional. If expected/emitted MARKER populations disagree, the witness denominator is not yet valid. Population mismatch is a hard stop; witness-level adjudication follows only after exact population equality. Clarify this in code.
+    C-02 missing bytes	WITHDRAWN / no defect. DeepSeek corrected itself.
+    C-03 negative bytes	DISPROVED. Orion’s real probe shows -1 cannot satisfy the token grammar, so the control fails. Pass-A’s actual byte count is also derived from len(...) and cannot be negative.
+    C-04 optional Git corroboration	UPHELD. For an admission-grade AW candidate run on this frozen subject, subject-repo corroboration must not be optional.
+    C-05 CLI IndexError	UPHELD MINOR. It fails safe, but a governed control should have deterministic argument refusal rather than an accidental traceback. Fix the CLI.
+    C-06 vague LEGITIMATE wording	UPHELD. Replace it with the exact mathematical property.
+    C-07 IMPLEMENTED population	CLOSED. Orion found no external code consumer treating it as a closed set. Adding AW01 is intentional.
+    
+    But there is a new issue:
+    
+    KAI-AW01-C-08 — MAJOR — the “real candidate” control does not establish that its inputs are bound
+    
+    The proposed aw01_candidate() currently does this:
+    
+    res = json.loads(pathlib.Path(result_path).read_bytes())
+    pa = json.loads(pathlib.Path(passa_path).read_bytes())
+    
+    It then calls aw01_check().
+    
+    That is not sufficient for a control whose own documentation says it judges the bound Pass-A rows and their classification result.
+    
+    The repository already has the correct machinery: Stage-B binds exact final artefact bytes to independently held anchors. Yet AW01 candidate mode does not consume those bindings at all.
+    
+    That means a coordinated substitute passA.json + classification result can be handed to AW01 and judged semantically self-consistent without AW01 establishing that either file is the actual governed candidate.
+    
+    Even if the qualifier ran earlier, a separate process must not rely on “those were probably the same files.” That recreates the exact provenance gap D379 has spent months eliminating.
+    
+    So the closure packet is not implementation-ready.
+    
+    There is a clean repair. Send Orion this updated ruling:
+    
+    KAI → ORION — AW-01 CLOSURE REVIEW RECONCILED / FINAL CLOSURE PACKET v2 REQUIRED
+    
+    Entry 69 d3e06921ace5cff2f3fe49c21dea124f17275b8a independently checked: signed/verified, handoff-only. Repair branch remains exactly:
+    
+    d0c08a4da85a447e0729fdb83d201cccc0af395a
+    
+    Neither proposed AW source file is implemented.
+    
+    FORMAL DEEPSEEK RECEIPT RULING
+    
+    The closure review is not admitted as the final adversarial review because SENTINEL B was not byte-exact. The packet contains:
+    
+    passa\.bytes
+    
+    while DeepSeek returned:
+    
+    passa.bytes
+    
+    Our receipt rule explicitly says any sentinel mismatch means NO REVIEW. I will not waive that rule because the rest of the answer looks plausible.
+    
+    DeepSeek’s substantive response is retained as adversarial hypothesis material and has been source-reconciled below. We will review the revised packet afresh.
+    
+    C-01 — KEEP POPULATION-FIRST HARD STOP
+    
+    The early return is intentional.
+    
+    Exact MARKER population equality is a prerequisite to witness adjudication. If:
+    
+    EXPECTED_MARKER != EMITTED_MARKER
+    
+    the control records population findings and stops that layer. It must not imply that witnesses were checked.
+    
+    Clarify this explicitly in the function documentation/output:
+    
+    population mismatch = hard stop; witness semantic population not evaluated
+    
+    Do not continue through witness checks using an invalid denominator merely to collect more findings.
+    
+    C-03 — DISPROVED
+    
+    Negative Pass-A byte counts do not escape the control. The canonical grammar rejects a minus sign; Orion’s -1 probe produces AW01_TOKEN_GRAMMAR.
+    
+    No repair required.
+    
+    C-04 — UPHELD
+    
+    Git-object corroboration may remain optional inside the pure aw01_check() helper for synthetic calibration, but it is mandatory for the real admission candidate path on this D379 subject.
+    
+    aw01_candidate() must not have an admission mode that succeeds without an exact subject repository.
+    
+    C-05 — UPHELD
+    
+    Replace accidental positional indexing with a deterministic argument parser for AW candidate mode. Missing/duplicate/malformed required arguments must produce a controlled non-zero refusal/usage result, never an IndexError.
+    
+    Do not disturb the existing --capture path.
+    
+    C-06 — UPHELD
+    
+    Replace:
+    
+    no other LEGITIMATE canonical token is a substring
+    
+    with the exact claim:
+    
+    no different string that fully matches the governed canonical-token grammar is a substring of this token
+    
+    Immediately state that noncanonical substrings can still satisfy generic _compliant() and are therefore rejected by the AW semantic control.
+    
+    C-07 — CLOSED
+    
+    Read-only repository search found no external code consumer treating IMPLEMENTED as a closed eight-section population. AW01’s addition is intentional.
+    
+    ⸻
+    
+    KAI-AW01-C-08 — NEW MAJOR: REAL CANDIDATE INPUTS ARE NOT BOUND
+    
+    Current proposed aw01_candidate() directly JSON-loads caller-selected Pass-A and classification files.
+    
+    This contradicts its own claim to adjudicate the bound Pass-A and candidate result.
+    
+    A semantic control cannot establish its subject by trusting file paths.
+    
+    Final closure packet v2 must change candidate mode so it independently consumes the original Stage-B bindings using the existing stage_identity machinery.
+    
+    Required admission inputs:
+    
+    RESULT
+    
+    PASSA
+    
+    --aw01-stage-a <descriptor>
+    
+    --aw01-result-stage-b <binding>
+    
+    --aw01-expected-result-binding-sha256 <parent-held 64hex>
+    
+    --aw01-passa-stage-b <binding>
+    
+    --aw01-expected-passa-binding-sha256 <parent-held 64hex>
+    
+    --aw01-subject-repo <full-history frozen-subject repository>
+    
+    All are mandatory in real candidate mode.
+    
+    Parse Stage A from a regular file using the existing strict Stage-A parser.
+    
+    Then use:
+    
+    stage_identity.consume_bound_artifact(...)
+    
+    independently for:
+    
+    CLASSIFICATION
+    
+    and:
+    
+    PASS_A
+    
+    using the caller-supplied independently held Stage-B binding hashes.
+    
+    Do not derive an expected binding hash from the binding file itself.
+    
+    After binding consumption, mechanically require the classification provenance’s input_binding to equal the actually consumed Pass-A binding:
+    
+    pass_a_artifact_sha256
+        == consumed Pass-A binding artifact_sha256
+    pass_a_stage_a_identity
+        == consumed Pass-A binding stage_a_identity
+    pass_a_producer_provenance_digest
+        == consumed Pass-A binding producer_provenance_digest
+    
+    Require:
+    
+    Pass-A subject == classification subject == Stage-A subject commit
+    
+    and:
+    
+    Pass-A subject_tree == classification subject_tree == Stage-A subject tree
+    
+    In the supplied subject repository, independently resolve:
+    
+    <subject>^{tree}
+    
+    and require that exact tree to equal the Stage-A subject tree before Git-size corroboration is trusted.
+    
+    Only after those bindings and subject identities close may aw01_check() receive the rows.
+    
+    This is not a new source-of-truth mechanism. It reuses the existing Stage-A / Stage-B authority chain.
+    
+    GIT-SIZE RULE
+    
+    Candidate mode must always supply the real frozen subject repository.
+    
+    For every emitted MARKER, Git lookup failure is a finding/refusal.
+    
+    Tighten the helper comparison to:
+    
+    type(git_size_value) is int and git_size_value == N
+    
+    so a pathological bool/string result cannot accidentally compare equal.
+    
+    This Git comparison remains D379-frozen-subject corroboration, not the universal definition of Pass-A bytes.
+    
+    PASS-A DENOMINATOR INPUT
+    
+    Before deriving EXPECTED_MARKER, fail the AW control if any Pass-A row needed for the population has an unusable path/byte measurement rather than silently allowing a malformed row to fall out of the denominator.
+    
+    At minimum require:
+    
+    path is a string
+    
+    bytes is an int but not bool
+    
+    bytes >= 0
+    
+    Duplicate rows remain findings.
+    
+    The standing control must never turn “cannot derive expected population” into “not expected.”
+    
+    TOKEN REGEX
+    
+    For the revised packet use the equivalent regex spelling:
+    
+    AW01_TOKEN = _re.compile(
+        r"passa[.]bytes=(0|[1-9][0-9]*) bytes;"
+    )
+    
+    Continue using fullmatch().
+    
+    [.] is deliberately chosen instead of \. so the next review receipt does not depend on a Markdown/rendering path preserving a backslash. Semantics are identical.
+    
+    STANDING-CONTROL SEMANTICS REMAIN
+    
+    The control must continue to independently derive:
+    
+    EXPECTED_MARKER
+    
+    from bound Pass-A rows and:
+    
+    EMITTED_MARKER
+    
+    from the bound classification result.
+    
+    Exact population equality remains a hard prerequisite to witness inspection.
+    
+    Every emitted MARKER witness must still validate:
+    
+    * SIZE_AND_ROLE
+    * canonical token grammar
+    * parsed N == bound Pass-A bytes
+    * exact source_path
+    * META:passa.bytes
+    * context == full canonical token
+    * WHOLE_FILE
+    * evidence_total = 1
+    * evidence_shown = 1
+    * truncated = False
+    * SELF
+    * POSITIVE
+    * VERIFIED
+    * AT_COMMIT
+    * N < 200
+    * README.md path role
+    * frozen Git blob size == N
+    
+    Preserve the existing can-fail mutations, including bare substrings and coordinated value+context forgery.
+    
+    Add hostile controls proving candidate mode rejects:
+    
+    1. substituted unbound classification bytes;
+    2. substituted unbound Pass-A bytes;
+    3. wrong classification Stage-B binding;
+    4. wrong Pass-A Stage-B binding;
+    5. wrong parent-held classification binding digest;
+    6. wrong parent-held Pass-A binding digest;
+    7. classification provenance naming a different Pass-A binding;
+    8. Stage-A subject/tree different from the supplied subject repository;
+    9. missing subject commit/blob;
+    10. omitted --aw01-subject-repo;
+    11. malformed/missing CLI arguments.
+    
+    Each must fail closed and produce no AW PASS.
+    
+    ⸻
+    
+    REVIEW TRANSPORT
+    
+    Because the previous receipt failed, this is a new closure packet version and requires a fresh DeepSeek review.
+    
+    Use a sentinel with no escape-sensitive backslash; passa[.]bytes... is suitable.
+    
+    DeepSeek has no repository access. Packet must again be self-contained.
+    
+    A review is admissible only when every receipt line is byte-exact.
+    
+    NO SOURCE MUTATION.
+    
+    Return the exact revised deltas, hashes, calibrations and DeepSeek response to Kai.
+    
+    HELD: classify.py implementation, d379_controls.py implementation, remainder of the matrix, D390 replay, F, capture, candidate, holdout, blind 40, Item 8 and merge.
+    
+    There is one separate process point from Orion’s report that I would not bury: the pipeline-status mistake has now occurred in a measurement after we hardened the commit path. The commit gate solved the commit-chain subclass; it did not solve the more general shell-pipeline evidence problem.
+    
+    So I am changing the status of that mechanism to:
+    
+    R18 commit-gate subclass: controlled.
+    R18 evidence-pipeline subclass: OPEN.
+    
+    For the rest of this tranche, any command whose exit status is itself evidence should be run unpiped, or with an explicit mechanically verified pipeline-status mechanism. Do not infer the upstream rc from $? after a pipeline.
+    
+    I would design the broader mechanical control separately rather than contaminate AW-01 again.
+    
+    The important part: DeepSeek found no design blocker in the standing-control direction, but its receipt failed and my source review found the unbound candidate-input problem. That is the one I care about most before we let this anywhere near implementation.
+    
+    Confidence: 0.998 on rejecting the receipt as final review; 0.995 on C-08 being a real MAJOR; 0.99 on the Stage-B-bound candidate design above.
+    END-VERBATIM KAI-AW01-CLOSURE-RECONCILIATION
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: scratch-only closure packet v2, its evidence, a fresh DeepSeek review; return to Kai  [CONVERSATION 2026-10-04 Kai, "Return the exact revised deltas, hashes, calibrations and DeepSeek response to Kai."]
+- HELD: classify.py implementation, d379_controls.py implementation, remainder of the matrix, D390 replay, F, capture, candidate, holdout, blind 40, Item 8, merge  [CONVERSATION 2026-10-04 Kai, "NO SOURCE MUTATION."]
+- FORBIDDEN (this tranche): inferring an upstream exit status from $? after a pipeline  [CONVERSATION 2026-10-04 Kai, "Do not infer the upstream rc from $? after a pipeline."]
+
+### 4. Open questions
+
+- The broader mechanical control for the R18 evidence-pipeline subclass, to be designed separately — owner: Kai  [CONVERSATION 2026-10-04 Kai, "I would design the broader mechanical control separately"]
+
+### 5. Incidents and corrections
+
+- None new in this entry; the C-05 pipe slip is in entry 69  [GIT d3e06921ace5cff2f3fe49c21dea124f17275b8a]
+
+### 6. Next authorised step
+
+- Read stage_identity's Stage-A parser and consume_bound_artifact, then build closure packet v2 in scratch  [CONVERSATION 2026-10-04 Kai, "It reuses the existing Stage-A / Stage-B authority chain."]
+
+### 7. What I am unsure of
+
+- The exact signatures of the strict Stage-A parser and stage_identity.consume_bound_artifact at d0c08a4, and where the classification provenance input_binding lives; to be read before designing  [FILE /home/user/kai-repair/kai-pm/house_in_order_h2_v13/stage_identity.py:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
