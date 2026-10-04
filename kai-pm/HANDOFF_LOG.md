@@ -26643,3 +26643,257 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-04T01:51:47Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-04T01:51:47Z  [CMD `date -u +%FT%TZ` → 2026-10-04T01:51:47Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 1f4880ccf9536e23e90a0e5dc068a851a1521d0f  [CMD `git rev-parse HEAD` → 1f4880ccf9536e23e90a0e5dc068a851a1521d0f]
+- tree: af34c315872895661d142b5eb4107102d9d43484  [CMD `git rev-parse HEAD^{tree}` → af34c315872895661d142b5eb4107102d9d43484]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/project-rework-plan-pgvp35: 1f4880ccf9536e23e90a0e5dc068a851a1521d0f  [CMD `git ls-remote --heads origin` → 1f4880ccf9536e23e90a0e5dc068a851a1521d0f]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d0c08a4da85a447e0729fdb83d201cccc0af395a  [CMD `git ls-remote --heads origin` → d0c08a4da85a447e0729fdb83d201cccc0af395a]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 66  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 66]
+
+### 1. The four states
+
+- physical: repair branch at d0c08a4; classify.py and d379_controls.py unchanged  [CMD `git ls-remote --heads origin` → claude/d379-repair-eb52f73 d0c08a4da85a447e0729fdb83d201cccc0af395a]
+- authorised: a scratch-only AW-01 CLOSURE packet — (A) comment-corrected v2 classify.py delta, (B) a standing AW-01 semantic control in build_evidence/d379_controls.py — with the required evidence; one final narrow DeepSeek review; STOP  [CONVERSATION 2026-10-04 Kai, "Prepare a scratch-only AW-01 closure packet containing two proposed deltas"]
+- evidence: Kai's reconciliation verbatim in section 2  [CMD `sha256sum kai_aw01_v2_reconciliation.txt` → 2ff2ac853d07bc57…]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-04 · AW-01 v2 REVIEW RECONCILED / CLOSURE PACKET REQUIRED: do not implement v2; v2 runtime witness shape accepted in principle; V2-01 UPHELD, closed only when the AW adjudicator becomes a standing governed control; V2-02 no contract violation; V2-03 metadata context acceptable; V2-04 UPHELD (validate the complete AW witness contract); V2-05 canonical token accepted, parse N; V2-06/07 outside AW-01; NEW KAI-AW01-V2-08: the v2 comment overstates the property and must be corrected, no runtime change; _compliant() and qualify.py unchanged; the standing control derives EXPECTED_MARKER and EMITTED_MARKER, requires equality, validates every witness field listed, independently re-derives predicate and grammar without classify.py helpers, corroborates git size for this subject only, and is calibrated with the listed hostile mutations; it remains producer/control evidence with zero admission weight; R18 fresh-session condition closed (entry 64). HELD: implementation of classify.py and d379_controls.py, the rest of the matrix, D390 replay, F, capture, candidate, holdout, blind 40, Item 8, merge. Verbatim below, 9986 bytes, sha256 2ff2ac853d07bc57dfd4f2f2a8e267a1dc443932773089d6d5a6326ee8403cce, final LF False, 4-space indent added ⚠ UNBANKED  [CONVERSATION 2026-10-04 Kai via Dainius, "KAI → ORION — AW-01 v2 REVIEW RECONCILED / CLOSURE PACKET REQUIRED"]
+    BEGIN-VERBATIM KAI-AW01-V2-RECONCILIATION
+    The new evidence changes the next step. Do not implement AW-01 v2 yet. DeepSeek’s remaining MAJOR is legitimate, and Orion independently confirmed it. But the correct fix is not another change to _compliant() or qualify.py.
+    
+    I also found one additional issue in the exact v2 source: its comment claims that “no other byte count … can be a substring” of the canonical token. Orion’s own hostile test disproves that for bare values such as "11" inside passa.bytes=114 bytes;. We cannot knowingly ship a governed source comment that overstates the property.
+    
+    Reconciliation
+    
+    Finding	Kai ruling
+    V2-01 — qualifier accepts substring/coordinated forgery	UPHELD, but not a defect in the MARKER predicate. _compliant() is a structural trace check, not an authenticity verifier. D367’s architecture separately requires independent adjudication. AW-01 therefore needs its semantic adjudicator promoted from scratch evidence to a standing governed control before closure.
+    V2-02 — metadata selector undocumented in envelope comment	DISPROVED as contract violation. D367 explicitly permits an “equivalent stable selector”. Orion measured 89/745 current witnesses already using non-line selectors. No v13 selector validator exists. envelope.py remains untouched.
+    V2-03 — local_context == witness_value	ACCEPTED for metadata evidence. There is no source-prose neighborhood for a Pass-A metadata field. Orion found nine accepted existing witnesses where context equals value. The standing adjudicator, not surrounding prose, proves its semantics.
+    V2-04 — adjudicator ignores fields	UPHELD. If the adjudicator becomes authoritative admission machinery, it must validate the whole relevant witness contract, not merely the fields convenient to AW-01.
+    V2-05 — canonical token versus bare matched number	ACCEPTED with clarification. passa.bytes=114 bytes; is a lossless canonical representation of the exact governed metadata field/value/unit—not a qualitative description. The adjudicator must parse it and recover exactly 114.
+    V2-06 — suffix README.md predicate	Out of AW-01. Predicate is frozen, population exposure on this subject is zero. Preserve as a separate latent observation.
+    V2-07 — qualifier missing[:5]	Out of AW-01. That cap belongs to the separate missing-witness presentation check; Q1b’s AXIS_WITNESS traversal is not capped to those five rows.
+    
+    There is one additional Kai finding:
+    
+    KAI-AW01-V2-08 — GOVERNED COMMENT OVERSTATES THE PROPERTY. The v2 comment says no other byte count can be a substring of the token. That is false for a deliberately forged bare witness value. Runtime semantics are unaffected, but governed source must not claim stronger protection than it provides.
+    
+    So I do not want AW-01 v3 to redesign the witness again. The runtime representation is acceptable. I want a closure package that corrects the comment and makes the independent semantic check a real standing control.
+    
+    Send Orion this:
+    
+    KAI → ORION — AW-01 v2 REVIEW RECONCILED / CLOSURE PACKET REQUIRED
+    
+    DeepSeek v2 review and entry 66 evidence are reconciled.
+    
+    Repair branch remains:
+    
+    d0c08a4da85a447e0729fdb83d201cccc0af395a
+    
+    classify.py remains unmodified.
+    
+    Do not implement AW-01 v2 yet.
+    
+    The v2 runtime witness shape is accepted in principle:
+    
+    token = f"passa.bytes={row['bytes']} bytes;"
+    
+    witness_value = token
+    
+    source_selector = "META:passa.bytes"
+    
+    local_context = token
+    
+    The remaining closure defect is that semantic authenticity currently exists only in the scratch adjudicator.
+    
+    _compliant() is deliberately only a structural traceability predicate. It does not and cannot prove that a producer-supplied token agrees with bound Pass-A evidence. D367’s final-admission model separately requires independent adjudication. Therefore do not modify _compliant() or qualify.py to turn a generic structural check into a witness-type-specific authenticity engine.
+    
+    Prepare a scratch-only AW-01 closure packet containing two proposed deltas:
+    
+    A. classify.py — runtime behavior unchanged from reviewed v2.
+    
+    Keep the v2 executable statements byte-for-byte unless required by the comment correction.
+    
+    Correct the current comment which says no other byte count can be a substring. That statement is false for hostile bare values such as "11" against passa.bytes=114 bytes;.
+    
+    The corrected comment must state the actual boundary: legitimate canonical tokens are self-delimiting and path/prose are removed from context, but generic _compliant() remains substring-based and is not an authenticity verifier; semantic authenticity is independently checked by the governed AW-01 control.
+    
+    No predicate change. No witness-field runtime change.
+    
+    B. build_evidence/d379_controls.py — standing AW-01 semantic control.
+    
+    Add AW-01 as an explicit governed control/section rather than leaving the adjudicator as a one-off scratch script.
+    
+    Its denominator must be derived, not hard-coded to “five”.
+    
+    For the measured Pass-A/classification population derive:
+    
+    EXPECTED_MARKER = rows where bytes < 200 and path.endswith("README.md")
+    
+    and independently derive:
+    
+    EMITTED_MARKER = rows where FUNCTION.value == "MARKER"
+    
+    Require exact population equality before inspecting individual witnesses.
+    
+    For every emitted MARKER witness, independently validate at least:
+    
+    witness_type == "SIZE_AND_ROLE"
+    
+    exact grammar
+    ^passa\.bytes=(0|[1-9][0-9]*) bytes;$
+    
+    parsed N exactly equals the corresponding bound Pass-A row["bytes"]
+    
+    source_path == row["path"]
+    
+    source_selector == "META:passa.bytes"
+    
+    local_context == witness_value
+    
+    applicability_scope == "WHOLE_FILE"
+    
+    evidence_total == 1
+    
+    evidence_shown == 1
+    
+    truncated is False
+    
+    subject == "SELF"
+    
+    polarity == "POSITIVE"
+    
+    certainty == "VERIFIED"
+    
+    temporal == "AT_COMMIT"
+    
+    N < 200
+    
+    source_path.endswith("README.md")
+    
+    For this exact frozen D379 subject only, independently corroborate git blob size == N, because strict UTF-8 equality for the whole relevant subject population is already established. Do not redefine generic Pass-A byte semantics as Git-size semantics.
+    
+    The standing control must not call classify.py helper logic to decide whether its expected witness is correct. The producer and adjudicator cannot share the answer. Re-derive the banked predicate and token grammar independently in the control.
+    
+    It must also prove it can fail. Include mutations for:
+    
+    * bare "11", "4", "14" against genuine 114;
+    * coordinated wrong canonical token in both value and context;
+    * wrong selector;
+    * wrong source path;
+    * wrong witness type;
+    * wrong scope/subject/polarity/certainty/temporal;
+    * wrong evidence_total/evidence_shown/truncated;
+    * missing witness;
+    * missing and extra MARKER rows;
+    * 199/200 README boundary;
+    * sub-200 non-README;
+    * clean exact positive.
+    
+    The hostile expected result is that the AW standing control fails, regardless of whether generic _compliant() happens to return True.
+    
+    Calibrate the control itself with known-positive and known-negative cases.
+    
+    Do not claim that moving this semantic check into d379_controls.py makes Orion’s evidence independent. It remains producer/control evidence with zero final admission weight; it becomes a standing governed can-fail control that is rerun for every candidate and then remains subject to Kai’s final holdout adjudication.
+    
+    DeepSeek v2 finding dispositions to record:
+    
+    V2-01 — UPHELD; closed only when the AW adjudicator becomes standing governed control.
+    
+    V2-02 — no contract violation. D367 permits equivalent stable selectors; measured pipeline already contains 89/745 non-line selectors.
+    
+    V2-03 — acceptable metadata context; no envelope.py change.
+    
+    V2-04 — UPHELD; standing control must validate the complete AW witness contract above.
+    
+    V2-05 — canonical typed metadata token accepted as lossless representation of exact Pass-A metadata value; independently parse N.
+    
+    V2-06 / V2-07 — outside AW-01; preserve separately.
+    
+    KAI-AW01-V2-08 — new: correct the inaccurate v2 source comment. No runtime semantic change.
+    
+    Produce:
+    
+    * exact comment-corrected classify.py delta against d0c08a4;
+    * exact proposed classify.py SHA-256;
+    * exact AW-only d379_controls.py delta;
+    * exact proposed controls-file SHA-256;
+    * fail-old/pass-new and hostile calibration outputs;
+    * real frozen-subject differential proving MARKER population and all six axis values unchanged while the five original AW findings disappear;
+    * evidence that the new standing control rejects the bare-substring and coordinated-tamper cases that the ordinary qualifier accepts.
+    
+    Then send the combined AW-01 closure packet to DeepSeek for one final narrow review:
+    
+    1. comment-corrected v2 producer;
+    2. standing AW semantic control;
+    3. no unrelated matrix work.
+    
+    DeepSeek still has no repository access, so include every required source excerpt.
+    
+    STOP after DeepSeek review for Kai.
+    
+    NO SOURCE MUTATION.
+    
+    HELD: implementation of classify.py, implementation of d379_controls.py, remainder of the full matrix, D390 replay, F, capture, candidate, holdout, blind 40, Item 8 and merge.
+    
+    The key architectural point is this: we should not teach the generic qualifier to pretend it proves semantic authenticity. It never did. The classification artifact is externally Stage-B bound, so post-production mutation is already detectable; the remaining threat is an incorrect producer emitting a structurally plausible but semantically false witness. That is exactly what an independent, calibrated, standing AW control plus the final holdout is supposed to attack.
+    
+    Also, Orion’s R18 control has now had its fresh-session calibration recorded in entry 64, so that outstanding condition is closed.
+    
+    Current state:
+    
+    AW v2 producer semantics acceptable → standing AW control missing → combined closure packet next → DeepSeek final attack → Kai reconciliation → only then ask you for implementation authority.
+    
+    Confidence: 0.995 on V2-01/V2-04 placement; 0.99 on keeping _compliant()/qualify.py unchanged; 0.995 that no AW source mutation should occur before the standing-control design is reviewed.
+    END-VERBATIM KAI-AW01-V2-RECONCILIATION
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: the scratch closure packet (A + B), its evidence, one DeepSeek review; STOP  [CONVERSATION 2026-10-04 Kai, "STOP after DeepSeek review for Kai."]
+- HELD: implementation of classify.py and d379_controls.py, the remainder of the full matrix, D390 replay, F, capture, candidate, holdout, blind 40, Item 8, merge  [CONVERSATION 2026-10-04 Kai, "NO SOURCE MUTATION."]
+
+### 4. Open questions
+
+- None before the packet  [CONVERSATION 2026-10-04 Kai, "Produce:"]
+
+### 5. Incidents and corrections
+
+- KAI-AW01-V2-08 is a defect in my v2 comment ("no other byte count … can be a substring of it"), disproved by my own hostile matrix (entry 65); I wrote the comment before measuring and did not reconcile it afterwards  [CMD `aw01v2_hostile.py` → bare '11' _compliant True]
+
+### 6. Next authorised step
+
+- Read d379_controls.py's structure, then prepare the closure packet in scratch  [CONVERSATION 2026-10-04 Kai, "Add AW-01 as an explicit governed control/section"]
+
+### 7. What I am unsure of
+
+- How d379_controls.py consumes a classification result today (its sections and inputs); to be read before designing  [FILE /home/user/kai-repair/kai-pm/house_in_order_h2_v13/build_evidence/d379_controls.py:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
