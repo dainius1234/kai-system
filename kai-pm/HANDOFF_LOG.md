@@ -22925,3 +22925,132 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-04T00:48:40Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-04T00:48:40Z  [CMD `date -u +%FT%TZ` → 2026-10-04T00:48:40Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 82bfac2ed86c0855f39eaf381c779336a8d3d798  [CMD `git rev-parse HEAD` → 82bfac2ed86c0855f39eaf381c779336a8d3d798]
+- tree: 750b33a5335d3e4a308f5297eb5cc692dd5646b4  [CMD `git rev-parse HEAD^{tree}` → 750b33a5335d3e4a308f5297eb5cc692dd5646b4]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 82bfac2ed86c0855f39eaf381c779336a8d3d798  [CMD `git ls-remote --heads origin` → 82bfac2ed86c0855f39eaf381c779336a8d3d798]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: dbe692d9c3f83020176aeda00a0f399ce5f020f8  [CMD `git ls-remote --heads origin` → dbe692d9c3f83020176aeda00a0f399ce5f020f8]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 57  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 57]
+
+### 1. The four states
+
+- physical: repair worktree unchanged since entry 57 (HEAD dbe692d, one uncommitted path, run_h2_v12.py a39359bc…)  [CMD `git -C /home/user/kai-repair rev-parse HEAD; status --porcelain; sha256sum` → dbe692d9c3f8…; " M …run_h2_v12.py"; a39359bc…]
+- authorised: commit and push exactly the one file, then STOP for Kai  [CONVERSATION 2026-10-04 Dainius, "DAINIUS → ORION — COMMIT + PUSH AUTHORISED"]
+- evidence: the grant verbatim in section 2  [CMD `sha256sum dainius_commit_grant.txt` → 3315380579fdf5f3…]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-04 · COMMIT + PUSH AUTHORISED: the 5 AXIS_WITNESS findings are accepted as pre-existing, explained and not caused by the composite; commit and push exactly kai-pm/house_in_order_h2_v13/run_h2_v12.py (sha256 a39359bc…) on claude/d379-repair-eb52f73 with parent dbe692d; pre-commit re-checks; report; STOP for Kai; the 5 findings remain a separate open blocker to B4 closeout; classify.py, d379_controls.py and every other path untouched. An earlier "I authorise" without scope was asked back and not acted on. Verbatim below, 2000 bytes, sha256 3315380579fdf5f312992fc39e6255a0ca3d313dbfbc47ddbfa9763d5a850300, final LF False, 4-space indent added ⚠ UNBANKED  [CONVERSATION 2026-10-04 Dainius, "I accept the 5 AXIS_WITNESS findings as pre-existing, explained, and not caused by the reviewed composite."]
+    BEGIN-VERBATIM DAINIUS-COMMIT-PUSH-GRANT
+    Choose “Commit + push the one file.”
+    
+    I’ve now checked the live repository again: the programme branch still ends at entry 57 (82bfac2…), and the repair branch is still exactly dbe692d…. The five AXIS_WITNESS findings are proven baseline defects from classify.py; they are present under OLD and NEW and are not caused by the composite. The composite removes the intended FACT_CLASS_ABSENT failures without collateral verdict/fact drift.
+    
+    So the correct authority is:
+    
+    DAINIUS → ORION — COMMIT + PUSH AUTHORISED
+    
+    I accept the 5 AXIS_WITNESS findings as pre-existing, explained, and not caused by the reviewed composite.
+    
+    You are authorised to commit and push exactly one file only on:
+    
+    claude/d379-repair-eb52f73
+    
+    Required parent:
+    
+    dbe692d9c3f83020176aeda00a0f399ce5f020f8
+    
+    Authorised path:
+    
+    kai-pm/house_in_order_h2_v13/run_h2_v12.py
+    
+    Required file SHA-256 before commit:
+    
+    a39359bc383c8f6f6ca4540c10474fcb094c990f7b8e8091792262436c7a4cfe
+    
+    Before committing, re-check:
+    
+    * branch HEAD still dbe692d…
+    * exactly one tracked changed path;
+    * no unexpected untracked path relevant to the commit;
+    * run_h2_v12.py hash exactly a39359bc….
+    
+    Then commit that exact one-file change and push the repair branch.
+    
+    After push, report:
+    
+    * new commit SHA;
+    * signature/verification status;
+    * parent SHA;
+    * tree SHA;
+    * changed-path population;
+    * final run_h2_v12.py SHA-256;
+    * remote readback proving the repair branch points to that commit.
+    
+    Then STOP for Kai.
+    
+    Do not touch:
+    
+    * classify.py;
+    * d379_controls.py;
+    * any other source/config/governance path.
+    
+    The five pre-existing AXIS_WITNESS findings remain a separate open blocker to B4 closeout, not a blocker to committing this reviewed composite.
+    
+    No D390 replay, fixity F, capture, candidate, holdout, blind 40, Item 8 or merge.
+    
+    That is the clean decision now. The qualifier not being green does not block this commit because the red population is identical before and after, fully explained, and outside this change’s scope.
+    
+    Confidence: 0.995.
+    END-VERBATIM DAINIUS-COMMIT-PUSH-GRANT
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: the one-file commit and push, then STOP  [CONVERSATION 2026-10-04 Dainius, "Then commit that exact one-file change and push the repair branch."]
+- OPEN BLOCKER (B4 closeout): the 5 pre-existing AXIS_WITNESS findings from classify.py  [CONVERSATION 2026-10-04 Dainius, "The five pre-existing AXIS_WITNESS findings remain a separate open blocker to B4 closeout"]
+- FORBIDDEN: classify.py, d379_controls.py, any other source/config/governance path; D390 replay, fixity F, capture, candidate, holdout, blind 40, Item 8, merge  [CONVERSATION 2026-10-04 Dainius, "Do not touch:"]
+
+### 4. Open questions
+
+- None before execution  [CONVERSATION 2026-10-04 Dainius, "That is the clean decision now."]
+
+### 5. Incidents and corrections
+
+- None this step  [CMD `handoff.py check` → findings=0]
+
+### 6. Next authorised step
+
+- Re-check, commit, push, read back, report, STOP for Kai  [CONVERSATION 2026-10-04 Dainius, "Then STOP for Kai."]
+
+### 7. What I am unsure of
+
+- Whether commits made here carry a verifiable signature; to be reported as observed  [CONVERSATION 2026-10-04 Dainius, "signature/verification status"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
