@@ -26897,3 +26897,1759 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-04T01:56:39Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-04T01:56:39Z  [CMD `date -u +%FT%TZ` → 2026-10-04T01:56:39Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 8cb080a2baf5ed251728c9575dd56cf38042013b  [CMD `git rev-parse HEAD` → 8cb080a2baf5ed251728c9575dd56cf38042013b]
+- tree: 3c5df72dfe6a66e0a2cb581051487a780fb366b0  [CMD `git rev-parse HEAD^{tree}` → 3c5df72dfe6a66e0a2cb581051487a780fb366b0]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 8cb080a2baf5ed251728c9575dd56cf38042013b  [CMD `git ls-remote --heads origin` → 8cb080a2baf5ed251728c9575dd56cf38042013b]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d0c08a4da85a447e0729fdb83d201cccc0af395a  [CMD `git ls-remote --heads origin` → d0c08a4da85a447e0729fdb83d201cccc0af395a]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 67  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 67]
+
+### 1. The four states
+
+- physical: repair branch at d0c08a4; classify.py and build_evidence/d379_controls.py unchanged outside scratch; the closure proposal exists only in scratch (instAW3), which differs from the d0c08a4 H2 tree in exactly those two files  [CMD `diff -rq instAW3/kai-pm /home/user/kai-repair/kai-pm (excluding repo-only files)` → classify.py, build_evidence/d379_controls.py]
+- authorised: entry 67 — scratch AW-01 closure packet (A + B), its evidence, one DeepSeek review; STOP  [CONVERSATION 2026-10-04 Kai, "STOP after DeepSeek review for Kai."]
+- evidence: both deltas, the packet, cover, instruments and full outputs verbatim in section 5  [CMD `sha256sum DEEPSEEK_PACKET_AW01_CLOSURE.md` → 8acd00cbdeaa64c0…]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- None; executed under entry 67  [CONVERSATION 2026-10-04 Kai, "CLOSURE PACKET REQUIRED"]
+
+### 3. Authorised / Held / Forbidden
+
+- DONE (delta A, classify.py): v2 runtime with the comment corrected (KAI-AW01-V2-08) to state the real boundary — legitimate canonical tokens are self-delimiting, path/prose are out of the context, generic _compliant() is substring-based and accepts forged bare values or coordinated forgeries, semantic authenticity is checked by the governed AW-01 control. AST of the corrected file == AST of v2 (15 changed lines vs v2, all comments). Delta vs d0c08a4: 1 hunk +17/−3, sha256 bcc69a50a76f041d…; proposed classify.py 1ae5cd08dfe4bd59…  [CMD `ast.dump(v2) == ast.dump(corrected)` → True]
+- DONE (delta B, build_evidence/d379_controls.py): aw01_check(passa_rows, result_rows, git_size=None) — population first (EXPECTED from the bound Pass-A rows by the re-derived predicate; EMITTED from FUNCTION == MARKER; row-population and duplicate checks), then every listed field (grammar ^passa\.bytes=(0|[1-9][0-9]*) bytes;$, N == bound Pass-A bytes, N < 200, context == value, source_path == row path, README.md role, type/selector/scope/subject/polarity/certainty/temporal, evidence_total and evidence_shown == int 1, truncated is False, optional git size); section_AW01 calibration registered as section AW01 (SECTIONS, IMPLEMENTED, main, NON_CLI roll-up); CLI --aw01-candidate RESULT PASSA [--aw01-subject-repo REPO]. Delta vs d0c08a4: 5 hunks +253/−2, sha256 51ccc45222f378e5…; base 59952df66850fd30…; proposed accd688808e7d6e0…  [CMD `diff -u base_d379_controls.py instAW3/…/d379_controls.py | sha256sum` → 51ccc452…]
+- DONE (calibration): section_AW01 25/25 under the qualified interpreter — clean known-negative and git-size known-negative pass; 17 witness mutations each fail the control while generic _compliant returns True for 16 of them; missing MARKER, extra MARKER (200-byte README, NOTES.md, README.md.bak), a Pass-A row absent from the result and a git-size mismatch each fail. Each mutation trips its own rule (bare values -> TOKEN_GRAMMAR + CONTEXT_NOT_TOKEN; coordinated -> N_NOT_PASSA_BYTES; field mutations -> AW01_FIELD naming the field). Static: aw01_check references none of classify, run_h2_v12, R, _compliant, function  [CMD `aw01_section_run.py; aw01_reason_probe.py` → 25 passed 0 failed; names as stated]
+- DONE (real frozen subject, full history, own Stage A): closure chain rc 0 end to end, qualifier FINDINGS 0; qualifier line diff vs the d0c08a4 run: only the rc/size header, the Stage-A identity and the 5 AXIS_WITNESS findings; MARKER population identical; 0 axis-value differences over 272 x 6; only the 5 FUNCTION witness fields differ; 0 fact/trace/abstention/other-key differences; the closure run's 272 rows == the v2 run's rows (only producer_provenance differs)  [CMD `impl_chain_aw3.py; aw01v2_diff.py full fullaw3; diff qualifier outputs` → as stated]
+- DONE (standing control on real candidates, with git corroboration): d0c08a4 run exit 1, 15 findings (fail-old); closure run exit 0, 0 findings (expected 5 == emitted 5, 5 witnesses checked); v2 run exit 0; the two forgeries the real qualifier ACCEPTS — coordinated tamper exit 1, 10 findings; bare-number substring exit 1, 10 findings; empty selector exit 1, 5 findings  [CMD `d379_controls.py --aw01-candidate … --aw01-subject-repo …` → as stated]
+- DONE (packet): DEEPSEEK_PACKET_AW01_CLOSURE.md sha256 8acd00cbdeaa64c01a448a6c5533b662d5969eee9390a6408f187723142c2007, 38,826 bytes, self-contained (8 earlier excerpts + 3 d379_controls.py excerpts from d0c08a4: lines 1-71, 2460-2541, 3958-3972), both deltas embedded exactly, sentinels once each; base64 transport 6 chunks (6,465 / 6,440 / 6,478 / 6,459 / 6,456 / 6,528), self-contained cover; message round-trip equal  [CMD `gen_aw01c_packet.py; gen_aw01c_b64.py; independent re-decode` → exact; True]
+- HELD: implementation of classify.py and d379_controls.py, the remainder of the full matrix, D390 replay, F, capture, candidate, holdout, blind 40, Item 8, merge  [CONVERSATION 2026-10-04 Kai, "NO SOURCE MUTATION."]
+
+### 4. Open questions
+
+- The full d379_controls.py main() was not run (it executes the held sections too); only section_AW01 was executed, in isolation, plus the CLI mode — owner: Kai  [CMD `aw01_section_run.py` → 25 passed 0 failed]
+
+### 5. Incidents and corrections
+
+- Two small own-instrument slips, both before any recorded result: the first cover said "review the delta" for a two-delta packet (corrected to "BOTH deltas", packet bytes unchanged); a `| head` on the transport generator cut its final listing loop (files were already written; re-verified independently)  [CMD `independent re-decode of the message` → round-trip True, 'BOTH deltas' present]
+- Credential scan of 16 evidence files and the transport: 0 hits; raw line separators: none  [CMD `secretscan.py` → TOTAL HITS 0]
+- EVIDENCE AWC-AW01C-CLASSIFY-DIFF aw01c.classify.diff: 1868 bytes, sha256 bcc69a50a76f041d724ecb3976fe10da4c6c6b9f13627f1df82679072978a76a, final LF True  [CMD `sha256sum aw01c.classify.diff` → bcc69a50a76f041d…]
+    BEGIN-VERBATIM AWC-AW01C-CLASSIFY-DIFF
+    --- a/kai-pm/house_in_order_h2_v13/classify.py
+    +++ b/kai-pm/house_in_order_h2_v13/classify.py
+    @@ -369,10 +369,24 @@
+         # objective witness: size and path role. This is the ONLY family that
+         # earns FUNCTION at H2 -- it does not consult self-description.
+         if row["bytes"] < 200 and path.endswith("README.md"):
+    +        # KAI-B4-AW-01: the determining evidence is FILE METADATA, not
+    +        # source text. v1.2 carried selector "L1" and the title as context,
+    +        # so the measurement was in neither. The witness is now one
+    +        # canonical token naming the governed Pass-A field, its exact value,
+    +        # its unit and a terminator, so no other LEGITIMATE canonical token
+    +        # is a substring of it; the path is carried by source_path alone, so
+    +        # no path or prose is in the context.
+    +        # This is NOT an authenticity check. The generic _compliant() is a
+    +        # substring test and still accepts, for example, a forged bare "11"
+    +        # against "passa.bytes=114 bytes;", or a value and context forged
+    +        # together. Semantic authenticity is checked independently by the
+    +        # governed AW-01 control in build_evidence/d379_controls.py. The
+    +        # predicate is unchanged; the title plays no part.
+    +        token = f"passa.bytes={row['bytes']} bytes;"
+             w = Witness(witness_type="SIZE_AND_ROLE",
+    -                    witness_value=f"{row['bytes']} bytes",
+    -                    source_path=path, source_selector="L1",
+    -                    local_context=title[:120] or "(no title)",
+    +                    witness_value=token,
+    +                    source_path=path, source_selector="META:passa.bytes",
+    +                    local_context=token,
+                         applicability_scope="WHOLE_FILE",
+                         # the byte count and path role OF THIS FILE
+                         subject=E.SUBJECT_SELF,
+    END-VERBATIM AWC-AW01C-CLASSIFY-DIFF
+- EVIDENCE AWC-AW01C-CONTROLS-DIFF aw01c.controls.diff: 14618 bytes, sha256 51ccc45222f378e5d442e87edddbed4401a04c47655f5ff2e16f13dae3a66f50, final LF True  [CMD `sha256sum aw01c.controls.diff` → 51ccc45222f378e5…]
+    BEGIN-VERBATIM AWC-AW01C-CONTROLS-DIFF
+    --- a/kai-pm/house_in_order_h2_v13/build_evidence/d379_controls.py
+    +++ b/kai-pm/house_in_order_h2_v13/build_evidence/d379_controls.py
+    @@ -36,8 +36,8 @@
+     # Sections of the D379 hostile matrix. Implemented sections run; the rest
+     # fail as NOT_IMPLEMENTED so this file can never report a green tranche.
+     SECTIONS = ["M2", "D14", "PPOP", "Q1a", "Q1b", "86", "SB", "I1A",
+    -            "I1B", "DEP", "STAGE_A", "STDLIB"]
+    -IMPLEMENTED = {"M2", "SB", "D14", "I1A", "I1B", "PPOP", "86", "Q1b"}
+    +            "I1B", "DEP", "STAGE_A", "STDLIB", "AW01"]
+    +IMPLEMENTED = {"M2", "SB", "D14", "I1A", "I1B", "PPOP", "86", "Q1b", "AW01"}
+     # HELD is NOT an excuse and does NOT make the gate green. These
+     # sections are implemented except for a limb that cannot execute
+     # on a KNOWN-NEGATIVE interpreter (INC-34 / D385). They still FAIL
+    @@ -2477,6 +2477,7 @@
+         section_86()
+         section_Q1a()
+         section_Q1b()
+    +    section_AW01()
+         section_STDLIB()
+         exec_bound_cases()
+     
+    @@ -2502,6 +2503,8 @@
+             "PPOP": "stage_identity.classify_origin",
+             "STAGE_A": "stage_identity Stage-A construction",
+             "STDLIB": "stage_identity stdlib construction (D380 §7)",
+    +        "AW01": "d379_controls.aw01_check — the MARKER witness semantic "
+    +                "control (KAI-B4-AW-01)",
+         }
+         for s in SECTIONS:
+             exec_cases = by_family.get(s, [])
+    @@ -3410,6 +3413,248 @@
+         print()
+     
+     
+    +# ── AW01 — KAI-B4-AW-01: the objective MARKER witness, STANDING control ──
+    +# The qualifier's _compliant() is a STRUCTURAL trace check: value-in-context
+    +# by substring. It is not, and is not made into, an authenticity verifier:
+    +# it accepts a forged bare "11" against "passa.bytes=114 bytes;", and a value
+    +# and context forged together. This control is the SEMANTIC check for the
+    +# FUNCTION=MARKER witness, run against the BOUND Pass-A rows.
+    +#
+    +# INDEPENDENCE FROM THE PRODUCER. Nothing below calls classify.py to decide
+    +# what is expected. The predicate and the token grammar are re-derived here
+    +# from the banked rule (row bytes < 200 and path ends "README.md";
+    +# "passa.bytes=<N> bytes;"). classify.function appears only in the
+    +# calibration, as the SUBJECT that produced the witnesses being judged.
+    +#
+    +# EVIDENCE CLASS: a standing, calibrated, can-fail PRODUCER control with
+    +# ZERO admission weight. It does not make Orion's evidence independent, and
+    +# it does not replace the final holdout adjudication.
+    +import re as _re
+    +AW01_TOKEN = _re.compile(r"passa\.bytes=(0|[1-9][0-9]*) bytes;")
+    +AW01_FIXED = (("witness_type", "SIZE_AND_ROLE"),
+    +              ("source_selector", "META:passa.bytes"),
+    +              ("applicability_scope", "WHOLE_FILE"),
+    +              ("subject", "SELF"), ("polarity", "POSITIVE"),
+    +              ("certainty", "VERIFIED"), ("temporal", "AT_COMMIT"))
+    +
+    +
+    +def _aw01_is_int(x):
+    +    return type(x) is int                 # bool is not a byte count
+    +
+    +
+    +def aw01_check(passa_rows, result_rows, git_size=None):
+    +    """Findings (list of (rule, path, detail)) and counts for the MARKER
+    +    witness population. [] means every requirement held.
+    +
+    +    git_size: None, or a callable path -> int giving the git blob size at
+    +    the frozen subject. Use it ONLY for a subject whose whole relevant
+    +    population is established strict UTF-8 (D379 entry 52); Pass-A bytes
+    +    are the UTF-8 length of the verified decoded text, not git size in
+    +    general.
+    +    """
+    +    findings = []
+    +    pa, dup = {}, []
+    +    for r in passa_rows:
+    +        (dup.append(r.get("path")) if r.get("path") in pa
+    +         else pa.__setitem__(r.get("path"), r))
+    +    res, rdup = {}, []
+    +    for r in result_rows:
+    +        (rdup.append(r.get("path")) if r.get("path") in res
+    +         else res.__setitem__(r.get("path"), r))
+    +    for p in dup:
+    +        findings.append(("AW01_PASSA_DUPLICATE_ROW", p, "Pass-A row repeated"))
+    +    for p in rdup:
+    +        findings.append(("AW01_RESULT_DUPLICATE_ROW", p, "result row repeated"))
+    +    if set(pa) != set(res):
+    +        for p in sorted(set(pa) - set(res), key=str):
+    +            findings.append(("AW01_ROW_POPULATION", p, "Pass-A row absent "
+    +                             "from the classification result"))
+    +        for p in sorted(set(res) - set(pa), key=str):
+    +            findings.append(("AW01_ROW_POPULATION", p, "classification row "
+    +                             "absent from the bound Pass A"))
+    +    # EXPECTED from the bound Pass A, by the re-derived predicate.
+    +    expected = sorted(p for p, r in pa.items()
+    +                      if isinstance(p, str) and _aw01_is_int(r.get("bytes"))
+    +                      and r["bytes"] < 200 and p.endswith("README.md"))
+    +    emitted = sorted(p for p, r in res.items()
+    +                     if ((r.get("FUNCTION") or {}).get("value")) == "MARKER")
+    +    counts = {"passa_rows": len(pa), "result_rows": len(res),
+    +              "expected_marker": len(expected),
+    +              "emitted_marker": len(emitted), "witnesses_checked": 0}
+    +    if expected != emitted:
+    +        for p in sorted(set(expected) - set(emitted), key=str):
+    +            findings.append(("AW01_MARKER_MISSING", p, "Pass-A predicate "
+    +                             "earns MARKER; the result does not emit it"))
+    +        for p in sorted(set(emitted) - set(expected), key=str):
+    +            findings.append(("AW01_MARKER_EXTRA", p, "the result emits MARKER; "
+    +                             "the Pass-A predicate does not earn it"))
+    +        return findings, counts          # population first (Kai, AW-01)
+    +    for p in emitted:
+    +        row, w = pa[p], (res[p].get("FUNCTION") or {}).get("witness")
+    +        counts["witnesses_checked"] += 1
+    +        if not isinstance(w, dict):
+    +            findings.append(("AW01_WITNESS_ABSENT", p, repr(w)[:40]))
+    +            continue
+    +        v = w.get("witness_value")
+    +        m = AW01_TOKEN.fullmatch(v) if isinstance(v, str) else None
+    +        if not m:
+    +            findings.append(("AW01_TOKEN_GRAMMAR", p, repr(v)[:60]))
+    +        n = int(m.group(1)) if m else None
+    +        if n is not None and n != row["bytes"]:
+    +            findings.append(("AW01_N_NOT_PASSA_BYTES", p,
+    +                             f"token N={n}, bound Pass-A bytes={row['bytes']}"))
+    +        if n is not None and not n < 200:
+    +            findings.append(("AW01_N_NOT_BELOW_200", p, str(n)))
+    +        if w.get("local_context") != v:
+    +            findings.append(("AW01_CONTEXT_NOT_TOKEN", p,
+    +                             repr(w.get("local_context"))[:60]))
+    +        if w.get("source_path") != p:
+    +            findings.append(("AW01_SOURCE_PATH", p,
+    +                             repr(w.get("source_path"))[:60]))
+    +        if not str(w.get("source_path", "")).endswith("README.md"):
+    +            findings.append(("AW01_PATH_ROLE", p, repr(w.get("source_path"))))
+    +        for k, want in AW01_FIXED:
+    +            if w.get(k) != want:
+    +                findings.append(("AW01_FIELD", p, f"{k}={w.get(k)!r}, "
+    +                                 f"required {want!r}"))
+    +        for k in ("evidence_total", "evidence_shown"):
+    +            if not (_aw01_is_int(w.get(k)) and w.get(k) == 1):
+    +                findings.append(("AW01_FIELD", p, f"{k}={w.get(k)!r}, "
+    +                                 f"required 1"))
+    +        if w.get("truncated") is not False:
+    +            findings.append(("AW01_FIELD", p, f"truncated="
+    +                             f"{w.get('truncated')!r}, required False"))
+    +        if git_size is not None and n is not None:
+    +            g = git_size(p)
+    +            if g != n:
+    +                findings.append(("AW01_N_NOT_GIT_SIZE", p,
+    +                                 f"token N={n}, git blob size={g}"))
+    +    return findings, counts
+    +
+    +
+    +def section_AW01():
+    +    print("AW01 — KAI-B4-AW-01 MARKER witness, standing semantic control")
+    +    print("  Calibration on synthetic Pass-A rows. The witnesses judged are")
+    +    print("  PRODUCED by classify.function (the subject); the expected answer")
+    +    print("  is re-derived here, never taken from classify.py.\n")
+    +    import copy
+    +    import run_h2_v12 as R
+    +
+    +    rows = [{"path": "a/README.md", "bytes": 114}, {"path": "b/README.md",
+    +            "bytes": 199}, {"path": "README.md", "bytes": 0},
+    +            {"path": "c/README.md", "bytes": 200},
+    +            {"path": "d/NOTES.md", "bytes": 150},
+    +            {"path": "e/README.md.bak", "bytes": 150}]
+    +
+    +    def produced(rs):
+    +        return [{"path": r["path"],
+    +                 "FUNCTION": classify.function(dict(r, title=""), "")}
+    +                for r in rs]
+    +    clean = produced(rows)
+    +    f0, c0 = aw01_check(rows, clean)
+    +    check("AW01-1 known-negative: the producer's witnesses on clean rows "
+    +          "PASS (199-byte README and 0-byte README earn MARKER; 200-byte "
+    +          "README, sub-200 non-README and README.md.bak do not)",
+    +          not f0 and c0["expected_marker"] == c0["emitted_marker"] == 3,
+    +          (f0[:3], c0))
+    +    git = {"a/README.md": 114, "b/README.md": 199, "README.md": 0}
+    +    f0g, _ = aw01_check(rows, clean, git_size=git.get)
+    +    check("AW01-2 known-negative with git-size corroboration PASSES",
+    +          not f0g, f0g[:3])
+    +
+    +    def mutate(path, **kw):
+    +        m = copy.deepcopy(clean)
+    +        cell = next(r for r in m if r["path"] == path)["FUNCTION"]
+    +        if kw.pop("_drop", False):
+    +            cell["witness"] = None
+    +        else:
+    +            cell["witness"].update(kw)
+    +        return m
+    +    T = "passa.bytes={} bytes;".format
+    +    cases = [
+    +        ("bare '11' vs genuine 114", mutate("a/README.md", witness_value="11")),
+    +        ("bare '4' vs genuine 114", mutate("a/README.md", witness_value="4")),
+    +        ("bare '14' vs genuine 114", mutate("a/README.md", witness_value="14")),
+    +        ("coordinated wrong canonical token in value AND context",
+    +         mutate("a/README.md", witness_value=T(115), local_context=T(115))),
+    +        ("wrong selector", mutate("a/README.md", source_selector="L1")),
+    +        ("wrong source path", mutate("a/README.md", source_path="b/README.md")),
+    +        ("wrong witness type", mutate("a/README.md", witness_type="DATE_STAMP")),
+    +        ("wrong scope", mutate("a/README.md", applicability_scope="SPAN")),
+    +        ("wrong subject", mutate("a/README.md", subject="OTHER:x")),
+    +        ("wrong polarity", mutate("a/README.md", polarity="NEUTRAL")),
+    +        ("wrong certainty", mutate("a/README.md", certainty="OBSERVED")),
+    +        ("wrong temporal", mutate("a/README.md", temporal="NEUTRAL")),
+    +        ("wrong evidence_total", mutate("a/README.md", evidence_total=999)),
+    +        ("wrong evidence_shown", mutate("a/README.md", evidence_shown=0)),
+    +        ("truncated True", mutate("a/README.md", truncated=True)),
+    +        ("evidence_total True (bool, not 1)",
+    +         mutate("a/README.md", evidence_total=True)),
+    +        ("missing witness", mutate("a/README.md", _drop=True)),
+    +    ]
+    +    for label, m in cases:
+    +        f, _ = aw01_check(rows, m)
+    +        w = next(r for r in m if r["path"] == "a/README.md")["FUNCTION"]["witness"]
+    +        struct = R._compliant(w)
+    +        check(f"AW01-M {label} -> the AW control FAILS (generic _compliant "
+    +              f"returns {struct})", bool(f), f"no finding; _compliant={struct}")
+    +    # population: missing and extra MARKER rows, boundaries
+    +    miss = copy.deepcopy(clean)
+    +    next(r for r in miss if r["path"] == "a/README.md")["FUNCTION"] = {
+    +        "value": "UNKNOWN"}
+    +    fm, _ = aw01_check(rows, miss)
+    +    check("AW01-P1 a MARKER the Pass-A predicate earns is MISSING -> FAIL",
+    +          any(x[0] == "AW01_MARKER_MISSING" for x in fm), fm[:3])
+    +    for p, why in (("c/README.md", "200-byte README (boundary)"),
+    +                   ("d/NOTES.md", "sub-200 non-README"),
+    +                   ("e/README.md.bak", "README.md.bak")):
+    +        ex = copy.deepcopy(clean)
+    +        cell = next(r for r in ex if r["path"] == p)
+    +        cell["FUNCTION"] = copy.deepcopy(
+    +            next(r for r in clean if r["path"] == "a/README.md")["FUNCTION"])
+    +        cell["FUNCTION"]["witness"]["source_path"] = p
+    +        fe, _ = aw01_check(rows, ex)
+    +        check(f"AW01-P2 an EXTRA MARKER on the {why} -> FAIL",
+    +              any(x[0] == "AW01_MARKER_EXTRA" and x[1] == p for x in fe),
+    +              fe[:3])
+    +    fr, _ = aw01_check(rows + [{"path": "z/README.md", "bytes": 5}], clean)
+    +    check("AW01-P3 a Pass-A row absent from the result -> FAIL",
+    +          any(x[0] == "AW01_ROW_POPULATION" for x in fr), fr[:3])
+    +    fg, _ = aw01_check(rows, clean, git_size=dict(git, **{"a/README.md": 115}).get)
+    +    check("AW01-G git blob size disagreeing with the token -> FAIL",
+    +          any(x[0] == "AW01_N_NOT_GIT_SIZE" for x in fg), fg[:3])
+    +    print()
+    +
+    +
+    +def aw01_candidate(result_path, passa_path, subject_repo=None):
+    +    """Standing application to a REAL candidate: the bound Pass-A artefact
+    +    and the classification result it produced. Exit 0 iff no finding."""
+    +    import subprocess
+    +    res = json.loads(pathlib.Path(result_path).read_bytes())
+    +    pa = json.loads(pathlib.Path(passa_path).read_bytes())
+    +    git_size = None
+    +    if subject_repo:
+    +        subj = pa["subject"]
+    +
+    +        def git_size(p):
+    +            out = subprocess.run(["git", "-C", subject_repo, "cat-file", "-s",
+    +                                  f"{subj}:{p}"], capture_output=True,
+    +                                 text=True)
+    +            return int(out.stdout) if out.returncode == 0 else None
+    +    findings, counts = aw01_check(pa["rows"], res["rows"], git_size=git_size)
+    +    print("AW01 CANDIDATE — MARKER witness semantic control")
+    +    print(f"  subject {pa['subject'][:12]}  result subject "
+    +          f"{res.get('subject', '')[:12]}")
+    +    print(f"  {counts}")
+    +    for x in findings:
+    +        print(f"  {x[0]}::{x[1]} — {x[2]}")
+    +    print(f"  AW01 FINDINGS: {len(findings)}")
+    +    if res.get("subject") != pa.get("subject"):
+    +        print("  AW01 REFUSE: result subject != Pass-A subject")
+    +        return 2
+    +    return 1 if findings else 0
+    +
+    +
+     # ── STDLIB — D385: known-negative present, positive HELD ──────────────
+     def section_STDLIB():
+         print("STDLIB — governed Python runtime identity (D380 §7, D385)")
+    @@ -3957,6 +4202,12 @@
+     
+     
+     if __name__ == "__main__":
+    +    if "--aw01-candidate" in sys.argv:
+    +        _i = sys.argv.index("--aw01-candidate")
+    +        sys.exit(aw01_candidate(
+    +            sys.argv[_i + 1], sys.argv[_i + 2],
+    +            sys.argv[sys.argv.index("--aw01-subject-repo") + 1]
+    +            if "--aw01-subject-repo" in sys.argv else None))
+         if "--capture" in sys.argv:
+             sys.exit(capture(sys.argv[sys.argv.index("--capture") + 1]))
+         _rc = main()
+    END-VERBATIM AWC-AW01C-CONTROLS-DIFF
+- EVIDENCE AWC-DEEPSEEK-PACKET-AW01-CLOSURE-MD DEEPSEEK_PACKET_AW01_CLOSURE.md: 38826 bytes, sha256 8acd00cbdeaa64c01a448a6c5533b662d5969eee9390a6408f187723142c2007, final LF True  [CMD `sha256sum DEEPSEEK_PACKET_AW01_CLOSURE.md` → 8acd00cbdeaa64c0…]
+    BEGIN-VERBATIM AWC-DEEPSEEK-PACKET-AW01-CLOSURE-MD
+    # D379 B4 — KAI-B4-AW-01 CLOSURE: ADVERSARIAL-REVIEW PACKET (A: comment-corrected producer, B: standing AW control)
+    
+    Producer: Orion. Date: 2026-10-04. Evidence class: PRODUCER MEASUREMENT, ZERO ADMISSION WEIGHT.
+    Status: PROPOSAL ONLY, scratch. Neither file is modified anywhere. The repair branch is at d0c08a4 (accepted).
+    
+    YOU HAVE NO REPOSITORY ACCESS AND NO PRIOR CONTEXT. Rely only on this packet. Source excerpts in section 3 are cut
+    mechanically from the repository at commit d0c08a4; nothing is paraphrased.
+    
+    ## 0. RECEIPT — reply with these lines FIRST, each copied exactly
+    
+        PACKET HASH: <sha256 of this decoded packet, as given by the sender>
+        BASE d379_controls.py SHA-256: <from section 1>
+        FIRST HUNK OF DELTA B: <the first line beginning with @@ in section 5>
+        SENTINEL A: <the added line in delta A that begins with "# This is NOT an authenticity check.">
+        SENTINEL B: <the added line in delta B that assigns AW01_TOKEN>
+        END OF PACKET SEEN: YES
+    
+    If either sentinel cannot be reproduced exactly, reply NO REVIEW. The last line of this file is
+    "END OF PACKET AW-01 CLOSURE — D379 MARKER WITNESS".
+    
+    ## 1. Identities
+    
+        BASE      classify.py at d0c08a4                   sha256 226873676c2373faaf29f4709bb1bb62d1d22f3c56cbdc0e594314cb6e5df9e8
+        BASE      build_evidence/d379_controls.py at d0c08a4 sha256 59952df66850fd30ade8dc75ee409f88ef644ca197af03a78e1a5cba1eb2359f
+        DELTA A   classify.py (section 4)                  sha256 bcc69a50a76f041d724ecb3976fe10da4c6c6b9f13627f1df82679072978a76a
+        DELTA B   d379_controls.py (section 5)             sha256 51ccc45222f378e5d442e87edddbed4401a04c47655f5ff2e16f13dae3a66f50
+        PROPOSED  classify.py                              sha256 1ae5cd08dfe4bd5902800df4f497b0cc53af77b50125f4f37b0483ff7f1286e9
+        PROPOSED  d379_controls.py                         sha256 accd688808e7d6e06d7ab92867b08b31f478f404c344201cac1b6b77457f6070
+    
+    ## 2. Background and the adjudicator's rulings this packet implements
+    
+    classify.function() earns FUNCTION=MARKER when `row["bytes"] < 200 and path.endswith("README.md")`. Its witness at
+    d0c08a4 (selector "L1", value "<N> bytes", context = title or "(no title)") is rejected by the qualifier on all five
+    frozen-subject rows (AXIS_WITNESS). The adjudicator (Kai) accepted, in principle, a replacement runtime witness (v2):
+    witness_value = local_context = "passa.bytes=<N> bytes;", source_selector "META:passa.bytes", path only in source_path.
+    
+    A previous review of v2 established, and the producer had measured, that the qualifier's run_h2_v12._compliant() (a
+    SUBSTRING value-in-context test, section 3) still accepts two forgeries of that witness: a bare number that is a
+    substring of the token ("11" against "passa.bytes=114 bytes;"), and value and context forged together to the same
+    wrong token. Kai ruled: _compliant() and qualify.py stay unchanged (they are structural trace checks, not authenticity
+    verifiers); semantic authenticity must become a STANDING, GOVERNED, can-fail control; and the v2 source comment, which
+    claimed "no other byte count ... can be a substring", overstates the property and must be corrected (KAI-AW01-V2-08).
+    
+    DELTA A: classify.py = v2 runtime, byte-for-byte identical executable statements (proved by AST equality with v2);
+    only the comment changes, to state the real boundary.
+    DELTA B: build_evidence/d379_controls.py gains aw01_check() (pure decision function over the bound Pass-A rows and the
+    classification result), section_AW01() (calibration, registered as section "AW01"), and a CLI mode
+    `--aw01-candidate RESULT PASSA [--aw01-subject-repo REPO]` for a real candidate. aw01_check re-derives the predicate
+    and the token grammar itself and calls nothing in classify.py; it derives EXPECTED_MARKER from Pass A and
+    EMITTED_MARKER from the result and requires equality before inspecting any witness; then it validates every field.
+    
+    ## 3. Source excerpts (verbatim, from d0c08a4)
+    
+    ----- kai-pm/house_in_order_h2_v13/classify.py (repair HEAD d0c08a4, lines 366-382) -----
+    def function(row, text):
+        path, title = row["path"], row.get("title") or ""
+    
+        # objective witness: size and path role. This is the ONLY family that
+        # earns FUNCTION at H2 -- it does not consult self-description.
+        if row["bytes"] < 200 and path.endswith("README.md"):
+            w = Witness(witness_type="SIZE_AND_ROLE",
+                        witness_value=f"{row['bytes']} bytes",
+                        source_path=path, source_selector="L1",
+                        local_context=title[:120] or "(no title)",
+                        applicability_scope="WHOLE_FILE",
+                        # the byte count and path role OF THIS FILE
+                        subject=E.SUBJECT_SELF,
+                        evidence_total=1, evidence_shown=1, truncated=False,
+                        polarity="POSITIVE", certainty="VERIFIED")
+            return E.claim(w, "MARKER", rationale="objective: byte count and "
+                                                  "path role, not self-description")
+    
+    ----- kai-pm/house_in_order_h2_v13/envelope.py (repair HEAD d0c08a4, lines 180-213) -----
+    class Witness:
+        """The nine mandatory fields of D367 5, plus the envelope dimensions.
+    
+        `value` is the EXACT matched token, never a description. v1.1
+        recorded the static string "cites a commit sha" for every VALIDITY
+        cell; an adjudicator could not audit the cell from the package and
+        had to open the source document. So could I.
+        """
+        witness_type: str          # what kind of evidence this is
+        witness_value: str         # the EXACT token or value matched
+        source_path: str           # the document it came from
+        source_selector: str       # stable selector: "L<line>" or "L<a>-L<b>"
+        local_context: str         # surrounding text, enough to judge it
+        applicability_scope: str   # SPAN | SECTION | WHOLE_FILE
+        evidence_total: int        # how many candidate rows existed
+        evidence_shown: int        # how many are carried here
+        truncated: bool            # explicit, never inferred
+        # envelope dimensions beyond scope
+        polarity: str = "NEUTRAL"
+        certainty: str = "OBSERVED"
+        temporal: str = "AT_COMMIT"
+        # NO DEFAULT. D381 3 / INC-31: `subject = "SELF"` here is precisely how
+        # 167 witnesses inherited a semantic claim nobody made about them. The
+        # sentinel keeps the field order stable while making omission FAIL.
+        subject: str = REQUIRED
+    
+        def __post_init__(self):
+            if self.subject is REQUIRED:
+                raise SubjectError(
+                    f"subject NOT STATED for {self.witness_type} witness at "
+                    f"{self.source_path} {self.source_selector}. There is no "
+                    f"default: a witness's semantic subject is determined once, "
+                    f"at the governed producer boundary (D381 5.5).")
+            parse_subject(self.subject)          # fail-closed, D381 3.1
+    
+    ----- kai-pm/house_in_order_h2_v13/run_h2_v12.py (repair HEAD d0c08a4, lines 244-246) -----
+    NINE_FIELDS = ("witness_type", "witness_value", "source_path",
+                   "source_selector", "local_context", "applicability_scope",
+                   "evidence_total", "evidence_shown", "truncated")
+    
+    ----- kai-pm/house_in_order_h2_v13/run_h2_v12.py (repair HEAD d0c08a4, lines 524-531) -----
+    def _compliant(t):
+        """E1 / D367 5. Present is not enough -- the trace must be SEMANTICALLY
+        TRUTHFUL: all nine fields, and the context must actually contain the
+        value it claims to evidence.
+        """
+        if not t or any(t.get(k) in (None, "") for k in NINE_FIELDS):
+            return False
+        return str(t["witness_value"]) in str(t["local_context"])
+    
+    ----- kai-pm/house_in_order_h2_v13/qualify.py (repair HEAD d0c08a4, lines 532-549) -----
+        axis_cells = 0
+        for r in rows:
+            for axis in ont.ALPHABETS:                    # the GOVERNING axis set
+                cell = r.get(axis)
+                if cell is None:
+                    findings.append(("AXIS_CELL_ABSENT", r.get("path"), axis,
+                                     "the emitted row has no cell for a governed "
+                                     "axis"))
+                    continue
+                if cell.get("value") in (ont.ABSTENTION, ont.CAPABILITY_FAILURE):
+                    continue
+                axis_cells += 1
+                w = cell.get("witness")
+                if not R._compliant(w):
+                    findings.append(("AXIS_WITNESS", r.get("path"), axis,
+                                     "non-abstaining cell carries no compliant "
+                                     "witness"))
+    
+    
+    ----- kai-pm/house_in_order_h2_v13/passa.py (repair HEAD d0c08a4, lines 1076-1090) -----
+        rows = []
+        for d in tracked:
+            txt = read_source(subject_repo, d)
+            title = ""
+            for ln in txt.splitlines():
+                if ln.startswith("#"):
+                    title = ln.lstrip("#").strip()[:120]
+                    break
+            n = git(history_repo, "rev-list", "--count", subject, "--",
+                    d).stdout.strip()
+            last = git(history_repo, "log", "-1", "--format=%ad", "--date=short",
+                       subject, "--", d).stdout.strip()
+            rows.append({
+                "path": d, "title": title, "bytes": len(txt.encode()),
+                "sha256": hashlib.sha256(txt.encode()).hexdigest()[:16],
+    
+    ----- kai-pm/H2_REPAIR_CONTRACT_D367.md (repair HEAD d0c08a4, lines 136-157) -----
+    ## 5. Evidence / witness trace schema
+    
+    Every **positive evidence fact** and every **non-abstention verdict**
+    must carry a source-bound witness sufficient for independent
+    adjudication:
+    
+    | field | meaning |
+    |---|---|
+    | `witness_type` | what kind of evidence this is |
+    | `witness_value` | the **exact** token or value matched — never a description |
+    | `source_path` | the document it came from |
+    | `source_selector` | line/span, or an equivalent **stable** selector |
+    | `local_context` | surrounding text sufficient to judge the match |
+    | `applicability_scope` | what the witness binds — whole document, or a region with its selector |
+    | `evidence_total` | how many candidate rows existed |
+    | `evidence_shown` | how many are carried here |
+    | `truncated` | explicit `true`/`false` |
+    
+    Oversized evidence may live in a **bound sidecar** referenced by hash.
+    **Silent truncation is forbidden.** The evidence actually responsible for
+    the emitted cell must always be recoverable from the candidate package
+    **without guessing which source fragment mattered.**
+    
+    ----- kai-pm/H2_REPAIR_CONTRACT_D367.md (repair HEAD d0c08a4, lines 214-215) -----
+    The 5 objective `MARKER` cases remain **candidate-proven, subject to
+    final qualification**.
+    
+    ----- kai-pm/house_in_order_h2_v13/build_evidence/d379_controls.py (repair HEAD d0c08a4, lines 1-71) -----
+    #!/usr/bin/env python3
+    """D379 HOSTILE CONTROLS — governed by D379 as corrected by D380.
+    
+    EVIDENCE CLASS: PRODUCER MEASUREMENT - SIGHTED - ZERO ADMISSION WEIGHT.
+    Orion's own assessment carries no final admission weight.
+    
+    Every control is EXECUTED, never merely asserted (R2). Controls whose
+    subject is a shipped process entry point assert the ACTUAL SUBPROCESS
+    RETURN CODE. Controls whose subject is a classification decision function
+    call that function directly, because the function IS the subject; calling
+    a helper and inferring a process exit status is what let an earlier defect
+    through and is not done here.
+    
+    SECTION REGISTRY. Sections not yet implemented FAIL LOUDLY. A control file
+    that reports green over a section it does not cover is the exact defect
+    class this programme exists to find, so absence is never silence here.
+    """
+    from __future__ import annotations
+    
+    import collections
+    import hashlib
+    import os
+    import json
+    import pathlib
+    import sys
+    
+    V = pathlib.Path(__file__).resolve().parent.parent
+    sys.path.insert(0, str(V))
+    
+    import classify                                              # noqa: E402
+    import qualify                                               # noqa: E402
+    import passa                                                 # noqa: E402
+    from envelope import Witness                                 # noqa: E402
+    
+    PASSED, FAILED, FAILURES = 0, 0, []
+    # Sections of the D379 hostile matrix. Implemented sections run; the rest
+    # fail as NOT_IMPLEMENTED so this file can never report a green tranche.
+    SECTIONS = ["M2", "D14", "PPOP", "Q1a", "Q1b", "86", "SB", "I1A",
+                "I1B", "DEP", "STAGE_A", "STDLIB"]
+    IMPLEMENTED = {"M2", "SB", "D14", "I1A", "I1B", "PPOP", "86", "Q1b"}
+    # HELD is NOT an excuse and does NOT make the gate green. These
+    # sections are implemented except for a limb that cannot execute
+    # on a KNOWN-NEGATIVE interpreter (INC-34 / D385). They still FAIL
+    # the exit gate; they are reported separately only so the registry
+    # does not call a blocked limb "not written".
+    HELD = {
+        # HELD names a limb that CANNOT EXECUTE on a known-negative runtime.
+        # It is not a pass and does not soften the gate: every section listed
+        # here still FAILS below. It exists so the registry does not describe a
+        # blocked limb as unwritten.
+        "Q1a": "Q1a-6 ONLY — needs a governed POSITIVE runtime identity to "
+               "compare against (INC-34). Q1a-1,2,3,4,5,7,8,9 all EXECUTE.",
+        "DEP": "DEP-2 ONLY — needs ordinary stdlib under a D380-COMPLIANT "
+               "interpreter (INC-34). DEP-1 and DEP-3 EXECUTE.",
+        "STAGE_A": "the canonical-runtime positive limb ONLY (INC-34). The V2 "
+                   "governance and identity matrix EXECUTES.",
+        "STDLIB": "V2-ID-2a, the canonical positive derivation ONLY (INC-34). "
+                  "The D380-STDLIB-NEG-1 negative control EXECUTES.",
+    }
+    
+    
+    def check(name: str, condition: bool, detail: str = "") -> bool:
+        global PASSED, FAILED
+        if condition:
+            PASSED += 1
+        else:
+            FAILED += 1
+            FAILURES.append(f"{name}: {detail}")
+        return condition
+    
+    
+    
+    ----- kai-pm/house_in_order_h2_v13/build_evidence/d379_controls.py (repair HEAD d0c08a4, lines 2460-2541) -----
+    def main() -> int:
+        print("=" * 70)
+        print("D379 HOSTILE CONTROLS — PRODUCER MEASUREMENT, SIGHTED,")
+        print("                        ZERO ADMISSION WEIGHT")
+        print("=" * 70)
+        print()
+        subject_digests()
+    
+        _capture_calibration()
+        section_M2()
+        section_SB()
+        section_D14()
+        section_PPOP()
+        section_DEP()
+        section_STAGE_A()
+        section_I1A()
+        section_I1B()
+        section_86()
+        section_Q1a()
+        section_Q1b()
+        section_STDLIB()
+        exec_bound_cases()
+    
+        print("-" * 70)
+        print("SECTION COVERAGE")
+        # B6 — THE ROLL-UP IS DERIVED FROM THE EXECUTABLE-BOUND VERDICTS
+        # wherever D379 names a shipped executable subject. INC-38 exists
+        # because helper status was allowed to stand in for executable status;
+        # a helper check can no longer make a section green over an executable
+        # HELD. Helper checks remain above as supplementary diagnostics.
+        by_family = collections.defaultdict(list)
+        for c in CASES:
+            fam = c["case"].split("-")[0]
+            fam = {"Q1a": "Q1a", "Q1b": "Q1b", "86": "86", "DEP": "DEP",
+                   "I1A": "I1A", "I1B": "I1B"}.get(fam, fam)
+            by_family[fam].append(c)
+        # Cases whose governed subject is a DECISION FUNCTION, not a shipped
+        # executable. Named explicitly so the exemption is visible, not assumed.
+        NON_CLI_SUBJECTS = {
+            "M2": "classify.lifecycle — a classification decision function",
+            "D14": "passa._eligible — the boundary predicate",
+            "SB": "passa scope derivation + the D382 executed derivation",
+            "PPOP": "stage_identity.classify_origin",
+            "STAGE_A": "stage_identity Stage-A construction",
+            "STDLIB": "stage_identity stdlib construction (D380 §7)",
+        }
+        for s in SECTIONS:
+            exec_cases = by_family.get(s, [])
+            if exec_cases:
+                heldc = [c for c in exec_cases if c["verdict"] == "HELD"]
+                failc = [c for c in exec_cases if c["verdict"] == "FAIL"]
+                passc = [c for c in exec_cases if c["verdict"] == "PASS"]
+                if failc:
+                    state = (f"FAIL (executable) — {len(failc)} of "
+                             f"{len(exec_cases)} cases")
+                elif heldc:
+                    state = (f"HELD (executable) — {len(passc)} PASS, "
+                             f"{len(heldc)} HELD of {len(exec_cases)}: "
+                             + ", ".join(c["case"] for c in heldc[:6]))
+                else:
+                    state = f"IMPLEMENTED (executable) — {len(passc)}/{len(passc)}"
+                ok = not failc and not heldc
+            elif s in NON_CLI_SUBJECTS:
+                ok = s in IMPLEMENTED
+                state = (("IMPLEMENTED" if ok else "HELD")
+                         + f" — subject is {NON_CLI_SUBJECTS[s]}, not a CLI")
+                if not ok:
+                    state += f"; {HELD.get(s, '')}"
+            else:
+                ok = False
+                state = "NOT_IMPLEMENTED — no executable-bound case ran"
+            print(f"  {s:<10} {state}")
+            if not ok:
+                check(f"section {s} is implemented and executed", False, state)
+        print()
+        print("=" * 70)
+        print(f"{PASSED} passed, {FAILED} failed")
+        for f in FAILURES:
+            print(f"  FAIL {f}")
+        print("EXIT GATE:", "PASS" if FAILED == 0 else "FAIL")
+        print("=" * 70)
+        return 1 if FAILED else 0
+    
+    ----- kai-pm/house_in_order_h2_v13/build_evidence/d379_controls.py (repair HEAD d0c08a4, lines 3958-3972) -----
+    
+    if __name__ == "__main__":
+        if "--capture" in sys.argv:
+            sys.exit(capture(sys.argv[sys.argv.index("--capture") + 1]))
+        _rc = main()
+        # ONE MEASUREMENT TRUTH SOURCE. The child dumps the EXACT result state
+        # it just produced; the parent renders BOTH human records from that one
+        # object. Nothing downstream re-counts, re-reads or re-types a figure.
+        if "--state" in sys.argv:
+            pathlib.Path(sys.argv[sys.argv.index("--state") + 1]).write_text(
+                json.dumps({"rc": _rc, "passed": PASSED, "failed": FAILED,
+                            "failures": FAILURES, "cases": CASES,
+                            "sections": SECTIONS, "implemented":
+                            sorted(IMPLEMENTED), "held": HELD}, indent=1))
+        sys.exit(_rc)
+    
+    
+    ## 4. DELTA A (base = classify.py at d0c08a4)
+    
+    --- a/kai-pm/house_in_order_h2_v13/classify.py
+    +++ b/kai-pm/house_in_order_h2_v13/classify.py
+    @@ -369,10 +369,24 @@
+         # objective witness: size and path role. This is the ONLY family that
+         # earns FUNCTION at H2 -- it does not consult self-description.
+         if row["bytes"] < 200 and path.endswith("README.md"):
+    +        # KAI-B4-AW-01: the determining evidence is FILE METADATA, not
+    +        # source text. v1.2 carried selector "L1" and the title as context,
+    +        # so the measurement was in neither. The witness is now one
+    +        # canonical token naming the governed Pass-A field, its exact value,
+    +        # its unit and a terminator, so no other LEGITIMATE canonical token
+    +        # is a substring of it; the path is carried by source_path alone, so
+    +        # no path or prose is in the context.
+    +        # This is NOT an authenticity check. The generic _compliant() is a
+    +        # substring test and still accepts, for example, a forged bare "11"
+    +        # against "passa.bytes=114 bytes;", or a value and context forged
+    +        # together. Semantic authenticity is checked independently by the
+    +        # governed AW-01 control in build_evidence/d379_controls.py. The
+    +        # predicate is unchanged; the title plays no part.
+    +        token = f"passa.bytes={row['bytes']} bytes;"
+             w = Witness(witness_type="SIZE_AND_ROLE",
+    -                    witness_value=f"{row['bytes']} bytes",
+    -                    source_path=path, source_selector="L1",
+    -                    local_context=title[:120] or "(no title)",
+    +                    witness_value=token,
+    +                    source_path=path, source_selector="META:passa.bytes",
+    +                    local_context=token,
+                         applicability_scope="WHOLE_FILE",
+                         # the byte count and path role OF THIS FILE
+                         subject=E.SUBJECT_SELF,
+    
+    ## 5. DELTA B (base = build_evidence/d379_controls.py at d0c08a4)
+    
+    --- a/kai-pm/house_in_order_h2_v13/build_evidence/d379_controls.py
+    +++ b/kai-pm/house_in_order_h2_v13/build_evidence/d379_controls.py
+    @@ -36,8 +36,8 @@
+     # Sections of the D379 hostile matrix. Implemented sections run; the rest
+     # fail as NOT_IMPLEMENTED so this file can never report a green tranche.
+     SECTIONS = ["M2", "D14", "PPOP", "Q1a", "Q1b", "86", "SB", "I1A",
+    -            "I1B", "DEP", "STAGE_A", "STDLIB"]
+    -IMPLEMENTED = {"M2", "SB", "D14", "I1A", "I1B", "PPOP", "86", "Q1b"}
+    +            "I1B", "DEP", "STAGE_A", "STDLIB", "AW01"]
+    +IMPLEMENTED = {"M2", "SB", "D14", "I1A", "I1B", "PPOP", "86", "Q1b", "AW01"}
+     # HELD is NOT an excuse and does NOT make the gate green. These
+     # sections are implemented except for a limb that cannot execute
+     # on a KNOWN-NEGATIVE interpreter (INC-34 / D385). They still FAIL
+    @@ -2477,6 +2477,7 @@
+         section_86()
+         section_Q1a()
+         section_Q1b()
+    +    section_AW01()
+         section_STDLIB()
+         exec_bound_cases()
+     
+    @@ -2502,6 +2503,8 @@
+             "PPOP": "stage_identity.classify_origin",
+             "STAGE_A": "stage_identity Stage-A construction",
+             "STDLIB": "stage_identity stdlib construction (D380 §7)",
+    +        "AW01": "d379_controls.aw01_check — the MARKER witness semantic "
+    +                "control (KAI-B4-AW-01)",
+         }
+         for s in SECTIONS:
+             exec_cases = by_family.get(s, [])
+    @@ -3410,6 +3413,248 @@
+         print()
+     
+     
+    +# ── AW01 — KAI-B4-AW-01: the objective MARKER witness, STANDING control ──
+    +# The qualifier's _compliant() is a STRUCTURAL trace check: value-in-context
+    +# by substring. It is not, and is not made into, an authenticity verifier:
+    +# it accepts a forged bare "11" against "passa.bytes=114 bytes;", and a value
+    +# and context forged together. This control is the SEMANTIC check for the
+    +# FUNCTION=MARKER witness, run against the BOUND Pass-A rows.
+    +#
+    +# INDEPENDENCE FROM THE PRODUCER. Nothing below calls classify.py to decide
+    +# what is expected. The predicate and the token grammar are re-derived here
+    +# from the banked rule (row bytes < 200 and path ends "README.md";
+    +# "passa.bytes=<N> bytes;"). classify.function appears only in the
+    +# calibration, as the SUBJECT that produced the witnesses being judged.
+    +#
+    +# EVIDENCE CLASS: a standing, calibrated, can-fail PRODUCER control with
+    +# ZERO admission weight. It does not make Orion's evidence independent, and
+    +# it does not replace the final holdout adjudication.
+    +import re as _re
+    +AW01_TOKEN = _re.compile(r"passa\.bytes=(0|[1-9][0-9]*) bytes;")
+    +AW01_FIXED = (("witness_type", "SIZE_AND_ROLE"),
+    +              ("source_selector", "META:passa.bytes"),
+    +              ("applicability_scope", "WHOLE_FILE"),
+    +              ("subject", "SELF"), ("polarity", "POSITIVE"),
+    +              ("certainty", "VERIFIED"), ("temporal", "AT_COMMIT"))
+    +
+    +
+    +def _aw01_is_int(x):
+    +    return type(x) is int                 # bool is not a byte count
+    +
+    +
+    +def aw01_check(passa_rows, result_rows, git_size=None):
+    +    """Findings (list of (rule, path, detail)) and counts for the MARKER
+    +    witness population. [] means every requirement held.
+    +
+    +    git_size: None, or a callable path -> int giving the git blob size at
+    +    the frozen subject. Use it ONLY for a subject whose whole relevant
+    +    population is established strict UTF-8 (D379 entry 52); Pass-A bytes
+    +    are the UTF-8 length of the verified decoded text, not git size in
+    +    general.
+    +    """
+    +    findings = []
+    +    pa, dup = {}, []
+    +    for r in passa_rows:
+    +        (dup.append(r.get("path")) if r.get("path") in pa
+    +         else pa.__setitem__(r.get("path"), r))
+    +    res, rdup = {}, []
+    +    for r in result_rows:
+    +        (rdup.append(r.get("path")) if r.get("path") in res
+    +         else res.__setitem__(r.get("path"), r))
+    +    for p in dup:
+    +        findings.append(("AW01_PASSA_DUPLICATE_ROW", p, "Pass-A row repeated"))
+    +    for p in rdup:
+    +        findings.append(("AW01_RESULT_DUPLICATE_ROW", p, "result row repeated"))
+    +    if set(pa) != set(res):
+    +        for p in sorted(set(pa) - set(res), key=str):
+    +            findings.append(("AW01_ROW_POPULATION", p, "Pass-A row absent "
+    +                             "from the classification result"))
+    +        for p in sorted(set(res) - set(pa), key=str):
+    +            findings.append(("AW01_ROW_POPULATION", p, "classification row "
+    +                             "absent from the bound Pass A"))
+    +    # EXPECTED from the bound Pass A, by the re-derived predicate.
+    +    expected = sorted(p for p, r in pa.items()
+    +                      if isinstance(p, str) and _aw01_is_int(r.get("bytes"))
+    +                      and r["bytes"] < 200 and p.endswith("README.md"))
+    +    emitted = sorted(p for p, r in res.items()
+    +                     if ((r.get("FUNCTION") or {}).get("value")) == "MARKER")
+    +    counts = {"passa_rows": len(pa), "result_rows": len(res),
+    +              "expected_marker": len(expected),
+    +              "emitted_marker": len(emitted), "witnesses_checked": 0}
+    +    if expected != emitted:
+    +        for p in sorted(set(expected) - set(emitted), key=str):
+    +            findings.append(("AW01_MARKER_MISSING", p, "Pass-A predicate "
+    +                             "earns MARKER; the result does not emit it"))
+    +        for p in sorted(set(emitted) - set(expected), key=str):
+    +            findings.append(("AW01_MARKER_EXTRA", p, "the result emits MARKER; "
+    +                             "the Pass-A predicate does not earn it"))
+    +        return findings, counts          # population first (Kai, AW-01)
+    +    for p in emitted:
+    +        row, w = pa[p], (res[p].get("FUNCTION") or {}).get("witness")
+    +        counts["witnesses_checked"] += 1
+    +        if not isinstance(w, dict):
+    +            findings.append(("AW01_WITNESS_ABSENT", p, repr(w)[:40]))
+    +            continue
+    +        v = w.get("witness_value")
+    +        m = AW01_TOKEN.fullmatch(v) if isinstance(v, str) else None
+    +        if not m:
+    +            findings.append(("AW01_TOKEN_GRAMMAR", p, repr(v)[:60]))
+    +        n = int(m.group(1)) if m else None
+    +        if n is not None and n != row["bytes"]:
+    +            findings.append(("AW01_N_NOT_PASSA_BYTES", p,
+    +                             f"token N={n}, bound Pass-A bytes={row['bytes']}"))
+    +        if n is not None and not n < 200:
+    +            findings.append(("AW01_N_NOT_BELOW_200", p, str(n)))
+    +        if w.get("local_context") != v:
+    +            findings.append(("AW01_CONTEXT_NOT_TOKEN", p,
+    +                             repr(w.get("local_context"))[:60]))
+    +        if w.get("source_path") != p:
+    +            findings.append(("AW01_SOURCE_PATH", p,
+    +                             repr(w.get("source_path"))[:60]))
+    +        if not str(w.get("source_path", "")).endswith("README.md"):
+    +            findings.append(("AW01_PATH_ROLE", p, repr(w.get("source_path"))))
+    +        for k, want in AW01_FIXED:
+    +            if w.get(k) != want:
+    +                findings.append(("AW01_FIELD", p, f"{k}={w.get(k)!r}, "
+    +                                 f"required {want!r}"))
+    +        for k in ("evidence_total", "evidence_shown"):
+    +            if not (_aw01_is_int(w.get(k)) and w.get(k) == 1):
+    +                findings.append(("AW01_FIELD", p, f"{k}={w.get(k)!r}, "
+    +                                 f"required 1"))
+    +        if w.get("truncated") is not False:
+    +            findings.append(("AW01_FIELD", p, f"truncated="
+    +                             f"{w.get('truncated')!r}, required False"))
+    +        if git_size is not None and n is not None:
+    +            g = git_size(p)
+    +            if g != n:
+    +                findings.append(("AW01_N_NOT_GIT_SIZE", p,
+    +                                 f"token N={n}, git blob size={g}"))
+    +    return findings, counts
+    +
+    +
+    +def section_AW01():
+    +    print("AW01 — KAI-B4-AW-01 MARKER witness, standing semantic control")
+    +    print("  Calibration on synthetic Pass-A rows. The witnesses judged are")
+    +    print("  PRODUCED by classify.function (the subject); the expected answer")
+    +    print("  is re-derived here, never taken from classify.py.\n")
+    +    import copy
+    +    import run_h2_v12 as R
+    +
+    +    rows = [{"path": "a/README.md", "bytes": 114}, {"path": "b/README.md",
+    +            "bytes": 199}, {"path": "README.md", "bytes": 0},
+    +            {"path": "c/README.md", "bytes": 200},
+    +            {"path": "d/NOTES.md", "bytes": 150},
+    +            {"path": "e/README.md.bak", "bytes": 150}]
+    +
+    +    def produced(rs):
+    +        return [{"path": r["path"],
+    +                 "FUNCTION": classify.function(dict(r, title=""), "")}
+    +                for r in rs]
+    +    clean = produced(rows)
+    +    f0, c0 = aw01_check(rows, clean)
+    +    check("AW01-1 known-negative: the producer's witnesses on clean rows "
+    +          "PASS (199-byte README and 0-byte README earn MARKER; 200-byte "
+    +          "README, sub-200 non-README and README.md.bak do not)",
+    +          not f0 and c0["expected_marker"] == c0["emitted_marker"] == 3,
+    +          (f0[:3], c0))
+    +    git = {"a/README.md": 114, "b/README.md": 199, "README.md": 0}
+    +    f0g, _ = aw01_check(rows, clean, git_size=git.get)
+    +    check("AW01-2 known-negative with git-size corroboration PASSES",
+    +          not f0g, f0g[:3])
+    +
+    +    def mutate(path, **kw):
+    +        m = copy.deepcopy(clean)
+    +        cell = next(r for r in m if r["path"] == path)["FUNCTION"]
+    +        if kw.pop("_drop", False):
+    +            cell["witness"] = None
+    +        else:
+    +            cell["witness"].update(kw)
+    +        return m
+    +    T = "passa.bytes={} bytes;".format
+    +    cases = [
+    +        ("bare '11' vs genuine 114", mutate("a/README.md", witness_value="11")),
+    +        ("bare '4' vs genuine 114", mutate("a/README.md", witness_value="4")),
+    +        ("bare '14' vs genuine 114", mutate("a/README.md", witness_value="14")),
+    +        ("coordinated wrong canonical token in value AND context",
+    +         mutate("a/README.md", witness_value=T(115), local_context=T(115))),
+    +        ("wrong selector", mutate("a/README.md", source_selector="L1")),
+    +        ("wrong source path", mutate("a/README.md", source_path="b/README.md")),
+    +        ("wrong witness type", mutate("a/README.md", witness_type="DATE_STAMP")),
+    +        ("wrong scope", mutate("a/README.md", applicability_scope="SPAN")),
+    +        ("wrong subject", mutate("a/README.md", subject="OTHER:x")),
+    +        ("wrong polarity", mutate("a/README.md", polarity="NEUTRAL")),
+    +        ("wrong certainty", mutate("a/README.md", certainty="OBSERVED")),
+    +        ("wrong temporal", mutate("a/README.md", temporal="NEUTRAL")),
+    +        ("wrong evidence_total", mutate("a/README.md", evidence_total=999)),
+    +        ("wrong evidence_shown", mutate("a/README.md", evidence_shown=0)),
+    +        ("truncated True", mutate("a/README.md", truncated=True)),
+    +        ("evidence_total True (bool, not 1)",
+    +         mutate("a/README.md", evidence_total=True)),
+    +        ("missing witness", mutate("a/README.md", _drop=True)),
+    +    ]
+    +    for label, m in cases:
+    +        f, _ = aw01_check(rows, m)
+    +        w = next(r for r in m if r["path"] == "a/README.md")["FUNCTION"]["witness"]
+    +        struct = R._compliant(w)
+    +        check(f"AW01-M {label} -> the AW control FAILS (generic _compliant "
+    +              f"returns {struct})", bool(f), f"no finding; _compliant={struct}")
+    +    # population: missing and extra MARKER rows, boundaries
+    +    miss = copy.deepcopy(clean)
+    +    next(r for r in miss if r["path"] == "a/README.md")["FUNCTION"] = {
+    +        "value": "UNKNOWN"}
+    +    fm, _ = aw01_check(rows, miss)
+    +    check("AW01-P1 a MARKER the Pass-A predicate earns is MISSING -> FAIL",
+    +          any(x[0] == "AW01_MARKER_MISSING" for x in fm), fm[:3])
+    +    for p, why in (("c/README.md", "200-byte README (boundary)"),
+    +                   ("d/NOTES.md", "sub-200 non-README"),
+    +                   ("e/README.md.bak", "README.md.bak")):
+    +        ex = copy.deepcopy(clean)
+    +        cell = next(r for r in ex if r["path"] == p)
+    +        cell["FUNCTION"] = copy.deepcopy(
+    +            next(r for r in clean if r["path"] == "a/README.md")["FUNCTION"])
+    +        cell["FUNCTION"]["witness"]["source_path"] = p
+    +        fe, _ = aw01_check(rows, ex)
+    +        check(f"AW01-P2 an EXTRA MARKER on the {why} -> FAIL",
+    +              any(x[0] == "AW01_MARKER_EXTRA" and x[1] == p for x in fe),
+    +              fe[:3])
+    +    fr, _ = aw01_check(rows + [{"path": "z/README.md", "bytes": 5}], clean)
+    +    check("AW01-P3 a Pass-A row absent from the result -> FAIL",
+    +          any(x[0] == "AW01_ROW_POPULATION" for x in fr), fr[:3])
+    +    fg, _ = aw01_check(rows, clean, git_size=dict(git, **{"a/README.md": 115}).get)
+    +    check("AW01-G git blob size disagreeing with the token -> FAIL",
+    +          any(x[0] == "AW01_N_NOT_GIT_SIZE" for x in fg), fg[:3])
+    +    print()
+    +
+    +
+    +def aw01_candidate(result_path, passa_path, subject_repo=None):
+    +    """Standing application to a REAL candidate: the bound Pass-A artefact
+    +    and the classification result it produced. Exit 0 iff no finding."""
+    +    import subprocess
+    +    res = json.loads(pathlib.Path(result_path).read_bytes())
+    +    pa = json.loads(pathlib.Path(passa_path).read_bytes())
+    +    git_size = None
+    +    if subject_repo:
+    +        subj = pa["subject"]
+    +
+    +        def git_size(p):
+    +            out = subprocess.run(["git", "-C", subject_repo, "cat-file", "-s",
+    +                                  f"{subj}:{p}"], capture_output=True,
+    +                                 text=True)
+    +            return int(out.stdout) if out.returncode == 0 else None
+    +    findings, counts = aw01_check(pa["rows"], res["rows"], git_size=git_size)
+    +    print("AW01 CANDIDATE — MARKER witness semantic control")
+    +    print(f"  subject {pa['subject'][:12]}  result subject "
+    +          f"{res.get('subject', '')[:12]}")
+    +    print(f"  {counts}")
+    +    for x in findings:
+    +        print(f"  {x[0]}::{x[1]} — {x[2]}")
+    +    print(f"  AW01 FINDINGS: {len(findings)}")
+    +    if res.get("subject") != pa.get("subject"):
+    +        print("  AW01 REFUSE: result subject != Pass-A subject")
+    +        return 2
+    +    return 1 if findings else 0
+    +
+    +
+     # ── STDLIB — D385: known-negative present, positive HELD ──────────────
+     def section_STDLIB():
+         print("STDLIB — governed Python runtime identity (D380 §7, D385)")
+    @@ -3957,6 +4202,12 @@
+     
+     
+     if __name__ == "__main__":
+    +    if "--aw01-candidate" in sys.argv:
+    +        _i = sys.argv.index("--aw01-candidate")
+    +        sys.exit(aw01_candidate(
+    +            sys.argv[_i + 1], sys.argv[_i + 2],
+    +            sys.argv[sys.argv.index("--aw01-subject-repo") + 1]
+    +            if "--aw01-subject-repo" in sys.argv else None))
+         if "--capture" in sys.argv:
+             sys.exit(capture(sys.argv[sys.argv.index("--capture") + 1]))
+         _rc = main()
+    
+    ## 6. Evidence (producer measurement; qualified interpreter -B -E -s)
+    
+    Real frozen subject d8aac4d4 (tree 3abc9e9d, 272 documents), full-history scratch clones, each run with its own Stage A,
+    fresh Pass A, Pass-A binding, classification, classification binding and qualifier. OLD = d0c08a4.
+    
+        delta A                AST of the corrected classify.py == AST of v2 (15 changed lines vs v2, all comments).
+        regression (closure)   qualifier OLD rc 1 FINDINGS 5 (AXIS_WITNESS) -> closure rc 0 FINDINGS 0; line diff: only the
+                               rc/size header, the Stage-A identity line and those five findings. MARKER population identical
+                               (5 paths); 0 axis-value differences over 272 x 6; whole-cell differences only those five
+                               FUNCTION cells, only witness_value / source_selector / local_context; 0 rows with any of the
+                               10 evidence facts, traces, abstentions or other keys changed. The closure run's 272 rows are
+                               identical to the v2 run's (only producer_provenance differs).
+        section_AW01           25/25: clean known-negative passes (199-byte and 0-byte README earn MARKER; 200-byte README,
+                               sub-200 NOTES.md and README.md.bak do not); git-size known-negative passes; 17 witness
+                               mutations each FAIL the control (bare '11','4','14'; coordinated T(115); wrong selector,
+                               source path, type, scope, subject, polarity, certainty, temporal; evidence_total 999 and True;
+                               evidence_shown 0; truncated True; missing witness) while generic _compliant returns True for
+                               16 of them; missing MARKER, extra MARKER on the 200-byte README / NOTES.md / README.md.bak,
+                               a Pass-A row absent from the result, and a git-size mismatch each FAIL.
+        reason per mutation    each mutation trips its own rule: bare values -> TOKEN_GRAMMAR (+ CONTEXT_NOT_TOKEN);
+                               coordinated -> N_NOT_PASSA_BYTES; each field mutation -> AW01_FIELD naming that field.
+        independence (static)  names referenced inside aw01_check include none of classify, run_h2_v12, R, _compliant,
+                               function.
+        real candidates        --aw01-candidate with git corroboration: d0c08a4 run -> exit 1, 15 findings (TOKEN_GRAMMAR,
+                               CONTEXT_NOT_TOKEN, FIELD selector, x5); closure run -> exit 0, 0 findings (expected 5 ==
+                               emitted 5, 5 witnesses checked); v2 run -> exit 0; real-qualifier-ACCEPTED forgeries:
+                               coordinated tamper -> exit 1, 10 findings (N_NOT_PASSA_BYTES, N_NOT_GIT_SIZE, x5); bare-number
+                               substring -> exit 1, 10 findings (TOKEN_GRAMMAR, CONTEXT_NOT_TOKEN, x5); empty selector ->
+                               exit 1, 5 findings.
+    
+    Limits stated: git-size corroboration is used only because this subject's whole relevant population is measured strict
+    UTF-8 (Pass-A bytes are the UTF-8 length of the verified decoded text, not git size in general). This control is producer
+    evidence with zero admission weight; it does not make the evidence independent and does not replace the final holdout.
+    
+    ## 7. Attack these
+    
+      Q1  Can any witness that is NOT a faithful description of the bound Pass-A row pass aw01_check?
+      Q2  Is the population-first rule (EXPECTED == EMITTED before any witness check) sound, including duplicates and rows
+          present on one side only?
+      Q3  Is aw01_check genuinely independent of the producer (no shared helper, no shared constant that encodes the answer)?
+      Q4  Does delta B change any existing section's behaviour or the exit gate other than adding section AW01 to the
+          registry, the main sequence and the NON_CLI roll-up?
+      Q5  Does the corrected comment in delta A now state the property exactly, neither more nor less?
+      Q6  Is the --aw01-candidate CLI mode safe (argument handling, subject mismatch refusal, git failure -> None)?
+    
+    ## 8. Out of scope
+    
+    The MARKER predicate; run_h2_v12.py; qualify.py; envelope.py; the rest of the d379 matrix; the accepted commit d0c08a4.
+    
+    END OF PACKET AW-01 CLOSURE — D379 MARKER WITNESS
+    END-VERBATIM AWC-DEEPSEEK-PACKET-AW01-CLOSURE-MD
+- EVIDENCE AWC-DEEPSEEK-COVER-AW01-CLOSURE-TXT aw01c_b64/DEEPSEEK_COVER_AW01_CLOSURE.txt: 1614 bytes, sha256 62da7e56b9064fb9c6fa030f60e2a4990c8b412b33fe532f6997f82ebda72392, final LF True  [CMD `sha256sum DEEPSEEK_COVER_AW01_CLOSURE.txt` → 62da7e56b9064fb9…]
+    BEGIN-VERBATIM AWC-DEEPSEEK-COVER-AW01-CLOSURE-TXT
+    To: DeepSeek (adversarial reviewer)
+    From: Orion, for Kai (adjudicator) and Dainius (operator)
+    Subject: D379 B4 KAI-B4-AW-01 objective MARKER witness repair, CLOSURE packet, final narrow adversarial review of two deltas
+    
+    This message is complete on its own. You have no repository access and no prior context; rely ONLY on the packet
+    below. Your findings carry zero admission weight: Kai reconciles every one against the repository.
+    
+    The packet is a Markdown document of 38826 bytes, sent inline as 6 base64 blocks.
+    Packet SHA-256 (the subject you must reconstruct):
+    8acd00cbdeaa64c01a448a6c5533b662d5969eee9390a6408f187723142c2007
+    
+    Protocol:
+    1. For each block, remove all whitespace from the base64 text and check its stated hash.
+    2. Decode it; check the stated decoded length and decoded hash.
+    3. Concatenate the decoded chunks strictly in order 1 to 6; check the packet hash above.
+    4. Read ONLY the decoded packet, then reply FIRST with the receipt in its section 0: copy the packet hash given
+       above on the PACKET HASH line, and copy both sentinels exactly from the DECODED delta. If you cannot compute
+       SHA-256, say so, but still copy the given hash. If you cannot reproduce both sentinels exactly, reply NO REVIEW.
+    5. Only after the receipt, review BOTH deltas (A and B) as the packet's section 7 suggests. Give each finding an ID
+       (DS-AW01-C-nn), a severity (BLOCKER / MAJOR / MINOR / QUESTION), the exact delta or excerpt lines copied from
+       the decoded packet, a concrete failing input where possible, and a remedy. If you find nothing, say so
+       explicitly. A PASS is not implementation authority.
+    END-VERBATIM AWC-DEEPSEEK-COVER-AW01-CLOSURE-TXT
+- EVIDENCE AWC-GEN-AW01C-PACKET-PY gen_aw01c_packet.py: 9448 bytes, sha256 ee665951f9248c92ea45cd101afbdb06a1f190ac8e9f8cbe143192be9eb82375, final LF True  [CMD `sha256sum gen_aw01c_packet.py` → ee665951f9248c92…]
+    BEGIN-VERBATIM AWC-GEN-AW01C-PACKET-PY
+    import hashlib, pathlib
+    S = pathlib.Path("/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/twofact"); I = S / "impl"
+    h = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+    H = "kai-pm/house_in_order_h2_v13"
+    dA = (S / "aw01c.classify.diff").read_text(); dB = (S / "aw01c.controls.diff").read_text()
+    exc = (S / "aw01_excerpts.txt").read_text(); exc2 = (S / "aw01c_controls_excerpts.txt").read_text()
+    P = f"""# D379 B4 — KAI-B4-AW-01 CLOSURE: ADVERSARIAL-REVIEW PACKET (A: comment-corrected producer, B: standing AW control)
+    
+    Producer: Orion. Date: 2026-10-04. Evidence class: PRODUCER MEASUREMENT, ZERO ADMISSION WEIGHT.
+    Status: PROPOSAL ONLY, scratch. Neither file is modified anywhere. The repair branch is at d0c08a4 (accepted).
+    
+    YOU HAVE NO REPOSITORY ACCESS AND NO PRIOR CONTEXT. Rely only on this packet. Source excerpts in section 3 are cut
+    mechanically from the repository at commit d0c08a4; nothing is paraphrased.
+    
+    ## 0. RECEIPT — reply with these lines FIRST, each copied exactly
+    
+        PACKET HASH: <sha256 of this decoded packet, as given by the sender>
+        BASE d379_controls.py SHA-256: <from section 1>
+        FIRST HUNK OF DELTA B: <the first line beginning with @@ in section 5>
+        SENTINEL A: <the added line in delta A that begins with "# This is NOT an authenticity check.">
+        SENTINEL B: <the added line in delta B that assigns AW01_TOKEN>
+        END OF PACKET SEEN: YES
+    
+    If either sentinel cannot be reproduced exactly, reply NO REVIEW. The last line of this file is
+    "END OF PACKET AW-01 CLOSURE — D379 MARKER WITNESS".
+    
+    ## 1. Identities
+    
+        BASE      classify.py at d0c08a4                   sha256 {h(S / "inst5" / H / "classify.py")}
+        BASE      build_evidence/d379_controls.py at d0c08a4 sha256 {h(S / "base_d379_controls.py")}
+        DELTA A   classify.py (section 4)                  sha256 {h(S / "aw01c.classify.diff")}
+        DELTA B   d379_controls.py (section 5)             sha256 {h(S / "aw01c.controls.diff")}
+        PROPOSED  classify.py                              sha256 {h(S / "instAW3" / H / "classify.py")}
+        PROPOSED  d379_controls.py                         sha256 {h(S / "instAW3" / H / "build_evidence/d379_controls.py")}
+    
+    ## 2. Background and the adjudicator's rulings this packet implements
+    
+    classify.function() earns FUNCTION=MARKER when `row["bytes"] < 200 and path.endswith("README.md")`. Its witness at
+    d0c08a4 (selector "L1", value "<N> bytes", context = title or "(no title)") is rejected by the qualifier on all five
+    frozen-subject rows (AXIS_WITNESS). The adjudicator (Kai) accepted, in principle, a replacement runtime witness (v2):
+    witness_value = local_context = "passa.bytes=<N> bytes;", source_selector "META:passa.bytes", path only in source_path.
+    
+    A previous review of v2 established, and the producer had measured, that the qualifier's run_h2_v12._compliant() (a
+    SUBSTRING value-in-context test, section 3) still accepts two forgeries of that witness: a bare number that is a
+    substring of the token ("11" against "passa.bytes=114 bytes;"), and value and context forged together to the same
+    wrong token. Kai ruled: _compliant() and qualify.py stay unchanged (they are structural trace checks, not authenticity
+    verifiers); semantic authenticity must become a STANDING, GOVERNED, can-fail control; and the v2 source comment, which
+    claimed "no other byte count ... can be a substring", overstates the property and must be corrected (KAI-AW01-V2-08).
+    
+    DELTA A: classify.py = v2 runtime, byte-for-byte identical executable statements (proved by AST equality with v2);
+    only the comment changes, to state the real boundary.
+    DELTA B: build_evidence/d379_controls.py gains aw01_check() (pure decision function over the bound Pass-A rows and the
+    classification result), section_AW01() (calibration, registered as section "AW01"), and a CLI mode
+    `--aw01-candidate RESULT PASSA [--aw01-subject-repo REPO]` for a real candidate. aw01_check re-derives the predicate
+    and the token grammar itself and calls nothing in classify.py; it derives EXPECTED_MARKER from Pass A and
+    EMITTED_MARKER from the result and requires equality before inspecting any witness; then it validates every field.
+    
+    ## 3. Source excerpts (verbatim, from d0c08a4)
+    
+    {exc}{exc2}
+    ## 4. DELTA A (base = classify.py at d0c08a4)
+    
+    {dA}
+    ## 5. DELTA B (base = build_evidence/d379_controls.py at d0c08a4)
+    
+    {dB}
+    ## 6. Evidence (producer measurement; qualified interpreter -B -E -s)
+    
+    Real frozen subject d8aac4d4 (tree 3abc9e9d, 272 documents), full-history scratch clones, each run with its own Stage A,
+    fresh Pass A, Pass-A binding, classification, classification binding and qualifier. OLD = d0c08a4.
+    
+        delta A                AST of the corrected classify.py == AST of v2 (15 changed lines vs v2, all comments).
+        regression (closure)   qualifier OLD rc 1 FINDINGS 5 (AXIS_WITNESS) -> closure rc 0 FINDINGS 0; line diff: only the
+                               rc/size header, the Stage-A identity line and those five findings. MARKER population identical
+                               (5 paths); 0 axis-value differences over 272 x 6; whole-cell differences only those five
+                               FUNCTION cells, only witness_value / source_selector / local_context; 0 rows with any of the
+                               10 evidence facts, traces, abstentions or other keys changed. The closure run's 272 rows are
+                               identical to the v2 run's (only producer_provenance differs).
+        section_AW01           25/25: clean known-negative passes (199-byte and 0-byte README earn MARKER; 200-byte README,
+                               sub-200 NOTES.md and README.md.bak do not); git-size known-negative passes; 17 witness
+                               mutations each FAIL the control (bare '11','4','14'; coordinated T(115); wrong selector,
+                               source path, type, scope, subject, polarity, certainty, temporal; evidence_total 999 and True;
+                               evidence_shown 0; truncated True; missing witness) while generic _compliant returns True for
+                               16 of them; missing MARKER, extra MARKER on the 200-byte README / NOTES.md / README.md.bak,
+                               a Pass-A row absent from the result, and a git-size mismatch each FAIL.
+        reason per mutation    each mutation trips its own rule: bare values -> TOKEN_GRAMMAR (+ CONTEXT_NOT_TOKEN);
+                               coordinated -> N_NOT_PASSA_BYTES; each field mutation -> AW01_FIELD naming that field.
+        independence (static)  names referenced inside aw01_check include none of classify, run_h2_v12, R, _compliant,
+                               function.
+        real candidates        --aw01-candidate with git corroboration: d0c08a4 run -> exit 1, 15 findings (TOKEN_GRAMMAR,
+                               CONTEXT_NOT_TOKEN, FIELD selector, x5); closure run -> exit 0, 0 findings (expected 5 ==
+                               emitted 5, 5 witnesses checked); v2 run -> exit 0; real-qualifier-ACCEPTED forgeries:
+                               coordinated tamper -> exit 1, 10 findings (N_NOT_PASSA_BYTES, N_NOT_GIT_SIZE, x5); bare-number
+                               substring -> exit 1, 10 findings (TOKEN_GRAMMAR, CONTEXT_NOT_TOKEN, x5); empty selector ->
+                               exit 1, 5 findings.
+    
+    Limits stated: git-size corroboration is used only because this subject's whole relevant population is measured strict
+    UTF-8 (Pass-A bytes are the UTF-8 length of the verified decoded text, not git size in general). This control is producer
+    evidence with zero admission weight; it does not make the evidence independent and does not replace the final holdout.
+    
+    ## 7. Attack these
+    
+      Q1  Can any witness that is NOT a faithful description of the bound Pass-A row pass aw01_check?
+      Q2  Is the population-first rule (EXPECTED == EMITTED before any witness check) sound, including duplicates and rows
+          present on one side only?
+      Q3  Is aw01_check genuinely independent of the producer (no shared helper, no shared constant that encodes the answer)?
+      Q4  Does delta B change any existing section's behaviour or the exit gate other than adding section AW01 to the
+          registry, the main sequence and the NON_CLI roll-up?
+      Q5  Does the corrected comment in delta A now state the property exactly, neither more nor less?
+      Q6  Is the --aw01-candidate CLI mode safe (argument handling, subject mismatch refusal, git failure -> None)?
+    
+    ## 8. Out of scope
+    
+    The MARKER predicate; run_h2_v12.py; qualify.py; envelope.py; the rest of the d379 matrix; the accepted commit d0c08a4.
+    
+    END OF PACKET AW-01 CLOSURE — D379 MARKER WITNESS
+    """
+    (S / "DEEPSEEK_PACKET_AW01_CLOSURE.md").write_text(P)
+    a4 = "## 4. DELTA A (base = classify.py at d0c08a4)\n\n"; i = P.index(a4) + len(a4); eA = P[i:P.index("## 5. DELTA B", i)]
+    a5 = "## 5. DELTA B (base = build_evidence/d379_controls.py at d0c08a4)\n\n"; j = P.index(a5) + len(a5); eB = P[j:P.index("## 6. Evidence (producer", j)]
+    L = P.split("\n")
+    print("delta A exact:", eA == dA + "\n", "| delta B exact:", eB == dB + "\n", "| excerpts:", exc in P and exc2 in P,
+          "| sentinel A", sum(l == "+        # This is NOT an authenticity check. The generic _compliant() is a" for l in L),
+          "| sentinel B", sum(l == '+AW01_TOKEN = _re.compile(r"passa\\.bytes=(0|[1-9][0-9]*) bytes;")' for l in L),
+          "| first @@ of B", [l for l in eB.split("\n") if l.startswith("@@")][0], "|", len(P.encode()), hashlib.sha256(P.encode()).hexdigest())
+    END-VERBATIM AWC-GEN-AW01C-PACKET-PY
+- EVIDENCE AWC-GEN-AW01C-B64-PY gen_aw01c_b64.py: 3186 bytes, sha256 521c2819d686cb9bee1de78ce09ef09ecd46ef86c69ad8a1dddb695227169728, final LF True  [CMD `sha256sum gen_aw01c_b64.py` → 521c2819d686cb9b…]
+    BEGIN-VERBATIM AWC-GEN-AW01C-B64-PY
+    import base64, hashlib, pathlib, textwrap, re
+    S = pathlib.Path("/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/twofact")
+    O = S / "aw01c_b64"; O.mkdir(exist_ok=True)
+    pkt = (S / "DEEPSEEK_PACKET_AW01_CLOSURE.md").read_bytes(); H = hashlib.sha256(pkt).hexdigest()
+    n = 6; cuts = [0]
+    for k in range(1, n):
+        cuts.append(pkt.rfind(b"\n", 0, len(pkt) * k // n) + 1)
+    cuts.append(len(pkt)); chunks = [pkt[cuts[i]:cuts[i + 1]] for i in range(n)]
+    cover = f"""To: DeepSeek (adversarial reviewer)
+    From: Orion, for Kai (adjudicator) and Dainius (operator)
+    Subject: D379 B4 KAI-B4-AW-01 objective MARKER witness repair, CLOSURE packet, final narrow adversarial review of two deltas
+    
+    This message is complete on its own. You have no repository access and no prior context; rely ONLY on the packet
+    below. Your findings carry zero admission weight: Kai reconciles every one against the repository.
+    
+    The packet is a Markdown document of {len(pkt)} bytes, sent inline as {n} base64 blocks.
+    Packet SHA-256 (the subject you must reconstruct):
+    {H}
+    
+    Protocol:
+    1. For each block, remove all whitespace from the base64 text and check its stated hash.
+    2. Decode it; check the stated decoded length and decoded hash.
+    3. Concatenate the decoded chunks strictly in order 1 to {n}; check the packet hash above.
+    4. Read ONLY the decoded packet, then reply FIRST with the receipt in its section 0: copy the packet hash given
+       above on the PACKET HASH line, and copy both sentinels exactly from the DECODED delta. If you cannot compute
+       SHA-256, say so, but still copy the given hash. If you cannot reproduce both sentinels exactly, reply NO REVIEW.
+    5. Only after the receipt, review BOTH deltas (A and B) as the packet's section 7 suggests. Give each finding an ID
+       (DS-AW01-C-nn), a severity (BLOCKER / MAJOR / MINOR / QUESTION), the exact delta or excerpt lines copied from
+       the decoded packet, a concrete failing input where possible, and a remedy. If you find nothing, say so
+       explicitly. A PASS is not implementation authority.
+    """
+    assert "AW01_TOKEN" not in cover and "NOT an authenticity" not in cover and "SENTINEL" not in cover
+    parts = []
+    for i, c in enumerate(chunks, 1):
+        b64 = base64.b64encode(c).decode(); wrapped = "\n".join(textwrap.wrap(b64, 76))
+        block = (f"CHUNK {i}/{n}\noriginal decoded-byte length: {len(c)}\nSHA-256 of original decoded chunk: {hashlib.sha256(c).hexdigest()}\n"
+                 f"SHA-256 of transmitted base64 text (all whitespace removed): {hashlib.sha256(b64.encode()).hexdigest()}\nBEGIN BASE64\n{wrapped}\nEND BASE64\n")
+        (O / f"aw01c_b64_chunk_{i}_of_{n}.txt").write_text(block); parts.append(block)
+    (O / "DEEPSEEK_COVER_AW01_CLOSURE.txt").write_text(cover)
+    msg = cover + "\n" + "\n".join(parts); (O / "DEEPSEEK_MESSAGE_AW01_CLOSURE_BASE64_COMPLETE.txt").write_text(msg)
+    dec = b"".join(base64.b64decode(re.sub(r"\s", "", b), validate=True) for b in re.findall(r"BEGIN BASE64\n(.*?)\nEND BASE64", msg, re.S))
+    print("chunks", [len(c) for c in chunks], "| message round-trip == packet:", dec == pkt, "| packet", H)
+    for f in sorted(O.iterdir()): print(f.name, len(f.read_bytes()), hashlib.sha256(f.read_bytes()).hexdigest())
+    END-VERBATIM AWC-GEN-AW01C-B64-PY
+- EVIDENCE AWC-AW01-SECTION-RUN-PY impl/aw01_section_run.py: 600 bytes, sha256 ad1173f951ce3dbea81ab5856518b893f88392647dacc7cc6eb8b64def583190, final LF True  [CMD `sha256sum aw01_section_run.py` → ad1173f951ce3dbe…]
+    BEGIN-VERBATIM AWC-AW01-SECTION-RUN-PY
+    """Run ONLY d379_controls.section_AW01 (child, qualified interpreter). argv: <build_evidence dir>. Prints every check."""
+    import sys, importlib.util
+    spec = importlib.util.spec_from_file_location("d379_controls", sys.argv[1] + "/d379_controls.py")
+    C = importlib.util.module_from_spec(spec); spec.loader.exec_module(C)
+    orig = C.check
+    def loud(name, cond, detail=""):
+        print(f"  {'PASS' if cond else 'FAIL'}  {name}" + ("" if cond else f"   -> {detail}")); return orig(name, cond, detail)
+    C.check = loud
+    C.section_AW01()
+    print(f"{C.PASSED} passed, {C.FAILED} failed"); sys.exit(1 if C.FAILED else 0)
+    END-VERBATIM AWC-AW01-SECTION-RUN-PY
+- EVIDENCE AWC-AW01-SECTION-OUT-TXT impl/aw01_section_out.txt: 2518 bytes, sha256 2f44a8a618d0d0c27849f73855d85a00af394eddcafcdf0cd7a37e53ac0909a0, final LF True  [CMD `sha256sum aw01_section_out.txt` → 2f44a8a618d0d0c2…]
+    BEGIN-VERBATIM AWC-AW01-SECTION-OUT-TXT
+    AW01 — KAI-B4-AW-01 MARKER witness, standing semantic control
+      Calibration on synthetic Pass-A rows. The witnesses judged are
+      PRODUCED by classify.function (the subject); the expected answer
+      is re-derived here, never taken from classify.py.
+    
+      PASS  AW01-1 known-negative: the producer's witnesses on clean rows PASS (199-byte README and 0-byte README earn MARKER; 200-byte README, sub-200 non-README and README.md.bak do not)
+      PASS  AW01-2 known-negative with git-size corroboration PASSES
+      PASS  AW01-M bare '11' vs genuine 114 -> the AW control FAILS (generic _compliant returns True)
+      PASS  AW01-M bare '4' vs genuine 114 -> the AW control FAILS (generic _compliant returns True)
+      PASS  AW01-M bare '14' vs genuine 114 -> the AW control FAILS (generic _compliant returns True)
+      PASS  AW01-M coordinated wrong canonical token in value AND context -> the AW control FAILS (generic _compliant returns True)
+      PASS  AW01-M wrong selector -> the AW control FAILS (generic _compliant returns True)
+      PASS  AW01-M wrong source path -> the AW control FAILS (generic _compliant returns True)
+      PASS  AW01-M wrong witness type -> the AW control FAILS (generic _compliant returns True)
+      PASS  AW01-M wrong scope -> the AW control FAILS (generic _compliant returns True)
+      PASS  AW01-M wrong subject -> the AW control FAILS (generic _compliant returns True)
+      PASS  AW01-M wrong polarity -> the AW control FAILS (generic _compliant returns True)
+      PASS  AW01-M wrong certainty -> the AW control FAILS (generic _compliant returns True)
+      PASS  AW01-M wrong temporal -> the AW control FAILS (generic _compliant returns True)
+      PASS  AW01-M wrong evidence_total -> the AW control FAILS (generic _compliant returns True)
+      PASS  AW01-M wrong evidence_shown -> the AW control FAILS (generic _compliant returns True)
+      PASS  AW01-M truncated True -> the AW control FAILS (generic _compliant returns True)
+      PASS  AW01-M evidence_total True (bool, not 1) -> the AW control FAILS (generic _compliant returns True)
+      PASS  AW01-M missing witness -> the AW control FAILS (generic _compliant returns False)
+      PASS  AW01-P1 a MARKER the Pass-A predicate earns is MISSING -> FAIL
+      PASS  AW01-P2 an EXTRA MARKER on the 200-byte README (boundary) -> FAIL
+      PASS  AW01-P2 an EXTRA MARKER on the sub-200 non-README -> FAIL
+      PASS  AW01-P2 an EXTRA MARKER on the README.md.bak -> FAIL
+      PASS  AW01-P3 a Pass-A row absent from the result -> FAIL
+      PASS  AW01-G git blob size disagreeing with the token -> FAIL
+    
+    25 passed, 0 failed
+    END-VERBATIM AWC-AW01-SECTION-OUT-TXT
+- EVIDENCE AWC-AW01-REASON-PROBE-PY impl/aw01_reason_probe.py: 2079 bytes, sha256 8045de0a70864e31b3eaf62646bd9f9cc854b4236ab14c41360db3aa1d9542b0, final LF True  [CMD `sha256sum aw01_reason_probe.py` → 8045de0a70864e31…]
+    BEGIN-VERBATIM AWC-AW01-REASON-PROBE-PY
+    """Per-mutation finding rules from d379_controls.aw01_check, plus a static independence check (child, qualified interp).
+    argv: <build_evidence dir>"""
+    import sys, ast, copy, importlib.util
+    spec = importlib.util.spec_from_file_location("d379_controls", sys.argv[1] + "/d379_controls.py")
+    C = importlib.util.module_from_spec(spec); spec.loader.exec_module(C)
+    src = open(sys.argv[1] + "/d379_controls.py").read(); tree = ast.parse(src)
+    fn = next(n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef) and n.name == "aw01_check")
+    names = {x.id for x in ast.walk(fn) if isinstance(x, ast.Name)} | {x.attr for x in ast.walk(fn) if isinstance(x, ast.Attribute)}
+    print("static: names referenced inside aw01_check:", sorted(names))
+    print("static: aw01_check references classify / run_h2_v12 / R / _compliant:", sorted(names & {"classify", "run_h2_v12", "R", "_compliant", "function"}))
+    rows = [{"path": "a/README.md", "bytes": 114}, {"path": "d/NOTES.md", "bytes": 150}]
+    clean = [{"path": r["path"], "FUNCTION": C.classify.function(dict(r, title=""), "")} for r in rows]
+    T = "passa.bytes={} bytes;".format
+    M = {"bare '11'": {"witness_value": "11"}, "bare '4'": {"witness_value": "4"}, "bare '14'": {"witness_value": "14"},
+         "coordinated T(115)": {"witness_value": T(115), "local_context": T(115)}, "selector L1": {"source_selector": "L1"},
+         "source_path b/README.md": {"source_path": "b/README.md"}, "type DATE_STAMP": {"witness_type": "DATE_STAMP"},
+         "scope SPAN": {"applicability_scope": "SPAN"}, "subject OTHER:x": {"subject": "OTHER:x"}, "polarity NEUTRAL": {"polarity": "NEUTRAL"},
+         "certainty OBSERVED": {"certainty": "OBSERVED"}, "temporal NEUTRAL": {"temporal": "NEUTRAL"}, "evidence_total 999": {"evidence_total": 999},
+         "evidence_shown 0": {"evidence_shown": 0}, "truncated True": {"truncated": True}, "evidence_total True": {"evidence_total": True}}
+    for label, kw in M.items():
+        m = copy.deepcopy(clean); m[0]["FUNCTION"]["witness"].update(kw)
+        f, _ = C.aw01_check(rows, m)
+        print(f"  {label:<26} -> {sorted({(x[0], x[2][:48]) for x in f})}")
+    END-VERBATIM AWC-AW01-REASON-PROBE-PY
+- EVIDENCE AWC-AW01-REASON-PROBE-OUT-TXT impl/aw01_reason_probe_out.txt: 2008 bytes, sha256 7665ff3d1efb9cc5b4ba96dfbd1a02a93a699a798e41463fb64de3bdf444bca4, final LF True  [CMD `sha256sum aw01_reason_probe_out.txt` → 7665ff3d1efb9cc5…]
+    BEGIN-VERBATIM AWC-AW01-REASON-PROBE-OUT-TXT
+    static: names referenced inside aw01_check: ['AW01_FIXED', 'AW01_TOKEN', '__setitem__', '_aw01_is_int', 'append', 'counts', 'dict', 'dup', 'emitted', 'endswith', 'expected', 'findings', 'fullmatch', 'g', 'get', 'git_size', 'group', 'int', 'isinstance', 'items', 'k', 'len', 'm', 'n', 'p', 'pa', 'passa_rows', 'r', 'rdup', 'repr', 'res', 'result_rows', 'row', 'set', 'sorted', 'str', 'v', 'w', 'want']
+    static: aw01_check references classify / run_h2_v12 / R / _compliant: []
+      bare '11'                  -> [('AW01_CONTEXT_NOT_TOKEN', "'passa.bytes=114 bytes;'"), ('AW01_TOKEN_GRAMMAR', "'11'")]
+      bare '4'                   -> [('AW01_CONTEXT_NOT_TOKEN', "'passa.bytes=114 bytes;'"), ('AW01_TOKEN_GRAMMAR', "'4'")]
+      bare '14'                  -> [('AW01_CONTEXT_NOT_TOKEN', "'passa.bytes=114 bytes;'"), ('AW01_TOKEN_GRAMMAR', "'14'")]
+      coordinated T(115)         -> [('AW01_N_NOT_PASSA_BYTES', 'token N=115, bound Pass-A bytes=114')]
+      selector L1                -> [('AW01_FIELD', "source_selector='L1', required 'META:passa.bytes")]
+      source_path b/README.md    -> [('AW01_SOURCE_PATH', "'b/README.md'")]
+      type DATE_STAMP            -> [('AW01_FIELD', "witness_type='DATE_STAMP', required 'SIZE_AND_RO")]
+      scope SPAN                 -> [('AW01_FIELD', "applicability_scope='SPAN', required 'WHOLE_FILE")]
+      subject OTHER:x            -> [('AW01_FIELD', "subject='OTHER:x', required 'SELF'")]
+      polarity NEUTRAL           -> [('AW01_FIELD', "polarity='NEUTRAL', required 'POSITIVE'")]
+      certainty OBSERVED         -> [('AW01_FIELD', "certainty='OBSERVED', required 'VERIFIED'")]
+      temporal NEUTRAL           -> [('AW01_FIELD', "temporal='NEUTRAL', required 'AT_COMMIT'")]
+      evidence_total 999         -> [('AW01_FIELD', 'evidence_total=999, required 1')]
+      evidence_shown 0           -> [('AW01_FIELD', 'evidence_shown=0, required 1')]
+      truncated True             -> [('AW01_FIELD', 'truncated=True, required False')]
+      evidence_total True        -> [('AW01_FIELD', 'evidence_total=True, required 1')]
+    END-VERBATIM AWC-AW01-REASON-PROBE-OUT-TXT
+- EVIDENCE AWC-IMPL-CHAIN-AW3-DIFF impl/impl_chain_aw3.diff: 484 bytes, sha256 11844da007d4c758e863cb937c418ce0a9254c84b0a4096237e2035951efe2e7, final LF True  [CMD `sha256sum impl_chain_aw3.diff` → 11844da007d4c758…]
+    BEGIN-VERBATIM AWC-IMPL-CHAIN-AW3-DIFF
+    8c8
+    < V = pathlib.Path("/home/user/kai-repair/kai-pm/house_in_order_h2_v13")
+    ---
+    > V = pathlib.Path("/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/twofact/instAW3/kai-pm/house_in_order_h2_v13")
+    39c39
+    <       "--census-package", CEN, "--stage-a", str(sa), "--out", str(W / "result.json")), "classification (composite)")
+    ---
+    >       "--census-package", CEN, "--stage-a", str(sa), "--out", str(W / "result.json")), "classification (AW-01 closure)")
+    END-VERBATIM AWC-IMPL-CHAIN-AW3-DIFF
+- EVIDENCE AWC-IMPL-CHAIN-AW3-OUT-TXT impl/impl_chain_aw3_out.txt: 1630 bytes, sha256 30d9b084ae388978258628d7271b67f0b2257c81331cf29cf8184dee3da80656, final LF True  [CMD `sha256sum impl_chain_aw3_out.txt` → 30d9b084ae388978…]
+    BEGIN-VERBATIM AWC-IMPL-CHAIN-AW3-OUT-TXT
+      subject HEAD                 rc=0  d8aac4d49e6ba997e3eb38062c0917186ee3f197
+      subject tree                 rc=0  3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+      subject status               rc=0  
+      subject HEAD == d8aac4d49e6b True; tree == 3abc9e9d8ca1 True; status lines 0
+      Stage A (CALIBRATION)        rc=0  
+      fresh Pass A                 rc=0    NO VERDICT ASSIGNED IN PASS A.
+      Pass-A binding               rc=0  da2508cda3bc29166797485db91b91426a4369e29713046262a4bac50408ae05
+      classification (AW-01 closure) rc=0    self_approval: NONE
+      classification binding       rc=0  bd2f5b17d91b346c48fc596ae1b881018889592b9bbaaf8fe487b494eae53818
+      qualifier                    rc=0    FINDINGS: 0
+      qualifier findings (lines with '::'): 0
+      subject status after chain: 0 lines
+    
+    FRESH PASS A  subject d8aac4d49e6b  rows 272  rows with readers 5  rows with reader_ops 5  reader_ops entries 8  distinct op sources 4
+      selected reader sources (composite _reader_trace): 5 selections, 4 distinct: ['scripts/auto_changelog.py', 'scripts/auto_session_log.py', 'scripts/security/check_gate_registry.py', 'scripts/sync_docs.py']
+      member of frozen subject: 4/4   strict UTF-8: 4/4
+      (all op sources, superset of selected) member: 4/4   strict UTF-8: 4/4
+      result: STATIC_REFERENCE_AT_SUBJECT positive 5; traces 5; abstained 0
+      result tallies: {"BINDING_CONTRADICTION": 5, "CARRIES_DATE_STAMP": 206, "CITES_COMMIT": 21, "CITES_RUN": 3, "MAINTENANCE_OBSERVED": 71, "NOMINAL_FUNCTION": 207, "SELF_ASSERTS_AUTHORITY": 4, "SELF_ASSERTS_CURRENT": 6, "SELF_ASSERTS_NON_AUTHORITY": 1, "STATIC_REFERENCE_AT_SUBJECT": 5}
+    
+    READER CONFIRMATION: PASS
+    END-VERBATIM AWC-IMPL-CHAIN-AW3-OUT-TXT
+- EVIDENCE AWC-AW3-CHAIN-FULL-LOG-TXT impl/aw3_chain_full_log.txt: 6885 bytes, sha256 1a42e462fc56cf7800273ee3fc00121a3f0228fdce6e1fcc81a7e21b63a8ed84, final LF True  [CMD `sha256sum aw3_chain_full_log.txt` → 1a42e462fc56cf78…]
+    BEGIN-VERBATIM AWC-AW3-CHAIN-FULL-LOG-TXT
+    --- subject HEAD rc=0 (41 bytes)
+    d8aac4d49e6ba997e3eb38062c0917186ee3f197
+    --- end subject HEAD
+    --- subject tree rc=0 (41 bytes)
+    3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+    --- end subject tree
+    --- subject status rc=0 (0 bytes)
+    --- end subject status
+    --- Stage A (CALIBRATION) rc=0 (0 bytes)
+    --- end Stage A (CALIBRATION)
+    --- fresh Pass A rc=0 (516 bytes)
+    PASS A v1.2 COMPLETE — 272 rows == population 272
+      WITNESS KINDS DISCRIMINATED (D2/D4), not assumed from shape:
+        DATE                        353
+        COMMIT                      110
+        RUN_ID                       12
+        HEX_SHAPED_UNRESOLVED         9
+        DECIMAL_TOKEN                 5
+        DIGEST_FRAGMENT               3
+      scope determined: WHOLE_FILE 201 · SPAN 291
+      binding predicates declared closed-world: 26
+      contextual predicates declared closed-world: 1 (status)
+      NO VERDICT ASSIGNED IN PASS A.
+    --- end fresh Pass A
+    --- Pass-A binding rc=0 (65 bytes)
+    da2508cda3bc29166797485db91b91426a4369e29713046262a4bac50408ae05
+    --- end Pass-A binding
+    --- classification (AW-01 closure) rc=0 (1356 bytes)
+    HOUSE_H2 v1.2 — 272 rows == population 272
+      subject d8aac4d49e6b tree 3abc9e9d8ca1
+    
+      LIFECYCLE    positives    8  UNKNOWN  264   {'HISTORICAL': 8}
+      FUNCTION     positives    5  UNKNOWN  267   {'MARKER': 5}
+      AUTHORITY    positives    0  UNKNOWN  272   
+      GENERATION   positives    0  UNKNOWN  272   
+      VALIDITY     positives    9  UNKNOWN  263   {'TIME_BOUND': 7, 'EXACT_SNAPSHOT': 2}
+      SCOPE        positives  194  UNKNOWN   78   {'WHOLE_FILE': 194}
+    
+      evidence facts (NOT verdicts):
+        MAINTENANCE_OBSERVED           71
+        SELF_ASSERTS_CURRENT            6
+        STATIC_REFERENCE_AT_SUBJECT     5
+        CITES_COMMIT                   21
+        CITES_RUN                       3
+        CARRIES_DATE_STAMP            206
+        BINDING_CONTRADICTION           5
+        NOMINAL_FUNCTION              207
+        SELF_ASSERTS_AUTHORITY          4
+        SELF_ASSERTS_NON_AUTHORITY      1
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 207
+        {'GOVERNANCE from self-description': 6, 'STATUS from self-description': 4, 'PLAN from self-description': 22, 'RUNTIME_INPUT from self-description': 9, 'USER_GUIDE from self-description': 10, 'REFERENCE from self-description': 11, 'EVIDENCE from self-description': 144, 'MARKER from self-description': 1}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end classification (AW-01 closure)
+    --- classification binding rc=0 (65 bytes)
+    bd2f5b17d91b346c48fc596ae1b881018889592b9bbaaf8fe487b494eae53818
+    --- end classification binding
+    --- qualifier rc=0 (4236 bytes)
+    HOUSE_H2 v1.2 — QUALIFICATION
+      subject d8aac4d49e6b  tree 3abc9e9d8ca1
+      history 2025-06-18 → 2026-08-23  shallow=false  ancestry=986
+      census  29064d650a612968…
+    
+      [1] GOVERNING INVARIANT — checked from the AXIS SET
+          UNKNOWN first-class on every axis: True
+      [1b] REMOVAL CALIBRATION — the gate proves it can fail, this run
+           remove UNKNOWN from LIFECYCLE   detected=True
+           remove UNKNOWN from FUNCTION    detected=True
+           remove UNKNOWN from AUTHORITY   detected=True
+           remove UNKNOWN from GENERATION  detected=True
+           remove UNKNOWN from VALIDITY    detected=True
+           remove UNKNOWN from SCOPE       detected=True
+    
+      [2] STATE DISPOSITIONS — checked from the ALPHABET
+          [LIFECYCLE]
+            ACTIVE            H2_NOT_EARNABLE        0  
+            HISTORICAL        H2_EMITTABLE           8  
+            SUPERSEDED        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE         264  
+          [FUNCTION]
+            GOVERNANCE        H2_EMITTABLE           0  not observed on this subject
+            STATUS            H2_EMITTABLE           0  not observed on this subject
+            PLAN              H2_EMITTABLE           0  not observed on this subject
+            EVIDENCE          H2_EMITTABLE           0  not observed on this subject
+            REFERENCE         H2_EMITTABLE           0  not observed on this subject
+            RUNTIME_INPUT     H2_EMITTABLE           0  not observed on this subject
+            TEMPLATE          H2_EMITTABLE           0  not observed on this subject
+            MARKER            H2_EMITTABLE           5  
+            USER_GUIDE        H2_EMITTABLE           0  not observed on this subject
+            OTHER             H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE         267  
+          [AUTHORITY]
+            AUTHORITATIVE     DEFERRED_TO_H3         0  
+            VERIFIED_DERIVED  DEFERRED_TO_H3         0  
+            ADVISORY          DEFERRED_TO_H3         0  
+            NON_AUTHORITY     DEFERRED_TO_H3         0  
+            UNKNOWN           H2_EMITTABLE         272  
+          [GENERATION]
+            MANUAL            H2_NOT_EARNABLE        0  
+            PARTIAL_DERIVED   H2_NOT_EARNABLE        0  
+            FULL_DERIVED      H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE         272  
+          [VALIDITY]
+            CURRENT_TREE      H2_EMITTABLE           0  not observed on this subject
+            EXACT_SNAPSHOT    H2_EMITTABLE           2  
+            RUN_ARTEFACT      H2_EMITTABLE           0  not observed on this subject
+            TIME_BOUND        H2_EMITTABLE           7  
+            UNKNOWN           H2_EMITTABLE         263  
+          [SCOPE]
+            WHOLE_FILE        H2_EMITTABLE         194  
+            HEADING           H2_NOT_EARNABLE        0  
+            TABLE             H2_NOT_EARNABLE        0  
+            MANAGED_REGION    H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE          78  
+    
+      [3] OUTPUT-DERIVED — values emitted but unknown to the ontology: 0
+    
+      [4] population declared 272 == rows 272: True
+      [5] every non-abstention cell carries a source-bound witness: True  (0 missing)
+    
+      [6] §8(6) CLOSED ORIGIN CLASSIFICATION — every loaded origin
+          observed 87   classified 87   refused 0
+          H2                 3
+          CENSUS             0
+          GOVERNED_STDLIB    48
+          BUILTIN_OR_FROZEN  36
+    
+      [7] Q1a RECORDED PRODUCER PROVENANCE vs STAGE A
+          verified against stage_a_identity 9e1763c8f4da863f…, every slot closed
+    
+      [8] Q1b / E1 — DERIVED denominators (D379 §8)
+          axis-cell denominator              216
+          positive-evidence-fact denominator 529
+          sum                                745
+    
+      UTILITY PROFILE — reported, never optimised (D367 11)
+          axis         positive  UNKNOWN  UNMEASURED
+          LIFECYCLE           8      264           0
+          FUNCTION            5      267           0
+          AUTHORITY           0      272           0
+          GENERATION          0      272           0
+          VALIDITY            9      263           0
+          SCOPE             194       78           0
+          Qualification asks: is the instrument TRUTHFUL?
+          A separate later decision asks: is it USEFUL enough for H3?
+    
+      FINDINGS: 0
+    --- end qualifier
+    END-VERBATIM AWC-AW3-CHAIN-FULL-LOG-TXT
+- EVIDENCE AWC-AW01C-QUALIFIER-DIFF-TXT impl/aw01c_qualifier_diff.txt: 821 bytes, sha256 6efe1593d979ae995e72b90be9dc691d073fe40f06fa2a8dd84c4bff319d0583, final LF True  [CMD `sha256sum aw01c_qualifier_diff.txt` → 6efe1593d979ae99…]
+    BEGIN-VERBATIM AWC-AW01C-QUALIFIER-DIFF-TXT
+    1c1
+    < --- qualifier rc=1 (4754 bytes)
+    ---
+    > --- qualifier rc=0 (4236 bytes)
+    72c72
+    <       verified against stage_a_identity 8c1f7a8138f828af…, every slot closed
+    ---
+    >       verified against stage_a_identity 9e1763c8f4da863f…, every slot closed
+    90,95c90
+    <   FINDINGS: 5
+    <     AXIS_WITNESS::data/self-emp/Accounting/README.md — non-abstaining cell carries no compliant witness
+    <     AXIS_WITNESS::data/self-emp/Coding/README.md — non-abstaining cell carries no compliant witness
+    <     AXIS_WITNESS::data/self-emp/Engineering/README.md — non-abstaining cell carries no compliant witness
+    <     AXIS_WITNESS::data/self-emp/Legal/README.md — non-abstaining cell carries no compliant witness
+    <     AXIS_WITNESS::data/self-emp/Social/README.md — non-abstaining cell carries no compliant witness
+    ---
+    >   FINDINGS: 0
+    END-VERBATIM AWC-AW01C-QUALIFIER-DIFF-TXT
+- EVIDENCE AWC-AW01C-DIFF-OUT-TXT impl/aw01c_diff_out.txt: 3254 bytes, sha256 13b16b667cede346abb8b0c0e3b702dd6cde2462c129a31c0d96f3195caf4204, final LF True  [CMD `sha256sum aw01c_diff_out.txt` → 13b16b667cede346…]
+    BEGIN-VERBATIM AWC-AW01C-DIFF-OUT-TXT
+    subjects d8aac4d49e6b d8aac4d49e6b  Pass-A rows identical: True
+    axis VALUE differences over 272 rows x 6 axes: 0
+    whole-cell differences: 5 -> ['FUNCTION'] on ['data/self-emp/Accounting/README.md', 'data/self-emp/Coding/README.md', 'data/self-emp/Engineering/README.md', 'data/self-emp/Legal/README.md', 'data/self-emp/Social/README.md']
+      data/self-emp/Accounting/README.md     FUNCTION: non-witness keys differing []; witness fields differing ['local_context', 'source_selector', 'witness_value']
+      data/self-emp/Coding/README.md         FUNCTION: non-witness keys differing []; witness fields differing ['local_context', 'source_selector', 'witness_value']
+      data/self-emp/Engineering/README.md    FUNCTION: non-witness keys differing []; witness fields differing ['local_context', 'source_selector', 'witness_value']
+      data/self-emp/Legal/README.md          FUNCTION: non-witness keys differing []; witness fields differing ['local_context', 'source_selector', 'witness_value']
+      data/self-emp/Social/README.md         FUNCTION: non-witness keys differing []; witness fields differing ['local_context', 'source_selector', 'witness_value']
+    rows with any of the 10 evidence facts different: 0; traces: 0; abstentions: 0; any other row key: 0
+    MARKER population OLD 5 AW 5 identical True: ['data/self-emp/Accounting/README.md', 'data/self-emp/Coding/README.md', 'data/self-emp/Engineering/README.md', 'data/self-emp/Legal/README.md', 'data/self-emp/Social/README.md']
+    
+    FAIL-OLD / PASS-NEW (run_h2_v12._compliant, the qualifier's predicate):
+      data/self-emp/Accounting/README.md     OLD False ('114 bytes' / L1 / '(no title)')   AW True  ('passa.bytes=114 bytes;' / META:passa.bytes / 'passa.bytes=114 bytes;')
+      data/self-emp/Coding/README.md         OLD False ('44 bytes' / L1 / '(no title)')   AW True  ('passa.bytes=44 bytes;' / META:passa.bytes / 'passa.bytes=44 bytes;')
+      data/self-emp/Engineering/README.md    OLD False ('35 bytes' / L1 / '(no title)')   AW True  ('passa.bytes=35 bytes;' / META:passa.bytes / 'passa.bytes=35 bytes;')
+      data/self-emp/Legal/README.md          OLD False ('71 bytes' / L1 / '(no title)')   AW True  ('passa.bytes=71 bytes;' / META:passa.bytes / 'passa.bytes=71 bytes;')
+      data/self-emp/Social/README.md         OLD False ('58 bytes' / L1 / '(no title)')   AW True  ('passa.bytes=58 bytes;' / META:passa.bytes / 'passa.bytes=58 bytes;')
+    
+    INDEPENDENT ADJUDICATION (aw01v2_adjudicator: grammar, selector, source_path, N == fresh Pass-A row bytes, README.md, N < 200, N == git blob size):
+      data/self-emp/Accounting/README.md     git size 114  token 'passa.bytes=114 bytes;'   ADJUDICATED
+      data/self-emp/Coding/README.md         git size  44  token 'passa.bytes=44 bytes;'    ADJUDICATED
+      data/self-emp/Engineering/README.md    git size  35  token 'passa.bytes=35 bytes;'    ADJUDICATED
+      data/self-emp/Legal/README.md          git size  71  token 'passa.bytes=71 bytes;'    ADJUDICATED
+      data/self-emp/Social/README.md         git size  58  token 'passa.bytes=58 bytes;'    ADJUDICATED
+      adjudicated 5/5
+      OLD witnesses under the same adjudicator (fail-old): 0/5 adjudicated
+    MARKER population recomputed from git over all 272 documents: 5 == AW population: True
+    git blob size == Pass-A row bytes for 272/272 documents
+    END-VERBATIM AWC-AW01C-DIFF-OUT-TXT
+- EVIDENCE AWC-AW01-CANDIDATE-OUT-TXT impl/aw01_candidate_out.txt: 5247 bytes, sha256 18a742afcbd30db6de0f034b6b7888054fcfab220f51e5e81093a58af52b8894, final LF True  [CMD `sha256sum aw01_candidate_out.txt` → 18a742afcbd30db6…]
+    BEGIN-VERBATIM AWC-AW01-CANDIDATE-OUT-TXT
+    === FAIL-OLD: d0c08a4 classifier run (entry 57)
+    AW01 CANDIDATE — MARKER witness semantic control
+      subject d8aac4d49e6b  result subject d8aac4d49e6b
+      {'passa_rows': 272, 'result_rows': 272, 'expected_marker': 5, 'emitted_marker': 5, 'witnesses_checked': 5}
+      AW01_TOKEN_GRAMMAR::data/self-emp/Accounting/README.md — '114 bytes'
+      AW01_CONTEXT_NOT_TOKEN::data/self-emp/Accounting/README.md — '(no title)'
+      AW01_FIELD::data/self-emp/Accounting/README.md — source_selector='L1', required 'META:passa.bytes'
+      AW01_TOKEN_GRAMMAR::data/self-emp/Coding/README.md — '44 bytes'
+      AW01_CONTEXT_NOT_TOKEN::data/self-emp/Coding/README.md — '(no title)'
+      AW01_FIELD::data/self-emp/Coding/README.md — source_selector='L1', required 'META:passa.bytes'
+      AW01_TOKEN_GRAMMAR::data/self-emp/Engineering/README.md — '35 bytes'
+      AW01_CONTEXT_NOT_TOKEN::data/self-emp/Engineering/README.md — '(no title)'
+      AW01_FIELD::data/self-emp/Engineering/README.md — source_selector='L1', required 'META:passa.bytes'
+      AW01_TOKEN_GRAMMAR::data/self-emp/Legal/README.md — '71 bytes'
+      AW01_CONTEXT_NOT_TOKEN::data/self-emp/Legal/README.md — '(no title)'
+      AW01_FIELD::data/self-emp/Legal/README.md — source_selector='L1', required 'META:passa.bytes'
+      AW01_TOKEN_GRAMMAR::data/self-emp/Social/README.md — '58 bytes'
+      AW01_CONTEXT_NOT_TOKEN::data/self-emp/Social/README.md — '(no title)'
+      AW01_FIELD::data/self-emp/Social/README.md — source_selector='L1', required 'META:passa.bytes'
+      AW01 FINDINGS: 15
+    exit=1 (expected 1)
+    === PASS-NEW: AW-01 closure run (comment-corrected classify)
+    AW01 CANDIDATE — MARKER witness semantic control
+      subject d8aac4d49e6b  result subject d8aac4d49e6b
+      {'passa_rows': 272, 'result_rows': 272, 'expected_marker': 5, 'emitted_marker': 5, 'witnesses_checked': 5}
+      AW01 FINDINGS: 0
+    exit=0 (expected 0)
+    === PASS: AW-01 v2 run (entry 65; same runtime)
+    AW01 CANDIDATE — MARKER witness semantic control
+      subject d8aac4d49e6b  result subject d8aac4d49e6b
+      {'passa_rows': 272, 'result_rows': 272, 'expected_marker': 5, 'emitted_marker': 5, 'witnesses_checked': 5}
+      AW01 FINDINGS: 0
+    exit=0 (expected 0)
+    === FORGED coordinated tamper (real qualifier: 0 findings)
+    AW01 CANDIDATE — MARKER witness semantic control
+      subject d8aac4d49e6b  result subject d8aac4d49e6b
+      {'passa_rows': 272, 'result_rows': 272, 'expected_marker': 5, 'emitted_marker': 5, 'witnesses_checked': 5}
+      AW01_N_NOT_PASSA_BYTES::data/self-emp/Accounting/README.md — token N=115, bound Pass-A bytes=114
+      AW01_N_NOT_GIT_SIZE::data/self-emp/Accounting/README.md — token N=115, git blob size=114
+      AW01_N_NOT_PASSA_BYTES::data/self-emp/Coding/README.md — token N=45, bound Pass-A bytes=44
+      AW01_N_NOT_GIT_SIZE::data/self-emp/Coding/README.md — token N=45, git blob size=44
+      AW01_N_NOT_PASSA_BYTES::data/self-emp/Engineering/README.md — token N=36, bound Pass-A bytes=35
+      AW01_N_NOT_GIT_SIZE::data/self-emp/Engineering/README.md — token N=36, git blob size=35
+      AW01_N_NOT_PASSA_BYTES::data/self-emp/Legal/README.md — token N=72, bound Pass-A bytes=71
+      AW01_N_NOT_GIT_SIZE::data/self-emp/Legal/README.md — token N=72, git blob size=71
+      AW01_N_NOT_PASSA_BYTES::data/self-emp/Social/README.md — token N=59, bound Pass-A bytes=58
+      AW01_N_NOT_GIT_SIZE::data/self-emp/Social/README.md — token N=59, git blob size=58
+      AW01 FINDINGS: 10
+    exit=1 (expected 1)
+    === FORGED bare-number substring (real qualifier: 0 findings)
+    AW01 CANDIDATE — MARKER witness semantic control
+      subject d8aac4d49e6b  result subject d8aac4d49e6b
+      {'passa_rows': 272, 'result_rows': 272, 'expected_marker': 5, 'emitted_marker': 5, 'witnesses_checked': 5}
+      AW01_TOKEN_GRAMMAR::data/self-emp/Accounting/README.md — '11'
+      AW01_CONTEXT_NOT_TOKEN::data/self-emp/Accounting/README.md — 'passa.bytes=114 bytes;'
+      AW01_TOKEN_GRAMMAR::data/self-emp/Coding/README.md — '4'
+      AW01_CONTEXT_NOT_TOKEN::data/self-emp/Coding/README.md — 'passa.bytes=44 bytes;'
+      AW01_TOKEN_GRAMMAR::data/self-emp/Engineering/README.md — '3'
+      AW01_CONTEXT_NOT_TOKEN::data/self-emp/Engineering/README.md — 'passa.bytes=35 bytes;'
+      AW01_TOKEN_GRAMMAR::data/self-emp/Legal/README.md — '7'
+      AW01_CONTEXT_NOT_TOKEN::data/self-emp/Legal/README.md — 'passa.bytes=71 bytes;'
+      AW01_TOKEN_GRAMMAR::data/self-emp/Social/README.md — '5'
+      AW01_CONTEXT_NOT_TOKEN::data/self-emp/Social/README.md — 'passa.bytes=58 bytes;'
+      AW01 FINDINGS: 10
+    exit=1 (expected 1)
+    === FORGED empty selector (real qualifier: 5 AXIS_WITNESS)
+    AW01 CANDIDATE — MARKER witness semantic control
+      subject d8aac4d49e6b  result subject d8aac4d49e6b
+      {'passa_rows': 272, 'result_rows': 272, 'expected_marker': 5, 'emitted_marker': 5, 'witnesses_checked': 5}
+      AW01_FIELD::data/self-emp/Accounting/README.md — source_selector='', required 'META:passa.bytes'
+      AW01_FIELD::data/self-emp/Coding/README.md — source_selector='', required 'META:passa.bytes'
+      AW01_FIELD::data/self-emp/Engineering/README.md — source_selector='', required 'META:passa.bytes'
+      AW01_FIELD::data/self-emp/Legal/README.md — source_selector='', required 'META:passa.bytes'
+      AW01_FIELD::data/self-emp/Social/README.md — source_selector='', required 'META:passa.bytes'
+      AW01 FINDINGS: 5
+    exit=1 (expected 1)
+    END-VERBATIM AWC-AW01-CANDIDATE-OUT-TXT
+
+### 6. Next authorised step
+
+- STOP. Dainius sends aw01c_b64/DEEPSEEK_MESSAGE_AW01_CLOSURE_BASE64_COMPLETE.txt to a fresh DeepSeek chat; the reply returns to Kai; no source mutation  [CONVERSATION 2026-10-04 Kai, "STOP after DeepSeek review for Kai."]
+
+### 7. What I am unsure of
+
+- Whether the --aw01-candidate CLI mode is the right standing hook, or the candidate check should run inside main() when a candidate is supplied; Q4/Q6 in the packet  [CONVERSATION 2026-10-04 Kai, "rerun for every candidate"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
