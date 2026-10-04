@@ -25176,3 +25176,1163 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-04T01:34:17Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-04T01:34:17Z  [CMD `date -u +%FT%TZ` → 2026-10-04T01:34:17Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 9a52670eef226cd3cec733566f92c8b1a751cb61  [CMD `git rev-parse HEAD` → 9a52670eef226cd3cec733566f92c8b1a751cb61]
+- tree: 1c2b4735281175b1aab5f7edac88e8075f079d8d  [CMD `git rev-parse HEAD^{tree}` → 1c2b4735281175b1aab5f7edac88e8075f079d8d]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 9a52670eef226cd3cec733566f92c8b1a751cb61  [CMD `git ls-remote --heads origin` → 9a52670eef226cd3cec733566f92c8b1a751cb61]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d0c08a4da85a447e0729fdb83d201cccc0af395a  [CMD `git ls-remote --heads origin` → d0c08a4da85a447e0729fdb83d201cccc0af395a]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 64  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 64]
+
+### 1. The four states
+
+- physical: repair branch at d0c08a4; classify.py unchanged outside scratch; AW-01 v2 exists only in scratch (instAW2)  [CMD `git ls-remote --heads origin` → claude/d379-repair-eb52f73 d0c08a4da85a447e0729fdb83d201cccc0af395a]
+- authorised: entry 64 — AW-01 v2 in scratch, its controls, the v2 packet, DeepSeek re-review; STOP after the review  [CONVERSATION 2026-10-04 Kai, "prepare AW-01 v2 in scratch and stop after its DeepSeek review."]
+- evidence: delta, packet, cover, adjudicator, instruments and full outputs verbatim in section 5  [CMD `sha256sum DEEPSEEK_PACKET_AW01_v2.md` → 8a8f1d1f08a3acac…]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- None; executed under entry 64  [CONVERSATION 2026-10-04 Kai, "AW-01 v2 REQUIRED"]
+
+### 3. Authorised / Held / Forbidden
+
+- DONE (v2 delta): token = f"passa.bytes={row['bytes']} bytes;" as witness_value AND local_context; source_selector "META:passa.bytes"; path not in context; predicate, type, scope, subject, certainty, polarity unchanged. 1 hunk +12/−3; delta sha256 6b3c4884220c5344…; base classify.py 226873676c2373fa… (= d0c08a4); proposed ee869ae10cafdbb8…  [CMD `diff -u inst5/…/classify.py instAW2/…/classify.py` → 6b3c4884…]
+- DONE (regression, real frozen subject, full history, own Stage A): v2 chain rc 0 end to end, qualifier FINDINGS 0; qualifier line diff vs the d0c08a4 run: only the rc/size header, Stage-A identity and the 5 AXIS_WITNESS findings; FAIL-OLD _compliant False x5, PASS-v2 True x5; MARKER population identical (5); 0 axis-value differences over 272 x 6; only those 5 FUNCTION cells differ, only witness_value / source_selector / local_context; 0 rows with any of the 10 facts, traces, abstentions or other keys different; adjudicator v2 5/5, OLD 0/5; MARKER recomputed from git == the 5; git size == Pass-A bytes 272/272  [CMD `impl_chain_aw2.py; aw01v2_diff.py; diff qualifier outputs` → as stated]
+- DONE (fixtures): 21/21 first run — 199-byte README MARKER ('passa.bytes=199 bytes;'), 200 not, 0-byte MARKER ('passa.bytes=0 bytes;'), NOTES.md / readme.md / README.md.bak not; non-MARKER cells identical OLD vs v2; titled / untitled / other-titled witnesses identical under v2, different under OLD  [CMD `aw01v2_fixtures_cmp.py` → 21 passed 0 failed]
+- DONE (hostile, in memory, both layers scored): 26/26 as declared. Canonical-token forgeries T(11), T(4), T(14), T(1140) vs genuine T(114): _compliant False, adjudicator rejects. BARE-number forgeries "11", "4", "14" vs genuine T(114): _compliant TRUE (substring of the token), adjudicator rejects (grammar); "1140" rejected by both. Paths containing "114", "; bytes=99", or the literal "passa.bytes=114 bytes;": the genuine witness passes both, a value forged to T(114) fails both. Kai's controls 8, 9, 10 and 11 as specified. COORDINATED tamper (both T(115)): _compliant TRUE, adjudicator rejects (N != bound Pass-A bytes), with or without git  [CMD `aw01v2_hostile.py` → 26 passed 0 failed]
+- DONE (hostile, real chain, declared): 9/9 — wrong value token / wrong context token / empty context / empty selector -> qualifier rc 1, exactly 5 AXIS_WITNESS; empty value and removed witness -> 5 AXIS_WITNESS + 5 WITNESS::FUNCTION; COORDINATED tamper and BARE-substring value -> qualifier rc 0, 0 findings, adjudicator accepts 0/5; unaltered -> qualifier 0, adjudicator 5/5  [CMD `aw01v2_corrupt.py` → 9 passed 0 failed]
+- DONE (packet): DEEPSEEK_PACKET_AW01_v2.md sha256 8a8f1d1f08a3acac82153676265aa9e5496e06feb5ec0606ff411c547faccfd5, 18,163 bytes, self-contained (same 8 excerpts from d0c08a4, the adjudicator source, the delta, the evidence, Q1–Q6); delta embedded exactly; sentinels once each; base64 transport 3 chunks (5,992 / 6,108 / 6,063), self-contained cover; message round-trip equal  [CMD `gen_aw01v2_packet.py; gen_aw01v2_b64.py` → embedded exact; round-trip True]
+- HELD: classify.py implementation, d379_controls.py, full matrix, D390 replay, fixity F, capture, candidate, holdout, blind 40, Item 8, merge  [CONVERSATION 2026-10-04 Kai, "HELD"]
+
+### 4. Open questions
+
+- The real qualifier ACCEPTS two forgeries of the v2 witness — the coordinated tamper (anticipated by Kai) and a bare-number value that is a substring of the token (e.g. "11" with context "passa.bytes=114 bytes;"; new) — and only the independent adjudicator rejects them. With _compliant() and qualify.py frozen, whether AW-01 closure needs the adjudicator (or an equivalent) as a standing control, and where it lives, is Kai's — owner: Kai  [CMD `aw01v2_corrupt.py; aw01v2_hostile.py` → qualifier 0 findings; adjudicator 0/5]
+- Kai's section-2 statement that "neither 4, 14, 1140, path digits … can accidentally satisfy the check" holds for canonical-token forgeries and for every path; it does not hold for bare-number forgeries "4", "14", "11" at the _compliant layer (measured above) — owner: Kai  [CMD `aw01v2_hostile.py` → BARE '11' / '4' / '14' _compliant True]
+
+### 5. Incidents and corrections
+
+- None this step; credential scan of 18 files and the transport: 0 hits; raw line separators: none  [CMD `secretscan.py` → TOTAL HITS 0]
+- EVIDENCE V2-AW01-V2-DIFF aw01.v2.diff: 1491 bytes, sha256 6b3c4884220c5344a5b533914982fc6a14d8fec7ed9e2f4a679c9673f37794d2, final LF True  [CMD `sha256sum aw01.v2.diff` → 6b3c4884220c5344…]
+    BEGIN-VERBATIM V2-AW01-V2-DIFF
+    --- a/kai-pm/house_in_order_h2_v13/classify.py
+    +++ b/kai-pm/house_in_order_h2_v13/classify.py
+    @@ -369,10 +369,19 @@
+         # objective witness: size and path role. This is the ONLY family that
+         # earns FUNCTION at H2 -- it does not consult self-description.
+         if row["bytes"] < 200 and path.endswith("README.md"):
+    +        # KAI-B4-AW-01: the determining evidence is FILE METADATA, not
+    +        # source text. v1.2 carried selector "L1" and the title as context,
+    +        # so the measurement was in neither. The witness is now one
+    +        # self-delimiting canonical token naming the governed Pass-A field,
+    +        # its exact value, its unit and a terminator: no other byte count,
+    +        # no path fragment and no prose can be a substring of it. The path
+    +        # is carried by source_path alone; the predicate is unchanged and
+    +        # the title plays no part.
+    +        token = f"passa.bytes={row['bytes']} bytes;"
+             w = Witness(witness_type="SIZE_AND_ROLE",
+    -                    witness_value=f"{row['bytes']} bytes",
+    -                    source_path=path, source_selector="L1",
+    -                    local_context=title[:120] or "(no title)",
+    +                    witness_value=token,
+    +                    source_path=path, source_selector="META:passa.bytes",
+    +                    local_context=token,
+                         applicability_scope="WHOLE_FILE",
+                         # the byte count and path role OF THIS FILE
+                         subject=E.SUBJECT_SELF,
+    END-VERBATIM V2-AW01-V2-DIFF
+- EVIDENCE V2-DEEPSEEK-PACKET-AW01-V2-MD DEEPSEEK_PACKET_AW01_v2.md: 18163 bytes, sha256 8a8f1d1f08a3acac82153676265aa9e5496e06feb5ec0606ff411c547faccfd5, final LF True  [CMD `sha256sum DEEPSEEK_PACKET_AW01_v2.md` → 8a8f1d1f08a3acac…]
+    BEGIN-VERBATIM V2-DEEPSEEK-PACKET-AW01-V2-MD
+    # D379 B4 — KAI-B4-AW-01 OBJECTIVE MARKER WITNESS: ADVERSARIAL-REVIEW PACKET v2 (AW-01 v2 DELTA ONLY)
+    
+    Producer: Orion. Date: 2026-10-04. Evidence class: PRODUCER MEASUREMENT, ZERO ADMISSION WEIGHT.
+    Status: PROPOSAL ONLY, scratch. classify.py is NOT modified anywhere. The repair branch is at d0c08a4 (accepted).
+    
+    YOU HAVE NO REPOSITORY ACCESS AND NO PRIOR CONTEXT. Rely only on this packet. Source excerpts in section 3 are cut
+    mechanically from the repository at commit d0c08a4; nothing is paraphrased.
+    
+    ## 0. RECEIPT — reply with these lines FIRST, each copied exactly
+    
+        PACKET HASH: <sha256 of this decoded packet, as given by the sender>
+        BASE classify.py SHA-256: <from section 1>
+        FIRST DELTA HUNK: <the first line beginning with @@ in section 5>
+        SENTINEL A: <the added line in section 5 that assigns token>
+        SENTINEL B: <the added line in section 5 that sets source_selector>
+        END OF PACKET SEEN: YES
+    
+    If either sentinel cannot be reproduced exactly, reply NO REVIEW. The last line of this file is
+    "END OF PACKET AW-01 v2 — D379 MARKER WITNESS".
+    
+    ## 1. Identities
+    
+        BASE      classify.py at d0c08a4                 sha256 226873676c2373faaf29f4709bb1bb62d1d22f3c56cbdc0e594314cb6e5df9e8
+        DELTA     AW-01 v2 (section 5)                   sha256 6b3c4884220c5344a5b533914982fc6a14d8fec7ed9e2f4a679c9673f37794d2
+        PROPOSED  classify.py                            sha256 ee869ae10cafdbb87222667cd68efc8c83c2f8ce8b8bab6463de20846f5d40df
+        ADJUDICATOR (section 4, scratch control)         sha256 0ab4376b1466537f3f0f8b8f963ac761b6bc1ca521c2e267cb19377e860b7622
+    
+    ## 2. The defect, and why v1 was rejected
+    
+    classify.function() earns FUNCTION=MARKER when `row["bytes"] < 200 and path.endswith("README.md")`. Its witness was
+    witness_value "<N> bytes", source_selector "L1", local_context = title or "(no title)": the measured value appeared in
+    neither selector nor context. The qualifier rejects all five such cells on the frozen subject (AXIS_WITNESS); the
+    adjudicator (Kai) ruled the finding correct and not waived (KAI-B4-AW-01).
+    
+    A previous proposal (v1) used witness_value "<N>", selector "META:bytes", context "path=<path>; bytes=<N>". A prior
+    review (finding DS-AW01-V1-01, upheld as MAJOR) showed that run_h2_v12._compliant (section 3) is a SUBSTRING test, so a
+    witness whose bytes field was removed or wrong still passed when the path's digits contained the value (path
+    data/114/README.md, value 11). Reordering the fields does not help: it was measured that "bytes=99; path=data/114/..."
+    still passes for value 11. v1 is rejected.
+    
+    v2 (Kai's design): witness_value = local_context = the self-delimiting canonical token "passa.bytes=<N> bytes;"; source
+    selector "META:passa.bytes" (Pass A's governed field `bytes`, section 3); the path is carried only by source_path and is
+    NOT in local_context. Fixed invariants: the predicate is unchanged; the same five frozen-subject rows stay MARKER; no
+    other FUNCTION verdict or abstention changes; _compliant(), envelope.py and qualify.py are NOT changed; WHOLE_FILE /
+    SELF / VERIFIED / POSITIVE unchanged.
+    
+    ## 3. Source excerpts (verbatim, from d0c08a4)
+    
+    ----- kai-pm/house_in_order_h2_v13/classify.py (repair HEAD d0c08a4, lines 366-382) -----
+    def function(row, text):
+        path, title = row["path"], row.get("title") or ""
+    
+        # objective witness: size and path role. This is the ONLY family that
+        # earns FUNCTION at H2 -- it does not consult self-description.
+        if row["bytes"] < 200 and path.endswith("README.md"):
+            w = Witness(witness_type="SIZE_AND_ROLE",
+                        witness_value=f"{row['bytes']} bytes",
+                        source_path=path, source_selector="L1",
+                        local_context=title[:120] or "(no title)",
+                        applicability_scope="WHOLE_FILE",
+                        # the byte count and path role OF THIS FILE
+                        subject=E.SUBJECT_SELF,
+                        evidence_total=1, evidence_shown=1, truncated=False,
+                        polarity="POSITIVE", certainty="VERIFIED")
+            return E.claim(w, "MARKER", rationale="objective: byte count and "
+                                                  "path role, not self-description")
+    
+    ----- kai-pm/house_in_order_h2_v13/envelope.py (repair HEAD d0c08a4, lines 180-213) -----
+    class Witness:
+        """The nine mandatory fields of D367 5, plus the envelope dimensions.
+    
+        `value` is the EXACT matched token, never a description. v1.1
+        recorded the static string "cites a commit sha" for every VALIDITY
+        cell; an adjudicator could not audit the cell from the package and
+        had to open the source document. So could I.
+        """
+        witness_type: str          # what kind of evidence this is
+        witness_value: str         # the EXACT token or value matched
+        source_path: str           # the document it came from
+        source_selector: str       # stable selector: "L<line>" or "L<a>-L<b>"
+        local_context: str         # surrounding text, enough to judge it
+        applicability_scope: str   # SPAN | SECTION | WHOLE_FILE
+        evidence_total: int        # how many candidate rows existed
+        evidence_shown: int        # how many are carried here
+        truncated: bool            # explicit, never inferred
+        # envelope dimensions beyond scope
+        polarity: str = "NEUTRAL"
+        certainty: str = "OBSERVED"
+        temporal: str = "AT_COMMIT"
+        # NO DEFAULT. D381 3 / INC-31: `subject = "SELF"` here is precisely how
+        # 167 witnesses inherited a semantic claim nobody made about them. The
+        # sentinel keeps the field order stable while making omission FAIL.
+        subject: str = REQUIRED
+    
+        def __post_init__(self):
+            if self.subject is REQUIRED:
+                raise SubjectError(
+                    f"subject NOT STATED for {self.witness_type} witness at "
+                    f"{self.source_path} {self.source_selector}. There is no "
+                    f"default: a witness's semantic subject is determined once, "
+                    f"at the governed producer boundary (D381 5.5).")
+            parse_subject(self.subject)          # fail-closed, D381 3.1
+    
+    ----- kai-pm/house_in_order_h2_v13/run_h2_v12.py (repair HEAD d0c08a4, lines 244-246) -----
+    NINE_FIELDS = ("witness_type", "witness_value", "source_path",
+                   "source_selector", "local_context", "applicability_scope",
+                   "evidence_total", "evidence_shown", "truncated")
+    
+    ----- kai-pm/house_in_order_h2_v13/run_h2_v12.py (repair HEAD d0c08a4, lines 524-531) -----
+    def _compliant(t):
+        """E1 / D367 5. Present is not enough -- the trace must be SEMANTICALLY
+        TRUTHFUL: all nine fields, and the context must actually contain the
+        value it claims to evidence.
+        """
+        if not t or any(t.get(k) in (None, "") for k in NINE_FIELDS):
+            return False
+        return str(t["witness_value"]) in str(t["local_context"])
+    
+    ----- kai-pm/house_in_order_h2_v13/qualify.py (repair HEAD d0c08a4, lines 532-549) -----
+        axis_cells = 0
+        for r in rows:
+            for axis in ont.ALPHABETS:                    # the GOVERNING axis set
+                cell = r.get(axis)
+                if cell is None:
+                    findings.append(("AXIS_CELL_ABSENT", r.get("path"), axis,
+                                     "the emitted row has no cell for a governed "
+                                     "axis"))
+                    continue
+                if cell.get("value") in (ont.ABSTENTION, ont.CAPABILITY_FAILURE):
+                    continue
+                axis_cells += 1
+                w = cell.get("witness")
+                if not R._compliant(w):
+                    findings.append(("AXIS_WITNESS", r.get("path"), axis,
+                                     "non-abstaining cell carries no compliant "
+                                     "witness"))
+    
+    
+    ----- kai-pm/house_in_order_h2_v13/passa.py (repair HEAD d0c08a4, lines 1076-1090) -----
+        rows = []
+        for d in tracked:
+            txt = read_source(subject_repo, d)
+            title = ""
+            for ln in txt.splitlines():
+                if ln.startswith("#"):
+                    title = ln.lstrip("#").strip()[:120]
+                    break
+            n = git(history_repo, "rev-list", "--count", subject, "--",
+                    d).stdout.strip()
+            last = git(history_repo, "log", "-1", "--format=%ad", "--date=short",
+                       subject, "--", d).stdout.strip()
+            rows.append({
+                "path": d, "title": title, "bytes": len(txt.encode()),
+                "sha256": hashlib.sha256(txt.encode()).hexdigest()[:16],
+    
+    ----- kai-pm/H2_REPAIR_CONTRACT_D367.md (repair HEAD d0c08a4, lines 136-157) -----
+    ## 5. Evidence / witness trace schema
+    
+    Every **positive evidence fact** and every **non-abstention verdict**
+    must carry a source-bound witness sufficient for independent
+    adjudication:
+    
+    | field | meaning |
+    |---|---|
+    | `witness_type` | what kind of evidence this is |
+    | `witness_value` | the **exact** token or value matched — never a description |
+    | `source_path` | the document it came from |
+    | `source_selector` | line/span, or an equivalent **stable** selector |
+    | `local_context` | surrounding text sufficient to judge the match |
+    | `applicability_scope` | what the witness binds — whole document, or a region with its selector |
+    | `evidence_total` | how many candidate rows existed |
+    | `evidence_shown` | how many are carried here |
+    | `truncated` | explicit `true`/`false` |
+    
+    Oversized evidence may live in a **bound sidecar** referenced by hash.
+    **Silent truncation is forbidden.** The evidence actually responsible for
+    the emitted cell must always be recoverable from the candidate package
+    **without guessing which source fragment mattered.**
+    
+    ----- kai-pm/H2_REPAIR_CONTRACT_D367.md (repair HEAD d0c08a4, lines 214-215) -----
+    The 5 objective `MARKER` cases remain **candidate-proven, subject to
+    final qualification**.
+    
+    
+    ## 4. The independent adjudicator used as evidence (scratch; not part of the delta)
+    
+    _compliant() is structural only. Authenticity is checked by this adjudicator against the BOUND Pass-A row and, for
+    the frozen subject, the git blob size.
+    
+    """Independent adjudicator for the AW-01 v2 objective MARKER metadata witness (Kai, entry 64, section 8).
+    
+    Not _compliant(): _compliant is a structural value-in-context test, not an authenticity verifier. This checks the witness
+    against the BOUND Pass-A row it claims to describe and, where supplied, an independent measurement (git blob size).
+    Returns a list of failed requirement names; [] means adjudicated.
+    """
+    import re
+    GRAMMAR = re.compile(r"^passa\.bytes=(0|[1-9][0-9]*) bytes;$")
+    
+    
+    def adjudicate(witness, row, git_size=None):
+        fails = []
+        if not isinstance(witness, dict):
+            return ["witness present"]
+        v, ctx = witness.get("witness_value"), witness.get("local_context")
+        m = GRAMMAR.fullmatch(v) if isinstance(v, str) else None
+        if not m:
+            fails.append("witness_value grammar ^passa\\.bytes=(0|[1-9][0-9]*) bytes;$")
+        if ctx != v:
+            fails.append("local_context == witness_value (the token, exactly)")
+        if witness.get("source_selector") != "META:passa.bytes":
+            fails.append("source_selector == META:passa.bytes")
+        if witness.get("source_path") != row.get("path"):
+            fails.append("source_path == row path")
+        n = int(m.group(1)) if m else None
+        if n is None or n != row.get("bytes"):
+            fails.append("N == bound Pass-A row bytes")
+        if not str(row.get("path", "")).endswith("README.md"):
+            fails.append("row path endswith README.md")
+        if n is None or not n < 200:
+            fails.append("N < 200")
+        if git_size is not None and n != git_size:
+            fails.append("N == git blob size (this frozen subject)")
+        for k, want in (("witness_type", "SIZE_AND_ROLE"), ("applicability_scope", "WHOLE_FILE"), ("subject", "SELF"),
+                        ("certainty", "VERIFIED"), ("polarity", "POSITIVE")):
+            if witness.get(k) != want:
+                fails.append(f"{k} == {want}")
+        return fails
+    
+    ## 5. THE DELTA (base = classify.py at d0c08a4; unified diff)
+    
+    --- a/kai-pm/house_in_order_h2_v13/classify.py
+    +++ b/kai-pm/house_in_order_h2_v13/classify.py
+    @@ -369,10 +369,19 @@
+         # objective witness: size and path role. This is the ONLY family that
+         # earns FUNCTION at H2 -- it does not consult self-description.
+         if row["bytes"] < 200 and path.endswith("README.md"):
+    +        # KAI-B4-AW-01: the determining evidence is FILE METADATA, not
+    +        # source text. v1.2 carried selector "L1" and the title as context,
+    +        # so the measurement was in neither. The witness is now one
+    +        # self-delimiting canonical token naming the governed Pass-A field,
+    +        # its exact value, its unit and a terminator: no other byte count,
+    +        # no path fragment and no prose can be a substring of it. The path
+    +        # is carried by source_path alone; the predicate is unchanged and
+    +        # the title plays no part.
+    +        token = f"passa.bytes={row['bytes']} bytes;"
+             w = Witness(witness_type="SIZE_AND_ROLE",
+    -                    witness_value=f"{row['bytes']} bytes",
+    -                    source_path=path, source_selector="L1",
+    -                    local_context=title[:120] or "(no title)",
+    +                    witness_value=token,
+    +                    source_path=path, source_selector="META:passa.bytes",
+    +                    local_context=token,
+                         applicability_scope="WHOLE_FILE",
+                         # the byte count and path role OF THIS FILE
+                         subject=E.SUBJECT_SELF,
+    
+    ## 6. Evidence (producer measurement; qualified interpreter -B -E -s)
+    
+    Real frozen subject d8aac4d4 (tree 3abc9e9d, 272 documents), full-history scratch clones, each run with its own Stage A,
+    fresh Pass A, Pass-A binding, classification, classification binding and qualifier. OLD = classifier at d0c08a4.
+    
+        qualifier            OLD rc 1, FINDINGS 5 (AXIS_WITNESS on the five README rows); v2 rc 0, FINDINGS 0. Line diff of
+                             the two qualifier outputs: only the rc/size header, the Stage-A identity line and the five findings.
+        regression           MARKER population identical (the same five paths); 0 axis-value differences over 272 x 6; the only
+                             whole-cell differences are those five FUNCTION cells, and only witness_value, source_selector,
+                             local_context; 0 rows with any of the 10 evidence facts, traces, abstentions or other keys changed.
+        compliance           _compliant OLD False x5; v2 True x5 ('passa.bytes=114 bytes;' / META:passa.bytes / same token).
+        adjudicator          v2 witnesses 5/5 adjudicated (grammar, selector, source_path, N == fresh Pass-A bytes, README.md,
+                             N < 200, N == git blob size); OLD witnesses 0/5. MARKER population recomputed from git over all
+                             272 == the five; git blob size == Pass-A bytes 272/272 (every document is valid UTF-8).
+        fixtures             21/21: 199-byte README MARKER, 200 not, 0-byte MARKER ('passa.bytes=0 bytes;'), NOTES.md /
+                             readme.md / README.md.bak not; non-MARKER cells identical OLD vs v2; titled / untitled /
+                             other-titled witnesses identical under v2 (they differed under OLD); OLD witnesses non-compliant.
+        hostile (in memory)  26/26 as declared, each case scored at BOTH layers:
+                             canonical-token forgeries T(11), T(4), T(14), T(1140) vs genuine T(114): _compliant False,
+                             adjudicator rejects. BARE-number forgeries "11", "4", "14" vs genuine T(114): _compliant TRUE
+                             (substring of the token), adjudicator rejects (grammar); "1140": both reject. Paths containing
+                             "114", "; bytes=99", or the literal "passa.bytes=114 bytes;": genuine witness passes both layers;
+                             value forged to T(114) fails both. Wrong value / right context and right value / wrong context:
+                             both reject. Empty selector, context, value, or no witness: both reject. COORDINATED tamper
+                             (value and context both T(115)): _compliant TRUE, adjudicator rejects (N != bound Pass-A bytes),
+                             with or without git. v1 shape and OLD shape: adjudicator rejects.
+        hostile (real chain) real v2 classifier with only the MARKER witness altered, then the real bind and qualifier, then the
+                             adjudicator over the result, 9/9 as declared: wrong value token, wrong context token, empty
+                             context, empty selector -> qualifier rc 1 with exactly 5 AXIS_WITNESS; empty value and removed
+                             witness -> 5 AXIS_WITNESS plus 5 WITNESS::FUNCTION; COORDINATED tamper and BARE-substring value
+                             -> qualifier rc 0 with 0 findings (structurally accepted) while the adjudicator accepts 0/5;
+                             unaltered -> qualifier 0 findings, adjudicator 5/5.
+    
+    ## 7. Attack these
+    
+      Q1  The real qualifier ACCEPTS two forgeries (coordinated tamper; bare-number substring of the token); only the
+          adjudicator rejects them. With _compliant() and qualify.py frozen, is AW-01 v2 sound only if this adjudicator (or an
+          equivalent) becomes a standing control? Where should it live, given the frozen files?
+      Q2  Is a context identical to the value "surrounding text sufficient to judge the match" (D367 §5, section 3)?
+      Q3  Grammar ^passa\.bytes=(0|[1-9][0-9]*) bytes;$ — any ambiguity left (leading zeros, sign, whitespace, unicode digits)?
+          Note: the Python regex is used with fullmatch on a str.
+      Q4  Is "META:passa.bytes" an adequate stable selector, given Pass A's bytes = len(text.encode()) of the verified text
+          decoded with errors="ignore" (equal to git blob size only for valid UTF-8; 272/272 here)?
+      Q5  Does anything in the delta change behaviour other than the five witnesses (e.g. the unused `title` path, envelope
+          conservation, subject/scope)?
+      Q6  The predicate is a suffix match (x/XREADME.md is MARKER, unchanged and frozen; 0 such paths in the subject). Flag only?
+    
+    ## 8. Out of scope
+    
+    The MARKER predicate; run_h2_v12.py; qualify.py; envelope.py; any other file; the accepted commit d0c08a4.
+    
+    END OF PACKET AW-01 v2 — D379 MARKER WITNESS
+    END-VERBATIM V2-DEEPSEEK-PACKET-AW01-V2-MD
+- EVIDENCE V2-DEEPSEEK-COVER-AW01-V2-TXT aw01v2_b64/DEEPSEEK_COVER_AW01_v2.txt: 1604 bytes, sha256 f876db3488b5055850b45ebac6f8d79b88376865d561b6d75da37fa8ffe3ac66, final LF True  [CMD `sha256sum DEEPSEEK_COVER_AW01_v2.txt` → f876db3488b50558…]
+    BEGIN-VERBATIM V2-DEEPSEEK-COVER-AW01-V2-TXT
+    To: DeepSeek (adversarial reviewer)
+    From: Orion, for Kai (adjudicator) and Dainius (operator)
+    Subject: D379 B4 KAI-B4-AW-01 objective MARKER witness repair, packet v2, adversarial review of one revised classify.py delta
+    
+    This message is complete on its own. You have no repository access and no prior context; rely ONLY on the packet
+    below. Your findings carry zero admission weight: Kai reconciles every one against the repository.
+    
+    The packet is a Markdown document of 18163 bytes, sent inline as 3 base64 blocks.
+    Packet SHA-256 (the subject you must reconstruct):
+    8a8f1d1f08a3acac82153676265aa9e5496e06feb5ec0606ff411c547faccfd5
+    
+    Protocol:
+    1. For each block, remove all whitespace from the base64 text and check its stated hash.
+    2. Decode it; check the stated decoded length and decoded hash.
+    3. Concatenate the decoded chunks strictly in order 1 to 3; check the packet hash above.
+    4. Read ONLY the decoded packet, then reply FIRST with the receipt in its section 0: copy the packet hash given
+       above on the PACKET HASH line, and copy both sentinels exactly from the DECODED delta. If you cannot compute
+       SHA-256, say so, but still copy the given hash. If you cannot reproduce both sentinels exactly, reply NO REVIEW.
+    5. Only after the receipt, review the delta as the packet's section 7 suggests. Give each finding an ID
+       (DS-AW01-V2-nn), a severity (BLOCKER / MAJOR / MINOR / QUESTION), the exact delta or excerpt lines copied from
+       the decoded packet, a concrete failing input where possible, and a remedy. If you find nothing, say so
+       explicitly. A PASS is not implementation authority.
+    END-VERBATIM V2-DEEPSEEK-COVER-AW01-V2-TXT
+- EVIDENCE V2-GEN-AW01V2-PACKET-PY gen_aw01v2_packet.py: 9155 bytes, sha256 4f1432a88d0b45f8564651f5837b6629a04c1f6915fdb57a91d8653c4211a2df, final LF True  [CMD `sha256sum gen_aw01v2_packet.py` → 4f1432a88d0b45f8…]
+    BEGIN-VERBATIM V2-GEN-AW01V2-PACKET-PY
+    import hashlib, pathlib
+    S = pathlib.Path("/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/twofact"); I = S / "impl"
+    h = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+    delta = (S / "aw01.v2.diff").read_text(); exc = (S / "aw01_excerpts.txt").read_text(); adj = (I / "aw01v2_adjudicator.py").read_text()
+    P = f"""# D379 B4 — KAI-B4-AW-01 OBJECTIVE MARKER WITNESS: ADVERSARIAL-REVIEW PACKET v2 (AW-01 v2 DELTA ONLY)
+    
+    Producer: Orion. Date: 2026-10-04. Evidence class: PRODUCER MEASUREMENT, ZERO ADMISSION WEIGHT.
+    Status: PROPOSAL ONLY, scratch. classify.py is NOT modified anywhere. The repair branch is at d0c08a4 (accepted).
+    
+    YOU HAVE NO REPOSITORY ACCESS AND NO PRIOR CONTEXT. Rely only on this packet. Source excerpts in section 3 are cut
+    mechanically from the repository at commit d0c08a4; nothing is paraphrased.
+    
+    ## 0. RECEIPT — reply with these lines FIRST, each copied exactly
+    
+        PACKET HASH: <sha256 of this decoded packet, as given by the sender>
+        BASE classify.py SHA-256: <from section 1>
+        FIRST DELTA HUNK: <the first line beginning with @@ in section 5>
+        SENTINEL A: <the added line in section 5 that assigns token>
+        SENTINEL B: <the added line in section 5 that sets source_selector>
+        END OF PACKET SEEN: YES
+    
+    If either sentinel cannot be reproduced exactly, reply NO REVIEW. The last line of this file is
+    "END OF PACKET AW-01 v2 — D379 MARKER WITNESS".
+    
+    ## 1. Identities
+    
+        BASE      classify.py at d0c08a4                 sha256 {h(S / "inst5/kai-pm/house_in_order_h2_v13/classify.py")}
+        DELTA     AW-01 v2 (section 5)                   sha256 {h(S / "aw01.v2.diff")}
+        PROPOSED  classify.py                            sha256 {h(S / "instAW2/kai-pm/house_in_order_h2_v13/classify.py")}
+        ADJUDICATOR (section 4, scratch control)         sha256 {h(I / "aw01v2_adjudicator.py")}
+    
+    ## 2. The defect, and why v1 was rejected
+    
+    classify.function() earns FUNCTION=MARKER when `row["bytes"] < 200 and path.endswith("README.md")`. Its witness was
+    witness_value "<N> bytes", source_selector "L1", local_context = title or "(no title)": the measured value appeared in
+    neither selector nor context. The qualifier rejects all five such cells on the frozen subject (AXIS_WITNESS); the
+    adjudicator (Kai) ruled the finding correct and not waived (KAI-B4-AW-01).
+    
+    A previous proposal (v1) used witness_value "<N>", selector "META:bytes", context "path=<path>; bytes=<N>". A prior
+    review (finding DS-AW01-V1-01, upheld as MAJOR) showed that run_h2_v12._compliant (section 3) is a SUBSTRING test, so a
+    witness whose bytes field was removed or wrong still passed when the path's digits contained the value (path
+    data/114/README.md, value 11). Reordering the fields does not help: it was measured that "bytes=99; path=data/114/..."
+    still passes for value 11. v1 is rejected.
+    
+    v2 (Kai's design): witness_value = local_context = the self-delimiting canonical token "passa.bytes=<N> bytes;"; source
+    selector "META:passa.bytes" (Pass A's governed field `bytes`, section 3); the path is carried only by source_path and is
+    NOT in local_context. Fixed invariants: the predicate is unchanged; the same five frozen-subject rows stay MARKER; no
+    other FUNCTION verdict or abstention changes; _compliant(), envelope.py and qualify.py are NOT changed; WHOLE_FILE /
+    SELF / VERIFIED / POSITIVE unchanged.
+    
+    ## 3. Source excerpts (verbatim, from d0c08a4)
+    
+    {exc}
+    ## 4. The independent adjudicator used as evidence (scratch; not part of the delta)
+    
+    _compliant() is structural only. Authenticity is checked by this adjudicator against the BOUND Pass-A row and, for
+    the frozen subject, the git blob size.
+    
+    {adj}
+    ## 5. THE DELTA (base = classify.py at d0c08a4; unified diff)
+    
+    {delta}
+    ## 6. Evidence (producer measurement; qualified interpreter -B -E -s)
+    
+    Real frozen subject d8aac4d4 (tree 3abc9e9d, 272 documents), full-history scratch clones, each run with its own Stage A,
+    fresh Pass A, Pass-A binding, classification, classification binding and qualifier. OLD = classifier at d0c08a4.
+    
+        qualifier            OLD rc 1, FINDINGS 5 (AXIS_WITNESS on the five README rows); v2 rc 0, FINDINGS 0. Line diff of
+                             the two qualifier outputs: only the rc/size header, the Stage-A identity line and the five findings.
+        regression           MARKER population identical (the same five paths); 0 axis-value differences over 272 x 6; the only
+                             whole-cell differences are those five FUNCTION cells, and only witness_value, source_selector,
+                             local_context; 0 rows with any of the 10 evidence facts, traces, abstentions or other keys changed.
+        compliance           _compliant OLD False x5; v2 True x5 ('passa.bytes=114 bytes;' / META:passa.bytes / same token).
+        adjudicator          v2 witnesses 5/5 adjudicated (grammar, selector, source_path, N == fresh Pass-A bytes, README.md,
+                             N < 200, N == git blob size); OLD witnesses 0/5. MARKER population recomputed from git over all
+                             272 == the five; git blob size == Pass-A bytes 272/272 (every document is valid UTF-8).
+        fixtures             21/21: 199-byte README MARKER, 200 not, 0-byte MARKER ('passa.bytes=0 bytes;'), NOTES.md /
+                             readme.md / README.md.bak not; non-MARKER cells identical OLD vs v2; titled / untitled /
+                             other-titled witnesses identical under v2 (they differed under OLD); OLD witnesses non-compliant.
+        hostile (in memory)  26/26 as declared, each case scored at BOTH layers:
+                             canonical-token forgeries T(11), T(4), T(14), T(1140) vs genuine T(114): _compliant False,
+                             adjudicator rejects. BARE-number forgeries "11", "4", "14" vs genuine T(114): _compliant TRUE
+                             (substring of the token), adjudicator rejects (grammar); "1140": both reject. Paths containing
+                             "114", "; bytes=99", or the literal "passa.bytes=114 bytes;": genuine witness passes both layers;
+                             value forged to T(114) fails both. Wrong value / right context and right value / wrong context:
+                             both reject. Empty selector, context, value, or no witness: both reject. COORDINATED tamper
+                             (value and context both T(115)): _compliant TRUE, adjudicator rejects (N != bound Pass-A bytes),
+                             with or without git. v1 shape and OLD shape: adjudicator rejects.
+        hostile (real chain) real v2 classifier with only the MARKER witness altered, then the real bind and qualifier, then the
+                             adjudicator over the result, 9/9 as declared: wrong value token, wrong context token, empty
+                             context, empty selector -> qualifier rc 1 with exactly 5 AXIS_WITNESS; empty value and removed
+                             witness -> 5 AXIS_WITNESS plus 5 WITNESS::FUNCTION; COORDINATED tamper and BARE-substring value
+                             -> qualifier rc 0 with 0 findings (structurally accepted) while the adjudicator accepts 0/5;
+                             unaltered -> qualifier 0 findings, adjudicator 5/5.
+    
+    ## 7. Attack these
+    
+      Q1  The real qualifier ACCEPTS two forgeries (coordinated tamper; bare-number substring of the token); only the
+          adjudicator rejects them. With _compliant() and qualify.py frozen, is AW-01 v2 sound only if this adjudicator (or an
+          equivalent) becomes a standing control? Where should it live, given the frozen files?
+      Q2  Is a context identical to the value "surrounding text sufficient to judge the match" (D367 §5, section 3)?
+      Q3  Grammar ^passa\\.bytes=(0|[1-9][0-9]*) bytes;$ — any ambiguity left (leading zeros, sign, whitespace, unicode digits)?
+          Note: the Python regex is used with fullmatch on a str.
+      Q4  Is "META:passa.bytes" an adequate stable selector, given Pass A's bytes = len(text.encode()) of the verified text
+          decoded with errors="ignore" (equal to git blob size only for valid UTF-8; 272/272 here)?
+      Q5  Does anything in the delta change behaviour other than the five witnesses (e.g. the unused `title` path, envelope
+          conservation, subject/scope)?
+      Q6  The predicate is a suffix match (x/XREADME.md is MARKER, unchanged and frozen; 0 such paths in the subject). Flag only?
+    
+    ## 8. Out of scope
+    
+    The MARKER predicate; run_h2_v12.py; qualify.py; envelope.py; any other file; the accepted commit d0c08a4.
+    
+    END OF PACKET AW-01 v2 — D379 MARKER WITNESS
+    """
+    (S / "DEEPSEEK_PACKET_AW01_v2.md").write_text(P)
+    a = "## 5. THE DELTA (base = classify.py at d0c08a4; unified diff)\n\n"; i = P.index(a) + len(a)
+    emb = P[i:P.index("## 6. Evidence", i)]; L = P.split("\n")
+    print("embedded delta exact:", emb == delta + "\n", "| excerpts:", exc in P, "| adjudicator:", adj in P,
+          "| sentinel A", sum(l == '''+        token = f"passa.bytes={row['bytes']} bytes;"''' for l in L),
+          "| sentinel B", sum(l == '+                    source_path=path, source_selector="META:passa.bytes",' for l in L),
+          "| first hunk", [l for l in L if l.startswith("@@")][0], "|", len(P.encode()), hashlib.sha256(P.encode()).hexdigest())
+    END-VERBATIM V2-GEN-AW01V2-PACKET-PY
+- EVIDENCE V2-GEN-AW01V2-B64-PY gen_aw01v2_b64.py: 3162 bytes, sha256 138f500b8edb9e9b5439b51d01c8d9ad8d95b690090f63d0835099767a704a62, final LF True  [CMD `sha256sum gen_aw01v2_b64.py` → 138f500b8edb9e9b…]
+    BEGIN-VERBATIM V2-GEN-AW01V2-B64-PY
+    import base64, hashlib, pathlib, textwrap, re
+    S = pathlib.Path("/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/twofact")
+    O = S / "aw01v2_b64"; O.mkdir(exist_ok=True)
+    pkt = (S / "DEEPSEEK_PACKET_AW01_v2.md").read_bytes(); H = hashlib.sha256(pkt).hexdigest()
+    n = 3; cuts = [0]
+    for k in range(1, n):
+        cuts.append(pkt.rfind(b"\n", 0, len(pkt) * k // n) + 1)
+    cuts.append(len(pkt)); chunks = [pkt[cuts[i]:cuts[i + 1]] for i in range(n)]
+    cover = f"""To: DeepSeek (adversarial reviewer)
+    From: Orion, for Kai (adjudicator) and Dainius (operator)
+    Subject: D379 B4 KAI-B4-AW-01 objective MARKER witness repair, packet v2, adversarial review of one revised classify.py delta
+    
+    This message is complete on its own. You have no repository access and no prior context; rely ONLY on the packet
+    below. Your findings carry zero admission weight: Kai reconciles every one against the repository.
+    
+    The packet is a Markdown document of {len(pkt)} bytes, sent inline as {n} base64 blocks.
+    Packet SHA-256 (the subject you must reconstruct):
+    {H}
+    
+    Protocol:
+    1. For each block, remove all whitespace from the base64 text and check its stated hash.
+    2. Decode it; check the stated decoded length and decoded hash.
+    3. Concatenate the decoded chunks strictly in order 1 to {n}; check the packet hash above.
+    4. Read ONLY the decoded packet, then reply FIRST with the receipt in its section 0: copy the packet hash given
+       above on the PACKET HASH line, and copy both sentinels exactly from the DECODED delta. If you cannot compute
+       SHA-256, say so, but still copy the given hash. If you cannot reproduce both sentinels exactly, reply NO REVIEW.
+    5. Only after the receipt, review the delta as the packet's section 7 suggests. Give each finding an ID
+       (DS-AW01-V2-nn), a severity (BLOCKER / MAJOR / MINOR / QUESTION), the exact delta or excerpt lines copied from
+       the decoded packet, a concrete failing input where possible, and a remedy. If you find nothing, say so
+       explicitly. A PASS is not implementation authority.
+    """
+    assert "META:passa.bytes" not in cover and "passa.bytes=" not in cover and "SENTINEL" not in cover
+    parts = []
+    for i, c in enumerate(chunks, 1):
+        b64 = base64.b64encode(c).decode(); wrapped = "\n".join(textwrap.wrap(b64, 76))
+        block = (f"CHUNK {i}/{n}\noriginal decoded-byte length: {len(c)}\nSHA-256 of original decoded chunk: {hashlib.sha256(c).hexdigest()}\n"
+                 f"SHA-256 of transmitted base64 text (all whitespace removed): {hashlib.sha256(b64.encode()).hexdigest()}\nBEGIN BASE64\n{wrapped}\nEND BASE64\n")
+        (O / f"aw01v2_b64_chunk_{i}_of_{n}.txt").write_text(block); parts.append(block)
+    (O / "DEEPSEEK_COVER_AW01_v2.txt").write_text(cover)
+    msg = cover + "\n" + "\n".join(parts); (O / "DEEPSEEK_MESSAGE_AW01_v2_BASE64_COMPLETE.txt").write_text(msg)
+    dec = b"".join(base64.b64decode(re.sub(r"\s", "", b), validate=True) for b in re.findall(r"BEGIN BASE64\n(.*?)\nEND BASE64", msg, re.S))
+    print("chunks", [len(c) for c in chunks], "| message round-trip == packet:", dec == pkt, "| packet", H)
+    for f in sorted(O.iterdir()): print(f.name, len(f.read_bytes()), hashlib.sha256(f.read_bytes()).hexdigest())
+    END-VERBATIM V2-GEN-AW01V2-B64-PY
+- EVIDENCE V2-IMPL-CHAIN-AW2-DIFF impl/impl_chain_aw2.diff: 479 bytes, sha256 a57aa749d398456a9699110b5eea52a608b6063c53b7fcf995ab084e79552711, final LF True  [CMD `sha256sum impl_chain_aw2.diff` → a57aa749d398456a…]
+    BEGIN-VERBATIM V2-IMPL-CHAIN-AW2-DIFF
+    8c8
+    < V = pathlib.Path("/home/user/kai-repair/kai-pm/house_in_order_h2_v13")
+    ---
+    > V = pathlib.Path("/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/twofact/instAW2/kai-pm/house_in_order_h2_v13")
+    39c39
+    <       "--census-package", CEN, "--stage-a", str(sa), "--out", str(W / "result.json")), "classification (composite)")
+    ---
+    >       "--census-package", CEN, "--stage-a", str(sa), "--out", str(W / "result.json")), "classification (AW-01 v2)")
+    END-VERBATIM V2-IMPL-CHAIN-AW2-DIFF
+- EVIDENCE V2-IMPL-CHAIN-AW2-OUT-TXT impl/impl_chain_aw2_out.txt: 1628 bytes, sha256 6d9e2ca42bfd0891e483fde6f987e61778117b4e2cb1dc53496f2fdee498f6a0, final LF True  [CMD `sha256sum impl_chain_aw2_out.txt` → 6d9e2ca42bfd0891…]
+    BEGIN-VERBATIM V2-IMPL-CHAIN-AW2-OUT-TXT
+      subject HEAD                 rc=0  d8aac4d49e6ba997e3eb38062c0917186ee3f197
+      subject tree                 rc=0  3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+      subject status               rc=0  
+      subject HEAD == d8aac4d49e6b True; tree == 3abc9e9d8ca1 True; status lines 0
+      Stage A (CALIBRATION)        rc=0  
+      fresh Pass A                 rc=0    NO VERDICT ASSIGNED IN PASS A.
+      Pass-A binding               rc=0  ec477ede306e6bba49832157d4f5a9ff4c8b8985390fce9dcb6f6171bf6c7463
+      classification (AW-01 v2)    rc=0    self_approval: NONE
+      classification binding       rc=0  83e13d09f731a05330b2c881c40cef16aeb886bd222503c0e2c03f7c27832121
+      qualifier                    rc=0    FINDINGS: 0
+      qualifier findings (lines with '::'): 0
+      subject status after chain: 0 lines
+    
+    FRESH PASS A  subject d8aac4d49e6b  rows 272  rows with readers 5  rows with reader_ops 5  reader_ops entries 8  distinct op sources 4
+      selected reader sources (composite _reader_trace): 5 selections, 4 distinct: ['scripts/auto_changelog.py', 'scripts/auto_session_log.py', 'scripts/security/check_gate_registry.py', 'scripts/sync_docs.py']
+      member of frozen subject: 4/4   strict UTF-8: 4/4
+      (all op sources, superset of selected) member: 4/4   strict UTF-8: 4/4
+      result: STATIC_REFERENCE_AT_SUBJECT positive 5; traces 5; abstained 0
+      result tallies: {"BINDING_CONTRADICTION": 5, "CARRIES_DATE_STAMP": 206, "CITES_COMMIT": 21, "CITES_RUN": 3, "MAINTENANCE_OBSERVED": 71, "NOMINAL_FUNCTION": 207, "SELF_ASSERTS_AUTHORITY": 4, "SELF_ASSERTS_CURRENT": 6, "SELF_ASSERTS_NON_AUTHORITY": 1, "STATIC_REFERENCE_AT_SUBJECT": 5}
+    
+    READER CONFIRMATION: PASS
+    END-VERBATIM V2-IMPL-CHAIN-AW2-OUT-TXT
+- EVIDENCE V2-AW2-CHAIN-FULL-LOG-TXT impl/aw2_chain_full_log.txt: 6875 bytes, sha256 2ccf162606423687234075fed35b6925c3b6f4798101e2a89aa2d88251f89c35, final LF True  [CMD `sha256sum aw2_chain_full_log.txt` → 2ccf162606423687…]
+    BEGIN-VERBATIM V2-AW2-CHAIN-FULL-LOG-TXT
+    --- subject HEAD rc=0 (41 bytes)
+    d8aac4d49e6ba997e3eb38062c0917186ee3f197
+    --- end subject HEAD
+    --- subject tree rc=0 (41 bytes)
+    3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+    --- end subject tree
+    --- subject status rc=0 (0 bytes)
+    --- end subject status
+    --- Stage A (CALIBRATION) rc=0 (0 bytes)
+    --- end Stage A (CALIBRATION)
+    --- fresh Pass A rc=0 (516 bytes)
+    PASS A v1.2 COMPLETE — 272 rows == population 272
+      WITNESS KINDS DISCRIMINATED (D2/D4), not assumed from shape:
+        DATE                        353
+        COMMIT                      110
+        RUN_ID                       12
+        HEX_SHAPED_UNRESOLVED         9
+        DECIMAL_TOKEN                 5
+        DIGEST_FRAGMENT               3
+      scope determined: WHOLE_FILE 201 · SPAN 291
+      binding predicates declared closed-world: 26
+      contextual predicates declared closed-world: 1 (status)
+      NO VERDICT ASSIGNED IN PASS A.
+    --- end fresh Pass A
+    --- Pass-A binding rc=0 (65 bytes)
+    ec477ede306e6bba49832157d4f5a9ff4c8b8985390fce9dcb6f6171bf6c7463
+    --- end Pass-A binding
+    --- classification (AW-01 v2) rc=0 (1356 bytes)
+    HOUSE_H2 v1.2 — 272 rows == population 272
+      subject d8aac4d49e6b tree 3abc9e9d8ca1
+    
+      LIFECYCLE    positives    8  UNKNOWN  264   {'HISTORICAL': 8}
+      FUNCTION     positives    5  UNKNOWN  267   {'MARKER': 5}
+      AUTHORITY    positives    0  UNKNOWN  272   
+      GENERATION   positives    0  UNKNOWN  272   
+      VALIDITY     positives    9  UNKNOWN  263   {'TIME_BOUND': 7, 'EXACT_SNAPSHOT': 2}
+      SCOPE        positives  194  UNKNOWN   78   {'WHOLE_FILE': 194}
+    
+      evidence facts (NOT verdicts):
+        MAINTENANCE_OBSERVED           71
+        SELF_ASSERTS_CURRENT            6
+        STATIC_REFERENCE_AT_SUBJECT     5
+        CITES_COMMIT                   21
+        CITES_RUN                       3
+        CARRIES_DATE_STAMP            206
+        BINDING_CONTRADICTION           5
+        NOMINAL_FUNCTION              207
+        SELF_ASSERTS_AUTHORITY          4
+        SELF_ASSERTS_NON_AUTHORITY      1
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 207
+        {'GOVERNANCE from self-description': 6, 'STATUS from self-description': 4, 'PLAN from self-description': 22, 'RUNTIME_INPUT from self-description': 9, 'USER_GUIDE from self-description': 10, 'REFERENCE from self-description': 11, 'EVIDENCE from self-description': 144, 'MARKER from self-description': 1}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end classification (AW-01 v2)
+    --- classification binding rc=0 (65 bytes)
+    83e13d09f731a05330b2c881c40cef16aeb886bd222503c0e2c03f7c27832121
+    --- end classification binding
+    --- qualifier rc=0 (4236 bytes)
+    HOUSE_H2 v1.2 — QUALIFICATION
+      subject d8aac4d49e6b  tree 3abc9e9d8ca1
+      history 2025-06-18 → 2026-08-23  shallow=false  ancestry=986
+      census  29064d650a612968…
+    
+      [1] GOVERNING INVARIANT — checked from the AXIS SET
+          UNKNOWN first-class on every axis: True
+      [1b] REMOVAL CALIBRATION — the gate proves it can fail, this run
+           remove UNKNOWN from LIFECYCLE   detected=True
+           remove UNKNOWN from FUNCTION    detected=True
+           remove UNKNOWN from AUTHORITY   detected=True
+           remove UNKNOWN from GENERATION  detected=True
+           remove UNKNOWN from VALIDITY    detected=True
+           remove UNKNOWN from SCOPE       detected=True
+    
+      [2] STATE DISPOSITIONS — checked from the ALPHABET
+          [LIFECYCLE]
+            ACTIVE            H2_NOT_EARNABLE        0  
+            HISTORICAL        H2_EMITTABLE           8  
+            SUPERSEDED        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE         264  
+          [FUNCTION]
+            GOVERNANCE        H2_EMITTABLE           0  not observed on this subject
+            STATUS            H2_EMITTABLE           0  not observed on this subject
+            PLAN              H2_EMITTABLE           0  not observed on this subject
+            EVIDENCE          H2_EMITTABLE           0  not observed on this subject
+            REFERENCE         H2_EMITTABLE           0  not observed on this subject
+            RUNTIME_INPUT     H2_EMITTABLE           0  not observed on this subject
+            TEMPLATE          H2_EMITTABLE           0  not observed on this subject
+            MARKER            H2_EMITTABLE           5  
+            USER_GUIDE        H2_EMITTABLE           0  not observed on this subject
+            OTHER             H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE         267  
+          [AUTHORITY]
+            AUTHORITATIVE     DEFERRED_TO_H3         0  
+            VERIFIED_DERIVED  DEFERRED_TO_H3         0  
+            ADVISORY          DEFERRED_TO_H3         0  
+            NON_AUTHORITY     DEFERRED_TO_H3         0  
+            UNKNOWN           H2_EMITTABLE         272  
+          [GENERATION]
+            MANUAL            H2_NOT_EARNABLE        0  
+            PARTIAL_DERIVED   H2_NOT_EARNABLE        0  
+            FULL_DERIVED      H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE         272  
+          [VALIDITY]
+            CURRENT_TREE      H2_EMITTABLE           0  not observed on this subject
+            EXACT_SNAPSHOT    H2_EMITTABLE           2  
+            RUN_ARTEFACT      H2_EMITTABLE           0  not observed on this subject
+            TIME_BOUND        H2_EMITTABLE           7  
+            UNKNOWN           H2_EMITTABLE         263  
+          [SCOPE]
+            WHOLE_FILE        H2_EMITTABLE         194  
+            HEADING           H2_NOT_EARNABLE        0  
+            TABLE             H2_NOT_EARNABLE        0  
+            MANAGED_REGION    H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE          78  
+    
+      [3] OUTPUT-DERIVED — values emitted but unknown to the ontology: 0
+    
+      [4] population declared 272 == rows 272: True
+      [5] every non-abstention cell carries a source-bound witness: True  (0 missing)
+    
+      [6] §8(6) CLOSED ORIGIN CLASSIFICATION — every loaded origin
+          observed 87   classified 87   refused 0
+          H2                 3
+          CENSUS             0
+          GOVERNED_STDLIB    48
+          BUILTIN_OR_FROZEN  36
+    
+      [7] Q1a RECORDED PRODUCER PROVENANCE vs STAGE A
+          verified against stage_a_identity b60f3a02bea0ce9b…, every slot closed
+    
+      [8] Q1b / E1 — DERIVED denominators (D379 §8)
+          axis-cell denominator              216
+          positive-evidence-fact denominator 529
+          sum                                745
+    
+      UTILITY PROFILE — reported, never optimised (D367 11)
+          axis         positive  UNKNOWN  UNMEASURED
+          LIFECYCLE           8      264           0
+          FUNCTION            5      267           0
+          AUTHORITY           0      272           0
+          GENERATION          0      272           0
+          VALIDITY            9      263           0
+          SCOPE             194       78           0
+          Qualification asks: is the instrument TRUTHFUL?
+          A separate later decision asks: is it USEFUL enough for H3?
+    
+      FINDINGS: 0
+    --- end qualifier
+    END-VERBATIM V2-AW2-CHAIN-FULL-LOG-TXT
+- EVIDENCE V2-AW01V2-QUALIFIER-DIFF-TXT impl/aw01v2_qualifier_diff.txt: 821 bytes, sha256 7720ddec66f2016dcdc86bfaaca2e5b1bef8567f5b4a3de152881930e7c8799e, final LF True  [CMD `sha256sum aw01v2_qualifier_diff.txt` → 7720ddec66f2016d…]
+    BEGIN-VERBATIM V2-AW01V2-QUALIFIER-DIFF-TXT
+    1c1
+    < --- qualifier rc=1 (4754 bytes)
+    ---
+    > --- qualifier rc=0 (4236 bytes)
+    72c72
+    <       verified against stage_a_identity 8c1f7a8138f828af…, every slot closed
+    ---
+    >       verified against stage_a_identity b60f3a02bea0ce9b…, every slot closed
+    90,95c90
+    <   FINDINGS: 5
+    <     AXIS_WITNESS::data/self-emp/Accounting/README.md — non-abstaining cell carries no compliant witness
+    <     AXIS_WITNESS::data/self-emp/Coding/README.md — non-abstaining cell carries no compliant witness
+    <     AXIS_WITNESS::data/self-emp/Engineering/README.md — non-abstaining cell carries no compliant witness
+    <     AXIS_WITNESS::data/self-emp/Legal/README.md — non-abstaining cell carries no compliant witness
+    <     AXIS_WITNESS::data/self-emp/Social/README.md — non-abstaining cell carries no compliant witness
+    ---
+    >   FINDINGS: 0
+    END-VERBATIM V2-AW01V2-QUALIFIER-DIFF-TXT
+- EVIDENCE V2-AW01V2-ADJUDICATOR-PY impl/aw01v2_adjudicator.py: 1877 bytes, sha256 0ab4376b1466537f3f0f8b8f963ac761b6bc1ca521c2e267cb19377e860b7622, final LF True  [CMD `sha256sum aw01v2_adjudicator.py` → 0ab4376b1466537f…]
+    BEGIN-VERBATIM V2-AW01V2-ADJUDICATOR-PY
+    """Independent adjudicator for the AW-01 v2 objective MARKER metadata witness (Kai, entry 64, section 8).
+    
+    Not _compliant(): _compliant is a structural value-in-context test, not an authenticity verifier. This checks the witness
+    against the BOUND Pass-A row it claims to describe and, where supplied, an independent measurement (git blob size).
+    Returns a list of failed requirement names; [] means adjudicated.
+    """
+    import re
+    GRAMMAR = re.compile(r"^passa\.bytes=(0|[1-9][0-9]*) bytes;$")
+    
+    
+    def adjudicate(witness, row, git_size=None):
+        fails = []
+        if not isinstance(witness, dict):
+            return ["witness present"]
+        v, ctx = witness.get("witness_value"), witness.get("local_context")
+        m = GRAMMAR.fullmatch(v) if isinstance(v, str) else None
+        if not m:
+            fails.append("witness_value grammar ^passa\\.bytes=(0|[1-9][0-9]*) bytes;$")
+        if ctx != v:
+            fails.append("local_context == witness_value (the token, exactly)")
+        if witness.get("source_selector") != "META:passa.bytes":
+            fails.append("source_selector == META:passa.bytes")
+        if witness.get("source_path") != row.get("path"):
+            fails.append("source_path == row path")
+        n = int(m.group(1)) if m else None
+        if n is None or n != row.get("bytes"):
+            fails.append("N == bound Pass-A row bytes")
+        if not str(row.get("path", "")).endswith("README.md"):
+            fails.append("row path endswith README.md")
+        if n is None or not n < 200:
+            fails.append("N < 200")
+        if git_size is not None and n != git_size:
+            fails.append("N == git blob size (this frozen subject)")
+        for k, want in (("witness_type", "SIZE_AND_ROLE"), ("applicability_scope", "WHOLE_FILE"), ("subject", "SELF"),
+                        ("certainty", "VERIFIED"), ("polarity", "POSITIVE")):
+            if witness.get(k) != want:
+                fails.append(f"{k} == {want}")
+        return fails
+    END-VERBATIM V2-AW01V2-ADJUDICATOR-PY
+- EVIDENCE V2-AW01V2-DIFF-PY impl/aw01v2_diff.py: 4380 bytes, sha256 97edecadf425cc2b562a99d141b7f3bb0fcca6c837051dc3de08f26eb84ff9ef, final LF True  [CMD `sha256sum aw01v2_diff.py` → 97edecadf425cc2b…]
+    BEGIN-VERBATIM V2-AW01V2-DIFF-PY
+    """KAI-B4-AW-01 v2 differential (child, qualified interpreter). argv: <OLD work dir = d0c08a4 run> <AW work dir> <OLD H2 dir>
+    OLD = repair HEAD d0c08a4 classifier; AW = d0c08a4 + the AW-01 classify.py proposal. Same subject d8aac4d4 (separate
+    full-history clones, separate Stage A / Pass A). The independent adjudication reads ONLY git objects of the AW clone."""
+    import sys, json, subprocess, re
+    OW, AW, H = sys.argv[1:4]
+    sys.path.insert(0, H); import run_h2_v12 as R, ontology as ont
+    o, a = json.load(open(OW + "/result.json")), json.load(open(AW + "/result.json"))
+    po, pa = json.load(open(OW + "/passA.json")), json.load(open(AW + "/passA.json"))
+    print(f"subjects {o['subject'][:12]} {a['subject'][:12]}  Pass-A rows identical: {po['rows'] == pa['rows']}")
+    on, an = {r["path"]: r for r in o["rows"]}, {r["path"]: r for r in a["rows"]}
+    assert set(on) == set(an) and len(an) == 272
+    AX = list(ont.ALPHABETS)
+    val_diff = [(p, x) for p in an for x in AX if an[p][x]["value"] != on[p][x]["value"]]
+    cell_diff = [(p, x) for p in an for x in AX if an[p][x] != on[p][x]]
+    print(f"axis VALUE differences over 272 rows x {len(AX)} axes: {len(val_diff)}")
+    print(f"whole-cell differences: {len(cell_diff)} -> {sorted(set(x for _, x in cell_diff))} on {sorted(set(p for p, _ in cell_diff))}")
+    for p, x in cell_diff:
+        oc, ac = on[p][x], an[p][x]
+        other = {k for k in set(oc) | set(ac) if k != "witness" and oc.get(k) != ac.get(k)}
+        wd = {k for k in set(oc["witness"]) | set(ac["witness"]) if oc["witness"].get(k) != ac["witness"].get(k)}
+        print(f"  {p:<38} {x}: non-witness keys differing {sorted(other)}; witness fields differing {sorted(wd)}")
+    facts = [p for p in an if an[p]["evidence_facts"] != on[p]["evidence_facts"]]
+    traces = [p for p in an if an[p]["evidence_fact_traces"] != on[p]["evidence_fact_traces"]]
+    abst = [p for p in an if an[p].get("evidence_facts_abstained_no_compliant_trace") != on[p].get("evidence_facts_abstained_no_compliant_trace")]
+    other_keys = [p for p in an if {k: v for k, v in an[p].items() if k not in AX} != {k: v for k, v in on[p].items() if k not in AX}]
+    print(f"rows with any of the 10 evidence facts different: {len(facts)}; traces: {len(traces)}; abstentions: {len(abst)}; any other row key: {len(other_keys)}")
+    mo = sorted(p for p in on if on[p]["FUNCTION"]["value"] == "MARKER"); ma = sorted(p for p in an if an[p]["FUNCTION"]["value"] == "MARKER")
+    print(f"MARKER population OLD {len(mo)} AW {len(ma)} identical {mo == ma}: {ma}")
+    print("\nFAIL-OLD / PASS-NEW (run_h2_v12._compliant, the qualifier's predicate):")
+    for p in ma:
+        ow, aw = on[p]["FUNCTION"]["witness"], an[p]["FUNCTION"]["witness"]
+        print(f"  {p:<38} OLD {R._compliant(ow)!s:<5} ({ow['witness_value']!r} / {ow['source_selector']} / {ow['local_context']!r})   AW {R._compliant(aw)!s:<5} ({aw['witness_value']!r} / {aw['source_selector']} / {aw['local_context']!r})")
+    # independent adjudication: the v2 adjudicator (aw01v2_adjudicator.py) against the BOUND Pass-A row and git blob size
+    sys.path.insert(0, "/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/twofact/impl")
+    import aw01v2_adjudicator as ADJ
+    repo, subj = AW + "/subj", a["subject"]
+    def size(p): return int(subprocess.run(["git", "-C", repo, "cat-file", "-s", f"{subj}:{p}"], capture_output=True, text=True, check=True).stdout)
+    prow = {r["path"]: r for r in pa["rows"]}
+    print("\nINDEPENDENT ADJUDICATION (aw01v2_adjudicator: grammar, selector, source_path, N == fresh Pass-A row bytes, README.md, N < 200, N == git blob size):")
+    ok = 0
+    for p in ma:
+        f = ADJ.adjudicate(an[p]["FUNCTION"]["witness"], prow[p], size(p)); ok += not f
+        print(f"  {p:<38} git size {size(p):>3}  token {an[p]['FUNCTION']['witness']['witness_value']!r:<26} " + ("ADJUDICATED" if not f else f"FAILED {f}"))
+    print(f"  adjudicated {ok}/{len(ma)}")
+    print(f"  OLD witnesses under the same adjudicator (fail-old): {sum(not ADJ.adjudicate(on[p]['FUNCTION']['witness'], prow[p], size(p)) for p in ma)}/{len(ma)} adjudicated")
+    allp = [r["path"] for r in pa["rows"]]
+    indep = sorted(p for p in allp if p.endswith("README.md") and size(p) < 200)
+    print(f"MARKER population recomputed from git over all {len(allp)} documents: {len(indep)} == AW population: {indep == ma}")
+    eq = sum(size(r["path"]) == r["bytes"] for r in pa["rows"])
+    print(f"git blob size == Pass-A row bytes for {eq}/{len(pa['rows'])} documents")
+    END-VERBATIM V2-AW01V2-DIFF-PY
+- EVIDENCE V2-AW01V2-DIFF-OUT-TXT impl/aw01v2_diff_out.txt: 3254 bytes, sha256 13b16b667cede346abb8b0c0e3b702dd6cde2462c129a31c0d96f3195caf4204, final LF True  [CMD `sha256sum aw01v2_diff_out.txt` → 13b16b667cede346…]
+    BEGIN-VERBATIM V2-AW01V2-DIFF-OUT-TXT
+    subjects d8aac4d49e6b d8aac4d49e6b  Pass-A rows identical: True
+    axis VALUE differences over 272 rows x 6 axes: 0
+    whole-cell differences: 5 -> ['FUNCTION'] on ['data/self-emp/Accounting/README.md', 'data/self-emp/Coding/README.md', 'data/self-emp/Engineering/README.md', 'data/self-emp/Legal/README.md', 'data/self-emp/Social/README.md']
+      data/self-emp/Accounting/README.md     FUNCTION: non-witness keys differing []; witness fields differing ['local_context', 'source_selector', 'witness_value']
+      data/self-emp/Coding/README.md         FUNCTION: non-witness keys differing []; witness fields differing ['local_context', 'source_selector', 'witness_value']
+      data/self-emp/Engineering/README.md    FUNCTION: non-witness keys differing []; witness fields differing ['local_context', 'source_selector', 'witness_value']
+      data/self-emp/Legal/README.md          FUNCTION: non-witness keys differing []; witness fields differing ['local_context', 'source_selector', 'witness_value']
+      data/self-emp/Social/README.md         FUNCTION: non-witness keys differing []; witness fields differing ['local_context', 'source_selector', 'witness_value']
+    rows with any of the 10 evidence facts different: 0; traces: 0; abstentions: 0; any other row key: 0
+    MARKER population OLD 5 AW 5 identical True: ['data/self-emp/Accounting/README.md', 'data/self-emp/Coding/README.md', 'data/self-emp/Engineering/README.md', 'data/self-emp/Legal/README.md', 'data/self-emp/Social/README.md']
+    
+    FAIL-OLD / PASS-NEW (run_h2_v12._compliant, the qualifier's predicate):
+      data/self-emp/Accounting/README.md     OLD False ('114 bytes' / L1 / '(no title)')   AW True  ('passa.bytes=114 bytes;' / META:passa.bytes / 'passa.bytes=114 bytes;')
+      data/self-emp/Coding/README.md         OLD False ('44 bytes' / L1 / '(no title)')   AW True  ('passa.bytes=44 bytes;' / META:passa.bytes / 'passa.bytes=44 bytes;')
+      data/self-emp/Engineering/README.md    OLD False ('35 bytes' / L1 / '(no title)')   AW True  ('passa.bytes=35 bytes;' / META:passa.bytes / 'passa.bytes=35 bytes;')
+      data/self-emp/Legal/README.md          OLD False ('71 bytes' / L1 / '(no title)')   AW True  ('passa.bytes=71 bytes;' / META:passa.bytes / 'passa.bytes=71 bytes;')
+      data/self-emp/Social/README.md         OLD False ('58 bytes' / L1 / '(no title)')   AW True  ('passa.bytes=58 bytes;' / META:passa.bytes / 'passa.bytes=58 bytes;')
+    
+    INDEPENDENT ADJUDICATION (aw01v2_adjudicator: grammar, selector, source_path, N == fresh Pass-A row bytes, README.md, N < 200, N == git blob size):
+      data/self-emp/Accounting/README.md     git size 114  token 'passa.bytes=114 bytes;'   ADJUDICATED
+      data/self-emp/Coding/README.md         git size  44  token 'passa.bytes=44 bytes;'    ADJUDICATED
+      data/self-emp/Engineering/README.md    git size  35  token 'passa.bytes=35 bytes;'    ADJUDICATED
+      data/self-emp/Legal/README.md          git size  71  token 'passa.bytes=71 bytes;'    ADJUDICATED
+      data/self-emp/Social/README.md         git size  58  token 'passa.bytes=58 bytes;'    ADJUDICATED
+      adjudicated 5/5
+      OLD witnesses under the same adjudicator (fail-old): 0/5 adjudicated
+    MARKER population recomputed from git over all 272 documents: 5 == AW population: True
+    git blob size == Pass-A row bytes for 272/272 documents
+    END-VERBATIM V2-AW01V2-DIFF-OUT-TXT
+- EVIDENCE V2-AW01V2-HOSTILE-PY impl/aw01v2_hostile.py: 3203 bytes, sha256 6e149ea0575e4e3e1ead08ef3a6ba4335f4c4a16c161c2cf1f6e6acb292deb20, final LF True  [CMD `sha256sum aw01v2_hostile.py` → 6e149ea0575e4e3e…]
+    BEGIN-VERBATIM V2-AW01V2-HOSTILE-PY
+    """KAI-B4-AW-01 v2 hostile matrix (child, qualified interpreter). argv: <AW2 H2 dir> <impl dir>
+    Every case is scored at TWO layers: run_h2_v12._compliant (the qualifier's structural predicate, unchanged) and the
+    independent aw01v2_adjudicator (authenticity against the bound Pass-A row and git size). Expectations are declared per
+    layer HERE, before running; a case passes only if BOTH layers behave as declared."""
+    import sys, copy
+    sys.path.insert(0, sys.argv[1]); sys.path.insert(0, sys.argv[2])
+    import run_h2_v12 as R, classify as cl, aw01v2_adjudicator as ADJ
+    ROW = {"path": "data/self-emp/Accounting/README.md", "bytes": 114, "title": ""}; GIT = 114
+    G = cl.function(ROW, "")["witness"]
+    def mut(**kw):
+        w = copy.deepcopy(G); w.update(kw); return w
+    T = lambda n: f"passa.bytes={n} bytes;"
+    C = []   # (label, witness, row, git_size, want_compliant, want_adjudicated)
+    C += [("11  exact canonical token (genuine)", G, ROW, GIT, True, True)]
+    for n in (11, 4, 14, 1140):
+        C += [(f"1-4 value token {T(n)!r} vs genuine context", mut(witness_value=T(n)), ROW, GIT, False, False)]
+    for n in ("11", "4", "14", "1140"):
+        C += [(f"1-4b BARE value {n!r} vs genuine context", mut(witness_value=n), ROW, GIT, n != "1140" and n in T(114), False)]
+    for p in ("data/114/README.md", "data/x; bytes=99/README.md", "data/passa.bytes=114 bytes;/README.md"):
+        row = {"path": p, "bytes": 11, "title": ""}; g = cl.function(row, "")["witness"]
+        C += [(f"5-7 path {p!r}, genuine 11-byte witness", g, row, None, True, True)]
+        w = copy.deepcopy(g); w["witness_value"] = T(114)
+        C += [(f"5-7 path {p!r}, value forged to {T(114)!r}", w, row, None, False, False)]
+    C += [("8   wrong canonical value, correct context", mut(witness_value=T(115)), ROW, GIT, False, False)]
+    C += [("9   correct value, wrong context", mut(local_context=T(115)), ROW, GIT, False, False)]
+    for k in ("source_selector", "local_context", "witness_value"):
+        C += [(f"10  empty {k}", mut(**{k: ""}), ROW, GIT, False, False)]
+    C += [("10  witness removed", None, ROW, GIT, False, False)]
+    C += [("12  COORDINATED tamper: value and context both T(115)", mut(witness_value=T(115), local_context=T(115)), ROW, GIT, True, False)]
+    C += [("12b COORDINATED tamper without git (row bytes still bind)", mut(witness_value=T(115), local_context=T(115)), ROW, None, True, False)]
+    C += [("--  v1 witness shape under the v2 adjudicator", mut(witness_value="114", source_selector="META:bytes", local_context="path=data/self-emp/Accounting/README.md; bytes=114"), ROW, GIT, True, False)]
+    C += [("--  OLD v1.2 witness under the v2 adjudicator", mut(witness_value="114 bytes", source_selector="L1", local_context="(no title)"), ROW, GIT, False, False)]
+    C += [("--  selector META:bytes (v1) with v2 token", mut(source_selector="META:bytes"), ROW, GIT, True, False)]
+    P = F = 0
+    for label, w, row, gs, wc, wa in C:
+        c = R._compliant(w); f = ADJ.adjudicate(w, row, gs); a = not f
+        ok = c == wc and a == wa; P += ok; F += not ok
+        print(f"  {'PASS' if ok else 'FAIL'}  {label:<62} _compliant={c!s:<5}(want {wc!s:<5}) adjudicated={a!s:<5}(want {wa!s:<5})" + ("" if a else f"  first failed: {f[0]}"))
+    print(f"\n{P} passed, {F} failed"); sys.exit(1 if F else 0)
+    END-VERBATIM V2-AW01V2-HOSTILE-PY
+- EVIDENCE V2-AW01V2-HOSTILE-OUT-TXT impl/aw01v2_hostile_out.txt: 4880 bytes, sha256 038eacc11855fc395122fedf75ef15336beef6fe7d6da0c805431de32c0a7911, final LF True  [CMD `sha256sum aw01v2_hostile_out.txt` → 038eacc11855fc39…]
+    BEGIN-VERBATIM V2-AW01V2-HOSTILE-OUT-TXT
+      PASS  11  exact canonical token (genuine)                            _compliant=True (want True ) adjudicated=True (want True )
+      PASS  1-4 value token 'passa.bytes=11 bytes;' vs genuine context     _compliant=False(want False) adjudicated=False(want False)  first failed: local_context == witness_value (the token, exactly)
+      PASS  1-4 value token 'passa.bytes=4 bytes;' vs genuine context      _compliant=False(want False) adjudicated=False(want False)  first failed: local_context == witness_value (the token, exactly)
+      PASS  1-4 value token 'passa.bytes=14 bytes;' vs genuine context     _compliant=False(want False) adjudicated=False(want False)  first failed: local_context == witness_value (the token, exactly)
+      PASS  1-4 value token 'passa.bytes=1140 bytes;' vs genuine context   _compliant=False(want False) adjudicated=False(want False)  first failed: local_context == witness_value (the token, exactly)
+      PASS  1-4b BARE value '11' vs genuine context                        _compliant=True (want True ) adjudicated=False(want False)  first failed: witness_value grammar ^passa\.bytes=(0|[1-9][0-9]*) bytes;$
+      PASS  1-4b BARE value '4' vs genuine context                         _compliant=True (want True ) adjudicated=False(want False)  first failed: witness_value grammar ^passa\.bytes=(0|[1-9][0-9]*) bytes;$
+      PASS  1-4b BARE value '14' vs genuine context                        _compliant=True (want True ) adjudicated=False(want False)  first failed: witness_value grammar ^passa\.bytes=(0|[1-9][0-9]*) bytes;$
+      PASS  1-4b BARE value '1140' vs genuine context                      _compliant=False(want False) adjudicated=False(want False)  first failed: witness_value grammar ^passa\.bytes=(0|[1-9][0-9]*) bytes;$
+      PASS  5-7 path 'data/114/README.md', genuine 11-byte witness         _compliant=True (want True ) adjudicated=True (want True )
+      PASS  5-7 path 'data/114/README.md', value forged to 'passa.bytes=114 bytes;' _compliant=False(want False) adjudicated=False(want False)  first failed: local_context == witness_value (the token, exactly)
+      PASS  5-7 path 'data/x; bytes=99/README.md', genuine 11-byte witness _compliant=True (want True ) adjudicated=True (want True )
+      PASS  5-7 path 'data/x; bytes=99/README.md', value forged to 'passa.bytes=114 bytes;' _compliant=False(want False) adjudicated=False(want False)  first failed: local_context == witness_value (the token, exactly)
+      PASS  5-7 path 'data/passa.bytes=114 bytes;/README.md', genuine 11-byte witness _compliant=True (want True ) adjudicated=True (want True )
+      PASS  5-7 path 'data/passa.bytes=114 bytes;/README.md', value forged to 'passa.bytes=114 bytes;' _compliant=False(want False) adjudicated=False(want False)  first failed: local_context == witness_value (the token, exactly)
+      PASS  8   wrong canonical value, correct context                     _compliant=False(want False) adjudicated=False(want False)  first failed: local_context == witness_value (the token, exactly)
+      PASS  9   correct value, wrong context                               _compliant=False(want False) adjudicated=False(want False)  first failed: local_context == witness_value (the token, exactly)
+      PASS  10  empty source_selector                                      _compliant=False(want False) adjudicated=False(want False)  first failed: source_selector == META:passa.bytes
+      PASS  10  empty local_context                                        _compliant=False(want False) adjudicated=False(want False)  first failed: local_context == witness_value (the token, exactly)
+      PASS  10  empty witness_value                                        _compliant=False(want False) adjudicated=False(want False)  first failed: witness_value grammar ^passa\.bytes=(0|[1-9][0-9]*) bytes;$
+      PASS  10  witness removed                                            _compliant=False(want False) adjudicated=False(want False)  first failed: witness present
+      PASS  12  COORDINATED tamper: value and context both T(115)          _compliant=True (want True ) adjudicated=False(want False)  first failed: N == bound Pass-A row bytes
+      PASS  12b COORDINATED tamper without git (row bytes still bind)      _compliant=True (want True ) adjudicated=False(want False)  first failed: N == bound Pass-A row bytes
+      PASS  --  v1 witness shape under the v2 adjudicator                  _compliant=True (want True ) adjudicated=False(want False)  first failed: witness_value grammar ^passa\.bytes=(0|[1-9][0-9]*) bytes;$
+      PASS  --  OLD v1.2 witness under the v2 adjudicator                  _compliant=False(want False) adjudicated=False(want False)  first failed: witness_value grammar ^passa\.bytes=(0|[1-9][0-9]*) bytes;$
+      PASS  --  selector META:bytes (v1) with v2 token                     _compliant=True (want True ) adjudicated=False(want False)  first failed: source_selector == META:passa.bytes
+    
+    26 passed, 0 failed
+    END-VERBATIM V2-AW01V2-HOSTILE-OUT-TXT
+- EVIDENCE V2-AW01V2-CORRUPT-PY impl/aw01v2_corrupt.py: 6181 bytes, sha256 cd9d55278c1607015ca8fed55baef7de9a0dcf7d38cc17b03278f9ee6425d8b4, final LF True  [CMD `sha256sum aw01v2_corrupt.py` → cd9d55278c160701…]
+    BEGIN-VERBATIM V2-AW01V2-CORRUPT-PY
+    """KAI-B4-AW-01 v2: corrupt or remove the MARKER metadata witness and prove qualification fails again.
+    Orchestrator (system python3). argv: <twofact dir>. Uses the AW chain artefacts (impl/fullaw: Stage A, Pass A, Pass-A binding,
+    full-history subject clone). Per case: the REAL AW-01 run_h2_v12.main() runs with __main__ = the script file (producer checks
+    unmodified); classify.function is wrapped so ONLY FUNCTION=MARKER cells are altered after they are built; the result is bound
+    (CLASSIFICATION) and qualified by the real CLIs. Expected (declared here): none -> qualifier rc 0, FINDINGS 0; every corruption ->
+    qualifier rc != 0 with exactly 5 AXIS_WITNESS findings on the 5 MARKER paths and no other finding."""
+    import json, pathlib, subprocess, sys, re
+    PY = "/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11"; CEN = "/home/user/kai-repair/kai-pm/house_in_order_census_v11"
+    D = pathlib.Path(sys.argv[1]); FA = D / "impl/fullaw2"; V = D / "instAW2/kai-pm/house_in_order_h2_v13"; OUT = D / "impl/aw01v2_corrupt_work"; OUT.mkdir(exist_ok=True)
+    PAB = subprocess.run(["sha256sum", str(FA / "pa.b")], capture_output=True, text=True).stdout.split()[0]
+    MARKERS = ['data/self-emp/Accounting/README.md', 'data/self-emp/Coding/README.md', 'data/self-emp/Engineering/README.md', 'data/self-emp/Legal/README.md', 'data/self-emp/Social/README.md']
+    HARNESS = r'''
+    import sys, os, types, copy
+    script, mode = sys.argv[1], sys.argv[2]
+    sys.argv = [script] + sys.argv[3:]
+    sys.path[0] = os.path.dirname(script)
+    m = types.ModuleType("__main__"); m.__file__ = script
+    sys.modules["__main__"] = m
+    ns = m.__dict__; ns["__name__"] = "__d379_under_test__"
+    with open(script, "rb") as fh:
+        exec(compile(fh.read(), script, "exec"), ns)
+    ns["__name__"] = "__main__"
+    cl = ns["cl"]; real = cl.function
+    def corrupt(row, text):
+        cell = real(row, text)
+        if mode == "none" or cell.get("value") != "MARKER":
+            return cell
+        cell = copy.deepcopy(cell)
+        n = row["bytes"]; T = lambda k: f"passa.bytes={k} bytes;"
+        if mode == "value_wrong_token":      cell["witness"]["witness_value"] = T(n + 1)
+        elif mode == "context_wrong_token":  cell["witness"]["local_context"] = T(n + 1)
+        elif mode == "value_removed":        cell["witness"]["witness_value"] = ""
+        elif mode == "context_removed":      cell["witness"]["local_context"] = ""
+        elif mode == "selector_removed":     cell["witness"]["source_selector"] = ""
+        elif mode == "witness_removed":      cell["witness"] = None
+        elif mode == "coordinated_tamper":   cell["witness"]["witness_value"] = cell["witness"]["local_context"] = T(n + 1)
+        elif mode == "bare_value_substring": cell["witness"]["witness_value"] = str(n)[:-1] or str(n)
+        else: raise SystemExit("harness: unknown mode " + mode)
+        return cell
+    cl.function = corrupt
+    ns["main"]()
+    '''
+    P = F = 0
+    # DECLARED: qualifier findings expected per mode (AXIS_WITNESS on the 5 MARKER paths; witness_removed also trips the
+    # separate [5] WITNESS check, measured in v1; coordinated_tamper and bare_value_substring are STRUCTURALLY accepted by
+    # _compliant -- expected qualifier PASS -- and must be rejected by the independent adjudicator instead)
+    EXPECT = {"none": (0, 0), "value_wrong_token": (5, 0), "context_wrong_token": (5, 0), "value_removed": (5, 5), "context_removed": (5, 0),
+              "selector_removed": (5, 0), "witness_removed": (5, 5), "coordinated_tamper": (0, 0), "bare_value_substring": (0, 0)}
+    sys.path.insert(0, str(D / "impl")); import aw01v2_adjudicator as ADJ
+    for mode in EXPECT:
+        w = OUT / mode; w.mkdir(exist_ok=True)
+        for f in ("result.json", "r.b"):
+            if (w / f).exists(): (w / f).unlink()
+        c = subprocess.run([PY, "-B", "-E", "-s", "-c", HARNESS, str(V / "run_h2_v12.py"), mode, "--subject-repo", str(FA / "subj"), "--passa", str(FA / "passA.json"),
+                            "--passa-stage-b", str(FA / "pa.b"), "--expected-passa-binding-sha256", PAB, "--census-package", CEN, "--stage-a", str(FA / "stage_a.json"),
+                            "--out", str(w / "result.json")], capture_output=True, text=True)
+        if c.returncode != 0:
+            print(f"  FAIL  {mode:<22} classification rc={c.returncode}: {(c.stdout + c.stderr).strip().splitlines()[-1][:150]}"); F += 1; continue
+        b = subprocess.run([PY, "-B", "-E", "-s", str(V / "stage_identity.py"), "bind", "--artifact", str(w / "result.json"), "--component", "CLASSIFICATION",
+                            "--stage-a", str(FA / "stage_a.json"), "--producer-exit", "0", "--out", str(w / "r.b")], capture_output=True, text=True)
+        q = subprocess.run([PY, "-B", "-E", "-s", str(V / "qualify.py"), "--result", str(w / "result.json"), "--stage-a", str(FA / "stage_a.json"), "--manifest", str(FA / "M"),
+                            "--stage-b", str(w / "r.b"), "--expected-binding-sha256", b.stdout.strip(), "--passa-stage-b", str(FA / "pa.b"),
+                            "--expected-passa-binding-sha256", PAB, "--census-package", CEN], capture_output=True, text=True)
+        (w / "qualifier_out.txt").write_text(q.stdout + q.stderr)
+        fl = [l.strip() for l in q.stdout.splitlines() if "::" in l]
+        aw = sorted(re.match(r"AXIS_WITNESS::(\S+)", l).group(1) for l in fl if l.startswith("AXIS_WITNESS::"))
+        other = [l for l in fl if not l.startswith("AXIS_WITNESS::")]
+        want_aw, want_other = EXPECT[mode]
+        ok_q = len(aw) == want_aw and (want_aw == 0 or aw == MARKERS) and len(other) == want_other and ((q.returncode == 0) == (want_aw + want_other == 0))
+        res = json.loads((w / "result.json").read_bytes()); pa = {r["path"]: r for r in json.loads((FA / "passA.json").read_bytes())["rows"]}
+        adj = {r["path"]: not ADJ.adjudicate(r["FUNCTION"].get("witness"), pa[r["path"]]) for r in res["rows"] if r["FUNCTION"]["value"] == "MARKER"}
+        ok_a = all(adj.values()) if mode == "none" else not any(adj.values())
+        ok = ok_q and ok_a and len(adj) == 5; P += ok; F += not ok
+        print(f"  {'PASS' if ok else 'FAIL'}  {mode:<22} qualifier rc={q.returncode} AXIS_WITNESS={len(aw)} other={len(other)} (want {want_aw}/{want_other})  adjudicator accepts {sum(adj.values())}/{len(adj)} (want {5 if mode == 'none' else 0})")
+    print(f"\n{P} passed, {F} failed"); sys.exit(1 if F else 0)
+    END-VERBATIM V2-AW01V2-CORRUPT-PY
+- EVIDENCE V2-AW01V2-CORRUPT-OUT-TXT impl/aw01v2_corrupt_out.txt: 1046 bytes, sha256 f935fc54be8932255ec587fd22356720cc6872e0629afb2694bff6eb6f665ad1, final LF True  [CMD `sha256sum aw01v2_corrupt_out.txt` → f935fc54be893225…]
+    BEGIN-VERBATIM V2-AW01V2-CORRUPT-OUT-TXT
+      PASS  none                   qualifier rc=0 AXIS_WITNESS=0 other=0 (want 0/0)  adjudicator accepts 5/5 (want 5)
+      PASS  value_wrong_token      qualifier rc=1 AXIS_WITNESS=5 other=0 (want 5/0)  adjudicator accepts 0/5 (want 0)
+      PASS  context_wrong_token    qualifier rc=1 AXIS_WITNESS=5 other=0 (want 5/0)  adjudicator accepts 0/5 (want 0)
+      PASS  value_removed          qualifier rc=1 AXIS_WITNESS=5 other=5 (want 5/5)  adjudicator accepts 0/5 (want 0)
+      PASS  context_removed        qualifier rc=1 AXIS_WITNESS=5 other=0 (want 5/0)  adjudicator accepts 0/5 (want 0)
+      PASS  selector_removed       qualifier rc=1 AXIS_WITNESS=5 other=0 (want 5/0)  adjudicator accepts 0/5 (want 0)
+      PASS  witness_removed        qualifier rc=1 AXIS_WITNESS=5 other=5 (want 5/5)  adjudicator accepts 0/5 (want 0)
+      PASS  coordinated_tamper     qualifier rc=0 AXIS_WITNESS=0 other=0 (want 0/0)  adjudicator accepts 0/5 (want 0)
+      PASS  bare_value_substring   qualifier rc=0 AXIS_WITNESS=0 other=0 (want 0/0)  adjudicator accepts 0/5 (want 0)
+    
+    9 passed, 0 failed
+    END-VERBATIM V2-AW01V2-CORRUPT-OUT-TXT
+- EVIDENCE V2-AW01V2-FIXTURES-CMP-PY impl/aw01v2_fixtures_cmp.py: 2700 bytes, sha256 c5e580bdba8ff68e843894c66ba86b6421aa5a698ab1329031885b8e5967245e, final LF True  [CMD `sha256sum aw01v2_fixtures_cmp.py` → c5e580bdba8ff68e…]
+    BEGIN-VERBATIM V2-AW01V2-FIXTURES-CMP-PY
+    """Orchestrator: run aw01_fixtures.py under OLD (inst5) and AW v2 (instAW2); declared expectations are HERE."""
+    import json, subprocess, sys
+    PY = "/home/user/d379-build/bw/A/stage/opt/d379-py311/bin/python3.11"; D = sys.argv[1]
+    get = lambda t: json.loads(subprocess.run([PY, "-B", "-E", "-s", f"{D}/impl/aw01_fixtures.py", f"{D}/{t}/kai-pm/house_in_order_h2_v13"], capture_output=True, text=True, check=True).stdout)
+    o, a = get("inst5"), get("instAW2")
+    sys.path.insert(0, f"{D}/inst5/kai-pm/house_in_order_h2_v13"); import run_h2_v12 as R
+    # expected witness value = the case row's own bytes (run 1 hand-wrote 199 for all but one case: a fixture bug)
+    BYTES = {"README 199 bytes, titled": 199, "README 199 bytes, no title": 199, "README 199 bytes, other title": 199, "README 200 bytes": 200,
+             "README 0 bytes": 0, "non-README 150 bytes": 150, "readme.md lower-case 150 bytes": 150, "README.md.bak 150 bytes": 150, "XREADME.md 150 bytes": 150}
+    MARK = {"README 199 bytes, titled": True, "README 199 bytes, no title": True, "README 199 bytes, other title": True, "README 200 bytes": False,
+            "README 0 bytes": True, "non-README 150 bytes": False, "readme.md lower-case 150 bytes": False, "README.md.bak 150 bytes": False, "XREADME.md 150 bytes": True}
+    P = F = 0
+    def chk(label, ok):
+        global P, F; P += ok; F += not ok; print(f"  {'PASS' if ok else 'FAIL'}  {label}")
+    for k, want in MARK.items():
+        chk(f"{k:<34} MARKER={want}: OLD {o[k]['value']}, AW {a[k]['value']}", (o[k]["value"] == "MARKER") == want and (a[k]["value"] == "MARKER") == want)
+    for k in MARK:
+        if not MARK[k]: chk(f"{k:<34} non-MARKER cell identical OLD vs AW", o[k] == a[k])
+    for k in [k for k in MARK if MARK[k]]:
+        w = a[k]["witness"]; chk(f"{k:<34} AW witness compliant {R._compliant(w)}, value {w['witness_value']!r}, context {w['local_context']!r}", R._compliant(w) and w["witness_value"] == w["local_context"] == f"passa.bytes={BYTES[k]} bytes;" and w["source_selector"] == "META:passa.bytes")
+    t = [a[k]["witness"] for k in ("README 199 bytes, titled", "README 199 bytes, no title", "README 199 bytes, other title")]
+    chk(f"title/no-title: the three 199-byte AW witnesses are identical: {t[0] == t[1] == t[2]}", t[0] == t[1] == t[2])
+    to = [o[k]["witness"]["local_context"] for k in ("README 199 bytes, titled", "README 199 bytes, no title", "README 199 bytes, other title")]
+    chk(f"known-positive: OLD witness context DID vary with the title: {to}", len(set(to)) == 3)
+    chk(f"OLD 199-byte witnesses non-compliant (fail-old): {[R._compliant(o[k]['witness']) for k in MARK if MARK[k]]}", not any(R._compliant(o[k]["witness"]) for k in MARK if MARK[k]))
+    print(f"\n{P} passed, {F} failed"); sys.exit(1 if F else 0)
+    END-VERBATIM V2-AW01V2-FIXTURES-CMP-PY
+- EVIDENCE V2-AW01V2-FIXTURES-OUT-TXT impl/aw01v2_fixtures_out.txt: 2007 bytes, sha256 f22e84c5e5eef406d1719b4463bd376a1353e107b24f879475926ef9300993f6, final LF True  [CMD `sha256sum aw01v2_fixtures_out.txt` → f22e84c5e5eef406…]
+    BEGIN-VERBATIM V2-AW01V2-FIXTURES-OUT-TXT
+      PASS  README 199 bytes, titled           MARKER=True: OLD MARKER, AW MARKER
+      PASS  README 199 bytes, no title         MARKER=True: OLD MARKER, AW MARKER
+      PASS  README 199 bytes, other title      MARKER=True: OLD MARKER, AW MARKER
+      PASS  README 200 bytes                   MARKER=False: OLD UNKNOWN, AW UNKNOWN
+      PASS  README 0 bytes                     MARKER=True: OLD MARKER, AW MARKER
+      PASS  non-README 150 bytes               MARKER=False: OLD UNKNOWN, AW UNKNOWN
+      PASS  readme.md lower-case 150 bytes     MARKER=False: OLD UNKNOWN, AW UNKNOWN
+      PASS  README.md.bak 150 bytes            MARKER=False: OLD UNKNOWN, AW UNKNOWN
+      PASS  XREADME.md 150 bytes               MARKER=True: OLD MARKER, AW MARKER
+      PASS  README 200 bytes                   non-MARKER cell identical OLD vs AW
+      PASS  non-README 150 bytes               non-MARKER cell identical OLD vs AW
+      PASS  readme.md lower-case 150 bytes     non-MARKER cell identical OLD vs AW
+      PASS  README.md.bak 150 bytes            non-MARKER cell identical OLD vs AW
+      PASS  README 199 bytes, titled           AW witness compliant True, value 'passa.bytes=199 bytes;', context 'passa.bytes=199 bytes;'
+      PASS  README 199 bytes, no title         AW witness compliant True, value 'passa.bytes=199 bytes;', context 'passa.bytes=199 bytes;'
+      PASS  README 199 bytes, other title      AW witness compliant True, value 'passa.bytes=199 bytes;', context 'passa.bytes=199 bytes;'
+      PASS  README 0 bytes                     AW witness compliant True, value 'passa.bytes=0 bytes;', context 'passa.bytes=0 bytes;'
+      PASS  XREADME.md 150 bytes               AW witness compliant True, value 'passa.bytes=150 bytes;', context 'passa.bytes=150 bytes;'
+      PASS  title/no-title: the three 199-byte AW witnesses are identical: True
+      PASS  known-positive: OLD witness context DID vary with the title: ['Shop notes', '(no title)', 'Plan of record']
+      PASS  OLD 199-byte witnesses non-compliant (fail-old): [False, False, False, False, False]
+    
+    21 passed, 0 failed
+    END-VERBATIM V2-AW01V2-FIXTURES-OUT-TXT
+
+### 6. Next authorised step
+
+- STOP. Dainius sends aw01v2_b64/DEEPSEEK_MESSAGE_AW01_v2_BASE64_COMPLETE.txt to a fresh DeepSeek chat; the reply returns to Kai; no classify.py mutation  [CONVERSATION 2026-10-04 Kai, "stop after its DeepSeek review"]
+
+### 7. What I am unsure of
+
+- Whether Kai intended controls 1–4 at the _compliant layer, the adjudicator layer, or both; both are reported  [CONVERSATION 2026-10-04 Kai, "11 against genuine 114 → fail."]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
