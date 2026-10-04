@@ -24740,3 +24740,73 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-04T01:19:42Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-04T01:19:42Z  [CMD `date -u +%FT%TZ` → 2026-10-04T01:19:42Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 91538641a33c4f668aff6f740b0f43bf451f09bc  [CMD `git rev-parse HEAD` → 91538641a33c4f668aff6f740b0f43bf451f09bc]
+- tree: b15d9c46c612fa78290c91dd591ecb0b33d28181  [CMD `git rev-parse HEAD^{tree}` → b15d9c46c612fa78290c91dd591ecb0b33d28181]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 91538641a33c4f668aff6f740b0f43bf451f09bc  [CMD `git ls-remote --heads origin` → 91538641a33c4f668aff6f740b0f43bf451f09bc]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d0c08a4da85a447e0729fdb83d201cccc0af395a  [CMD `git ls-remote --heads origin` → d0c08a4da85a447e0729fdb83d201cccc0af395a]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 62  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 62]
+
+### 1. The four states
+
+- physical: programme branch carries the R18 control commit 9153864 (handoff.py, SKILL.md, settings.json, CLAUDE.md); repair branch unchanged at d0c08a4  [GIT 9153864]
+- authorised: Dainius directed that the recurring mistake be prevented by implementation  [CONVERSATION 2026-10-04 Dainius, "you know procedure if we see same systematic mistake , please implement to avoid in future"]
+- evidence: population measurement and calibration in section 3; commit message of 9153864 carries the verified / not-verified halves  [GIT 9153864]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-04 · directs R18 escalation for the recurring "check that cannot stop its chain" mechanism: implement a structural control rather than restate the rule ⚠ UNBANKED  [CONVERSATION 2026-10-04 Dainius, "you know procedure if we see same systematic mistake , please implement to avoid in future"]
+
+### 3. Authorised / Held / Forbidden
+
+- DONE (population, R4, before gating): mechanism = a check beside a commit whose failure the chain cannot see; occurrences 4 (CLAUDE.md R3's two `;` incidents, entry 46's printing round-trip, entry 61's `| grep -c` round-trip) — third-or-later occurrence, so the control is structural (R18)  [FILE CLAUDE.md:162]
+- DONE (layer 1): `handoff.py check` now verifies every verbatim block against its own declaration (rules VERBATIM-UNTERMINATED / -INDENT / -MISMATCH / -UNDECLARED); new entries need '<N> bytes, sha256 <hex>, final LF <True|False>'; committed legacy blocks verified where a full sha is declared, counted otherwise. Real log measured first: 159 blocks — 114 full grammar, 36 without the final-LF field, 9 sha-only (8 verifiable, 1 with no full sha); check now reports verbatim=159/verified=158/legacy-undeclared=1, findings 0  [CMD `handoff.py check` → verbatim=159/verified=158/legacy-undeclared=1 findings=0]
+- DONE (layer 2): `handoff.py gate` registered as a PreToolUse(Bash) hook in .claude/settings.json; a command containing `git … commit` while kai-pm/HANDOFF_LOG.md differs from HEAD runs check first and is blocked (exit 2) on failure; fails closed only when a commit is proposed and check cannot run  [FILE .claude/settings.json:16]
+- DONE (calibration): selftest 74/74 incl. 10 verbatim cases and 8 gate-decision cases (entry 61's piped shape and R3's `;` shape both block); real-log known-positive (one altered byte -> VERBATIM-MISMATCH at that block); gate CLI in a disposable clone: clean allow, dirty-valid allow, one altered byte block (piped, `;`, -C), non-commit allow; LIVE: with a temporary one-byte change the harness blocked `git commit --dry-run` ("PreToolUse:Bash hook error … BLOCKED"), log restored byte-identical (sha256 cebb8997…)  [CMD `handoff.py selftest; gate CLI cases; live dry-run` → 74/74; as stated; blocked]
+- NOT DONE: no FAILURE_PATTERN_LEDGER incident allocated (incident allocation is held in the D379 tranche); raised to Kai with this entry  [CONVERSATION 2026-10-04 Kai, "I would not allocate a failure-ledger incident yet."]
+- HELD (unchanged): classify.py mutation, d379_controls.py, full matrix, D390 replay, fixity F, capture, candidate, holdout, blind 40, Item 8, merge; awaiting Kai on DS-AW01-V1-01..07  [CONVERSATION 2026-10-04 Kai, "HELD: any classify.py mutation"]
+
+### 4. Open questions
+
+- Kai: whether this mechanism (four occurrences) should be allocated as a FAILURE_PATTERN_LEDGER incident with its control recorded, once allocation is no longer held — owner: Kai  [GIT 9153864]
+
+### 5. Incidents and corrections
+
+- None new this step; the slip itself was recorded in entry 62  [GIT 35398ce38c3f8050fe0338c620bd4538fead4154]
+
+### 6. Next authorised step
+
+- Wait for Kai's reconciliation of DeepSeek's AW-01 review  [CONVERSATION 2026-10-04 Dainius, "While waiting for gpt"]
+
+### 7. What I am unsure of
+
+- The hook is exercised in this session; a fresh session reads it from settings.json at startup, which is not yet observed  [GIT 9153864]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
