@@ -90,8 +90,14 @@ python3 -B .claude/skills/kai-handoff/handoff.py verify
    below.
 3. Append the entry to the end of `kai-pm/HANDOFF_LOG.md`.
 4. `python3 -B .claude/skills/kai-handoff/handoff.py check` must exit 0.
+   It also verifies every verbatim block: each block in a new entry must
+   carry the declaration `<N> bytes, sha256 <hex>, final LF <True|False>`
+   on its bullet line and reconstruct to exactly that. There is no
+   separate round-trip step to run, pipe or forget.
 5. Commit and push only if authorised (rule 7), chained with `&&` (R3).
-   Then report which it was.
+   Then report which it was. The commit gate (below) runs `check` again
+   on any `git commit` while the log is modified and blocks a failing one,
+   whatever the chain looks like.
 
 ## Entry template
 
@@ -146,7 +152,8 @@ python3 -B .claude/skills/kai-handoff/handoff.py verify
 every `check` rule fires on a known-positive and stays silent on the
 known-negative, and that `verify` reads the **last** entry. The expected
 answers come from the synthetic constructions, not from the checker.
-Run it after any change to `handoff.py`.
+It covers the verbatim-integrity rule and the commit gate's decision as
+well. Run it after any change to `handoff.py`.
 
 ## Limits, stated plainly
 
@@ -175,6 +182,20 @@ Run it after any change to `handoff.py`.
     `WRITE-DUE`.
   - **Blind spot:** a ruling made only in conversation leaves no trace in
     Git, so `due` cannot see it. The producer still judges those.
+- **The commit gate is enforced, not chained** (R18 control, 2026-10-04).
+  `handoff.py gate`, registered in `.claude/settings.json` as a
+  `PreToolUse` hook on `Bash`, runs `check` before any command containing
+  `git … commit` while `kai-pm/HANDOFF_LOG.md` differs from HEAD, and a
+  failure blocks the command (exit 2). It exists because a check run
+  *beside* the commit was twice unable to stop it: entry 46 (a round-trip
+  that only printed) and entry 61 (the round-trip piped through
+  `grep -c`), after R3's two `;` incidents. Calibrated live: a one-byte
+  change to a verbatim block blocked `git commit --dry-run` in this
+  session. Limits: it is a Claude Code hook, not a git hook, so it guards
+  commits made through Claude's Bash tool only, never a human's terminal;
+  a commit while the log is clean is never touched; if the gate
+  itself cannot run `check` while a commit is proposed and the log may be
+  dirty, it fails closed.
 - **Shallow clones.** Cloud sessions clone about 50 commits deep. A
   recorded HEAD older than that is *absent*, which `verify` and `due`
   report as `UNKNOWN`, never as diverged.

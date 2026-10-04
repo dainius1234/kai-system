@@ -164,6 +164,18 @@ pushed past a failing gate — the second time hours after writing the
 first one down. If a chain contains a gate, the gate must be able to
 stop it.
 
+**Recurred twice more, 2026-10-03/04, so the control moved out of the
+chain.** The mechanism is wider than `;`: *any* check whose failure the
+chain cannot see — a round-trip that only printed (handoff entry 46), a
+round-trip piped through `grep -c` so the chain saw grep's exit status
+(entry 61). Four occurrences means the reminder has failed (R18). Since
+2026-10-04 the verbatim round-trip is part of `handoff.py check`, and a
+`PreToolUse` hook (`handoff.py gate`) re-runs `check` before any `git
+commit` while the handoff log is modified, blocking a failure whatever
+the chain looks like. Outside the handoff log the rule still binds by
+hand: never pipe a gate's output into another command inside a gated
+chain.
+
 ## R4. Measure the population before fixing it
 
 Never apply a new rule to a large denominator before counting what it

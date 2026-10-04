@@ -296,7 +296,109 @@ def check_text(text: str, committed: str | None):
                             ln, "RULING-STATUS",
                             "a ruling is either banked [D<n>] or marked "
                             f"'{UNBANKED}'; there is no third state"))
+    _check_verbatim(lines, starts, committed, findings, stats)
     return findings, stats
+
+
+# ── VERBATIM INTEGRITY (R18 control) ─────────────────────────────────────
+# The round-trip of every verbatim block used to be a SEPARATE step run
+# beside `check` -- and twice it could not stop the commit it guarded:
+# entry 46 (a check that only printed) and entry 61 (the check piped
+# through `grep -c`, so the chain saw grep's exit status). A check that
+# has to be chained correctly is a check that will one day be chained
+# wrongly. It now lives INSIDE `check`, so anything that runs `check`
+# runs it. The expected answer comes from the declaration the entry
+# itself makes (bytes, sha256, final LF), never from the block.
+VERBATIM_BEGIN = "    BEGIN-VERBATIM "
+VERBATIM_END = "    END-VERBATIM "
+DECLARATION_RE = re.compile(
+    r"(\d[\d,]*) bytes, sha256 ([0-9a-f]{64}), final LF (True|False)")
+ANY_SHA_RE = re.compile(r"(?<![0-9a-f])[0-9a-f]{64}(?![0-9a-f])")
+
+
+def _check_verbatim(lines, starts, committed, findings, stats):
+    """Every BEGIN-VERBATIM block must close, and must reconstruct to what
+    its declaration line (the nearest preceding '- ' bullet) says.
+
+    NEW entries (not in the committed log) are held to the full grammar
+    '<N> bytes, sha256 <hex>, final LF <True|False>' and an exact match.
+    COMMITTED entries are immutable history written under older grammars
+    (measured 2026-10-04: 159 blocks; 114 full grammar, 36 without the
+    final-LF field, 9 sha-only, 1 of those with no full sha): for them a
+    full sha on the declaration line must match under either LF variant,
+    and an undeclared legacy block is counted, not failed.
+    """
+    import hashlib
+    n_committed = len(_entries(committed)) if committed is not None else 0
+    stats.update(verbatim_blocks=0, verbatim_verified=0,
+                 verbatim_legacy_undeclared=0)
+    entry_of = []                      # line index -> entry ordinal
+    for k, s in enumerate(starts):
+        end = starts[k + 1] if k + 1 < len(starts) else len(lines)
+        entry_of += [k] * (end - len(entry_of))
+    i = 0
+    while i < len(lines):
+        if not lines[i].startswith(VERBATIM_BEGIN):
+            i += 1
+            continue
+        b, name = i, lines[i][len(VERBATIM_BEGIN):]
+        stats["verbatim_blocks"] += 1
+        new = b < len(entry_of) and entry_of[b] >= n_committed
+        e = next((j for j in range(b + 1, len(lines))
+                  if lines[j].startswith((VERBATIM_BEGIN, VERBATIM_END))),
+                 None)
+        if e is None or lines[e] != VERBATIM_END + name:
+            findings.append(Finding(b + 1, "VERBATIM-UNTERMINATED",
+                                    f"BEGIN-VERBATIM {name} has no matching "
+                                    f"END-VERBATIM {name} before the next "
+                                    f"verbatim marker"))
+            i = b + 1
+            continue
+        body = lines[b + 1:e]
+        raw = "\n".join(l[4:] if l.startswith("    ") else l for l in body)
+        unindented = [b + 2 + k for k, l in enumerate(body)
+                      if l and not l.startswith("    ")]
+        if unindented:
+            findings.append(Finding(unindented[0], "VERBATIM-INDENT",
+                                    f"{name}: {len(unindented)} line(s) "
+                                    f"lack the 4-space verbatim indent"))
+        d = b - 1
+        while d >= 0 and not lines[d].startswith("- "):
+            d -= 1
+        decl = lines[d] if d >= 0 else ""
+        m = DECLARATION_RE.search(decl)
+        if m:
+            want_n, want_sha = int(m[1].replace(",", "")), m[2]
+            data = (raw + ("\n" if m[3] == "True" else "")).encode("utf-8")
+            if len(data) != want_n or \
+                    hashlib.sha256(data).hexdigest() != want_sha:
+                findings.append(Finding(
+                    b + 1, "VERBATIM-MISMATCH",
+                    f"{name}: reconstructs to {len(data)} bytes sha256 "
+                    f"{hashlib.sha256(data).hexdigest()[:16]}…, declared "
+                    f"{want_n} bytes {want_sha[:16]}… final LF {m[3]}"))
+            else:
+                stats["verbatim_verified"] += 1
+        elif new:
+            findings.append(Finding(
+                b + 1, "VERBATIM-UNDECLARED",
+                f"{name}: a new verbatim block needs a declaration "
+                f"'<N> bytes, sha256 <hex>, final LF <True|False>' on its "
+                f"bullet line"))
+        else:
+            shas = set(ANY_SHA_RE.findall(decl))
+            got = {hashlib.sha256((raw + t).encode("utf-8")).hexdigest()
+                   for t in ("", "\n")}
+            if shas and not (shas & got):
+                findings.append(Finding(
+                    b + 1, "VERBATIM-MISMATCH",
+                    f"{name}: no sha256 on its declaration line matches "
+                    f"the block under either final-LF variant"))
+            elif shas:
+                stats["verbatim_verified"] += 1
+            else:
+                stats["verbatim_legacy_undeclared"] += 1
+        i = e + 1
 
 
 def committed_text(root: pathlib.Path, ref: str):
@@ -607,6 +709,66 @@ def run_hook(event, root: pathlib.Path):
     return 2
 
 
+# ── commit gate (R18 control, PreToolUse) ────────────────────────────────
+# The verbatim round-trip moved INTO `check`; this gate moves `check` out
+# of my command chain. Whatever a Bash command looks like -- `;`, a pipe,
+# `|| true`, a forgotten step -- if it would run `git commit` while the
+# handoff log differs from HEAD, `check` runs first and a failure BLOCKS
+# the command (exit 2). The chain's syntax can no longer decide whether
+# the gate is a gate. R9: the gate inspects the proposed command text,
+# never a running process, so it cannot observe itself.
+GIT_COMMIT_RE = re.compile(r"\bgit\b[^\n;&|]*?\bcommit\b")
+
+
+def gate_action(command: str, log_dirty: bool, check_rc: int | None):
+    """Pure decision: 'allow' or 'block'. check_rc is None when not run."""
+    if not GIT_COMMIT_RE.search(command or ""):
+        return "allow"
+    if not log_dirty:
+        return "allow"
+    return "allow" if check_rc == 0 else "block"
+
+
+def run_gate(stdin_text: str):
+    import json
+    try:
+        payload = json.loads(stdin_text or "{}")
+        command = (payload.get("tool_input") or {}).get("command") or ""
+    except Exception:                                        # noqa: BLE001
+        return 0                 # not a Bash payload we understand: allow
+    if not GIT_COMMIT_RE.search(command):
+        return 0
+    try:
+        root = repo_root(pathlib.Path(__file__).resolve().parent)
+        rc, out, err = _run(["git", "status", "--porcelain=v1", "--",
+                             LOG_REL], root)
+        if rc != 0:
+            raise Refusal(f"git status failed: {err.strip()}")
+        dirty = bool(out.strip())
+        if gate_action(command, dirty, 0) == "allow" and not dirty:
+            return 0
+        text = (root / LOG_REL).read_text(encoding="utf-8")
+        findings, st = check_text(text, committed_text(root, "HEAD"))
+    except Exception as e:                                   # noqa: BLE001
+        # FAIL CLOSED, but only here: a commit is proposed AND the log is
+        # (or may be) dirty, and the gate could not establish that it
+        # passes. Every other path above allows.
+        print(f"kai-handoff gate: BLOCKED `git commit` — could not run the "
+              f"handoff check: {e!r}", file=sys.stderr)
+        return 2
+    if gate_action(command, True, 1 if findings else 0) == "allow":
+        return 0
+    print(f"kai-handoff gate: BLOCKED `git commit` — {LOG_REL} is modified "
+          f"and fails `handoff.py check` ({len(findings)} finding(s)):",
+          file=sys.stderr)
+    for f in findings[:20]:
+        print(str(f), file=sys.stderr)
+    if len(findings) > 20:
+        print(f"  … {len(findings) - 20} more; run handoff.py check for all",
+              file=sys.stderr)
+    return 2
+
+
 # ── selftest (calibration) ──────────────────────────────────────────────
 def _valid_entry(stamp="2026-09-30T00:00:00Z", head="a" * 40):
     body = {
@@ -671,6 +833,45 @@ def selftest():
          good.replace("- None  [LEDGER INC-2026-09-19-38]", ""), None,
          "EMPTY-SECTION")
     case("POS no entry", preamble, None, "NO-ENTRY")
+
+    # VERBATIM INTEGRITY: the expected digest is computed HERE from the
+    # payload, independently of the checker.
+    import hashlib
+    payload = "line one\n  indented two\n\nlast\n"
+    sha = hashlib.sha256(payload.encode()).hexdigest()
+
+    def vb(decl, body=payload, end=True, name="P"):
+        ind = "\n".join("    " + l for l in body.rstrip("\n").split("\n"))
+        blk = f"{decl}  [CMD `sha256sum p` → x]\n    BEGIN-VERBATIM {name}\n{ind}\n"
+        blk += f"    END-VERBATIM {name}\n" if end else ""
+        return good.replace("- None  [LEDGER INC-2026-09-19-38]",
+                            "- None  [LEDGER INC-2026-09-19-38]\n" + blk)
+    ok_decl = f"- EVIDENCE P p: {len(payload)} bytes, sha256 {sha}, final LF True"
+    case("NEG verbatim block matching its declaration", vb(ok_decl), None, None)
+    case("POS verbatim body altered by one byte",
+         vb(ok_decl, payload.replace("two", "tw0")), None, "VERBATIM-MISMATCH")
+    case("POS verbatim declared final LF wrong",
+         vb(ok_decl.replace("final LF True", "final LF False")), None,
+         "VERBATIM-MISMATCH")
+    case("POS verbatim declared byte count wrong",
+         vb(ok_decl.replace(f"{len(payload)} bytes", f"{len(payload) + 1} bytes")),
+         None, "VERBATIM-MISMATCH")
+    case("POS verbatim block without END marker", vb(ok_decl, end=False), None,
+         "VERBATIM-UNTERMINATED")
+    case("POS new verbatim block without a declaration",
+         vb("- EVIDENCE P p"), None, "VERBATIM-UNDECLARED")
+    case("POS verbatim line missing its indent",
+         vb(ok_decl).replace("    last\n", "last\n"), None, "VERBATIM-INDENT")
+    legacy = vb("- EVIDENCE P p, verbatim")
+    case("NEG committed legacy block with no declaration is counted, not failed",
+         legacy, legacy, None)
+    bad_legacy = vb(f"- EVIDENCE P p, verbatim, sha256 {'0' * 64}")
+    case("POS committed legacy block whose declared sha does not match",
+         bad_legacy, bad_legacy, "VERBATIM-MISMATCH")
+    sha_nolf = hashlib.sha256(payload.rstrip("\n").encode()).hexdigest()
+    old_ok = vb(f"- EVIDENCE P p, verbatim, sha256 {sha_nolf}")
+    case("NEG committed legacy sha-only block (either LF variant) verifies",
+         old_ok, old_ok, None)
 
     # verify's parser: must read section 0 of the LAST entry only
     two = good + "\n" + _valid_entry("2026-10-01T00:00:00Z", head="b" * 40)
@@ -790,6 +991,28 @@ def selftest():
         cases.append((f"{name.split()[0]} hook: {' '.join(name.split()[1:])}",
                       got == want, [got]))
 
+    # gate_action(): the commit gate's decision, every branch by construction
+    for name, cmd, dirty, rc, want in (
+        ("NEG no commit in the command", "git status && ls", True, 1, "allow"),
+        ("NEG commit, log clean", "git add x && git commit -m m", False, None,
+         "allow"),
+        ("NEG commit, log dirty, check passes", "git commit -q -F -", True, 0,
+         "allow"),
+        ("POS commit, log dirty, check fails", "git commit -q -F -", True, 1,
+         "block"),
+        ("POS piped round-trip before commit (entry 61's shape)",
+         "x.py | grep -c True && git add L && git commit -q -F -", True, 1,
+         "block"),
+        ("POS `;` past the gate (R3's shape)",
+         "handoff.py check ; git commit -m x", True, 1, "block"),
+        ("POS commit with -C path", "git -C /r commit -m x", True, 1, "block"),
+        ("NEG the word commit outside a git command", "echo commit", True, 1,
+         "allow"),
+    ):
+        got = gate_action(cmd, dirty, rc)
+        cases.append((f"{name.split()[0]} gate: {' '.join(name.split()[1:])}",
+                      got == want, [got]))
+
     # the tag grammar itself: known-good and known-bad tags
     for tag, want in (("[GIT 0af5d32]", True), ("[D386]", True),
                       ("[LEDGER INC-2026-09-19-38]", True),
@@ -830,8 +1053,12 @@ def main(argv=None):
                                  "STALE/NOT-LIVE, 2 if UNKNOWN")
     hk = sub.add_parser("hook", help="Stop/PreCompact hook entry point")
     hk.add_argument("event", choices=("stop", "precompact"))
+    sub.add_parser("gate", help="PreToolUse(Bash) entry point: block a "
+                                "`git commit` while the log fails `check`")
     a = ap.parse_args(argv)
 
+    if a.cmd == "gate":
+        return run_gate(sys.stdin.read())
     try:
         if a.cmd == "selftest":
             return 1 if selftest() else 0
@@ -850,6 +1077,9 @@ def main(argv=None):
             print(f"HANDOFF CHECK: entries={st['entries']} "
                   f"claim-lines={st['claim_lines']} tagged={st['tagged']} "
                   f"rulings={st['rulings']} unbanked={st['unbanked']} "
+                  f"verbatim={st['verbatim_blocks']}"
+                  f"/verified={st['verbatim_verified']}"
+                  f"/legacy-undeclared={st['verbatim_legacy_undeclared']} "
                   f"findings={len(findings)} (append-only against "
                   f"{a.against})")
             return 1 if findings else 0
