@@ -23124,3 +23124,201 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-04T00:55:40Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-04T00:55:40Z  [CMD `date -u +%FT%TZ` → 2026-10-04T00:55:40Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 1c4d1e38df0ccd9dbf5e9a0588c778247ce936dd  [CMD `git rev-parse HEAD` → 1c4d1e38df0ccd9dbf5e9a0588c778247ce936dd]
+- tree: c0221642cb4385bd8687a0f58ea312badbe861c3  [CMD `git rev-parse HEAD^{tree}` → c0221642cb4385bd8687a0f58ea312badbe861c3]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/project-rework-plan-pgvp35: 1c4d1e38df0ccd9dbf5e9a0588c778247ce936dd  [CMD `git ls-remote --heads origin` → 1c4d1e38df0ccd9dbf5e9a0588c778247ce936dd]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d0c08a4da85a447e0729fdb83d201cccc0af395a  [CMD `git ls-remote --heads origin` → d0c08a4da85a447e0729fdb83d201cccc0af395a]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 59  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 59]
+
+### 1. The four states
+
+- physical: repair branch at d0c08a4 (accepted); classify.py unchanged  [CMD `git ls-remote --heads origin` → claude/d379-repair-eb52f73 d0c08a4da85a447e0729fdb83d201cccc0af395a]
+- authorised: scratch-only KAI-B4-AW-01 repair packet v1 with the required evidence, then the AW-01 delta alone to DeepSeek; STOP after the packet / review evidence  [CONVERSATION 2026-10-04 Kai, "Prepare a scratch-only KAI-B4-AW-01 repair packet v1."]
+- evidence: Kai's adjudication verbatim in section 2  [CMD `sha256sum kai_aw01_ruling.txt` → 0cd066361179e733…]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-04 · d0c08a4 ADJUDICATED / KAI-B4-AW-01 NEXT: d0c08a4 ACCEPTED as the faithful implementation of the frozen composite (parent dbe692d, tree 4995f6db…, one path, a39359bc…, GitHub verified valid); do not revert or amend. NEW BLOCKER KAI-B4-AW-01 — OBJECTIVE MARKER WITNESS NOT SOURCE-ADJUDICABLE — OPEN, blocks B4 closeout; the 5 AXIS_WITNESS findings are correct and NOT waived. classify.py stays outside the surface; no source mutation; scratch AW-01 packet v1 under stated invariants and required evidence; DeepSeek review with a self-contained packet; no ledger incident yet. HELD: classify.py mutation, d379_controls.py, full matrix, D390 replay, fixity F, capture, candidate, holdout, blind 40, Item 8, merge. Verbatim below, 7232 bytes, sha256 0cd066361179e733f62466813ede51f16ca6e569a4af77298c79c1f6c7d475f1, final LF False, 4-space indent added ⚠ UNBANKED  [CONVERSATION 2026-10-04 Kai via Dainius, "KAI → ORION — d0c08a4 ADJUDICATED / KAI-B4-AW-01 NEXT"]
+    BEGIN-VERBATIM KAI-D0C08A4-ADJUDICATION-AND-AW01
+    I’ve independently inspected the pushed repair commit and the handoff state.
+    
+    d0c08a4da85a447e0729fdb83d201cccc0af395a is accepted as the faithful implementation of the frozen composite. GitHub reports a valid verified SSH signature; its parent is exactly dbe692d9c3f83020176aeda00a0f399ce5f020f8, its tree is 4995f6db9a80123f98bc625e65eeb94edbb317a0, and it changes exactly one path: kai-pm/house_in_order_h2_v13/run_h2_v12.py, +342/−7. The repair branch now points to that exact commit. Entry 59 is also signed/verified.
+    
+    The important ruling is that the five AXIS_WITNESS findings are not waived for B4. Your grant correctly allowed the already-reviewed composite to be committed despite them because OLD and NEW prove they are unrelated baseline defects. But D367 explicitly says the five objective FUNCTION=MARKER cases are only “candidate-proven, subject to final qualification.” Final qualification has now done exactly what it was supposed to do: it rejected their witnesses.
+    
+    I checked the root cause directly. classify.function() emits SIZE_AND_ROLE with a witness like:
+    
+    witness_value = "114 bytes"
+    local_context = "(no title)"
+    source_selector = "L1"
+    
+    That is not a compliant D367 §5 witness. The decisive objective evidence is file size + README path role, yet the trace pretends its context is a source-text title at line 1. The byte measurement is not recoverable from that context, so the qualifier is correct to reject all five.
+    
+    I am assigning this separate blocker:
+    
+    KAI-B4-AW-01 — OBJECTIVE MARKER WITNESS NOT SOURCE-ADJUDICABLE — OPEN / BLOCKS B4 CLOSEOUT.
+    
+    This is not a reason to revert d0c08a4. It is also not permission to alter classify.py: that file is outside the existing six-file repair surface. And I am not releasing d379_controls.py or the full hostile matrix yet; running the final matrix with a knowingly invalid five-cell baseline would force us either to accept red or special-case it, both of which are wrong.
+    
+    The repair direction should be extremely narrow. The MARKER predicate must remain exactly the same: <200 bytes AND path ends README.md; MARKER population must remain exactly five; no other FUNCTION semantics move. Only the witness representation should change from a fake source-line context to a truthful objective file-metadata witness. A good candidate shape is a stable metadata selector plus context containing the exact measured size and path, rather than stuffing the byte count into source prose. We should adversarially review that before touching classify.py.
+    
+    Send Orion this:
+    
+    KAI → ORION — d0c08a4 ADJUDICATED / KAI-B4-AW-01 NEXT
+    
+    I independently inspected repair commit:
+    
+    d0c08a4da85a447e0729fdb83d201cccc0af395a
+    
+    COMMIT ACCEPTED as the faithful implementation of the frozen two-fact v4 + SB-01 composite.
+    
+    Verified:
+    
+    parent
+    dbe692d9c3f83020176aeda00a0f399ce5f020f8
+    
+    tree
+    4995f6db9a80123f98bc625e65eeb94edbb317a0
+    
+    changed paths = exactly
+    kai-pm/house_in_order_h2_v13/run_h2_v12.py
+    
+    final file SHA-256 remains
+    a39359bc383c8f6f6ca4540c10474fcb094c990f7b8e8091792262436c7a4cfe
+    
+    GitHub signature verification = verified: true, reason: valid.
+    
+    Do not revert or amend this commit.
+    
+    NEW SEPARATE BLOCKER: KAI-B4-AW-01 — OBJECTIVE MARKER WITNESS NOT SOURCE-ADJUDICABLE.
+    
+    Source-confirmed mechanism:
+    
+    classify.function() earns FUNCTION=MARKER when:
+    
+    row["bytes"] < 200 and path.endswith("README.md")
+    
+    but constructs SIZE_AND_ROLE with:
+    
+    witness_value = "<N> bytes"
+    
+    source_selector = "L1"
+    
+    local_context = title or "(no title)"
+    
+    D367 §5 requires every non-abstention verdict to carry a source-bound witness sufficient for independent adjudication and defines witness_value as the exact matched token/value, never merely a description.
+    
+    Therefore the qualifier’s five AXIS_WITNESS findings are correct. They are pre-existing and did not block committing d0c08a4, but they block B4 closeout.
+    
+    classify.py remains outside the currently authorised repair surface.
+    
+    NO SOURCE MUTATION YET.
+    
+    Prepare a scratch-only KAI-B4-AW-01 repair packet v1.
+    
+    Repair invariants:
+    
+    * FUNCTION=MARKER predicate remains byte-for-byte/semantically unchanged: <200 bytes + README.md path role.
+    * exactly the same five frozen-subject rows remain MARKER.
+    * no other FUNCTION verdict or abstention changes.
+    * no vocabulary changes.
+    * no change to run_h2_v12.py, qualify.py, envelope semantics or _compliant() merely to make the five rows green.
+    * do not fabricate a source-text token or insert the byte count into document text.
+    
+    The proposed witness must truthfully represent the objective metadata that actually determined the verdict.
+    
+    Preferred design to evaluate:
+    
+    witness_type = "SIZE_AND_ROLE"
+    
+    source_path = path
+    
+    source_selector = an explicit stable objective-metadata selector, not "L1"
+    
+    witness_value = the exact measured size value
+    
+    local_context = a canonical metadata context containing the exact path and exact byte measurement so an adjudicator can independently see both predicates
+    
+    with existing WHOLE_FILE / SELF / VERIFIED semantics preserved only where already earned.
+    
+    Do not treat that sketch as implementation authority. Test whether it actually satisfies D367 §5 rather than merely satisfying _compliant().
+    
+    Required scratch evidence:
+    
+    * FAIL-OLD: the exact five current MARKER witnesses produce AXIS_WITNESS.
+    * PASS-NEW: those same five have compliant, independently adjudicable witnesses.
+    * qualifier differential: exactly those five findings disappear; no other finding changes.
+    * MARKER population remains exactly the same five paths.
+    * all six axis values for all 272 rows unchanged.
+    * all ten evidence facts and their traces unchanged.
+    * boundary: 199-byte README earns MARKER; 200-byte README does not.
+    * boundary: sub-200 non-README does not earn MARKER.
+    * title/no-title must not affect objective MARKER evidence.
+    * corrupt/remove the metadata witness and prove qualification fails again.
+    
+    Then produce the exact proposed classify.py delta and send KAI-B4-AW-01 only to DeepSeek for narrow adversarial review. DeepSeek has no repository access, so its packet must contain every source excerpt/evidence necessary to attack the proposal.
+    
+    Return DeepSeek’s findings to Kai for repository reconciliation.
+    
+    HELD: any classify.py mutation, d379_controls.py rebuild, full hostile matrix, D390 replay, fixity F, capture, candidate, holdout, blind 40, Item 8 and merge.
+    
+    Preserve this ruling in the append-only handoff as ⚠ UNBANKED and STOP after the AW-01 review packet/review evidence.
+    
+    I would not allocate a failure-ledger incident yet. D367 already explicitly left these five MARKER cases “subject to final qualification,” and qualification has now rejected them. First establish the exact root-cause correction and whether it represents a new recurrent mechanism or simply the last unresolved part of the already-known MARKER candidate.
+    
+    Once AW-01 is independently reviewed and fixed under a new explicit grant from you, we rerun the real frozen-subject qualifier. Only when that baseline becomes clean do I release d379_controls.py and the full v4.5 hostile matrix.
+    
+    Confidence: 0.995 on d0c08a4 acceptance; 0.995 that KAI-B4-AW-01 is a genuine blocker; 0.98 on the objective-metadata-witness direction pending the narrow adversarial review.
+    END-VERBATIM KAI-D0C08A4-ADJUDICATION-AND-AW01
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: scratch-only AW-01 packet v1 and its evidence; DeepSeek packet (AW-01 delta only)  [CONVERSATION 2026-10-04 Kai, "Then produce the exact proposed classify.py delta and send KAI-B4-AW-01 only to DeepSeek"]
+- HELD: any classify.py mutation, d379_controls.py rebuild, full hostile matrix, D390 replay, fixity F, capture, candidate, holdout, blind 40, Item 8, merge  [CONVERSATION 2026-10-04 Kai, "HELD: any classify.py mutation"]
+- NOT YET: a FAILURE_PATTERN_LEDGER incident for AW-01  [CONVERSATION 2026-10-04 Kai, "I would not allocate a failure-ledger incident yet."]
+
+### 4. Open questions
+
+- None before the packet  [CONVERSATION 2026-10-04 Kai, "Do not treat that sketch as implementation authority."]
+
+### 5. Incidents and corrections
+
+- None this step  [CMD `handoff.py check` → findings=0]
+
+### 6. Next authorised step
+
+- Build AW-01 packet v1 in scratch with the required evidence; prepare the DeepSeek packet; STOP  [CONVERSATION 2026-10-04 Kai, "STOP after the AW-01 review packet/review evidence."]
+
+### 7. What I am unsure of
+
+- Whether a metadata witness can satisfy D367 §5 without changing _compliant(); to be measured  [CONVERSATION 2026-10-04 Kai, "Test whether it actually satisfies D367 §5 rather than merely satisfying _compliant()."]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
