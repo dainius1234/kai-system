@@ -31983,3 +31983,224 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-06T19:53:24Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-06T19:53:24Z  [CMD `date -u +%FT%TZ` → 2026-10-06T19:53:24Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 06a893356065f579e580e8273b72f3bfa7bce819  [CMD `git rev-parse HEAD` → 06a893356065f579e580e8273b72f3bfa7bce819]
+- tree: 028ff56c0aaf65e56f3f8b4934d1dce4dd9c4ca1  [CMD `git rev-parse HEAD^{tree}` → 028ff56c0aaf65e56f3f8b4934d1dce4dd9c4ca1]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/project-rework-plan-pgvp35: 06a893356065f579e580e8273b72f3bfa7bce819  [CMD `git ls-remote --heads origin` → 06a893356065f579e580e8273b72f3bfa7bce819]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d0c08a4da85a447e0729fdb83d201cccc0af395a  [CMD `git ls-remote --heads origin` → d0c08a4da85a447e0729fdb83d201cccc0af395a]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 72  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 72]
+
+### 1. The four states
+
+- physical: repair branch at d0c08a4; classify.py and d379_controls.py unchanged on it  [CMD `git ls-remote --heads origin` → claude/d379-repair-eb52f73 d0c08a4da85a447e0729fdb83d201cccc0af395a]
+- authorised: NOTHING new to implement yet — Kai's ruling drafts a Dainius grant but states "I cannot authorize this implementation on your behalf"; the grant must come from Dainius explicitly  [CONVERSATION 2026-10-06 Kai, "It requires a fresh, explicit Dainius authority."]
+- evidence: Kai's final reconciliation verbatim in section 2  [CMD `sha256sum kai_aw01_final_reconciliation.txt` → 778c9ca810aa8d2b…]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-06 · AW-01 FINAL RECONCILIATION: DeepSeek closure-v2 receipt ADMISSIBLE (quote reformatting does not invalidate it); C2-01 correct and intentional, no change; C2-02 bounded, no AW change (I1-B owns path validity); C2-03 diagnostic redundancy, keep; C2-04 no defect; C2-05 closed; selector/docstring concern and missing[:5] remain closed / outside AW-01; C-08 authority chain verified closed; NO DESIGN BLOCKER REMAINS; closure subject FROZEN at classify base 22687367…, delta A 7a8739df…, proposed classify 2ab19403…, controls base 59952df6…, delta B 322f3df1…, proposed controls 1ccfa601…, packet 214ea833…; implementation requires a fresh explicit Dainius grant (draft text inside); no further DeepSeek round; R18 evidence-pipeline subclass stays open, to be treated structurally after this checkpoint. Verbatim below, 8265 bytes, sha256 778c9ca810aa8d2bc80b6613af46cd4060767b337bc1bf57e0c1042c06e0c820, final LF True, 4-space indent added ⚠ UNBANKED  [CONVERSATION 2026-10-06 Kai via Dainius, "NO DESIGN BLOCKER REMAINS."]
+    BEGIN-VERBATIM KAI-AW01-FINAL-RECONCILIATION
+    Yes — this one is finally at the point where I am prepared to close the AW-01 design review and move it to bounded implementation authority.
+    
+    I checked the live state before ruling. Entry 72 is signed/verified at 06a893356065f579e580e8273b72f3bfa7bce819; the repair branch is still exactly d0c08a4da85a447e0729fdb83d201cccc0af395a. Neither classify.py nor d379_controls.py has been modified on the repair branch.
+    
+    Most importantly, DeepSeek’s receipt is fully admissible this time. All seven receipt lines, including all three sentinels, are byte-exact. Its later reformatting of some quoted lines does not invalidate the review: those quotations are finding locators, and I reconcile every substantive claim against the exact preserved subject anyway.
+    
+    Final reconciliation
+    
+    DeepSeek finding	Kai ruling
+    C2-01 — producer control has zero admission weight	CORRECT AND INTENTIONAL. The standing AW control is evidence-producing machinery, not programme authority. It does not self-admit its result. Orion executes it; Kai independently adjudicates its exact evidence; final holdout remains separate. No change.
+    C2-02 — empty string path accepted	BOUNDED / NO AW CHANGE. AW01’s job is MARKER semantic authenticity, not complete Git-tree path validation. Empty paths cannot arise from the real tracked Git population and the real 272-row Pass A contains none. I1-B/tree-population controls own that invariant. Duplicating it inside AW01 would collapse control boundaries.
+    C2-03 — extra N=None Git-size finding	DIAGNOSTIC REDUNDANCY ONLY. A malformed token already fails grammar; the Git corroboration also saying it cannot corroborate N=None creates extra diagnostic output but cannot produce false green. Keep it. No semantic defect.
+    C2-04 — comment references grammar defined elsewhere	NO DEFECT. classify.py states the property and immediately constructs the exact token. The standing semantic grammar belongs in the independent control, not duplicated into the producer.
+    C2-05 — helper allows git_size=None	CLOSED. That mode exists solely for synthetic/calibration calls. The actual admission candidate path mandates --aw01-subject-repo, creates git_size, binds the exact subject/tree and performs Git corroboration. There is no candidate-mode PASS without it.
+    
+    DeepSeek’s earlier selector/docstring concern also remains closed: D367 allows an equivalent stable selector, 89/745 measured witnesses already use non-line selectors, and no runtime validator enforces only L<n>. Likewise missing[:5] remains outside AW-01; it is not the Q1b traversal that adjudicates all axis cells.
+    
+    I also checked the critical C-08 authority-chain correction. The proposed candidate mode now consumes both CLASSIFICATION and PASS_A through the existing Stage-B machinery using independently supplied binding anchors; ties classification input_binding back to the actually consumed Pass-A binding; binds both artefacts to Stage A commit/tree; independently resolves <subject>^{tree} in the supplied subject repository; and only then runs the AW semantic check. That closes the major provenance hole that caused me to reject the previous closure proposal.
+    
+    Final AW-01 verdict
+    
+    NO DESIGN BLOCKER REMAINS.
+    
+    I accept the following exact AW-01 closure subject as frozen:
+    
+    classify.py base
+    226873676c2373faaf29f4709bb1bb62d1d22f3c56cbdc0e594314cb6e5df9e8
+    
+    classify.py delta A
+    7a8739dfd2c4d24ba9a036b81f32db432b8b3baeaf45dba5ca74db2c0f9e3e9d
+    
+    proposed classify.py
+    2ab19403964560637a5541a3a02282bc68a833f363fd64d8fe0e0abd14bfbbb8
+    
+    d379_controls.py base
+    59952df66850fd30ade8dc75ee409f88ef644ca197af03a78e1a5cba1eb2359f
+    
+    d379_controls.py delta B
+    322f3df10b0a8a6ebd1a81edbb39c542d7008c16c59c87d3a4a4fd002a5c8583
+    
+    proposed d379_controls.py
+    1ccfa601b35478ea484ac932a1fbabbc19a680e117b867cb17ef9a2aafa1d35b
+    
+    DeepSeek packet
+    214ea833e3d3a8ff280323522512d765f8ad345ac896dcd5fb6b1e5d0c74f0c3
+    
+    Orion’s evidence is also strong enough for implementation staging: AW calibration 71/71, real frozen-subject chain clean, qualifier 0 findings, standing AW candidate PASS with all three layers evaluated, and the candidate hostile suite passes its declared population. These remain zero-admission-weight producer evidence, exactly as designed.
+    
+    Authority boundary
+    
+    There is one important governance point: I cannot authorize this implementation on your behalf.
+    
+    classify.py is outside the original six-file B4 mutation surface. Therefore this cannot be inferred from your earlier B4 grant. It requires a fresh, explicit Dainius authority.
+    
+    If you approve, send Orion exactly this:
+    
+    DAINIUS → ORION — D379 B4 AW-01 CLOSURE IMPLEMENTATION AUTHORITY
+    
+    I explicitly authorise implementation of the exact Kai-reconciled AW-01 closure subject on:
+    
+    claude/d379-repair-eb52f73
+    
+    Required starting HEAD:
+    
+    d0c08a4da85a447e0729fdb83d201cccc0af395a
+    
+    Only these two tracked files are authorised:
+    
+    kai-pm/house_in_order_h2_v13/classify.py
+    
+    kai-pm/house_in_order_h2_v13/build_evidence/d379_controls.py
+    
+    Required final SHA-256:
+    
+    classify.py
+    2ab19403964560637a5541a3a02282bc68a833f363fd64d8fe0e0abd14bfbbb8
+    
+    d379_controls.py
+    1ccfa601b35478ea484ac932a1fbabbc19a680e117b867cb17ef9a2aafa1d35b
+    
+    The authorised changes are exactly the reviewed deltas:
+    
+    classify delta
+    7a8739dfd2c4d24ba9a036b81f32db432b8b3baeaf45dba5ca74db2c0f9e3e9d
+    
+    controls delta
+    322f3df10b0a8a6ebd1a81edbb39c542d7008c16c59c87d3a4a4fd002a5c8583
+    
+    No reinterpretation, cleanup, refactoring, extra hardening or adjacent fix is authorised.
+    
+    Before mutation prove:
+    
+    repair HEAD exactly d0c08a4…;
+    
+    worktree clean;
+    
+    base hashes exactly match the reviewed bases;
+    
+    remote repair branch still points to the same HEAD.
+    
+    Apply only those exact deltas.
+    
+    Before commit prove:
+    
+    both resulting file hashes exactly match the required proposed hashes;
+    
+    git diff --name-only contains exactly those two paths and nothing else.
+    
+    Then run the already-reviewed narrow verification under the qualified interpreter:
+    
+    * compile/import;
+    * AW01 standing section: expected 71/71;
+    * real full-history frozen-subject Stage A → fresh Pass A → classification → bindings → qualifier;
+    * qualifier expected 0 findings;
+    * AW01 real candidate mode with the real Stage-A descriptor, both real Stage-B bindings, both independently held binding hashes and the full-history frozen-subject repository: expected PASS / rc 0;
+    * exact three layers EVALUATED, 272 Pass-A rows, 272 result rows, expected MARKER = emitted MARKER = 5, witnesses checked = 5;
+    * real hostile candidate suite: every declared case must produce its predeclared failure/REFUSE reason;
+    * zero unexplained axis-value changes versus d0c08a4;
+    * all ten evidence facts/traces remain unchanged;
+    * only the five intended MARKER witness representations change.
+    
+    Any unexpected difference, additional path, hash mismatch, changed expectation, new finding, missing binding closure or unexplained failure → STOP, do not commit.
+    
+    If all checks pass, commit the exact two-file AW-01 closure as one bounded repair commit and push the repair branch.
+    
+    After push report:
+    
+    new commit SHA;
+    
+    signature status;
+    
+    parent SHA;
+    
+    tree SHA;
+    
+    changed-path population;
+    
+    both final file hashes;
+    
+    complete narrow verification results;
+    
+    remote readback proving origin points to the same commit.
+    
+    Then STOP for Kai adjudication.
+    
+    This authority does not authorise the remainder of the full D379 hostile matrix, D390 replay, fixity F, capture, candidate packaging, holdout, blind 40, Item 8, merge, DECISIONS.md mutation, or any other source/config/governance file.
+    
+    One other programme issue remains separate: the R18 evidence-pipeline subclass is still open. Orion correctly avoided pipelines for the current review measurements, so it does not block AW-01. But after this implementation checkpoint we should give that process defect its own structural treatment rather than rely indefinitely on operator discipline.
+    
+    At this point I would not send AW-01 back to DeepSeek again. We have a byte-exact receipt, no blocker, no major, every remaining finding is source-reconciled, and the final candidate has survived repeated hostile review. Another round without a changed substantive subject would be review churn rather than additional assurance.
+    
+    Confidence: 0.997 that AW-01 is ready for this exact bounded implementation grant.
+    END-VERBATIM KAI-AW01-FINAL-RECONCILIATION
+
+### 3. Authorised / Held / Forbidden
+
+- HELD pending Dainius's explicit grant: the two-file AW-01 closure implementation on claude/d379-repair-eb52f73  [CONVERSATION 2026-10-06 Kai, "I cannot authorize this implementation on your behalf."]
+- HELD: remainder of the full D379 hostile matrix, D390 replay, F, capture, candidate packaging, holdout, blind 40, Item 8, merge, DECISIONS.md mutation  [CONVERSATION 2026-10-06 Kai, "This authority does not authorise the remainder of the full D379 hostile matrix"]
+
+### 4. Open questions
+
+- Does Dainius issue the drafted AW-01 closure implementation authority exactly as written? — owner: Dainius  [CONVERSATION 2026-10-06 Kai, "If you approve, send Orion exactly this:"]
+- R18 evidence-pipeline subclass structural treatment, after the implementation checkpoint — owner: Kai  [CONVERSATION 2026-10-06 Kai, "we should give that process defect its own structural treatment"]
+
+### 5. Incidents and corrections
+
+- None  [CMD `handoff.py check` → findings=0]
+
+### 6. Next authorised step
+
+- Ask Dainius whether he issues the drafted grant; implement nothing until he does  [CONVERSATION 2026-10-06 Kai, "It requires a fresh, explicit Dainius authority."]
+
+### 7. What I am unsure of
+
+- Whether the relayed message itself was meant as Dainius's approval; it is Kai's text addressed to Dainius, so I treat it as not yet a grant  [CONVERSATION 2026-10-06 Kai, "If you approve, send Orion exactly this:"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
