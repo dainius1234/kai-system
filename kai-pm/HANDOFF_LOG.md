@@ -32795,3 +32795,253 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-06T20:23:11Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-06T20:23:11Z  [CMD `date -u +%FT%TZ` → 2026-10-06T20:23:11Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 15f653bb02c36ddb7ea687ecfec0cd83bed78911  [CMD `git rev-parse HEAD` → 15f653bb02c36ddb7ea687ecfec0cd83bed78911]
+- tree: 91c9147070cff724f69e3dfca15e94d38b9ffcbc  [CMD `git rev-parse HEAD^{tree}` → 91c9147070cff724f69e3dfca15e94d38b9ffcbc]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/project-rework-plan-pgvp35: 15f653bb02c36ddb7ea687ecfec0cd83bed78911  [CMD `git ls-remote --heads origin` → 15f653bb02c36ddb7ea687ecfec0cd83bed78911]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 76  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 76]
+
+### 1. The four states
+
+- physical: repair branch at c358798adf4bca392f3f19187d66b3db6008891d; programme branch carries entries up to 76  [GIT c358798adf4bca392f3f19187d66b3db6008891d]
+- authorised: DAI-6 READ-ONLY census and design only; no mutation, implementation, ledger allocation or DAI-7  [CONVERSATION 2026-10-06 Kai, "No mutation. No implementation. No ledger allocation. No DAI-7."]
+- evidence: Kai's correction and DAI-6 design authority verbatim in section 2  [CMD `sha256sum kai_state_resolved_dai6.txt` → 0683ff2cc5e98a7c…]
+- admission: Kai ACCEPTS the AW-01 implementation checkpoint c358798; AW-01 closed as a work package; D379/H2 NOT closed  [CONVERSATION 2026-10-06 Kai, "I have independently inspected c358798… and ACCEPT the AW-01 implementation checkpoint." ⚠ UNBANKED]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-06 · STATE CONFLICT RESOLVED / ENTRY 76 SUPERSEDED: Orion's R14 handling correct; entry 76 stays as history, its "pending Kai adjudication" superseded; AW-01 checkpoint c358798adf4bca392f3f19187d66b3db6008891d ACCEPTED, AW-01 closed as a work package, D379/H2 NOT closed; no D390 replay, F, capture, candidate, holdout, blind 40, Item 8 or merge released; Linear (Kai-maintained): DAI-5 DONE, DAI-6 IN PROGRESS, DAI-7 BACKLOG blocked by DAI-6; Orion does not mirror Linear; NEXT: DAI-6 read-only R4 census and design for the evidence-pipeline exit-status class, 11 predeclared threat cases, deliverables listed; then STOP. Verbatim below, 6186 bytes, sha256 0683ff2cc5e98a7c2efa0144b074c958deb6da57884640f8a25ecef71524ddba, final LF True, 4-space indent added ⚠ UNBANKED  [CONVERSATION 2026-10-06 Kai via Dainius, "KAI → ORION — STATE CONFLICT RESOLVED / ENTRY 76 SUPERSEDED"]
+    BEGIN-VERBATIM KAI-STATE-RESOLVED-DAI6-DESIGN
+    Orion handled that correctly. The apparent contradiction came from sequencing: he received my earlier tooling-foundation brief after AW-01 had already moved forward. His R14 response was exactly the behaviour we want—repository state over stale prose, no pretending the requested state was still true.
+    
+    I have independently rechecked the live state again. The authoritative position is now:
+    
+    * repair branch = c358798adf4bca392f3f19187d66b3db6008891d, signature verified/valid;
+    * AW-01 implementation is Kai-adjudicated and accepted;
+    * DAI-5 = DONE in Linear;
+    * DAI-6 = IN PROGRESS;
+    * DAI-7 = BACKLOG, blocked by DAI-6;
+    * programme branch currently contains Orion’s entry 76 at 15f653bb…, signed/verified;
+    * PR #122 remains DO NOT MERGE.
+    
+    So entry 76 is useful history, but its “pending Kai adjudication” state is now superseded.
+    
+    Send Orion this correction/current-state packet:
+    
+    KAI → ORION — STATE CONFLICT RESOLVED / ENTRY 76 SUPERSEDED
+    
+    Your handling of the stale programme-control brief was correct.
+    
+    You were right to refuse to repeat two statements that contradicted live repository evidence:
+    
+    * DAI-5 was no longer held;
+    * repair HEAD was no longer d0c08a4….
+    
+    Entry 76 may remain append-only exactly as preserved. Its conflict annotation is valid historical evidence.
+    
+    It is now superseded by this current state.
+    
+    CURRENT PHYSICAL STATE
+    
+    Repair branch:
+    
+    claude/d379-repair-eb52f73
+    
+    HEAD:
+    
+    c358798adf4bca392f3f19187d66b3db6008891d
+    
+    Parent:
+    
+    d0c08a4da85a447e0729fdb83d201cccc0af395a
+    
+    Tree:
+    
+    2eebb48439ae50c0ddd7cb39ded089d37526e53c
+    
+    GitHub signature:
+    
+    verified=true, reason valid.
+    
+    Exactly two repair paths changed in that commit:
+    
+    kai-pm/house_in_order_h2_v13/classify.py
+    
+    kai-pm/house_in_order_h2_v13/build_evidence/d379_controls.py
+    
+    CURRENT AUTHORITY STATE
+    
+    Dainius’s explicit AW-01 implementation grant was preserved in entry 74 and was executed within scope.
+    
+    No further D379 implementation authority is implied.
+    
+    CURRENT EVIDENCE STATE
+    
+    Entry 75 preserves the bounded implementation evidence:
+    
+    * compile/import pass;
+    * AW01 calibration 71/71;
+    * real full-history subject chain clean;
+    * qualifier 0 findings;
+    * AW01 real candidate PASS;
+    * 272/272 rows;
+    * expected/emitted MARKER = 5/5;
+    * 5 witnesses checked;
+    * all three layers EVALUATED;
+    * hostile suite 15/15;
+    * 0 axis-value drift;
+    * 0 evidence-fact/trace/abstention drift;
+    * only the five intended MARKER witness representations changed.
+    
+    CURRENT ADMISSION STATE
+    
+    I have independently inspected c358798… and ACCEPT the AW-01 implementation checkpoint.
+    
+    AW-01 is closed as a work package.
+    
+    D379/H2 IS NOT CLOSED.
+    
+    No D390 replay, F, capture, candidate, holdout, blind 40, Item 8 or merge has been released.
+    
+    ⸻
+    
+    LINEAR CURRENT STATE
+    
+    You do not need Linear access in your current session. Do not fabricate or manually mirror unavailable Linear state.
+    
+    Kai has already updated Linear directly:
+    
+    DAI-5 = DONE
+    
+    DAI-6 = IN PROGRESS
+    
+    DAI-7 = BACKLOG / blocked by DAI-6
+    
+    Linear remains programme coordination only.
+    
+    ⸻
+    
+    NEXT STEP — DAI-6 READ-ONLY DESIGN
+    
+    This is now the only active technical task.
+    
+    Do not start DAI-7.
+    
+    Do not mutate source/tooling yet.
+    
+    Perform the R4 census and design work for the evidence-pipeline exit-status defect class:
+    
+    “An evidence-producing command is placed in a shell pipeline or compound command such that the status later recorded as evidence is not mechanically guaranteed to be the evidence-producing process’s actual status.”
+    
+    Inspect, read-only:
+    
+    * .claude/skills/kai-handoff/handoff.py;
+    * current PreToolUse/commit-gate configuration;
+    * CLAUDE.md R3/R18 material;
+    * current handoff [CMD … → …] evidence grammar;
+    * any helper/wrapper currently responsible for executing or recording shell evidence;
+    * mechanically identifiable historical occurrences of the mechanism.
+    
+    Do not count from memory.
+    
+    Threat cases to predeclare and test in the design:
+    
+    1. failing command piped to successful tail;
+    2. failed check piped to grep -c;
+    3. failed gate followed through ;;
+    4. ordinary unpiped evidence command;
+    5. pipeline with immediate exact PIPESTATUS capture;
+    6. pipefail where exact upstream rc is nevertheless claimed;
+    7. quoted literal | which must not be interpreted as shell pipeline structure;
+    8. |&;
+    9. ||;
+    10. subshell / command substitution;
+    11. ordinary pipeline whose rc is not being used as programme evidence.
+    
+    My preferred architecture remains a hypothesis until your census:
+    
+    enforce the invariant at the evidence-admission boundary rather than banning pipelines globally.
+    
+    A handoff claim about an evidence-producing command should only be admissible if the rc provenance is mechanically established. A bare $? after a pipeline must never establish an upstream command’s exact rc.
+    
+    Consider whether a small governed evidence runner should produce:
+    
+    command + stdout + stderr + process rc / per-stage rc + immutable representation
+    
+    rather than humans assembling these claims manually.
+    
+    Return to Kai:
+    
+    * exact measured mechanism population;
+    * current enforcement surfaces;
+    * root invariant;
+    * proposed control architecture;
+    * why it closes each historical mechanism;
+    * false-positive analysis;
+    * false-negative analysis;
+    * calibration matrix with predeclared expected outcomes;
+    * exact files that implementation would modify;
+    * explicitly excluded surfaces;
+    * whether the control itself requires an adversarial review before implementation.
+    
+    Then STOP.
+    
+    No mutation. No implementation. No ledger allocation. No DAI-7.
+    
+    Preserve this current-state correction and DAI-6 design authority append-only as ⚠ UNBANKED.
+    
+    One thing I particularly like about Orion’s reply: he didn’t blindly obey my stale message just because it came from Kai. He checked the repository, identified the conflict, preserved both the instruction and the contradiction, and stopped. That is exactly the governance behaviour we have been trying to engineer into this project.
+    
+    And his lack of Linear/Miro/Context7 access in that session is not a blocker. Those integrations are primarily tools I can use from here. Orion should consume their conclusions through governed instructions and repository/handoff records, not pretend to possess connectors he does not have.
+    END-VERBATIM KAI-STATE-RESOLVED-DAI6-DESIGN
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: DAI-6 read-only inspection, census and design; return to Kai; STOP  [CONVERSATION 2026-10-06 Kai, "Perform the R4 census and design work for the evidence-pipeline exit-status defect class"]
+- HELD: DAI-7 (rest of the D379 matrix), D390 replay, F, capture, candidate, holdout, blind 40, Item 8, merge; any source or tooling mutation; ledger allocation  [CONVERSATION 2026-10-06 Kai, "Do not mutate source/tooling yet."]
+- FORBIDDEN: merging PR #122  [CONVERSATION 2026-10-06 Kai, "PR #122 remains DO NOT MERGE."]
+
+### 4. Open questions
+
+- None before the census  [CONVERSATION 2026-10-06 Kai, "Do not count from memory."]
+
+### 5. Incidents and corrections
+
+- None  [CMD `handoff.py check` → findings=0]
+
+### 6. Next authorised step
+
+- Read handoff.py, .claude/settings.json hooks, CLAUDE.md R3/R18 and the [CMD …] grammar; measure the historical population mechanically; design; return to Kai  [CONVERSATION 2026-10-06 Kai, "Inspect, read-only:"]
+
+### 7. What I am unsure of
+
+- Which historical universes can earn a mechanism count (the handoff log, the ledger, session transcripts); to be decided by what is mechanically readable, and named with every count  [CONVERSATION 2026-10-06 Kai, "mechanically identifiable historical occurrences of the mechanism"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
