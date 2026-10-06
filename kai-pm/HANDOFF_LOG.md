@@ -32270,3 +32270,341 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-06T19:57:20Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-06T19:57:20Z  [CMD `date -u +%FT%TZ` → 2026-10-06T19:57:20Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 3d2ee6d7a2565669fc3244ac0b287d097a52acf0  [CMD `git rev-parse HEAD` → 3d2ee6d7a2565669fc3244ac0b287d097a52acf0]
+- tree: ca8879d1e49a28d407f2b63706994ea6f386b5f5  [CMD `git rev-parse HEAD^{tree}` → ca8879d1e49a28d407f2b63706994ea6f386b5f5]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/project-rework-plan-pgvp35: 3d2ee6d7a2565669fc3244ac0b287d097a52acf0  [CMD `git ls-remote --heads origin` → 3d2ee6d7a2565669fc3244ac0b287d097a52acf0]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 74  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 74]
+
+### 1. The four states
+
+- physical: repair branch claude/d379-repair-eb52f73 at c358798adf4bca392f3f19187d66b3db6008891d (parent d0c08a4da85a447e0729fdb83d201cccc0af395a, tree 2eebb48439ae50c0ddd7cb39ded089d37526e53c); changed paths exactly kai-pm/house_in_order_h2_v13/build_evidence/d379_controls.py (+796/−2) and kai-pm/house_in_order_h2_v13/classify.py (+19/−3); worktree clean after commit  [GIT c358798adf4bca392f3f19187d66b3db6008891d]
+- authorised: Dainius's AW-01 closure implementation grant (entry 74), now executed; STOP for Kai adjudication  [CONVERSATION 2026-10-06 Dainius, "Approve exactly as drafted"]
+- evidence: full narrow verification outputs verbatim in section 5  [CMD `real_aw01impl_probe.py` → 15/15 cases as required]
+- admission: `eb52f73` is the admitted technical restart; c358798 awaits Kai's adjudication  [D387]
+
+### 2. Rulings since the last handoff
+
+- None; executed under entry 74  [CONVERSATION 2026-10-06 Dainius, "Approve exactly as drafted"]
+
+### 3. Authorised / Held / Forbidden
+
+- DONE (pre-mutation): repair HEAD d0c08a4da85a…, worktree 0 status lines, base classify.py 226873676c23…, base d379_controls.py 59952df66850…, remote and origin/ ref d0c08a4da85a…; delta files 7a8739dfd2c4… and 322f3df10b0a… as frozen  [CMD `git rev-parse HEAD; git status --porcelain; git ls-remote; sha256sum` → as stated]
+- DONE (apply + pre-commit): `git apply` of exactly the two frozen deltas; resulting classify.py 2ab19403964560637a5541a3a02282bc68a833f363fd64d8fe0e0abd14bfbbb8, d379_controls.py 1ccfa601b35478ea484ac932a1fbabbc19a680e117b867cb17ef9a2aafa1d35b; `git diff --name-only` exactly those two paths; credential scan of the worktree diff 0 hits  [CMD `git apply; sha256sum; git diff --name-only` → as stated]
+- DONE (narrow verification, qualified interpreter, against the repair worktree's own files): compile + import both files; section AW01 71 passed 0 failed, output byte-identical to the reviewed scratch run (entry 71); real full-history frozen-subject chain d8aac4d4/3abc9e9d rc 0 end to end, qualifier FINDINGS 0, AW01 candidate through the real CLI with the real Stage A, both real Stage-B bindings, both binder-stdout anchors and the full-history subject repository rc 0 VERDICT PASS, passa_rows 272, result_rows 272, expected 5 == emitted 5, witnesses_checked 5, input/population/witness layers EVALUATED; stage_a.json, passA.json, pa.b, result.json and r.b byte-identical to the reviewed scratch run's (fullaw4); real hostile suite 15/15 with the declared expectations unchanged (only the instrument path, work dir and known-negative chain dir differ from entry 71's probe); vs d0c08a4 run: Pass-A rows identical, 0 axis-value differences over 272 x 6, whole-cell differences only FUNCTION on the 5 MARKER READMEs and only witness_value / source_selector / local_context, 0 rows with evidence fact / trace / abstention / other-key differences, MARKER population identical (5), independent adjudication 5/5 new vs 0/5 old, git blob size == Pass-A bytes 272/272  [CMD `impl_compile; aw01_section_run.py; impl_chain_aw5.py; real_aw01impl_probe.py; aw01v2_diff.py full fullaw5` → rc 0 each]
+- DONE (commit + push): c358798adf4bca392f3f19187d66b3db6008891d, parent d0c08a4…, tree 2eebb484…, carries an SSH signature (gpgsig header); local verification unavailable (gpg.ssh.allowedSignersFile not configured → %G? N); GitHub reports verified true, reason valid; remote readback refs/heads/claude/d379-repair-eb52f73 == c358798adf4bca392f3f19187d66b3db6008891d; committed blobs hash 2ab19403… and 1ccfa601…  [CMD `gh api repos/dainius1234/kai-system/commits/c358798adf4bca392f3f19187d66b3db6008891d; git ls-remote` → verified true, valid; c358798adf4bca392f3f19187d66b3db6008891d]
+- HELD: remainder of the full D379 hostile matrix, D390 replay, F, capture, candidate packaging, holdout, blind 40, Item 8, merge, DECISIONS.md mutation, any other source/config/governance file  [CONVERSATION 2026-10-06 Kai, "This authority does not authorise the remainder of the full D379 hostile matrix"]
+
+### 4. Open questions
+
+- Kai's adjudication of c358798 — owner: Kai  [CONVERSATION 2026-10-06 Kai, "Then STOP for Kai adjudication."]
+- R18 evidence-pipeline subclass structural treatment, after this checkpoint — owner: Kai  [CONVERSATION 2026-10-06 Kai, "we should give that process defect its own structural treatment"]
+
+### 5. Incidents and corrections
+
+- None. Every exit status was read from the process itself; none through a pipeline  [CMD `each run: cmd > file 2>&1 then $?` → rc 0]
+- Credential scan of the eight files below and the worktree diff: 0 hits  [CMD `secretscan.py` → TOTAL HITS 0]
+- EVIDENCE AWI-IMPL-COMPILE-OUT-TXT impl_compile_out.txt: 330 bytes, sha256 9a7fd47c7e2f81c7a1a50a19a7ffb458328d944fdf5f78faf392ef46d7a037b6, final LF True  [CMD `sha256sum impl_compile_out.txt` → 9a7fd47c7e2f81c7…]
+    BEGIN-VERBATIM AWI-IMPL-COMPILE-OUT-TXT
+    compiles: /home/user/kai-repair/kai-pm/house_in_order_h2_v13/classify.py
+    compiles: /home/user/kai-repair/kai-pm/house_in_order_h2_v13/build_evidence/d379_controls.py
+    imports: classify /home/user/kai-repair/kai-pm/house_in_order_h2_v13/classify.py | d379_controls has ['aw01_check', 'aw01_cli', 'aw01_bind_inputs', 'section_AW01']
+    END-VERBATIM AWI-IMPL-COMPILE-OUT-TXT
+- EVIDENCE AWI-IMPL-CHAIN-AW5-DIFF impl/impl_chain_aw5.diff: 495 bytes, sha256 770c5c618dd8ba5b4f4369639e7b3257ba4cc1a99e7c8f0704fd8a6ee9dac9ce, final LF True  [CMD `sha256sum impl_chain_aw5.diff` → 770c5c618dd8ba5b…]
+    BEGIN-VERBATIM AWI-IMPL-CHAIN-AW5-DIFF
+    8c8
+    < V = pathlib.Path("/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/twofact/instAW4/kai-pm/house_in_order_h2_v13")
+    ---
+    > V = pathlib.Path("/home/user/kai-repair/kai-pm/house_in_order_h2_v13")
+    39c39
+    <       "--census-package", CEN, "--stage-a", str(sa), "--out", str(W / "result.json")), "classification (AW-01 closure v2)")
+    ---
+    >       "--census-package", CEN, "--stage-a", str(sa), "--out", str(W / "result.json")), "classification (AW-01 implemented)")
+    END-VERBATIM AWI-IMPL-CHAIN-AW5-DIFF
+- EVIDENCE AWI-IMPL-CHAIN-AW5-OUT-TXT impl/impl_chain_aw5_out.txt: 1692 bytes, sha256 07ef41bf205c434091a72e13df39c96924173fcaa726da0b9387e37da344445c, final LF True  [CMD `sha256sum impl_chain_aw5_out.txt` → 07ef41bf205c4340…]
+    BEGIN-VERBATIM AWI-IMPL-CHAIN-AW5-OUT-TXT
+      subject HEAD                 rc=0  d8aac4d49e6ba997e3eb38062c0917186ee3f197
+      subject tree                 rc=0  3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+      subject status               rc=0  
+      subject HEAD == d8aac4d49e6b True; tree == 3abc9e9d8ca1 True; status lines 0
+      Stage A (CALIBRATION)        rc=0  
+      fresh Pass A                 rc=0    NO VERDICT ASSIGNED IN PASS A.
+      Pass-A binding               rc=0  37ed61b32e5de5f827a81c569050ae36bb00ad12a078967450ee427c87de8312
+      classification (AW-01 implemented) rc=0    self_approval: NONE
+      classification binding       rc=0  6281f607bc251d49bf3a622d5fd3c4b0575725ed875bd9837acac8df8e75eaff
+      qualifier                    rc=0    FINDINGS: 0
+      qualifier findings (lines with '::'): 0
+      AW01 candidate (bound)       rc=0    AW01 VERDICT: PASS
+      subject status after chain: 0 lines
+    
+    FRESH PASS A  subject d8aac4d49e6b  rows 272  rows with readers 5  rows with reader_ops 5  reader_ops entries 8  distinct op sources 4
+      selected reader sources (composite _reader_trace): 5 selections, 4 distinct: ['scripts/auto_changelog.py', 'scripts/auto_session_log.py', 'scripts/security/check_gate_registry.py', 'scripts/sync_docs.py']
+      member of frozen subject: 4/4   strict UTF-8: 4/4
+      (all op sources, superset of selected) member: 4/4   strict UTF-8: 4/4
+      result: STATIC_REFERENCE_AT_SUBJECT positive 5; traces 5; abstained 0
+      result tallies: {"BINDING_CONTRADICTION": 5, "CARRIES_DATE_STAMP": 206, "CITES_COMMIT": 21, "CITES_RUN": 3, "MAINTENANCE_OBSERVED": 71, "NOMINAL_FUNCTION": 207, "SELF_ASSERTS_AUTHORITY": 4, "SELF_ASSERTS_CURRENT": 6, "SELF_ASSERTS_NON_AUTHORITY": 1, "STATIC_REFERENCE_AT_SUBJECT": 5}
+    
+    READER CONFIRMATION: PASS
+    END-VERBATIM AWI-IMPL-CHAIN-AW5-OUT-TXT
+- EVIDENCE AWI-CHAIN-FULL-LOG-TXT impl/fullaw5/chain_full_log.txt: 7418 bytes, sha256 1568488a96a1f56de33da3a86f6adbe3fb439dee596c76822cf1c055544da5da, final LF True  [CMD `sha256sum chain_full_log.txt` → 1568488a96a1f56d…]
+    BEGIN-VERBATIM AWI-CHAIN-FULL-LOG-TXT
+    --- subject HEAD rc=0 (41 bytes)
+    d8aac4d49e6ba997e3eb38062c0917186ee3f197
+    --- end subject HEAD
+    --- subject tree rc=0 (41 bytes)
+    3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+    --- end subject tree
+    --- subject status rc=0 (0 bytes)
+    --- end subject status
+    --- Stage A (CALIBRATION) rc=0 (0 bytes)
+    --- end Stage A (CALIBRATION)
+    --- fresh Pass A rc=0 (516 bytes)
+    PASS A v1.2 COMPLETE — 272 rows == population 272
+      WITNESS KINDS DISCRIMINATED (D2/D4), not assumed from shape:
+        DATE                        353
+        COMMIT                      110
+        RUN_ID                       12
+        HEX_SHAPED_UNRESOLVED         9
+        DECIMAL_TOKEN                 5
+        DIGEST_FRAGMENT               3
+      scope determined: WHOLE_FILE 201 · SPAN 291
+      binding predicates declared closed-world: 26
+      contextual predicates declared closed-world: 1 (status)
+      NO VERDICT ASSIGNED IN PASS A.
+    --- end fresh Pass A
+    --- Pass-A binding rc=0 (65 bytes)
+    37ed61b32e5de5f827a81c569050ae36bb00ad12a078967450ee427c87de8312
+    --- end Pass-A binding
+    --- classification (AW-01 implemented) rc=0 (1356 bytes)
+    HOUSE_H2 v1.2 — 272 rows == population 272
+      subject d8aac4d49e6b tree 3abc9e9d8ca1
+    
+      LIFECYCLE    positives    8  UNKNOWN  264   {'HISTORICAL': 8}
+      FUNCTION     positives    5  UNKNOWN  267   {'MARKER': 5}
+      AUTHORITY    positives    0  UNKNOWN  272   
+      GENERATION   positives    0  UNKNOWN  272   
+      VALIDITY     positives    9  UNKNOWN  263   {'TIME_BOUND': 7, 'EXACT_SNAPSHOT': 2}
+      SCOPE        positives  194  UNKNOWN   78   {'WHOLE_FILE': 194}
+    
+      evidence facts (NOT verdicts):
+        MAINTENANCE_OBSERVED           71
+        SELF_ASSERTS_CURRENT            6
+        STATIC_REFERENCE_AT_SUBJECT     5
+        CITES_COMMIT                   21
+        CITES_RUN                       3
+        CARRIES_DATE_STAMP            206
+        BINDING_CONTRADICTION           5
+        NOMINAL_FUNCTION              207
+        SELF_ASSERTS_AUTHORITY          4
+        SELF_ASSERTS_NON_AUTHORITY      1
+    
+      NOMINAL_FUNCTION (self-description, earns no verdict): 207
+        {'GOVERNANCE from self-description': 6, 'STATUS from self-description': 4, 'PLAN from self-description': 22, 'RUNTIME_INPUT from self-description': 9, 'USER_GUIDE from self-description': 10, 'REFERENCE from self-description': 11, 'EVIDENCE from self-description': 144, 'MARKER from self-description': 1}
+    
+      admission contract sha256 7d41c1d5dcbdaa14ce8d849f9c0d8c62cc29b92e2ea70968ef508d4a028f52be
+      self_approval: NONE
+    --- end classification (AW-01 implemented)
+    --- classification binding rc=0 (65 bytes)
+    6281f607bc251d49bf3a622d5fd3c4b0575725ed875bd9837acac8df8e75eaff
+    --- end classification binding
+    --- qualifier rc=0 (4236 bytes)
+    HOUSE_H2 v1.2 — QUALIFICATION
+      subject d8aac4d49e6b  tree 3abc9e9d8ca1
+      history 2025-06-18 → 2026-08-23  shallow=false  ancestry=986
+      census  29064d650a612968…
+    
+      [1] GOVERNING INVARIANT — checked from the AXIS SET
+          UNKNOWN first-class on every axis: True
+      [1b] REMOVAL CALIBRATION — the gate proves it can fail, this run
+           remove UNKNOWN from LIFECYCLE   detected=True
+           remove UNKNOWN from FUNCTION    detected=True
+           remove UNKNOWN from AUTHORITY   detected=True
+           remove UNKNOWN from GENERATION  detected=True
+           remove UNKNOWN from VALIDITY    detected=True
+           remove UNKNOWN from SCOPE       detected=True
+    
+      [2] STATE DISPOSITIONS — checked from the ALPHABET
+          [LIFECYCLE]
+            ACTIVE            H2_NOT_EARNABLE        0  
+            HISTORICAL        H2_EMITTABLE           8  
+            SUPERSEDED        H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE         264  
+          [FUNCTION]
+            GOVERNANCE        H2_EMITTABLE           0  not observed on this subject
+            STATUS            H2_EMITTABLE           0  not observed on this subject
+            PLAN              H2_EMITTABLE           0  not observed on this subject
+            EVIDENCE          H2_EMITTABLE           0  not observed on this subject
+            REFERENCE         H2_EMITTABLE           0  not observed on this subject
+            RUNTIME_INPUT     H2_EMITTABLE           0  not observed on this subject
+            TEMPLATE          H2_EMITTABLE           0  not observed on this subject
+            MARKER            H2_EMITTABLE           5  
+            USER_GUIDE        H2_EMITTABLE           0  not observed on this subject
+            OTHER             H2_EMITTABLE           0  not observed on this subject
+            UNKNOWN           H2_EMITTABLE         267  
+          [AUTHORITY]
+            AUTHORITATIVE     DEFERRED_TO_H3         0  
+            VERIFIED_DERIVED  DEFERRED_TO_H3         0  
+            ADVISORY          DEFERRED_TO_H3         0  
+            NON_AUTHORITY     DEFERRED_TO_H3         0  
+            UNKNOWN           H2_EMITTABLE         272  
+          [GENERATION]
+            MANUAL            H2_NOT_EARNABLE        0  
+            PARTIAL_DERIVED   H2_NOT_EARNABLE        0  
+            FULL_DERIVED      H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE         272  
+          [VALIDITY]
+            CURRENT_TREE      H2_EMITTABLE           0  not observed on this subject
+            EXACT_SNAPSHOT    H2_EMITTABLE           2  
+            RUN_ARTEFACT      H2_EMITTABLE           0  not observed on this subject
+            TIME_BOUND        H2_EMITTABLE           7  
+            UNKNOWN           H2_EMITTABLE         263  
+          [SCOPE]
+            WHOLE_FILE        H2_EMITTABLE         194  
+            HEADING           H2_NOT_EARNABLE        0  
+            TABLE             H2_NOT_EARNABLE        0  
+            MANAGED_REGION    H2_NOT_EARNABLE        0  
+            UNKNOWN           H2_EMITTABLE          78  
+    
+      [3] OUTPUT-DERIVED — values emitted but unknown to the ontology: 0
+    
+      [4] population declared 272 == rows 272: True
+      [5] every non-abstention cell carries a source-bound witness: True  (0 missing)
+    
+      [6] §8(6) CLOSED ORIGIN CLASSIFICATION — every loaded origin
+          observed 87   classified 87   refused 0
+          H2                 3
+          CENSUS             0
+          GOVERNED_STDLIB    48
+          BUILTIN_OR_FROZEN  36
+    
+      [7] Q1a RECORDED PRODUCER PROVENANCE vs STAGE A
+          verified against stage_a_identity 4a2c68b5b86d0fce…, every slot closed
+    
+      [8] Q1b / E1 — DERIVED denominators (D379 §8)
+          axis-cell denominator              216
+          positive-evidence-fact denominator 529
+          sum                                745
+    
+      UTILITY PROFILE — reported, never optimised (D367 11)
+          axis         positive  UNKNOWN  UNMEASURED
+          LIFECYCLE           8      264           0
+          FUNCTION            5      267           0
+          AUTHORITY           0      272           0
+          GENERATION          0      272           0
+          VALIDITY            9      263           0
+          SCOPE             194       78           0
+          Qualification asks: is the instrument TRUTHFUL?
+          A separate later decision asks: is it USEFUL enough for H3?
+    
+      FINDINGS: 0
+    --- end qualifier
+    --- AW01 candidate (bound) rc=0 (450 bytes)
+    AW01 CANDIDATE — MARKER witness semantic control
+      bound: Stage A, Stage-B CLASSIFICATION and PASS_A against the parent-held anchors; subject d8aac4d49e6b tree 3abc9e9d8ca1 resolved in the subject repository
+      {'passa_rows': 272, 'result_rows': 272, 'expected_marker': 5, 'emitted_marker': 5, 'witnesses_checked': 5, 'input_layer': 'EVALUATED', 'population_layer': 'EVALUATED', 'witness_layer': 'EVALUATED'}
+      AW01 FINDINGS: 0
+      AW01 VERDICT: PASS
+    --- end AW01 candidate (bound)
+    END-VERBATIM AWI-CHAIN-FULL-LOG-TXT
+- EVIDENCE AWI-REAL-AW01IMPL-PROBE-DIFF impl/real_aw01impl_probe.diff: 396 bytes, sha256 3fb3bc662765a46d5df6927d4cec54ec8b95e3efe86fbe1fe80d7e4af865fbb3, final LF True  [CMD `sha256sum real_aw01impl_probe.diff` → 3fb3bc662765a46d…]
+    BEGIN-VERBATIM AWI-REAL-AW01IMPL-PROBE-DIFF
+    7,8c7,8
+    < V = T / "instAW4/kai-pm/house_in_order_h2_v13"; CTL = V / "build_evidence/d379_controls.py"
+    < I = T / "impl"; W = I / "aw01c2_real_work"
+    ---
+    > V = pathlib.Path("/home/user/kai-repair/kai-pm/house_in_order_h2_v13"); CTL = V / "build_evidence/d379_controls.py"
+    > I = T / "impl"; W = I / "aw01impl_real_work"
+    38c38
+    < good = opts("fullaw4"); res = []
+    ---
+    > good = opts("fullaw5"); res = []
+    END-VERBATIM AWI-REAL-AW01IMPL-PROBE-DIFF
+- EVIDENCE AWI-REAL-AW01IMPL-PROBE-OUT-TXT impl/real_aw01impl_probe_out.txt: 3631 bytes, sha256 89f1153aa05d68dbcd39b7f695ad64adcc6bd135bcc4ea3f923242d63ae0ca05, final LF True  [CMD `sha256sum real_aw01impl_probe_out.txt` → 89f1153aa05d68db…]
+    BEGIN-VERBATIM AWI-REAL-AW01IMPL-PROBE-OUT-TXT
+    OK   KN closure v2 candidate, fully bound: rc=0 (want 0) :: AW01 FINDINGS: 0 | AW01 VERDICT: PASS
+    OK   KP d0c08a4 candidate (pre-AW-01 witness), fully bound: rc=1 (want 1) :: AW01 FINDINGS: 20 | AW01 VERDICT: FAIL
+    OK   1 substituted unbound classification bytes: rc=2 (want 2) :: AW01 REFUSE: Stage-A / Stage-B: REFUSE: artefact bytes do not match the ORIGINAL Stage-B binding | AW01 VERDICT: REFUSED — inputs not established; input, population and witness layers NOT_EVALUATED
+    OK   2 substituted unbound Pass-A bytes: rc=2 (want 2) :: AW01 REFUSE: Stage-A / Stage-B: REFUSE: artefact bytes do not match the ORIGINAL Stage-B binding | AW01 VERDICT: REFUSED — inputs not established; input, population and witness layers NOT_EVALUATED
+    OK   3 wrong classification Stage-B binding (valid binding of the substitute, original anchor): rc=2 (want 2) :: AW01 REFUSE: Stage-A / Stage-B: REFUSE: Stage-B binding does not match the independently held anchor (coordinated rewrite or substituted binding) | AW01 VERDICT: REFUSED — inputs not established; input, population and witness layers NOT_EVALUATED
+    OK   4 wrong Pass-A Stage-B binding (valid binding of the substitute, original anchor): rc=2 (want 2) :: AW01 REFUSE: Stage-A / Stage-B: REFUSE: Stage-B binding does not match the independently held anchor (coordinated rewrite or substituted binding) | AW01 VERDICT: REFUSED — inputs not established; input, population and witness layers NOT_EVALUATED
+    OK   5 wrong parent-held classification binding digest: rc=2 (want 2) :: AW01 REFUSE: Stage-A / Stage-B: REFUSE: Stage-B binding does not match the independently held anchor (coordinated rewrite or substituted binding) | AW01 VERDICT: REFUSED — inputs not established; input, population and witness layers NOT_EVALUATED
+    OK   6 wrong parent-held Pass-A binding digest (a real anchor of another chain): rc=2 (want 2) :: AW01 REFUSE: Stage-A / Stage-B: REFUSE: Stage-B binding does not match the independently held anchor (coordinated rewrite or substituted binding) | AW01 VERDICT: REFUSED — inputs not established; input, population and witness layers NOT_EVALUATED
+    OK   7 classification provenance naming a different (real) Pass-A artefact, validly rebound: rc=2 (want 2) :: AW01 REFUSE: classification input_binding.pass_a_artifact_sha256 is not the consumed Pass-A binding's artifact_sha256 | AW01 VERDICT: REFUSED — inputs not established; input, population and witness layers NOT_EVALUATED
+    OK   8r a different real Stage A (closure v1's) with this chain's bindings: rc=2 (want 2) :: AW01 REFUSE: Stage-A / Stage-B: REFUSE: Stage-B binding names a different Stage A | AW01 VERDICT: REFUSED — inputs not established; input, population and witness layers NOT_EVALUATED
+    OK   9 subject repository without the subject commit: rc=2 (want 2) :: AW01 REFUSE: the subject repository does not resolve d8aac4d49e6ba997e3eb38062c0917186ee3f197^{tree} to the Stage-A subject tree (rc 1) | AW01 VERDICT: REFUSED — inputs not established; input, population and witness layers NOT_EVALUATED
+    OK   10 omitted --aw01-subject-repo: rc=2 (want 2) :: AW01 REFUSE (usage): required argument(s) missing: ['--aw01-subject-repo']
+    OK   11a no arguments after --aw01-candidate: rc=2 (want 2) :: AW01 REFUSE (usage): RESULT and PASSA are required, as the two non-empty positional paths after --aw01-candidate
+    OK   11b anchor with a trailing newline character: rc=2 (want 2) :: AW01 REFUSE (usage): --aw01-expected-result-binding-sha256 is not 64 lowercase hex
+    OK   11c a flag given twice: rc=2 (want 2) :: AW01 REFUSE (usage): --aw01-subject-repo given more than once
+    
+    15/15 cases as required
+    END-VERBATIM AWI-REAL-AW01IMPL-PROBE-OUT-TXT
+- EVIDENCE AWI-AW01IMPL-DIFF-OUT-TXT impl/aw01impl_diff_out.txt: 3254 bytes, sha256 13b16b667cede346abb8b0c0e3b702dd6cde2462c129a31c0d96f3195caf4204, final LF True  [CMD `sha256sum aw01impl_diff_out.txt` → 13b16b667cede346…]
+    BEGIN-VERBATIM AWI-AW01IMPL-DIFF-OUT-TXT
+    subjects d8aac4d49e6b d8aac4d49e6b  Pass-A rows identical: True
+    axis VALUE differences over 272 rows x 6 axes: 0
+    whole-cell differences: 5 -> ['FUNCTION'] on ['data/self-emp/Accounting/README.md', 'data/self-emp/Coding/README.md', 'data/self-emp/Engineering/README.md', 'data/self-emp/Legal/README.md', 'data/self-emp/Social/README.md']
+      data/self-emp/Accounting/README.md     FUNCTION: non-witness keys differing []; witness fields differing ['local_context', 'source_selector', 'witness_value']
+      data/self-emp/Coding/README.md         FUNCTION: non-witness keys differing []; witness fields differing ['local_context', 'source_selector', 'witness_value']
+      data/self-emp/Engineering/README.md    FUNCTION: non-witness keys differing []; witness fields differing ['local_context', 'source_selector', 'witness_value']
+      data/self-emp/Legal/README.md          FUNCTION: non-witness keys differing []; witness fields differing ['local_context', 'source_selector', 'witness_value']
+      data/self-emp/Social/README.md         FUNCTION: non-witness keys differing []; witness fields differing ['local_context', 'source_selector', 'witness_value']
+    rows with any of the 10 evidence facts different: 0; traces: 0; abstentions: 0; any other row key: 0
+    MARKER population OLD 5 AW 5 identical True: ['data/self-emp/Accounting/README.md', 'data/self-emp/Coding/README.md', 'data/self-emp/Engineering/README.md', 'data/self-emp/Legal/README.md', 'data/self-emp/Social/README.md']
+    
+    FAIL-OLD / PASS-NEW (run_h2_v12._compliant, the qualifier's predicate):
+      data/self-emp/Accounting/README.md     OLD False ('114 bytes' / L1 / '(no title)')   AW True  ('passa.bytes=114 bytes;' / META:passa.bytes / 'passa.bytes=114 bytes;')
+      data/self-emp/Coding/README.md         OLD False ('44 bytes' / L1 / '(no title)')   AW True  ('passa.bytes=44 bytes;' / META:passa.bytes / 'passa.bytes=44 bytes;')
+      data/self-emp/Engineering/README.md    OLD False ('35 bytes' / L1 / '(no title)')   AW True  ('passa.bytes=35 bytes;' / META:passa.bytes / 'passa.bytes=35 bytes;')
+      data/self-emp/Legal/README.md          OLD False ('71 bytes' / L1 / '(no title)')   AW True  ('passa.bytes=71 bytes;' / META:passa.bytes / 'passa.bytes=71 bytes;')
+      data/self-emp/Social/README.md         OLD False ('58 bytes' / L1 / '(no title)')   AW True  ('passa.bytes=58 bytes;' / META:passa.bytes / 'passa.bytes=58 bytes;')
+    
+    INDEPENDENT ADJUDICATION (aw01v2_adjudicator: grammar, selector, source_path, N == fresh Pass-A row bytes, README.md, N < 200, N == git blob size):
+      data/self-emp/Accounting/README.md     git size 114  token 'passa.bytes=114 bytes;'   ADJUDICATED
+      data/self-emp/Coding/README.md         git size  44  token 'passa.bytes=44 bytes;'    ADJUDICATED
+      data/self-emp/Engineering/README.md    git size  35  token 'passa.bytes=35 bytes;'    ADJUDICATED
+      data/self-emp/Legal/README.md          git size  71  token 'passa.bytes=71 bytes;'    ADJUDICATED
+      data/self-emp/Social/README.md         git size  58  token 'passa.bytes=58 bytes;'    ADJUDICATED
+      adjudicated 5/5
+      OLD witnesses under the same adjudicator (fail-old): 0/5 adjudicated
+    MARKER population recomputed from git over all 272 documents: 5 == AW population: True
+    git blob size == Pass-A row bytes for 272/272 documents
+    END-VERBATIM AWI-AW01IMPL-DIFF-OUT-TXT
+- impl_section_out.txt (section AW01, 71/71) is byte-identical to aw01c2_section_out.txt preserved in entry 71, sha256 5bdf6fb1f0eba591cfaf89f93a227af68be44eea46587ec37aee7523615ab203; not repeated  [CMD `cmp impl_section_out.txt aw01c2_section_out.txt` → identical]
+
+### 6. Next authorised step
+
+- STOP for Kai adjudication of c358798adf4bca392f3f19187d66b3db6008891d  [CONVERSATION 2026-10-06 Kai, "Then STOP for Kai adjudication."]
+
+### 7. What I am unsure of
+
+- Nothing beyond section 4; signature verification rests on GitHub's API, not a local verifier  [CMD `git log -1 --format=%G?` → N (no allowedSignersFile)]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
