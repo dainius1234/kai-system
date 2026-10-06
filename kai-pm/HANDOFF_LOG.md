@@ -35868,3 +35868,2149 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-06T21:03:01Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-06T21:03:01Z  [CMD `date -u +%FT%TZ` → 2026-10-06T21:03:01Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 543784f6ea6b244e9994e421516643026295e9d0  [CMD `git rev-parse HEAD` → 543784f6ea6b244e9994e421516643026295e9d0]
+- tree: ff0d2af82dfcefd6989db6280610b6a14ea58eab  [CMD `git rev-parse HEAD^{tree}` → ff0d2af82dfcefd6989db6280610b6a14ea58eab]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 543784f6ea6b244e9994e421516643026295e9d0  [CMD `git ls-remote --heads origin` → 543784f6ea6b244e9994e421516643026295e9d0]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 79  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 79]
+
+### 1. The four states
+
+- physical: no source, tooling, workflow, script or ledger change; repair branch at c358798; this entry is the only write  [CMD `git ls-remote --heads origin` → claude/d379-repair-eb52f73 c358798adf4bca392f3f19187d66b3db6008891d]
+- authorised: entry 79 — read-only supplemental census, design hardening, DAI-6 design packet v1 for DeepSeek; STOP before implementation  [CONVERSATION 2026-10-06 Kai, "STOP before implementation."]
+- evidence: the packet (census 2 incl. all 162 classified occurrences, hardened design, calibration matrix), instruments and outputs verbatim in section 5  [CMD `sha256sum DEEPSEEK_PACKET_DAI6_V1.md` → 58228244b3f4e776…]
+- admission: none; producer evidence  [CONVERSATION 2026-10-06 Kai, "DAI-6 remains OPEN. No implementation authority yet."]
+
+### 2. Rulings since the last handoff
+
+- None; executed under entry 79  [CONVERSATION 2026-10-06 Kai, "BEFORE FREEZING DAI-6, COMPLETE THE TWO DISCOVERED BUT UNINSPECTED POPULATIONS"]
+
+### 3. Authorised / Held / Forbidden
+
+- DONE (census 2 subject): 8 workflows + 11 scripts/security/*.sh at programme HEAD 543784f; the same 19 files are byte-identical at repair c358798; main (194db0a) carries 3 of the 8 workflows (different versions) and none of the 11 scripts; 2 further workflows invoke 7 collectors, each as one direct command with no pipe, $?, PIPESTATUS or pipefail in either file  [CMD `git rev-parse HEAD:<f> vs c358798:<f>; git diff --stat 194db0a HEAD` → same=19 differ=0]
+- DONE (CI shell, measured from job logs, docs host blocked): no `shell:` key → `/usr/bin/bash -e {0}` (errexit on, pipefail off; jobs 97055875877 on 2026-08-22 and 112487834402 on 2026-10-06); `shell: bash` → `--noprofile --norc -e -o pipefail` (job 111676440704); 121 of 122 steps have no shell key  [CMD `mcp github get_job_logs` → as stated]
+- DONE (bash semantics, measured, bash 5.2.21): under `bash -e`, `set -uo pipefail` keeps errexit; a failing command ends the script before `rc=$?`, `PIPESTATUS` or `echo rc=$? >>`; only `if cmd; then …; else rc=$?; fi` captures  [CMD `bash -e case1..4.sh` → exit 3, 5, 4 with no output; case4 REACHED rc=3]
+- DONE (census 2 result): 162 occurrences (114 pipelines, 48 status reads), all classified, 42 manual decisions each with a reason: IN-CLASS-DEFECT 13, SAFE-EXACT 50, SAFE-PIPEFAIL 11, ADJ-SIGPIPE 2, EV-WRITE-UNCHECKED 22, PRODUCER-DISCARDED 2, VALUE-ONLY 49, DISPLAY 10, NOT-EVIDENCE 2, SCANNER-FP 1. Mechanisms: M-CI-ERREXIT 7 occurrences in 5 steps of 3 workflows (item8-network-contingency known-negative steps can never pass, never run (Actions API 404); item8 PIPESTATUS captures dead on the failure path; p1 fetch_state rc output written only on 0, comment says "without set -e"); M-LAUNDER 6 occurrences in 5 scripts (git status failure recorded as `dirty 0` ×4, git ls-tree failure recorded as the empty-input sha256 build-input identity ×1, gated_commit untracked guard passes on git failure ×1). All 7 collector `stage()` helpers capture and return the exact rc; the D379 instrument tree at c358798 invokes none of the 11 collectors  [CMD `classify_supp.py; supp_breakdown` → 162 rows, 0 unclassified]
+- DONE (design hardening per entry 79): refined invariant; L1 record schema kai.evrun/v1, wrapper result 0/1/2 never encoding a child rc, one owned process group, TERM→grace→KILL, residue probe, no intermediate stdout capture in v1 (declared NOT_CAPTURED), atomic temp+fsync+rename, environment INHERITED_NOT_SERIALISED, realpath cwd; L2 RUN grammar and algorithm with link checks; L3 B1–B5 required-but-narrow; calibration D 20 (run), L3 22, L1 15, L2 17 (predeclared, not run)  [FILE DEEPSEEK_PACKET_DAI6_V1.md]
+- DONE (packet): DEEPSEEK_PACKET_DAI6_V1.md 61,691 bytes, sha256 58228244b3f4e776955b3aae77e4d8735d2c2539637a9e7eedcb8849126bbc56; three plain-character sentinels, 0 backslashes, unique; Appendix A row count in the receipt; 10 base64 chunks; message 88,008 bytes sha256 ee9b8dce210b9627…, round-trip equal  [CMD `gen_dai6_packet.py; gen_dai6_b64.py (unpiped)` → sentinels [1,1,1]; round-trip True]
+- HELD: DAI-6 implementation; repairs of the workflow and script findings (proposed as separate work packages); ledger mutation incl. INC-35; DAI-7; D390, F, capture, candidate, holdout, blind 40, Item 8, merge  [CONVERSATION 2026-10-06 Kai, "No source/tooling mutation. No ledger mutation. No DAI-7."]
+
+### 4. Open questions
+
+- Whether M-LAUNDER (value laundered from a discarded upstream failure) is inside DAI-6's class or a sibling class; whether M-CI-ERREXIT and M-LAUNDER get their own work packages; the L2 open point on externally reported exit statuses (CI job logs) — owner: Kai  [FILE DEEPSEEK_PACKET_DAI6_V1.md]
+- Core Tests failed on the entry-78 push (c269bdb) at "Doc-drift check (README metrics match codebase)"; not investigated (out of DAI-6 scope); whether it predates entry 78 is unmeasured — owner: Kai  [CMD `mcp actions list_workflow_jobs 37527417080` → step 7 failure]
+
+### 5. Incidents and corrections
+
+- R18 evidence-pipeline recurrence, my own: I piped the transport generator through `| head -3` inside an `&&` chain; the generator raised BrokenPipeError in its final listing loop and the chain continued on head's status. All files had been written before that loop; re-run unpiped: rc 0, round-trip True  [CMD `python3 -B gen_dai6_b64.py > gen_dai6_b64_out.txt` → rc=0]
+- My own earlier note in unified-hunter.yml:108 (2026-09-18) that the shell is `bash -e {0}` was confirmed by today's independent job log, not used as the source  [CMD `get_job_logs 112487834402` → shell: /usr/bin/bash -e {0}]
+- Corrections before hashing: the packet's sentinel C moved off an indented line; the appendix header said 41 manual decisions, corrected to 42 after P046 was added on reading `BUILD_INPUTS`; a TSV row broke on an embedded newline (writer now escapes); the census scanner misreads `case` patterns as pipelines (P080, SCANNER-FP; L3 must model case)  [CMD `classify_supp.py` → 163 lines × 11 fields]
+- Credential scan of every file below, the transport message, supp_rows.json: 0 hits; raw separators none; model identifiers in the packet 0  [CMD `secretscan.py` → TOTAL HITS 0]
+- EVIDENCE DAI6S-DEEPSEEK-PACKET-DAI6-V1-MD DEEPSEEK_PACKET_DAI6_V1.md: 61691 bytes, sha256 58228244b3f4e776955b3aae77e4d8735d2c2539637a9e7eedcb8849126bbc56, final LF True  [CMD `sha256sum DEEPSEEK_PACKET_DAI6_V1.md` → 58228244b3f4e776…]
+    BEGIN-VERBATIM DAI6S-DEEPSEEK-PACKET-DAI6-V1-MD
+    # KAI DAI-6 — EVIDENCE-PIPELINE EXIT-STATUS CONTROL: DESIGN PACKET v1 FOR ADVERSARIAL REVIEW
+    
+    Producer: Orion. Date: 2026-10-06. Evidence class: PRODUCER MEASUREMENT AND DESIGN, ZERO ADMISSION WEIGHT.
+    Status: DESIGN ONLY. Nothing here is implemented. You have NO repository access and NO prior context: rely only on
+    this packet. Every measured figure names its universe; the full classified occurrence table is Appendix A.
+    
+    ## 0. RECEIPT — reply FIRST with these lines inside ONE fenced code block, each copied exactly
+    
+        PACKET HASH: <sha256 of this decoded packet, as given by the sender>
+        SENTINEL A: <the whole line in section 3 that begins "An exit status admitted ">
+        SENTINEL B: <the whole line in section 4, "Timeout and cleanup", that begins "outlived its parent), it">
+        SENTINEL C: <the whole line in section 5 that begins "recorded in handoff.py w">
+        APPENDIX A DATA ROWS: <the number of tab-separated data rows after the header line in Appendix A>
+        END OF PACKET SEEN: YES
+    
+    If any receipt line cannot be reproduced exactly, reply NO REVIEW. The last line of this file is
+    "END OF PACKET DAI-6 DESIGN v1".
+    
+    ## 1. The defect class and the authority for this design
+    
+    Defect class (the adjudicator's definition): *an evidence-producing command is placed in a shell pipeline or compound
+    command such that the status later recorded as evidence is not mechanically guaranteed to be the evidence-producing
+    process's actual status.*
+    
+    Programme: KAI. The producer (Orion) executes and measures; the adjudicator (Kai) rules; the operator (Dainius)
+    authorises. This packet is a DESIGN. Nothing in it is implemented. It is producer evidence with zero admission weight.
+    Rulings already made by the adjudicator and NOT open to redesign here: no global ban on shell pipelines; three
+    layers, all required — L1 governed evidence runner, L2 handoff evidence-admission rule, L3 narrow pre-execution
+    structural guard; L3 is defence in depth, L2 is the admission boundary.
+    
+    ## 2. Measured populations (every count names its universe)
+    
+    ### 2.1 Census 1 (accepted by the adjudicator as a bounded measurement)
+    
+    Universe U3: the 1,261 distinct Bash commands this producer actually ran in one session (2026-09-18 → 2026-10-06),
+    read from the only transcript on disk. Earlier sessions are not on disk: every count is a lower bound.
+    Instrument: a quote/escape/heredoc/substitution-aware shell-structure scanner (no third-party shell parser was
+    available), calibrated BEFORE the census against 20 predeclared cases (all pass), then a second pass classifying
+    the ROLE of the stage whose status is actually read: FILTER (last stage is an output filter such as tail, head,
+    grep, cut, wc, cat, sed, awk, tee) = the mechanism; FEEDER (every earlier stage is echo/printf/cat) = exact, not the
+    mechanism.
+    
+    | shape | instances | mechanism instances |
+    |---|---|---|
+    | `$?` read straight after a pipeline | 18 | 4 FILTER (13 FEEDER, 1 evidence-last) |
+    | `PIPESTATUS` read after an intervening command | 4 | 4 (2 a deliberate demonstration) |
+    | a pipeline's status gates an `&&`/`\|\|` chain reaching `git commit`/`git push` | 31 | 21 FILTER |
+    | `git commit`/`git push` after `;` or newline following a gate-like command | 19 | 19 (18 are `git commit … ⏎ git push`) |
+    | risk only: a pipeline gates a non-commit chain / the command ends in a pipeline / `\|\| true`-style masks | 263 / 417 / 38 | not enforced |
+    
+    Of the 8 wrong-status reads, 4 printed a WRONG value: a probe printed `exit=0` for a program that exits 1; a
+    `git grep | cut` printed `rc=0` for a search with no match; a capture wrote `process exit status = 0` into a committed
+    evidence file for a run that returned 1 (banked incident INC-2026-09-18-35, `PIPESTATUS` expanded after a bare
+    `echo`); a credential-scan line printed `grep rc=0` from a `PIPESTATUS` that could not see the pipeline inside
+    `$( )`. Two more were correct by coincidence.
+    
+    Universe U1, the handoff log: 675 hand-written `[CMD `…` → …]` tags; 26 name a piped command; 0 assert an exit status;
+    the tags are free text and nothing links any of them to a run.
+    
+    ### 2.2 Census 2 (this packet's new measurement)
+    
+    Universe: every `run:` step of the 8 workflow files that mention `pipefail`/`PIPESTATUS` (122 steps) and all 11
+    tracked `scripts/security/*.sh` evidence collectors/gates, committed bytes of the programme branch (identical, all 19
+    files, to the D379 repair branch). Two further workflows that INVOKE 7 of the collectors (they mention neither word)
+    were read for how they consume the collector's status: each runs the collector as one direct command (`bash
+    scripts/security/<x>.sh`), with no pipe, `$?`, `PIPESTATUS` or `pipefail` anywhere in either file.
+    
+    **Measured CI shell semantics** (this repository's own job logs; the documentation host was not reachable):
+    a step with no `shell:` key runs as `/usr/bin/bash -e {0}` — errexit ON, pipefail OFF — observed 2026-08-22 and again
+    on 2026-10-06; a step with `shell: bash` runs as `/usr/bin/bash --noprofile --norc -e -o pipefail {0}` (2026-10-05).
+    121 of the 122 steps have no `shell:` key.
+    
+    **Measured bash semantics** (bash 5.2.21, run here): under `bash -e`, `set -uo pipefail` leaves errexit ON. A
+    failing command — or a failing `cmd | tee` under pipefail — ends the script immediately with that status; a following
+    `rc=$?`, `rc="${PIPESTATUS[0]}"` or `echo "rc=$?" >> file` never runs. Only `if cmd; then rc=0; else rc=$?; fi`
+    captures it.
+    
+    Occurrences: 114 multi-stage pipelines and 48 explicit status reads = 162, each classified (Appendix A, all 162 rows):
+    
+    | class | n | meaning |
+    |---|---|---|
+    | IN-CLASS-DEFECT | 13 | the status or status-derived value recorded/acted on is not mechanically the intended process's |
+    | SAFE-EXACT | 50 | read directly from the intended process (single command; `if/else` capture; a `stage()` helper that captures `$?` and returns it — all 7 collectors' helpers do; `wait` on one PID) |
+    | SAFE-PIPEFAIL | 11 | correct only because `pipefail` is set (adjacent to INC-2026-09-12-14/-16) |
+    | ADJ-SIGPIPE | 2 | `ls -R \| head -40` under pipefail+errexit can turn SIGPIPE into a false failure (unmeasured) |
+    | EV-WRITE-UNCHECKED | 22 | a write into an evidence file through `\| tee -a` whose status nothing consumes |
+    | PRODUCER-DISCARDED | 2 | an evidence-producing summariser's status consumed by nothing; the collector then exits 0 |
+    | VALUE-ONLY / DISPLAY / NOT-EVIDENCE | 49 / 10 / 2 | output used as data, display, dependency installs |
+    | SCANNER-FP | 1 | a `case` pattern `*a*\|*b*)` read as a pipeline: the scanner does not model `case` |
+    
+    The 13 defects are two mechanisms:
+    
+    **M-CI-ERREXIT — 7 occurrences, 5 steps, 3 workflows (CI-only, adjacent).** A step written as though errexit were
+    off, on a runner whose default shell has it on.
+    * `item8-network-contingency.yml` two known-negative calibration steps: the instrument is EXPECTED to exit 3 (resp. 1)
+      and the step then checks `rc=$?`. Errexit ends the step at the expected exit, so the step can never pass for any
+      instrument behaviour. This workflow has never run (the Actions API knows no workflow at that path).
+    * `item8-network-contingency.yml` and `item8-preflight.yml`: `runner 2>&1 | tee log; rc="${PIPESTATUS[0]}"; echo
+      "runner exit: $rc"; exit "$rc"`. On failure errexit exits at the pipeline; the designed capture and its record line
+      never run. The step's exit code still equals the runner's (errexit + pipefail, by accident).
+    * `p1-replay-completeness.yml`: a step whose comment states it "runs without `set -e`" writes `echo "rc=$?" >>
+      "$GITHUB_OUTPUT"` after a classifier; with errexit on, the rc output exists only when it is 0 (nothing consumes it),
+      and a failed `curl` aborts the step before the classifier can report NETWORK_FAILURE as designed.
+    
+    **M-LAUNDER — 6 occurrences, 5 scripts (inside the class: a value variant).** An evidence-producing `git` command's
+    failure is discarded (`2>/dev/null`, `|| true`, an unchecked assignment) and a downstream filter's output is recorded
+    as a plausible fact: four collectors record `dirty 0` when `git status` fails; one records the SHA-256 of EMPTY input
+    as the build-input identity when `git ls-tree` fails; the commit gate's untracked-file guard passes when `git status`
+    fails. All latent: no observed wrong record.
+    
+    Neither mechanism is reachable through the producer's handoff evidence path, so neither is repaired by the five
+    files proposed here (section 9). Both are reported for separate work packages. The D379 instrument code at the
+    repair branch head invokes none of the 11 collectors (the only textual hits are quoted data in a source-packet file).
+    
+    ## 3. Root invariant (as ruled)
+    
+    An exit status admitted as evidence must come directly from the operating-system process result for the
+    specifically named process/stage, captured by governed instrumentation and bound to that exact execution. A
+    shell-composed status such as `$?`, stale `PIPESTATUS`, pipeline aggregate status or downstream-filter status is not
+    evidence of another stage's exact return code. Governed inter-process plumbing is permitted when the runner itself
+    owns the processes and directly observes each return code.
+    
+    ## 4. L1 — governed evidence runner `evrun.py`
+    
+    Stdlib only; requires a Python whose `subprocess.Popen` accepts `process_group` (present, with `restore_signals` and
+    `close_fds` defaulting to True, in the two 3.11.15 interpreters measured here); never a shell; never `shell=True`.
+    
+    **Invocation.**
+    ```
+    evrun.py --out-dir DIR --name NAME [--timeout SECONDS] [--grace SECONDS] [--evidence-stage K] -- ARGV0 [ARG ...]
+    evrun.py --out-dir DIR --name NAME [...] --stage ARGV0 [ARG ...] --stage ARGV0 [ARG ...]   (a pipeline)
+    ```
+    NAME matches `[A-Z][A-Z0-9-]{1,63}`. SECONDS are positive integers (no floats anywhere in the record). Default
+    evidence stage = the last stage. Argument errors → wrapper result 2, no record.
+    
+    **Process ownership.** All stages are started in ONE new process group owned by the runner: stage 0 with
+    `process_group=0` (it becomes the group leader), every later stage with `process_group=<pid of stage 0>`. The runner
+    is not in that group. `restore_signals=True` (Python's default) so children get default SIGPIPE disposition, as under
+    a shell. `stdin` of stage 0 is `/dev/null`. `close_fds=True`.
+    
+    **Plumbing (v1).** Stage i's stdout is a pipe to stage i+1's stdin; the runner closes its own copy of every
+    intermediate pipe end immediately after spawning the consumer, so EOF and SIGPIPE behave as in a shell pipeline. The
+    runner never reads an intermediate pipe, so it cannot deadlock on one. The final stage's stdout goes to a file. Every
+    stage's stderr goes to its own file. **Intermediate stdout is NOT captured in v1** and the record says so
+    (`"intermediate_stdout": "NOT_CAPTURED"`). Output files are opened `O_CREAT|O_EXCL` before spawn; a pre-existing file
+    is a runner failure.
+    
+    **Waiting.** The runner waits for every stage with `Popen.wait()`; `returncode` is taken exactly as Python reports it
+    (negative = terminated by that signal number).
+    
+    **Timeout and cleanup.** If `--timeout` elapses before every stage has exited: `os.killpg(pgid, SIGTERM)`; poll up to
+    `--grace` seconds (default 5); then `os.killpg(pgid, SIGKILL)`; then reap every stage. After all stages have exited —
+    timeout or not — the runner probes the group with `os.killpg(pgid, 0)`: if any member survives (a grandchild that
+    outlived its parent), it sends SIGTERM, waits the grace period, then SIGKILL, and records that it did. Each action is
+    recorded with its offset in milliseconds from start.
+    Documented boundary: the guarantee covers the runner's process group only. A process that calls `setsid()`/
+    `setpgid()` leaves it; a container started through a client such as `docker run` belongs to the daemon, not to the
+    group, and can outlive the client being killed. The record cannot see either.
+    
+    **Interruption.** On SIGINT/SIGTERM to the runner itself: kill the group as above, delete the temporary record file,
+    write no record, wrapper result 2.
+    
+    **Record (`DIR/NAME.json`), schema `kai.evrun/v1`.** Canonical bytes = `json.dumps(obj, sort_keys=True,
+    separators=(",", ":"), ensure_ascii=False).encode("utf-8") + b"\n"`; no floats; integers and strings only.
+    ```
+    {
+     "schema": "kai.evrun/v1",
+     "name": "NAME",
+     "status": "COMPLETE",
+     "utc_start": "YYYY-MM-DDTHH:MM:SS.ffffffZ",  "utc_end": "…",
+     "cwd": "<os.path.realpath of the working directory>",
+     "environment": "INHERITED_NOT_SERIALISED",
+     "stdin": "DEVNULL",
+     "timeout_s": <int or null>,  "grace_s": <int>,
+     "evidence_stage": <int, 0-based>,
+     "stages": [ { "index": <int>, "argv": [<exact strings>], "pid": <int>, "pgid": <int>,
+                   "returncode": <int or null>,        # Popen.returncode exactly
+                   "exit_code": <int or null>,         # returncode when >= 0
+                   "signal": <int or null>,            # -returncode when < 0
+                   "termination": "NATURAL" | "SIGNALLED_NOT_BY_RUNNER" | "TERMINATED_BY_RUNNER" | "KILLED_BY_RUNNER",
+                   "stderr": {"file": "NAME.stage<i>.stderr", "bytes": <int>, "sha256": "<hex>"} } , … ],
+     "stdout": {"stage": <last index>, "file": "NAME.stdout", "bytes": <int>, "sha256": "<hex>"},
+     "intermediate_stdout": "NOT_CAPTURED",
+     "runner_actions": [ {"t_ms": <int>, "action": "TIMEOUT_SIGTERM_GROUP" | "TIMEOUT_SIGKILL_GROUP" |
+                           "RESIDUE_SIGTERM_GROUP" | "RESIDUE_SIGKILL_GROUP", "pgid": <int>} , … ],
+     "timeout_fired": <bool>,  "group_residue_found": <bool>,
+     "runner": {"version": "evrun/1", "sha256": "<sha256 of evrun.py's own bytes>", "python": "<major.minor.micro>"}
+    }
+    ```
+    `termination` is decided from the runner's own action log, not inferred from the number: a negative returncode with
+    no runner action against the group before that stage exited is `SIGNALLED_NOT_BY_RUNNER`.
+    
+    **Atomic commit.** Hashes are computed from the closed output files after every stage is reaped. The record is
+    written to `DIR/.NAME.json.tmp.<runner pid>`, flushed, `os.fsync`ed, `os.replace`d onto `DIR/NAME.json` (refused if
+    that path already exists), then the directory is `fsync`ed. A crash before the rename leaves no `NAME.json`. No
+    record is ever written with any status other than COMPLETE.
+    
+    **Wrapper result (the runner's own exit code; it never encodes a child's return code).**
+    * `0` — record committed; the evidence stage's termination is NATURAL with returncode 0; the runner took no action
+      against the process group (no timeout, no residue).
+    * `1` — record committed; anything else (evidence stage non-zero, signalled, timed out, or any runner action).
+    * `2` — runner/instrument failure: bad arguments, an executable that cannot be spawned (no process existed, so there
+      is no process result), an unwritable directory, a pre-existing output file, a record write failure, an internal
+      exception, or the runner being interrupted. No record.
+    The exact child result exists only in the record. Nothing may reconstruct it from the wrapper result.
+    
+    ## 5. L2 — the evidence-admission rule in `handoff.py check`
+    
+    **Grammar.**
+    * New source tag `[RUN NAME]`, or `[RUN NAME#K]` to name stage K explicitly (default: the record's `evidence_stage`).
+    * The record travels in the SAME entry as a verbatim block named `RUN-NAME`, on a bullet carrying the existing
+      declaration `<bytes> bytes, sha256 <hex>, final LF <True|False>`; the block's content is the record's exact bytes.
+    * Status language, matched case-insensitively ONLY in the claim text of a bullet and in the result portion of its
+      tags (the text after `→` inside a `[CMD …]` tag) — never inside the backticked command text and never inside a
+      verbatim block:
+      `\b(rc|returncode|return code|exit|exit code|exit status|exited(?: with)?)\s*[:=]?\s*(-?\d+)\b` and
+      `\b(signal|killed by signal|SIG)\s*[:=]?\s*(\d+)\b`.
+    
+    **Algorithm, for each bullet in a NEW entry** (an entry whose header timestamp is at or after a single epoch constant
+    recorded in handoff.py when the rule is enabled; earlier entries are counted as legacy and never fail):
+    1. Collect status claims (number + kind: exit or signal) from the claim/result text. None → nothing to check.
+    2. The bullet must carry at least one `[RUN …]` tag. A `[CMD]` tag alone → finding `STATUS-UNPROVENANCED`.
+    3. For each `[RUN NAME(#K)]`: exactly one verbatim block `RUN-NAME` in the entry (`RUN-MISSING` / `RUN-DUPLICATE`);
+       its declaration verifies (existing `VERBATIM-*` rules); its bytes parse with duplicate keys refused, floats and
+       constants refused (`RUN-MALFORMED`); re-canonicalising reproduces the bytes exactly (`RUN-NONCANONICAL`);
+       `schema == "kai.evrun/v1"` and `status == "COMPLETE"` and every required field has its declared type
+       (`RUN-SCHEMA`); K (or `evidence_stage`) indexes an existing stage (`RUN-STAGE-INDEX`).
+    4. Every exit claim must equal that stage's `returncode` (and `termination == NATURAL`); every signal claim must
+       equal its `signal` (`RUN-STATUS-MISMATCH`). A claim of exit 0 on a record with `timeout_fired` or any
+       `runner_actions` → `RUN-STATUS-MISMATCH`.
+    5. If the bullet also carries a `[CMD `X` …]` tag, X must equal `shlex.join(argv)` of the named stage, or the whole
+       pipeline's stages joined with ` | ` (`RUN-ARGV-MISMATCH`).
+    6. A `RUN-NAME` block whose name is not cited by any bullet → finding `RUN-UNCITED` (a record must be used, not
+       decorative).
+    `check`'s summary line gains `run=<records>/<verified>/legacy-status-claims=<n>`.
+    
+    ## 6. L3 — narrow pre-execution guard (an extension of the existing `handoff.py gate` PreToolUse hook)
+    
+    Applies to every proposed Bash command (not only commits). Built on the calibrated structure scanner, extended to
+    model `[[ … ]]` as one compound word, `case … esac` patterns, and function definitions. BLOCK only these shapes:
+    * **B1 COMMIT-PUSH-UNGATED** — `git push` joined by `;` or newline to a preceding `git commit`.
+    * **B2 GATE-SEPARATOR-COMMIT** — `git commit`/`git push` joined by `;` or newline to a preceding gate-like command
+      (argv0 `make`, `pytest`, `python*`, `*.py`, `*.sh`, `bash`, `sh`, `test`, `[`, `*handoff.py`).
+    * **B3 STATUS-AFTER-FILTER-PIPELINE** — `$?`/`${?}` read by the item immediately after a pipeline (directly, via a
+      `( … )`/`{ … }` group ending in one, or via an assignment whose last `$( )` ends in one) whose last stage is a
+      FILTER and whose earlier stages are not all FEEDERS.
+    * **B4 STALE-PIPESTATUS** — `PIPESTATUS` read anywhere other than the item immediately after a multi-stage pipeline
+      (including inside a `$( )` that cannot see the parent's pipeline).
+    * **B5 FILTER-GATES-COMMIT** — a FILTER-ending, non-feeder pipeline followed by `&&`/`||` in an and-or list that
+      reaches `git commit`/`git push`.
+    Everything else is allowed. The block message names the rule and the rewrite (`&&`; `${PIPESTATUS[i]}` immediately;
+    unpiped capture; or `evrun.py`).
+    
+    ## 7. Calibration matrix — expected outcomes predeclared
+    
+    **D — detector cases already run (20/20).** 1 `cmd | tail -1; echo rc=$?` → S1 · 1b `cmd | tail -1` → S6 only ·
+    2 `check | grep -c True && git commit` → S2C · 3 `make check ; git commit ; git push` → S3G · 3b `cd x; git commit` →
+    S3 (not gate-like) · 4 `cmd > f 2>&1; echo rc=$?` → nothing · 5 `cmd | tail; rc=${PIPESTATUS[0]}` → S4OK, no S1 ·
+    5b PIPESTATUS after `ls` → S4LATE · 6 `set -o pipefail; cmd | tail; echo $?` → S1PF · 7 `grep -c 'a|b'; echo "x | y";
+    echo $?` → nothing · 7b `|`/`&&` inside a heredoc → nothing · 8 `cmd |& tail; echo $?` → S1 · 9 `cmd || true; echo $?`
+    → S5 · 9b `cmd | tail || echo` → S2+S5 · 10a `( cmd | tail ); echo $?` → S1 · 10b `x=$(cmd | tail); echo $?` → S1 ·
+    10c a pipeline gating a commit inside `$( )` → S2C · 11 `git log | head` → S6 only · 12 the entry-61 shape → S2C ·
+    13 `echo a \| b; echo $?` → nothing.
+    
+    **L3 — ALLOW / BLOCK.**
+    | # | command | expected |
+    |---|---|---|
+    | G1 | `git commit -m x && git push` | ALLOW |
+    | G2 | `git commit -m x` ⏎ `git push` | BLOCK B1 |
+    | G3 | `git commit -m x ; git push` | BLOCK B1 |
+    | G4 | `make check ; git commit -m x` | BLOCK B2 |
+    | G5 | `cd repo; git commit -m x` | ALLOW |
+    | G6 | `python3 check.py \| tail -1; echo $?` | BLOCK B3 |
+    | G7 | `python3 check.py \| grep -c ok && git commit -m x` | BLOCK B5 |
+    | G8 | `python3 check.py \| tail -1; rc=${PIPESTATUS[0]}` | ALLOW |
+    | G9 | `python3 check.py \| tail -1; ls; echo ${PIPESTATUS[0]}` | BLOCK B4 |
+    | G10 | `echo "$(a \| wc -l) rc=${PIPESTATUS[0]}"` | BLOCK B4 |
+    | G11 | `grep -c 'a\|b' f; echo $?` | ALLOW |
+    | G12 | heredoc body containing `x \| tail; echo $?` | ALLOW |
+    | G13 | `[[ -n "$a" \|\| -n "$b" ]] && echo y` | ALLOW |
+    | G14 | `case "$s" in *a*\|*b*) echo hit;; esac` | ALLOW |
+    | G15 | `out=$(echo '{}' \| bash hook.sh); rc=$?` (FEEDER, evidence last) | ALLOW |
+    | G16 | `( cmd \| tail -1 ); echo $?` | BLOCK B3 |
+    | G17 | `x=$(cmd \| tail -1); echo $?` | BLOCK B3 |
+    | G18 | `git log --oneline \| head -5` | ALLOW |
+    | G19 | `cmd \|& tail -1; echo $?` | BLOCK B3 |
+    | G20 | `if cmd \| grep -q x; then …; fi` | ALLOW |
+    | G21 | the 4 + 4 + 21 + 19 historical commands of census 1 | BLOCK (each by its predeclared rule) |
+    | G22 | 50 census-1 commands drawn by a fixed seed from those with no finding | ALLOW |
+    
+    **L1 — runner.**
+    | # | case | expected record / wrapper |
+    |---|---|---|
+    | R1 | `-- false` | returncode 1, NATURAL; wrapper 1 |
+    | R2 | `-- true` | returncode 0, NATURAL; wrapper 0 |
+    | R3 | `--stage false --stage cat` | stages [1, 0]; evidence stage 1 (default last) → wrapper 0; with `--evidence-stage 0` → wrapper 1 |
+    | R4 | `-- sh -c 'exit 255'` | returncode 255, exit_code 255; wrapper 1 (never 255) |
+    | R5 | `-- sh -c 'kill -9 $$'` | returncode -9, signal 9, SIGNALLED_NOT_BY_RUNNER; wrapper 1 |
+    | R6 | `--timeout 1 -- sleep 30` | timeout_fired, TIMEOUT_SIGTERM_GROUP, returncode -15, TERMINATED_BY_RUNNER; wrapper 1 |
+    | R7 | `--timeout 1 -- sh -c 'trap "" TERM; sleep 30'` | TERM then KILL; returncode -9, KILLED_BY_RUNNER; wrapper 1 |
+    | R8 | `-- sh -c 'sleep 30 & exit 0'` (child outlives parent) | stage returncode 0; group_residue_found; RESIDUE_SIGTERM_GROUP; the sleep is gone afterwards; wrapper 1 |
+    | R9 | `--stage yes --stage head -n1` | head 0; yes -13 (SIGPIPE) SIGNALLED_NOT_BY_RUNNER; no deadlock; wrapper 0 |
+    | R10 | 10 MB of binary on stdout and stderr | bytes and sha256 equal an independent hash of the same bytes |
+    | R11 | `-- /nonexistent` | wrapper 2, no NAME.json |
+    | R12 | NAME.json already present | wrapper 2, existing file unchanged |
+    | R13 | runner killed with SIGKILL between collection and rename | no NAME.json; at most a `.NAME.json.tmp.*` |
+    | R14 | runner sent SIGTERM mid-run | group killed, no record, wrapper 2 |
+    | R15 | any record | re-parses and re-canonicalises to identical bytes; contains no environment variable values |
+    
+    **L2 — admission.** (A new entry unless stated.)
+    | # | case | expected |
+    |---|---|---|
+    | A1 | `[CMD `x` → rc 0]`, no RUN | STATUS-UNPROVENANCED |
+    | A2 | `[RUN N]` + matching record, claim "exit 0" | clean |
+    | A3 | claim "rc 0", record returncode 1 | RUN-STATUS-MISMATCH |
+    | A4 | `[RUN N]`, no block | RUN-MISSING |
+    | A5 | two `RUN-N` blocks | RUN-DUPLICATE |
+    | A6 | one byte of the record changed | VERBATIM-MISMATCH |
+    | A7 | record with a duplicated key | RUN-MALFORMED |
+    | A8 | record re-indented (valid JSON, not canonical) | RUN-NONCANONICAL |
+    | A9 | `[RUN N#3]` on a 2-stage record | RUN-STAGE-INDEX |
+    | A10 | claim "exit 0" on a timeout record | RUN-STATUS-MISMATCH |
+    | A11 | `[CMD `a \| b`]` + `[RUN N]` whose stages are `c \| d` | RUN-ARGV-MISMATCH |
+    | A12 | a record block cited by no bullet | RUN-UNCITED |
+    | A13 | `rc 1` only inside a CMD's backticked command text | clean (not a claim) |
+    | A14 | `rc 1` only inside a verbatim block | clean |
+    | A15 | every entry before the epoch | legacy, no finding |
+    | A16 | claim "killed by signal 9", record signal 9 | clean |
+    | A17 | record `status: "FAILED"` hand-inserted | RUN-SCHEMA |
+    
+    Independence (I-8): every expected outcome above comes from bash/POSIX semantics or from recorded incidents, never
+    from the instrument under test.
+    
+    ## 8. False positives and false negatives (the stated boundary)
+    
+    FP:
+    * L3 B3 would still block the 2 census-1 commands where a `grep -v` status was intended as a test: acceptable —
+      the rewrite is `${PIPESTATUS[i]}` or an unpiped capture.
+    * B5 blocks `git … | cat && git commit` (cat used only to defeat a pager): structurally real, practically benign.
+    * L2: an exit status reported by an external authority (for example a GitHub job's "Process completed with exit
+      code N") has no RUN record. OPEN DESIGN POINT: require a dedicated external-authority tag, or forbid such claims in
+      status grammar form.
+    * The status grammar matches words like "exit 2" inside quoted prose about other systems; such a bullet must cite a
+      record or rephrase.
+    FN:
+    * Status claims without the grammar ("passed", "clean", "0 findings", "PASS") escape L2.
+    * L3 sees only the proposed top-level command text: pipelines inside scripts, `bash -c` strings, functions defined
+      elsewhere, `eval`, and aliases are invisible to it; only L1 sees what it runs.
+    * A producer can hand-type a fake `RUN` record that is internally consistent. L2 checks form, canonical bytes and
+      consistency, not provenance against an external journal; `runner.sha256` binds the runner bytes, not the execution.
+      The control targets the accidental mechanism, not an adversarial producer.
+    * Daemon-owned processes (containers) and `setsid` children escape the process group (section 4).
+    * Census-1 is a lower bound (one session's transcript); census-2 covers 8 + 2 workflows and 11 scripts, not every
+      workflow in the repository.
+    
+    ## 9. Exact implementation surface (five files) and exclusions
+    
+    * `.claude/skills/kai-handoff/evrun.py` — new (L1).
+    * `.claude/skills/kai-handoff/shell_status.py` — new: the calibrated scanner + L3 rules, stdlib.
+    * `.claude/skills/kai-handoff/handoff.py` — L2 in `check`, L3 in `gate`, selftest extended with sections 7's cases.
+    * `.claude/skills/kai-handoff/SKILL.md` — the RUN tag and runner usage.
+    * `CLAUDE.md` — the R3 note points at the control.
+    `.claude/settings.json` unchanged (L3 rides the existing PreToolUse gate hook).
+    
+    Excluded: all `.github/workflows/*` (the M-CI-ERREXIT findings go to a separate work package); all
+    `scripts/security/*.sh` (M-LAUNDER, EV-WRITE-UNCHECKED and PRODUCER-DISCARDED go to a separate work package); the
+    D379 repair branch and every `kai-pm` source; the decisions log; the failure-pattern ledger (allocation held, incl.
+    INC-2026-09-18-35's mechanism field); `session-start.sh`, `handoff-hook.sh`; every existing handoff entry (legacy);
+    Python subprocess harnesses (already exact); the Bash tool itself.
+    
+    ## 10. Attack these (findings: ID DS-DAI6-nn, severity BLOCKER / MAJOR / MINOR / QUESTION, the exact packet lines,
+    a concrete failing input, a remedy)
+    
+      Q1  rc/signal collisions: can any child result be confused with a runner result, or a signal with an exit code?
+      Q2  timeout and orphan processes: can a process the runner started survive it, or be mis-recorded?
+      Q3  PIPE / SIGPIPE / deadlock: can the plumbing hang, lose data, or mis-attribute a SIGPIPE?
+      Q4  malformed, duplicate or tampered RUN records: can any pass L2?
+      Q5  status-claim grammar bypasses: can a status claim avoid the grammar and still be read as a status?
+      Q6  stage-index confusion: can a claim be checked against the wrong stage?
+      Q7  output/hash misbinding: can a record's hashes describe bytes other than the stage's real output?
+      Q8  atomic-write interruption: can a partial or stale record become admissible?
+      Q9  shell-parser evasions (quotes, heredocs, substitutions, case, [[ ]], functions): can L3 be evaded, or misfire?
+      Q10 L3 false positives that would block legitimate work.
+      Q11 Can any producer obtain a false-green evidence record from this design?
+      Q12 Are the census-2 classifications in Appendix A right, especially the 13 IN-CLASS-DEFECT rows and the two
+          mechanisms (M-CI-ERREXIT, M-LAUNDER)?
+    
+    ## Appendix A — census 2, all 162 classified occurrences (tab-separated; the 42 decisions not taken by the default rule
+    carry their reason in the `note` column)
+    
+    ```
+    id	file:line	kind	consumed(mech)	class	intended	actually_consumed	established_by	evidence	note	text
+    P000	.github/workflows/core-tests.yml:95	P	ERREXIT	NOT-EVIDENCE	each pip install	while-loop status under errexit; `|| true` inside	-	no	install failures deliberately tolerated	find . -name requirements.txt -not -path './.venv/*' -not -path './_archive/*' -not -path './.*' | while read f
+    P001	.github/workflows/core-tests.yml:305	P	ERREXIT	SAFE-PIPEFAIL	docker compose build	pipeline status under pipefail -> errexit	pipefail (set at L304)	YES: step conclusion	correct only because of the pipefail line	docker compose -f docker-compose.minimal.yml build 2>&1 | tee /tmp/build-minimal.log | tail -40
+    P002	.github/workflows/core-tests.yml:307	P	FINAL	DISPLAY	-	FINAL	-	display		df -h / | tail -1
+    P003	.github/workflows/core-tests.yml:312	P	ERREXIT	SAFE-PIPEFAIL	docker compose build	pipeline status under pipefail -> errexit	pipefail (L311)	YES: step conclusion		docker compose -f docker-compose.full.yml build 2>&1 | tee /tmp/build-full.log | tail -40
+    P004	.github/workflows/core-tests.yml:314	P	FINAL	DISPLAY	-	FINAL	-	display		df -h / | tail -1
+    P005	.github/workflows/core-tests.yml:390	P	ERREXIT	SAFE-PIPEFAIL	docker compose up	pipeline status under pipefail -> errexit	pipefail	YES: step conclusion		docker compose -f docker-compose.minimal.yml up -d --build 2>&1 | tee /tmp/bringup.log
+    P006	.github/workflows/core-tests.yml:392	P	ERREXIT	DISPLAY	-	ERREXIT	-	display		df -h / | tail -1
+    P007	.github/workflows/core-tests.yml:506	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		docker compose -f docker-compose.minimal.yml images -q memu-core | head -1
+    P008	.github/workflows/core-tests.yml:518	P	GATE	DISPLAY	embedding-ready line present	grep's status gates an echo	grep is the evidence; docker logs failure reads as 'not found'	display only		docker compose -f docker-compose.minimal.yml logs memu-core 2>&1 | grep -iE "embedding backend ready|Embedding backend unavailable"
+    P009	.github/workflows/core-tests.yml:526	P	FINAL	SAFE-PIPEFAIL	live_smoke.py	final pipeline status under pipefail = step exit	pipefail (L525)	YES: step conclusion		python3 scripts/ci/live_smoke.py --compose-file docker-compose.minimal.yml 2>&1 | tee /tmp/live-smoke.log
+    P010	.github/workflows/core-tests.yml:552	P	FINAL	SAFE-PIPEFAIL	test_restart_persistence.py	final pipeline status under pipefail	pipefail (L551)	YES: step conclusion		python3 scripts/test_restart_persistence.py --compose-file docker-compose.minimal.yml --service memu-core 2>&1 | tee /tmp/restart-persistence.log
+    P011	.github/workflows/core-tests.yml:678	P	ERREXIT	DISPLAY	-	ERREXIT	-	display		df -h / | tail -1
+    P012	.github/workflows/core-tests.yml:686	P	FINAL	SAFE-PIPEFAIL	live_smoke.py (full)	final pipeline status under pipefail	pipefail (L685)	YES: step conclusion		python3 scripts/ci/live_smoke.py --compose-file docker-compose.full.yml 2>&1 | tee /tmp/full-smoke.log
+    P013	.github/workflows/core-tests.yml:790	P	GATE	DISPLAY	-	GATE	-	display		df -h / /var/lib/docker 2>&1 | head -5
+    P014	.github/workflows/core-tests.yml:824	P	GATE	DISPLAY	-	GATE	-	display		docker compose -f docker-compose.minimal.yml ps -a 2>/dev/null | head -12
+    P015	.github/workflows/core-tests.yml:827	P	GATE	DISPLAY	-	GATE	-	display		docker images --format '{{.Repository}}:{{.Tag}}' 2>/dev/null | head -8
+    P016	.github/workflows/drift-detector.yml:83	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		printf '%s\n' "${line}" | sed -nE 's/.*Last-updated:[[:space:]]*([0-9]{4}-[0-9]{2}-[0-9]{2}).*/\1/p'
+    P017	.github/workflows/embedding-backend-proof.yml:92	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		head -c 24 /dev/urandom | base64 | tr -dc 'a-zA-Z0-9' | head -c 20
+    R018	.github/workflows/embedding-backend-proof.yml:169	R	$?	SAFE-EXACT	compose up	if/else capture	direct	YES		up_rc=$?
+    R019	.github/workflows/embedding-backend-proof.yml:186	R	$?	SAFE-EXACT	width probe	if/else capture	direct	YES		rc=$?
+    P020	.github/workflows/embedding-backend-proof.yml:193	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		tail -1 claim-b-width.log | tr -dc '0-9'
+    P021	.github/workflows/embedding-backend-proof.yml:195	P	ERREXIT	SAFE-EXACT	the evidence write	errexit/step exit sees tee's status	direct (feeder | tee)	YES		echo "memu-core claim-B: TIMEOUT_UNKNOWN (producer=$producer) — the wrapper stopped it, so nothing was measured" | tee -a claim-b-summary.txt
+    P022	.github/workflows/embedding-backend-proof.yml:198	P	ERREXIT	SAFE-EXACT	the evidence write	errexit/step exit sees tee's status	direct (feeder | tee)	YES		echo "memu-core claim-B: NO_OBSERVATION — nothing was produced" | tee -a claim-b-summary.txt
+    P023	.github/workflows/embedding-backend-proof.yml:201	P	ERREXIT	SAFE-EXACT	the evidence write	errexit/step exit sees tee's status	direct (feeder | tee)	YES		echo "memu-core claim-B: REAL (384) — production default reaches the real backend" | tee -a claim-b-summary.txt
+    P024	.github/workflows/embedding-backend-proof.yml:204	P	ERREXIT	SAFE-EXACT	the evidence write	errexit/step exit sees tee's status	direct (feeder | tee)	YES		echo "memu-core claim-B: FAKE (8) — the service degraded despite the default" | tee -a claim-b-summary.txt
+    P025	.github/workflows/embedding-backend-proof.yml:207	P	ERREXIT	SAFE-EXACT	the evidence write	errexit/step exit sees tee's status	direct (feeder | tee)	YES		echo "memu-core claim-B: WRONG_DIMENSION ($width)" | tee -a claim-b-summary.txt
+    P026	.github/workflows/embedding-backend-proof.yml:212	P	ERREXIT	DISPLAY	-	tail's status under errexit	-	display ('corroboration')	docker logs failure is masked; display only	docker compose -f docker-compose.minimal.yml logs memu-core | tail -40
+    P027	.github/workflows/item8-network-contingency.yml:124	P	COND	SAFE-PIPEFAIL	toolchain record group	group | tee under pipefail -> step exit	pipefail	YES: toolchain record	scanner labelled COND; it is the final command	 | tee item8-toolchain.txt
+    R028	.github/workflows/item8-network-contingency.yml:183	R	$?	IN-CLASS-DEFECT	identity instrument exits 3 (known-negative)	errexit kills the step at exit 3 before rc=$?; exit 0 fails the test	-	YES: the known-negative calibration	the step cannot pass for any instrument behaviour; never run (404)	rc=$?
+    R029	.github/workflows/item8-network-contingency.yml:201	R	$?	IN-CLASS-DEFECT	event parser exits 1 (known-negative)	errexit kills the step at exit 1 before rc=$?	-	YES: the known-negative calibration	the step cannot pass; never run (404)	rc=$?
+    P030	.github/workflows/item8-network-contingency.yml:267	P	READ-PS-IMMEDIATE	IN-CLASS-DEFECT	run_item8_experiment.sh exit	on failure: errexit exits the step at the pipeline; rc=${PIPESTATUS[0]}, the 'runner exit:' line and exit "$rc" never run	errexit + pipefail (accidental), not the designed PIPESTATUS capture	YES: runner exit line in the log	default shell is bash -e; `set -uo pipefail` does not clear -e. Workflow never registered/run (API 404)	bash scripts/security/run_item8_experiment.sh 2>&1 | tee item8-run.log
+    R031	.github/workflows/item8-network-contingency.yml:269	R	PIPESTATUS	IN-CLASS-DEFECT	run_item8_experiment.sh exit	unreachable on the failure path	-	YES	as P030	rc="${PIPESTATUS[0]}"
+    P032	.github/workflows/item8-preflight.yml:122	P	COND	SAFE-PIPEFAIL	toolchain record group	group | tee under pipefail -> step exit	pipefail	YES: toolchain record	scanner labelled COND; it is the final command	 | tee item8-preflight-toolchain.txt
+    P033	.github/workflows/item8-preflight.yml:139	P	READ-PS-IMMEDIATE	IN-CLASS-DEFECT	preflight_buildkit_rawjson.py exit	on failure: errexit exits at the pipeline; the PIPESTATUS capture and 'preflight exit:' line never run	errexit + pipefail (accidental)	YES	the one recorded run (32594846522) took the success path	python3 scripts/security/preflight_buildkit_rawjson.py --emit-binding-rule item8-preflight/binding-rule.json --workdir item8-preflight/captures --keep --run-id 
+    R034	.github/workflows/item8-preflight.yml:146	R	PIPESTATUS	IN-CLASS-DEFECT	preflight exit	unreachable on the failure path	-	YES	as P033	rc="${PIPESTATUS[0]}"
+    P035	.github/workflows/p1-replay-completeness.yml:147	P	ERREXIT	ADJ-SIGPIPE	listing for diagnosis	ls -R | head -40 under pipefail+errexit	-	no (diagnostic branch)	a long listing can abort the branch with 141; unmeasured	ls -R p1-evidence | head -40
+    P036	.github/workflows/p1-replay-completeness.yml:157	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		docker compose -f docker-compose.full.yml --profile introspection config --format json | python3 -c "import json,sys; d=json.load(sys.stdin); s=d['services']['m
+    P037	.github/workflows/p1-replay-completeness.yml:166	P	ERREXIT	SAFE-PIPEFAIL	docker run census	pipeline under pipefail -> errexit	pipefail (set -euo)	YES		docker run --rm "$IMG" python3 -c "import importlib, pathlib; [print(n, getattr(importlib.import_module(n), '__version__', 'unrecorded'), pathlib.Path(importlib
+    R038	.github/workflows/p1-replay-completeness.yml:184	R	$?	SAFE-EXACT	p1_replay_completeness.py	$? after set +e	direct	YES		RC=$?
+    R039	.github/workflows/p1-replay-completeness.yml:333	R	$?	IN-CLASS-DEFECT	classify_artifact_fetch.py rc	on non-zero: errexit exits before `echo rc=$? >> $GITHUB_OUTPUT`; a failed artifacts curl exits before the classifier	errexit	output has no consumer; the step exit carries the rc	the comment says the step runs without set -e; it runs with it	"rc=$?"
+    P040	.github/workflows/p1-replay-completeness.yml:361	P	ERREXIT	ADJ-SIGPIPE	listing for diagnosis	ls -R | head -40 under pipefail+errexit	-	no	as P035	ls -R fmt-evidence | head -40
+    P041	.github/workflows/stage1-replay.yml:99	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		head -c 24 /dev/urandom | base64 | tr -dc 'a-zA-Z0-9' | head -c 20
+    P042	.github/workflows/unified-hunter.yml:92	P	ERREXIT	NOT-EVIDENCE	each pip install	while-loop status under errexit	-	no		find . -maxdepth 3 -name requirements.txt -not -path './.venv/*' -not -path './_archive/*' -print0 | while IFS= read -r -d '' req
+    P043	.github/workflows/unified-hunter.yml:131	P	GATE	SAFE-PIPEFAIL	make test-uh	`|| status=$?` = pipeline status under pipefail	pipefail	YES: run.log.status sidecar	the INC-2026-09-12-14 design	make test-uh 2>&1 | tee /tmp/test-uh.log
+    R044	.github/workflows/unified-hunter.yml:131	R	$?	SAFE-PIPEFAIL	make test-uh	pipeline status under pipefail	pipefail	YES	INC-2026-09-12-14	status=$?
+    P045	scripts/security/accept_memu_graph_offline.sh:61	P	GATE	IN-CLASS-DEFECT	git status succeeded and N paths dirty	grep -c count of $DIRTY_LIST; DIRTY_LIST=$(git status --porcelain 2>/dev/null) at L60 is never status-checked	none (status of git status discarded at L60)	YES: DIRTY recorded L119 and in rc env L260	a failed git status yields DIRTY=0, recorded as a clean tree	printf '%s' "$DIRTY_LIST" | grep -c .
+    P046	scripts/security/accept_memu_graph_offline.sh:84	P	SUBST	IN-CLASS-DEFECT	git ls-tree of the build-input paths succeeded	sha256 of whatever reached sha256sum; 2>/dev/null and no status check	none	YES: `build inputs` recorded L131 and BUILD_INPUTS in rc env L261	a failed git ls-tree records e3b0c442..., the sha256 of empty input, as the build-input identity	git ls-tree -r HEAD -- $BUILD_INPUT_PATHS 2>/dev/null | sha256sum | cut -d' ' -f1
+    P047	scripts/security/accept_memu_graph_offline.sh:90	P	NONE	EV-WRITE-UNCHECKED	the evidence write	nothing (no errexit)	-	YES (evidence file)		record { printf '%s\n' "$*" | tee -a "$EVIDENCE"
+    R048	scripts/security/accept_memu_graph_offline.sh:96	R	$?	SAFE-EXACT	preceding command	inside stage(): $? of "$@", returned as `return $rc`	direct	YES		rc=$?
+    P049	scripts/security/accept_memu_graph_offline.sh:97	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		wc -c < "$log" | tr -d ' '
+    P050	scripts/security/accept_memu_graph_offline.sh:104	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		wc -c < "$log" | tr -d ' '
+    P051	scripts/security/accept_memu_graph_offline.sh:106	P	NONE	EV-WRITE-UNCHECKED	the evidence write	nothing (no errexit)	-	YES (evidence file)		tail -n "$lines" "$log" | sed 's/^/  | /' | tee -a "$EVIDENCE"
+    P052	scripts/security/accept_memu_graph_offline.sh:123	P	NONE	EV-WRITE-UNCHECKED	the evidence write	nothing (no errexit)	-	YES (evidence file)		printf '%s\n' "$DIRTY_LIST" | sed 's/^/    /' | tee -a "$EVIDENCE"
+    P053	scripts/security/accept_memu_graph_offline.sh:126	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		docker compose -f "$COMPOSE" images -q "$SERVICE" 2>/dev/null | head -1
+    P054	scripts/security/accept_memu_graph_offline.sh:128	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		docker images --format '{{.ID}}' --filter 'reference=*memu-graph*' | head -1
+    R055	scripts/security/accept_memu_graph_offline.sh:151	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		a_rc=$?
+    R056	scripts/security/accept_memu_graph_offline.sh:163	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		d_rc=$?
+    R057	scripts/security/accept_memu_graph_offline.sh:173	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		$?
+    R058	scripts/security/accept_memu_graph_offline.sh:184	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		probe_rc=$?
+    R059	scripts/security/accept_memu_graph_offline.sh:237	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		c3_rc=$?
+    P060	scripts/security/accept_memu_graph_offline.sh:263	P	NONE	EV-WRITE-UNCHECKED	the evidence write	nothing (no errexit)	-	YES (evidence file)		cat "$LOGDIR/rc.env" | sed 's/^/  /' | tee -a "$EVIDENCE"
+    P061	scripts/security/capture_llm_contract.sh:29	P	GATE	IN-CLASS-DEFECT	git status succeeded and N paths dirty	grep -c count; `|| true` discards git's failure	none	YES: `dirty ${DIRTY}` recorded L36	a failed git status records dirty 0	git status --porcelain 2>/dev/null | grep -c .
+    P062	scripts/security/capture_llm_contract.sh:33	P	NONE	EV-WRITE-UNCHECKED	the evidence write	nothing (no errexit)	-	YES (evidence file)		record { printf '%s\n' "$*" | tee -a "$EVIDENCE"
+    R063	scripts/security/capture_llm_contract.sh:45	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		$?
+    P064	scripts/security/capture_llm_contract.sh:48	P	NONE	EV-WRITE-UNCHECKED	the evidence write	nothing (no errexit)	-	YES (evidence file)		tail -n 40 "$LOGDIR/up.log" | sed 's/^/  | /' | tee -a "$EVIDENCE"
+    R065	scripts/security/capture_llm_contract.sh:54	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		health_rc=$?
+    P066	scripts/security/capture_llm_contract.sh:55	P	NONE	EV-WRITE-UNCHECKED	the evidence write	nothing (no errexit)	-	YES (evidence file)		tail -n 4 "$LOGDIR/health.log" | sed 's/^/  | /' | tee -a "$EVIDENCE"
+    R067	scripts/security/capture_llm_contract.sh:73	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		selftest_rc=$?
+    P068	scripts/security/capture_llm_contract.sh:79	P	NONE	EV-WRITE-UNCHECKED	the evidence write	nothing (no errexit)	-	YES (evidence file)		tail -n 40 "$LOGDIR/selftest.log" | sed 's/^/  | /' | tee -a "$EVIDENCE"
+    P069	scripts/security/capture_llm_contract.sh:85	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		grep -m1 '^SELFTEST-CLASS: ' "$LOGDIR/selftest.log" | sed 's/^SELFTEST-CLASS: //'
+    R070	scripts/security/capture_llm_contract.sh:113	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		probe_rc=$?
+    P071	scripts/security/capture_llm_contract.sh:123	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		wc -c < "$LOGDIR/capture.jsonl" | tr -d ' '
+    P072	scripts/security/capture_llm_contract.sh:132	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		wc -c < "$LOGDIR/capture.err" | tr -d ' '
+    P073	scripts/security/capture_llm_contract.sh:136	P	NONE	EV-WRITE-UNCHECKED	the evidence write	nothing (no errexit)	-	YES (evidence file)		tail -n 40 "$LOGDIR/capture.err" 2>/dev/null | sed 's/^/  | /' | tee -a "$EVIDENCE"
+    P074	scripts/security/capture_llm_contract.sh:157	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		wc -c < "$LOGDIR/service.log" | tr -d ' '
+    P075	scripts/security/capture_llm_contract.sh:158	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		wc -c < "$LOGDIR/ollama.log" | tr -d ' '
+    P076	scripts/security/collect_degradation_deployed.sh:58	P	NONE	EV-WRITE-UNCHECKED	the evidence write	nothing (no errexit)	-	YES (evidence file)		record { printf '%s\n' "$*" | tee -a "$EVIDENCE"
+    R077	scripts/security/collect_degradation_deployed.sh:81	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		rc=$?
+    P078	scripts/security/collect_degradation_deployed.sh:86	P	GATE	VALUE-ONLY	-	value of $( )	-	value		tail -c 1200 "$out" | tr '\n' '|'
+    P079	scripts/security/collect_degradation_deployed.sh:87	P	GATE	VALUE-ONLY	-	value of $( )	-	value		tail -c 1200 "$err" | tr '\n' '|'
+    P080	scripts/security/collect_degradation_deployed.sh:112	P	NONE	SCANNER-FP	-	-	-	-	`case` pattern alternatives `*a*|*b*)` read as a pipeline: the census scanner does not model case/esac	*unhealthy* | *starting* | *exited* | *restarting* | *created* | *dead*
+    P081	scripts/security/collect_degradation_deployed.sh:120	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		docker inspect --format '{{.Name}}' "$cid" 2>/dev/null | tr -d '/'
+    P082	scripts/security/collect_degradation_deployed.sh:183	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		printf '%s\n' $GATED | wc -w
+    R083	scripts/security/collect_degradation_deployed.sh:187	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		up_rc=$?
+    P084	scripts/security/collect_degradation_deployed.sh:255	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		printf '%s' "$STAGE_OUT" | tr '\n' ' '
+    P085	scripts/security/collect_degradation_deployed.sh:303	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		printf '%s' "$STAGE_OUT" | tr '\n' ' '
+    P086	scripts/security/collect_degradation_deployed.sh:326	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		printf '%s\n' "$STAGE_OUT" | wc -l
+    R087	scripts/security/collect_embedding_evidence.sh:59	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		rc=$?
+    P088	scripts/security/collect_embedding_evidence.sh:64	P	GATE	VALUE-ONLY	-	value of $( )	-	value		tr '\n' '|' < "$err" | cut -c1-400
+    P089	scripts/security/collect_embedding_evidence.sh:76	P	COND	SAFE-EXACT	grep -qx found the service	grep's status (if-condition)	direct (grep is the evidence; printf is a feeder)	YES		if printf '%s\n' "$services" | grep -qx "$SERVICE"
+    P090	scripts/security/collect_embedding_evidence.sh:88	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		printf '%s' "$STAGE_OUT" | tr '\n' ','
+    P091	scripts/security/collect_embedding_evidence.sh:92	P	COND	SAFE-EXACT	grep -qx found the service	grep's status (if-condition)	direct	YES		if printf '%s\n' "$STAGE_OUT" | grep -qx "$SERVICE"
+    P092	scripts/security/collect_embedding_evidence.sh:122	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		printf '%s' "$config_json" | python3 -c ' \n import json, sys \n try: \n     doc = json.load(sys.stdin) \n except Exception: \n     sys.exit(0) \n svc = (doc.get("services") or {
+    P093	scripts/security/collect_embedding_evidence.sh:140	P	NONE	SAFE-EXACT	grep -qxF found the image name	grep's status, as part of an if-condition	direct (grep is the evidence)	YES (claim-A producer detection)	the scanner missed the `if [ … ] &&` prefix; manually COND	printf '%s\n' "$STAGE_OUT" | grep -qxF "$image_name"
+    P094	scripts/security/collect_embedding_evidence.sh:149	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		printf '%s' "$config_json" | python3 -c ' \n import json, sys \n try: \n     doc = json.load(sys.stdin) \n except Exception: \n     sys.exit(0) \n me, name = sys.argv[1], sys.arg
+    P095	scripts/security/collect_embedding_evidence.sh:182	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		printf '%s' "$STAGE_OUT" | head -1
+    P096	scripts/security/collect_embedding_evidence.sh:188	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		printf '%s' "$STAGE_OUT" | head -1
+    P097	scripts/security/collect_embedding_evidence.sh:205	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		printf '%s' "$STAGE_OUT" | head -1
+    R098	scripts/security/collect_embedding_evidence.sh:226	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		probe_exit=$?
+    P099	scripts/security/collect_embedding_evidence.sh:250	P	NONE	EV-WRITE-UNCHECKED	the evidence write	nothing (no errexit)	-	YES (evidence file)		printf '%s claim-A: measurement=%s claim_verdict=%s producer=%s probe_exit=%s image=%s\n' "$SERVICE" "$measurement" "$claim" "$producer" "${probe_exit:-n/a}" "$
+    P100	scripts/security/collect_memu_graph_startup.sh:72	P	NONE	EV-WRITE-UNCHECKED	the evidence write	nothing (no errexit)	-	YES (evidence file)		record { printf '%s\n' "$*" | tee -a "$EVIDENCE"
+    R101	scripts/security/collect_memu_graph_startup.sh:80	R	$?	SAFE-EXACT	preceding command	inside stage(): $? of "$@", returned as `return $rc`	direct	YES		rc=$?
+    P102	scripts/security/collect_memu_graph_startup.sh:82	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		wc -c < "$log" | tr -d ' '
+    P103	scripts/security/collect_memu_graph_startup.sh:90	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		wc -c < "$log" | tr -d ' '
+    P104	scripts/security/collect_memu_graph_startup.sh:92	P	NONE	EV-WRITE-UNCHECKED	the evidence write	nothing (no errexit)	-	YES (evidence file)		tail -n "$lines" "$log" | sed 's/^/  | /' | tee -a "$EVIDENCE"
+    R105	scripts/security/collect_memu_graph_startup.sh:107	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		up_rc=$?
+    R106	scripts/security/collect_memu_graph_startup.sh:132	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		probe_rc=$?
+    R107	scripts/security/collect_memu_graph_startup.sh:212	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		live_rc=$?
+    P108	scripts/security/collect_memu_graph_startup.sh:235	P	NONE	PRODUCER-DISCARDED	summarise_memu_graph_startup.py succeeded	nothing (no errexit; script then exits 0)	none	YES: the CLASSIFICATION section of the evidence	a crashed classifier leaves a traceback in the evidence and exit 0	python3 scripts/security/summarise_memu_graph_startup.py --stage-logs "$LOGDIR" --probe-rc "$probe_rc" --live-rc "$live_rc" 2>&1 | tee -a "$EVIDENCE"
+    P109	scripts/security/define_memu_graph_asset_contract.sh:55	P	NONE	EV-WRITE-UNCHECKED	the evidence write	nothing (no errexit)	-	YES (evidence file)		record { printf '%s\n' "$*" | tee -a "$EVIDENCE"
+    R110	scripts/security/define_memu_graph_asset_contract.sh:61	R	$?	SAFE-EXACT	preceding command	inside stage(): $? of "$@", returned as `return $rc`	direct	YES		rc=$?
+    P111	scripts/security/define_memu_graph_asset_contract.sh:62	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		wc -c < "$log" | tr -d ' '
+    P112	scripts/security/define_memu_graph_asset_contract.sh:69	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		wc -c < "$log" | tr -d ' '
+    P113	scripts/security/define_memu_graph_asset_contract.sh:71	P	NONE	EV-WRITE-UNCHECKED	the evidence write	nothing (no errexit)	-	YES (evidence file)		tail -n "$lines" "$log" | sed 's/^/  | /' | tee -a "$EVIDENCE"
+    P114	scripts/security/define_memu_graph_asset_contract.sh:82	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		docker compose -f docker-compose.full.yml images -q memu-graph 2>/dev/null | head -1
+    P115	scripts/security/define_memu_graph_asset_contract.sh:84	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		docker images --format '{{.Repository}}:{{.Tag}}' | grep -E 'memu-graph' | head -1
+    R116	scripts/security/define_memu_graph_asset_contract.sh:166	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		a_rc=$?
+    P117	scripts/security/define_memu_graph_asset_contract.sh:215	P	NONE	PRODUCER-DISCARDED	summarise_asset_contract.py succeeded	nothing (no errexit; script then exits 0)	none	YES: the SUMMARY section of the evidence	a crashed summariser leaves a traceback in the evidence and exit 0	python3 scripts/security/summarise_asset_contract.py --stage-logs "$LOGDIR" 2>&1 | tee -a "$EVIDENCE"
+    P118	scripts/security/diagnose_graph_stall.sh:82	P	GATE	IN-CLASS-DEFECT	git status succeeded and N paths dirty	grep -c count; `|| true` discards git's failure	none	YES: recorded L107 and L224	a failed git status records dirty 0	git status --porcelain 2>/dev/null | grep -c .
+    P119	scripts/security/diagnose_graph_stall.sh:86	P	NONE	EV-WRITE-UNCHECKED	the evidence write	nothing (no errexit)	-	YES (evidence file)		record { printf '%s\n' "$*" | tee -a "$EVIDENCE"
+    R120	scripts/security/diagnose_graph_stall.sh:92	R	$?	SAFE-EXACT	preceding command	inside stage(): $? of "$@", returned as `return $rc`	direct	YES		rc=$?
+    P121	scripts/security/diagnose_graph_stall.sh:93	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		wc -c < "$log" | tr -d ' '
+    P122	scripts/security/diagnose_graph_stall.sh:100	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		wc -c < "$log" | tr -d ' '
+    P123	scripts/security/diagnose_graph_stall.sh:102	P	NONE	EV-WRITE-UNCHECKED	the evidence write	nothing (no errexit)	-	YES (evidence file)		tail -n "$lines" "$log" | sed 's/^/  | /' | tee -a "$EVIDENCE"
+    R124	scripts/security/diagnose_graph_stall.sh:119	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		$?
+    R125	scripts/security/diagnose_graph_stall.sh:128	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		health_rc=$?
+    R126	scripts/security/diagnose_graph_stall.sh:184	R	$?	SAFE-EXACT	background ingest	wait $PID on one backgrounded command	direct	YES		ingest_rc=$?
+    P127	scripts/security/diagnose_graph_stall.sh:203	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		wc -c < "$LOGDIR/samples.log" | tr -d ' '
+    P128	scripts/security/diagnose_graph_stall.sh:226	P	NONE	EV-WRITE-UNCHECKED	the evidence write	nothing (no errexit)	-	YES (evidence file)		cat "$LOGDIR/rc.env" | sed 's/^/  /' | tee -a "$EVIDENCE"
+    P129	scripts/security/gated_commit.sh:65	P	GATE	IN-CLASS-DEFECT	git status succeeded and lists 0 untracked	grep -v output; `|| true` discards git's failure	none	YES: the commit gate's untracked-file guard (L66)	a failed git status passes the guard	git status --porcelain --untracked-files=all | grep -v '^[MADRC]'
+    R130	scripts/security/gated_commit.sh:107	R	$?	SAFE-EXACT	the gate ($GATE)	if/else capture of the subshell	direct for the default `make prepush`	YES: GATE EXIT CODE line	LATENT if a caller sets GATE to a pipeline: the eval'd status is its last stage's	gate_rc=$?
+    P131	scripts/security/measure_ingest_contract.sh:61	P	GATE	IN-CLASS-DEFECT	git status succeeded and N paths dirty	grep -c count; `|| true` discards git's failure	none	YES: recorded L86 and L169	a failed git status records dirty 0	git status --porcelain 2>/dev/null | grep -c .
+    P132	scripts/security/measure_ingest_contract.sh:65	P	NONE	EV-WRITE-UNCHECKED	the evidence write	nothing (no errexit)	-	YES (evidence file)		record { printf '%s\n' "$*" | tee -a "$EVIDENCE"
+    R133	scripts/security/measure_ingest_contract.sh:71	R	$?	SAFE-EXACT	preceding command	inside stage(): $? of "$@", returned as `return $rc`	direct	YES		rc=$?
+    P134	scripts/security/measure_ingest_contract.sh:72	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		wc -c < "$log" | tr -d ' '
+    P135	scripts/security/measure_ingest_contract.sh:79	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		wc -c < "$log" | tr -d ' '
+    P136	scripts/security/measure_ingest_contract.sh:81	P	NONE	EV-WRITE-UNCHECKED	the evidence write	nothing (no errexit)	-	YES (evidence file)		tail -n "$lines" "$log" | sed 's/^/  | /' | tee -a "$EVIDENCE"
+    R137	scripts/security/measure_ingest_contract.sh:106	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		$?
+    R138	scripts/security/measure_ingest_contract.sh:116	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		health_rc=$?
+    R139	scripts/security/measure_ingest_contract.sh:132	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		ingest_rc=$?
+    P140	scripts/security/measure_ingest_contract.sh:144	P	NONE	EV-WRITE-UNCHECKED	the evidence write	nothing (no errexit)	-	YES (evidence file)		sed 's/^/  | /' "$LOGDIR/ingest-${n}.log" | tee -a "$EVIDENCE"
+    R141	scripts/security/measure_ingest_contract.sh:153	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		"  cognee-log probe exit: $?"
+    P142	scripts/security/measure_ingest_contract.sh:171	P	NONE	EV-WRITE-UNCHECKED	the evidence write	nothing (no errexit)	-	YES (evidence file)		sed 's/^/  /' "$LOGDIR/rc.env" | tee -a "$EVIDENCE"
+    P143	scripts/security/run_item8_experiment.sh:145	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		echo "$BRANCH" | tr 'A-Z' 'a-z'
+    P144	scripts/security/run_item8_experiment.sh:168	P	SUBST	VALUE-ONLY	imagetools inspect resolved the digest	value; empty -> UNRESOLVED at L170	value test, not status	YES (recorded as UNRESOLVED when empty)	failure is represented, by value	"$DOCKER" buildx imagetools inspect python:3.11-slim --format '{{.Manifest.Digest}}' 2>/dev/null | tr -d ' \n'
+    R145	scripts/security/run_item8_experiment.sh:222	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		BUILD_RC=$?
+    R146	scripts/security/run_item8_experiment.sh:273	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		PARSE_RC=$?
+    P147	scripts/security/run_item8_experiment.sh:289	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		printf '%s' "$FACTS" | python3 -c 'import json,sys;print(json.load(sys.stdin)["executed"])'
+    P148	scripts/security/run_item8_experiment.sh:290	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		printf '%s' "$FACTS" | python3 -c 'import json,sys;print(json.load(sys.stdin)["cached"])'
+    P149	scripts/security/run_item8_experiment.sh:291	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		printf '%s' "$FACTS" | python3 -c 'import json,sys;print(json.load(sys.stdin)["error"][:200])'
+    P150	scripts/security/run_item8_experiment.sh:292	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		printf '%s' "$FACTS" | K="$RETRY_MARK" python3 -c 'import json,os,sys;print(json.load(sys.stdin)["counts"][os.environ["K"]])'
+    P151	scripts/security/run_item8_experiment.sh:293	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		printf '%s' "$FACTS" | K="$REFUSE_MARK" python3 -c 'import json,os,sys;print(json.load(sys.stdin)["counts"][os.environ["K"]])'
+    P152	scripts/security/run_item8_experiment.sh:294	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		printf '%s' "$FACTS" | K="$INJECT_MARK" python3 -c 'import json,os,sys;print(json.load(sys.stdin)["counts"][os.environ["K"]])'
+    R153	scripts/security/run_item8_experiment.sh:361	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		OFFLINE_RC=$?
+    R154	scripts/security/verify_identity_in_containers.sh:65	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		$?
+    R155	scripts/security/verify_identity_in_containers.sh:84	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		$?
+    R156	scripts/security/verify_identity_in_containers.sh:97	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		$?
+    R157	scripts/security/verify_identity_in_containers.sh:128	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		$?
+    P158	scripts/security/verify_identity_in_containers.sh:163	P	SUBST	VALUE-ONLY	-	value of $( )	-	value		printf '%s\n' "$raw_out" | tail -1
+    P159	scripts/security/verify_identity_in_containers.sh:166	P	NONE	DISPLAY	-	NONE	-	display		printf '        container output:\n%s\n' "$raw_out" | sed 's/^/        /'
+    R160	scripts/security/verify_identity_in_containers.sh:243	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		$?
+    R161	scripts/security/verify_identity_in_containers.sh:268	R	$?	SAFE-EXACT	preceding command	$? of the preceding single command	direct	YES		$?
+    ```
+    
+    ## Appendix B — measured CI shell invocation, and the bash errexit probe
+    
+    ```
+    CI shell invocation, OBSERVED in this repository's own GitHub Actions job logs (read through the GitHub MCP get_job_logs tool).
+    docs.github.com was blocked by the egress proxy; github/docs is not attached to this session. These are measurements, not documentation.
+    
+    1. explicit `shell: bash` step
+       job 111676440704 (run 37283380552, Weekly Drift Detector, main 194db0a), 2026-10-05T08:24:05Z
+       log line: "shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}"
+    2. default shell (no `shell:` key)
+       job 97055875877 (run 32583346970, item8-preflight, f6151711), 2026-08-22T15:59:25Z, two steps
+       log line: "shell: /usr/bin/bash -e {0}"
+    3. default shell (no `shell:` key), current runner
+       job 112487834402 (run 37527417080, Core Tests, c269bdb), 2026-10-06T20:39:07Z, step "Post-mortem"
+       log line: "shell: /usr/bin/bash -e {0}"
+    Consequence: a default `run:` step has errexit and NO pipefail unless its own script sets `set -o pipefail`.
+    ```
+    
+    Probe scripts, each executed as `bash -e <script>` (the measured default CI invocation) on GNU bash 5.2.21:
+    
+    ```
+    --- case1.sh
+    set -uo pipefail
+    python3 -c 'import sys; sys.exit(3)'
+    rc=$?
+    echo "REACHED rc=$rc"
+    --- case2.sh
+    set -uo pipefail
+    python3 -c 'import sys; sys.exit(5)' 2>&1 | tee /dev/null
+    rc="${PIPESTATUS[0]}"
+    echo "REACHED rc=$rc"
+    --- case3.sh
+    set -uo pipefail
+    python3 -c 'import sys; sys.exit(4)'
+    echo "rc=$?" >> out3.txt
+    --- case4.sh
+    set -uo pipefail
+    if python3 -c 'import sys; sys.exit(3)'; then rc=0; else rc=$?; fi
+    echo "REACHED rc=$rc"
+    ```
+    
+    Results:
+    
+    ```
+    case1.sh under bash -e: exit=3 stdout=[]
+    case2.sh under bash -e: exit=5 stdout=[]
+    case3.sh under bash -e: exit=4 stdout=[]
+    case4.sh under bash -e: exit=0 stdout=[REACHED rc=3 ]
+    GNU bash, version 5.2.21(1)-release (x86_64-pc-linux-gnu)
+    ```
+    
+    END OF PACKET DAI-6 DESIGN v1
+    END-VERBATIM DAI6S-DEEPSEEK-PACKET-DAI6-V1-MD
+- EVIDENCE DAI6S-DEEPSEEK-COVER-DAI6-V1-TXT dai6_b64/DEEPSEEK_COVER_DAI6_V1.txt: 1682 bytes, sha256 575247fd40af3238066f4ca41edb725cf124ba15172d0a77b1bba31917a52808, final LF True  [CMD `sha256sum DEEPSEEK_COVER_DAI6_V1.txt` → 575247fd40af3238…]
+    BEGIN-VERBATIM DAI6S-DEEPSEEK-COVER-DAI6-V1-TXT
+    To: DeepSeek (adversarial reviewer)
+    From: Orion, for Kai (adjudicator) and Dainius (operator)
+    Subject: KAI DAI-6 evidence-pipeline exit-status control, DESIGN packet v1, adversarial review (no code to review: a design)
+    
+    This message is complete on its own. You have no repository access and no prior context; rely ONLY on the packet
+    below. Your findings carry zero admission weight: Kai reconciles every one against the repository.
+    
+    The packet is a Markdown document of 61691 bytes, sent inline as 10 base64 blocks.
+    Packet SHA-256 (the subject you must reconstruct):
+    58228244b3f4e776955b3aae77e4d8735d2c2539637a9e7eedcb8849126bbc56
+    
+    Protocol:
+    1. For each block, remove all whitespace from the base64 text and check its stated hash.
+    2. Decode it; check the stated decoded length and decoded hash.
+    3. Concatenate the decoded chunks strictly in order 1 to 10; check the packet hash above.
+    4. Read ONLY the decoded packet, then reply FIRST with the receipt in its section 0, inside ONE fenced code block:
+       copy the packet hash given above on the PACKET HASH line, copy all three sentinels exactly, as whole lines,
+       from the DECODED packet, and count the Appendix A data rows. If you cannot compute SHA-256, say so, but still copy the given hash. If you
+       cannot reproduce every receipt line exactly, reply NO REVIEW.
+    5. Only after the receipt, attack the design as the packet's section 10 asks. Give each finding an ID
+       (DS-DAI6-nn), a severity (BLOCKER / MAJOR / MINOR / QUESTION), the exact packet lines copied from
+       the decoded packet, a concrete failing input where possible, and a remedy. If you find nothing, say so
+       explicitly. A PASS is not implementation authority.
+    END-VERBATIM DAI6S-DEEPSEEK-COVER-DAI6-V1-TXT
+- EVIDENCE DAI6S-GEN-DAI6-PACKET-PY gen_dai6_packet.py: 4084 bytes, sha256 69615909f54c0adfcbf9e415a9cdaa33b00e5cf7b380f7e47ff14a44d7bcc224, final LF True  [CMD `sha256sum gen_dai6_packet.py` → 69615909f54c0adf…]
+    BEGIN-VERBATIM DAI6S-GEN-DAI6-PACKET-PY
+    import hashlib, pathlib, re
+    S = pathlib.Path("/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/dai6")
+    body = (S / "DAI6_PACKET_V1_BODY.md").read_text()
+    tsv = (S / "supp/supp_classified.tsv").read_text()
+    ci = (S / "ci_shell_observed.txt").read_text()
+    probe = "".join(f"--- {c}.sh\n" + (S / f"supp/{c}.sh").read_text() for c in ("case1", "case2", "case3", "case4"))
+    probe_out = (S / "supp/errexit_probe_results.txt").read_text()
+    PLAIN = re.compile(r"[A-Za-z0-9][A-Za-z0-9 ,.;:()'/-]{49,}")
+    def pick(section_start, section_end):
+        seg = body[body.index(section_start):body.index(section_end)]
+        cands = [l for l in seg.split("\n") if PLAIN.fullmatch(l) and body.split("\n").count(l) == 1]
+        return cands[0]
+    SA = pick("## 3. Root invariant", "## 4. L1")
+    SB = pick("**Timeout and cleanup.**", "**Interruption.**")
+    SC = pick("## 5. L2", "## 6. L3")
+    P = f"""# KAI DAI-6 — EVIDENCE-PIPELINE EXIT-STATUS CONTROL: DESIGN PACKET v1 FOR ADVERSARIAL REVIEW
+    
+    Producer: Orion. Date: 2026-10-06. Evidence class: PRODUCER MEASUREMENT AND DESIGN, ZERO ADMISSION WEIGHT.
+    Status: DESIGN ONLY. Nothing here is implemented. You have NO repository access and NO prior context: rely only on
+    this packet. Every measured figure names its universe; the full classified occurrence table is Appendix A.
+    
+    ## 0. RECEIPT — reply FIRST with these lines inside ONE fenced code block, each copied exactly
+    
+        PACKET HASH: <sha256 of this decoded packet, as given by the sender>
+        SENTINEL A: <the whole line in section 3 that begins "{SA[:24]}">
+        SENTINEL B: <the whole line in section 4, "Timeout and cleanup", that begins "{SB[:24]}">
+        SENTINEL C: <the whole line in section 5 that begins "{SC[:24]}">
+        APPENDIX A DATA ROWS: <the number of tab-separated data rows after the header line in Appendix A>
+        END OF PACKET SEEN: YES
+    
+    If any receipt line cannot be reproduced exactly, reply NO REVIEW. The last line of this file is
+    "END OF PACKET DAI-6 DESIGN v1".
+    
+    {body}
+    ## 10. Attack these (findings: ID DS-DAI6-nn, severity BLOCKER / MAJOR / MINOR / QUESTION, the exact packet lines,
+    a concrete failing input, a remedy)
+    
+      Q1  rc/signal collisions: can any child result be confused with a runner result, or a signal with an exit code?
+      Q2  timeout and orphan processes: can a process the runner started survive it, or be mis-recorded?
+      Q3  PIPE / SIGPIPE / deadlock: can the plumbing hang, lose data, or mis-attribute a SIGPIPE?
+      Q4  malformed, duplicate or tampered RUN records: can any pass L2?
+      Q5  status-claim grammar bypasses: can a status claim avoid the grammar and still be read as a status?
+      Q6  stage-index confusion: can a claim be checked against the wrong stage?
+      Q7  output/hash misbinding: can a record's hashes describe bytes other than the stage's real output?
+      Q8  atomic-write interruption: can a partial or stale record become admissible?
+      Q9  shell-parser evasions (quotes, heredocs, substitutions, case, [[ ]], functions): can L3 be evaded, or misfire?
+      Q10 L3 false positives that would block legitimate work.
+      Q11 Can any producer obtain a false-green evidence record from this design?
+      Q12 Are the census-2 classifications in Appendix A right, especially the 13 IN-CLASS-DEFECT rows and the two
+          mechanisms (M-CI-ERREXIT, M-LAUNDER)?
+    
+    ## Appendix A — census 2, all 162 classified occurrences (tab-separated; the 42 decisions not taken by the default rule
+    carry their reason in the `note` column)
+    
+    ```
+    {tsv}```
+    
+    ## Appendix B — measured CI shell invocation, and the bash errexit probe
+    
+    ```
+    {ci}```
+    
+    Probe scripts, each executed as `bash -e <script>` (the measured default CI invocation) on GNU bash 5.2.21:
+    
+    ```
+    {probe}```
+    
+    Results:
+    
+    ```
+    {probe_out}```
+    
+    END OF PACKET DAI-6 DESIGN v1
+    """
+    (S / "DEEPSEEK_PACKET_DAI6_V1.md").write_text(P)
+    L = P.split("\n")
+    print("sentinels:", [L.count(x) for x in (SA, SB, SC)], [x.count("\\") for x in (SA, SB, SC)])
+    print("SA:", SA); print("SB:", SB); print("SC:", SC)
+    print("appendix rows:", tsv.count("\n") - 1, "| bytes", len(P.encode()), hashlib.sha256(P.encode()).hexdigest())
+    END-VERBATIM DAI6S-GEN-DAI6-PACKET-PY
+- EVIDENCE DAI6S-GEN-DAI6-B64-PY gen_dai6_b64.py: 3271 bytes, sha256 99cdff159eee7dd07c52239fbaaa41d18796377e9a5ac45bd9998abae0cc2d3c, final LF True  [CMD `sha256sum gen_dai6_b64.py` → 99cdff159eee7dd0…]
+    BEGIN-VERBATIM DAI6S-GEN-DAI6-B64-PY
+    import base64, hashlib, pathlib, textwrap, re
+    S = pathlib.Path("/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/dai6")
+    O = S / "dai6_b64"; O.mkdir(exist_ok=True)
+    pkt = (S / "DEEPSEEK_PACKET_DAI6_V1.md").read_bytes(); H = hashlib.sha256(pkt).hexdigest()
+    n = 10; cuts = [0]
+    for k in range(1, n):
+        cuts.append(pkt.rfind(b"\n", 0, len(pkt) * k // n) + 1)
+    cuts.append(len(pkt)); chunks = [pkt[cuts[i]:cuts[i + 1]] for i in range(n)]
+    cover = f"""To: DeepSeek (adversarial reviewer)
+    From: Orion, for Kai (adjudicator) and Dainius (operator)
+    Subject: KAI DAI-6 evidence-pipeline exit-status control, DESIGN packet v1, adversarial review (no code to review: a design)
+    
+    This message is complete on its own. You have no repository access and no prior context; rely ONLY on the packet
+    below. Your findings carry zero admission weight: Kai reconciles every one against the repository.
+    
+    The packet is a Markdown document of {len(pkt)} bytes, sent inline as {n} base64 blocks.
+    Packet SHA-256 (the subject you must reconstruct):
+    {H}
+    
+    Protocol:
+    1. For each block, remove all whitespace from the base64 text and check its stated hash.
+    2. Decode it; check the stated decoded length and decoded hash.
+    3. Concatenate the decoded chunks strictly in order 1 to {n}; check the packet hash above.
+    4. Read ONLY the decoded packet, then reply FIRST with the receipt in its section 0, inside ONE fenced code block:
+       copy the packet hash given above on the PACKET HASH line, copy all three sentinels exactly, as whole lines,
+       from the DECODED packet, and count the Appendix A data rows. If you cannot compute SHA-256, say so, but still copy the given hash. If you
+       cannot reproduce every receipt line exactly, reply NO REVIEW.
+    5. Only after the receipt, attack the design as the packet's section 10 asks. Give each finding an ID
+       (DS-DAI6-nn), a severity (BLOCKER / MAJOR / MINOR / QUESTION), the exact packet lines copied from
+       the decoded packet, a concrete failing input where possible, and a remedy. If you find nothing, say so
+       explicitly. A PASS is not implementation authority.
+    """
+    assert all(x not in cover for x in ("operating-system process result", "outlived its parent", "recorded in handoff.py when", "SENTINEL"))
+    parts = []
+    for i, c in enumerate(chunks, 1):
+        b64 = base64.b64encode(c).decode(); wrapped = "\n".join(textwrap.wrap(b64, 76))
+        block = (f"CHUNK {i}/{n}\noriginal decoded-byte length: {len(c)}\nSHA-256 of original decoded chunk: {hashlib.sha256(c).hexdigest()}\n"
+                 f"SHA-256 of transmitted base64 text (all whitespace removed): {hashlib.sha256(b64.encode()).hexdigest()}\nBEGIN BASE64\n{wrapped}\nEND BASE64\n")
+        (O / f"dai6_b64_chunk_{i}_of_{n}.txt").write_text(block); parts.append(block)
+    (O / "DEEPSEEK_COVER_DAI6_V1.txt").write_text(cover)
+    msg = cover + "\n" + "\n".join(parts); (O / "DEEPSEEK_MESSAGE_DAI6_V1_BASE64_COMPLETE.txt").write_text(msg)
+    dec = b"".join(base64.b64decode(re.sub(r"\s", "", b), validate=True) for b in re.findall(r"BEGIN BASE64\n(.*?)\nEND BASE64", msg, re.S))
+    print("chunks", [len(c) for c in chunks], "| message round-trip == packet:", dec == pkt, "| packet", H)
+    for f in sorted(O.iterdir()): print(f.name, len(f.read_bytes()), hashlib.sha256(f.read_bytes()).hexdigest())
+    END-VERBATIM DAI6S-GEN-DAI6-B64-PY
+- EVIDENCE DAI6S-GEN-DAI6-B64-OUT-TXT gen_dai6_b64_out.txt: 1363 bytes, sha256 786bf38ef5a741dd3ba2bfa7ed376d4c19d02ee481ad99046db4ad10ca915683, final LF True  [CMD `sha256sum gen_dai6_b64_out.txt` → 786bf38ef5a741dd…]
+    BEGIN-VERBATIM DAI6S-GEN-DAI6-B64-OUT-TXT
+    chunks [6151, 6170, 6087, 6195, 6209, 5966, 6227, 6220, 6104, 6362] | message round-trip == packet: True | packet 58228244b3f4e776955b3aae77e4d8735d2c2539637a9e7eedcb8849126bbc56
+    DEEPSEEK_COVER_DAI6_V1.txt 1682 575247fd40af3238066f4ca41edb725cf124ba15172d0a77b1bba31917a52808
+    DEEPSEEK_MESSAGE_DAI6_V1_BASE64_COMPLETE.txt 88008 ee9b8dce210b9627ec4ccada551fbec73543b6c201d0bd68e40749242ad12be6
+    dai6_b64_chunk_10_of_10.txt 8893 805c9469801c183de22d2187ee248e78c9635aaea2c6fd2364f0dfb7cd8dd1e1
+    dai6_b64_chunk_1_of_10.txt 8608 7e86aabb22e653209f5f0bb014a303676ecb943eb2106b8c8339368de7eb1ddf
+    dai6_b64_chunk_2_of_10.txt 8633 915299cc08b0e6ca94ac63c54ed1aca15dea90bd387d62256e7ef88298714efc
+    dai6_b64_chunk_3_of_10.txt 8519 7fc1866d500e8ce40769825eee81a472283c23574fc666d2b12f068302afaed9
+    dai6_b64_chunk_4_of_10.txt 8665 70947ee70ebc4a777ff355e06c068f112d3489b23788c1e896c2195138ec12d5
+    dai6_b64_chunk_5_of_10.txt 8685 db0ed1c2ce544cdba7c8138336e92722d808ac5cf9cbf93d4eb333ef1a976d65
+    dai6_b64_chunk_6_of_10.txt 8357 dbc6f2b76a323bd8e62ae8d39cc7f57cf6736a2823dd55a1f430c1f8b3092f2a
+    dai6_b64_chunk_7_of_10.txt 8710 60fc126075dddb00f2849d78795c2951acc23aa10d8b9cb9d7fac82573203dbc
+    dai6_b64_chunk_8_of_10.txt 8702 ecbb82877c8c75ae6b031605e2b93d87b16e814eb41027f4509c7fe15e2ec405
+    dai6_b64_chunk_9_of_10.txt 8544 a8f4cbeaaa065ba6b1ef3078ccb0ead8e9a6ad8a55b26e6bbf36a1d0a5be2c68
+    END-VERBATIM DAI6S-GEN-DAI6-B64-OUT-TXT
+- EVIDENCE DAI6S-SHSTRUCT2-PY supp/shstruct2.py: 8562 bytes, sha256 088f29ea805255b32c72446c06d96fd1c83bec54c7f7cafc7c20efcc339c5f6b, final LF True  [CMD `sha256sum shstruct2.py` → 088f29ea805255b3…]
+    BEGIN-VERBATIM DAI6S-SHSTRUCT2-PY
+    """Minimal, quote/heredoc/substitution-aware bash STRUCTURE scanner for the DAI-6 census.
+    
+    Not a full bash parser. It recovers the list structure that matters for exit-status provenance:
+      sequence  := and_or (SEP and_or)*        SEP in {';', '\\n', '&'}
+      and_or    := pipeline (('&&'|'||') pipeline)*
+      pipeline  := stage (('|'|'|&') stage)*
+    A stage is a list of words; a '( ... )' subshell or '{ ...; }' group is one stage whose inner text is
+    parsed recursively. '$( ... )' and backtick substitutions are kept inside their word and parsed
+    recursively as nested sequences. Single-quoted text and heredoc bodies are opaque: an operator
+    character inside them is never structure. '$?' / '${?}' outside single quotes and heredoc bodies are
+    recorded per word; so are references to PIPESTATUS.
+    """
+    import re
+    
+    OPS3 = ()
+    OPS2 = ("&&", "||", "|&", ";;", "<<", ">>", "<&", ">&", "&>")
+    OPS1 = ("|", "&", ";", "(", ")", "\n")
+    
+    
+    class Word:
+        def __init__(self, pos=None):
+            self.text, self.status_ref, self.pipestatus, self.subs = "", False, False, []
+            self.pos = pos
+    
+    
+    def _scan_subst(s, i, close):
+        """s[i] is just after '$(' (close=')') or after '`' (close='`'). Return (inner, index after close)."""
+        depth, j, start = 1, i, i
+        while j < len(s):
+            ch = s[j]
+            if close == "`":
+                if ch == "\\": j += 2; continue
+                if ch == "`": return s[start:j], j + 1
+                j += 1; continue
+            if ch == "\\": j += 2; continue
+            if ch == "'":
+                k = s.find("'", j + 1); j = len(s) if k < 0 else k + 1; continue
+            if ch == '"':
+                j = _scan_dq(s, j + 1, Word())[1]; continue
+            if s.startswith("$(", j): depth += 1; j += 2; continue
+            if ch == "(": depth += 1
+            elif ch == ")":
+                depth -= 1
+                if depth == 0: return s[start:j], j + 1
+            j += 1
+        return s[start:], len(s)
+    
+    
+    def _scan_dq(s, j, w):
+        """s[j] is just after an opening '"'. Returns (text, index after closing quote)."""
+        start = j
+        while j < len(s):
+            ch = s[j]
+            if ch == "\\": j += 2; continue
+            if ch == '"': return s[start:j], j + 1
+            if s.startswith("$?", j) or s.startswith("${?}", j): w.status_ref = True
+            if s.startswith("PIPESTATUS", j): w.pipestatus = True
+            if s.startswith("$(", j):
+                inner, j = _scan_subst(s, j + 2, ")"); w.subs.append(inner); continue
+            if ch == "`":
+                inner, j = _scan_subst(s, j + 1, "`"); w.subs.append(inner); continue
+            j += 1
+        return s[start:], len(s)
+    
+    
+    def tokenize(s):
+        """Yield ('W', Word) or ('O', op). Heredoc bodies are skipped (opaque)."""
+        toks, i, pending_heredocs = [], 0, []
+        w = None
+    
+        def flush():
+            nonlocal w
+            if w is not None:
+                toks.append(("W", w)); w = None
+    
+        while i < len(s):
+            ch = s[i]
+            if ch == "\n":
+                flush(); toks.append(("O", "\n")); i += 1
+                for delim, strip in pending_heredocs:          # skip each body to its delimiter line
+                    while i < len(s):
+                        k = s.find("\n", i); line = s[i:] if k < 0 else s[i:k]
+                        i = len(s) if k < 0 else k + 1
+                        if (line.lstrip("\t") if strip else line) == delim: break
+                pending_heredocs = []
+                continue
+            if ch in " \t": flush(); i += 1; continue
+            if ch == "#" and w is None:                          # comment to end of line
+                k = s.find("\n", i); i = len(s) if k < 0 else k; continue
+            if ch == "\\":
+                if s.startswith("\\\n", i): i += 2; continue       # line continuation
+                w = w or Word(i); w.text += s[i:i + 2]; i += 2; continue
+            if s.startswith("<<<", i):
+                flush(); toks.append(("O", "<<<")); i += 3; continue
+            if s.startswith("<<", i):
+                flush(); strip = s.startswith("<<-", i); i += 3 if strip else 2
+                while i < len(s) and s[i] in " \t": i += 1
+                m = re.match(r"""(['"]?)([A-Za-z_][A-Za-z0-9_]*)\1""", s[i:])
+                if m:
+                    pending_heredocs.append((m.group(2), strip)); i += m.end()
+                toks.append(("O", "<<")); continue
+            two = s[i:i + 2]
+            if two in OPS2 and two not in ("<<",):
+                if two in (">>", "<&", ">&", "&>"):               # redirections: part of the stage
+                    w = w or Word(i); w.text += two; i += 2; continue
+                flush(); toks.append(("O", two)); i += 2; continue
+            if ch in "|&;()":
+                if ch == "(" and w is not None and w.text.endswith("="):   # array assignment a=(...)
+                    inner, i = _scan_subst(s, i + 1, ")"); w.text += "(" + inner + ")"; continue
+                flush(); toks.append(("O", ch)); i += 1; continue
+            if ch in "<>":
+                w = w or Word(i); w.text += ch; i += 1; continue
+            w = w or Word(i)
+            if ch == "'":
+                k = s.find("'", i + 1); k = len(s) if k < 0 else k
+                w.text += s[i:k + 1]; i = k + 1; continue
+            if ch == '"':
+                text, i2 = _scan_dq(s, i + 1, w); w.text += '"' + text + '"'; i = i2; continue
+            if s.startswith("$(", i):
+                inner, i = _scan_subst(s, i + 2, ")"); w.subs.append(inner); w.text += "$(" + inner + ")"; continue
+            if ch == "`":
+                inner, i = _scan_subst(s, i + 1, "`"); w.subs.append(inner); w.text += "`" + inner + "`"; continue
+            if s.startswith("$?", i) or s.startswith("${?}", i): w.status_ref = True
+            if s.startswith("PIPESTATUS", i): w.pipestatus = True
+            w.text += ch; i += 1
+        flush()
+        return toks
+    
+    
+    class Stage:
+        def __init__(self):
+            self.words, self.inner = [], None          # inner: parsed sequence for ( ... ) / { ...; }
+    
+        @property
+        def argv0(self):
+            for w in self.words:
+                if not re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", w.text): return w.text
+            return ""
+    
+        def status_ref(self):
+            return any(w.status_ref for w in self.words)
+    
+        def pipestatus(self):
+            return any(w.pipestatus for w in self.words)
+    
+    
+    def parse(s):
+        """Return a sequence: list of (and_or, sep) where and_or is list of (pipeline, conn) and a
+        pipeline is a list of (stage, pipe_op)."""
+        toks = tokenize(s)
+        pos = 0
+    
+        def parse_seq(end_tok=None):
+            nonlocal pos
+            seq, and_or, pipeline, stage = [], [], [], Stage()
+    
+            def end_stage(op):
+                nonlocal stage
+                pipeline.append((stage, op)); stage = Stage()
+    
+            def end_pipeline(conn):
+                nonlocal pipeline
+                end_stage(None)
+                and_or.append((pipeline, conn)); pipeline_reset()
+    
+            def pipeline_reset():
+                nonlocal pipeline
+                pipeline = []
+    
+            def end_and_or(sep):
+                nonlocal and_or
+                end_pipeline(None)
+                seq.append((and_or, sep)); and_or = []
+    
+            while pos < len(toks):
+                kind, v = toks[pos]; pos += 1
+                if kind == "W":
+                    if v.text == "{" and not stage.words:
+                        stage.inner = parse_seq("}")
+                        continue
+                    if end_tok == "}" and v.text == "}" and not stage.words:
+                        break
+                    stage.words.append(v); continue
+                if v == "(":
+                    stage.inner = parse_seq(")"); continue
+                if v == ")" and end_tok == ")":
+                    break
+                if v in ("|", "|&"): end_stage(v); continue
+                if v in ("&&", "||"): end_pipeline(v); continue
+                if v in (";", "\n", "&", ";;"):
+                    if not stage.words and stage.inner is None and not pipeline and not and_or:
+                        continue                                   # empty command (blank line)
+                    end_and_or(v); continue
+                if v in ("<<", "<<<"):
+                    stage.words.append(Word()); continue           # heredoc/herestring operand marker
+            if stage.words or stage.inner is not None or pipeline or and_or:
+                end_and_or(None)
+            return seq
+    
+        return parse_seq()
+    
+    
+    PIPEFAIL_RE = re.compile(r"\bset\s+-[A-Za-z]*o\s+pipefail\b|\bset\s+-o\s+pipefail\b|\bset\s+-[a-z]*o\b.*pipefail")
+    
+    
+    def items(seq):
+        """Flatten a sequence into the ordered list of (pipeline, connector_before) seen by $?.
+        connector_before is the operator that joined this pipeline to the previous one."""
+        out, prev = [], None
+        for and_or, sep in seq:
+            for k, (pl, conn) in enumerate(and_or):
+                out.append((pl, prev))
+                prev = conn if conn is not None else sep
+        return out
+    END-VERBATIM DAI6S-SHSTRUCT2-PY
+- EVIDENCE DAI6S-SUPP-EXTRACT-PY supp/supp_extract.py: 8005 bytes, sha256 56a1d142eec076f2ef13f9e01d3af2b2b8c629be8b359c126516b586ef448053, final LF True  [CMD `sha256sum supp_extract.py` → 56a1d142eec076f2…]
+    BEGIN-VERBATIM DAI6S-SUPP-EXTRACT-PY
+    """DAI-6 supplemental census, mechanical layer. argv: <repo root> <file list> <out.json>
+    
+    Units: every `run:` scalar of the 8 workflows (located with PyYAML node marks) and every tracked scripts/security/*.sh
+    file, read from the committed tree via `git show HEAD:<path>` (exact committed bytes, not the worktree).
+    
+    For each unit, the initial shell options come from MEASURED CI behaviour (ci_shell_observed.txt):
+      workflow step, no `shell:`     -> bash -e          errexit on, pipefail off
+      workflow step, `shell: bash`   -> bash -e -o pipefail
+      scripts/security/*.sh          -> no options until the script's own `set`
+    `set` lines then update the state in order (top level only; functions inherit the state at their definition point,
+    an approximation stated in the output).
+    
+    Occurrences recorded:
+      P  every multi-stage pipeline, at any depth (top level, ( ) / { } groups, $( ) substitutions);
+      R  every explicit status read: $?, ${?}, PIPESTATUS, `|| <var>=$?`.
+    For each P: line, stages' argv0, last-stage role, pipefail state, and how its status is consumed:
+      COND    condition of if / elif / while / until, or negated with !
+      GATE    followed by && or ||
+      READ    the next item reads $? or PIPESTATUS (READ-PS-IMMEDIATE when PIPESTATUS is read right after)
+      SUBST   inside $( ): its status becomes the enclosing command's (assignment status, or nothing)
+      ERREXIT errexit is on and none of the above: a non-zero status aborts the unit
+      FINAL   last item of the unit: its status is the step's / script's exit status
+      NONE    nothing consumes it
+    """
+    import json, re, subprocess, sys
+    import yaml
+    sys.path.insert(0, __file__.rsplit("/", 1)[0])
+    import shstruct2 as SS
+    
+    ROOT, LIST, OUT = sys.argv[1:4]
+    FILTERS = {"tail", "head", "grep", "egrep", "fgrep", "cut", "sort", "uniq", "wc", "sed", "awk", "tr", "tee", "jq",
+               "column", "fold", "nl", "xargs", "cat", "base64", "sha256sum", "od", "xxd", "rev", "paste", "fmt"}
+    FEEDERS = {"echo", "printf", "cat", "yes", "true", "printenv"}
+    CONDKW = {"if", "elif", "while", "until", "!"}
+    
+    
+    def show(path):
+        return subprocess.run(["git", "-C", ROOT, "show", f"HEAD:{path}"], capture_output=True, text=True, check=True).stdout
+    
+    
+    def a0(st):
+        x = st.argv0
+        return x.rsplit("/", 1)[-1] if x else ("(group)" if st.inner is not None else "")
+    
+    
+    def lead(st):
+        """argv0 after a leading condition keyword / negation."""
+        ws = [w.text for w in st.words]
+        while ws and ws[0] in CONDKW | {"then", "do", "else", "{"}:
+            ws = ws[1:]
+        return (ws[0].rsplit("/", 1)[-1] if ws else ""), bool([w for w in st.words[:1] if w.text in CONDKW])
+    
+    
+    def role(stages):
+        names = [lead(s)[0] or a0(s) for s in stages]
+        last, before = names[-1], names[:-1]
+        if all(b in FEEDERS for b in before):
+            return "FEEDER", names
+        if last in FILTERS:
+            return "FILTER", names
+        return "OTHER", names
+    
+    
+    def set_update(stage, opts):
+        ws = [w.text for w in stage.words]
+        if not ws or ws[0] != "set":
+            return
+        i = 1
+        while i < len(ws):
+            a = ws[i]
+            if a in ("-o", "+o") and i + 1 < len(ws):
+                if ws[i + 1] == "pipefail": opts["pipefail"] = a == "-o"
+                if ws[i + 1] == "errexit": opts["errexit"] = a == "-o"
+                i += 2; continue
+            if re.fullmatch(r"[-+][a-zA-Z]+", a):
+                on = a[0] == "-"
+                if "e" in a[1:]: opts["errexit"] = on
+                if "o" in a[1:] and i + 1 < len(ws) and ws[i + 1] == "pipefail":
+                    opts["pipefail"] = on; i += 2; continue
+            i += 1
+    
+    
+    def line_of(text, pos):
+        return text.count("\n", 0, pos) + 1 if pos is not None else None
+    
+    
+    def first_pos(stages):
+        for st in stages:
+            for w in st.words:
+                if w.pos is not None: return w.pos
+        return None
+    
+    
+    def walk(seq, text, base, opts, depth, ctx, out, unit_last=False):
+        its = SS.items(seq)
+        for k, (pl, conn_before) in enumerate(its):
+            sts = [s for s, _ in pl]
+            for st in sts:
+                set_update(st, opts)
+            nxt = its[k + 1] if k + 1 < len(its) else None
+            pos = first_pos(sts)
+            ln = line_of(text, None if pos is None else base + pos)
+            # explicit status reads (R)
+            for st in sts:
+                for w in st.words:
+                    if w.status_ref or w.pipestatus:
+                        prev = its[k - 1][0] if k else None
+                        prevn = len(prev) if prev else 0
+                        out.append({"kind": "R", "line": ln, "depth": depth, "ctx": ctx,
+                                    "read": "PIPESTATUS" if w.pipestatus else "$?",
+                                    "prev_stages": prevn, "prev_conn": conn_before,
+                                    "text": w.text[:160]})
+            if len(sts) >= 2:
+                lk, neg = lead(sts[0])
+                if neg or lk != (a0(sts[0])):
+                    cons = "COND"
+                elif nxt is not None and nxt[1] in ("&&", "||"):
+                    cons = "GATE"
+                elif nxt is not None and any(w.status_ref or w.pipestatus for s, _ in nxt[0] for w in s.words):
+                    ps = any(w.pipestatus for s, _ in nxt[0] for w in s.words)
+                    cons = "READ-PS-IMMEDIATE" if ps else "READ"
+                elif ctx == "subst":
+                    cons = "SUBST"
+                elif depth == 0 and nxt is None and unit_last:
+                    cons = "FINAL"
+                elif opts["errexit"]:
+                    cons = "ERREXIT"
+                else:
+                    cons = "NONE"
+                r, names = role(sts)
+                out.append({"kind": "P", "line": ln, "depth": depth, "ctx": ctx, "stages": names, "role": r,
+                            "pipefail": opts["pipefail"], "errexit": opts["errexit"], "consumed": cons,
+                            "conn_after": nxt[1] if nxt else None,
+                            "text": " | ".join(" ".join(w.text for w in s.words) for s in sts)[:220]})
+            for st in sts:
+                if st.inner is not None:
+                    walk(st.inner, text, base, dict(opts), depth + 1, "group", out)
+                for w in st.words:
+                    for sub in w.subs:
+                        off = text.find(sub, base + (w.pos or 0)) if w.pos is not None else -1
+                        walk(SS.parse(sub), text, off if off >= 0 else base, dict(opts), depth + 1, "subst", out)
+    
+    
+    def units():
+        for path in open(LIST).read().split():
+            src = show(path)
+            if path.startswith(".github/workflows/"):
+                node = yaml.compose(src)
+    
+                def maps(n):
+                    if isinstance(n, yaml.MappingNode):
+                        yield n
+                        for k, v in n.value: yield from maps(v)
+                    elif isinstance(n, yaml.SequenceNode):
+                        for v in n.value: yield from maps(v)
+                for m in maps(node):
+                    kv = {k.value: v for k, v in m.value if isinstance(k, yaml.ScalarNode)}
+                    if "run" in kv and isinstance(kv["run"], yaml.ScalarNode):
+                        shell = kv["shell"].value if "shell" in kv else None
+                        name = kv["name"].value if "name" in kv else ""
+                        opts = {"errexit": True, "pipefail": shell == "bash"}
+                        yield path, kv["run"].start_mark.line + 1 + (1 if kv["run"].style in ("|", ">") else 0) - 1, name, shell, kv["run"].value, opts
+            else:
+                yield path, 1, "(script)", "bash-script", src, {"errexit": False, "pipefail": False}
+    
+    
+    rows, stats = [], []
+    for path, l0, name, shell, body, opts in units():
+        out = []
+        walk(SS.parse(body), body, 0, dict(opts), 0, "top", out, unit_last=True)
+        for o in out:
+            o.update(file=path, unit_line=l0, step=name[:80], shell=shell,
+                     src_line=(l0 + o["line"]) if (o["line"] and not path.endswith(".sh")) else o["line"])
+        rows += out
+        stats.append((path, l0, name[:60], sum(o["kind"] == "P" for o in out), sum(o["kind"] == "R" for o in out)))
+    json.dump({"rows": rows, "units": stats}, open(OUT, "w"), indent=1)
+    print(f"units {len(stats)}; P {sum(r['kind']=='P' for r in rows)}; R {sum(r['kind']=='R' for r in rows)}")
+    END-VERBATIM DAI6S-SUPP-EXTRACT-PY
+- EVIDENCE DAI6S-SUPP-EXTRACT-OUT-TXT supp/supp_extract_out.txt: 23 bytes, sha256 51ec6167a79d16a58099f3810dcc56ec9777cd2fcba86277aeda3d50a3e2727a, final LF True  [CMD `sha256sum supp_extract_out.txt` → 51ec6167a79d16a5…]
+    BEGIN-VERBATIM DAI6S-SUPP-EXTRACT-OUT-TXT
+    units 133; P 114; R 48
+    END-VERBATIM DAI6S-SUPP-EXTRACT-OUT-TXT
+- EVIDENCE DAI6S-SUPP-SUMMARY-TXT supp/supp_summary.txt: 1897 bytes, sha256 90da3b86023140b47bc70b30faae2f45c37a6a87c8c65b79de38d52340935f02, final LF True  [CMD `sha256sum supp_summary.txt` → 90da3b86023140b4…]
+    BEGIN-VERBATIM DAI6S-SUPP-SUMMARY-TXT
+    P by file: [('core-tests.yml', 16), ('capture_llm_contract.sh', 11), ('collect_embedding_evidence.sh', 11), ('accept_memu_graph_offline.sh', 10), ('collect_degradation_deployed.sh', 9), ('embedding-backend-proof.yml', 8), ('run_item8_experiment.sh', 8), ('define_memu_graph_asset_contract.sh', 7), ('diagnose_graph_stall.sh', 7), ('measure_ingest_contract.sh', 7), ('collect_memu_graph_startup.sh', 5), ('p1-replay-completeness.yml', 4), ('item8-network-contingency.yml', 2), ('item8-preflight.yml', 2), ('unified-hunter.yml', 2), ('verify_identity_in_containers.sh', 2), ('drift-detector.yml', 1), ('stage1-replay.yml', 1), ('gated_commit.sh', 1)]
+    R by file: [('accept_memu_graph_offline.sh', 6), ('verify_identity_in_containers.sh', 6), ('measure_ingest_contract.sh', 5), ('capture_llm_contract.sh', 4), ('collect_memu_graph_startup.sh', 4), ('diagnose_graph_stall.sh', 4), ('item8-network-contingency.yml', 3), ('run_item8_experiment.sh', 3), ('embedding-backend-proof.yml', 2), ('p1-replay-completeness.yml', 2), ('collect_degradation_deployed.sh', 2), ('collect_embedding_evidence.sh', 2), ('define_memu_graph_asset_contract.sh', 2), ('item8-preflight.yml', 1), ('unified-hunter.yml', 1), ('gated_commit.sh', 1)]
+      ('COND', 'FEEDER', 'pf') 2
+      ('COND', 'FILTER', 'pf') 2
+      ('ERREXIT', 'FEEDER', 'nopf') 5
+      ('ERREXIT', 'FILTER', 'nopf') 1
+      ('ERREXIT', 'FILTER', 'pf') 8
+      ('ERREXIT', 'OTHER', 'nopf') 2
+      ('FINAL', 'FILTER', 'pf') 5
+      ('GATE', 'FEEDER', 'pf') 1
+      ('GATE', 'FILTER', 'nopf') 4
+      ('GATE', 'FILTER', 'pf') 8
+      ('NONE', 'FEEDER', 'pf') 3
+      ('NONE', 'FILTER', 'pf') 23
+      ('NONE', 'OTHER', 'pf') 1
+      ('READ-PS-IMMEDIATE', 'FILTER', 'pf') 2
+      ('SUBST', 'FEEDER', 'pf') 19
+      ('SUBST', 'FILTER', 'nopf') 4
+      ('SUBST', 'FILTER', 'pf') 23
+      ('SUBST', 'OTHER', 'pf') 1
+    R kinds: Counter({('$?', 'after-single'): 45, ('PIPESTATUS', 'after-multistage'): 2, ('$?', 'after-multistage'): 1})
+    END-VERBATIM DAI6S-SUPP-SUMMARY-TXT
+- EVIDENCE DAI6S-REVIEW-SCRIPTS-TXT supp/review_scripts.txt: 15215 bytes, sha256 4e113b3618bd79e31c33870120db3ba0ab7b850a3d4a9062d4b6e4be0c0e7ff9, final LF True  [CMD `sha256sum review_scripts.txt` → 4e113b3618bd79e3…]
+    BEGIN-VERBATIM DAI6S-REVIEW-SCRIPTS-TXT
+    === scripts/security/accept_memu_graph_offline.sh  (270 lines)  set-lines: ['38:set -uo pipefail']
+    P045 L61 P d1/subst pf=1 e=0 GATE              FEEDER ['printf', 'grep']
+          DIRTY="$(printf '%s' "$DIRTY_LIST" | grep -c . || true)"
+    P046 L84 P d1/subst pf=1 e=0 SUBST             FILTER ['git', 'sha256sum', 'cut']
+          BUILD_INPUTS="$(git ls-tree -r HEAD -- $BUILD_INPUT_PATHS 2>/dev/null \
+    P047 L90 P d0/top pf=1 e=0 NONE              FILTER ['record', 'tee']
+          record() { printf '%s\n' "$*" | tee -a "$EVIDENCE"; }
+    R048 L96 R $? prev_stages=1 conn='\n'
+          local rc=$?
+    P049 L97 P d1/subst pf=1 e=0 SUBST             FILTER ['wc', 'tr']
+          local bytes; bytes=$(wc -c < "$log" | tr -d ' ')
+    P050 L104 P d1/subst pf=1 e=0 SUBST             FILTER ['wc', 'tr']
+          local bytes; bytes=$(wc -c < "$log" | tr -d ' ')
+    P051 L106 P d0/top pf=1 e=0 NONE              FILTER ['tail', 'sed', 'tee']
+          tail -n "$lines" "$log" | sed 's/^/  | /' | tee -a "$EVIDENCE"
+    P052 L123 P d0/top pf=1 e=0 NONE              FILTER ['printf', 'sed', 'tee']
+          printf '%s\n' "$DIRTY_LIST" | sed 's/^/    /' | tee -a "$EVIDENCE"
+    P053 L126 P d1/subst pf=1 e=0 SUBST             FILTER ['docker', 'head']
+          IMAGE=$(docker compose -f "$COMPOSE" images -q "$SERVICE" 2>/dev/null | head -1)
+    P054 L128 P d1/subst pf=1 e=0 SUBST             FILTER ['docker', 'head']
+          IMAGE=$(docker images --format '{{.ID}}' --filter 'reference=*memu-graph*' | head -1)
+    R055 L151 R $? prev_stages=1 conn='\n'
+          a_rc=$?
+    R056 L163 R $? prev_stages=1 conn='\n'
+          d_rc=$?
+    R057 L173 R $? prev_stages=1 conn='\n'
+          if [ $? -ne 0 ]; then
+    R058 L184 R $? prev_stages=1 conn='\n'
+          probe_rc=$?
+    R059 L237 R $? prev_stages=1 conn='\n'
+          c3_rc=$?
+    P060 L263 P d0/top pf=1 e=0 NONE              FILTER ['cat', 'sed', 'tee']
+          cat "$LOGDIR/rc.env" | sed 's/^/  /' | tee -a "$EVIDENCE"
+    === scripts/security/capture_llm_contract.sh  (166 lines)  set-lines: ['16:set -uo pipefail']
+    P061 L29 P d1/subst pf=1 e=0 GATE              FILTER ['git', 'grep']
+          DIRTY="$(git status --porcelain 2>/dev/null | grep -c . || true)"
+    P062 L33 P d0/top pf=1 e=0 NONE              FILTER ['record', 'tee']
+          record() { printf '%s\n' "$*" | tee -a "$EVIDENCE"; }
+    R063 L45 R $? prev_stages=1 conn='\n'
+          if [ $? -ne 0 ]; then
+    P064 L48 P d0/top pf=1 e=0 NONE              FILTER ['tail', 'sed', 'tee']
+          tail -n 40 "$LOGDIR/up.log" | sed 's/^/  | /' | tee -a "$EVIDENCE"
+    R065 L54 R $? prev_stages=1 conn='\n'
+          health_rc=$?
+    P066 L55 P d0/top pf=1 e=0 NONE              FILTER ['tail', 'sed', 'tee']
+          tail -n 4 "$LOGDIR/health.log" | sed 's/^/  | /' | tee -a "$EVIDENCE"
+    R067 L73 R $? prev_stages=1 conn='\n'
+          selftest_rc=$?
+    P068 L79 P d0/top pf=1 e=0 NONE              FILTER ['tail', 'sed', 'tee']
+          tail -n 40 "$LOGDIR/selftest.log" | sed 's/^/  | /' | tee -a "$EVIDENCE"
+    P069 L85 P d1/subst pf=1 e=0 SUBST             FILTER ['grep', 'sed']
+          selftest_class="$(grep -m1 '^SELFTEST-CLASS: ' "$LOGDIR/selftest.log" \
+    R070 L113 R $? prev_stages=1 conn='\n'
+          probe_rc=$?
+    P071 L123 P d1/subst pf=1 e=0 SUBST             FILTER ['wc', 'tr']
+          bytes=$(wc -c < "$LOGDIR/capture.jsonl" | tr -d ' ')
+    P072 L132 P d1/subst pf=1 e=0 SUBST             FILTER ['wc', 'tr']
+          err_bytes=$(wc -c < "$LOGDIR/capture.err" | tr -d ' ')
+    P073 L136 P d0/top pf=1 e=0 NONE              FILTER ['tail', 'sed', 'tee']
+          tail -n 40 "$LOGDIR/capture.err" 2>/dev/null | sed 's/^/  | /' | tee -a "$EVIDENCE"
+    P074 L157 P d1/subst pf=1 e=0 SUBST             FILTER ['wc', 'tr']
+          record "  service log: $(wc -c < "$LOGDIR/service.log" | tr -d ' ') bytes"
+    P075 L158 P d1/subst pf=1 e=0 SUBST             FILTER ['wc', 'tr']
+          record "  ollama log:  $(wc -c < "$LOGDIR/ollama.log" | tr -d ' ') bytes"
+    === scripts/security/collect_degradation_deployed.sh  (340 lines)  set-lines: ['51:set -uo pipefail']
+    P076 L58 P d0/top pf=1 e=0 NONE              FILTER ['record', 'tee']
+          record() { printf '%s\n' "$*" | tee -a "$EVIDENCE"; }
+    R077 L81 R $? prev_stages=1 conn=';'
+          if "$@" > "$out" 2> "$err"; then rc=0; else rc=$?; fi
+    P078 L86 P d1/subst pf=1 e=0 GATE              FILTER ['tail', 'tr']
+          record "  stdout_TAIL=$( [ -s "$out" ] && tail -c 1200 "$out" | tr '\n' '|' || echo '(empty)' )"
+    P079 L87 P d1/subst pf=1 e=0 GATE              FILTER ['tail', 'tr']
+          record "  stderr_TAIL=$( [ -s "$err" ] && tail -c 1200 "$err" | tr '\n' '|' || echo '(empty)' )"
+    P080 L112 P d0/top pf=1 e=0 NONE              OTHER  ['*unhealthy*', '*starting*', '*exited*', '*restarting*', '*created*', '*dead*']
+          *unhealthy*|*starting*|*exited*|*restarting*|*created*|*dead*)
+    P081 L120 P d1/subst pf=1 e=0 SUBST             FILTER ['docker', 'tr']
+          name="$(docker inspect --format '{{.Name}}' "$cid" 2>/dev/null | tr -d '/')"
+    P082 L183 P d1/subst pf=1 e=0 SUBST             FEEDER ['printf', 'wc']
+          record "gated_count=$(printf '%s\n' $GATED | wc -w)"
+    R083 L187 R $? prev_stages=1 conn='\n'
+          up_rc=$?
+    P084 L255 P d1/subst pf=1 e=0 SUBST             FEEDER ['printf', 'tr']
+          record "ground_truth_${dep}=$(printf '%s' "$STAGE_OUT" | tr '\n' ' ')"
+    P085 L303 P d1/subst pf=1 e=0 SUBST             FEEDER ['printf', 'tr']
+          record "caller_behaviour_${dep}=$(printf '%s' "$STAGE_OUT" | tr '\n' ' ')"
+    P086 L326 P d1/subst pf=1 e=0 SUBST             FEEDER ['printf', 'wc']
+          record "dashboard_log_lines=$(printf '%s\n' "$STAGE_OUT" | wc -l)"
+    === scripts/security/collect_embedding_evidence.sh  (264 lines)  set-lines: ['37:set -uo pipefail']
+    R087 L59 R $? prev_stages=1 conn=';'
+          if "$@" > "$out" 2> "$err"; then rc=0; else rc=$?; fi
+    P088 L64 P d1/subst pf=1 e=0 GATE              FILTER ['tr', 'cut']
+          record "  stderr=$( [ -s "$err" ] && tr '\n' '|' < "$err" | cut -c1-400 || echo '(empty)' )"
+    P089 L76 P d0/top pf=1 e=0 COND              FEEDER ['printf', 'grep']
+          if printf '%s\n' "$services" | grep -qx "$SERVICE"; then
+    P090 L88 P d1/subst pf=1 e=0 SUBST             FEEDER ['printf', 'tr']
+          record "profiles_declared=$(printf '%s' "$STAGE_OUT" | tr '\n' ',')"
+    P091 L92 P d0/top pf=1 e=0 COND              FEEDER ['printf', 'grep']
+          if printf '%s\n' "$STAGE_OUT" | grep -qx "$SERVICE"; then
+    P092 L122 P d1/subst pf=1 e=0 SUBST             FEEDER ['printf', 'python3']
+          image_name="$(printf '%s' "$config_json" | python3 -c '
+    P093 L140 P d0/top pf=1 e=0 NONE              FEEDER ['printf', 'grep']
+          if [ -n "$image_name" ] && printf '%s\n' "$STAGE_OUT" | grep -qxF "$image_name"; then
+    P094 L149 P d1/subst pf=1 e=0 SUBST             FEEDER ['printf', 'python3']
+          other="$(printf '%s' "$config_json" | python3 -c '
+    P095 L182 P d1/subst pf=1 e=0 SUBST             FEEDER ['printf', 'head']
+          cid="$(printf '%s' "$STAGE_OUT" | head -1)"
+    P096 L188 P d1/subst pf=1 e=0 SUBST             FEEDER ['printf', 'head']
+          image="$(printf '%s' "$STAGE_OUT" | head -1)"
+    P097 L205 P d1/subst pf=1 e=0 SUBST             FEEDER ['printf', 'head']
+          image="$(printf '%s' "$STAGE_OUT" | head -1)"
+    R098 L226 R $? prev_stages=1 conn=';'
+          then probe_exit=0; else probe_exit=$?; fi
+    P099 L250 P d0/top pf=1 e=0 NONE              FEEDER ['printf', 'tee']
+          printf '%s claim-A: measurement=%s claim_verdict=%s producer=%s probe_exit=%s image=%s\n' \
+    === scripts/security/collect_memu_graph_startup.sh  (243 lines)  set-lines: ['63:set -uo pipefail']
+    P100 L72 P d0/top pf=1 e=0 NONE              FILTER ['record', 'tee']
+          record() { printf '%s\n' "$*" | tee -a "$EVIDENCE"; }
+    R101 L80 R $? prev_stages=1 conn='\n'
+          local rc=$?
+    P102 L82 P d1/subst pf=1 e=0 SUBST             FILTER ['wc', 'tr']
+          bytes=$(wc -c < "$log" | tr -d ' ')
+    P103 L90 P d1/subst pf=1 e=0 SUBST             FILTER ['wc', 'tr']
+          local bytes; bytes=$(wc -c < "$log" | tr -d ' ')
+    P104 L92 P d0/top pf=1 e=0 NONE              FILTER ['tail', 'sed', 'tee']
+          tail -n "$lines" "$log" | sed 's/^/  | /' | tee -a "$EVIDENCE"
+    R105 L107 R $? prev_stages=1 conn='\n'
+          up_rc=$?
+    R106 L132 R $? prev_stages=1 conn='\n'
+          probe_rc=$?
+    R107 L212 R $? prev_stages=1 conn='\n'
+          live_rc=$?
+    P108 L235 P d0/top pf=1 e=0 NONE              FILTER ['python3', 'tee']
+          python3 scripts/security/summarise_memu_graph_startup.py \
+    === scripts/security/define_memu_graph_asset_contract.sh  (222 lines)  set-lines: ['46:set -uo pipefail']
+    P109 L55 P d0/top pf=1 e=0 NONE              FILTER ['record', 'tee']
+          record() { printf '%s\n' "$*" | tee -a "$EVIDENCE"; }
+    R110 L61 R $? prev_stages=1 conn='\n'
+          local rc=$?
+    P111 L62 P d1/subst pf=1 e=0 SUBST             FILTER ['wc', 'tr']
+          local bytes; bytes=$(wc -c < "$log" | tr -d ' ')
+    P112 L69 P d1/subst pf=1 e=0 SUBST             FILTER ['wc', 'tr']
+          local bytes; bytes=$(wc -c < "$log" | tr -d ' ')
+    P113 L71 P d0/top pf=1 e=0 NONE              FILTER ['tail', 'sed', 'tee']
+          tail -n "$lines" "$log" | sed 's/^/  | /' | tee -a "$EVIDENCE"
+    P114 L82 P d1/subst pf=1 e=0 SUBST             FILTER ['docker', 'head']
+          IMAGE=$(docker compose -f docker-compose.full.yml images -q memu-graph 2>/dev/null | head -1)
+    P115 L84 P d1/subst pf=1 e=0 SUBST             FILTER ['docker', 'grep', 'head']
+          IMAGE=$(docker images --format '{{.Repository}}:{{.Tag}}' \
+    R116 L166 R $? prev_stages=1 conn='\n'
+          a_rc=$?
+    P117 L215 P d0/top pf=1 e=0 NONE              FILTER ['python3', 'tee']
+          python3 scripts/security/summarise_asset_contract.py --stage-logs "$LOGDIR" \
+    === scripts/security/diagnose_graph_stall.sh  (232 lines)  set-lines: ['62:set -uo pipefail']
+    P118 L82 P d1/subst pf=1 e=0 GATE              FILTER ['git', 'grep']
+          DIRTY="$(git status --porcelain 2>/dev/null | grep -c . || true)"
+    P119 L86 P d0/top pf=1 e=0 NONE              FILTER ['record', 'tee']
+          record() { printf '%s\n' "$*" | tee -a "$EVIDENCE"; }
+    R120 L92 R $? prev_stages=1 conn='\n'
+          local rc=$?
+    P121 L93 P d1/subst pf=1 e=0 SUBST             FILTER ['wc', 'tr']
+          local bytes; bytes=$(wc -c < "$log" | tr -d ' ')
+    P122 L100 P d1/subst pf=1 e=0 SUBST             FILTER ['wc', 'tr']
+          local bytes; bytes=$(wc -c < "$log" | tr -d ' ')
+    P123 L102 P d0/top pf=1 e=0 NONE              FILTER ['tail', 'sed', 'tee']
+          tail -n "$lines" "$log" | sed 's/^/  | /' | tee -a "$EVIDENCE"
+    R124 L119 R $? prev_stages=1 conn='\n'
+          if [ $? -ne 0 ]; then
+    R125 L128 R $? prev_stages=1 conn='\n'
+          health_rc=$?
+    R126 L184 R $? prev_stages=1 conn='\n'
+          ingest_rc=$?
+    P127 L203 P d1/subst pf=1 e=0 SUBST             FILTER ['wc', 'tr']
+          bytes=$(wc -c < "$LOGDIR/samples.log" | tr -d ' ')
+    P128 L226 P d0/top pf=1 e=0 NONE              FILTER ['cat', 'sed', 'tee']
+          cat "$LOGDIR/rc.env" | sed 's/^/  /' | tee -a "$EVIDENCE"
+    === scripts/security/gated_commit.sh  (140 lines)  set-lines: ['46:set -uo pipefail']
+    P129 L65 P d1/subst pf=1 e=0 GATE              FILTER ['git', 'grep']
+          untracked="$(git status --porcelain --untracked-files=all | grep -v '^[MADRC]' || true)"
+    R130 L107 R $? prev_stages=1 conn='\n'
+          gate_rc=$?
+    === scripts/security/measure_ingest_contract.sh  (177 lines)  set-lines: ['44:set -uo pipefail']
+    P131 L61 P d1/subst pf=1 e=0 GATE              FILTER ['git', 'grep']
+          DIRTY="$(git status --porcelain 2>/dev/null | grep -c . || true)"
+    P132 L65 P d0/top pf=1 e=0 NONE              FILTER ['record', 'tee']
+          record() { printf '%s\n' "$*" | tee -a "$EVIDENCE"; }
+    R133 L71 R $? prev_stages=1 conn='\n'
+          local rc=$?
+    P134 L72 P d1/subst pf=1 e=0 SUBST             FILTER ['wc', 'tr']
+          local bytes; bytes=$(wc -c < "$log" | tr -d ' ')
+    P135 L79 P d1/subst pf=1 e=0 SUBST             FILTER ['wc', 'tr']
+          local bytes; bytes=$(wc -c < "$log" | tr -d ' ')
+    P136 L81 P d0/top pf=1 e=0 NONE              FILTER ['tail', 'sed', 'tee']
+          tail -n "$lines" "$log" | sed 's/^/  | /' | tee -a "$EVIDENCE"
+    R137 L106 R $? prev_stages=1 conn='\n'
+          if [ $? -ne 0 ]; then
+    R138 L116 R $? prev_stages=1 conn='\n'
+          health_rc=$?
+    R139 L132 R $? prev_stages=1 conn='\n'
+          ingest_rc=$?
+    P140 L144 P d0/top pf=1 e=0 NONE              FILTER ['sed', 'tee']
+          sed 's/^/  | /' "$LOGDIR/ingest-${n}.log" | tee -a "$EVIDENCE"
+    R141 L153 R $? prev_stages=1 conn='\n'
+          record "  cognee-log probe exit: $?"
+    P142 L171 P d0/top pf=1 e=0 NONE              FILTER ['sed', 'tee']
+          sed 's/^/  /' "$LOGDIR/rc.env" | tee -a "$EVIDENCE"
+    === scripts/security/run_item8_experiment.sh  (487 lines)  set-lines: ['47:set -uo pipefail']
+    P143 L145 P d1/subst pf=1 e=0 SUBST             FEEDER ['echo', 'tr']
+          LOWER="$(echo "$BRANCH" | tr 'A-Z' 'a-z')"
+    P144 L168 P d1/subst pf=1 e=0 SUBST             FILTER ['"$DOCKER"', 'tr']
+          BASEDIG="$("$DOCKER" buildx imagetools inspect python:3.11-slim \
+    R145 L222 R $? prev_stages=1 conn='\n'
+          BUILD_RC=$?
+    R146 L273 R $? prev_stages=1 conn='\n'
+          PARSE_RC=$?
+    P147 L289 P d1/subst pf=1 e=0 SUBST             FEEDER ['printf', 'python3']
+          EXECUTED="$(printf '%s' "$FACTS" | python3 -c 'import json,sys;print(json.load(sys.stdin)["executed"])')"
+    P148 L290 P d1/subst pf=1 e=0 SUBST             FEEDER ['printf', 'python3']
+          CACHED="$(printf '%s' "$FACTS" | python3 -c 'import json,sys;print(json.load(sys.stdin)["cached"])')"
+    P149 L291 P d1/subst pf=1 e=0 SUBST             FEEDER ['printf', 'python3']
+          VERR="$(printf '%s' "$FACTS" | python3 -c 'import json,sys;print(json.load(sys.stdin)["error"][:200])')"
+    P150 L292 P d1/subst pf=1 e=0 SUBST             FEEDER ['printf', 'K="$RETRY_MARK"']
+          RETRIES="$(printf '%s' "$FACTS" | K="$RETRY_MARK" python3 -c 'import json,os,sys;print(json.load(sys.stdin)["counts"][os.environ["K"]])')"
+    P151 L293 P d1/subst pf=1 e=0 SUBST             FEEDER ['printf', 'K="$REFUSE_MARK"']
+          TARGET_REFUSALS="$(printf '%s' "$FACTS" | K="$REFUSE_MARK" python3 -c 'import json,os,sys;print(json.load(sys.stdin)["counts"][os.environ["K"]])')"
+    P152 L294 P d1/subst pf=1 e=0 SUBST             FEEDER ['printf', 'K="$INJECT_MARK"']
+          INJECTIONS="$(printf '%s' "$FACTS" | K="$INJECT_MARK" python3 -c 'import json,os,sys;print(json.load(sys.stdin)["counts"][os.environ["K"]])')"
+    R153 L361 R $? prev_stages=1 conn='\n'
+          OFFLINE_RC=$?
+    === scripts/security/verify_identity_in_containers.sh  (281 lines)  set-lines: ['21:set -uo pipefail']
+    R154 L65 R $? prev_stages=1 conn='\n'
+          check "cortex and agentic images build" 0 $?
+    R155 L84 R $? prev_stages=1 conn='\n'
+          check "ed25519 works inside the real image" 0 $?
+    R156 L97 R $? prev_stages=1 conn='\n'
+          check "agentic's private key is mounted and not world-readable" 0 $?
+    R157 L128 R $? prev_stages=1 conn='\n'
+          check "cortex's key map loads, grants agentic, and is read-only" 0 $?
+    P158 L163 P d1/subst pf=1 e=0 SUBST             FEEDER ['printf', 'tail']
+          actual=$(printf '%s\n' "$raw_out" | tail -1)
+    P159 L166 P d0/top pf=1 e=0 NONE              FEEDER ['printf', 'sed']
+          printf '        container output:\n%s\n' "$raw_out" | sed 's/^/        /'
+    R160 L243 R $? prev_stages=1 conn='\n'
+          check "the same signed request succeeds ONCE, then is refused as a replay" 0 $?
+    R161 L268 R $? prev_stages=1 conn='\n'
+          check "a FRESH signed request is still accepted after restart" 0 $?
+    END-VERBATIM DAI6S-REVIEW-SCRIPTS-TXT
+- EVIDENCE DAI6S-REVIEW-SCRIPTS-R-TXT supp/review_scripts_R.txt: 12551 bytes, sha256 2b220204e4e29b63ba13e21e7dc307123c79b6066556fe5e622b832956c78fff, final LF True  [CMD `sha256sum review_scripts_R.txt` → 2b220204e4e29b63…]
+    BEGIN-VERBATIM DAI6S-REVIEW-SCRIPTS-R-TXT
+    --- R048 accept_memu_graph_offline.sh:96
+        91 
+        92 stage() {
+        93   local name="$1"; shift
+        94   local log="$LOGDIR/${name}.log"
+        95   "$@" > "$log" 2>&1
+        96   local rc=$?
+    --- R055 accept_memu_graph_offline.sh:151
+       146 record "== A. FINAL-IMAGE ASSET PROOF — --network none =="
+       147 record "  the same verify path the build ran, but against the shipped"
+       148 record "  image in a container that has no network interface at all."
+       149 stage "A-final-image-offline" docker run --rm --network none "$IMAGE" \
+       150     python /tmp/bake_tokenizer.py verify
+       151 a_rc=$?
+    --- R056 accept_memu_graph_offline.sh:163
+       158 record "  passes, stage A proves nothing: the check would be reporting"
+       159 record "  something other than the asset."
+       160 stage "D-canfail-no-asset" docker run --rm --network none \
+       161     -e HF_HOME=/tmp/deliberately-empty "$IMAGE" \
+       162     python /tmp/bake_tokenizer.py verify
+       163 d_rc=$?
+    --- R057 accept_memu_graph_offline.sh:173
+       168 
+       169 # ── the intended topology, from the repo-defined bring-up ────────────
+       170 record "== INTENDED TOPOLOGY — core-tests.yml's bring-up, unchanged =="
+       171 record "  docker compose -f $COMPOSE up -d ollama ollama-pull $SERVICE"
+       172 stage "up" docker compose -f "$COMPOSE" up -d ollama ollama-pull "$SERVICE"
+       173 if [ $? -ne 0 ]; then
+    --- R058 accept_memu_graph_offline.sh:184
+       179   record "VERDICT: INCOMPLETE (asset level only)"
+       180   exit 2
+       181 fi
+       182 stage "probe" python3 scripts/ci/compose_probe.py \
+       183     --compose-file "$COMPOSE" --services ollama "$SERVICE" --timeout 300
+       184 probe_rc=$?
+    --- R059 accept_memu_graph_offline.sh:237
+       232 
+       233 record "  C3: the real model-dependent operation — the same live cycle"
+       234 record "      core-tests.yml already runs, not a new route"
+       235 stage "C3-live-cycle" sh -c \
+       236     "docker compose -f '$COMPOSE' exec -T '$SERVICE' python - < scripts/test_graph_live.py"
+       237 c3_rc=$?
+    --- R063 capture_llm_contract.sh:45
+        40 record "validation or topology change. Stops after Q1/Q2/Q6."
+        41 record ""
+        42 
+        43 docker compose -f "$COMPOSE" up -d ollama ollama-pull "$SERVICE" \
+        44     > "$LOGDIR/up.log" 2>&1
+        45 if [ $? -ne 0 ]; then
+    --- R065 capture_llm_contract.sh:54
+        49   exit 2
+        50 fi
+        51 
+        52 python3 scripts/ci/compose_probe.py --compose-file "$COMPOSE" \
+        53     --services ollama "$SERVICE" --timeout 300 > "$LOGDIR/health.log" 2>&1
+        54 health_rc=$?
+    --- R067 capture_llm_contract.sh:73
+        68 # it happens before anything expensive.
+        69 record "== CAPTURE-POINT SELFTEST — is the hook actually on the path? =="
+        70 timeout 300 docker compose -f "$COMPOSE" exec -T "$SERVICE" \
+        71     python - selftest < scripts/security/probe_llm_contract.py \
+        72     > "$LOGDIR/selftest.log" 2>&1
+        73 selftest_rc=$?
+    --- R070 capture_llm_contract.sh:113
+       108 
+       109 record "== CAPTURE — in-process, same image, same environment =="
+       110 timeout "$BUDGET" docker compose -f "$COMPOSE" exec -T "$SERVICE" \
+       111     python - < scripts/security/probe_llm_contract.py \
+       112     > "$LOGDIR/capture.jsonl" 2>"$LOGDIR/capture.err"
+       113 probe_rc=$?
+    --- R077 collect_degradation_deployed.sh:81
+        76 
+        77 stage() {
+        78   local name="$1"; shift
+        79   local out err rc
+        80   out="$STAGE_LOGS/${name}.out"; err="$STAGE_LOGS/${name}.err"
+        81   if "$@" > "$out" 2> "$err"; then rc=0; else rc=$?; fi
+    --- R083 collect_degradation_deployed.sh:187
+       182 record "gated_dependencies=$GATED"
+       183 record "gated_count=$(printf '%s\n' $GATED | wc -w)"
+       184 
+       185 # ── 2. bring up the contained core ──────────────────────────────────────
+       186 stage compose_up docker compose -f "$COMPOSE" up -d --build
+       187 up_rc=$?
+    --- R087 collect_embedding_evidence.sh:59
+        54 # stage <name> <command...> — runs it, records everything, returns its status
+        55 stage() {
+        56   local name="$1"; shift
+        57   local out err rc
+        58   out="$(mktemp)"; err="$(mktemp)"
+        59   if "$@" > "$out" 2> "$err"; then rc=0; else rc=$?; fi
+    --- R098 collect_embedding_evidence.sh:226
+       221 else
+       222   producer=probe
+       223   if timeout 600 docker run --rm --network none \
+       224       -v "$PROBE:/probe.py:ro" -e MEMU_ALLOW_FAKE_EMBEDDINGS= \
+       225       "$image" python /probe.py "$SERVICE" > "claim-a-${SERVICE}.log" 2>&1
+       226   then probe_exit=0; else probe_exit=$?; fi
+    --- R101 collect_memu_graph_startup.sh:80
+        75 # saying so.
+        76 stage() {
+        77   local name="$1"; shift
+        78   local log="$LOGDIR/${name}.log"
+        79   "$@" > "$log" 2>&1
+        80   local rc=$?
+    --- R105 collect_memu_graph_startup.sh:107
+       102 
+       103 # ── 1. the repo-defined bring-up, unmodified ─────────────────────────
+       104 record "== 1. BRING-UP — the command from core-tests.yml, unchanged =="
+       105 record "  docker compose -f $COMPOSE up -d ollama ollama-pull $SERVICE"
+       106 stage "up" docker compose -f "$COMPOSE" up -d ollama ollama-pull "$SERVICE"
+       107 up_rc=$?
+    --- R106 collect_memu_graph_startup.sh:132
+       127 fi
+       128 
+       129 record "  readiness wait: the repo-defined probe, same services, same timeout"
+       130 stage "probe" python3 scripts/ci/compose_probe.py \
+       131     --compose-file "$COMPOSE" --services ollama "$SERVICE" --timeout 300
+       132 probe_rc=$?
+    --- R107 collect_memu_graph_startup.sh:212
+       207 # ── 5. the repo-defined request-time exercise ────────────────────────
+       208 record "== 5. REQUEST-TIME — the exercise core-tests.yml already runs =="
+       209 record "  docker compose exec -T $SERVICE python - < scripts/test_graph_live.py"
+       210 stage "live-cycle" sh -c \
+       211     "docker compose -f '$COMPOSE' exec -T '$SERVICE' python - < scripts/test_graph_live.py"
+       212 live_rc=$?
+    --- R110 define_memu_graph_asset_contract.sh:61
+        56 
+        57 stage() {
+        58   local name="$1"; shift
+        59   local log="$LOGDIR/${name}.log"
+        60   "$@" > "$log" 2>&1
+        61   local rc=$?
+    --- R116 define_memu_graph_asset_contract.sh:166
+       161 stage "A-fetch" docker run --rm \
+       162     -e "HUGGINGFACE_TOKENIZER=$TOKENIZER" \
+       163     -e "HF_HOME=/probe-cache" \
+       164     -v "$CACHE:/probe-cache" \
+       165     --entrypoint python "$IMAGE" -c "$PROBE"
+       166 a_rc=$?
+    --- R120 diagnose_graph_stall.sh:92
+        87 
+        88 stage() {
+        89   local name="$1"; shift
+        90   local log="$LOGDIR/${name}.log"
+        91   "$@" > "$log" 2>&1
+        92   local rc=$?
+    --- R124 diagnose_graph_stall.sh:119
+       114 record ""
+       115 
+       116 # ── bring-up: the repo-defined route, unchanged ──────────────────────
+       117 record "== BRING-UP — core-tests.yml's command, unchanged =="
+       118 stage "up" docker compose -f "$COMPOSE" up -d ollama ollama-pull "$SERVICE"
+       119 if [ $? -ne 0 ]; then
+    --- R125 diagnose_graph_stall.sh:128
+       123   excerpt "$LOGDIR/up.log" 40
+       124   exit 2
+       125 fi
+       126 stage "probe-health" python3 scripts/ci/compose_probe.py \
+       127     --compose-file "$COMPOSE" --services ollama "$SERVICE" --timeout 300
+       128 health_rc=$?
+    --- R126 diagnose_graph_stall.sh:184
+       179   sleep "$SAMPLE_EVERY"
+       180   elapsed=$(( elapsed + SAMPLE_EVERY ))
+       181 done
+       182 
+       183 wait "$INGEST_PID"
+       184 ingest_rc=$?
+    --- R130 gated_commit.sh:107
+       102 
+       103 # ── 5. the gate's own verdict, conditional so `-e` cannot eat it ────
+       104 if ( cd "$WORKTREE" && eval "$GATE" ) > "$WORKTREE/../gate.log" 2>&1; then
+       105   gate_rc=0
+       106 else
+       107   gate_rc=$?
+    --- R133 measure_ingest_contract.sh:71
+        66 
+        67 stage() {
+        68   local name="$1"; shift
+        69   local log="$LOGDIR/${name}.log"
+        70   "$@" > "$log" 2>&1
+        71   local rc=$?
+    --- R137 measure_ingest_contract.sh:106
+       101   # only: a failure to tear down a stack that does not yet exist is not a
+       102   # measurement failure.
+       103   docker compose -f "$COMPOSE" down -v > "$LOGDIR/down-${n}.log" 2>&1 || true
+       104 
+       105   stage "up-${n}" docker compose -f "$COMPOSE" up -d ollama ollama-pull "$SERVICE"
+       106   if [ $? -ne 0 ]; then
+    --- R138 measure_ingest_contract.sh:116
+       111     exit 2
+       112   fi
+       113 
+       114   stage "health-${n}" python3 scripts/ci/compose_probe.py \
+       115       --compose-file "$COMPOSE" --services ollama "$SERVICE" --timeout 300
+       116   health_rc=$?
+    --- R139 measure_ingest_contract.sh:132
+       127   record "  -- the request --"
+       128   docker compose -f "$COMPOSE" exec -T "$SERVICE" \
+       129       python - ingest "$BUDGET" "kai-gate-050-obs-${n}" \
+       130       < scripts/security/probe_ingest_contract.py \
+       131       > "$LOGDIR/ingest-${n}.log" 2>&1
+       132   ingest_rc=$?
+    --- R141 measure_ingest_contract.sh:153
+       148   # This is precisely what run 9 could not capture.
+       149   record "  -- cognee's own terminal state, read AFTER the return --"
+       150   docker compose -f "$COMPOSE" exec -T "$SERVICE" \
+       151       python - cognee-log < scripts/security/probe_ingest_contract.py \
+       152       > "$LOGDIR/cognee-log-${n}.log" 2>&1
+       153   record "  cognee-log probe exit: $?"
+    --- R145 run_item8_experiment.sh:222
+       217     NOCACHE=""; [ "$BRANCH" = "B1" ] && NOCACHE="--no-cache"
+       218     START="$(date +%s)"
+       219     # shellcheck disable=SC2086
+       220     DOCKER_BUILDKIT=1 "$DOCKER" build $NOCACHE --progress=rawjson \
+       221       -f "$DF" -t "$TAG" --iidfile "$IID" . > "$EVENTS_OUT" 2> "$EVENTS"
+       222     BUILD_RC=$?
+    --- R146 run_item8_experiment.sh:273
+       268                --target-substring 'for attempt in 1 2 3 4 5' \
+       269                --count "$RETRY_MARK" \
+       270                --count "$REFUSE_MARK" \
+       271                --count "$INJECT_MARK" \
+       272                --emit-log "$RTLOG" --json 2>"${EVENTS}.parse.err")"
+       273     PARSE_RC=$?
+    --- R153 run_item8_experiment.sh:361
+       356       else
+       357         PROBE='import subprocess,sys; sys.exit(subprocess.call([sys.executable,"/tmp/bake_tokenizer.py","verify"]))'
+       358       fi
+       359       "$DOCKER" run --name "$CNAME" --network none "$TAG" \
+       360         python -c "$PROBE" > "${IDENT}/${LABEL}.offline.log" 2>&1
+       361       OFFLINE_RC=$?
+    --- R154 verify_identity_in_containers.sh:65
+        60 fi
+        61 
+        62 echo
+        63 echo "── 1. the images build with cryptography==43.0.1 ──"
+        64 docker compose -f "$COMPOSE_FILE" --profile "$PROFILE" build cortex agentic
+        65 check "cortex and agentic images build" 0 $?
+    --- R155 verify_identity_in_containers.sh:84
+        79 entry = KeyEntry(key_id='k', identity='i', algorithm=ALG_ED25519, public_key=pub)
+        80 assert verify(b'container proof', sig, entry), 'verify failed in container'
+        81 assert not verify(b'tampered', sig, entry), 'tampering NOT detected in container'
+        82 print('   sign/verify/tamper-reject all OK in-image')
+        83 "
+        84 check "ed25519 works inside the real image" 0 $?
+    --- R156 verify_identity_in_containers.sh:97
+        92 mode = stat.S_IMODE(os.stat(path).st_mode)
+        93 assert not (mode & 0o077), f'private key is group/other readable: {mode:o}'
+        94 open(path).read()
+        95 print(f'   private key {path} mode {mode:o}')
+        96 "
+        97 check "agentic's private key is mounted and not world-readable" 0 $?
+    --- R157 verify_identity_in_containers.sh:128
+       123     if exc.errno not in (errno.EROFS, errno.EACCES):
+       124         raise
+       125     print('   key map refuses writes:',
+       126           'read-only mount' if exc.errno == errno.EROFS else 'permissions')
+       127 "
+       128 check "cortex's key map loads, grants agentic, and is read-only" 0 $?
+    --- R160 verify_identity_in_containers.sh:243
+       238         with urllib.request.urlopen(req, timeout=5) as r: codes.append(r.status)
+       239     except urllib.error.HTTPError as e: codes.append(e.code)
+       240 assert codes == [200, 401], f'expected [200, 401], got {codes}'
+       241 print('   first', codes[0], 'replay', codes[1])
+       242 "
+       243 check "the same signed request succeeds ONCE, then is refused as a replay" 0 $?
+    --- R161 verify_identity_in_containers.sh:268
+       263     with urllib.request.urlopen(req, timeout=5) as r: code = r.status
+       264 except urllib.error.HTTPError as e: code = e.code
+       265 assert code == 200, f'a fresh signed request after restart got {code}'
+       266 print('   fresh request after restart:', code)
+       267 "
+       268 check "a FRESH signed request is still accepted after restart" 0 $?
+    END-VERBATIM DAI6S-REVIEW-SCRIPTS-R-TXT
+- EVIDENCE DAI6S-REVIEW-WF-TXT supp/review_wf.txt: 13558 bytes, sha256 ab0e67e8a4dbdacfe2cb3ebdf44207ee4cdf26575c640aeb7be81dc8d0371527, final LF True  [CMD `sha256sum review_wf.txt` → ab0e67e8a4dbdacf…]
+    BEGIN-VERBATIM DAI6S-REVIEW-WF-TXT
+    P000 core-tests.yml:95 [Install dependencies] shell=None pf=0 e=1 ERREXIT OTHER ['find', 'read'] after=';'
+         94           # install each requirements.txt individually (skip hidden/archive dirs)
+         95           find . -name requirements.txt \
+         96                -not -path './.venv/*' \
+    P001 core-tests.yml:305 [Build the images the bring-up needs] shell=None pf=1 e=1 ERREXIT FILTER ['docker', 'tee', 'tail'] after='\n'
+        304           set -o pipefail
+        305           docker compose -f docker-compose.minimal.yml build 2>&1 \
+        306             | tee /tmp/build-minimal.log | tail -40
+    P002 core-tests.yml:307 [Build the images the bring-up needs] shell=None pf=1 e=1 FINAL FILTER ['df', 'tail'] after=None
+        306             | tee /tmp/build-minimal.log | tail -40
+        307           df -h / | tail -1
+        308 
+    P003 core-tests.yml:312 [Build full stack Docker images] shell=None pf=1 e=1 ERREXIT FILTER ['docker', 'tee', 'tail'] after='\n'
+        311           set -o pipefail
+        312           docker compose -f docker-compose.full.yml build 2>&1 \
+        313             | tee /tmp/build-full.log | tail -40
+    P004 core-tests.yml:314 [Build full stack Docker images] shell=None pf=1 e=1 FINAL FILTER ['df', 'tail'] after=None
+        313             | tee /tmp/build-full.log | tail -40
+        314           df -h / | tail -1
+        315 
+    P005 core-tests.yml:390 [Bring up minimal sovereign AI stack] shell=None pf=1 e=1 ERREXIT FILTER ['docker', 'tee'] after='\n'
+        389           # the tool I built to find it. The real output is kept instead.
+        390           docker compose -f docker-compose.minimal.yml up -d --build \
+        391             2>&1 | tee /tmp/bringup.log
+    P006 core-tests.yml:392 [Bring up minimal sovereign AI stack] shell=None pf=1 e=1 ERREXIT FILTER ['df', 'tail'] after='\n'
+        391             2>&1 | tee /tmp/bringup.log
+        392           df -h / | tail -1
+        393 
+    P007 core-tests.yml:506 [Measured — baked model revision and embe] shell=None pf=0 e=1 SUBST FILTER ['docker', 'head'] after=None
+        505           # has spent a week removing. Compose knows; ask it.
+        506           MEMU_IMAGE="$(docker compose -f docker-compose.minimal.yml images -q memu-core | head -1)"
+        507           if [ -n "$MEMU_IMAGE" ]; then
+    P008 core-tests.yml:518 [Measured — baked model revision and embe] shell=None pf=0 e=1 GATE FILTER ['docker', 'grep'] after='||'
+        517           echo "  Tune it from the number below, not from this comment."
+        518           docker compose -f docker-compose.minimal.yml logs memu-core 2>&1 \
+        519             | grep -iE "embedding backend ready|Embedding backend unavailable" \
+    P009 core-tests.yml:526 [Live smoke against the running stack] shell=None pf=1 e=1 FINAL FILTER ['python3', 'tee'] after=None
+        525           set -o pipefail
+        526           python3 scripts/ci/live_smoke.py \
+        527             --compose-file docker-compose.minimal.yml \
+    P010 core-tests.yml:552 [Restart-persistence smoke test — memory ] shell=None pf=1 e=1 FINAL FILTER ['python3', 'tee'] after=None
+        551           set -o pipefail
+        552           python3 scripts/test_restart_persistence.py \
+        553             --compose-file docker-compose.minimal.yml \
+    P011 core-tests.yml:678 [Bring up the full profile] shell=None pf=1 e=1 ERREXIT FILTER ['df', 'tail'] after='\n'
+        677           docker compose -f docker-compose.full.yml up -d
+        678           df -h / | tail -1
+        679           # The same script the minimal bring-up uses, so the two cannot
+    P012 core-tests.yml:686 [Live smoke against the full profile] shell=None pf=1 e=1 FINAL FILTER ['python3', 'tee'] after=None
+        685           set -o pipefail
+        686           python3 scripts/ci/live_smoke.py \
+        687             --compose-file docker-compose.full.yml \
+    P013 core-tests.yml:790 [Post-mortem (last, so it survives log tr] shell=None pf=0 e=1 GATE FILTER ['df', 'head'] after='||'
+        789           echo "── disk ──"
+        790           df -h / /var/lib/docker 2>&1 | head -5 || true
+        791           echo "── minimal compose config parses? ──"
+    P014 core-tests.yml:824 [Post-mortem (last, so it survives log tr] shell=None pf=0 e=1 GATE FILTER ['docker', 'head'] after='||'
+        823           echo "   logs on failure', which runs before it.)"
+        824           docker compose -f docker-compose.minimal.yml ps -a 2>/dev/null \
+        825             | head -12 || true
+    P015 core-tests.yml:827 [Post-mortem (last, so it survives log tr] shell=None pf=0 e=1 GATE FILTER ['docker', 'head'] after='||'
+        826           echo "── images built ──"
+        827           docker images --format '{{.Repository}}:{{.Tag}}' 2>/dev/null \
+        828             | head -8 || true
+    P016 drift-detector.yml:83 [Generate and publish drift snapshot] shell=bash pf=1 e=1 SUBST FEEDER ['printf', 'sed'] after=None
+         82             [ -z "${line}" ] && continue
+         83             date_str="$(printf '%s\n' "${line}" | sed -nE 's/.*Last-updated:[[:space:]]*([0-9]{4}-[0-9]{2}-[0-9]{2}).*/\1/p')"
+         84             if [[ "${date_str}" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+    P017 embedding-backend-proof.yml:92 [Mint an ephemeral database password for ] shell=None pf=0 e=1 SUBST FILTER ['head', 'base64', 'tr', 'head'] after=None
+         91           printf 'DB_PASSWORD=ci-ephemeral-%s\n' \
+         92             "$(head -c 24 /dev/urandom | base64 | tr -dc 'a-zA-Z0-9' | head -c 20)" \
+         93             >> "$GITHUB_ENV"
+    R018 embedding-backend-proof.yml:169 [Claim B — does memu-core reach that back] R $? prev_stages=1 conn=';'
+        168             > claim-b-bringup.log 2>&1
+        169           then up_rc=0; else up_rc=$?; fi
+        170           echo "compose up exit: $up_rc"
+    R019 embedding-backend-proof.yml:186 [Claim B — does memu-core reach that back] R $? prev_stages=1 conn=';'
+        185             > claim-b-width.log 2>&1
+        186           then rc=0; else rc=$?; fi
+        187           if [ "$rc" -eq 124 ]; then producer=timeout-wrapper; fi
+    P020 embedding-backend-proof.yml:193 [Claim B — does memu-core reach that back] shell=None pf=0 e=1 SUBST FILTER ['tail', 'tr'] after=None
+        192 
+        193           width=$(tail -1 claim-b-width.log | tr -dc '0-9')
+        194           if [ "$producer" != "application" ]; then
+    P021 embedding-backend-proof.yml:195 [Claim B — does memu-core reach that back] shell=None pf=0 e=1 ERREXIT FEEDER ['echo', 'tee'] after='\n'
+        194           if [ "$producer" != "application" ]; then
+        195             echo "memu-core claim-B: TIMEOUT_UNKNOWN (producer=$producer) — the wrapper stopped it, so nothing was measured" \
+        196               | tee -a claim-b-summary.txt
+    P022 embedding-backend-proof.yml:198 [Claim B — does memu-core reach that back] shell=None pf=0 e=1 ERREXIT FEEDER ['echo', 'tee'] after='\n'
+        197           elif [ "$rc" -ne 0 ] || [ -z "$width" ]; then
+        198             echo "memu-core claim-B: NO_OBSERVATION — nothing was produced" \
+        199               | tee -a claim-b-summary.txt
+    P023 embedding-backend-proof.yml:201 [Claim B — does memu-core reach that back] shell=None pf=0 e=1 ERREXIT FEEDER ['echo', 'tee'] after='\n'
+        200           elif [ "$width" = "384" ]; then
+        201             echo "memu-core claim-B: REAL (384) — production default reaches the real backend" \
+        202               | tee -a claim-b-summary.txt
+    P024 embedding-backend-proof.yml:204 [Claim B — does memu-core reach that back] shell=None pf=0 e=1 ERREXIT FEEDER ['echo', 'tee'] after='\n'
+        203           elif [ "$width" = "8" ]; then
+        204             echo "memu-core claim-B: FAKE (8) — the service degraded despite the default" \
+        205               | tee -a claim-b-summary.txt
+    P025 embedding-backend-proof.yml:207 [Claim B — does memu-core reach that back] shell=None pf=0 e=1 ERREXIT FEEDER ['echo', 'tee'] after='\n'
+        206           else
+        207             echo "memu-core claim-B: WRONG_DIMENSION ($width)" \
+        208               | tee -a claim-b-summary.txt
+    P026 embedding-backend-proof.yml:212 [Claim B — does memu-core reach that back] shell=None pf=0 e=1 ERREXIT FILTER ['docker', 'tail'] after='\n'
+        211           echo "::group::memu-core startup log (corroboration)"
+        212           docker compose -f docker-compose.minimal.yml logs memu-core | tail -40
+        213           echo "::endgroup::"
+    P027 item8-network-contingency.yml:124 [Record the toolchain identities this exp] shell=None pf=1 e=1 COND FILTER ['(group)', 'tee'] after=None
+        123               || echo UNRESOLVED)"
+        124           } | tee item8-toolchain.txt
+        125 
+    R028 item8-network-contingency.yml:183 [The identity instrument must refuse a re] R $? prev_stages=1 conn='\n'
+        182             --out item8-identity/preflight.jsonl
+        183           rc=$?
+        184           test "$rc" -eq 3 || { echo "REFUSED: the identity instrument \
+    R029 item8-network-contingency.yml:201 [The event parser must refuse an empty st] R $? prev_stages=1 conn='\n'
+        200             --target-substring 'for attempt in 1 2 3 4 5' --json
+        201           rc=$?
+        202           test "$rc" -eq 1 || { echo "REFUSED: the event parser returned \
+    P030 item8-network-contingency.yml:267 [Run the six frozen builds — B1, B2, B3 p] shell=None pf=1 e=1 READ-PS-IMMEDIATE FILTER ['bash', 'tee'] after='\n'
+        266           set -uo pipefail
+        267           bash scripts/security/run_item8_experiment.sh 2>&1 \
+        268             | tee item8-run.log
+    R031 item8-network-contingency.yml:269 [Run the six frozen builds — B1, B2, B3 p] R PIPESTATUS prev_stages=2 conn='\n'
+        268             | tee item8-run.log
+        269           rc="${PIPESTATUS[0]}"
+        270           echo "runner exit: ${rc}"
+    P032 item8-preflight.yml:122 [Record the toolchain this measurement ra] shell=None pf=1 e=1 COND FILTER ['(group)', 'tee'] after=None
+        121             echo "run_id=${GITHUB_RUN_ID}"
+        122           } | tee item8-preflight-toolchain.txt
+        123 
+    P033 item8-preflight.yml:139 [Measure rawjson behaviour on this daemon] shell=None pf=1 e=1 READ-PS-IMMEDIATE FILTER ['python3', 'tee'] after='\n'
+        138           # b971807. (D301)
+        139           python3 scripts/security/preflight_buildkit_rawjson.py \
+        140             --emit-binding-rule item8-preflight/binding-rule.json \
+    R034 item8-preflight.yml:146 [Measure rawjson behaviour on this daemon] R PIPESTATUS prev_stages=2 conn='\n'
+        145             2>&1 | tee item8-preflight/preflight.log
+        146           rc="${PIPESTATUS[0]}"
+        147           echo "preflight exit: ${rc}"
+    P035 p1-replay-completeness.yml:147 [P1 verdict — two axes, no collapsing, no] shell=None pf=1 e=1 ERREXIT FILTER ['ls', 'head'] after='\n'
+        146               echo "  what WAS downloaded:"
+        147               ls -R p1-evidence | head -40
+        148             else
+    P036 p1-replay-completeness.yml:157 [P1 verdict — two axes, no collapsing, no] shell=None pf=1 e=1 SUBST OTHER ['docker', 'python3'] after=None
+        156           # images` needs a container, and this job creates none.
+        157           IMG=$(docker compose -f docker-compose.full.yml \
+        158                   --profile introspection config --format json \
+    P037 p1-replay-completeness.yml:166 [P1 verdict — two axes, no collapsing, no] shell=None pf=1 e=1 ERREXIT FILTER ['docker', 'tee'] after='\n'
+        165           # census runs as a plain, visible invocation.
+        166           docker run --rm "$IMG" python3 -c "import importlib, pathlib; [print(n, getattr(importlib.import_module(n), '__version__', 'unreco
+        167           COGNEE_ROOT=$(awk '$1=="cognee"{print $3}' p1-resolved.txt)
+    R038 p1-replay-completeness.yml:184 [P1 verdict — two axes, no collapsing, no] R $? prev_stages=1 conn='\n'
+        183             --forwarder-root p1-src/instructor
+        184           RC=$?
+        185           set -e
+    R039 p1-replay-completeness.yml:333 [Why did the artifact arrive, or not — fi] R $? prev_stages=1 conn='\n'
+        332             --expected-file fmt-evidence/llm-contract-logs/capture.jsonl
+        333           echo "rc=$?" >> "$GITHUB_OUTPUT"
+        334 
+    P040 p1-replay-completeness.yml:361 [Capture format validation — the file's s] shell=None pf=1 e=1 ERREXIT FILTER ['ls', 'head'] after='\n'
+        360               echo "  what WAS downloaded:"
+        361               ls -R fmt-evidence | head -40
+        362             else
+    P041 stage1-replay.yml:99 [Mint an ephemeral database password for ] shell=None pf=0 e=1 SUBST FILTER ['head', 'base64', 'tr', 'head'] after=None
+         98           printf 'DB_PASSWORD=ci-ephemeral-%s\n' \
+         99             "$(head -c 24 /dev/urandom | base64 | tr -dc 'a-zA-Z0-9' | head -c 20)" \
+        100             >> "$GITHUB_ENV"
+    P042 unified-hunter.yml:92 [Install dependencies] shell=None pf=0 e=1 ERREXIT OTHER ['find', 'IFS='] after=';'
+         91           pip install pyyaml fastapi 'httpx<1' starlette pydantic pytest
+         92           find . -maxdepth 3 -name requirements.txt -not -path './.venv/*' -not -path './_archive/*' -print0 | while IFS= read -r -d '' req;
+         93             echo "Installing $req"
+    P043 unified-hunter.yml:131 [Unified Hunter suites] shell=None pf=1 e=1 GATE FILTER ['make', 'tee'] after='||'
+        130           status=0
+        131           make test-uh 2>&1 | tee /tmp/test-uh.log || status=$?
+        132           printf '%s\n' "$status" > /tmp/test-uh.log.status
+    R044 unified-hunter.yml:131 [Unified Hunter suites] R $? prev_stages=2 conn='||'
+        130           status=0
+        131           make test-uh 2>&1 | tee /tmp/test-uh.log || status=$?
+        132           printf '%s\n' "$status" > /tmp/test-uh.log.status
+    END-VERBATIM DAI6S-REVIEW-WF-TXT
+- EVIDENCE DAI6S-CLASSIFY-SUPP-PY supp/classify_supp.py: 11513 bytes, sha256 dbf78bd06905c46f4775500a9fff9f27e51baf8f63f84f6c59a9daf937705614, final LF True  [CMD `sha256sum classify_supp.py` → dbf78bd06905c46f…]
+    BEGIN-VERBATIM DAI6S-CLASSIFY-SUPP-PY
+    """DAI-6 supplemental census, adjudication layer. argv: supp_rows_ids.json out.tsv
+    
+    Every occurrence from supp_extract.py gets: intended status, status actually consumed, what establishes it,
+    whether it becomes programme evidence, and a class. Defaults are mechanical; every manual decision is an entry in
+    OVERRIDE with its reason, made after reading the source lines cited in the census report (nothing defaulted silently).
+    
+    Classes
+      IN-CLASS-DEFECT   the status (or status-derived value) recorded or acted on is not mechanically the intended
+                        process's, and the shape is reachable
+      SAFE-EXACT        status read directly from the intended process (single command, if/else capture, stage()
+                        that captures and returns $?, wait on one PID)
+      SAFE-PIPEFAIL     correct only because pipefail is set; adjacent to INC-2026-09-12-14 / -16
+      ADJ-SIGPIPE       pipefail + an early-exiting reader (head) can turn a SIGPIPE into a false failure
+      EV-WRITE-UNCHECKED a write into an evidence file through `| tee -a` whose status nothing consumes
+      PRODUCER-DISCARDED an evidence-producing process's status is consumed by nothing
+      VALUE-ONLY        pipeline output used as data; status not consumed
+      DISPLAY           diagnostic display; status deliberately or harmlessly discarded
+      NOT-EVIDENCE      dependency installation etc.
+      SCANNER-FP        not a pipeline at all: an artefact of the census scanner
+    """
+    import json, sys
+    
+    rows = json.load(open(sys.argv[1]))
+    OVR = {
+     # ── scripts/security collectors ─────────────────────────────────────────────
+     "P045": ("IN-CLASS-DEFECT", "git status succeeded and N paths dirty", "grep -c count of $DIRTY_LIST; DIRTY_LIST=$(git status --porcelain 2>/dev/null) at L60 is never status-checked", "none (status of git status discarded at L60)", "YES: DIRTY recorded L119 and in rc env L260", "a failed git status yields DIRTY=0, recorded as a clean tree"),
+     "P061": ("IN-CLASS-DEFECT", "git status succeeded and N paths dirty", "grep -c count; `|| true` discards git's failure", "none", "YES: `dirty ${DIRTY}` recorded L36", "a failed git status records dirty 0"),
+     "P118": ("IN-CLASS-DEFECT", "git status succeeded and N paths dirty", "grep -c count; `|| true` discards git's failure", "none", "YES: recorded L107 and L224", "a failed git status records dirty 0"),
+     "P131": ("IN-CLASS-DEFECT", "git status succeeded and N paths dirty", "grep -c count; `|| true` discards git's failure", "none", "YES: recorded L86 and L169", "a failed git status records dirty 0"),
+     "P046": ("IN-CLASS-DEFECT", "git ls-tree of the build-input paths succeeded", "sha256 of whatever reached sha256sum; 2>/dev/null and no status check", "none", "YES: `build inputs` recorded L131 and BUILD_INPUTS in rc env L261", "a failed git ls-tree records e3b0c442..., the sha256 of empty input, as the build-input identity"),
+     "P129": ("IN-CLASS-DEFECT", "git status succeeded and lists 0 untracked", "grep -v output; `|| true` discards git's failure", "none", "YES: the commit gate's untracked-file guard (L66)", "a failed git status passes the guard"),
+     "P108": ("PRODUCER-DISCARDED", "summarise_memu_graph_startup.py succeeded", "nothing (no errexit; script then exits 0)", "none", "YES: the CLASSIFICATION section of the evidence", "a crashed classifier leaves a traceback in the evidence and exit 0"),
+     "P117": ("PRODUCER-DISCARDED", "summarise_asset_contract.py succeeded", "nothing (no errexit; script then exits 0)", "none", "YES: the SUMMARY section of the evidence", "a crashed summariser leaves a traceback in the evidence and exit 0"),
+     "P080": ("SCANNER-FP", "-", "-", "-", "-", "`case` pattern alternatives `*a*|*b*)` read as a pipeline: the census scanner does not model case/esac"),
+     "P093": ("SAFE-EXACT", "grep -qxF found the image name", "grep's status, as part of an if-condition", "direct (grep is the evidence)", "YES (claim-A producer detection)", "the scanner missed the `if [ … ] &&` prefix; manually COND"),
+     "P089": ("SAFE-EXACT", "grep -qx found the service", "grep's status (if-condition)", "direct (grep is the evidence; printf is a feeder)", "YES", ""),
+     "P091": ("SAFE-EXACT", "grep -qx found the service", "grep's status (if-condition)", "direct", "YES", ""),
+     "P144": ("VALUE-ONLY", "imagetools inspect resolved the digest", "value; empty -> UNRESOLVED at L170", "value test, not status", "YES (recorded as UNRESOLVED when empty)", "failure is represented, by value"),
+     # ── workflows ───────────────────────────────────────────────────────────────
+     "P000": ("NOT-EVIDENCE", "each pip install", "while-loop status under errexit; `|| true` inside", "-", "no", "install failures deliberately tolerated"),
+     "P042": ("NOT-EVIDENCE", "each pip install", "while-loop status under errexit", "-", "no", ""),
+     "P001": ("SAFE-PIPEFAIL", "docker compose build", "pipeline status under pipefail -> errexit", "pipefail (set at L304)", "YES: step conclusion", "correct only because of the pipefail line"),
+     "P003": ("SAFE-PIPEFAIL", "docker compose build", "pipeline status under pipefail -> errexit", "pipefail (L311)", "YES: step conclusion", ""),
+     "P005": ("SAFE-PIPEFAIL", "docker compose up", "pipeline status under pipefail -> errexit", "pipefail", "YES: step conclusion", ""),
+     "P009": ("SAFE-PIPEFAIL", "live_smoke.py", "final pipeline status under pipefail = step exit", "pipefail (L525)", "YES: step conclusion", ""),
+     "P010": ("SAFE-PIPEFAIL", "test_restart_persistence.py", "final pipeline status under pipefail", "pipefail (L551)", "YES: step conclusion", ""),
+     "P012": ("SAFE-PIPEFAIL", "live_smoke.py (full)", "final pipeline status under pipefail", "pipefail (L685)", "YES: step conclusion", ""),
+     "P037": ("SAFE-PIPEFAIL", "docker run census", "pipeline under pipefail -> errexit", "pipefail (set -euo)", "YES", ""),
+     "P027": ("SAFE-PIPEFAIL", "toolchain record group", "group | tee under pipefail -> step exit", "pipefail", "YES: toolchain record", "scanner labelled COND; it is the final command"),
+     "P032": ("SAFE-PIPEFAIL", "toolchain record group", "group | tee under pipefail -> step exit", "pipefail", "YES: toolchain record", "scanner labelled COND; it is the final command"),
+     "P043": ("SAFE-PIPEFAIL", "make test-uh", "`|| status=$?` = pipeline status under pipefail", "pipefail", "YES: run.log.status sidecar", "the INC-2026-09-12-14 design"),
+     "R044": ("SAFE-PIPEFAIL", "make test-uh", "pipeline status under pipefail", "pipefail", "YES", "INC-2026-09-12-14"),
+     "P030": ("IN-CLASS-DEFECT", "run_item8_experiment.sh exit", "on failure: errexit exits the step at the pipeline; rc=${PIPESTATUS[0]}, the 'runner exit:' line and exit \"$rc\" never run", "errexit + pipefail (accidental), not the designed PIPESTATUS capture", "YES: runner exit line in the log", "default shell is bash -e; `set -uo pipefail` does not clear -e. Workflow never registered/run (API 404)"),
+     "R031": ("IN-CLASS-DEFECT", "run_item8_experiment.sh exit", "unreachable on the failure path", "-", "YES", "as P030"),
+     "P033": ("IN-CLASS-DEFECT", "preflight_buildkit_rawjson.py exit", "on failure: errexit exits at the pipeline; the PIPESTATUS capture and 'preflight exit:' line never run", "errexit + pipefail (accidental)", "YES", "the one recorded run (32594846522) took the success path"),
+     "R034": ("IN-CLASS-DEFECT", "preflight exit", "unreachable on the failure path", "-", "YES", "as P033"),
+     "R028": ("IN-CLASS-DEFECT", "identity instrument exits 3 (known-negative)", "errexit kills the step at exit 3 before rc=$?; exit 0 fails the test", "-", "YES: the known-negative calibration", "the step cannot pass for any instrument behaviour; never run (404)"),
+     "R029": ("IN-CLASS-DEFECT", "event parser exits 1 (known-negative)", "errexit kills the step at exit 1 before rc=$?", "-", "YES: the known-negative calibration", "the step cannot pass; never run (404)"),
+     "R039": ("IN-CLASS-DEFECT", "classify_artifact_fetch.py rc", "on non-zero: errexit exits before `echo rc=$? >> $GITHUB_OUTPUT`; a failed artifacts curl exits before the classifier", "errexit", "output has no consumer; the step exit carries the rc", "the comment says the step runs without set -e; it runs with it"),
+     "R018": ("SAFE-EXACT", "compose up", "if/else capture", "direct", "YES", ""),
+     "R019": ("SAFE-EXACT", "width probe", "if/else capture", "direct", "YES", ""),
+     "R038": ("SAFE-EXACT", "p1_replay_completeness.py", "$? after set +e", "direct", "YES", ""),
+     "P035": ("ADJ-SIGPIPE", "listing for diagnosis", "ls -R | head -40 under pipefail+errexit", "-", "no (diagnostic branch)", "a long listing can abort the branch with 141; unmeasured"),
+     "P040": ("ADJ-SIGPIPE", "listing for diagnosis", "ls -R | head -40 under pipefail+errexit", "-", "no", "as P035"),
+     "P008": ("DISPLAY", "embedding-ready line present", "grep's status gates an echo", "grep is the evidence; docker logs failure reads as 'not found'", "display only", ""),
+     "P026": ("DISPLAY", "-", "tail's status under errexit", "-", "display ('corroboration')", "docker logs failure is masked; display only"),
+     "R130": ("SAFE-EXACT", "the gate ($GATE)", "if/else capture of the subshell", "direct for the default `make prepush`", "YES: GATE EXIT CODE line", "LATENT if a caller sets GATE to a pipeline: the eval'd status is its last stage's"),
+     "R126": ("SAFE-EXACT", "background ingest", "wait $PID on one backgrounded command", "direct", "YES", ""),
+    }
+    SCRIPT_STAGE_READS = {"R048", "R101", "R110", "R120", "R133"}
+    
+    
+    def default(x):
+        t = x.get("text", "")
+        if x["kind"] == "R":
+            why = "inside stage(): $? of \"$@\", returned as `return $rc`" if x["id"] in SCRIPT_STAGE_READS else "$? of the preceding single command"
+            return ("SAFE-EXACT", "preceding command", why, "direct", "YES" if x["file"].endswith(".sh") else "?", "")
+        tee_ev = x["stages"][-1] == "tee" and ("EVIDENCE" in t or "summary" in t)
+        if tee_ev and x["consumed"] in ("NONE", "ERREXIT", "FINAL"):
+            if x["consumed"] == "NONE":
+                return ("EV-WRITE-UNCHECKED", "the evidence write", "nothing (no errexit)", "-", "YES (evidence file)", "")
+            return ("SAFE-EXACT", "the evidence write", "errexit/step exit sees tee's status", "direct (feeder | tee)", "YES", "")
+        if x["consumed"] in ("SUBST",) or (x["consumed"] == "GATE" and x["ctx"] == "subst"):
+            return ("VALUE-ONLY", "-", "value of $( )", "-", "value", "")
+        if x["consumed"] in ("NONE", "ERREXIT", "FINAL", "GATE"):
+            return ("DISPLAY", "-", x["consumed"], "-", "display", "")
+        return ("?", "", "", "", "", "")
+    
+    
+    out = ["id\tfile:line\tkind\tconsumed(mech)\tclass\tintended\tactually_consumed\testablished_by\tevidence\tnote\ttext"]
+    for x in rows:
+        c = OVR.get(x["id"]) or default(x)
+        loc = f"{x['file']}:{x['src_line']}"
+        fields = [x["id"], loc, x["kind"], x.get("consumed", x.get("read", "")), *c, x.get("text", "")[:160]]
+        out.append("\t".join(str(f).replace("\t", " ").replace("\n", " \\n ") for f in fields))
+    open(sys.argv[2], "w").write("\n".join(out) + "\n")
+    import collections
+    cl = collections.Counter(l.split("\t")[4] for l in out[1:])
+    print("occurrences", len(out) - 1, dict(sorted(cl.items())))
+    print("unclassified:", [l.split("\t")[0] for l in out[1:] if l.split("\t")[4] == "?"])
+    print("overrides used:", len([k for k in OVR if any(r["id"] == k for r in rows)]), "of", len(OVR))
+    END-VERBATIM DAI6S-CLASSIFY-SUPP-PY
+- EVIDENCE DAI6S-CLASSIFY-SUPP-OUT-TXT supp/classify_supp_out.txt: 259 bytes, sha256 36f627c1f0df8f93c112712c76583618e79333fd2f297af605fc9b38f49c19ef, final LF True  [CMD `sha256sum classify_supp_out.txt` → 36f627c1f0df8f93…]
+    BEGIN-VERBATIM DAI6S-CLASSIFY-SUPP-OUT-TXT
+    occurrences 162 {'ADJ-SIGPIPE': 2, 'DISPLAY': 10, 'EV-WRITE-UNCHECKED': 22, 'IN-CLASS-DEFECT': 13, 'NOT-EVIDENCE': 2, 'PRODUCER-DISCARDED': 2, 'SAFE-EXACT': 50, 'SAFE-PIPEFAIL': 11, 'SCANNER-FP': 1, 'VALUE-ONLY': 49}
+    unclassified: []
+    overrides used: 42 of 42
+    END-VERBATIM DAI6S-CLASSIFY-SUPP-OUT-TXT
+- EVIDENCE DAI6S-SUPP-BREAKDOWN-TXT supp/supp_breakdown.txt: 3150 bytes, sha256 b92b94123f5bfaf91379619662dd0e4971ad09e2d5a985d12997b5e4f11df96b, final LF True  [CMD `sha256sum supp_breakdown.txt` → b92b94123f5bfaf9…]
+    BEGIN-VERBATIM DAI6S-SUPP-BREAKDOWN-TXT
+    file                                                   DEFECT    EXACT PIPEFAIL  SIGPIPE  EVWRITE PRODDISC    VALUE  DISPLAY    NOTEV   SCANFP  total
+    .github/workflows/core-tests.yml                            0        0        6        0        0        0        1        8        1        0     16
+    .github/workflows/drift-detector.yml                        0        0        0        0        0        0        1        0        0        0      1
+    .github/workflows/embedding-backend-proof.yml               0        7        0        0        0        0        2        1        0        0     10
+    .github/workflows/item8-network-contingency.yml             4        0        1        0        0        0        0        0        0        0      5
+    .github/workflows/item8-preflight.yml                       2        0        1        0        0        0        0        0        0        0      3
+    .github/workflows/p1-replay-completeness.yml                1        1        1        2        0        0        1        0        0        0      6
+    .github/workflows/stage1-replay.yml                         0        0        0        0        0        0        1        0        0        0      1
+    .github/workflows/unified-hunter.yml                        0        0        2        0        0        0        0        0        1        0      3
+    scripts/security/accept_memu_graph_offline.sh               2        6        0        0        4        0        4        0        0        0     16
+    scripts/security/capture_llm_contract.sh                    1        4        0        0        5        0        5        0        0        0     15
+    scripts/security/collect_degradation_deployed.sh            0        2        0        0        1        0        7        0        0        1     11
+    scripts/security/collect_embedding_evidence.sh              0        5        0        0        1        0        7        0        0        0     13
+    scripts/security/collect_memu_graph_startup.sh              0        4        0        0        2        1        2        0        0        0      9
+    scripts/security/define_memu_graph_asset_contract.sh        0        2        0        0        2        1        4        0        0        0      9
+    scripts/security/diagnose_graph_stall.sh                    1        4        0        0        3        0        3        0        0        0     11
+    scripts/security/gated_commit.sh                            1        1        0        0        0        0        0        0        0        0      2
+    scripts/security/measure_ingest_contract.sh                 1        5        0        0        4        0        2        0        0        0     12
+    scripts/security/run_item8_experiment.sh                    0        3        0        0        0        0        8        0        0        0     11
+    scripts/security/verify_identity_in_containers.sh           0        6        0        0        0        0        1        1        0        0      8
+    TOTAL                                                      13       50       11        2       22        2       49       10        2        1    162
+    END-VERBATIM DAI6S-SUPP-BREAKDOWN-TXT
+- EVIDENCE DAI6S-SUPP-FILES-TXT supp_files.txt: 812 bytes, sha256 c29d4a26a76056e06c54ecacaf3e7a3ba0085324d362862852e6df3a82e4b9e9, final LF True  [CMD `sha256sum supp_files.txt` → c29d4a26a76056e0…]
+    BEGIN-VERBATIM DAI6S-SUPP-FILES-TXT
+    .github/workflows/core-tests.yml
+    .github/workflows/drift-detector.yml
+    .github/workflows/embedding-backend-proof.yml
+    .github/workflows/item8-network-contingency.yml
+    .github/workflows/item8-preflight.yml
+    .github/workflows/p1-replay-completeness.yml
+    .github/workflows/stage1-replay.yml
+    .github/workflows/unified-hunter.yml
+    scripts/security/accept_memu_graph_offline.sh
+    scripts/security/capture_llm_contract.sh
+    scripts/security/collect_degradation_deployed.sh
+    scripts/security/collect_embedding_evidence.sh
+    scripts/security/collect_memu_graph_startup.sh
+    scripts/security/define_memu_graph_asset_contract.sh
+    scripts/security/diagnose_graph_stall.sh
+    scripts/security/gated_commit.sh
+    scripts/security/measure_ingest_contract.sh
+    scripts/security/run_item8_experiment.sh
+    scripts/security/verify_identity_in_containers.sh
+    END-VERBATIM DAI6S-SUPP-FILES-TXT
+
+### 6. Next authorised step
+
+- STOP. Dainius sends dai6_b64/DEEPSEEK_MESSAGE_DAI6_V1_BASE64_COMPLETE.txt to a fresh DeepSeek chat; the reply is preserved exactly and returned to Kai  [CONVERSATION 2026-10-06 Kai, "Preserve the reply exactly and return it to Kai for reconciliation."]
+
+### 7. What I am unsure of
+
+- CI default-shell semantics are measured on the hosted ubuntu-24.04 runner in three logs; a change of runner image could change them  [CMD `get_job_logs` → 3 observations]
+- The 42 manual classifications rest on my reading of the cited lines; Appendix A carries each reason so a reviewer can contest any row  [FILE DEEPSEEK_PACKET_DAI6_V1.md]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
