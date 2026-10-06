@@ -32204,3 +32204,69 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-06T19:54:35Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-06T19:54:35Z  [CMD `date -u +%FT%TZ` → 2026-10-06T19:54:35Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 3bda4d05d538c1827b6eb7c3ff90848ccb11c7f7  [CMD `git rev-parse HEAD` → 3bda4d05d538c1827b6eb7c3ff90848ccb11c7f7]
+- tree: 43dbca9be8844a24c4a1236c20653c6f1d5e3c9b  [CMD `git rev-parse HEAD^{tree}` → 43dbca9be8844a24c4a1236c20653c6f1d5e3c9b]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/project-rework-plan-pgvp35: 3bda4d05d538c1827b6eb7c3ff90848ccb11c7f7  [CMD `git ls-remote --heads origin` → 3bda4d05d538c1827b6eb7c3ff90848ccb11c7f7]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d0c08a4da85a447e0729fdb83d201cccc0af395a  [CMD `git ls-remote --heads origin` → d0c08a4da85a447e0729fdb83d201cccc0af395a]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 73  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 73]
+
+### 1. The four states
+
+- physical: repair branch at d0c08a4; not yet mutated  [CMD `git ls-remote --heads origin` → claude/d379-repair-eb52f73 d0c08a4da85a447e0729fdb83d201cccc0af395a]
+- authorised: the AW-01 closure implementation grant exactly as drafted by Kai (verbatim in entry 73 §2, from "DAINIUS → ORION — D379 B4 AW-01 CLOSURE IMPLEMENTATION AUTHORITY" to "or any other source/config/governance file.")  [CONVERSATION 2026-10-06 Dainius, AskUserQuestion answer "Approve exactly as drafted"]
+- evidence: the grant text is the block preserved in entry 73  [GIT 3bda4d05d538c1827b6eb7c3ff90848ccb11c7f7]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-06 · issues "DAINIUS → ORION — D379 B4 AW-01 CLOSURE IMPLEMENTATION AUTHORITY" exactly as drafted in entry 73: two files only (classify.py, build_evidence/d379_controls.py) on claude/d379-repair-eb52f73 from d0c08a4; final sha256 2ab19403… and 1ccfa601…; deltas 7a8739df… and 322f3df1…; pre-mutation and pre-commit proofs; narrow verification; one bounded commit and push; report; STOP for Kai ⚠ UNBANKED  [CONVERSATION 2026-10-06 Dainius, AskUserQuestion answer "Approve exactly as drafted"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: exactly the grant above  [CONVERSATION 2026-10-06 Dainius, "Approve exactly as drafted"]
+- HELD: remainder of the full D379 hostile matrix, D390 replay, F, capture, candidate packaging, holdout, blind 40, Item 8, merge, DECISIONS.md mutation, any other source/config/governance file  [CONVERSATION 2026-10-06 Kai, "This authority does not authorise the remainder of the full D379 hostile matrix"]
+
+### 4. Open questions
+
+- None before execution  [CONVERSATION 2026-10-06 Dainius, "Approve exactly as drafted"]
+
+### 5. Incidents and corrections
+
+- None  [CMD `handoff.py check` → findings=0]
+
+### 6. Next authorised step
+
+- Prove repair HEAD == d0c08a4, clean worktree, base hashes, remote unchanged; then apply the two frozen deltas  [CONVERSATION 2026-10-06 Kai, "Before mutation prove:"]
+
+### 7. What I am unsure of
+
+- Whether the real hostile suite's declared population is the 15-case real_aw01c2_probe.py set (entry 71); I will run exactly that set with its declared expectations, unchanged  [GIT 11271cb98b4ab11418d48a43e0594443ede02ea4]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
