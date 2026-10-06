@@ -36,8 +36,8 @@ PASSED, FAILED, FAILURES = 0, 0, []
 # Sections of the D379 hostile matrix. Implemented sections run; the rest
 # fail as NOT_IMPLEMENTED so this file can never report a green tranche.
 SECTIONS = ["M2", "D14", "PPOP", "Q1a", "Q1b", "86", "SB", "I1A",
-            "I1B", "DEP", "STAGE_A", "STDLIB"]
-IMPLEMENTED = {"M2", "SB", "D14", "I1A", "I1B", "PPOP", "86", "Q1b"}
+            "I1B", "DEP", "STAGE_A", "STDLIB", "AW01"]
+IMPLEMENTED = {"M2", "SB", "D14", "I1A", "I1B", "PPOP", "86", "Q1b", "AW01"}
 # HELD is NOT an excuse and does NOT make the gate green. These
 # sections are implemented except for a limb that cannot execute
 # on a KNOWN-NEGATIVE interpreter (INC-34 / D385). They still FAIL
@@ -2477,6 +2477,7 @@ def main() -> int:
     section_86()
     section_Q1a()
     section_Q1b()
+    section_AW01()
     section_STDLIB()
     exec_bound_cases()
 
@@ -2502,6 +2503,8 @@ def main() -> int:
         "PPOP": "stage_identity.classify_origin",
         "STAGE_A": "stage_identity Stage-A construction",
         "STDLIB": "stage_identity stdlib construction (D380 §7)",
+        "AW01": "d379_controls.aw01_check — the MARKER witness semantic "
+                "control (KAI-B4-AW-01)",
     }
     for s in SECTIONS:
         exec_cases = by_family.get(s, [])
@@ -3410,6 +3413,795 @@ def section_Q1b():
     print()
 
 
+# ── AW01 — KAI-B4-AW-01: the objective MARKER witness, STANDING control ──
+# The qualifier's _compliant() is a STRUCTURAL trace check: value-in-context
+# by substring. It is not, and is not made into, an authenticity verifier:
+# it accepts a forged bare "11" against "passa.bytes=114 bytes;", and a value
+# and context forged together. This control is the SEMANTIC check for the
+# FUNCTION=MARKER witness, run against the BOUND Pass-A rows.
+#
+# INDEPENDENCE FROM THE PRODUCER. Nothing below calls classify.py to decide
+# what is expected. The predicate and the token grammar are re-derived here
+# from the banked rule (row bytes < 200 and path ends "README.md";
+# "passa.bytes=<N> bytes;"). classify.function appears only in the
+# calibration, as the SUBJECT that produced the witnesses being judged.
+#
+# LAYERS, EACH A HARD STOP FOR THE NEXT (Kai, AW-01 closure reconciliation):
+#   1. input    every Pass-A row has a string path and a non-bool int
+#               bytes >= 0, every result row a string path and a FUNCTION
+#               object, and no path repeats. Otherwise EXPECTED cannot be
+#               derived, and "cannot derive" is never read as "not expected".
+#   2. population  the row sets agree and EXPECTED_MARKER == EMITTED_MARKER.
+#               Otherwise the witness denominator is not valid.
+#   3. witness  every emitted MARKER witness, field by field.
+# A layer that did not run is reported NOT_EVALUATED, never as checked.
+#
+# EVIDENCE CLASS: a standing, calibrated, can-fail PRODUCER control with
+# ZERO admission weight. It does not make Orion's evidence independent, and
+# it does not replace the final holdout adjudication.
+import re as _re
+AW01_TOKEN = _re.compile(
+    r"passa[.]bytes=(0|[1-9][0-9]*) bytes;"
+)
+AW01_FIXED = (("witness_type", "SIZE_AND_ROLE"),
+              ("source_selector", "META:passa.bytes"),
+              ("applicability_scope", "WHOLE_FILE"),
+              ("subject", "SELF"), ("polarity", "POSITIVE"),
+              ("certainty", "VERIFIED"), ("temporal", "AT_COMMIT"))
+NOT_EVALUATED = "NOT_EVALUATED"
+
+
+def _aw01_is_int(x):
+    return type(x) is int                 # bool is not a byte count
+
+
+def _aw01_index(rows, who, usable):
+    """{path: row} for usable rows; findings for unusable or repeated ones."""
+    out, findings = {}, []
+    if type(rows) is not list:
+        return out, [(f"AW01_{who}_ROWS_UNUSABLE", None,
+                      f"rows is {type(rows).__name__}, not a list")]
+    for i, r in enumerate(rows):
+        why = usable(r)
+        if why:
+            findings.append((f"AW01_{who}_ROW_UNUSABLE",
+                             r.get("path") if isinstance(r, dict) else None,
+                             f"row {i}: {why}"))
+        elif r["path"] in out:
+            findings.append((f"AW01_{who}_DUPLICATE_ROW", r["path"],
+                             f"row {i} repeats a path"))
+        else:
+            out[r["path"]] = r
+    return out, findings
+
+
+def _aw01_passa_usable(r):
+    if not isinstance(r, dict):
+        return f"not an object ({type(r).__name__})"
+    if type(r.get("path")) is not str:
+        return f"path is {type(r.get('path')).__name__}, not str"
+    if not _aw01_is_int(r.get("bytes")):
+        return f"bytes is {type(r.get('bytes')).__name__}, not a non-bool int"
+    if r["bytes"] < 0:
+        return f"bytes is {r['bytes']}, below 0"
+    return ""
+
+
+def _aw01_result_usable(r):
+    if not isinstance(r, dict):
+        return f"not an object ({type(r).__name__})"
+    if type(r.get("path")) is not str:
+        return f"path is {type(r.get('path')).__name__}, not str"
+    if not isinstance(r.get("FUNCTION"), dict):
+        return f"FUNCTION is {type(r.get('FUNCTION')).__name__}, not an object"
+    return ""
+
+
+def aw01_check(passa_rows, result_rows, git_size=None):
+    """Findings (list of (rule, path, detail)) and counts for the MARKER
+    witness population. [] means every requirement held.
+
+    counts["population_layer"] and counts["witness_layer"] say whether each
+    layer ran. A hard stop leaves the later layers NOT_EVALUATED and their
+    counts None: population mismatch = hard stop; witness semantic
+    population not evaluated.
+
+    git_size: None, or a callable path -> int giving the git blob size at
+    the frozen subject. Called for EVERY emitted MARKER; anything but an
+    int (a failed lookup returns None) is a finding. Optional HERE so the
+    synthetic calibration can run without a repository; aw01_candidate()
+    always supplies it. It is D379 frozen-subject corroboration only, for a
+    subject whose relevant population is established strict UTF-8 (D379
+    entry 52): Pass-A bytes are the UTF-8 length of the verified decoded
+    text, not git size in general.
+    """
+    counts = {"passa_rows": None, "result_rows": None,
+              "expected_marker": None, "emitted_marker": None,
+              "witnesses_checked": None, "input_layer": "EVALUATED",
+              "population_layer": NOT_EVALUATED,
+              "witness_layer": NOT_EVALUATED}
+    pa, findings = _aw01_index(passa_rows, "PASSA", _aw01_passa_usable)
+    res, rf = _aw01_index(result_rows, "RESULT", _aw01_result_usable)
+    findings += rf
+    if findings:                         # layer 1 hard stop
+        return findings, counts
+    counts.update(passa_rows=len(pa), result_rows=len(res),
+                  population_layer="EVALUATED")
+    for p in sorted(set(pa) - set(res)):
+        findings.append(("AW01_ROW_POPULATION", p, "Pass-A row absent "
+                         "from the classification result"))
+    for p in sorted(set(res) - set(pa)):
+        findings.append(("AW01_ROW_POPULATION", p, "classification row "
+                         "absent from the bound Pass A"))
+    # EXPECTED from the bound Pass A, by the re-derived predicate.
+    expected = sorted(p for p, r in pa.items()
+                      if r["bytes"] < 200 and p.endswith("README.md"))
+    emitted = sorted(p for p, r in res.items()
+                     if r["FUNCTION"].get("value") == "MARKER")
+    counts.update(expected_marker=len(expected), emitted_marker=len(emitted))
+    for p in sorted(set(expected) - set(emitted)):
+        findings.append(("AW01_MARKER_MISSING", p, "Pass-A predicate "
+                         "earns MARKER; the result does not emit it"))
+    for p in sorted(set(emitted) - set(expected)):
+        findings.append(("AW01_MARKER_EXTRA", p, "the result emits MARKER; "
+                         "the Pass-A predicate does not earn it"))
+    if findings:                         # layer 2 hard stop
+        return findings, counts
+    counts.update(witnesses_checked=0, witness_layer="EVALUATED")
+    for p in emitted:
+        row, w = pa[p], res[p]["FUNCTION"].get("witness")
+        counts["witnesses_checked"] += 1
+        if not isinstance(w, dict):
+            findings.append(("AW01_WITNESS_ABSENT", p, repr(w)[:40]))
+            continue
+        v = w.get("witness_value")
+        m = AW01_TOKEN.fullmatch(v) if isinstance(v, str) else None
+        if not m:
+            findings.append(("AW01_TOKEN_GRAMMAR", p, repr(v)[:60]))
+        n = int(m.group(1)) if m else None
+        if n is not None and n != row["bytes"]:
+            findings.append(("AW01_N_NOT_PASSA_BYTES", p,
+                             f"token N={n}, bound Pass-A bytes={row['bytes']}"))
+        if n is not None and not n < 200:
+            findings.append(("AW01_N_NOT_BELOW_200", p, str(n)))
+        if w.get("local_context") != v:
+            findings.append(("AW01_CONTEXT_NOT_TOKEN", p,
+                             repr(w.get("local_context"))[:60]))
+        if w.get("source_path") != p:
+            findings.append(("AW01_SOURCE_PATH", p,
+                             repr(w.get("source_path"))[:60]))
+        if not str(w.get("source_path", "")).endswith("README.md"):
+            findings.append(("AW01_PATH_ROLE", p, repr(w.get("source_path"))))
+        for k, want in AW01_FIXED:
+            if w.get(k) != want:
+                findings.append(("AW01_FIELD", p, f"{k}={w.get(k)!r}, "
+                                 f"required {want!r}"))
+        for k in ("evidence_total", "evidence_shown"):
+            if not (_aw01_is_int(w.get(k)) and w.get(k) == 1):
+                findings.append(("AW01_FIELD", p, f"{k}={w.get(k)!r}, "
+                                 f"required 1"))
+        if w.get("truncated") is not False:
+            findings.append(("AW01_FIELD", p, f"truncated="
+                             f"{w.get('truncated')!r}, required False"))
+        if git_size is not None:
+            g = git_size(p)
+            if type(g) is not int:
+                findings.append(("AW01_GIT_LOOKUP", p,
+                                 f"frozen git blob size unavailable ({g!r})"))
+            elif not (n is not None and g == n):
+                findings.append(("AW01_N_NOT_GIT_SIZE", p,
+                                 f"token N={n}, git blob size={g}"))
+    return findings, counts
+
+
+# ── AW01 candidate mode: inputs established through Stage A and Stage B ──
+# KAI-AW01-C-08. A semantic control cannot establish its subject by trusting
+# file paths. Candidate mode therefore consumes the ORIGINAL Stage-B
+# bindings through stage_identity.consume_bound_artifact, against
+# PARENT-HELD anchors that never come from the binding file, the artefact or
+# their directory; closes the classification input_binding on the Pass-A
+# binding it actually consumed; closes Pass-A subject == classification
+# subject == Stage-A subject (commit and tree); and resolves
+# <subject>^{tree} in the supplied frozen-subject repository before any git
+# size is trusted. Only then may aw01_check() receive the rows. Every one of
+# these is the existing Stage-A / Stage-B authority chain, reused.
+AW01_CLI_FLAGS = ("--aw01-stage-a", "--aw01-result-stage-b",
+                  "--aw01-expected-result-binding-sha256",
+                  "--aw01-passa-stage-b",
+                  "--aw01-expected-passa-binding-sha256",
+                  "--aw01-subject-repo")
+AW01_ANCHOR_FLAGS = ("--aw01-expected-result-binding-sha256",
+                     "--aw01-expected-passa-binding-sha256")
+AW01_HEX64 = _re.compile(r"[0-9a-f]{64}")
+AW01_DECIMAL_LF = _re.compile(r"(0|[1-9][0-9]*)\n")
+AW01_USAGE = ("usage: d379_controls.py --aw01-candidate RESULT PASSA "
+              + " ".join(f"{f} {f[7:].upper().replace('-', '_')}"
+                         for f in AW01_CLI_FLAGS)
+              + "\n  every argument is required, each flag exactly once; "
+                "the two binding anchors are 64 lowercase hex")
+
+
+class AW01Refusal(Exception):
+    """An input the AW control cannot establish. Never an AW PASS."""
+
+
+def aw01_parse_argv(argv):
+    """Exact argument grammar for candidate mode; raises AW01Refusal.
+
+    argv is sys.argv[1:]. Missing, repeated, unknown, empty or malformed
+    arguments refuse deterministically; nothing is indexed blindly."""
+    if type(argv) is not list or not argv or argv[0] != "--aw01-candidate":
+        raise AW01Refusal("the first argument must be --aw01-candidate")
+    rest = argv[1:]
+    pos = []
+    while rest and len(pos) < 2 and not rest[0].startswith("--"):
+        pos.append(rest.pop(0))
+    if len(pos) != 2 or "" in pos:
+        raise AW01Refusal("RESULT and PASSA are required, as the two "
+                          "non-empty positional paths after --aw01-candidate")
+    opts = {}
+    while rest:
+        flag = rest.pop(0)
+        if flag not in AW01_CLI_FLAGS:
+            raise AW01Refusal(f"unknown or misplaced argument {flag!r}")
+        if flag in opts:
+            raise AW01Refusal(f"{flag} given more than once")
+        if not rest or rest[0] == "" or rest[0].startswith("--"):
+            raise AW01Refusal(f"{flag} has no value")
+        opts[flag] = rest.pop(0)
+    missing = [f for f in AW01_CLI_FLAGS if f not in opts]
+    if missing:
+        raise AW01Refusal(f"required argument(s) missing: {missing}")
+    for f in AW01_ANCHOR_FLAGS:
+        if not AW01_HEX64.fullmatch(opts[f]):
+            raise AW01Refusal(f"{f} is not 64 lowercase hex")
+    return {"result": pos[0], "passa": pos[1],
+            "stage_a": opts["--aw01-stage-a"],
+            "result_stage_b": opts["--aw01-result-stage-b"],
+            "result_anchor": opts["--aw01-expected-result-binding-sha256"],
+            "passa_stage_b": opts["--aw01-passa-stage-b"],
+            "passa_anchor": opts["--aw01-expected-passa-binding-sha256"],
+            "subject_repo": opts["--aw01-subject-repo"]}
+
+
+def aw01_bind_inputs(o):
+    """Establish the candidate's rows through the authority chain.
+    Returns (passa_rows, result_rows, git_size, subject). Raises
+    AW01Refusal at the first link that does not close."""
+    import subprocess
+    import stage_identity as SI
+    try:
+        desc = SI.parse_descriptor_bytes(SI._read_regular_once(o["stage_a"]))
+        _rb, res, _rbind = SI.consume_bound_artifact(
+            o["result"], o["result_stage_b"], o["result_anchor"],
+            stage_a_desc=desc, producer_component="CLASSIFICATION")
+        _pb, pa, pbind = SI.consume_bound_artifact(
+            o["passa"], o["passa_stage_b"], o["passa_anchor"],
+            stage_a_desc=desc, producer_component="PASS_A")
+    except SI.StageIdentityError as e:
+        raise AW01Refusal(f"Stage-A / Stage-B: {e}") from None
+    ib = res["producer_provenance"].get("input_binding")
+    if not isinstance(ib, dict) or set(ib) != set(SI.INPUT_BINDING_FIELDS):
+        raise AW01Refusal("classification provenance carries no complete "
+                          "input_binding")
+    for ibk, bk in (("pass_a_artifact_sha256", "artifact_sha256"),
+                    ("pass_a_stage_a_identity", "stage_a_identity"),
+                    ("pass_a_producer_provenance_digest",
+                     "producer_provenance_digest")):
+        if ib[ibk] != pbind[bk]:
+            raise AW01Refusal(f"classification input_binding.{ibk} is not "
+                              f"the consumed Pass-A binding's {bk}")
+    sc, st = desc["subject"]["commit"], desc["subject"]["tree"]
+    for who, doc in (("Pass-A", pa), ("classification", res)):
+        if doc.get("subject") != sc:
+            raise AW01Refusal(f"{who} subject is not the Stage-A subject commit")
+        if doc.get("subject_tree") != st:
+            raise AW01Refusal(f"{who} subject_tree is not the Stage-A subject tree")
+    repo = o["subject_repo"]
+    try:
+        out = subprocess.run(["git", "-C", repo, "rev-parse", "--verify",
+                              "--quiet", f"{sc}^{{tree}}"],
+                             capture_output=True, text=True)
+    except OSError as e:
+        raise AW01Refusal(f"git could not run ({type(e).__name__})") from None
+    if out.returncode != 0 or out.stdout != st + "\n":
+        raise AW01Refusal(f"the subject repository does not resolve "
+                          f"{sc}^{{tree}} to the Stage-A subject tree "
+                          f"(rc {out.returncode})")
+
+    def git_size(p):
+        try:
+            r = subprocess.run(["git", "-C", repo, "cat-file", "-s",
+                                f"{sc}:{p}"], capture_output=True, text=True)
+        except OSError:
+            return None
+        if r.returncode != 0 or not AW01_DECIMAL_LF.fullmatch(r.stdout):
+            return None
+        return int(r.stdout)
+    return pa.get("rows"), res.get("rows"), git_size, (sc, st)
+
+
+def aw01_candidate(o):
+    """Standing application to a REAL candidate. Exit 0 = AW PASS, 1 = AW
+    findings, 2 = REFUSED (an input could not be established; the AW
+    semantic layers were not evaluated)."""
+    print("AW01 CANDIDATE — MARKER witness semantic control")
+    try:
+        pa_rows, res_rows, git_size, (sc, st) = aw01_bind_inputs(o)
+    except AW01Refusal as e:
+        print(f"  AW01 REFUSE: {e}")
+        print("  AW01 VERDICT: REFUSED — inputs not established; input, "
+              "population and witness layers NOT_EVALUATED")
+        return 2
+    print(f"  bound: Stage A, Stage-B CLASSIFICATION and PASS_A against the "
+          f"parent-held anchors; subject {sc[:12]} tree {st[:12]} resolved "
+          f"in the subject repository")
+    findings, counts = aw01_check(pa_rows, res_rows, git_size=git_size)
+    print(f"  {counts}")
+    for x in findings:
+        print(f"  {x[0]}::{x[1]} — {x[2]}")
+    print(f"  AW01 FINDINGS: {len(findings)}")
+    print(f"  AW01 VERDICT: {'FAIL' if findings else 'PASS'}")
+    return 1 if findings else 0
+
+
+def aw01_cli(argv):
+    try:
+        o = aw01_parse_argv(argv)
+    except AW01Refusal as e:
+        print(f"AW01 REFUSE (usage): {e}", file=sys.stderr)
+        print(AW01_USAGE, file=sys.stderr)
+        return 2
+    return aw01_candidate(o)
+
+
+def _aw01_synthetic_candidate(rows, *, sizes=None):
+    """A complete synthetic candidate: a disposable git subject, a VALID
+    calibration Stage A naming it, a Pass-A artefact and the classification
+    result PRODUCED by classify.function, each bound by the real binder.
+    Returns (dir, options, desc). sizes overrides the bytes committed."""
+    import subprocess
+    import tempfile
+    import stage_identity as SI
+    d = pathlib.Path(tempfile.mkdtemp(prefix="d379_aw01_"))
+    repo = d / "subject"
+    repo.mkdir()
+    subprocess.run(["git", "init", "-q", str(repo)], check=True,
+                   capture_output=True)
+    for r in rows:
+        f = repo / r["path"]
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_bytes(b"x" * (sizes or {}).get(r["path"], r["bytes"]))
+    for cmd in (["add", "-A"],
+                ["-c", "user.name=d379", "-c", "user.email=d379@local",
+                 "commit", "-q", "-m", "aw01 subject"]):
+        subprocess.run(["git", "-C", str(repo)] + cmd, check=True,
+                       capture_output=True)
+
+    def rp(x):
+        return subprocess.run(["git", "-C", str(repo), "rev-parse", x],
+                              check=True, capture_output=True,
+                              text=True).stdout.strip()
+    commit, tree = rp("HEAD"), rp("HEAD^{tree}")
+    desc = _synthetic_descriptor(SI.SCHEMA_V2, SI.MODE_CALIBRATION)
+    desc["subject"] = {"commit": commit, "tree": tree,
+                       "population": len(rows)}
+    desc["tree_paths"] = dict(desc["tree_paths"], population=len(rows))
+    desc["history"] = {"subject_commit": commit, "is_shallow": False,
+                       "reachable_count": 1, "oldest_commit": commit,
+                       "oldest_date": "2026-01-01",
+                       "reachable_set_sha256": "0" * 64}
+    (d / "stage_a.json").write_bytes(SI.canonical_bytes(desc))
+    pa_doc = {"subject": commit, "subject_tree": tree, "rows": rows,
+              "producer_provenance": _prov_block(SI, desc, "PASS_A")}
+    (d / "passA.json").write_text(json.dumps(pa_doc))
+    pb, pbb = SI.bind_artifact(d / "passA.json", producer_component="PASS_A",
+                               stage_a_desc=desc, producer_exit_status=0)
+    (d / "pa.b").write_bytes(pbb)
+    res_doc = {"subject": commit, "subject_tree": tree,
+               "rows": [{"path": r["path"], "FUNCTION": classify.function(
+                   dict(r, title=""), "")} for r in rows],
+               "producer_provenance": _prov_block(
+                   SI, desc, "CLASSIFICATION", input_binding={
+                       "pass_a_artifact_sha256": pb["artifact_sha256"],
+                       "pass_a_stage_a_identity": pb["stage_a_identity"],
+                       "pass_a_producer_provenance_digest":
+                           pb["producer_provenance_digest"]})}
+    (d / "result.json").write_text(json.dumps(res_doc))
+    _rb, rbb = SI.bind_artifact(d / "result.json",
+                                producer_component="CLASSIFICATION",
+                                stage_a_desc=desc, producer_exit_status=0)
+    (d / "r.b").write_bytes(rbb)
+    o = {"result": str(d / "result.json"), "passa": str(d / "passA.json"),
+         "stage_a": str(d / "stage_a.json"),
+         "result_stage_b": str(d / "r.b"),
+         "result_anchor": SI.sha256_hex(rbb),
+         "passa_stage_b": str(d / "pa.b"), "passa_anchor": SI.sha256_hex(pbb),
+         "subject_repo": str(repo)}
+    return d, o, desc
+
+
+def _aw01_argv(o, drop=(), extra=()):
+    """The CLI form of options o, with flags dropped or tokens appended."""
+    names = {"--aw01-stage-a": "stage_a",
+             "--aw01-result-stage-b": "result_stage_b",
+             "--aw01-expected-result-binding-sha256": "result_anchor",
+             "--aw01-passa-stage-b": "passa_stage_b",
+             "--aw01-expected-passa-binding-sha256": "passa_anchor",
+             "--aw01-subject-repo": "subject_repo"}
+    argv = ["--aw01-candidate", o["result"], o["passa"]]
+    for f in AW01_CLI_FLAGS:
+        if f not in drop:
+            argv += [f, o[names[f]]]
+    return argv + list(extra)
+
+
+def _aw01_run(o):
+    """aw01_candidate in-process; (rc, captured stdout)."""
+    import contextlib
+    import io
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        rc = aw01_candidate(o)
+    return rc, buf.getvalue()
+
+
+def section_AW01():
+    print("AW01 — KAI-B4-AW-01 MARKER witness, standing semantic control")
+    print("  Calibration on synthetic Pass-A rows. The witnesses judged are")
+    print("  PRODUCED by classify.function (the subject); the expected answer")
+    print("  is re-derived here, never taken from classify.py.\n")
+    import copy
+    import run_h2_v12 as R
+
+    rows = [{"path": "a/README.md", "bytes": 114}, {"path": "b/README.md",
+            "bytes": 199}, {"path": "README.md", "bytes": 0},
+            {"path": "c/README.md", "bytes": 200},
+            {"path": "d/NOTES.md", "bytes": 150},
+            {"path": "e/README.md.bak", "bytes": 150}]
+
+    def produced(rs):
+        return [{"path": r["path"],
+                 "FUNCTION": classify.function(dict(r, title=""), "")}
+                for r in rs]
+    clean = produced(rows)
+    f0, c0 = aw01_check(rows, clean)
+    check("AW01-1 known-negative: the producer's witnesses on clean rows "
+          "PASS (199-byte README and 0-byte README earn MARKER; 200-byte "
+          "README, sub-200 non-README and README.md.bak do not)",
+          not f0 and c0["expected_marker"] == c0["emitted_marker"] == 3
+          and c0["witness_layer"] == "EVALUATED"
+          and c0["witnesses_checked"] == 3, (f0[:3], c0))
+    git = {"a/README.md": 114, "b/README.md": 199, "README.md": 0}
+    f0g, _ = aw01_check(rows, clean, git_size=git.get)
+    check("AW01-2 known-negative with git-size corroboration PASSES",
+          not f0g, f0g[:3])
+
+    # The grammar property the classify.py comment states, MEASURED: no
+    # different string that fully matches the grammar is a substring of a
+    # canonical token. Known-positive first, so the scan cannot be vacuous.
+    T = "passa.bytes={} bytes;".format
+    fp = [n for n in range(2000) if not AW01_TOKEN.fullmatch(T(n))]
+    sub = [(n, t[i:j]) for n in range(2000) for t in (T(n),)
+           for i in range(len(t)) for j in range(i + 1, len(t) + 1)
+           if (i, j) != (0, len(t)) and AW01_TOKEN.fullmatch(t[i:j])]
+    check("AW01-S the canonical token fully matches its grammar (N 0..1999) "
+          "and no proper substring of it does", not fp and not sub,
+          (fp[:3], sub[:3]))
+
+    def mutate(path, **kw):
+        m = copy.deepcopy(clean)
+        cell = next(r for r in m if r["path"] == path)["FUNCTION"]
+        if kw.pop("_drop", False):
+            cell["witness"] = None
+        else:
+            cell["witness"].update(kw)
+        return m
+    cases = [
+        ("bare '11' vs genuine 114", mutate("a/README.md", witness_value="11")),
+        ("bare '4' vs genuine 114", mutate("a/README.md", witness_value="4")),
+        ("bare '14' vs genuine 114", mutate("a/README.md", witness_value="14")),
+        ("coordinated wrong canonical token in value AND context",
+         mutate("a/README.md", witness_value=T(115), local_context=T(115))),
+        ("wrong selector", mutate("a/README.md", source_selector="L1")),
+        ("wrong source path", mutate("a/README.md", source_path="b/README.md")),
+        ("wrong witness type", mutate("a/README.md", witness_type="DATE_STAMP")),
+        ("wrong scope", mutate("a/README.md", applicability_scope="SPAN")),
+        ("wrong subject", mutate("a/README.md", subject="OTHER:x")),
+        ("wrong polarity", mutate("a/README.md", polarity="NEUTRAL")),
+        ("wrong certainty", mutate("a/README.md", certainty="OBSERVED")),
+        ("wrong temporal", mutate("a/README.md", temporal="NEUTRAL")),
+        ("wrong evidence_total", mutate("a/README.md", evidence_total=999)),
+        ("wrong evidence_shown", mutate("a/README.md", evidence_shown=0)),
+        ("truncated True", mutate("a/README.md", truncated=True)),
+        ("evidence_total True (bool, not 1)",
+         mutate("a/README.md", evidence_total=True)),
+        ("missing witness", mutate("a/README.md", _drop=True)),
+    ]
+    for label, m in cases:
+        f, _ = aw01_check(rows, m)
+        w = next(r for r in m if r["path"] == "a/README.md")["FUNCTION"]["witness"]
+        struct = R._compliant(w)
+        check(f"AW01-M {label} -> the AW control FAILS (generic _compliant "
+              f"returns {struct})", bool(f), f"no finding; _compliant={struct}")
+    # population: missing and extra MARKER rows, boundaries
+    miss = copy.deepcopy(clean)
+    next(r for r in miss if r["path"] == "a/README.md")["FUNCTION"] = {
+        "value": "UNKNOWN"}
+    fm, _ = aw01_check(rows, miss)
+    check("AW01-P1 a MARKER the Pass-A predicate earns is MISSING -> FAIL",
+          any(x[0] == "AW01_MARKER_MISSING" for x in fm), fm[:3])
+    for p, why in (("c/README.md", "200-byte README (boundary)"),
+                   ("d/NOTES.md", "sub-200 non-README"),
+                   ("e/README.md.bak", "README.md.bak")):
+        ex = copy.deepcopy(clean)
+        cell = next(r for r in ex if r["path"] == p)
+        cell["FUNCTION"] = copy.deepcopy(
+            next(r for r in clean if r["path"] == "a/README.md")["FUNCTION"])
+        cell["FUNCTION"]["witness"]["source_path"] = p
+        fe, _ = aw01_check(rows, ex)
+        check(f"AW01-P2 an EXTRA MARKER on the {why} -> FAIL",
+              any(x[0] == "AW01_MARKER_EXTRA" and x[1] == p for x in fe),
+              fe[:3])
+    fr, _ = aw01_check(rows + [{"path": "z/README.md", "bytes": 5}], clean)
+    check("AW01-P3 a Pass-A row absent from the result -> FAIL",
+          any(x[0] == "AW01_ROW_POPULATION" for x in fr), fr[:3])
+    # C-01: the population hard stop says the witness layer did not run.
+    hx = mutate("a/README.md", witness_value="11")
+    next(r for r in hx if r["path"] == "d/NOTES.md")["FUNCTION"] = \
+        copy.deepcopy(next(r for r in hx if r["path"] == "b/README.md")
+                      ["FUNCTION"])
+    fh, ch = aw01_check(rows, hx)
+    check("AW01-H population mismatch is a HARD STOP: witness layer "
+          "NOT_EVALUATED, witnesses_checked None, no witness finding",
+          ch["witness_layer"] == NOT_EVALUATED
+          and ch["witnesses_checked"] is None
+          and {x[0] for x in fh} == {"AW01_MARKER_EXTRA"}, (fh[:3], ch))
+    # Layer 1: an unusable or repeated row stops BEFORE EXPECTED is derived,
+    # so "cannot derive" is never read as "not expected". Each mutant puts
+    # the defect on a README that the predicate would otherwise judge.
+    for label, prow, rule in (
+            ("bytes None", {"path": "a/README.md", "bytes": None},
+             "AW01_PASSA_ROW_UNUSABLE"),
+            ("bytes True (bool)", {"path": "a/README.md", "bytes": True},
+             "AW01_PASSA_ROW_UNUSABLE"),
+            ("bytes -1", {"path": "a/README.md", "bytes": -1},
+             "AW01_PASSA_ROW_UNUSABLE"),
+            ("bytes '114' (str)", {"path": "a/README.md", "bytes": "114"},
+             "AW01_PASSA_ROW_UNUSABLE"),
+            ("bytes absent", {"path": "a/README.md"},
+             "AW01_PASSA_ROW_UNUSABLE"),
+            ("path not a string", {"path": 7, "bytes": 114},
+             "AW01_PASSA_ROW_UNUSABLE"),
+            ("row not an object", ["a/README.md", 114],
+             "AW01_PASSA_ROW_UNUSABLE")):
+        bad = [prow if r["path"] == "a/README.md" else r for r in rows]
+        fu, cu = aw01_check(bad, clean)
+        check(f"AW01-U Pass-A row {label} -> FAIL at the input layer, "
+              f"population and witness layers NOT_EVALUATED",
+              any(x[0] == rule for x in fu)
+              and cu["population_layer"] == NOT_EVALUATED
+              and cu["expected_marker"] is None, (fu[:3], cu))
+    fd, cd = aw01_check(rows + [{"path": "a/README.md", "bytes": 300}], clean)
+    check("AW01-U a repeated Pass-A path -> FAIL at the input layer",
+          any(x[0] == "AW01_PASSA_DUPLICATE_ROW" for x in fd)
+          and cd["population_layer"] == NOT_EVALUATED, (fd[:3], cd))
+    fn, cn = aw01_check({"rows": rows}, clean)
+    check("AW01-U Pass-A rows not a list -> FAIL at the input layer",
+          any(x[0] == "AW01_PASSA_ROWS_UNUSABLE" for x in fn)
+          and cn["population_layer"] == NOT_EVALUATED, (fn[:3], cn))
+    rbad = copy.deepcopy(clean)
+    next(r for r in rbad if r["path"] == "a/README.md")["FUNCTION"] = "MARKER"
+    fq, cq = aw01_check(rows, rbad)
+    check("AW01-U a result FUNCTION that is not an object -> FAIL at the "
+          "input layer", any(x[0] == "AW01_RESULT_ROW_UNUSABLE" for x in fq)
+          and cq["population_layer"] == NOT_EVALUATED, (fq[:3], cq))
+    fg, _ = aw01_check(rows, clean, git_size=dict(git, **{"a/README.md": 115}).get)
+    check("AW01-G git blob size disagreeing with the token -> FAIL",
+          any(x[0] == "AW01_N_NOT_GIT_SIZE" for x in fg), fg[:3])
+    for label, gv in (("None (lookup failed)", None), ("True (bool)", True),
+                      ("'114' (str)", "114")):
+        fl, _ = aw01_check(rows, clean, git_size=lambda p, gv=gv:
+                           gv if p == "a/README.md" else git.get(p))
+        check(f"AW01-G git size {label} -> FAIL (type is int and == N)",
+              any(x[0] == "AW01_GIT_LOOKUP" and x[1] == "a/README.md"
+                  for x in fl), fl[:3])
+
+    # ── candidate mode: the authority chain, known-negative then 1-11 ──
+    import stage_identity as SI
+    d, o, desc = _aw01_synthetic_candidate(rows)
+    rc, out = _aw01_run(o)
+    check("AW01-C0 known-negative: a correctly bound synthetic candidate "
+          "-> AW PASS (rc 0)", rc == 0 and "AW01 VERDICT: PASS" in out,
+          (rc, out[-300:]))
+
+    def refused(label, oo, want_rc=2, want=""):
+        rc, out = _aw01_run(oo)
+        check(f"AW01-C{label} -> fails closed (rc {want_rc}), no AW PASS",
+              rc == want_rc and "AW01 VERDICT: PASS" not in out
+              and want in out, (rc, out[-300:]))
+
+    def rewrite(src, dst, fn):
+        doc = json.loads(pathlib.Path(src).read_bytes())
+        fn(doc)
+        pathlib.Path(dst).write_text(json.dumps(doc))
+        return str(dst)
+
+    def forge_witness(doc):
+        cell = next(r for r in doc["rows"] if r["path"] == "a/README.md")
+        cell["FUNCTION"]["witness"]["witness_value"] = "11"
+    sub_r = rewrite(o["result"], d / "result_sub.json", forge_witness)
+    refused("1 substituted unbound classification bytes",
+            dict(o, result=sub_r), want="do not match the ORIGINAL")
+    sub_p = rewrite(o["passa"], d / "passA_sub.json",
+                    lambda doc: doc["rows"][0].update(bytes=115))
+    refused("2 substituted unbound Pass-A bytes",
+            dict(o, passa=sub_p), want="do not match the ORIGINAL")
+    # 3/4: a VALID binding of the substitute, with the ORIGINAL anchor
+    _b, sub_rb = SI.bind_artifact(sub_r, producer_component="CLASSIFICATION",
+                                  stage_a_desc=desc, producer_exit_status=0)
+    (d / "r_sub.b").write_bytes(sub_rb)
+    refused("3 wrong classification Stage-B binding (a valid binding of a "
+            "substitute, original anchor)",
+            dict(o, result=sub_r, result_stage_b=str(d / "r_sub.b")),
+            want="independently held")
+    _b, sub_pb = SI.bind_artifact(sub_p, producer_component="PASS_A",
+                                  stage_a_desc=desc, producer_exit_status=0)
+    (d / "pa_sub.b").write_bytes(sub_pb)
+    refused("4 wrong Pass-A Stage-B binding (a valid binding of a "
+            "substitute, original anchor)",
+            dict(o, passa=sub_p, passa_stage_b=str(d / "pa_sub.b")),
+            want="independently held")
+    refused("3b the Pass-A binding offered as the classification binding",
+            dict(o, result_stage_b=o["passa_stage_b"],
+                 result_anchor=o["passa_anchor"]), want="different producer")
+    refused("5 wrong parent-held classification binding digest",
+            dict(o, result_anchor=SI.sha256_hex(sub_rb)),
+            want="independently held")
+    refused("6 wrong parent-held Pass-A binding digest",
+            dict(o, passa_anchor="0" * 64), want="independently held")
+    # 7: the classification is bound correctly but its provenance names a
+    # different Pass-A binding, one field at a time
+    for ibk in SI.INPUT_BINDING_FIELDS:
+        def other_pa(doc, ibk=ibk):
+            doc["producer_provenance"]["input_binding"][ibk] = "e" * 64
+        r7 = rewrite(o["result"], d / f"result_7_{ibk}.json", other_pa)
+        _b, b7 = SI.bind_artifact(r7, producer_component="CLASSIFICATION",
+                                  stage_a_desc=desc, producer_exit_status=0)
+        (d / f"r_7_{ibk}.b").write_bytes(b7)
+        refused(f"7 classification provenance naming a different Pass-A "
+                f"binding ({ibk})",
+                dict(o, result=r7, result_stage_b=str(d / f"r_7_{ibk}.b"),
+                     result_anchor=SI.sha256_hex(b7)), want=ibk)
+    # 8: a fully bound candidate whose Stage A names a tree the supplied
+    # repository does not resolve for that commit
+    import subprocess as _sp
+    _d, o_other, desc_other = _aw01_synthetic_candidate(
+        rows, sizes={"a/README.md": 3})
+    d8, o8, desc8 = _aw01_synthetic_candidate(rows)
+    desc8["subject"] = dict(desc8["subject"],
+                            tree=desc_other["subject"]["tree"])
+    refused("8 Stage-A subject tree different from the supplied subject "
+            "repository", _aw01_retree(d8, o8, desc8),
+            want="does not resolve")
+    refused("8b the subject repository is a different repository",
+            dict(o, subject_repo=o_other["subject_repo"]),
+            want="does not resolve")
+    # 9: missing subject commit; missing blob for an emitted MARKER
+    empty = d / "empty_repo"
+    _sp.run(["git", "init", "-q", str(empty)], check=True, capture_output=True)
+    refused("9 subject repository without the subject commit",
+            dict(o, subject_repo=str(empty)), want="does not resolve")
+    d9, o9, _ = _aw01_synthetic_candidate(rows)
+    _sp.run(["git", "-C", o9["subject_repo"], "rm", "-q", "--cached",
+             "a/README.md"], check=True, capture_output=True)
+    _sp.run(["git", "-C", o9["subject_repo"], "-c", "user.name=d379", "-c",
+             "user.email=d379@local", "commit", "-q", "-m", "drop"],
+            check=True, capture_output=True)
+    d9b, o9b, desc9b = _aw01_synthetic_candidate(rows)
+    o9b = _aw01_resubject(d9b, o9b, desc9b, o9["subject_repo"])
+    refused("9b an emitted MARKER whose blob is absent at the subject",
+            o9b, want_rc=1, want="AW01_GIT_LOOKUP")
+    # 10/11: the CLI grammar, in-process and through the real entry point
+    for label, argv in (
+            ("10 omitted --aw01-subject-repo",
+             _aw01_argv(o, drop=("--aw01-subject-repo",))),
+            ("11a no arguments after --aw01-candidate", ["--aw01-candidate"]),
+            ("11b PASSA missing",
+             ["--aw01-candidate", o["result"]] + _aw01_argv(o)[3:]),
+            ("11c a flag with no value",
+             _aw01_argv(o, drop=("--aw01-subject-repo",))
+             + ["--aw01-subject-repo"]),
+            ("11d a flag given twice",
+             _aw01_argv(o, extra=("--aw01-subject-repo", o["subject_repo"]))),
+            ("11e an unknown flag", _aw01_argv(o, extra=("--aw01-bogus", "x"))),
+            ("11f a 63-hex anchor",
+             [x if x != o["passa_anchor"] else x[:63]
+              for x in _aw01_argv(o)]),
+            ("11g an upper-case anchor",
+             [x if x != o["result_anchor"] else x.upper()
+              for x in _aw01_argv(o)]),
+            ("11h an empty RESULT",
+             ["--aw01-candidate", ""] + _aw01_argv(o)[2:]),
+            ("11i --capture mixed in", _aw01_argv(o, extra=("--capture", "x"))),
+            ("11j the flag not first", ["x"] + _aw01_argv(o))):
+        try:
+            aw01_parse_argv(argv)
+            outcome = "parsed"
+        except AW01Refusal as e:
+            outcome = f"refused: {e}"
+        except Exception as e:                      # noqa: BLE001
+            outcome = f"UNCONTROLLED {type(e).__name__}"
+        check(f"AW01-C{label} -> the parser refuses deterministically",
+              outcome.startswith("refused: "), outcome)
+    check("AW01-C0b the complete argv parses to exactly the options",
+          aw01_parse_argv(_aw01_argv(o)) == o, "parse mismatch")
+    me = pathlib.Path(__file__).resolve()
+    for label, argv in (("10", _aw01_argv(o, drop=("--aw01-subject-repo",))),
+                        ("11a", ["--aw01-candidate"]),
+                        ("11c", _aw01_argv(o, drop=("--aw01-subject-repo",))
+                         + ["--aw01-subject-repo"])):
+        p = _sp.run([sys.executable, "-B", str(me)] + argv,
+                    capture_output=True, text=True, cwd=str(me.parent))
+        check(f"AW01-C{label} through the real entry point -> rc 2, usage "
+              f"refusal, no traceback",
+              p.returncode == 2 and "AW01 REFUSE (usage)" in p.stderr
+              and "Traceback" not in p.stderr
+              and "AW01 VERDICT: PASS" not in p.stdout,
+              (p.returncode, p.stderr[-300:]))
+    p = _sp.run([sys.executable, "-B", str(me)] + _aw01_argv(o),
+                capture_output=True, text=True, cwd=str(me.parent))
+    check("AW01-C0c known-negative through the real entry point -> rc 0",
+          p.returncode == 0 and "AW01 VERDICT: PASS" in p.stdout,
+          (p.returncode, p.stdout[-300:], p.stderr[-300:]))
+    print()
+
+
+def _aw01_retree(d, o, desc):
+    """Re-fix Stage A as desc and rebind both artefacts to it, so every link
+    except the subject repository closes. Returns the new options."""
+    import stage_identity as SI
+    (d / "stage_a.json").write_bytes(SI.canonical_bytes(desc))
+    pa = json.loads((d / "passA.json").read_bytes())
+    pa.update(subject=desc["subject"]["commit"],
+              subject_tree=desc["subject"]["tree"],
+              producer_provenance=_prov_block(SI, desc, "PASS_A"))
+    (d / "passA.json").write_text(json.dumps(pa))
+    pb, pbb = SI.bind_artifact(d / "passA.json", producer_component="PASS_A",
+                               stage_a_desc=desc, producer_exit_status=0)
+    (d / "pa.b").write_bytes(pbb)
+    res = json.loads((d / "result.json").read_bytes())
+    res.update(subject=desc["subject"]["commit"],
+               subject_tree=desc["subject"]["tree"],
+               producer_provenance=_prov_block(
+                   SI, desc, "CLASSIFICATION", input_binding={
+                       "pass_a_artifact_sha256": pb["artifact_sha256"],
+                       "pass_a_stage_a_identity": pb["stage_a_identity"],
+                       "pass_a_producer_provenance_digest":
+                           pb["producer_provenance_digest"]}))
+    (d / "result.json").write_text(json.dumps(res))
+    _rb, rbb = SI.bind_artifact(d / "result.json",
+                                producer_component="CLASSIFICATION",
+                                stage_a_desc=desc, producer_exit_status=0)
+    (d / "r.b").write_bytes(rbb)
+    return dict(o, result_anchor=SI.sha256_hex(rbb),
+                passa_anchor=SI.sha256_hex(pbb))
+
+
+def _aw01_resubject(d, o, desc, repo):
+    """Point the candidate at repo's HEAD (commit and tree), rebinding
+    everything, so only the git blob lookup can differ."""
+    import subprocess
+    commit, tree = (subprocess.run(["git", "-C", repo, "rev-parse", x],
+                                   check=True, capture_output=True,
+                                   text=True).stdout.strip()
+                    for x in ("HEAD", "HEAD^{tree}"))
+    desc["subject"] = dict(desc["subject"], commit=commit, tree=tree)
+    desc["history"] = dict(desc["history"], subject_commit=commit,
+                           oldest_commit=commit)
+    return dict(_aw01_retree(d, o, desc), subject_repo=repo)
+
+
 # ── STDLIB — D385: known-negative present, positive HELD ──────────────
 def section_STDLIB():
     print("STDLIB — governed Python runtime identity (D380 §7, D385)")
@@ -3957,6 +4749,8 @@ def capture(out_path) -> int:
 
 
 if __name__ == "__main__":
+    if "--aw01-candidate" in sys.argv:
+        sys.exit(aw01_cli(sys.argv[1:]))
     if "--capture" in sys.argv:
         sys.exit(capture(sys.argv[sys.argv.index("--capture") + 1]))
     _rc = main()

@@ -369,10 +369,26 @@ def function(row, text):
     # objective witness: size and path role. This is the ONLY family that
     # earns FUNCTION at H2 -- it does not consult self-description.
     if row["bytes"] < 200 and path.endswith("README.md"):
+        # KAI-B4-AW-01: the determining evidence is FILE METADATA, not
+        # source text. v1.2 carried selector "L1" and the title as context,
+        # so the measurement was in neither. The witness is now one
+        # canonical token naming the governed Pass-A field, its exact value,
+        # its unit and a terminator, so no different string that fully
+        # matches the governed canonical-token grammar is a substring of
+        # this token. The path is carried by source_path alone, so no path
+        # or prose is in the context.
+        # Noncanonical substrings can still satisfy the generic _compliant()
+        # (a substring test): for example a forged bare "11" against
+        # "passa.bytes=114 bytes;", or a value and context forged together.
+        # This is NOT an authenticity check; such witnesses are rejected by
+        # the governed AW-01 semantic control in
+        # build_evidence/d379_controls.py. The predicate is unchanged; the
+        # title plays no part.
+        token = f"passa.bytes={row['bytes']} bytes;"
         w = Witness(witness_type="SIZE_AND_ROLE",
-                    witness_value=f"{row['bytes']} bytes",
-                    source_path=path, source_selector="L1",
-                    local_context=title[:120] or "(no title)",
+                    witness_value=token,
+                    source_path=path, source_selector="META:passa.bytes",
+                    local_context=token,
                     applicability_scope="WHOLE_FILE",
                     # the byte count and path role OF THIS FILE
                     subject=E.SUBJECT_SELF,
