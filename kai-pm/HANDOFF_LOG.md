@@ -32608,3 +32608,190 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-06T20:06:28Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-06T20:06:28Z  [CMD `date -u +%FT%TZ` → 2026-10-06T20:06:28Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: bd31223009da17a63344959e6d6c1343b63c1d8b  [CMD `git rev-parse HEAD` → bd31223009da17a63344959e6d6c1343b63c1d8b]
+- tree: a0a381d0d07aee878418b8f9a600b29933d2cf90  [CMD `git rev-parse HEAD^{tree}` → a0a381d0d07aee878418b8f9a600b29933d2cf90]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/project-rework-plan-pgvp35: bd31223009da17a63344959e6d6c1343b63c1d8b  [CMD `git ls-remote --heads origin` → bd31223009da17a63344959e6d6c1343b63c1d8b]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 75  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 75]
+
+### 1. The four states
+
+- physical: repair branch at c358798adf4bca392f3f19187d66b3db6008891d (parent d0c08a4…), the AW-01 two-file closure, pushed 2026-10-06T19:56:37Z, GitHub signature verified  [GIT c358798adf4bca392f3f19187d66b3db6008891d]
+- authorised: the AW-01 grant was issued by Dainius and executed (entries 74, 75); no new grant since  [CONVERSATION 2026-10-06 Dainius, "Approve exactly as drafted"]
+- evidence: Kai's programme-control message verbatim in section 2  [CMD `sha256sum kai_connected_tooling.txt` → 303efaa7eca54bc8…]
+- admission: c358798 awaits Kai's adjudication  [CONVERSATION 2026-10-06 Kai, "Then STOP for Kai adjudication."]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-06 · CONNECTED TOOLING / PROGRAMME-CONTROL FOUNDATION: Linear project "KAI System — Assurance Programme" is the programme-control layer only (work packages, dependencies, milestones, status) and never authorises mutation or proves closure; authority roles unchanged (Dainius final; Kai rulings/adjudication; Orion execution, zero self-admission; DeepSeek zero authority); GitHub exact evidence is technical truth; DAI-5 AW-01, DAI-6 R18 evidence-pipeline (OPEN), DAI-7 matrix (blocked by DAI-5), DAI-8 tool model; tool boundaries for GitHub, Context7, Linear, Miro, OpenAI Platform, Vercel; Linear updates must separate physical / authority / evidence / admission state; PR #122 DO NOT MERGE. Verbatim below, 5777 bytes, sha256 303efaa7eca54bc8cbbca79128540bcd2db35fbf6e33b3bad442f8754de71b79, final LF True, 4-space indent added ⚠ UNBANKED  [CONVERSATION 2026-10-06 Kai via Dainius, "KAI → ORION — CONNECTED TOOLING / PROGRAMME-CONTROL FOUNDATION"]
+    BEGIN-VERBATIM KAI-CONNECTED-TOOLING-FOUNDATION
+    Foundations are laid.
+    
+    In Linear I created the project “KAI System — Assurance Programme” and set the governance boundary explicitly: GitHub remains technical truth; Linear coordinates the programme but cannot create implementation authority or prove closure.
+    
+    The foundation now includes the KAI Programme Governance Charter, six programme milestones from D379/H2 Closure through Evidence Plane / Kingsman, and dedicated labels for Governance, Evidence, Adversarial Review, Implementation Authority, Blocker, Process Control, Architecture and D379.
+    
+    The live work packages are now:
+    
+    * DAI-5 — D379 / AW-01 exact two-file closure implementation — URGENT, but explicitly HELD pending your authority.
+    * DAI-6 — R18 evidence-pipeline exit-status failure class — open structural process-control work.
+    * DAI-7 — Complete D379 hostile matrix — explicitly blocked by DAI-5.
+    * DAI-8 — KAI connected-tool operating model — GitHub + Context7 + Linear + Miro, under Professionalisation/CI Truth.
+    
+    I also created the “Orion Operating Brief — Connected Tooling Foundations” inside the programme so the operating model is durable rather than living only in chat.
+    
+    No KAI source was mutated by any of this.
+    
+    Send Orion this now:
+    
+    KAI → ORION — CONNECTED TOOLING / PROGRAMME-CONTROL FOUNDATION
+    
+    We now have a formal Linear programme-control surface for KAI.
+    
+    Do not confuse it with programme authority or repository truth.
+    
+    Authority remains:
+    
+    Dainius — final consequential authority.
+    Kai — architecture, rulings, evidence reconciliation, sequencing, IV&V and adjudication.
+    Orion — repository execution/evidence production only under explicit authority; zero self-admission weight.
+    DeepSeek — adversarial reviewer/hypothesis generator only; zero programme authority.
+    
+    Technical truth remains GitHub exact repository evidence: commits, trees, blobs, signatures, exact bytes, governed artefacts and CI evidence.
+    
+    Linear is now the programme-control layer for work packages, dependencies, milestones and current status. A Linear issue being Todo/In Progress/Done never authorises source mutation and never proves technical closure.
+    
+    Current project:
+    
+    KAI System — Assurance Programme
+    
+    Current milestone:
+    
+    D379 / H2 Closure
+    
+    Current immediate issue:
+    
+    DAI-5 — D379 / AW-01 — exact two-file closure implementation
+    
+    It remains HELD pending explicit Dainius implementation authority.
+    
+    Current repair branch:
+    
+    claude/d379-repair-eb52f73
+    
+    Accepted repair HEAD:
+    
+    d0c08a4da85a447e0729fdb83d201cccc0af395a
+    
+    Frozen AW-01 proposed outputs:
+    
+    classify.py
+    2ab19403964560637a5541a3a02282bc68a833f363fd64d8fe0e0abd14bfbbb8
+    
+    build_evidence/d379_controls.py
+    1ccfa601b35478ea484ac932a1fbabbc19a680e117b867cb17ef9a2aafa1d35b
+    
+    Do not implement them merely because DAI-5 exists.
+    
+    Wait for Dainius’s explicit grant.
+    
+    Once authority is issued, execute only the exact bounded grant, preserve all existing STOP conditions, produce exact evidence, push only when authorised conditions pass, update the Linear work package with the resulting exact Git identities, then STOP for Kai adjudication.
+    
+    Other active programme items
+    
+    DAI-6 — R18 evidence-pipeline control.
+    Commit-gate subclass is controlled; broader evidence-pipeline subclass remains OPEN. Until structurally repaired, any command whose exit code is evidence must run unpiped or use a mechanically verified pipeline-status mechanism. Never infer an upstream rc from $? after a pipeline.
+    
+    DAI-7 — D379 hostile matrix completion.
+    This is blocked by DAI-5. Do not start it before AW-01 implementation is committed under authority and independently adjudicated by Kai.
+    
+    DAI-8 — connected-tool operating model.
+    
+    Tool boundaries going forward:
+    
+    GitHub — authoritative repository evidence.
+    
+    Context7 — use when a finding/repair materially depends on third-party library or framework semantics. First establish the exact dependency/version from the repository, then consult current authoritative documentation. Never submit credentials, secrets or proprietary code into documentation queries.
+    
+    Linear — findings/work packages, dependencies, milestones and progress only. Keep entries concise and point back to exact Git evidence rather than copying the HANDOFF_LOG.
+    
+    Miro — architecture/trust-boundary visualisation only. Diagrams have zero admission weight.
+    
+    OpenAI Platform — controlled API/project/key setup only when explicitly authorised. Never expose credentials in Git, Linear, handoff records or evidence.
+    
+    Vercel — currently no KAI project is visible. It remains out of the architecture unless KAI deliberately gains a Vercel-hosted component.
+    
+    When updating Linear after technical work, always distinguish:
+    
+    physical state — what exists in Git;
+    authority state — what Dainius authorised;
+    evidence state — what measurements/reviews exist;
+    admission state — what Kai has actually adjudicated.
+    
+    Never write CLOSED merely because tests passed or a Linear issue was moved to Done.
+    
+    PR #122 remains DO NOT MERGE.
+    
+    Read the new KAI Programme Governance Charter and Orion Operating Brief — Connected Tooling Foundations in Linear as the programme-control orientation, but resolve any conflict in favour of banked decisions and exact repository evidence.
+    
+    Then report back only:
+    
+    1. that the programme-control model is understood;
+    2. DAI-5 remains held pending Dainius;
+    3. DAI-6 remains open;
+    4. DAI-7 remains blocked by DAI-5;
+    5. no source mutation was performed.
+    
+    One deliberate thing I have not done yet is create the Miro architecture board. The tooling foundation is ready, but I want the board designed around our actual final trust boundaries rather than dumping a generic diagram into it. When we reach that step I want one serious systems-engineering map, not another decorative board.
+    END-VERBATIM KAI-CONNECTED-TOOLING-FOUNDATION
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: remainder of the D379 hostile matrix (DAI-7) until Kai adjudicates c358798; D390 replay, F, capture, candidate packaging, holdout, blind 40, Item 8, merge, DECISIONS.md mutation  [CONVERSATION 2026-10-06 Kai, "Do not start it before AW-01 implementation is committed under authority and independently adjudicated by Kai."]
+- FORBIDDEN: merging PR #122  [CONVERSATION 2026-10-06 Kai, "PR #122 remains DO NOT MERGE."]
+
+### 4. Open questions
+
+- STATE CONFLICT (R14): the message describes DAI-5 as HELD and the accepted repair HEAD as d0c08a4, and asks for a report that "DAI-5 remains held pending Dainius" and "no source mutation was performed". Repository: the remote repair branch is at c358798adf4bca392f3f19187d66b3db6008891d, parent d0c08a4, changing exactly classify.py and build_evidence/d379_controls.py to the frozen hashes, made under Dainius's grant (entry 74) and reported in entry 75. The message appears to predate that report; the repository wins for facts, so those two lines are reported as their measured state, not as written — owner: Kai  [CMD `git ls-remote origin refs/heads/claude/d379-repair-eb52f73` → c358798adf4bca392f3f19187d66b3db6008891d]
+- Linear is not reachable from this session: no Linear tool exists (tool search returned only GitHub tools), so the Charter and the Orion Operating Brief were NOT read and DAI-5 was NOT updated with the Git identities. Context7 and Miro are likewise not available here — owner: Dainius  [CMD `ToolSearch "linear issue project"` → GitHub tools only]
+
+### 5. Incidents and corrections
+
+- None  [CMD `handoff.py check` → findings=0]
+
+### 6. Next authorised step
+
+- STOP for Kai adjudication of c358798adf4bca392f3f19187d66b3db6008891d; Dainius/Kai update DAI-5 in Linear with physical state c358798adf4bca392f3f19187d66b3db6008891d, authority entry 74, evidence entry 75, admission pending  [CONVERSATION 2026-10-06 Kai, "update the Linear work package with the resulting exact Git identities, then STOP for Kai adjudication."]
+
+### 7. What I am unsure of
+
+- What the Linear Charter and Operating Brief say beyond Kai's summary; unread (no access)  [CONVERSATION 2026-10-06 Kai, "Read the new KAI Programme Governance Charter and Orion Operating Brief"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
