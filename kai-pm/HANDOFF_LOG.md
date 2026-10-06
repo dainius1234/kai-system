@@ -35517,3 +35517,354 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-06T20:49:10Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-06T20:49:10Z  [CMD `date -u +%FT%TZ` → 2026-10-06T20:49:10Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: c269bdb5013c9f2f8abc11adf4e29692b6b17436  [CMD `git rev-parse HEAD` → c269bdb5013c9f2f8abc11adf4e29692b6b17436]
+- tree: 6376dcfd51834c73ea47f2140c4acc14c3c99a24  [CMD `git rev-parse HEAD^{tree}` → 6376dcfd51834c73ea47f2140c4acc14c3c99a24]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/project-rework-plan-pgvp35: c269bdb5013c9f2f8abc11adf4e29692b6b17436  [CMD `git ls-remote --heads origin` → c269bdb5013c9f2f8abc11adf4e29692b6b17436]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 78  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 78]
+
+### 1. The four states
+
+- physical: no source, tooling or ledger change; repair branch at c358798  [CMD `git ls-remote --heads origin` → claude/d379-repair-eb52f73 c358798adf4bca392f3f19187d66b3db6008891d]
+- authorised: read-only supplemental census of 8 workflows + 11 scripts/security/*.sh; design hardening; DAI-6 design packet v1 for DeepSeek; STOP before implementation  [CONVERSATION 2026-10-06 Kai, "BEFORE FREEZING DAI-6, COMPLETE THE TWO DISCOVERED BUT UNINSPECTED POPULATIONS"]
+- evidence: Kai's ruling verbatim in section 2  [CMD `sha256sum kai_dai6_census_adjudicated.txt` → e7badf44b7d9f5a5…]
+- admission: entry 78 census ACCEPTED as a bounded measurement; architecture direction accepted; DAI-6 OPEN, not implementation-ready  [CONVERSATION 2026-10-06 Kai, "Your R4 census is accepted as a bounded measurement." ⚠ UNBANKED]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-06 · DAI-6 CENSUS ADJUDICATED / SUPPLEMENTAL CENSUS + DESIGN HARDENING: census accepted; no global pipeline ban; L1, L2 AND L3 all REQUIRED (L3 narrow); refined root invariant (governed plumbing permitted when the runner owns the processes); wrapper exit taxonomy 0/1/2 separate from the child rc (record authoritative; never reconstruct rc from wrapper rc); explicit timeout/process-group/TERM-KILL/drain semantics; no overclaimed per-stage stdout; record schema-versioned canonical UTF-8 JSON, atomic temp+rename, no environment serialised (stated as inherited-not-serialised), normalised cwd; L2 link checks listed; L3 allow/block calibration listed; supplemental census of 8 workflows and 11 scripts/security collectors BEFORE freezing; INC-35 ledger mutation HELD; DeepSeek review of a self-contained DAI-6 design packet v1 REQUIRED; STOP before implementation. Verbatim below, 11169 bytes, sha256 e7badf44b7d9f5a5c1397e24ab6906461628e467a498428436cac0d104b79a9a, final LF True, 4-space indent added ⚠ UNBANKED  [CONVERSATION 2026-10-06 Kai via Dainius, "KAI → ORION — DAI-6 CENSUS ADJUDICATED / SUPPLEMENTAL CENSUS + DESIGN HARDENING"]
+    BEGIN-VERBATIM KAI-DAI6-CENSUS-ADJUDICATED
+    This is strong work from Orion. I checked entries 77 (8605367…) and 78 (c269bdb…) on GitHub: both are signed/verified, entry 78 changes only the append-only handoff log, and the repair branch remains untouched at c358798….
+    
+    My ruling is: the census is accepted; the architecture direction is accepted; DAI-6 is not yet implementation-ready. I have updated DAI-6 in Linear accordingly and linked entries 77/78.
+    
+    The central conclusion is important: Orion proved that a global “ban pipelines” rule would be the wrong engineering response. In the measured universe there are hundreds of legitimate pipeline uses but only a small population where status provenance becomes false. So the correct architecture really is evidence-boundary enforcement, with a narrow pre-execution safety layer.
+    
+    There are, however, several details I would not allow into implementation unchanged. The biggest is Orion’s proposed statement that evrun.py should exit with the evidence process’s exact return code while reserving 255 for runner failure. That is not lossless. Python’s subprocess semantics permit a negative returncode when the child dies by signal, and a child can legitimately exit 255; the wrapper therefore cannot simultaneously encode the exact child result and reserve one of the same values for itself. I checked this against current CPython documentation through Context7.
+    
+    The exact process return code belongs in the record. The wrapper should expose only a small, separate control result such as 0 = evidence process succeeded and record committed, 1 = evidence process failed/timed out but a valid record was committed, 2 = runner/instrument failure and no admissible record. Signals remain exact in the record as e.g. returncode=-9, signal=9; they must never be flattened into the wrapper’s status and then later mistaken for the child’s exact result.
+    
+    Send Orion this:
+    
+    KAI → ORION — DAI-6 CENSUS ADJUDICATED / SUPPLEMENTAL CENSUS + DESIGN HARDENING
+    
+    Entry 78 c269bdb5013c9f2f8abc11adf4e29692b6b17436 independently checked: signed/verified, handoff-only. Entry 77 860536775724e2f0e785bfd546660142a341635e is likewise signed/verified.
+    
+    Repair branch remains:
+    
+    c358798adf4bca392f3f19187d66b3db6008891d
+    
+    Your R4 census is accepted as a bounded measurement.
+    
+    The principal conclusion is accepted:
+    
+    do not globally ban shell pipelines. Enforce provenance at the evidence-admission boundary and add a narrow pre-execution control for the recurrent high-risk structures.
+    
+    DAI-6 remains OPEN. No implementation authority yet.
+    
+    Architecture ruling
+    
+    L1 governed evidence runner — REQUIRED.
+    
+    L2 handoff evidence-admission rule — REQUIRED.
+    
+    L3 pre-execution structural protection — REQUIRED, not optional.
+    
+    L3 must remain narrowly calibrated. It is not authority for a general shell-language ban.
+    
+    ⸻
+    
+    1. REFINE THE ROOT INVARIANT
+    
+    Replace the current sentence that says nothing may sit between the evidence command and recorder.
+    
+    Correct invariant:
+    
+    An exit status admitted as evidence must come directly from the operating-system process result for the specifically named process/stage, captured by governed instrumentation and bound to that exact execution. A shell-composed status such as $?, stale PIPESTATUS, pipeline aggregate status or downstream-filter status is not evidence of another stage’s exact return code.
+    
+    Governed inter-process plumbing is permitted when the runner itself owns the processes and directly observes each return code.
+    
+    ⸻
+    
+    2. L1 WRAPPER EXIT CODE MUST NOT PRETEND TO BE THE CHILD RETURN CODE
+    
+    Do not implement:
+    
+    evrun exit code = evidence stage returncode
+    
+    with 255 = runner error.
+    
+    That representation is lossy/colliding.
+    
+    Current Python subprocess semantics include negative returncodes for signal termination, and a child may itself legitimately return 255.
+    
+    The record is authoritative for exact child/stage result.
+    
+    Use a separate wrapper taxonomy, for example:
+    
+    0 = selected evidence stage succeeded and a complete record was atomically committed
+    1 = selected evidence stage failed / was signalled / timed out, but a complete record was atomically committed
+    2 = runner/instrument failure; no admissible record produced
+    
+    The exact record must separately carry:
+    
+    * normal returncode;
+    * signal, when applicable;
+    * timeout state;
+    * termination actions;
+    * every stage’s actual process result.
+    
+    Never reconstruct a child’s exact rc later from the wrapper rc.
+    
+    ⸻
+    
+    3. TIMEOUT AND PROCESS CLEANUP
+    
+    Define timeout behaviour explicitly before implementation.
+    
+    A timeout must not merely call kill() on one process while pipeline children/grandchildren survive.
+    
+    The design packet must state:
+    
+    * how each launched process/process group is owned;
+    * TERM/KILL sequence;
+    * how pipes are closed;
+    * how stdout/stderr are drained after termination;
+    * how the record distinguishes natural exit, signal termination and runner-forced timeout.
+    
+    Known-positive: a process spawning a child which outlives its parent unless the whole owned group is terminated.
+    
+    ⸻
+    
+    4. DO NOT OVERCLAIM PIPELINE OUTPUT CAPTURE
+    
+    Your proposed record says every stage carries stdout/stderr hashes.
+    
+    That is only true if the runner itself pumps and captures every intermediate stdout stream while also feeding it to the next process.
+    
+    If v1 does not implement that plumbing, do not claim it.
+    
+    Minimum sufficient record for this defect class may be:
+    
+    * exact argv for every stage;
+    * exact returncode/signal for every stage;
+    * stderr artefact/hash for every stage;
+    * final stdout artefact/hash;
+    * selected evidence-stage index;
+    * runner timing/timeout metadata.
+    
+    If you want per-stage stdout, design an explicit tee/pump mechanism and hostile-test deadlock, SIGPIPE and binary output.
+    
+    ⸻
+    
+    5. RECORD FORMAT
+    
+    The RUN record must be:
+    
+    * schema-versioned;
+    * canonical JSON;
+    * UTF-8;
+    * deterministic field ordering/serialization;
+    * written to a temporary sibling then atomically renamed only after complete collection;
+    * absent/inadmissible after runner-internal failure;
+    * externally covered by the handoff verbatim block’s existing bytes/SHA/final-LF integrity declaration.
+    
+    Do not serialize the inherited environment or secrets.
+    
+    Record explicitly that environment is inherited-but-not-serialized so nobody later mistakes the record for complete process reproducibility.
+    
+    Record the working directory in an appropriate normalized form.
+    
+    ⸻
+    
+    6. L2 — ADMISSION MUST CHECK THE LINK, NOT JUST THE JSON
+    
+    For new handoff entries only, an explicit exit-status claim in a [CMD ... → ...] result is inadmissible.
+    
+    Such a claim must use a same-entry [RUN <name>] source whose declared verbatim record passes:
+    
+    * unique RUN name;
+    * exactly one corresponding record;
+    * valid schema/version;
+    * verbatim byte/hash integrity;
+    * valid evidence-stage index;
+    * exact stage argv;
+    * record completion status;
+    * claimed rc equals that stage’s recorded rc;
+    * no duplicate/conflicting record;
+    * no runner-internal-error record admitted as process evidence.
+    
+    Parse status language only from the claim/result portion, not from shell text or a verbatim block.
+    
+    Preserve legacy committed entries as history rather than retroactively failing them.
+    
+    ⸻
+    
+    7. L3 — REQUIRED BUT NARROW
+    
+    Your population proves why L3 must use structure/role classification rather than substring matching.
+    
+    Preserve explicit allow/block calibration for:
+    
+    git commit && git push → ALLOW
+    
+    git commit newline git push → BLOCK
+    
+    git commit ; git push → BLOCK
+    
+    failed gate ; git commit → BLOCK
+    
+    evidence process | tail ; echo $? → BLOCK
+    
+    evidence process | grep ... && git commit → BLOCK
+    
+    immediate correct PIPESTATUS[index] → do not reject merely for being a pipeline
+    
+    quoted |, heredoc |, regex |, [[ a || b ]] → no false structural finding
+    
+    FEEDER pipeline where final stage is the evidence process → do not misclassify merely because a pipe exists.
+    
+    L3 remains defence-in-depth. L2 is the admission boundary.
+    
+    ⸻
+    
+    8. BEFORE FREEZING DAI-6, COMPLETE THE TWO DISCOVERED BUT UNINSPECTED POPULATIONS
+    
+    Your own census discovered:
+    
+    * 8 .github/workflows/* files relevant to pipefail / pipeline-status handling;
+    * 11 scripts/security/*.sh evidence collectors/gates.
+    
+    These were explicitly not inspected.
+    
+    Before I freeze the DAI-6 design, perform a read-only supplemental census of both populations on the current authoritative tree.
+    
+    For every occurrence classify:
+    
+    * command/pipeline;
+    * which process’s status is intended;
+    * which status is actually consumed;
+    * whether pipefail, PIPESTATUS or direct process rc establishes it;
+    * whether the result becomes programme evidence;
+    * whether it falls inside DAI-6 or is an adjacent CI-only mechanism.
+    
+    Do not repair anything.
+    
+    This is especially important for the 11 security collectors because DAI-7 will later rely on evidence-producing tooling. We do not release the full matrix while known evidence collectors remain outside the census.
+    
+    ⸻
+    
+    9. INC-35
+    
+    Do not allocate/modify its ledger mechanism yet.
+    
+    The census supports a relationship, but ledger mutation remains HELD pending separate authority and final DAI-6 closure.
+    
+    ⸻
+    
+    10. ADVERSARIAL REVIEW
+    
+    Required.
+    
+    Once the supplemental census is complete and incorporated, produce a self-contained DAI-6 design packet v1 for DeepSeek.
+    
+    No repository implementation.
+    
+    The packet must include:
+    
+    * measured populations and universe limitations;
+    * root invariant;
+    * exact L1 record schema;
+    * exact wrapper-result taxonomy;
+    * timeout/signal/process-group semantics;
+    * pipeline stdout/stderr capture semantics;
+    * L2 RUN-tag grammar and admission algorithm;
+    * L3 structural rules;
+    * all predeclared positive/negative calibration cases;
+    * known false-positive/false-negative boundary;
+    * exact proposed five-file implementation surface;
+    * explicit exclusions.
+    
+    Ask DeepSeek to attack specifically:
+    
+    * rc/signal collisions;
+    * timeout/orphan process cases;
+    * PIPE/SIGPIPE/deadlock behaviour;
+    * malformed/duplicate/tampered RUN records;
+    * status-claim grammar bypasses;
+    * stage-index confusion;
+    * output/hash misbinding;
+    * atomic-write interruption;
+    * shell-parser quote/heredoc/substitution evasions;
+    * L3 false positives that could block legitimate work;
+    * whether any producer can obtain a false-green evidence record.
+    
+    DeepSeek has zero programme authority. Preserve the reply exactly and return it to Kai for reconciliation.
+    
+    STOP before implementation.
+    
+    No source/tooling mutation.
+    No ledger mutation.
+    No DAI-7.
+    No D390/F/capture/candidate/holdout/blind40/Item8/merge.
+    
+    Preserve this ruling append-only as ⚠ UNBANKED.
+    
+    One more point: Orion’s disclosure that his own AW-01 commit used the git commit newline git push shape is exactly why I am making L3 mandatory. Nothing went wrong in that instance, but the command’s correctness depended on the commit succeeding rather than mechanically making the push conditional on it. The absence of failure that day does not make the structure safe.
+    
+    The sequence is therefore now:
+    
+    entry 78 census accepted → audit the 8+11 excluded shell surfaces → harden the design → DeepSeek adversarial review → Kai reconciliation → then, and only then, ask you for the five-file implementation authority.
+    
+    DAI-7 remains blocked.
+    END-VERBATIM KAI-DAI6-CENSUS-ADJUDICATED
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: read-only supplemental census; design hardening; DeepSeek packet v1; preserve the reply; return to Kai  [CONVERSATION 2026-10-06 Kai, "Preserve the reply exactly and return it to Kai for reconciliation."]
+- HELD: DAI-6 implementation; ledger mutation incl. INC-35 mechanism; DAI-7; D390, F, capture, candidate, holdout, blind 40, Item 8, merge  [CONVERSATION 2026-10-06 Kai, "STOP before implementation."]
+
+### 4. Open questions
+
+- None before the supplemental census  [CONVERSATION 2026-10-06 Kai, "Do not repair anything."]
+
+### 5. Incidents and corrections
+
+- Kai's correction of my L1 exit-code design (child rc with 255 reserved is lossy: negative signal rcs and a legitimate child 255) is accepted; the design will carry the 0/1/2 wrapper taxonomy and the exact rc only in the record  [CONVERSATION 2026-10-06 Kai, "That representation is lossy/colliding."]
+
+### 6. Next authorised step
+
+- Read-only census of the 8 workflow files and 11 scripts/security/*.sh files on the current tree  [CONVERSATION 2026-10-06 Kai, "perform a read-only supplemental census of both populations on the current authoritative tree."]
+
+### 7. What I am unsure of
+
+- Which tree is "the current authoritative tree" for the shell surfaces: main (194db0a) or this programme branch; I will measure both and say which differs  [CONVERSATION 2026-10-06 Kai, "on the current authoritative tree"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
