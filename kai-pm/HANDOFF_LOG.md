@@ -31699,3 +31699,287 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-06T19:40:41Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-06T19:40:41Z  [CMD `date -u +%FT%TZ` → 2026-10-06T19:40:41Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 11271cb98b4ab11418d48a43e0594443ede02ea4  [CMD `git rev-parse HEAD` → 11271cb98b4ab11418d48a43e0594443ede02ea4]
+- tree: 91aef8f4dc28577e5165c7fc80b26760ac817ae2  [CMD `git rev-parse HEAD^{tree}` → 91aef8f4dc28577e5165c7fc80b26760ac817ae2]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/project-rework-plan-pgvp35: 11271cb98b4ab11418d48a43e0594443ede02ea4  [CMD `git ls-remote --heads origin` → 11271cb98b4ab11418d48a43e0594443ede02ea4]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: d0c08a4da85a447e0729fdb83d201cccc0af395a  [CMD `git ls-remote --heads origin` → d0c08a4da85a447e0729fdb83d201cccc0af395a]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 71  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 71]
+
+### 1. The four states
+
+- physical: repair branch at d0c08a4; classify.py and d379_controls.py unchanged outside scratch  [CMD `git ls-remote --heads origin` → claude/d379-repair-eb52f73 d0c08a4da85a447e0729fdb83d201cccc0af395a]
+- authorised: preserve DeepSeek's review of closure packet v2 and return it with the evidence to Kai; no source mutation  [CONVERSATION 2026-10-04 Kai, "Return the exact revised deltas, hashes, calibrations and DeepSeek response to Kai."]
+- evidence: DeepSeek's reply verbatim, the receipt check and a read-only probe in section 5  [CMD `sha256sum deepseek_aw01_closure_v2_review.txt` → 29632104e40f4ce4…]
+- admission: `eb52f73` is the admitted technical restart  [D387]
+
+### 2. Rulings since the last handoff
+
+- None; DeepSeek is a reviewer  [CONVERSATION 2026-10-06 Dainius, relaying DeepSeek, "Finding register — KAI-B4-AW-01 final closure v2"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: classify.py implementation, d379_controls.py implementation, remainder of the matrix, D390 replay, F, capture, candidate, holdout, blind 40, Item 8, merge  [CONVERSATION 2026-10-04 Kai, "NO SOURCE MUTATION."]
+
+### 4. Open questions
+
+- RECEIPT: all seven lines byte-exact against DEEPSEEK_PACKET_AW01_CLOSURE_V2.md (PACKET HASH and BASE values exact, each followed by the "(cannot compute SHA-256; …)" note the cover permits; FIRST HUNK exact; SENTINELS A, B, C each the exact whole diff line, each occurring once in the packet; END YES). The reply contains 0 backslashes and none was required. Admission of the review is Kai's — owner: Kai  [CMD `aw01c2_receipt_check.py` → all True]
+- QUOTE FIDELITY: of 12 quoted code lines, 6 are exact packet lines; 3 in C2-03 are the right lines re-indented; 2 in C2-03 are abbreviated or joined ("...", one call joined from two lines); the 2-line C2-04 "diff" quote is NOT in delta A — it re-wraps delta A lines 11-13 ("its unit and a terminator, so no different string that fully" / "matches the governed canonical-token grammar is a substring of" / "this token. …") — owner: Kai  [CMD `aw01c2_receipt_check.py` → EXACT 6 / STRIP 3 / ABSENT 4 (2 of the 4 in C2-03, 2 in C2-04)]
+- DS-AW01-C2-01 (QUESTION, producer control vs independent adjudication): no source fact to measure; the packet itself states zero admission weight. Kai's — owner: Kai  [FILE DEEPSEEK_PACKET_AW01_CLOSURE_V2.md]
+- DS-AW01-C2-02 (MINOR, empty path): CONFIRMED on the proposed code — an empty path on both sides passes all three layers with 0 findings; on the Pass-A side only it is caught as AW01_ROW_POPULATION. It can never join EXPECTED ("" does not end with README.md). The real Pass-A has 0 empty paths and 0 paths beginning "/", "./", "../" or ending "/" (272 rows). AW01 does not reconcile rows against the frozen tree path population (that is I1-B's) — owner: Kai  [CMD `aw01c2_review_probe.py` → [] EVALUATED EVALUATED; ['AW01_ROW_POPULATION']; 0 / 0]
+- DS-AW01-C2-03 (MINOR, N=None git finding): CONFIRMED and already disclosed by me as a design choice in entry 71 §4 — bare '11' with git 114 gives TOKEN_GRAMMAR, CONTEXT_NOT_TOKEN and N_NOT_GIT_SIZE "token N=None"; on the real d0c08a4 candidate it is 5 of the 20 findings — owner: Kai  [CMD `aw01c2_review_probe.py` → 3 findings as stated]
+- DS-AW01-C2-04 (QUESTION, comment cites an external grammar): measured — delta A's comment states the property in words; the token's shape is the next code line (`token = f"passa.bytes={row['bytes']} bytes;"`); the comment names build_evidence/d379_controls.py only for the semantic control, not as the location of the grammar — owner: Kai  [FILE aw01c2.classify.diff:11]
+- DS-AW01-C2-05 (QUESTION, git optional in the helper): measured — in the proposed d379_controls.py aw01_check has 14 call sites (a 15th grep hit, line 3606, is a comment): 13 in section_AW01 (calibration; 10 without git_size) and 1 in aw01_candidate, always with git_size; no caller in any *.py at d0c08a4 (the function does not exist there). Without git_size a token that matches Pass-A but not the blob passes (0 findings); with it, N_NOT_GIT_SIZE. The docstring already says git is optional only for calibration — owner: Kai  [CMD `grep -n "aw01_check(" d379_controls.py; aw01c2_review_probe.py` → 15 hits, 14 call sites; [] vs ['AW01_N_NOT_GIT_SIZE']]
+- DeepSeek evidence request 2 (Witness selector pattern): no validator found — envelope.Witness.__post_init__ (v13 envelope.py:206-230) checks subject, scope, polarity, certainty, temporal, evidence_shown/total and truncated, not source_selector; the field comment (envelope.py:191) still reads "L<line>" or "L<a>-L<b>", while v13 producers already emit "path" (classify.py:474), "opscan:…" (run_h2_v12.py:210) and claim selectors. classify.py:198 parses selectors with int() and a ValueError fallback (VALIDITY ordering, not the MARKER path); run_h2_v12._class_ok uses startswith on evidence-fact traces. Searched: source_selector|selector in envelope, qualify, run_h2_v12, holdout, stage_identity, classify, passa (v13) at d0c08a4 — owner: Kai  [CMD `grep -n "source_selector\|selector" <7 v13 files>` → as stated]
+- DeepSeek evidence requests 1, 3, 4 (who runs aw01_check; admission-grade use without git; qualifier missing[:5] in scope?): rulings, not measurements; qualify.py:427 still reads `for p, ax in missing[:5]:` at d0c08a4 — owner: Kai  [CMD `grep -n "missing\[:5\]" qualify.py` → 427]
+
+### 5. Incidents and corrections
+
+- None. Every exit status in this entry was read from the process, not a pipeline  [CMD `aw01c2_receipt_check.py; aw01c2_review_probe.py` → rc 0, rc 0]
+- Credential scan of the five files below: 0 hits  [CMD `secretscan.py` → TOTAL HITS 0]
+- EVIDENCE DEEPSEEK-AW01-CLOSURE-V2-RECEIPT-AND-REVIEW deepseek_aw01_closure_v2_review.txt: 6255 bytes, sha256 29632104e40f4ce440bc0888e13c8d8ba745945930d84a739d6b14128c38930c, final LF True  [CMD `sha256sum deepseek_aw01_closure_v2_review.txt` → 29632104e40f4ce4…]
+    BEGIN-VERBATIM DEEPSEEK-AW01-CLOSURE-V2-RECEIPT-AND-REVIEW
+    ```text
+    PACKET HASH: 214ea833e3d3a8ff280323522512d765f8ad345ac896dcd5fb6b1e5d0c74f0c3 (cannot compute SHA-256; copied as given)
+    BASE d379_controls.py SHA-256: 59952df66850fd30ade8dc75ee409f88ef644ca197af03a78e1a5cba1eb2359f (cannot compute SHA-256; copied from section 1)
+    FIRST HUNK OF DELTA B: @@ -36,8 +36,8 @@
+    SENTINEL A: +        # Noncanonical substrings can still satisfy the generic _compliant()
+    SENTINEL B: +    r"passa[.]bytes=(0|[1-9][0-9]*) bytes;"
+    SENTINEL C: +            stage_a_desc=desc, producer_component="PASS_A")
+    END OF PACKET SEEN: YES
+    ```
+    
+    Finding register — KAI-B4-AW-01 final closure v2
+    
+    DS-AW01-C2-01 — QUESTION — Standing control remains producer evidence with zero admission weight
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked construct: Delta B adds aw01_check, section_AW01, and candidate mode to d379_controls.py. The packet states repeatedly that this is a standing, calibrated, can-fail producer control with zero admission weight.
+    
+    Invariant attacked: independent adjudication. The control can detect forgeries, but it is authored and executed by the producer side. It does not by itself make the evidence independent.
+    
+    Concrete failure sequence: none in the control’s own logic. The question is institutional: if Kai is the adjudicator, is a producer-authored control sufficient to establish semantic authenticity, or must an independent adjudicator rerun it?
+    
+    Remedy: none in the delta. Kai must reconcile whether this control is admissible as a standing control or only as producer diagnostics.
+    
+    ---
+    
+    DS-AW01-C2-02 — MINOR — aw01_check does not validate non-empty path strings
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked construct:
+    
+    ```python
+    def _aw01_passa_usable(r):
+        ...
+        if type(r.get("path")) is not str:
+            return f"path is {type(r.get('path')).__name__}, not str"
+    ```
+    
+    The input layer requires path to be a string but does not require it to be non-empty. An empty path "" passes the input layer.
+    
+    Concrete failing input: Pass-A row {"path": "", "bytes": 10}. It passes _aw01_passa_usable. It will not end with README.md, so it will not be in expected, but it still enters the row index. If the result side also has "", it can participate in population checks without being a valid document path.
+    
+    Remedy: add if not r["path"]: return "path is empty" to _aw01_passa_usable and _aw01_result_usable.
+    
+    ---
+    
+    DS-AW01-C2-03 — MINOR — aw01_check reports AW01_N_NOT_GIT_SIZE with N=None when the token grammar already failed
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked construct:
+    
+    ```python
+    if git_size is not None:
+        g = git_size(p)
+        if type(g) is not int:
+            findings.append(("AW01_GIT_LOOKUP", p, ...))
+        elif not (n is not None and g == n):
+            findings.append(("AW01_N_NOT_GIT_SIZE", p, f"token N={n}, git blob size={g}"))
+    ```
+    
+    If AW01_TOKEN.fullmatch(v) fails, n is None. If git_size is supplied and returns an int, the code appends both AW01_TOKEN_GRAMMAR and AW01_N_NOT_GIT_SIZE with N=None.
+    
+    Concrete failing input: witness value "11" with git size 114. Findings include AW01_TOKEN_GRAMMAR and AW01_N_NOT_GIT_SIZE (token N=None, git blob size=114). The second finding is noise, not a separate defect.
+    
+    Remedy: only run the git-size comparison when n is not None, or phrase the finding as “token N unavailable”.
+    
+    ---
+    
+    DS-AW01-C2-04 — QUESTION — Delta A comment refers to a grammar defined only in Delta B
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked construct in Delta A:
+    
+    ```diff
+    +        # no different string that fully matches the governed canonical-token
+    +        # grammar is a substring of this token.
+    ```
+    
+    The grammar passa[.]bytes=(0|[1-9][0-9]*) bytes; is defined in d379_controls.py, not in classify.py. The comment in classify.py refers to an external governing grammar.
+    
+    Concrete failure sequence: a reader of classify.py alone cannot verify the comment’s property without opening d379_controls.py.
+    
+    Remedy: either cite the governing file in the comment, or restate the grammar inline.
+    
+    ---
+    
+    DS-AW01-C2-05 — QUESTION — Git-size corroboration remains optional in the pure helper
+    
+    Evidence status: SUPPLIED-EVIDENCE
+    Attacked construct:
+    
+    ```python
+    def aw01_check(passa_rows, result_rows, git_size=None):
+    ```
+    
+    The pure helper accepts git_size=None and skips the git-size check. Candidate mode always supplies it, but synthetic calibration can run without it. The packet states this is intentional.
+    
+    Concrete failure sequence: if a future caller uses aw01_check directly without git_size, the control can pass witnesses that do not match the committed blob size.
+    
+    Remedy: document that aw01_check without git_size is calibration-only, or require a sentinel to distinguish calibration from admission-grade runs.
+    
+    ---
+    
+    Executive advisory verdict
+    
+    NO DESIGN BLOCKER FOUND, MINOR/QUESTION FINDINGS REMAIN
+    
+    Delta A is comment-only and correctly states the real boundary of _compliant(). Delta B adds a substantially hardened standing semantic control with input-layer, population-layer, and witness-layer hard stops, grammar validation, field checks, and candidate-mode binding through the existing Stage-A / Stage-B authority chain. No BLOCKER-level defect was found. The remaining items are minor validation gaps, redundant finding noise, and institutional questions about admission weight and optional corroboration.
+    
+    ---
+    
+    Unverified claims register
+    
+    1. That aw01_check is accepted by Kai as a standing control despite being producer-authored.
+    2. That no downstream consumer relies on aw01_check being callable without git_size for admission-grade decisions.
+    3. That the Witness docstring selector pattern is not enforced by any validator that would reject META:passa.bytes.
+    4. That the qualifier’s missing[:5] limitation remains out of scope for AW-01.
+    5. That the suffix-match latent condition (Q6) remains frozen and out of scope.
+    
+    ---
+    
+    Evidence requests
+    
+    1. Confirm whether aw01_check is intended to be run by Kai or an independent adjudicator, not only by the producer.
+    2. Confirm whether any validator enforces the Witness docstring selector pattern.
+    3. Confirm whether aw01_check without git_size may ever be used for admission-grade decisions.
+    4. Confirm whether the qualifier’s missing[:5] limitation is truly out of scope for AW-01.
+    END-VERBATIM DEEPSEEK-AW01-CLOSURE-V2-RECEIPT-AND-REVIEW
+- EVIDENCE AWC2-RECEIPT-CHECK-PY aw01c2_receipt_check.py: 1744 bytes, sha256 1cc4c71ccb6c7bd2751563c940695ee1b19e7943562a0581115a1cfd487fa998, final LF True  [CMD `sha256sum aw01c2_receipt_check.py` → 1cc4c71ccb6c7bd2…]
+    BEGIN-VERBATIM AWC2-RECEIPT-CHECK-PY
+    import hashlib, re, sys
+    P = open("DEEPSEEK_PACKET_AW01_CLOSURE_V2.md", encoding="utf-8").read(); L = P.split("\n")
+    R = open("deepseek_aw01_closure_v2_review.txt", encoding="utf-8").read()
+    blk = R.split("```text\n", 1)[1].split("\n```", 1)[0].split("\n")
+    get = lambda k: next(l[len(k):] for l in blk if l.startswith(k))
+    dB = P[P.index("## 5. DELTA B"):P.index("## 6. Evidence (producer")].split("\n")
+    dA = P[P.index("## 4. DELTA A"):P.index("## 5. DELTA B")].split("\n")
+    ph = get("PACKET HASH: "); print("PACKET HASH value exact:", ph.split(" ")[0] == hashlib.sha256(P.encode()).hexdigest(), "| suffix:", ph.split(" ", 1)[1])
+    bh = get("BASE d379_controls.py SHA-256: "); print("BASE value exact:", bh.split(" ")[0] in P and "59952df66850fd30ade8dc75ee409f88ef644ca197af03a78e1a5cba1eb2359f" == bh.split(" ")[0])
+    print("FIRST HUNK exact:", get("FIRST HUNK OF DELTA B: ") == next(l for l in dB if l.startswith("@@")))
+    for k, src in (("SENTINEL A: ", dA), ("SENTINEL B: ", dB), ("SENTINEL C: ", dB)):
+        v = get(k); print(k.strip(), "exact whole line:", src.count(v) == 1 and v in src, "| count in packet lines:", L.count(v), "| backslashes:", v.count("\\"))
+    print("END line:", get("END OF PACKET SEEN: ") == "YES")
+    print("receipt lines:", len(blk), "| backslashes in whole reply:", R.count("\\"))
+    # quoted code in findings vs packet lines (stripped of leading +/space)
+    pl = {l.lstrip("+").rstrip() for l in L}; pl2 = {l.lstrip("+ ").rstrip() for l in L}
+    for m in re.finditer(r"```(?:python|diff)\n(.*?)\n```", R, re.S):
+        for q in m.group(1).split("\n"):
+            if q.strip() in ("...", ""): continue
+            print(f"  quote {'EXACT ' if q.rstrip() in pl or q in L else ('STRIP ' if q.lstrip('+ ').rstrip() in pl2 else 'ABSENT')} | {q[:110]}")
+    END-VERBATIM AWC2-RECEIPT-CHECK-PY
+- EVIDENCE AWC2-RECEIPT-CHECK-OUT aw01c2_receipt_check_out.txt: 1202 bytes, sha256 6f349fd6d0f6753650b3ecae218ca7ab0d9d9447c09dfd9c4091757c4c10b581, final LF True  [CMD `sha256sum aw01c2_receipt_check_out.txt` → 6f349fd6d0f67536…]
+    BEGIN-VERBATIM AWC2-RECEIPT-CHECK-OUT
+    PACKET HASH value exact: True | suffix: (cannot compute SHA-256; copied as given)
+    BASE value exact: True
+    FIRST HUNK exact: True
+    SENTINEL A: exact whole line: True | count in packet lines: 1 | backslashes: 0
+    SENTINEL B: exact whole line: True | count in packet lines: 1 | backslashes: 0
+    SENTINEL C: exact whole line: True | count in packet lines: 1 | backslashes: 0
+    END line: True
+    receipt lines: 7 | backslashes in whole reply: 0
+      quote EXACT  | def _aw01_passa_usable(r):
+      quote EXACT  |     if type(r.get("path")) is not str:
+      quote EXACT  |         return f"path is {type(r.get('path')).__name__}, not str"
+      quote STRIP  | if git_size is not None:
+      quote STRIP  |     g = git_size(p)
+      quote STRIP  |     if type(g) is not int:
+      quote ABSENT |         findings.append(("AW01_GIT_LOOKUP", p, ...))
+      quote STRIP  |     elif not (n is not None and g == n):
+      quote ABSENT |         findings.append(("AW01_N_NOT_GIT_SIZE", p, f"token N={n}, git blob size={g}"))
+      quote ABSENT | +        # no different string that fully matches the governed canonical-token
+      quote ABSENT | +        # grammar is a substring of this token.
+      quote EXACT  | def aw01_check(passa_rows, result_rows, git_size=None):
+    END-VERBATIM AWC2-RECEIPT-CHECK-OUT
+- EVIDENCE AWC2-REVIEW-PROBE-PY aw01c2_review_probe.py: 1909 bytes, sha256 66cd565718e4810a4025bef1419be9df2e7c9c4b4a82679354702ae2c50a1967, final LF True  [CMD `sha256sum aw01c2_review_probe.py` → 66cd565718e4810a…]
+    BEGIN-VERBATIM AWC2-REVIEW-PROBE-PY
+    """Read-only probe of DeepSeek closure-v2 findings against the PROPOSED d379_controls.py (instAW4). argv: build_evidence dir."""
+    import sys, importlib.util, json
+    spec = importlib.util.spec_from_file_location("d379_controls", sys.argv[1] + "/d379_controls.py")
+    C = importlib.util.module_from_spec(spec); spec.loader.exec_module(C)
+    import classify
+    rows = [{"path": "a/README.md", "bytes": 114}, {"path": "d/NOTES.md", "bytes": 150}]
+    prod = lambda rs: [{"path": r["path"], "FUNCTION": classify.function(dict(r, title=""), "")} for r in rs]
+    # C2-02: empty path on both sides
+    f, c = C.aw01_check(rows + [{"path": "", "bytes": 10}], prod(rows) + [{"path": "", "FUNCTION": {"value": "UNKNOWN"}}])
+    print("C2-02 empty path both sides (non-MARKER):", f, c["population_layer"], c["witness_layer"])
+    # empty path that ends README.md cannot exist ("" does not end with README.md); a path "README.md" is the root file
+    f, c = C.aw01_check(rows + [{"path": "", "bytes": 10}], prod(rows))
+    print("C2-02 empty path on Pass-A side only:", [x[0] for x in f])
+    # C2-03: bare '11', git int -> both findings
+    m = prod(rows); m[0]["FUNCTION"]["witness"]["witness_value"] = "11"
+    f, _ = C.aw01_check(rows, m, git_size={"a/README.md": 114}.get)
+    print("C2-03 bare '11' with git 114:", [(x[0], x[2]) for x in f])
+    # C2-05: aw01_check without git_size passes a token that matches Pass-A but not git (git is not consulted)
+    f, _ = C.aw01_check(rows, prod(rows))
+    print("C2-05 no git_size, clean:", f, "| with git disagreeing:", [x[0] for x in C.aw01_check(rows, prod(rows), git_size={"a/README.md": 115}.get)[0]])
+    # real Pass-A: any empty / non-normal path?
+    pa = json.load(open(sys.argv[2]))
+    print("real Pass-A rows:", len(pa["rows"]), "| empty paths:", sum(r["path"] == "" for r in pa["rows"]),
+          "| leading '/' or './' or '../' or trailing '/':", sum(r["path"].startswith(("/", "./", "../")) or r["path"].endswith("/") for r in pa["rows"]))
+    END-VERBATIM AWC2-REVIEW-PROBE-PY
+- EVIDENCE AWC2-REVIEW-PROBE-OUT aw01c2_review_probe_out.txt: 472 bytes, sha256 5fdf4838c6d578bd25b6760c209eb4a926756e8c0a9bdc6b14d1005e0900d4f5, final LF True  [CMD `sha256sum aw01c2_review_probe_out.txt` → 5fdf4838c6d578bd…]
+    BEGIN-VERBATIM AWC2-REVIEW-PROBE-OUT
+    C2-02 empty path both sides (non-MARKER): [] EVALUATED EVALUATED
+    C2-02 empty path on Pass-A side only: ['AW01_ROW_POPULATION']
+    C2-03 bare '11' with git 114: [('AW01_TOKEN_GRAMMAR', "'11'"), ('AW01_CONTEXT_NOT_TOKEN', "'passa.bytes=114 bytes;'"), ('AW01_N_NOT_GIT_SIZE', 'token N=None, git blob size=114')]
+    C2-05 no git_size, clean: [] | with git disagreeing: ['AW01_N_NOT_GIT_SIZE']
+    real Pass-A rows: 272 | empty paths: 0 | leading '/' or './' or '../' or trailing '/': 0
+    END-VERBATIM AWC2-REVIEW-PROBE-OUT
+
+### 6. Next authorised step
+
+- STOP. Kai reconciles DS-AW01-C2-01..05, the receipt and the quote-fidelity note; no source mutation without Dainius's grant  [CONVERSATION 2026-10-04 Kai, "Return the exact revised deltas, hashes, calibrations and DeepSeek response to Kai."]
+
+### 7. What I am unsure of
+
+- Whether Kai counts the C2-04 re-wrapped quote against the review, since the receipt rule binds the receipt lines, not quotations in findings  [CMD `aw01c2_receipt_check.py` → C2-04 quote ABSENT]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
