@@ -52839,3 +52839,72 @@ python3 -B .claude/hooks/ruling_capture.py status
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
 python3 -B .claude/hooks/ruling_capture.py status
+
+## HANDOFF 2026-10-07T20:07:57Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-07T20:07:57Z  [CMD `date -u +%FT%TZ` → 2026-10-07T20:07:57Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 5058a84d82dd4f5e03f6ed6de3f824ec4c34e85f  [CMD `git rev-parse HEAD` → 5058a84d82dd4f5e03f6ed6de3f824ec4c34e85f]
+- tree: 88211c88184c6a71fe31b0f9c80dc6188a849dd1  [CMD `git rev-parse HEAD^{tree}` → 88211c88184c6a71fe31b0f9c80dc6188a849dd1]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 5058a84d82dd4f5e03f6ed6de3f824ec4c34e85f  [CMD `git ls-remote --heads origin` → 5058a84d82dd4f5e03f6ed6de3f824ec4c34e85f]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 86  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 86]
+
+### 1. The four states
+
+- physical: unchanged since entry 86 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: no new module design by Orion. Kai (GPT) does the design and integration work inside his comprehensive plan; whatever is built must be tied into the one Kai organism, not stand alone as a good script. Orion's reading: the ruling-capture hook (entries 83–86) stays in place as continuity tooling for the development process (it is not a Kai runtime component), and its form and integration are Kai's to decide  [CONVERSATION 2026-10-07 Dainius, "Let gpt do his part"]
+- evidence: none new  [CMD `handoff.py check` → findings=0]
+- admission: none  [CONVERSATION 2026-10-06 Kai, "DAI-6 remains OPEN. No implementation authority yet."]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-07 · Kai designs; nothing is designed apart from the whole organism ("Kai project is one organism not bunch of good scripts or programs"); the operator message verbatim below, 169 bytes, sha256 a42fa62100dc6eeb667c82639d580559b5856f059127df94b7d54cf65e7ceb7d, final LF True ⚠ UNBANKED  [CONVERSATION 2026-10-07 Dainius, "Kai project is one organism not bunch of good scripts or programs"]
+    BEGIN-VERBATIM DAINIUS-ONE-ORGANISM
+    Let gpt do his part as designing good modules without tying to universe isn’t what we do as you know Kai project is one organism not bunch of good scripts or programs
+    END-VERBATIM DAINIUS-ONE-ORGANISM
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: any further tooling or module design by Orion, including tuning the ruling-capture classifier, until Kai's plan places it  [CONVERSATION 2026-10-07 Dainius, "Let gpt do his part"]
+- HELD (unchanged): DAI-6 implementation, DAI-7, ledger mutation incl. INC-35, D390, F, capture, candidate, holdout, blind 40, Item 8, merge  [CONVERSATION 2026-10-06 Kai, "STOP before implementation."]
+
+### 4. Open questions
+
+- For Kai: where the continuity machinery (handoff log, hooks, ruling capture) sits in the organism — Continuity / Stewardship, or the development process outside it; and entries 84–85's open questions — owner: Kai  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:70]
+
+### 5. Incidents and corrections
+
+- Classifier miss, live: this message carries a direction and was NOT flagged (no marker word, under 300 characters); third measured miss of a short marker-free direction (after the two in entry 84). Banked by hand. Not tuned: held above  [CMD `ls .git/kai-ruling-capture/` → no record for this prompt]
+
+### 6. Next authorised step
+
+- Wait for Kai's plan; Dainius sends the DAI-6 DeepSeek packet when ready  [CONVERSATION 2026-10-07 Dainius, "Let gpt do his part"]
+
+### 7. What I am unsure of
+
+- Whether Dainius wants the ruling-capture hook kept running in the meantime; kept, as the reading in section 1, unless he says otherwise  [CONVERSATION 2026-10-07 Dainius, "Let gpt do his part"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
