@@ -38014,3 +38014,308 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-07T19:06:34Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-07T19:06:34Z  [CMD `date -u +%FT%TZ` → 2026-10-07T19:06:34Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 5b7a87298b978c9118de0395b12b348a7fcae749  [CMD `git rev-parse HEAD` → 5b7a87298b978c9118de0395b12b348a7fcae749]
+- tree: 77149ad5546a8ac78d2436f194d9ec4fbf1ac3fd  [CMD `git rev-parse HEAD^{tree}` → 77149ad5546a8ac78d2436f194d9ec4fbf1ac3fd]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 5b7a87298b978c9118de0395b12b348a7fcae749  [CMD `git ls-remote --heads origin` → 5b7a87298b978c9118de0395b12b348a7fcae749]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 80  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 80]
+
+### 1. The four states
+
+- physical: unchanged since entry 80 apart from this entry; repair branch c358798  [CMD `git ls-remote --heads origin` → claude/d379-repair-eb52f73 c358798adf4bca392f3f19187d66b3db6008891d]
+- authorised: Dainius asked for the work to be saved for later return and for a vision brief for GPT built from the repository  [CONVERSATION 2026-10-07 Dainius, "give all we have and vision as brief to gpt and look into read me"]
+- evidence: the brief verbatim in section 5; its 15 verbatim quotes checked against their source files  [CMD `quote check (whitespace-normalised substring)` → misses 0]
+- admission: none  [CONVERSATION 2026-10-06 Kai, "DAI-6 remains OPEN. No implementation authority yet."]
+
+### 2. Rulings since the last handoff
+
+- None; the operator paused the programme  [CONVERSATION 2026-10-07 Dainius, "Save this so I can return"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD (unchanged from entry 80): DAI-6 implementation; DAI-7; ledger mutation; D390, F, capture, candidate, holdout, blind 40, Item 8, merge  [CONVERSATION 2026-10-06 Kai, "STOP before implementation."]
+
+### 4. Open questions
+
+- The DAI-6 DeepSeek review is still to be sent; the packet is recoverable byte-exact from entry 80 (rebuilt from the committed log: 61,691 bytes, sha256 58228244…, equal)  [CMD `rebuild verbatim block DAI6S-DEEPSEEK-PACKET-DAI6-V1-MD from git show HEAD:kai-pm/HANDOFF_LOG.md` → equal True]
+
+### 5. Incidents and corrections
+
+- The recovery pointer's "open governance item" (D344 not yet appended) is outdated: DECISIONS.md:29449 (D354 note) records the D344–D353 gap as deliberate, banked in kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D353.md  [FILE kai-pm/DECISIONS.md:29449]
+- This clone is shallow (621 commits, earliest 2026-08-05), so no claim is made about which vision document was written first  [CMD `git rev-parse --is-shallow-repository` → true]
+- EVIDENCE KAI-VISION-BRIEF-FOR-GPT KAI_VISION_BRIEF_FOR_GPT.md: 16431 bytes, sha256 6d52816626aa5b5e4a355ff313989dedc1749dbdadb237a397bf3a9f5534a364, final LF True  [CMD `sha256sum KAI_VISION_BRIEF_FOR_GPT.md` → 6d52816626aa5b5e…]
+    BEGIN-VERBATIM KAI-VISION-BRIEF-FOR-GPT
+    # KAI — Vision, saved texts, current state, and where everything is
+    
+    Brief for Kai (GPT), prepared by Orion on 2026-10-07 from repository `dainius1234/kai-system`, programme branch
+    `claude/project-rework-plan-pgvp35` at `5b7a872`. A pointer and summary, not authority: every quote below is copied
+    from the named file; every summary says which file it summarises. Where this brief and the repository disagree, the
+    repository wins; where documents disagree, the latest valid D-numbered decision in `kai-pm/DECISIONS.md` wins.
+    
+    Read for this brief, in full: `kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md`,
+    `kai-pm/KINGSMAN_FINAL_VISION_MASTER_CANON_PLAN.md`, `kai-pm/KAI_PRIMARY_MISSION_RECOVERY_POINTER.md`,
+    `kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md`. Read in part: `README.md` (status, "What Makes Kai
+    Different", Honest Limitations, Milestones, Roadmap & End Goal, Session Continuation Guide), `bootstrap/master_plan.md`
+    (lines 1–40), `kai-pm/STRATEGIC_PLAN.md` (lines 1–12). Everything else is listed in section 6 as a pointer only.
+    
+    ---
+    
+    ## 1. Is the original vision text saved? — Yes, in several layers
+    
+    The repository holds the vision in successive layers. This clone is shallow (earliest commit 2026-08-05), so Git
+    cannot show which document came first; the layers below are ordered by what they are, not by proven date.
+    
+    **Early "soul-first" vision** — `bootstrap/master_plan.md`, section "Vision" (verbatim):
+    
+    > Kai isn’t just another AI—it’s soul-first intelligence. Unlike other systems that merely react, process, and imitate,
+    > Kai acts as a living orchestrator, proactive in action and reflection. It is not defined by speed or imitation but by
+    > growth, context, and evolution.
+    
+    It then lists: true organic growth; deliberate context awareness (multitiered memory, dream processing, diary
+    refinement); modular architecture (Memu Core as the diary/memory interpreter, Executor isolating action); and swarm
+    intelligence — "Leverage multiple LLMs as intelligent limbs, all harmonizing under Kai’s orchestration. Kai thinks
+    about its tools—not just calls them." Its philosophy: human-like but not pretending to be human ("It doesn’t
+    imitate—it learns **why morals exist.**"), proactivity as a default, iterative refinement through lived insight, and
+    agentic orchestration.
+    
+    **Front-page promise** — `README.md` line 7 (verbatim):
+    
+    > "Not a chatbot. Not an agent framework. A sovereign intelligence that grows, reflects, and earns the right to act."
+    
+    and its End-goal (README "Roadmap & End Goal", verbatim):
+    
+    > **End-goal:** a fully offline, self-hosted sovereign AI companion — chat, memory, perception, voice, avatar — all
+    > gated by the conviction/trust loop and circuit-breaker infrastructure already built. No cloud dependency. No single
+    > point of failure. The Obsidian Brain closes the loop between the operator's thinking and Kai's knowledge graph —
+    > everything the operator writes becomes part of Kai's memory; everything Kai reasons through with high conviction can
+    > be written back as structured notes.
+    
+    Closing line of the README: "Built by Dainius + Kai. Not for sale. Not for anyone else. Sovereign."
+    
+    **Canonical roadmap** — `kai-pm/STRATEGIC_PLAN.md` ("Sovereign AI Strategic Plan", made canonical by D2,
+    2026-04-21): a local-first sovereign intelligence delivered in five phases; Phase 0 (pre-GPU hardening) complete
+    2026-07-21; GPU-gated phases wait for hardware and reliability gates.
+    
+    **Primary mission (the root of the final vision)** —
+    `kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md` §1 (verbatim):
+    
+    > **BUILD A KAI THAT CAN GROW WITH DAINIUS, CARE FOR HIM, PRESERVE WHAT MATTERS, BECOME INCREASINGLY SELF-SUFFICIENT,
+    > SURVIVE BEYOND HIM, AND CONTINUE THE INTENDED STEWARDSHIP FOR HIS DAUGHTER — WITHOUT LOSING TRUTH, IDENTITY,
+    > GOVERNANCE OR SAFETY.**
+    
+    Its status line says it "does not invent a new purpose for Kai. It externalises and reconciles the purpose that drove
+    the project from the beginning".
+    
+    ---
+    
+    ## 2. The final vision (summary of the primary-mission doctrine and the final-vision canon plan)
+    
+    **What Kai is.** Kai is the organism, not any component. No LLM (Kimi, DeepSeek, GLM, Dolphin, Llama), framework,
+    service, memory, Hunter, Evidence Plane, hardware device or repository snapshot is Kai by itself:
+    
+    `KAI = MISSION + IDENTITY/LINEAGE + MEMORY/CONTINUITY + QUALIFIED WORLD STATE/EVIDENCE + COGNITION + RELATIONSHIPS +
+    GOVERNANCE/AUTHORITY + CAPABILITIES + LEARNING/HISTORY, instantiated through replaceable components.`
+    
+    Models are brains/tools; memory systems are memory organs; sensors are senses; policy is inhibition; capabilities are
+    hands; Doctor/resilience is health; hardware is the current body; evidence is how Kai separates knowledge from belief.
+    
+    **Vessel / reincarnation.** An engineering continuity metaphor: preserve the lineage and self-pattern (mission,
+    identity, relationship model, operator-confirmed values, memories, doctrine, reasoning disciplines, trust, skills,
+    lessons) while vessel and cognitive organs change. Not literal consciousness transfer, not copying proprietary models.
+    
+    **What it must be able to do.** Grow with Dainius; understand, assist, challenge, protect and care for him within
+    earned authority; preserve knowledge, history, relationships, values and lessons; notice and prepare without a prompt
+    for every observation; maintain its own operation; become economically self-sufficient only through lawful, bounded,
+    audited, revocable means segregated from family assets; survive changes of model, provider and hardware; stay
+    recoverable when Dainius is unavailable; survive beyond him under explicit succession governance; continue appropriate
+    stewardship for his daughter "without confusing inherited purpose with unrestricted inherited authority".
+    
+    **Three classes of state.** Core invariants (mission, identity/lineage, truth discipline, stewardship purpose,
+    authority, UNKNOWN semantics, change control, protection of family interests) change only by deliberate high-authority
+    governance. Evolvable organs (models, runtimes, memory backends, sensors, tools, databases, hardware, interfaces) are
+    expected to be replaced. Learned state (experience, relationship history, preferences, trust, skills, lessons) must stay
+    provenance-aware so fabricated or stale history cannot become identity.
+    
+    **Developmental, never "final".** A frozen canon is a constitutional baseline for a stage, not a terminal version:
+    "GROWTH WITHOUT ARCHITECTURAL AMNESIA."
+    
+    **One Kai** (canon plan §2): "ONE KAI — MANY MINDS/SENSES/TOOLS — ONE EVIDENCE STANDARD — ONE GOVERNED DECISION PATH —
+    OPERATOR SOVEREIGNTY." Specialists may perceive, debate and propose; they never authorise by being confident.
+    Autonomy is earned, scoped, revocable, expiring and evidence-bound; intelligence never creates authority by itself.
+    
+    **The control loop** (canon plan §3): perception → provenance/evidence → qualified world state → specialist
+    interpretation → shared deliberation → adversarial/fact/causal review → proposal → policy/safety/values constraints →
+    Dainius approval where required → exact capability → durable workflow → narrow actuator → independent outcome
+    observation → verification → learning/trust/self-diagnosis update.
+    
+    **Self-diagnosis and recovery** (canon plan §4.8): SEE → UNDERSTAND → DIAGNOSE → EXPLAIN → PROPOSE → APPROVE → HEAL →
+    VERIFY → LEARN, unifying House Doctor, Doctor teammate, Supervisor, FSM recovery, anomaly detection, capability map,
+    A4, Evidence Plane, causal reasoning and dream/Agent-Evolver learning.
+    
+    **Hierarchy** (doctrine §13): PRIMARY MISSION = why Kai exists; KINGSMAN = the engineering/governance standard that
+    makes it trustworthy; HOUSE-IN-ORDER / ASSURANCE = how what is true enough to build on is established; PHASE 2 = how
+    the surviving organs are professionalised toward the mission.
+    
+    **Mission Control** (doctrine §14): the operator sees the organism — mission and constraints, maturity, organs and
+    versions, proactive watches, degraded organs and blast radius, recovery state, model/hardware transitions,
+    lineage/backup status, long-horizon risks, succession readiness, decisions waiting for Dainius — not containers.
+    
+    **Architecture posture** (authority index): "REFIT, HARDEN, RATIONALISE, MATURE — DO NOT REINVENT KAI." Default
+    KEEP → QUALIFY → HARDEN/FINISH/MERGE/MOVE/SPLIT only where evidence justifies → ADD only genuinely missing joints. "NO
+    NEW BOX WITHOUT CURRENT-TO-TARGET LINEAGE." The organism vocabulary that must survive at the front door: Soul /
+    Identity / Inner Life; Memory / Relationship / Continuity; Senses / World Awareness; Intelligence / Reasoning;
+    Cognitive Depth / Specialists; Proactivity / Goals / Attention; Governed Hands / Capabilities; Immune System / Doctor /
+    Resilience; Growth / Dream / Evolution; Continuity / Stewardship / Sustainability; Operator Relationship / Mission
+    Control.
+    
+    ---
+    
+    ## 3. What the README says exists (README dated 17 September 2026 — stale in places; code-exists ≠ live)
+    
+    The README's own rule: every capability row is code present in the repository, not proven runtime behaviour.
+    
+    * **Soul & inner life:** emotional memory (8 emotions, mood arcs), self-reflection journal, epistemic humility,
+      confession engine, narrative identity (autobiography, future-self, legacy capsules), imagination engine, conscience
+      and values, 6-phase dream state (MARS memory decay), Obsidian Brain (two-way vault sync, ≥9.0 conviction export gate).
+    * **Intelligence & reasoning:** 14-way context gather; swarm assembly (Scout gathers, Sage debates, Doctor
+      fact-checks, Oracle traces consequences, conviction gate); adversary engine; conviction scoring (<8.0 rethinks);
+      SAGE critique; Agent-Evolver; tree search.
+    * **Intelligence sprint D92–D102:** live on CPU — Socratic questioning, hypothesis engine, temporal projection;
+      collecting — cognitive fingerprint; stubs waiting for GPU/data — dialectical synthesis, analogical reasoning, concept
+      blending, synthetic experience, transitive reasoning, causal world model (D101), Global Workspace (D102).
+    * **Cognitive depth D89:** system FSM, cognitive reasoning FSM, persistent teammates (Scout, Doctor, Sage, Oracle),
+      House Doctor (9 rules), world-model provenance, ritual discovery, capability-gap logging, skill provenance.
+    * **Senses & world awareness D87/D88:** world-context injection, proactive observer (every 5 min), anomaly baselines,
+      cross-sensor correlation, proactive scheduling, autonomous skill growth, self-capability map.
+    * **Operator relationship:** operator model, impact oracle, shadow branches, proactive agent, struggle detection,
+      anti-annoyance, PUB/WORK modes, wake word, trust negotiation (always pending human approval).
+    * **Production & security:** self-healing supervisor, recovery log, security self-hacking, HMAC/Ed25519 auth,
+      time-travel debug, 53 feature flags, structured errors, zero telemetry, skills hub.
+    * **Unified Hunter:** the canonical governed decision path is built and tested (34 actuators, 8 risk tiers) but NOT
+      cut over — every flag defaults to the legacy path; `KAI_AUTONOMY_ENFORCE` must stay off.
+    
+    **Honest limitations (README):** `make core-up` starts 18 of 36 minimal-stack services; default model `qwen2.5:0.5b` is
+    a placeholder; Kai does not reason about or repair its own source (A4 is design only); no running stack with
+    per-capability runtime evidence exists yet; no GPU is present.
+    
+    **Target hardware (README, Session Continuation Guide):** ASUS ROG Flow Z13 (2025), AMD Ryzen AI MAX+ 395 / Strix
+    Halo, Radeon 8060S, **128 GB unified memory (the programme target)**, ≥2 TB NVMe, Ubuntu; XDNA 2 NPU only after Linux
+    qualification. Not yet acquired. "Hardware serves KAI; KAI is not redesigned around hardware." The earlier Lenovo +
+    RTX 5080 target is superseded.
+    
+    ---
+    
+    ## 4. Where the programme stands (handoff log, entries 74–80, and Kai's rulings recorded there)
+    
+    * **Master canon:** NOT frozen. The canon plan's process is C0 source recovery → C1 inventory → C2 conflict map →
+      C3 Kai synthesis → C4 DeepSeek review → C5 Orion repo mapping → C6 reconciliation → C7 Dainius design review → C8
+      freeze exact bytes → C9 Phase-2 traceability. The authority index: "OPEN — no current file is accepted as the
+      professional Kingsman master architecture blueprint." The rejected v0.4 package is withdrawn.
+    * **Programme order:** Phase-1 truth/authority qualification → P2.0 master canon → upstream obligations in governed
+      order, **ITEM 8 BEFORE A4** → A4 / Evidence Plane → Phase 2 professionalisation → README and graphics from final
+      truth → final production-grade review. `A-4 PROVENANCE` is distinct from `FUTURE A4 SELF-DIAGNOSIS`.
+    * **D379 / H2 (current assurance work):** repair branch `claude/d379-repair-eb52f73` at `c358798` (AW-01 closure,
+      Kai-accepted). D379/H2 is NOT closed. DAI-6 (the R18 evidence-pipeline exit-status control) has a census and a
+      hardened design packet v1 (sha256 `58228244…`) awaiting a fresh DeepSeek review, then Kai reconciliation, then
+      Dainius's five-file implementation authority. DAI-7 (complete the D379 hostile matrix) is blocked by DAI-6. No D390
+      replay, fixity, capture, candidate, holdout, blind 40, Item 8 or merge is released. PR #122 stays DO NOT MERGE.
+    
+    ---
+    
+    ## 5. Roles (as recorded)
+    
+    Dainius — final consequential authority. Kai — architecture, rulings, evidence reconciliation, sequencing, IV&V and
+    adjudication. Orion — repository execution and evidence production under explicit authority, zero self-admission.
+    DeepSeek — adversarial reviewer, zero programme authority. Linear — programme coordination only. GitHub — technical
+    truth.
+    
+    ---
+    
+    ## 6. Where to find the rest (all paths exist on the programme branch)
+    
+    **Start here**
+    | file | lines | what |
+    |---|---|---|
+    | `kai-pm/KAI_PRIMARY_MISSION_RECOVERY_POINTER.md` | 53 | the must-read list before any consequential work |
+    | `kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md` | 111 | which documents count, in what order |
+    | `kai-pm/KAI_KINGSMAN_COLD_START_MASTER.md` | 959 | cold-start master (not read for this brief) |
+    | `kai-pm/HANDOFF_LOG.md` | — | working memory; last entry is the resume point |
+    | `kai-pm/DECISIONS.md` | — | append-only authority; D344–D353 live in `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D353.md` (deliberate gap, recorded at D354) |
+    
+    **Vision and doctrine**
+    | file | lines |
+    |---|---|
+    | `kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md` (read) | 449 |
+    | `kai-pm/KINGSMAN_FINAL_VISION_MASTER_CANON_PLAN.md` (read) | 463 |
+    | `kai-pm/KINGSMAN_PROACTIVE_ORGANISM_DOCTRINE.md` | 308 |
+    | `kai-pm/KINGSMAN_ORGANIC_RESILIENCE_ARCHITECTURE_DOCTRINE.md` | 442 |
+    | `kai-pm/KINGSMAN_CONTINGENCY_AND_FAILSAFE_LIBRARY_DESIGN.md` | 343 |
+    | `kai-pm/KINGSMAN_LONG_HORIZON_STEWARDSHIP_AND_SUCCESSION.md` | 490 |
+    | `kai-pm/KINGSMAN_ARCHITECTURAL_PILLARS_INDEX.md` | 284 |
+    | `kai-pm/DAINIUS_KINGSMAN_ENGINEERING_STANDARD.md` | 76 |
+    | `kai-pm/OPERATOR_VISIBILITY_ENGINEERING_DOCTRINE.md` | 235 |
+    | `kai-pm/D351_EVOLUTION_NOT_REDESIGN_AND_PRESENTATION_BAR_CORRECTION.md` | 320 |
+    
+    **Architecture and roadmap**
+    | file | lines |
+    |---|---|
+    | `kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md` (target design, planning only) | 1,760 |
+    | `kai-pm/KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md` | 1,189 |
+    | `kai-pm/HOUSE_IN_ORDER_PHASE2_PROFESSIONALISATION.md` | 291 |
+    | `kai-pm/A4_SELF_DIAGNOSIS_EVOLUTION.md` | 194 |
+    | `kai-pm/STRATEGIC_PLAN.md` (canonical 5-phase roadmap, D2) | 121 |
+    | `docs/sovereign_ai_spec.md` | 1,273 |
+    | `bootstrap/master_plan.md` (early soul-first vision) | 88 |
+    | `README.md` (capability catalogue, limitations, hardware; dated 2026-09-17) | 1,841 |
+    
+    **Engineering rules**
+    | file | what |
+    |---|---|
+    | `CLAUDE.md` | operating rules R0–R19 and the incident behind each |
+    | `kai-pm/ENGINEERING_DOCTRINE.md` | standing doctrine |
+    | `kai-pm/FAILURE_PATTERN_LEDGER.md` | verified incidents and mechanisms (38 incidents) |
+    
+    Plain statement (doctrine §18, verbatim, two excerpts):
+    
+    > Kai was never meant to be "a bunch of LLMs in a box."
+    
+    > The thing meant to persist is the **organism and its lineage**: the mission, identity, relationships, history,
+    > evidence discipline, governance, learned state and continuing responsibility.
+    END-VERBATIM KAI-VISION-BRIEF-FOR-GPT
+
+### 6. Next authorised step
+
+- On return: send the DAI-6 DeepSeek message (regenerate from entry 80's packet and gen_dai6_b64.py if the container is gone), preserve the reply, return it to Kai  [CONVERSATION 2026-10-06 Kai, "Preserve the reply exactly and return it to Kai for reconciliation."]
+
+### 7. What I am unsure of
+
+- The brief summarises the README (dated 2026-09-17) and four Kingsman documents read in full; the other documents it lists were not read for it  [FILE KAI_VISION_BRIEF_FOR_GPT.md]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
