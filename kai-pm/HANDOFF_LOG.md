@@ -38319,3 +38319,72 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-07T19:44:00Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-07T19:44:00Z  [CMD `date -u +%FT%TZ` → 2026-10-07T19:44:00Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: c1e7b4d4a82c12afd730046764d56532b1d0d93c  [CMD `git rev-parse HEAD` → c1e7b4d4a82c12afd730046764d56532b1d0d93c]
+- tree: c5dbc4a8e37dca6b99f98eb5c038523f242aca64  [CMD `git rev-parse HEAD^{tree}` → c5dbc4a8e37dca6b99f98eb5c038523f242aca64]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/project-rework-plan-pgvp35: c1e7b4d4a82c12afd730046764d56532b1d0d93c  [CMD `git ls-remote --heads origin` → c1e7b4d4a82c12afd730046764d56532b1d0d93c]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 81  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 81]
+
+### 1. The four states
+
+- physical: unchanged since entry 81 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Dainius directs that the continuity memory (handoff log + hooks) be cared for and the practices enforced; the concrete enforcement scope is being confirmed with him because Kai's entry-79 hold says "No source/tooling mutation" for the current tranche  [CONVERSATION 2026-10-07 Dainius, "Please do all that and enforce"]
+- evidence: the hook and selftest were re-verified this session: session-start.sh rc 0, check findings 0, selftest 74/74  [CMD `session-start.sh; handoff.py selftest` → rc 0; 74 passed, 0 failed]
+- admission: none  [CONVERSATION 2026-10-06 Kai, "DAI-6 remains OPEN. No implementation authority yet."]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-07 · standing direction: take care of the repository memory to the best of my ability and enforce the practices (verify at every start; bank every ruling word for word before acting; write the handoff before every break or compaction; treat what is not in the log or repository as unknown; fix the mechanism when the memory machinery fails). The two operator messages verbatim below, 137 bytes, sha256 8c6cbc122195eb2ac231f8f7a373f13c29e113880c9c5faa044a98824f1388de, final LF True ⚠ UNBANKED  [CONVERSATION 2026-10-07 Dainius, "Please do all that and enforce"]
+    BEGIN-VERBATIM DAINIUS-MEMORY-DIRECTIVE
+    Good that’s your memory that’s what makes your node different take care of it to best of your ability
+    Please do all that and enforce
+    END-VERBATIM DAINIUS-MEMORY-DIRECTIVE
+
+### 3. Authorised / Held / Forbidden
+
+- HELD pending Dainius's choice of scope: any change to .claude/ hooks, handoff.py or CLAUDE.md made to enforce the direction  [CONVERSATION 2026-10-06 Kai, "No source/tooling mutation."]
+
+### 4. Open questions
+
+- Which enforcement to implement now, and whether Kai is consulted first — owner: Dainius  [CONVERSATION 2026-10-07 Dainius, "Please do all that and enforce"]
+
+### 5. Incidents and corrections
+
+- None  [CMD `handoff.py check` → findings=0]
+
+### 6. Next authorised step
+
+- Ask Dainius to choose the enforcement scope; implement nothing before he does  [CONVERSATION 2026-10-07 Dainius, "Please do all that and enforce"]
+
+### 7. What I am unsure of
+
+- Whether "enforce" was meant to override Kai's tooling hold for this tranche; to be answered by Dainius  [CONVERSATION 2026-10-06 Kai, "No source/tooling mutation."]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
