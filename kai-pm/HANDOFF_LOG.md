@@ -56246,3 +56246,75 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-07T21:48:52Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-07T21:48:52Z  [CMD `date -u +%FT%TZ` → 2026-10-07T21:48:52Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 4131556d202bc237942b4aacaa2db6175da41df8  [CMD `git rev-parse HEAD` → 4131556d202bc237942b4aacaa2db6175da41df8]
+- tree: 69fcb8fc99cb8601912696ac4ebaabf2109bb577  [CMD `git rev-parse HEAD^{tree}` → 69fcb8fc99cb8601912696ac4ebaabf2109bb577]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 4131556d202bc237942b4aacaa2db6175da41df8  [CMD `git ls-remote --heads origin` → 4131556d202bc237942b4aacaa2db6175da41df8]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 97  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 97]
+
+### 1. The four states
+
+- physical: unchanged since entry 97 apart from this entry; nothing written to Linear or Miro  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: read-only use of the newly connected Linear and Miro tools; no writes without Dainius's instruction  [CONVERSATION 2026-10-07 Dainius, "I’ve aged plug ins micro and linear"]
+- evidence: TOOLING FACT CHANGED: this session now has Linear (workspace "DAINIUS", https://linear.app/kaidainius) and Miro (user 3458764686259206303) tools; entries 76–77 recorded Linear as unreachable from this session  [CMD `Linear get_workspace` → id 057c1186-e5a7-4d6b-aab6-8a4491b886ca]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius (as recorded by Kai in Linear, not yet confirmed to Orion) · 2026-10-07 · PAUSE: "All current engineering continuation is paused until the KAI universe, end-state vision, architecture lineage and cold-start recovery are coherently reconstructed." DAI-9 is the active work package; "No DAI-6 implementation, adversarial packet progression, DAI-7 or downstream engineering should resume until Dainius/Kai explicitly release the pause after the universe reconciliation." Source is Linear, not conversation or DECISIONS ⚠ UNBANKED  [CMD `Linear get_issue DAI-9` → updatedAt 2026-10-07T21:35:04.489Z, status In Progress] [CMD `Linear get_issue DAI-6` → updatedAt 2026-10-07T17:43:31.212Z, status Backlog] [CONVERSATION 2026-10-07 Dainius, "I’ve aged plug ins micro and linear" — entry route only; the ruling text is from Linear, not from Dainius to Orion]
+- Dainius (Linear document, owner Dainius) · 2026-10-07 · "KAI Kingsman Master Plan v1.0 — LOCKED PLANNING BASELINE", status "LOCKED FOR RECONCILIATION / DESIGN CONTROL"; "architecture and programme-planning baseline only. It does not create source-code implementation authority, alter D-numbered programme authority, release D379/DAI-6, or authorise downstream Kingsman implementation"; includes Controlled Amendment A1 (research adjudication) and §16 "Orion notes / delta-control obligation — locked addendum" ⚠ UNBANKED  [CMD `Linear get_document a0fad986-5e60-4f80-9588-0713ce200da6` → updatedAt 2026-10-07T21:37:51.833Z, creator dan.apex.engineer@gmail.com] [CONVERSATION 2026-10-07 Dainius, "I’ve aged plug ins micro and linear" — entry route only; the ruling text is from Linear, not from Dainius to Orion]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD (per Linear DAI-9/DAI-6, pending Dainius's confirmation): DAI-6 design/implementation and its DeepSeek packet progression, DAI-7, D379 continuation and downstream engineering, until the universe-reconciliation pause is released  [CMD `Linear get_issue DAI-6` → updatedAt 2026-10-07T17:43:31.212Z, status Backlog]
+- HELD (unchanged): every plan as canon; DAI-6 implementation, DAI-7, ledger mutation incl. INC-35, D390, F, capture, candidate, holdout, blind 40, Item 8, merge; code/tooling changes; any Linear/Miro write without instruction  [CONVERSATION 2026-10-07 Dainius, "Ruling this is only the base line pending review and adversary deep seeks attack"]
+
+### 4. Open questions
+
+- CONFLICT with Orion's own recent advice: entries 87–97 and Orion's replies said the DAI-6 DeepSeek packet "remains ready to send"; Linear says that progression is paused. Orion's advice is withdrawn pending Dainius's confirmation of the pause — owner: Dainius  [CMD `Linear get_issue DAI-6` → updatedAt 2026-10-07T17:43:31.212Z, status Backlog]
+- CONFLICT, v1.0 A1.10 vs entries 93/95: A1.10 accepts "PERSIST", the "IETF execution-outcome and COGITATOR drafts" and the "OECD Agent Evidence Conformance Suite" as useful inputs "after source verification"; Orion's searches did not find PERSIST, an IETF draft of that title, COGITATOR or the OECD suite. Kai is asked for the exact source links — owner: Kai  [CMD `Linear get_document a0fad986-5e60-4f80-9588-0713ce200da6` → updatedAt 2026-10-07T21:37:51.833Z, creator dan.apex.engineer@gmail.com]
+- CONFLICT, v1.0 §12 status vocabulary (PLANNED · STUB · BUILT · QUALIFIED · SHADOW · LIVE · DEGRADED · QUARANTINED · RETIRED) vs IDX/D351 (LIVE / BUILT-NOT-CUT-OVER / WORKING / STUB / BLOCKED / UNKNOWN) — entry 95 finding D11 still open — owner: Dainius/Kai  [FILE kai-pm/D351_EVOLUTION_NOT_REDESIGN_AND_PRESENTATION_BAR_CORRECTION.md:238]
+- v1.0 §3 organ list now includes Proactivity/Goals/Attention, Resilience/Doctor, Evolution Lab, Embodiment and Mission Control (closer to IDX:58-74) but still has no Soul/Inner Life or Growth/Dream front-door organ — entry 95 findings D1/D2 partly addressed — owner: Kai  [CMD `Linear get_document a0fad986-5e60-4f80-9588-0713ce200da6` → updatedAt 2026-10-07T21:37:51.833Z, creator dan.apex.engineer@gmail.com]
+- v1.0 §16D requires an "Orion ↔ Kai ↔ Repository ↔ Research Reconciliation Matrix" before canon freeze; v1.0 §16 does not yet reference Orion's review (entry 95) or candidate (entry 97) — owner: Kai  [CMD `Linear get_document a0fad986-5e60-4f80-9588-0713ce200da6` → updatedAt 2026-10-07T21:37:51.833Z, creator dan.apex.engineer@gmail.com]
+- Linear status drift vs the log: DAI-6 is Backlog in Linear since 2026-10-07T17:43:31Z (was In Progress, entry 77); new issues DAI-8 (toolchain), DAI-9 (cold-start control plane, In Progress), DAI-10..DAI-14 (Kingsman work packages) exist only in Linear  [CMD `Linear list_issues` → 14 issues]
+
+### 5. Incidents and corrections
+
+- Preservation limit, stated: the v1.0 document (and the DAI-6/DAI-8/DAI-9 descriptions) are NOT preserved byte-for-byte here; this session has no byte-exact path from the Linear tool response to disk, and a retyped copy would carry Orion's hash, not Linear's. Identity recorded instead (document id, updatedAt, URL); the quotes above are copied from the tool response  [CMD `Linear get_document a0fad986-5e60-4f80-9588-0713ce200da6` → updatedAt 2026-10-07T21:37:51.833Z, creator dan.apex.engineer@gmail.com]
+
+### 6. Next authorised step
+
+- Report to Dainius: tools confirmed, the Linear pause ruling and the locked v1.0 baseline, the conflicts above; ask him to confirm the pause so it can be banked  [CONVERSATION 2026-10-07 Dainius, "I’ve aged plug ins micro and linear"]
+
+### 7. What I am unsure of
+
+- Whether "dan.apex.engineer@gmail.com" (creator of the Linear document) is Dainius's own account used by Kai; not verified  [CMD `Linear get_document a0fad986-5e60-4f80-9588-0713ce200da6` → updatedAt 2026-10-07T21:37:51.833Z, creator dan.apex.engineer@gmail.com]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
