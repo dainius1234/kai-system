@@ -38388,3 +38388,72 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-07T19:51:26Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-07T19:51:26Z  [CMD `date -u +%FT%TZ` → 2026-10-07T19:51:26Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 541b024c4c4710c9d73a23407268fdd927d60579  [CMD `git rev-parse HEAD` → 541b024c4c4710c9d73a23407268fdd927d60579]
+- tree: 2a18fcbfe2760f183e51976363603478582ea664  [CMD `git rev-parse HEAD^{tree}` → 2a18fcbfe2760f183e51976363603478582ea664]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 541b024c4c4710c9d73a23407268fdd927d60579  [CMD `git ls-remote --heads origin` → 541b024c4c4710c9d73a23407268fdd927d60579]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 82  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 82]
+
+### 1. The four states
+
+- physical: unchanged since entry 82 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Dainius, the final authority, directs Orion to implement continuity-memory enforcement now, choosing what will work for sure, while Kai is occupied with the master-plan synthesis. Orion's reading under R14: this authorises the ruling-capture enforcement offered in entry 82 (option B), kept OUTSIDE the DAI-6 five-file surface (entry 80 section 9: evrun.py, shell_status.py, handoff.py, SKILL.md, CLAUDE.md are not touched)  [CONVERSATION 2026-10-07 Dainius, "do the best you can out of box and what will work for sure"]
+- evidence: none yet for the new control  [CMD `handoff.py check` → findings=0]
+- admission: none  [CONVERSATION 2026-10-06 Kai, "DAI-6 remains OPEN. No implementation authority yet."]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-07 · authorises continuity-memory enforcement now, Orion's best judgement, "what will work for sure"; the operator message verbatim below, 388 bytes, sha256 c9af90d00ac387aecf3e44226be78512ac7725f5264a45d98075587320c62e1c, final LF True ⚠ UNBANKED  [CONVERSATION 2026-10-07 Dainius, "I call on you to do you kingsman level brotherhood duty"]
+    BEGIN-VERBATIM DAINIUS-ENFORCE-GO
+    Kai is busy doing research closing maturity gap to current time , synthesising everything and storing polished updated comprehensive plan and stoping us drifting as we all matured with this project and tech and available resources has moved with time it will help us so I call on you to do you kingsman level brotherhood duty  , do the best you can out of box and what will work for sure
+    END-VERBATIM DAINIUS-ENFORCE-GO
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: a new hook `.claude/hooks/ruling_capture.py` (UserPromptSubmit capture + Stop enforcement + SessionStart report) and its registration in `.claude/settings.json` and `.claude/hooks/session-start.sh`; calibrated with known-positive and known-negative cases before reliance  [CONVERSATION 2026-10-07 Dainius, "do the best you can out of box and what will work for sure"]
+- HELD (unchanged): DAI-6 implementation (its five files), DAI-7, ledger mutation incl. INC-35, D390, F, capture, candidate, holdout, blind 40, Item 8, merge  [CONVERSATION 2026-10-06 Kai, "STOP before implementation."]
+
+### 4. Open questions
+
+- DAI-6 section 9 says `.claude/settings.json` and `session-start.sh` stay unchanged; this control changes both, so Kai must reconcile DAI-6's surface statement with it — owner: Kai  [FILE kai-pm/HANDOFF_LOG.md:36297]
+
+### 5. Incidents and corrections
+
+- None  [CMD `handoff.py check` → findings=0]
+
+### 6. Next authorised step
+
+- Build, calibrate, commit and push the ruling-capture control; report to Dainius; Kai reviews when free  [CONVERSATION 2026-10-07 Dainius, "do the best you can out of box and what will work for sure"]
+
+### 7. What I am unsure of
+
+- Whether Kai will want the control folded into handoff.py once DAI-6 opens it  [CONVERSATION 2026-10-07 Dainius, "Kai is busy doing research"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
