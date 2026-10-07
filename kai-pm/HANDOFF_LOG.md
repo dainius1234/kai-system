@@ -54104,3 +54104,72 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-07T21:06:06Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-07T21:06:06Z  [CMD `date -u +%FT%TZ` → 2026-10-07T21:06:06Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 213c714bb19ce0da73ab89062c4abb7908720b69  [CMD `git rev-parse HEAD` → 213c714bb19ce0da73ab89062c4abb7908720b69]
+- tree: 1381b790022c853cabbb52b07fc0be3051803be7  [CMD `git rev-parse HEAD^{tree}` → 1381b790022c853cabbb52b07fc0be3051803be7]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/project-rework-plan-pgvp35: 213c714bb19ce0da73ab89062c4abb7908720b69  [CMD `git ls-remote --heads origin` → 213c714bb19ce0da73ab89062c4abb7908720b69]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 90  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 90]
+
+### 1. The four states
+
+- physical: unchanged since entry 90 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: nothing new; the entry-89 plan is a BASELINE only, pending BOTH Dainius's review AND a DeepSeek adversarial attack on it  [CONVERSATION 2026-10-07 Dainius, "Ruling this is only the base line pending review and adversary deep seeks attack"]
+- evidence: none new  [CMD `handoff.py check` → findings=0]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-07 · RULING: the Kingsman plan of entry 89 is only the baseline, pending review and DeepSeek's adversarial attack (extends entry 90); verbatim below, 81 bytes, sha256 2c451778e599963b73eefe4ad8a688b7c72c8832013c397ccfd7f4d118495b97, final LF True ⚠ UNBANKED  [CONVERSATION 2026-10-07 Dainius, "Ruling this is only the base line pending review and adversary deep seeks attack"]
+    BEGIN-VERBATIM DAINIUS-PLAN-BASELINE-DEEPSEEK
+    Ruling this is only the base line pending review and adversary deep seeks attack
+    END-VERBATIM DAINIUS-PLAN-BASELINE-DEEPSEEK
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: any use of the entry-89 plan as design authority until Dainius's review AND DeepSeek's adversarial attack are done and reconciled  [CONVERSATION 2026-10-07 Dainius, "Ruling this is only the base line pending review and adversary deep seeks attack"]
+- HELD (unchanged): DAI-6 implementation, DAI-7, ledger mutation incl. INC-35, D390, F, capture, candidate, holdout, blind 40, Item 8, merge; Orion module design  [CONVERSATION 2026-10-07 Dainius, "Let gpt do his part"]
+
+### 4. Open questions
+
+- Dainius's review outcome, and who prepares the DeepSeek attack packet for the plan (Orion can build a self-contained base64 packet with receipt sentinels on instruction) — owner: Dainius  [CONVERSATION 2026-10-07 Dainius, "Ruling this is only the base line pending review and adversary deep seeks attack"]
+
+### 5. Incidents and corrections
+
+- Captured by the hook (id 7844bda7ad240001, keyword(ruling)); banked from the hook's exact copy  [CMD `cat .git/kai-ruling-capture/7844bda7ad240001.json` → flagged]
+
+### 6. Next authorised step
+
+- Wait for Dainius's review outcome and his instruction on the DeepSeek attack; the DAI-6 DeepSeek packet remains ready to send  [CONVERSATION 2026-10-07 Dainius, "Ruling this is only the base line pending review and adversary deep seeks attack"]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff.py check` → findings=0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
