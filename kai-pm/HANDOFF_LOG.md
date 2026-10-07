@@ -55355,3 +55355,894 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-07T21:25:29Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-07T21:25:29Z  [CMD `date -u +%FT%TZ` → 2026-10-07T21:25:29Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 9bb01af0782816fc64c1f564e18ccc491cf96588  [CMD `git rev-parse HEAD` → 9bb01af0782816fc64c1f564e18ccc491cf96588]
+- tree: 9b93872781f467a10929c093b8acd19d78ec1b0d  [CMD `git rev-parse HEAD^{tree}` → 9b93872781f467a10929c093b8acd19d78ec1b0d]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 9bb01af0782816fc64c1f564e18ccc491cf96588  [CMD `git ls-remote --heads origin` → 9bb01af0782816fc64c1f564e18ccc491cf96588]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 96  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 96]
+
+### 1. The four states
+
+- physical: unchanged since entry 96 apart from this entry; no source or tooling file touched  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: as entry 96 (one non-authoritative candidate document)  [CONVERSATION 2026-10-07 Dainius, "If you was to rewrite plan as top tier nasa or silicone valet dev pm show me your version and make sure its has nothing missing"]
+- evidence: Orion's candidate "KAI — KINGSMAN MASTER ARCHITECTURE & PROGRAMME PLAN, Orion candidate v0.1", organism-first (eleven IDX organs with TODAY / MATURED / CHANGE TYPE / WHY), D359 order verbatim, constitution, trust boundary, resilience, stewardship, cognitive resources, assurance, roadmap, risks/decisions, canon process, and a completeness matrix; written after reading IDX, D351, D353, the canon plan, the mission doctrine and the cold-start master in full, plus the required sections of eight further doctrine documents. Preserved below  [FILE kai-pm/D351_EVOLUTION_NOT_REDESIGN_AND_PRESENTATION_BAR_CORRECTION.md:198]
+- admission: none; candidate only  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `ruling_capture.py status` → OUTSTANDING=0]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD (unchanged): every plan as design authority; DAI-6 implementation, DAI-7, ledger mutation incl. INC-35, D390, F, capture, candidate, holdout, blind 40, Item 8, merge; code/tooling changes  [CONVERSATION 2026-10-07 Dainius, "Ruling this is only the base line pending review and adversary deep seeks attack"]
+
+### 4. Open questions
+
+- The eleven Dainius decisions listed in the candidate's §12.3 — owner: Dainius  [CONVERSATION 2026-10-07 Dainius, "If you was to rewrite plan as top tier nasa or silicone valet dev pm show me your version and make sure its has nothing missing"]
+- Whether the candidate goes to Kai for reconciliation with his baseline and then to DeepSeek — owner: Dainius  [CONVERSATION 2026-10-07 Dainius, "If you was to rewrite plan as top tier nasa or silicone valet dev pm show me your version and make sure its has nothing missing"]
+
+### 5. Incidents and corrections
+
+- CORRECTION of a claim Orion transmitted to Dainius after entry 89 ("70/30 as an original concept | Present in docs/sovereign_ai_spec.md"): FALSE. That file's only "70/30" is line 1268, "- [ ] WORK mode: 70/30 rule enforced", a deployment-checklist item unrelated to a revenue split. A full search of committed files (HANDOFF_LOG excluded) finds the revenue-split concept nowhere; it exists only in Kai's baseline (entry 89). Mechanism: a literal-string match reported as a concept (R13 tell: "I can name a literal string in the query behind a number I am calling a mechanism"); caught by an R15 check while writing the candidate. Candidate text corrected before banking; Dainius asked to confirm the intent so it can be banked  [CMD `git grep -n -i -E "70 ?/ ?30" HEAD` → docs/sovereign_ai_spec.md:1268 only]
+- Own check slip, disclosed: a verification chain used `^## Mode H` where the product spec's headings are `### Mode H0…H3` (lines 207–231); re-run correctly  [CMD `grep -n -E "^### Mode H[0-3]" kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md` → 4 lines]
+- Credential scan of the candidate (calibrated): TOTAL HITS 0  [CMD `credscan.py cand_scan.json` → TOTAL HITS 0]
+- EVIDENCE KINGSMAN-MASTER-PLAN-ORION-CANDIDATE-V0-1 KINGSMAN_MASTER_PLAN_ORION_CANDIDATE_v0_1.md: 64560 bytes, sha256 1d0c6fc48eadd400c4edeeb091fe0d34990934383fdb6d0b393a002336ad2fd6, final LF True  [CMD `sha256sum KINGSMAN_MASTER_PLAN_ORION_CANDIDATE_v0_1.md` → 1d0c6fc48eadd400…]
+    BEGIN-VERBATIM KINGSMAN-MASTER-PLAN-ORION-CANDIDATE-V0-1
+    # KAI — KINGSMAN MASTER ARCHITECTURE & PROGRAMME PLAN
+    
+    ## Orion candidate v0.1 · 2026-10-07
+    
+    > **STATUS: NON-AUTHORITATIVE CANDIDATE.** Written by Orion at Dainius's direction (handoff entry 96) beside
+    > Kai's baseline (entry 89), using the findings of the review in entry 95. It is **not** the canon, **not** a
+    > D-numbered decision, and it **authorises nothing**: no implementation, no refactor, no service change, no
+    > Item 8, no A-4, no succession, no finance. D359 governs programme order; where anything here differs from a
+    > valid D-numbered decision, **the decision wins**. Canon freeze requires the process in §13: repository mapping,
+    > adversarial review, Dainius approval, exact-byte freeze.
+    >
+    > **Subject identity of every repository fact in this document:** branch `claude/project-rework-plan-pgvp35`,
+    > commit `9bb01af0782816fc64c1f564e18ccc491cf96588`. Facts marked **[V]** were opened and read by Orion at that
+    > commit; **[S]** were reported by a census subagent and not re-read; **[R]** are README claims (README is
+    > "stale factually, but mandatory organism/capability/presentation lineage input; never current fact
+    > authority", IDX:14). **Runtime status of nearly every organ is UNKNOWN**: the E0 census has not been run and
+    > no organ has qualified runtime evidence. This document says so wherever it applies.
+    
+    **How to read it.** Pages 1–4 are the organism view for Dainius (D351 §6: WHO KAI IS → KAI TODAY → KAI MATURED
+    → WHAT CHANGES). §5–§10 are the engineering drill-down. §11 is where the programme actually is and what comes
+    next. §12 lists the risks and the decisions only Dainius can make. §13 is how this becomes canon. Appendix A
+    proves completeness: every source requirement mapped to the section that carries it.
+    
+    ---
+    
+    ## 1. WHO KAI IS
+    
+    **Mission.** Build a Kai that can **grow with Dainius, care for him, preserve what matters, become increasingly
+    self-sufficient, survive beyond him, and continue the intended stewardship for his daughter — without losing
+    truth, identity, governance or safety.** (Mission doctrine §1.)
+    
+    **Identity.** Kai is the **organism**, not any component. No model, framework, service, device or repository
+    snapshot is Kai. `KAI = MISSION + IDENTITY/LINEAGE + MEMORY/CONTINUITY + QUALIFIED WORLD STATE/EVIDENCE +
+    COGNITION + RELATIONSHIPS + GOVERNANCE/AUTHORITY + CAPABILITIES + LEARNING/HISTORY, instantiated through
+    replaceable components.` The vessel/reincarnation metaphor means *preserve the lineage and self-pattern while
+    the vessel and cognitive organs change* — never literal transfer of a hosted model.
+    
+    **The hierarchy (must stay visible):**
+    
+    | layer | meaning |
+    |---|---|
+    | PRIMARY MISSION | why Kai exists |
+    | KINGSMAN | the engineering/governance standard that makes the mission trustworthy |
+    | HOUSE-IN-ORDER / ASSURANCE | how we establish what is true enough to build on |
+    | PHASE 2 | how surviving organs are professionalised toward the mission |
+    
+    **Operator standard.** Dainius's standard 150%; Kai's expected standard 110% — real, measured, earned. *Kai does
+    not earn trust by promising more; Kai earns trust by repeatedly proving more.* Intelligence is not authority.
+    Performance evidence is not automatic authority.
+    
+    **One-glance organism map — the eleven organs (front door; engineering lives beneath them):**
+    
+    | # | organ | what it is in one line | today (status vocabulary §5.6) |
+    |---|---|---|---|
+    | O1 | **Soul / Identity / Inner Life** | who Kai is: values, narrative self, emotion, conscience, dreams | code present; runtime UNKNOWN |
+    | O2 | **Memory / Relationship / Continuity** | what Kai remembers and how it stays the same Kai | WORKING in minimal stack [R]; runtime UNKNOWN |
+    | O3 | **Senses / World Awareness** | what Kai perceives and how it knows the present | mixed: STUB/WORKING; perception in SHADOW |
+    | O4 | **Intelligence / Reasoning** | how Kai thinks one problem through | WORKING on CPU with a 0.5B model [S] |
+    | O5 | **Cognitive Depth / Specialists** | teammates, swarm, FSMs, deeper reasoners | mixed: built; several GPU STUBs [R] |
+    | O6 | **Proactivity / Goals / Attention** | noticing without being asked; knowing what matters | 5-minute observer loop [R]; target not built |
+    | O7 | **Governed Hands / Capabilities** | how Kai acts on the world, and only with authority | **BUILT-NOT-CUT-OVER**; legacy routes are the live hands [V] |
+    | O8 | **Immune System / Doctor / Resilience** | diagnosis, containment, recovery, honest degradation | diagnosis WORKING [S]; recovery off by default [V] |
+    | O9 | **Growth / Dream / Evolution** | learning, skills, controlled self-improvement | insights only; no self-modification [S] |
+    | O10 | **Continuity / Stewardship / Sustainability** | surviving years, hardware, providers, succession, money | backup partial [S]; succession/finance LOGGED, not built |
+    | O11 | **Operator Relationship / Mission Control** | Dainius's relationship with Kai and his control room | dashboard WORKING [S]; Mission Control not built |
+    
+    **What is being changed now:** nothing in the runtime. The programme is in **House-in-Order H2** (D379 repair
+    and its DAI-6/DAI-7 assurance follow-ons). Every Kingsman change below is **destination**, behind D359 (§11).
+    
+    ---
+    
+    ## 2. KAI TODAY — the organism as it exists
+    
+    Each row: what exists, where, and its honest status. **Runtime UNKNOWN** means "code present, no qualified
+    runtime evidence", never "absent" (FP-INV-07, A4 rule: *never turn "I cannot prove it" into "it does not exist"*).
+    
+    ### O1 Soul / Identity / Inner Life
+    - `data/SOUL.md` — operator's CRITICAL identity file (D60); rewritable via `POST /soul` in agentic [S], **outside
+      the actuator catalogue**. *Hard rule: not touched without explicit instruction.*
+    - Emotional Memory, Self-Reflection, Epistemic Humility, Confession Engine, Narrative Identity (autobiography,
+      `memu-core/app.py:5648-5708` [S]), Imagination Engine, Conscience & Values (`memu-core/app.py:2317-2326,
+      6840-6913` [S]), Dream State (6-phase consolidation), Obsidian Brain (vault-sync) [R].
+    - Defect: `CONSCIENCE_FILTER` flag ("value-gate on actions", default ON) is **never read** [S].
+    - Status: code present; runtime UNKNOWN.
+    
+    ### O2 Memory / Relationship / Continuity
+    - memu-core (pgvector `pgvector/pgvector:pg15` + TurboVec) [S]; memu-graph (Cognee 1.1.3, Kuzu) — full compose
+      only [S]; Letta archival (letta 0.16.8) — full compose only [S]; vault-sync (Obsidian) [R]; Redis session
+      buffer; ledger-worker; memory-compressor [R].
+    - **Graphiti is not in code** — rejected for Cognee at D29 (`DECISIONS.md:529`) [S].
+    - Status: WORKING claimed for the minimal stack [R]; runtime UNKNOWN.
+    
+    ### O3 Senses / World Awareness
+    - perception/{audio, camera, vision, wake, clipboard, files}, screen-capture, screen-watcher, email-reader,
+      calendar, weather, airquality, news-feed, sysmetrics, docker-watcher, git-watcher, document-parser,
+      financial-awareness, monitor [V dirs].
+    - World state is an in-process library (`common/world_state/`) [S]; `KAI_PERCEPTION_MODE` defaults to
+      **shadow**; `KAI_CORTEX_SOURCE` defaults to **poll** with a documented fallback to the polled document when
+      world state is empty (`common/perception_spine/cortex_source.py:17-21`) [S] — *exactly* the legacy-truth
+      regression the canon forbids.
+    - Audio transcription is a stub unless `WHISPER_BACKEND` is set; camera degrades without OpenCV [S].
+    - World Model Provenance: `{value, source, timestamp, confidence}` per field [R].
+    - Status: STUB / WORKING mix; perception spine in SHADOW.
+    
+    ### O4 Intelligence / Reasoning
+    - agentic (port 8007): 14-way context gather, specialist router, planner, adversary engine, conviction scoring,
+      SAGE critique, tree search [R]; Socratic Self-Questioning, Hypothesis Engine, Temporal Projection (✅ Live
+      claimed) [R].
+    - Models: **Ollama `ollama/ollama:0.6.8` with `qwen2.5:0.5b`** is the live default backend [S]; DeepSeek-V4 /
+      Kimi-2.5 / Dolphin endpoints with a deterministic stub fallback (`common/llm.py`) [S]; model names hard-coded in
+      `common/model_registry.py`, compose files and several services [S].
+    - **Conviction still drives gate decisions** (tool-gate cosign; FSM conviction gate 7.0–8.0) [S].
+    - Status: WORKING on CPU; reasoning quality bounded by the 0.5B model (README "Honest Limitations").
+    
+    ### O5 Cognitive Depth / Specialists
+    - Cognitive Reasoning FSM `GATHER → DEBATE → FACT_CHECK → CAUSAL_CHECK → CONVICTION_GATE → PRESENT`, bounded
+      RETHINK/ESCALATE/HALT (`agentic/cognitive_fsm.py`) [S]; System FSM (IDLE/ACTIVE/FOCUSED/DEGRADED/RECOVERING)
+      [R]; Swarm Assembly with `AgentHandoff` schema [R].
+    - Persistent teammates: **5 on disk** (auditor, doctor, oracle, sage, scout — `data/teammates/`); README says 4 [S].
+    - GPU STUBs: Dialectical Synthesis, Analogical Reasoning, Concept Blending, Synthetic Experience, Transitive
+      Reasoning, Causal World Model, **Global Workspace (D102)** [R]. Cognitive Fingerprinting collecting [R].
+    - **LangGraph is not used**: `langgraph>=0.2.0` floor in `agentic/requirements.txt:8`, imported only by
+      `scripts/agentic_integration_test.py` [V]. CVE-2026-104873 (langgraph-sdk) does not apply today [S].
+    
+    ### O6 Proactivity / Goals / Attention
+    - Proactive Observer every 5 minutes; anomaly detection (z-score); cross-sensor correlation; sensory pattern
+      learning; ritual discovery (`RITUALS.md`); proactive scheduling; Proactive Agent (briefings, reminders,
+      13-action registry); anti-annoyance; struggle detection [R].
+    - Doctrine: *a five-minute polling timer is not proactive intelligence.* Durable Goal/Watch/Attention not built.
+    - Status: WORKING (loop) [R]; target architecture not built.
+    
+    ### O7 Governed Hands / Capabilities
+    - **Tool Gate** (`tool-gate/app.py`): HMAC request signing + nonce cache in `/tmp/tool-gate-nonces.json`; the
+      signed string is `actor_did|session_id|tool|nonce|ts` — **parameters are not signed** [S].
+    - **ActuatorRegistry / Unified Hunter**: **34 actuators** in `common/actuator_registry/catalog.py:55-258`, all
+      starting `LEGACY` [S]; README: "Built and tested. NOT cut over." (`README.md:118`) [V].
+    - **Risk tiers in code: five** — OBSERVE, ADVISE, PROPOSE, ACT_SUPERVISED, ACT_AUTONOMOUS
+      (`common/contracts/base.py:27-32`) [V]. The README's "8 risk tiers" are **migration** tiers [S].
+    - Capabilities: one-use, audience-bound, 30 s expiry, revocable — but **in-memory only** (`capability.py:45`),
+      **unsigned**, and `issue()` accepts free-form `parameters` (`:56,77`); `ActionProposal` has **no parameters or
+      target field** (`common/contracts/action.py:18-33`) [V]. One-use: yes. Exact: no.
+    - `ActuatorRegistry.dispatch()` has **no non-test caller** [V]. "Legacy path closed" is an AST check for
+      `require_service_auth` (shared `KAI_SERVICE_TOKEN`), not a capability (`legacy_verification.py:52`); the file's
+      own line 16: *"requiring a capability token is the actual fix"* [V]. **The legacy routes are the only live
+      hands.** browser-agent `/type` and `/run` are not in `LEGACY_CHECKS` [S].
+    - executor, browser-agent, sandboxes, telegram-bot, calendar-sync, workspace-manager [V dirs].
+    - Status: **BUILT-NOT-CUT-OVER.**
+    
+    ### O8 Immune System / Doctor / Resilience
+    - House Doctor (port 8046, 9 rules D001–D009): diagnoses and notifies only [S].
+    - Supervisor: deep health + circuit breaker; recovery gated by `SUPERVISOR_RECOVERY_ENABLED` (default **false**);
+      `POST /recover/{service_name}` has **no auth decorator** (`supervisor/app.py:756-760`) [V].
+    - `common/resilience.py`; structured errors; time-travel debug (checkpoint restore resets circuit-breaker state
+      only) [S]; security self-hacking (34 payloads) [R]; verifier (SAGE) [R]; heartbeat [V dir].
+    - Self-Capability Map `GET /introspect/capabilities` [R]. `memu-core/introspect_app.py` is **not** the intended
+      self-diagnostic brain (cold-start §5.5) [C].
+    - Status: diagnosis WORKING [S]; recovery disabled by default.
+    
+    ### O9 Growth / Dream / Evolution
+    - Skill Hunter: fetches PyPI metadata, writes probationary `.md` skills with provenance front-matter; auto-disable
+      at ≥3 errors [S/R]; in minimal compose `/data/skills` is not mounted into agentic [S].
+    - Agent-Evolver: insight files only (`FF_EVOLVER_ENABLED` off; dream phase 7 on) [S]; Capability Gap Logging [R].
+    - No code installs packages; no self-modifying actuator registered although tier 8 is labelled "self-modifying" [S].
+    - Status: proposal-only growth; no self-modification exists.
+    
+    ### O10 Continuity / Stewardship / Sustainability
+    - backup-service (full compose only): pg_dump, Redis BGSAVE, memory, ledger **stats only** (not entries);
+      **restore exists for Postgres only** [S]; `scripts/backup_offsite.sh`, `monthly_paper_backup.py`,
+      `kai-drill.sh` [S]. No resurrection drill found [S].
+    - Capability/nonce state is not backed up — so restore cannot roll it back **today**, by accident, and it also does
+      not survive restart [S].
+    - Finance: broker-bridge **GET-only**, minimal compose `finance` profile; the only reader of `BINANCE_API_KEY/SECRET`
+      (`broker-bridge/app.py:27-28`) [S]; paper trader trust gate **fails open** (`agentic/paper_trader.py:168`) [V].
+    - Trust ledger HMAC-SHA512 chain (`trust-ledger/ledger.py:49-72`) [S]; Ed25519 service identity wired into one
+      endpoint (`cortex/app.py:569`) [S].
+    - Succession, 70/30, legal entity: **LOGGED, NOT PRIORITISED** (D270, `DECISIONS.md:19321-19325`) [V].
+    
+    ### O11 Operator Relationship / Mission Control
+    - Operator Model, Impact Oracle, Shadow Branches, PUB/WORK modes, Wake & Intent, Trust Negotiation
+      (`POST /gate/autonomy/request` → `pending_approval`) [R]; telegram-bot [V dir].
+    - Dashboard (`dashboard/app.py`, 2,862 lines, mostly proxies; 16 views) [S/R]. "Mission Control" exists only in
+      planning documents [S].
+    - Status: dashboard WORKING [S]; Mission Control PLANNED.
+    
+    ---
+    
+    ## 3. KAI MATURED — the same organism, strengthened
+    
+    Every organ keeps its name and purpose. **CHANGE TYPE**: KEEP / HARDEN / MERGE / MOVE / SPLIT / ADD-JOINT (D351
+    §6C). **STATUS** after maturation is not claimed — it is earned per §10.
+    
+    | organ | MATURE TO | CHANGE TYPE | WHY |
+    |---|---|---|---|
+    | O1 Soul | identity layer as **core invariant** with change control; SOUL/narrative as projections that keep source references; `POST /soul` routed through governed hands; conscience as a value constraint in policy, never evidence quality | KEEP · HARDEN · ADD-JOINT (identity change control) | identity must not change silently; values ≠ evidence (canon §4.7) |
+    | O2 Memory | memory family keeps memu-core/Cognee/Letta/vault-sync; **source vs projection ownership clarified** (graph, vector, Obsidian, SOUL narrative = projections with source ids); temporal validity; provenance on every record; memory→action firewall consumer (§5.3) | KEEP · HARDEN · MOVE (maintenance/mirroring inside the family) | D351:152; projections are not truth (§8 cold-start) |
+    | O3 Senses | sensors stay senses; feed **typed events + provenance** into the Evidence Plane; World State versioned and scoped with VERIFIED/CONTESTED/UNKNOWN/EXPIRED; **poll fallback can restore READ only, never authority**; watcher consolidation only where isolation adds nothing | KEEP · HARDEN · MERGE (simple watchers) | D351:151, :169; rollback cannot restore weaker authority |
+    | O4 Intelligence | cognition owns reasoning only; **conviction becomes epistemic information, never authority**; qualified models selected per role (§9) | HARDEN · MOVE (authority out of conviction) | intelligence ≠ authority; tool-gate cosign currently keyed on conviction |
+    | O5 Specialists | teammates/personas become roles under the Hunter, not services; Global Workspace coordinates reasoning only, holds no credentials (FP-INV-03); one complementary cognitive architecture (Socratic, swarm/debate, Sage/adversary, causal/temporal, GW) with historical alternatives labelled | MERGE · KEEP | D351:170; canon §4.6 |
+    | O6 Proactivity | **nine-stage** proactive architecture (perception → world-state update → goal comparison → significance → forecast → intervention selection → authority check → timing/attention → outcome feedback); **nine distinct outcomes**; durable Goal/Watch/Attention; **PROACTIVE AWARENESS DEGRADED** surfaced | HARDEN · ADD-JOINT (Goal/Watch/Attention) | proactive doctrine §4, §15; D351:190 |
+    | O7 Hands | Tool Gate remains the control point; ActuatorRegistry the hands catalogue; **final-hand exact capability** (signed, parameter- and target-bound, durable, atomically consumed); durable workflow; legacy routes proven dead at runtime | HARDEN · ADD-JOINT (final-hand validation, durable authority state, bypass proof, egress/target constraints) | IDX:83; D351:154-155, :182-187; P1 already requires it (D353:46) |
+    | O8 Doctor | one self-diagnosis & recovery architecture `SEE → UNDERSTAND → DIAGNOSE → EXPLAIN → PROPOSE → APPROVE → HEAL → VERIFY → LEARN`; diagnosis and recovery distinct; contingency library; FUTURE A4 SELF-DIAGNOSIS as the structural intelligence behind it (after Item 8 and A-4 PROVENANCE) | KEEP · HARDEN · MOVE (user nudging → O6) | canon §4.8; D351:171, :174 |
+    | O9 Growth | release/probation governance for skills, Dream, Evolver; **Kai may discover its own future; Kai does not authorise its own future**; model artifacts admitted like skills (§6.7) | HARDEN · ADD-JOINT (admission pipeline) | D351:160; North Star V |
+    | O10 Stewardship | lineage-aware backup/restore with **restore epochs**; Lineage Manifest; dependency survivability; secrets lifecycle; Financial Sustainability Plane (design only until authorised); succession authority model | HARDEN · ADD-JOINT (lineage manifest, restore epoch) | D351:158, :188; stewardship doctrine |
+    | O11 Mission Control | Dashboard **becomes** Mission Control (not replaced); views generated from qualified machine evidence; approval screens rendered deterministically from exact capability fields | MOVE · HARDEN · ADD-JOINT (machine component/dependency/authority view) | D351:156, :189; D353 accepted challenge 6 |
+    
+    **Genuinely missing joints (ADD, never new mini-Kai systems — D351 §5):** final-hand exact capability validation
+    and atomic consumption · runtime bypass/legacy-retirement proof · durable authority state (KAI-REV-018) · governed
+    autonomy-grant bootstrap · explicit egress/target constraints · evidence-bound migration record · lineage
+    manifest · machine component/dependency/authority view · durable Goal/Watch/Attention · **plus, from review
+    (entry 95):** derivation-checked parameter provenance · operator-channel minting of operator-instruction records ·
+    deterministic approval rendering · restore epoch for one-use state · trusted-time policy · single-host trust
+    boundary statement and OS-level isolation · model-artifact admission · calibrated KaiBench.
+    
+    ---
+    
+    ## 4. WHAT CHANGES — delta map
+    
+    ```
+                     TODAY                                   MATURED
+    O7 HANDS   legacy route + shared token      →   Tool Gate → exact signed capability → final hand
+               capability: one-use, in-memory   →   one-use, signed, parameter/target-bound, durable, epoch-aware
+               conviction decides cosign        →   conviction informs; policy + approval + capability decide
+    O3 SENSES  cortex default POLL fallback     →   World State canonical; poll = READ-only fallback, fenced
+    O8 DOCTOR  Doctor diagnoses, Supervisor     →   one SEE→…→LEARN loop; repair only via approved capability;
+               /recover unauthenticated            independent post-repair verification
+    O2 MEMORY  stores without source/projection →   source records canonical; graph/vector/Obsidian/SOUL = projections
+               ownership; no signed provenance      with source ids; provenance + temporal validity on every record
+    O6 PROACT  5-minute observer loop           →   nine-stage proactive architecture + Goal/Watch/Attention
+    O10 STEW   Postgres-only restore            →   lineage-aware restore with epoch bump + qualification drill
+    O11 MC     dashboard proxies                →   Mission Control generated from qualified evidence
+    O4/O5      hard-coded models; 0.5B on CPU   →   qualified model per role; Ollama kept until multi-runtime pressure
+    ```
+    
+    Nothing is deleted. Every arrow is a migration under §7.4: **adapter → shadow → compare → qualify → controlled
+    cutover → prove old authority path unreachable → retire.**
+    
+    ---
+    
+    ## 5. CONSTITUTION — invariants, control loop, authority, truth
+    
+    ### 5.1 Invariants (all retained; none new)
+    
+    **ONE KAI — MANY MINDS/SENSES/TOOLS — ONE EVIDENCE STANDARD — ONE GOVERNED DECISION PATH — OPERATOR SOVEREIGNTY.**
+    
+    Nine constitutional laws (cold-start §7.1): ONE KAI · FREE TEXT NEVER GRANTS AUTHORITY · PROVENANCE SURVIVES
+    COGNITION · LOCAL CORE — EXPLICIT EGRESS · SHADOW ALLOWED, DUAL AUTHORITY FORBIDDEN · REUSE → EXTEND → MIGRATE →
+    CREATE · EARNED AUTONOMY · STRUCTURED CONTROL BEFORE VISUAL CONTROL · SYNTHETIC OUTPUT IS NOT EXTERNAL EVIDENCE.
+    
+    Twelve product invariants FP-INV-01…12 (final product spec): one decision path; separated roles (no component
+    proposes, approves, executes **and** verifies the same action); Global Workspace coordinates only; operator
+    sovereign (approval authenticated, exact, expiring, never inferred from chat); security at the final hand; data
+    scoped and attributable; **unknown remains unknown**; learning follows verified reality; local-first ≠ trusted
+    (loopback/IP is not identity); graceful reduction, not fail-open; capability-specific release; portable operation
+    recoverable (sleep, battery loss, restart, throttling never corrupt state, duplicate actions or restore permissive
+    authority).
+    
+    Continuity classes: **core invariants** (change only by high-authority governance) · **evolvable organs** ·
+    **learned state** (provenance-aware). **GROWTH WITHOUT ARCHITECTURAL AMNESIA.** **THE ENGINEERING MUST MAKE KAI
+    STRONGER WITHOUT MAKING KAI UNRECOGNISABLE.** **NO NEW BOX WITHOUT CURRENT-TO-TARGET LINEAGE.**
+    
+    ### 5.2 The canonical control loop
+    
+    ```
+    PERCEPTION → TYPED EVENT + PROVENANCE → EVIDENCE / QUALIFICATION → CLAIM
+    → VERSIONED + SCOPED WORLD STATE → SPECIALIST INTERPRETATION → SHARED DELIBERATION
+    → FACT / ADVERSARIAL / CAUSAL REVIEW → CONVICTION + UNCERTAINTY (information only)
+    → IMMUTABLE ACTION PROPOSAL (with exact parameters, target, parameter provenance)
+    → POLICY / SAFETY / VALUES CONSTRAINTS → MEMORY→ACTION FIREWALL
+    → DAINIUS APPROVAL WHERE REQUIRED (rendered from the exact proposal) or SCOPED AUTONOMY GRANT
+    → EXACT CAPABILITY → DURABLE WORKFLOW → FINAL-HAND ACTUATOR (validates + atomically consumes)
+    → INDEPENDENT OUTCOME OBSERVATION → VERIFICATION (VERIFIED / FAILED / OUTCOME_UNKNOWN / UNVERIFIABLE)
+    → MEMORY / LEARNING / TRUST / SELF-DIAGNOSIS UPDATE (verified outcomes only)
+    ```
+    
+    No architecture may bypass this path without an explicit, justified exception class recorded in the canon.
+    
+    ### 5.3 Authority model
+    
+    **Separation.** Gate (evaluates a transition) ≠ Policy (is this class allowed?) ≠ Authority record (who allowed
+    this exact action?) ≠ Capability (machine-enforceable permission for one narrow side effect). These evolve
+    **behind Tool Gate and ActuatorRegistry**; no second authority beside Tool Gate.
+    
+    **Final hand.** `membership ≠ identity ; identity ≠ permission ; policy + approval/scoped autonomy → exact
+    capability → final-hand validation + durable consumption ; dispatch success ≠ verified real-world outcome.`
+    
+    **Exact capability (requirements, not a format).** Finish the existing Ed25519 service identity and nonce
+    protections (IDX:82, D353:60); do not build a parallel identity system. A capability must: name issuer key id,
+    **algorithm and proof version** (crypto agility, R353-02); bind actuator, audience, target, **hash of the exact
+    parameters**, principal, purpose, policy version, world-state snapshot id, approval id, max consequence/spend,
+    expiry, nonce, **restore epoch**; be verified at the final hand with an issuer key the model's OS principal cannot
+    read; be consumed atomically in **durable** storage before the side effect; be replayed server-side exactly as
+    approved (no model reconstruction after approval).
+    
+    **Memory→Action Firewall (adopted; MEMDRIFT arXiv 2605.24941 supports it).** Every consequential parameter
+    carries provenance from {CURRENT_VERIFIED_EVIDENCE, CURRENT_OPERATOR_INSTRUCTION, APPROVED_STANDING_PREFERENCE,
+    RECALLED_MEMORY, MODEL_INFERENCE, DEFAULT, EXTERNAL_UNVERIFIED}; policy states per actuator field which are
+    admissible. Three hardening rules from review:
+    1. **Provenance is bound to records, not labels** — a source record id + hash, never a model-written label.
+    2. **Derivation, not citation** — the value must appear literally in the cited record or be produced by a
+       declared non-model function of it; otherwise the field's provenance is MODEL_INFERENCE. (Stops a real
+       instruction being cited while the amount comes from memory.)
+    3. **Only authenticated operator channels mint CURRENT_OPERATOR_INSTRUCTION records** — never cognition.
+    Standing preferences carry scope, expiry and re-confirmation.
+    
+    **Approval integrity.** Approval screens are rendered deterministically from the exact proposal/capability
+    fields, never from model prose. Channel compromise and voice cloning are threats (§6). Approval load is budgeted
+    and batched so it cannot decay into rubber-stamping.
+    
+    **Risk tiers, autonomy levels, release states** (one vocabulary each — see §5.6 reconciliation):
+    risk R0 observation · R1 reversible isolated test · R2 sensitive read / external research · R3 external
+    communication or consequential reversible action · **R4 financial, destructive, administrative, public, recovery
+    or self-modifying — disabled until separate domain qualification; per-action step-up by default.** Autonomy
+    `A0_DISABLED · A1_ADVISORY · A2_PREPARE_ONLY · A3_SUPERVISED_EXECUTION · A4_NARROW_AUTONOMY` — a grant names
+    capability, domain, operations, principal, purpose, model/tool revisions, budget, rate limits, data classes,
+    validity, revocation, monitoring and evidence expiry. **No universal trust score unlocks all tools.** Release
+    `LAB_ONLY · ISOLATED_TEST · ADVISORY_LOCAL · SUPERVISED_INTERNAL · SUPERVISED_PRODUCTION · NARROW_AUTONOMOUS ·
+    SUSPENDED · REVOKED`; recorded state today `LAB_ONLY / NO_GO` (final product spec) [C].
+    
+    **Migration invariants.** Monotonic authority (compatibility may preserve or reduce permission, never widen) ·
+    canonical writer fencing (dual-read fine, dual ownership not) · **rollback cannot restore weaker authority** ·
+    projections are not truth.
+    
+    ### 5.4 Truth model — evidence, claims, memory
+    
+    - **Evidence**: "source X stated Y at time T under provenance P". **Claim**: the qualified present belief with
+      VERIFIED / CONTESTED / UNKNOWN / EXPIRED. **Memory**: autobiographical/relational. Same semantics may overlap;
+      **authority semantics never shared.**
+    - **EVIDENCE CAN INFORM AUTHORITY. EVIDENCE CAN NEVER CREATE AUTHORITY.** The component that acts may not be the
+      sole component that certifies success.
+    - Evidence Plane lineage is deliberate (NASA fault management/ISHM/IV&V, SRE, AI TEVV); its ten carried patterns
+      stand (cold-start §5.5): observation ≠ diagnosis · instrument failure ≠ subject failure · diagnosis ≠ authority
+      · the actor does not certify its own success · fault isolation needs discriminating evidence · unknown stays
+      unknown · exact provenance travels · health is derived, not self-reported · recovery bounded and reversible ·
+      learning follows verified outcomes. Phases V0–V7; V7 narrow self-maintenance only if separately earned.
+    - Evidence Plane must reconcile: identity, provenance, subject/version binding, **applicability**, authority,
+      uncertainty, **evidence graph**, **attestations**, policy consumption, downstream enforcement, audit and outcome
+      verification (canon §4.4). It **supports cognition and self-diagnosis without becoming a parallel decision
+      authority**, and Kingsman maturation **consumes** the eventual Evidence/A-4 contracts rather than creating a
+      second truth system (D353:59, :161).
+    - **Evidence identity** (already banked): Git commit object id + SHA-256 of canonical `MANIFEST.json` (D390).
+    - **Time semantics (R353-03):** event time · observation/ingest time · authority/decision time · validity
+      window · monotonic deadlines/leases. Wall clock never decides expiry alone (§6.5).
+    - **Data classification (R353-05):** principal/purpose/classification/provenance travel through retrieval,
+      context assembly, model/provider selection, tool proposals, capabilities and egress.
+    
+    ### 5.5 Outcome verification
+    
+    Per-actuator **verification matrix** is a canon deliverable: independent source · timeout · reconciliation ·
+    retry policy · what counts as UNVERIFIABLE. Rules: **the executor's own record is not independent** (a sent
+    folder, a stat by the same principal on the same host are self-report); lost receipt after a possible external
+    mutation = `OUTCOME_UNKNOWN`, which is **not permission to repeat** (persist attempt identity, reconcile target,
+    then decide); UNVERIFIABLE actions close only by explicit operator acknowledgement; escalations are budgeted.
+    Supporting reference (real, cited in entry 93): IETF draft-das-execution-finality-deployment-01 distinguishes not
+    committed / committed exactly once / denied / indeterminate.
+    
+    ### 5.6 Vocabulary reconciliation (decision required — §12)
+    
+    Four collisions must be resolved before freeze:
+    1. **Status**: IDX/D351 `LIVE / BUILT-NOT-CUT-OVER / WORKING / STUB / BLOCKED / UNKNOWN` (governing) vs Kai's
+       baseline (PLANNED…RETIRED) vs README markers vs KaiBench lifecycle vs release states. Proposal: IDX vocabulary
+       is the organ status; add `PLANNED` and `DEGRADED` only if Dainius approves (D351:210 mentions both); release
+       states stay a separate axis (capability release, not organ status).
+    2. **Risk tiers**: code has 5 (`RiskTier`), the final spec has R0–R4, the README's "8 risk tiers" are migration
+       tiers. Proposal: one risk vocabulary (R0–R4) mapped to the code enum; migration tiers renamed `UH-M1…M8`.
+    3. **"H"**: HOUSE_H0–H6 vs the product spec's power modes "Mode H0–H3". D359 forbids bare `H<n>`. Proposal:
+       power modes become `POWER_SENTINEL / POWER_PORTABLE / POWER_DOCKED / POWER_MAINTENANCE`.
+    4. **"A4"**: `A-4_PROVENANCE` vs `FUTURE A4 SELF-DIAGNOSIS` vs autonomy level `A4_NARROW_AUTONOMY`. Always written
+       in full; proposal: autonomy levels renamed `AUTONOMY_0…4`.
+    
+    ---
+    
+    ## 6. TRUST BOUNDARY & SECURITY ARCHITECTURE
+    
+    6.1 **Single-host truth.** On one laptop, cognition, authority, actuators and verifier share a kernel. The canon
+    must state the real trust boundary and the isolation that makes the separations real: separate OS principals
+    and containers, network policy, issuer keys TPM-bound or held by a principal the model runtime cannot read.
+    Code execution inside the model runtime (malicious model file, chat template, skill, backend CVE) must not reach
+    the issuer key, the capability store or the verifier.
+    
+    6.2 **Key custody and lifecycle.** `CREATE → STORE → USE → ROTATE → RECOVER → REVOKE → SUCCESSION/RETIRE` for
+    every secret (stewardship §11). Keys must not die with Dainius (unrecoverable Kai) nor be escrowed carelessly
+    (new attack surface): escrow design is a §12 decision.
+    
+    6.3 **Hard constraint.** `BINANCE_API_KEY` and `BINANCE_API_SECRET` never leave broker-bridge and never reach the
+    dashboard/Mission Control under any profile. Holds today [S]. No credential vault or mediation layer may move them.
+    
+    6.4 **Secure update / anti-rollback (R353-01).** Monotonic release state; target hashes; expiry/freshness;
+    rollback/freeze/mix-and-match resistance; compartmentalised, rotatable signing trust; explicit emergency-rollback
+    authority. TUF properties as reference; no TUF deployment implied.
+    
+    6.5 **Restore and time.** Once capabilities/nonces/grants become durable, **every restore bumps an epoch that
+    invalidates all pre-restore capabilities**, or anchors consumed-nonce state outside the restored set (monotonic
+    counter). Expiry uses monotonic deadlines plus a trusted-time policy (suspend/resume, RTC drift, NTP spoofing).
+    
+    6.6 **Hostile content.** Email, web, documents, clipboard, screen text, model output, remembered text, MCP tool
+    descriptions and skill Markdown are **observations, never instructions**. Metadata sanitisation; version/hash
+    pinning of tools with re-verification each session (rug-pull); runtime call-pattern monitoring.
+    
+    6.7 **Supply chain.** One admission pipeline for skills **and** model artifacts (weights, quantisations, chat
+    templates, tokenizers) **and** runtime builds (Ollama, llama.cpp, Lemonade, ROCm): upstream provenance + hash,
+    licence, SBOM/vulnerabilities, static and exfiltration analysis, instruction-injection analysis, declared
+    capability manifest, sandbox run without real secrets and deny-by-default egress, adversarial test, risk-based
+    human review, signed admission record, scoped install, runtime monitoring, revoke/quarantine. SSDF and SLSA as
+    references. Guardrail-removed models: red-team laboratory only, no credentials, no canonical memory writes, no real
+    actuators, disposable sandbox.
+    
+    6.8 **Egress.** Local core, explicit egress; per-capability egress/target constraints; proactive notifications
+    through third-party channels (Telegram) are **outward actions** under policy.
+    
+    6.9 **Privacy of home sensing.** Screen/mic/camera perception records other people (daughter, visitors):
+    consent, purpose, retention, deletion and egress rules are canon requirements before embodiment expands.
+    *"Outlive me" does not imply "reveal everything after me."*
+    
+    6.10 **Known live defects carried as findings (not repaired here):** paper-trader trust gate fails open;
+    supervisor `/recover/{service_name}` unauthenticated (disabled by default); capabilities unsigned/in-memory/not
+    parameter-bound; legacy routes behind a shared token; `CONSCIENCE_FILTER` never read; `POST /soul` outside the
+    catalogue; cortex poll fallback restores legacy truth.
+    
+    ---
+    
+    ## 7. RESILIENCE, CONTINGENCY & MIGRATION
+    
+    7.1 **Organism, not monolith:** ONE ORGANISM + CLEAR ORGANS + STABLE CONTRACTS + BOUNDED FAILURE DOMAINS +
+    TRUTHFUL DEGRADATION + INDEPENDENT REPLACEMENT + CONTINUOUS GROWTH. Service boundaries must be earned (isolation,
+    trust, failure, lifecycle, resource) — default is not replacement (D351 §4).
+    
+    7.2 **Every organ answers eleven questions before freeze** (resilience §17): responsibility · contract · authority
+    · dependencies · failure boundary · degraded behaviour · recovery path · observability · update/replace strategy ·
+    evidence requirements · operator-visible status. Appendix B is the per-organ sheet to be filled from E0 evidence.
+    
+    7.3 **Contingency library** (contingency design): classes — dependency unavailable, slow/hung, specialist model
+    unavailable, memory unavailable, policy/authority unavailable, skill failure, evidence/provenance failure,
+    data/schema incompatibility, resource pressure, repeated failed recovery. Three response classes kept distinct:
+    automatic containment · automatic truthful degradation · recovery/repair (authority-gated). No dangerous
+    universal fallback; retry budgets; no healing loops. Short horizon: `detect → contain → degrade truthfully →
+    recover where authorised → independently verify`.
+    
+    7.4 **Migration law.** Adapter → shadow → compare → qualify → controlled cutover → **prove the old authority path
+    unreachable at runtime** → retire. Cross-organ resource budgets (R353-04) enforced by the organs that own the
+    resources; **no central mega-scheduler**.
+    
+    7.5 **Portable operation.** Power modes (renamed per §5.6): SENTINEL (battery, NPU-led) · PORTABLE · DOCKED
+    (deep reasoning) · MAINTENANCE/RECOVERY. Sleep, battery loss, restart and throttling must never corrupt state,
+    duplicate actions or restore permissive authority (FP-INV-12).
+    
+    ---
+    
+    ## 8. LONG-HORIZON STEWARDSHIP — the time dimension of the mission
+    
+    8.1 **Three horizons.** A — Dainius present (normal Kingsman mode). B — temporarily unavailable: essential
+    services only, pre-authorised operational costs only, discretionary spending frozen, evidence preserved,
+    **temporary silence never triggers permanent transfer**. C — permanent succession: separately governed, strong
+    evidence, legal alignment, pre-designed transfer; **never inferred from inactivity; no dead-man timer alone is
+    evidence of death or incapacity.**
+    
+    8.2 **Succession is an authority problem first.** Who establishes conditions, what evidence suffices, which
+    authorities transfer, which need trusted-human/legal confirmation, which terminate, how coercion and account
+    takeover are distinguished. Identity continuity without impersonation: *"Dainius was my original operator and
+    defined these values; the current authorised steward is X under succession authority Y."* **The daughter is a
+    human beneficiary/successor relationship — not a configuration field, not a credential target.**
+    
+    8.3 **Financial Sustainability Plane (design only).** Purpose: keep Kai viable while protecting the people and
+    assets it exists to serve. The 70/30 concept is retained as a **mission allocation rule** (source: Kai's baseline and
+    Dainius's original intent; **not found in any committed repository file** — the only repository "70/30",
+    `docs/sovereign_ai_spec.md:1268` "WORK mode: 70/30 rule enforced", is an unrelated checklist item; to be banked as
+    Dainius's intent before canon): 70% of appropriately defined realised value to Dainius/family, 30% to a segregated **KAI Development &
+    Continuity Fund** — a budget, never authority. The accounting base, legal vehicle (company/trust or other) and tax
+    treatment require a **solicitor and accountant**; FCA implications of any automated trading/treasury activity
+    must be assessed. Invariants: no unlimited mandate · no self-created credit/debt · no unbounded leverage · no
+    hidden positions · no spending beyond approved budgets/classes · separation of operating, protected-family and
+    experimental capital · full audit · tax/legal compliance · risk limits · revocation · independent outcome
+    verification · operator/successor visibility. Speculative trading is **not** the default survival mechanism.
+    *Kai's need to survive can never by itself create authority to consume or risk the assets of the people it
+    exists to protect.* Spending authority classes: proposal-only → pre-approved small recurring envelope (exact,
+    expiring mandate) → material acquisition (explicit approval) → new destination/irreversible (never self-approved).
+    **Priority: LOGGED, NOT PRIORITISED (D270) unless Dainius explicitly re-prioritises (§12).** Legal groundwork can
+    run in parallel without engineering authority.
+    
+    8.4 **Dependency survivability** (local alternative, reproducible archive, alternate provider, migration adapter,
+    degraded mode or explicit end-of-life contingency) · **hardware continuity** (Strix Halo is an implementation
+    generation, not Kai's lifetime identity) · **long-term data stewardship** (what transfers vs stays sealed) ·
+    **lineage test**: *what must survive so the restored or upgraded system is still the intended Kai lineage?* —
+    mission/invariant version, identity/governance version, trusted memory lineage, evidence lineage,
+    operator/successor authority lineage, migration record, component transitions, backup/restore identity,
+    conformance evidence, post-migration behavioural/policy qualification → **Lineage Manifest / Identity Ledger**.
+    
+    8.5 **Resurrection drill** (before any irreversible autonomy): cryptographic manifest verification, database
+    restore, restore epoch bump, lineage checks, schema compatibility, independent functional qualification, **then**
+    the narrative/soul integrity audit — which detects inconsistency but cannot certify truth or authenticity.
+    
+    8.6 **The fifteen stewardship questions** (stewardship §19) are open decisions in §12, unanswered by this plan.
+    
+    ---
+    
+    ## 9. COGNITIVE RESOURCES — models, runtimes, hardware
+    
+    9.1 **Models are organs.** The useful question is *which qualified cognitive organ should Kai use for this role
+    under current evidence, hardware and policy?* No model has permanent status. Resource classes HOT / WARM / HEAVY /
+    COLD / EXTERNAL describe residency behaviour, not identities.
+    
+    9.2 **Runtime posture.** **Ollama remains until actual multi-runtime pressure earns a larger runtime abstraction**
+    (D351:161). When it does, a KAI-owned inference contract with adapters (Ollama, llama.cpp, Lemonade, vLLM/ROCm,
+    XDNA2, optional external) — Lemonade is a strong first candidate on Strix Halo (AMD-optimised, gfx1151 listed;
+    vLLM paths experimental; Linux NPU only via FastFlowLM) but never architectural ownership. Every result binds
+    model hash/revision, quantisation, backend build, kernel/driver, device, context, prompt/eval version.
+    
+    9.3 **KaiBench** (local measured selection) under **I-8**: known-positive and known-negative cases; a held-out
+    private suite (contamination); judges from a different model family than the candidate; reproducibility metadata;
+    suites for task quality, tool correctness, structured reliability, long context, multimodal, calibration, prompt
+    security, **memory security (MEMDRIFT-style cases)**, authority security, performance, memory/KV, storage,
+    thermal/power, reliability, and outcome quality by independent verifier. Lifecycle DISCOVERED → ADMITTED →
+    SANDBOX → ADVERSARIAL → SHADOW → NARROW ROLE → OBSERVED → PROMOTED; regression → QUARANTINE → FALL BACK →
+    INVESTIGATE. **A benchmark score never grants a capability.** Inspect AI, garak and Promptfoo feed it; none is the
+    registry. Charts (tokens/s, TTFT, RAM/KV growth, NVMe bandwidth) are generated from measured runs only.
+    
+    9.4 **Model candidates (verified to exist; not appointments):** Qwen3.6-35B-A3B (MoE ~3B active, vision, 262K) ·
+    gpt-oss-20b (21B/3.6B active) · gpt-oss-120b (117B/5.1B active) · Mistral Small 4 (119B MoE ~6.5B active; BF16
+    ~238 GB → quantisation mandatory on 128 GB) · DeepSeek/Kimi/GLM families re-evaluated at purchase time.
+    
+    9.5 **Hardware.** Target ASUS ROG Flow Z13 GZ302: Ryzen AI MAX+ 395, Radeon 8060S, 128 GB LPDDR5X-8000 soldered,
+    XDNA NPU up to 50 TOPS, **one M.2 2230 slot, single-sided SSD only** (verified). ROCm gfx1151 support official but
+    narrow (ROCm 7.2.1, Ubuntu 24.04.4). **AMD Ryzen AI MAX 400 ("Gorgon Halo", up to 192 GB) is announced with ASUS
+    as a partner from Q3 2026 — re-check before buying.** Compute roles: NPU = low-power sentinel/perception;
+    iGPU = reasoning/multimodal; CPU = control, data, deterministic services. Memory headroom for OS, services,
+    databases and KV is measured by KaiBench, never assumed. Optional later: sovereign home node (identity and
+    authority stay in lineage/governance records, never "move to the biggest GPU").
+    
+    9.6 **Procurement gate:** exact SKU and 128 GB in writing · onboard memory non-upgradable · SSD candidate
+    physically verified (2230, single-sided) · capacity from the KaiBench storage budget · sustained I/O after cache
+    exhaustion · thermals at 10/30/60 min with concurrent NVMe · docked vs battery · Linux GPU stack · Vulkan fallback
+    · XDNA2 as bonus until qualified · suspend/resume with services, encryption, runtimes · audio/camera under Linux ·
+    LUKS + TPM recovery exercised (TPM never the sole continuity secret) · full restore rehearsal · all within the
+    return window.
+    
+    ---
+    
+    ## 10. ASSURANCE — how we know (NASA-style discipline, no certification claimed)
+    
+    10.1 **Roles (independence).** Dainius — final consequential authority. Kai — architecture, adjudication,
+    evidence reconciliation. Orion — implementation and evidence capture; **no admission weight on own work**. GPT —
+    read access, findings bounded by what it opened, no admission authority. DeepSeek — no access, hypotheses only.
+    *Nobody is outside the denominator.*
+    
+    10.2 **Canonical package:** Mission & Product Constitution · System Requirements Baseline (`KAI-SYS-xxxx`, each
+    traced to mission and organ) · this Architecture Description · Interface Control Documents (one per arrow in §5.2)
+    · Threat & Hazard Register · Requirements Verification Matrix (inspection/analysis/demo/test → evidence) ·
+    Current-to-Target Traceability Matrix (one row per box) · Configuration Baseline (exact commits, schemas,
+    policies, runtimes) · Operational Readiness Review criteria · Failure Pattern Ledger (existing, append-only) ·
+    Lineage Manifest · Degraded-Mode Matrix. Chain: **MISSION → REQUIREMENT → DESIGN → CODE → TEST → RUNTIME
+    EVIDENCE → DECISION → RELEASE**, traceable both ways.
+    
+    10.3 **Engineering doctrine is connected, not copied.** `kai-pm/ENGINEERING_DOCTRINE.md` is the source; the
+    architecture embodies its rules mechanically where feasible (e.g. I-8 calibration in every gate and in KaiBench;
+    R11 abort at the prerequisite boundary; R17 bounded claims in Mission Control; rule 51 *signal is not cause*).
+    
+    10.4 **E0 census** (D351 §8): for every component — product meaning, implementation path, status, connections,
+    state ownership, trust/authority, failure boundary, maturity, intended maturity, disposition. The census
+    instrument itself needs calibration, mutation and can-fail proof (D353 challenge 5).
+    
+    10.5 **Phase 2 loop per organ:** discover intent → verify reality → map ownership → compare with canon → identify
+    duplication/drift/defects → preserve concepts → design production form → adversarial review → bounded
+    implementation → test/mutate/verify → update evidence + architecture + docs together → bank known-good state.
+    Production bar (Phase 2 §4) applies to every retained capability. Maturity S0→S5 promotion by evidence.
+    
+    10.6 **A4 acceptance** (when authorised, after Item 8 and A-4 PROVENANCE): detect an injected fault; identify the
+    affected relationship; separate decisive evidence from uncertainty; avoid false certainty; propose a safe
+    response; state what it cannot know; preserve operator authority; verify the approved repair fixed the original
+    condition without a neighbouring regression. A4 self-repair is never autonomous mutation.
+    
+    10.7 **Mission Control (operator visibility, OV-1…OV-9):** generated from qualified machine evidence, never a
+    manually maintained truth. Panels: whole Kai (organs, status, versions, degraded organs and blast radius) ·
+    programme roadmap (D359 strip, current position) · outstanding-work board · operator decisions/approvals · risks
+    and unknowns · recent change · proactive watches/obligations · contingency/recovery state · model/hardware
+    transitions · lineage/backup/restore status · long-horizon runway and dependency risk · succession readiness ·
+    drill-down to exact repo evidence. *The operator cannot govern what the system does not make legible.*
+    
+    ---
+    
+    ## 11. ROADMAP / CURRENT POSITION
+    
+    ### 11.1 Programme order — D359, verbatim (sole canonical source; DECISIONS.md:30299-30331)
+    
+    ```
+    HOUSE-IN-ORDER
+      HOUSE_H0 → HOUSE_H1 → HOUSE_H2 → HOUSE_H3 → HOUSE_H4 → HOUSE_H5
+               → HOUSE_H6 → explicit DAINIUS HOUSE EXIT RULING
+            ↓
+    KAI-GATE-048 CLOSURE PATH
+      Phase B resolution/authority → sentinel retirement where applicable
+      → exact-tree review → separate ITEM8_GO → six subject builds under
+      explicit Dainius authority → FORMAL KAI-GATE-048 CLOSURE
+            ↓
+    A-4_PROVENANCE
+            ↓
+    ASSURANCE INTEGRATION MAPPING
+            ↓
+    PROFESSIONALISATION / CI TRUTH RESTORATION
+            ↓
+    EVIDENCE PLANE / KINGSMAN IMPLEMENTATION
+    ```
+    
+    **ITEM 8 BEFORE A4.** Item 8: frozen design R2, preflight only, `ITEM8_GO` does not exist, implemented not
+    executed (D290). `A-4_PROVENANCE` ≠ `FUTURE A4 SELF-DIAGNOSIS`, which does not follow automatically.
+    
+    ### 11.2 Where we are (2026-10-07)
+    
+    - **HOUSE_H2.** D379 (2026-09-18) pre-candidate admission-surface repair; D380–D386 repairs; D387 continuity
+      record; D388–D389 rulings on repair plan v4; D390 Git-native evidence identity. Repair branch
+      `claude/d379-repair-eb52f73` at `c358798` (AW-01 closed, entry 77).
+    - Assurance follow-ons: **DAI-6** (evidence-pipeline status discipline) — census and design packet v1 done, awaiting
+      DeepSeek review; **DAI-7** blocked by DAI-6. Held: D390 replay, fixity F, capture, candidate, holdout, blind 40,
+      Item 8, merge. PR #122 DO NOT MERGE.
+    - **D344–D353** remain in the append queue (`DECISIONS_CANONICAL_APPEND_QUEUE_D344_D353.md`); D351/D353 are not yet
+      canonical D-numbers.
+    - Canon process (§13): C3 (Kai synthesis) delivered as baseline (entry 89); C4 adversarial review in progress
+      (analysis entry 92; Orion review entry 95); this candidate is an input to C6.
+    
+    ### 11.3 Destination timeline (after D359's last step; ordered by dependency, not dates)
+    
+    | stage | work package | depends on | exit evidence |
+    |---|---|---|---|
+    | K0 | Canon freeze: requirements baseline, ICDs, RVM, hazard register, traceability matrix, vocabulary reconciliation | §13 C0–C9 | exact-byte freeze + Dainius approval |
+    | K1 | E0 census (calibrated) → per-organ eleven-question sheets | K0 | census with known-positive/negative and can-fail proof |
+    | K2 | **Truth**: Evidence Plane consumption of A-4 contracts; World State canonical; poll fallback READ-only | A-4_PROVENANCE, K1 | dual-read comparison; legacy writers fenced |
+    | K3 | **Authority**: exact signed durable capability at the final hand; Memory→Action Firewall; approval rendering; restore epoch; bypass proof | K2 | negative bypass tests at runtime; legacy routes unreachable |
+    | K4 | **Controlled hands**: durable workflow; per-actuator verification matrix; OUTCOME_UNKNOWN reconciliation | K3 | independent outcome verification per actuator |
+    | K5 | **Verification & learning**: verified-outcome learning, trust updates, unified self-diagnosis loop | K4 | A4 acceptance (§10.6) when authorised |
+    | K6 | Memory source/projection ownership; lineage manifest; resurrection drill | K2 | restore drill passed incl. epoch |
+    | K7 | Mission Control from qualified evidence | K2–K6 incrementally | panels generated, not maintained |
+    | K8 | Cognitive resources: KaiBench (calibrated); runtime abstraction **only if** multi-runtime pressure is shown; hardware qualification | K0 (bench design), hardware purchase | measured baselines on the exact device |
+    | K9 | Growth governance: skill/model admission, Dream/Evolver probation | K3 | admission records; sandbox evidence |
+    | K10 | Proactive architecture: nine stages, Goal/Watch/Attention, degraded awareness | K2, K3 | PROACTIVE AWARENESS DEGRADED provable |
+    | K11 | Embodiment and perception expansion; privacy controls | K3, K10 | consent/retention controls qualified |
+    | K12 | Stewardship: horizon-B mode, succession authority model, key escrow; Financial Sustainability Plane | Dainius decisions (§12); legal advice | per §8 |
+    
+    Sequencing rule: **truth → authority → controlled hands → verification → learning → increasing autonomy.**
+    Never: bigger model → more tools → more autonomy → security later. **No effort estimates are given**: the programme
+    is assurance-dominated (D379, dated 2026-09-18, is still open on 2026-10-07) and gates are passed by evidence,
+    not by calendar. Every work package carries the C9 trace: `CANON REQUIREMENT → PROGRAMME PREREQUISITES → CURRENT
+    REPO REALITY → GAP → APPROVED CHANGE → TEST / EVIDENCE → CONFORMANCE RESULT`.
+    
+    ---
+    
+    ## 12. RISKS, BLOCKERS, OPERATOR DECISIONS
+    
+    ### 12.1 Top risks
+    
+    | risk | consequence | control in this plan |
+    |---|---|---|
+    | Legacy routes stay the live hands behind a shared token | any token holder acts with no capability | K3 bypass proof; §6.10 |
+    | Conviction keeps deciding | confidence becomes authority | §5.3; O4 MOVE |
+    | Poll fallback restores legacy truth | stale world state drives action | K2 fencing |
+    | Memory silently sets action parameters | MEMDRIFT-class drift into money/messages | Memory→Action Firewall with derivation |
+    | Restore revives used permissions | duplicate payments/side effects | restore epoch (§6.5) |
+    | Single-host compromise | separations collapse | §6.1 isolation |
+    | Approval fatigue / misleading approval text | rubber-stamped harm | deterministic rendering, budgets |
+    | Unsourced figures enter canon | decisions on fabricated evidence | R13; entries 93/95 |
+    | Rediscovery/fragmentation | another redesign cycle | reuse P1–P4, UH, House; NO NEW BOX WITHOUT LINEAGE |
+    | Hardware generation shift | buying the outgoing platform | §9.5 re-check |
+    | Keys lost or captured | Kai unrecoverable or hijacked | §6.2, §8 decisions |
+    | Succession by inactivity or coercion | wrong person gains authority | §8.1–8.2 |
+    
+    ### 12.2 Blockers to canon freeze (from entry 95)
+    
+    Front door not organism-first (fixed in this candidate §1–§4) · D351 bar (addressed by §1–§4, to be judged) ·
+    priority table not D359 (fixed §11) · vocabulary collisions (§5.6, needs decision) · unsourced citations (removed
+    here; only verified references kept) · E0 evidence absent (K1).
+    
+    ### 12.3 Decisions only Dainius can make
+    
+    1. Whether this candidate, Kai's baseline, or a merge goes forward to DeepSeek (C4) and reconciliation (C6).
+    2. Status vocabulary: IDX six states, plus PLANNED/DEGRADED or not.
+    3. Risk-tier, power-mode and autonomy-level renaming (§5.6).
+    4. Whether succession and/or the Financial Sustainability Plane are **re-prioritised** above D270's "logged, not
+       prioritised" — and whether legal/accounting groundwork starts in parallel now.
+    5. The 70/30 accounting base (gross / net / post-tax distributable) — after professional advice.
+    6. Key-escrow model and trusted-human/legal roles.
+    7. Hardware purchase timing given the announced next-generation platform.
+    8. Privacy policy for home sensing (who/what may be recorded, retention, deletion).
+    9. The fifteen stewardship questions (stewardship §19): authority during temporary unavailability · what
+       establishes permanent succession · which authority transfers to the daughter/successor · preserving identity
+       without impersonation · data that transfers vs stays sealed · survival budget and financial powers · permitted
+       revenue classes · risk limits protecting family assets · key rotation/recovery after unavailability ·
+       trusted-human/legal roles · dependencies needing local/alternate survival paths · secure migration to
+       replacement hardware · restoration identity after catastrophic loss · what maintenance Kai may perform
+       autonomously · conditions forcing safe archival/read-only mode.
+    10. Closing the D344–D353 append queue so D351/D353 become canonical.
+    11. Confirming the 70/30 intent in your own words so it can be banked: it exists in no committed repository file
+        (the repository's only "70/30" is an unrelated WORK-mode checklist item).
+    
+    ---
+    
+    ## 13. HOW THIS BECOMES CANON
+    
+    Process (canon plan §6): **C0** source recovery → **C1** concept/dependency inventory (`concept | original intent |
+    current implementation/evidence | duplicate names | status | target role/dependency | evidence | unresolved`) →
+    **C2** conflict/overlap map → **C3** Kai synthesis → **C4** DeepSeek design/adversarial review → **C5** Orion repo
+    mapping → **C6** reconciliation (material disagreement becomes a decision or a discriminating experiment, never
+    prose compromise) → **C7** Dainius design review → **C8** freeze (version, subject/reference set, resolved
+    decisions, deferred questions, prerequisites, change-control rule) → **C9** Phase-2 traceability.
+    
+    Change control after freeze: reason/new evidence · affected invariants/components · alternatives · external review
+    when material · repo feasibility · Dainius approval · new version/hash · migration consequences. *Stable by
+    default, changed deliberately.* Frozen experiment authority (Item 8) is never granted by canon change.
+    
+    `MASTER CANON = WHERE WE ARE GOING · REPO / TEST / RUNTIME EVIDENCE = WHERE WE ACTUALLY ARE.` The canon cannot
+    declare a capability live because the design includes it. README and graphics are derived from final truth (Phase 2
+    P2.8), not the other way round.
+    
+    **Definition of done (canon plan §9), self-assessed for this candidate:**
+    
+    | criterion | this candidate |
+    |---|---|
+    | all major historical final-vision documents considered | read in full: IDX, D351, D353, canon plan, mission doctrine, cold-start master; required sections of stewardship, proactive, resilience, contingency, Phase 2, A4, operator visibility, final product spec (headings + invariants via cold-start), pillars; **not read in full**: final product spec (1,760 lines), P1–P4 audit plans, UH roadmap, puzzle map body, EVIDENCE_PLANE_RESEARCH_LINEAGE |
+    | every capability family has a home | yes — §2/§3 (README catalogue mapped to O1–O11) |
+    | Item 8 as pre-A4 obligation | yes — §11.1 |
+    | duplicate architectures reconciled | partly — vocabulary collisions named (§5.6), merges proposed; needs E0 |
+    | authority and evidence boundaries explicit | yes — §5.3–5.5 |
+    | one self-diagnosis/recovery architecture | yes — O8, §10.6 |
+    | hardware/runtime roles explicit | yes — §9 |
+    | autonomy/growth constraints explicit | yes — §5.3, O9 |
+    | doctrine connected | yes — §10.3 |
+    | every arrow has an intended contract | **no** — ICDs are a K0 deliverable |
+    | incremental migration without dual authority | yes — §5.3 migration invariants, §7.4 |
+    | DeepSeek meaningful review | **not yet** |
+    | Orion mapped to repository reality | partly — §2 facts at 9bb01af; full mapping is C5/K1 |
+    | Dainius approved product intent | **not yet** |
+    | exact canon bytes frozen | **no** |
+    
+    ---
+    
+    ## APPENDIX A — COMPLETENESS MATRIX (source requirement → section)
+    
+    | source requirement | where carried |
+    |---|---|
+    | IDX product vocabulary (11 groupings) at the front door | §1 table, §2, §3 |
+    | IDX/D351 status vocabulary | §5.6 (1) |
+    | D351 §6A one-glance identity | §1 |
+    | D351 §6C TODAY/MATURE TO/CHANGE TYPE/STATUS/WHY | §2, §3 |
+    | D351 §6D six front views | §1 WHO · §2 TODAY · §3 MATURED · §4 WHAT CHANGES · §11 ROADMAP · §12 RISKS |
+    | D351 §5 genuinely missing joints (9) | §3 joints list |
+    | D351:161 Ollama retained | §9.2 |
+    | D351 §4 change requires evidence (duplicate authority, conflicting truth, unsafe boundary, shared fate, wrong ownership, lifecycle conflict, isolation need, contract mismatch, maintenance burden) | §7.1 (earned boundaries) — list to be applied per organ in K1 |
+    | D353 R353-01 secure update / anti-rollback | §6.4 |
+    | D353 R353-02 crypto agility | §5.3, §6.2 |
+    | D353 R353-03 time semantics | §5.4, §6.5 |
+    | D353 R353-04 cross-organ budgets, no mega-scheduler | §7.4 |
+    | D353 R353-05 classification propagation | §5.4 |
+    | D353 six accepted challenges | consume Evidence/A-4 (§5.4) · readiness ≠ authority (§5.3) · reuse identity registry (§5.3) · OUTCOME_UNKNOWN (§5.5) · census calibration (§10.4) · Mission Control from evidence (§10.7) |
+    | D353 P1–P4 as first-class inputs | §3 O7 (P1), §6.6–6.7 (P2), §5.5/§7 (P3), §9.3 (P4); full reading in K1 |
+    | Canon §3 control loop incl. DURABLE WORKFLOW | §5.2 |
+    | Canon §4.1 Kingsman tier properties | §1 operator standard, §10 |
+    | Canon §4.2 Item 8 rules | §11.1 |
+    | Canon §4.3 A4 reconciliation content | O8, §10.6 |
+    | Canon §4.4 Evidence Plane elements | §5.4 |
+    | Canon §4.5 Unified Hunter roles | O7, §5.3 |
+    | Canon §4.6 cognitive architecture incl. Global Workspace, Socratic, Sage/adversary, runtime manager, residency | O5, §9 |
+    | Canon §4.7 Ohana/values separate from evidence | O1, §5.3 |
+    | Canon §4.8 unified self-diagnosis loop | O8 |
+    | Canon §4.9 doctrine reference | §10.3 |
+    | Canon §4.10 hardware incl. proven vs planned, modes | §9.5, §7.5 |
+    | Canon §4.11 autonomy & growth incl. trust negotiation, financial ideas, self-repair, swarms | O9, §5.3 autonomy levels, §8.3 |
+    | Canon §5 hierarchy (canon ≠ evidence) | §13 |
+    | Canon §6–§9 process, change control, DoD | §13 |
+    | Mission doctrine §1–§18 (mission, organism, vessel, continuity classes, developmental, model-as-organ, proactivity, organic, lineage test, horizons, self-sufficiency, succession, hierarchy, Mission Control views, Phase-2 test, DeepSeek questions, programme protection) | §1, §5.1, §8, §10.7, §11; Phase-2 test and DeepSeek questions → Appendix C |
+    | Cold-start §7.1 nine laws | §5.1 |
+    | Cold-start §7.3 nine proactive stages + nine outcomes + degraded awareness | O6, §11.3 K10 |
+    | Cold-start §8 migration invariants | §5.3 |
+    | Cold-start §9 stewardship incl. secrets lifecycle, data stewardship | §6.2, §8 |
+    | Cold-start §10 FP-INV-01…12, risk tiers, autonomy levels, release states, LAB_ONLY/NO_GO | §5.1, §5.3 |
+    | Cold-start §14 standing DO NOTs (architecture) | §5.3, §7, §12 |
+    | Cold-start §18 North Stars | O9, §9, Appendix C |
+    | Stewardship §7–§8 finance invariants, capital separation | §8.3 |
+    | Stewardship §19 fifteen questions | §12.3 (9) |
+    | Proactive §4 states, §15 reactive/proactive/autonomous distinction | O6; reactive ≠ proactive ≠ autonomous execution kept distinct in §5.3 |
+    | Resilience §17 eleven questions per organ | §7.2, Appendix B |
+    | Contingency classes and three response classes | §7.3 |
+    | Phase 2 loop, production bar, DoD, P2.1–P2.10 | §10.5, §13 |
+    | Operator visibility OV-1…OV-9 and OV-7A panels | §10.7 |
+    | A4 acceptance (8 criteria) | §10.6 |
+    | D359 programme order | §11.1 verbatim |
+    | D270 succession logged, not prioritised | §8.3, §12.3 (4) |
+    | D390 evidence identity | §5.4 |
+    | IDX retained findings KAI-REV-016/017/018, egress, Mission Control from Dashboard, World-State no legacy truth, finish signed identity, evolve behind Tool Gate | §3, §5.3, §6.8, O3, O11 |
+    | CLAUDE.md hard constraints | §6.3; SOUL.md rule O1 |
+    | Kai baseline (entry 89) content worth keeping: firewall, journal/projection idea, KaiBench, resource classes, verification, procurement, 70/30 fund, skill admission | §5.3, O2, §9, §5.5, §9.6, §8.3, §6.7 |
+    | Analysis (entry 92) valid findings: signed provenance, capability enforcement, per-actuator matrix, legal structure, MCP hardening, memory envelopes | §5.3, §5.5, §8.3, §6.6, O2 |
+    | Orion attacks A1–A20 (entry 95) | §3 joints, §5.3, §6, §8, §9.3, §11.3, §12 |
+    
+    **Known gaps in this candidate (stated, not hidden):** ICDs not written; per-organ eleven-question sheets empty
+    until E0; the final product spec, P1–P4 plans, UH roadmap and puzzle map not read in full by Orion; runtime status
+    of every organ UNKNOWN; repository facts marked [S] not re-read by Orion.
+    
+    ## APPENDIX B — per-organ engineering sheet (template, filled in K1)
+    
+    `organ | responsibility | contract | authority | dependencies | failure boundary | degraded behaviour | recovery
+    path | observability | update/replace strategy | evidence requirements | operator-visible status | mission served
+    | what learned state must survive replacement | proactive role | long-horizon provider risk | duplicate truth or
+    authority? | S-level and promotion evidence`
+    
+    ## APPENDIX C — questions carried for external review
+    
+    Mission doctrine §16 (ten identity/lineage questions) · resilience §16 · contingency §16 · stewardship §20 ·
+    puzzle map §10 packet — carried by reference to their sources, to be put to DeepSeek at C4 verbatim.
+    
+    ## APPENDIX D — external facts used (verified 2026-10-07; entries 93, 95)
+    
+    Flow Z13 GZ302 specification and single-sided 2230 slot · Lemonade support matrix · ROCm gfx1151 matrix (summary
+    only) · Qwen3.6-35B-A3B, gpt-oss-20b/120b, Mistral Small 4 · Inspect AI, garak, Promptfoo · MEMDRIFT (arXiv
+    2605.24941) · CVE-2026-104873 (langgraph-sdk; not applicable today) · "Securing Agents With Tracked Capabilities"
+    (ACM CAIS 2026) · SMSR (arXiv 2606.12703; HMAC-signed memory, 65.3% → 5.3%) · IETF
+    draft-das-execution-finality-deployment-01 · MCPTox (average ASR 36.5%) · AMD Ryzen AI MAX 400 announcement.
+    **Excluded as unsourced:** PERSIST 46.2%→8.9%, OECD Agent Evidence Conformance Suite, COGITATOR Witness Protocol,
+    "Capability-Container Pattern" as a named standard, eBPF "sub-100ns/200x", "70–73% of agents".
+    
+    ---
+    
+    *Preserve the organism. Replace and improve the organs. Never confuse intelligence with authority, memory with
+    truth, a demo with verification, or modernisation with permission to erase lineage. Kai may discover its own
+    future; Kai does not authorise its own future.*
+    END-VERBATIM KINGSMAN-MASTER-PLAN-ORION-CANDIDATE-V0-1
+
+### 6. Next authorised step
+
+- Show Dainius the candidate; await his decision on its route (Kai reconciliation, DeepSeek attack)  [CONVERSATION 2026-10-07 Dainius, "If you was to rewrite plan as top tier nasa or silicone valet dev pm show me your version and make sure its has nothing missing"]
+
+### 7. What I am unsure of
+
+- Documents not read in full for this candidate: the final product spec (1,760 lines), CODE_AUDIT P1–P4, the UH roadmap, the puzzle-map body, EVIDENCE_PLANE_RESEARCH_LINEAGE; the candidate's Appendix A names this gap  [FILE kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
