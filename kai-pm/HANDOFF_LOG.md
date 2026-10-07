@@ -56888,3 +56888,72 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-07T22:15:26Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-07T22:15:26Z  [CMD `date -u +%FT%TZ` → 2026-10-07T22:15:26Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: d71e73f2da521e50f40ecde9484e516c500829f5  [CMD `git rev-parse HEAD` → d71e73f2da521e50f40ecde9484e516c500829f5]
+- tree: ba61938fc696d47e82b2b380976bb63cfd27f27f  [CMD `git rev-parse HEAD^{tree}` → ba61938fc696d47e82b2b380976bb63cfd27f27f]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/project-rework-plan-pgvp35: d71e73f2da521e50f40ecde9484e516c500829f5  [CMD `git ls-remote --heads origin` → d71e73f2da521e50f40ecde9484e516c500829f5]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 104  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 104]
+
+### 1. The four states
+
+- physical: unchanged since entry 104 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: develop ONE master plan, agree it, with no README feature missing, updated to today's available technology, toward a common goal, then stick to it. Orion's reading: a unified draft merging Kai's v1.0 (+A1, §16) with Orion's candidate v0.1 and the matrix proposals, plus a mechanically extracted README feature-lineage appendix; published for Kai's agreement and Dainius's decision. Planning only — the engineering pause (entry 99) stands; no code  [CONVERSATION 2026-10-07 Dainius, "Now I want to develop one master plan agree on it make sure none of features are missing  from read me. Take it to today’s available updates to reach common goal and stick to it"]
+- evidence: none yet  [CMD `handoff.py check` → findings=0]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-07 · one agreed master plan, no README feature missing, updated to today, then stick to it; verbatim below, 180 bytes, sha256 e486edb32d227ec23f5564a86a35cae8a26c1af09df15ebbc138c146a62f3c3d, final LF True ⚠ UNBANKED  [CONVERSATION 2026-10-07 Dainius, "Now I want to develop one master plan agree on it make sure none of features are missing  from read me. Take it to today’s available updates to reach common goal and stick to it"]
+    BEGIN-VERBATIM DAINIUS-ONE-MASTER-PLAN
+    Now I want to develop one master plan agree on it make sure none of features are missing  from read me. Take it to today’s available updates to reach common goal and stick to it
+    END-VERBATIM DAINIUS-ONE-MASTER-PLAN
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: planning document, README extraction (read-only), repository bank, Linear publication of the draft  [CONVERSATION 2026-10-07 Dainius, "Now I want to develop one master plan agree on it make sure none of features are missing  from read me. Take it to today’s available updates to reach common goal and stick to it"]
+- PAUSED / HELD (unchanged): all engineering per entry 99; ledger, D390, F, capture, candidate, holdout, blind 40, Item 8, merge; code/tooling changes  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- "Stick to it" requires a freeze and change control (canon plan §7, v1.0 §14); the freeze itself is Dainius's act after Kai's agreement — owner: Dainius  [CONVERSATION 2026-10-07 Dainius, "Now I want to develop one master plan agree on it make sure none of features are missing  from read me. Take it to today’s available updates to reach common goal and stick to it"]
+
+### 5. Incidents and corrections
+
+- Classifier miss, live: not flagged (no marker word, under 300 characters); eighth measured miss; banked by hand  [CMD `ls .git/kai-ruling-capture` → no new record]
+
+### 6. Next authorised step
+
+- Extract the README feature population; build the unified draft; bank; publish  [CONVERSATION 2026-10-07 Dainius, "Now I want to develop one master plan agree on it make sure none of features are missing  from read me. Take it to today’s available updates to reach common goal and stick to it"]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff.py check` → findings=0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
