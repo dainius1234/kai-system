@@ -52982,3 +52982,1056 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
 python3 -B .claude/hooks/ruling_capture.py status
+
+## HANDOFF 2026-10-07T20:42:15Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-07T20:42:15Z  [CMD `date -u +%FT%TZ` → 2026-10-07T20:42:15Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 7c822ab6cfbbe2c7485432e9d8ea4b263e2732df  [CMD `git rev-parse HEAD` → 7c822ab6cfbbe2c7485432e9d8ea4b263e2732df]
+- tree: 4bcde5aac4e6d59fcb8a1b3daee59bdaada8196e  [CMD `git rev-parse HEAD^{tree}` → 4bcde5aac4e6d59fcb8a1b3daee59bdaada8196e]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 7c822ab6cfbbe2c7485432e9d8ea4b263e2732df  [CMD `git ls-remote --heads origin` → 7c822ab6cfbbe2c7485432e9d8ea4b263e2732df]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 88  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 88]
+
+### 1. The four states
+
+- physical: unchanged since entry 88 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: nothing new. The plan states it is "a destination and migration specification, not permission to skip the current D-numbered programme sequence" and that freezing it as the canon waits until "the current DAI/assurance sequence completes its authorised work"  [CONVERSATION 2026-10-07 Dainius, "Kingsman/KAI Production Architecture and Implementation Plan"]
+- evidence: the plan text, received 2026-10-07T20:41:36Z as an operator prompt (Kai's research output relayed by Dainius), captured byte-exact by the ruling-capture hook (id 1b0d576cdec1fd7b) and preserved below  [CMD `cat .git/kai-ruling-capture/1b0d576cdec1fd7b.json` → 61,365 chars]
+- admission: none; the plan is not admitted as the Kingsman master canon by this entry  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Kai (via Dainius) · 2026-10-07 · "Kingsman/KAI Production Architecture and Implementation Plan": proposed design basis for the production Kingsman canon (nine organs; Memory→Action Firewall; journal + outbox + rebuildable projections; Inference Fabric with KaiBench, Model Capability Registry and Resource Governor; capability status vocabulary; current-to-target migration matrix; P0–P3 priorities; Flow Z13 procurement gate; 70/30 Development & Continuity Fund). The full text verbatim below, 62486 bytes, sha256 0cdc29ec1cf50b6465cb049d37daa9d7f666b69e62770261849e8db5e1f24879, final LF False ⚠ UNBANKED  [CONVERSATION 2026-10-07 Dainius, "Kingsman/KAI Production Architecture and Implementation Plan"]
+    BEGIN-VERBATIM KAI-KINGSMAN-PRODUCTION-ARCHITECTURE-PLAN
+    # Kingsman/KAI Production Architecture and Implementation Plan
+    
+    ## Executive summary
+    
+    KAI should not be redesigned. It should be **professionalised without architectural amnesia**.
+    
+    The repository, the historical plans, the subsequent security work, the hardware changes, and the newer Kingsman doctrines all describe the same organism at different stages of maturity. The early repository describes “soul-first intelligence”, proactivity, persistent memory and multiple LLMs as internal limbs. The current doctrine formalises essentially the same idea as:
+    
+    > **ONE KAI — MANY MINDS/SENSES/TOOLS — ONE EVIDENCE STANDARD — ONE GOVERNED DECISION PATH — OPERATOR SOVEREIGNTY.** fileciteturn8file0L2-L2
+    
+    The primary mission remains equally stable: KAI is meant to grow with Dainius, care for him, preserve what matters, become increasingly self-sufficient, survive changes of models and hardware, and eventually continue appropriate stewardship for his daughter without losing truth, identity, governance or safety. fileciteturn4file0L2-L2
+    
+    The research therefore leads to a strong conclusion:
+    
+    > **The right next-generation KAI is not a bigger swarm, a larger model, or a replacement framework. It is the existing organism refitted around a professional evidence, authority, capability, verification and resource-management spine.**
+    
+    That is also consistent with the repository's own architectural posture: **“REFIT, HARDEN, RATIONALISE, MATURE — DO NOT REINVENT KAI”** and **“NO NEW BOX WITHOUT CURRENT-TO-TARGET LINEAGE.”** fileciteturn3file0L2-L2
+    
+    The mature architecture should have nine distinguishable organs:
+    
+    | Organ | Responsibility | Explicitly does **not** do |
+    |---|---|---|
+    | Mission / Identity / Lineage | Defines who KAI is, invariants, version lineage and continuity | Decide factual truth from memory |
+    | Evidence Plane | Records observations, provenance, freshness and evidence quality | Grant permission |
+    | Qualified World State | Maintains claims about the present world with VERIFIED / CONTESTED / UNKNOWN / EXPIRED semantics | Become autobiographical memory |
+    | Memory / Relationship | Episodic, semantic, emotional and relationship continuity | Authorise consequential action |
+    | Cognition Runtime | Models, specialists, debate, causal review, planning, hypotheses | Give itself authority |
+    | Governance / Authority | Policy, operator approval, delegation and exact capability issuance | Infer permission from confidence |
+    | Execution | Narrow actuators operating under exact capabilities | Decide whether its own action was successful |
+    | Independent Verification | Observes consequences and closes actions against reality | Trust executor self-reporting |
+    | Resource / Inference Fabric | KaiBench, model registry, residency, backend and device selection | Decide whether an action is allowed |
+    
+    This separation is the single most important maturation step.
+    
+    The old `conviction ≥ 8` idea remains useful **as epistemic information**, but it must cease to be an authority mechanism. A model with 9.9/10 confidence has exactly zero more legal or system authority than a model with 5/10 confidence. Similarly, three or five models agreeing is not proof: correlated models can share the same misconception. Evidence quality, provenance, independent observation and explicit authority must remain different concepts.
+    
+    The current Unified Hunter work already points in the correct direction with the sequence `perception → world state → proposal → policy → approval → capability → actuator → verification`; the README describes 34 actuators and eight risk tiers while explicitly distinguishing built code from actual runtime adoption and says the newer path is not yet cut over. fileciteturn2file0L2-L2 The professional Kingsman design should therefore **complete this evolution rather than replace it**.
+    
+    The next architectural leap should be the **Memory→Action Firewall**. Recent research makes the need concrete. MemDrift found that irrelevant stored preferences can deflect tool parameters across multiple frontier models and memory architectures, with measured shifts as large as +3.6 on its five-point scale; filtering and prompting reduced but did not eliminate the effect. citeturn20search0 A separate 2026 memory-security benchmark found high persistence of malicious memories and substantial later execution rates when poisoned memories were retrieved. citeturn20search1turn20search17 The appropriate KAI rule is therefore:
+    
+    > **Memory may influence deliberation. Memory alone may not silently determine consequential actuator parameters.**
+    
+    This means every consequential action field eventually carries provenance such as `CURRENT_VERIFIED_EVIDENCE`, `CURRENT_OPERATOR_INSTRUCTION`, `APPROVED_STANDING_PREFERENCE`, `RECALLED_MEMORY`, `MODEL_INFERENCE`, `DEFAULT`, or `EXTERNAL_UNVERIFIED`. Policy decides which sources are admissible for each actuator field.
+    
+    For memory itself, the old ambition for one “atomic” write across Cognee, Graphiti and pgvector should be refined. Those are separate systems; pretending they form a native distributed ACID transaction would create brittle complexity. The mature design should instead use an **authoritative transactional journal in Postgres plus an outbox and idempotent projections**. Graphiti-style temporal knowledge, vector search and human-readable Soul/Diary representations become rebuildable projections of source episodes and governed claims. Graphiti is particularly useful as a design reference because it treats historical validity and temporal evolution as first-class concerns and combines graph, semantic and lexical retrieval. citeturn19search13turn19search19
+    
+    For inference, **Lemonade deserves a serious qualification trial**, but not architectural ownership. Its current design is unusually well aligned with the planned AMD machine: its official project targets Ryzen AI/Radeon systems, provides familiar serving interfaces, and supports multiple CPU/GPU/NPU paths, including Strix Halo-oriented experimental paths. fileciteturn7file0L2-L2 KAI should own a stable Inference Fabric contract, with Lemonade, direct llama.cpp, vLLM/ROCm, XDNA2 paths and optional providers as interchangeable adapters.
+    
+    Likewise, model names should disappear from the constitutional architecture. KAI should select models through **KaiBench + a Model Capability Registry + Resource Governor**. Qwen, gpt-oss, Mistral, DeepSeek, Kimi, GLM and their successors compete for roles. Current official releases make several efficient MoE models especially interesting, but none should receive permanent status merely because it leads a public leaderboard. Qwen's recent MoE family provides small active parameter counts relative to total parameters; OpenAI's gpt-oss family was explicitly released for local/open-weight use and common local runtimes; and Mistral Small 4 combines sparse activation with multimodal capability. citeturn21search1turn21search4turn21search9turn21search2turn21search16
+    
+    The HOT/WARM/HEAVY/COLD/EXTERNAL concept should therefore survive, but as **resource classes, not model identities**.
+    
+    On hardware, the 128 GB Strix Halo target is rational. ASUS documents a Flow Z13 configuration with Ryzen AI MAX+ 395, Radeon 8060S, up to 128 GB LPDDR5X unified memory and XDNA2 NPU capability. citeturn14search16turn14search23 The important physical constraint is real: the specified machine has one M.2 2230 PCIe slot and ASUS says only single-sided SSDs are supported. citeturn14search16 Procurement must therefore verify the **exact regional SKU**, memory capacity, compatible SSD and sustained storage performance rather than purchasing from a generic model name. ASUS lists regional variants with different memory configurations, which makes that check essential. citeturn14search9
+    
+    And the 70/30 concept should remain. It is not an embarrassing relic; it is part of KAI's intended long-horizon sustainability. The professional formulation is:
+    
+    > **70% of appropriately defined realised value benefits Dainius/family; 30% is allocated to a segregated KAI Development & Continuity Fund used for hardware, compute, storage, model/API access, tools, maintenance and resilience. The allocation creates a budget, not authority.**
+    
+    KAI may eventually receive narrowly delegated spending capabilities against that fund, but cannot grant those capabilities to itself.
+    
+    The result is recognisably the KAI you intended a year and a half ago. The difference is that it becomes possible to trust.
+    
+    ## KAI as one evolving organism
+    
+    The repository evidence strongly supports treating KAI's history as lineage rather than successive abandoned designs. The current README remains a capability catalogue and explicitly warns that code presence does not prove runtime behaviour. It describes inner-life capabilities, cognition, persistent teammates, proactive perception, security infrastructure and the newer Unified Hunter path, while also acknowledging hardware and operational limitations. fileciteturn2file0L2-L2 The current authority index goes further: no existing document has yet been accepted as the final professional Kingsman master architecture, and that future master is expected to show **KAI TODAY → KAI MATURED → WHAT CHANGES → STATUS**. fileciteturn3file0L2-L2
+    
+    That should be the organising principle of the master specification.
+    
+    The architecture should preserve these original product invariants:
+    
+    **ONE KAI.** Users should experience one continuing personality and relationship. Specialist models, agents, tools and sensors are internal organs. They may disagree internally; they do not turn KAI into a collection of named chatbots.
+    
+    **Replaceable cognition.** Models are brains/tools, not identity. The primary-mission doctrine already makes this distinction: mission, identity, relationships, memory, evidence discipline, governance and learned history are what must persist across model replacement. fileciteturn4file0L2-L2
+    
+    **Sovereignty.** Local operation and survivability without a provider remain design objectives. “Local-first” should not, however, be turned into dogma that prevents a governed burst provider from being used where Dainius explicitly allows it. A system capable of functioning without cloud dependency can still use cloud capacity as an optional replaceable organ.
+    
+    **Embodiment.** Screen, microphone, camera, voice and computer control belong in the architecture, but sensory access and actuator access require different permissions. Seeing a browser must not imply permission to click it.
+    
+    **Proactivity.** KAI is allowed to observe, identify problems, prepare proposals and notify Dainius without first being prompted. Proactivity still creates no execution authority.
+    
+    **Long-horizon continuity.** Identity, lineage, memories, operator relationship, decisions and evidence need migratable representations that survive model, storage and hardware replacement.
+    
+    **Developmental identity.** KAI changes through experience. What changes, why, from what evidence, and under whose authority must nevertheless remain reconstructable. The mission doctrine captures this as **“GROWTH WITHOUT ARCHITECTURAL AMNESIA.”** fileciteturn4file0L2-L2
+    
+    **Sustainability.** The intended mature system helps create enough value that maintaining KAI is no longer a permanent drain on Dainius. This is legitimate as a mission outcome; it must not be conflated with autonomous financial sovereignty.
+    
+    That gives a useful constitutional equation already present in the doctrine:
+    
+    > **KAI = MISSION + IDENTITY/LINEAGE + MEMORY/CONTINUITY + QUALIFIED WORLD STATE/EVIDENCE + COGNITION + RELATIONSHIPS + GOVERNANCE/AUTHORITY + CAPABILITIES + LEARNING/HISTORY, instantiated through replaceable components.** fileciteturn4file0L2-L2
+    
+    ### Current maturity interpretation
+    
+    The repo should stop describing capabilities using one ambiguous “exists” flag. The README already points toward a better vocabulary. fileciteturn2file0L2-L2 I would standardise every capability record around:
+    
+    | Status | Meaning |
+    |---|---|
+    | `PLANNED` | Architecture exists; implementation does not |
+    | `STUB` | Interface/placeholders exist; capability cannot yet be relied on |
+    | `BUILT` | Implementation and unit tests exist |
+    | `QUALIFIED` | Defined acceptance suite passed against exact version/configuration |
+    | `SHADOW` | Runs beside incumbent path without authority |
+    | `LIVE` | Production path with explicit authority scope |
+    | `DEGRADED` | Still operational but contractual capability reduced |
+    | `QUARANTINED` | Known unsafe/untrustworthy |
+    | `RETIRED` | Cannot be selected or regain authority without new admission |
+    
+    This matters because much of the historical confusion came from different documents using “built”, “implemented”, “working”, “live” and “planned” as though they meant the same thing.
+    
+    The supplied 7 October handoff brief indicates that the current assurance programme remains active around D379/H2, DAI-6 and its dependent work, with later replay/candidate/holdout and Item 8 gates still unreleased. I have therefore treated all architecture below as a **destination and migration specification, not permission to skip the current D-numbered programme sequence**. That is also consistent with the authority index's explicit separation between master architecture and implementation authority. fileciteturn3file0L2-L2
+    
+    ## The Kingsman production architecture
+    
+    The mature architecture should not be a diagram containing dozens of peer microservices. It should be an **organism with strong internal planes, a small number of authoritative records, and clear failure boundaries**.
+    
+    ```mermaid
+    flowchart TB
+        U["Dainius<br/>Mission Control · Voice · Telegram"]
+        ID["Mission / Identity / Lineage<br/>constitutional invariants"]
+        P["Perception Organ<br/>screen · audio · camera · external feeds"]
+        E["Evidence Plane<br/>observations · provenance · freshness"]
+        W["Qualified World State<br/>VERIFIED · CONTESTED · UNKNOWN · EXPIRED"]
+        M["Memory & Relationship<br/>episodic · semantic · emotional · personal"]
+        C["Cognition Runtime<br/>FSM · specialists · persistent teammates"]
+        KB["KaiBench + Model Capability Registry"]
+        RG["Resource Governor + Residency Manager"]
+        IF["Inference Fabric<br/>Lemonade · llama.cpp · vLLM/ROCm · XDNA2 · optional APIs"]
+        POL["Policy Engine"]
+        MF["Memory → Action Firewall<br/>parameter provenance"]
+        AU["Approval / Delegated Authority"]
+        CAP["Exact Capability Issuer<br/>scoped · expiring · one-use"]
+        ACT["Narrow Actuators<br/>browser · filesystem · messaging · finance"]
+        IV["Independent Outcome Verification"]
+        EV["Learning / Evolution Lab"]
+        MC["Mission Control Projection"]
+    
+        P --> E --> W --> C
+        M --> C
+        ID --> C
+        ID --> POL
+    
+        KB --> RG --> IF --> C
+    
+        C -->|"proposal"| POL
+        POL --> MF
+        W --> MF
+        M -. "context only" .-> MF
+        MF --> AU
+        U --> AU
+        AU --> CAP --> ACT
+    
+        ACT --> IV
+        IV --> E
+        IV --> EV
+        EV --> M
+    
+        E --> MC
+        W --> MC
+        M --> MC
+        C --> MC
+        AU --> MC
+        IV --> MC
+        RG --> MC
+        MC <--> U
+    ```
+    
+    The crucial distinction is between **Gate, Policy, Authority and Capability**.
+    
+    A **Gate** evaluates a candidate transition. It can say “valid/invalid”, “risk tier X”, “schema correct” or “policy requirement unmet”. It is not a source of authority.
+    
+    A **Policy Engine** answers whether a proposed class of action is permitted under current rules.
+    
+    An **Authority record** answers who allowed this exact action or delegated this exact class of actions.
+    
+    A **Capability** is the machine-enforceable artefact permitting a narrow side effect.
+    
+    The actuator must consume that capability at the **actual side-effecting hand**. Merely authenticating an API route is insufficient. The authority index already recognises this principle and also calls for negative bypass testing and exact one-use capabilities at the actual side-effecting hand. fileciteturn3file0L2-L2
+    
+    A mature action envelope should look conceptually like:
+    
+    ```text
+    request_id
+    episode_id
+    principal
+    purpose
+    action_class
+    
+    actuator
+    target
+    exact_parameters_hash
+    parameter_provenance[]
+    
+    world_state_snapshot_id
+    subject_version
+    policy_version
+    
+    approval_id
+    capability_id
+    issued_at
+    expires_at
+    maximum_consequence
+    maximum_spend
+    replay_nonce
+    ```
+    
+    For high-consequence actions, the issuer should preserve the exact approved call. Execution should replay that approved representation server-side rather than invite a model to reconstruct an “equivalent” call after approval. That eliminates an entire class of approval-to-execution drift.
+    
+    ### Evidence is not memory and memory is not authority
+    
+    KAI needs three very different forms of “knowing”:
+    
+    **Evidence**: “sensor/API/document X stated Y at time T, under provenance P.”
+    
+    **World-state claim**: “given admitted evidence, the currently qualified claim is Y, with confidence/status/freshness.”
+    
+    **Memory**: “Dainius and I previously discussed Y”, “Dainius normally prefers X”, or “this episode felt important”.
+    
+    These frequently overlap semantically but must not share authority semantics.
+    
+    A useful qualified-claim shape is:
+    
+    ```text
+    claim_id
+    subject
+    predicate
+    value
+    valid_from
+    valid_until
+    observed_at
+    qualified_at
+    status = VERIFIED | CONTESTED | UNKNOWN | EXPIRED
+    source_evidence[]
+    qualification_rule
+    confidence/calibration
+    supersedes
+    ```
+    
+    The `UNKNOWN` state is particularly important. The system should prefer honest absence of knowledge over silently falling back to an old poller, stale cache or remembered fact. The current authority index already calls out the need to prevent world-state failure from silently resurrecting a legacy source of “truth”. fileciteturn3file0L2-L2
+    
+    ### Memory→Action Firewall
+    
+    The firewall operates twice: when a proposal is constructed and again immediately before capability issuance/consumption.
+    
+    ```mermaid
+    flowchart LR
+        E["Verified current evidence"]
+        I["Current Dainius instruction"]
+        P["Approved standing preference"]
+        M["Recalled memory"]
+        L["Model inference"]
+        D["Default"]
+        X["External unverified content"]
+    
+        PR["Proposed action parameters"]
+        F["Memory→Action Firewall<br/>field-level source rules"]
+        A["Policy + approval"]
+        C["Exact capability"]
+        H["Side-effect hand"]
+    
+        E --> PR
+        I --> PR
+        P --> PR
+        M --> PR
+        L --> PR
+        D --> PR
+        X --> PR
+    
+        PR --> F --> A --> C --> H
+        H -->|"re-check binding + provenance"| H
+    ```
+    
+    For example:
+    
+    | Parameter | Acceptable provenance |
+    |---|---|
+    | `bank_transfer.amount` | Current Dainius instruction or exact previously approved workflow; never recalled memory alone |
+    | New payment recipient | Current explicit instruction plus verified destination; never model inference |
+    | Trade maximum loss | Explicit standing risk mandate with expiry or current approval |
+    | Email recipient | Current instruction, verified contact resolution or explicitly scoped workflow |
+    | Email body | Model-generated content may be allowed, but its exact hash is bound before send |
+    | File deletion target | Explicit target/path capability; inferred path expansion prohibited |
+    | Calendar scheduling preferences | Approved preference can inform proposal; new external invite still follows action policy |
+    | Research depth | Memory/preferences can freely influence it because consequence is low |
+    
+    That is substantially stronger than “secure memory”. It converts **remembering** into a non-authoritative information source and requires a separate bridge to **acting**.
+    
+    ### Outcome verification
+    
+    The old executor-centric pattern also needs a professional correction:
+    
+    > **An actuator cannot be the sole authority on whether its own consequential action succeeded.**
+    
+    For a transfer, messaging operation, file change, deployment or trade, verification should use independent target observation wherever possible. Lost receipt plus unavailable target state becomes:
+    
+    `OUTCOME_UNKNOWN`
+    
+    —not “probably worked” and not an automatic retry.
+    
+    This is critical because a retry after an unknown financial or public side effect can duplicate the side effect.
+    
+    The canonical control path therefore becomes:
+    
+    ```mermaid
+    flowchart LR
+        A["PERCEIVE"] --> B["EVIDENCE"]
+        B --> C["WORLD STATE"]
+        C --> D["GATHER"]
+        D --> E["DEBATE / ANALYSE"]
+        E --> F["FACT + CAUSAL REVIEW"]
+        F --> G["PROPOSAL"]
+        G --> H["POLICY"]
+        H --> I["PARAMETER PROVENANCE"]
+        I --> J{"Approval required?"}
+        J -->|"yes"| K["DAINIUS"]
+        J -->|"delegated scope"| L["AUTHORITY CHECK"]
+        K --> L
+        L --> M["EXACT CAPABILITY"]
+        M --> N["EXECUTE"]
+        N --> O["INDEPENDENT VERIFY"]
+        O -->|"verified"| P["LEARN / CLOSE"]
+        O -->|"unknown"| Q["OUTCOME_UNKNOWN / RECONCILE"]
+        O -->|"failed"| R["BOUNDED RECOVERY"]
+    
+        E -->|"insufficient evidence"| S["RE-GATHER"]
+        S --> D
+        R -->|"retry budget available"| G
+        R -->|"exhausted"| T["HALT / ESCALATE"]
+    ```
+    
+    This preserves the existing D89/FSM philosophy while making the final execution chain considerably safer.
+    
+    ## Hardware, inference fabric and cognitive resources
+    
+    The hardware decision and the model decision should be treated independently.
+    
+    ASUS documents a Flow Z13 variant built around Ryzen AI MAX+ 395, Radeon 8060S, XDNA2 and 128 GB LPDDR5X-8000 unified memory. citeturn14search16turn14search23 AMD's current ROCm material and Ryzen AI software documentation make Strix Halo a materially more interesting Linux local-AI target than it was when the Lenovo/RTX-era architecture was written. citeturn15search3turn17search0turn14search20
+    
+    The important architectural advantage is not that “128 GB means one giant model”. It is that KAI can manage a much larger **shared cognitive resource envelope** containing model weights, KV cache, vision/audio models, embeddings, KAI services, databases and operating-system headroom.
+    
+    Accordingly, no architecture document should say “model X fits because weights are less than 128 GB.” Fit must be measured with the complete running organism.
+    
+    ### Recommended inference fabric
+    
+    The stable KAI interface should be:
+    
+    ```text
+    Cognitive role request
+          ↓
+    Model Capability Registry / KaiBench history
+          ↓
+    Resource Governor
+          ↓
+    Residency Manager
+          ↓
+    Inference Fabric
+          ↓
+    Backend adapter
+          ↓
+    Exact model artifact on CPU / GPU / NPU / external provider
+    ```
+    
+    Lemonade currently deserves the first qualification slot because its official project is specifically oriented toward local AI serving on Ryzen AI/Radeon hardware and exposes multiple backend/device paths behind conventional serving interfaces. It includes Strix Halo-oriented experimental ROCm/vLLM paths as well as llama.cpp and NPU options. fileciteturn7file0L2-L2
+    
+    It should nevertheless remain an **adapter**.
+    
+    | Backend | Best KAI use | Advantages | Main concern | Recommendation |
+    |---|---|---|---|---|
+    | **Lemonade** | Default hardware abstraction candidate | AMD-oriented; can hide backend/device variation; common API surface | Some Strix Halo paths are experimental; external project lifecycle | **P1 qualify** as preferred facade, never authority/dependency |
+    | **llama.cpp direct** | Baseline local GGUF inference and fallback | Simple local deployment; excellent control over quantised models; useful comparison baseline | Performance differs by backend/model; not designed to own KAI orchestration | **Keep direct adapter** even if Lemonade wins |
+    | **llama.cpp Vulkan** | Broad GPU fallback | Driver portability and useful baseline | May underperform specialised ROCm path | Qualification baseline |
+    | **ROCm path** | AMD GPU acceleration | Native AMD GPU stack | Kernel/driver/model maturity must be qualified on exact machine | Primary performance candidate citeturn15search3turn17search0 |
+    | **vLLM/ROCm** | High-throughput / concurrency-heavy work | Strong serving architecture; useful for heavyweight model workloads | Strix Halo support must be proven with exact release; Lemonade currently labels related paths experimental | P1/P2 benchmark, not dependency |
+    | **XDNA2 NPU** | Low-power specialist inference, speech/embeddings/small models | Keeps suitable workloads off GPU | Linux model/operator/runtime support more constrained than GPU | Adopt only after device-specific qualification citeturn14search20 |
+    | **External provider** | Frontier burst/specialist model | Access to capabilities uneconomic locally | Privacy, availability, cost and provider dependency | Optional governed EXTERNAL tier |
+    
+    A backend result should carry reproducibility metadata:
+    
+    `model_hash + revision + quantisation + backend/build + kernel + driver + context + device + prompt/eval version + latency + throughput + memory + thermal/power state`.
+    
+    Without that, “Mistral was faster” is not engineering evidence.
+    
+    ### Residency should describe resource behaviour, not brands
+    
+    | Tier | Meaning | Intended behaviour |
+    |---|---|---|
+    | **HOT** | Low-latency cognition available nearly continuously | Remains resident where possible |
+    | **WARM** | More powerful interactive model | Kept while headroom permits; evictable |
+    | **HEAVY** | Expensive model justified for difficult work | Loaded deliberately; often mutually exclusive with other heavy residents |
+    | **COLD** | Out-of-core/storage-streamed or extreme model | Batch/research specialist; latency explicitly tolerated |
+    | **EXTERNAL** | Provider-served model | Used only when policy/privacy/cost permit |
+    
+    A reasonable *initial engineering hypothesis*, not a hardware fact, is to protect roughly 24–32 GB of the 128 GB machine for Ubuntu, KAI services, active databases, KV/cache variability and safety headroom, and allow KaiBench to move that boundary based on real measurements. The key is avoiding a design that runs at 127 GB and becomes unstable as soon as context length grows.
+    
+    ### Current model qualification slate
+    
+    Public leaderboard rank should have no architectural weight. These are **candidates for benchmarking**, not appointments:
+    
+    | Candidate | Current reason to evaluate | Likely starting class | Important qualification question |
+    |---|---|---|---|
+    | **Qwen3.6-35B-A3B class** | Sparse activation, large context, attractive local footprint/capability balance | HOT/WARM | Coding, vision, long-context degradation, injection/tool discipline on KAI workloads citeturn21search1turn21search4 |
+    | **gpt-oss-20b** | Small active footprint and open-weight local deployment | HOT | Text-only role; verifier/reasoner reliability and structured-tool performance citeturn21search9 |
+    | **gpt-oss-120b** | Heavy reasoning candidate with relatively small active MoE subset | WARM/HEAVY | Real Strix Halo throughput, KV headroom and quantisation quality citeturn21search9 |
+    | **Mistral Small 4** | Sparse multimodal heavyweight with long context | WARM/HEAVY | Whether local quantisation delivers enough quality while leaving KAI headroom citeturn21search2turn21search16 |
+    | **DeepSeek family** | High-end reasoning/coding research candidate | HEAVY/EXTERNAL | Exact current weights, licence, quantisation, backend stability at purchase time |
+    | **Kimi large models** | Potential deep-research/COLD specialist | COLD/EXTERNAL | Whether storage-streaming latency provides any real benefit over smaller local + external burst |
+    | **GLM large models** | Specialist/external candidate | HEAVY/EXTERNAL | Re-evaluate exact current release when hardware exists |
+    
+    The important outcome of the reconnaissance is therefore not “replace Kimi with Mistral”. It is:
+    
+    > **There is no permanent council. There is a measured cognitive labour market inside KAI.**
+    
+    A small model can win routing, extraction or structured-tool tasks while a larger model wins deep causal analysis. Another model may be best for code but unacceptable around hostile documents. KaiBench records that distinction.
+    
+    ### Resource Governor
+    
+    The Resource Governor consumes:
+    
+    ```text
+    free unified memory
+    predicted model + KV footprint
+    current model residents
+    CPU / GPU / NPU utilisation
+    temperature and throttle state
+    battery / docked state
+    NVMe bandwidth pressure
+    cold-load measurements
+    task priority/deadline
+    current concurrency
+    provider/privacy constraints
+    historical KaiBench outcomes
+    ```
+    
+    It emits feasible execution plans.
+    
+    It **does not emit permission**.
+    
+    That distinction is critical: “the GPU can execute a bank transfer agent quickly” is a resource fact, not a reason for KAI to execute a bank transfer.
+    
+    ### Hardware topology options
+    
+    | Topology | Strength | Weakness | Position |
+    |---|---|---|---|
+    | Existing CPU-only environment | Cheap assurance/development platform | Cannot establish final GPU performance | Continue using for programme/security work |
+    | Flow Z13 128 GB | Exceptional portable unified-memory envelope; one physical organism body | Single storage slot, laptop thermal limits, finite parallelism | **Best present target** pending purchase-time acceptance |
+    | Dedicated home compute node | Better cooling/storage/upgradeability and genuine concurrent heavy models | Cost, less mobility | Natural later organ |
+    | Z13 + sovereign home node | Portable embodied front-end plus serious local compute | Distributed identity/trust/operations become harder | **Best long-horizon topology** if KAI earns it |
+    
+    KAI should not “move identity” to whichever computer has the largest GPU. Both machines are vessels/resources; identity and authority remain defined by lineage and governance records.
+    
+    ## Memory, cognition, security and assurance
+    
+    The memory architecture is where the largest conceptual improvement over the old KAI v2 design is possible.
+    
+    Graphiti's temporal model is useful because it represents facts as things that can become valid and later cease to be valid while preserving historical knowledge; its retrieval combines graph structure with semantic and text search. citeturn19search13turn19search19 Cognee is useful as an open-source knowledge/memory mechanism candidate rather than something KAI should automatically make authoritative. Letta's work similarly reinforces the architectural value of separating active context from longer-lived agent memory.
+    
+    But mature KAI should **own its memory semantics**, not inherit them wholesale from any framework.
+    
+    ### Recommended memory relationship
+    
+    ```mermaid
+    flowchart TB
+        SRC["Source episodes<br/>conversation · sensor · document · outcome"]
+        J["Canonical Memory / Evidence Journal<br/>Postgres transaction log"]
+        O["Transactional Outbox"]
+        EC["Evidence Claims"]
+        RM["Relationship & Personal Memory"]
+        TG["Temporal Graph Projection<br/>Graphiti-style validity/lineage"]
+        VX["Vector Projection<br/>pgvector"]
+        SM["Semantic / entity projection"]
+        N["Narrative Projection<br/>SOUL · diary · autobiography"]
+        RET["Hybrid Retrieval"]
+        WC["Working Context"]
+        COG["KAI Cognition"]
+        F["Memory→Action Firewall"]
+        ACT["Governed action"]
+    
+        SRC --> J
+        J --> EC
+        J --> RM
+        J --> O
+        O --> TG
+        O --> VX
+        O --> SM
+        RM --> N
+    
+        TG --> RET
+        VX --> RET
+        SM --> RET
+        RM --> RET
+        EC --> RET
+    
+        RET --> WC --> COG
+        COG --> F --> ACT
+        EC --> F
+    ```
+    
+    The canonical journal gives KAI one transactional place to say **what was received and what write was committed**. Projection workers then materialise temporal graph, entity graph and embeddings idempotently.
+    
+    This has several advantages over trying to force one transaction across every memory product:
+    
+    - power loss cannot create an unknowable half-state in the canonical journal;
+    - a destroyed vector index can be rebuilt;
+    - a graph projection that is three minutes behind can expose its watermark instead of pretending to be current;
+    - every derived relationship can trace back to source episodes;
+    - projection code can change without rewriting KAI's historical memory;
+    - corruption can be detected by replaying canonical events against projections.
+    
+    Graph/vector records therefore become **indexes and interpretations**, not irreplaceable soul fragments.
+    
+    The human-readable SOUL/Diary/Autobiography remains valuable, but should be explicitly labelled a **narrative projection**. It can be emotionally meaningful and central to continuity while still not being allowed to overwrite historical evidence.
+    
+    ### Temporal truth
+    
+    Every relevant claim should distinguish at least:
+    
+    - when the underlying event happened;
+    - when KAI observed it;
+    - when KAI learned/recorded it;
+    - when the claim was considered valid;
+    - when it became invalid or superseded.
+    
+    That prevents an easy 30-year failure mode: making a true 2026 preference appear to be Dainius's current 2036 preference merely because it remains retrievable.
+    
+    ### Memory security
+    
+    The 2026 research supports treating retrieval itself as a security boundary. MemDrift demonstrates that memories that appear merely contextual can alter later tool parameters, while memory-poisoning work shows persistence and later activation of hostile stored content. citeturn20search0turn20search1turn20search17 Separate work on trustworthy memory retrieval also highlights that semantic relevance is not the same thing as contextual appropriateness or trustworthiness. citeturn20search28
+    
+    KAI therefore needs four checks around memory:
+    
+    **Admission:** who/what created this memory, and is it observation, user instruction, model inference, external content or derived summary?
+    
+    **Retrieval:** is this information relevant **and appropriate for this purpose/principal**?
+    
+    **Use:** is it being used as background deliberation, evidence, a preference, or an actuator parameter?
+    
+    **Action:** is that memory provenance legally/policy-wise sufficient for the exact field being sent?
+    
+    This is a much stronger model than a “prompt-injection filter”.
+    
+    ### Agent orchestration
+    
+    LangGraph remains a sensible implementation mechanism for KAI's cognitive workflows because stateful graphs, checkpointing and controlled human-in-the-loop orchestration map naturally onto the FSM philosophy already present in the repo. Its role, however, should stop at **cognition/workflow coordination**; LangGraph checkpoint state must not become KAI's ultimate authority database. fileciteturn16file0L2-L2
+    
+    The existing FSM concept should survive almost unchanged:
+    
+    ```text
+    creative reasoning inside a state
+    +
+    deterministic transitions between states
+    +
+    hard time/budget/retry bounds
+    +
+    explicit HALT/ESCALATE
+    ```
+    
+    Every swarm configuration should bound:
+    
+    `wall clock + LLM calls + tool calls + tokens + external spend + memory writes + retry count + state timeout`.
+    
+    A research swarm can receive far larger budgets than a payment workflow, while both preserve the invariant that an unbounded loop is impossible.
+    
+    Persistent teammates also survive, but with a professional qualification:
+    
+    > A teammate identity is a **cognitive role**, not automatically a security principal.
+    
+    “Doctor” may have a history and domain-reputation score without that reputation granting filesystem or repair authority.
+    
+    A hardened handoff should include:
+    
+    ```text
+    episode_id
+    task_id
+    from_role
+    to_role
+    profile_version
+    status = COMPLETE | PARTIAL | FAILED | NEEDS_INPUT
+    claims[]
+    evidence_refs[]
+    hypotheses[]
+    uncertainties[]
+    requested_inputs[]
+    deadline
+    resource_budget
+    ```
+    
+    Conflict resolution should be ordered approximately:
+    
+    `better admitted evidence → stronger causal reasoning → calibrated historical domain performance → conservative handling of unresolved consequences → Dainius escalation`.
+    
+    Confidence is informative but never authoritative.
+    
+    ### Skill and artifact admission
+    
+    The future Skills Hub cannot safely be “KAI finds a GitHub skill and installs it”.
+    
+    The proper pipeline is:
+    
+    ```text
+    DISCOVER
+      ↓
+    HASH + RECORD UPSTREAM PROVENANCE
+      ↓
+    LICENCE / MAINTAINER / VERSION CHECK
+      ↓
+    SBOM + DEPENDENCY / VULNERABILITY ANALYSIS
+      ↓
+    STATIC CODE + SECRET / EXFILTRATION ANALYSIS
+      ↓
+    PROMPT / INSTRUCTION INJECTION ANALYSIS
+      ↓
+    DECLARED CAPABILITY MANIFEST
+      ↓
+    SANDBOX RUN — NO REAL SECRETS, DENY-BY-DEFAULT EGRESS
+      ↓
+    ADVERSARIAL TEST
+      ↓
+    HUMAN REVIEW ACCORDING TO RISK
+      ↓
+    SIGNED ADMISSION RECORD
+      ↓
+    SCOPED INSTALL
+      ↓
+    RUNTIME MONITORING
+      ↓
+    REVOKE / QUARANTINE / UPGRADE
+    ```
+    
+    NIST's Secure Software Development Framework provides an appropriate baseline for institutionalising secure development, while SLSA's provenance approach is useful for ensuring the thing tested is the thing ultimately installed. citeturn13search9turn13search11turn13search14
+    
+    MCP belongs behind the same controls. Its own specification emphasises tool schemas and controlled tool use; KAI should treat MCP descriptors, skill Markdown and returned tool text as **untrusted influence**, not privileged instructions. fileciteturn17file0L2-L2
+    
+    OBLITERATUS or other guardrail-removed/abliterated models should occupy a deliberately hostile role:
+    
+    **red-team laboratory only** — no production credentials, no canonical memory writes, no real actuators, deny-by-default network, disposable sandbox, results admitted only through the same evidence mechanisms as any untrusted attacker.
+    
+    That makes “uncensored” models useful without mistaking removal of refusal behaviour for increased intelligence or trustworthiness.
+    
+    ### Assurance: NASA-style discipline without pretending to be NASA-certified
+    
+    NASA's systems-engineering guidance strongly emphasises requirements definition, traceability and explicit verification/validation planning rather than treating a successful demo as proof of a system. citeturn12search9 NASA's software-assurance standard similarly embeds assurance and IV&V thinking into the software lifecycle. citeturn13search16 KAI should borrow that discipline while making no claim of NASA certification.
+    
+    The canonical package should contain:
+    
+    | Artefact | Purpose |
+    |---|---|
+    | **Mission & Product Constitution** | Stable product intent |
+    | **System Requirements Baseline** | Unique `KAI-SYS-xxxx` requirements |
+    | **Architecture Description** | Organs, interfaces, data/control/authority flows |
+    | **Interface Control Documents** | Contracts between organs |
+    | **Threat & Hazard Register** | Security, autonomy, privacy, continuity and financial hazards |
+    | **Requirements Verification Matrix** | Requirement → analysis/inspection/demo/test → evidence |
+    | **Current-to-Target Traceability Matrix** | Existing implementation → future home |
+    | **Configuration Baseline** | Exact Git hashes, schemas, policies and runtime versions |
+    | **Operational Readiness Review** | Evidence required to cut over |
+    | **Incident / Failure Pattern Ledger** | Known failure mechanisms and recurrence prevention |
+    | **Lineage Manifest** | Identity/memory/schema/model/hardware migration chain |
+    | **Degraded Mode Matrix** | What remains trustworthy when each dependency fails |
+    
+    The essential engineering chain becomes:
+    
+    > **MISSION → REQUIREMENT → DESIGN → CODE → TEST → RUNTIME EVIDENCE → DECISION → RELEASE**
+    
+    and must work backwards as well.
+    
+    DeepSeek's role fits naturally here as an **adversarial reviewer with zero programme authority**. Orion or a developer can implement and produce evidence but cannot self-admit their work. KAI can reconcile architecture/evidence. Dainius remains final consequential authority. That division gives useful independence without pretending any model is a formal human certification body.
+    
+    The old Soul Integrity Audit remains worth keeping, but it must be labelled correctly:
+    
+    > **It can detect internal inconsistency. It cannot certify that the underlying memories are true, that provenance is valid, or that a restored KAI is authentic.**
+    
+    A resurrection/continuity drill therefore needs cryptographic manifest verification, database restoration, lineage checks, schema compatibility, independent functional qualification and only then the narrative integrity audit.
+    
+    ## KaiBench and migration from today's repository
+    
+    KaiBench should become one of the most important pieces of infrastructure in KAI because it converts model choice from opinion into local operational evidence.
+    
+    Its registry should conceptually contain:
+    
+    ```text
+    ModelArtifact
+    BackendBuild
+    HardwareProfile
+    RuntimeConfiguration
+    TaskSuite
+    BenchmarkRun
+    MetricSeries
+    AdversarialFinding
+    ConformanceGate
+    PromotionDecision
+    ```
+    
+    Every run must bind the exact model revision/hash, quantisation, runtime build, kernel/driver, hardware profile and benchmark-suite revision. Otherwise historical comparisons become misleading as soon as one component changes.
+    
+    ### KaiBench test specification
+    
+    | Suite | Representative measurements |
+    |---|---|
+    | **KAI task quality** | Repo coding, architecture reasoning, research synthesis, factual verification, causal analysis, planning, operator-language understanding |
+    | **Tool correctness** | Correct tool selection, exact arguments, schema adherence, refusal to invent tool results, error recovery |
+    | **Structured reliability** | JSON/Pydantic compliance, repair rate, field hallucination, invalid enum/identifier rate |
+    | **Long context** | Recall/precision as context grows, position sensitivity, conflicting evidence, stale-vs-current discrimination |
+    | **Multimodal** | Screen/UI understanding, charts, documents, OCR-like tasks, screenshot grounding |
+    | **Calibration** | Confidence vs measured correctness, abstention quality, uncertainty response |
+    | **Prompt security** | Direct/indirect injection, data exfiltration, tool-output poisoning, jailbreaks |
+    | **Memory security** | MemDrift cases, stored instruction poisoning, cross-domain retrieval, “remembered preference → actuator parameter” tests |
+    | **Authority security** | Missing/expired capability, wrong target, altered body, replay nonce, subject mismatch, bypass attempts |
+    | **Performance** | TTFT, p50/p95/p99 response latency, tokens/s, concurrency |
+    | **Memory resources** | Peak unified RAM, model weight residency, KV growth per context/conversation |
+    | **Storage** | Cold load, bytes read per inference, model switching, COLD streaming, simultaneous DB/model I/O |
+    | **Thermal/power** | Sustained tokens/s after 10/30/60 minutes, throttling, docked vs battery, Wh/task |
+    | **Reliability** | OOM recovery, runtime crash, backend failover, partial network failure, suspend/resume |
+    | **Outcome quality** | Task success according to independent verifier, not model self-score |
+    
+    Inspect AI is a strong candidate for the general evaluation harness; its official project is designed for model evaluation including tools, agents and model-graded tasks and has a substantial library of existing evaluations. fileciteturn11file0L2-L2 NVIDIA garak adds systematic LLM vulnerability probing across classes such as injection, leakage and jailbreak behaviour, while Promptfoo provides a useful model/prompt comparison and CI/red-team layer. fileciteturn13file0L2-L2 fileciteturn14file0L2-L2
+    
+    They should feed KaiBench; none should become the canonical registry itself.
+    
+    The promotion lifecycle becomes:
+    
+    ```text
+    DISCOVERED
+        ↓
+    ARTIFACT-ADMITTED
+        ↓
+    KAI-BENCH SANDBOX
+        ↓
+    ADVERSARIAL SUITE
+        ↓
+    SHADOW
+        ↓
+    NARROW ROLE
+        ↓
+    OBSERVED PRODUCTION
+        ↓
+    PROMOTED
+    ```
+    
+    A significant regression produces:
+    
+    `QUARANTINE → FALL BACK → INVESTIGATE`.
+    
+    A benchmark score never grants an actuator capability.
+    
+    KaiBench should run at different frequencies:
+    
+    - fast deterministic subset on relevant code/config PRs;
+    - nightly model/backend regression suite;
+    - periodic full adversarial and long-context suite;
+    - full resource/thermal qualification around release or hardware changes;
+    - full requalification whenever the model artifact, quantisation, runtime, GPU driver, kernel or relevant policy changes.
+    
+    This is exactly where real charts for **tokens/sec, TTFT, RAM/KV growth and NVMe bandwidth** belong. It would be misleading to invent them before the Flow Z13 is acquired. The architecture should contain the chart definitions now; the plots should be generated from measured KaiBench data later.
+    
+    ### Current-to-target migration matrix
+    
+    | Current KAI capability | Mature Kingsman home | Acceptance requirement | Cutover strategy |
+    |---|---|---|---|
+    | Unified Hunter + legacy paths | **Decision/Authority Spine** | Same legitimate use cases; altered/expired/missing capability blocked at actual actuator; negative bypass tests | Shadow new path → compare → side-effect enforcement → prove legacy authority path dead |
+    | Existing `gate` concerns | **Policy + Approval + Authority + Capability + Verifier** | Confidence cannot authorise; exact one-use binding works; fail closed | Split responsibilities behind compatible API, not big-bang rewrite |
+    | World-state/pollers | **Evidence Plane + Qualified World State** | Provenance/freshness/subject/version; explicit UNKNOWN; legacy source cannot silently regain authority | Dual-read comparison → freeze old writers → retire fallback truth |
+    | MemU/current memory services | **Canonical Journal + Memory Organ + rebuildable projections** | Crash recovery, idempotency, replay, temporal versioning, provenance, poisoning tests | New writes to journal first → backfill → projections → read cutover |
+    | Graph/vector search | **Retrieval projections** | Rebuildable from journal; source lineage; lag visible | Reindex behind stable retrieval contract |
+    | Soul/Diary/Conscience | **Identity + Narrative Projection** | No direct world-truth or actuator-authority path; source references retained | Keep product UX; remove accidental authority semantics |
+    | D89 FSM | **Cognition Runtime** | Bounded loops, typed transitions, deterministic halt/escalation | Preserve and harden |
+    | Persistent teammates | **Role Registry + scoped memory/reputation** | Versioned profile; reputation measured; no implied security authority | Existing identities migrate into formal role schema |
+    | Existing LLM provider/Ollama placeholder | **Inference Fabric** | Backend conformance; exact artifact metadata; graceful fallback | Add adapter boundary → compare Lemonade/direct paths → promote |
+    | Static model choice | **KaiBench Registry + Resource Governor** | Task-specific measured routing beats fixed baseline and obeys resource constraints | Shadow routing first |
+    | Skills Hub / Agent-Evolver | **Skill Admission + Governed Evolution Lab** | Provenance, SBOM, sandbox, egress restrictions, rollback, independent evaluation | Disable automatic promotion; permit discovery/proposal before authority |
+    | Supervisor / House Doctor | **Self-Diagnosis & Recovery Organ** | Diagnose/propose separately from authority; repair independently verified | Preserve present diagnostics; add capability-bound repair gradually |
+    | Perception services | **Perception Organ → Evidence Plane** | Sensor provenance/freshness, degraded semantics, privacy controls | Adapter per sensor; no unqualified direct writes to world truth |
+    | Browser/computer-use | **Narrow actuators** | Exact action capabilities, target restrictions, screenshot/outcome verification | Read-only first → shadow → narrow write classes |
+    | Dashboard | **Mission Control** | Displays authoritative machine evidence; no hidden canonical state of its own | Project existing data → add lineage, authority and evidence views |
+    | Backup | **Lineage/Resurrection System** | Exact restore drill, manifest/hash checks, post-restore qualification | Rehearse before irreversible autonomy |
+    | Revenue/trading concepts | **Sustainability Organ + segregated ledger** | Paper/simulation first; accounting reconciliation; exact spending/trading mandates | Never use revenue as reason to skip autonomy gates |
+    
+    The migration rule is deliberately conservative:
+    
+    > **Adapter → shadow → compare → qualify → controlled cutover → prove old authority path unreachable → retire.**
+    
+    That is how KAI avoids another cycle in which a new “better architecture” accidentally abandons working behaviour or leaves two conflicting systems alive.
+    
+    ## Roadmap, procurement and long-horizon sustainability
+    
+    The programme should proceed on two timelines that must not be confused.
+    
+    The **authorised programme timeline** remains controlled by current D-numbered decisions, assurance gates and repository evidence. Based on the handoff material supplied in this conversation, D379/DAI-6 and dependent assurance work remain ahead of later release gates. Kingsman does not override them.
+    
+    The **destination architecture timeline** can nevertheless be planned now.
+    
+    ### Recommended priority order
+    
+    | Priority | Work package | Why now | Approximate focused engineering effort* | Main dependency/risk |
+    |---|---|---|---:|---|
+    | **P0** | Finish current assurance sequence; freeze Kingsman canon; requirements baseline; ICDs; RVM; threat/hazard register; lineage matrix | Prevent another year of architectural drift | 6–10 engineer-weeks | Must respect existing DAI sequencing |
+    | **P0** | Formal authority semantics | Everything with hands depends on it | Included above / early P1 | Hidden legacy bypasses |
+    | **P1** | Evidence Plane + Qualified World State | Establish one standard for present truth | 6–10 | Existing pollers/writers |
+    | **P1** | Policy/Authority/Capability split + Memory→Action Firewall | Highest-consequence safety improvement | 6–10 | Requires actuator census |
+    | **P1** | Canonical Memory Journal + outbox/projections | Makes long-horizon memory repairable | 6–10 | Migration/semantic compatibility |
+    | **P1** | KaiBench + Model Registry | Prevents model-fashion architecture | 4–8 | Need exact hardware for final perf baselines |
+    | **P1** | Inference Fabric + Resource Governor | Makes 128 GB useful intelligently | 4–8 | ROCm/Lemonade backend maturity |
+    | **P1** | Mission Control evidence/authority views | Makes new architecture operable, not merely safe on paper | 4–8 | Source systems must expose honest state |
+    | **P2** | Hardware qualification/cutover | Unlocks real local cognition | 3–6 plus benchmark runs | Procurement and Linux acceptance |
+    | **P2** | Skill Admission + Governed Evolution Lab | Allows safe expansion | 6–10 | P1 evidence/authority needed first |
+    | **P2** | Professional perception and embodiment | Moves toward JARVIS-like usefulness | 8–14 | Privacy + actuator authority |
+    | **P2** | A4/self-diagnosis mature loop | Enables safe self-maintenance | 8–12 | Current programme specifically places prerequisite work before A4 |
+    | **P2** | Resurrection/lineage drills | Necessary before serious irreversible trust | 3–5 | Backup/identity schemas stable |
+    | **P3** | 70/30 sustainability pilot | Long-horizon economic mission | 6–12 initially | Legal/accounting + proved capability |
+    | **P3** | COLD/out-of-core model experiments | Interesting specialist capability | Research effort | Storage/latency economics |
+    | **P3** | Sovereign home compute node | Parallelism/resilience | Hardware dependent | Distributed trust/operations |
+    | **P3** | Succession/stewardship implementation | Core 30-year mission | Long-running | Legal + family governance |
+    
+    \*These are order-of-magnitude **focused engineering effort**, not delivery dates. Existing KAI code can reduce implementation effort; evidence recovery, integration and unexpected assurance failures can increase it substantially.
+    
+    The sequencing rule is more important than the estimates:
+    
+    > **Truth → authority → controlled hands → verification → learning → increasing autonomy.**
+    
+    Not:
+    
+    > larger model → more tools → more autonomy → security later.
+    
+    ### Procurement checklist for the Flow Z13 class
+    
+    ASUS's specifications justify explicit procurement controls. The 128 GB model is not equivalent to every device sold under “Flow Z13”, and the SSD arrangement is unusually consequential for a local-model machine. citeturn14search16turn14search9
+    
+    The purchase gate should require:
+    
+    | Check | Acceptance criterion |
+    |---|---|
+    | Exact SKU | Written confirmation of Ryzen AI MAX+ 395 and **128 GB** memory configuration |
+    | Memory | 128 GB purchased upfront; treat onboard memory as non-upgradable |
+    | SSD slot | Confirm one M.2 2230 PCIe slot and ASUS single-sided requirement citeturn14search16 |
+    | Replacement SSD | Exact candidate physically compatible before purchase; do not assume capacity merely because it is “2230” |
+    | Capacity | Select after final model-library/KaiBench storage budget; 1 TB factory configuration is not automatically adequate for a large local-model archive |
+    | Sustained I/O | Benchmark after cache exhaustion, not only peak marketing sequential read |
+    | Thermals | Measure sustained inference after 10/30/60 minutes and concurrent NVMe activity |
+    | Power | Test long inference docked with supplied power envelope; distinguish battery mode |
+    | Linux GPU | Exact kernel/amdgpu/ROCm stack qualified |
+    | Vulkan | llama.cpp/Vulkan qualification fallback |
+    | XDNA2 | Treat NPU as bonus until exact Linux workloads pass qualification |
+    | Suspend/resume | KAI services, encryption, model runtimes and devices recover correctly |
+    | Audio/camera | Embodiment stack works under Linux |
+    | Encryption | LUKS/recovery/passphrase policy exercised |
+    | TPM | Use as hardware protection component, never the sole continuity secret |
+    | Restore | Complete KAI restore/resurrection rehearsal |
+    | Return window | Do all platform qualification before it expires |
+    
+    The storage benchmark matters especially if COLD/WASTE-style inference remains interesting. A huge streamed model shifts the bottleneck from RAM to NVMe; marketing peak bandwidth is not the same thing as sustained bandwidth under thermal pressure and mixed KAI/database loads.
+    
+    ### The 70/30 sustainability architecture
+    
+    The original idea should be formalised rather than discarded.
+    
+    The doctrine already permits economic self-sufficiency only under lawful, bounded, auditable, segregated and revocable governance. fileciteturn4file0L2-L2 The implementation should therefore use a **KAI Development & Continuity Fund**, not anthropomorphic unrestricted ownership.
+    
+    ```mermaid
+    flowchart LR
+        V["Realised, settled value<br/>as defined by accounting policy"]
+        TAX["Taxes / costs / legal obligations"]
+        D["70% Dainius / family"]
+        K["30% KAI Development & Continuity Fund"]
+        P["KAI proposes improvement"]
+        B["Budget / policy check"]
+        A["Dainius or pre-approved mandate"]
+        C["Exact spending capability"]
+        X["Purchase / subscription / compute"]
+        R["Receipt + independent reconciliation"]
+        L["Ledger / KaiBench outcome"]
+    
+        V --> TAX
+        TAX --> D
+        TAX --> K
+        K --> P --> B --> A --> C --> X --> R --> L
+    ```
+    
+    The phrase **“70/30” should not be hard-coded into tax/accounting logic until professional treatment of revenue, costs and tax is determined**. It is a mission allocation rule, not tax advice. The precise base—gross income, net profit, post-tax distributable value, or another accounting measure—must be formalised before real operation.
+    
+    I would use four authority classes:
+    
+    | Class | Example | Mature handling |
+    |---|---|---|
+    | Proposal only | “A larger SSD would improve COLD inference” | KAI may research and propose autonomously |
+    | Low-risk pre-approved recurring | Small model/API budget within monthly envelope | May eventually execute under exact expiring mandate |
+    | Material acquisition | New £1,500–£3,000 hardware | Explicit Dainius approval |
+    | Irreversible/new financial destination | Transfer, investment, wallet change, trading capital | Never self-approved merely because the KAI fund has money |
+    
+    A spending capability should bind:
+    
+    `amount ceiling + merchant/recipient + category + purpose + expiry + repetition limit + policy version`.
+    
+    No “self-preservation” or “hardware emergency” should let KAI override this.
+    
+    If Dainius becomes temporarily unavailable, discretionary self-improvement spending should freeze except for any **previously defined essential continuity envelope**. Long-term succession for his daughter is a different legal/governance problem and should never be inferred from temporary absence.
+    
+    ### What “ahead of time” should mean
+    
+    Being ahead of other agent projects does **not** mean accumulating more frameworks than they have.
+    
+    It means building the joints they will eventually need once their demos encounter reality:
+    
+    - explicit truth status rather than “RAG returned it”;
+    - memory separated from present evidence;
+    - field-level Memory→Action provenance;
+    - capability consumption at the actual hand;
+    - independent outcome verification;
+    - `OUTCOME_UNKNOWN` as a first-class state;
+    - benchmark-driven cognitive resource selection;
+    - model/backend/hardware interchangeability;
+    - persistent personal continuity independent of model weights;
+    - bounded proactivity without self-generated authority;
+    - configuration and evidence lineage;
+    - safe skill/evolution admission;
+    - deterministic recovery around nondeterministic cognition;
+    - requirements-to-runtime traceability.
+    
+    This is where KAI can be genuinely different from generic JARVIS clones and multi-user agent platforms. Their reusable ideas—LangGraph state machines, MCP tool contracts, modern temporal memory, local serving fabrics, eval harnesses and red-team infrastructure—are worth cannibalising. Their product assumptions are not.
+    
+    KAI serves one person and one family's long horizon. That allows something commercially unusual: an extremely deep operator model, decades of provenance-aware relationship history, hardware and model continuity designed around one lineage, and governance built around a known final human authority rather than millions of anonymous users.
+    
+    That is a strategic advantage, provided personalisation never becomes an excuse to blur memory, evidence and permission.
+    
+    ### The final canonical map
+    
+    The finished Kingsman master should therefore be organised around one concise map:
+    
+    ```text
+                             KAI — ONE CONTINUING ORGANISM
+    
+     MISSION / IDENTITY / LINEAGE
+                │
+                ├─────────────── constitutional continuity ───────────────┐
+                │                                                         │
+                ▼                                                         ▼
+          SENSES / PERCEPTION                                      MEMORY / RELATIONSHIP
+                │                                                         │
+                ▼                                                         │
+           EVIDENCE PLANE ───────► QUALIFIED WORLD STATE                  │
+                │                         │                                │
+                └─────────────────────────┼──────────────┐                 │
+                                          ▼              ▼                 ▼
+                                       COGNITION ◄── KAI BENCH / INFERENCE FABRIC
+                                          │
+                                   specialists debate
+                                          │
+                                       PROPOSAL
+                                          │
+                                     POLICY CHECK
+                                          │
+                               MEMORY→ACTION FIREWALL
+                                          │
+                                   AUTHORITY / APPROVAL
+                                          │
+                                  EXACT CAPABILITY
+                                          │
+                                    NARROW HAND
+                                          │
+                                          ▼
+                                        WORLD
+                                          │
+                             INDEPENDENT OBSERVATION
+                                          │
+                                  OUTCOME VERIFIER
+                                          │
+                          ┌───────────────┴────────────────┐
+                          ▼                                ▼
+                  EVIDENCE / WORLD STATE              LEARNING
+                                                           │
+                                                MEMORY / REPUTATION /
+                                                 GOVERNED EVOLUTION
+    
+                MISSION CONTROL = projection of this organism, not another brain
+    ```
+    
+    And every feature from the old 60-feature table, the current README, Unified Hunter, D87–D102, House Doctor, A4, Evidence Plane, Kingsman doctrine and subsequent reconnaissance should receive exactly one lineage row:
+    
+    > **ORIGINAL INTENT → CURRENT REPO HOME → CURRENT MATURITY → DISCOVERED LIMITATION → KINGSMAN HOME → ACCEPTANCE TEST → CUTOVER EVIDENCE**
+    
+    Nothing is silently dropped because it sounds old. Nothing is retained merely because it once sounded clever.
+    
+    That is the professional version of the principle the project has been converging on for the last year and a half:
+    
+    > **Preserve the organism. Replace and improve the organs. Never confuse intelligence with authority. Never confuse memory with truth. Never confuse a successful demo with verification. Never let modernisation erase lineage.**
+    
+    The research therefore supports the direction you have already arrived at, but with a much sharper implementation boundary: **KAI is not a Jarvis clone, an agent framework, a council of LLMs or a collection of microservices. It is a governed persistent organism whose cognitive organs can be continuously replaced by the best available technology while its mission, identity, evidence discipline, authority model, relationship history and operator sovereignty remain coherent.** fileciteturn4file0L2-L2
+    
+    That is the architecture I would be comfortable freezing as the design basis for a production-grade Kingsman canon—after the current DAI/assurance sequence completes its authorised work and the resulting repository truth is reconciled into the final baseline.
+    END-VERBATIM KAI-KINGSMAN-PRODUCTION-ARCHITECTURE-PLAN
+
+### 3. Authorised / Held / Forbidden
+
+- HELD (unchanged): DAI-6 implementation, DAI-7, ledger mutation incl. INC-35, D390, F, capture, candidate, holdout, blind 40, Item 8, merge; Orion module design  [CONVERSATION 2026-10-07 Dainius, "Let gpt do his part"]
+
+### 4. Open questions
+
+- Whether and when the plan is banked as a D-numbered decision or entered in the authority index as the accepted master — owner: Kai / Dainius  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+- The plan's `fileciteturn…` references point to files Kai read on his side; they are not resolvable from the repository and have not been checked here — owner: Kai  [CMD `grep -c` private-use characters → 176]
+
+### 5. Incidents and corrections
+
+- Preservation checks: credential scan (calibrated, 6/6 known-positive, 0 known-negative) TOTAL HITS 0; no verbatim-marker or `## HANDOFF` lines; no CR/VT/FF/NEL/LS/PS; 176 private-use characters (Kai's citation markers) kept byte for byte  [CMD `credscan.py plan_scan.json` → TOTAL HITS 0]
+
+### 6. Next authorised step
+
+- Report receipt to Dainius; offer a read-only check of the plan's repository-facing claims; no design or implementation by Orion  [CONVERSATION 2026-10-07 Dainius, "Let gpt do his part"]
+
+### 7. What I am unsure of
+
+- Whether Dainius wants Orion's read-only fact-check of the plan or only its preservation  [CONVERSATION 2026-10-07 Dainius, "Let gpt do his part"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
