@@ -38457,3 +38457,142 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-07T19:59:12Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-07T19:59:12Z  [CMD `date -u +%FT%TZ` → 2026-10-07T19:59:12Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 4b539c3548264907071b7d66696f492e4e9693e2  [CMD `git rev-parse HEAD` → 4b539c3548264907071b7d66696f492e4e9693e2]
+- tree: 0599900f959b0d5e87f3e1142f0b40d931a8e118  [CMD `git rev-parse HEAD^{tree}` → 0599900f959b0d5e87f3e1142f0b40d931a8e118]
+- uncommitted_paths: 2  [CMD `git status --porcelain | count lines` → 2]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 4b539c3548264907071b7d66696f492e4e9693e2  [CMD `git ls-remote --heads origin` → 4b539c3548264907071b7d66696f492e4e9693e2]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 83  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 83]
+
+### 1. The four states
+
+- physical: this commit adds `.claude/hooks/ruling_capture.py` (21,262 bytes, sha256 ec44fc75ab9dea4c0b5fb0361122cce8ebb4f8c116a77a99f7b1d1410262a3b3) and registers it in `.claude/settings.json` (sha256 25cd4a921dade6a23e0ec0f914de45573b925d77f12d4e10f95ed763d7bae751): UserPromptSubmit `prompt`, a second Stop hook `stop`, a second SessionStart hook `report`. handoff.py, SKILL.md, CLAUDE.md, session-start.sh and handoff-hook.sh are byte-unchanged  [CMD `sha256sum .claude/hooks/ruling_capture.py .claude/settings.json; git diff --stat` → as stated]
+- authorised: the ruling-capture control, as entry 83 records  [CONVERSATION 2026-10-07 Dainius, "do the best you can out of box and what will work for sure"]
+- evidence: hook selftest 41/41 (known-positive/known-negative, end to end against a real bare remote); handoff selftest 74/74 unchanged; live probes through the registered command lines: a KAI → ORION probe was FLAGGED and the Stop hook BLOCKED; Dainius's entry-83 message was recognised as BANKED; after a waiver Stop allowed  [CMD `ruling_capture.py selftest; handoff.py selftest` → 41/41; 74/74]
+- admission: none  [CONVERSATION 2026-10-06 Kai, "DAI-6 remains OPEN. No implementation authority yet."]
+
+### 2. Rulings since the last handoff
+
+- None new; executed under entry 83's direction  [CONVERSATION 2026-10-07 Dainius, "I call on you to do you kingsman level brotherhood duty"]
+
+### 3. Authorised / Held / Forbidden
+
+- DONE: the control. What it does: every operator prompt is classified; a FLAGGED prompt is kept, exact, in `.git/kai-ruling-capture/` (clone-local, outside the work tree, mode 600) and Claude is told in context to bank it before acting; every later prompt re-announces what is OUTSTANDING; the Stop hook BLOCKS the end of a turn while OUTSTANDING is non-empty (inside its own continuation only if the set changed, so it cannot loop); SessionStart lists OUTSTANDING and every WAIVED item with its reason. OUTSTANDING = FLAGGED − BANKED − WAIVED. BANKED = the whitespace-normalised text inside one verbatim block of this log AT THE UPSTREAM REF (pushed, not merely committed); a prompt under 80 characters must equal a whole block line, the whole block, or a whole `[CONVERSATION …, "…"]` quote  [FILE .claude/hooks/ruling_capture.py:1]
+- HELD (unchanged): DAI-6 implementation (its five files), DAI-7, ledger mutation incl. INC-35, D390, F, capture, candidate, holdout, blind 40, Item 8, merge  [CONVERSATION 2026-10-06 Kai, "STOP before implementation."]
+
+### 4. Open questions
+
+- DAI-6 packet v1 section 9 states `.claude/settings.json` stays unchanged; it has now changed (three hook registrations added, none removed), so DAI-6's surface statement needs reconciling — owner: Kai  [FILE kai-pm/HANDOFF_LOG.md:36297]
+- Whether this control should fold into handoff.py when DAI-6 opens it — owner: Kai  [CONVERSATION 2026-10-07 Dainius, "Kai is busy doing research"]
+
+### 5. Incidents and corrections
+
+- Calibration universe: this session's transcript, /tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/../84284242-f61e-5a69-9588-732883a5292c.jsonl as read from /root/.claude/projects/-home-user-kai-system/, user turns only, tool results excluded: 146 prompts, 2026-09-18 .. 2026-10-07. Reference set (independent of the classifier: banked by hand before the classifier existed) = prompts BANKED in this log at origin before this commit: 45. Classifier recall on it: 43/45. The two misses, both short and marker-free: "add the pointer to CLAUDE.md" and "Good that’s your memory …" (its companion "Please do all that and enforce" IS flagged). Not tuned to them: fitting the reference set would make it non-independent  [CMD `calib.py prompts.json` → FLAG/BANKED 43, pass/BANKED 2, FLAG/unbanked 66, pass/unbanked 35]
+- Matcher defect found and fixed before commit: a plain substring match counted "Continue" and "I authorise" as banked because the words occur in unrelated prose (loose matcher: 47 "banked"); restricted to verbatim blocks and whole tag quotes, with known-negative selftest cases  [CMD `banked.py` → 47 FULL under the loose rule]
+- Finding, recorded not fixed here: 66 distinct flagged prompts of this session are not banked word for word anywhere in the log; they include the source texts of the D381–D386 rulings. Rescued in the next entry  [CMD `rescue_set.py` → 66 distinct, 421,005 bytes]
+- Blind spots, stated: AskUserQuestion answers arrive as tool results and are not seen; the store dies with the container (as does the conversation); the classifier is heuristic, so a marker-free short direction can pass unflagged (2/45 measured)  [FILE .claude/hooks/ruling_capture.py:36]
+- EVIDENCE RULING-CAPTURE-SELFTEST-OUTPUT selftest_out.txt: 38 bytes, sha256 6d47fa3831a8a4b6554481726715f4cff8eb4a5f2262ad1724c7a95f9bedc181, final LF True  [CMD `sha256sum selftest_out.txt` → 6d47fa3831a8a4b6…]
+    BEGIN-VERBATIM RULING-CAPTURE-SELFTEST-OUTPUT
+    RULING-CAPTURE SELFTEST: 41/41 passed
+    END-VERBATIM RULING-CAPTURE-SELFTEST-OUTPUT
+- EVIDENCE RULING-CAPTURE-CORPUS-CALIBRATION-OUTPUT calib_out2.txt: 2777 bytes, sha256 4ccf136c83c58c35590e9f917e6fb5a50401d3f3792748bd1dfd10a91fdcbb25, final LF True  [CMD `sha256sum calib_out2.txt` → 4ccf136c83c58c35…]
+    BEGIN-VERBATIM RULING-CAPTURE-CORPUS-CALIBRATION-OUTPUT
+    2026-09-30T18:34 pass/BANKED 28 no-marker 'add the pointer to CLAUDE.md'
+    2026-09-30T18:44 FLAG/unbanked 87 keyword(implementing) 'Make it automatic but make sure all checks done to make sure all ok be'
+    2026-09-30T20:20 FLAG/unbanked 12 keyword(go ahead) 'Yes go ahead'
+    2026-09-30T20:39 FLAG/unbanked 122 keyword(delete) 'Ok guide me Orion step by step !should I delete other (new chat /sesio'
+    2026-09-30T20:46 FLAG/unbanked 5348 long(5325),keyword(commit) 'This message is addressed to me: I\'m the "other session". Before actin'
+    2026-09-30T20:57 FLAG/unbanked 4111 long(4084),keyword(commit) 'Yes — I’m now aligned with Orion, and the continuity work is compatibl'
+    2026-09-30T21:01 FLAG/unbanked 928 long(921),keyword(do not) 'Orion — correction before you act on the v4.5 preservation instruction'
+    2026-09-30T21:10 FLAG/unbanked 66599 long(65375),keyword(commit) 'Yes. Orion’s report checks out against GitHub: * Governance commit G i'
+    2026-09-30T21:16 FLAG/unbanked 2261 long(2237),keyword(implementation) 'From gpt : just read ! The Git blob IDs also match Orion’s report exac'
+    2026-09-30T21:18 FLAG/unbanked 212 keyword(stop) 'You are approaching limit before reset have you saved all will you rem'
+    2026-09-30T21:21 FLAG/unbanked 167 keyword(always) 'Good shame it took me so long to make you use GitHub as your memory as'
+    2026-10-01T15:56 FLAG/unbanked 3575 long(3561),keyword(merge) 'Check this and debrief gpt so we can resume : Yes — and this last pack'
+    2026-10-01T16:00 FLAG/unbanked 4520 long(4487),keyword(authorise) 'I authorise: We are finally at the point where we should stop redesign'
+    2026-10-01T16:13 FLAG/unbanked 6146 header,long(6102),keyword(hold) 'I’ve checked the governing text and the new repository state. Mileston'
+    2026-10-01T16:21 FLAG/unbanked 4451 long(4427),keyword(option a) 'Yes — the mechanism is technically ready for your external Option A au'
+    2026-10-01T17:16 FLAG/unbanked 2810 long(2790),keyword(do not) 'Good. I independently checked 55962cc2d7b65a134818625ee8f1f877af754040'
+    2026-10-02T07:54 FLAG/unbanked 2612 long(2600),keyword(instead) 'You’re right to challenge that. Dropbox was not part of the original K'
+    2026-10-02T16:41 FLAG/unbanked 2491 long(2482),keyword(commit) 'Good. I independently checked GitHub rather than relying only on Orion'
+    2026-10-04T01:15 FLAG/unbanked 112 keyword(implement) 'While waiting for gpt you know procedure if we see same systematic mis'
+    2026-10-06T20:21 FLAG/unbanked 2427 long(2406),keyword(held) "Kai's message says DAI-5 is still held and the repair HEAD is `d0c08a4"
+    2026-10-07T19:42 pass/BANKED 101 no-marker 'Good that’s your memory that’s what makes your node different take car'
+    ALL 146 {'FLAG/unbanked': 66, 'pass/unbanked': 35, 'FLAG/BANKED': 43, 'pass/BANKED': 2}
+    END-VERBATIM RULING-CAPTURE-CORPUS-CALIBRATION-OUTPUT
+- EVIDENCE RULING-CAPTURE-CORPUS-CALIBRATION-INSTRUMENT calib.py: 769 bytes, sha256 3431425df129a396bb475e922766a83a2ec4a4402d41e833e5be8a6342def978, final LF True  [CMD `sha256sum calib.py` → 3431425df129a396…]
+    BEGIN-VERBATIM RULING-CAPTURE-CORPUS-CALIBRATION-INSTRUMENT
+    import json, subprocess, sys
+    sys.path.insert(0, "/home/user/kai-system/.claude/hooks")
+    import ruling_capture as RC
+    rows = json.load(open(sys.argv[1]))
+    log = subprocess.run(["git", "show", "origin/claude/project-rework-plan-pgvp35:kai-pm/HANDOFF_LOG.md"], capture_output=True, text=True, check=True).stdout
+    idx = RC.bank_index(log)
+    era = "2026-09-30T18:00"   # the handoff log's first entries; earlier prompts predate it
+    c = {}
+    for r in rows:
+        f, why = RC.classify(r["text"]); b = RC.is_banked(r["text"], idx)
+        k = ("FLAG" if f else "pass") + "/" + ("BANKED" if b else "unbanked")
+        c[k] = c.get(k, 0) + 1
+        if r["ts"] >= era and (f != b):
+            print(r["ts"][:16], k, len(r["text"]), ",".join(why), repr(RC.norm(r["text"])[:70]))
+    print("ALL", len(rows), c)
+    END-VERBATIM RULING-CAPTURE-CORPUS-CALIBRATION-INSTRUMENT
+- EVIDENCE TRANSCRIPT-PROMPT-EXTRACTOR extract.py: 784 bytes, sha256 63de97643e67808208bc55ff8877d190c0540a27f5d037cb02e1ce53da6ae161, final LF True  [CMD `sha256sum extract.py` → 63de97643e678082…]
+    BEGIN-VERBATIM TRANSCRIPT-PROMPT-EXTRACTOR
+    import json, sys, re
+    rows = []
+    for line in open(sys.argv[1], encoding="utf-8"):
+        try: o = json.loads(line)
+        except ValueError: continue
+        if o.get("type") != "user" or o.get("isMeta"): continue
+        m = o.get("message", {}); c = m.get("content")
+        if isinstance(c, str): txt = c
+        elif isinstance(c, list):
+            parts = [p.get("text", "") for p in c if isinstance(p, dict) and p.get("type") == "text"]
+            if not parts or any(isinstance(p, dict) and p.get("type") == "tool_result" for p in c): continue
+            txt = "\n".join(parts)
+        else: continue
+        rows.append({"ts": o.get("timestamp"), "text": txt})
+    json.dump(rows, open(sys.argv[2], "w"), ensure_ascii=False)
+    print("prompts", len(rows))
+    for r in rows: print(r["ts"], len(r["text"]), repr(r["text"][:90]))
+    END-VERBATIM TRANSCRIPT-PROMPT-EXTRACTOR
+
+### 6. Next authorised step
+
+- Rescue the 66 flagged-unbanked prompts word for word into the log (credential scan first: calibrated, 0 hits), then report to Dainius  [CONVERSATION 2026-10-07 Dainius, "do the best you can out of box and what will work for sure"]
+
+### 7. What I am unsure of
+
+- How noisy the Stop block is in practice: 66 of 101 non-banked prompts in the corpus would have been flagged, many of them short operator directions that a waiver clears in one command  [CMD `calib.py prompts.json` → FLAG/unbanked 66]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
+python3 -B .claude/hooks/ruling_capture.py selftest
+python3 -B .claude/hooks/ruling_capture.py status

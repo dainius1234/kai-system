@@ -8,6 +8,11 @@
             "type": "command",
             "command": "bash \"${CLAUDE_PROJECT_DIR}\"/.claude/hooks/session-start.sh",
             "timeout": 180
+          },
+          {
+            "type": "command",
+            "command": "python3 -B \"${CLAUDE_PROJECT_DIR}\"/.claude/hooks/ruling_capture.py report",
+            "timeout": 30
           }
         ]
       }
@@ -31,6 +36,11 @@
             "type": "command",
             "command": "bash \"${CLAUDE_PROJECT_DIR}\"/.claude/hooks/handoff-hook.sh stop",
             "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "python3 -B \"${CLAUDE_PROJECT_DIR}\"/.claude/hooks/ruling_capture.py stop",
+            "timeout": 30
           }
         ]
       }
@@ -42,6 +52,17 @@
           {
             "type": "command",
             "command": "bash \"${CLAUDE_PROJECT_DIR}\"/.claude/hooks/handoff-hook.sh precompact",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -B \"${CLAUDE_PROJECT_DIR}\"/.claude/hooks/ruling_capture.py prompt",
             "timeout": 30
           }
         ]
