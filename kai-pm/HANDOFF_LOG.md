@@ -56957,3 +56957,929 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-07T22:21:32Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-07T22:21:32Z  [CMD `date -u +%FT%TZ` → 2026-10-07T22:21:32Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 5842ea4176eee4b5a1cf059b34f9bb6456364f62  [CMD `git rev-parse HEAD` → 5842ea4176eee4b5a1cf059b34f9bb6456364f62]
+- tree: d094b140a03e45c6599f8f82d5de4e78772ce378  [CMD `git rev-parse HEAD^{tree}` → d094b140a03e45c6599f8f82d5de4e78772ce378]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 5842ea4176eee4b5a1cf059b34f9bb6456364f62  [CMD `git ls-remote --heads origin` → 5842ea4176eee4b5a1cf059b34f9bb6456364f62]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 105  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 105]
+
+### 1. The four states
+
+- physical: unchanged since entry 105 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: as entry 105 (one agreed master plan; planning only; pause stands)  [CONVERSATION 2026-10-07 Dainius, "Now I want to develop one master plan agree on it make sure none of features are missing  from read me. Take it to today’s available updates to reach common goal and stick to it"]
+- evidence: "KAI — ONE MASTER PLAN v1.1 UNIFIED DRAFT FOR AGREEMENT": merges Kai v1.0 (+A1, §16), Orion candidate v0.1, review and matrix; every section marked [AGREED] / [ORION→KAI] / [DAINIUS]; §9 brings it to verified 2026-10-07 technology; Appendix R is a generated README Feature Lineage Register: 356 README feature rows → 104 distinct features → 11 organs + engineering substrate, 0 unmapped, 32 non-feature rows excluded with reasons  [CMD `extract_readme.py; register.py; apply_canon.py; appendix_r.py` → rows 356, unmapped 0, distinct 104]
+- admission: none; draft for agreement  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `ruling_capture.py status` → OUTSTANDING=0]
+
+### 3. Authorised / Held / Forbidden
+
+- PAUSED / HELD (unchanged): all engineering per entry 99; ledger, D390, F, capture, candidate, holdout, blind 40, Item 8, merge; code/tooling changes  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- Every [ORION→KAI] mark — owner: Kai; every [DAINIUS] mark — owner: Dainius  [CONVERSATION 2026-10-07 Dainius, "Now I want to develop one master plan agree on it make sure none of features are missing  from read me. Take it to today’s available updates to reach common goal and stick to it"]
+
+### 5. Incidents and corrections
+
+- Derivation (R13): README table data rows 301 (fenced blocks excluded, header rows excluded) − 32 excluded (Project Status 12, Milestone Summary 8, Key Docs 12) = 269; + prose 87 (GPU unlock 13, Phase-1 15, cross-check working 33, needs-GPU 17, end-goal 9) = 356 feature rows. Unit: README rows. Distinct features: 104 canonical features (unit: canonical feature labels in canon.py)  [CMD `extract_readme.py` → TOTAL table data rows: 301]
+- Calibration (I-8): known-positive — an injected unmapped feature makes apply_canon.py exit 1 and appendix_r.py exit 1; known-negative — the real register exits 0  [CMD `apply_canon.py register_kp.json` → rc 1; `apply_canon.py register.json` → rc 0; `appendix_r.py register_kp3.json` → rc 1]
+- Own corrections before transmission: (1) keyword-on-description mapping misfiled features (e.g. "14-Way Context Gather" → Stewardship via "financial", "Swarm Assembly" → Doctor); replaced by an explicit name-only canonical table; (2) the console "Memory" view matched the hardware table's "Memory" row; hardware rule scoped to the hardware section; (3) the §2 per-organ counts were typed placeholders and three were wrong (O1 12→11, O2 9→8, O3 8→7); replaced by derived "distinct / rows" values  [CMD `apply_canon.py` → hardware rows 11; Memory view → memu-core memory service]
+- Mapping judgement, stated: organ assignment of each canonical feature is Orion's judgement (canon.py), reviewable row by row; Kai may move features between organs  [FILE kai-pm/HANDOFF_LOG.md:1]
+- Not preserved byte-for-byte: register.json/register2.json (deterministically regenerable from README.md at HEAD with the scripts below)  [CMD `apply_canon.py` → deterministic]
+- Credential scan of all six texts (calibrated): TOTAL HITS 0  [CMD `credscan.py mp_scan.json` → TOTAL HITS 0]
+- EVIDENCE KAI-MASTER-PLAN-V1-1-UNIFIED-DRAFT KAI_MASTER_PLAN_v1_1_UNIFIED_DRAFT.md: 47743 bytes, sha256 ed982aec499081d87ff8fd8115f6400840be7297bc2b4a3ff51adf266a9baf1c, final LF True  [CMD `sha256sum KAI_MASTER_PLAN_v1_1_UNIFIED_DRAFT.md` → ed982aec499081d8…]
+    BEGIN-VERBATIM KAI-MASTER-PLAN-V1-1-UNIFIED-DRAFT
+    # KAI — ONE MASTER PLAN
+    
+    ## v1.1 UNIFIED DRAFT FOR AGREEMENT · 7 October 2026
+    
+    > **What this is.** The single plan Dainius asked for (handoff entry 105): one document that merges Kai's
+    > *KAI Kingsman Master Plan v1.0 — Locked Planning Baseline* (with Amendment A1 and §16), Orion's candidate v0.1
+    > (entry 97), Orion's review (entry 95) and the reconciliation matrix (entry 101), with **every README feature
+    > carried** (Appendix R, derived mechanically from the README) and brought to **today's verified technology**
+    > (§9). It is a **draft for agreement**, not the canon and not a D-number. It authorises **no** code: the
+    > engineering pause (Dainius, "Ruling pause", entry 99) and D359 programme order stand.
+    >
+    > **How agreement works.** Every section carries one mark:
+    > **[AGREED]** — Kai's v1.0 and Orion already say the same thing.
+    > **[ORION→KAI]** — Orion's proposal; Kai accepts, amends or rejects it.
+    > **[DAINIUS]** — only Dainius can decide.
+    > When no [ORION→KAI] or [DAINIUS] marks remain, the plan is frozen by exact bytes (§13) — and then we stick to it:
+    > every later change goes through change control, never silent drift.
+    >
+    > **Evidence marks.** [V] opened by Orion at commit `5842ea4`; [S] subagent-reported; [R] README claim (README is
+    > lineage input, never current fact authority). **Runtime status of nearly every organ is UNKNOWN** until the E0
+    > census runs.
+    
+    ---
+    
+    ## 1. WHO KAI IS — [AGREED]
+    
+    **Mission.** Build a Kai that can grow with Dainius, care for him, preserve what matters, become increasingly
+    self-sufficient, survive beyond him, and continue the intended stewardship for his daughter — without losing
+    truth, identity, governance or safety.
+    
+    **Identity.** Kai is **one persistent personal intelligence organism** — not a Jarvis clone, agent framework,
+    SaaS assistant, council of LLMs or bunch of good scripts. Models, frameworks, services, devices and repository
+    snapshots are replaceable organs. `KAI = MISSION + IDENTITY/LINEAGE + MEMORY/CONTINUITY + QUALIFIED WORLD
+    STATE/EVIDENCE + COGNITION + RELATIONSHIPS + GOVERNANCE/AUTHORITY + CAPABILITIES + LEARNING/HISTORY.`
+    
+    **Posture.** **REFIT → HARDEN → RATIONALISE → MATURE — DO NOT REINVENT KAI.** We cannibalise mechanisms from the
+    outside world; we do not inherit their product assumptions. **No new box without current→target lineage.**
+    
+    **Hierarchy.** PRIMARY MISSION = why · KINGSMAN = the engineering/governance standard · HOUSE-IN-ORDER/ASSURANCE =
+    how we know what is true · PHASE 2 = how surviving organs are professionalised.
+    
+    **End goal (from the README, kept):** a fully offline, self-hosted sovereign companion — chat, memory, perception,
+    voice, avatar — gated by the governed trust loop and resilience machinery; no cloud dependency; no single point of
+    failure; the Obsidian Brain closing the loop between Dainius's thinking and Kai's knowledge.
+    
+    **Operator standard.** Dainius 150%; Kai 110% — real, measured, earned. Kai earns trust by proving more, not
+    promising more.
+    
+    ---
+    
+    ## 2. THE ORGANISM AT A GLANCE — front door [ORION→KAI: B1, B2]
+    
+    Eleven organs, named as Dainius knows Kai (IDX:58-74, D351 §6B). Engineering planes (Evidence Plane, Qualified
+    World State, Policy/Authority/Capability, Inference Fabric, …) live **inside** organs as drill-down. README
+    features per organ are counted from Appendix R (356 README rows → 104 distinct features).
+    
+    | # | organ | today (honest) | matured | change | README features (distinct / rows) |
+    |---|---|---|---|---|---|
+    | O1 | **Soul / Identity / Inner Life** | code present; runtime UNKNOWN; `CONSCIENCE_FILTER` never read [S] | identity as a core invariant with change control; narrative/SOUL as its projection; values constrain policy, never evidence | KEEP · HARDEN · ADD-JOINT | 11 / 22 |
+    | O2 | **Memory / Relationship / Continuity** | memu-core (pgvector/TurboVec), Cognee, Letta, vault-sync [S] | source vs projection ownership traced, then journal + outbox + rebuildable projections; temporal validity; signed provenance | KEEP · HARDEN · MOVE | 8 / 41 |
+    | O3 | **Senses / World Awareness** | sensors mixed STUB/WORKING; perception in SHADOW; poll fallback default [S] | typed events + provenance → Evidence Plane → Qualified World State (VERIFIED/CONTESTED/UNKNOWN/EXPIRED); poll = READ-only, fenced | KEEP · HARDEN · MERGE | 7 / 43 |
+    | O4 | **Intelligence / Reasoning** | Ollama + qwen2.5:0.5b live default [S]; conviction still gates [S] | qualified model per role via KaiBench; conviction = information only | HARDEN · MOVE | 7 / 12 |
+    | O5 | **Cognitive Depth / Specialists** | FSM, swarm, teammates built; D95–D102 GPU STUBs [R] | roles under one Hunter; Global Workspace coordinates only; stubs activate only when qualified | MERGE · KEEP | 19 / 76 |
+    | O6 | **Proactivity / Goals / Attention** | 5-minute observer loop [R] | nine stages, nine outcomes, Goal/Watch/Attention, PROACTIVE AWARENESS DEGRADED | HARDEN · ADD-JOINT | 9 / 18 |
+    | O7 | **Governed Hands / Capabilities** | **BUILT-NOT-CUT-OVER**; legacy routes are the live hands [V] | exact, signed, durable capability consumed at the final hand behind Tool Gate/ActuatorRegistry; old paths proven dead | HARDEN · ADD-JOINT | 8 / 19 |
+    | O8 | **Immune System / Doctor / Resilience** | diagnosis WORKING; recovery off by default; `/recover` unauthenticated [V] | one SEE→…→LEARN loop; contingency library; FUTURE A4 SELF-DIAGNOSIS later | KEEP · HARDEN · MOVE | 10 / 31 |
+    | O9 | **Growth / Dream / Evolution** | proposal-only; no self-modification [S] | governed admission for skills, models, plugins; Dream/Evolver under probation; Kai discovers, never self-authorises | HARDEN · ADD-JOINT | 6 / 23 |
+    | O10 | **Continuity / Stewardship / Sustainability** | backup partial, Postgres-only restore [S]; finance read-only [S]; paper-trader gate fails open [V] | lineage manifest, resurrection drill with restore epoch, succession authority, sustainability (70/30 intent) behind a legal gate | HARDEN · ADD-JOINT | 4 / 8 |
+    | O11 | **Operator Relationship / Mission Control** | dashboard (16 views) WORKING [S]; presence = chat/Telegram/TTS/avatar | Dashboard **becomes** Mission Control generated from qualified evidence; presence organ never a second brain | MOVE · HARDEN | 9 / 29 |
+    | — | engineering substrate | toolchain, flags, hardware, honest-status pages | assurance artefacts (§10) | KEEP · HARDEN | 6 / 34 |
+    
+    (Derived by the Appendix R generator: 104 distinct features from 356 README rows; 0 unmapped.)
+    
+    ---
+    
+    ## 3. CONSTITUTION — [AGREED except where marked]
+    
+    **Stable invariants** (Kai v1.0 §2, all 15, kept): ONE KAI · Dainius final consequential authority · intelligence
+    never creates authority · memory is not truth; confidence is not permission; consensus is not proof · local-first
+    sovereignty with explicit optional egress · identity, lineage, relationship and learned history survive replacement
+    · proactivity allowed, hidden execution rights not · autonomy earned, scoped, measurable, revocable, evidence-bound ·
+    no consequential action without exact authority at the actual side-effecting hand · independent outcome
+    verification closes consequential actions · UNKNOWN stays UNKNOWN; ambiguous external effects → OUTCOME_UNKNOWN ·
+    no dual authority, dual writers or silent fallback truth · synthetic content never masquerades as evidence · Kai
+    may propose improvements, never self-authorise promotion · growth without architectural amnesia.
+    
+    **Plus, carried from the canon sources** [ORION→KAI: B6]: the nine laws (free text never grants authority;
+    provenance survives cognition; shadow allowed, dual authority forbidden; reuse → extend → migrate → create;
+    structured control before visual control; …) and FP-INV-01…12 (no component proposes, approves, executes **and**
+    verifies the same action; Global Workspace holds no credentials; approval never inferred from chat; local-first ≠
+    trusted — loopback/IP is not identity; graceful reduction, not fail-open; capability-specific release; portable
+    operation never corrupts state, duplicates actions or restores permissive authority).
+    
+    **Vocabulary** [DAINIUS: B3, B4, B5, A3]:
+    - **Organ status**: IDX/D351 `LIVE · BUILT-NOT-CUT-OVER · WORKING · STUB · BLOCKED · UNKNOWN` (+ PLANNED, DEGRADED
+      if approved). Kai v1.0 §12 proposes PLANNED…RETIRED; Orion proposes v1.0's set becomes the **capability
+      release/lifecycle axis**, separate from organ status. *Dainius decides.*
+    - **Risk**: code has 5 tiers (`common/contracts/base.py:27-32` [V]); spec R0–R4 maps onto them; the README's "8"
+      are migration tiers → rename `UH-M1…M8`.
+    - **Names**: power modes SENTINEL / PORTABLE / DOCKED / MAINTENANCE (not "H0–H3"); autonomy levels AUTONOMY_0…4
+      (not "A4"); always `A-4_PROVENANCE` and `FUTURE A4 SELF-DIAGNOSIS` in full.
+    
+    ---
+    
+    ## 4. HOW KAI DECIDES AND ACTS — [AGREED; one ORION→KAI addition]
+    
+    **Control loop:** PERCEIVE → OBSERVE → QUALIFY → WORLD STATE → GATHER → ANALYSE/DEBATE → FACT/CAUSAL REVIEW →
+    PROPOSAL → POLICY → PARAMETER PROVENANCE (Memory→Action Firewall) → AUTHORITY/APPROVAL → EXACT CAPABILITY →
+    **DURABLE WORKFLOW** [ORION→KAI: B7] → EXECUTE (final hand validates + atomically consumes) → INDEPENDENT VERIFY →
+    LEARN/CLOSE. Branches: insufficient evidence → RE-GATHER; bounded failure → RECOVERY; ambiguous effect →
+    OUTCOME_UNKNOWN/RECONCILE; exhausted budget → HALT/ESCALATE.
+    
+    **Learning/evolution loop:** DISCOVER → ADMIT ARTIFACT → SANDBOX → KAIBENCH → ADVERSARIAL/REGRESSION → SHADOW →
+    NARROW ROLE → OBSERVED PRODUCTION → INDEPENDENT EVIDENCE → DAINIUS PROMOTION; regression → QUARANTINE → FALL BACK
+    → INVESTIGATE. No benchmark, confidence or agreement creates authority.
+    
+    **Authority separation:** Gate ≠ Policy ≠ Authority record ≠ Capability. These evolve **behind Tool Gate and
+    ActuatorRegistry** [ORION→KAI: C7]; no second authority beside Tool Gate (IDX:83).
+    
+    **Memory→Action Firewall** (Kai A1.1, adopted) — every consequential field carries a `ParameterBinding`
+    (proposal, field, value hash, provenance class, source record id + hash, subject/version, freshness,
+    admission state) resolved **outside** the proposing model. Additions [ORION→KAI: D1, D2]: **derivation, not
+    citation** (the value must appear in the cited record or come from a declared non-model function, else it is
+    MODEL_INFERENCE); **only authenticated operator channels mint CURRENT_OPERATOR_INSTRUCTION records**; standing
+    preferences carry scope, expiry and re-confirmation. Integrity ≠ truth: a signed memory can still be stale or
+    poisoned.
+    
+    **Capability contract** (Kai A1.2, adopted): id/jti, issuer, audience/actuator, subject, proposal hash, action,
+    target, parameter constraints, grant/approval ref, policy version, issued/expires, revocation epoch, one-use,
+    authenticator; the final-hand enforcer authenticates, validates, checks a **persistent** replay ledger, consumes
+    **before** the side effect, records the attempt id. Additions [ORION→KAI: D3]: reuse the existing Ed25519 service
+    identity (IDX:82); algorithm/key/proof version fields (crypto agility, R353-02); an explicit **restore epoch**.
+    
+    **Approval integrity** [ORION→KAI: D8]: what Dainius approves is rendered deterministically from the exact
+    capability fields — never model prose; approvals are budgeted and batched against fatigue.
+    
+    **Outcome Verification Contract** (Kai A1.3, adopted): per actuator — attempt id, channel, independent or
+    separately-derived verification, deadline, terminal states **CONFIRMED_SUCCESS · CONFIRMED_FAILURE ·
+    OUTCOME_UNKNOWN · UNVERIFIABLE**, reconciliation, retry semantics, escalation. The executor's own record (a sent
+    folder, a stat by the same principal) is not independent [ORION→KAI: D4].
+    
+    **Autonomy & release:** AUTONOMY_0 disabled … AUTONOMY_4 narrow, each grant naming capability, domain, operations,
+    principal, purpose, model/tool revisions, budget, rates, data classes, validity, revocation, monitoring, evidence
+    expiry; no universal trust score. Release states LAB_ONLY → … → NARROW_AUTONOMOUS, SUSPENDED, REVOKED; recorded
+    today LAB_ONLY / NO_GO.
+    
+    ---
+    
+    ## 5. TRUTH, EVIDENCE AND MEMORY — [AGREED]
+    
+    Evidence ("X stated Y at T under provenance P") ≠ qualified claim (VERIFIED/CONTESTED/UNKNOWN/EXPIRED) ≠ memory
+    (relationship/autobiography). **Evidence can inform authority; it can never create it.** The Evidence Plane
+    reconciles identity, provenance, subject/version binding, applicability, authority, uncertainty, evidence graph,
+    attestations, policy consumption, enforcement, audit and outcome verification — and **consumes** the eventual
+    A-4 contracts rather than becoming a second truth system. Evidence identity already banked: Git commit + SHA-256
+    of canonical MANIFEST.json (D390). Time: event · observed · recorded · validity · decision time · monotonic
+    deadlines; trusted-time policy for expiry [ORION→KAI: D7]. Classification travels through retrieval, context,
+    model choice, proposals, capabilities and egress (R353-05).
+    
+    **Memory baseline** (Kai v1.0 §6): authoritative layer = source episodes, canonical transactional journal,
+    append-only provenance, relationship state, claim references, temporal validity, migration lineage; derived =
+    temporal graph, vectors, entity projections, summaries, SOUL/Diary narrative. Memory security: SOURCE → ADMISSION
+    → INTEGRITY ENVELOPE → TEMPORAL/SCOPE → RETRIEVAL POLICY → USE CLASSIFICATION → ACTION PROVENANCE CHECK.
+    **Order** [ORION→KAI: C2]: trace current ownership first (COLD:780), then migrate; existing memu-core, Cognee,
+    Letta, vault-sync and Obsidian Brain are kept and re-homed as source or projection.
+    
+    ---
+    
+    ## 6. SECURITY AND TRUST BOUNDARY — [ORION→KAI unless marked]
+    
+    - **Single host** (D5): on one laptop all organs share a kernel; the plan states the real boundary and the OS-level
+      isolation (separate principals/containers, network policy, issuer keys a model runtime cannot read, TPM-bound
+      where useful).
+    - **Keys**: CREATE → STORE → USE → ROTATE → RECOVER → REVOKE → SUCCESSION/RETIRE; escrow model [DAINIUS].
+    - **Hard constraint** [AGREED]: BINANCE keys never leave broker-bridge; the Broker view and Mission Control get
+      read results only.
+    - **Secure update / anti-rollback** (R353-01) and **restore epoch** (D6): a restored or compromised Kai never
+      revives consumed capabilities or accepts an obsolete signed release.
+    - **Hostile content** [AGREED, A1.5]: tool metadata/outputs, MCP descriptors, skill text, email, web, screen text
+      are observations, never instructions; manifest/hash pinning, KAI-normalised schemas, declared permissions,
+      sandbox, egress policy, runtime monitoring, quarantine on change.
+    - **Supply chain** [ORION→KAI: C9]: one admission pipeline for skills, plugins, MCP servers **and model artifacts,
+      chat templates and runtime builds**; guardrail-removed models only in a disposable red-team lab.
+    - **Egress**: local core, explicit egress; proactive notifications through third parties are outward actions.
+    - **Privacy** [DAINIUS: F4]: consent, retention, deletion and egress rules for home sensing (daughter, visitors)
+      before embodiment expands; "outlive me" ≠ "reveal everything after me".
+    - **Live defects to carry** [V/S]: paper-trader gate fails open; supervisor `/recover/{name}` unauthenticated;
+      capabilities unsigned/in-memory/not parameter-bound; legacy routes behind a shared token; `CONSCIENCE_FILTER` never
+      read; `POST /soul` outside the catalogue; cortex poll fallback; **TTS uses edge-tts (a cloud service) against the
+      offline end-goal** [R: README.md:530].
+    
+    ---
+    
+    ## 7. RESILIENCE AND MIGRATION — [AGREED]
+    
+    One organism with stable contracts, bounded failure domains, truthful degradation and independent replacement.
+    Every organ answers, before freeze: responsibility · contract · authority · dependencies · failure boundary ·
+    degraded behaviour · recovery · observability · update/replace · evidence · operator-visible status. Contingency
+    classes (dependency down, slow, model unavailable, memory unavailable, authority unavailable, skill failure,
+    evidence failure, schema mismatch, resource pressure, repeated failed recovery) with three distinct responses:
+    containment · truthful degradation · authorised recovery. **Migration law:** CURRENT → QUALIFY → RECOVER INTENT →
+    KEEP/HARDEN/FINISH/MERGE/MOVE/SPLIT → ADAPTER → TARGET → SHADOW/COMPARE → VERIFIED CUTOVER → PROVE OLD
+    AUTHORITY/TRUTH PATH DEAD → RETIRE. Monotonic authority; canonical-writer fencing; rollback never restores weaker
+    authority; no central mega-scheduler (budgets enforced by owning organs).
+    
+    ---
+    
+    ## 8. STEWARDSHIP, SUCCESSION, SUSTAINABILITY — [AGREED in principle; DAINIUS decisions]
+    
+    Three horizons: present · temporarily unavailable (essential services only, discretionary spend frozen,
+    temporary silence never transfers authority) · permanent succession (separately governed, never inferred from
+    inactivity or a dead-man timer). The daughter is a human beneficiary/successor, never a configuration field.
+    Succession and incapacity **requirements** enter the requirements baseline now (Kai A1.9) [DAINIUS: F2 —
+    confirms the D270 re-prioritisation for requirements only]; legal vehicles only after UK professional advice.
+    **70/30** stays mission intent — 70% of defined realised value to Dainius/family, 30% to a segregated KAI
+    Development & Continuity Fund; a budget, never authority [DAINIUS: F1 — state the intent in your own words; it
+    exists in no repository file]. The fifteen stewardship questions (stewardship §19) are open decisions. Resurrection
+    drill (manifest, restore, epoch bump, lineage, schema, functional qualification, then narrative integrity audit)
+    before any irreversible autonomy.
+    
+    ---
+    
+    ## 9. TODAY'S TECHNOLOGY — brought up to 7 October 2026 (verified only)
+    
+    | area | README / old plan | today (verified, entries 93/95) | plan position |
+    |---|---|---|---|
+    | reasoning model | qwen2.5:0.5b now; "qwen2.5:7b" on GPU | Qwen3.6-35B-A3B (MoE ~3B active); gpt-oss-20b (3.6B active) / 120b (5.1B active); Mistral Small 4 (119B MoE ~6.5B active, needs quantisation on 128 GB) | candidates for KaiBench by role; no model in the constitution [AGREED] |
+    | serving | Ollama | Lemonade (AMD-optimised; gfx1151 listed; vLLM paths experimental; Linux NPU via FastFlowLM only) | keep Ollama until multi-runtime pressure (D351:161) [ORION→KAI: D10]; KAI-owned inference contract; Lemonade first adapter candidate |
+    | GPU stack | "awaiting hardware" | ROCm official gfx1151 support narrow (ROCm 7.2.1, Ubuntu 24.04.4) | qualify on the exact image/kernel |
+    | NPU (Cortex D114) | XDNA2 "subject to Linux" | FastFlowLM proprietary kernels; amdxdna driver; kernel 7.0+ or backport | bonus until qualified |
+    | hardware | Flow Z13 2025, 128 GB | GZ302 verified: one M.2 2230, single-sided; AMD Ryzen AI MAX 400 (up to 192 GB) announced, ASUS partner from Q3 2026 | re-check successor before purchase [DAINIUS: F5] |
+    | memory security | — | MEMDRIFT (arXiv 2605.24941) proves memory-induced tool drift; SMSR (2606.12703) signed memory + retrieval gate | firewall + envelopes [AGREED] |
+    | tool/MCP security | Skills Hub scanning | MCPTox (avg ASR 36.5%; worst model 72.8%) | admission + pinning [AGREED] |
+    | workflow framework | (assumed LangGraph) | LangGraph not used by services [V]; if adopted, `langgraph-sdk ≥ 0.4.4` (CVE-2026-104873) | framework state ≠ authority [AGREED] |
+    | evaluation | — | Inspect AI, garak, Promptfoo exist | feed KaiBench; never the registry |
+    | voice | edge-tts (cloud), faster-whisper, parakeet | — | local TTS required by the offline end-goal; choose by KaiBench [ORION→KAI] |
+    | unverified (excluded) | — | PERSIST, OECD conformance suite, COGITATOR, IETF "execution outcome attestation" title, eBPF "200x" | Kai to supply sources or drop [ORION→KAI: E2–E4] |
+    
+    **KaiBench** [ORION→KAI: D9]: suites for quality, tools, structure, long context, multimodal, calibration,
+    prompt/memory/authority security, performance, memory/KV, storage, thermal, reliability, outcome quality — under
+    I-8: known-positive/negative, held-out private suite, judges from another model family; every result binds model
+    hash, quantisation, backend, kernel/driver, device, context, eval version.
+    
+    ---
+    
+    ## 10. ASSURANCE — [AGREED]
+    
+    Roles: Dainius final; Kai architecture/adjudication; Orion implementation/evidence, no self-admission; GPT
+    read-access findings; DeepSeek no-access hypotheses. Tool boundaries: GitHub = truth; Linear = programme control;
+    Miro = projection; **every Linear ruling is banked in the repository** [ORION→KAI: A9]. Artefacts: Constitution ·
+    Requirements Baseline (KAI-SYS-xxxx) · Architecture Description · ICDs · Threat & Hazard Register · Assumption
+    Register · RVM · Current→Target Traceability Matrix · Configuration Baseline · ORR · Failure Pattern Ledger ·
+    Lineage Manifest · Degraded-Mode Matrix. Chain MISSION → REQUIREMENT → DESIGN → CODE → TEST → RUNTIME EVIDENCE →
+    DECISION → RELEASE, both directions. E0 census calibrated (known +/−, can-fail). A4 acceptance: injected fault
+    detected, relationship identified, uncertainty separated, safe proposal, limits stated, authority preserved, repair
+    verified without neighbouring regression. Mission Control generated from qualified evidence, with panels for the
+    whole organism, D359 roadmap, work board, decisions, risks/unknowns, recent change, watches, contingency, model and
+    hardware transitions, lineage/backup, runway, succession readiness, drill-down.
+    
+    ---
+    
+    ## 11. ROADMAP — programme order and destination [AGREED; A1 ORION→KAI]
+    
+    **Programme order (D359, sole canonical source, verbatim):** HOUSE_H0 → … → HOUSE_H6 → Dainius House Exit Ruling →
+    KAI-GATE-048 path (Phase B → sentinel retirement → exact-tree review → separate ITEM8_GO → six builds → formal
+    closure) → A-4_PROVENANCE → ASSURANCE INTEGRATION MAPPING → PROFESSIONALISATION / CI TRUTH → EVIDENCE PLANE /
+    KINGSMAN IMPLEMENTATION. **ITEM 8 BEFORE A4.**
+    
+    **Where we are:** HOUSE_H2 (D379, 2026-09-18, open) · engineering **paused** for universe reconstruction (DAI-9;
+    entry 99) · D344–D353 still in the append queue [DAINIUS: A7].
+    
+    **Destination work packages** (Kai v1.0 numbering kept; architecture dependency, not permission):
+    WP0 universe reconciliation & canon freeze · WP1 Evidence + Qualified World State · WP2 authority spine +
+    Memory→Action Firewall · WP3 memory journal (after ownership trace) · WP4 KaiBench/registry/inference/resource
+    governor (runtime abstraction only on demonstrated pressure) · WP5 Mission Control · WP6 hardware qualification ·
+    WP7 artifact admission + governed evolution · WP8 perception, computer use (structured-first: API → shell/files →
+    DOM → accessibility tree → vision → coordinates last), embodiment, privacy · WP9 self-diagnosis/recovery · WP10
+    continuity/resurrection/succession · WP11 sustainability. Dependency order: canon → evidence → authority →
+    controlled hands → verification → memory migration → KaiBench/inference → Mission Control → evolution → deeper
+    autonomy. **No effort estimates** [ORION→KAI: A10] — gates are passed by evidence.
+    
+    ---
+    
+    ## 12. DECISIONS — what is locked, what needs evidence, what stays uncommitted
+    
+    **Locked now** [AGREED]: ONE KAI · the constitution · migration law · evidence/memory/authority separation ·
+    Memory→Action Firewall · exact capability at the final hand · independent outcome verification · journal +
+    rebuildable projections as direction · benchmark-driven model/runtime choice · logical ≠ physical components ·
+    structured-first computer control · governed artifact admission · Mission Control as projection · no big-bang
+    rewrite · no dual authority.
+    **Needs prototype/benchmark evidence** [AGREED]: memory projection technology; Graphiti/Cognee/Mem0/Letta;
+    workflow framework; Lemonade vs direct runtimes; models/quantisation/residency; NPU roles; service consolidation;
+    home-node topology; perception models; local TTS/STT choice.
+    **Intentionally uncommitted** [AGREED]: permanent model council or framework; service count; unrestricted finance;
+    self-authorised promotion; always-on raw surveillance; "uncensored = better".
+    **Dainius decisions outstanding:** status vocabulary (B3) · risk/power/autonomy naming (B4, B5, A3) · D359/canon
+    relationship confirmed (A5) · D344–D353 queue (A7) · front door organs (B1, C1) · restore drill and escrow (C10,
+    F3) · 70/30 intent (F1) · succession requirements priority (F2) · privacy (F4) · hardware timing (F5).
+    
+    ---
+    
+    ## 13. AGREEMENT, FREEZE AND STICKING TO IT
+    
+    1. Kai answers every [ORION→KAI] mark (accept / amend / reject with reason) on DAI-9/DAI-10.
+    2. Dainius answers every [DAINIUS] mark.
+    3. DeepSeek attacks the agreed text (entry 91 ruling).
+    4. Orion maps the result to the repository (C5) and refreshes Appendix R mechanically.
+    5. Dainius approves; the exact bytes are frozen and banked as a D-number.
+    6. **Stick to it:** any later change states the invariant it affects, why the current mechanism is insufficient,
+       current→target lineage, evidence, rollback/degraded mode, and whether it is an organ change or a constitutional
+       change; Dainius approves consequential changes; new version and hash every time. No silent drift. **A README
+       feature may never disappear**: Appendix R is regenerated from the README at every revision and every row must
+       map to an organ (the generator refuses to finish otherwise).
+    
+    *Preserve the organism. Replace and improve the organs. Never confuse intelligence with authority, memory with
+    truth, a demo with verification, or modernisation with permission to erase lineage.*
+    
+    ---
+    ## APPENDIX R — README FEATURE LINEAGE REGISTER (generated)
+    
+    Generated by `appendix_r.py` from README.md at HEAD. Universe: every table data row outside fenced blocks (301), plus the Roadmap GPU-unlock list, Phase-1 priorities, Cross-check checklists and End-goal elements. **356 feature rows mapped, 0 unmapped; 104 distinct features; 32 rows excluded with reason** (listed at the end). Every revision of the plan must regenerate this appendix; a row that cannot be mapped stops the generator.
+    
+    ### O1 — Soul / Identity / Inner Life (11 features, 22 README rows)
+    Kingsman home: WP0 canon (identity invariants) · WP3 narrative projection
+    
+    | feature | README rows | README status claims | today / maturation note |
+    |---|---|---|---|
+    | Ohana Core (operator moral fingerprint / goals) | L1178 | flag default OFF | mature in place per organ plan |
+    | PUB/WORK personality modes | L242, 1214, 1225, 1226 | code present; runtime UNKNOWN (README) | mature in place per organ plan |
+    | Soul console view | L1196 | code present; runtime UNKNOWN (README) | mature in place per organ plan |
+    | confession engine | L168 | code present; runtime UNKNOWN (README) | mature in place per organ plan |
+    | conscience & values | L171, 1134 | code present; runtime UNKNOWN (README); flag default ON | mature in place per organ plan |
+    | emotional memory & predictive empathy | L165, 1151, 1256, 1358, 1805, 1811 | KNOWN LIMITATION (README); code present; runtime UNKNOWN (README); flag default ON; planned (README roadmap); unchecked [ ] (README) | mature in place per organ plan |
+    | epistemic humility | L167 | code present; runtime UNKNOWN (README) | mature in place per organ plan |
+    | imagination engine | L170, 1130 | code present; runtime UNKNOWN (README); flag default ON | mature in place per organ plan |
+    | narrative identity | L169, 1133 | code present; runtime UNKNOWN (README); flag default ON | mature in place per organ plan |
+    | self-reflection | L166 | code present; runtime UNKNOWN (README) | mature in place per organ plan |
+    | temporal self-model (self-assessment) | L1136 | flag default ON | mature in place per organ plan |
+    
+    ### O2 — Memory / Relationship / Continuity (8 features, 41 README rows)
+    Kingsman home: WP3 memory journal + projections (after ownership trace)
+    
+    | feature | README rows | README status claims | today / maturation note |
+    |---|---|---|---|
+    | Letta archival memory | L523, 1157, 1158, 1336, 1809 | flag default OFF; planned (README roadmap); service defined (README); runtime UNKNOWN; unchecked [ ] (README) | keep; re-home as projection/consumer after ownership trace |
+    | MARS memory decay / consolidation | L1135, 1799 | checked [x] (README); flag default ON | mature in place per organ plan |
+    | Obsidian Brain / vault-sync | L173, 491, 1154, 1162, 1245, 1341, 1352, 1361, 1366, 1788, 1808 | DONE (README, struck through); KNOWN LIMITATION (README); checked [x] (README); code present; runtime UNKNOWN (README); end-goal (README); flag default OFF; flag default ON; planned (README roadmap); service defined (README); runtime UNKNOWN; unchecked [ ] (README) | keep; vault notes are untrusted input to memory admission |
+    | knowledge graph (memu-graph, Cognee/Kuzu) | L522, 1156, 1200, 1337, 1787, 1810 | checked [x] (README); code present; runtime UNKNOWN (README); flag default OFF; planned (README roadmap); service defined (README); runtime UNKNOWN; unchecked [ ] (README) | keep Cognee; Graphiti-style temporal validity as design reference; graph = projection |
+    | memory diary / mind-map views | L1197, 1198 | code present; runtime UNKNOWN (README) | mature in place per organ plan |
+    | memory stores (Postgres/pgvector/TurboVec/Redis) | L460, 461, 551, 560, 1261, 1770, 1771 | KNOWN LIMITATION (README); checked [x] (README); service defined (README); runtime UNKNOWN | keep; canonical journal + outbox as target after trace |
+    | memu-core memory service | L465, 466, 527, 556, 1194, 1366 | code present; runtime UNKNOWN (README); end-goal (README); service defined (README); runtime UNKNOWN | mature in place per organ plan |
+    | per-teammate memory slices | L1357, 1807 | planned (README roadmap); unchecked [ ] (README) | mature in place per organ plan |
+    
+    ### O3 — Senses / World Awareness (7 features, 43 README rows)
+    Kingsman home: WP1 Evidence + Qualified World State · WP8 perception
+    
+    | feature | README rows | README status claims | today / maturation note |
+    |---|---|---|---|
+    | anomaly detection | L225, 769, 1140, 1783 | LIVE claimed (README); checked [x] (README); code present; runtime UNKNOWN (README); flag default ON | mature in place per organ plan |
+    | cortex (perception spine / NPU inference) | L495, 1177 | flag default OFF; service defined (README); runtime UNKNOWN | Linux NPU via FastFlowLM (amdxdna, kernel 7.0+/backport); bonus until qualified |
+    | cross-sensor correlation | L226, 1784 | checked [x] (README); code present; runtime UNKNOWN (README) | mature in place per organ plan |
+    | multi-modal fusion | L260, 521 | code present; runtime UNKNOWN (README); service defined (README); runtime UNKNOWN | mature in place per organ plan |
+    | sensors & perception services | L470, 473, 474, 475, 477, 478, 480, 481, 482, 483, 484, 485, 486, 487, 488, 528, 529, 532, 534, 538, 561, 563, 1203, 1204, 1366 | code present; runtime UNKNOWN (README); end-goal (README); service defined (README); runtime UNKNOWN | mature in place per organ plan |
+    | sensory pattern learning | L227, 1142 | code present; runtime UNKNOWN (README); flag default ON | mature in place per organ plan |
+    | world state & provenance | L213, 223, 261, 1141, 1778, 1782 | checked [x] (README); code present; runtime UNKNOWN (README); flag default ON | mature in place per organ plan |
+    
+    ### O4 — Intelligence / Reasoning (7 features, 12 README rows)
+    Kingsman home: WP4 KaiBench/model registry · WP2 (conviction → information only)
+    
+    | feature | README rows | README status claims | today / maturation note |
+    |---|---|---|---|
+    | 14-way context gather | L179, 1139 | code present; runtime UNKNOWN (README); flag default ON | mature in place per organ plan |
+    | agentic reasoning service | L467 | service defined (README); runtime UNKNOWN | mature in place per organ plan |
+    | conviction scoring (→ information only) | L184 | code present; runtime UNKNOWN (README) | conviction informs, never authorises |
+    | local LLM serving (Ollama) | L462, 463, 1242, 1335 | KNOWN LIMITATION (README); planned (README roadmap); service defined (README); runtime UNKNOWN | qwen2.5:0.5b → KaiBench role selection among Qwen3.6-35B-A3B, gpt-oss-20b/120b, Mistral Small 4 (quantised); Ollama kept until multi-runtime pressure |
+    | memory-driven planner | L182 | code present; runtime UNKNOWN (README) | mature in place per organ plan |
+    | priority queue | L1128 | flag default ON | mature in place per organ plan |
+    | specialist router | L181, 1258 | KNOWN LIMITATION (README); code present; runtime UNKNOWN (README) | mature in place per organ plan |
+    
+    ### O5 — Cognitive Depth / Specialists (19 features, 76 README rows)
+    Kingsman home: WP4 qualified models per role · WP9 (Doctor role)
+    
+    | feature | README rows | README status claims | today / maturation note |
+    |---|---|---|---|
+    | D100 transitive reasoning | L201, 1171, 1254, 1347, 1818 | STUB (README); flag default OFF; planned (README roadmap); unchecked [ ] (README) | mature in place per organ plan |
+    | D101 causal world model | L202, 1172, 1173, 1174, 1363, 1794, 1819 | STUB (README); checked [x] (README); flag default OFF; planned (README roadmap); unchecked [ ] (README) | mature in place per organ plan |
+    | D102 Global Workspace | L203, 1175, 1364, 1795, 1820 | STUB (README); checked [x] (README); flag default OFF; planned (README roadmap); unchecked [ ] (README) | coordinates reasoning only; no credentials (FP-INV-03) |
+    | D90 swarm assembly | L180, 1153, 1775 | checked [x] (README); code present; runtime UNKNOWN (README); flag default ON | mature in place per organ plan |
+    | D92 Socratic self-questioning | L193, 1163, 1246, 1353, 1789 | DONE (README, struck through); KNOWN LIMITATION (README); LIVE claimed (README); checked [x] (README); flag default ON | mature in place per organ plan |
+    | D93 hypothesis engine | L194, 1164, 1247, 1354, 1790 | DONE (README, struck through); KNOWN LIMITATION (README); LIVE claimed (README); checked [x] (README); flag default ON | mature in place per organ plan |
+    | D94 temporal projection | L195, 1165, 1248, 1355, 1791 | DONE (README, struck through); KNOWN LIMITATION (README); LIVE claimed (README); checked [x] (README); flag default ON | mature in place per organ plan |
+    | D95 dialectical synthesis | L196, 1167, 1250, 1342, 1813 | STUB (README); flag default OFF; planned (README roadmap); unchecked [ ] (README) | mature in place per organ plan |
+    | D96 analogical reasoning | L197, 1168, 1251, 1343, 1814 | STUB (README); flag default OFF; planned (README roadmap); unchecked [ ] (README) | mature in place per organ plan |
+    | D97 concept blending | L198, 1169, 1252, 1344, 1815 | STUB (README); flag default OFF; planned (README roadmap); unchecked [ ] (README) | mature in place per organ plan |
+    | GPU-era foundations & stub activation | L217, 1362 | STUB (README); planned (README roadmap) | mature in place per organ plan |
+    | SAGE critique / self-review | L185, 1129, 1161 | code present; runtime UNKNOWN (README); flag default OFF; flag default ON | mature in place per organ plan |
+    | adversary engine | L183 | code present; runtime UNKNOWN (README) | mature in place per organ plan |
+    | cognitive reasoning FSM | L210, 1243, 1350, 1774 | DONE (README, struck through); KNOWN LIMITATION (README); checked [x] (README); code present; runtime UNKNOWN (README) | mature in place per organ plan |
+    | counterfactual rehearsal | L1255, 1338, 1804 | STUB (README); planned (README roadmap); unchecked [ ] (README) | mature in place per organ plan |
+    | debate / tree search | L187, 1127, 1801 | checked [x] (README); code present; runtime UNKNOWN (README); flag default ON | mature in place per organ plan |
+    | multi-model consensus / specialist endpoints | L1339, 1360, 1812 | planned (README roadmap); unchecked [ ] (README) | mature in place per organ plan |
+    | persistent teammates & reputation | L211, 771, 1146, 1244, 1351, 1776 | DONE (README, struck through); KNOWN LIMITATION (README); LIVE claimed (README); checked [x] (README); code present; runtime UNKNOWN (README); flag default ON | mature in place per organ plan |
+    | verifier (SAGE semantic fact-check) | L494 | service defined (README); runtime UNKNOWN | mature in place per organ plan |
+    
+    ### O6 — Proactivity / Goals / Attention (9 features, 18 README rows)
+    Kingsman home: WP8/WP1 nine-stage proactivity + Goal/Watch/Attention
+    
+    | feature | README rows | README status claims | today / maturation note |
+    |---|---|---|---|
+    | Goals view (Ohana goals) | L1193 | code present; runtime UNKNOWN (README) | mature in place per organ plan |
+    | Watch rule engine | L1201 | code present; runtime UNKNOWN (README) | mature in place per organ plan |
+    | anti-annoyance | L241 | code present; runtime UNKNOWN (README) | mature in place per organ plan |
+    | emergent ritual discovery | L214, 1148, 1780 | checked [x] (README); code present; runtime UNKNOWN (README); flag default ON | mature in place per organ plan |
+    | proactive observer / agent | L224, 239, 1131 | code present; runtime UNKNOWN (README); flag default ON | mature in place per organ plan |
+    | proactive scheduling | L228, 1144 | code present; runtime UNKNOWN (README); flag default ON | mature in place per organ plan |
+    | resource-aware curiosity | L1152, 1257, 1806 | KNOWN LIMITATION (README); flag default ON; unchecked [ ] (README) | mature in place per organ plan |
+    | struggle detection | L240 | code present; runtime UNKNOWN (README) | mature in place per organ plan |
+    | wake word & intent | L243, 492, 1155 | code present; runtime UNKNOWN (README); flag default OFF; service defined (README); runtime UNKNOWN | wake output is an observation, never an instruction |
+    
+    ### O7 — Governed Hands / Capabilities (8 features, 19 README rows)
+    Kingsman home: WP2 authority spine + final-hand capability (behind Tool Gate/ActuatorRegistry)
+    
+    | feature | README rows | README status claims | today / maturation note |
+    |---|---|---|---|
+    | Tool Gate + HMAC/Ed25519 auth | L254, 464, 555, 1262, 1772 | KNOWN LIMITATION (README); checked [x] (README); code present; runtime UNKNOWN (README); service defined (README); runtime UNKNOWN | finish Ed25519 identity; signed, parameter-bound, durable capability (A1.2) |
+    | Unified Hunter (34 actuators, not cut over) | L1239 | KNOWN LIMITATION (README) | cut over behind Tool Gate/ActuatorRegistry with bypass proof; 5 code risk tiers |
+    | action audit ledger | L525 | service defined (README); runtime UNKNOWN | mature in place per organ plan |
+    | browser agent | L472, 1216, 1217 | code present; runtime UNKNOWN (README); service defined (README); runtime UNKNOWN | mature in place per organ plan |
+    | governed decision path (end-goal) | L1366 | end-goal (README) | mature in place per organ plan |
+    | sandboxed executor | L520, 557, 1786 | checked [x] (README); service defined (README); runtime UNKNOWN | mature in place per organ plan |
+    | secret management & rotation | L553 | service defined (README); runtime UNKNOWN | mature in place per organ plan |
+    | trust negotiation / autonomy requests | L244, 1150, 1259, 1359 | KNOWN LIMITATION (README); code present; runtime UNKNOWN (README); flag default ON; planned (README roadmap) | mature in place per organ plan |
+    
+    ### O8 — Immune System / Doctor / Resilience (10 features, 31 README rows)
+    Kingsman home: WP9 self-diagnosis/recovery loop
+    
+    | feature | README rows | README status claims | today / maturation note |
+    |---|---|---|---|
+    | House Doctor / self-diagnosis | L212, 252, 490, 540, 766, 1147, 1240, 1777 | KNOWN LIMITATION (README); LIVE claimed (README); checked [x] (README); code present; runtime UNKNOWN (README); flag default ON; service defined (README); runtime UNKNOWN | mature in place per organ plan |
+    | checkpoint / time-travel debug | L255, 1126 | code present; runtime UNKNOWN (README); flag default ON | mature in place per organ plan |
+    | heartbeat / pulse | L468, 562, 1190 | code present; runtime UNKNOWN (README); service defined (README); runtime UNKNOWN | mature in place per organ plan |
+    | no single point of failure (end-goal) | L1366 | end-goal (README) | mature in place per organ plan |
+    | observability (metrics/alerts) | L526, 554 | service defined (README); runtime UNKNOWN | mature in place per organ plan |
+    | security self-hacking | L253, 1137 | code present; runtime UNKNOWN (README); flag default ON | mature in place per organ plan |
+    | self-capability map | L230, 770 | LIVE claimed (README); code present; runtime UNKNOWN (README) | mature in place per organ plan |
+    | structured errors / circuit breakers | L257, 1798 | checked [x] (README); code present; runtime UNKNOWN (README) | mature in place per organ plan |
+    | supervisor self-healing & recovery log | L250, 251, 493, 767, 1785 | LIVE claimed (README); checked [x] (README); code present; runtime UNKNOWN (README); service defined (README); runtime UNKNOWN | mature in place per organ plan |
+    | system FSM (operational state) | L209, 768, 1145, 1773 | LIVE claimed (README); checked [x] (README); code present; runtime UNKNOWN (README); flag default ON | mature in place per organ plan |
+    
+    ### O9 — Growth / Dream / Evolution (6 features, 23 README rows)
+    Kingsman home: WP7 artifact admission + governed evolution
+    
+    | feature | README rows | README status claims | today / maturation note |
+    |---|---|---|---|
+    | Agent-Evolver | L186, 1160 | code present; runtime UNKNOWN (README); flag default OFF | mature in place per organ plan |
+    | D99 synthetic experience | L200, 1170, 1253, 1346, 1817 | STUB (README); flag default OFF; planned (README roadmap); unchecked [ ] (README) | mature in place per organ plan |
+    | agentic cold path (dream/evolve/audit) | L519, 559 | service defined (README); runtime UNKNOWN | mature in place per organ plan |
+    | capability gap logging | L215, 1149, 1779 | checked [x] (README); code present; runtime UNKNOWN (README); flag default ON | mature in place per organ plan |
+    | dream state / dream cycles | L172, 1159, 1176 | code present; runtime UNKNOWN (README); flag default OFF; flag default ON | mature in place per organ plan |
+    | skills hub / skill hunter / skill provenance | L216, 229, 259, 489, 539, 564, 1143, 1781 | checked [x] (README); code present; runtime UNKNOWN (README); flag default ON; service defined (README); runtime UNKNOWN | one admission pipeline incl. MCP servers and model artifacts (MCPTox-class threats) |
+    
+    ### O10 — Continuity / Stewardship / Sustainability (4 features, 8 README rows)
+    Kingsman home: WP10 continuity/resurrection · WP11 sustainability
+    
+    | feature | README rows | README status claims | today / maturation note |
+    |---|---|---|---|
+    | backup service | L533 | service defined (README); runtime UNKNOWN | mature in place per organ plan |
+    | broker-bridge (Binance, read-only) + Broker view | L479, 1202 | code present; runtime UNKNOWN (README); service defined (README); runtime UNKNOWN | keys stay in broker-bridge (hard constraint) |
+    | financial awareness / UK self-employment advisor | L524, 535, 1138, 1199 | code present; runtime UNKNOWN (README); flag default ON; service defined (README); runtime UNKNOWN | keep read-only; sustainability WP11 behind legal gate |
+    | sovereign offline operation (end-goal) | L1366 | end-goal (README) | mature in place per organ plan |
+    
+    ### O11 — Operator Relationship / Mission Control (9 features, 29 README rows)
+    Kingsman home: WP5 Mission Control · WP8 embodiment
+    
+    | feature | README rows | README status claims | today / maturation note |
+    |---|---|---|---|
+    | D98 cognitive fingerprint (operator thinking style) | L199, 1166, 1249, 1345, 1356, 1792, 1816 | COLLECTING (README); DONE (README, struck through); KNOWN LIMITATION (README); checked [x] (README); flag default ON; planned (README roadmap); unchecked [ ] (README) | mature in place per organ plan |
+    | Telegram interface | L536 | service defined (README); runtime UNKNOWN | mature in place per organ plan |
+    | dashboard / operator console (→ Mission Control) | L469, 558, 1191, 1192, 1195, 1213, 1215 | code present; runtime UNKNOWN (README); service defined (README); runtime UNKNOWN | mature in place per organ plan |
+    | impact oracle | L237 | code present; runtime UNKNOWN (README) | mature in place per organ plan |
+    | notifications | L476 | service defined (README); runtime UNKNOWN | mature in place per organ plan |
+    | operator model | L236, 1132 | code present; runtime UNKNOWN (README); flag default ON | mature in place per organ plan |
+    | presence: chat / voice / TTS / avatar | L471, 530, 531, 1189, 1340, 1366 | code present; runtime UNKNOWN (README); end-goal (README); planned (README roadmap); service defined (README); runtime UNKNOWN | TTS today = edge-tts (cloud) → local TTS required by offline end-goal; STT faster-whisper/parakeet local; avatar = presentation organ only |
+    | shadow branches | L238 | code present; runtime UNKNOWN (README) | mature in place per organ plan |
+    | workspace manager | L537 | service defined (README); runtime UNKNOWN | mature in place per organ plan |
+    
+    ### ENG — Engineering / Assurance substrate (6 features, 34 README rows)
+    Kingsman home: WP0 assurance artefacts (RVM, ICDs, config baseline)
+    
+    | feature | README rows | README status claims | today / maturation note |
+    |---|---|---|---|
+    | engineering toolchain / CI gates | L1260, 1490, 1491, 1492, 1493, 1494, 1495, 1496, 1497, 1498, 1499, 1500, 1501 | KNOWN LIMITATION (README); code present; runtime UNKNOWN (README) | mature in place per organ plan |
+    | feature-flag system (53 flags) | L256, 1800 | checked [x] (README); code present; runtime UNKNOWN (README) | mature in place per organ plan |
+    | honest status / build & test substrate | L1238, 1241, 1769, 1793, 1796, 1797 | KNOWN LIMITATION (README); checked [x] (README) | mature in place per organ plan |
+    | private overlay network | L552 | service defined (README); runtime UNKNOWN | mature in place per organ plan |
+    | target hardware (Flow Z13 / Strix Halo) | L1676, 1677, 1678, 1679, 1680, 1681, 1682, 1715, 1716, 1717, 1718 | code present; runtime UNKNOWN (README) | GZ302 verified; re-check Ryzen AI MAX 400 successor before purchase |
+    | zero telemetry / local core (constitution) | L258 | code present; runtime UNKNOWN (README) | mature in place per organ plan |
+    
+    ### Excluded README rows (not features)
+    
+    | README line | reason |
+    |---|---|
+    | L36 | status snapshot, not a feature |
+    | L37 | status snapshot, not a feature |
+    | L38 | status snapshot, not a feature |
+    | L39 | status snapshot, not a feature |
+    | L40 | status snapshot, not a feature |
+    | L41 | status snapshot, not a feature |
+    | L42 | status snapshot, not a feature |
+    | L61 | status snapshot, not a feature |
+    | L62 | status snapshot, not a feature |
+    | L63 | status snapshot, not a feature |
+    | L64 | status snapshot, not a feature |
+    | L65 | status snapshot, not a feature |
+    | L1315 | history, not a feature |
+    | L1316 | history, not a feature |
+    | L1317 | history, not a feature |
+    | L1318 | history, not a feature |
+    | L1319 | history, not a feature |
+    | L1320 | history, not a feature |
+    | L1321 | history, not a feature |
+    | L1322 | history, not a feature |
+    | L1753 | documentation index, not a feature |
+    | L1754 | documentation index, not a feature |
+    | L1755 | documentation index, not a feature |
+    | L1756 | documentation index, not a feature |
+    | L1757 | documentation index, not a feature |
+    | L1758 | documentation index, not a feature |
+    | L1759 | documentation index, not a feature |
+    | L1760 | documentation index, not a feature |
+    | L1761 | documentation index, not a feature |
+    | L1762 | documentation index, not a feature |
+    | L1763 | documentation index, not a feature |
+    | L1764 | documentation index, not a feature |
+    END-VERBATIM KAI-MASTER-PLAN-V1-1-UNIFIED-DRAFT
+- EVIDENCE README-EXTRACTOR extract_readme.py: 1102 bytes, sha256 516d9ae218da14a2b43f3a611a198da8a2a07f55646290cb4f081fdf6a30c29f, final LF True  [CMD `sha256sum extract_readme.py` → 516d9ae218da14a2…]
+    BEGIN-VERBATIM README-EXTRACTOR
+    import re, json, subprocess, collections, sys
+    src = subprocess.run(["git","show","HEAD:README.md"],capture_output=True,text=True,check=True).stdout
+    h2 = h3 = ""; rows = []; infence = False
+    for n, l in enumerate(src.split("\n"), 1):
+        if l.startswith("```"): infence = not infence; continue
+        if infence: continue
+        if l.startswith("## "): h2, h3 = l[3:].strip(), ""; continue
+        if l.startswith("### "): h3 = l[4:].strip(); continue
+        if l.startswith("|") and not re.match(r"^\|\s*:?-+", l):
+            cells = [c.strip() for c in l.strip().strip("|").split("|")]
+            rows.append({"line": n, "h2": h2, "h3": h3, "cells": cells})
+    # drop header rows: a row immediately followed by a separator row
+    lines = src.split("\n")
+    data = [r for r in rows if not (r["line"] < len(lines) and re.match(r"^\|\s*:?-+", lines[r["line"]]))]
+    by = collections.Counter((r["h2"], r["h3"]) for r in data)
+    for k, v in by.items(): print(f"{v:4d}  {k[0]} / {k[1]}")
+    print("TOTAL table data rows:", len(data), "(all tables; fenced blocks excluded)")
+    json.dump(data, open(sys.argv[1], "w"), ensure_ascii=False, indent=0)
+    END-VERBATIM README-EXTRACTOR
+- EVIDENCE README-REGISTER-BUILDER register.py: 8079 bytes, sha256 2931ea15254a6b3166415e99536c3e1abf9f17a27cf2acf1a3947ea6a4e0a2f5, final LF True  [CMD `sha256sum register.py` → 2931ea15254a6b31…]
+    BEGIN-VERBATIM README-REGISTER-BUILDER
+    """README Feature Lineage Register: every README feature row -> organ, README status, Kingsman home.
+    Universe: README.md at HEAD. Populations: capability catalogue, feature flags, service map, operator console,
+    personality modes, self-diagnosis table, honest limitations, target hardware, engineering toolchain, roadmap
+    unlock list + Phase-1 pending + end-goal, cross-check checklists. Excluded with reason: Project Status rows
+    (status, not features), Milestone Summary (history), Key Docs (documentation index)."""
+    import json, re, subprocess, sys, collections
+    src = subprocess.run(["git","show","HEAD:README.md"],capture_output=True,text=True,check=True).stdout
+    L = src.split("\n")
+    rows = json.load(open(sys.argv[1]))
+    ORG = {"O1":"Soul / Identity / Inner Life","O2":"Memory / Relationship / Continuity","O3":"Senses / World Awareness",
+    "O4":"Intelligence / Reasoning","O5":"Cognitive Depth / Specialists","O6":"Proactivity / Goals / Attention",
+    "O7":"Governed Hands / Capabilities","O8":"Immune System / Doctor / Resilience","O9":"Growth / Dream / Evolution",
+    "O10":"Continuity / Stewardship / Sustainability","O11":"Operator Relationship / Mission Control","ENG":"Engineering / Assurance substrate"}
+    HOME = {"O1":"WP0 canon (identity invariants) · WP3 narrative projection","O2":"WP3 memory journal + projections (after ownership trace)",
+    "O3":"WP1 Evidence + Qualified World State · WP8 perception","O4":"WP4 KaiBench/model registry · WP2 (conviction → information only)",
+    "O5":"WP4 qualified models per role · WP9 (Doctor role)","O6":"WP8/WP1 nine-stage proactivity + Goal/Watch/Attention",
+    "O7":"WP2 authority spine + final-hand capability (behind Tool Gate/ActuatorRegistry)","O8":"WP9 self-diagnosis/recovery loop",
+    "O9":"WP7 artifact admission + governed evolution","O10":"WP10 continuity/resurrection · WP11 sustainability","O11":"WP5 Mission Control · WP8 embodiment",
+    "ENG":"WP0 assurance artefacts (RVM, ICDs, config baseline)"}
+    # keyword rules, first match wins (checked against name + description)
+    KW = [
+     (r"temporal projection|forecast", "O5"),
+     (r"services defined|compose", "ENG"),
+     (r"broker|binance|financ|vat|tax|cis\b|advisor|self-employment|trading|paper", "O10"),
+     (r"backup|restore|checkpoint|time-travel|rollback", "O10"),
+     (r"soul|emotion|mood|narrative|conscience|values|ohana|confession|epistemic|imagination|self-reflection|self.assessment|personality|pub/work|\bpub\b|\bwork\b|gratitude|loyalty|reflection", "O1"),
+     (r"dream|evolver|skill|hunt|gap|growth|synthetic experience|curiosity|hypothesis", "O9"),
+     (r"doctor|diagnos|supervisor|heal|recover|anomal|circuit|resilien|structured error|self-hacking|security audit|security_audit|heartbeat|monitor|metrics|prometheus|grafana|alert|capability map|introspect|fsm.*degraded|degraded", "O8"),
+     (r"tool-gate|tool gate|hmac|executor|sandbox|actuator|unified hunter|trust negotiation|autonomy|vault \+ vault-rotator|secret|browser|click|navigate|\bverifier\b|ledger", "O7"),
+     (r"memory|memu|mars|letta|graph|vault-sync|obsidian|vault|compress|redis|postgres|pgvector|turbovec|diary|canvas|memory map", "O2"),
+     (r"proactive|ritual|schedul|watch|attention|goal|nudge|briefing|reminder|struggle|anti-annoyance|wake", "O6"),
+     (r"camera|audio|vision|screen|clipboard|files|document|email|news|weather|air ?quality|airquality|calendar|sysmetric|docker-watcher|git-watcher|sensor|world|fusion|perception|stt|ocr|parakeet|feeds|body", "O3"),
+     (r"teammate|swarm|socratic|dialectical|analogical|concept blending|fingerprint|transitive|causal|global workspace|counterfactual|tree search|sage|adversary|debate|specialist|cortex|npu|policy memory|surprise", "O5"),
+     (r"tts|avatar|telegram|dashboard|console|chat|pulse|thinking|configure|trace|operator|impact oracle|shadow branch|notify|ctrl|escape|search:|browse:|tailscale|workspace", "O11"),
+     (r"llm|model|ollama|router|planner|conviction|context|reason|priority queue|intelligence", "O4"),
+     (r"coverage|test|pre-commit|scan|trivy|flag|telemetry|anchor|hardware|device|soc|igpu|storage|os\b|zen|radeon|xdna|unified memory|toolchain|make|pip|lint|ruff|mypy|bandit|this page|what actually starts", "ENG"),
+    ]
+    def organ(text):
+        t = text.lower()
+        for rx, o in KW:
+            if re.search(rx, t): return o
+        return None
+    def status_of(sec, cells, text):
+        if sec == "Feature Flags": return "flag default ON" if "✓" in cells[1] else "flag default OFF"
+        if "🔜" in text or "can_" in text and "False" in text: return "STUB (README)"
+        if "✅ Live" in text: return "LIVE claimed (README)"
+        if "✅ Collecting" in text: return "COLLECTING (README)"
+        if sec == "Honest Limitations": return "KNOWN LIMITATION (README)"
+        if sec == "Service Map": return "service defined (README); runtime UNKNOWN"
+        return "code present; runtime UNKNOWN (README)"
+    EXCL = {"Project Status (17 September 2026)":"status snapshot, not a feature","Milestone History":"history, not a feature","Session Continuation Guide/Key Docs (read in order)":"documentation index, not a feature"}
+    reg, excluded = [], []
+    for r in rows:
+        key2 = r["h2"]; key3 = r["h2"] + "/" + r["h3"]
+        if key2 in EXCL or key3 in EXCL:
+            excluded.append((r["line"], EXCL.get(key2) or EXCL.get(key3))); continue
+        c = r["cells"]; name = re.sub(r"[*`]", "", c[1] if key2 == "Service Map" and r["h3"].startswith("Minimal") else c[0]).strip()
+        text = " ".join(c)
+        o = organ(name + " " + text)
+        reg.append({"src": f"README.md:{r['line']}", "section": (r["h3"] or r["h2"])[:40], "feature": name[:60], "organ": o, "status": status_of(key2, c, text)})
+    # prose populations
+    def add_prose(start_pat, end_pat, item_rx, sec):
+        s = next(i for i,l in enumerate(L) if re.search(start_pat, l))
+        e = next(i for i in range(s+1, len(L)) if re.search(end_pat, L[i]))
+        for i in range(s, e):
+            m = re.match(item_rx, L[i])
+            if m:
+                name = re.sub(r"[*`~]", "", m.group(1)).strip()
+                st = "DONE (README, struck through)" if L[i].lstrip("- ").startswith("~~") else ("checked [x] (README)" if "[x]" in L[i] else ("unchecked [ ] (README)" if "[ ]" in L[i] else "planned (README roadmap)"))
+                reg.append({"src": f"README.md:{i+1}", "section": sec, "feature": name[:60], "organ": organ(name), "status": st})
+    add_prose(r"^When it arrives:", r"^\*\*Phase 1 priorities", r"^\d+\.\s+(.*)", "Roadmap: GPU unlock list")
+    add_prose(r"^\*\*Phase 1 priorities", r"^\*\*End-goal", r"^- (.*)", "Roadmap: Phase-1 priorities")
+    add_prose(r"^\*\*Working now", r"^\*\*Infrastructure ready", r"^- \[x\] (.*)", "Cross-check: working now")
+    add_prose(r"^\*\*Infrastructure ready", r"^---", r"^- \[ \] (.*)", "Cross-check: needs GPU")
+    end_goal = ["offline self-hosted sovereign companion (no cloud dependency)", "chat", "memory", "perception", "voice", "avatar",
+                "gated by conviction/trust loop and circuit breakers", "no single point of failure", "Obsidian Brain closed loop operator↔knowledge graph"]
+    eg = next(i for i,l in enumerate(L) if l.startswith("**End-goal:**")) + 1
+    for f in end_goal: reg.append({"src": f"README.md:{eg}", "section": "End-goal", "feature": f, "organ": organ(f) or ("O11" if f in ("chat","voice","avatar") else None), "status": "end-goal (README)"})
+    # manual overrides for end-goal items the keyword rules cannot place sensibly
+    for x in reg:
+        if x["section"] == "End-goal":
+            x["organ"] = {"offline self-hosted sovereign companion (no cloud dependency)":"O10","chat":"O11","memory":"O2","perception":"O3","voice":"O11","avatar":"O11",
+                          "gated by conviction/trust loop and circuit breakers":"O7","no single point of failure":"O8","Obsidian Brain closed loop operator↔knowledge graph":"O2"}[x["feature"]]
+    un = [x for x in reg if not x["organ"]]
+    for x in un: print("UNMAPPED", x)
+    cnt = collections.Counter(x["organ"] for x in reg)
+    print("register rows:", len(reg), "excluded:", len(excluded), "unmapped:", len(un))
+    print("by organ:", dict(sorted(cnt.items())))
+    json.dump({"reg": reg, "excluded": excluded, "ORG": ORG, "HOME": HOME}, open(sys.argv[2], "w"), ensure_ascii=False)
+    sys.exit(1 if un else 0)
+    END-VERBATIM README-REGISTER-BUILDER
+- EVIDENCE README-CANON-TABLE canon.py: 8013 bytes, sha256 d90439f4e0f08c76b7a33c08b3add6f49ecdf7fe009c5157f12414299b8317d9, final LF True  [CMD `sha256sum canon.py` → d90439f4e0f08c76…]
+    BEGIN-VERBATIM README-CANON-TABLE
+    # Canonical feature table: (regex on feature NAME, organ, canonical feature). Order matters: specific first.
+    CANON = [
+     # ENG / substrate first (toolchain, hardware, page meta)
+     (r"^(sync-docs|check-docs|go_no_go|merge-gate|pre-commit|dep-audit|coverage-floors|coverage|trivy|health-sweep|chaos-ci|test-github-models)$", "ENG", "engineering toolchain / CI gates"),
+     (r"^(this page|what actually starts)$|services defined|test targets|pre-commit, dep scanning|gpu-era stub interfaces fixed", "ENG", "honest status / build & test substrate"),
+     (r"53 feature flags", "ENG", "feature-flag system (53 flags)"),
+     (r"zero telemetry", "ENG", "zero telemetry / local core (constitution)"),
+     (r"^coverage$", "ENG", "test coverage"),
+     (r"tailscale", "ENG", "private overlay network"),
+     (r"prometheus|metrics-gateway", "O8", "observability (metrics/alerts)"),
+     # O10 stewardship / money / backup
+     (r"broker|binance", "O10", "broker-bridge (Binance, read-only) + Broker view"),
+     (r"financ|kai-advisor|^finance$", "O10", "financial awareness / UK self-employment advisor"),
+     (r"backup", "O10", "backup service"),
+     (r"offline self-hosted sovereign", "O10", "sovereign offline operation (end-goal)"),
+     (r"time-travel debug|checkpoint", "O8", "checkpoint / time-travel debug"),
+     # O1 soul
+     (r"predictive empathy|emotional intelligence|emotional memory", "O1", "emotional memory & predictive empathy"),
+     (r"self-reflection", "O1", "self-reflection"),
+     (r"epistemic humility", "O1", "epistemic humility"),
+     (r"confession", "O1", "confession engine"),
+     (r"narrative identity", "O1", "narrative identity"),
+     (r"imagination", "O1", "imagination engine"),
+     (r"conscience", "O1", "conscience & values"),
+     (r"ohana", "O1", "Ohana Core (operator moral fingerprint / goals)"),
+     (r"self_assessment", "O1", "temporal self-model (self-assessment)"),
+     (r"^(work|pub)$|pub/work|ctrl\+shift\+m", "O1", "PUB/WORK personality modes"),
+     (r"^soul$", "O1", "Soul console view"),
+     # O2 memory
+     (r"obsidian|vault-sync|vault_sync|vault context|vault_context", "O2", "Obsidian Brain / vault-sync"),
+     (r"per-teammate memory slices", "O2", "per-teammate memory slices"),
+     (r"letta", "O2", "Letta archival memory"),
+     (r"graph_ingest|graph ingest|memu-graph|memory map", "O2", "knowledge graph (memu-graph, Cognee/Kuzu)"),
+     (r"mars", "O2", "MARS memory decay / consolidation"),
+     (r"turbovec|pgvector|memory persistence|^postgres$|^redis$", "O2", "memory stores (Postgres/pgvector/TurboVec/Redis)"),
+     (r"memu-core|memory-compressor|^memory$", "O2", "memu-core memory service"),
+     (r"^diary$|^canvas$", "O2", "memory diary / mind-map views"),
+     (r"^memory$|end-goal memory", "O2", "memory (end-goal)"),
+     # O5 cognitive depth (D89–D102)
+     (r"gpu-era foundations|activate d95", "O5", "GPU-era foundations & stub activation"),
+     (r"dialectical", "O5", "D95 dialectical synthesis"),
+     (r"analogical", "O5", "D96 analogical reasoning"),
+     (r"concept blending", "O5", "D97 concept blending"),
+     (r"transitive", "O5", "D100 transitive reasoning"),
+     (r"causal world model|causal_world_model|causal_surprise|policy_memory", "O5", "D101 causal world model"),
+     (r"global workspace|global_workspace", "O5", "D102 Global Workspace"),
+     (r"counterfactual", "O5", "counterfactual rehearsal"),
+     (r"temporal projection|temporal_projection", "O5", "D94 temporal projection"),
+     (r"socratic", "O5", "D92 Socratic self-questioning"),
+     (r"hypothesis", "O5", "D93 hypothesis engine"),
+     (r"swarm", "O5", "D90 swarm assembly"),
+     (r"teammate reputation|teammate", "O5", "persistent teammates & reputation"),
+     (r"cognitive reasoning fsm|cognitive fsm", "O5", "cognitive reasoning FSM"),
+     (r"multi-model consensus|multi-specialist routing", "O5", "multi-model consensus / specialist endpoints"),
+     (r"debate engine|tree search|tree_search", "O5", "debate / tree search"),
+     (r"adversary", "O5", "adversary engine"),
+     (r"sage", "O5", "SAGE critique / self-review"),
+     (r"^verifier$", "O5", "verifier (SAGE semantic fact-check)"),
+     # O11 operator / Mission Control (before generic patterns)
+     (r"cognitive fingerprint", "O11", "D98 cognitive fingerprint (operator thinking style)"),
+     (r"operator model|operator_model", "O11", "operator model"),
+     (r"impact oracle", "O11", "impact oracle"),
+     (r"shadow branches", "O11", "shadow branches"),
+     (r"^tts|tts-service|^avatar|avatar-service|^voice$|^chat$|stt.*tts|real stt", "O11", "presence: chat / voice / TTS / avatar"),
+     (r"telegram-bot", "O11", "Telegram interface"),
+     (r"^dashboard|^configure$|^trace$|^thinking$|^ctrl\+k$|^escape$", "O11", "dashboard / operator console (→ Mission Control)"),
+     (r"notify-service", "O11", "notifications"),
+     (r"workspace-manager", "O11", "workspace manager"),
+     (r"trust negotiation", "O7", "trust negotiation / autonomy requests"),
+     # O6 proactivity
+     (r"proactive observer|proactive_agent|proactive agent", "O6", "proactive observer / agent"),
+     (r"proactive scheduling|proactive_scheduling", "O6", "proactive scheduling"),
+     (r"ritual", "O6", "emergent ritual discovery"),
+     (r"struggle", "O6", "struggle detection"),
+     (r"anti-annoyance", "O6", "anti-annoyance"),
+     (r"wake", "O6", "wake word & intent"),
+     (r"^watch$", "O6", "Watch rule engine"),
+     (r"^goals$", "O6", "Goals view (Ohana goals)"),
+     (r"curiosity", "O6", "resource-aware curiosity"),
+     # O9 growth
+     (r"synthetic experience|synthetic_experience", "O9", "D99 synthetic experience"),
+     (r"dream", "O9", "dream state / dream cycles"),
+     (r"evolver", "O9", "Agent-Evolver"),
+     (r"gap logging|gap_logging|capability gap", "O9", "capability gap logging"),
+     (r"skill", "O9", "skills hub / skill hunter / skill provenance"),
+     (r"agentic-introspect", "O9", "agentic cold path (dream/evolve/audit)"),
+     # O8 doctor / resilience
+     (r"house doctor|house-doctor|house_doctor|self-diagnosis|doctor teammate", "O8", "House Doctor / self-diagnosis"),
+     (r"supervisor|self-healing|recovery log", "O8", "supervisor self-healing & recovery log"),
+     (r"system fsm|^ff_fsm$", "O8", "system FSM (operational state)"),
+     (r"self-capability map", "O8", "self-capability map"),
+     (r"security self-hacking|security_audit", "O8", "security self-hacking"),
+     (r"structured errors|circuit breakers", "O8", "structured errors / circuit breakers"),
+     (r"heartbeat|^pulse$", "O8", "heartbeat / pulse"),
+     (r"no single point of failure", "O8", "no single point of failure (end-goal)"),
+     (r"cognitive fsm wiring", "O5", "cognitive reasoning FSM"),
+     # O7 hands
+     (r"tool-gate|hmac|security defaults", "O7", "Tool Gate + HMAC/Ed25519 auth"),
+     (r"executor", "O7", "sandboxed executor"),
+     (r"browser-agent|^browse:|^search:", "O7", "browser agent"),
+     (r"vault \+ vault-rotator", "O7", "secret management & rotation"),
+     (r"ledger-worker", "O7", "action audit ledger"),
+     (r"unified hunter", "O7", "Unified Hunter (34 actuators, not cut over)"),
+     (r"gated by conviction", "O7", "governed decision path (end-goal)"),
+     # O3 senses
+     (r"world context|world model provenance|world_model_persistence|world anchor", "O3", "world state & provenance"),
+     (r"anomaly", "O3", "anomaly detection"),
+     (r"cross-sensor", "O3", "cross-sensor correlation"),
+     (r"sensory pattern|sensory_learning", "O3", "sensory pattern learning"),
+     (r"fusion", "O3", "multi-modal fusion"),
+     (r"cortex", "O3", "cortex (perception spine / NPU inference)"),
+     (r"audio|camera|vision|screen|clipboard|files-service|document-parser|email|news|weather|airquality|calendar|sysmetrics|docker-watcher|git-watcher|monitor-service|perception|parakeet|^feeds$|^body$", "O3", "sensors & perception services"),
+     # O4 intelligence
+     (r"14-way|context_enrichment", "O4", "14-way context gather"),
+     (r"specialist router|specialist routing", "O4", "specialist router"),
+     (r"memory-driven planner", "O4", "memory-driven planner"),
+     (r"conviction scoring", "O4", "conviction scoring (→ information only)"),
+     (r"priority_queue", "O4", "priority queue"),
+     (r"llm model|ollama|qwen2.5:7b", "O4", "local LLM serving (Ollama)"),
+     (r"^agentic$|agentic \+ agentic-introspect", "O4", "agentic reasoning service"),
+     (r"^(chat|memory|perception|voice|avatar)$", None, None),
+    ]
+    END-VERBATIM README-CANON-TABLE
+- EVIDENCE README-CANON-APPLIER apply_canon.py: 1893 bytes, sha256 62bf5d13bdd59215194e295cfc07b282b6c64e737800f494bebe1dec7394a3bf, final LF True  [CMD `sha256sum apply_canon.py` → 62bf5d13bdd59215…]
+    BEGIN-VERBATIM README-CANON-APPLIER
+    import json, re, sys, collections
+    sys.path.insert(0, sys.argv[1]); from canon import CANON
+    d = json.load(open(sys.argv[2]))
+    reg = d["reg"]
+    END = {"chat":("O11","presence: chat / voice / TTS / avatar"),"voice":("O11","presence: chat / voice / TTS / avatar"),"avatar":("O11","presence: chat / voice / TTS / avatar"),
+           "memory":("O2","memu-core memory service"),"perception":("O3","sensors & perception services"),
+           "Obsidian Brain closed loop operator↔knowledge graph":("O2","Obsidian Brain / vault-sync"),
+           "gated by conviction/trust loop and circuit breakers":("O7","governed decision path (end-goal)"),
+           "no single point of failure":("O8","no single point of failure (end-goal)"),
+           "offline self-hosted sovereign companion (no cloud dependency)":("O10","sovereign offline operation (end-goal)")}
+    un = []
+    for x in reg:
+        name = x["feature"].lower()
+        forms = [name]
+        if name.startswith("ff_"): forms += [name[3:], name[3:].replace("_", " ")]
+        if x["section"].startswith("Target Hardware"):
+            x["organ"], x["canon"] = "ENG", "target hardware (Flow Z13 / Strix Halo)"; continue
+        if x["section"] == "End-goal":
+            x["organ"], x["canon"] = END[x["feature"]]; continue
+        for rx, o, c in CANON:
+            if o and any(re.search(rx, f) for f in forms):
+                x["organ"], x["canon"] = o, c; break
+        else:
+            x["organ"], x["canon"] = None, None; un.append(x)
+    for u in un: print("UNMAPPED", u["src"], u["section"], u["feature"])
+    print("rows", len(reg), "unmapped", len(un))
+    print("by organ", dict(sorted(collections.Counter(x["organ"] for x in reg if x["organ"]).items())))
+    canon = collections.defaultdict(list)
+    for x in reg:
+        if x["canon"]: canon[(x["organ"], x["canon"])].append(x)
+    print("distinct canonical features", len(canon))
+    d["reg"] = reg; json.dump(d, open(sys.argv[3], "w"), ensure_ascii=False)
+    sys.exit(1 if un else 0)
+    END-VERBATIM README-CANON-APPLIER
+- EVIDENCE APPENDIX-R-GENERATOR appendix_r.py: 3728 bytes, sha256 40bca7c96add5e28f8d42bbb9b2cba2f32fdc8ec91912bb4f4fd2252bc8ab6c2, final LF True  [CMD `sha256sum appendix_r.py` → 40bca7c96add5e28…]
+    BEGIN-VERBATIM APPENDIX-R-GENERATOR
+    """Generate Appendix R (README Feature Lineage Register) from register2.json. Refuses on any unmapped row."""
+    import json, sys, collections
+    d = json.load(open(sys.argv[1]))
+    reg, excl, ORG, HOME = d["reg"], d["excluded"], d["ORG"], d["HOME"]
+    assert all(x["organ"] and x["canon"] for x in reg), "unmapped rows present"
+    TODAY = {
+     "local LLM serving (Ollama)": "qwen2.5:0.5b → KaiBench role selection among Qwen3.6-35B-A3B, gpt-oss-20b/120b, Mistral Small 4 (quantised); Ollama kept until multi-runtime pressure",
+     "presence: chat / voice / TTS / avatar": "TTS today = edge-tts (cloud) → local TTS required by offline end-goal; STT faster-whisper/parakeet local; avatar = presentation organ only",
+     "cortex (perception spine / NPU inference)": "Linux NPU via FastFlowLM (amdxdna, kernel 7.0+/backport); bonus until qualified",
+     "knowledge graph (memu-graph, Cognee/Kuzu)": "keep Cognee; Graphiti-style temporal validity as design reference; graph = projection",
+     "Letta archival memory": "keep; re-home as projection/consumer after ownership trace",
+     "memory stores (Postgres/pgvector/TurboVec/Redis)": "keep; canonical journal + outbox as target after trace",
+     "Tool Gate + HMAC/Ed25519 auth": "finish Ed25519 identity; signed, parameter-bound, durable capability (A1.2)",
+     "Unified Hunter (34 actuators, not cut over)": "cut over behind Tool Gate/ActuatorRegistry with bypass proof; 5 code risk tiers",
+     "skills hub / skill hunter / skill provenance": "one admission pipeline incl. MCP servers and model artifacts (MCPTox-class threats)",
+     "broker-bridge (Binance, read-only) + Broker view": "keys stay in broker-bridge (hard constraint)",
+     "financial awareness / UK self-employment advisor": "keep read-only; sustainability WP11 behind legal gate",
+     "D102 Global Workspace": "coordinates reasoning only; no credentials (FP-INV-03)",
+     "conviction scoring (→ information only)": "conviction informs, never authorises",
+     "target hardware (Flow Z13 / Strix Halo)": "GZ302 verified; re-check Ryzen AI MAX 400 successor before purchase",
+     "wake word & intent": "wake output is an observation, never an instruction",
+     "Obsidian Brain / vault-sync": "keep; vault notes are untrusted input to memory admission",
+    }
+    by = collections.defaultdict(list)
+    for x in reg: by[(x["organ"], x["canon"])].append(x)
+    order = ["O1","O2","O3","O4","O5","O6","O7","O8","O9","O10","O11","ENG"]
+    out = ["## APPENDIX R — README FEATURE LINEAGE REGISTER (generated)", "",
+     f"Generated by `appendix_r.py` from README.md at HEAD. Universe: every table data row outside fenced blocks (301), plus the Roadmap GPU-unlock list, Phase-1 priorities, Cross-check checklists and End-goal elements. **{len(reg)} feature rows mapped, 0 unmapped; {len(by)} distinct features; {len(excl)} rows excluded with reason** (listed at the end). Every revision of the plan must regenerate this appendix; a row that cannot be mapped stops the generator.", ""]
+    for o in order:
+        items = sorted((k for k in by if k[0] == o), key=lambda k: k[1])
+        out += [f"### {o} — {ORG[o]} ({len(items)} features, {sum(len(by[k]) for k in items)} README rows)", f"Kingsman home: {HOME[o]}", "",
+                "| feature | README rows | README status claims | today / maturation note |", "|---|---|---|---|"]
+        for k in items:
+            xs = by[k]
+            srcs = ", ".join(sorted({x["src"].split(":")[1] for x in xs}, key=int))
+            sts = "; ".join(sorted({x["status"] for x in xs}))
+            out.append(f"| {k[1]} | L{srcs} | {sts} | {TODAY.get(k[1], 'mature in place per organ plan')} |")
+        out.append("")
+    out += ["### Excluded README rows (not features)", "", "| README line | reason |", "|---|---|"]
+    out += [f"| L{ln} | {why} |" for ln, why in sorted(excl)]
+    print("\n".join(out))
+    END-VERBATIM APPENDIX-R-GENERATOR
+
+### 6. Next authorised step
+
+- Publish the unified draft to Linear under DAI-10 and point Kai to it on DAI-9; report to Dainius  [CONVERSATION 2026-10-07 Dainius, "Now I want to develop one master plan agree on it make sure none of features are missing  from read me. Take it to today’s available updates to reach common goal and stick to it"]
+
+### 7. What I am unsure of
+
+- Whether every organ assignment matches Kai's and Dainius's view of the organism; the register makes each one visible for correction  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
