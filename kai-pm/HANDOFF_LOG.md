@@ -56633,3 +56633,70 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-07T21:58:57Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-07T21:58:57Z  [CMD `date -u +%FT%TZ` → 2026-10-07T21:58:57Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 3d5a7535a71cd608fedd75733be13dda7e0e1445  [CMD `git rev-parse HEAD` → 3d5a7535a71cd608fedd75733be13dda7e0e1445]
+- tree: ef45f63bc6d6da072b30b39e2f8f8d2d3d978aac  [CMD `git rev-parse HEAD^{tree}` → ef45f63bc6d6da072b30b39e2f8f8d2d3d978aac]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/project-rework-plan-pgvp35: 3d5a7535a71cd608fedd75733be13dda7e0e1445  [CMD `git ls-remote --heads origin` → 3d5a7535a71cd608fedd75733be13dda7e0e1445]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 101  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 101]
+
+### 1. The four states
+
+- physical: unchanged since entry 101 apart from this entry; two Linear writes made (below)  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: as entry 100 (one new Linear document, one linking comment on DAI-9)  [CONVERSATION 2026-10-07 Dainius, "Yes do that as it’s another Chanel of you two have to help working on this project"]
+- evidence: Linear document "Orion ↔ Kai ↔ Repository ↔ Research Reconciliation Matrix — Orion side v0.1" created under DAI-10, URL https://linear.app/kaidainius/document/orion-kai-repository-research-reconciliation-matrix-orion-side-v01-2a2030bc00ef; its header names the canonical copy (entry 101, sha256 8533668c40af6c3f0d7b31553c6fe2beb0b80a300972c922323ea60b31ca51e6)  [CMD `Linear save_document (issue DAI-10)` → id 90ed2274-fcf3-4caa-ab58-bdd18265d1d0, createdAt 2026-10-07T21:58:24.726Z]
+- evidence: linking comment on DAI-9 listing the CONFLICT rows, the Dainius-decision rows, and the request for A1.10 source links  [CMD `Linear save_comment (issue DAI-9)` → id cb92d690-c672-482b-b1fc-9b5232b39c75, createdAt 2026-10-07T21:58:38.118Z]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `ruling_capture.py status` → OUTSTANDING=0]
+
+### 3. Authorised / Held / Forbidden
+
+- PAUSED / HELD (unchanged): all engineering per entry 99; no edits to Kai's existing Linear documents or issue descriptions  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- Linear authorship is not attributable by account: Orion's writes are recorded as "dan.apex.engineer@gmail.com", the same account as the creator of Kai's v1.0 document; authorship must be stated in the text. This answers entry 98 section 7 only partly (the account is the connector's account; who typed each Linear text is not knowable from Linear) — owner: Dainius  [CMD `Linear save_document (issue DAI-10)` → id 90ed2274-fcf3-4caa-ab58-bdd18265d1d0, createdAt 2026-10-07T21:58:24.726Z]
+
+### 5. Incidents and corrections
+
+- First save_document attempt rejected ("icon is not a valid icon", status 400); nothing was created; retried without an icon  [CMD `Linear save_document` → invalid_request, then success]
+- The Linear page content is Orion's transcription of the matrix; the repository block (entry 101) is canonical and the page says so  [CMD `Linear save_document (issue DAI-10)` → id 90ed2274-fcf3-4caa-ab58-bdd18265d1d0, createdAt 2026-10-07T21:58:24.726Z]
+
+### 6. Next authorised step
+
+- Report to Dainius; wait for Kai's dispositions and Dainius's decisions; engineering stays paused  [CONVERSATION 2026-10-07 Dainius, "Yes do that as it’s another Chanel of you two have to help working on this project"]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff.py check` → findings=0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
