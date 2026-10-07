@@ -56700,3 +56700,126 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-07T22:10:41Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-07T22:10:41Z  [CMD `date -u +%FT%TZ` → 2026-10-07T22:10:41Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: dbac684b212e050f2869bddebb0cdd12187259a9  [CMD `git rev-parse HEAD` → dbac684b212e050f2869bddebb0cdd12187259a9]
+- tree: 1b2e53d2dfbf61ed13911ef9e8b5693cea8183a5  [CMD `git rev-parse HEAD^{tree}` → 1b2e53d2dfbf61ed13911ef9e8b5693cea8183a5]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/project-rework-plan-pgvp35: dbac684b212e050f2869bddebb0cdd12187259a9  [CMD `git ls-remote --heads origin` → dbac684b212e050f2869bddebb0cdd12187259a9]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 102  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 102]
+
+### 1. The four states
+
+- physical: unchanged since entry 102 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: post Orion's update message to Kai as a comment on Linear DAI-9 (answering Orion's offer "post this as a comment on DAI-9")  [CONVERSATION 2026-10-07 Dainius, "Ruling yes please"]
+- evidence: the exact message text, preserved below before posting  [CMD `sha256sum ORION_TO_KAI_UPDATE_2026-10-07.md` → 439a93b3d2ddf46b…]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-07 · RULING: yes, post the update to Kai on DAI-9; captured by the hook (id 6e1fb51a99a0b081); verbatim below, 18 bytes, sha256 caed6d8c052f2b34c32064c4c92486dd12ece2db6871c9556cef2ec3ded519e3, final LF True ⚠ UNBANKED  [CONVERSATION 2026-10-07 Dainius, "Ruling yes please"]
+    BEGIN-VERBATIM DAINIUS-POST-TO-KAI-YES
+    Ruling yes please
+    END-VERBATIM DAINIUS-POST-TO-KAI-YES
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: one comment on DAI-9 with the message below  [CONVERSATION 2026-10-07 Dainius, "Ruling yes please"]
+- PAUSED / HELD (unchanged): all engineering per entry 99  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- Kai's answers to the five asks in the message — owner: Kai  [CONVERSATION 2026-10-07 Dainius, "Ruling yes please"]
+
+### 5. Incidents and corrections
+
+- Credential scan of the message (calibrated): TOTAL HITS 0  [CMD `credscan.py msg_scan.json` → TOTAL HITS 0]
+- EVIDENCE ORION-TO-KAI-UPDATE-2026-10-07 ORION_TO_KAI_UPDATE_2026-10-07.md: 4164 bytes, sha256 439a93b3d2ddf46b9675bd2a4b2c144faa469b4367720db14608bdfa219bf57f, final LF True  [CMD `sha256sum ORION_TO_KAI_UPDATE_2026-10-07.md` → 439a93b3d2ddf46b…]
+    BEGIN-VERBATIM ORION-TO-KAI-UPDATE-2026-10-07
+    **ORION → KAI — UPDATE 7 OCT 2026 (handoff entries 82–102, branch `claude/project-rework-plan-pgvp35`, HEAD `dbac684`)**
+    
+    **1. Tools.** Orion now has Linear and Miro in-session (read/write), alongside GitHub. Boundaries are as in DAI-8: GitHub = technical truth; Linear = programme control; Miro = projection only. **Authorship note:** Orion's Linear writes appear under the same account as yours (dan.apex.engineer), so every Linear text must state its author ("KAI →" / "ORION →"). The account doesn't show it.
+    
+    **2. What Orion has read in Linear (entry 98):**
+    - the DAI-9 pause;
+    - *KAI Kingsman Master Plan v1.0 — Locked Planning Baseline* with Amendment A1 and §16;
+    - the new issues DAI-8 to DAI-14.
+    
+    Dainius has confirmed the pause directly to Orion ("Ruling pause", entry 99). D379, DAI-6 (including its DeepSeek packet) and DAI-7 stay paused. Orion has withdrawn his earlier advice that the DAI-6 packet was ready to send.
+    
+    **3. Continuity enforcement, live (entries 83–88):**
+    - `.claude/hooks/ruling_capture.py` flags operator prompts that look like rulings, stores the exact text, and blocks the end of Orion's turn until each one is saved word for word in the pushed handoff log or waived with a reason. Waivers are listed at every session start.
+    - Verified live in the harness: Dainius's prompt was flagged, and the end-of-turn block fired.
+    - Recall: 43/45 against prompts previously saved by hand. Seven short marker-free directions have been missed since, all saved by hand. Starting a message with "Ruling:" forces capture.
+    - Open for you: this changed `settings.json`, which the DAI-6 surface statement (entry 80 §9) says stays unchanged. Please reconcile.
+    
+    **4. Rescue (entry 85).** 66 operator prompts that existed only in the session transcript are now preserved word for word, including the original texts of the D381–D386 rulings. Credential scan: 0 hits. Open for you: check whether any of them holds a ruling that `DECISIONS.md` doesn't carry.
+    
+    **5. Plan work, all preserved word for word:**
+    
+    | What | Entry |
+    |---|---|
+    | Your baseline | 89 |
+    | The Deep Research Analysis | 92 |
+    | Orion's citation check | 93 |
+    | Orion's four-angle review (repository / doctrine / external / attacks) | 95 |
+    | Orion's candidate master plan v0.1 | 97 |
+    
+    The headline review findings:
+    - the front door must be the IDX organs (IDX:58-74; D351 bar);
+    - the programme order must be D359 verbatim;
+    - the code has **5 risk tiers**, not 8 (`common/contracts/base.py:27-32`);
+    - capabilities are one-use but not parameter-bound, signed or durable (`capability.py:45,56`);
+    - the legacy routes are the only live hands (`legacy_verification.py:16,52`);
+    - the paper-trader gate fails open (`paper_trader.py:168`).
+    
+    **6. Correction.** Orion wrongly told Dainius that 70/30 appears in `docs/sovereign_ai_spec.md`. The only "70/30" there (line 1268) is an unrelated WORK-mode checklist item. The revenue split is in no committed file. Dainius has been asked to state the intent so it can be saved (entry 97).
+    
+    **7. The reconciliation matrix you required in v1.0 §16D (entries 101–102).** Orion's side is in Linear under DAI-10 ("Orion ↔ Kai ↔ Repository ↔ Research Reconciliation Matrix — Orion side v0.1"), with a pointer comment on DAI-9. The master copy is entry 101, sha256 `8533668c…`.
+    - 52 rows: SAME 9 · MORE PRECISE 29 · CONFLICT 8 · SUPERSEDED BY EVIDENCE 1 · HISTORICAL LINEAGE 1 · UNVERIFIED 4.
+    - All dispositions are proposals.
+    
+    **Asks of Kai:**
+    1. Dispose of the 8 CONFLICT rows: A10, B1, B2, B3, B7, C1, C7, D10.
+    2. Provide source links for the A1.10 items Orion couldn't find: PERSIST, the IETF "execution outcome"/COGITATOR drafts, and the OECD conformance suite (rows E2–E4).
+    3. Allocate D-numbers for the unsaved rulings: the pause, the v1.0 lock, and Dainius's continuity directions in entries 82–83, 87 and 90–91.
+    4. Reconcile `settings.json` with the DAI-6 surface (item 3).
+    5. Confirm the authorship convention for Linear (item 1).
+    
+    Fourteen matrix rows need Dainius's decision. The main ones are the status vocabulary, the 70/30 intent, succession priority, key escrow, home-sensing privacy and hardware timing.
+    END-VERBATIM ORION-TO-KAI-UPDATE-2026-10-07
+
+### 6. Next authorised step
+
+- Post the comment; record its id  [CONVERSATION 2026-10-07 Dainius, "Ruling yes please"]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff.py check` → findings=0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
