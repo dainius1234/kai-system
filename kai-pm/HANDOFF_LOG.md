@@ -54522,3 +54522,74 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-07T21:09:03Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-07T21:09:03Z  [CMD `date -u +%FT%TZ` → 2026-10-07T21:09:03Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 4ea5920a74c3c32eb1b8aa9b6eb3acf3e4a16980  [CMD `git rev-parse HEAD` → 4ea5920a74c3c32eb1b8aa9b6eb3acf3e4a16980]
+- tree: 510be3c16734d86310dc6585a4ece7f782317d20  [CMD `git rev-parse HEAD^{tree}` → 510be3c16734d86310dc6585a4ece7f782317d20]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 4ea5920a74c3c32eb1b8aa9b6eb3acf3e4a16980  [CMD `git ls-remote --heads origin` → 4ea5920a74c3c32eb1b8aa9b6eb3acf3e4a16980]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 92  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 92]
+
+### 1. The four states
+
+- physical: unchanged since entry 92 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: read-only source check of the entry-92 analysis's citations (R15/R16), no design  [CONVERSATION 2026-10-07 Dainius, "Ruling :For your info now gpt amending-Deep Research Analysis: Kingsman/KAI Architecture Plan"]
+- evidence: six web searches, one per citation; results below. Universe: the search engine's index on 2026-10-07; a NOT FOUND is NOT_FOUND_IN_SEARCHED_INDEX, never "does not exist"  [CMD `WebSearch` (extended), 2026-10-07 → 6 result sets]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `ruling_capture.py status` → OUTSTANDING=0]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD (unchanged): as entry 92  [CONVERSATION 2026-10-07 Dainius, "Ruling this is only the base line pending review and adversary deep seeks attack"]
+
+### 4. Open questions
+
+- For Kai, before any of these enter the canon: sources for PERSIST (46.2% → 8.9%), the IETF draft titled "Execution Outcome Attestation for AI Agents", the COGITATOR Witness Protocol, and the eBPF "sub-100ns / 200x" figure; unchecked here: OECD Agent Evidence Conformance Suite, Capability-Container Pattern, "70–73%" / ">90%" MCP tool-poisoning rates — owner: Kai  [CMD `WebSearch` (extended), 2026-10-07 → not found / not searched]
+
+### 5. Incidents and corrections
+
+- CORRECTION to entry 92 section 4: I wrote that the LangGraph range "0.1.45–0.4.4" with "Pin to version ≥ 0.4.4" meant "one of the two numbers is wrong". Wrong: the advisory's range is 0.1.45 up to but NOT including 0.4.4, and 0.4.4 is the fix; "≥ 0.4.4" is correct. The analysis's dash notation is ambiguous, not wrong  [CMD `WebSearch` (extended), 2026-10-07: GitLab advisory CVE-2026-104873, GHSA-fvww-7h3r-vfhp → fixed in 0.4.4]
+- VERIFIED (exists, figures match): CVE-2026-104873, langgraph-sdk resource decorators ignore actions=; CVSS 8.1 per the GitLab advisory (OpenCVE lists 7.6)  [CMD `WebSearch` (extended), 2026-10-07: https://advisories.gitlab.com/pypi/langgraph-sdk/CVE-2026-104873/ → as stated]
+- VERIFIED (exists, figures match): MEMDRIFT, "Memory-Induced Tool-Drift in LLM Agents", arXiv 2605.24941 (Dabas, Jeong, Jin, Jia): 6,062 tools / 288 verified MCP servers / 608 flagged; up to +3.6 on a 1–5 scale across seven frontier models; three production memory architectures. Authors' own results; no independent replication found. Their stated limits: single tool, single turn, tool selection not tested  [CMD `WebSearch` (extended), 2026-10-07: https://arxiv.org/abs/2605.24941 → as stated]
+- VERIFIED (exists): "Securing Agents With Tracked Capabilities", ACM CAIS 2026 (Odersky et al.; TACIT, Scala 3 capture checking, experimental). The eBPF "sub-100ns / 200x" claim is NOT in what was found for this paper; the analysis attributes it there without a source  [CMD `WebSearch` (extended), 2026-10-07: https://dl.acm.org/doi/10.1145/3786335.3813127 → as stated]
+- NOT FOUND IN SEARCHED INDEX: "PERSIST" and the figures 46.2% → 8.9% / 7.9%. Nearest real work: SMSR, arXiv 2606.12703, HMAC-SHA256-signed memory with retrieval-time admission, reports ASR 65.3% → 5.3%, and states its own limit (a DB-write attacker without the signing oracle is out of model). The direction (signed memory + retrieval gate) is supported; the cited numbers are not  [CMD `WebSearch` (extended), 2026-10-07: https://arxiv.org/html/2606.12703 → PERSIST not found]
+- NOT FOUND IN SEARCHED INDEX: an IETF draft titled "Execution Outcome Attestation for AI Agents". Related real drafts: draft-das-rats-attestation-bnd-execution-finality-01, draft-das-execution-finality-deployment-01 (not committed / committed exactly once / denied / indeterminate), draft-mih-agent-bilateral-attestation-01, draft-sergeev-claim-boundaries-00  [CMD `WebSearch` (extended), 2026-10-07: https://www.ietf.org/archive/id/draft-das-execution-finality-deployment-01.html → title not found]
+- NOT FOUND IN SEARCHED INDEX: "COGITATOR Witness Protocol". Related real projects: anzal1/witness (hash-chained journal), agent-trace-witness, NovaFabric arXiv 2609.12582  [CMD `WebSearch` (extended), 2026-10-07 → not found]
+
+### 6. Next authorised step
+
+- Report to Dainius so the findings can reach GPT while he amends the plan  [CONVERSATION 2026-10-07 Dainius, "For your info now gpt amending"]
+
+### 7. What I am unsure of
+
+- Each NOT FOUND rests on one extended search; a differently named source may exist  [CMD `WebSearch` (extended), 2026-10-07 → one query each]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
