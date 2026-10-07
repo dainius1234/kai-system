@@ -57883,3 +57883,95 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-07T22:22:25Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-07T22:22:25Z  [CMD `date -u +%FT%TZ` → 2026-10-07T22:22:25Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 0d20cd17ac4a76091aaef019e33db4db8c2c77a6  [CMD `git rev-parse HEAD` → 0d20cd17ac4a76091aaef019e33db4db8c2c77a6]
+- tree: b666cd203509b93ff2d3d610bcd751ead45598fa  [CMD `git rev-parse HEAD^{tree}` → b666cd203509b93ff2d3d610bcd751ead45598fa]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/project-rework-plan-pgvp35: 0d20cd17ac4a76091aaef019e33db4db8c2c77a6  [CMD `git ls-remote --heads origin` → 0d20cd17ac4a76091aaef019e33db4db8c2c77a6]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 106  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 106]
+
+### 1. The four states
+
+- physical: unchanged since entry 106 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: as entry 105  [CONVERSATION 2026-10-07 Dainius, "Now I want to develop one master plan agree on it make sure none of features are missing  from read me. Take it to today’s available updates to reach common goal and stick to it"]
+- evidence: corrected master plan v1.1 unified draft = entry-106 block KAI-MASTER-PLAN-V1-1-UNIFIED-DRAFT + PLAN-FIX1-DIFF below; result sha256 8c7d574e22cf7ebb2ae481a030a36699b2db334590ff67bf2b62633c1874857a  [CMD `patch entry106-plan < plan_fix1.diff; cmp` → identical to the corrected file]
+- admission: none; draft for agreement  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `ruling_capture.py status` → OUTSTANDING=0]
+
+### 3. Authorised / Held / Forbidden
+
+- PAUSED / HELD (unchanged): all engineering per entry 99  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- As entry 106  [CONVERSATION 2026-10-07 Dainius, "Now I want to develop one master plan agree on it make sure none of features are missing  from read me. Take it to today’s available updates to reach common goal and stick to it"]
+
+### 5. Incidents and corrections
+
+- CORRECTION to entry 106's Appendix R: the 11 target-hardware rows carried the status "code present; runtime UNKNOWN (README)", which describes code, not a device; the README says the target device "has **not** been acquired" (README.md:1330-1331). The generator now labels them "target device, NOT acquired (README.md:1330-1331)". A first fix cited lines 1328-1330; checked with grep and corrected before banking  [CMD `grep -n "has \*\*not\*\* been acquired" README.md` → 1331]
+- EVIDENCE PLAN-FIX1-DIFF plan_fix1.diff: 1387 bytes, sha256 cc8c7d35910e6ea389a594332a6fb876cc89bf37bda015c7ec5183d5dad66320, final LF True  [CMD `sha256sum plan_fix1.diff` → cc8c7d35910e6ea3…]
+    BEGIN-VERBATIM PLAN-FIX1-DIFF
+    --- /tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/mp/plan_v11_entry106.md	2026-10-07 22:21:59.342432197 +0000
+    +++ /tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/mp/KAI_MASTER_PLAN_v1_1_UNIFIED_DRAFT.md	2026-10-07 22:22:07.511216251 +0000
+    @@ -493,7 +493,7 @@
+     | feature-flag system (53 flags) | L256, 1800 | checked [x] (README); code present; runtime UNKNOWN (README) | mature in place per organ plan |
+     | honest status / build & test substrate | L1238, 1241, 1769, 1793, 1796, 1797 | KNOWN LIMITATION (README); checked [x] (README) | mature in place per organ plan |
+     | private overlay network | L552 | service defined (README); runtime UNKNOWN | mature in place per organ plan |
+    -| target hardware (Flow Z13 / Strix Halo) | L1676, 1677, 1678, 1679, 1680, 1681, 1682, 1715, 1716, 1717, 1718 | code present; runtime UNKNOWN (README) | GZ302 verified; re-check Ryzen AI MAX 400 successor before purchase |
+    +| target hardware (Flow Z13 / Strix Halo) | L1676, 1677, 1678, 1679, 1680, 1681, 1682, 1715, 1716, 1717, 1718 | target device, NOT acquired (README.md:1330-1331) | GZ302 verified; re-check Ryzen AI MAX 400 successor before purchase |
+     | zero telemetry / local core (constitution) | L258 | code present; runtime UNKNOWN (README) | mature in place per organ plan |
+     
+     ### Excluded README rows (not features)
+    END-VERBATIM PLAN-FIX1-DIFF
+- EVIDENCE APPENDIX-R-GENERATOR-FIX1-DIFF gen_fix1.diff: 800 bytes, sha256 78b3ce870d16d05a398b4aa66b9603b8212f2f416dda3e8f31a86b8057a17e93, final LF True  [CMD `sha256sum gen_fix1.diff` → 78b3ce870d16d05a…]
+    BEGIN-VERBATIM APPENDIX-R-GENERATOR-FIX1-DIFF
+    --- /tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/mp/appendix_r_entry106.py	2026-10-07 22:21:59.346473624 +0000
+    +++ /tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/mp/appendix_r.py	2026-10-07 22:22:07.439680628 +0000
+    @@ -34,6 +34,7 @@
+             xs = by[k]
+             srcs = ", ".join(sorted({x["src"].split(":")[1] for x in xs}, key=int))
+             sts = "; ".join(sorted({x["status"] for x in xs}))
+    +        if k[1].startswith("target hardware"): sts = "target device, NOT acquired (README.md:1330-1331)"
+             out.append(f"| {k[1]} | L{srcs} | {sts} | {TODAY.get(k[1], 'mature in place per organ plan')} |")
+         out.append("")
+     out += ["### Excluded README rows (not features)", "", "| README line | reason |", "|---|---|"]
+    END-VERBATIM APPENDIX-R-GENERATOR-FIX1-DIFF
+
+### 6. Next authorised step
+
+- Publish the corrected plan (sha256 8c7d574e22cf7ebb…) to Linear under DAI-10; point Kai to it on DAI-9  [CONVERSATION 2026-10-07 Dainius, "Now I want to develop one master plan agree on it make sure none of features are missing  from read me. Take it to today’s available updates to reach common goal and stick to it"]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff.py check` → findings=0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
