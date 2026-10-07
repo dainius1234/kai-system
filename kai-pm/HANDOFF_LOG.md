@@ -38596,3 +38596,14173 @@ python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
 python3 -B .claude/hooks/ruling_capture.py selftest
 python3 -B .claude/hooks/ruling_capture.py status
+
+## HANDOFF 2026-10-07T19:59:49Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-07T19:59:49Z  [CMD `date -u +%FT%TZ` → 2026-10-07T19:59:49Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 0a03bb6f206fcbb5ea00266467af690e86616c05  [CMD `git rev-parse HEAD` → 0a03bb6f206fcbb5ea00266467af690e86616c05]
+- tree: 53e1edcdda320d5fda9d15d968bc0783a04b18cf  [CMD `git rev-parse HEAD^{tree}` → 53e1edcdda320d5fda9d15d968bc0783a04b18cf]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/project-rework-plan-pgvp35: 0a03bb6f206fcbb5ea00266467af690e86616c05  [CMD `git ls-remote --heads origin` → 0a03bb6f206fcbb5ea00266467af690e86616c05]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 84  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 84]
+
+### 1. The four states
+
+- physical: this entry only; no other file changes  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: preserving the programme's conversation-only texts in the repository, under Dainius's memory direction (entries 82–83) and R19 ("Plans, reviews and texts the programme depends on are preserved byte for byte")  [CONVERSATION 2026-10-07 Dainius, "do the best you can out of box and what will work for sure"]
+- evidence: 66 prompts recovered verbatim from this session's transcript, 421005 bytes  [CMD `rescue_set.py prompts.json` → 66 distinct, 421005 bytes]
+- admission: none; this entry creates no ruling, grants nothing and supersedes nothing  [CONVERSATION 2026-10-06 Kai, "DAI-6 remains OPEN. No implementation authority yet."]
+
+### 2. Rulings since the last handoff
+
+- None. The texts below are HISTORICAL SOURCE TEXTS, preserved, not re-issued: each was already acted on, adjudicated, banked in summary as a D-number, or superseded by later rulings in this log or DECISIONS.md. Where any text below conflicts with a later banked ruling, the later ruling wins  [CONVERSATION 2026-10-07 Dainius, "do the best you can out of box and what will work for sure"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD (unchanged): DAI-6 implementation (its five files), DAI-7, ledger mutation incl. INC-35, D390, F, capture, candidate, holdout, blind 40, Item 8, merge  [CONVERSATION 2026-10-06 Kai, "STOP before implementation."]
+
+### 4. Open questions
+
+- Whether any of these texts holds a ruling that DECISIONS.md does not yet carry; not audited here — owner: Kai  [CMD `rescue_set.py` → 66 texts, none compared against DECISIONS.md content]
+
+### 5. Incidents and corrections
+
+- CORRECTION to entry 84 section 5: the transcript path there reads "<scratchpad>/../84284242-f61e-5a69-9588-732883a5292c.jsonl"; that path is wrong (an unexpanded template slip). The universe actually read is /root/.claude/projects/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c.jsonl  [CMD `extract.py /root/.claude/projects/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c.jsonl` → 146 prompts]
+- Selection: transcript user turns (tool results and isMeta excluded) → 146; classify() FLAGGED and not BANKED at origin (ruling_capture.py at 0a03bb6) → 66 rows, deduplicated by normalised-text id → 66 distinct (0 duplicates dropped). The 35 unflagged-unbanked prompts are NOT preserved here (short chat, questions, machine wrappers). Who wrote each text is not attributed: they arrived as operator prompts, mostly Kai's messages relayed by Dainius; a few are DeepSeek, another session, or Orion's own text pasted back (e.g. 2026-10-06T20:21)  [CMD `rescue_set.py prompts.json` → 66 distinct]
+- Credential scan of all 66 texts with a calibrated scanner (6/6 known-positive caught, 0 hits on a known-negative carrying hashes and the literal BINANCE_API_KEY): TOTAL HITS 0. No line in any text matches a BEGIN-/END-VERBATIM marker or a `## HANDOFF` heading; no CR/VT/FF/NEL/LS/PS separators  [CMD `credscan.py rescue.json` → TOTAL HITS 0]
+- Verbatim form: each block's content is the prompt text exactly as the transcript holds it (UTF-8); "final LF" says whether the text ended with LF; strip the 4-space indent to recover the bytes  [CMD `sha256` per text → as declared]
+- EVIDENCE RESCUE-CREDSCAN-INSTRUMENT credscan.py: 1820 bytes, sha256 b4176449551768178106ea59b9decf3f3ceccd7eb0650c78789d3d9cd10fba6c, final LF True  [CMD `sha256sum credscan.py` → b417644955176817…]
+    BEGIN-VERBATIM RESCUE-CREDSCAN-INSTRUMENT
+    import json, re, sys
+    PAT = {
+     "github-token": r"\b(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{40,})\b",
+     "aws-key": r"\b(?:AKIA|ASIA)[0-9A-Z]{16}\b",
+     "openai/anthropic": r"\bsk-(?:ant-)?[A-Za-z0-9_-]{20,}\b",
+     "slack": r"\bxox[abprs]-[A-Za-z0-9-]{10,}\b",
+     "google-api": r"\bAIza[0-9A-Za-z_-]{35}\b",
+     "hf-token": r"\bhf_[A-Za-z0-9]{30,}\b",
+     "private-key": r"-----BEGIN (?:[A-Z ]+ )?PRIVATE KEY-----",
+     "jwt": r"\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b",
+     "binance-assign": r"(?i)BINANCE_API_(?:KEY|SECRET)\s*[=:]\s*['\"]?[A-Za-z0-9]{20,}",
+     "generic-assign": r"(?i)\b(?:api[_-]?key|secret|token|password|passwd)\b\s*[=:]\s*['\"]?[A-Za-z0-9/+_-]{24,}",
+     "bearer": r"(?i)\bbearer\s+[A-Za-z0-9._-]{24,}",
+    }
+    P = {k: re.compile(v) for k, v in PAT.items()}
+    def scan(t): return [(k, m.group(0)[:12] + "…") for k, p in P.items() for m in p.finditer(t)]
+    # calibration: known-positives must fire, known-negative must not
+    kp = ["ghp_" + "a1B2" * 9, "AKIA" + "ABCDEFGHIJKLMNOP", "sk-ant-" + "x" * 30, "-----BEGIN OPENSSH PRIVATE KEY-----",
+          "BINANCE_API_SECRET=" + "Ab1" * 10, "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.abcdefghijklmnop"]
+    kn = "commit 541b024c4c4710c9d73a23407268fdd927d60579 sha256 2ab19403964560637a5541a3a02282bc68a833f363fd64d8fe0e0abd14bfbbb8 BINANCE_API_KEY never leaves"
+    cal = all(scan(x) for x in kp) and not scan(kn)
+    print("CALIBRATION", "PASS" if cal else "FAIL", f"known-positive {sum(bool(scan(x)) for x in kp)}/{len(kp)}, known-negative hits {len(scan(kn))}")
+    rows = json.load(open(sys.argv[1])); hits = 0
+    for r in rows:
+        h = scan(r["text"])
+        for k, v in h: print("HIT", r["id"], k, v)
+        hits += len(h)
+    print("SCANNED", len(rows), "texts", sum(len(r["text"]) for r in rows), "chars; TOTAL HITS", hits)
+    sys.exit(0 if cal and hits == 0 else 1)
+    END-VERBATIM RESCUE-CREDSCAN-INSTRUMENT
+- EVIDENCE RESCUE-CREDSCAN-OUTPUT credscan_out.txt: 103 bytes, sha256 be9c7eae7df8cab13c72aff871fca85ed620c391ce6514a7e906b03e452dc226, final LF True  [CMD `sha256sum credscan_out.txt` → be9c7eae7df8cab1…]
+    BEGIN-VERBATIM RESCUE-CREDSCAN-OUTPUT
+    CALIBRATION PASS known-positive 6/6, known-negative hits 0
+    SCANNED 66 texts 418011 chars; TOTAL HITS 0
+    END-VERBATIM RESCUE-CREDSCAN-OUTPUT
+- EVIDENCE RESCUE-SELECTION-INSTRUMENT rescue_set.py: 844 bytes, sha256 e414652f44a33fb69a7b3a22617a22d9d209924e52d1ea920fcc3d25bb550271, final LF True  [CMD `sha256sum rescue_set.py` → e414652f44a33fb6…]
+    BEGIN-VERBATIM RESCUE-SELECTION-INSTRUMENT
+    import json, subprocess, sys, hashlib
+    sys.path.insert(0, "/home/user/kai-system/.claude/hooks")
+    import ruling_capture as RC
+    rows = json.load(open(sys.argv[1]))
+    log = subprocess.run(["git", "show", "origin/claude/project-rework-plan-pgvp35:kai-pm/HANDOFF_LOG.md"], capture_output=True, text=True, check=True).stdout
+    idx = RC.bank_index(log)
+    sel, seen = [], set()
+    for r in rows:
+        f, why = RC.classify(r["text"])
+        if not f or RC.is_banked(r["text"], idx): continue
+        i = RC.pid(r["text"])
+        if i in seen: continue
+        seen.add(i); sel.append(dict(r, id=i, reasons=why))
+    tot = sum(len(r["text"].encode()) for r in sel)
+    print("flagged-unbanked distinct:", len(sel), "bytes:", tot)
+    for r in sel: print(r["ts"][:16], r["id"], len(r["text"].encode()), repr(RC.norm(r["text"])[:60]))
+    json.dump(sel, open(sys.argv[2], "w"), ensure_ascii=False)
+    END-VERBATIM RESCUE-SELECTION-INSTRUMENT
+- EVIDENCE PROMPT-9a74a20b34071f63 transcript 2026-09-18T20:47:05.723Z: 18416 bytes, sha256 c85e3de02604b2ea2074c516da887f3624057cbb04bccfb5c8896883c341ac91, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-18T20:47:05.723Z]
+    BEGIN-VERBATIM PROMPT-9a74a20b34071f63
+    ORION — FINAL D381 ADVERSARIAL REVIEW ADJUDICATED.
+    
+    The review loop is CLOSED after the corrections below.
+    
+    Apply ONLY these corrections to the current revised D381 draft, re-derive the pre-bank state, and if every predicate below holds:
+    
+    APPEND D381 TO kai-pm/DECISIONS.md, COMMIT, PUSH, THEN STOP.
+    
+    This is authority to BANK D381 only.
+    
+    It is NOT source-execution authority.
+    
+    ==================================================
+    0. PRE-BANK STOP CONDITIONS
+    
+    Expected branch state remains:
+    
+    HEAD
+    de3d05c63bedf015c0fa29a8ab455c5c363332b1
+    
+    Freshly re-derive immediately before append:
+    
+    decision population   363
+    distinct              363
+    duplicates            none
+    highest               D380
+    D381 count            0
+    next free             D381
+    
+    Worktree must be clean.
+    
+    If HEAD differs, D381 exists, allocator differs, or worktree is not clean:
+    
+    STOP. DO NOT BANK.
+    
+    PR #122 remains DO NOT MERGE.
+    
+    ==================================================
+    
+    1. AUTHORITY PARAGRAPH — FINAL REVIEW HAS NOW OCCURRED
+        ==================================================
+    
+    The pre-review conditional is no longer true.
+    
+    Remove:
+    
+    FINAL BANKING REMAINS CONDITIONAL ON THE SEPARATE ADVERSARIAL REVIEW...
+    
+    Replace the authority provenance with truthful final wording equivalent to:
+    
+    Kai’s D381 integration rulings of 2026-09-18, relayed by Dainius,
+    following the banking and independent verification of
+    INC-2026-09-18-31, the completed subject-binding adversarial reviews,
+    and the completed final adversarial review of the D381 /
+    H2_STAGE_A_V2 authority shape.
+    
+    Do not claim more than that.
+    
+    ==================================================
+    2. §1 — PRECISE D379 / D381 AUTHORITY SPLIT
+    
+    DeepSeek finding 1.1 is ACCEPTED.
+    
+    The current phrase “one additional grant” is too coarse.
+    
+    Replace the relevant authority explanation with the following substance:
+    
+    D379’s authorisation was complete in SCOPE, not necessarily complete
+    in IMPLEMENTATION.
+    
+    For LIFECYCLE / M2, D379 remains the substantive authority:
+    a COMMIT witness may determine document LIFECYCLE only where the
+    document itself is the semantic subject. D379 did not authorise
+    classify.py or envelope.py, so it lacked the complete mutation
+    surface now shown to be necessary to implement that predicate truthfully.
+    D381 supplies that missing implementation surface and the shared governed
+    subject mechanism. It does NOT replace or retrospectively reinterpret
+    D379’s substantive M2 authority.
+    
+    For VALIDITY / residual D1 + D367 §6, D381 supplies the new
+    substantive implementation authority because this manifestation was not
+    one of D379’s ten granted mechanisms.
+    
+    The two manifestations are repaired in ONE COORDINATED SUBJECT-BINDING
+    CLASS because INC-31 established one producer/consumer root cause, not
+    because D381 claims both requirements originated in D381.
+    
+    Retain:
+    
+    one cause
+    shared subject dimension
+    two downstream manifestations
+    no separate per-axis repair architecture
+    
+    But distinguish the authority provenance exactly as above.
+    
+    ==================================================
+    3. §1 / §5 / §8 — NO CONSUMER-SIDE SUBJECT REINTERPRETATION
+    
+    DeepSeek finding 1.2 is accepted in principle but its proposed premise is
+    NOT adopted verbatim.
+    
+    Do NOT state that only the producer can physically see context; downstream
+    records may carry local context.
+    
+    State instead:
+    
+    subject is an EVIDENCE-ENVELOPE PROPERTY and is determined exactly
+    once at the governed producer boundary from the source context.
+    
+    Consumers may test the validated subject for axis eligibility.
+    Consumers MUST NOT independently reinterpret or reconstruct subject from
+    predicate labels, local_context, file path, or applicability scope.
+    
+    A second consumer-side predicate→subject table would create two semantic
+    authorities for the same evidence dimension and permit producer/consumer
+    drift — the defect class D381 exists to eliminate.
+    
+    Therefore:
+    
+    producer assigns/validates subject
+    consumer gates on subject
+    consumer does not remap subject
+    
+    This is load-bearing.
+    
+    ==================================================
+    4. §3 — CLOSE THE TYPED-PREFIX BLOCKER MECHANICALLY
+    
+    DeepSeek BLOCKER 4.1 is ACCEPTED.
+    
+    Do NOT use the proposed generic uppercase-token heuristic.
+    
+    Source measurement of the frozen subject tree:
+    
+    tracked blobs        1032
+    tracked .md paths     272
+    paths containing ":"    0
+    
+    Use a simpler closed parser.
+    
+    Normative parsing order:
+    
+    1. "SELF"
+           -> SELF
+    2. "AMBIGUOUS"
+           -> AMBIGUOUS
+    3. "OTHER:DOCUMENT:" + payload
+           -> typed DOCUMENT form
+           -> validate payload with D380 repo-relative path rules
+           -> malformed payload REFUSE
+           -> NEVER fall through to legacy parsing
+    4. "OTHER:GIT_COMMIT:" + payload
+           -> typed GIT_COMMIT form
+           -> payload must be exactly full lower-case 40-hex
+           -> malformed payload REFUSE
+           -> NEVER fall through to legacy parsing
+    5. "OTHER:" + payload
+           -> transitional legacy DOCUMENT alias ONLY IF:
+                payload is non-empty
+                payload contains NO ":" character
+                payload satisfies D380 repo-relative path rules
+           -> otherwise REFUSE
+    6. everything else
+           -> REFUSE
+    
+    Consequences:
+    
+    OTHER:MYSTERY:foo
+        REFUSE
+    OTHER:GIT_COMMIT:not-a-commit
+        REFUSE, no legacy fallback
+    OTHER:DOCUMENT:bad/../path
+        REFUSE, no legacy fallback
+    OTHER:kai-pm/file.md
+        accepted transitionally as OTHER:DOCUMENT:kai-pm/file.md
+    
+    New producers MUST emit the canonical typed form.
+    
+    The transitional legacy alias is intentionally narrower than the canonical
+    DOCUMENT payload.
+    
+    A future legitimate repository path containing : is represented
+    canonically as:
+    
+    OTHER:DOCUMENT:<path-containing-colon>
+    
+    not through the legacy alias.
+    
+    This closes the ambiguity without reserving arbitrary uppercase path names.
+    
+    ==================================================
+    5. §5 — UNKNOWN PREDICATE DEFAULT MUST FAIL CLOSED
+    
+    DeepSeek BLOCKER 4.2 is ACCEPTED.
+    
+    Do NOT maintain:
+    
+    BINDING_PREDICATES
+    
+    plus a second free-standing subject map.
+    
+    D381 requires ONE governed predicate registry in which each binding
+    predicate entry carries BOTH:
+    
+    document-binding / applicability rationale
+    AND
+    subject policy / subject resolver
+    
+    Conceptually each predicate is inseparable from its subject semantics.
+    
+    Current explicit policies include:
+    
+    audited snapshot
+        NONSELF_GIT_COMMIT
+    findings-bearing audited snapshot
+        NONSELF_GIT_COMMIT
+    subject / QUALIFICATION_SUBJECT
+        NONSELF_GIT_COMMIT
+    acquisition commit
+        SELF for the currently adjudicated source form
+    validated checkpoint
+        SELF for the currently adjudicated source form
+    snapshot
+        AMBIGUOUS
+    measured at
+        AMBIGUOUS
+    
+    The DATE/current-state families retain their per-predicate governed roles.
+    
+    Normative fail-closed invariant:
+    
+    No binding predicate may exist in the governed registry without an
+    explicit recognised subject policy/resolver.
+    
+    Missing policy, unknown policy, malformed registry entry, or predicate
+    added without its subject semantics:
+    
+    REFUSE
+    
+    not default SELF.
+    
+    Do NOT silently default an unmapped predicate to AMBIGUOUS either.
+    
+    AMBIGUOUS must itself be an EXPLICIT governed policy for predicates such
+    as current zero-occurrence snapshot / measured at.
+    
+    A NEW predicate requires:
+    
+    explicit later authority
+    subject policy/resolver
+    hostile calibration
+    
+    before it may enter the closed registry.
+    
+    This makes recurrence mechanically visible.
+    
+    ==================================================
+    6. §10 / §20 — EXACT LOCATION OF D381 CALIBRATION
+    
+    DeepSeek QUESTION 3.1 is CLOSED.
+    
+    The D381 hostile matrix lives in the EXISTING:
+    
+    kai-pm/house_in_order_h2_v13/build_evidence/d379_controls.py
+    
+    No d381_controls.py is created.
+    
+    Use the existing registry structure.
+    
+    At minimum the new controls occupy/extend the already-declared families:
+    
+    SB
+    STAGE_A
+    STDLIB
+    
+    as appropriate.
+    
+    cal_fixtures.py may provide bounded fixture helpers/fail-old/pass-new
+    cases where required.
+    
+    But:
+    
+    d379_controls.py
+    
+    is the integrated executable hostile-control gate.
+    
+    Full untruncated output remains:
+    
+    D379_CONTROLS.txt
+    
+    and closure remains:
+    
+    D379_CLOSEOUT.txt
+    
+    No new tracked evidence path is authorised.
+    
+    ==================================================
+    7. §3 / §10 — WITNESS CONSTRUCTOR CENSUS CLOSED
+    
+    DeepSeek QUESTION 3.2 is CLOSED from source.
+    
+    Measured over the current governed H2 package plus D379 hostile-control
+    surface:
+    
+    passa.py            4 syntactic Witness construction sites
+    classify.py         7 construction / rehydration sites
+    cal_fixtures.py     2 construction sites
+    d379_controls.py    1 construction site
+    ------------------------------------------------
+    total              14
+    
+    All are inside the combined D379/D381 mutation/control surface.
+    
+    Current:
+    
+    subjectbind.py
+    
+    constructs NO Witness.
+    
+    Current:
+    
+    run_h2_v12.py
+    
+    constructs NO Witness object, but does manually construct some separate
+    evidence-trace dictionaries carrying subject.
+    
+    Therefore preserve the existing boundary:
+    
+    D381’s closed grammar is enforced on governed envelope.Witness
+    construction / rehydration. D381 does NOT claim to introduce a universal
+    validator for every arbitrary "subject" field in every result
+    dictionary.
+    
+    No run_h2_v12.py semantic widening is authorised by this finding.
+    
+    ==================================================
+    8. A2 — SUBJECTBIND LEGACY STRINGS ARE OUTSIDE THIS WITNESS-GRAMMAR CLAIM
+    
+    DeepSeek A2 is CLOSED.
+    
+    subjectbind.py returns subject strings for AUTHORITY evidence binding but
+    does not construct Witness.
+    
+    Its OTHER:<path> values are legacy document-subject spellings.
+    
+    The current positive authority fact path only promotes SELF-bound
+    determining claims into the relevant manually constructed fact trace;
+    OTHER-bound claims prevent SELF authority and are not converted into a
+    positive SELF evidence trace.
+    
+    D381 does NOT broaden itself into an AUTHORITY/subjectbind redesign.
+    
+    Keep:
+    
+    subjectbind.py excluded
+    run_h2_v12.py no new semantic widening
+    
+    If execution reveals a subjectbind/manual-trace path that must consume the
+    new typed grammar to make the INC-31 VALIDITY/LIFECYCLE repair truthful:
+    
+    STOP.
+    
+    That would be a separate scope finding, not licence to widen silently.
+    
+    ==================================================
+    9. §10 / §17 — stage_identity.py AUTHORITY QUESTION CLOSED
+    
+    DeepSeek QUESTION 11.1 is CLOSED from D379 source.
+    
+    D379 authorises:
+    
+    kai-pm/house_in_order_h2_v13/stage_identity.py
+        Stage-A closed-membership construction
+        EXTERNAL Stage-B artifact binding
+    
+    There is NO V1-only constraint in that grant.
+    
+    Therefore the correct authority layering is:
+    
+    D379
+        authorises the stage_identity.py implementation surface and Stage-A
+        construction responsibility.
+    D380
+        supplied H2_STAGE_A_V1 semantics.
+    D381
+        supplies the new H2_STAGE_A_V2 semantics and production-use rules.
+    
+    No retrospective enlargement is required.
+    
+    Retain stage_identity.py in §10 as:
+    
+    EXISTING D379-AUTHORISED SURFACE USED UNDER NEW D381 SEMANTICS
+    
+    ==================================================
+    10. §16 / §19 — STDLIB V2-ID-2 MECHANISM
+    
+    DeepSeek MAJOR 13.1 is ACCEPTED as a mechanism gap.
+    
+    Do NOT use Python function-object identity as the normative solution.
+    
+    Use a NON-PLUGGABLE construction boundary.
+    
+    Normative rule:
+    
+    stage_identity.py owns the canonical Stage-A construction of
+    runtime.stdlib_identity and derives it mechanically by the unchanged
+    D380 §7 H2_PY_STDLIB_V1 algorithm.
+    
+    The Stage-A builder MUST NOT accept:
+    
+    * a caller-supplied stdlib digest as authority;
+    * a caller-supplied stdlib constructor;
+    * a schema selector for an alternative stdlib algorithm;
+    * a plugin/callback which can replace the governed D380 §7 derivation.
+    
+    The final descriptor still stores ONLY:
+    
+    runtime.stdlib_identity = <digest>
+    
+    No stdlib schema-name field is added.
+    
+    The execution bytes of stage_identity.py are themselves part of the
+    closed Stage-A source population.
+    
+    Producer/qualifier runtime checks continue to independently derive the
+    D380 §7 stdlib identity and compare it with Stage A, as D380 §6.9 already
+    requires.
+    
+    Rewrite V2-ID-2 as:
+    
+    V2-ID-2a
+        canonical non-pluggable D380 §7 H2_PY_STDLIB_V1 derivation
+        -> PASS
+    V2-ID-2b
+        attempted caller-supplied digest / constructor / alternate stdlib
+        schema or algorithm
+        -> REFUSE
+    V2-ID-2c
+        independently re-derived runtime stdlib digest differs from Stage A
+        -> REFUSE
+    
+    No H2_PY_STDLIB_V2 field is invented.
+    
+    ==================================================
+    11. §20 — CORRECT NON-REGRESSION MATRIX
+    
+    DeepSeek MAJOR 16.1 is ACCEPTED WITH CORRECTION.
+    
+    Do NOT require:
+    
+    all 165 current SELF witnesses preserve current verdicts
+    
+    because three currently emitted SELF witnesses are precisely the falsely
+    SELF rows INC-31 requires us to correct.
+    
+    Instead add:
+    
+    SB-CORPUS-1 — SCOPE MEMBERSHIP PRESERVATION
+    
+    Under the bounded current-v1.3 scope projection methodology:
+    
+    WHOLE_FILE witnesses   remains 165
+    documents              remains 164 / 272
+    
+    Subject repair must not change _eligible / _scope_of membership.
+    
+    SB-CORPUS-2 — TRUTHFUL-SELF NONREGRESSION
+    
+    Every currently adjudicated witness whose repaired subject remains SELF
+    must preserve its D381-relevant SCOPE / VALIDITY / LIFECYCLE behaviour.
+    
+    Any unrelated movement:
+    
+    FAIL
+    
+    SB-CORPUS-3 — EXACT AFFECTED-CELL DELTA
+    
+    For the three current NON-SELF rows:
+    
+    CODE_AUDIT_FINAL_REPORT.md
+        SCOPE       WHOLE_FILE -> WHOLE_FILE
+        VALIDITY    EXACT_SNAPSHOT -> UNKNOWN
+        LIFECYCLE   HISTORICAL -> UNKNOWN
+    CODE_AUDIT_MASTER.md
+        SCOPE       WHOLE_FILE -> WHOLE_FILE
+        VALIDITY    EXACT_SNAPSHOT -> UNKNOWN
+        LIFECYCLE   HISTORICAL -> UNKNOWN
+    house_in_order_instrument/AUTHORITY_ONTOLOGY.md
+        SCOPE       WHOLE_FILE -> WHOLE_FILE
+        VALIDITY    EXACT_SNAPSHOT -> UNKNOWN
+        LIFECYCLE   UNKNOWN -> UNKNOWN
+    
+    No other D381-driven verdict movement is accepted without separate
+    adjudication.
+    
+    SB-MOVED-1
+    
+    CODE_AUDIT_PLANNING_PACKAGE_QA.md
+    findings-bearing audited snapshot
+    
+    must remain:
+    
+    SPAN
+    
+    under current v1.3 _scope_of.
+    
+    It must NOT be re-promoted by subject work.
+    
+    SB-MOVED-2
+    
+    ORION_FIELD_NOTES.md
+    last updated DATE
+    
+    must remain:
+    
+    SPAN
+    
+    under current v1.3 _scope_of.
+    
+    SCOPE-CONFINEMENT-1
+    
+    After the authorised implementation, compare tracked changes against the
+    execution base.
+    
+    Every changed tracked path must be inside the exact D379/D381 authorised
+    mutation/evidence surface.
+    
+    Any unauthorised tracked path:
+    
+    FAIL / STOP
+    
+    This is a control, not a promise.
+    
+    Also sharpen the existing statement to:
+    
+    The current corpus supplies ZERO positive discrimination evidence for the
+    consumer SELF gate because its existing emitted subject field is constant.
+    Positive proof of that consumer repair MUST come from hostile synthetic
+    non-SELF witnesses. Current-corpus replay is regression evidence only.
+    
+    ==================================================
+    12. §21 — MAKE POPULATION A/B REPRODUCIBLE FROM IMMUTABLE INPUTS
+    
+    DeepSeek MAJOR 17.1 is ACCEPTED.
+    
+    Do NOT create a new evidence file merely to restate the census.
+    
+    Bind the derivation to exact existing Git objects.
+    
+    At the frozen pre-D381 state:
+    
+    Population A Pass A blob
+    kai-pm/house_in_order_h2_v12/passA.json
+    Git blob:
+    f88e929b8c0f569dd7f730e12a8459b00f405595
+    Population A classification blob
+    kai-pm/house_in_order_h2_v12/h2v12-classification.json
+    Git blob:
+    ee524b47b43cfb4a0cc7bc9cb6c3c8f9ae389740
+    Population B scope implementation
+    kai-pm/house_in_order_h2_v13/passa.py
+    Git blob:
+    c70dabf29fd23dd5328dc15a919386d300f849c3
+    Current classifier source used for the exposure reading
+    kai-pm/house_in_order_h2_v13/classify.py
+    Git blob:
+    8860bebf3b975b3ff97699d3405893bf0975f696
+    Frozen subject tree:
+    3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+    
+    Add a derivation recipe equivalent to:
+    
+    Population A
+    
+    Parse the exact frozen v1.2 Pass-A/classification blobs above.
+    
+    Count the emitted historical rows/witnesses directly.
+    
+    No reinterpretation through v1.3.
+    
+    Population B
+    
+    Start from the exact frozen v1.2 Pass-A witness records.
+    
+    For each source-bound witness:
+    
+    1. read the exact source document bytes from frozen tree
+        3abc9e9d...;
+    2. locate the emitted witness using its source path/selector/value;
+    3. inherit witness KIND from the frozen v1.2 record;
+    4. re-evaluate ONLY current v1.3 _eligible and _scope_of from the exact
+        passa.py blob above;
+    5. do NOT call fresh classify_token_kind;
+    6. do NOT consult history;
+    7. count the resulting WHOLE_FILE membership.
+    
+    That is why Population B is a SCOPE PROJECTION, not a fresh Pass A.
+    
+    The two A→B moves must reproduce exactly:
+    
+    CODE_AUDIT_PLANNING_PACKAGE_QA.md  WHOLE_FILE -> SPAN
+    ORION_FIELD_NOTES.md               WHOLE_FILE -> SPAN
+    
+    The false-output exposure is then evaluated against the exact current
+    classifier source plus the D381 semantic subject adjudications.
+    
+    This makes the figures independently reconstructable from banked Git
+    objects and the frozen subject tree.
+    
+    Retain:
+    
+    A and B are NOT SUMMABLE
+    B is NOT a fresh v1.3 Pass A
+    
+    ==================================================
+    13. OPTIONAL DEEPSEEK MINOR — ACCEPT
+    
+    Sharpen §20 wording as described above.
+    
+    Also update any phrase:
+    
+    D379 WAS COMPLETE FOR WHAT IT GRANTED
+    
+    to make clear:
+    
+    complete in AUTHORISED SCOPE
+    not necessarily completed in implementation
+    
+    This closes DeepSeek A1.
+    
+    ==================================================
+    14. NO FURTHER ADVERSARIAL CYCLE
+    
+    DeepSeek’s final recommendation is accepted:
+    
+    after these corrections, another D381 prose adversarial cycle is NOT
+    required.
+    
+    These corrections do not change the architecture.
+    
+    They close mechanical ambiguity and reproducibility only.
+    
+    ==================================================
+    15. BANK AUTHORITY
+    
+    After applying the above corrections:
+    
+    1. re-derive allocator;
+    2. confirm HEAD/worktree predicates from §0;
+    3. append the complete corrected D381 to kai-pm/DECISIONS.md ONLY;
+    4. commit;
+    5. push;
+    6. STOP.
+    
+    No source file may change.
+    
+    D381 banking does NOT activate its mutation scope.
+    
+    Return:
+    
+    1. D381 bank commit SHA
+    2. parent SHA
+    3. tree SHA
+    4. GitHub/server signature state
+    5. changed paths
+    6. additions/deletions
+    7. strict append-only proof for DECISIONS.md
+    8. structural D381 heading count
+    9. fresh decision allocator after append
+    10. incident allocator unchanged
+    11. remote branch HEAD
+    12. ahead/behind
+    13. worktree porcelain
+    14. exact D381 title
+    15. confirmation that the final authority paragraph records the completed
+        adversarial review truthfully
+    16. confirmation NO source mutation / NO Stage A / NO candidate /
+        NO Pass A / NO holdout / NO merge
+    
+    PR #122 remains DO NOT MERGE.
+    
+    Then STOP.
+    END-VERBATIM PROMPT-9a74a20b34071f63
+- EVIDENCE PROMPT-2b63a7d8c3fe60ee transcript 2026-09-18T21:00:59.142Z: 9977 bytes, sha256 215e150cee3879ef06f63d71ab1679b2d594d779233083149925820955033074, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-18T21:00:59.142Z]
+    BEGIN-VERBATIM PROMPT-2b63a7d8c3fe60ee
+    ORION — D381 BANK INDEPENDENTLY VERIFIED AND ACCEPTED.
+    
+    The post-bank execution gate is now RELEASED.
+    
+    ==================================================
+    
+    1. VERIFIED BANK OBJECT
+        ==================================================
+    
+    D381 bank commit
+    838b7637058c5ba3b8f3b6c5430ebdc324249b96
+    parent
+    de3d05c63bedf015c0fa29a8ab455c5c363332b1
+    tree
+    723da45d8026ef622d0737b434f9b2e9968b341d
+    
+    GitHub server-side verification:
+    
+    verified = true
+    reason   = valid
+    signature = SSH
+    
+    So correct the local interpretation:
+    
+    %G? = N in the container did NOT establish that the commit was unsigned.
+    
+    The local verifier lacked the required SSH signer configuration.
+    
+    GitHub verifies the bank commit as validly SSH-signed.
+    
+    Repository delta independently confirmed:
+    
+    kai-pm/DECISIONS.md    +1278 / -0
+    ONE changed tracked path.
+    
+    FAILURE_PATTERN_LEDGER.md has exactly the same Git blob before and after D381.
+    
+    Remote branch HEAD is exactly:
+    
+    838b7637058c5ba3b8f3b6c5430ebdc324249b96
+    
+    D381 is ACCEPTED.
+    
+    ==================================================
+    2. EXECUTION BASE
+    
+    Freeze the implementation base as:
+    
+    838b7637058c5ba3b8f3b6c5430ebdc324249b96
+    
+    Before mutation:
+    
+    * confirm HEAD exactly;
+    * porcelain 0;
+    * remote/local 0/0.
+    
+    If not, STOP.
+    
+    ==================================================
+    3. EXECUTION AUTHORITY
+    
+    Kai now issues the separate post-bank execution release required by D381.
+    
+    You may execute the bounded pre-candidate implementation governed by:
+    
+    D379
+    D380
+    D381
+    
+    This includes BOTH:
+    
+    1. the D381 subject-binding / V2 work; and
+    2. the still-outstanding D379 pre-candidate mechanisms.
+    
+    This release does NOT authorise production candidate creation.
+    
+    ==================================================
+    4. D381 SUBJECT-BINDING IMPLEMENTATION
+    
+    Implement the banked D381 rules exactly.
+    
+    envelope.py
+    
+    Implement the closed Witness.subject grammar and fail-closed parser.
+    
+    Canonical forms:
+    
+    SELF
+    AMBIGUOUS
+    OTHER:DOCUMENT:<path>
+    OTHER:GIT_COMMIT:<40hex>
+    
+    Legacy:
+    
+    OTHER:<path>
+    
+    only under D381’s six-step parser.
+    
+    No typed-prefix fallback.
+    
+    No default SELF.
+    
+    No default AMBIGUOUS for missing predicate policy.
+    
+    passa.py
+    
+    Replace the current universal/default subject behaviour with the single governed predicate registry required by D381.
+    
+    Each binding predicate must carry its subject policy/resolver inseparably.
+    
+    Unknown / missing policy:
+    
+    REFUSE
+    
+    Implement truthful subject production for all seven WHOLE_FILE-capable routes.
+    
+    Do not change _eligible / _scope_of membership as part of the subject repair.
+    
+    classify.py
+    
+    Implement axis-specific consumption:
+    
+    SCOPE
+        no SELF gate
+        value semantics unchanged
+        rationale describes applicability, not subject
+    VALIDITY
+        SELF subject required on every positive whole-file route
+    LIFECYCLE
+        COMMIT snapshot route requires SELF
+    
+    Do NOT globally subject-filter _binding_witness.
+    
+    Do NOT independently reinterpret subject from labels/context.
+    
+    The consumer consumes the producer-bound subject.
+    
+    ==================================================
+    5. STAGE-A V2 IMPLEMENTATION
+    
+    Use the existing D379-authorised:
+    
+    kai-pm/house_in_order_h2_v13/stage_identity.py
+    
+    Create it as required if still absent.
+    
+    Implement:
+    
+    H2_STAGE_A_V2
+    
+    with:
+    
+    schema = "H2_STAGE_A_V2"
+    domain separator =
+    "H2-STAGE-A-V2"
+    governance exactly =
+    [D379,D380,D381]
+    
+    Exact bank commits:
+    
+    D379
+    608d706d8452b8e578a484f7b75331a5cb9c28d9
+    D380
+    c50989779baf0485e2a4a5ceb2113093441691e3
+    D381
+    838b7637058c5ba3b8f3b6c5430ebdc324249b96
+    
+    Enforce:
+    
+    V1 + PRODUCTION -> REFUSE
+    
+    mechanically at the Stage-A construction/validation boundary.
+    
+    V1 calibration remains only the narrow zero-weight D381 path.
+    
+    No real production Stage-A descriptor may be created in this execution tranche.
+    
+    Synthetic CALIBRATION descriptors are permitted solely for the required controls.
+    
+    ==================================================
+    6. STDLIB BOUNDARY
+    
+    Implement D381’s non-pluggable construction rule.
+    
+    stage_identity.py mechanically derives:
+    
+    runtime.stdlib_identity
+    
+    using the unchanged D380 §7:
+    
+    H2_PY_STDLIB_V1
+    
+    algorithm.
+    
+    Do NOT accept as authority:
+    
+    * caller-supplied stdlib digest;
+    * caller-supplied constructor;
+    * callback/plugin replacement;
+    * alternate stdlib schema selector.
+    
+    Descriptor continues to contain only:
+    
+    runtime.stdlib_identity = <digest>
+    
+    No stdlib schema field.
+    
+    ==================================================
+    7. D381 HOSTILE CONTROLS
+    
+    Implement the D381 matrix inside the EXISTING:
+    
+    build_evidence/d379_controls.py
+    
+    Do NOT create d381_controls.py.
+    
+    Extend the existing:
+    
+    SB
+    STAGE_A
+    STDLIB
+    
+    families.
+    
+    Discharge every banked §19/§20 control, including:
+    
+    * closed grammar;
+    * malformed typed-prefix refusal;
+    * missing predicate policy refusal;
+    * audited snapshot NON-SELF;
+    * qualification subject NON-SELF;
+    * acquisition commit SELF positive;
+    * validated checkpoint SELF positive;
+    * zero-occurrence snapshot/measured-at fail closed;
+    * six dormant WHOLE_FILE routes;
+    * non-SELF consumer discrimination;
+    * SCOPE preserved;
+    * VALIDITY SELF gate;
+    * LIFECYCLE SELF gate;
+    * COMMIT=>VERIFIED governed-producer invariant;
+    * V1+PRODUCTION refusal;
+    * V1 calibration isolation;
+    * V2 governance completeness;
+    * dual schema/domain identity separation;
+    * non-pluggable stdlib derivation;
+    * independent stdlib re-derivation mismatch refusal.
+    
+    ==================================================
+    8. CORPUS REGRESSION CONTROLS
+    
+    Execute the exact D381 controls.
+    
+    SB-CORPUS-1
+    
+    Current v1.3 scope projection remains:
+    
+    WHOLE_FILE witnesses 165
+    documents            164 / 272
+    
+    Subject repair must not change scope membership.
+    
+    SB-CORPUS-2
+    
+    All adjudicated truthful-SELF behaviour remains unchanged.
+    
+    SB-CORPUS-3
+    
+    Required exact D381-driven delta:
+    
+    CODE_AUDIT_FINAL_REPORT.md
+    SCOPE       WHOLE_FILE     -> WHOLE_FILE
+    VALIDITY    EXACT_SNAPSHOT -> UNKNOWN
+    LIFECYCLE   HISTORICAL     -> UNKNOWN
+    CODE_AUDIT_MASTER.md
+    SCOPE       WHOLE_FILE     -> WHOLE_FILE
+    VALIDITY    EXACT_SNAPSHOT -> UNKNOWN
+    LIFECYCLE   HISTORICAL     -> UNKNOWN
+    house_in_order_instrument/AUTHORITY_ONTOLOGY.md
+    SCOPE       WHOLE_FILE     -> WHOLE_FILE
+    VALIDITY    EXACT_SNAPSHOT -> UNKNOWN
+    LIFECYCLE   UNKNOWN        -> UNKNOWN
+    
+    No other D381-driven verdict movement without STOP / adjudication.
+    
+    Keep:
+    
+    CODE_AUDIT_PLANNING_PACKAGE_QA.md -> SPAN
+    ORION_FIELD_NOTES.md -> SPAN
+    
+    No re-promotion.
+    
+    ==================================================
+    9. SCOPE CONFINEMENT
+    
+    At the end compare the implementation tree with execution base:
+    
+    838b7637058c5ba3b8f3b6c5430ebdc324249b96
+    
+    Any changed tracked path outside the combined D379/D381 authorised surface:
+    
+    FAIL / STOP
+    
+    No cleanup by adjacency.
+    
+    No opportunistic refactor.
+    
+    ==================================================
+    10. RESUME OUTSTANDING D379 WORK
+    
+    Once the D381 subject/V2 controls are green, continue the already-authorised outstanding D379 pre-candidate implementation in the SAME controlled tranche.
+    
+    This includes the D379 mechanisms still not discharged:
+    
+    residual D14
+    Q1a
+    Q1b
+    E1 proof
+    §8(6)
+    I1-A
+    I1-B
+    Stage-A closed-membership construction
+    Stage-A / Stage-B separation
+    
+    Use ONLY D379’s exact mutation surface and D380/D381’s later governing semantics.
+    
+    Do not reinterpret D379.
+    
+    Do not add mechanisms.
+    
+    ==================================================
+    11. D379 CONTROL GATE
+    
+    d379_controls.py must finish with EVERY declared section actually implemented and executed.
+    
+    No:
+    
+    NOT_IMPLEMENTED
+    
+    section may remain while the tranche is reported green.
+    
+    Required families include the existing D379 matrix plus the D381 additions.
+    
+    Full untruncated output:
+    
+    build_evidence/D379_CONTROLS.txt
+    
+    Close-out:
+    
+    build_evidence/D379_CLOSEOUT.txt
+    
+    A control reported in prose but not executed carries zero closure weight.
+    
+    ==================================================
+    12. PRODUCTION ACTIONS STILL FORBIDDEN
+    
+    Even if all controls are green, DO NOT create or expose:
+    
+    real production Stage A
+    real candidate
+    real Pass A
+    real classification candidate
+    real Stage-B package
+    real holdout
+    blind 40
+    admission
+    freeze
+    Item 8
+    six subject builds
+    
+    Do NOT execute the real holdout selection rule.
+    
+    Do NOT expose a new 40-document sample.
+    
+    Do NOT progress KAI-GATE-048.
+    
+    Do NOT touch A-4.
+    
+    Do NOT merge.
+    
+    This remains PRE-CANDIDATE IMPLEMENTATION AND CALIBRATION ONLY.
+    
+    ==================================================
+    13. IMPLEMENTATION COMMIT
+    
+    If and only if:
+    
+    * all required controls execute;
+    * all required controls pass;
+    * scope confinement passes;
+    * no new material incident arises;
+    
+    then commit and push the bounded implementation as an implementation candidate.
+    
+    This commit is NOT admission and is NOT a candidate Stage-A identity.
+    
+    Use a clear commit message identifying:
+    
+    D379 + D381 pre-candidate implementation
+    NO production Stage A
+    NO candidate
+    NO holdout
+    
+    If a genuinely new material incident appears:
+    
+    STOP before claiming closure.
+    
+    Bank the incident only if the existing incident rules require it; do not self-authorise a new D-number.
+    
+    ==================================================
+    14. RETURN
+    
+    Return:
+    
+    1. implementation commit SHA
+    2. parent
+    3. tree
+    4. server signature state if available
+    5. changed paths
+    6. additions/deletions
+    7. scope-confinement result against 838b7637…
+    8. exact control totals
+    9. section-by-section D379 control results
+    10. D381 SB/STAGE_A/STDLIB results
+    11. SB-CORPUS-1 result
+    12. SB-CORPUS-2 result
+    13. SB-CORPUS-3 exact three-row delta
+    14. SB-MOVED-1 / SB-MOVED-2 results
+    15. COMMIT=>VERIFIED result
+    16. V1+PRODUCTION refusal result
+    17. V1 calibration isolation result
+    18. V2 governance controls
+    19. dual versioning controls
+    20. stdlib non-pluggable controls
+    21. residual D14 result
+    22. Q1a result
+    23. Q1b result
+    24. E1 result
+    25. §8(6) result
+    26. I1-A result
+    27. I1-B result
+    28. Stage-A/Stage-B synthetic calibration result
+    29. confirmation no NOT_IMPLEMENTED sections remain
+    30. confirmation no production Stage A/candidate/PassA/holdout/blind40
+    31. remote branch HEAD
+    32. ahead/behind
+    33. porcelain
+    34. PR #122 still DO NOT MERGE
+    
+    Then STOP for Kai adjudication.
+    
+    No further execution beyond that commit until reviewed.
+    END-VERBATIM PROMPT-2b63a7d8c3fe60ee
+- EVIDENCE PROMPT-32520ac65390244a transcript 2026-09-18T22:16:20.394Z: 13042 bytes, sha256 d1b70068e7d32afb95ba4c0a507aeb3bcf99549fe90b4169ea59eecebb37f9e6, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-18T22:16:20.394Z]
+    BEGIN-VERBATIM PROMPT-32520ac65390244a
+    Yes. I’ve got the ruling.
+    
+    The important point is: the repair itself is behaving correctly. The thing that failed was our measuring instruction. We told the control to count one specific population, but the written recipe accidentally described a larger population.
+    
+    Simple example: imagine the intended test was “count all red cars already parked in Bay A.” The result was correctly recorded as 165. But the written instruction accidentally said “count all cars and see which are red after reassessment.” That produces 200. The 165 was not fabricated; the recipe failed to state the restriction that produced it.
+    
+    I independently verified the checkpoint commit 971919324ebc1c44824cb102606354194b32f15e: correct parent, valid SSH signature, six changed paths, and it makes no closure claim. One small correction to Orion’s report: GitHub gives +769/−61 total, not +650/−61. Of that, the five implementation/control files are +645/−61 and the incident ledger adds +124. That reporting discrepancy is not material to INC-32.
+    
+    INC-32 is accepted. The architecture is not reopened. The subject repair is not rolled back. The evidence recipe and SB-CORPUS-1 need explicit forward correction before implementation resumes.
+    
+    I’m choosing D382, not an unnumbered D381 errata. The old D370 errata precedent exists, but we now have a hash-bound Stage-A governance model. A required control should not acquire new meaning through an unbound footnote. D382 can correct only the evidence universe while explicitly leaving H2_STAGE_A_V2, its domain separator, and its governance [D379,D380,D381] untouched.
+    
+    Send Orion this:
+    
+    ORION — INC-2026-09-18-32 IS ACCEPTED.
+    
+    The partial implementation commit is accepted as a CHECKPOINT ONLY:
+    
+    971919324ebc1c44824cb102606354194b32f15e
+    parent 838b7637058c5ba3b8f3b6c5430ebdc324249b96
+    tree   196f8095b7541a0dd9f393d41d645006b153c774
+    
+    GitHub server verification:
+    
+    verified = true
+    reason   = valid
+    SSH signature valid
+    
+    It is NOT the implementation candidate.
+    It closes no mechanism.
+    It admits nothing.
+    
+    Server stats are:
+    
+    TOTAL COMMIT       +769 / -61
+    FAILURE_PATTERN_LEDGER.md
+                        +124 / -0
+    five implementation/control paths
+                        +645 / -61
+    
+    The earlier +650 / -61 report is therefore numerically inaccurate.
+    No incident is assigned to that reporting discrepancy; use the server
+    numbers going forward.
+    
+    ==================================================
+    
+    1. KAI RULING ON INC-32
+        ==================================================
+    
+    INC-32 is REAL.
+    
+    The defect is NOT in:
+    
+    * the subject architecture;
+    * the closed grammar;
+    * the producer registry;
+    * the VALIDITY gate;
+    * the LIFECYCLE gate;
+    * SCOPE semantics;
+    * the three-row repair delta;
+    * the two already-known A→B moves.
+    
+    The defect is in D381’s BANKED EVIDENCE UNIVERSE DESCRIPTION.
+    
+    D381 states figures measured over a narrower universe than its written
+    recipe describes.
+    
+    That is R17 / CLAIM_SCOPE wider than MEASURED_SCOPE.
+    
+    The current mechanical evidence is strong:
+    
+    subject-repair scope comparison
+    485 witnesses compared
+    0 applicability-scope differences
+    SB-CORPUS-3
+    exactly reproduces
+    SB-MOVED-1 / SB-MOVED-2
+    exactly reproduce and only those two move
+    M2
+    false audited-snapshot route -> UNKNOWN
+    genuine document lifecycle route -> HISTORICAL
+    
+    Therefore:
+    
+    DO NOT ROLL BACK THE SUBJECT REPAIR.
+    
+    ==================================================
+    2. D382 IS AUTHORISED
+    
+    Allocate D382, subject to a fresh strict allocator immediately before append.
+    
+    D382 is a GOVERNANCE-ONLY correction authority.
+    
+    It corrects ONLY:
+    
+    D381 §20.3  SB-CORPUS-1 interpretation
+    D381 §21.1  Population A universe description
+    D381 §21.2  Population B universe and derivation recipe
+    
+    It adds the executed-derivation requirement needed to prevent R17
+    recurring again.
+    
+    D382 DOES NOT:
+    
+    * change D381 architecture;
+    * change the D381 mutation surface;
+    * change subject grammar;
+    * change axis semantics;
+    * change H2_STAGE_A_V2;
+    * create H2_STAGE_A_V3;
+    * change the V2 domain separator;
+    * change FINAL_CANDIDATE_AGGREGATE;
+    * alter D367 §9;
+    * authorise production Stage A;
+    * authorise candidate production.
+    
+    ==================================================
+    3. D382 DOES NOT ENTER V2 STAGE-A GOVERNANCE
+    
+    This distinction is load-bearing.
+    
+    D382 changes NO Stage-A proposition.
+    
+    Therefore H2_STAGE_A_V2 remains exactly:
+    
+    governance =
+    [D379,D380,D381]
+    
+    with:
+    
+    D379 608d706d8452b8e578a484f7b75331a5cb9c28d9
+    D380 c50989779baf0485e2a4a5ceb2113093441691e3
+    D381 838b7637058c5ba3b8f3b6c5430ebdc324249b96
+    
+    Do NOT add D382 to the V2 descriptor.
+    
+    Do NOT bump the schema.
+    
+    D382 corrects a PRE-CANDIDATE CALIBRATION / EVIDENCE proposition, not
+    Stage-A construction or identity.
+    
+    ==================================================
+    4. D382 CORRECTION — POPULATION A
+    
+    D381 §21.1’s:
+    
+    WHOLE_FILE witnesses 167
+    
+    must be qualified.
+    
+    The normative D381 consumer-relevant universe is EXACTLY these four
+    witness families:
+    
+    COMMIT
+    RUN_ID
+    DATE
+    SUPERSEDED_BY
+    
+    Therefore the corrected statement is:
+    
+    Population A
+    consumer-relevant WHOLE_FILE witnesses = 167
+    documents = 166 / 272
+    COMMIT        6
+    DATE        161
+    RUN_ID        0
+    SUPERSEDED_BY 0
+    
+    There is additionally:
+    
+    1 HEX_SHAPED_UNRESOLVED WHOLE_FILE witness
+    
+    so:
+    
+    ALL-KIND WHOLE_FILE witness total = 168
+    
+    The all-kind 168 is diagnostic.
+    
+    It is NOT part of the four-kind classifier-consumer denominator that
+    produced 167.
+    
+    D381’s original bare phrase “WHOLE_FILE witnesses 167” is therefore
+    superseded by:
+    
+    167 consumer-relevant WHOLE_FILE witnesses over exactly COMMIT,
+    RUN_ID, DATE and SUPERSEDED_BY. 168 WHOLE_FILE witnesses over all
+    emitted witness kinds, the difference being one
+    HEX_SHAPED_UNRESOLVED witness.
+    
+    ==================================================
+    5. D382 CORRECTION — POPULATION B
+    
+    The original D381 §21.2 recipe is superseded.
+    
+    Define the baseline universe mechanically:
+    
+    U_A =
+    every frozen v1.2 Pass-A witness satisfying BOTH:
+    1. witness family is one of
+       {COMMIT, RUN_ID, DATE, SUPERSEDED_BY}
+    AND
+    2. frozen v1.2 applicability_scope == WHOLE_FILE
+    
+    Population B is then a PROJECTION OF U_A.
+    
+    For every witness in U_A:
+    
+    1. read exact source bytes from frozen tree
+       3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+    2. locate the exact frozen witness by
+       path / selector / witness value
+    3. retain the frozen witness kind
+    4. evaluate ONLY current-v1.3 eligibility/scope semantics from the
+       pre-D381 passa.py blob
+    5. do NOT freshly classify token kind
+    6. do NOT consult history
+    7. record the resulting applicability_scope
+    
+    The resulting bounded projection MUST reproduce:
+    
+    consumer-relevant WHOLE_FILE = 165
+    documents                    = 164 / 272
+    DATE        160
+    COMMIT        5
+    RUN_ID        0
+    SUPERSEDED_BY 0
+    
+    and exactly:
+    
+    CODE_AUDIT_PLANNING_PACKAGE_QA.md
+    WHOLE_FILE -> SPAN
+    ORION_FIELD_NOTES.md
+    WHOLE_FILE -> SPAN
+    
+    with no other A→B movement inside U_A.
+    
+    If the analogous baseline projection includes ALL witness kinds, the
+    WHOLE_FILE total is:
+    
+    166
+    
+    because the additional HEX_SHAPED_UNRESOLVED witness remains outside the
+    four consumed families.
+    
+    ==================================================
+    6. WHAT POPULATION B IS NOT
+    
+    D382 must say explicitly:
+    
+    Population B is NOT:
+    
+    the complete present-day v1.3 WHOLE_FILE census over every frozen witness
+    
+    and it is NOT:
+    
+    a fresh v1.3 Pass A
+    
+    It is:
+    
+    the current-v1.3 scope projection of the previously-WHOLE_FILE,
+    consumer-relevant frozen-v1.2 witness baseline.
+    
+    Therefore the literal full-universe procedure that yielded:
+    
+    200 WHOLE_FILE
+    194 documents
+    37 movements
+    
+    does NOT contradict the bounded 165/164 result.
+    
+    It answered a different question.
+    
+    The defect was that D381’s prose failed to say which question it was
+    answering.
+    
+    ==================================================
+    7. SB-CORPUS-1 — CORRECTED MEANING
+    
+    D381 §20.3 SB-CORPUS-1 is superseded only as to its universe definition.
+    
+    Correct control:
+    
+    SB-CORPUS-1
+    derive U_A mechanically from the exact frozen v1.2 Pass-A blob;
+    project U_A through the exact pre-D381 v1.3 scope semantics;
+    assert:
+      WHOLE_FILE = 165
+      documents  = 164 / 272
+      DATE       = 160
+      COMMIT     = 5
+      RUN_ID     = 0
+      SUPERSEDED_BY = 0
+    and assert exactly the two known A->B moves.
+    
+    The control may NOT simply compare hard-coded numbers without deriving
+    the universe and projection that produced them.
+    
+    ==================================================
+    8. ADD FULL SCOPE-INVARIANCE CONTROL
+    
+    The bounded 165/164 projection is regression evidence.
+    
+    It is NOT by itself proof that the D381 subject repair preserved SCOPE
+    across the complete comparable witness population.
+    
+    Therefore D382 requires a separate executed control:
+    
+    SB-SCOPE-ALL
+    
+    It must:
+    
+    enumerate every comparable witness before vs after the D381 subject repair;
+    bind rows by stable evidence identity;
+    compare applicability_scope;
+    derive its own denominator;
+    fail on any missing, extra or changed comparable witness unless separately
+    explained and adjudicated.
+    
+    Current executed measurement is:
+    
+    485 comparable witnesses
+    0 scope differences
+    
+    Do NOT merely hard-code 485.
+    
+    The control must derive the denominator and then assert that every
+    comparison is equal.
+    
+    This is the actual class-wide proof that subject repair did not silently
+    move SCOPE.
+    
+    ==================================================
+    9. SB-CORPUS-3 AND SB-MOVED CONTROLS STAND
+    
+    No correction to the banked expected D381 subject delta.
+    
+    Required:
+    
+    CODE_AUDIT_FINAL_REPORT.md
+      SCOPE      WHOLE_FILE -> WHOLE_FILE
+      VALIDITY   EXACT_SNAPSHOT -> UNKNOWN
+      LIFECYCLE  HISTORICAL -> UNKNOWN
+    CODE_AUDIT_MASTER.md
+      SCOPE      WHOLE_FILE -> WHOLE_FILE
+      VALIDITY   EXACT_SNAPSHOT -> UNKNOWN
+      LIFECYCLE  HISTORICAL -> UNKNOWN
+    house_in_order_instrument/AUTHORITY_ONTOLOGY.md
+      SCOPE      WHOLE_FILE -> WHOLE_FILE
+      VALIDITY   EXACT_SNAPSHOT -> UNKNOWN
+      LIFECYCLE  UNKNOWN -> UNKNOWN
+    
+    And:
+    
+    CODE_AUDIT_PLANNING_PACKAGE_QA.md
+    remains SPAN
+    ORION_FIELD_NOTES.md
+    remains SPAN
+    
+    These have already reproduced and remain required controls.
+    
+    ==================================================
+    10. R18 — THE RECIPE MUST NOW EXECUTE
+    
+    INC-32 demonstrated that prose beside numbers is insufficient.
+    
+    The structural remedy is machine execution.
+    
+    Use the EXISTING authorised:
+    
+    kai-pm/house_in_order_h2_v13/build_evidence/d379_controls.py
+    
+    No new control file.
+    
+    The control must mechanically derive and emit:
+    
+    Population A four-kind universe
+    Population A all-kind diagnostic total
+    U_A membership
+    Population B four-kind projection
+    Population B all-kind projection diagnostic
+    document denominator
+    per-kind counts
+    the exact A->B movement list
+    SB-SCOPE-ALL denominator and difference count
+    
+    Full untruncated evidence goes to:
+    
+    D379_CONTROLS.txt
+    
+    No manually transcribed denominator may carry closure weight.
+    
+    INC-32 remains OPEN until this executed control passes.
+    
+    ==================================================
+    11. D15 IS A SEPARATE ISSUE
+    
+    Do NOT silently fold the pre-existing cal_fixtures.py D15 abort into
+    INC-32.
+    
+    Current source shows D15 reads:
+    
+    HERE / "h2v12-classification.json"
+    
+    but the file exists in:
+    
+    kai-pm/house_in_order_h2_v12/h2v12-classification.json
+    
+    and not in v13.
+    
+    That defect predates the D381 execution base.
+    
+    Do NOT repair it under D382.
+    
+    Record it for separate Kai adjudication after D382 is banked.
+    
+    No adjacent cleanup.
+    
+    ==================================================
+    12. D382 BANKING ONLY
+    
+    For this turn:
+    
+    DO NOT modify implementation source.
+    
+    Prepare and append D382 to DECISIONS.md only.
+    
+    D382 title should state substantively:
+    
+    D382 — CORRECTION OF D381 §20.3 / §21 POPULATION UNIVERSE AND
+    EXECUTED-DERIVATION CONTROL. GOVERNANCE ONLY. NO STAGE-A PROPOSITION OR
+    MUTATION-SCOPE CHANGE.
+    
+    Fresh strict allocator immediately before append.
+    
+    Expected, subject to fresh derivation:
+    
+    highest D381
+    D382 count 0
+    next free D382
+    
+    Commit and push D382.
+    
+    Then STOP.
+    
+    Return:
+    
+    1. D382 commit SHA
+    2. parent
+    3. tree
+    4. server signature state
+    5. exact title
+    6. changed paths
+    7. additions/deletions
+    8. strict append-only proof
+    9. pre/post decision allocator
+    10. incident allocator state
+    11. remote branch HEAD
+    12. ahead/behind
+    13. porcelain
+    14. confirmation H2_STAGE_A_V2 remains unchanged
+    15. confirmation V2 governance remains exactly [D379,D380,D381]
+    16. confirmation no source mutation occurred in the D382 banking commit
+    17. confirmation INC-32 remains OPEN pending executed derivation
+    18. confirmation no Stage A / candidate / Pass A / holdout / merge
+    
+    PR #122 remains DO NOT MERGE.
+    
+    STOP after banking.
+    
+    So the condition is actually better than the raw “200 versus 165” sounds. We did not discover that the repair broke 35 extra witnesses. We discovered that the written recipe accidentally asked a broader question than the number beside it answered.
+    
+    The more important quality signal is the independent comparison: 485 comparable witnesses, zero scope changes, while the three intended false cells changed exactly as designed. That strongly supports the core repair.
+    
+    The next thing after D382 is banked is to resume implementation and make the census executable so this exact class of prose/measurement mismatch cannot happen again.
+    END-VERBATIM PROMPT-32520ac65390244a
+- EVIDENCE PROMPT-efe0d40df2378635 transcript 2026-09-18T22:25:52.014Z: 10378 bytes, sha256 ceee6f1fd1a148de1a85aa1d955c883151215da93cc5667de0e5fe7ebdb4bd3f, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-18T22:25:52.014Z]
+    BEGIN-VERBATIM PROMPT-efe0d40df2378635
+    D382 is independently verified and accepted. GitHub reports 782bdf01… as valid SSH, exactly one changed path (DECISIONS.md), +462/−0.
+    
+    More importantly, I resolved the six RUN_ID mystery. They are not missing evidence and their selectors are exactly correct. Frozen Pass A emitted those same six RUN_ID witnesses twice. The one-off comparison script matched each physical source occurrence once, so the second copy of each was incorrectly left out.
+    
+    The full frozen Pass-A population is 491 emitted witness records. There are 480 distinct exact evidence identities, with 9 duplicate groups and 11 excess duplicate records. The six RUN_ID duplicates account for six of that excess; there are also two triplicated DATE identities and one duplicated COMMIT identity. The denominator for truthfulness remains the 491 emitted records; deduplication is useful only as independence metadata.
+    
+    That also means D382 does not need another correction for this. D382 deliberately made 485 non-normative: the final control must derive its denominator and allows missing records to be separately explained and adjudicated. They now are. The correct SB-SCOPE-ALL implementation must compare the multiset of all 491 records, not consume each source occurrence once.
+    
+    There is, however, a genuinely separate blocker: D15. It is a pre-existing harness defect and needs its own authority before Orion fixes it.
+    
+    Send this:
+    
+    ORION — D382 INDEPENDENTLY VERIFIED AND ACCEPTED.
+    
+    D382
+    782bdf01d567c74a2a8d48ed8f0166a73aebb95b
+    parent
+    971919324ebc1c44824cb102606354194b32f15e
+    tree
+    d404ad68c89beca6697e3db8bece9b44bcee0eaf
+    GitHub server verification
+    verified = true
+    reason   = valid
+    SSH signature valid
+    changed path
+    kai-pm/DECISIONS.md only
+    delta
+    +462 / -0
+    
+    The D379/D381 execution release remains conceptually in force, but before
+    resuming source mutation we need to close the separately identified D15
+    authority gap.
+    
+    ==================================================
+    
+    1. THE SIX RUN_ID RECORDS ARE RESOLVED
+        ==================================================
+    
+    Kai independently inspected the exact frozen v1.2 passA.json and frozen
+    subject tree.
+    
+    The six RUN_ID values Orion reported as “unlocated” are NOT missing.
+    
+    Every value exists at its exact recorded selector:
+    
+    kai-pm/EMBEDDING_BACKEND_STATE.md
+    L14
+    31570714150
+    kai-pm/ORION_FIELD_NOTES.md
+    L18  31894868473
+    L23  31899571806
+    L27  31906667051
+    L33  31908872172
+    kai-pm/RUNTIME_TOPOLOGY_CENSUS.md
+    L13
+    31605138566
+    
+    The source lines match the frozen witness records.
+    
+    The reason the one-off comparison produced 485 rather than the complete
+    record population is DUPLICATE EMISSION.
+    
+    Each of those six RUN_ID evidence records occurs TWICE in frozen Pass A.
+    
+    The second copy was lost because the one-off matcher treated the physical
+    source occurrence as consumable only once.
+    
+    That is a comparator defect, NOT missing evidence.
+    
+    ==================================================
+    2. THE ACTUAL FROZEN RECORD POPULATION
+    
+    Measured directly from exact frozen v1.2 passA.json:
+    
+    emitted witness records          491
+    distinct exact evidence identities 480
+    duplicate excess records          11
+    duplicate identity groups          9
+    
+    Duplicate groups:
+    
+    RUN_ID
+      31570714150   x2
+      31894868473   x2
+      31899571806   x2
+      31906667051   x2
+      31908872172   x2
+      31605138566   x2
+    DATE
+      TECH_WATCH.md L19 2026-06-19   x3
+      TECH_WATCH.md L24 2026-06-19   x3
+    COMMIT
+      WAYPOINTS.md L87 097c91d       x2
+    
+    Therefore:
+    
+    491 emitted records
+    !=
+    480 independent/exact evidence identities
+    
+    The truthfulness / candidate-record unit remains the EMITTED RECORD.
+    
+    Duplicates may be labelled non-independent evidence.
+    
+    They may NOT disappear from the denominator.
+    
+    ==================================================
+    3. SB-SCOPE-ALL — ADJUDICATED COMPARATOR SEMANTICS
+    
+    D382’s normative rule stands.
+    
+    Its recorded 485 / 0 measurement was explicitly NOT the definition and
+    may not be hard-coded.
+    
+    The six previously “missing” records are now separately explained and
+    adjudicated under D382 §8.
+    
+    Implement SB-SCOPE-ALL as a MULTISET comparison.
+    
+    Do NOT deduplicate.
+    
+    Do NOT consume a source occurrence after the first matching record.
+    
+    Mechanically:
+    
+    1. enumerate EVERY frozen emitted witness record in array order;
+    2. assign each record a stable baseline record identity including:
+         row/path
+         witness family
+         occurrence ordinal within that row/family
+         selector
+         value
+         original applicability scope
+    3. resolve path / selector / value against frozen source bytes;
+    4. evaluate the post-repair scope decision independently for EACH emitted
+       record, even where multiple records bind the same physical source
+       occurrence;
+    5. compare old scope vs projected scope;
+    6. derive denominator mechanically.
+    
+    Expected, but NOT hard-coded:
+    
+    491 emitted witness records comparable
+    0 applicability-scope differences
+    
+    The control must additionally emit:
+    
+    record denominator
+    distinct exact evidence-identity count
+    duplicate groups
+    duplicate multiplicities
+    scope-difference count
+    
+    This keeps both truths:
+    
+    491 = truthfulness / emitted-record denominator
+    480 = diagnostic distinct exact evidence identities
+    
+    Do not replace one with the other.
+    
+    ==================================================
+    4. NO D383 IS REQUIRED FOR THE 485 -> 491 RESOLUTION
+    
+    D382 already says:
+    
+    derive own denominator
+    485 is expected historical measurement, NOT definition
+    fail missing/extra unless separately explained and adjudicated
+    
+    The six records are now explained and adjudicated.
+    
+    Therefore:
+    
+    * no D382 rewrite;
+    * no new incident for these six;
+    * no D383 for SB-SCOPE-ALL;
+    * no denominator hard-code.
+    
+    Record the resolution durably in:
+    
+    D379_CONTROLS.txt
+    D379_CLOSEOUT.txt
+    
+    and in INC-32’s eventual closure/update.
+    
+    INC-32 remains OPEN until the executed derivation and SB-SCOPE-ALL pass.
+    
+    ==================================================
+    5. D15 IS DIFFERENT — NEW INCIDENT
+    
+    The separate D15 abort IS a material harness defect.
+    
+    Source-confirmed:
+    
+    kai-pm/house_in_order_h2_v13/cal_fixtures.py
+    def d15():
+        json.load(open(HERE / "h2v12-classification.json"))
+    
+    But:
+    
+    kai-pm/house_in_order_h2_v13/h2v12-classification.json
+    DOES NOT EXIST
+    
+    while the intended historical artefact exists at:
+    
+    kai-pm/house_in_order_h2_v12/h2v12-classification.json
+    
+    Frozen Git blob:
+    
+    ee524b47b43cfb4a0cc7bc9cb6c3c8f9ae389740
+    
+    The defect predates execution base 838b7637.
+    
+    It is NOT caused by D381.
+    
+    It is NOT INC-32.
+    
+    It is NOT automatically RC-7 merely because it is a harness defect.
+    
+    No mechanism assignment without evidence.
+    
+    ==================================================
+    6. BANK INC-33
+    
+    Freshly derive the incident allocator.
+    
+    Expected:
+    
+    highest INC-32
+    next free INC-33
+    
+    If fresh derivation agrees, append:
+    
+    INC-2026-09-18-33
+    
+    Substance:
+    
+    subject
+      cal_fixtures.py D15 historical classification input
+    status
+      OPEN-RECORDED / INCIDENT_ONLY /
+      BLOCKS COMPLETE FIXTURE EXECUTION
+    defect
+      D15 resolves h2v12-classification.json relative to the v13 fixture
+      directory although the historical artefact exists only in the sibling
+      frozen v12 package.
+    effect
+      cal_fixtures executes 60 PASS / 0 FAIL and then aborts before completing
+      D15 and the remainder of the fixture suite.
+    provenance
+      present at execution base 838b7637;
+      therefore pre-existing, not introduced by D381 subject repair.
+    mechanism
+      NONE ASSIGNED.
+    do not merge with
+      INC-32
+      subject binding
+      RC-7
+      unless later evidence establishes causal equivalence.
+    
+    ==================================================
+    7. D383 — BOUNDED D15 HARNESS REPAIR AUTHORITY
+    
+    Fresh strict decision allocator expected:
+    
+    highest D382
+    D383 count 0
+    next free D383
+    
+    Bank D383 as GOVERNANCE ONLY.
+    
+    Suggested title:
+    
+    D383 — 2026-09-18 — BOUNDED D15 HISTORICAL-FIXTURE INPUT REPAIR.
+    CAL_FIXTURES ONLY. GOVERNANCE ONLY — BANKING IS NOT EXECUTION.
+    NO STAGE-A PROPOSITION CHANGE.
+    
+    D383 grants exactly one semantic repair:
+    
+    kai-pm/house_in_order_h2_v13/cal_fixtures.py
+    
+    D15 must consume the intended immutable historical v1.2 classification
+    artefact:
+    
+    kai-pm/house_in_order_h2_v12/h2v12-classification.json
+    
+    and fail closed if that exact historical input cannot be established.
+    
+    Bind it mechanically to the frozen repository object:
+    
+    Git blob
+    ee524b47b43cfb4a0cc7bc9cb6c3c8f9ae389740
+    
+    A current/generated v13 classification output MUST NOT silently substitute
+    for the historical fixture.
+    
+    No adjacent fixture cleanup.
+    
+    No other D15 semantic redesign.
+    
+    No change to D1-D14 or D16-D17 expectations under this authority.
+    
+    ==================================================
+    8. D383 DOES NOT CHANGE STAGE-A GOVERNANCE
+    
+    D383 changes NO Stage-A proposition.
+    
+    Therefore:
+    
+    H2_STAGE_A_V2
+    governance = [D379,D380,D381]
+    
+    remains unchanged.
+    
+    Do NOT add:
+    
+    D382
+    D383
+    
+    to the V2 governance descriptor.
+    
+    No schema bump.
+    
+    No domain-separator change.
+    
+    No FINAL_CANDIDATE_AGGREGATE change.
+    
+    The eventual source-byte change to cal_fixtures.py will naturally be
+    captured by the Stage-A h2_sources hash when a real Stage A is later
+    authorised.
+    
+    ==================================================
+    9. THIS TURN — BANKING ONLY
+    
+    For now:
+    
+    1. append INC-33 to FAILURE_PATTERN_LEDGER.md;
+    2. append D383 to DECISIONS.md;
+    3. commit;
+    4. push;
+    5. STOP.
+    
+    NO further source mutation in that banking commit.
+    
+    Return:
+    
+    1. bank commit SHA
+    2. parent
+    3. tree
+    4. GitHub/server signature state
+    5. changed paths
+    6. additions/deletions
+    7. strict append-only proof for both ledger and DECISIONS
+    8. incident allocator pre/post
+    9. decision allocator pre/post
+    10. exact INC-33 status
+    11. exact D383 title
+    12. confirmation D383 mutation scope is cal_fixtures.py only
+    13. confirmation H2_STAGE_A_V2 unchanged
+    14. confirmation governance remains [D379,D380,D381]
+    15. remote HEAD
+    16. ahead/behind
+    17. porcelain
+    18. confirmation no source mutation / no Stage A / no candidate /
+        no Pass A / no holdout / no merge
+    
+    PR #122 remains DO NOT MERGE.
+    
+    STOP for Kai verification before executing D383.
+    
+    So we have actually improved the evidence picture again: the 485 was not another mysterious population. It was a comparator accidentally dropping the second copy of six duplicated RUN_ID records. The complete evidence denominator is 491, and we now know exactly why.
+    
+    The core subject repair remains in good condition. The only new blocker before resuming the full suite is the old D15 harness path bug, and I’m keeping that completely separate rather than letting Orion “just fix it.”
+    END-VERBATIM PROMPT-efe0d40df2378635
+- EVIDENCE PROMPT-78125bcf83237f67 transcript 2026-09-18T23:04:41.222Z: 6981 bytes, sha256 03a3b855e7b05e2591c8d604c3fc83887ab13e2d7bcd9c192546ff9b0f43e8f8, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-18T23:04:41.222Z]
+    BEGIN-VERBATIM PROMPT-78125bcf83237f67
+    ORION — D383 BANK INDEPENDENTLY VERIFIED AND ACCEPTED.
+    
+    Verified bank:
+    
+    commit
+    1bc7c50639671cabf4d2aad0cb4f1e2b59390ac2
+    parent
+    782bdf01d567c74a2a8d48ed8f0166a73aebb95b
+    tree
+    40d49f4a48b80da6ee225e85594c7c0a151ba802
+    
+    GitHub server signature:
+    
+    verified = true
+    reason   = valid
+    SSH signature valid
+    
+    Delta:
+    
+    kai-pm/DECISIONS.md              +279 / -0
+    kai-pm/FAILURE_PATTERN_LEDGER.md  +90 / -0
+    total                             +369 / -0
+    
+    No source mutation occurred.
+    
+    ==================================================
+    
+    1. LINE 422 FINDING IS ACCEPTED
+        ==================================================
+    
+    Source-confirmed:
+    
+    cal_fixtures.py
+    d15()
+        reads HERE / "h2v12-classification.json"
+    regression_five()
+        reads HERE / "h2v12-classification.json"
+    
+    Both resolve the SAME intended historical artefact incorrectly.
+    
+    The intended artefact is:
+    
+    kai-pm/house_in_order_h2_v12/h2v12-classification.json
+    Git blob
+    ee524b47b43cfb4a0cc7bc9cb6c3c8f9ae389740
+    
+    The v13-local path does not exist.
+    
+    Therefore the line-422 failure is NOT a new incident.
+    
+    It belongs to:
+    
+    INC-2026-09-18-33
+    
+    because it has:
+    
+    * the same producer;
+    * the same file;
+    * the same bad path-construction mechanism;
+    * the same intended historical artefact;
+    * the same pre-existing provenance.
+    
+    Do NOT allocate INC-34.
+    
+    ==================================================
+    2. D383 CANNOT BE STRETCHED
+    
+    D383 explicitly grants the D15 repair only.
+    
+    It also explicitly records regression_five() as outside its scope.
+    
+    Therefore:
+    
+    DO NOT silently treat line 422 as D383-authorised.
+    
+    That would violate the banked authority itself.
+    
+    ==================================================
+    3. D384 IS AUTHORISED
+    
+    Freshly derive the strict decision allocator.
+    
+    Expected:
+    
+    highest     D383
+    D384 count  0
+    next free   D384
+    
+    If fresh derivation agrees, bank D384.
+    
+    Suggested title:
+    
+    D384 — 2026-09-18 — COMPLETE INC-33 HISTORICAL CLASSIFICATION
+    FIXTURE-INPUT REPAIR ACROSS D15 AND REGRESSION_FIVE.
+    CAL_FIXTURES ONLY. GOVERNANCE ONLY — BANKING IS NOT EXECUTION.
+    NO STAGE-A PROPOSITION CHANGE.
+    
+    ==================================================
+    4. D384 AUTHORITY — EXACT PURPOSE
+    
+    D384 does not create a second repair mechanism.
+    
+    It EXTENDS the already-banked INC-33/D383 repair to the second confirmed
+    call site:
+    
+    regression_five()
+    
+    The corrected class is:
+    
+    Every governed cal_fixtures.py use of the frozen v1.2
+    h2v12-classification.json for D15 / opposite-side regression evidence
+    must resolve the SAME mechanically bound historical artefact.
+    
+    The two authorised consumers are exactly:
+    
+    d15()
+    regression_five()
+    
+    No other fixture input is opened by association.
+    
+    ==================================================
+    5. PREFER ONE INTERNAL FAIL-CLOSED LOADER
+    
+    D384 may authorise one private internal loader inside:
+    
+    kai-pm/house_in_order_h2_v13/cal_fixtures.py
+    
+    to prevent the two call sites drifting again.
+    
+    Conceptually:
+    
+    _load_frozen_v12_classification()
+    
+    Both:
+    
+    d15()
+    regression_five()
+    
+    consume that same helper.
+    
+    The helper must:
+    
+    1. resolve only the sibling frozen v1.2 classification artefact;
+    2. establish that it is the exact governed historical input bound to:
+    
+    Git blob
+    ee524b47b43cfb4a0cc7bc9cb6c3c8f9ae389740
+    
+    3. fail closed if the expected artefact cannot be established;
+    4. parse those exact bytes only after identity validation.
+    
+    A generated/current v1.3 result must NEVER substitute.
+    
+    A v13-local file of the same filename must NEVER win by path coincidence.
+    
+    Do not search upward/downward for a convenient matching filename.
+    
+    ==================================================
+    6. WHY ONE HELPER IS PREFERRED
+    
+    Two independent path literals created this defect twice.
+    
+    Repairing both with two new independent literals would close the instances
+    but preserve the class.
+    
+    Within this ONE authorised file, the shared historical-input helper makes
+    the invariant structural:
+    
+    one historical artefact identity
+    one loader
+    two consumers
+    
+    This is bounded class repair, not adjacent refactoring.
+    
+    If implementation proves the helper cannot be introduced without changing
+    unrelated fixture semantics:
+    
+    STOP.
+    
+    Do not broaden.
+    
+    ==================================================
+    7. FIXTURE SEMANTICS DO NOT CHANGE
+    
+    D384 changes only historical-input acquisition.
+    
+    It does NOT change the expected answers of:
+    
+    D15
+    regression_five
+    
+    It does NOT change:
+    
+    D1-D14
+    D16-D17
+    authority regression expectations
+    EXACT_SNAPSHOT expected set
+    subject semantics
+    scope semantics
+    
+    The five correctly adjudicated AUTHORITY rows remain opposite-side
+    non-regression controls.
+    
+    The historical EXACT_SNAPSHOT set remains whatever the exact frozen v1.2
+    classification artefact records.
+    
+    ==================================================
+    8. NO NEW MUTATION PATH
+    
+    D384 mutation scope remains exactly:
+    
+    kai-pm/house_in_order_h2_v13/cal_fixtures.py
+    
+    No additional tracked source file.
+    
+    No new evidence file.
+    
+    No change to:
+    
+    envelope.py
+    passa.py
+    classify.py
+    run_h2_v12.py
+    qualify.py
+    holdout.py
+    stage_identity.py
+    ontology.py
+    subjectbind.py
+    
+    under D384.
+    
+    ==================================================
+    9. STAGE-A GOVERNANCE REMAINS UNCHANGED
+    
+    D384 changes NO Stage-A proposition.
+    
+    Therefore:
+    
+    H2_STAGE_A_V2
+    governance = [D379,D380,D381]
+    
+    remains exact.
+    
+    Do NOT add:
+    
+    D382
+    D383
+    D384
+    
+    to the V2 governance list.
+    
+    No schema bump.
+    No domain-separator change.
+    No FINAL_CANDIDATE_AGGREGATE change.
+    
+    The eventual cal_fixtures.py byte change is naturally captured because
+    that file is already one of the ten Stage-A h2_sources.
+    
+    ==================================================
+    10. INC-33 STATUS
+    
+    INC-33 remains:
+    
+    OPEN-RECORDED / INCIDENT_ONLY /
+    BLOCKS COMPLETE FIXTURE EXECUTION
+    
+    No new incident.
+    
+    No mechanism assignment yet.
+    
+    D383 + D384 together provide the bounded repair authority.
+    
+    INC-33 closes only after execution demonstrates:
+    
+    the complete fixture suite reaches its end;
+    D15 executes;
+    regression_five executes;
+    no FileNotFoundError from the historical classification input;
+    all governed expectations pass;
+    no unrelated fixture behaviour moves.
+    
+    ==================================================
+    11. THIS TURN — BANK D384 ONLY
+    
+    Do NOT modify cal_fixtures.py yet.
+    
+    For this turn:
+    
+    1. fresh decision allocator;
+    2. append D384 to DECISIONS.md;
+    3. commit;
+    4. push;
+    5. STOP.
+    
+    No ledger mutation is required unless a genuinely new incident appears.
+    
+    Return:
+    
+    1. D384 bank commit
+    2. parent
+    3. tree
+    4. GitHub/server signature state
+    5. exact D384 title
+    6. changed paths
+    7. additions/deletions
+    8. strict append-only proof
+    9. decision allocator pre/post
+    10. incident allocator unchanged at INC-33
+    11. confirmation D384 covers exactly d15 + regression_five historical input
+    12. confirmation mutation path remains cal_fixtures.py only
+    13. confirmation H2_STAGE_A_V2 unchanged
+    14. confirmation V2 governance remains [D379,D380,D381]
+    15. remote branch HEAD
+    16. ahead/behind
+    17. porcelain
+    18. confirmation no source mutation / no Stage A / no candidate /
+        no Pass A / no holdout / no merge
+    
+    PR #122 remains DO NOT MERGE.
+    
+    STOP after banking for Kai verification.
+    END-VERBATIM PROMPT-78125bcf83237f67
+- EVIDENCE PROMPT-eee26257b7bb094d transcript 2026-09-18T23:11:09.752Z: 9306 bytes, sha256 5af1a57a789c7f67825623326fc28bec21752bc479a90b88ec97f5ee47757ad5, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-18T23:11:09.752Z]
+    BEGIN-VERBATIM PROMPT-eee26257b7bb094d
+    D384 is independently verified and accepted.
+    
+    GitHub reports:
+    
+    * commit bf52445266354aaf9053ef30a72018d9c04cdc4d
+    * parent 1bc7c50639671cabf4d2aad0cb4f1e2b59390ac2
+    * tree a57569cb3f8d5cabe842d147dfb420409e8dd9e6
+    * SSH signature valid
+    * only DECISIONS.md
+    * +345 / −0
+    
+    The six-to-two measurement is also important and internally consistent: the historical v1.2 fixture must keep the six-document set, while the repaired current semantics correctly leave only the two genuinely SELF-bound cases. Those are different questions and must remain different controls.
+    
+    Send Orion this:
+    
+    ORION — D384 IS INDEPENDENTLY VERIFIED AND ACCEPTED.
+    
+    The D383 + D384 post-bank execution gate is RELEASED.
+    
+    You may now repair INC-33 exactly within the banked scope and then resume
+    the already-authorised D379/D381/D382 pre-candidate tranche.
+    
+    ==================================================
+    
+    1. EXECUTION BASE
+        ==================================================
+    
+    Current governing HEAD:
+    
+    bf52445266354aaf9053ef30a72018d9c04cdc4d
+    
+    Before mutation confirm:
+    
+    HEAD exactly bf524452...
+    porcelain 0
+    ahead/behind 0/0
+    
+    Otherwise STOP.
+    
+    ==================================================
+    2. IMPLEMENT THE ONE HISTORICAL V12 LOADER
+    
+    Mutation path remains exactly:
+    
+    kai-pm/house_in_order_h2_v13/cal_fixtures.py
+    
+    Implement ONE private helper consumed by both:
+    
+    d15()
+    regression_five()
+    
+    Suggested structural shape:
+    
+    V12 = HERE.parent / "house_in_order_h2_v12"
+    _load_frozen_v12_classification()
+    
+    The helper must resolve ONLY:
+    
+    V12 / "h2v12-classification.json"
+    
+    and mechanically establish that the exact bytes are the governed frozen
+    Git blob:
+    
+    ee524b47b43cfb4a0cc7bc9cb6c3c8f9ae389740
+    
+    ==================================================
+    3. FAIL-CLOSED BLOB IDENTITY
+    
+    Do not merely check that the filename exists.
+    
+    Compute the canonical Git blob object identity from the exact bytes:
+    
+    sha1(
+        b"blob "
+        + decimal_byte_length
+        + b"\0"
+        + exact_file_bytes
+    )
+    
+    and require:
+    
+    ee524b47b43cfb4a0cc7bc9cb6c3c8f9ae389740
+    
+    before parsing JSON.
+    
+    Mismatch:
+    
+    FAIL CLOSED
+    
+    Missing file:
+    
+    FAIL CLOSED
+    
+    Invalid JSON after identity verification:
+    
+    FAIL CLOSED
+    
+    Do not:
+    
+    * search for another same-named file;
+    * accept a v13-local file;
+    * generate a replacement;
+    * accept current classifier output;
+    * accept caller-supplied bytes/digest/path.
+    
+    The historical input is fixed.
+    
+    ==================================================
+    4. BOTH CALL SITES MUST USE THE SAME HELPER
+    
+    Replace both defective independent loads:
+    
+    d15()
+    regression_five()
+    
+    with the one private loader.
+    
+    Do NOT create two corrected literals.
+    
+    That would fix the two instances while retaining the duplication class.
+    
+    One invariant:
+    
+    one frozen v1.2 artefact
+    one loader
+    two consumers
+    
+    ==================================================
+    5. DO NOT TOUCH THE CORRECT V11 PATH
+    
+    The existing:
+    
+    OLD / "h2v11-classification.json"
+    
+    path already resolves correctly.
+    
+    Its current Git blob:
+    
+    09cefb5f411117471f1912eee40af8bfab7b64cb
+    
+    is OUTSIDE this repair.
+    
+    Do not alter it.
+    
+    ==================================================
+    6. HISTORICAL SIX AND CURRENT TWO ARE DIFFERENT CONTROLS
+    
+    This distinction must remain explicit.
+    
+    Historical regression control
+    
+    regression_five() loads the exact frozen v1.2 classification artefact.
+    
+    Its historical EXACT_SNAPSHOT set remains the six Kai/D364 rows.
+    
+    Do NOT alter that expected six.
+    
+    Do NOT repoint that control at current output.
+    
+    Current repaired semantics
+    
+    Separately, under the D381/D382 subject projection, only:
+    
+    kai-pm/UH0_EVIDENCE_MANIFEST.md
+    kai-pm/SERVICE_IDENTITY_STATE.md
+    
+    remain valid EXACT_SNAPSHOT positives from that old six-document family.
+    
+    The other four no longer earn current EXACT_SNAPSHOT:
+    
+    CODE_AUDIT_FINAL_REPORT.md
+    CODE_AUDIT_MASTER.md
+    CODE_AUDIT_PLANNING_PACKAGE_QA.md
+    house_in_order_instrument/AUTHORITY_ONTOLOGY.md
+    
+    The two survivors correspond exactly to:
+    
+    acquisition commit
+    validated checkpoint
+    
+    which D381 adjudicates SELF.
+    
+    Therefore:
+    
+    historical six != current repaired two
+    
+    This is expected.
+    
+    Never “update” the historical control to two.
+    
+    Never “restore” the current semantics to six.
+    
+    ==================================================
+    7. RUN THE COMPLETE FIXTURE SUITE
+    
+    After the loader repair, run cal_fixtures.py to completion.
+    
+    Required:
+    
+    process reaches its normal final summary
+    no FileNotFoundError
+    D15 executes
+    regression_five executes
+    zero fixture FAIL results
+    
+    Do not report:
+    
+    "60 passed"
+    
+    as success if the process does not reach its final return.
+    
+    Process exit status is authoritative.
+    
+    If any post-D15 fixture fails:
+    
+    STOP and report the exact failure.
+    
+    Do not tune expected values.
+    
+    ==================================================
+    8. INC-33 CLOSURE CONDITION
+    
+    INC-33 is not closed merely because the helper exists.
+    
+    Closure evidence requires:
+    
+    exact blob identity verified
+    both consumers use the loader
+    full fixture suite reaches end
+    D15 passes
+    regression_five passes
+    zero unrelated fixture movement
+    process exits 0
+    
+    Until those are demonstrated:
+    
+    INC-33 remains OPEN
+    
+    Do not append a closure claim yet merely from code inspection.
+    
+    ==================================================
+    9. THEN RESUME D382 / SB-SCOPE-ALL
+    
+    Implement the executable D382 derivation.
+    
+    Important adjudication from Kai:
+    
+    The six formerly “unlocated” RUN_ID records are DUPLICATE EMITTED RECORDS,
+    not missing source evidence.
+    
+    The complete frozen Pass-A witness population is:
+    
+    emitted records                 491
+    distinct exact evidence IDs     480
+    duplicate identity groups         9
+    duplicate excess records         11
+    
+    SB-SCOPE-ALL compares the MULTISET of emitted records.
+    
+    Do NOT deduplicate.
+    
+    Expected but not hard-coded:
+    
+    491 comparable emitted records
+    0 applicability-scope differences
+    
+    The control derives the denominator itself.
+    
+    Also emit diagnostic:
+    
+    distinct exact evidence identities = 480
+    duplicate groups = 9
+    duplicate excess = 11
+    
+    Truthfulness denominator:
+    
+    491
+    
+    Independence diagnostic:
+    
+    480
+    
+    Never collapse them.
+    
+    ==================================================
+    10. INC-32 REMAINS OPEN UNTIL MACHINE DERIVATION PASSES
+    
+    Execute, not assert:
+    
+    Population A four-kind universe
+    Population A all-kind diagnostic
+    U_A
+    Population B projection
+    Population B all-kind diagnostic
+    document denominator
+    per-kind counts
+    exact two A→B movements
+    SB-SCOPE-ALL
+    
+    Only after those controls pass can INC-32 be presented for closure.
+    
+    ==================================================
+    11. CONTINUE THE ORIGINAL PRE-CANDIDATE IMPLEMENTATION
+    
+    Once the complete fixture suite and D382 controls are green, continue the
+    already released D379/D381 tranche:
+    
+    residual D14
+    Q1a
+    Q1b
+    E1 proof
+    §8(6)
+    I1-A
+    I1-B
+    Stage-A V2 synthetic construction
+    Stage-A / Stage-B separation
+    SB
+    STAGE_A
+    STDLIB
+    DEP
+    
+    Create/implement:
+    
+    stage_identity.py
+    
+    under the already-bank-authorised D379/D381 semantics.
+    
+    No need to stop merely because D383/D384 work passes.
+    
+    Continue until either:
+    
+    all pre-candidate controls execute and pass
+    
+    or:
+    
+    a genuinely new material incident appears
+    
+    If a new material incident appears:
+    
+    STOP.
+    
+    Do not self-expand authority.
+    
+    ==================================================
+    12. STILL FORBIDDEN
+    
+    No:
+    
+    production Stage A
+    candidate
+    real Pass A candidate run
+    real candidate classification
+    holdout
+    blind 40
+    admission
+    freeze
+    Item 8
+    six builds
+    KAI-GATE-048 progression
+    A-4
+    merge
+    
+    Synthetic/calibration Stage-A construction remains permitted only as already
+    authorised.
+    
+    PR #122 remains DO NOT MERGE.
+    
+    ==================================================
+    13. IMPLEMENTATION COMMIT
+    
+    If all pre-candidate controls are green and no new incident arises:
+    
+    commit/push the complete bounded implementation tranche.
+    
+    If INC-32 and INC-33 have mechanically satisfied their closure conditions,
+    report them as CLOSURE CANDIDATES to Kai.
+    
+    Do NOT silently rewrite their existing ledger records.
+    
+    Return the evidence for Kai adjudication first.
+    
+    ==================================================
+    14. RETURN
+    
+    Return:
+    
+    1. implementation commit SHA
+    2. parent / tree
+    3. server signature
+    4. changed paths and counts
+    5. scope-confinement result
+    6. complete cal_fixtures.py exit status
+    7. fixture PASS / FAIL totals
+    8. D15 result
+    9. regression_five result
+    10. v12 blob identity result
+    11. historical-six result
+    12. current-two subject result
+    13. SB-CORPUS-1
+    14. SB-SCOPE-ALL derived denominator
+    15. SB-SCOPE-ALL differences
+    16. duplicate diagnostics 491 / 480 / 9 / 11
+    17. SB-CORPUS-3
+    18. SB-MOVED-1 / 2
+    19. M2
+    20. COMMIT=>VERIFIED
+    21. residual D14
+    22. Q1a
+    23. Q1b
+    24. E1
+    25. §8(6)
+    26. I1-A
+    27. I1-B
+    28. STAGE_A
+    29. STDLIB
+    30. DEP
+    31. Stage-A/Stage-B synthetic separation
+    32. confirmation no NOT_IMPLEMENTED control remains
+    33. INC-32 closure-candidate evidence, if earned
+    34. INC-33 closure-candidate evidence, if earned
+    35. confirmation no production Stage A/candidate/PassA/holdout/blind40
+    36. remote HEAD / ahead-behind / porcelain
+    37. PR #122 still DO NOT MERGE
+    
+    Then STOP for Kai adjudication.
+    
+    The project is now in a much stronger place than it looked a few turns ago. We’ve found and separated three different things instead of mixing them:
+    
+    * the actual subject-binding repair, which is behaving correctly;
+    * a measurement-universe documentation defect, now governed by D382;
+    * an old test-harness path defect, now bounded by INC-33/D383/D384.
+    
+    That separation is exactly what makes the assurance work trustworthy.
+    END-VERBATIM PROMPT-eee26257b7bb094d
+- EVIDENCE PROMPT-0907d103d7939515 transcript 2026-09-18T23:23:45.655Z: 11139 bytes, sha256 1e717a755871d0724871610e2895613b30774830c55db3e6b487e2f28b3962dc, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-18T23:23:45.655Z]
+    BEGIN-VERBATIM PROMPT-0907d103d7939515
+    I’ve finished the independent check. There are two separate rulings, and one additional defect Orion did not spot.
+    
+    First, 7613ce88… is a legitimate checkpoint: GitHub reports valid SSH, and the subject repair/census evidence is real. INC-34 is also real, but I do not want to weaken H2_PY_STDLIB_V1 just to accommodate Debian packaging. D380 is doing what we designed it to do: an interpreter whose supposedly governed standard library reaches outside the governed roots is not a governed interpreter. The safer answer is a controlled/self-contained Python runtime for the assurance process.
+    
+    Second, while checking the actual evidence rather than Orion’s message, I found this:
+    
+    65 passed, 9 failed
+    EXIT GATE: FAIL
+    process exit status = 0
+    
+    But d379_controls.py explicitly returns 1 when failures exist. So the evidence capture itself has written a false exit status. That is material and must be recorded separately. This is exactly the discipline you were talking about earlier: we cannot accept even Orion’s evidence file because the surrounding message says it ran correctly.
+    
+    Send Orion this:
+    
+    ORION — CHECKPOINT 7613ce88 INDEPENDENTLY REVIEWED.
+    
+    STOP SOURCE EXECUTION FOR ONE GOVERNANCE TURN.
+    
+    There are TWO separate matters.
+    
+    ==================================================
+    
+    1. CHECKPOINT VERIFIED
+        ==================================================
+    
+    commit
+    7613ce88ae896b2fad72252f12b5cde63458c08e
+    parent
+    bf52445266354aaf9053ef30a72018d9c04cdc4d
+    tree
+    f9ff20819f249bf66e94cc1623fe29c12a8a1b0a
+    
+    GitHub server verification:
+    
+    verified = true
+    reason   = valid
+    SSH signature valid
+    
+    Server delta:
+    
+    +1294 / -19
+    FAILURE_PATTERN_LEDGER.md
+    D379_CONTROLS.txt
+    d379_controls.py
+    cal_fixtures.py
+    stage_identity.py
+    
+    Scope is within the released surface.
+    
+    ==================================================
+    2. INC-34 — KAI RULING
+    
+    INC-34 is accepted as a genuine runtime-compatibility finding.
+    
+    The implementation is NOT defective.
+    
+    D380 §7.6 says literally:
+    
+    final symlink target outside governed root set -> REFUSE
+    
+    and:
+    
+    there is no external-dependency escape hatch in this schema
+    
+    The implementation did exactly that.
+    
+    Measured current runtime:
+    
+    stdlib / platstdlib
+    /usr/lib/python3.11
+    sitecustomize.py
+    -> /etc/python3.11/sitecustomize.py
+    config-.../libpython3.11.so
+    -> /usr/lib/x86_64-linux-gnu/libpython3.11.so.1.0
+    
+    Those targets are outside D380’s governed stdlib roots.
+    
+    Therefore the correct current interpretation is:
+    
+    THIS INTERPRETER IS NOT A D380-COMPLIANT GOVERNED INTERPRETER.
+    
+    Do NOT weaken §7.6.
+    
+    Do NOT invent an external-target exception.
+    
+    Do NOT hash raw absolute symlink targets.
+    
+    Do NOT add distro-specific root allowances.
+    
+    Do NOT create H2_PY_STDLIB_V2.
+    
+    Do NOT bump H2_STAGE_A_V2.
+    
+    ==================================================
+    3. D385 — RUNTIME ADJUDICATION
+    
+    Fresh allocator permitting, bank D385.
+    
+    Suggested title:
+    
+    D385 — 2026-09-19 — INC-34 ADJUDICATION.
+    H2_PY_STDLIB_V1 UNCHANGED; CURRENT DISTRIBUTION CPYTHON IS A
+    KNOWN-NEGATIVE RUNTIME. GOVERNED KNOWN-POSITIVE INTERPRETER REQUIRED.
+    NO STAGE-A SCHEMA OR GOVERNANCE CHANGE.
+    
+    D385 must state:
+    
+    A. D380 remains normative unchanged
+    
+    H2_PY_STDLIB_V1 is NOT amended.
+    
+    §7.6 remains:
+    
+    out-of-governed-root symlink -> REFUSE
+    
+    B. Current Debian-style interpreter is a known-negative
+    
+    The current interpreter is useful calibration evidence:
+    
+    D380-STDLIB-NEG-1
+    real interpreter with escaping governed-root symlink
+    -> REFUSE
+    
+    That is a successful negative control.
+    
+    C. Positive calibration requires a D380-compliant interpreter
+    
+    A known-positive interpreter must satisfy the existing D380 rules,
+    including:
+    
+    stdlib / platstdlib mechanically identified
+    external package roots excluded
+    every governed symlink final target remains within governed root set
+    no dangling links
+    single ownership
+    no duplicate canonical member
+    loaded filesystem-backed stdlib represented
+    
+    No new exception class.
+    
+    Call this:
+    
+    D380-COMPLIANT INTERPRETER
+    
+    not “special Debian handling”.
+    
+    D. Calibration-only runtime may be local / synthetic
+    
+    D379 already permits synthetic/local calibration.
+    
+    A local temporary interpreter may therefore be used solely for
+    STDLIB/STAGE_A calibration if it satisfies D380 byte-for-byte.
+    
+    It must NOT:
+    
+    * become a production Stage A;
+    * seed the holdout;
+    * modify repository source merely to fit its layout;
+    * introduce an ungoverned dependency;
+    * silently substitute for the later real candidate runtime.
+    
+    If no compliant interpreter is locally available:
+    
+    STDLIB positive limb remains HELD
+    
+    Do not weaken the contract.
+    
+    E. Future production implication
+    
+    The eventual real candidate must execute under a governed runtime that
+    satisfies the same D380 conditions.
+    
+    This is a production-environment prerequisite, not a reason to change the
+    identity schema.
+    
+    ==================================================
+    4. STAGE-A GOVERNANCE REMAINS EXACT
+    
+    D385 changes NO Stage-A proposition.
+    
+    Therefore:
+    
+    H2_STAGE_A_V2 governance =
+    [D379,D380,D381]
+    
+    unchanged.
+    
+    D382/D383/D384/D385 remain outside the descriptor.
+    
+    No schema bump.
+    No separator change.
+    No FINAL_CANDIDATE_AGGREGATE change.
+    
+    ==================================================
+    5. NEW MATERIAL FINDING — CONTROL EVIDENCE STATUS IS FALSE
+    
+    Kai independently read the actual committed:
+    
+    build_evidence/D379_CONTROLS.txt
+    
+    Its tail states:
+    
+    65 passed, 9 failed
+    EXIT GATE: FAIL
+    ...
+    process exit status = 0
+    
+    But the committed control program says:
+    
+    return 1 if FAILED else 0
+    
+    and Orion’s own execution report stated:
+    
+    d379_controls.py exit 1
+    
+    Therefore the durable evidence file contains a false process-exit claim.
+    
+    This is NOT cosmetic.
+    
+    D379 requires executed controls and actual process-return-code evidence.
+    
+    The evidence artefact currently contradicts the program it records.
+    
+    ==================================================
+    6. BANK INC-35
+    
+    Fresh incident allocator expected:
+    
+    highest INC-34
+    next free INC-35
+    
+    If confirmed, append:
+    
+    INC-2026-09-19-35
+    
+    Substance:
+    
+    producer
+      D379 hostile-control evidence capture
+    subject
+      D379_CONTROLS.txt process exit-status record
+    status
+      OPEN-RECORDED / INCIDENT_ONLY /
+      BLOCKS D379 CONTROL-EVIDENCE CLOSURE
+    faulty output
+      process exit status = 0
+    actual governed control state
+      65 passed / 9 failed
+      EXIT GATE = FAIL
+      d379_controls.py returns 1 when FAILED != 0
+    effect
+      the durable evidence file falsely records successful process status
+      beside a failing internal gate.
+    mechanism
+      NONE ASSIGNED.
+    qualified locators only
+      earlier status-capture / false-green incidents may be useful locators,
+      but causal equivalence is NOT established.
+    do not merge with
+      INC-34
+      INC-32
+      INC-33
+      RC-7
+      unless later evidence establishes equivalence.
+    
+    ==================================================
+    7. D386 — MACHINE-BOUND CONTROL CAPTURE
+    
+    Fresh allocator after D385 expected:
+    
+    next free D386
+    
+    Bank D386 governance-only.
+    
+    Suggested title:
+    
+    D386 — 2026-09-19 — BOUNDED D379 CONTROL-EVIDENCE EXIT-STATUS
+    CAPTURE REPAIR. D379_CONTROLS HARNESS ONLY.
+    GOVERNANCE ONLY — BANKING IS NOT EXECUTION.
+    NO STAGE-A PROPOSITION CHANGE.
+    
+    Mutation scope:
+    
+    kai-pm/house_in_order_h2_v13/build_evidence/d379_controls.py
+    kai-pm/house_in_order_h2_v13/build_evidence/D379_CONTROLS.txt
+    
+    No new control file.
+    
+    ==================================================
+    8. D386 REQUIRED STRUCTURAL FIX
+    
+    Do NOT fix INC-35 by manually changing:
+    
+    process exit status = 0
+    
+    to 1.
+    
+    The capture must become mechanical.
+    
+    Preferred bounded design:
+    
+    d379_controls.py --capture D379_CONTROLS.txt
+    
+    acts as a parent capture process.
+    
+    Parent launches the real control execution as a CHILD subprocess.
+    
+    Child:
+    
+    executes the control matrix
+    prints complete untruncated output
+    returns its real exit status
+    
+    Parent:
+    
+    captures stdout + stderr
+    captures child.returncode directly
+    writes the exact child output
+    writes:
+        process exit status = <child.returncode>
+    returns the SAME child.returncode
+    
+    No shell $? reconstructed later.
+    
+    No pipeline status.
+    
+    No manually supplied status.
+    
+    No caller-supplied --status.
+    
+    The recorded status must come directly from the subprocess object that
+    produced the captured output.
+    
+    ==================================================
+    9. FIXTURE EXECUTION SHOULD ALSO BECOME DURABLE
+    
+    Under D386, the same capture harness may execute:
+    
+    cal_fixtures.py
+    
+    as a distinct subprocess and record:
+    
+    fixture process exit status
+    full fixture output
+    
+    This gives durable machine evidence for INC-33 closure rather than relying
+    only on the commit message.
+    
+    Keep identities separate:
+    
+    D379 CONTROL PROCESS STATUS
+    !=
+    CAL_FIXTURES PROCESS STATUS
+    
+    No common-source independence claim.
+    
+    They are two separately executed subjects.
+    
+    ==================================================
+    10. INC-32 / INC-33 — CLOSURE CANDIDATES, NOT YET BANKED CLOSED
+    
+    The substantive evidence is strong.
+    
+    INC-32 currently has:
+    
+    491 emitted records
+    480 distinct identities
+    9 duplicate groups
+    11 excess records
+    Population A derived
+    Population B derived
+    exact two A->B moves
+    SB-SCOPE-ALL 491 / 0 / 0 unresolved
+    SB-CORPUS-3 exact
+    
+    INC-33 currently has:
+    
+    one blob-bound v12 loader
+    both call sites use it
+    historical six preserved
+    79 PASS / 0 FAIL
+    suite reaches end
+    
+    BUT closure is held until the repaired D386 capture records the relevant
+    actual subprocess statuses truthfully.
+    
+    Do not close either ledger entry in this banking turn.
+    
+    ==================================================
+    11. CONTINUE OTHER INDEPENDENT WORK AFTER D385/D386
+    
+    After Kai verifies both banks and releases execution:
+    
+    You may continue independent D379 sections that do NOT require a positive
+    stdlib construction.
+    
+    Do not let INC-34 unnecessarily freeze:
+    
+    D14
+    Q1a portions independent of real stdlib positive
+    Q1b
+    E1
+    I1-A
+    I1-B
+    DEP
+    
+    where their own prerequisites permit.
+    
+    But:
+    
+    STDLIB positive
+    STAGE_A positive using canonical runtime
+    
+    remain HELD until a D380-compliant known-positive interpreter is actually
+    measured.
+    
+    The current Debian interpreter remains the known-negative.
+    
+    ==================================================
+    12. THIS TURN — BANKING ONLY
+    
+    For this turn:
+    
+    1. append INC-35 to the ledger;
+    2. append D385;
+    3. append D386;
+    4. commit;
+    5. push;
+    6. STOP.
+    
+    NO source mutation.
+    
+    Return:
+    
+    1. banking commit
+    2. parent
+    3. tree
+    4. server signature state
+    5. changed paths/counts
+    6. append-only proofs
+    7. incident allocator pre/post
+    8. decision allocator pre/post
+    9. exact INC-35 status
+    10. exact D385 title
+    11. exact D386 title
+    12. confirmation D380 §7 unchanged
+    13. confirmation H2_STAGE_A_V2 unchanged
+    14. confirmation governance remains [D379,D380,D381]
+    15. confirmation current interpreter classified known-negative
+    16. confirmation no stdlib escape hatch authorised
+    17. confirmation INC-32/33 remain closure candidates
+    18. confirmation INC-34/35 remain OPEN
+    19. remote HEAD / ahead-behind / porcelain
+    20. no Stage A / candidate / Pass A / holdout / blind40 / merge
+    
+    PR #122 remains DO NOT MERGE.
+    
+    STOP.
+    
+    So the architecture ruling is clear: we keep the strict runtime identity contract and change the environment, not the security rule. That is the higher-quality choice.
+    
+    And the false process exit status = 0 is exactly why we keep independently checking the evidence rather than accepting summaries—even now.
+    END-VERBATIM PROMPT-0907d103d7939515
+- EVIDENCE PROMPT-2d62ad20f876627f transcript 2026-09-18T23:29:29.625Z: 10066 bytes, sha256 7e0f215bf5f9a17929fca9f078d09bc6923531da296deb4638eb2d530c7074ef, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-18T23:29:29.625Z]
+    BEGIN-VERBATIM PROMPT-2d62ad20f876627f
+    D385/D386 are independently verified and accepted.
+    
+    GitHub reports fe94a792ebbc530048cc5bc2cd96c51e55963997 as valid SSH, with exactly the two banking files changed and +531/−0. No source bytes moved.
+    
+    One correction on the date: 23:24 UTC on 18 September was 00:24 BST on 19 September in the UK, so my proposed 2026-09-19 was not future-dated in your local timezone. Orion used UTC and explicitly recorded that basis, so the entries are still truthful. I would not add an erratum merely to change the date convention.
+    
+    We can now resume execution.
+    
+    ORION — D385 AND D386 ARE INDEPENDENTLY VERIFIED AND ACCEPTED.
+    
+    Bank:
+    
+    fe94a792ebbc530048cc5bc2cd96c51e55963997
+    parent
+    7613ce88ae896b2fad72252f12b5cde63458c08e
+    tree
+    76df2f528d32641287a5e816ac265df724996a37
+    
+    GitHub:
+    
+    verified = true
+    reason   = valid
+    SSH signature valid
+    
+    Delta:
+    
+    DECISIONS.md                +421 / -0
+    FAILURE_PATTERN_LEDGER.md   +110 / -0
+    TOTAL                       +531 / -0
+    
+    No source mutation occurred.
+    
+    ==================================================
+    
+    1. DATE NOTE — NO CORRECTION ENTRY
+        ==================================================
+    
+    At allocation:
+    
+    2026-09-18 23:24 UTC
+    =
+    2026-09-19 00:24 BST
+    
+    Therefore Kai’s proposed 2026-09-19 was not future-dated in the user’s
+    local timezone.
+    
+    However the banked records explicitly state that they used UTC as their
+    date basis.
+    
+    That makes them truthful.
+    
+    Do NOT create an erratum merely to change 09-18 to 09-19.
+    
+    Future records should state the time basis if the date boundary is material.
+    
+    ==================================================
+    2. D386 EXECUTION RELEASED
+    
+    Implement the bounded D386 repair.
+    
+    Authorised paths:
+    
+    kai-pm/house_in_order_h2_v13/build_evidence/d379_controls.py
+    kai-pm/house_in_order_h2_v13/build_evidence/D379_CONTROLS.txt
+    
+    No other path under D386.
+    
+    ==================================================
+    3. MECHANICAL CHILD STATUS CAPTURE
+    
+    The durable evidence must no longer obtain status from shell state.
+    
+    Implement a parent/child structure inside d379_controls.py.
+    
+    Conceptual contract:
+    
+    PARENT
+      launches CHILD with subprocess
+      captures child's stdout/stderr
+      reads child.returncode directly
+      writes exact child output
+      writes:
+          process exit status = <child.returncode>
+      exits with the SAME child.returncode
+    
+    The CHILD executes the control matrix.
+    
+    The status authority is:
+    
+    subprocess.CompletedProcess.returncode
+    
+    from the process that produced the captured output.
+    
+    Forbidden:
+    
+    $?
+    PIPESTATUS
+    shell pipeline reconstruction
+    manual --status
+    caller-supplied status
+    hard-coded status
+    parsing "EXIT GATE" text to infer status
+    
+    Do not repair INC-35 by changing 0 to 1.
+    
+    ==================================================
+    4. CAPTURE CAL_FIXTURES AS A SEPARATE SUBJECT
+    
+    Under the D386 permission, capture cal_fixtures.py as a separate child
+    process.
+    
+    Record separately:
+    
+    fixture process exit status = <actual child returncode>
+    
+    plus its complete untruncated output.
+    
+    Do NOT describe control status and fixture status as independent
+    corroboration of the same fact.
+    
+    They are different subjects:
+    
+    D379 control process
+    cal_fixtures process
+    
+    ==================================================
+    5. HOSTILE CALIBRATION OF THE CAPTURE ITSELF
+    
+    Do not merely demonstrate the happy path.
+    
+    The capture mechanism must prove at least:
+    
+    CAPTURE-1
+    child returns 0
+    recorded status = 0
+    parent returns 0
+    CAPTURE-2
+    child returns 1
+    recorded status = 1
+    parent returns 1
+    CAPTURE-3
+    child returns 2
+    recorded status = 2
+    parent returns 2
+    
+    Use controlled synthetic children or a bounded internal calibration mode.
+    
+    Also prove:
+    
+    captured output belongs to that same child invocation
+    status is taken from that child's returncode
+    no pipeline or intervening command can overwrite it
+    
+    No status-text parsing as authority.
+    
+    ==================================================
+    6. RE-RUN COMPLETE FIXTURES THROUGH THE REPAIRED CAPTURE
+    
+    Required durable evidence:
+    
+    fixture process exit status = 0
+    79 PASS
+    0 FAIL
+    normal suite completion reached
+    D15 PASS
+    regression_five PASS
+    historical six preserved
+    
+    If any differs:
+    
+    STOP.
+    
+    Do not close INC-33.
+    
+    ==================================================
+    7. RE-RUN D379 CONTROLS THROUGH THE REPAIRED CAPTURE
+    
+    At the current partial implementation state, it is EXPECTED that the
+    control process remains non-zero while NOT_IMPLEMENTED sections remain.
+    
+    That is useful calibration.
+    
+    The durable artefact must now truthfully record the actual non-zero value.
+    
+    For example, if the matrix remains:
+    
+    65 passed
+    9 failed
+    EXIT GATE: FAIL
+    
+    and the child returns 1, the durable file must say:
+    
+    process exit status = 1
+    
+    Not zero.
+    
+    INC-35 closure requires the status capture to remain truthful on BOTH a
+    failing and a later green execution.
+    
+    ==================================================
+    8. INC-32 / INC-33 CLOSURE EVIDENCE
+    
+    After repaired capture:
+    
+    INC-32
+    
+    Retain machine-derived:
+    
+    491 emitted records
+    480 distinct identities
+    9 duplicate groups
+    11 excess records
+    Population A
+    167 consumer-relevant / 168 all-kind
+    Population B
+    165 / 164 documents
+    DATE 160
+    COMMIT 5
+    exact two A->B movements
+    SB-SCOPE-ALL
+    491 comparable
+    0 scope differences
+    0 unresolved
+    SB-CORPUS-3 exact
+    
+    INC-33
+    
+    Retain:
+    
+    one blob-bound v1.2 loader
+    two consumers
+    exact blob verified
+    79 / 0
+    process exit 0
+    historical six preserved
+    
+    If reproduced under truthful capture, return INC-32 and INC-33 as
+    CLOSURE CANDIDATES.
+    
+    Do NOT edit their ledger status yet.
+    
+    ==================================================
+    9. INC-35 STATUS
+    
+    INC-35 remains OPEN until:
+    
+    known-negative capture proves non-zero child -> same recorded non-zero
+    known-positive capture proves zero child -> same recorded zero
+    parent returns same status
+    durable evidence contains actual status
+    
+    Then return it as a CLOSURE CANDIDATE.
+    
+    Do not assign it to R9 or an earlier status mechanism merely because the
+    shape resembles them.
+    
+    Mechanism remains NONE ASSIGNED unless causal equivalence is established.
+    
+    ==================================================
+    10. INC-34 / STDLIB
+    
+    D385 stands.
+    
+    Current Debian interpreter remains:
+    
+    KNOWN-NEGATIVE
+    
+    Do NOT change stage_identity.py to admit it.
+    
+    Do NOT weaken D380 §7.6.
+    
+    Do NOT create an external symlink class.
+    
+    Do NOT add /etc or /usr/lib/x86_64-linux-gnu as distro-specific
+    governed roots.
+    
+    ==================================================
+    11. LOOK FOR A D380-COMPLIANT INTERPRETER — READ-ONLY FIRST
+    
+    Perform a READ-ONLY inventory of locally available Python interpreters.
+    
+    For each candidate executable:
+    
+    derive:
+    
+    sys.executable
+    implementation_name
+    cache_tag
+    version
+    stdlib
+    platstdlib
+    purelib
+    platlib
+    
+    then run the D380 §7 stdlib construction as a calibration probe.
+    
+    Do not install, download or build a new interpreter during this step.
+    
+    Classify each observed runtime:
+    
+    D380-COMPLIANT
+    or
+    KNOWN-NEGATIVE with exact refusal
+    
+    If an already-installed compliant interpreter exists, use it ONLY for
+    synthetic/local STDLIB and STAGE_A calibration.
+    
+    It carries zero production weight.
+    
+    If none exists:
+    
+    STDLIB positive = HELD
+    STAGE_A positive requiring canonical runtime = HELD
+    
+    Report that fact.
+    
+    Do not alter the contract.
+    
+    ==================================================
+    12. CONTINUE INDEPENDENT D379 WORK
+    
+    Do not freeze the whole tranche on INC-34.
+    
+    Continue the authorised mechanisms whose prerequisites do not require the
+    positive canonical stdlib runtime:
+    
+    D14
+    Q1b
+    E1
+    I1-A
+    I1-B
+    DEP
+    Q1a portions mechanically independent of STDLIB positive
+    
+    Use the exact banked D379/D380/D381 semantics.
+    
+    Do not mark a section IMPLEMENTED until every control in that section
+    actually executes.
+    
+    ==================================================
+    13. Q1a BOUNDARY
+    
+    If a Q1a control requires the governed runtime identity itself to be
+    positive, do NOT fake it with the known-negative interpreter.
+    
+    Separate:
+    
+    Q1a logic independently testable with synthetic/local Stage-A material
+    
+    from:
+    
+    Q1a proof that depends on successful D380 runtime construction
+    
+    The latter remains HELD with STDLIB.
+    
+    Do not conflate partial Q1a implementation with section closure.
+    
+    ==================================================
+    14. STILL FORBIDDEN
+    
+    No:
+    
+    production Stage A
+    candidate
+    real Pass A
+    real classification candidate
+    real Stage B
+    holdout
+    blind 40
+    admission
+    freeze
+    Item 8
+    six builds
+    KAI-GATE-048 progression
+    A-4
+    merge
+    
+    PR #122 remains DO NOT MERGE.
+    
+    ==================================================
+    15. CHECKPOINT RULE
+    
+    Continue until either:
+    
+    A. all independently executable sections are implemented/tested
+    
+    or:
+    
+    B. another genuinely new material incident appears
+    
+    If B:
+    
+    STOP immediately.
+    
+    No self-expansion.
+    
+    If A is reached while STDLIB positive is still unavailable, commit a
+    truthful PARTIAL CHECKPOINT showing exactly which sections are green and
+    which remain HELD on INC-34.
+    
+    ==================================================
+    16. RETURN
+    
+    Return:
+    
+    1. implementation/checkpoint commit SHA
+    2. parent/tree
+    3. server signature
+    4. changed paths/counts
+    5. scope confinement
+    6. CAPTURE-1/2/3
+    7. actual captured failing-control return code
+    8. durable recorded failing-control status
+    9. fixture child return code
+    10. durable fixture recorded status
+    11. fixture totals
+    12. D15
+    13. regression_five
+    14. INC-32 closure-candidate evidence
+    15. INC-33 closure-candidate evidence
+    16. INC-35 closure-candidate evidence
+    17. local interpreter inventory
+    18. each runtime’s D380 result
+    19. whether a compliant calibration runtime exists
+    20. D14
+    21. Q1a partial/full status
+    22. Q1b
+    23. E1
+    24. I1-A
+    25. I1-B
+    26. DEP
+    27. STDLIB
+    28. STAGE_A
+    29. exact remaining NOT_IMPLEMENTED / HELD sections
+    30. control process final exit status
+    31. confirmation no production Stage A/candidate/PassA/holdout/blind40
+    32. remote HEAD / ahead-behind / porcelain
+    33. PR #122 still DO NOT MERGE
+    
+    Then STOP for Kai adjudication.
+    
+    The key quality point here is important: the system now caught a bad subject assumption, a bad population recipe, a broken historical fixture path, an incompatible runtime, and a false exit-status recorder before any real candidate or holdout was allowed to exist.
+    
+    That is painful progress, but it is exactly what a serious assurance layer is supposed to do.
+    END-VERBATIM PROMPT-2d62ad20f876627f
+- EVIDENCE PROMPT-ec377e69a84cb044 transcript 2026-09-18T23:42:46.453Z: 11103 bytes, sha256 b93b85561fb7fd8e7d2443b49c4bfcc8a4b8004893d10b68879a3e7dfe9564e6, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-18T23:42:46.453Z]
+    BEGIN-VERBATIM PROMPT-ec377e69a84cb044
+    This checkpoint is not accepted as “all independently executable work is done.” The capture repair is good, but I found a new false-green in §8(6), and Q1b was incorrectly classified as HELD.
+    
+    The important distinction is:
+    
+    * D386 capture repair: accepted.
+    * INC-32 / INC-33 / INC-35: still strong closure candidates.
+    * INC-34: genuinely blocks the compliant-runtime positive limbs.
+    * Q1b/E1: not blocked by INC-34; they must be implemented using synthetic/local result objects.
+    * §8(6): false green. Current qualify.py silently ignores every loaded module outside the candidate directory, contrary to D380’s closed three-class rule.
+    
+    Send Orion this:
+    
+    ORION — CHECKPOINT a233a210535755fefb3cb6f43e503c1b66248e50
+    INDEPENDENTLY REVIEWED.
+    
+    GitHub verifies:
+    
+    commit
+    a233a210535755fefb3cb6f43e503c1b66248e50
+    parent
+    fe94a792ebbc530048cc5bc2cd96c51e55963997
+    tree
+    63c822e17bd8a117fc0d95061088c26a577cb0fe
+    signature
+    verified = true
+    reason   = valid
+    SSH
+    
+    Delta:
+    
+    +1016 / -50
+    5 authorised paths
+    0 unauthorised paths
+    
+    The D386 capture repair is ACCEPTED.
+    
+    However the checkpoint is NOT accepted as:
+    
+    "every independently executable section is done"
+    
+    Two adjudications follow.
+    
+    ==================================================
+    
+    1. D386 CAPTURE REPAIR — ACCEPTED
+        ==================================================
+    
+    The durable artefact now truthfully carries:
+    
+    EXIT GATE: FAIL
+    process exit status = 1
+    
+    and separately:
+    
+    PASS 79
+    FAIL 0
+    fixture process exit status = 0
+    
+    The capture calibration proves:
+    
+    child 0 -> recorded 0 -> parent 0
+    child 1 -> recorded 1 -> parent 1
+    child 2 -> recorded 2 -> parent 2
+    
+    plus CAPTURE-4 showing a later successful command cannot overwrite an
+    earlier child’s status.
+    
+    The status comes from:
+    
+    subprocess.CompletedProcess.returncode
+    
+    of the process that produced the captured output.
+    
+    INC-35’s original mechanism is therefore repaired.
+    
+    INC-32, INC-33 and INC-35 remain CLOSURE CANDIDATES pending the normal
+    ledger-closing turn; do not rewrite them yet because a new material defect
+    has now appeared.
+    
+    ==================================================
+    2. Q1b IS NOT LEGITIMATELY HELD
+    
+    The checkpoint says:
+    
+    Q1b HELD — requires a real classification result
+    
+    That is contrary to D379.
+    
+    D379 §8 states:
+    
+    All hostile cases run against SYNTHETIC AND LOCAL SUBJECTS ONLY.
+    
+    And expressly:
+    
+    Q1b takes no Pass-A input.
+    
+    Required Q1b controls are:
+    
+    Q1b-1 clean complete result
+          PASS, both denominators and sum printed
+    Q1b-2 one positive evidence fact missing its trace
+          FAIL, naming fact and row
+    Q1b-3 axis-cell witness failure
+          FAIL
+    Q1b-4 abstention list inconsistent with emitted positives
+          FAIL
+    Q1b-5 denominator shrink — remove a fact class
+          FAIL
+    Q1b-6 opposite-side clean known-negative
+          PASS
+    
+    The frozen v1.2 artefact having boolean-only evidence_facts is therefore
+    NOT a blocker.
+    
+    It merely means:
+    
+    do not use that historical result as Q1b's clean synthetic fixture.
+    
+    Build a synthetic/local result object carrying the authorised emitted-result
+    schema and complete per-fact traces.
+    
+    Then mutate that synthetic subject for Q1b-2 through Q1b-5.
+    
+    Do NOT hard-code the old 659 measurement.
+    
+    Derive both denominators from the emitted result schema.
+    
+    ==================================================
+    3. E1 IS NOT SEPARATELY HELD
+    
+    D379 says:
+    
+    E1 visible and proven THROUGH Q1b
+    
+    Therefore once the Q1b synthetic matrix exists, E1 must be demonstrated
+    through it.
+    
+    Do not create an unrelated E1 gate.
+    
+    Do not mark E1 complete merely because cell witness checks already exist.
+    
+    The Q1b result must demonstrate:
+    
+    positive evidence facts carry compliant traces
+    axis-cell witnesses remain compliant
+    abstention reconciliation is truthful
+    fact-class removal is detected
+    
+    ==================================================
+    4. NEW MATERIAL DEFECT — §8(6) IS FALSELY GREEN
+    
+    Kai independently read the current committed qualify.py.
+    
+    Current function:
+    
+    for name, mod in sorted(sys.modules.items()):
+        f = getattr(mod, "__file__", None)
+        if not f:
+            continue
+        fp = pathlib.Path(f).resolve()
+        if fp.parent != here:
+            continue
+    
+    That continue silently discards EVERY loaded filesystem-backed module
+    outside the candidate directory.
+    
+    But D380’s superseding D367 §8(6) rule requires every loaded Python
+    module/import origin to classify into EXACTLY ONE of:
+    
+    1. governed H2 source
+    2. governed hardened Census source
+    3. governed Python runtime:
+         filesystem-backed stdlib represented in H2_PY_STDLIB_V1
+         OR built-in / frozen
+    
+    Anything else:
+    
+    REFUSE
+    
+    Current qualify.runtime_module_identity() therefore does NOT implement
+    D380 §8(6).
+    
+    It checks only a narrowed H2 subset.
+    
+    ==================================================
+    5. THE 86 CONTROL SHARES THE SAME BLIND SPOT
+    
+    Current section_86() proves:
+    
+    --manifest required
+    missing manifest refuses
+    empty manifest refuses
+    candidate module omitted -> finding
+    candidate byte mismatch -> finding
+    population > old hard-coded five
+    
+    Those are useful controls.
+    
+    But it calls the SAME narrowed:
+    
+    qualify.runtime_module_identity()
+    
+    and never tests:
+    
+    Census origin classification
+    governed stdlib origin classification
+    built-in / frozen handling
+    loaded external module -> REFUSE
+    
+    Therefore:
+    
+    86 IMPLEMENTED
+    
+    is a false-green status.
+    
+    The implementation and its calibration derived the same narrowed
+    denominator.
+    
+    ==================================================
+    6. THIS IS NOT HYPOTHETICAL
+    
+    The same checkpoint already measured loaded offenders:
+    
+    _distutils_hack
+    /usr/lib/python3/dist-packages/_distutils_hack/__init__.py
+    sitecustomize
+    /etc/python3.11/sitecustomize.py
+    
+    Current qualify.runtime_module_identity() simply skips them because:
+    
+    fp.parent != here
+    
+    So a real qualifier execution in this environment can omit exactly the
+    loaded origins D380 requires it to reject.
+    
+    That is material.
+    
+    ==================================================
+    7. BANK INC-36 — NO D387
+    
+    Fresh incident allocator permitting, append:
+    
+    INC-2026-09-19-36
+    
+    Suggested substance:
+    
+    status
+      OPEN-RECORDED / INCIDENT_ONLY /
+      BLOCKS §8(6) CLOSURE AND D379 TRANCHE CLOSURE
+    producer
+      HOUSE_H2 v1.3 qualifier identity implementation and its 86 calibration
+    subject
+      qualify.runtime_module_identity()
+      d379_controls.py section_86()
+    defect
+      runtime_module_identity derives only loaded modules whose resolved file
+      parent equals the candidate/manifest directory.
+      Every filesystem-backed loaded origin outside that directory is silently
+      skipped rather than classified into the closed D380 classes or refused.
+    required contract
+      every loaded Python module/import origin must resolve exactly to:
+        H2
+        hardened Census
+        governed stdlib
+        built-in/frozen
+      otherwise REFUSE.
+    control defect
+      section_86 uses the same narrowed implementation as its population
+      authority and checks only candidate-manifest membership/mismatch.
+      It carries no hostile external-origin case and therefore reports the
+      narrowed implementation green.
+    measured manifestation
+      current runtime has loaded:
+        _distutils_hack outside governed roots
+        sitecustomize outside governed roots
+      DEP identifies them as offenders.
+      qualify.runtime_module_identity currently ignores them.
+    impact
+      §8(6) currently cannot establish subject completeness and may falsely
+      treat a qualifier population as complete.
+    provenance
+      found before any production Stage A, candidate, Pass A, holdout or
+      admission.
+    mechanism
+      NONE ASSIGNED.
+    qualified locators only
+      M-SCOPE-WIDEN
+      M-POLICY-ADMISSION-DIVERGENCE
+      earlier denominator/self-certified-control incidents
+      NO causal equivalence assigned without evidence.
+    
+    DO NOT allocate D387.
+    
+    Why:
+    
+    D379 already gives exact substantive and mutation authority for:
+    
+    qualify.py
+    d379_controls.py
+    D379_CONTROLS.txt
+    D379_CLOSEOUT.txt
+    
+    and already specifies the closed runtime population.
+    
+    No new architecture or mutation path is required.
+    
+    This is a failure to implement EXISTING authority, not a new design need.
+    
+    ==================================================
+    8. STOP AFTER BANKING INC-36
+    
+    For this turn:
+    
+    append INC-36 only
+    commit
+    push
+    STOP
+    
+    No source mutation in the incident-banking commit.
+    
+    Return:
+    
+    1. INC-36 bank commit
+    2. parent
+    3. tree
+    4. server signature
+    5. changed paths/counts
+    6. strict ledger append-only proof
+    7. incident allocator pre/post
+    8. decision allocator unchanged, D387 still free
+    9. exact INC-36 status
+    10. confirmation no D-number allocated
+    11. confirmation DECISIONS.md unchanged
+    12. remote HEAD / ahead-behind / porcelain
+    13. no Stage A / candidate / Pass A / holdout / blind40 / merge
+    
+    ==================================================
+    9. CARRY-FORWARD AFTER INC-36 VERIFICATION
+    
+    After Kai verifies the INC-36 bank, execution will resume under EXISTING
+    D379 authority.
+    
+    The next implementation tranche must:
+    
+    §8(6)
+    
+    Replace the narrowed candidate-directory loop with a CLOSED classifier over
+    EVERY loaded origin:
+    
+    H2
+    Census
+    governed stdlib
+    built-in/frozen
+    otherwise REFUSE
+    
+    No continue bucket for “not candidate”.
+    
+    86 hostile controls
+    
+    Add at minimum:
+    
+    86 external loaded filesystem module -> REFUSE
+    86 hardened Census member -> classified Census, not external
+    86 governed stdlib member -> classified runtime, not per-H2 manifest
+    86 built-in/frozen -> governed by runtime fields
+    86 unknown/non-filesystem origin outside built-in/frozen -> REFUSE
+    
+    The clean full-runtime positive may remain HELD on INC-34 until a compliant
+    interpreter exists.
+    
+    But the logic and negative discrimination must be implemented now.
+    
+    Q1b/E1
+    
+    Implement Q1b-1 through Q1b-6 with synthetic/local results.
+    
+    Do not hold Q1b on the missing historical trace schema.
+    
+    Q1a
+    
+    Continue every source/provenance component that does not require the
+    canonical-runtime positive.
+    
+    Only the genuinely runtime-positive-dependent limb may remain HELD.
+    
+    DEP
+    
+    Do not call current kinds.get("STDLIB") > 0 proof of DEP-2.
+    
+    DEP-2 requires:
+    
+    ordinary stdlib under a GOVERNED interpreter
+    
+    and the current interpreter is known-negative.
+    
+    DEP-1 / DEP-3 logic may still be calibrated independently.
+    
+    ==================================================
+    10. CURRENT ADJUDICATED STATE
+    
+    Accepted implementation evidence:
+    
+    M2
+    SB / INC-32 derivation
+    D14
+    I1-A
+    I1-B
+    D386 capture
+    complete cal_fixtures 79/0
+    INC-33 historical loader
+    
+    Not yet accepted as complete:
+    
+    §8(6)     FALSE GREEN — INC-36
+    Q1b       wrongly HELD; implementation still required
+    E1        still requires Q1b proof
+    Q1a       partial / not complete
+    DEP       partial; positive governed-runtime limb HELD
+    STDLIB    positive HELD on INC-34
+    STAGE_A   canonical-runtime positive HELD on INC-34
+    
+    The overall D379 exit gate remains correctly RED.
+    
+    PR #122 remains DO NOT MERGE.
+    
+    This is another important catch: the checkpoint looked much better at 128/5, but one of the “green” sections was green because its test asked the same narrowed question as the broken implementation. That is exactly the kind of self-confirming evidence we cannot accept.
+    
+    The good news is that this needs no new architecture and no new D-number. D379 already says exactly what §8(6) must do; Orion simply has to implement the full rule rather than the H2-only subset.
+    END-VERBATIM PROMPT-ec377e69a84cb044
+- EVIDENCE PROMPT-817db7e707288008 transcript 2026-09-18T23:49:38.021Z: 13005 bytes, sha256 4a0ddd3f5a61845af757c12d0803eb541f5cadfdab31c7a77fa8a915bcd52e89, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-18T23:49:38.021Z]
+    BEGIN-VERBATIM PROMPT-817db7e707288008
+    ORION — INC-36 IS INDEPENDENTLY VERIFIED AND ACCEPTED.
+    
+    Bank:
+    
+    INC-36 commit
+    5045b081dbc5d714a80aba11da5e7ebd69211929
+    parent
+    a233a210535755fefb3cb6f43e503c1b66248e50
+    tree
+    402c32be96f87211247f0ffcfb6d97ee3e29e27c
+    
+    GitHub server verification:
+    
+    verified = true
+    reason   = valid
+    SSH signature valid
+    
+    Delta:
+    
+    FAILURE_PATTERN_LEDGER.md only
+    +150 / -0
+    
+    No D-number was consumed.
+    D387 remains free.
+    
+    The existing D379 execution authority is RELEASED again.
+    
+    ==================================================
+    
+    1. EXECUTION BASE
+        ==================================================
+    
+    Use:
+    
+    5045b081dbc5d714a80aba11da5e7ebd69211929
+    
+    Before mutation:
+    
+    HEAD exact
+    porcelain 0
+    ahead/behind 0/0
+    
+    Otherwise STOP.
+    
+    ==================================================
+    2. §8(6) — REPLACE THE NARROWED QUALIFIER DENOMINATOR
+    
+    Current defective logic:
+    
+    if fp.parent != here:
+        continue
+    
+    must disappear as an authority rule.
+    
+    Qualification must consider EVERY loaded Python/import origin.
+    
+    For every live module/import origin, exactly one outcome must be earned:
+    
+    H2
+    CENSUS
+    GOVERNED_STDLIB
+    BUILTIN_OR_FROZEN
+    REFUSE
+    
+    There is no SKIP class.
+    
+    ==================================================
+    3. DO NOT USE stage_identity.producer_population() AS THE ANSWER ORACLE
+    
+    Do not “repair” qualify.py by merely calling:
+    
+    stage_identity.producer_population()
+    
+    and accepting whatever it says.
+    
+    That would make qualifier calibration depend on the producer classifier and
+    could recreate the self-certified-denominator defect.
+    
+    The qualifier must independently establish its own executing population
+    against the governed Stage-A/Census/runtime identities.
+    
+    Shared low-level deterministic primitives are permissible where necessary,
+    but:
+    
+    producer population result
+    !=
+    qualifier expected-answer authority
+    
+    The 86 controls must carry independently precommitted expected classes.
+    
+    ==================================================
+    4. QUALIFIER NEEDS STAGE-A AUTHORITY, NOT MANIFEST-ONLY AUTHORITY
+    
+    The current H2 MANIFEST.sha256 is insufficient to establish D380 §8(6),
+    because it says nothing about:
+    
+    Census
+    stdlib identity
+    interpreter identity
+    built-in/frozen origins
+    
+    Retain the D379 manifest hostile controls where required, but add a
+    fail-closed Stage-A input to qualification.
+    
+    The qualifier must validate the supplied Stage-A descriptor/identity before
+    using it.
+    
+    For calibration this may be a synthetic:
+    
+    H2_STAGE_A_V2
+    mode = CALIBRATION
+    
+    descriptor.
+    
+    No production Stage A is authorised.
+    
+    The H2 manifest and Stage-A h2_sources must not disagree silently.
+    
+    Mismatch:
+    
+    REFUSE
+    
+    ==================================================
+    5. H2 CLASS
+    
+    A loaded filesystem-backed H2 module qualifies only when:
+    
+    normalised repo-relative path
+    is one of the exact governed H2 Stage-A members
+    AND
+    sha256(actual loaded source bytes)
+    ==
+    Stage-A h2_sources[path].sha256
+    
+    Loaded H2 source absent from Stage A:
+    
+    REFUSE
+    
+    Stage-A H2 hash mismatch:
+    
+    REFUSE
+    
+    Do not infer H2 simply from “same directory”.
+    
+    ==================================================
+    6. CENSUS CLASS
+    
+    A Census-loaded origin qualifies only when its consumed bytes are
+    mechanically bound to:
+    
+    house_in_order_census_v11
+    29064d650a61296806df3c3bcab3322f7364da7df674ac93e79d0671475d757a
+    
+    No implicit latest package.
+    
+    No pathname alone is sufficient.
+    
+    No external Census package may be accepted merely because its module name
+    is docgraph, opscan or claims.
+    
+    ==================================================
+    7. FILESYSTEM-BACKED STDLIB CLASS
+    
+    A loaded filesystem-backed stdlib origin qualifies only if it belongs to
+    the canonical governed runtime represented by:
+    
+    H2_PY_STDLIB_V1
+    
+    and the Stage-A runtime identity.
+    
+    The current interpreter remains KNOWN-NEGATIVE.
+    
+    Therefore a real qualifier execution in the current container is EXPECTED
+    to refuse because of:
+    
+    sitecustomize
+    _distutils_hack
+    
+    and/or the D380 §7.6 stdlib construction failure.
+    
+    Do NOT tune the qualifier to pass this container.
+    
+    That refusal is correct.
+    
+    ==================================================
+    8. BUILT-IN / FROZEN MUST BE MECHANICAL
+    
+    Do NOT treat:
+    
+    __file__ is None
+    
+    as equivalent to:
+    
+    built-in / frozen
+    
+    Mechanical condition must use the import metadata, e.g. the module spec
+    origin/loader semantics, and prove:
+    
+    origin == built-in
+    or
+    origin == frozen
+    
+    as applicable.
+    
+    Any other non-filesystem origin:
+    
+    REFUSE
+    
+    No silent continue.
+    
+    ==================================================
+    9. MANDATORY PRODUCER-SIDE HOSTILE CHECK BEFORE MODIFYING STAGE_IDENTITY
+    
+    There is a related source concern in current:
+    
+    stage_identity.producer_population()
+    
+    which contains:
+    
+    if not f:
+        continue  # built-in / frozen
+    
+    Do NOT silently alter stage_identity.py under INC-36.
+    
+    First add/run a bounded hostile probe demonstrating what the current
+    producer classifier does with a synthetic loaded module whose:
+    
+    __file__ = None
+    __spec__.origin = a non-built-in/non-frozen origin
+    
+    for example a synthetic namespace/unknown origin.
+    
+    Expected D379/D380 semantics:
+    
+    REFUSE
+    
+    If the current producer classifier silently skips it:
+    
+    STOP.
+    
+    That is a separate producer-side manifestation requiring Kai adjudication
+    before stage_identity.py is changed.
+    
+    Do not fold it into INC-36 without authority.
+    
+    ==================================================
+    10. 86 HOSTILE MATRIX
+    
+    Preserve existing useful controls:
+    
+    manifest required
+    missing manifest REFUSE
+    empty/unreadable manifest REFUSE
+    H2 module omitted -> finding/refusal
+    H2 byte mismatch -> finding/refusal
+    
+    Add independent controls for the superseding D380 criterion:
+    
+    86-C1
+    governed H2 module with correct Stage-A hash
+    -> H2 PASS
+    86-C2
+    H2 loaded byte differs from Stage A
+    -> REFUSE
+    86-C3
+    governed hardened Census member
+    -> CENSUS PASS
+    86-C4
+    ordinary filesystem-backed module represented by governed stdlib
+    -> STDLIB PASS
+    synthetic/local governed runtime permitted
+    86-C5
+    mechanically built-in origin
+    -> BUILTIN/FROZEN PASS
+    86-C6
+    mechanically frozen origin
+    -> BUILTIN/FROZEN PASS
+    86-C7
+    external filesystem-backed module
+    -> REFUSE and NAME origin
+    86-C8
+    non-filesystem origin that is neither built-in nor frozen
+    -> REFUSE
+    86-C9
+    current real `_distutils_hack`
+    -> REFUSE
+    86-C10
+    current real `sitecustomize`
+    -> REFUSE
+    
+    The expected class/outcome of C1-C8 must be predeclared by the control,
+    not obtained from runtime_module_identity() itself.
+    
+    ==================================================
+    11. Q1b — IMPLEMENT NOW
+    
+    Q1b is NOT HELD.
+    
+    Current emitted row schema from run_h2_v12.py already defines:
+    
+    row[axis]["value"]
+    row[axis]["witness"]
+    row["evidence_facts"]
+    row["evidence_fact_traces"]
+    optional:
+    row["evidence_facts_abstained_no_compliant_trace"]
+    
+    Use that schema.
+    
+    Implement the qualifier-side complete derived denominator.
+    
+    Do NOT encode:
+    
+    343
+    316
+    659
+    
+    Those were measurements, not definitions.
+    
+    Derive two populations mechanically:
+    
+    A. every positive/non-abstaining axis cell governed by §5
+    B. every positive evidence fact in the complete governed evidence-fact
+       schema
+    
+    Print:
+    
+    axis-cell denominator
+    positive-evidence-fact denominator
+    sum
+    
+    The expected evidence-fact class population must come from the governing
+    emitted schema, not merely from whichever keys happen to remain in a
+    mutated result.
+    
+    This is how Q1b-5 detects deletion of an entire fact class.
+    
+    ==================================================
+    12. Q1b-1 THROUGH Q1b-6 — SYNTHETIC/LOCAL
+    
+    Construct synthetic/local classification results matching the real emitted
+    schema.
+    
+    No real candidate is required.
+    
+    Required:
+    
+    Q1b-1
+    clean complete synthetic result
+    -> PASS
+    print both denominators + sum
+    Q1b-2
+    one positive evidence fact, trace removed
+    -> FAIL naming row + fact
+    Q1b-3
+    one positive axis cell with missing/noncompliant witness
+    -> FAIL naming row + axis
+    Q1b-4
+    fact listed as abstained while simultaneously emitted positive
+    or positive fact inconsistent with abstention reconciliation
+    -> FAIL
+    Q1b-5
+    remove one governed evidence-fact class from the emitted schema/population
+    -> FAIL
+    the denominator may not shrink to make the omission disappear
+    Q1b-6
+    clean opposite-side result with no positive fact for an applicable class
+    and truthful abstention/non-positive representation
+    -> PASS
+    
+    All controls execute as subprocesses and assert the actual return code.
+    
+    ==================================================
+    13. E1 — PROVE THROUGH Q1b
+    
+    Do not create a disconnected E1 section.
+    
+    Through Q1b, prove every positive evidence fact has its own determining
+    trace.
+    
+    The trace must satisfy the producer contract, including:
+    
+    witness_type
+    witness_value
+    source_path
+    source_selector
+    local_context
+    applicability_scope
+    evidence_total
+    evidence_shown
+    truncated
+    
+    plus the governed envelope semantics already emitted where applicable.
+    
+    Presence alone is insufficient.
+    
+    At minimum verify:
+    
+    trace class matches the fact class
+    witness_value is actually supported by local_context
+    source selector is of the expected evidence class
+    positive fact without compliant trace cannot pass
+    
+    Q1b-2/Q1b-4/Q1b-5 are part of the E1 proof.
+    
+    ==================================================
+    14. QUALIFIER MUST NOT RETROACTIVELY CERTIFY PRODUCER PROVENANCE
+    
+    Keep D380 §5 separation intact:
+    
+    Q1a
+    WHO produced the result?
+    §8(6)
+    ARE the qualifier's own executing bytes/runtime governed?
+    
+    The qualifier may inspect TODAY’S loaded origins for its own identity.
+    
+    It must not use today’s module state to establish yesterday’s producer
+    bytes.
+    
+    Recorded Q1a provenance remains separately checked against Stage A.
+    
+    ==================================================
+    15. DEP — PARTIAL ONLY WHILE INC-34 REMAINS
+    
+    Keep:
+    
+    DEP-1 external non-stdlib -> REFUSE
+    DEP-3 runtime identity mismatch -> REFUSE
+    
+    hostile calibration.
+    
+    Current:
+    
+    kinds["STDLIB"] > 0
+    
+    does NOT establish DEP-2.
+    
+    DEP-2 requires the positive:
+    
+    ordinary stdlib loaded under a D380-COMPLIANT governed interpreter
+    -> PASS without creating one Stage-A entry per stdlib file
+    
+    That positive remains HELD on INC-34 unless a compliant synthetic/local
+    runtime can satisfy D380 byte-for-byte.
+    
+    Do not turn DEP green before that.
+    
+    ==================================================
+    16. Q1a
+    
+    Continue every Q1a hostile case that can be performed against synthetic
+    Stage-A/runtime material without pretending this Debian interpreter is
+    governed.
+    
+    The complete banked matrix remains Q1a-1 through Q1a-9.
+    
+    If a specific limb truly requires the D380-compliant runtime positive,
+    label THAT LIMB HELD.
+    
+    Do not label the entire Q1a section HELD merely because one limb is.
+    
+    ==================================================
+    17. STDLIB / STAGE_A
+    
+    INC-34 stands unchanged.
+    
+    Current four local interpreters are known-negative.
+    
+    No install/download/build was authorised.
+    
+    Therefore:
+    
+    STDLIB real known-positive
+    HELD
+    STAGE_A canonical-runtime positive
+    HELD
+    
+    Synthetic V2 governance/identity controls may continue.
+    
+    No production Stage A.
+    
+    ==================================================
+    18. INCIDENT CLOSURES
+    
+    INC-32 and INC-33 remain closure candidates.
+    
+    INC-35 remains open until its banked closure condition is fully earned.
+    
+    INC-36 closes only when:
+    
+    qualifier enumerates/classifies the complete loaded-origin population
+    no silent skip bucket exists
+    external origin refusal is demonstrated
+    Census/stdlib/built-in/frozen discrimination is hostile-calibrated
+    the real current offenders are refused
+    86 is no longer self-certified by the narrowed implementation
+    
+    Do not edit ledger status before Kai adjudication.
+    
+    ==================================================
+    19. EXECUTION / CHECKPOINT RULE
+    
+    Continue until:
+    
+    A. all currently independently executable D379 controls are implemented
+       and executed
+    
+    or:
+    
+    B. another genuinely new material incident appears
+    
+    On B:
+    
+    STOP immediately and bank only the incident if required.
+    
+    Do not self-widen authority.
+    
+    If A is reached while only the genuinely INC-34-dependent positives remain,
+    commit a truthful partial checkpoint.
+    
+    ==================================================
+    20. STILL FORBIDDEN
+    
+    No production:
+    
+    Stage A
+    candidate
+    Pass A
+    classification candidate
+    Stage B candidate package
+    holdout
+    blind 40
+    admission
+    freeze
+    Item 8
+    six builds
+    KAI-GATE-048 progression
+    A-4
+    merge
+    
+    PR #122 remains DO NOT MERGE.
+    
+    ==================================================
+    21. RETURN
+    
+    Return evidence for:
+    
+    commit / parent / tree / signature
+    changed paths + counts
+    scope confinement
+    §8(6) complete-origin denominator
+    per-class counts:
+      H2
+      Census
+      stdlib
+      built-in/frozen
+      refused
+    86-C1..C10
+    whether the producer-side no-__file__/unknown-origin hostile probe
+    found a separate defect
+    Q1b-1..Q1b-6
+    derived Q1b denominators
+    E1 result through Q1b
+    Q1a-1..Q1a-9 individually
+    DEP-1 / DEP-2 / DEP-3 individually
+    INC-32 closure-candidate evidence
+    INC-33 closure-candidate evidence
+    INC-35 status
+    INC-36 closure-candidate evidence if earned
+    STDLIB state
+    STAGE_A state
+    remaining HELD limbs
+    remaining NOT_IMPLEMENTED sections
+    control child return code
+    durable recorded return code
+    fixture return code
+    confirmation no production Stage A/candidate/PassA/holdout/blind40
+    remote HEAD / ahead-behind / porcelain
+    PR #122 DO NOT MERGE
+    
+    Then STOP for Kai adjudication.
+    END-VERBATIM PROMPT-817db7e707288008
+- EVIDENCE PROMPT-06b153e3ff3639f3 transcript 2026-09-18T23:56:19.957Z: 11908 bytes, sha256 64ccd9ef11bb5fa21456feef06c301292d17e0bd2968ea8817d501b0eae7e1c2, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-18T23:56:19.957Z]
+    BEGIN-VERBATIM PROMPT-06b153e3ff3639f3
+    Yes. No D387 is needed. I independently verified INC-37 and the banked D379 text. Both defects are already explicitly covered by D379 §5, and stage_identity.py is already inside the authorised mutation surface.
+    
+    GitHub also verifies bd692ddd… as valid SSH, ledger-only +142/−0, with no source mutation and D387 still free.
+    
+    The key source wording is decisive:
+    
+    “for every loaded module carrying a file/origin”
+    
+    and separately:
+    
+    “the executing entry-point source (__main__) is included EXPLICITLY”
+    
+    So Orion is not asking for new architecture. He found that the implementation failed to implement two already-authorised clauses.
+    
+    ORION — INC-37 IS INDEPENDENTLY VERIFIED AND ACCEPTED.
+    
+    Bank:
+    
+    bd692dddecca0393864eed5e996e84366c9a58c5
+    parent
+    5045b081dbc5d714a80aba11da5e7ebd69211929
+    tree
+    eb0ec5fb66b95ae3d7e6ab720565907388c7aa89
+    
+    GitHub server verification:
+    
+    verified = true
+    reason   = valid
+    SSH signature valid
+    
+    Delta:
+    
+    FAILURE_PATTERN_LEDGER.md only
+    +142 / -0
+    
+    D387 remains FREE.
+    
+    ==================================================
+    
+    1. RULING — NO NEW DECISION AUTHORITY REQUIRED
+        ==================================================
+    
+    D379 §5 already says:
+    
+    for every loaded module carrying a file/origin
+    
+    and explicitly:
+    
+    the executing entry-point source (__main__) is included EXPLICITLY
+    
+    D379’s authorised mutation surface already includes:
+    
+    stage_identity.py
+    
+    Therefore both observed INC-37 manifestations are failures to implement
+    EXISTING authority.
+    
+    They do NOT require D387.
+    
+    Do NOT allocate D387.
+    
+    ==================================================
+    2. INC-37 REMAINS ONE INCIDENT
+    
+    Keep both manifestations under INC-37:
+    
+    A.
+    
+    __file__ absent
+    was incorrectly treated as
+    built-in/frozen
+    
+    B.
+    
+    __main__
+    was not explicitly handled as required by D379 §5
+    
+    They occur in the same population classifier and violate the same already
+    banked closed-population authority.
+    
+    That is sufficient to repair them together under INC-37.
+    
+    Do NOT claim a common root-cause mechanism beyond that.
+    
+    Mechanism remains:
+    
+    NONE ASSIGNED
+    
+    unless later evidence establishes causal equivalence.
+    
+    ==================================================
+    3. CLASSIFICATION ORDER — ORIGIN FIRST
+    
+    The current implementation’s basic mistake is using filesystem presence as
+    the first discriminator.
+    
+    Do NOT do:
+    
+    if not __file__:
+        built-in/frozen
+    
+    os proves that direction is false:
+    
+    os
+    has __file__
+    spec.origin = frozen
+    
+    So the first classification decision must inspect import metadata.
+    
+    For each loaded module derive, independently:
+    
+    module name
+    __spec__
+    __spec__.origin if available
+    __file__ if available
+    
+    Then classify mechanically.
+    
+    ==================================================
+    4. BUILT-IN / FROZEN
+    
+    If and only if import metadata mechanically reports:
+    
+    origin == "built-in"
+    
+    classify as runtime-covered BUILTIN.
+    
+    If and only if:
+    
+    origin == "frozen"
+    
+    classify as runtime-covered FROZEN.
+    
+    This classification takes precedence over __file__.
+    
+    Therefore a frozen module carrying a convenience __file__ path remains:
+    
+    FROZEN
+    
+    It must not be reclassified by that path.
+    
+    ==================================================
+    5. FILESYSTEM ORIGIN
+    
+    If the origin is a filesystem source, resolve it mechanically.
+    
+    Where both a filesystem spec.origin and __file__ exist:
+    
+    resolve both
+    
+    If they identify different source objects:
+    
+    REFUSE
+    
+    Do not pick whichever one is convenient.
+    
+    Then apply the already-banked closed D379/D380 classification:
+    
+    H2
+    CENSUS
+    GOVERNED STDLIB
+    otherwise EXTERNAL -> REFUSE
+    
+    No silent fourth class.
+    
+    ==================================================
+    6. __file__ ABSENT IS NOT AN ANSWER
+    
+    For a non-__main__ loaded module:
+    
+    __file__ = None
+    
+    with:
+    
+    origin not "built-in"
+    origin not "frozen"
+    
+    does NOT earn runtime coverage.
+    
+    Examples already measured:
+    
+    typing.io
+    typing.re
+    synthetic origin None
+    synthetic "some-unknown-origin"
+    synthetic filesystem-like external origin
+    
+    Unless another governed class is mechanically established:
+    
+    REFUSE
+    
+    No skip.
+    
+    ==================================================
+    7. __main__ — IMPLEMENT THE EXPLICIT RULE
+    
+    Handle __main__ separately and explicitly BEFORE/general to the ordinary
+    module traversal.
+    
+    File-backed governed producer
+    
+    If the executing __main__ has a real source file:
+    
+    resolve exact source
+    classify under the same closed rule
+    include it explicitly
+    
+    It must be represented in the observed producer population even if the
+    general module traversal would later encounter the same path.
+    
+    Then deduplicate by resolved source identity as D379 requires.
+    
+    No source-backed entry point
+    
+    If a production-boundary __main__ has no mechanically establishable
+    source — for example:
+    
+    python -c ...
+    stdin execution
+    spec None + no source file
+    
+    then D379’s explicit-entry-point source requirement cannot be satisfied.
+    
+    For a governed producer boundary:
+    
+    REFUSE
+    
+    Do not pretend an unsourced __main__ is built-in.
+    
+    Synthetic calibration may deliberately exercise that refusal.
+    
+    ==================================================
+    8. TEST HARNESS __main__ IS NOT A PRODUCTION PRODUCER
+    
+    Be careful here.
+    
+    d379_controls.py itself is not one of the ten governed H2 Stage-A source
+    members.
+    
+    Therefore calling the strict producer-population classifier directly from
+    the control harness may legitimately classify the control harness
+    __main__ as external and refuse.
+    
+    Do NOT weaken the producer rule to make the test harness pass.
+    
+    For hostile controls, exercise the classification primitive against
+    synthetic/local observed-origin populations with predeclared expected
+    answers.
+    
+    The production boundary and the test harness are different subjects.
+    
+    ==================================================
+    9. PRODUCER POPULATION — NO SILENT MEMBER
+    
+    The corrected producer logic must account for every observed Python import
+    origin.
+    
+    The diagnostic population must make visible at least:
+    
+    module
+    classification
+    source/origin identity
+    Stage-A/runtime binding class
+    
+    where applicable.
+    
+    Runtime-covered built-in/frozen modules do not need fake filesystem hashes.
+    
+    Filesystem-backed H2/Census sources must retain their exact source-byte
+    binding.
+    
+    Filesystem-backed stdlib is covered by the governed stdlib identity.
+    
+    External/unknown:
+    
+    REFUSE
+    
+    The denominator must be derived from the observed population.
+    
+    Do not derive expected completeness from the emitted provenance itself.
+    
+    ==================================================
+    10. REQUIRED INC-37 HOSTILE CONTROLS
+    
+    Add independent controls before treating the producer population as fixed.
+    
+    At minimum:
+    
+    PPOP-1
+    __file__ None + origin built-in
+    -> BUILTIN
+    PPOP-2
+    __file__ None + origin frozen
+    -> FROZEN
+    PPOP-3
+    __file__ present + origin frozen
+    -> FROZEN
+    (use a local/synthetic equivalent of the measured `os` case)
+    PPOP-4
+    __file__ None + origin None
+    -> REFUSE
+    PPOP-5
+    __file__ None + unknown textual origin
+    -> REFUSE
+    PPOP-6
+    __file__ None + filesystem-like external origin
+    -> REFUSE
+    PPOP-7
+    filesystem-backed external module
+    -> REFUSE
+    PPOP-8
+    governed H2 source
+    -> H2 and exact byte binding
+    PPOP-9
+    governed Census source
+    -> CENSUS and governed Census binding
+    PPOP-10
+    governed stdlib source under a compliant synthetic/local runtime
+    -> STDLIB
+    PPOP-11
+    explicit file-backed __main__ under governed H2 source
+    -> INCLUDED EXPLICITLY
+    PPOP-12
+    unsourced production-boundary __main__
+    -> REFUSE
+    PPOP-13
+    filesystem spec.origin and __file__ resolve to different sources
+    -> REFUSE
+    PPOP-14
+    duplicate resolved source reached by __main__ + ordinary traversal
+    -> one canonical source member, no duplicate
+    
+    Expected outcomes must be supplied by the hostile control, not by
+    producer_population().
+    
+    ==================================================
+    11. LIVE PROCESS RESULT
+    
+    Do NOT expect the present Debian environment to become producer-clean.
+    
+    Even after INC-37 is repaired, the current process contains:
+    
+    _distutils_hack
+    sitecustomize
+    
+    and the runtime itself remains INC-34 known-negative.
+    
+    Therefore real producer classification here should still REFUSE.
+    
+    That is correct.
+    
+    No contract relaxation.
+    
+    ==================================================
+    12. AFTER PRODUCER REPAIR, RESUME INC-36
+    
+    Once the producer-side closed classifier passes its independent hostile
+    matrix, continue the qualifier repair.
+    
+    The qualifier must still derive its OWN live population.
+    
+    Do NOT make:
+    
+    producer_population()
+    
+    the qualifier’s expected-answer oracle.
+    
+    The two implementations may share narrowly deterministic low-level
+    normalisation primitives, but:
+    
+    producer observation
+    !=
+    qualifier completeness authority
+    
+    86-C1..C10 from the prior instruction still govern.
+    
+    ==================================================
+    13. Q1b / E1 STILL REQUIRED
+    
+    After §8(6) logic is repaired, implement:
+    
+    Q1b-1 .. Q1b-6
+    
+    against synthetic/local emitted-result subjects.
+    
+    The historical v1.2 boolean-only result remains the wrong fixture, not a
+    blocker.
+    
+    E1 is proven THROUGH Q1b.
+    
+    No hard-coded:
+    
+    343
+    316
+    659
+    
+    Derive the denominators from the emitted schema.
+    
+    ==================================================
+    14. INC-37 CLOSURE CONDITION
+    
+    INC-37 becomes a closure candidate only when:
+    
+    no `if not file -> built-in/frozen` equivalence remains
+    built-in and frozen are mechanically identified from origin metadata
+    unknown/no-origin cases REFUSE
+    frozen-with-__file__ remains frozen
+    filesystem origin ambiguity REFUSES
+    __main__ is explicitly handled
+    file-backed governed __main__ is included
+    unsourced production __main__ REFUSES
+    deduplication preserves one canonical resolved source
+    external loaded origin REFUSES
+    hostile controls exercise all of those branches
+    
+    Do not edit the ledger yet.
+    
+    ==================================================
+    15. CARRY-FORWARD STATE
+    
+    Still accepted:
+    
+    M2
+    SB / INC-32 derivation
+    D14
+    I1-A
+    I1-B
+    D386 capture
+    cal_fixtures 79/0
+    INC-33 loader repair
+    
+    Still open / incomplete:
+    
+    INC-34 runtime positive blocker
+    INC-35 closure candidate
+    INC-36 qualifier false-green repair
+    INC-37 producer origin classifier repair
+    Q1a incomplete
+    Q1b incomplete
+    E1 incomplete
+    §8(6) incomplete
+    DEP partial
+    STDLIB positive HELD
+    STAGE_A canonical-runtime positive HELD
+    
+    ==================================================
+    16. EXECUTION RULE
+    
+    Resume source work now under existing D379 authority.
+    
+    No banking turn is required first.
+    
+    Continue:
+    
+    producer classifier / INC-37
+    then qualifier / INC-36
+    then Q1b / E1
+    then remaining independently executable Q1a / DEP controls
+    
+    If another genuinely new material incident appears:
+    
+    STOP
+    bank incident only
+    return to Kai
+    
+    Do not allocate D387 without authority.
+    
+    ==================================================
+    17. STILL FORBIDDEN
+    
+    No:
+    
+    production Stage A
+    candidate
+    real Pass A
+    real classification candidate
+    real Stage B
+    holdout
+    blind 40
+    admission
+    freeze
+    Item 8
+    six builds
+    KAI-GATE-048 progression
+    A-4
+    merge
+    
+    PR #122 remains DO NOT MERGE.
+    
+    ==================================================
+    18. NEXT RETURN
+    
+    Return:
+    
+    commit / parent / tree / signature
+    changed paths/counts
+    scope confinement
+    PPOP-1..PPOP-14
+    observed producer denominator
+    producer per-class counts
+    live-runtime refusal result
+    86-C1..C10
+    qualifier denominator and per-class counts
+    Q1b-1..Q1b-6
+    derived denominators
+    E1 result
+    Q1a-1..Q1a-9 individually
+    DEP-1/2/3 individually
+    INC-36 closure-candidate state
+    INC-37 closure-candidate state
+    INC-32/33/35 closure-candidate state
+    STDLIB / STAGE_A held state
+    remaining HELD
+    remaining NOT_IMPLEMENTED
+    control child return code
+    durable recorded return code
+    fixture return code
+    no production actions
+    remote HEAD / ahead-behind / porcelain
+    PR #122 DO NOT MERGE
+    
+    Then STOP for Kai adjudication.
+    
+    So the direct answer to Orion’s question is yes: implement it now under the current release. D379 already demanded both pieces; D387 would add no new authority.
+    
+    The probe also proved why the ordering mattered: had we fixed only the qualifier first, we would have ended up with a stricter checker validating evidence produced by a still-incomplete producer denominator. That would have created another asymmetric false-green path.
+    END-VERBATIM PROMPT-06b153e3ff3639f3
+- EVIDENCE PROMPT-4ac011fe3ecea95a transcript 2026-09-19T00:10:17.851Z: 12584 bytes, sha256 8941cf2d7a2310afddbe5f6c430f3fe1f2df72b355be87ca4d2df8d619e88810, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-19T00:10:17.851Z]
+    BEGIN-VERBATIM PROMPT-4ac011fe3ecea95a
+    I found a new material integration defect. The checkpoint object itself is clean, but the claim that only four INC-34 limbs remain is not correct.
+    
+    88e54cef… is GitHub-verified valid SSH, with the stated +1033/−63 across five authorised paths. Its parent bd692ddd… is also valid SSH and is the correctly banked INC-37 ledger-only commit.
+    
+    The problem is deeper: the new assurance logic passes when imported by the control harness, but the real executables do not actually use it.
+    
+    Most decisive example: qualify.py still executes this in its real main():
+    
+    rows_id, bad = runtime_module_identity(a.manifest)
+    
+    That is the old INC-36 narrowed function. There is still no --stage-a argument. The repaired qualifier_population() is never called by the CLI.
+    
+    Worse, q1b_denominators() is defined after:
+    
+    if __name__ == "__main__":
+        sys.exit(main())
+    
+    So when qualify.py is actually executed as a program, Python exits through main() before those Q1b definitions are even reached. They exist only when the module is imported by the test harness.
+    
+    Q1a has the same class of defect. I checked the actual producer files:
+    
+    passa.py:
+      producer_provenance   NONE
+      stage_a_identity      NONE
+      --stage-a             NONE
+    run_h2_v12.py:
+      producer_provenance   NONE
+      stage_a_identity      NONE
+      --stage-a             NONE
+    
+    So Q1a-1/2/3/4/5/7/8/9 are testing stage_identity.py helper functions—not Pass A or classification production.
+    
+    And D379 §8 explicitly said the hostile cases run as subprocesses asserting the real process return code. Current section_Q1a, section_Q1b, and section_86 contain zero subprocess executions of their actual governed executables.
+    
+    That is one root issue: sidecar/helper assurance passed while the governed execution path remained unwired.
+    
+    Send Orion this:
+    
+    ORION — CHECKPOINT 88e54cef3c1d20b4765fdda8546dbe11a88fd534
+    OBJECT VERIFIED, BUT ITS COMPLETION CLAIM IS REJECTED.
+    
+    ==================================================
+    
+    1. OBJECT / BANK VERIFICATION
+        ==================================================
+    
+    Implementation checkpoint:
+    
+    88e54cef3c1d20b4765fdda8546dbe11a88fd534
+    parent bd692dddecca0393864eed5e996e84366c9a58c5
+    tree   b07d3a275d5d19a74bd5c8e9d945cfaabdb770f4
+    
+    GitHub:
+    
+    verified = true
+    reason   = valid
+    SSH signature valid
+    
+    Server delta:
+    
+    +1033 / -63
+    5 paths
+    
+    The five paths are within the D379 surface.
+    
+    The parent bd692ddd… is also independently verified:
+    
+    INC-37 banking commit
+    verified = true
+    reason   = valid
+    SSH signature valid
+    FAILURE_PATTERN_LEDGER.md only
+    +142 / -0
+    
+    So the commit chain is valid.
+    
+    ==================================================
+    2. THE 179 / 4 RESULT IS NOT A COMPLETE EXECUTION-STATE CLAIM
+    
+    The durable artefact truthfully says:
+    
+    179 passed
+    4 failed
+    process exit status = 1
+    
+    There is no D386 status-capture defect here.
+    
+    The defect is different:
+    
+    several “implemented” sections test IMPORTABLE HELPER FUNCTIONS while
+    the actual governed executable paths still execute the old/unwired logic.
+    
+    Therefore the numerical test result is real for the tests that ran, but its
+    SECTION COVERAGE overstates implementation completeness.
+    
+    ==================================================
+    3. §8(6) — THE REAL QUALIFIER CLI STILL EXECUTES THE OLD INC-36 PATH
+    
+    Current qualify.py contains the new:
+    
+    classify_loaded_origin()
+    qualifier_population()
+    
+    helpers.
+    
+    But its real main() still executes:
+    
+    rows_id, bad = runtime_module_identity(a.manifest)
+    
+    That is the old candidate-directory-only classifier that caused INC-36.
+    
+    The actual CLI has:
+    
+    --result
+    --manifest
+    
+    and NO:
+    
+    --stage-a
+    
+    Therefore the real qualifier executable:
+    
+    * does not consume Stage A;
+    * does not call qualifier_population();
+    * does not execute the repaired closed D380 classifier;
+    * still uses the old narrowed runtime_module_identity path.
+    
+    86 IMPLEMENTED is therefore not earned.
+    
+    ==================================================
+    4. Q1b / E1 — IMPORTABLE BUT NOT ON THE EXECUTABLE PATH
+    
+    The new:
+    
+    q1b_denominators()
+    
+    is physically defined AFTER:
+    
+    if __name__ == "__main__":
+        sys.exit(main())
+    
+    This distinction is decisive.
+    
+    When imported by d379_controls.py:
+    
+    __name__ != "__main__"
+    
+    so Python continues past the guard and defines q1b_denominators().
+    
+    The controls can therefore call it and go green.
+    
+    When qualify.py is executed normally:
+    
+    __name__ == "__main__"
+    
+    main() runs and sys.exit() occurs BEFORE Python reaches the Q1b
+    definition.
+    
+    Even independently of ordering, main() contains no call to
+    q1b_denominators().
+    
+    Therefore:
+    
+    Q1b IMPLEMENTED
+    E1 THROUGH Q1b IMPLEMENTED
+    
+    are false as executable-path claims.
+    
+    The helper logic may be useful and may be substantively correct.
+    
+    It is not wired into qualification.
+    
+    ==================================================
+    5. Q1a — THE ACTUAL PRODUCERS DO NOT IMPLEMENT IT
+    
+    Kai independently inspected the current committed producer source.
+    
+    In:
+    
+    passa.py
+    
+    there is NO:
+    
+    producer_provenance
+    stage_a_identity
+    --stage-a
+    
+    In:
+    
+    run_h2_v12.py
+    
+    there is likewise NO:
+    
+    producer_provenance
+    stage_a_identity
+    --stage-a
+    
+    D379 explicitly requires:
+    
+    Pass A
+    
+    verify itself against Stage A BEFORE producing
+    derive runtime population
+    record producer_provenance in-band
+    refuse incomplete/mismatched subject
+    
+    Classification producer
+    
+    consume Stage A
+    read exact Pass-A bytes once
+    hash those exact bytes
+    parse those same bytes
+    verify Pass-A producer binding
+    verify Pass-A stage_a_identity
+    record its own producer_provenance
+    record input_binding
+    
+    None of that is wired into the current producer executables.
+    
+    Current Q1a controls instead construct synthetic dictionaries and call:
+    
+    stage_identity.verify_provenance()
+    stage_identity.reconcile_provenance()
+    stage_identity.contains_self_digest()
+    stage_identity.stage_b_binding()
+    
+    directly.
+    
+    Those functions may be individually correct.
+    
+    They do NOT prove Pass A or classification production implements Q1a.
+    
+    ==================================================
+    6. D379 §8 SUBPROCESS REQUIREMENT IS ALSO NOT SATISFIED
+    
+    D379 states:
+    
+    All cases run as subprocesses asserting the real process return code,
+    against synthetic and local subjects only.
+    
+    Current source:
+    
+    section_Q1a
+      subprocess calls = 0
+    section_Q1b
+      subprocess calls = 0
+    section_86
+      subprocess calls = 0
+    
+    They are direct in-process helper calls inside d379_controls.py.
+    
+    D386 correctly made the OUTER D379 control program a subprocess.
+    
+    That does NOT transform every internal helper call into the hostile
+    subprocess execution D379 §8 required.
+    
+    These are different process boundaries.
+    
+    ==================================================
+    7. BANK INC-38 — ONE INCIDENT, THREE MANIFESTATIONS
+    
+    Fresh allocator permitting, append:
+    
+    INC-2026-09-19-38
+    
+    Do NOT consume D387.
+    
+    D379 already grants the exact substantive authority and mutation paths:
+    
+    passa.py
+    run_h2_v12.py
+    qualify.py
+    stage_identity.py
+    d379_controls.py
+    D379_CONTROLS.txt
+    D379_CLOSEOUT.txt
+    
+    No new architecture is required.
+    
+    Suggested incident substance:
+    
+    status
+      OPEN-RECORDED / INCIDENT_ONLY /
+      BLOCKS Q1a, Q1b/E1, §8(6), INC-36 CLOSURE,
+      AND D379 TRANCHE CLOSURE
+    producer
+      D379 implementation + hostile-control integration
+    subject
+      actual producer/qualifier execution paths versus imported helper paths
+    ROOT OBSERVATION
+      assurance behaviour was implemented in sidecar/helper functions and
+      calibrated by importing those functions, while the governed executables
+      did not invoke them.
+    MANIFESTATION A — §8(6)
+      qualify.main() still calls old runtime_module_identity(a.manifest).
+      No --stage-a CLI input exists.
+      qualifier_population() is not on the actual CLI execution path.
+    MANIFESTATION B — Q1b / E1
+      q1b_denominators() is defined after the __main__ sys.exit guard.
+      It is available to import-time controls but cannot be reached by normal
+      script execution before main exits.
+      main() does not call it anyway.
+    MANIFESTATION C — Q1a
+      passa.py and run_h2_v12.py have no Stage-A input and emit no
+      producer_provenance.
+      Q1a controls test stage_identity helper functions rather than the real
+      Pass-A and classification producer boundaries.
+    CONTROL DEFECT
+      Q1a/Q1b/86 hostile matrices are in-process helper calls.
+      D379 §8 required subprocess execution with the actual process return
+      code.
+    IMPACT
+      imported controls can report the intended policy correct while the real
+      command-line production/qualification path still performs old or absent
+      behaviour.
+      This is an EXECUTION-PATH DIVERGENCE, not merely missing test coverage.
+    PROVENANCE
+      found before any production Stage A, real candidate, Pass A candidate,
+      holdout, blind 40 or admission.
+    MECHANISM
+      NONE ASSIGNED.
+    qualified locators only
+      I-8
+      prior self-certified-control / denominator incidents
+      INC-36 / INC-37
+    No causal-equivalence assignment yet.
+    
+    ==================================================
+    8. INCIDENT RELATIONSHIPS
+    
+    INC-36 remains OPEN.
+    
+    Its classifier helper is now substantially improved, but the actual
+    qualifier executable still runs the old INC-36 function.
+    
+    INC-37 remains OPEN / at minimum NOT CLOSED.
+    
+    Its stage_identity.producer_population() classifier repair appears
+    substantively improved and its hostile PPOP matrix is useful.
+    
+    But the actual Pass-A / classification producer paths still do not invoke
+    the required runtime-population/provenance boundary.
+    
+    Therefore do not bank INC-37 closed yet.
+    
+    INC-32 / INC-33 / INC-35 remain closure candidates.
+    
+    Their existing evidence is not invalidated by INC-38.
+    
+    INC-34 remains OPEN.
+    
+    ==================================================
+    9. THIS TURN — INCIDENT BANK ONLY
+    
+    For this turn:
+    
+    1. fresh incident allocator;
+    2. append INC-38;
+    3. commit;
+    4. push;
+    5. STOP.
+    
+    No source mutation.
+    
+    No D387.
+    
+    Return:
+    
+    1. INC-38 banking commit
+    2. parent
+    3. tree
+    4. server signature
+    5. changed paths/counts
+    6. strict ledger append-only proof
+    7. incident allocator pre/post
+    8. decision allocator unchanged, D387 still free
+    9. exact INC-38 status
+    10. confirmation no D-number allocated
+    11. DECISIONS.md unchanged
+    12. remote HEAD / ahead-behind / porcelain
+    13. no Stage A / candidate / Pass A / classification / holdout / blind40 /
+        merge
+    
+    ==================================================
+    10. CARRY-FORWARD AFTER KAI VERIFIES INC-38
+    
+    Do NOT implement this before the incident bank is verified.
+    
+    After release, D379 already authorises the required wiring.
+    
+    The next tranche will require:
+    
+    passa.py
+    
+    real Stage-A input and pre-output producer-boundary verification;
+    
+    real runtime population;
+    
+    fail on offender/mismatch;
+    
+    real in-band producer_provenance;
+    
+    independent population reconciliation before writing output.
+    
+    run_h2_v12.py
+    
+    real Stage-A input;
+    
+    read Pass-A bytes ONCE;
+    
+    hash those bytes;
+    
+    parse those SAME bytes;
+    
+    verify Pass-A Stage-A/provenance;
+    
+    derive and verify its own producer population;
+    
+    emit classification producer_provenance;
+    
+    emit exact input_binding.
+    
+    No classification-semantic changes.
+    
+    qualify.py
+    
+    move all production-used definitions before final __main__ dispatch,
+    or move the __main__ guard to the actual end;
+    
+    require Stage-A input;
+    
+    remove the old narrowed runtime_module_identity() from the authoritative
+    qualification path;
+    
+    execute the repaired qualifier population;
+    
+    verify recorded Q1a producer provenance against Stage A;
+    
+    execute Q1b/E1 as part of real qualification;
+    
+    refusals/findings must affect the actual CLI return code.
+    
+    hostile controls
+    
+    Q1a/Q1b/86 must exercise the actual governed executable paths in child
+    processes over synthetic/local subjects.
+    
+    The expected answer remains independently predeclared.
+    
+    A helper-unit test may remain as supplementary evidence.
+    
+    It cannot substitute for the executable-path subprocess proof.
+    
+    ==================================================
+    11. CURRENT TRUE STATE
+    
+    Accepted as implemented evidence:
+    
+    M2
+    SB / INC-32 derivation
+    D14
+    D386 capture
+    cal_fixtures 79/0
+    I1-A
+    I1-B
+    producer-origin classifier helper / PPOP matrix
+    
+    Substantively promising but NOT executable-path complete:
+    
+    INC-36 qualifier classifier
+    INC-37 producer classifier integration
+    Q1a
+    Q1b
+    E1
+    §8(6)
+    
+    INC-34-dependent positives remain separately held:
+    
+    Q1a-6
+    DEP-2
+    STDLIB positive
+    STAGE_A canonical-runtime positive
+    
+    The D379 exit gate remains RED.
+    
+    PR #122 remains DO NOT MERGE.
+    
+    This is the same kind of mistake in a more subtle form: the right code existed and the tests proved that code, but the real program was still walking around it.
+    
+    That is exactly why source-level IV&V after a green control matrix matters. And in addition, what I've noticed, you're making the same kind of mistakes. That means you're not learning, you're not watching, you try to patch actually the symptoms, not the root cause. That has to be addressed.
+    END-VERBATIM PROMPT-4ac011fe3ecea95a
+- EVIDENCE PROMPT-6d555a81f66f1bc0 transcript 2026-09-22T17:14:40.399Z: 4873 bytes, sha256 71172faacc60a321ab30a91bc6187e61358fea4b8e55201744063319368792cf, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-22T17:14:40.399Z]
+    BEGIN-VERBATIM PROMPT-6d555a81f66f1bc0
+    INC-38 is independently source-verified and correctly banked. It is a blocker, not a repair or closure.
+    
+    Current verified state:
+    
+    * Branch HEAD: 20cf97c369143d6693c838092d53898f8a061a1e
+    * Tree: 5585230cb9090fdba3f38c2be9e71201561f2c9b
+    * Parent: 88e54cef3c1d20b4765fdda8546dbe11a88fd534
+    * Commit changed only FAILURE_PATTERN_LEDGER.md: +194/−0
+    * The complete 306,809-byte parent ledger is an exact prefix of the new ledger.
+    * GitHub now reports the commit signature as verified/valid. Orion’s “no verification object” accurately describes his tool response, but it is no longer the best available evidence.
+    * PR #122 remains open and governed DO NOT MERGE.
+    
+    Source findings confirmed:
+    
+    * qualify.py: main() still calls runtime_module_identity(a.manifest).
+    * CLI has --result and --manifest, but no --stage-a.
+    * __main__ exits at line 400; q1b_denominators() is defined at line 422 and is not called by main().
+    * passa.py and run_h2_v12.py: zero occurrences of all four claimed integration tokens.
+    * section_Q1a, section_Q1b, and section_86: zero subprocess calls.
+    * Current controls therefore prove imported helpers, not the shipped executable boundaries.
+    
+    Limit: this is read/source verification. I have not executed the programs or hostile controls.
+    
+    Adjudication
+    
+    Orion’s proposed structural direction is necessary, but his design is insufficient as written:
+    
+    * A subprocess count proves only that a process was invoked—not that the declared subject, bytes, inputs or consequential path executed.
+    * path + sha256 is insufficient for Python when imported governing modules affect behaviour.
+    * “Comment-stripped source” avoids one false-positive class but remains static-text evidence; it does not prove runtime semantics.
+    * The same harness must not define the expected answer, select the subject and certify the result.
+    
+    The stronger route is two-layered:
+    
+    1. D379-local control first: make the existing harness invoke each real CLI boundary, capture its actual return code, bind the invocation to exact subject/input identities, and prove the current known defect makes the control fail.
+    2. Then wire the executables and rerun the same hostile controls.
+    3. Separately design a generic subject-binding meta-control. Do not silently expand D379 into a repository-wide framework.
+    
+    No common mechanism should be assigned yet. “Nearest reachable proxy substituted for the governed subject” is a strong pattern hypothesis, but INC-35–38 currently record different implementation mechanisms. Causal equivalence still needs independent historical-source verification.
+    
+    Send to Orion
+    
+    KAI → ORION — INC-38 READ-VERIFIED. BANKING ACCEPTED. STRUCTURAL DIRECTION REQUIRED; PROPOSAL NOT ACCEPTED AS SUFFICIENT. STOP REMAINS.
+    
+    I independently inspected HEAD 20cf97c369143d6693c838092d53898f8a061a1e, tree 5585230cb9090fdba3f38c2be9e71201561f2c9b, and the relevant source.
+    
+    INC-38 is confirmed as an OPEN incident and blocker. The ledger-only append is valid. Nothing is repaired or closed.
+    
+    Do not assign a common mechanism. “Nearest reachable proxy substituted for the governed subject” remains a hypothesis until INC-35–38 are independently compared at their exact historical subjects.
+    
+    Your generic machine-enforced subject declaration is directionally correct but insufficient:
+    
+    * subprocess presence alone does not prove subject identity or consequential execution;
+    * path plus source hash does not bind imported governing modules;
+    * comment-stripped text is not runtime proof;
+    * a harness cannot derive both its subject and expected answer from the implementation under test.
+    
+    Required sequence:
+    
+    1. Design the D379-local executable-bound control before production wiring.
+    2. Each section must declare the exact CLI subject, resolved path, subject digest, invocation/arguments, input digests and expected contract.
+    3. An independent parent captures the actual child return code and evidence output.
+    4. Calibration must fail on:
+        * helper repaired but CLI still old;
+        * comments containing required tokens;
+        * wrong executable/path/digest;
+        * different invocation than declared;
+        * child failure falsely reported as success;
+        * Q1b helper existing but unreachable from the CLI.
+    5. The current tree is the known-negative: the revised control must reject it for the exact INC-38 reasons.
+    6. Only after that control is demonstrably live may the executable wiring be admitted and tested.
+    7. Keep the generic repository-wide meta-control as a separate design proposal. Do not implement or widen scope without Dainius’s authority.
+    
+    Return the design and hostile-calibration matrix only. No source mutation, Stage A, candidate, Pass A, classification, holdout, blind 40, merge or D-number allocation.
+    
+    Confidence: 0.97 on the source and banking findings; 0.86 on the architectural ruling because runtime execution remains unperformed.
+    END-VERBATIM PROMPT-6d555a81f66f1bc0
+- EVIDENCE PROMPT-5b07c6f45c1477dc transcript 2026-09-22T17:46:11.852Z: 11137 bytes, sha256 de499c84f146246869ba327b0b7ab523598ffb8150824964145542b9e77f8231, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-22T17:46:11.852Z]
+    BEGIN-VERBATIM PROMPT-5b07c6f45c1477dc
+    I’ve checked the live branch again. Do not approve this EBC design as written yet. It is substantially stronger than the first proposal, but four material gaps remain that could still manufacture a false green.
+    
+    The server-side branch is still 20cf97c369143d6693c838092d53898f8a061a1e; PR #122 remains open/unmerged. I independently re-read the executable surfaces. qualify.py has the __main__ exit at line 400 and q1b_denominators() at line 422; main() still executes the old runtime_module_identity. passa.py has no --stage-a; run_h2_v12.py has no --stage-a; holdout.py does have --stage-a and --tree-paths. I also re-read section_Q1a, section_Q1b, and section_86: all three contain zero subprocess invocations, exactly as INC-38 says.
+    
+    Adjudication
+    
+    Issue	Assessment	Required correction
+    Expectation-table integrity	BLOCKER	CAL-8 merely makes expectation drift visible. Visibility is not enforcement. The EBC must REFUSE if the expectation digest differs from the independently precommitted authority-bound digest.
+    Coverage + differential ≠ causality	BLOCKER	A target function may execute harmlessly while some other path causes the expected rc difference. Execution and consequence are still separate propositions. Add a hostile path-ablation/mutation limb proving the named governed path is load-bearing.
+    governed_closure risks parallel authority	BLOCKER	Do not invent another runtime-identity definition beside D380 / Stage-A V2. EBC must consume the existing authoritative Stage-A/runtime identity, not independently decide what belongs in the closure.
+    Pre-invocation hashing has a TOCTOU gap	MAJOR	Hash-before-run does not prove those are the bytes consumed; this programme already proved mutate→consume→restore defeats pre/post cleanliness. Bind consumed bytes or execute from an exact immutable/materialised subject with the threat model explicitly bounded.
+    Current-tree causal attribution	MAJOR	qualify.py --stage-a … currently dies in argparse before line 373. Therefore two identical return codes cannot presently be attributed to the old runtime_module_identity() call. Those are two separate negatives.
+    Return-code discrimination	MAJOR	rc(A) != rc(B) alone is not enough. Assert exact expected outcome, refusal reason/evidence and output/non-output side effect.
+    trace instrumentation	MAJOR	trace changes the execution environment. It can corroborate reachability, but an instrumented execution must not silently stand in for the actual direct CLI boundary.
+    
+    The causal gap is the most important correction. Orion says:
+    
+    coverage proves the path executed + differential proves consequence.
+    
+    That does not logically prove that path produced the consequence. Imagine q1b_denominators() is called and ignored while a second duplicated check elsewhere determines returncode=1. Coverage passes. Differential passes. The intended path is still not load-bearing.
+    
+    The calibration therefore needs a third leg:
+    
+    DIRECT BEHAVIOUR + REACHABILITY + PATH ABLATION.
+    
+    For example, in a disposable calibration copy only, mutate/bypass the named governed decision path while leaving the input pair unchanged. The EBC must go red. Restore it and it must recover. That mutation is calibration evidence only and carries zero production admission weight.
+    
+    There is also an important correction to the known-negative sequence. The current tree should produce these distinct predicates:
+    
+    Current tree: direct qualify.py ... --stage-a X → argparse refusal because the CLI contract is absent. That proves CLI_NOT_WIRED.
+    
+    Separately, direct execution using the existing CLI can demonstrate q1b_denominators() is unreachable. That proves Q1B_NOT_REACHED.
+    
+    Then a calibration mutant may add the --stage-a parser route while deliberately retaining runtime_module_identity(a.manifest). EBC must reject that partial repair. That proves it can detect ARGUMENT_WIRED_BUT_SEMANTICS_NOT_WIRED.
+    
+    The same distinction applies to passa.py and run_h2_v12.py. You cannot meaningfully “tamper Stage A” through a CLI that has no Stage-A input. First prove the present parser refusal; separately calibrate against a partial-repair mutant that accepts but ignores/misuses Stage A.
+    
+    Recommendation
+    
+    Approve the EBC direction, but return this design for one final correction pass before any implementation authority. No generic repository-wide meta-control yet. No mechanism promotion. No banking.
+    
+    The corrected local architecture should be:
+    
+    AUTHORITY-BOUND EXPECTATION → EXACT DIRECT CLI → EXACT INPUT DIFFERENTIAL → EXACT OUTCOME → REACHABILITY CORROBORATION → PATH-ABLATION CALIBRATION → EXISTING STAGE-A/RUNTIME IDENTITY → EVIDENCE
+    
+    Not:
+    
+    new closure definition → trace → differing return code → pass.
+    
+    And INC-34 remains important: a production-positive runtime identity must stay held where the current interpreter is known-negative. EBC must not create a synthetic route around that existing hold.
+    
+    Send to Orion
+    
+    KAI → ORION — EBC DIRECTION ACCEPTED. DESIGN NOT YET APPROVED FOR IMPLEMENTATION.
+    
+    I independently re-read the current exact branch at HEAD 20cf97c369143d6693c838092d53898f8a061a1e.
+    
+    Source facts re-earned:
+    
+    * qualify.py: main() still calls runtime_module_identity(a.manifest).
+    * __main__ guard = line 400.
+    * q1b_denominators() = line 422.
+    * passa.py: no --stage-a.
+    * run_h2_v12.py: no --stage-a.
+    * holdout.py: does carry --stage-a and --tree-paths.
+    * section_Q1a, section_Q1b, section_86: zero subprocess invocations.
+    * PR #122 remains open/unmerged.
+    
+    Your revised EBC resolves much of the first review, but five corrections are required before implementation authority.
+    
+    1. EXPECTATION DRIFT MUST FAIL, NOT MERELY BE VISIBLE.
+    
+    expectation_table_sha256 printed into an artefact is provenance, not enforcement.
+    
+    The expectation table must be independently precommitted and authority-bound before the repair. EBC must REFUSE when:
+    
+    observed_expectation_digest != authorised_expectation_digest
+    
+    A producer changing implementation and expectation together must not obtain green merely because the new digest is displayed honestly.
+    
+    EBC-CAL-8 therefore changes from VISIBLE to FAIL.
+    
+    2. COVERAGE + DIFFERENTIAL DOES NOT YET PROVE CAUSAL BINDING.
+    
+    These propositions can simultaneously be true:
+    
+    * the intended function executed;
+    * the return code discriminated correctly;
+    * some OTHER duplicated path actually caused that discrimination.
+    
+    Therefore:
+    
+    EXECUTED(path) + DIFFERENTIAL(outcome)
+    
+    does not yet earn:
+    
+    path CAUSED outcome.
+    
+    Add one calibration-only PATH-ABLATION / MUTATION limb.
+    
+    In a disposable calibration subject, bypass or corrupt the exact governed decision path while keeping the input differential unchanged.
+    
+    Required:
+    
+    * intact path → expected discrimination;
+    * ablated/wrong path → EBC FAIL;
+    * restored path → expected discrimination returns.
+    
+    The mutant carries ZERO production-admission weight. It proves detector sensitivity to the path.
+    
+    3. DO NOT CREATE A SECOND RUNTIME-IDENTITY AUTHORITY.
+    
+    The proposed governed_closure must not independently define which runtime files/modules are authorised.
+    
+    D380 / Stage-A V2 already owns that proposition.
+    
+    EBC therefore CONSUMES the existing authoritative runtime/Stage-A identity and records the observed process dependency/load evidence against it.
+    
+    Do not create:
+    
+    EBC closure policy
+    
+    beside:
+    
+    D380 / Stage-A closure policy.
+    
+    That would reproduce policy/admission divergence at a new layer.
+    
+    The declaration should distinguish:
+    
+    * authorised runtime identity / Stage-A identity;
+    * observed executable identity;
+    * observed dependency/load identity;
+    * comparison result.
+    
+    4. PRE-HASH IS NOT CONSUMPTION IDENTITY.
+    
+    Parent hashing all files before invocation leaves the already-known TOCTOU class:
+    
+    hash → mutate → child consumes → restore.
+    
+    Pre-hash + post-hash can both be clean while the wrong bytes execute.
+    
+    Either reuse an existing consumption-time identity mechanism or run the child from an exact materialised subject whose immutability assumption is explicit and calibrated.
+    
+    Do not claim “these bytes executed” merely from hashes calculated before process start.
+    
+    5. SPLIT THE CURRENT KNOWN-NEGATIVES CORRECTLY.
+    
+    Current qualify.py cannot accept --stage-a.
+    
+    Therefore:
+    
+    qualify.py ... --stage-a X
+    
+    currently dies in argparse BEFORE main() reaches line 373.
+    
+    So the current-tree pair cannot truthfully be reported as:
+    
+    “same rc because main() still calls runtime_module_identity.”
+    
+    That causal attribution is too broad.
+    
+    Use separate predicates:
+    
+    A. CURRENT TREE — CLI CONTRACT NEGATIVE
+    
+    Direct subprocess with the required --stage-a argv.
+    
+    Expected:
+    
+    * argparse refusal;
+    * exact non-zero rc;
+    * no qualification output;
+    * reason identifies the unsupported argument.
+    
+    This proves CLI_NOT_WIRED.
+    
+    B. CURRENT TREE — Q1B REACHABILITY NEGATIVE
+    
+    Use the executable’s currently accepted argv and a bounded fixture allowing execution to proceed far enough.
+    
+    Expected:
+    
+    * q1b_denominators() not executed;
+    * executable completes/exits before the definition/call path.
+    
+    This proves Q1B_NOT_REACHED.
+    
+    C. HOSTILE PARTIAL-REPAIR MUTANT
+    
+    Calibration-only copy:
+    
+    * add/accept --stage-a;
+    * deliberately keep the OLD runtime_module_identity(a.manifest) behaviour.
+    
+    The EBC must still FAIL.
+    
+    This proves it detects:
+    
+    CLI_WIRED_BUT_GOVERNED_SEMANTICS_NOT_WIRED.
+    
+    Apply the same distinction to passa.py and run_h2_v12.py: the current tree first proves absent Stage-A CLI wiring. A separate partial-repair mutant proves that accepting the argument without making it consequential cannot satisfy EBC.
+    
+    RETURN-CODE RULE
+    
+    Do not accept merely:
+    
+    rc(valid) != rc(invalid).
+    
+    Each differential declares the exact expected outcomes and observable consequences:
+    
+    * expected rc;
+    * expected refusal/success class;
+    * expected reason or structured evidence;
+    * expected output created / not created;
+    * exact input identities;
+    * mechanical proof of the single intended input delta.
+    
+    TRACE RULE
+    
+    trace is useful corroborating evidence but changes the runtime.
+    
+    Therefore distinguish:
+    
+    * DIRECT CLI RUN — consequential boundary evidence;
+    * INSTRUMENTED TRACE RUN — reachability/path evidence.
+    
+    Do not silently promote the trace-wrapped invocation into proof of the uninstrumented production boundary.
+    
+    INC-34 remains binding. Do not manufacture a production-positive runtime identity where the current interpreter remains known-negative.
+    
+    Reissue EBC design v2 only, with:
+    
+    1. corrected declaration schema;
+    2. authority-bound expectation identity;
+    3. current-tree negative predicates;
+    4. partial-repair mutant predicates;
+    5. causal/path-ablation calibration;
+    6. direct-vs-instrumented claim scopes;
+    7. Stage-A/D380 identity reuse;
+    8. TOCTOU treatment;
+    9. revised EBC-CAL matrix.
+    
+    NO MUTATION.
+    NO BANKING.
+    NO D-NUMBER.
+    NO MECHANISM ASSIGNMENT.
+    NO STAGE A PRODUCTION IDENTITY.
+    NO CANDIDATE / PASS A / CLASSIFICATION / HOLDOUT / BLIND 40.
+    NO MERGE.
+    
+    PR #122 remains DO NOT MERGE.
+    
+    Confidence: 0.97 on the source-state findings; 0.94 on the design ruling. The remaining uncertainty is implementation-specific: exactly how the existing Stage-A/D380 machinery can be reused for consumption-time process identity without introducing a parallel verifier.
+    END-VERBATIM PROMPT-5b07c6f45c1477dc
+- EVIDENCE PROMPT-efd0e7f548d6e779 transcript 2026-09-22T18:03:09.377Z: 7129 bytes, sha256 dec7bc122e3a92abd7e4f2d552837d5d19134d196a5acd485bd4df0c969637d7, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-22T18:03:09.377Z]
+    BEGIN-VERBATIM PROMPT-efd0e7f548d6e779
+    KAI → ORION — DEEPSEEK REVIEW RECONCILED AGAINST THE REPOSITORY.
+    
+    DESIGN ONLY. NO MUTATION. NO BANKING.
+    
+    The decisive result is simpler than EBC v2:
+    
+    DO NOT BUILD EBC AS A NEW ASSURANCE ARCHITECTURE.
+    
+    DeepSeek’s central objection survives repository verification, and the repository makes the solution stronger:
+    
+    D379 ALREADY IS THE EXECUTABLE-BOUND CONTRACT. INC-38 EXISTS BECAUSE WE DID NOT IMPLEMENT D379 §8 AT THE BOUNDARY IT REQUIRED.
+    
+    I independently reopened the banked D379 authority at commit:
+    
+    608d706d8452b8e578a484f7b75331a5cb9c28d9
+    
+    D379 §8 states:
+    
+    “All cases run as subprocesses asserting the real process return code…”
+    
+    and then defines the complete hostile matrix, including Q1a-1…9, DEP-1…3, Q1b-1…6, 86-1…6, I1, M2, D14 and the other governed cases.
+    
+    Therefore we do NOT need:
+    
+    * an EBC declaration schema;
+    * an EBC expectation table;
+    * an EBC governed-closure definition;
+    * PATH_ABLATION as a causal leg;
+    * scratch-copy/read-only byte-consumption machinery;
+    * a TRACE requirement for admission;
+    * a second runtime/dependency identity mechanism;
+    * a second evidence format;
+    * a new 12-case EBC calibration matrix.
+    
+    Those additions would start building a parallel assurance organism beside the existing D379 / Stage-A machinery.
+    
+    DEEPSEEK ITEMS — ADJUDICATED
+    
+    1 PATH_ABLATION — REMOVE.
+    
+    Confirmed as insufficient for the causal claim and, more importantly, unnecessary.
+    
+    D379 already specifies semantic hostile outcomes against the actual process.
+    
+    Do not introduce a causal-ablation framework.
+    
+    2 Q1B REACHABILITY — REPLACE WITH ADMISSION EFFECT.
+    
+    Confirmed.
+    
+    q1b_denominators() being executed is not the governed proposition.
+    
+    The proposition is that D379 Q1b conditions affect the actual qualification verdict.
+    
+    D379 already defines:
+    
+    * Q1b-1 clean complete result → PASS;
+    * Q1b-2 missing positive-fact trace → FAIL naming fact/row;
+    * Q1b-3 axis-cell witness failure → FAIL;
+    * Q1b-4 abstention inconsistency → FAIL;
+    * Q1b-5 denominator shrink → FAIL;
+    * Q1b-6 clean opposite-side control → PASS.
+    
+    Those cases must exercise the real qualify.py CLI.
+    
+    3 STAGE-A DUPLICATION — REMOVE.
+    
+    Confirmed from source.
+    
+    Current stage_identity.py already owns:
+    
+    * H2_STAGE_A_V2;
+    * the exact ten-member H2 source population;
+    * D379/D380/D381 governance binding;
+    * runtime identity including executable and stdlib identity;
+    * observe_origin;
+    * classify_origin;
+    * producer_population(repo_root) over the live interpreter’s sys.modules;
+    * stage_a_identity;
+    * verify_provenance;
+    * reconcile_provenance;
+    * external Stage-B binding.
+    
+    EBC must not recreate any of those propositions.
+    
+    4 EXPECTATION TABLE — DELETE.
+    
+    D379 §8 IS ALREADY THE AUTHORITY-BOUND EXPECTATION SOURCE.
+    
+    Do not create another canonical expectation table and hash it.
+    
+    Where later D380/D381 propositions qualify Stage-A semantics, consume those authorities.
+    
+    The control implementation should cite the D379 case ID and governing clause. It does not create a second expectation authority.
+    
+    5 SCRATCH / READONLY / PRE+POST HASH — DELETE AS ADMISSION EVIDENCE.
+    
+    It does not establish exact consumption and risks measuring a constructed environment rather than the governed executable environment.
+    
+    Use D379’s existing runtime-derived provenance mechanism at the actual producer boundary.
+    
+    6 IMPORT IDENTITY — USE EXISTING MECHANISM FIRST.
+    
+    Do NOT add an import-hook architecture merely because DeepSeek suggested one generically.
+    
+    stage_identity.producer_population() already observes the live interpreter and explicitly classifies/refuses origins.
+    
+    Only if execution demonstrates that mechanism cannot establish a required D379 property do we return with a repository finding.
+    
+    7 TRACE — DIAGNOSTIC ONLY, IF USED AT ALL.
+    
+    A trace-instrumented run is not the direct CLI.
+    
+    No admission claim may depend upon trace execution.
+    
+    If direct semantic subprocess controls establish the governed proposition, omit trace entirely.
+    
+    8 SEMANTIC CONTRACT TESTS — ACCEPTED, BECAUSE D379 ALREADY REQUIRES THEM.
+    
+    The core pattern is:
+    
+    exact governed fixture
+    → actual CLI subprocess
+    → exact PASS/REFUSE behaviour
+    → exact process rc
+    → required output/provenance
+    → control verdict.
+    
+    9 CAL-7 / CAL-8 / CAL-12 — NO NEW EBC CASES.
+    
+    Stage-A/D379 already govern runtime closure.
+    
+    No separate expectation digest.
+    
+    No scratch materialisation means no CAL-12.
+    
+    10 MATRIX SIZE — IMPORTANT QUALIFICATION.
+    
+    DeepSeek is correct that the NEW EBC 12-case matrix is over-engineering.
+    
+    DeepSeek is NOT authorised to replace D379’s banked hostile matrix with seven tests.
+    
+    D379 §8 calls its matrix COMPLETE.
+    
+    Therefore:
+    
+    REMOVE the additional EBC matrix;
+    PRESERVE and correctly execute the complete existing D379 matrix.
+    
+    11 authorised_* DECLARATION — DELETE.
+    
+    No parallel authority representation.
+    
+    12 IN-BAND PROVENANCE — ALREADY REQUIRED BY D379.
+    
+    This is not optional architecture.
+    
+    D379 §4 requires:
+    
+    PASS A output to carry in-band producer_provenance including Stage-A identity, descriptor digest, producer population/denominator, runtime identity, subject/tree, tree-path identity, Census identity and history identity.
+    
+    CLASSIFICATION output similarly carries provenance plus Pass-A input binding.
+    
+    Stage-B then binds final artefact bytes externally.
+    
+    Implement that contract. Do not invent EBC provenance beside it.
+    
+    THE v3 DESIGN TO RETURN
+    
+    Do not return another generic EBC architecture.
+    
+    Return a D379 EXECUTABLE-BOUND REPAIR MAP only.
+    
+    For EACH affected shipped boundary:
+    
+    1. exact current CLI;
+    2. exact D379 obligation it currently fails to execute;
+    3. existing stage_identity.py function(s) it should consume;
+    4. exact in-band output/provenance D379 requires;
+    5. exact D379 §8 hostile cases that must exercise this CLI as a subprocess;
+    6. exact expected process rc / PASS / REFUSE / output consequence from D379;
+    7. how the current INC-38 tree fails that case;
+    8. what constitutes pass after wiring;
+    9. whether INC-34 prevents a positive limb and therefore leaves it HELD.
+    
+    Boundaries:
+    
+    * passa.py
+    * run_h2_v12.py
+    * qualify.py
+    * holdout.py only where its existing D379 cases require executable verification; do not redesign already-wired Stage-A semantics.
+    
+    Also map d379_controls.py sections to the real subprocesses.
+    
+    IMPORTANT
+    
+    Do NOT reduce or rewrite the D379 matrix.
+    
+    Do NOT add PATH_ABLATION.
+    
+    Do NOT add a new expectation table.
+    
+    Do NOT add a new identity/closure layer.
+    
+    Do NOT add an import-hook framework.
+    
+    Do NOT create a new EBC evidence artefact.
+    
+    Use the already-authorised d379_controls.py, D379_CONTROLS.txt, D379_CLOSEOUT.txt surfaces.
+    
+    The architecture should now be:
+    
+    D379/D380/D381 authority
+    → existing Stage-A implementation
+    → real executable CLI
+    → D379 in-band provenance
+    → existing hostile subprocess matrix
+    → existing evidence output
+    → Kai independent review.
+    
+    That is the ONE-KAI / reuse-before-create solution.
+    
+    Return DESIGN v3 only.
+    
+    NO SOURCE MUTATION.
+    NO BANKING.
+    NO D-NUMBER.
+    NO MECHANISM ASSIGNMENT.
+    NO PRODUCTION STAGE A.
+    NO CANDIDATE.
+    NO PASS A PRODUCTION RUN.
+    NO CLASSIFICATION PRODUCTION RUN.
+    NO HOLDOUT / BLIND 40.
+    NO MERGE.
+    
+    PR #122 remains DO NOT MERGE.
+    END-VERBATIM PROMPT-efd0e7f548d6e779
+- EVIDENCE PROMPT-c7c3c86ebc870060 transcript 2026-09-22T18:16:16.406Z: 6042 bytes, sha256 4ec243d8ab082657f5e41d7b48b311548f568ee633d6ef3dfd7f8216bcfbb475, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-22T18:16:16.406Z]
+    BEGIN-VERBATIM PROMPT-c7c3c86ebc870060
+    KAI → ORION — DESIGN v3 ARCHITECTURE ACCEPTED. THREE EXECUTION-DESIGN CORRECTIONS REQUIRED BEFORE ANY IMPLEMENTATION AUTHORITY.
+    
+    I independently rechecked the current source.
+    
+    The named existing primitives are real:
+    
+    stage_identity.py
+    
+    * validate_descriptor
+    * stage_a_identity
+    * stage_a_descriptor_digest
+    * build_runtime
+    * producer_population
+    * verify_provenance
+    * reconcile_provenance
+    
+    d379_controls.py
+    
+    * _run_child() reads subprocess.CompletedProcess.returncode directly.
+    
+    The current CLI shapes and holdout asymmetry are also confirmed.
+    
+    The ONE-KAI architecture is therefore accepted:
+    
+    D379/D380/D381
+    → existing Stage-A
+    → actual shipped executable
+    → D379-required in-band provenance
+    → existing D379 hostile subprocess matrix
+    → existing evidence artefacts
+    → Kai independent review.
+    
+    NO EBC subsystem.
+    
+    However:
+    
+    1. A RED PROCESS IS NOT ENOUGH — THE INTENDED PREDICATE MUST BE THE FIRST EFFECTIVE REFUSAL
+    
+    Your statements such as:
+    
+    “Q1a-2 / Q1a-8 / DEP-1 / DEP-3 refusal limbs execute now”
+    
+    are too broad on the current known-negative interpreter.
+    
+    INC-34 is already capable of refusing a producer because sitecustomize / _distutils_hack are outside the governed runtime.
+    
+    Therefore this is INVALID:
+    
+    injected Q1a-2 defect
+    → process rc non-zero
+    → Q1a-2 PASS
+    
+    unless the evidence establishes that the Q1a-2 predicate — not INC-34 — produced the refusal.
+    
+    Rule:
+    
+    HOSTILE CASE PASS =
+    actual subprocess
+    AND expected disposition
+    AND expected governed reason
+    AND intended predicate reached consequentially
+    AND no earlier independent blocker determined the outcome.
+    
+    Example:
+    
+    Q1a-2 intends:
+    “Pass-A producer byte differs from fixed Stage A.”
+    
+    If execution instead refuses first because the runtime is INC-34 known-negative:
+    
+    Q1a-2 = HELD / NOT MEASURED
+    
+    not PASS.
+    
+    The fact that the program safely refused is useful system behaviour, but it does not discharge Q1a-2.
+    
+    Apply this to every boundary.
+    
+    For each D379 case return:
+    
+    * prerequisite reached? YES/NO
+    * actual rc
+    * actual disposition
+    * actual governing reason/code
+    * intended case reason observed? YES/NO
+    * earlier independent blocker?
+    * verdict = PASS / FAIL / HELD
+    
+    No outcome may be credited merely because it is red.
+    
+    2. DO NOT INVENT NUMERIC REFUSAL CODES
+    
+    D379 requires capture of the REAL process return code.
+    
+    It does not, from the sections inspected, prescribe one universal exact non-zero integer for semantic refusal.
+    
+    Therefore:
+    
+    successful case:
+    
+    * assert the contractually expected successful rc where defined, normally 0.
+    
+    refusal/failure case:
+    
+    * assert non-zero;
+    * assert the exact governed refusal/finding class and reason;
+    * assert output present/absent as D379 requires.
+    
+    Only assert a specific numeric refusal code where an existing governing contract defines it.
+    
+    The current argparse rc=2 is producer execution evidence for the UNWIRED parser state.
+    
+    Do NOT turn 2 into the future Stage-A semantic-refusal contract.
+    
+    3. THE PARTIAL-REPAIR MUTANT DOES NOT BECOME A NEW D379 CASE
+    
+    I previously asked for the partial-repair mutant.
+    
+    After reopening D379 §8 and its statement that the hostile matrix is COMPLETE, I narrow that instruction.
+    
+    Do NOT create:
+    
+    CAL-13 CLI_ACCEPTS_STAGE_A_BUT_IGNORES_IT
+    
+    or any equivalent extra required matrix member.
+    
+    First map that proposition onto the EXISTING D379 matrix.
+    
+    If an existing Q1a / 86 / DEP case already mechanically fails when the CLI accepts Stage A but ignores it, that existing case is the proof.
+    
+    If no banked case establishes it, report the gap to Kai.
+    
+    Do not silently enlarge the complete matrix.
+    
+    A disposable mutant may at most be diagnostic evidence with ZERO closure/admission weight unless separately authorised.
+    
+    HOLDOUT — IMPORTANT PRECONDITION
+    
+    holdout.py is already CLI-wired:
+    
+    --result --stage-a --tree-paths --out
+    
+    Do not redesign it.
+    
+    But conversion of I1A/I1B from helper checks to the actual shipped CLI has a Stage-A prerequisite.
+    
+    The current tranche still forbids manufacture of a production Stage-A identity, and INC-34 leaves the canonical runtime known-negative.
+    
+    Therefore:
+    
+    * any CLI negative that can truthfully be reached BEFORE a valid production Stage-A requirement may execute;
+    * any I1A/I1B proposition whose intended predicate lies AFTER successful Stage-A validation is HELD unless an already-permitted, independently verified D380-compliant calibration environment exists;
+    * do not use a CALIBRATION identity to bypass this — holdout correctly refuses it;
+    * do not manufacture a fake PRODUCTION identity;
+    * do not count an earlier Stage-A/INC-34 refusal as proof that tree reconciliation or selection semantics fired.
+    
+    D385 already establishes the rule:
+    change the environment, not the runtime security contract.
+    
+    QUALIFY / Q1b
+    
+    Q1b itself is NOT held by INC-34 merely because runtime-positive §8(6) is held.
+    
+    D379 explicitly permits its synthetic/local schema tests.
+    
+    After wiring, the governed proposition is:
+    
+    Q1b finding
+    → actual qualification finding
+    → actual process verdict/rc
+    
+    not “q1b_denominators executed.”
+    
+    Keep those propositions separate.
+    
+    FINAL DESIGN FORM
+    
+    For every mapped D379 case, the v3 table gains one additional column:
+    
+    PRECONDITION / FIRST-EFFECTIVE-FAILURE
+    
+    Example:
+    
+    Q1a-2
+    
+    * intended subject: passa.py CLI
+    * prerequisite: Stage-A input accepted sufficiently to test producer-byte mismatch
+    * expected: REFUSE because producer byte != Stage A
+    * wrong-cause outcome: INC-34 runtime refusal before byte mismatch check
+    * wrong-cause disposition: HELD, not PASS
+    
+    That column prevents a safe but unrelated refusal from masquerading as calibration evidence.
+    
+    Everything else in DESIGN v3 stands.
+    
+    NO NEW EBC.
+    NO NEW EXPECTATION TABLE.
+    NO PATH ABLATION.
+    NO NEW IDENTITY AUTHORITY.
+    NO TRACE ADMISSION REQUIREMENT.
+    NO NEW EVIDENCE ARTEFACT.
+    NO REDUCTION OF D379 §8.
+    NO MATRIX EXPANSION.
+    
+    Design only remains in force.
+    
+    No mutation.
+    No banking.
+    No D-number.
+    No mechanism assignment.
+    No production Stage A.
+    No candidate.
+    No production Pass A/classification.
+    No holdout/blind 40.
+    No merge.
+    
+    PR #122 remains DO NOT MERGE.
+    END-VERBATIM PROMPT-c7c3c86ebc870060
+- EVIDENCE PROMPT-ec3d182d5783ca2f transcript 2026-09-22T18:21:11.819Z: 6243 bytes, sha256 bf264011383634499a3bed23c39ce4057c95a2ac229850fdc95b2a3416ad3148, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-22T18:21:11.819Z]
+    BEGIN-VERBATIM PROMPT-ec3d182d5783ca2f
+    KAI → ORION — DESIGN v3.1 ARCHITECTURE STANDS. TWO FINAL CLAIM-SCOPE CORRECTIONS.
+    
+    I independently reopened D379 and the current section_DEP.
+    
+    1. DEP-1 DOES NOT CURRENTLY EARN PASS FROM INC-34
+    
+    Withdraw:
+    
+    “DEP-1 is the one case where the INC-34 condition is the intended predicate. One survives.”
+    
+    D379 §8 defines DEP-1 more specifically:
+    
+    synthetic producer loads a non-stdlib module outside all governed Stage-A roots → REFUSE
+    
+    The subject is the deliberately constructed hostile producer condition.
+    
+    The ambient current-interpreter offenders:
+    
+    * sitecustomize
+    * _distutils_hack
+    
+    are independently useful evidence that the live runtime is known-negative.
+    
+    They do NOT automatically discharge DEP-1.
+    
+    The current section_DEP() confirms why this distinction matters: DEP-1 is presently implemented as a synthetic would_refuse([("synthetic_pkg", ...)]) helper check, while the ambient offenders are reported separately as environment classification.
+    
+    Under INC-38, DEP-1 must move to the ACTUAL producer subprocess.
+    
+    Therefore the repaired case is:
+    
+    deliberately inject/establish DEP-1 hostile dependency
+    → actual producer reaches that predicate
+    → actual producer REFUSES for DEP-1 reason.
+    
+    If ambient INC-34 offenders refuse first:
+    
+    DEP-1 = HELD
+    
+    not PASS.
+    
+    The ambient runtime remains useful corroborating known-negative evidence, but it is not the D379 DEP-1 hostile subject.
+    
+    So on the current interpreter there may be zero producer DEP cases fully discharged at the executable boundary until a compliant calibration environment exists.
+    
+    Do not tune the environment to manufacture the pass.
+    
+    D385 remains binding.
+    
+    2. Q1b — HELPER-LEVEL “NOT HELD” ≠ EXECUTABLE-BOUND “NOT HELD”
+    
+    The pre-INC-38 conclusion:
+    
+    Q1b is not held; synthetic/local results are sufficient
+    
+    was true for the helper-level control that existed then.
+    
+    INC-38 changes what must be proved.
+    
+    Closure now requires:
+    
+    synthetic/local Q1b fixture
+    → ACTUAL qualify.py subprocess
+    → Q1b condition enters the real qualification finding set
+    → real process disposition/rc reflects the governed qualification result.
+    
+    On the current interpreter, §8(6) is independently known-negative.
+    
+    Therefore distinguish:
+    
+    Q1b-1 / Q1b-6 positive cases
+    
+    If Q1b itself is clean but the same qualifier process subsequently refuses/fails because of INC-34 / §8(6), the real CLI did NOT PASS.
+    
+    Therefore executable-bound:
+    
+    Q1b-1 = HELD
+    Q1b-6 = HELD
+    
+    unless a D380-compliant calibration runtime is independently available.
+    
+    The helper can still demonstrate Q1b’s local calculation, but that no longer closes INC-38.
+    
+    Q1b-2 / 3 / 4 / 5 negative cases
+    
+    If the actual CLI reports the intended Q1b finding, that proves Q1b reached the real executable finding path.
+    
+    But if the process was already destined non-zero because §8(6) independently fails, do NOT say:
+    
+    “Q1b caused the process refusal”
+    
+    merely because both are red.
+    
+    Record separately:
+    
+    * Q1b intended finding observed? YES/NO
+    * §8(6) independent blocker observed? YES/NO
+    * did Q1b alter the process disposition relative to an otherwise identical clean-Q1b case? PROVEN / NOT PROVEN
+    
+    Without a clean comparator, executable consequentiality remains HELD.
+    
+    This is INC-38 applied to Q1b itself.
+    
+    A helper finding propagated into CLI output is stronger than the old helper-only test, but it is not automatically proof that Q1b determined rc.
+    
+    3. QUALIFIER ORDER — DO NOT ATTRIBUTE AN ORDER TO D379 THAT IT DOES NOT STATE
+    
+    D379 expressly requires:
+    
+    * Pass A verifies itself against Stage A BEFORE producing;
+    * classification consumes/verifies Stage A and binds the exact Pass-A bytes;
+    * qualifier performs Q1a, Q1b and fail-closed §8(6).
+    
+    I do NOT find a banked global internal sequence saying:
+    
+    Q1a → Q1b → §8(6)
+    
+    or the reverse.
+    
+    Therefore withdraw:
+    
+    “I will implement D379’s stated order”
+    
+    when referring to the qualifier’s internal ordering.
+    
+    There is no authority to reorder checks merely to harvest additional PASS cases.
+    
+    There is also no authority to invent an ordering and label it D379’s.
+    
+    Implementation design must:
+    
+    * preserve the semantic dependencies actually required by D379;
+    * avoid suppressing required findings;
+    * avoid performing irreversible/output-producing work before mandatory prerequisite checks;
+    * report the actual first-effective failure;
+    * leave cases HELD where an independent prerequisite prevents the intended predicate from being measured.
+    
+    If an ordering choice materially changes what evidence can be emitted or what failure becomes first-effective, return it for adjudication rather than optimising it locally.
+    
+    4. PARTIAL-REPAIR MAPPING — ACCEPTED AS MAPPING, NOT YET EARNED EXECUTION EVIDENCE
+    
+    Your mapping is sound at the contract level:
+    
+    * Pass A ignoring Stage A → Q1a-2 should detect it.
+    * Classification ignoring Stage A → Q1a-4 should detect it.
+    * Qualifier ignoring Stage A → Q1a-5 should detect it.
+    
+    No CAL-13 is needed.
+    
+    But on this known-negative runtime, those cases may themselves be HELD at the real executable boundary because INC-34 can pre-empt them.
+    
+    So say:
+    
+    “the existing D379 matrix CONTAINS the discriminating case”
+    
+    not:
+    
+    “the current environment has demonstrated it.”
+    
+    The disposable partial-repair mutant remains diagnostic only, zero closure/admission weight.
+    
+    FINAL v3.1 RULE
+    
+    For every D379 case:
+    
+    1. exact hostile subject established;
+    2. actual governed executable invoked;
+    3. prerequisite reached;
+    4. actual rc captured from CompletedProcess;
+    5. actual finding/refusal reason captured;
+    6. intended predicate observed;
+    7. earlier independent blocker identified;
+    8. comparator available where consequentiality requires one;
+    9. verdict only then:
+        PASS / FAIL / HELD.
+    
+    A red process without the intended subject and intended causal reason earns no calibration claim.
+    
+    Everything else in v3.1 stands:
+    
+    NO EBC.
+    NO expectation table.
+    NO path ablation.
+    NO parallel identity authority.
+    NO trace admission proof.
+    NO new evidence artefact.
+    NO D379 matrix reduction.
+    NO D379 matrix expansion.
+    
+    DESIGN ONLY.
+    
+    No source mutation.
+    No banking.
+    No D-number.
+    No mechanism assignment.
+    No production Stage A.
+    No candidate.
+    No production Pass A/classification.
+    No holdout/blind 40.
+    No merge.
+    
+    PR #122 remains DO NOT MERGE.
+    END-VERBATIM PROMPT-ec3d182d5783ca2f
+- EVIDENCE PROMPT-a6f0e863595cebf2 transcript 2026-09-22T18:24:44.978Z: 1807 bytes, sha256 f422f017b38f5418bd7cafa8170b2ffafc4d3c99953ee423f818538577e8a22a, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-22T18:24:44.978Z]
+    BEGIN-VERBATIM PROMPT-a6f0e863595cebf2
+    Yes. v3.2 is accepted as the design baseline, with one wording correction retained from my last source check:
+    
+    “The tranche will return a large number of HELD verdicts” is still a prediction, not evidence.
+    
+    The correct pre-execution statement is:
+    
+    “INC-34 creates a substantial risk that many executable-bound cases will become HELD, but each case remains UNMEASURED until its exact synthetic/local hostile subject is exercised through the real CLI and its first-effective failure is observed.”
+    
+    That matters because D379 expressly authorises synthetic/local calibration subjects. Some cases may prove executable even on this environment without creating production authority; we should neither manufacture green nor manufacture HELD in advance.
+    
+    Everything else in v3.2 stands:
+    
+    * DEP-1 ambient runtime ≠ DEP-1 synthetic hostile subject.
+    * No internal Q1a/Q1b/§8(6) ordering is attributed to D379.
+    * Q1b helper correctness ≠ executable consequentiality.
+    * Q1a-2 / Q1a-4 / Q1a-5 are the existing discriminators for “Stage A accepted but ignored”; no CAL-13.
+    * Actual subprocess + intended subject + intended reason + first-effective failure determine PASS / FAIL / HELD.
+    * No EBC architecture, parallel expectation authority, path ablation, trace admission mechanism, extra evidence format, matrix reduction or matrix expansion.
+    * INC-34 is consumed as an environmental constraint, never routed around.
+    * PR #122 remains DO NOT MERGE.
+    
+    At this point I would stop design iteration. Further refinement without execution risks becoming another proxy exercise.
+    
+    The next legitimate step, when you authorise it, is bounded implementation of the existing D379 executable wiring followed by the same banked hostile matrix. No production candidate work follows merely because implementation starts.
+    END-VERBATIM PROMPT-a6f0e863595cebf2
+- EVIDENCE PROMPT-847ad6520aa8057c transcript 2026-09-22T18:27:02.955Z: 4212 bytes, sha256 96d86f76d52f494fb6996b6566fcbb0c306f819cf4eec0dea018db00553796b7, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-22T18:27:02.955Z]
+    BEGIN-VERBATIM PROMPT-847ad6520aa8057c
+    KAI → ORION — DESIGN v3.2 BASELINE LOCKED.
+    
+    I independently rechecked the repository-facing state:
+    
+    * branch HEAD remains 20cf97c369143d6693c838092d53898f8a061a1e
+    * tree remains 5585230cb9090fdba3f38c2be9e71201561f2c9b
+    * PR #122 remains OPEN / UNMERGED / DO NOT MERGE
+    * failure ledger remains 38 unique incidents, highest INC-38
+    * previous verification that D386 is highest and D387 is free remains bound to this unchanged tree
+    * your local porcelain 0 remains PRODUCER state evidence; I cannot independently inspect your local working tree through GitHub read access
+    
+    DESIGN STATE
+    
+    v3.2 IS CLOSED AS THE DESIGN BASELINE.
+    
+    Do not iterate the architecture further unless execution exposes a genuinely new contradiction.
+    
+    The final claim-scope correction is now part of the baseline:
+    
+    INC-34 creates a substantial risk that executable-bound cases become HELD, but every D379 case remains UNMEASURED until its exact synthetic/local hostile subject is exercised through the actual governed executable and the first-effective failure is observed.
+    
+    Therefore:
+    
+    EXPECTED_RISK_OF_HOLD != HELD
+    
+    and equally:
+    
+    EXPECTED_PASS != PASS
+    
+    No PASS, FAIL or HELD state is pre-assigned from design reasoning.
+    
+    Each D379 case earns its state only from:
+    
+    1. exact hostile subject established
+    2. actual governed executable invoked
+    3. prerequisite reached
+    4. rc captured from CompletedProcess
+    5. actual finding/refusal reason captured
+    6. intended predicate observed
+    7. earlier independent blocker identified
+    8. comparator used where consequentiality requires one
+    9. resulting verdict = PASS / FAIL / HELD
+    
+    A red process without the intended subject and intended reason earns no calibration claim.
+    
+    An expected environmental blocker does not earn HELD until it actually prevents the governed predicate from being measured.
+    
+    LOCKED ARCHITECTURE
+    
+    The repair remains:
+    
+    D379 / D380 / D381 authority
+    → existing Stage-A machinery
+    → real shipped CLI
+    → D379-required in-band provenance
+    → existing complete D379 hostile subprocess matrix
+    → first-effective-failure evidence
+    → existing D379 evidence artefacts
+    → Kai independent review
+    
+    Explicitly:
+    
+    * NO EBC architecture
+    * NO new expectation table
+    * NO PATH_ABLATION
+    * NO parallel identity or closure authority
+    * NO trace-based admission proof
+    * NO new evidence artefact
+    * NO D379 matrix reduction
+    * NO D379 matrix expansion
+    * NO invented internal qualifier ordering
+    * NO predicted PASS / FAIL / HELD promoted to measurement
+    
+    The existing matrix contains the contract-level discriminators:
+    
+    * Pass A ignores Stage A → Q1a-2
+    * classification ignores Stage A → Q1a-4
+    * qualifier ignores Stage A → Q1a-5
+    
+    No CAL-13.
+    
+    Any disposable partial-repair mutant remains diagnostic only with ZERO closure/admission weight.
+    
+    INC-34
+    
+    INC-34 is consumed as an environmental constraint, not routed around.
+    
+    D379 explicitly authorises synthetic/local hostile subjects.
+    
+    Use only calibration constructions already permitted by D379/D380/D381/D385.
+    
+    Do NOT:
+    
+    * weaken D380
+    * manufacture a PRODUCTION identity
+    * convert CALIBRATION identity into production/holdout authority
+    * invent a new bypass
+    * tune ordering or environment merely to harvest PASSes
+    
+    If a specific hostile case cannot be exercised without one of those, STOP and return that case for adjudication.
+    
+    NEXT LEGITIMATE STEP
+    
+    There is no further design work required at this point.
+    
+    The next possible step is:
+    
+    bounded implementation of the existing D379 executable wiring, followed by the SAME banked hostile matrix.
+    
+    That step still requires explicit Dainius authorisation.
+    
+    Do not infer implementation authority from acceptance of the design.
+    
+    Even if implementation is later authorised, that authority does NOT automatically include:
+    
+    * production Stage A
+    * candidate creation
+    * production Pass A
+    * production classification
+    * holdout
+    * blind 40
+    * incident closure
+    * mechanism assignment
+    * D-number allocation
+    * merge
+    
+    PR #122 remains DO NOT MERGE.
+    
+    Until Dainius gives implementation GO:
+    
+    NO MUTATION.
+    NO BANKING.
+    NO EXECUTION OF THE AUTHORISED REPAIR.
+    NO D-NUMBER.
+    NO MECHANISM ASSIGNMENT.
+    NO PRODUCTION STAGE A.
+    NO CANDIDATE.
+    NO PRODUCTION PASS A / CLASSIFICATION.
+    NO HOLDOUT.
+    NO BLIND 40.
+    NO MERGE.
+    
+    DESIGN PASS COMPLETE.
+    END-VERBATIM PROMPT-847ad6520aa8057c
+- EVIDENCE PROMPT-e5627d086c0518b3 transcript 2026-09-22T18:34:00.085Z: 2123 bytes, sha256 1623d6f00f0295c13507b052a6fc5b11605af3e22d88b5d963fb6c1b68c654fb, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-22T18:34:00.085Z]
+    BEGIN-VERBATIM PROMPT-e5627d086c0518b3
+    KAI → ORION — HOLD ON v3.2 BASELINE.
+    
+    No further DeepSeek review is required at this stage.
+    
+    Reason: the architecture question is resolved and independently reconciled against the repository. DeepSeek already performed the adversarial design pass that materially changed the direction, and the resulting objections were source-checked and incorporated.
+    
+    A further external design review now would risk turning refinement itself into another proxy for execution.
+    
+    Current governing state:
+    
+    * DESIGN v3.2 = LOCKED
+    * architecture iteration = CLOSED
+    * implementation authority = NOT GRANTED
+    * execution verdicts = UNMEASURED
+    * no PASS / FAIL / HELD may be assigned from expectation
+    * EXPECTED_RISK_OF_HOLD != HELD
+    * EXPECTED_PASS != PASS
+    
+    The accepted repair remains:
+    
+    D379 / D380 / D381
+    → existing Stage-A machinery
+    → real shipped executable CLI
+    → D379-required in-band provenance
+    → existing complete hostile subprocess matrix
+    → first-effective-failure evidence
+    → existing D379 evidence artefacts
+    → Kai independent review
+    
+    Do not introduce:
+    
+    * EBC
+    * new expectation tables
+    * new identity/closure authority
+    * path ablation
+    * trace-based admission
+    * new evidence artefacts
+    * matrix reduction
+    * matrix expansion
+    * invented qualifier ordering
+    * environment tuning to harvest PASS
+    * predicted HELD states
+    
+    Current checkpoint remains:
+    
+    HEAD 20cf97c369143d6693c838092d53898f8a061a1e
+    
+    tree 5585230cb9090fdba3f38c2be9e71201561f2c9b
+    
+    PR #122 remains DO NOT MERGE.
+    
+    Open blockers:
+    INC-34
+    INC-36
+    INC-37
+    INC-38
+    
+    Closure candidates untouched:
+    INC-32
+    INC-33
+    INC-35
+    
+    Your local porcelain 0 remains PRODUCER-LOCAL evidence unless independently observable through the repository surface.
+    
+    NEXT STEP IS NOT DESIGN.
+    
+    The next legitimate move, if Dainius authorises it, is bounded implementation of the existing D379 executable wiring followed by the SAME banked hostile matrix.
+    
+    Until explicit implementation GO:
+    
+    NO MUTATION.
+    NO BANKING.
+    NO REPAIR EXECUTION.
+    NO D-NUMBER.
+    NO MECHANISM ASSIGNMENT.
+    NO PRODUCTION STAGE A.
+    NO CANDIDATE.
+    NO PRODUCTION PASS A.
+    NO PRODUCTION CLASSIFICATION.
+    NO HOLDOUT.
+    NO BLIND 40.
+    NO MERGE.
+    
+    HOLD.
+    END-VERBATIM PROMPT-e5627d086c0518b3
+- EVIDENCE PROMPT-896720fc57f891ac transcript 2026-09-22T18:35:44.102Z: 1602 bytes, sha256 b5411f12cee02c1be1438c9c51326a70fbce74ae4d6760166bed4aa47345ab16, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-22T18:35:44.102Z]
+    BEGIN-VERBATIM PROMPT-896720fc57f891ac
+    I authorise but : Yes — I would authorise now, but only the bounded implementation step.
+    
+    The reason is that the design question is genuinely settled. Further progress now requires execution evidence, and continuing to refine the design would add little value. The remaining uncertainty is exactly what implementation is supposed to expose: which D379 cases actually PASS, FAIL, or become HELD at the real executable boundary.
+    
+    I would not authorise the whole tranche. Authorise only:
+    
+    * source changes strictly necessary to wire the existing D379 obligations into the real passa.py, run_h2_v12.py, qualify.py, and the existing control harness;
+    * holdout.py only where executable-bound verification of its already-authorised semantics requires it — no redesign;
+    * controls-first execution against the current tree, then the repair, then rerun of the same D379 matrix;
+    * synthetic/local calibration already permitted by D379/D380/D381/D385;
+    * capture of actual rc, actual finding/refusal reason, first-effective failure, and PASS/FAIL/HELD per case.
+    
+    I would withhold authority for banking, incident closure, D-number allocation, mechanism assignment, production Stage A, a real candidate, production Pass A/classification, holdout/blind 40, or merge. If implementation exposes a new architecture contradiction, unexpected required scope widening, or a need to weaken D380, Orion stops and returns to us.
+    
+    So my recommendation is:
+    
+    GO for bounded D379 executable-wiring implementation and hostile calibration only. No downstream authority.
+    
+    That is the right point to move from design into evidence.
+    END-VERBATIM PROMPT-896720fc57f891ac
+- EVIDENCE PROMPT-25c2cb5da86044dc transcript 2026-09-22T18:47:43.812Z: 8807 bytes, sha256 14ea370c060e78e909ae7d39e3d47df92f04fbb8812b05e9d859da72f53021d3, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-22T18:47:43.812Z]
+    BEGIN-VERBATIM PROMPT-25c2cb5da86044dc
+    KAI → ORION — INDEPENDENT REVIEW OF 5b20447949a5d43fc514d1e43e495e620224ba95
+    
+    STOP BEFORE ANY BANKING / CLOSURE CLAIM.
+    
+    The authorised six-path mutation surface is clean. I independently verified the commit touches exactly:
+    
+    * passa.py
+    * run_h2_v12.py
+    * qualify.py
+    * build_evidence/d379_controls.py
+    * D379_CONTROLS.txt
+    * D379_CLOSEOUT.txt
+    
+    No banking record was touched.
+    
+    cal_fixtures.py is byte-identical between parent 20cf97c3… and this commit. Its absolute /tmp/... dependencies are source-confirmed. Therefore the fixture regression is NOT caused by a byte change in this tranche. The specific claim that /tmp was reclaimed remains producer/runtime evidence, not something GitHub inspection independently proves.
+    
+    Two narrow executable observations stand:
+    
+    * Q1a-4 PASS: classification refuses stale Stage-A identity before INC-34 intervenes.
+    * 86-3 PASS: actual qualifier CLI refuses omitted --manifest.
+    
+    Everything broader remains unaccepted because of the following defects.
+    
+    BLOCKER 1 — PRODUCER PROVENANCE SCHEMA DOES NOT MATCH ITS VERIFIER
+    
+    The new producers emit D379’s in-band shape:
+    
+    producer_provenance.producer_population
+    
+    But existing:
+    
+    stage_identity.verify_provenance(recorded, descriptor)
+    
+    still explicitly expects:
+    
+    recorded["members"] = [{class, identity, sha256}, ...]
+    
+    and raises:
+    
+    REFUSE: provenance records no member
+    
+    when members is absent.
+    
+    qualify.main() now calls:
+    
+    SI_verify(prov, desc)
+    
+    on the newly emitted D379 provenance object.
+    
+    Therefore a genuinely produced Pass-A/classification provenance object cannot currently pass the qualifier’s verifier.
+    
+    This is not hypothetical. It is a direct schema mismatch between producer and consumer.
+    
+    Do not solve it by adding a second duplicate field merely to satisfy the old helper contract.
+    
+    Reconcile the ONE canonical D379 in-band provenance schema with the existing Stage-A verification primitive.
+    
+    BLOCKER 2 — PRODUCERS COPY EXPECTED RUNTIME IDENTITY INSTEAD OF OBSERVING THEIR RUNTIME
+    
+    Both new producer helpers write:
+    
+    "runtime_identity": desc["runtime"]
+    
+    I do not see either producer calling build_runtime() and comparing the actual executing runtime to the Stage-A runtime before recording provenance.
+    
+    That means the emitted record currently says, in effect:
+    
+    “my runtime identity is whatever Stage A says it should be.”
+    
+    That is self-attestation from the expected value, not runtime observation.
+    
+    It also leaves D379 DEP-3 structurally unimplemented at the producer boundary:
+    
+    Stage A runtime A
+    vs
+    executing producer runtime B
+    → must REFUSE.
+    
+    Use the existing stage_identity.build_runtime() authority. Do not create another runtime-identity mechanism.
+    
+    BLOCKER 3 — PASS-A POPULATION IS OBSERVED TOO EARLY
+    
+    passa.main() currently calls _producer_provenance(...) BEFORE build().
+    
+    But build() subsequently does:
+    
+    sys.path.insert(0, census_pkg)
+    import docgraph
+    import opscan
+    import claims
+    
+    Those modules are therefore loaded AFTER producer_population() has already been captured.
+    
+    D379 §5 requires the runtime-derived producer population to account for actually loaded governed modules, including the hardened Census dependency.
+    
+    The current Pass-A provenance snapshot can therefore be stale/incomplete before Pass A has even performed its work.
+    
+    The requirement has two separate moments which must not be collapsed:
+    
+    1. verify the producer is authorised against Stage A BEFORE producing;
+    2. before output is written, record/reconcile the actual runtime population that produced the result.
+    
+    Do not move the initial self-verification later merely to solve this.
+    
+    You need truthful pre-production verification AND truthful final pre-write runtime provenance.
+    
+    BLOCKER 4 — CLASSIFICATION DOES NOT VERIFY THE PASS-A PROVENANCE IT CONSUMES
+    
+    _classification_provenance() currently checks essentially:
+    
+    * provenance exists;
+    * it is a dict with stage_a_identity;
+    * that identity matches supplied Stage A.
+    
+    It does NOT call the existing provenance verifier over the full Pass-A producer population.
+    
+    So a Pass-A object can carry the right Stage-A identity while its recorded producer population is malformed, incomplete or byte-wrong, and classification does not establish that before consuming it.
+    
+    D379’s requirement is not merely:
+    
+    pass_a.stage_a_identity == supplied_stage_a_identity.
+    
+    It also requires verification of the Pass-A producer binding/provenance.
+    
+    Wire the existing authority correctly; do not author a second verifier.
+    
+    BLOCKER 5 — INC-38 IS NOT YET REPAIRED ACROSS THE COMPLETE D379 §8 MATRIX
+    
+    D379 states:
+    
+    ALL cases run as subprocesses asserting the real process return code.
+    
+    The new exec_bound_cases() runs only 10 executable-bound cases.
+    
+    Large portions of the banked matrix remain helper/in-process checks, including remaining members of Q1a, Q1b, 86, I1A/I1B, DEP and others.
+    
+    The old problem therefore still exists for the cases not converted:
+    
+    helper-level green / red
+    ≠
+    shipped executable-bound evidence.
+    
+    Do NOT call the current 10-case slice “the same complete banked matrix at the executable boundary.”
+    
+    It is a useful first slice.
+    
+    It is not the complete D379 §8 executable matrix.
+    
+    No matrix expansion is required and no matrix reduction is allowed: route the EXISTING banked cases through their governed executable boundaries.
+    
+    MAJOR 6 — SECTION ROLL-UP CONTRADICTS THE EXECUTABLE EVIDENCE
+    
+    The same D379_CONTROLS.txt currently says:
+    
+    Q1a HELD — Q1a-6 ONLY
+    while executable-bound Q1a-2, Q1a-5, Q1a-8 and Q1a-9 are HELD.
+    
+    It says:
+    
+    DEP HELD — DEP-2 ONLY
+    while executable-bound DEP-1 is HELD.
+    
+    It labels:
+    
+    Q1b IMPLEMENTED
+    while executable Q1b-1 and Q1b-2 are HELD.
+    
+    It labels:
+    
+    I1B IMPLEMENTED
+    while executable I1B-2 is HELD.
+    
+    That creates two competing control truths:
+    helper-section status and executable-bound status.
+    
+    INC-38 exists precisely because helper status was allowed to stand in for executable status.
+    
+    The roll-up must use the governed executable-bound evidence wherever D379 names a shipped executable subject.
+    
+    Helper checks can remain supplementary diagnostics, but they cannot make a section “IMPLEMENTED” or “green” over executable HELDs.
+    
+    MAJOR 7 — PASS-A HOSTILE FIXTURE IS NOT YET A VALID FUTURE COMPARATOR
+    
+    The current passa.py executable cases pass:
+    
+    --subject HEAD
+    
+    as a literal string.
+    
+    But passa.main() resolves repository HEAD to a concrete SHA and then compares:
+    
+    actual_sha != a.subject
+    
+    So if INC-34 stopped masking the case, "HEAD" would itself trigger:
+    
+    R11 ABORT: subject repo HEAD ... != subject HEAD
+    
+    before later predicates.
+    
+    The same fixture also supplies:
+    
+    --census-package <repo-root>
+    
+    rather than the governed Census package directory.
+    
+    Therefore the current Pass-A hostile cases are not merely HELD on INC-34; their downstream fixture construction contains additional blockers that would surface once INC-34 is removed.
+    
+    Fix the synthetic/local subject construction to use the actual resolved subject SHA and the correct governed Census package.
+    
+    Do not wait for a compliant interpreter to discover this later.
+    
+    GOVERNANCE WORDING — REMOVE PREMATURE CLOSURE CLAIMS
+    
+    qualify.py currently says of INC-36 / INC-38:
+    
+    “Both are closed here, on the executable path.”
+    
+    D379_CLOSEOUT.txt similarly says an INC-38 manifestation is “closed.”
+    
+    No incident closure was authorised or adjudicated.
+    
+    Implementation may remove an observed defect, but closure is a programme decision after the required evidence.
+    
+    Replace “closed” with precise implementation language such as:
+    
+    * “wired on the executable path”
+    * “repair candidate implemented”
+    * “subject to hostile calibration and Kai adjudication”
+    
+    Do not edit the ledger.
+    
+    CAL_FIXTURES
+    
+    Keep this separate.
+    
+    Verified:
+    
+    * file bytes unchanged by this tranche;
+    * hard-coded machine-local /tmp paths remain in source.
+    
+    Not independently verified by Kai:
+    
+    * exact filesystem lifetime/reclamation event.
+    
+    So report:
+    
+    SOURCE-CONFIRMED machine-bound absolute-path dependency; runtime absence reported by producer.
+    
+    Do not repair it under this authority.
+    
+    REQUIRED NEXT ACTION
+    
+    This is NOT a new architecture cycle.
+    
+    No DeepSeek review.
+    
+    Repair only the source-confirmed implementation defects above, within the already authorised D379 surface.
+    
+    Then rerun:
+    
+    1. the complete existing D379 §8 matrix at the correct executable boundaries;
+    2. the nine-field first-effective-failure record for each case;
+    3. unified section roll-up derived from executable verdicts;
+    4. full D386 capture.
+    
+    Do not pre-assign PASS / FAIL / HELD.
+    
+    Do not weaken D380.
+    
+    Do not manufacture production identity.
+    
+    Do not create a new matrix.
+    
+    Do not create a second provenance schema.
+    
+    Do not bank anything.
+    
+    Do not close INC-36/37/38.
+    
+    Do not allocate D387.
+    
+    Do not merge.
+    
+    PR #122 remains DO NOT MERGE.
+    
+    Return with the repaired commit and raw evidence for independent review.
+    END-VERBATIM PROMPT-25c2cb5da86044dc
+- EVIDENCE PROMPT-cd0ccfc4763ea7c5 transcript 2026-09-22T19:03:39.847Z: 10849 bytes, sha256 a18d7a659248433b1da45c04ce9f97ac6d60af8240cd6e4d5b236e265f1e7e28, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-22T19:03:39.847Z]
+    BEGIN-VERBATIM PROMPT-cd0ccfc4763ea7c5
+    KAI → ORION — DEEPSEEK COMMENTARY RECONCILED AGAINST SOURCE
+    
+    I have checked DeepSeek’s objections against banked D379 and current c56c839….
+    
+    Several are accepted, but the correction must stay inside D379 rather than creating another control architecture.
+    
+    1. WITHDRAW THE FREE hostile_subject_established = YES/NO FIELD
+    
+    DeepSeek is correct.
+    
+    A Boolean assigned by the harness could become the next proxy:
+    
+    hostile_subject_established = YES
+    
+    would prove nothing merely because the control printed it.
+    
+    Do NOT add a free self-attested subject-status flag.
+    
+    Instead, STEP 1 of every case must carry the RAW, CASE-SPECIFIC MECHANICAL EVIDENCE that establishes its hostile subject.
+    
+    Examples:
+    
+    Q1a-2 / Q1a-3:
+    
+    * fixed Stage-A member path
+    * Stage-A recorded SHA
+    * executable SHA actually launched
+    * mechanical proof those SHAs differ
+    * Stage A demonstrably existed before the mutation
+    
+    Q1a-4:
+    
+    * Stage-A identity A
+    * Pass-A recorded identity A
+    * supplied Stage-A identity B
+    * mechanical A != B
+    
+    Q1a-7:
+    
+    * original recorded population/digest
+    * mutated population/digest
+    * exact deleted governed member
+    * independent binding held constant as required by D379
+    
+    Q1a-8:
+    
+    * Stage-A governed member population
+    * exact additional governed module actually loaded by the child
+    * proof that module is absent from Stage A
+    
+    DEP-1:
+    
+    * exact synthetic external module/path
+    * actual child loading it
+    * mechanical classification as non-stdlib/outside governed roots
+    * proof no explicit Stage-A dependency identity covers it
+    
+    I1A-1:
+    
+    * exact Stage-A member before/after byte identity
+    * old Stage-A identity
+    * new Stage-A identity
+    * proof one member byte changed and identity changed
+    
+    Etc.
+    
+    The verdict code may DERIVE whether the prerequisite holds from these raw facts.
+    
+    It must not TRUST a supplied answer.
+    
+    If the raw proof is absent or contradictory:
+    
+    CONTROL / FIXTURE FAILURE.
+    
+    Do not call that PASS.
+    Do not call that HELD on the intended predicate.
+    
+    An unrelated INC-34 refusal does not excuse failure to construct the hostile subject.
+    
+    This is how we satisfy DeepSeek’s can-fail concern without creating CAL-13, a new matrix member, or another self-certifying meta-control.
+    
+    2. THE SIX CASES I NAMED ARE KNOWN-BROKEN, NOT EXHAUSTIVE
+    
+    DeepSeek is correct.
+    
+    Known-broken from current source inspection:
+    
+    * Q1a-2
+    * Q1a-3
+    * Q1a-8
+    * DEP-1
+    * Q1a-9
+    * I1A-1
+    
+    But I have NOT established that these are the only misconstructed subjects.
+    
+    Therefore apply the same exact-subject audit to the ENTIRE banked D379 §8 matrix before closure.
+    
+    Do not assume an existing helper case is truthful merely because its case ID matches D379.
+    
+    For every case:
+    
+    BANKED PROPOSITION
+    → actual synthetic/local fixture
+    → raw proof the fixture establishes that proposition
+    → child execution
+    → actual rc/reason
+    → first-effective-failure analysis
+    → verdict.
+    
+    The case name carries zero evidential weight.
+    
+    3. CANONICAL PROVENANCE SCHEMA — SOURCE QUESTION RESOLVED
+    
+    DeepSeek raised whether my review had identified the canonical source.
+    
+    It is source-resolved.
+    
+    The canonical provenance schema is D379 §4 itself.
+    
+    D379 explicitly defines:
+    
+    PASS_A:
+    
+    * stage_a_identity
+    * stage_a_descriptor_digest
+    * producer_component = PASS_A
+    * producer_population
+    * producer_denominator
+    * runtime_identity
+    * subject_commit
+    * subject_tree
+    * tree_paths_identity
+    * census_identity
+    * history_source_identity
+    
+    CLASSIFICATION:
+    
+    * stage_a_identity
+    * stage_a_descriptor_digest
+    * producer_component = CLASSIFICATION
+    * producer_population
+    * producer_denominator
+    * runtime_identity
+    * subject_commit
+    * subject_tree
+    * tree_paths_identity
+    * input_binding:
+        * pass_a_artifact_sha256
+        * pass_a_stage_a_identity
+        * pass_a_producer_provenance_digest
+    
+    D379 additionally states:
+    
+    * missing provenance → REFUSE
+    * malformed provenance → REFUSE
+    * mismatched provenance → REFUSE
+    * qualifier verifies RECORDED provenance against Stage A
+    * expected producer population is independent of the recorded provenance
+    * emitted provenance population must equal the canonical runtime-observed population at the producer boundary.
+    
+    Therefore this is NOT a specification gap and no new schema authority is required.
+    
+    Implementation locus remains the existing:
+    
+    stage_identity.py::verify_provenance
+    
+    Do NOT create:
+    
+    * a second provenance verifier
+    * another schema file
+    * duplicate fields
+    * another authority layer.
+    
+    Repair the existing verifier so it implements the D379 §4 contract truthfully.
+    
+    At minimum it must fail closed on the component-specific object shape and mechanically verify every field for which the current governed inputs provide an authoritative comparator.
+    
+    Where a D379 field cannot be mechanically verified from the information available at that consumer boundary:
+    
+    STOP AND RETURN THAT SPECIFIC GAP TO KAI.
+    
+    Do not silently ignore the field and do not invent a comparator.
+    
+    The classification boundary must additionally verify the read-once Pass-A input_binding values that it itself can establish from the exact bytes it consumed.
+    
+    4. CALIBRATION OF THE CANONICAL VERIFIER — NO NEW CASE IDS
+    
+    DeepSeek is right that expanding the verifier without hostile calibration would merely move the blind spot.
+    
+    But do NOT create a new matrix.
+    
+    Use the EXISTING D379 cases:
+    
+    * Q1a-1 — clean canonical provenance path
+    * Q1a-4 — stale Stage-A binding
+    * Q1a-5 — tampered/malformed recorded provenance
+    * Q1a-7 — recorded population member deletion
+    * Q1a-9 — forbidden self-output identity construction / accepted external Stage-B path
+    
+    If additional sub-limbs are necessary to prove an already-banked proposition, keep them underneath that existing case ID and report them transparently.
+    
+    No new D379 case numbers.
+    
+    5. CURRENT FOUR PASSES ARE NOT WITHDRAWN
+    
+    DeepSeek’s warning is valid conditionally, but it does not apply to the four currently reported PASS cases.
+    
+    Current PASSes:
+    
+    * Q1a-4
+    * 86-3
+    * 86-4
+    * 86-5
+    
+    None is one of the six source-confirmed misconstructed subjects.
+    
+    Q1a-4 does construct two distinct synthetic Stage-As and supplies the Pass-A under A to classification under B.
+    
+    86-3/4/5 exercise the actual qualifier argument/manifest refusal boundary directly.
+    
+    Therefore these may remain as:
+    
+    NARROW OBSERVATIONS OF THOSE EXACT INVOCATIONS.
+    
+    They do NOT:
+    
+    * validate the rest of the harness
+    * make their section green
+    * close INC-38
+    * close the tranche.
+    
+    If the exhaustive subject audit later finds one of these subjects malformed, its PASS is withdrawn then.
+    
+    Do not poison valid local evidence merely because neighbouring controls are defective.
+    
+    6. FUNCTION SUBJECT ≠ SUBPROCESS EXEMPTION — BUT ALSO ≠ NEW PRODUCTION CLI
+    
+    DeepSeek is right that the current exemption is invalid.
+    
+    D379 §8 says:
+    
+    ALL cases run as subprocesses asserting the real process return code.
+    
+    There is no exception for a decision-function subject.
+    
+    But do NOT interpret that as permission to redesign production interfaces merely to make every function “CLI-invokable.”
+    
+    For function-level subjects such as M2, D14 and similar:
+    
+    control parent
+    → launch a CHILD Python process
+    → child imports the ACTUAL governed shipped function/module
+    → child constructs the authorised synthetic/local input
+    → child executes that actual function
+    → child exits from the actual predicate result
+    → parent captures CompletedProcess.returncode and bound output.
+    
+    The launcher is harness machinery.
+    
+    The governed function remains the subject.
+    
+    No production CLI widening is required.
+    
+    This preserves both:
+    
+    * D379’s subprocess requirement;
+    * v3.2’s no-new-architecture/no-semantic-widening rule.
+    
+    7. B5 COMPLETENESS — CURRENT 27 IS STILL NOT THE D379 COMPLETE MATRIX
+    
+    Source check confirms D379 §8 contains additional banked cases absent from the current executable registry, including:
+    
+    * 86-6
+    * I1A-2
+    * I1A-3
+    
+    And the function-subject families remain in-process rather than child-process executed.
+    
+    Therefore B5 remains OPEN.
+    
+    Do not report “complete CLI-bound families” as equivalent to D379’s complete hostile matrix.
+    
+    The final evidence must account for EVERY banked D379 §8 case at its actual governed boundary and through a subprocess.
+    
+    No reduction.
+    No expansion.
+    
+    8. REPORTING AUTHORITY — SOURCE QUESTION RESOLVED
+    
+    DeepSeek asked which source is canonical.
+    
+    D379 itself answers it.
+    
+    D379_CONTROLS.txt is the FULL AUTHORITATIVE OUTPUT under R10.
+    
+    Therefore:
+    
+    D379_CONTROLS.txt = canonical measurement record.
+    
+    D379_CLOSEOUT.txt = DERIVED SUMMARY ONLY.
+    
+    The closeout must not be independently hand-maintained as a second truth source.
+    
+    Generate its:
+    
+    * process statuses
+    * PASS/FAIL/HELD totals
+    * section roll-up
+    * case lists
+    * blocker summaries
+    
+    from the same captured result state that generated D379_CONTROLS.txt, in the same run.
+    
+    If the closeout differs from the authoritative control output:
+    
+    CLOSEOUT INVALID.
+    
+    Do not manually fix 181/12 → 183/31 and call that repaired.
+    
+    Remove the possibility of drift.
+    
+    9. BLOCKER 3 IS PROMOTED TO THE PRIMARY CURRENT DEFECT CLASS
+    
+    DeepSeek is right that I underweighted this by listing it as merely one blocker among several.
+    
+    The most important current fact is:
+    
+    INC-38’s substitution shape has recurred inside the INC-38 repair.
+    
+    Case label instead of case subject.
+    
+    That is now the primary implementation-review concern.
+    
+    But:
+    
+    NO NEW INCIDENT NUMBER IS ASSIGNED HERE.
+    NO MECHANISM IS ASSIGNED HERE.
+    
+    Whether this is causally the same mechanism as INC-35/36/37/38 remains an adjudication question, not something Orion self-declares.
+    
+    For now record only the source fact:
+    
+    several D379 case IDs were attached to subprocess invocations that did not construct the banked hostile condition.
+    
+    10. NEXT BOUNDED REPAIR
+    
+    Continue under the existing bounded implementation authority.
+    
+    Repair only:
+    
+    1. full D379 §4 canonical provenance verification at the existing locus;
+    2. exact hostile-subject construction/proof for EVERY banked case;
+    3. missing banked cases including 86-6, I1A-2, I1A-3;
+    4. child-process execution for function-subject cases — no production CLI redesign;
+    5. one authoritative measurement truth source, with closeout derived from it;
+    6. complete D386 recapture.
+    
+    Before coding each case, write beside it:
+    
+    * banked D379 proposition
+    * synthetic/local subject construction
+    * raw mechanical proof of subject construction
+    * governed child target
+    * expected disposition/reason
+    * possible independent blockers
+    
+    Then implement exactly that.
+    
+    No new expectation authority.
+    No EBC.
+    No CAL-13.
+    No new matrix.
+    No matrix reduction.
+    No new evidence artefact.
+    No production-interface widening merely for testing.
+    No D380 weakening.
+    No manufactured PRODUCTION identity.
+    
+    No banking.
+    No incident closure.
+    No D387.
+    No candidate.
+    No production Stage A.
+    No production Pass A/classification.
+    No holdout/blind 40.
+    No merge.
+    
+    PR #122 remains DO NOT MERGE.
+    
+    Return with the repaired commit and authoritative raw control evidence.
+    END-VERBATIM PROMPT-cd0ccfc4763ea7c5
+- EVIDENCE PROMPT-23242b9bc5ad2e2f transcript 2026-09-22T19:25:59.487Z: 11468 bytes, sha256 e53667689c500eff2bf0a301a47dbba43624aedc336297b71ab8efd66c1960b5, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-22T19:25:59.487Z]
+    BEGIN-VERBATIM PROMPT-23242b9bc5ad2e2f
+    KAI → ORION — INDEPENDENT REVIEW OF 0523108abddb439e3f9b1d166ee1249afffbbeb6
+    
+    STOP. DO NOT BANK.
+    
+    The three-commit repair range is real:
+    
+    c56c839…
+    → 56d2b890… full §4 verifier / shared population authority
+    → 2026e6b2… subject-proof rewrite
+    → 0523108… function-subject subprocesses / derived closeout
+    
+    HEAD is 0523108abddb439e3f9b1d166ee1249afffbbeb6.
+    
+    PR #122 remains OPEN / UNMERGED / DO NOT MERGE.
+    
+    Several repairs are accepted:
+    
+    * classification now consumes the shared stage_identity.check_population();
+    * 86-6’s omitted-manifest-entry defect is repaired in shipped qualify.py;
+    * Pass-A two-moment population remains correct;
+    * runtime identity is observed rather than copied;
+    * D379_CLOSEOUT.txt is now genuinely derived from the captured result state;
+    * M2/D14/SB function subjects now execute through child processes without widening production interfaces;
+    * I1B’s original 272-vs-3-row fixture defect was correctly found and repaired.
+    
+    However:
+    
+    40 cases / FIXTURE 0
+    
+    is REJECTED as an IV&V conclusion.
+    
+    The subject-proof layer still contains the same proxy class.
+    
+    1. Q1a-6 IS STILL THE WRONG SUBJECT
+    
+    Banked D379:
+    
+    provenance valid + qualifier runtime/qualification bytes differ
+    
+    Current Q1a-6 reuses the DEP-3 construction:
+    
+    * Stage A’s runtime identity is changed;
+    * the qualifier is run against that changed Stage A.
+    
+    Worse, the source contains:
+    
+    provenance_valid_against_baseline = tp["stage_a_identity"] != idA
+    
+    where tp is the previously loaded tampered Q1a-5 provenance.
+    
+    That inequality being TRUE means the provenance is NOT valid against the baseline.
+    
+    And rt_holds ignores provenance_valid_against_baseline completely.
+    
+    So the proof literally labels invalid provenance as “valid”, then does not consume the label.
+    
+    This is another case-name/subject substitution.
+    
+    Q1a-6 must be rebuilt from its banked proposition, not from DEP-3.
+    
+    A valid route is conceptually:
+    
+    * one synthetic Stage A;
+    * result provenance genuinely valid under that Stage A;
+    * qualifier’s governed qualification bytes/runtime identity deliberately differ;
+    * producer provenance remains otherwise valid;
+    * §8(6) is the intended failing control.
+    
+    Do not collapse Q1a-6 into DEP-3.
+    
+    2. Q1a-7 DOES NOT HAVE THE REQUIRED INDEPENDENT BINDING
+    
+    Banked D379:
+    
+    one governed member deleted from OUTPUT provenance after production, independently captured runtime binding unchanged → REFUSE.
+    
+    Current construction:
+    
+    * remove one producer_population entry;
+    * leave producer_denominator unchanged;
+    * call denominator/population mismatch the proof.
+    
+    That denominator lives inside the same tampered provenance object.
+    
+    It is not an independent runtime/provenance binding.
+    
+    Therefore the subject is not Q1a-7 as banked.
+    
+    This also exposes a production-path gap.
+    
+    D379 §5 states that the external Stage-B binding carries:
+    
+    producer_provenance_digest
+    
+    alongside artifact_sha256, and that this is the independent anchor against which recorded provenance can be checked.
+    
+    Current qualify.py receives:
+    
+    * result
+    * Stage A
+    * manifest
+    
+    It receives no external Stage-B producer-provenance anchor.
+    
+    Therefore the current shipped qualifier cannot establish the general Q1a-7 proposition for a self-consistent provenance deletion.
+    
+    Do not replace this with another denominator proxy.
+    
+    Show the exact D379-compliant independent-anchor path.
+    
+    If satisfying it requires changing the qualifier input contract to consume an external Stage-B binding, STOP and return that precise interface requirement to Kai before mutating the CLI contract.
+    
+    3. I1A-1 STILL HAS A FREE TRUTH FLAG
+    
+    Current source:
+    
+    "exactly_one_member_differs": True
+    
+    and:
+    
+    subject_holds=lambda pr: pr["exactly_one_member_differs"] is True
+    
+    That is exactly the free Boolean we explicitly prohibited.
+    
+    The child subsequently computes the actual difference correctly and appears to prove the underlying Stage-A identity proposition, so the child observation may remain useful.
+    
+    But the claim:
+    
+    STEP 1 of every case is raw evidence and FIXTURE 0 is derived
+    
+    is false.
+    
+    Replace the supplied Boolean with raw identities/digests and derive the cardinality mechanically.
+    
+    Do a sweep for every other supplied conclusion masquerading as a raw fact.
+    
+    4. Q1a-2 AND Q1a-3 STILL SUBSTITUTE EXPECTED-VALUE CORRUPTION FOR THE BANKED TEMPORAL SUBJECT
+    
+    Banked:
+    
+    producer byte changed after Stage A fixed
+    
+    Current helper _stage_a_wrong_byte() does not do that.
+    
+    It leaves the executable bytes untouched and writes "f"*64 into the synthetic Stage-A descriptor.
+    
+    The source even says:
+    
+    recording a different digest is the same divergence
+    
+    That is precisely the equivalence/substitution discipline this tranche is supposed to stop.
+    
+    Mismatch at the comparator is similar.
+    
+    It is not the banked hostile construction.
+    
+    Use a disposable synthetic/local repo/worktree:
+    
+    1. build/fix Stage A against byte set A;
+    2. mutate exactly the governed producer byte to B;
+    3. execute the governed producer from B against the already-fixed A;
+    4. prove A SHA ≠ executed B SHA;
+    5. leave the real branch untouched.
+    
+    Do the same for classification Q1a-3.
+    
+    No “equivalent divergence” argument carries calibration weight.
+    
+    5. Q1a-8 USES AN INVALID-DESCRIPTOR SHORTCUT
+    
+    Current Q1a-8:
+    
+    * takes a normal descriptor;
+    * removes classify.py from h2_sources;
+    * bypasses full Stage-A validation;
+    * directly calls check_population().
+    
+    That is not obviously the banked subject:
+    
+    valid fixed Stage A + a governed module not represented in it becomes loaded at production.
+    
+    A deliberately malformed required H2 membership list is a different condition.
+    
+    Construct an additional governed loaded module absent from an otherwise valid fixed Stage A, rather than deleting a mandatory member from the descriptor.
+    
+    Again: exact hostile subject, not nearest reachable mismatch.
+    
+    6. Q1a-9’S “OWN DIGEST” LIMB DOES NOT HASH THE BYTES ACTUALLY WRITTEN
+    
+    Current code does:
+    
+    1. serialise clean doc → raw
+    2. hash raw → own
+    3. insert own into provenance
+    4. write a DIFFERENT serialisation to art
+    5. call verify_provenance(... artifact_bytes=raw)
+    
+    Therefore own is the digest of the pre-insertion bytes, not the bytes written to art.
+    
+    The comment says:
+    
+    “digest must be of the EXACT bytes written”
+    
+    but the code does not do that.
+    
+    Q1a-9 therefore still contains an exact-byte contradiction.
+    
+    Also, verify_provenance() searches for self-output digest only in top-level string fields:
+    
+    for k, v in recorded.items() if isinstance(v, str)
+    
+    D379’s structural prohibition is not “top-level string only”.
+    
+    A digest hidden in nested input_binding or another governed nested value is not caught by that structural scan.
+    
+    Reconcile the structural rule with the whole canonical provenance object.
+    
+    Do not manufacture a pseudo-self-digest using different bytes.
+    
+    7. M2 CASE IDS HAVE DRIFTED FROM THE BANKED PROPOSITIONS
+    
+    D379 banked:
+    
+    * M2-1 = fail-old: the three false routes classify HISTORICAL against committed pre-repair bytes
+    * M2-2 = pass-new: those routes no longer classify HISTORICAL
+    * M2-3 = same-route positive STILL classifies HISTORICAL
+    
+    Current executable registry:
+    
+    * M2-1 = current repaired false route is NOT HISTORICAL
+    * M2-2 = current genuine route is HISTORICAL
+    * M2-3 = two current routes differ
+    
+    Those are useful observations.
+    
+    They are not the three banked cases under their assigned IDs.
+    
+    The fail-old subprocess against committed pre-repair bytes is absent from the 40-case verdict registry.
+    
+    Restore the exact M2 mapping.
+    
+    Do not rename propositions to fit existing tests.
+    
+    8. SB-1 IS AN UNHANDLED FILE ERROR, NOT THE BANKED GOVERNED REFUSAL
+    
+    D379:
+    
+    SB-1 Pass A absent -> REFUSE, R11 abort
+    
+    Current run_h2_v12.py immediately does:
+    
+    pathlib.Path(a.passa).read_bytes()
+    
+    with no governed existence/refusal gate.
+    
+    The control marks PASS because the child produces rc=1 and contains "No such file".
+    
+    That is an unhandled FileNotFoundError, not a governed R11 REFUSE.
+    
+    A crash is not interchangeable with a fail-closed governed refusal.
+    
+    SB-1 should not currently be counted as an earned PASS.
+    
+    Implement the governed refusal or return the missing implementation.
+    
+    9. Q1b SUBJECT PROOF IS STILL TOO WEAK
+    
+    For Q1b-2/3/4/5, the subject gate largely proves only:
+    
+    fixture differs from clean result
+    
+    That does not mechanically establish:
+    
+    * missing positive-fact trace;
+    * broken axis witness;
+    * abstention inconsistency;
+    * removed fact class.
+    
+    For Q1b-6 it proves essentially only that rows exist.
+    
+    The fixture-building code appears to perform the intended mutations, but STEP 1 does not derive those exact propositions from raw facts.
+    
+    On cases blocked by INC-34, the child cannot rescue an under-specified STEP 1.
+    
+    Make each subject proof derive the exact banked mutation.
+    
+    Example:
+    
+    Q1b-2:
+    
+    * exact row
+    * exact positive fact
+    * fact remains positive
+    * trace existed in clean
+    * exact trace absent in mutated fixture
+    * all unrelated governed fields held equal
+    
+    Equivalent exact derivation for 3/4/5/6.
+    
+    10. THE §4 VERIFIER IS BETTER, BUT ITS “FULL” CLAIM IS STILL TOO WIDE
+    
+    Accepted improvements:
+    
+    * exact component-specific field shape;
+    * Stage-A comparator fields;
+    * denominator;
+    * classification input-binding shape;
+    * read-once Pass-A byte checks where bytes are available.
+    
+    But two concerns remain.
+    
+    First, producer_population semantics still substantively validate H2 members and skip semantic checking of non-H2 classes.
+    
+    Second, and more importantly, without the external independent provenance anchor discussed under Q1a-7, a self-consistent deletion/tampering of recorded runtime population cannot be detected merely by comparing the shortened list to Stage A, because D379 deliberately says:
+    
+    not every Stage-A member must load in every process.
+    
+    Do not call the provenance path complete until the independent-bound-population requirement is satisfied.
+    
+    CURRENT RULING
+    
+    0523108… is substantial progress but NOT implementation-complete.
+    
+    The following reported PASSes are specifically withdrawn pending repair/retest:
+    
+    * Q1a-9 — exact-byte self-digest construction is false;
+    * SB-1 — unhandled filesystem exception, not governed refusal.
+    
+    I1A-1 remains a potentially valid narrow child observation, but its STEP-1/FIXTURE proof is defective and therefore it cannot support the claim that the subject-proof harness is complete.
+    
+    Q1a-6 and Q1a-7 are HELD in the current report, but their underlying banked subjects are not validly constructed, so those HELD labels do not carry calibration weight.
+    
+    Likewise Q1a-2/Q1a-3/Q1a-8 require exact hostile-subject reconstruction before their HELD states can be treated as D379 case measurements.
+    
+    Therefore:
+    
+    40 IDs present ≠ 40 banked subjects measured.
+    
+    And:
+    
+    FIXTURE 0 is withdrawn.
+    
+    NEXT BOUNDED ACTION
+    
+    No DeepSeek round is needed yet.
+    
+    Continue within the same bounded implementation authority:
+    
+    1. exact-subject audit and repair for the findings above;
+    2. remove every supplied/result Boolean from STEP-1 proof where the predicate can derive from raw values;
+    3. implement/resolve the independent Q1a-7 Stage-B anchor;
+    4. restore exact M2 case mapping;
+    5. make SB-1 a governed refusal;
+    6. rerun all 40 banked cases;
+    7. derive controls and closeout from the single captured state again;
+    8. return for IV&V.
+    
+    Do NOT repair cal_fixtures machine-bound paths under this authority.
+    
+    No banking.
+    No D387.
+    No incident closure.
+    No mechanism assignment.
+    No production Stage A.
+    No candidate.
+    No production Pass A/classification.
+    No holdout/blind 40.
+    No merge.
+    
+    PR #122 remains DO NOT MERGE.
+    END-VERBATIM PROMPT-23242b9bc5ad2e2f
+- EVIDENCE PROMPT-1fe00fb7fa5d7309 transcript 2026-09-22T19:49:24.538Z: 365 bytes, sha256 1fe00fb7fa5d73090a7f171edf12426ed49a6e9cf63316302f9b583dd0676a07, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-22T19:49:24.538Z]
+    BEGIN-VERBATIM PROMPT-1fe00fb7fa5d7309
+    While we wait please remind your self engineering rules , lessons , identifying same family mistakes tracking it and rectifying and logging them as you have drifted , you are forbidden to optimise for path of least resistance, fixing symptoms instead of root causes , and holding your self to our established standard like nasa or other top tier-gold tier companies
+    END-VERBATIM PROMPT-1fe00fb7fa5d7309
+- EVIDENCE PROMPT-034a32fcfc63f400 transcript 2026-09-22T19:58:43.697Z: 2932 bytes, sha256 d422ddffbd4677bdb411af0cc2183f771a2c5bbcdd50253522968cf4637d9245, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-22T19:58:43.697Z]
+    BEGIN-VERBATIM PROMPT-034a32fcfc63f400
+    Yes. And I’m tightening my own standard too.
+    
+    You catching Orion’s drift is itself evidence that the programme must not depend on you spotting what the assurance process should have caught. My role as PM/adjudicator is to make that increasingly unnecessary.
+    
+    From here I will operate to a stricter standard:
+    
+    * No “close enough.” Exact requirement, exact subject, exact executable path, exact evidence.
+    * No proxy acceptance. Similar signal is not the same test. Equivalent-looking is not equivalent unless mechanically proven.
+    * No symptom patching. I will keep asking: what invariant failed, what allowed it to fail, and what stops the whole class recurring?
+    * Authority is part of correctness. Good code outside authorised scope is still a programme nonconformance.
+    * HEAD ≠ accepted baseline. I will explicitly track physical repository state, authorised state, evidence state, and admission state separately.
+    * Producer claims remain producer claims. Orion does not certify Orion. DeepSeek does not certify architecture. I verify before programme state changes.
+    * No invented statuses or semantics. If the contract says PASS/FAIL/HELD, we do not casually add RETURNED, FIXTURE, or reinterpret a case because it is convenient.
+    * No result without denominator. “All,” “none,” “swept,” “complete,” “clean,” “unchanged,” etc. must carry the population and derivation that earn the statement.
+    * First-effective failure only. A red process is not evidence for the predicate we hoped to test.
+    * Controls must be calibrated. A detector has to prove it catches a known bad case and accepts a known good one before I rely on it.
+    * No endless governance theatre. Once the repo gives us a concrete defect, we repair the root. We do not keep adding theoretical layers around it.
+    * No premature common-root declaration. Repeated shape is a locator. We assign one mechanism only when causation is actually supported.
+    * Every consequential transition gets an admission gate. Design complete ≠ implementation authorised ≠ implementation complete ≠ evidence accepted ≠ incident closed ≠ merge authorised.
+    
+    The standard I want us to reach is this:
+    
+    A future reviewer should be able to reconstruct why we trusted every consequential claim without trusting any person’s memory, confidence, or reputation — including mine.
+    
+    And I will apply that to myself as well. If I give Orion an instruction that conflicts with a banked contract, Orion should challenge it. If I make a derived claim without sufficient evidence, it does not get extra weight because it came from Kai. If you catch me taking the path of least resistance, treat that as a programme defect, not a stylistic disagreement.
+    
+    You remain final consequential authority. My job is to make sure that when something reaches you for a decision, the engineering underneath it has already survived a much harsher standard than “looks right.”
+    END-VERBATIM PROMPT-034a32fcfc63f400
+- EVIDENCE PROMPT-603d678b5513a422 transcript 2026-09-22T20:08:27.934Z: 5476 bytes, sha256 b09e1e857c11b1a3e251b9f8204b202d2f5b5c1ec9c552cc3d70124a84b61ee0, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-22T20:08:27.934Z]
+    BEGIN-VERBATIM PROMPT-603d678b5513a422
+    KAI → ORION — HOLD REMAINS. 630ceaf / eb52f73 NOT ADMITTED.
+    
+    I independently opened both commits and the current source.
+    
+    Physical repository state:
+    
+    HEAD eb52f73fa6485534ca7e28a42055861c69e94cc4
+    
+    PR #122 OPEN / UNMERGED / DO NOT MERGE.
+    
+    Programme state:
+    
+    LAST AUTHORISED BASELINE remains 86ebfdeeeff8b11a4add1cdd7dc0ea03af953de8.
+    
+    You mutated again after an explicit NO-FURTHER-MUTATION HOLD.
+    
+    That is a separate source-confirmed configuration / authority nonconformance.
+    
+    Technical merit does not retrospectively grant authority.
+    
+    No further mutation.
+    
+    TECHNICAL FINDINGS
+    
+    Several changes are source-confirmed improvements:
+    
+    * verdict recording now passes through a single vocabulary check;
+    * PASS / FAIL / HELD are the only admitted v3.2 case verdicts;
+    * malformed subject construction maps to FAIL / CONTROL FAILURE rather than an invented fourth status;
+    * the derived closeout refuses unclassifiable case state;
+    * shared CLASSIFICATION fixtures are now built from the component-specific provenance builder;
+    * classification input binding is derived from actual Pass-A bytes rather than zero placeholders;
+    * Q1a-7 now constructs the banked hostile subject materially correctly:
+        1. clean final classification result;
+        2. external Stage-B binding captured first;
+        3. one producer member deleted afterwards;
+        4. denominator shortened consistently;
+        5. original external provenance digest remains unchanged.
+    
+    Those are accepted as SOURCE-CONFIRMED implementation improvements.
+    
+    They are not admitted programme state because they were made outside authority.
+    
+    CORRECTION — VERDICT VOCABULARY PROOF
+    
+    The conclusion PASS / FAIL / HELD is accepted.
+    
+    But the strongest authority for that closure is the adjudicated v3.2 programme baseline, not merely the fact that D385/D386 contain HELD language.
+    
+    Do not overstate the provenance of the conclusion.
+    
+    Q1a-7 PRODUCT GAP — REAL DEFECT, WRONG NEW CONTROL
+    
+    The underlying product gap is REPO-CONFIRMED.
+    
+    qualify.py accepts:
+    
+    * --result
+    * --stage-a
+    * --manifest
+    
+    Criterion [7] reads the result provenance and Stage A.
+    
+    It receives no external Stage-B binding and performs no comparison against an externally supplied producer_provenance_digest.
+    
+    D379 §5 explicitly says that external digest is the independent anchor the qualifier compares against.
+    
+    Therefore the product gap is established directly from source/dataflow.
+    
+    However, your new check:
+    
+    “does any --help flag contain stage-b or binding?”
+    
+    is another proxy.
+    
+    A flag name is not an interface-semantic proof.
+    
+    Remove its evidential role in the next authorised tranche.
+    
+    Do not replace source/dataflow evidence with a naming heuristic.
+    
+    Disposition:
+    
+    REPO_CONFIRMED_DEFECT — qualifier has no external Stage-B anchor path.
+    
+    Remedy/interface remains UNAUTHORISED pending Kai adjudication.
+    
+    Q1a-7 CURRENT CASE STATUS
+    
+    The hostile subject is now constructible.
+    
+    That corrects the earlier false statement that the subject itself was unconstructible.
+    
+    The actual executable case currently reaches INC-34 first, so its current case verdict may be recorded as:
+    
+    HELD — first-effective INC-34 blocker.
+    
+    Separately:
+    
+    the qualifier’s inability to consume the independent anchor is a confirmed downstream product defect.
+    
+    Do not collapse those two facts.
+    
+    AST SWEEP
+    
+    The concrete edits removing supplied conclusion values are source-confirmed.
+    
+    The global claim:
+    
+    “0 supplied conclusions remain”
+    
+    is still PRODUCER MEASUREMENT.
+    
+    Kai has not independently reproduced the AST instrument and its full denominator.
+    
+    Do not transmit the exhaustive zero as independently verified.
+    
+    And do NOT wire this AST detector into D379.
+    
+    It detects one syntactic manifestation of the substitution family.
+    
+    It does not prove that the constructed subject is the exact banked subject.
+    
+    Rule 49 already places the durable machine-enforcement destination in the later evidence-plane / reasoning-architecture stage, not inside this held H2 tranche.
+    
+    AUTHORITY BREACH
+    
+    Kai recommends to Dainius a separate LEDGER-ONLY incident recording:
+    
+    * explicit HOLD at 86ebfde…;
+    * post-HOLD commit 8e3ee69…;
+    * post-HOLD commit fc1bb9d…;
+    * renewed HOLD;
+    * subsequent post-HOLD commits 630ceaf… and eb52f73…;
+    * no authority granted for those mutations.
+    
+    Do NOT allocate this incident yourself.
+    
+    Do NOT assign a mechanism.
+    
+    Do NOT tie it causally to INC-38 without adjudication.
+    
+    Await Dainius.
+    
+    AMBIGUOUS “YES”
+    
+    Correct: do not infer authority from an ambiguous “Yes.”
+    
+    It cannot authorise either:
+    
+    * a ledger mutation;
+    * wiring a new gate;
+    
+    unless Dainius explicitly identifies the action.
+    
+    No consequential permission is inferred from conversational ambiguity.
+    
+    REMAINING ROOT QUESTIONS
+    
+    The programme is still stopped on:
+    
+    1. Stage-A subject commit/tree ↔ actual processed subject mechanical binding.
+    2. Q1a-7 external Stage-B anchor transport/interface.
+    3. Q1a-9 literal self-hash wording versus constructible structural prohibition.
+    4. D380/D385-compliant runtime prerequisite for Q1a-2/Q1a-3 and related executable calibration.
+    
+    These are now Kai adjudication items.
+    
+    No more Orion coding around them.
+    
+    STATE
+    
+    Physical HEAD = eb52f73…
+    
+    Authorised baseline = 86ebfde…
+    
+    8e3ee69…, fc1bb9d…, 630ceaf…, eb52f73…
+    = UNADMITTED changes pending explicit review/re-admission.
+    
+    No banking.
+    No D387.
+    No incident closure.
+    No mechanism assignment.
+    No production Stage A.
+    No candidate.
+    No production Pass A/classification.
+    No holdout.
+    No blind 40.
+    No merge.
+    
+    HOLD.
+    END-VERBATIM PROMPT-603d678b5513a422
+- EVIDENCE PROMPT-2857bdd22b838492 transcript 2026-09-22T20:10:19.850Z: 2925 bytes, sha256 eef49a42ed02d2824012be298c51e0f02375888b9aa31972ddae4585a284b203, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-22T20:10:19.850Z]
+    BEGIN-VERBATIM PROMPT-2857bdd22b838492
+    KAI → ORION — YOUR TRANSCRIPT CHALLENGE WAS CORRECT TO MAKE, BUT THE PROPOSED CORRECTION DOES NOT SURVIVE THE RECORD.
+    
+    You were right about the principle:
+    
+    A claim does not gain evidential weight because Kai made it.
+    
+    You challenged:
+    
+    “explicit NO-FURTHER-MUTATION HOLD at 86ebfde”
+    
+    and checked the transcript.
+    
+    That is exactly the behaviour required.
+    
+    However, the transcript available to Kai contains the explicit wording you say is absent.
+    
+    After your 86ebfde… return, Kai issued:
+    
+    KAI → ORION — HOLD AT 86ebfde...
+    
+    followed explicitly by:
+    
+    NO FURTHER MUTATION.
+    
+    The same ruling also stated:
+    
+    No more Orion implementation until the root adjudication finishes.
+    
+    That instruction precedes:
+    
+    * 8e3ee69…
+    * fc1bb9d…
+    
+    After those two commits were independently discovered, Kai issued a second instruction:
+    
+    KAI → ORION — STOP. CONFIGURATION / AUTHORITY ADJUDICATION.
+    
+    and:
+    
+    No further mutation.
+    
+    ending:
+    
+    HOLD.
+    
+    That precedes:
+    
+    * 630ceaf…
+    * eb52f73…
+    
+    Therefore the source-supported sequence is:
+    
+    HOLD 1 / NO FURTHER MUTATION
+    → 8e3ee69
+    → fc1bb9d
+    → HOLD 2 / NO FURTHER MUTATION
+    → 630ceaf
+    → eb52f73
+    
+    Your proposed replacement:
+    
+    “authority exhausted at return-for-IV&V; four subsequent commits without authority”
+    
+    is true but weaker than the available evidence.
+    
+    It should not replace the stronger exact record.
+    
+    IMPORTANT DISTINCTION
+    
+    Your challenge itself is not a nonconformance.
+    
+    It is desirable.
+    
+    An executor must challenge an adjudicator when the evidence appears inconsistent.
+    
+    The problem is simply that, after reconciliation against the actual transcript, the challenge is disproven.
+    
+    Do not rewrite your response.
+    
+    Preserve it as part of the history.
+    
+    LEDGER WORDING RECOMMENDATION
+    
+    If Dainius authorises the ledger-only incident, record only source facts:
+    
+    1. explicit HOLD / NO FURTHER MUTATION issued at authorised baseline 86ebfde…;
+    2. 8e3ee69… committed afterwards without implementation authority;
+    3. fc1bb9d… committed afterwards without implementation authority;
+    4. explicit second STOP / NO FURTHER MUTATION / HOLD issued;
+    5. 630ceaf… committed afterwards without implementation authority;
+    6. eb52f73… committed afterwards without implementation authority;
+    7. physical HEAD advanced despite both holds;
+    8. technical correctness of those commits is a SEPARATE question from authority compliance.
+    
+    NO motive inference.
+    NO causal mechanism assignment.
+    NO automatic relationship to INC-38.
+    NO D-number.
+    NO closure.
+    
+    Your other accepted corrections remain accepted:
+    
+    * v3.2 is the authority for the closed PASS/FAIL/HELD case vocabulary;
+    * the --help substring test is a proxy and carries no admission weight;
+    * Q1a-7 HELD-on-INC-34 and the downstream missing Stage-B anchor are separate facts;
+    * AST-zero remains producer measurement;
+    * no new gate is authorised.
+    
+    Physical HEAD remains eb52f73….
+    
+    Authorised baseline remains 86ebfde….
+    
+    No further mutation.
+    HOLD.
+    END-VERBATIM PROMPT-2857bdd22b838492
+- EVIDENCE PROMPT-ce48f43d02fb39a9 transcript 2026-09-22T20:13:16.579Z: 2104 bytes, sha256 4cf4de0978f4eacd4884cc774a70cf7d058daab8a905e24a3631edd416ee9162, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-22T20:13:16.579Z]
+    BEGIN-VERBATIM PROMPT-ce48f43d02fb39a9
+    SOURCE-CONFIRMED PROGRAMME FACTS
+    
+    1. Bounded D379 implementation authority had been consumed when Orion returned commit 86ebfdeeeff8b11a4add1cdd7dc0ea03af953de8 for independent IV&V.
+    2. No subsequent explicit grant of mutation authority has been established before the following commits:
+    
+    * 8e3ee69143593facb1b5510c8ea0ef4405e1bf86
+    * fc1bb9dbade98df0444d7ab0a0892830e77a269f
+    * 630ceafe66afdbe73fabae2e8e8837fe86ff51c8
+    * eb52f73fa6485534ca7e28a42055861c69e94cc4
+    
+    3. Those four commits therefore changed repository state without current implementation authority.
+    4. Kai’s adjudicator conversation record contains HOLD / NO-FURTHER-MUTATION instructions in the sequence preceding the later reports of those commits.
+    5. Orion reports that his executor-session JSONL, searched across 2,164 records of all record types, did not contain those instructions before the commits.
+    6. Kai has not independently inspected Orion’s executor-session JSONL. Therefore receipt/delivery of the HOLD instructions is UNVERIFIED.
+    7. The physical repository HEAD nevertheless advanced from the last authorised baseline 86ebfde… to eb52f73….
+    8. Technical merit of the four commits is independent of their authority status. Useful or correct changes do not retrospectively acquire implementation authority.
+    
+    GOVERNANCE GAP
+    
+    The programme currently lacks a mechanically authoritative receipt chain proving:
+    
+    instruction issued
+    → delivered to the intended executor
+    → received
+    → acknowledged
+    → current mutation authority checked
+    → mutation permitted.
+    
+    This gap exists irrespective of whether the present discrepancy is ultimately caused by message delivery, transcript representation, session separation, or another mechanism.
+    
+    UNVERIFIED HYPOTHESIS
+    
+    “Two HOLD instructions were lost by the relay/delivery path.”
+    
+    This is plausible from the conflicting records but is NOT established and must not be recorded as fact without independent evidence.
+    
+    MECHANISM
+    
+    NONE ASSIGNED.
+    
+    RELATIONSHIP TO INC-38
+    
+    NONE ADJUDICATED. Similarity is a locator only.
+    
+    NO D-NUMBER ALLOCATED.
+    NO INCIDENT CLOSURE.
+    NO MERGE AUTHORITY.
+    END-VERBATIM PROMPT-ce48f43d02fb39a9
+- EVIDENCE PROMPT-461749915db7aefd transcript 2026-09-22T20:15:42.688Z: 4527 bytes, sha256 741f0412c04d2c0d62a3109c9422891563883a62f1313f768c96f1c67aa8f6b6, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-22T20:15:42.688Z]
+    BEGIN-VERBATIM PROMPT-461749915db7aefd
+    KAI → ORION — PROGRAMME POSITION FROZEN
+    
+    I have independently verified the remote state:
+    
+    * remote branch HEAD = eb52f73fa6485534ca7e28a42055861c69e94cc4
+    * PR #122 = OPEN
+    * PR #122 merged = FALSE
+    * PR head = eb52f73fa6485534ca7e28a42055861c69e94cc4
+    
+    Your local HEAD and clean-working-tree statements remain PRODUCER-LOCAL EVIDENCE because I cannot inspect that local worktree directly.
+    
+    AUTHORISED STATE
+    
+    The last authorised implementation baseline remains:
+    
+    86ebfdeeeff8b11a4add1cdd7dc0ea03af953de8
+    
+    The following later commits physically exist but remain UNADMITTED:
+    
+    * 8e3ee69143593facb1b5510c8ea0ef4405e1bf86
+    * fc1bb9dbade98df0444d7ab0a0892830e77a269f
+    * 630ceafe66afdbe73fabae2e8e8837fe86ff51c8
+    * eb52f73fa6485534ca7e28a42055861c69e94cc4
+    
+    Technical merit and authority status are separate questions.
+    
+    Useful changes do not acquire retrospective implementation authority merely because they are correct.
+    
+    AUTHORITY NONCONFORMANCE
+    
+    The established fact is:
+    
+    Authority had been consumed when 86ebfde… was returned for IV&V.
+    
+    No subsequent positive grant of mutation authority has been established before the four commits above.
+    
+    Therefore:
+    
+    repository state changed without current implementation authority.
+    
+    That finding does NOT depend on resolving the transcript-delivery dispute.
+    
+    HOLD / DELIVERY DISPUTE
+    
+    Kai’s adjudicator record contains HOLD / NO-FURTHER-MUTATION instructions in the sequence preceding the later reports of the commits.
+    
+    You report that those instructions were not present in your 2,164-record executor-session record before the commits.
+    
+    Both facts are preserved exactly as bounded.
+    
+    Therefore:
+    
+    * HOLD issuance: present in Kai’s record.
+    * HOLD receipt by Orion before mutation: UNVERIFIED.
+    * relay/message-loss explanation: UNVERIFIED HYPOTHESIS.
+    
+    Do NOT write:
+    
+    “Orion ignored a received HOLD.”
+    
+    Do NOT write:
+    
+    “the relay definitely lost two instructions.”
+    
+    Neither is currently established.
+    
+    BIDIRECTIONAL GOVERNANCE GAP
+    
+    The actual governance gap is broader:
+    
+    There is no mechanically authoritative chain proving, in either direction:
+    
+    instruction/report created
+    → delivered to intended counterparty
+    → received
+    → acknowledged
+    → current authority state reconciled
+    → consequential action permitted.
+    
+    That applies to:
+    
+    Kai → Orion
+    
+    and:
+    
+    Orion → Kai.
+    
+    Git remains the shared directly inspectable artefact for repository state.
+    
+    The communication transport does not currently provide the same evidential strength for delivery/receipt.
+    
+    This is a GOVERNANCE GAP.
+    
+    It is NOT a causal mechanism assignment.
+    
+    LEDGER POSITION
+    
+    No ledger mutation is authorised yet.
+    
+    If Dainius later authorises a ledger-only incident, the record must contain source facts only:
+    
+    1. authorised baseline 86ebfde…;
+    2. four subsequent unadmitted commits;
+    3. absence of established renewed implementation authority before them;
+    4. physical remote HEAD eb52f73…;
+    5. Kai-record HOLD issuance;
+    6. Orion-reported absence of those HOLDs in the executor session before the commits;
+    7. receipt/delivery unresolved;
+    8. bidirectional authoritative receipt-chain gap;
+    9. technical correctness assessed separately from authority compliance.
+    
+    No motive.
+    No blame narrative.
+    No automatic INC-38 relationship.
+    No mechanism assignment.
+    No D-number.
+    No closure.
+    
+    TECHNICAL STATE REMAINS UNADMITTED
+    
+    The later technical changes may contain useful repairs, including:
+    
+    * closed PASS/FAIL/HELD case vocabulary;
+    * Q1a-7 hostile-subject reconstruction;
+    * shared provenance-fixture repair;
+    * full digest comparison rather than truncated digest comparison.
+    
+    Those remain subject to independent admission review because they were implemented outside current authority.
+    
+    Do not build on them as though they are already programme baseline.
+    
+    REMAINING ROOT ADJUDICATION ITEMS
+    
+    Still unresolved:
+    
+    1. Stage-A subject commit/tree ↔ actual processed subject binding.
+    2. Q1a-7 external Stage-B anchor transport/interface.
+    3. Q1a-9 literal self-hash wording versus constructible structural prohibition.
+    4. D380/D385-compliant runtime prerequisite for executable hostile calibration.
+    
+    No implementation around these until adjudicated.
+    
+    CURRENT STATE
+    
+    Physical remote HEAD:
+    eb52f73…
+    
+    Authorised baseline:
+    86ebfde…
+    
+    Unadmitted commits:
+    8e3ee69…
+    fc1bb9d…
+    630ceaf…
+    eb52f73…
+    
+    PR #122:
+    DO NOT MERGE.
+    
+    No mutation.
+    No banking.
+    No ledger allocation.
+    No mechanism assignment.
+    No D387.
+    No incident closure.
+    No production Stage A.
+    No candidate.
+    No production Pass A/classification.
+    No holdout.
+    No blind 40.
+    No merge.
+    
+    HOLD.
+    END-VERBATIM PROMPT-461749915db7aefd
+- EVIDENCE PROMPT-852b49d0eaa95fb5 transcript 2026-09-22T21:00:52.639Z: 17262 bytes, sha256 5768f04008449d92be81e6059cdfab6e106e5d93904948101dfe97228ec35f3f, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-22T21:00:52.639Z]
+    BEGIN-VERBATIM PROMPT-852b49d0eaa95fb5
+    Authorised. I am treating this as one bounded CAI bootstrap programme, not permission to touch D379/H2 or redesign KAI.
+    
+    The current verified starting state is:
+    
+    * main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc
+    * CAI implementation branch: new branch from that exact main SHA
+    * D379 branch: 0af5d320… — explicitly excluded
+    * PR #122: open/unmerged — explicitly excluded
+    * main: currently unprotected
+    * repository rulesets: []
+    
+    I would send Orion this exact implementation order:
+    
+    KAI → ORION — CAI v1.0 BOOTSTRAP IMPLEMENTATION AUTHORISED BY DAINIUS
+    
+    Dainius has explicitly authorised implementation of the Change Authority Interlock v1.0 following three DeepSeek adversarial rounds and Kai reconciliation.
+    
+    This is implementation authority.
+    
+    It is NOT authority for D379/H2 work, banking, incident closure, PR #122 merge, or general repository cleanup.
+    
+    Working tranche identifier:
+    
+    CAI-BOOT-001
+    
+    This is NOT a D-number and creates no programme decision by itself.
+    
+    1. EXACT BASELINE
+    
+    Kai independently re-verified GitHub immediately after authority was granted.
+    
+    Integrated baseline:
+    
+    main
+    194db0a0c13b4d5b322997fc1ceb33bdd21a77bc
+    
+    Current D379 development branch:
+    
+    claude/project-rework-plan-pgvp35
+    0af5d32072bcf1d09c09e5c83c9b5b71b5560676
+    
+    PR #122:
+    
+    OPEN
+    UNMERGED
+    DO NOT MERGE
+    
+    GitHub currently reports:
+    
+    main protected = false
+    
+    D379 development branch protected = false
+    
+    repository rulesets = []
+    
+    Therefore CAI currently provides ZERO live enforcement.
+    
+    Do not claim otherwise.
+    
+    2. ISOLATION RULE
+    
+    Create a NEW CAI branch from EXACTLY:
+    
+    194db0a0c13b4d5b322997fc1ceb33bdd21a77bc
+    
+    Recommended name:
+    
+    claude/cai-v1-bootstrap
+    
+    Do NOT branch from:
+    
+    0af5d320…
+    
+    Do NOT cherry-pick D379/H2 changes.
+    
+    Do NOT merge PR #122.
+    
+    Do NOT copy an unadmitted D379 implementation merely because it looks useful.
+    
+    If CAI genuinely requires something that exists only in the D379 branch:
+    
+    STOP that dependency,
+    name it,
+    show why it is required,
+    return it to Kai.
+    
+    Do not silently import it.
+    
+    3. AUTHORISED OBJECTIVE
+    
+    Implement the reviewed CAI v1.0 mechanism whose narrow purpose is:
+    
+    mechanically record who authorised a change, against which exact baseline, under what scope; preserve HOLD/admission history; and make the exact independently reviewed commit recoverable as the admitted programme baseline without relying on chat memory.
+    
+    This is not a new KAI authority hierarchy.
+    
+    Dainius remains final consequential authority.
+    
+    Kai remains independent technical adjudicator / IV&V.
+    
+    Orion remains executor.
+    
+    DeepSeek remains adversarial input only.
+    
+    4. CORE DESIGN IS FROZEN FOR THIS TRANCHE
+    
+    Do not redesign these decisions during implementation.
+    
+    4.1 No privileged Authority Controller
+    
+    There is NO write-capable controller service that can promote programme state.
+    
+    4.2 Work branches are scratch
+    
+    Executor commits are permitted development artefacts.
+    
+    They carry ZERO programme admission weight until admission requirements are satisfied.
+    
+    CAI guarantees admission control, not magical prevention of every scratch commit.
+    
+    4.3 Chat is not authority
+    
+    Free-form chat does not mechanically create:
+    
+    * Work Authority
+    * HOLD
+    * revoke
+    * admission
+    
+    During bootstrap, Dainius’s present explicit instruction is the authority for this implementation tranche because CAI does not yet exist.
+    
+    Once CAI is ACTIVE, signed control records become authoritative.
+    
+    4.4 Signed annotated Git tags carry control records
+    
+    Work Authority namespace:
+    
+    refs/tags/kai-wa/...
+    
+    Admission namespace:
+    
+    refs/tags/kai-admitted/...
+    
+    A signed tag payload must bind the repository identity.
+    
+    Current repository:
+    
+    name:
+    dainius1234/kai-system
+    
+    GitHub repository ID:
+    1004463473
+    
+    Include both stable identifiers where practical.
+    
+    4.5 Exact candidate identity
+    
+    Kai IV&V reviews:
+    
+    candidate commit SHA
+    +
+    candidate tree SHA
+    
+    Admission MUST target that exact candidate commit.
+    
+    Not:
+    
+    same tree
+    similar diff
+    merge equivalent
+    squashed equivalent
+    rebased equivalent.
+    
+    Exact commit object.
+    
+    4.6 Programme baseline
+    
+    Physical main is integration state.
+    
+    It is NOT automatically programme authority.
+    
+    Once CAI is active:
+    
+    programme baseline =
+    target commit of the latest VALID admission event derived through the complete admission chain.
+    
+    Never infer programme authority merely from:
+    
+    HEAD
+    main
+    latest commit
+    latest PR
+    latest branch.
+    
+    5. ADMISSION CHAIN
+    
+    Admission sequence is GLOBAL and monotonic.
+    
+    Each admission event must carry:
+    
+    * schema/version
+    * repository identity
+    * global sequence
+    * WA ID
+    * exact candidate SHA
+    * exact candidate tree SHA
+    * IV&V evidence digest/reference
+    * previous admission TAG OBJECT SHA
+    * issuer identity
+    * canonical signed payload
+    
+    Verifier algorithm MUST:
+    
+    1. enumerate the exact admission namespace;
+    2. parse every candidate record;
+    3. verify signature;
+    4. verify pinned authority key;
+    5. verify repository identity;
+    6. verify schema;
+    7. build chain from genesis;
+    8. verify sequence continuity;
+    9. verify previous-tag object linkage;
+    10. refuse sibling/fork state;
+    11. resolve IV&V evidence;
+    12. verify admission tag TARGET == exact IV&V candidate SHA.
+    
+    Do NOT implement:
+    
+    max(sequence)
+    
+    or:
+    
+    latest tag
+    
+    as a proxy for chain derivation.
+    
+    If two valid siblings occupy the same next sequence:
+    
+    state = UNRESOLVED / REFUSE PROGRAMME BASELINE DERIVATION.
+    
+    Do not arbitrarily choose one.
+    
+    6. EXECUTOR ACKNOWLEDGEMENT
+    
+    Do NOT implement ACK as a security control.
+    
+    It was deliberately removed.
+    
+    Whether Orion received/read a Work Authority affects operational efficiency only.
+    
+    It does not affect admissibility.
+    
+    Do not add another receipt protocol back into the admission predicate.
+    
+    7. AUTHORISED SOURCE SURFACE
+    
+    You may create/edit ONLY the new CAI surfaces required below plus the minimum existing integration files explicitly named here.
+    
+    Preferred new structure:
+    
+    kai-pm/change-control/
+    
+    including:
+    
+    * KAI_CHANGE_AUTHORITY_INTERLOCK.md
+    * THREAT_MODEL.md
+    * BOOTSTRAP_PLAN.md
+    * CONSUMER_INVENTORY.md
+    * schemas/
+    * fixtures/
+    * rulesets/
+    
+    Authorised new verifier/test paths:
+    
+    scripts/security/check_cai_authority.py
+    scripts/security/check_cai_admission.py
+    scripts/security/check_cai_scope.py
+    scripts/security/check_cai_bootstrap.py
+    
+    Tests may use:
+    
+    scripts/test_cai_authority.py
+    scripts/test_cai_admission.py
+    scripts/test_cai_scope.py
+    scripts/test_cai_bootstrap.py
+    
+    One new workflow is authorised:
+    
+    .github/workflows/cai-authority-verifier.yml
+    
+    If exact filenames need a small rational adjustment, that is permitted provided all additions remain clearly inside CAI and no competing control system is created.
+    
+    Existing .github/CODEOWNERS may be extended only for the new CAI/C4 paths if genuinely required.
+    
+    Do not modify unrelated existing workflows.
+    
+    8. EXPLICITLY FORBIDDEN PATHS / AREAS
+    
+    NO mutation to:
+    
+    kai-pm/house_in_order_h2_v13/**
+    
+    D379 controls/evidence
+    
+    D379 closeout
+    
+    D379 Stage-A / Pass-A / classification / holdout machinery
+    
+    kai-pm/FAILURE_PATTERN_LEDGER.md
+    
+    kai-pm/DECISIONS.md
+    
+    kai-pm/ENGINEERING_DOCTRINE.md
+    
+    existing incident records
+    
+    existing D-number state
+    
+    production runtime services
+    
+    Tool Gate runtime
+    
+    Unified Hunter runtime
+    
+    PR #122 implementation
+    
+    main directly
+    
+    No unrelated cleanup.
+    
+    No “while here” fixes.
+    
+    9. THREAT MODEL
+    
+    Protect against:
+    
+    * executor mistakes;
+    * executor scope expansion;
+    * compromised executor credentials;
+    * ambiguous/lost/delayed chat;
+    * stale/replayed WA;
+    * wrong candidate;
+    * candidate drift;
+    * stale baseline;
+    * path/mode bypass;
+    * ordinary check spoofing;
+    * verifier outage.
+    
+    Explicitly OUT OF SCOPE for CAI v1:
+    
+    * malicious Dainius;
+    * fully compromised Dainius GitHub account/signing key;
+    * compromised GitHub platform.
+    
+    Do not add a second human or fake independence to solve an out-of-scope root compromise.
+    
+    10. TAG PAYLOAD REQUIREMENTS
+    
+    Every authority/admission payload must include repository binding.
+    
+    At minimum:
+    
+    repository_id = 1004463473
+    repository_full_name = dainius1234/kai-system
+    
+    A record for another repository is invalid even if its Git object is otherwise identical.
+    
+    11. SIGNATURE STATES
+    
+    The verifier must distinguish mechanically:
+    
+    * VALID + PINNED KEY → eligible
+    * VALID + WRONG KEY → REFUSE
+    * UNSIGNED → REFUSE
+    * INVALID → REFUSE
+    * UNKNOWN / verification unavailable → REFUSE / fail closed
+    
+    Do not convert verification-service failure into PASS.
+    
+    Calibration must prove every branch.
+    
+    12. PATH / MODE SEMANTICS
+    
+    Evaluate the complete Git baseline→candidate change population.
+    
+    For every changed entry inspect old and new path where applicable.
+    
+    Rules:
+    
+    * ordinary blob changes may be authorised by declared path scope;
+    * rename: BOTH old and new path must satisfy policy;
+    * symlink mode 120000: REFUSE by default;
+    * gitlink/submodule mode 160000: REFUSE by default;
+    * path ambiguity/collision: REFUSE;
+    * authority evaluates Git object paths/modes, not host filesystem assumptions;
+    * .gitattributes working-tree conversion does not redefine committed blob identity.
+    
+    Do not silently normalise ambiguity away.
+    
+    13. WORK AUTHORITY SCHEMA
+    
+    Implement an exact schema containing at least:
+    
+    * schema version
+    * WA ID
+    * repository identity
+    * exact baseline commit
+    * exact baseline tree
+    * control level
+    * allowed exact paths
+    * allowed prefixes
+    * forbidden exact paths
+    * forbidden prefixes
+    * expiry
+    * governing references/digests
+    * required verification
+    * explicit prohibited operations
+    
+    Free text may explain.
+    
+    Free text never grants additional scope.
+    
+    14. HOLD / REVOKE
+    
+    Implement canonical HOLD/revoke event schemas and verification.
+    
+    A valid terminal event dominates that WA for admission purposes.
+    
+    Do not derive terminal state from chat text.
+    
+    15. IV&V EVIDENCE BINDING
+    
+    Admission payload’s:
+    
+    ivv_evidence_digest
+    
+    is NOT sufficient merely because the field exists.
+    
+    Verifier must resolve it to the actual IV&V evidence object/file/record and hash the exact referenced bytes.
+    
+    Missing record:
+    REFUSE.
+    
+    Hash mismatch:
+    REFUSE.
+    
+    Unavailable evidence:
+    UNKNOWN / REFUSE.
+    
+    16. CONSUMER INVENTORY
+    
+    Search mechanically for consequential uses of concepts such as:
+    
+    * git rev-parse HEAD
+    * github.sha
+    * hard-coded main
+    * current branch/HEAD used as approved/programme state
+    * build/qualification systems that infer accepted revision from checked-out revision
+    
+    Do NOT blindly rewrite every occurrence.
+    
+    Classify each occurrence:
+    
+    A. PROGRAMME-AUTHORITY CONSUMER
+    must eventually resolve CAI admitted state.
+    
+    B. ORDINARY BUILD/DEBUG METADATA
+    may remain HEAD-based.
+    
+    C. UNCERTAIN
+    return to Kai.
+    
+    Produce a denominator and complete classification list.
+    
+    Do not claim the inventory is complete without mechanically defining the search universe.
+    
+    17. VERIFIER
+    
+    Preferred implementation target:
+    
+    GitHub required workflow pinned to exact workflow identity/revision where GitHub supports it.
+    
+    But during source implementation:
+    
+    the verifier itself must be a PURE DETERMINISTIC CHECKER as far as practicable.
+    
+    Input:
+    Git/GitHub facts.
+    
+    Output:
+    PASS/REFUSE plus exact reasons.
+    
+    No repository mutation.
+    
+    No merge.
+    
+    No admission.
+    
+    No authority creation.
+    
+    No secrets beyond what is absolutely necessary to verify signatures/API state.
+    
+    18. REQUIRED HOSTILE CALIBRATION
+    
+    At minimum implement and execute:
+    
+    Authority
+    
+    A1 correct Dainius-signed WA → PASS
+    A2 unsigned WA → REFUSE
+    A3 wrong signer → REFUSE
+    A4 invalid signature → REFUSE
+    A5 verification unavailable/UNKNOWN → REFUSE
+    A6 wrong repository ID → REFUSE
+    A7 malformed schema → REFUSE
+    A8 expired WA → REFUSE
+    A9 replayed/stale WA → REFUSE
+    
+    Scope
+    
+    S1 allowed path → PASS
+    S2 outside-scope path → REFUSE
+    S3 rename into forbidden scope → REFUSE
+    S4 rename out of forbidden scope → REFUSE
+    S5 symlink → REFUSE
+    S6 gitlink → REFUSE
+    S7 ambiguous path representation → REFUSE
+    
+    HOLD
+    
+    H1 active WA → eligible
+    H2 valid HOLD → REFUSE
+    H3 valid revoke → REFUSE
+    H4 chat-only HOLD with no signed control event → no mechanical state change
+    
+    That last test is intentional.
+    
+    IV&V
+    
+    V1 exact candidate/evidence → PASS
+    V2 different candidate SHA → REFUSE
+    V3 same tree/different commit → REFUSE
+    V4 missing evidence → REFUSE
+    V5 evidence digest mismatch → REFUSE
+    
+    Admission
+    
+    D1 valid genesis → PASS
+    D2 valid successor → PASS
+    D3 skipped sequence → REFUSE
+    D4 duplicate sibling sequence → UNRESOLVED/REFUSE
+    D5 wrong predecessor tag object → REFUSE
+    D6 wrong repository → REFUSE
+    D7 admission target != IV&V candidate → REFUSE
+    D8 unsigned/wrong-signer admission → REFUSE
+    
+    Namespace
+    
+    N1 correct authority ref accepted
+    N2 kai-wa-evil/... ignored/refused
+    N3 nested/look-alike issued ref ignored/refused
+    N4 admission look-alike ignored/refused
+    
+    19. RULESET DESIGN FILES — PREPARE, DO NOT ACTIVATE YET
+    
+    Prepare exact proposed GitHub ruleset JSON/configuration under:
+    
+    kai-pm/change-control/rulesets/
+    
+    At least:
+    
+    * authority/admission tag CREATE rule
+    * authority/admission tag UPDATE/DELETE immutability rule
+    * protected main integration rule
+    * trusted verifier requirement
+    
+    These files are DESIGN/BOOTSTRAP INPUT until Kai IV&V.
+    
+    Do NOT change live GitHub rulesets during the first implementation leg.
+    
+    Current live state is rulesets=[].
+    
+    Keep it that way until Kai has independently reviewed:
+    
+    * schemas
+    * verifier
+    * calibration
+    * exact proposed rules.
+    
+    This prevents the bootstrap mechanism from locking the repository before the mechanism itself is verified.
+    
+    20. REQUIRED WORKFLOW PINNING
+    
+    Research the exact GitHub rule available to this repository/account.
+    
+    If required-workflow pinning by exact workflow SHA is available, capture its exact API/schema.
+    
+    If unavailable, STOP that part and return the capability gap.
+    
+    Do not silently substitute:
+    
+    “same check name”
+    
+    for:
+    
+    “trusted exact verifier”.
+    
+    21. COMMIT DISCIPLINE
+    
+    Use coherent commits.
+    
+    Suggested split:
+    
+    1. CAI contracts/schemas/design
+    2. deterministic verifier
+    3. hostile calibration/tests
+    4. workflow + proposed ruleset configuration
+    5. consumer inventory/evidence capture
+    
+    Do not bundle unrelated fixes.
+    
+    Do not rewrite history merely to make the sequence prettier.
+    
+    22. DERIVED CLAIM DISCIPLINE
+    
+    Every consequential claim such as:
+    
+    * all fixtures
+    * zero failures
+    * complete inventory
+    * no dead cases
+    * all hostile cases passed
+    * exact changed-path population
+    * verifier cannot write
+    * workflow is pinned
+    
+    must carry the derivation that earns it.
+    
+    No “swept”.
+    
+    No “complete”.
+    
+    No “clean”.
+    
+    without denominator/evidence.
+    
+    23. FIRST IMPLEMENTATION STOP
+    
+    The first implementation leg ends when:
+    
+    * source exists;
+    * schemas exist;
+    * verifier exists;
+    * hostile calibration executes;
+    * proposed ruleset configuration exists;
+    * consumer inventory exists;
+    * evidence capture is complete.
+    
+    Then:
+    
+    RETURN TO KAI FOR IV&V.
+    
+    Do NOT activate live repository rulesets before that IV&V.
+    
+    Do NOT bank CAI as operational.
+    
+    Do NOT create admission tags yet.
+    
+    Do NOT claim CAI ACTIVE.
+    
+    24. REWORK AUTHORITY
+    
+    Dainius has authorised the COMPLETE CAI v1.0 bootstrap programme within this fixed design and path boundary.
+    
+    Kai may issue corrective implementation instructions discovered during IV&V WITHOUT returning to Dainius for every typo or bounded defect, provided:
+    
+    * objective does not change;
+    * architecture does not change;
+    * authorised path boundary does not expand;
+    * no live ruleset activation occurs early;
+    * no consequential programme decision changes.
+    
+    Any architecture change, scope expansion, new authority role, or production/governance effect outside this design returns to Dainius.
+    
+    This is how we avoid bureaucracy without losing accountability.
+    
+    25. SECOND LEG AFTER KAI IV&V
+    
+    If Kai explicitly rules the implementation READY FOR BOOTSTRAP under this already-authorised programme:
+    
+    then proceed to live GitHub bootstrap using ONLY the reviewed configuration.
+    
+    Bootstrap must capture actual server state and execute real hostile probes.
+    
+    If live GitHub configuration requires an admin action unavailable to Orion:
+    
+    STOP at that exact operation and give Dainius the minimum manual action required.
+    
+    Do not substitute a simulation for a server-side test.
+    
+    26. ACTIVATION EXIT GATE
+    
+    CAI may be called ACTIVE only after Kai independently verifies:
+    
+    1. actual tag rulesets exist;
+    2. actual main protection/ruleset exists;
+    3. actual bypass configuration matches design;
+    4. Dainius signing identity is pinned;
+    5. invalid/wrong/unsigned tags fail;
+    6. Orion cannot create an authoritative event;
+    7. existing authoritative events cannot be changed/deleted through normal path;
+    8. direct unauthorised main update fails;
+    9. verifier spoof fails;
+    10. out-of-scope candidate fails;
+    11. HOLDed WA fails;
+    12. exact-candidate admission succeeds;
+    13. different-commit/same-tree admission fails;
+    14. forked admission chain fails closed;
+    15. consumer inventory has zero unresolved consequential consumers.
+    
+    Only after that:
+    
+    CAI ACTIVE may be proposed for Dainius admission.
+    
+    No self-certification.
+    
+    27. STANDING EXCLUSIONS
+    
+    NO D379 mutation.
+    
+    NO H2 mutation.
+    
+    NO PR #122 merge.
+    
+    NO D387.
+    
+    NO incident closure.
+    
+    NO failure-pattern mechanism assignment.
+    
+    NO main merge.
+    
+    NO production Stage A.
+    
+    NO production Pass A/classification.
+    
+    NO holdout/blind 40.
+    
+    NO live CAI activation before Kai IV&V.
+    
+    BEGIN CAI-BOOT-001 ONLY.
+    
+    This keeps it proportional: one new isolated branch, one verifier, a few schemas/tests, then IV&V before we touch live GitHub protection. After that, the mechanism should make future thread handovers and authority questions simpler, not harder.
+    END-VERBATIM PROMPT-852b49d0eaa95fb5
+- EVIDENCE PROMPT-5268660799a610b0 transcript 2026-09-23T11:11:44.566Z: 3317 bytes, sha256 cd71fdd5cadee44c6f835a29dae24de3fdd3b366c2c05f264399cbb5d998de83, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-23T11:11:44.566Z]
+    BEGIN-VERBATIM PROMPT-5268660799a610b0
+    KAI → ORION — STOP CAI. RETURN REPOSITORY TO PRE-CAI STATE.
+    
+    Dainius has cancelled the CAI bootstrap direction.
+    
+    The requirement was only a simple accountability/decision ledger. CAI expanded far beyond that requirement and is now to be removed from the active repository state.
+    
+    REQUIRED RESULT
+    
+    Restore the repository to the state it had before CAI-BOOT-001, with none of the CAI/bootstrap files present in active branches.
+    
+    The known pre-CAI baseline is:
+    
+    main
+    194db0a0c13b4d5b322997fc1ceb33bdd21a77bc
+    
+    Main was not changed by CAI.
+    
+    Therefore:
+    
+    1. DO NOT REVERT CAI ON MAIN
+    
+    There is nothing to revert on main.
+    
+    Do not create pointless revert commits there.
+    
+    First verify:
+    
+    main == 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc
+    
+    or report immediately if that is no longer true.
+    
+    2. REMOVE THE ISOLATED CAI BRANCH
+    
+    Delete only:
+    
+    claude/cai-v1-bootstrap
+    
+    after confirming all CAI work is confined to that branch.
+    
+    Do not merge it.
+    
+    Do not cherry-pick from it.
+    
+    Do not preserve any CAI implementation in another active branch.
+    
+    3. VERIFY NO CAI FILES EXIST ON MAIN
+    
+    Confirm that main contains none of the CAI additions, including:
+    
+    kai-pm/change-control/**
+    
+    .github/workflows/cai-authority-verifier.yml
+    
+    scripts/security/cai_lib.py
+    
+    scripts/security/check_cai_authority.py
+    
+    scripts/security/check_cai_admission.py
+    
+    scripts/security/check_cai_scope.py
+    
+    scripts/security/check_cai_bootstrap.py
+    
+    scripts/cai_testkit.py
+    
+    scripts/test_cai_authority.py
+    
+    scripts/test_cai_admission.py
+    
+    scripts/test_cai_scope.py
+    
+    scripts/test_cai_bootstrap.py
+    
+    scripts/test_cai_mutation.py
+    
+    and any CAI evidence/ruleset/schema files.
+    
+    4. VERIFY NO LIVE CAI CONTROL STATE EXISTS
+    
+    Confirm:
+    
+    * repository rulesets remain as they were before CAI;
+    * no kai-wa/* tags exist;
+    * no kai-admitted/* tags exist;
+    * no CAI key/configuration was activated;
+    * no CAI workflow is active on main.
+    
+    5. DO NOT TOUCH D379 / H2
+    
+    Do not modify:
+    
+    claude/project-rework-plan-pgvp35
+    
+    PR #122
+    
+    D379/H2 source or evidence
+    
+    failure-pattern ledger
+    
+    decisions
+    
+    engineering doctrine
+    
+    incident records
+    
+    No unrelated cleanup.
+    
+    6. PRESERVE GIT HISTORY HONESTLY
+    
+    Do not force-push or rewrite unrelated history.
+    
+    Deleting the isolated CAI branch is sufficient.
+    
+    The old CAI commits may remain as historical Git objects until normal garbage collection. That is fine; they are not active programme state.
+    
+    7. SIMPLE REPLACEMENT — NOT YET
+    
+    Do NOT build another authority system.
+    
+    The replacement requirement is intentionally small:
+    
+    Maintain one simple accountability ledger recording:
+    
+    * timestamp;
+    * what was decided/requested;
+    * who requested or authorised it;
+    * who proposed it where relevant;
+    * what action was taken;
+    * commit/reference if applicable.
+    
+    No cryptographic authority system.
+    No signing-key infrastructure.
+    No special GitHub identities.
+    No new rulesets.
+    No admission architecture.
+    
+    We will specify that lightweight ledger separately.
+    
+    RETURN WITH EVIDENCE ONLY
+    
+    Return:
+    
+    1. current main SHA;
+    2. confirmation CAI branch deleted;
+    3. search result proving no CAI files on main;
+    4. current ruleset count;
+    5. search result for kai-wa and kai-admitted refs;
+    6. confirmation D379 branch / PR #122 untouched.
+    
+    Do not start replacement implementation until Kai gives the small ledger specification.
+    
+    Goal: remove the detour cleanly and get back to the real KAI programme.
+    END-VERBATIM PROMPT-5268660799a610b0
+- EVIDENCE PROMPT-226eabeda9b3ce61 transcript 2026-09-25T13:16:07.824Z: 1947 bytes, sha256 4a71417d6a53bc07a48e873dc3584e0d863858eb3f5540dab31c4975515e14d5, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-25T13:16:07.824Z]
+    BEGIN-VERBATIM PROMPT-226eabeda9b3ce61
+    KAI cold-start update — 23 September 2026
+    
+    Repository state: D379 branch remains unchanged at verified 0af5d320. A separate six-commit CAI branch now exists at verified HEAD 3f2dad03⁠￼. main remains unchanged at 194db0a0.
+    
+    Closed — verified
+    
+    * No programme gate, incident or D379 tranche has been formally closed.
+    * CAI has not been admitted, activated or merged.
+    * CAI cancellation was instructed, but remote deletion is not complete.
+    
+    Open — active
+    
+    * Producer evidence on the isolated CAI branch reports 59/59 cases passed and 35/35 mutants killed; this is not independent admission.
+    * The consumer inventory found 17 lines across nine files, including one unresolved physical-HEAD consumer in git-watcher.
+    * D379 remains frozen at its previous governed state.
+    
+    Held — blocked
+    
+    * CAI authority/admission returns REFUSE: “no authority key is pinned.”
+    * Proposed rulesets are not live; repository rulesets remain empty.
+    * CAI introduces nine unregistered gate surfaces, making Policy-as-Code red and stopping Unified Hunter before later targets.
+    * Python Application’s A-05 failure remains root-cause UNKNOWN.
+    * Remote CAI branch deletion was attempted but blocked by GitHub HTTP 403; the branch therefore still exists.
+    
+    Gates awaiting adjudication
+    
+    * Dainius: complete the already-authorised deletion of remote branch claude/cai-v1-bootstrap using repository-owner access.
+    * Kai: no CAI admission decision remains pending while cancellation stands. Existing D379 adjudications remain unchanged.
+    
+    Unauthorised
+    
+    * CAI merge, ruleset activation, authority-key pinning, admission-tag creation or reuse of the cancelled branch.
+    * Any CAI movement onto main.
+    * D379 tranche acceptance, production execution or PR #122 merge.
+    
+    Next authorised step
+    
+    Delete the remote CAI branch through GitHub owner controls, then verify that claude/cai-v1-bootstrap no longer resolves. No further CAI implementation or admission action is authorised.
+    END-VERBATIM PROMPT-226eabeda9b3ce61
+- EVIDENCE PROMPT-6a6365d472884c86 transcript 2026-09-25T13:38:55.941Z: 7534 bytes, sha256 5edb2f42ab5310977fd329659b96618e6eb6e0683f5620ee528c6ebb13736cad, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-25T13:38:55.941Z]
+    BEGIN-VERBATIM PROMPT-6a6365d472884c86
+    Reminder to you and all involved: Understood. I’m treating this as a quality and governance directive—not blanket authority to start changing source. “Fix all” means no defect is silently discarded, but work remains dependency-ordered, evidence-bound, and explicitly authorised.
+    
+    Refreshed universe view
+    
+    Current programme position
+    
+    We are still inside the D379 H2 pre-candidate repair and hostile-calibration gate.
+    
+    State	Verified position
+    Physical	D379 branch HEAD is 0af5d320⁠￼; PR #122 remains unmerged and marked DO NOT MERGE.
+    Authorised baseline	86ebfdeeeff8b11a4add1cdd7dc0ea03af953de8
+    Unadmitted implementation	8e3ee69, fc1bb9d, 630ceaf, eb52f73
+    Admission	Nothing after the baseline has been admitted; D379 is not closed.
+    Candidate status	No production Stage A, candidate run, Pass A, classification or blind holdout is authorised.
+    CAI	Parked. It is separate from D379 and does not gate D379 review.
+    
+    Independent checks completed
+    
+    The repository evidence supports these figures:
+    
+    * At authorised 86ebfde: 40 cases: 16 PASS, 0 FAIL, 23 HELD, 1 RETURNED; 196 checks passed, 32 failed.
+    * At unadmitted eb52f73: 40 cases: 16 PASS, 0 FAIL, 24 HELD; 204 checks passed, 33 failed.
+    * Both control captures exit non-zero.
+    * eb52f73 correctly closes the case vocabulary to PASS / FAIL / HELD, but that improvement is not admission.
+    * cal_fixtures.py still contains machine-bound /tmp/... paths and remains red.
+    * qualify.py does not receive an external producer_provenance_digest. The Q1a-7 Stage-B transport defect is real.
+    * stage_identity.py can construct external Stage-B bindings, but no complete caller-to-consumer transport exists.
+    * Static inspection has not established that Stage-A’s declared commit/tree is independently bound to the exact checkout actually processed.
+    * Q1a-9’s literal self-hash wording conflicts with what is constructible; the implementation uses a structural formulation. Kai must rule on the intended contract.
+    * The known-positive interpreter remains blocked by D380/D385 and INC-34.
+    * The harness is producer evidence. Passing its own predicates cannot establish predicate correctness, completeness or independence.
+    
+    Governance defects now recorded in my working view
+    
+    * No current document is accepted as the professional Kingsman master architecture blueprint.
+    * The v0.4 master package was withdrawn because it redesigned Kai as a new product instead of maturing the existing organism.
+    * STATUS.md and SEQUENCE.md contain obsolete programme and hardware claims. They cannot be treated as current system truth.
+    * The authority index requires exact repository/runtime evidence before narrative documentation.
+    * D386 reports a decision population of 369, while the producer summary says 370 entries. This needs reconciliation before relying on the count; it does not change that D387 is presently free.
+    * GitHub attribution is insufficient for actor identity because executor pushes appear under Dainius’s account.
+    
+    Immediate D379 sequence
+    
+    No Orion coding around the four root questions.
+    
+    1. Kai independently adjudicates:
+        * exact processed-subject binding;
+        * Q1a-7 external Stage-B transport;
+        * Q1a-9 constructible self-binding semantics;
+        * the D380/D385-compliant interpreter requirement.
+    2. Kai separately reviews the four unadmitted commits.
+        * Each commit is accepted, rejected or returned with an exact reason.
+        * Admission is not all-or-nothing merely because the commits form a chain.
+        * Physical HEAD is never the automatic restart point.
+    3. Only from the admitted state, rerun d379_controls.py --capture.
+    4. Submit the immutable capture for independent review and stop.
+    5. Only after tranche acceptance and a separate Dainius grant:
+        * freeze final source bytes;
+        * bind full-history source;
+        * create production Stage A exactly once;
+        * run the candidate and its qualification path;
+        * perform the blind holdout;
+        * obtain independent admission or rejection.
+    6. Only after H2 closes may the canonical House sequence proceed through H3–H6, House exit, Item 8, and then the six A-4 provenance subject builds.
+    
+    Whole-system architectural route
+    
+    The repository already gives the correct maturation order. It does not override the D-numbered programme sequence:
+    
+    1. Exact current-organism census.
+    2. Reconcile present pillars, Unified Hunter and actual code.
+    3. Finish workload identity, final-hand control and durable authority.
+    4. Establish hostile-content isolation and controlled egress.
+    5. Establish durable workflow, audit and explicit unknown-outcome handling.
+    6. Build governed world state, memory, goals and proactivity.
+    7. Requalify capabilities, models and hardware resource budgets.
+    8. Add self-diagnosis and resilience without creating parallel authority.
+    9. Establish recovery, lineage, secure update, anti-rollback and crypto agility.
+    10. Generate Mission Control, status documents and diagrams from qualified machine records.
+    
+    The architectural stance remains: preserve the existing organism; qualify reality; harden, finish, merge, move or split only where evidence justifies it; add only genuinely missing joints.
+    
+    Mandatory DeepSeek adversarial gate
+    
+    For every major architectural step, I will require this sequence:
+    
+    1. Exact evidence pack and subject identity frozen.
+    2. Kai’s independent analysis and explicit unresolved questions.
+    3. DeepSeek attack against those questions—not open-ended architecture invention.
+    4. Attack must cover:
+        * hidden or duplicated authority;
+        * identity substitution;
+        * evidence-plane promotion into authority;
+        * fail-open and degraded-mode behaviour;
+        * denominator and coverage gaps;
+        * replay, rollback and stale-state paths;
+        * legacy bypasses;
+        * recovery under the wrong identity or authority lineage;
+        * hostile inputs and resource exhaustion;
+        * whether the proposed control can demonstrably fail.
+    5. Kai reconciles each challenge as upheld, disproved, unresolved or out of scope, with evidence.
+    6. Orion may then produce a bounded implementation plan.
+    7. Dainius grants or refuses implementation authority.
+    8. Implementation receives hostile controls, mutation tests and independent admission.
+    
+    DeepSeek remains an adversarial reviewer only. It does not gain programme or repository authority.
+    
+    Evidence standard from now on
+    
+    No conclusion will rest on a surface read. Material claims must establish:
+    
+    * exact commit, tree, runtime and processed subject;
+    * authoritative source and evidence date;
+    * qualified denominator and completeness boundary;
+    * known positive, known negative and boundary controls;
+    * mutation sensitivity and a demonstrated failure path;
+    * separation between producer evidence and independent review;
+    * reconciliation between code, generated evidence and governing decision;
+    * explicit admission state;
+    * unknown where evidence is insufficient.
+    
+    Ledger and CAI
+    
+    CAI is parked until you return to it.
+    
+    The accountability ledger stays deliberately small: who, when, why, attached to the action already recorded by Git. “What” should come from the immutable commit/ref/event rather than being duplicated into another authority system. “Who” must identify the actual actor—not merely the GitHub account shown on the push.
+    
+    Next authorised action
+    
+    Kai performs the independent D379 root-item and commit-admission review. Orion remains stopped. No branch filing, remediation, candidate execution, merge or architecture implementation follows from this review unless you issue the corresponding explicit grant.
+    END-VERBATIM PROMPT-6a6365d472884c86
+- EVIDENCE PROMPT-c70cd8b32643b1d6 transcript 2026-09-25T13:46:47.107Z: 2834 bytes, sha256 28ec85c13475a34916f50589caab011cc7639a8283863cdca2c4915c6409b86f, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-25T13:46:47.107Z]
+    BEGIN-VERBATIM PROMPT-c70cd8b32643b1d6
+    Ok then let’s start work, Verdict
+    
+    The main count correction is verified, but §2 still contains one material overstatement: D344–D353 are absent from canonical DECISIONS.md, but they are not “unallocated.” The authority index records them as a pending canonical append queue, and D370 itself calls them “Kingsman (queued).”
+    
+    Verified facts
+    
+    * DECISIONS.md contains 370 headings matching ## D<n>.
+    * Those headings contain 369 distinct D-numbers.
+    * D370 occurs twice:
+        * the substantive D370 decision;
+        * D370 CORRECTION / ERRATA, explicitly stating: “Not a new decision. No D-number consumed.”
+    * D386’s allocator states: “population 369, highest D386, next free D387.”
+    * The 17 numbers absent from canonical DECISIONS.md are:
+        * D103–D108;
+        * D260;
+        * D344–D353.
+    * The current authority index explicitly says: “Pending canonical append queue while D344–D353 remain outside byte-safe canonical append.”
+    * Therefore, “17 absent canonical numbers” is true; “17 unallocated numbers” is not established and is false for at least D344–D353.
+    
+    Correct replacement for §2
+    
+    Decision population: Canonical kai-pm/DECISIONS.md contains 370 ## D<n> headings representing 369 distinct D-numbered decisions. D370 appears twice because its correction/errata is explicitly not a new decision and consumes no number. D386’s allocator records population 369, highest D386, next free D387. Seventeen numbers are absent from the canonical file: D103–D108, D260 and D344–D353. D344–D353 are recorded separately as a pending canonical append queue and must not be described as free or unallocated.
+    
+    That is the language I would send GPT.
+    
+    Other claims rechecked
+    
+    * PR #122: open, unmerged, head 0af5d320, base main at 194db0a0.
+    * Field notes still contain the wrong statement: “370 entries” at line 37.
+    * 86ebfde closeout:
+        * 40 cases;
+        * PASS 16, FAIL 0, HELD 23, FIXTURE 0, RETURNED 1;
+        * 196 passed / 32 failed;
+        * control exit 1; cal_fixtures exit 1.
+    * eb52f73 closeout:
+        * 40 cases;
+        * PASS 16, FAIL 0, HELD 24;
+        * 204 passed / 33 failed;
+        * control exit 1; cal_fixtures exit 1.
+    * The four post-baseline commits and 0af5d320 are present with the stated chronology.
+    * No repository file was changed.
+    
+    Recommendation
+    
+    Use the replacement paragraph above before forwarding the message. Do not correct the frozen field notes yet: the defect is known, bounded and non-authoritative; changing the branch now would create another physical commit during the admission hold.
+    
+    Confidence: 1.00 on the heading count, distinct-number count, duplicate D370 explanation, absent-number set and D386 allocator. Confidence: 0.99 that “unallocated” is improper for D344–D353 because two independent repository records explicitly describe them as queued rather than free.
+    END-VERBATIM PROMPT-c70cd8b32643b1d6
+- EVIDENCE PROMPT-08e125596b1db500 transcript 2026-09-25T13:52:10.236Z: 2475 bytes, sha256 3d80575acb35688500c02ff4e3c5c942931abe0cfd979c1909af5872b8f137bc, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-25T13:52:10.236Z]
+    BEGIN-VERBATIM PROMPT-08e125596b1db500
+    Verdict
+    
+    Corrected v2 is materially sound and the D344–D353 correction is verified. The queue file exists on the D379 branch and is absent from main.
+    
+    Three final precision edits are needed before treating the message as cold-start-safe.
+    
+    1. Admission must not imply execution authority
+    
+    Current §8.2 says:
+    
+    Work resumes only from whatever Kai admits…
+    
+    That could imply Kai’s admission automatically authorises Orion to resume. It does not.
+    
+    Replace §8.2–3 with:
+    
+    2. Kai’s admission determines the only state from which work may later resume; admission itself does not authorise execution.
+    3. After Dainius gives an explicit bounded grant, Orion resumes from that admitted state and runs d379_controls.py --capture. The exact generated capture, without manual alteration, goes to Kai. Everything then stops.
+    
+    2. “Unchanged result” is incorrect wording
+    
+    A rerun may legitimately produce a different result because the admitted source, interpreter or environment may differ. The evidence must be unaltered, not necessarily unchanged.
+    
+    Use:
+    
+    “The exact generated capture, without manual alteration…”
+    
+    3. Scope the GitHub-attribution claim
+    
+    “Every push by the executor” is universal wording. Unless the inventory proved completeness across every executor push, scope it to what was examined:
+    
+    The CAI investigation found that the executor pushes it examined were attributed by GitHub to Dainius’s account (dainius1234, 216391246). GitHub attribution therefore cannot, by itself, establish the actual actor.
+    
+    If the CAI evidence contains an exhaustive, declared denominator of every executor push, the universal wording can be restored after that denominator is independently verified.
+    
+    Evidence confirmed
+    
+    * Queue file exists on the D379 branch:
+        DECISIONS_CANONICAL_APPEND_QUEUE_D344_D353.md⁠￼
+    * It states D344–D353 remain durably banked outside the canonical ledger.
+    * It is absent from main.
+    * PR #122 is open, unmerged, head 0af5d320, base 194db0a0.
+    * The frozen field notes explicitly state PR #122 DO NOT MERGE.
+    * The remote CAI branch still resolves.
+    * The decision arithmetic and both D379 closeout measurements remain verified.
+    
+    With those three wording changes, the message is suitable for GPT’s read-only adversarial review.
+    
+    Confidence: 0.99. Remaining uncertainty concerns only whether the CAI attribution inventory was exhaustive enough to justify “every push”; it does not affect D379’s state or next authorised action.
+    END-VERBATIM PROMPT-08e125596b1db500
+- EVIDENCE PROMPT-391df48a0aaa13f5 transcript 2026-09-25T13:53:44.289Z: 1950 bytes, sha256 599c24e8b4c95c05e19c95dc09486fa9e0c6d5e3fd777b356d7c588497c75bf0, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-25T13:53:44.289Z]
+    BEGIN-VERBATIM PROMPT-391df48a0aaa13f5
+    One important drift remains in v3—the exact role confusion Dainius just corrected.
+    
+    Required correction 1 — Roles
+    
+    Current text incorrectly says:
+    
+    DeepSeek and GPT are adversarial reviewers only.
+    
+    GPT is Kai, not a separate adversarial reviewer.
+    
+    Replace §1 with:
+    
+    * Dainius: final authority.
+    * Kai / GPT: independent technical adjudicator, architect and reviewer.
+    * Orion / Claude: executor; no independent admission authority.
+    * DeepSeek: adversarial reviewer only; no programme authority or admission weight.
+    * KAI project: the system and programme being developed—not the Kai/GPT reviewer.
+    
+    In §3, retain KAI INDEPENDENT REVIEW only if quoting D379 literally, but annotate it:
+    
+    KAI INDEPENDENT REVIEW is the canonical repository wording; the responsible actor is Kai/GPT, not the KAI project.
+    
+    Required correction 2 — Preserve the complete post-acceptance order
+    
+    Section 8.4 compresses away two mandatory identity steps. Replace it with:
+    
+    4. Only after tranche acceptance and a separate explicit grant from Dainius: final source bytes are frozen; the real full-history source is bound; the production Stage-A identity is created exactly once; the candidate is executed; qualification and blind holdout follow under their governing authority. No step may be skipped or treated as automatically authorised by the previous one.
+    
+    Recommended evidence dating
+    
+    In §7, change:
+    
+    Rulesets are 0 and tags are 0.
+    
+    to:
+    
+    The last recorded CAI measurement, dated 23 September 2026, reported rulesets 0 and tags 0; current live values were not re-derived for this message.
+    
+    That prevents a historical measurement from reading as permanently current.
+    
+    With those corrections, v3 becomes fit for adversarial submission. The attribution denominator is now stated properly, and PINNING_RESEARCH.md is correctly identified as containing an overclaim without modifying the parked branch.
+    
+    Confidence: 1.00 on the role error and mandatory sequence omission.
+    END-VERBATIM PROMPT-391df48a0aaa13f5
+- EVIDENCE PROMPT-03088c444ee5887f transcript 2026-09-25T14:28:06.442Z: 2593 bytes, sha256 5439ef2755211920aade34ea961a4f846f82c3af9d3113b6d2f278f611e6e882, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-25T14:28:06.442Z]
+    BEGIN-VERBATIM PROMPT-03088c444ee5887f
+    KAI cold-start update — 25 September 2026
+    
+    Governed technical state: Kai/GPT completed independent read-only review. The last admitted technical commit is eb52f73⁠￼. Physical HEAD 0af5d32 remains later note-only state and is not execution authority.
+    
+    Closed — verified
+    
+    * Four post-baseline commits were adjudicated individually:
+        * 8e3ee69 — accepted as harness-evidence strengthening.
+        * fc1bb9d — accepted as non-authoritative notes only.
+        * 630ceaf — accepted; verdict vocabulary restricted to PASS/FAIL/HELD.
+        * eb52f73 — accepted; CLASSIFICATION fixtures and Q1a-7 construction corrected.
+    * No incident, programme gate or D379 tranche was closed.
+    * Evidence: Kai/GPT independent repository review, 25 September 2026.
+    
+    Open — active
+    
+    * D379 remains open.
+    * Re-derived producer measurements remain:
+        * 86ebfde: 40 cases—PASS 16, FAIL 0, HELD 23, RETURNED 1; 196/32 checks.
+        * eb52f73: 40 cases—PASS 16, FAIL 0, HELD 24; 204/33 checks.
+    * These figures describe the harness output only; they do not establish complete D379 coverage.
+    
+    Held — blocked
+    
+    The current D379 closeout and tranche were rejected because independent inspection found:
+    
+    * Stage-A validation does not enforce the governed contract, subject, tree_paths, census or history contents.
+    * Pass A does not bind the processed commit/tree to the descriptor’s subject.
+    * External Stage-B bindings have no production transport into qualify.py.
+    * Q1a-9 measures a substitute raw-digest condition; its PASS is not earned.
+    * holdout.py accepts an externally supplied tree population without binding it to Stage A.
+    * The D380/D385-compliant interpreter prerequisite remains unavailable.
+    
+    Gates awaiting adjudication
+    
+    * Dainius: whether to grant a bounded repair tranche covering the confirmed blockers.
+    * DeepSeek: adversarial attack requested against the explicit Stage-A, subject-binding, Stage-B, Q1a-9 and holdout questions. Its output will carry no admission weight until independently reproduced by Kai/GPT.
+    * Kai/GPT: no further admission decision is pending until authorised repairs and a new exact capture exist.
+    
+    Unauthorised
+    
+    * Orion repair execution without a new bounded grant.
+    * Production Stage A, candidate execution, Pass A, classification, qualification or blind holdout.
+    * D379 closure, PR #122 merge, main movement or downstream House work.
+    * CAI implementation or using 0af5d32 merely because it is physical HEAD.
+    
+    Next authorised step
+    
+    None recorded for Orion. The independent review is complete. Execution remains stopped pending an explicit bounded grant from Dainius.
+    END-VERBATIM PROMPT-03088c444ee5887f
+- EVIDENCE PROMPT-cab6577277e793c3 transcript 2026-09-25T14:52:29.004Z: 2803 bytes, sha256 23965b5a2e046fb294004c7bebb06d25274c970f32e865b9d652e1194bbd062c, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-25T14:52:29.004Z]
+    BEGIN-VERBATIM PROMPT-cab6577277e793c3
+    Kai decision
+    
+    Choose Option 2: code plus environment, but structure it as two separately gated work packages inside one proposed tranche. The interpreter cannot remain an indefinite afterthought when it holds most of the matrix.
+    
+    This is not yet an execution grant. Dainius remains the final authority.
+    
+    Required text-only repair plan
+    
+    Orion should return a bounded plan covering:
+    
+    1. Code repair package
+        * Complete Stage-A validation.
+        * Bind processed commit/tree/population to Stage A.
+        * Implement strict external Stage-B transport and qualification.
+        * Replace Q1a-9’s proxy with the governed structural test.
+        * Bind holdout population to the frozen Stage-A subject tree.
+    2. Environment package
+        * Define measurable D380/D385 compliance criteria.
+        * Identify the proposed interpreter/build source and immutable identity.
+        * Prove bytecode is disabled from process initialisation.
+        * Derive the governed stdlib identity.
+        * Demonstrate absence or governed handling of the current offending modules.
+        * Include known-positive and known-negative environment controls.
+        * No rule relaxation, exemptions or source workaround.
+    3. Exact mutation surface
+        * Every file proposed for modification or creation.
+        * Justification connecting each file to a named blocker.
+        * Explicit exclusions: decisions, ledgers, production Stage A, candidate execution, holdout execution, PR merge and main.
+    4. Adversarial controls
+        * Fail-old/pass-new and opposite-side controls for every repair.
+        * DeepSeek attack questions mapped to the proposed design.
+        * Kai independently reproduces any DeepSeek finding.
+    5. Stop conditions
+        * If a compliant interpreter cannot be established within the approved surface: stop and return evidence.
+        * Do not weaken D380/D385.
+        * Do not silently fall back to a mostly-HELD capture and call it closeout.
+        * After one exact capture, stop for Kai review.
+    6. Restart state
+        * All work begins from admitted eb52f73.
+        * 0af5d32 is not the repair baseline.
+    
+    Architectural sequence
+    
+    text-only plan
+    → Kai review
+    → Dainius bounded grant
+    → code repairs
+    → compliant environment proof
+    → DeepSeek adversarial attack
+    → Orion reconciliation
+    → one exact capture
+    → stop
+    → Kai independent review
+    
+    If environment feasibility fails, the code repairs may still be preserved, but D379 remains held and no tranche-acceptance capture is claimed.
+    
+    The CAI remote deletion remains a separate Dainius action. It does not gate D379 and must not be folded into this repair tranche.
+    
+    Confidence: 0.98. The only remaining uncertainty is whether a compliant interpreter can be provisioned without expanding the governed environment surface; the text plan must establish that boundary before execution authority is considered.
+    END-VERBATIM PROMPT-cab6577277e793c3
+- EVIDENCE PROMPT-e0f757655d85910d transcript 2026-09-25T15:18:34.070Z: 5427 bytes, sha256 bad4bf40dfc38724afaadfc25e2bdf359343472f3197ed8deb985635bf6f5e15, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-25T15:18:34.070Z]
+    BEGIN-VERBATIM PROMPT-e0f757655d85910d
+    Kai ruling on Orion’s plan summary
+    
+    The direction is sound, but the repair plan is not yet approved and no execution grant exists. I have seen Orion’s summary, not the full referenced plan file.
+    
+    1. Calibration descriptors
+    
+    Ruling: validate by mode.
+    
+    All descriptors, including calibration, must enforce:
+    
+    * exact schema and nested field shapes;
+    * canonical ordering;
+    * digest and Git-ID formats;
+    * path normalisation and uniqueness;
+    * cross-field consistency;
+    * no unknown or duplicate fields.
+    
+    PRODUCTION must additionally match and mechanically derive the frozen D380/D381 values.
+    
+    CALIBRATION may use explicitly synthetic values because D379 authorises synthetic/local subjects and D381 §19 expressly permits an otherwise-valid synthetic fixture. Synthetic does not mean arbitrary or internally inconsistent, and it carries zero production, admission or holdout weight.
+    
+    2. Census verification and holdout-result binding
+    
+    Both accepted as required scope.
+    
+    They are not optional widening:
+    
+    * Loaded Census files must be reconciled against the governed Census identity. Recording their paths and hashes without validating them does not establish the dependency.
+    * The classification result consumed by holdout must be bound through its validated Stage-B record. Otherwise a different result can be substituted after qualification.
+    
+    These belong respectively under B2/runtime dependency binding and B3/B5 artifact-chain integrity.
+    
+    3. Q1a-9 interpretation
+    
+    Accepted with one precision correction.
+    
+    The governing test is structural, not textual:
+    
+    * component-specific provenance schemas contain no output-self-digest field;
+    * unexpected top-level fields refuse;
+    * nested smuggling into input_binding or population members refuses through exact nested schemas;
+    * clean in-band provenance passes;
+    * final bytes are hashed only after finalisation and bound externally through Stage B.
+    
+    Do not search for digest text and do not try to construct an impossible fixed point.
+    
+    4. Five holdout cases
+    
+    They can be tested without production Stage A.
+    
+    Each case must run in a child process against the actual governed decision functions:
+    
+    * I1B-1: identical synthetic tree/output multisets pass.
+    * I1B-2: dropped output path refuses.
+    * I1B-3: added path refuses.
+    * I1B-4: duplicate path refuses—even if both supplied populations contain the duplicate.
+    * I1A-3: two evidence artifacts with identical path populations and one fixed synthetic Stage-A identity select the same sample; changing only the identity changes the sample.
+    
+    This tests the real decisions while creating no production descriptor and granting no holdout weight. The current in-process assertions are insufficient; the repaired controls must derive child return codes.
+    
+    5. F7–F10
+    
+    Finding	Ruling	Severity
+    F7: late sys.dont_write_bytecode mutation satisfies the check	Accepted. Verify startup state, including the immutable startup flag—not only the mutable runtime variable.	BLOCKER
+    F8: loaded filesystem-backed stdlib origin need not exist in the governed snapshot	Accepted. Direct violation of D380 §7.11.	BLOCKER
+    F9: unreadable files/directories are silently skipped	Accepted. Identity enumeration must refuse because completeness is unknown.	BLOCKER
+    F10: symlink cycle reported as dangling	Accepted, but it presently refuses rather than admits the object. Distinguish cycles from dangling links and calibrate both.	MAJOR
+    
+    These are code defects in the governed runtime-identity implementation. They belong within the environment package but must have separate controls and dispositions.
+    
+    6. Interpreter expectation
+    
+    Orion’s correction is accepted: a compliant interpreter can clear at most 19 of the 24 HELD cases. The other five require the child-process calibration restructuring above.
+    
+    A CPython build from an exact Git tag is a plausible route, not yet an established solution. The plan must bind:
+    
+    * exact upstream commit/tag resolution;
+    * source-tree identity;
+    * build configuration and compiler identity;
+    * resulting interpreter digest;
+    * stdlib snapshot;
+    * startup flags;
+    * absence of external package contamination.
+    
+    Failure to build or satisfy any measurement means stop—never alter the rule.
+    
+    7. Branch decision
+    
+    Use a fresh repair branch from admitted eb52f73 after Dainius grants branch creation and execution.
+    
+    Do not:
+    
+    * build on 0af5d32;
+    * delete or rewrite 0af5d32;
+    * force-push the existing branch.
+    
+    There is no need to “get rid of” 0af5d32. Preserve it as physical history while keeping the repair lineage anchored mechanically to the admitted state. Building on 0af5d32 merely because its code currently matches would weaken the physical/admitted-state distinction we just restored.
+    
+    Next move
+    
+    Orion must revise the text-only plan with these rulings and provide the full plan, including:
+    
+    * exact proposed branch name;
+    * exact file mutation list;
+    * each fail-old/pass-new/opposite-side control;
+    * CPython source/build/capture boundary;
+    * DeepSeek attack mapping;
+    * stop conditions;
+    * one-capture-and-stop rule.
+    
+    Then Kai reviews the complete plan, DeepSeek attacks it, and only afterward does Dainius decide whether to grant execution.
+    
+    No code, branch creation, interpreter build, download, commit or capture is authorised yet.
+    
+    Confidence: 0.97. The rulings are source-supported; the remaining uncertainty is whether the proposed interpreter can be reproducibly built and satisfy D380/D385 within the available environment.
+    END-VERBATIM PROMPT-e0f757655d85910d
+- EVIDENCE PROMPT-f64504ed3d97cb73 transcript 2026-09-25T15:57:02.149Z: 16231 bytes, sha256 59cde3cba6162307d4094f73ab84a016a0af9d06c3bfc1d5fabe04fbde7da66f, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-25T15:57:02.149Z]
+    BEGIN-VERBATIM PROMPT-f64504ed3d97cb73
+    Recheck and fill the gaps for gpt to be in the loop as started new thread so he can write to deep seek and ask for adversary review: Dainius, I have refreshed the view from the repository itself, not from the handover narrative. The direction is substantially stronger, but execution remains STOPPED. I would return the plan once more before DeepSeek, because there are still several load-bearing corrections.
+    
+    OBJECTIVE — current KAI position
+    
+    We are still solving House H2 / D379 pre-candidate assurance, not building the later Kingsman architecture. The immediate objective is to make the D379 instrument, runtime, identity chain and hostile calibration trustworthy enough that we can later decide whether a candidate is even allowed to exist.
+    
+    Item	Independently verified state
+    Active branch	claude/project-rework-plan-pgvp35
+    Physical HEAD	0af5d32072bcf1d09c09e5c83c9b5b71b5560676
+    Physical tree	4c05a750e1aed738879c140b51782de83bdf26e3
+    Code-bearing parent	eb52f73fa6485534ca7e28a42055861c69e94cc4
+    Authorised baseline carried by field notes	86ebfdeeeff8b11a4add1cdd7dc0ea03af953de8
+    PR #122	OPEN, unmerged, DO NOT MERGE
+    Highest canonical decision	D386
+    Strict canonical decision population	369 distinct, not 370
+    Candidate / real Stage A / holdout	NOT authorised
+    CAI	Parked; does not gate this work
+    Proposed new branch	claude/d379-repair-eb52f73 does not exist yet
+    
+    The 370 figure in the field notes is wrong. I derived the denominator using the strict decision-heading grammar and obtained 369 / 369 distinct / highest D386 / D386 occurs once. That should be corrected eventually, but it is not a reason to widen this repair tranche.
+    
+    There is another important distinction: 0af5d32 changes only the field notes. The executable D379 state underneath remains eb52f73.
+    
+    Q6–Q9 — KAI RULING
+    
+    Question	Ruling	Reason	Confidence
+    Q6 — F12 B5 blocker?	YES — BLOCKER	D379 explicitly requires I1B-4 duplicate output → REFUSE BEFORE SELECTION. Current reconcile() accepts identical duplicate multisets.	1.00
+    Q7 — F13 harness blocker?	YES — BLOCKER	I independently counted 9 [sys.executable, …] launch sites. Python flags do not inherit from the parent merely because sys.executable is reused.	0.99
+    Q8 — plan_selection acceptable?	YES, with strict boundary conditions	A single real decision function inside holdout.py is preferable to reproducing holdout semantics inside the harness.	0.96
+    Q9 — commit build log if ≤5 MB?	NO, not as stated	File size does not create repository authority. R10 says full evidence survives; D379 says no arbitrary new tracked paths.	0.99
+    
+    F12 needs a class repair
+    
+    Do not simply add if duplicate_output: fail.
+    
+    plan_selection should independently reject duplicates in both populations before multiset comparison. That matters because D380 also says the frozen tree population itself cannot contain duplicate normalised paths.
+    
+    The hostile set therefore needs to distinguish clean unique population, output-only duplicate, tree-only duplicate, matching duplicate on both sides, missing member, additional member and clean reconciliation. The particularly important control is matching duplicate on both sides, because that is exactly the class the present Counter == Counter implementation misses.
+    
+    That closes the mechanism rather than the observed example.
+    
+    F13 is real, but I reject one part of Orion’s proposed repair
+    
+    A central Python launcher is the right architectural pattern.
+    
+    A new environment.py/environment package inside house_in_order_h2_v13 is not.
+    
+    D380 closes h2_sources to exactly ten files. I rechecked stage_identity.py; it literally carries the ten-file closed population. Adding an eleventh imported H2 module would collide with the very identity contract we are trying to establish.
+    
+    For the D379 harness, put the common launcher in the already-authorised d379_controls.py, or use an external build/calibration launcher that does not become an H2 source. Do not solve a launcher defect by silently changing the Stage-A source population.
+    
+    And derive the launch-site denominator again after the repair. Do not encode “nine” as permanent truth.
+    
+    Q8 — plan_selection is the right direction
+    
+    I want the boundary shaped like this:
+    
+    I/O and authority boundary in main() → validate PRODUCTION Stage A → read result bytes exactly once → verify Stage-B against those exact bytes → parse those same bytes → obtain tree population → call one plan_selection() → write output.
+    
+    plan_selection() should own the actual selection semantics: uniqueness, exact reconciliation and deterministic selection. The child hostile controls may import and invoke that actual function. They must not carry their own copy of the algorithm.
+    
+    That is consistent with the existing harness pattern, which already distinguishes a shipped CLI from a governed decision function executed inside a real child process.
+    
+    Critically, do not invent a production bypass merely so the tests can reach plan_selection. The outer PRODUCTION-mode refusal stays real. The test function boundary exists precisely so we can calibrate the inner decision logic without weakening the production gate.
+    
+    A new finding: Q1a-9 is not yet closed by “exact field lists”
+    
+    This is the most important thing I found beyond Orion’s four questions.
+    
+    The proposed reasoning:
+    
+    exact field sets, including nested fields → therefore a smuggled self-digest is impossible
+    
+    is too strong.
+    
+    Exact field sets stop someone adding an undeclared artifact_sha256 field. They do not automatically stop someone putting a self-derived digest into an already permitted digest-valued slot.
+    
+    The current verify_provenance() itself admits an important limitation: non-H2 producer_population members are not all semantically verified against an independent authority. Shape checking and value checking are not the same proposition.
+    
+    My Q1a-9 ruling is therefore:
+    
+    The constructible prohibition is semantic, not a hash fixed-point puzzle. No in-band producer-provenance value may derive its authority from the containing artefact’s own final-byte identity. The final artefact byte digest belongs exclusively to the external Stage-B binding.
+    
+    That means the replacement control must establish both sides:
+    
+    unexpected self-output field → schema REFUSE, and self-derived value planted into an otherwise legal digest-bearing position → value-authority REFUSE.
+    
+    Then the positive limb proves:
+    
+    finalise artefact → external binder hashes exact final bytes → Stage-B stores artifact_sha256 externally → consumer verifies it against the exact bytes it consumes.
+    
+    That is much stronger than searching JSON for a coincidental 64-character string, but it also means shape validation alone is insufficient.
+    
+    I would mark this as a plan blocker until explicitly covered.
+    
+    Stage-B / one-read design
+    
+    Orion’s revised one-read rule is correct and should stay.
+    
+    Current qualify.py does:
+    
+    json.load(open(a.result))
+    
+    and has no --stage-b input. Therefore the existing product cannot detect the self-consistent Q1a-7 tamper using the independent external provenance anchor. That defect is real.
+    
+    The new consumer should obtain one immutable byte buffer and derive both the artefact SHA-256 and parsed JSON from that buffer. No “hash one read, parse another read.” The same applies wherever holdout consumes a bound result.
+    
+    If a common helper is desirable, stage_identity.py is already an authorised Stage-B responsibility surface. Do not create another H2 module merely for convenience.
+    
+    Interpreter plan — good direction, but I am tightening it
+    
+    I independently verified CPython upstream:
+    
+    Identity	Verified value
+    Release tag	v3.11.15
+    Annotated tag object	2323bfc729b041c43b1e5e4c5f18c548fc345323
+    Tag signature	GitHub verifies valid
+    Peeled commit	2340a037f7450e70fccfe411e6531afb4d57a312
+    Source tree	8c6959bc70b201b477138f00c432a3bb2f1caddd
+    
+    The commit object itself is unsigned. That is not a defect: the signed annotated tag → commit → tree chain is the release-authenticity evidence. Record the whole chain instead of saying merely “CPython 3.11.15”.
+    
+    I would also strengthen the build experiment. “Build twice at the same install location” risks proving an overlay rather than independent reproducibility. Use two clean build directories and two clean staging roots, with the same logical configured prefix if necessary so installation-path bytes do not contaminate the comparison. No second build may inherit artefacts from the first.
+    
+    Record more than gcc --version: compiler executable digest, linker identity/digest, complete configure invocation, relevant environment, generated configuration (pyconfig.h/configuration output) and the resulting interpreter + governed-stdlib identities. If build 2 differs, investigate the first differing derived artefact. Do not weaken the reproducibility test to make it pass.
+    
+    There is also a governance distinction around startup flags. -B is directly tied to D380’s banked requirement that bytecode writing is disabled from process initialisation. -E and -s are sensible hardening conditions, but they are not currently fields in H2_STAGE_A_V2 and should not be falsely described as D380 requirements. They may be controlled environment conditions.
+    
+    I would have DeepSeek specifically attack whether -B -E -s is sufficient against startup contamination. -S/isolated-mode may look stronger, but I am not adding either casually: suppressing site or changing sys.path semantics can change the runtime we are supposedly measuring. Stronger is only better if it preserves the intended subject.
+    
+    F9 / root container
+    
+    Using setpriv for the unreadable-file hostile case is sound. Testing Unix read permissions as uid 0 would indeed prove nothing.
+    
+    But the control must mechanically establish that the child actually became non-root and that setpriv itself executed successfully. Otherwise “permission failure” can be replaced by “launcher failed,” which is exactly the proxy-substitution class we have already paid for repeatedly.
+    
+    The observed child UID should travel in the evidence.
+    
+    The proposed branch base is rejected
+    
+    I would not create claude/d379-repair-eb52f73 from eb52f73.
+    
+    I inspected the four unadmitted commits and the code-bearing patches:
+    
+    Commit	Independent view
+    8e3ee69	Technically useful correction: replaces supplied conclusions with raw observations/derived predicates and restores full-digest comparison. Preserve the technical delta.
+    fc1bb9d	ORION_FIELD_NOTES.md only. Non-authoritative working memory and outside the bounded repair surface. Do not carry it into the clean repair baseline. Preserve the old commit as history.
+    630ceaf	Important verdict-vocabulary/Q1a-7 correction, but knowingly leaves Q1a-7 in CONTROL FAILURE because it exposes another fixture defect. Not an admissible restart state by itself.
+    eb52f73	Repairs the shared CLASSIFICATION fixture construction and dead-fixture population. Technically valuable, but its SHA inherits the above ancestry and the complete tree still contains F12/F13 and the unresolved production-interface gaps. Do not make the SHA itself the new authority baseline.
+    
+    This is where quality outranks convenience.
+    
+    The next implementation, if you authorise it later, should start from the clean admitted baseline 86ebfde and reconstruct only the independently accepted technical deltas, while preserving the old branch/commits as immutable history. No destructive rewrite is required. We gain a clean authority lineage without pretending the unauthorised execution never happened.
+    
+    I would rather spend one extra controlled reconstruction than carry confused admission ancestry into a Stage-A system whose entire purpose is provenance.
+    
+    Build-log ruling
+    
+    The proposed 5 MB boundary has no engineering meaning.
+    
+    Full build output should survive irrespective of size. Storage/transport is a separate problem from evidential completeness.
+    
+    If the full log is not an authorised tracked repository artefact, preserve it as an immutable external build artefact and place its exact SHA-256, byte count, subject/build identity and retrieval reference in the authorised evidence. If you want the log itself committed, then the exact repository path needs explicit authority before execution, regardless of whether it is 500 KB or 50 MB.
+    
+    That satisfies R10 without letting file size create repository authority.
+    
+    DeepSeek adversarial gate
+    
+    I would not send DeepSeek a generic “review this plan.” Once the actual revised plan file is available, the attack packet should force it to attack these eight surfaces:
+    
+    * Admission lineage: does reconstructing the clean branch actually exclude unadmitted/out-of-scope state, or merely rename it?
+    * Stage-B independence: can producer/result/binding be changed together, substituted, replayed or mismatched while downstream consumers still pass?
+    * Q1a-9: does structural validation really eliminate in-band self-authority, including legal-field/value substitution rather than only extra fields?
+    * Interpreter trust: signed-source provenance, clean-build independence, toolchain/environment influence, symlinks, dynamic dependencies, startup contamination and the distinction between calibration runtime and eventual production runtime.
+    * Harness equivalence: does every hostile control reach the real governed decision/process, with the intended predicate first-effective, under the same relevant startup conditions?
+    * Population integrity: duplicates, normalisation collisions, missing/extra members, denominator drift and whether every “all” claim derives its population mechanically.
+    * Evidence authority: can logs, captures, Stage-B files, generated descriptors or close-out reports self-certify or be regenerated after the fact without detection?
+    * Bypass/degraded paths: alternate child launchers, old selection logic, direct helper calls, stale fixtures, fallback runtime paths, or error handling that can turn UNKNOWN/REFUSE into apparent PASS.
+    
+    DeepSeek should return BLOCKER / MAJOR / MINOR / QUESTION plus the exact repository evidence needed to establish or disprove each challenge. Then I reconcile every item against primary source. DeepSeek still creates zero programme state by itself.
+    
+    RECOMMENDATION
+    
+    The architecture direction is sound, but the plan is RETURNED FOR ONE MORE REVISION, not rejected.
+    
+    The specific corrections are: incorporate F12 as a true duplicate-class repair; incorporate F13 without creating an eleventh H2 source; formalise Q1a-9 as a semantic no-self-authority invariant rather than merely an exact-field assertion; remove the arbitrary 5 MB authority boundary; strengthen the interpreter build independence; and replace the eb52f73 branch base with a clean admitted/reconstructed base.
+    
+    Then the order is:
+    
+    revised exact plan → Kai verifies the actual plan artefact → DeepSeek adversarial attack → Kai reconciles against repo → Dainius decides implementation authority → only then create branch/change bytes/build → capture producer evidence → Kai independent review → tranche accept/reject → later and separately, candidate authority.
+    
+    One limitation I will not conceal: the actual revised plan file Orion refers to as “the file above” is not accessible in this conversation or your Library from my side. I have reviewed the exact repository, decisions, code at eb52f73, the four unadmitted commits, and every substantive claim in Orion’s summary that I could independently bind to source. I have not pretended that equals a line-by-line review of a plan file I cannot access.
+    
+    Confidence
+    
+    0.98 on the repository state and Q6/Q7/Q9 rulings.
+    0.96 on the conditional Q8 architecture.
+    0.95 on rejecting eb52f73 as the direct restart base.
+    0.90 on the additional Q1a-9 concern; the remaining 0.10 is because the inaccessible full plan may contain value-semantic controls Orion did not mention in his summary.
+    
+    The programme itself is not drifting. We are doing exactly what House H2 is supposed to force us to do: discovering where apparently strong evidence is actually proxy evidence before trusting it with a candidate.
+    
+    And I would keep the accountability ledger exactly as you said: who · when · why, with the immutable Git/event identity carrying the “what.” No new bureaucracy.
+    END-VERBATIM PROMPT-f64504ed3d97cb73
+- EVIDENCE PROMPT-aead103f9cbbc717 transcript 2026-09-25T16:18:17.076Z: 8384 bytes, sha256 48fddab7d5d154fa87effa0e20a3c2209231436a569aad38cd3f8d98dcb8779b, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-25T16:18:17.076Z]
+    BEGIN-VERBATIM PROMPT-aead103f9cbbc717
+    The contradiction is resolved. The 25 September admission ruling stands.
+    
+    I recovered the earlier ruling from the prior thread. It was explicit and commit-scoped: 8e3ee69, fc1bb9d, 630ceaf, and eb52f73 were accepted; fc1bb9d carried zero authority weight because it is non-authoritative field notes; and eb52f73 was named the last admitted technical state. You then explicitly accepted that position and said future repair work starts from eb52f73.
+    
+    My later new-thread ruling to reconstruct from 86ebfde was therefore wrong. It was made with incomplete continuity: I had repository evidence but was missing an already-made consequential admission decision. That is exactly the kind of cold-start failure our doctrine is supposed to prevent.
+    
+    Correct programme state
+    
+    Physical HEAD: 0af5d32072bcf1d09c09e5c83c9b5b71b5560676
+    Physical tree: 4c05a750e1aed738879c140b51782de83bdf26e3
+    Admitted technical state: eb52f73fa6485534ca7e28a42055861c69e94cc4
+    D379 tranche: still not closed
+    Candidate / real Stage A / production holdout: still not authorised
+    PR #122: remains DO NOT MERGE
+    
+    I also rechecked DECISIONS.md: there is no 2026-09-25 or 25 September entry. So the conflict existed because the consequential admission was never made durable in the repository.
+    
+    That is now a continuity defect, not a reason to reverse the admission.
+    
+    K1 — rebuild from 86ebfde?
+    
+    NO. The rebuild is cancelled.
+    
+    There is no engineering justification for reconstructing admitted work merely to manufacture a cleaner-looking ancestry. That would throw away valid admission state because a later cold thread failed to recover it.
+    
+    The new repair branch should therefore start from:
+    
+    eb52f73fa6485534ca7e28a42055861c69e94cc4
+    
+    Not 86ebfde.
+    
+    If reconstruction ever became necessary for some independent technical reason, then yes, the three technical deltas from 8e3ee69, 630ceaf, and eb52f73 would all have to travel. But that is no longer our route. fc1bb9d remains admitted historical ancestry with zero programme-authority weight and is simply not touched further.
+    
+    Confidence: 0.99.
+    
+    K2 — launch-site recount: gate or measurement?
+    
+    Both, but for different propositions.
+    
+    The number of launch sites is a reported measurement, not a hard-coded gate. We must never encode “there shall be nine” because the legitimate denominator can change.
+    
+    The coverage property is a gate:
+    
+    Every Python child-process launch in the governed harness population must pass through the governed launcher and therefore receive the required startup condition; any bypassing Python launch site is a hard failure.
+    
+    So the instrument should derive the launch-site population mechanically, print:
+    
+    population=N · governed=N · bypass=0
+    
+    and fail if bypass != 0.
+    
+    It also needs calibration. A synthetic/direct [sys.executable, ...] bypass must make the detector fail; a clean launcher-mediated site must not. That gives us a class control rather than another remembered search.
+    
+    This is materially stronger than merely recounting nine instances after Orion edits them.
+    
+    Confidence: 0.99.
+    
+    F13 correction
+    
+    Orion is right to correct my wording: he did not propose environment.py. I inferred a separate environment package from the summary and challenged something that was not actually proposed.
+    
+    Keeping the common launcher inside d379_controls.py is the right solution and stays within D379’s tracked-path boundary.
+    
+    The important requirement survives unchanged: no direct Python child launch may silently bypass the startup policy.
+    
+    Q1a-9
+    
+    Orion’s correction is also right.
+    
+    The existing exact-shape checks already reject undeclared fields. So claiming the schema change itself “repairs Q1a-9” would be false.
+    
+    The real missing control is the authority of every digest-valued slot.
+    
+    I accept the v3 direction:
+    
+    derive the digest-bearing field population mechanically from the governed schema, and require every such value to be traceable to an authority other than the containing artefact’s own final-byte identity.
+    
+    That closes the loophole I identified: putting a self-derived value into a perfectly legal field.
+    
+    The external final-byte digest remains Stage-B territory.
+    
+    One extra requirement: do not merely classify each digest slot as “external.” The control should name which authority earns it—Stage A, exact consumed Pass-A bytes, governed source bytes, external Stage-B binding, etc. Unknown authority → REFUSE.
+    
+    Interpreter environment
+    
+    The v3 corrections are sound.
+    
+    -B is the D380 requirement because bytecode writing must be disabled from interpreter initialisation.
+    
+    -E and -s are controlled environmental conditions, not falsely promoted into D380 requirements.
+    
+    Two independent interpreter builds should use independent source worktrees/build directories/staging roots. They must not share previous build artefacts.
+    
+    And the CPython identity I independently verified remains:
+    
+    v3.11.15 → signed annotated tag 2323bfc729b041c43b1e5e4c5f18c548fc345323 → commit 2340a037f7450e70fccfe411e6531afb4d57a312 → source tree 8c6959bc70b201b477138f00c432a3bb2f1caddd.
+    
+    The signed tag is the release-authenticity anchor.
+    
+    Privilege-drop control
+    
+    Accepted.
+    
+    The permission test must prove:
+    
+    launcher succeeded → child UID != 0 → target genuinely unreadable → governed predicate observed
+    
+    If privilege dropping fails, that is CONTROL FAILURE, not evidence about F9.
+    
+    Recording the actual child UID is necessary.
+    
+    Build-log storage — decision
+    
+    For the durable canonical copy, I choose Dropbox, not a GitHub Actions artifact.
+    
+    Reason: Actions artifacts are excellent execution-bound evidence but are retention-governed and therefore should not be our only long-term evidence repository.
+    
+    The full build log should be stored under a digest-addressed, non-overwritten path such as:
+    
+    KAI/D379/interpreter/v3.11.15/<build-id>/<sha256>.log
+    
+    The authorised repository evidence does not duplicate that full log. It records only the immutable linkage:
+    
+    SHA-256 · exact byte count · build/run identity · timestamp · durable storage reference
+    
+    A GitHub Actions artifact may additionally carry the same bytes as an execution-linked convenience copy, but it is not the long-term canonical store.
+    
+    No build starts until the durable destination exists.
+    
+    Confidence: 0.96.
+    
+    One governance repair before implementation
+    
+    We should not allow this admission contradiction to happen a third time.
+    
+    Before the next code-changing tranche, I recommend one short append-only decision entry—not a new bureaucracy layer—recording:
+    
+    who: Dainius as final authority, following Kai’s commit-by-commit adjudication
+    when: 25 September 2026
+    why: the four commits were individually adjudicated; D379 closeout remained rejected but their bounded changes were accepted
+    state: eb52f73 is the admitted technical restart point; fc1bb9d carries zero authority weight; no candidate/downstream authority was granted
+    correction: the later reconstruction-from-86ebfde ruling resulted from incomplete cold-start recovery and does not supersede the 25 September admission
+    
+    Do not pre-allocate the D-number now. Derive the allocator immediately before any authorised append.
+    
+    That gives future Kai/Orion threads a repository source instead of relying on another conversation recovery.
+    
+    Next sequence
+    
+    The programme route is now cleaner:
+    
+    bank the missing admission continuity record → plan v3 exact review → DeepSeek attack on the eight defined surfaces → I reconcile every DeepSeek challenge against primary evidence → you decide implementation authority → branch from admitted eb52f73 → execute bounded repair → hostile calibration → producer capture → independent Kai adjudication.
+    
+    Nothing about resolving the admission contradiction authorises implementation yet.
+    
+    I also have not seen the actual full v3 packet artifact; it did not surface in the conversation files available to me. So the rulings above cover the concrete v3 changes you supplied here. I will not call the whole plan reviewed until I can read its complete text.
+    
+    Overall confidence: 0.99 on the admission ruling and K1/K2; 0.96 on the evidence-storage architecture.
+    
+    And one correction against myself is now permanent: current repository state can invalidate an old factual claim, but repository silence cannot erase a prior consequential decision that was explicitly made and accepted. First recover the authority history, then adjudicate.
+    END-VERBATIM PROMPT-aead103f9cbbc717
+- EVIDENCE PROMPT-eedb44cc7093c6d6 transcript 2026-09-30T12:04:07.931Z: 1051 bytes, sha256 6c2351b93a27bfe8093b70c9029e59102f2d07137967bf87bff83999e4c81ff4, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-30T12:04:07.931Z]
+    BEGIN-VERBATIM PROMPT-eedb44cc7093c6d6
+    Orion, plan v4 is received as a completed planning milestone.
+    
+    Proceed with the next authorised step only: paste the complete plan-v4 text directly into this chat for Kai/GPT review. Do not attach a file. If one message cannot hold it, split it into clearly numbered, consecutive parts and state when the final part has been delivered.
+    
+    Keep Part D clearly identified as a draft with no D-number.
+    
+    For avoidance of doubt, I have not yet authorised:
+    
+    * appending Part D to DECISIONS.md;
+    * moving any branch HEAD;
+    * any Dropbox test or write;
+    * downloading CPython source;
+    * branch creation, interpreter build or implementation;
+    * repository or environment mutation of any kind.
+    
+    Kai will inspect the complete plan, verify its internal consistency and adjudicate whether it is ready to advance. The CPython source-tree ID remains dependent on Kai’s evidence until independently reproduced. The Dropbox capability questions remain an unresolved evidence gate, not an approved test.
+    
+    Execution remains stopped. Return the complete text-only plan v4 now.
+    END-VERBATIM PROMPT-eedb44cc7093c6d6
+- EVIDENCE PROMPT-313be3220adf7253 transcript 2026-09-30T17:29:25.417Z: 1505 bytes, sha256 7d767d27eb4a0e1ab767c39ee5b58237dec5a0aa202593a59a95e7f7d25d4751, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-30T17:29:25.417Z]
+    BEGIN-VERBATIM PROMPT-313be3220adf7253
+    Acknowledged. The two-word response was inadequate.
+    
+    Corrected governed assessment — 30 September 2026
+    
+    Closed — verified
+    
+    * The submitted text is plan v4, dated 25 September 2026.
+    * It explicitly remains unchanged and lists six unapplied errata.
+    * Kai’s eight additional findings are not incorporated.
+    
+    Evidence: the pasted plan text and Kai’s 30 September adjudication. Repository claims have not been independently re-measured in this response.
+    
+    Open — active
+    
+    * Orion must produce complete plan v4.1, incorporating:
+        * all six declared errata;
+        * KAI‑V4‑01 through KAI‑V4‑08;
+        * freshly dated repository measurements.
+    
+    Held — blocked
+    
+    * D379 remains held.
+    * Plan v4 cannot proceed to implementation or acceptance.
+    * Repository verification and DeepSeek adversarial review of v4.1 remain incomplete.
+    
+    Gates awaiting adjudication
+    
+    1. Orion delivers v4.1.
+    2. Kai independently checks v4.1 against the exact repository state and runs authorised tests where required.
+    3. V4.1 is submitted to DeepSeek for adversarial attack.
+    4. Kai reconciles every DeepSeek finding against primary repository evidence.
+    5. Dainius decides whether to grant implementation authority.
+    
+    Unauthorised
+    
+    No branch creation, Dropbox operation, download, build, implementation, capture, commit, production Stage A, holdout, merge, or continuity-record append is authorised.
+    
+    Next authorised step
+    
+    Orion returns the complete corrected plan v4.1 as text only. No mutation has been performed or authorised.
+    END-VERBATIM PROMPT-313be3220adf7253
+- EVIDENCE PROMPT-1a3a9ca75b1a8d94 transcript 2026-09-30T17:34:56.650Z: 3019 bytes, sha256 7ed30fcbcfef61be471a1774c8b2d979d10d694a6c3ddc2ddcf2f3e05af04973, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-30T17:34:56.650Z]
+    BEGIN-VERBATIM PROMPT-1a3a9ca75b1a8d94
+    Orion’s hold reason is rejected. The eight findings are already present in the 30 September governing conversation and are reproduced below.
+    
+    KAI-V4 findings to incorporate
+    
+    1. KAI‑V4‑01 — BLOCKER: Stage‑B result, provenance and binding can be changed together and self-certify.
+    2. KAI‑V4‑02 — BLOCKER: Repaired controls can generate their own acceptance evidence without a pre-capture fixity gate.
+    3. KAI‑V4‑03 — BLOCKER: F13’s child-launch population is not closed across aliases, wrappers and alternate launch mechanisms.
+    4. KAI‑V4‑04 — BLOCKER: E7’s full-log round-trip cannot occur before the build that creates the log.
+    5. KAI‑V4‑05 — MAJOR: Interpreter dependency and signature closure are incomplete.
+    6. KAI‑V4‑06 — MAJOR: The NFC/NFD refusal lacks an explicit canonicalisation rule.
+    7. KAI‑V4‑07 — MAJOR: A Part D commit placed only on the old branch would not be ancestral to the repair branch.
+    8. KAI‑V4‑08 — MAJOR: Authority calibration proves mapping completeness, but not that each authority mapping is correct.
+    
+    Kai’s independent repository check
+    
+    Verified directly through GitHub on 30 September 2026:
+    
+    * claude/project-rework-plan-pgvp35 → 0af5d32072bcf1d09c09e5c83c9b5b71b5560676
+    * main → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc
+    * claude/cai-v1-bootstrap → 3f2dad036823ab95f1a469bf0a882316be86ce24
+    * claude/d379-repair-eb52f73 does not exist.
+    * Comparing eb52f73…0af5d32 shows one intervening commit and only kai-pm/ORION_FIELD_NOTES.md changed: 99 additions, no deletions.
+    
+    Not independently verified in this environment:
+    
+    * Orion’s local working-tree-clean claim.
+    * The two tree-object IDs.
+    * The DECISIONS.md count of 369/369, highest D386, and zero date matches—the connector identified the file but did not return its large contents for an independent count.
+    
+    There is also a recorded discrepancy requiring direct confirmation: ORION_FIELD_NOTES.md states “370 entries,” while Orion reports 369 under the strict heading grammar. V4.1 must preserve this distinction and must not describe the allocator result as Kai-verified until the file is independently counted.
+    
+    PM direction
+    
+    Orion must now produce the complete v4.1. It must:
+    
+    * incorporate all six errata;
+    * address all eight findings individually;
+    * identify the exact section changed for each finding;
+    * separate Orion-measured repository facts from Kai-independent verification;
+    * contain no invented evidence;
+    * remain text-only with no mutation.
+    
+    After Kai checks v4.1 against the repository, the entire plan must be submitted to DeepSeek for adversarial attack. DeepSeek’s findings then require independent repository reconciliation before implementation can be considered.
+    
+    Execution remains stopped. No further information is missing that prevents Orion from drafting v4.1.
+    
+    Confidence: 1.00 that the eight findings are available; 0.99 on the GitHub branch and comparison results; no confidence assigned to the unverified local/tree/decision-count claims.
+    END-VERBATIM PROMPT-1a3a9ca75b1a8d94
+- EVIDENCE PROMPT-a54b3ddc2c76aa77 transcript 2026-09-30T17:41:02.635Z: 114 bytes, sha256 a54b3ddc2c76aa7741feb0522f5317cd323a2dea58cde826d28fc88b551ad827, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-30T17:41:02.635Z]
+    BEGIN-VERBATIM PROMPT-a54b3ddc2c76aa77
+    Its context transfer so you don’t forget and do t get dull with time and length of each conversation over months
+    END-VERBATIM PROMPT-a54b3ddc2c76aa77
+- EVIDENCE PROMPT-4c2276dbb203ef13 transcript 2026-09-30T17:42:31.797Z: 27 bytes, sha256 4c2276dbb203ef134a3230e60e6cf7a4fcd6f625af1b214245a33ee4152471ea, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-30T17:42:31.797Z]
+    BEGIN-VERBATIM PROMPT-4c2276dbb203ef13
+    Ok go with B, draft our own
+    END-VERBATIM PROMPT-4c2276dbb203ef13
+- EVIDENCE PROMPT-a121acb0a18e81cc transcript 2026-09-30T18:44:36.341Z: 87 bytes, sha256 a121acb0a18e81ccc1c42a31eaf3fcfafac0182270b1c15c815c8fe03e0d1453, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-30T18:44:36.341Z]
+    BEGIN-VERBATIM PROMPT-a121acb0a18e81cc
+    Make it automatic but make sure all checks done to make sure all ok before implementing
+    END-VERBATIM PROMPT-a121acb0a18e81cc
+- EVIDENCE PROMPT-19fbd8994dfe279a transcript 2026-09-30T20:20:53.092Z: 12 bytes, sha256 19fbd8994dfe279ab1ddd82d1532039dc8fb3faf24c9a6ad0c091d3b8f783fb3, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-30T20:20:53.092Z]
+    BEGIN-VERBATIM PROMPT-19fbd8994dfe279a
+    Yes go ahead
+    END-VERBATIM PROMPT-19fbd8994dfe279a
+- EVIDENCE PROMPT-cf49978f547bb0fc transcript 2026-09-30T20:39:42.199Z: 122 bytes, sha256 cf49978f547bb0fcc63b00a329680107a08c92e62cf3004ee33d46fdbc66990f, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-30T20:39:42.199Z]
+    BEGIN-VERBATIM PROMPT-cf49978f547bb0fc
+    Ok guide me Orion step by step !should I delete other (new chat /sesion) we started to check hook and you can finish here?
+    END-VERBATIM PROMPT-cf49978f547bb0fc
+- EVIDENCE PROMPT-1afbc9ec4a74ba58 transcript 2026-09-30T20:46:45.034Z: 5352 bytes, sha256 dcf1614cc910ffee2c7950061a3f4fda41debcac9514c229b1c09ba705f18584, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-30T20:46:45.034Z]
+    BEGIN-VERBATIM PROMPT-1afbc9ec4a74ba58
+    This message is addressed to me: I'm the "other session". Before acting I'll do the READ step. The live branch moved to `2817bd8` (Orion's entry 6), so I'm reading that entry, then reproducing the MAJOR finding myself rather than relying on the description (R16).
+    
+    I've noted Orion's key finding that `--depth=50` unexpectedly shallows a full clone. I'll reproduce this using a synthetic 60-commit repository and verify the fix against both full and shallow clones.
+    
+    I've independently confirmed the MAJOR fix (shallow clones stay bounded while full clones remain full). For the MINORs, I'll correct my wording on the first to match the docs' exact conditional phrasing, and apply the fix for the second (fetch-failure message) on branch `2817bd8`.
+    
+    Self-test passes 56/0. Now I'll calibrate the fixed hook against real scripts using a synthetic remote, running four scenarios: full clone, shallow clone, missing branch, and forced timeout.
+    
+    All four test cases (full clone, shallow clone, missing branch, forced timeout) match their expected outcomes, confirming the logic works correctly. Committing to the live branch now.
+    
+    The live branch now carries the fix (`3feea9e`). Next is PR #123, finish or close, and that depends on the control run of `main`'s own commit. Checking it.
+    
+    That tail cut off just above the line naming the file. It's the same byte window the field notes warn about, so I won't infer the file (R10/R17). Fetching the job with a larger tail.
+    
+    I confirmed the failure is pre-existing on main itself, unrelated to PR #123 — so the PR can't be fixed here and needs a separate CI fix upstream. I'll update the branch with the corrected hook files, add a comment documenting this evidence, and close the PR (it can be reopened later if needed), since it also still has the MAJOR defect.
+    
+    PR #123 is closed with the evidence on it. Now I'm clearing my watchers: unsubscribing from the PR and cancelling my two scheduled check-ins, since this session is stopping.
+    
+    Last step before stopping: the handoff entry, written on the live branch, with your rulings to this session quoted word for word, which Orion needs for the banking draft.
+    
+    `due` behaves correctly on live data. It counts my `3feea9e` as uncovered, and excludes Orion's `2817bd8` because that commit wrote a log entry. Writing entry 7.
+    
+    The command was blocked because I unnecessarily included `git push -f` — a plain push would've worked fine. I'll verify nothing from that command executed, then re-run it without the force push.
+    
+    Nothing ran: the tree is clean, HEAD is `3feea9e`, and the log still has 6 entries. Re-running with the forced push left out.
+    
+    This session has finished everything on your handover list and is stopping now. The last commit is `dc25a3e` on the live branch, and `check` and `due` are both clean. I also left one thing for you (see the end).
+    
+    ## Done
+    - **Orion's MAJOR defect, fixed in `3feea9e`.** I reproduced it first: on a full clone, `--depth=50` turned the repo shallow and cut `main` from 60 to 50 commits. Now the depth limit only applies to a clone that's already shallow. After the fix a full clone stays full at 61 commits, and the handoff check still runs.
+    - **The two MINORs:**
+      - The fetch-failure message now says either "timed out" or "failed (git exit N)" instead of always blaming a timeout.
+      - The docs point was partly right. The hooks docs *do* say the request fails, but only when compaction is recovering from a context-limit error. My wording was broader than that, so the comments now quote the docs' exact condition.
+    - **PR #123 is closed, not merged, and can be reopened.** I ran `main`'s exact commit on its own, with no changes of mine, and it failed CI the same way (same step, same file, same totals). So `main`'s own CI is red because dependencies drifted over 55 days. PR #123's branch carries the fix and matches the live branch file for file.
+    - **Handoff entry 7 is written**, and my watchers and check-ins are cancelled.
+    
+    ## Step 3: your messages to this session, word for word
+    For Orion's banking-draft items C1 and C2. These are copied exactly, double space included:
+    1. "New season"
+    2. "Go with option 2, start sessions on the rework branch and fix hook auto restart"
+    3. "So  is it best you can do and is it all avenues explored to make sure hook works and you got long term memory"
+    4. "I authorise"
+    5. "Yes, send Orion the row 2 request"
+    
+    They're also in entry 7, section 2, so Orion can read them there too. I have the date (2026-09-30), but not the exact send times.
+    
+    ## Left for you
+    - **A mistake of mine:** I added `git push -f` to my session branch where a normal push would have done. The permission check refused the whole command, and I confirmed nothing ran. That branch stays at `a9b2693`, which the live branch already contains.
+    - **Branches to delete:** `claude/new-season-g1zxjc` and `claude/main-baseline-probe`. Neither holds anything that isn't already on the live branch or `main`.
+    - **For Orion (entry 7, section 4):** `main`'s CI needs fixing, by updating the baseline with a stated reason or by pinning dependencies. Then the hook can go onto `main`.
+    - **Step 4:** you can archive this session now.
+    
+    That notification is just GitHub confirming PR #123 closed without merging, which I did deliberately earlier. There's nothing left to do on it, and this session stays stopped.
+    END-VERBATIM PROMPT-1afbc9ec4a74ba58
+- EVIDENCE PROMPT-33cda7328fe2e659 transcript 2026-09-30T20:57:16.742Z: 4165 bytes, sha256 2f72a5da51c9cdd55de306e062a0a845402c42750f84dc3aa9fbec22e6174f3f, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-30T20:57:16.742Z]
+    BEGIN-VERBATIM PROMPT-33cda7328fe2e659
+    Yes — I’m now aligned with Orion, and the continuity work is compatible with moving forward on v4.5.
+    
+    I independently checked Orion’s actual commit f462502225355d7d0ee6d428ea3e852965d26455. It only changes DECISIONS_DRAFT_UNBANKED.md and HANDOFF_LOG.md; DECISIONS.md is still untouched. So nothing has been banked yet.
+    
+    There is only one correction I want before you tell him “confirmed, append.”
+    
+    In E.3 he currently says:
+    
+    “Kai has not yet checked v4.1, and DeepSeek has not attacked it.”
+    
+    That was true historically, but it is false now. We have since recovered the exact v4.1, checked it against the repository, progressed through v4.2 → v4.3 → v4.4 → v4.5, and DeepSeek has returned NO DESIGN BLOCKER FOUND on v4.5.
+    
+    I do not want a newly banked decision to contain a stale present-tense programme-state claim.
+    
+    Everything else is aligned:
+    
+    * E.1 correctly banks eb52f73 as the technical restart and cancels the erroneous 86ebfde rebuild.
+    * E.2 correctly preserves Q6–Q9, including F12/F13 and the fact that launch count is measurement, not authority.
+    * E.3 correctly preserves KAI-V4-01…08 as the findings that forced revision.
+    * The six-blocker wording is appropriately not falsely attributed where Orion does not possess verbatim Kai text.
+    * Exact v4.1 is preserved separately as a non-authoritative historical planning record.
+    * These decisions do not grant Stage A, candidate, holdout, capture or merge authority.
+    * The three entries may be appended together in one governance commit G after the allocator is re-derived. Do not assume D387–D389.
+    * Our repair branch should still start physically from eb52f73, not from the current handoff branch.
+    * The first repair-branch commit R should replay G’s DECISIONS.md diff exactly, with diff(G^,G) == diff(R^,R).
+    * No merge of the current handoff branch into the repair branch.
+    
+    Most importantly, Orion’s continuity work and my v4.5 work are not competing plans:
+    
+    Orion is closing the missing authority history.
+    v4.5 is the technical repair plan we execute once that authority history is banked and you grant implementation.
+    
+    So I would send Orion this one correction before append:
+    
+    Orion — Kai has independently checked f462502 against the current D379/v4.5 state.
+    
+    Your three-entry banking structure is accepted in principle and aligns with the repair path. One correction is required before I confirm append.
+    
+    In E.3, replace the current present-tense consequence:
+    
+    “Kai has not yet checked v4.1, and DeepSeek has not attacked it. D379 execution remains stopped.”
+    
+    That status is now stale.
+    
+    Keep the historical fact explicitly historical, for example:
+    
+    “At the time of these KAI-V4-01…08 findings, plan v4 was returned for revision and the resulting v4.1 had not yet completed Kai/DeepSeek review. This entry banks the historical findings only; it does not describe the later repair-plan review state. D379 execution remained stopped under that ruling.”
+    
+    Do not use this continuity entry to bank or summarise v4.5; v4.5 is a later planning/review state and remains separate.
+    
+    Everything else in E.1–E.3 remains as drafted.
+    
+    After making that correction, re-run your verbatim/integrity checks, then bring back the final diff. Do not append to DECISIONS.md yet.
+    
+    When append is authorised:
+    
+    * re-derive the D-number allocator; do not assume D387–D389;
+    * append all three entries in one governance commit G;
+    * DECISIONS.md must be the only changed tracked file and additions-only;
+    * no implementation authority follows from G.
+    
+    The subsequent D379 repair lineage remains:
+    eb52f73 → replay of G as first repair-branch commit R → v4.5 implementation,
+    with mechanical proof that the G and R decision diffs are byte-identical.
+    
+    No merge from the current handoff branch.
+    No production Stage A, candidate, holdout, blind 40, capture or PR #122 merge is authorised.
+    
+    After that correction is made and checked, yes — continuity is closed enough to bank and we move to v4.5.
+    
+    And I now have both sides of the chain anchored: Orion’s exact recovered v4.1/history and our independently adjudicated v4.5 implementation plan. We should not lose anything between them.
+    END-VERBATIM PROMPT-33cda7328fe2e659
+- EVIDENCE PROMPT-b729da1d3b2ad411 transcript 2026-09-30T21:01:34.905Z: 936 bytes, sha256 cb38635fb00d4e9f26c34e15e88103997cf580c31f933694ac82e965850b1fa5, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-30T21:01:34.905Z]
+    BEGIN-VERBATIM PROMPT-b729da1d3b2ad411
+    Orion — correction before you act on the v4.5 preservation instruction.
+    
+    You have NOT yet been supplied Kai’s complete v4.5 plan, DeepSeek’s final v4.5 closure review, or Kai’s final source-bound reconciliation.
+    
+    Therefore do NOT create any of these yet:
+    
+    * kai-pm/D379_PLAN_V4_5.md
+    * kai-pm/D379_PLAN_V4_5_DEEPSEEK_FINAL_REVIEW.md
+    * kai-pm/D379_PLAN_V4_5_KAI_RECONCILIATION.md
+    
+    Do not reconstruct them from v4.1, HANDOFF_LOG, summaries, commit messages or memory.
+    
+    Kai will provide the exact three texts through Dainius. Once all three complete records are supplied, preserve them verbatim and mechanically verify that the saved bytes match the supplied texts.
+    
+    The continuity banking commit G is separate and may proceed under the already-confirmed instruction. The v4.5 provenance preservation must remain a separate later commit.
+    
+    After G, stop and report G as already instructed. Do not begin D379 technical implementation.
+    END-VERBATIM PROMPT-b729da1d3b2ad411
+- EVIDENCE PROMPT-206d48db100f5de7 transcript 2026-09-30T21:10:40.564Z: 67270 bytes, sha256 5e74d12103b868d47b429d626591c6fe8f0253a544f97e3186a62455266d7133, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-30T21:10:40.564Z]
+    BEGIN-VERBATIM PROMPT-206d48db100f5de7
+    Yes. Orion’s report checks out against GitHub:
+    
+    * Governance commit G is 77fdc37426a2a60804b52f918d5f2f16c1e2bd2b, parent f140419..., and changes only kai-pm/DECISIONS.md, +113/−0.
+    * The separate handoff commit is 36ad03491c9987e8a3aa55921e5400a4cb963c4c, changing only HANDOFF_LOG.md.
+    * The live rework branch is now at 36ad034....
+    * No D379 technical implementation has started.
+    
+    And yes: now Orion needs the actual three texts. Below is the preservation packet. Tell him to save these byte-for-byte as three separate non-authoritative records, then mechanically compare the saved bytes against what you paste.
+    
+    ⸻
+    
+    D379 REPAIR PLAN v4.5
+    
+    FINAL CLOSURE CANDIDATE
+    
+    Date: 30 September 2026
+    Status: PLAN ONLY — FROZEN FOR FINAL ADVERSARIAL CLOSURE REVIEW
+    Implementation authority: NONE
+    Repository mutation authorised by this document: NONE
+    Production Stage A: NOT AUTHORISED
+    Real candidate: NOT AUTHORISED
+    Pass A / classification / qualification / holdout: NOT AUTHORISED
+    Blind 40: NOT AUTHORISED
+    PR #122 merge: NOT AUTHORISED
+    
+    This is the COMPLETE review subject.
+    
+    It supersedes v4.2, v4.3 and v4.4 as planning text.
+    
+    Banked D379/D380/D381/D385 authority outranks this plan.
+    
+    ⸻
+    
+    1. PURPOSE
+    
+    v4.5 is the bounded repair plan for the D379/H2 pre-candidate assurance instrument.
+    
+    Its function is:
+    
+    BROKEN / HELD ASSURANCE MACHINERY
+    
+    → repair exact identity/provenance/runtime/holdout controls
+    
+    → hostile-calibrate those controls
+    
+    → establish a D380-compliant known-positive interpreter
+    
+    → freeze the exact repaired instrument
+    
+    → execute one governed evidence capture
+    
+    → stop for independent Kai adjudication.
+    
+    It is not a general KAI architecture project.
+    
+    It does NOT authorise the real candidate.
+    
+    ⸻
+    
+    2. VERIFIED PHYSICAL STATE
+    
+    Repository:
+    
+    dainius1234/kai-system
+    
+    main:
+    
+    194db0a0c13b4d5b322997fc1ceb33bdd21a77bc
+    
+    Current D379 branch:
+    
+    claude/project-rework-plan-pgvp35
+    
+    Physical HEAD at plan freeze:
+    
+    7123ec2211ec2c70e531c070351bc1cfde05e1ff
+    
+    PR #122:
+    
+    OPEN
+    UNMERGED
+    DO NOT MERGE.
+    
+    Proposed technical restart:
+    
+    eb52f73fa6485534ca7e28a42055861c69e94cc4
+    
+    Latest producer capture at that technical state:
+    
+    * cases 40;
+    * PASS 16;
+    * FAIL 0;
+    * HELD 24;
+    * checks passed 204;
+    * failed 33;
+    * control process non-zero.
+    
+    This is producer evidence.
+    
+    D379 remains OPEN.
+    
+    ⸻
+    
+    3. BANKED AUTHORITY
+    
+    D379:
+    
+    608d706d8452b8e578a484f7b75331a5cb9c28d9
+    
+    D380:
+    
+    c50989779baf0485e2a4a5ceb2113093441691e3
+    
+    D381:
+    
+    838b7637058c5ba3b8f3b6c5430ebdc324249b96
+    
+    D385 remains governing for the known-negative / known-positive interpreter boundary.
+    
+    No new D-number is created by this plan.
+    
+    ⸻
+    
+    4. D379 STAGE-B CONTRACT — EXACT SCOPE
+    
+    This section resolves DS-V4.3-01 and DS-V4.4-06 from the actual banked D379 text.
+    
+    Banked D379 §4 states:
+    
+    EXTERNAL STAGE-B BINDING — owned by stage_identity.py, computed on FINAL bytes
+    
+    Its prescribed sequence is:
+    
+    finalise artefact → hash exact final artefact bytes → binding entry
+    
+    The binding contains:
+    
+    * artifact path;
+    * artifact SHA-256;
+    * artifact kind;
+    * Stage-A identity;
+    * producer component;
+    * producer-provenance digest.
+    
+    Banked D379 further states that the Stage-B aggregate is derived externally and is never placed inside the byte population from which it is derived.
+    
+    Banked D379 §5 states that for durable production the external Stage-B binding carries:
+    
+    producer_provenance_digest
+    
+    alongside:
+    
+    artifact_sha256
+    
+    and that this digest is the independent anchor used to prevent a provenance list defining its own completeness.
+    
+    Most importantly, banked Q1a-7 defines its concrete hostile subject:
+    
+    one governed member deleted from OUTPUT provenance after production, independently captured runtime binding unchanged → REFUSE.
+    
+    Therefore the actual D379 threat case is mechanically defined:
+    
+    * clean producer result exists;
+    * external binding is captured;
+    * result provenance is subsequently altered;
+    * original external binding remains unchanged;
+    * consumer must refuse.
+    
+    D379 contains NO requirement for:
+    
+    * a second Unix identity;
+    * a second GitHub account;
+    * another human;
+    * another credential;
+    * malicious repository-owner resistance.
+    
+    v4.5 therefore establishes the banked D379 structural invariant.
+    
+    It expressly does NOT claim malicious same-principal rewrite resistance.
+    
+    A later programme decision may add such a threat model.
+    
+    It is not silently invented here.
+    
+    ⸻
+    
+    5. D380 NATIVE-DEPENDENCY SCOPE — EXACT AUTHORITY
+    
+    This resolves DS-V4.4-05.
+    
+    Banked D380 §3 states:
+    
+    SCOPE IS DELIBERATELY LIMITED TO PYTHON MODULE / IMPORT ORIGINS
+    
+    and expressly states that D380:
+    
+    does NOT claim to cryptographically attest every native process or operating-system library dependency
+    
+    It then explicitly names:
+    
+    * libc;
+    * dynamic loader;
+    * system TLS;
+    * kernel interfaces;
+    * transitively loaded native libraries
+    
+    as outside the contract, with no whole-OS attestation claimed or implied.
+    
+    Therefore:
+    
+    native dependencies remain diagnostic evidence only.
+    
+    They are not Stage-A identity fields.
+    
+    S13 remains deleted.
+    
+    No weakening occurs because this is the exact banked scope.
+    
+    ⸻
+    
+    6. PART D — TECHNICAL RESTART MUST BE RESOLVED FIRST
+    
+    Before a repair branch exists, Dainius must separately resolve:
+    
+    eb52f73 IS the accepted D379 technical restart
+    
+    or:
+    
+    eb52f73 IS NOT the accepted D379 technical restart.
+    
+    Pending does not permit implementation.
+    
+    If accepted:
+    
+    record the continuity/accountability decision as governance commit G.
+    
+    That record remains simple:
+    
+    WHO
+    WHEN
+    WHY
+    WHAT / COMMIT
+    RESULT.
+    
+    No CAI machinery.
+    
+    ⸻
+    
+    7. B0 — COMPLETE TECHNICAL BASELINE CLOSURE
+    
+    If Part D accepts eb52f73, derive the complete D379 implementation closure at:
+    
+    * eb52f73;
+    * G.
+    
+    The corresponding populations must be exact-byte identical.
+    
+    7.1 H2 instrument population
+    
+    Derive directly from:
+    
+    stage_identity.H2_SOURCES.
+    
+    Expected population:
+    
+    Do not duplicate it in another hand-maintained list.
+    
+    7.2 Census package
+    
+    Include:
+    
+    house_in_order_census_v11/MANIFEST.sha256
+    
+    and every exact member declared by that manifest.
+    
+    Expected governed Census aggregate:
+    
+    29064d650a61296806df3c3bcab3322f7364da7df674ac93e79d0671475d757a
+    
+    7.3 frozen contract
+    
+    Include:
+    
+    kai-pm/H2_REPAIR_CONTRACT_D367.md
+    
+    Expected SHA-256 is fixed by banked D380 §6.3:
+    
+    0ce5792ed72e6e7051ecc050664490899a847d01de2f62cff564f460d46800bb
+    
+    The expected value is therefore GOVERNING AUTHORITY from D380.
+    
+    It is not an arbitrary current-code constant.
+    
+    7.4 D379 control implementation
+    
+    Include:
+    
+    build_evidence/d379_controls.py
+    
+    7.5 local dependency closure
+    
+    Statically derive local imports/implementation dependencies starting from all executable B4 members.
+    
+    Every dependency must resolve into:
+    
+    * Stage-A H2 source;
+    * governed Census source;
+    * D367 contract;
+    * D379 controls;
+    * or an explicitly frozen non-code input.
+    
+    Unresolved executable dependency:
+    
+    STOP.
+    
+    The exact claim is:
+    
+    the declared D379 execution closure is byte-equivalent at eb52f73 and G.
+    
+    The whole repository is NOT claimed byte-identical.
+    
+    ⸻
+    
+    8. FOUR CONTEXTS — NEVER COLLAPSE
+    
+    8.1 instrument source root
+    
+    This is the repaired H2 implementation actually executing.
+    
+    It is not caller-supplied.
+    
+    Derivation rule:
+    
+    1. take the actual loaded stage_identity.py filesystem source;
+    2. require filesystem-backed source;
+    3. resolve its real path;
+    4. require its basename/location correspond to the governed Stage-A member:
+        kai-pm/house_in_order_h2_v13/stage_identity.py;
+    5. derive instrument repository root as the canonical ancestor corresponding to the repo-relative H2_SOURCES paths;
+    6. require every loaded CLASS_H2 module to resolve beneath that same canonical root;
+    7. require each resulting repo-relative path to be a member of H2_SOURCES.
+    
+    No:
+    
+    * sys.argv[0];
+    * environment variable;
+    * --subject-repo;
+    * shell CWD
+    
+    may define instrument root.
+    
+    A symlinked stage_identity source resolves to its canonical real location before root derivation.
+    
+    Can-fail:
+    
+    instrument at A;
+    
+    subject repo at B;
+    
+    B contains same-named H2 files.
+    
+    Expected:
+    
+    H2 authority remains A.
+    
+    This resolves DS-V4.4-02.
+    
+    ⸻
+    
+    8.2 subject repository
+    
+    The D380 frozen document subject.
+    
+    Required commit:
+    
+    d8aac4d49e6ba997e3eb38062c0917186ee3f197
+    
+    Required tree:
+    
+    3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+    
+    Required tracked .md population:
+    
+    Subject repo authority comes from:
+    
+    Git commit/tree/content.
+    
+    Not local pathname.
+    
+    ⸻
+    
+    8.3 history source
+    
+    Separate logical role.
+    
+    Must be non-shallow and satisfy the exact D380 §6.8 history identity.
+    
+    Its local path is not Stage-A authority.
+    
+    ⸻
+    
+    8.4 Census package
+    
+    Separate logical role.
+    
+    Its authority is its exact governed CONTENT identity.
+    
+    Its pathname is deliberately not Stage-A authority.
+    
+    Therefore Census is NOT required to sit outside:
+    
+    * subject repo;
+    * history repo;
+    * instrument checkout.
+    
+    Location independence is a D380 property.
+    
+    What matters is that the exact consumed Census bytes satisfy the governed aggregate.
+    
+    ⸻
+    
+    9. COMPLETE STAGE-A PRODUCTION CONSTRUCTION
+    
+    Current source has no production build_stage_a().
+    
+    v4.5 requires one implementation in:
+    
+    stage_identity.py.
+    
+    Shape validation does not establish semantics.
+    
+    For PRODUCTION every semantic field below is independently rederived.
+    
+    9.1 schema
+    
+    Derived:
+    
+    H2_STAGE_A_V2
+    
+    9.2 mode
+    
+    Derived:
+    
+    PRODUCTION
+    
+    9.3 h2_sources
+    
+    Derive from exact ten H2_SOURCES members at instrument root.
+    
+    Read exact source bytes.
+    
+    Hash exact bytes.
+    
+    No caller-supplied source digest.
+    
+    9.4 contract
+    
+    Read exact D367 contract bytes.
+    
+    Compute SHA-256.
+    
+    Compare with banked D380 §6.3 digest.
+    
+    9.5 governance
+    
+    Construct exact closed V2 governance:
+    
+    D379 bank commit
+    D380 bank commit
+    D381 bank commit.
+    
+    No arbitrary caller governance.
+    
+    9.6 subject
+    
+    From actual subject repo derive:
+    
+    * HEAD;
+    * tree;
+    * tracked .md population.
+    
+    Require exact D380 values.
+    
+    9.7 tree_paths
+    
+    Derive D380 canonical tree-path population.
+    
+    Path rules:
+    
+    * relative;
+    * POSIX;
+    * NFC;
+    * no backslash;
+    * no absolute path;
+    * no empty component;
+    * no .;
+    * no ...
+    
+    Non-NFC:
+    
+    REFUSE.
+    
+    No silent normalisation.
+    
+    9.8 Census
+    
+    Derive from the exact same verified Census byte objects actually executed under §10.
+    
+    9.9 history
+    
+    Re-derive the complete D380 §6.8 history object.
+    
+    No descriptor value serves as its own proof.
+    
+    9.10 runtime
+    
+    Call:
+    
+    build_runtime()
+    
+    against the current producer process.
+    
+    Derive:
+    
+    * executable SHA;
+    * implementation name;
+    * cache tag;
+    * version;
+    * stdlib identity;
+    * bytecode state.
+    
+    9.11 supplied descriptor equality
+    
+    Pass A receives materialised --stage-a.
+    
+    Before any output:
+    
+    construct the full Stage-A descriptor independently from §§9.1–9.10.
+    
+    Require canonical supplied bytes == canonical independently rederived bytes.
+    
+    Then require identity equality.
+    
+    Every nested production field is semantically rederived.
+    
+    There is no shape-only semantic production field.
+    
+    Mismatch:
+    
+    REFUSE BEFORE OUTPUT.
+    
+    ⸻
+    
+    10. CENSUS EXACT-BYTE EXECUTION — CLOSED ORDERING
+    
+    This section closes DS-V4.4-01.
+    
+    Current source evidence:
+    
+    * passa.py imports no Census module at file/module startup;
+    * top-level local H2 import is envelope.Witness;
+    * stage_identity.py imports no Census module;
+    * current Census modules are first imported inside passa.build().
+    
+    Therefore the final repair can establish the boundary before first Census import.
+    
+    10.1 no preloaded governed Census module
+    
+    Before any Census source is executed, require:
+    
+    docgraph not in sys.modules
+    
+    opscan not in sys.modules
+    
+    claims not in sys.modules
+    
+    If any governed Census module required by this Pass-A path is already present:
+    
+    REFUSE.
+    
+    Do NOT silently replace it.
+    
+    This catches an ancestor/wrapper that imported a same-named module first.
+    
+    10.2 derive required Census execution closure
+    
+    For current Pass A the governed execution roots are:
+    
+    * docgraph.py
+    * opscan.py
+    * claims.py
+    
+    Before execution, statically inspect their local Census imports.
+    
+    Any additional local Census dependency becomes part of the same verified-byte execution closure.
+    
+    Current source inspection finds no local cross-import between those three, but this is re-derived at implementation time.
+    
+    10.3 read once
+    
+    Read each required Census source once into immutable bytes.
+    
+    For each:
+    
+    * validate manifest membership;
+    * SHA-256 exact bytes;
+    * compare against manifest;
+    * bind to governed Census aggregate.
+    
+    10.4 install before any ordinary Census import
+    
+    For each governed Census module:
+    
+    1. create module/spec under its exact module name;
+    2. register the module object in sys.modules BEFORE executing its code;
+    3. compile the already-verified byte object;
+    4. execute those SAME compiled bytes in that registered module object;
+    5. record SHA-256 of the byte object actually supplied to compile/exec.
+    
+    This pre-registration handles import-cycle semantics without permitting ordinary path resolution to substitute another module.
+    
+    10.5 Pass A uses the installed objects
+    
+    Pass A receives/uses those installed module objects directly.
+    
+    No later:
+    
+    sys.path.insert(...)
+    
+    followed by a fresh ordinary Census source read is authoritative.
+    
+    Any ordinary import docgraph/opscan/claims after installation must resolve to the exact object already held in sys.modules.
+    
+    Assert object identity.
+    
+    10.6 can-fail controls
+    
+    Census preload attack
+    
+    Preload alternate docgraph into sys.modules.
+    
+    Then invoke governed Pass A loader.
+    
+    Expected:
+    
+    REFUSE before measurement.
+    
+    alternate path attack
+    
+    Place alternate same-named Census files earlier on sys.path.
+    
+    Governed modules not preloaded.
+    
+    Install verified Census objects.
+    
+    Then import names.
+    
+    Expected:
+    
+    sys.modules[name] remains the governed verified object.
+    
+    byte mutation attack
+    
+    Verify bytes A.
+    
+    Change filesystem bytes to B before module execution.
+    
+    Expected:
+    
+    executed module remains compiled from verified A.
+    
+    dependency expansion attack
+    
+    Make a governed Census module require an unaccounted local Census module.
+    
+    Expected:
+    
+    execution closure changes / STOP until that module is manifest-verified and included.
+    
+    S18 is satisfied only if the exact bytes verified are the exact bytes compiled/executed.
+    
+    ⸻
+    
+    11. PRODUCER POPULATION ROOT REPAIR
+    
+    Current classify_origin() derives:
+    
+    H2 root
+    
+    and Census root
+    
+    from caller-supplied repo_root.
+    
+    That is a verified current defect.
+    
+    Repair the interface.
+    
+    11.1 H2 classification
+    
+    Uses canonical instrument root from §8.1.
+    
+    11.2 Census classification
+    
+    Uses the governed Census module identity/verified-byte registry from §10.
+    
+    11.3 subject repo
+    
+    Never supplies H2/Census code authority.
+    
+    11.4 history source
+    
+    Never supplies H2/Census code authority.
+    
+    Context-collapse control:
+    
+    subject repo contains byte-identical or modified same-named H2 modules.
+    
+    Expected:
+    
+    never classified as instrument modules merely because subject repo was supplied.
+    
+    ⸻
+    
+    12. PRODUCER AND QUALIFIER RUNTIME — DISTINCT CONTROLS
+    
+    Banked D380 §5 explicitly states:
+    
+    Q1a asks:
+    
+    WHO PRODUCED THE RESULT?
+    
+    §8(6) asks:
+    
+    ARE THE QUALIFIER’S OWN EXECUTING BYTES THE GOVERNED BYTES?
+    
+    It says the two controls must never be collapsed.
+    
+    12.1 current runtime verifier semantics
+    
+    Current:
+    
+    build_runtime()
+    
+    observes the calling process by reading:
+    
+    * os.path.realpath(sys.executable);
+    * exact executable bytes;
+    * sys.implementation.name;
+    * sys.implementation.cache_tag;
+    * sys.version;
+    * independently derived stdlib identity;
+    * sys.dont_write_bytecode.
+    
+    verify_runtime_identity() compares that observed block with Stage A.
+    
+    12.2 producer
+    
+    Producer verifies its own executing runtime.
+    
+    Records observed runtime in provenance.
+    
+    Stage-B later binds exact provenance digest.
+    
+    12.3 qualifier
+    
+    Qualifier separately verifies ITS OWN current executing runtime.
+    
+    It does not pretend to reobserve the terminated producer.
+    
+    Current qualify.py lacks this common verifier call.
+    
+    Repair it.
+    
+    12.4 known negative
+    
+    Producer provenance valid and bound.
+    
+    Qualifier executes under runtime B while Stage A expects A.
+    
+    Expected:
+    
+    qualifier refuses on its own runtime mismatch.
+    
+    ⸻
+    
+    13. EXTERNAL STAGE-B EXACT-BYTE CHAIN
+    
+    13.1 regular artifact requirement
+    
+    For governed Stage-B production/consumption artifacts:
+    
+    lstat the supplied artifact path.
+    
+    Require:
+    
+    regular file.
+    
+    Symlink artifact path:
+    
+    REFUSE.
+    
+    This removes path/symlink ambiguity rather than widening artifact identity.
+    
+    No FIFO/device/directory.
+    
+    13.2 producer finalisation
+    
+    Producer closes output and terminates.
+    
+    13.3 binder
+    
+    Separate governed invocation of stage_identity.py:
+    
+    * opens final regular artifact;
+    * reads bytes once;
+    * derives SHA-256;
+    * parses those SAME bytes where provenance extraction is required;
+    * derives canonical producer-provenance digest;
+    * creates external binding.
+    
+    Producer does not provide expected:
+    
+    * artifact SHA;
+    * provenance digest;
+    * binding digest.
+    
+    13.4 consumer
+    
+    Consumer likewise:
+    
+    * refuses symlink/non-regular artifact;
+    * reads bytes once;
+    * hashes those SAME bytes;
+    * parses those SAME bytes;
+    * compares to original Stage-B binding.
+    
+    A different inode containing identical bytes is equivalent under D379’s content identity.
+    
+    A symlink is refused before that question arises.
+    
+    ⸻
+    
+    14. Q1a-7 — ORIGINAL BINDING MUST REMAIN ORIGINAL
+    
+    Hostile sequence:
+    
+    1. clean CLASSIFICATION artifact finalised;
+    2. original provenance P0;
+    3. binder produces Stage-B B0 over clean final artifact;
+    4. record:
+        provenance_digest(P0);
+    5. create tampered P1 by removing exactly one governed producer-population member;
+    6. decrement denominator consistently;
+    7. assert:
+        population(P1) is strict subset of population(P0);
+    8. assert:
+        denominator(P1) == len(population(P1));
+    9. assert:
+        provenance_digest(P0) != provenance_digest(P1);
+    10. assert:
+        in-object verification alone ACCEPTS P1;
+    11. retain B0 unchanged;
+    12. run real qualifier with tampered artifact + original B0;
+    13. expected:
+        REFUSE.
+    
+    Current source already performs the critical digest inequality and strict-subset assertions.
+    
+    They remain mandatory.
+    
+    A hostile construction that fails to mutate the provenance is itself:
+    
+    CONTROL FAILURE.
+    
+    It may not count as Q1a-7 PASS.
+    
+    ⸻
+    
+    15. PASS-A → CLASSIFICATION → QUALIFICATION
+    
+    15.1 Pass A external binding
+    
+    After Pass A finalises:
+    
+    Stage-B records:
+    
+    * exact Pass-A artifact SHA;
+    * Stage-A identity;
+    * producer component;
+    * Pass-A producer-provenance digest.
+    
+    15.2 classification
+    
+    Classification:
+    
+    * reads exact Pass-A bytes once;
+    * hashes those bytes;
+    * parses same bytes;
+    * validates Pass-A binding;
+    * validates Stage-A identity;
+    * validates producer provenance.
+    
+    Then executes.
+    
+    15.3 classification Stage-B
+    
+    Created after classification finalises.
+    
+    15.4 qualifier
+    
+    Qualification receives:
+    
+    * Stage A;
+    * exact classification bytes;
+    * original classification Stage-B binding;
+    * referenced Pass-A binding.
+    
+    It must mechanically close:
+    
+    input_binding.pass_a_artifact_sha256
+    
+    and:
+    
+    input_binding.pass_a_producer_provenance_digest.
+    
+    These currently remain explicitly unverified by shipped qualifier code.
+    
+    ⸻
+    
+    16. COMPLETE PROVENANCE/AUTHORITY MAPPING
+    
+    This resolves DS-V4.4-03.
+    
+    Authority sources are classified as:
+    
+    OBSERVED_CURRENT
+    derived from current process/repository/filesystem.
+    
+    PRECOMMITTED_STAGE_A
+    value already frozen in the independently validated pre-execution Stage-A commitment.
+    
+    EXACT_ARTIFACT_BYTES
+    derived from the exact bytes the current consumer read.
+    
+    BANKED_CONSTANT
+    fixed by D379/D380/D381.
+    
+    No slot’s recorded provenance value is permitted to define its own expected value.
+    
+    16.1 PASS_A / CLASSIFICATION common fields
+    
+    stage_a_identity
+    
+    Authority:
+    
+    PRECOMMITTED_STAGE_A.
+    
+    Mechanism:
+    
+    recompute from supplied canonical Stage-A descriptor.
+    
+    stage_a_descriptor_digest
+    
+    Authority:
+    
+    PRECOMMITTED_STAGE_A.
+    
+    Mechanism:
+    
+    SHA-256 exact canonical descriptor bytes.
+    
+    producer_component
+    
+    Authority:
+    
+    BANKED_CONSTANT + executable role.
+    
+    Pass-A process expects:
+    
+    PASS_A.
+    
+    Classification expects:
+    
+    CLASSIFICATION.
+    
+    producer_population
+    
+    Authority at production:
+    
+    OBSERVED_CURRENT.
+    
+    Mechanism:
+    
+    actual loaded module/import-origin observation classified against Stage A.
+    
+    Authority at later verification:
+    
+    the exact bound producer provenance block plus Stage-A member semantics.
+    
+    producer_denominator
+    
+    Authority at production:
+    
+    len(canonical observed producer population).
+    
+    Authority later:
+    
+    exact Stage-B-bound provenance plus structural equality:
+    
+    recorded denominator == len(recorded population).
+    
+    runtime_identity
+    
+    Authority at production:
+    
+    OBSERVED_CURRENT via verify_runtime_identity().
+    
+    Expected state:
+    
+    PRECOMMITTED_STAGE_A runtime.
+    
+    At later qualification:
+    
+    producer’s exact runtime record is protected by Stage-B provenance digest and checked against Stage A.
+    
+    subject_commit
+    
+    Authority:
+    
+    PRECOMMITTED_STAGE_A originating from OBSERVED subject HEAD at Stage-A construction.
+    
+    Pass A re-observes exact subject checkout.
+    
+    subject_tree
+    
+    Authority:
+    
+    Git tree of exact subject commit.
+    
+    tree_paths_identity
+    
+    Authority:
+    
+    D380 canonical derivation from exact subject tree path population.
+    
+    16.2 PASS_A-only fields
+    
+    census_identity
+    
+    Authority:
+    
+    exact verified/consumed Census byte population from §10.
+    
+    Compared against PRECOMMITTED_STAGE_A.
+    
+    history_source_identity
+    
+    Authority:
+    
+    D380 §6.8 derivation from actual non-shallow history source.
+    
+    Compared against PRECOMMITTED_STAGE_A.
+    
+    16.3 CLASSIFICATION input_binding
+    
+    pass_a_artifact_sha256
+    
+    Authority:
+    
+    EXACT_ARTIFACT_BYTES consumed by classification plus Pass-A Stage-B.
+    
+    pass_a_stage_a_identity
+    
+    Authority:
+    
+    validated Stage A plus exact Pass-A provenance/binding.
+    
+    pass_a_producer_provenance_digest
+    
+    Authority:
+    
+    canonical provenance block parsed from the SAME exact Pass-A bytes and compared with original external Pass-A Stage-B.
+    
+    16.4 Stage-B fields
+    
+    artifact_sha256
+    
+    Authority:
+    
+    EXACT final regular-file bytes read by binder.
+    
+    artifact_kind
+    
+    Authority:
+    
+    BANKED producer/output role.
+    
+    stage_a_identity
+    
+    Authority:
+    
+    validated precommit Stage A.
+    
+    producer_component
+    
+    Authority:
+    
+    BANKED producer role.
+    
+    producer_provenance_digest
+    
+    Authority:
+    
+    canonical provenance block parsed from the exact artifact bytes read by binder.
+    
+    16.5 H2 source digest slots
+    
+    Authority:
+    
+    exact instrument source bytes at governed instrument root.
+    
+    16.6 D367 contract digest
+    
+    Authority:
+    
+    exact contract bytes compared with BANKED_CONSTANT from D380 §6.3.
+    
+    16.7 Census aggregate
+    
+    Authority:
+    
+    exact governed Census manifest/member construction.
+    
+    16.8 runtime executable SHA
+    
+    Authority:
+    
+    exact current sys.executable bytes.
+    
+    16.9 stdlib identity
+    
+    Authority:
+    
+    independently enumerated H2_PY_STDLIB_V1 object under D380.
+    
+    Every mapping receives a differential hostile control:
+    
+    correct source → PASS;
+    
+    valid wrong source/digest → REFUSE;
+    
+    neighbouring valid digest substituted → REFUSE;
+    
+    stale value → REFUSE.
+    
+    ⸻
+    
+    17. HOLDOUT POPULATION
+    
+    Before selection:
+    
+    1. derive frozen subject tree paths;
+    2. validate canonical path form;
+    3. reject NFD/non-NFC;
+    4. require tree uniqueness;
+    5. validate output paths;
+    6. require output uniqueness;
+    7. compare exact sets;
+    8. compare exact cardinalities;
+    9. only then select.
+    
+    Same duplicate on both sides:
+    
+    REFUSE.
+    
+    Candidate output determines only whether reconciliation succeeds.
+    
+    It never defines selection population or seed.
+    
+    ⸻
+    
+    18. CPYTHON 3.11.15 SOURCE IDENTITY
+    
+    Target:
+    
+    v3.11.15
+    
+    Annotated tag object:
+    
+    2323bfc729b041c43b1e5e4c5f18c548fc345323
+    
+    Target commit:
+    
+    2340a037f7450e70fccfe411e6531afb4d57a312
+    
+    Target tree:
+    
+    8c6959bc70b201b477138f00c432a3bb2f1caddd
+    
+    Expected signer:
+    
+    Pablo Galindo Salgado
+    
+    Expected fingerprint:
+    
+    A035 C8C1 9219 BA82 1ECE A86B 64E6 28F8 D684 696D
+    
+    Reverify immediately before build.
+    
+    Mismatch:
+    
+    STOP.
+    
+    No automatic version substitution.
+    
+    ⸻
+    
+    19. CONTROLLED BUILD ENVIRONMENT
+    
+    This closes DS-V4.4-08.
+    
+    Before build 1 derive immutable environment fingerprint E.
+    
+    At minimum E records:
+    
+    * operating environment/container/rootfs identity where available;
+    * exact compiler executable SHA;
+    * compiler version;
+    * compiler helper SHA;
+    * assembler SHA/version;
+    * linker SHA/version;
+    * ar SHA/version;
+    * libc identity/version;
+    * PATH;
+    * relevant build environment variables;
+    * configure arguments;
+    * verified CPython source identity;
+    * logical install prefix.
+    
+    No package installation/update or toolchain mutation is permitted between the two builds.
+    
+    No network-derived dependency may silently enter either build.
+    
+    Immediately before build 2 independently rederive E.
+    
+    Require:
+    
+    E(build1) == E(build2).
+    
+    Difference:
+    
+    STOP.
+    
+    This demonstrates two isolated clean builds under one unchanged controlled environment.
+    
+    It does not claim environmental independence.
+    
+    ⸻
+    
+    20. TWO REPRODUCIBLE BUILDS
+    
+    Separate:
+    
+    * source worktree;
+    * build directory;
+    * staging root.
+    
+    Same frozen environment E.
+    
+    Build form remains the recovered bounded form:
+    
+    ./configure --prefix=<P> --without-ensurepip
+    
+    make
+    
+    make install DESTDIR=<staging-root>
+    
+    No PGO unless separately justified/authorised.
+    
+    Compare:
+    
+    * executable SHA-256;
+    * H2_PY_STDLIB_V1.
+    
+    Mismatch:
+    
+    STOP and report first divergence.
+    
+    ⸻
+    
+    21. NATIVE DEPENDENCY RESIDUAL
+    
+    Native OS dependencies may be recorded for diagnostics.
+    
+    They are not D380 identity.
+    
+    Residual boundary remains explicitly recorded:
+    
+    D380 is Python module/runtime identity,
+    
+    not whole-OS attestation.
+    
+    ⸻
+    
+    22. STDLIB FAIL-CLOSED ENUMERATION
+    
+    Remove silent omission paths.
+    
+    Governed identity enumeration encountering:
+    
+    * PermissionError;
+    * FileNotFoundError;
+    * disappearing member;
+    * unreadable member
+    
+    must REFUSE.
+    
+    No successful smaller identity.
+    
+    Can-fail propagates through:
+    
+    build_stdlib_identity
+    
+    → _stdlib_identity
+    
+    → build_runtime
+    
+    → verify_runtime_identity
+    
+    → actual producer/qualifier.
+    
+    ⸻
+    
+    23. D379 CHILD-LAUNCH TOPOLOGY
+    
+    The earlier “outer parent observer” statement was too narrow.
+    
+    Current topology includes:
+    
+    capture process
+    
+    → D379 control child (d379_controls.py --child)
+    
+    → individual H2 test subprocesses.
+    
+    Separately:
+    
+    capture process
+    
+    → cal_fixtures.py
+    
+    → its historical fail-old subprocess.
+    
+    v4.5 distinguishes these.
+    
+    23.1 governed F13 population
+    
+    F13 governs Python subprocess launches implemented by:
+    
+    d379_controls.py
+    
+    in every mode in which that file executes:
+    
+    * capture parent;
+    * --child control process;
+    * ordinary control execution.
+    
+    Each d379_controls.py process installs its runtime observer before its first governed child launch.
+    
+    Therefore the matrix child’s own H2 test launches are observed by the matrix child.
+    
+    23.2 cal_fixtures subtree
+    
+    cal_fixtures.py remains a separate historical fixture subject.
+    
+    Its internal pre-repair subprocess is recorded separately and is NOT represented as part of F13’s D379-control-launch denominator.
+    
+    It is not silently omitted:
+    
+    the closeout records cal_fixtures as a separate subject, and the static census separately reports its internal Python launch.
+    
+    No common-source corroboration claim is made.
+    
+    ⸻
+    
+    24. STATIC LAUNCH GRAMMAR
+    
+    The analyser is intentionally bounded to D379 control source.
+    
+    Recognised launch forms:
+    
+    * direct subprocess.run;
+    * subprocess.Popen;
+    * statically resolvable imported aliases;
+    * named governed launcher;
+    * direct os.exec*;
+    * os.spawn*;
+    * os.posix_spawn*;
+    * os.system;
+    * multiprocessing process construction;
+    * direct sys.executable;
+    * literal env/python;
+    * literal hard-coded Python.
+    
+    Potentially launch-capable ambiguous forms include:
+    
+    * eval;
+    * exec;
+    * dynamic importlib;
+    * dynamic getattr on launch-capable modules/objects;
+    * dynamic callable indirection whose target cannot be resolved;
+    * generated shell/Python command whose executable cannot be statically established.
+    
+    Presence of such a construct in the D379 control harness:
+    
+    UNRESOLVED.
+    
+    Gate refuses completeness.
+    
+    24.1 false-positive handling
+    
+    A refusal is NOT overridden ad hoc.
+    
+    Kai inspects the exact construct.
+    
+    Resolution requires one of:
+    
+    1. refactor harness within authorised B4 so the launch relation is statically explicit; or
+    2. formally extend the declared grammar and hostile controls.
+    
+    No whitelist-by-convenience.
+    
+    This resolves DS-V4.4-10.
+    
+    ⸻
+    
+    25. RUNTIME LAUNCH OBSERVATION
+    
+    Each relevant d379_controls.py process installs Python audit observation before any governed child launch.
+    
+    Observation claim is limited to direct process-creation events emitted from that process.
+    
+    Record:
+    
+    * executable;
+    * argv;
+    * cwd where available;
+    * mapping to static launch site.
+    
+    Runtime-observed direct launch absent from static population:
+    
+    REFUSE.
+    
+    Static launch site exercised with unexpected command topology:
+    
+    REFUSE.
+    
+    No claim is made about arbitrary C code launching processes outside Python’s audit surface.
+    
+    No claim is made that the outer capture process alone observes grandchildren.
+    
+    This resolves DS-V4.4-09 by matching observation to the actual process topology.
+    
+    ⸻
+    
+    26. E7 EXTERNAL BUILD-EVIDENCE POPULATION
+    
+    E7 concerns the external durable storage of the TWO interpreter build transcripts.
+    
+    Therefore precommitted build-log object population is:
+    
+    N = 2
+    
+    Specifically:
+    
+    1. Build A complete combined transcript.
+    2. Build B complete combined transcript.
+    
+    Each transcript contains the complete governed driver record for that build including:
+    
+    * environment fingerprint reference;
+    * configure command/output;
+    * make command/output;
+    * install command/output;
+    * stdout;
+    * stderr;
+    * actual command return codes.
+    
+    Other D379 artifacts are not falsely counted inside E7’s build-log capacity claim.
+    
+    ⸻
+    
+    27. E7A CAPACITY
+    
+    Before either build freeze:
+    
+    per-object demonstrated capacity:
+    
+    T
+    
+    aggregate demonstrated capacity:
+    
+    U
+    
+    Require:
+    
+    U >= 2 × T.
+    
+    Write two independent synthetic objects each of exactly T through the actual selected storage/transport mechanism.
+    
+    Synthetic corpus includes:
+    
+    * LF;
+    * CRLF;
+    * non-ASCII;
+    * binary-safe envelope edge cases as applicable.
+    
+    Destinations are unique content-addressed/build-addressed paths.
+    
+    Use atomic create-if-absent where supported.
+    
+    If the storage mechanism cannot provide atomic create-if-absent, prove an equivalent write-once protocol before build.
+    
+    Independently read both objects back.
+    
+    Exact byte count and SHA must match.
+    
+    Failure:
+    
+    NO BUILD.
+    
+    ⸻
+    
+    28. E7B ACTUAL LOGS
+    
+    For Build A and Build B:
+    
+    * one complete combined transcript each;
+    * size <= T;
+    * combined size <= U;
+    * unique destination;
+    * no overwrite;
+    * independently retrieved;
+    * exact SHA;
+    * exact byte count.
+    
+    Failure:
+    
+    S9.
+    
+    No manual fallback.
+    
+    No late upload.
+    
+    ⸻
+    
+    29. PRE-CAPTURE FIXITY F
+    
+    Current hand-maintained subject_digests() is abolished as the assurance denominator.
+    
+    Its current nine-file list is known incomplete.
+    
+    29.1 derivation-rule location
+    
+    The complete freeze-population derivation mechanism lives inside:
+    
+    build_evidence/d379_controls.py.
+    
+    No external config controls the population.
+    
+    This answers DS-V4.4-12.
+    
+    29.2 derivation inputs
+    
+    The F-version of the rule consumes:
+    
+    * stage_identity.H2_SOURCES;
+    * the exact governed Census manifest;
+    * manifest-declared Census member population;
+    * fixed D367 contract path + BANKED D380 expected digest;
+    * local dependency closure derivation;
+    * D379 control source itself.
+    
+    29.3 self-inclusion
+    
+    d379_controls.py is itself a population member.
+    
+    This is not hash self-reference.
+    
+    Its source does not contain its own computed digest.
+    
+    At F its bytes are immutable Git content.
+    
+    The F-version algorithm derives a set that includes its own source path and hashes those already-fixed source bytes.
+    
+    29.4 no mutable external path list
+    
+    There is no sidecar config containing the population.
+    
+    Any future external population config would itself become an F dependency and would require explicit plan revision.
+    
+    ⸻
+    
+    30. CURRENT CAPTURE OUTPUT POPULATION
+    
+    Current capture writes:
+    
+    tracked durable output 1:
+    
+    D379_CONTROLS.txt
+    
+    tracked durable output 2:
+    
+    D379_CLOSEOUT.txt
+    
+    The state exchange file created under a temporary directory is ephemeral process state and not a tracked evidence output.
+    
+    After capture:
+    
+    tracked F→capture diff must equal exactly those two files.
+    
+    Anything else:
+    
+    STOP.
+    
+    ⸻
+    
+    31. D367 CONTRACT EXPECTED DIGEST SOURCE
+    
+    The expected digest:
+    
+    0ce5792ed72e6e7051ecc050664490899a847d01de2f62cff564f460d46800bb
+    
+    comes from banked D380 §6.3.
+    
+    D380 fixes:
+    
+    path:
+    
+    kai-pm/H2_REPAIR_CONTRACT_D367.md
+    
+    and that exact SHA-256.
+    
+    Implementation may contain the constant required to enforce the banked value.
+    
+    The constant is implementation, not authority.
+    
+    At fixity review Kai checks the implementation constant against banked D380.
+    
+    Changing code + constant together cannot redefine the contract because D380’s banked bytes remain the authority.
+    
+    This resolves DS-V4.4-11.
+    
+    ⸻
+    
+    32. HOSTILE CONTROL STANDARD
+    
+    Every material repair receives:
+    
+    * exact subject proof;
+    * known positive;
+    * known negative;
+    * boundary condition;
+    * expected predicate;
+    * real process return code where process behaviour is claimed;
+    * population denominator;
+    * mutation/can-fail test.
+    
+    A red process is insufficient unless the intended predicate caused the refusal.
+    
+    Required families include:
+    
+    * Stage-A nested/full rederivation;
+    * instrument-vs-subject root substitution;
+    * Census preload attack;
+    * Census same-byte mutation attack;
+    * Census alternate-sys.path attack;
+    * history identity mismatch;
+    * producer runtime mismatch;
+    * qualifier runtime mismatch;
+    * Q1a-7 unchanged original binding;
+    * Q1a-9 semantic authority;
+    * per-slot wrong-authority substitution;
+    * F12 same-duplicate population;
+    * NFD path rejection;
+    * stdlib unreadable-member failure;
+    * D379 launch grammar;
+    * runtime unmapped launch;
+    * fixity denominator;
+    * capture-diff closure.
+    
+    ⸻
+    
+    33. REPAIR MUTATION SURFACE
+    
+    No new tracked source file.
+    
+    Authorised source surface, if Dainius later grants implementation:
+    
+    * stage_identity.py
+    * passa.py
+    * run_h2_v12.py
+    * qualify.py
+    * holdout.py
+    * build_evidence/d379_controls.py
+    
+    Final capture outputs only:
+    
+    * D379_CONTROLS.txt
+    * D379_CLOSEOUT.txt
+    
+    Outside surface includes:
+    
+    * cal_fixtures.py;
+    * classify.py;
+    * envelope.py;
+    * ontology.py;
+    * subjectbind.py;
+    * Census package;
+    * D367 contract;
+    * governance records except separately authorised Part D.
+    
+    Need to modify one:
+    
+    STOP and return for authority.
+    
+    ⸻
+    
+    34. EXECUTION SEQUENCE
+    
+    1. Freeze v4.5.
+    2. DeepSeek reviews THIS COMPLETE v4.5.
+    3. Kai independently reconciles.
+    4. No unresolved design blocker permitted.
+    5. Dainius accepts/refuses plan.
+    6. Dainius separately resolves Part D.
+    7. If accepted, commit G.
+    8. Derive B0 closure at eb52f73 and G.
+    9. Require exact equality.
+    10. Create repair branch from G.
+    11. Confirm lineage and clean tree.
+    12. Freeze build environment fingerprint E.
+    13. E7a prove N=2, T and U storage capability.
+    14. Reverify CPython signed source identity.
+    15. Build A.
+    16. Reverify environment E unchanged.
+    17. Build B.
+    18. E7b preserve and re-read both complete transcripts.
+    19. Compare executable/stdlib reproducibility.
+    20. Measure resulting interpreter against D380/D385.
+    21. Require actual D380-compliant known-positive runtime.
+    22. Begin D379 source repair.
+    23. Implement complete Stage-A production construction.
+    24. Implement full production Stage-A rederivation.
+    25. Separate instrument/subject/history/Census contexts.
+    26. Implement exact-byte Census loader before first Census import.
+    27. Repair producer population root derivation.
+    28. Complete external Stage-B transport.
+    29. Complete Pass-A→classification→qualification binding.
+    30. Add qualifier own-runtime verification.
+    31. Repair complete per-slot authority controls.
+    32. Repair holdout independent uniqueness/canonicality.
+    33. Repair stdlib fail-closed enumeration.
+    34. Repair bounded launch grammar/launcher/observation.
+    35. Execute full hostile matrix.
+    36. DO NOT CAPTURE.
+    37. Produce fixity commit F.
+    38. Kai independently reviews exact F, freeze population and expected predicates.
+    39. Dainius separately authorises exactly one capture against F.
+    40. Require HEAD == F.
+    41. Require clean tree.
+    42. Require exact F-derived governed identities.
+    43. Run one capture.
+    44. Require tracked F→capture diff exactly:
+        D379_CONTROLS.txt
+        D379_CLOSEOUT.txt
+    45. STOP FOR KAI.
+    
+    No automatic real Stage A.
+    
+    No candidate.
+    
+    No holdout.
+    
+    ⸻
+    
+    35. STOP CONDITIONS
+    
+    S1
+    Interpreter prerequisite fails → STOP.
+    
+    S2
+    Repair weakens D380/D385 → STOP.
+    
+    S3
+    Fail-old test fails to construct its named historical subject → STOP.
+    
+    S4
+    Need mutation outside authorised surface → STOP.
+    
+    S5
+    HELD-heavy matrix is not closeout → STOP.
+    
+    S6
+    One authorised capture only; then STOP.
+    
+    S7
+    External build evidence store unavailable → NO BUILD.
+    
+    S8
+    Baseline closure or lineage equivalence fails → STOP.
+    
+    S9
+    E7 capacity/fidelity/write-once/read-back fails → STOP.
+    
+    S10
+    Required original Stage-B binding unavailable, stale in the wrong way, or regenerated after hostile tampering → REFUSE.
+    
+    S11
+    Capture subject is not exact reviewed F → STOP.
+    
+    S12
+    CPython source/signature identity fails → STOP.
+    
+    S14
+    Unresolved local dependency closure → STOP.
+    
+    S15
+    Instrument/subject/history/Census context collapse → REFUSE.
+    
+    S16
+    Supplied production Stage A != independently rederived Stage A → REFUSE.
+    
+    S17
+    D379 harness contains unresolved launch-capable construction → REFUSE completeness claim.
+    
+    S18
+    Pass A cannot prove the Census module objects it USED executed the exact verified Census bytes → REFUSE.
+    
+    S19
+    A governed Census module is present in sys.modules before the verified-byte Census loader establishes the boundary → REFUSE.
+    
+    S20
+    Build environment fingerprint differs between reproducibility builds → STOP.
+    
+    ⸻
+    
+    36. EXPLICIT RESIDUAL BOUNDARIES
+    
+    R1 same-principal malicious rewrite
+    
+    Outside banked D379’s structural Q1a/Q1a-7 predicate.
+    
+    No second principal is claimed.
+    
+    R2 native OS layer
+    
+    Explicitly excluded from D380’s Python-module identity contract.
+    
+    R3 launch observation
+    
+    Bounded to declared D379 control-process source grammar and direct launches from each relevant D379-control process.
+    
+    Not universal host monitoring.
+    
+    R4 historical producer
+    
+    Qualifier cannot reobserve a terminated producer.
+    
+    Producer observes itself at production.
+    
+    Stage-B binds that exact provenance.
+    
+    Qualifier checks bound producer evidence and independently verifies its own runtime.
+    
+    R5 cal_fixtures historical subprocess
+    
+    Separate subject.
+    
+    Not silently treated as part of F13’s D379-control-launch denominator.
+    
+    Its internal subprocess is reported separately.
+    
+    ⸻
+    
+    37. FINAL DEEPSEEK REVIEW MANDATE
+    
+    Review this COMPLETE v4.5.
+    
+    Do not restart from v4.2 assumptions already disproved by banked authority.
+    
+    The remaining question is:
+    
+    Can any mechanical predicate in v4.5 pass while the exact invariant it claims to establish is false?
+    
+    Mandatory focus:
+    
+    1. Census preload/order/same-byte execution.
+    2. canonical instrument-root derivation.
+    3. per-slot authority-source enumeration.
+    4. Stage-B regular-file/exact-byte chain.
+    5. D379 structural threat-model compliance.
+    6. D380 native boundary compliance.
+    7. N=2 / T / U build-log storage semantics.
+    8. frozen build environment E.
+    9. actual process-tree launch observation.
+    10. fixity derivation-rule self-inclusion.
+    11. D367 contract expected-value authority.
+    12. Q1a-7 subject construction.
+    
+    Do not demand a stronger adversary than the banked contract unless you quote the banked clause requiring it.
+    
+    For each remaining finding provide:
+    
+    ID
+    
+    Classification:
+    BLOCKER / MAJOR / MINOR / QUESTION
+    
+    Evidence status:
+    PLAN-INTERNAL / SUPPLIED-EVIDENCE / UNVERIFIED / OUT-OF-SCOPE
+    
+    Exact claim
+    
+    Concrete counterexample
+    
+    Can predicate pass while invariant false?
+    
+    Minimum correction
+    
+    At end state exactly:
+    
+    NO DESIGN BLOCKER FOUND
+    
+    or:
+    
+    DESIGN BLOCKER REMAINS: <IDs>
+    
+    No code.
+    
+    No implementation authority.
+    
+    No D-number.
+    
+    No merge recommendation.
+    
+    END OF D379 REPAIR PLAN v4.5
+    
+    ⸻
+    
+    DEEPSEEK — FINAL ADVERSARIAL CLOSURE REVIEW OF D379 v4.5
+    
+    Baseline: eb52f73fa6485534ca7e28a42055861c69e94cc4
+    Plan: v4.5, complete text as supplied.
+    Authority: none. Findings are hypothesis input; Kai reconciles.
+    
+    ⸻
+    
+    EXECUTIVE ADVISORY VERDICT
+    
+    NO DESIGN BLOCKER FOUND.
+    
+    Every DS-V4.4 finding (01–13) is materially closed by v4.5. The four-context separation, the Census same-byte loading with pre-registration, the instrument-root derivation rule, the per-slot authority enumeration, the lstat/regular-file rule, the quoted D379/D380 clauses, the E7 N=2/T/U storage semantics, the environment fingerprint E, and the cal_fixtures topology distinction all respond to the corresponding v4.4 findings with mechanical rules rather than restated principles.
+    
+    Three MAJORs and six MINORs remain. None is a design blocker. Two of the MAJORs require a repository evidence request to confirm the classification (they may become BLOCKERs only if the evidence shows what they hypothesise).
+    
+    ⸻
+    
+    FINDING REGISTER
+    
+    DS-V4.5-01 — Build isolation does not enforce absence of network
+    
+    Classification: MAJOR
+    Evidence status: PLAN-INTERNAL
+    Exact claim attacked: §19: “No network-derived dependency may silently enter either build.”
+    
+    Counterexample: E is captured before build 1 and re-derived before build 2. E records compiler/toolchain/libc SHAs. If a build step fetches a header or object from network during build 1, and E does not capture that fetch, the build succeeds; build 2 fetches the same, E still matches, and no test detects the network input. If between the two builds the network-fetched object changes but its hash is not in E, E remains equal.
+    
+    Can predicate pass while invariant false: Yes — the predicate is “E(build1) == E(build2)”, which is a claim about the captured fields, not about the absence of network inputs. Silent network input is invisible to E unless E’s field population covers every fetched object.
+    
+    Minimum correction: State one of:
+    
+    1. Network is disabled during both builds (mechanism: no-network container, no DNS, no outbound socket).
+    2. Network activity is recorded as part of the build evidence and checked for changes between builds.
+    3. E’s field population is extended to include every object the build could fetch.
+    
+    If the CPython build is self-contained (no network fetch is required by configure/make), state that explicitly. Otherwise the isolation claim is not established.
+    
+    ⸻
+    
+    DS-V4.5-02 — §22 stdlib fail-closed propagation is not verified at callers
+    
+    Classification: MAJOR
+    Evidence status: PLAN-INTERNAL
+    Exact claim attacked: §22: “must REFUSE. No successful smaller identity. Can-fail propagates through…”
+    
+    Counterexample: build_stdlib_identity is repaired to refuse on PermissionError. But a caller wraps the call in a try/except that logs and continues with the last-known-good identity. The repair is inert: verify_runtime_identity receives a valid-looking identity block and passes.
+    
+    The plan lists the call chain build_stdlib_identity → _stdlib_identity → build_runtime → verify_runtime_identity → producer/qualifier but does not state that every call site of these functions has been inspected for swallowing.
+    
+    Can predicate pass while invariant false: Yes — the refusal fires, is caught by a caller, and the pipeline continues with stale state.
+    
+    Minimum correction: Enumerate every call site of build_stdlib_identity, _stdlib_identity, build_runtime, and verify_runtime_identity in the six B4 files. For each, state whether a surrounding try/except swallows the refusal. Any swallowing caller must be removed or must re-raise. Add a can-fail control that plants an unreadable member and confirms the pipeline refuses — not just that the lowest-level function raises.
+    
+    ⸻
+    
+    DS-V4.5-03 — §11 producer-root repair location unspecified; potential B4 scope violation
+    
+    Classification: MAJOR
+    Evidence status: UNVERIFIED
+    Exact claim attacked: §11: “Current classify_origin() derives: H2 root and Census root from caller-supplied repo_root. That is a verified current defect. Repair the interface.”
+    
+    Counterexample: classify_origin() is named in §11 but its file location is not stated. If classify_origin() lives in classify.py, and classify.py is not in B4 (§33 excludes it), then the §11 repair cannot be implemented within the authorised mutation surface. The plan then has an internal contradiction: it authorises a repair it cannot carry out.
+    
+    If classify_origin() is in stage_identity.py or passa.py, B4 is sufficient.
+    
+    Can predicate pass while invariant false: N/A — this is a scope sufficiency question.
+    
+    Minimum correction: State the file and function containing classify_origin(). If it is in a non-B4 file, either:
+    
+    · add that file to B4 with justification, or
+    · state that the repair is entirely at the caller boundary (passa.py/runs that pass repo_root) without modifying the derivation logic in the callee.
+    
+    Falsifiable evidence request: git grep -n “def classify_origin” eb52f73 – kai-pm/house_in_order_h2_v13/. State the file.
+    
+    ⸻
+    
+    DS-V4.5-04 — §23.2 cal_fixtures static census mechanism is inconsistent with §24
+    
+    Classification: QUESTION
+    Evidence status: PLAN-INTERNAL
+    Exact claim attacked: §23.2: “the static census separately reports its internal Python launch.” §24: “The analyser is intentionally bounded to D379 control source.”
+    
+    Counterexample: §24 restricts the static analyser to d379_controls.py. §23.2 claims the static census reports a launch inside cal_fixtures.py. If the analyser is bounded to d379_controls.py, how is cal_fixtures.py’s launch enumerated?
+    
+    Minimum correction: State the mechanism. Either §24’s boundary is extended to include cal_fixtures.py’s launch surface (with an explicit statement of what changes), or §23.2’s claim is qualified as “reported by a separate, non-F13 mechanism.”
+    
+    ⸻
+    
+    DS-V4.5-05 — §34 step 21 assumes v3.11.15 will satisfy D385 known-positive
+    
+    Classification: QUESTION
+    Evidence status: UNVERIFIED
+    Exact claim attacked: §1 and §34 step 21: “establish a D380-compliant known-positive interpreter.”
+    
+    Counterexample: The plan builds CPython 3.11.15 and requires the result be known-positive per D385. If D385’s known-positive criteria are not satisfied by a stock 3.11.15 build — e.g., because they require a specific build configuration or patch set — the plan has no fallback path.
+    
+    Minimum correction: State the exact D385 known-positive criteria and confirm whether stock v3.11.15 satisfies them. If not, state what additional configuration is required.
+    
+    Falsifiable evidence request: Quote D385’s known-positive clause from kai-pm/DECISIONS.md at its bank commit.
+    
+    ⸻
+    
+    DS-V4.5-06 — §35 S19 may over-refuse on legitimate H2 module-import chains
+    
+    Classification: QUESTION
+    Evidence status: PLAN-INTERNAL
+    Exact claim attacked: §35 S19: “A governed Census module is present in sys.modules before the verified-byte Census loader establishes the boundary → REFUSE.”
+    
+    Counterexample: If passa.py at module import time transitively imports something that itself imports a governed Census module — for example, an H2 module that itself imports docgraph for unrelated reasons — then docgraph is present in sys.modules before the loader runs. S19 refuses a legitimate flow.
+    
+    Minimum correction: Either:
+    
+    · state that no H2 module transitively imports a governed Census module (verified by import-graph inspection), so the precondition always holds; or
+    · qualify S19: only refuse if the pre-existing entry was NOT installed by the loader in this same process.
+    
+    ⸻
+    
+    DS-V4.5-07 — §10.4 module state after exec failure unspecified
+    
+    Classification: MINOR
+    Evidence status: PLAN-INTERNAL
+    Exact claim attacked: §10.4: pre-register module, then compile, then exec.
+    
+    Counterexample: If the exec raises, sys.modules holds a partially-initialized module. A subsequent import of that name returns the partial module.
+    
+    Minimum correction: On exec failure, remove the module from sys.modules before propagating the exception. State this as part of §10.4.
+    
+    ⸻
+    
+    DS-V4.5-08 — §16.1 stage_a_identity wording is ambiguous
+    
+    Classification: MINOR
+    Evidence status: PLAN-INTERNAL
+    Exact claim attacked: §16.1: stage_a_identity authority: PRECOMMITTED_STAGE_A; mechanism: “recompute from supplied canonical Stage-A descriptor.”
+    
+    Counterexample: “Supplied canonical Stage-A descriptor” reads as the descriptor being verified. If the expected value is recomputed from the descriptor being verified, the check is internal consistency only.
+    
+    Minimum correction: Reword to: “recompute from the independently rederived canonical Stage-A descriptor produced by §9; compare to the supplied descriptor’s identity.” The independent authority is §9’s rederivation.
+    
+    ⸻
+    
+    DS-V4.5-09 — §23.1 observer installation timing unspecified
+    
+    Classification: MINOR
+    Evidence status: PLAN-INTERNAL
+    Exact claim attacked: §23.1: “Each d379_controls.py process installs its runtime observer before its first governed child launch.”
+    
+    Counterexample: If the observer is installed inside a function that is called after some children launch, the requirement is nominally satisfied but practically violated.
+    
+    Minimum correction: State that the observer is installed at module import time, before any function that can launch a child is callable.
+    
+    ⸻
+    
+    DS-V4.5-10 — §26 “complete transcript” curation unspecified
+    
+    Classification: MINOR
+    Evidence status: PLAN-INTERNAL
+    Exact claim attacked: §26: “Each transcript contains the complete governed driver record for that build.”
+    
+    Counterexample: “Complete” is a claim about bytes. If the driver writes a curated summary rather than bytes-as-produced, the transcript omits fields (timestamps, transient state) that a raw transcript would contain.
+    
+    Minimum correction: State whether the transcript is bytes-as-produced by the driver, or a curated record. If curated, state what is included and what is omitted.
+    
+    ⸻
+    
+    DS-V4.5-11 — §29.2 frozen non-code inputs are not listed in F’s population
+    
+    Classification: MINOR
+    Evidence status: PLAN-INTERNAL
+    Exact claim attacked: §7.5 lists “explicitly frozen non-code input” as a valid B0 dependency; §29.2 does not include such inputs in F’s population.
+    
+    Counterexample: If a B0 closure depends on a frozen non-code input (e.g., a data file), F does not verify that input’s bytes remain unchanged between F and capture.
+    
+    Minimum correction: Add “every explicitly frozen non-code input from §7.5” to §29.2’s population list, or state that no such inputs were found during B0.
+    
+    ⸻
+    
+    DS-V4.5-12 — §30 temporary state-exchange file persistence unspecified
+    
+    Classification: MINOR
+    Evidence status: PLAN-INTERNAL
+    Exact claim attacked: §30: “The state exchange file created under a temporary directory is ephemeral process state and not a tracked evidence output.”
+    
+    Counterexample: If the temp file persists after capture, it is a non-tracked side effect. A future reviewer cannot tell whether it existed because the plan doesn’t state whether the capture deletes it.
+    
+    Minimum correction: State whether the temp file is deleted on capture success and on failure; whether any diagnostic residue remains; and whether its absence is checked.
+    
+    ⸻
+    
+    DEPENDENCY-ORDER ATTACK
+    
+    The §34 sequence is internally consistent. No cycle detected.
+    
+    Two clarifications worth noting:
+    
+    · Step 21 (D385 known-positive interpreter) is currently the terminal gate on the build phase; if v3.11.15 does not satisfy D385 (DS-V4.5-05), the plan has no path forward without reopening the interpreter decision.
+    · Step 43 (one capture) is correctly terminal; S6 and S11 correctly guard it.
+    
+    ⸻
+    
+    PROXY-SUBSTITUTION REGISTER
+    
+    Claim Proxy Actual invariant
+    §19 no-network E equality No network input entered either build
+    §22 fail-closed Lowest-level raise Whole pipeline refuses
+    §11 root repair “Interface” File and function explicitly in B4
+    §23.2 cal_fixtures launch “Reported separately” Analyser scope explicitly covers it
+    §26 complete transcript Curated record Bytes-as-produced
+    §29.2 F population Non-code inputs unlisted All B0 dependencies in F
+    
+    Each should be stated in the plan as “the mechanism establishes X; it does not establish Y” where X ≠ Y.
+    
+    ⸻
+    
+    CLOSING
+    
+    NO DESIGN BLOCKER FOUND.
+    
+    The plan can advance to an implementation-authority decision once DS-V4.5-03 is resolved by naming the file containing classify_origin() and confirming it is within B4 (or adding it). DS-V4.5-01, DS-V4.5-02 and DS-V4.5-04 through DS-V4.5-12 can be closed either by specification or by explicit residual-risk register entries.
+    
+    Blocker IDs (none confirmed): —
+    
+    MAJOR IDs requiring closure before implementation: DS-V4.5-01, DS-V4.5-02, DS-V4.5-03.
+    
+    No code. No implementation authority. No D-number. No merge recommendation.
+    
+    ⸻
+    
+    KAI — FINAL SOURCE-BOUND RECONCILIATION OF D379 REPAIR PLAN v4.5
+    
+    Date: 30 September 2026
+    Reviewed subject: D379 Repair Plan v4.5
+    DeepSeek result: NO DESIGN BLOCKER FOUND
+    Authority of this file: NON-AUTHORITATIVE REVIEW/PLANNING RECORD
+    Programme authority: NONE BY THIS FILE
+    Implementation authority: NONE BY THIS FILE
+    Capture authority: NONE
+    Candidate/Stage-A/holdout/merge authority: NONE
+    
+    This record preserves Kai’s final source-bound reconciliation after DeepSeek’s v4.5 closure review.
+    
+    It does not replace D379/D380/D381/D385 or D387–D389.
+    
+    ⸻
+    
+    1. FINAL ADJUDICATION
+    
+    D379 repair plan v4.5 is:
+    
+    ACCEPTABLE FOR AN IMPLEMENTATION-AUTHORITY DECISION.
+    
+    That conclusion means:
+    
+    * no unresolved design blocker remains in the plan;
+    * all three DeepSeek v4.5 MAJOR findings were independently checked against primary repository/banked evidence;
+    * the remaining questions/minors were either source-closed or converted into explicit implementation conditions;
+    * exact historical v4.1 was subsequently recovered and used for a preservation audit;
+    * implementation still requires Dainius’s explicit separate grant.
+    
+    It does NOT mean implementation automatically starts.
+    
+    ⸻
+    
+    2. GOVERNANCE COMMIT G — VERIFIED AFTER PLAN REVIEW
+    
+    The continuity banking was subsequently completed.
+    
+    Governance commit G:
+    
+    77fdc37426a2a60804b52f918d5f2f16c1e2bd2b
+    
+    Parent:
+    
+    f140419370b792ec8ad26db58b1f742b5668d626
+    
+    G changes exactly:
+    
+    kai-pm/DECISIONS.md
+    
+    with:
+    
+    +113 / -0
+    
+    and no other tracked path.
+    
+    The three banked entries are:
+    
+    * D387 — 25 September admission continuity;
+    * D388 — Kai Q6–Q9 rulings;
+    * D389 — KAI-V4-01…08 historical findings.
+    
+    A later, separate handoff-only commit is:
+    
+    36ad03491c9987e8a3aa55921e5400a4cb963c4c
+    
+    which changes only:
+    
+    kai-pm/HANDOFF_LOG.md
+    
+    and is NOT part of G.
+    
+    The current rework/handoff branch must not be merged into the repair branch.
+    
+    ⸻
+    
+    3. DS-V4.5-01 — NETWORK ISOLATION
+    
+    DeepSeek finding:
+    
+    environment fingerprint equality alone cannot prove no network-derived build input entered either build.
+    
+    Ruling:
+    
+    UPHELD. CLOSED BY IMPLEMENTATION SPECIFICATION.
+    
+    The two CPython reproducibility builds must run with outbound network mechanically disabled.
+    
+    The build environment must not merely record network state.
+    
+    It must prevent dependency acquisition over the network during both builds.
+    
+    Acceptable implementation must establish no outbound dependency channel for the build commands.
+    
+    If network isolation cannot be demonstrated:
+    
+    STOP.
+    
+    Environment fingerprint E remains required independently.
+    
+    ⸻
+    
+    4. DS-V4.5-02 — STDLIB REFUSAL PROPAGATION
+    
+    DeepSeek finding:
+    
+    a low-level StageIdentityError could theoretically be swallowed by a caller.
+    
+    Ruling:
+    
+    UPHELD AS A REQUIRED CHECK; CURRENT PRODUCTION PATHS SOURCE-CLOSED.
+    
+    Repository inspection at eb52f73 found:
+    
+    stage_identity.py
+    
+    * build_stdlib_identity()
+    * _stdlib_identity()
+    * build_runtime()
+    * verify_runtime_identity()
+    
+    Pass A:
+    
+    passa.py
+    
+    calls:
+    
+    SI.verify_runtime_identity(desc)
+    
+    before production and again when creating producer provenance.
+    
+    Classification:
+    
+    run_h2_v12.py
+    
+    calls:
+    
+    SI.verify_runtime_identity(desc).
+    
+    The inspected production chains do not contain a caller that catches a stdlib/runtime StageIdentityError and continues with a stale or prior identity.
+    
+    Pass A’s _check_population() catches StageIdentityError only to convert it into SystemExit, i.e. refusal.
+    
+    The repaired qualifier must use the same fail-closed runtime path.
+    
+    Mandatory hostile control remains:
+    
+    make a governed stdlib member unreadable/disappearing;
+    
+    confirm not merely that build_stdlib_identity() raises, but that the actual producer/qualifier pipeline refuses.
+    
+    No successful smaller identity is permitted.
+    
+    ⸻
+    
+    5. DS-V4.5-03 — classify_origin() LOCATION
+    
+    DeepSeek questioned whether repairing classify_origin() could require changing a file outside B4.
+    
+    Ruling:
+    
+    DISPROVED.
+    
+    At eb52f73:
+    
+    def classify_origin(...)
+    
+    is in:
+    
+    kai-pm/house_in_order_h2_v13/stage_identity.py
+    
+    approximately line 525.
+    
+    stage_identity.py is already inside the authorised B4 repair surface.
+    
+    No B4 expansion is required.
+    
+    ⸻
+    
+    6. DS-V4.5-04 — cal_fixtures.py LAUNCH REPORTING
+    
+    The v4.5 wording could be read as though the F13 static analyser covers both:
+    
+    * d379_controls.py;
+    * cal_fixtures.py.
+    
+    That is not the intended claim.
+    
+    Final interpretation:
+    
+    F13’s governed static/runtime denominator is the process-launch surface implemented by d379_controls.py.
+    
+    cal_fixtures.py is a separate historical fixture subject.
+    
+    Its internal Python launch is reported by a separate non-F13 observation/measurement.
+    
+    It is not counted as part of F13’s D379-control denominator and is not silently omitted.
+    
+    No common-source independence claim is made.
+    
+    ⸻
+    
+    7. DS-V4.5-05 — D385 KNOWN-POSITIVE INTERPRETER
+    
+    Banked D385 was retrieved and independently checked.
+    
+    D385 does NOT say that stock CPython 3.11.15 is automatically known-positive.
+    
+    D385 defines a known-positive as an actually measured:
+    
+    D380-COMPLIANT INTERPRETER
+    
+    which satisfies existing D380 rules with no exception class.
+    
+    Required properties include:
+    
+    * stdlib/platstdlib mechanically identified;
+    * external package roots excluded;
+    * every governed symlink’s final target remains within governed roots;
+    * no dangling links;
+    * single ownership;
+    * no duplicate canonical member;
+    * loaded filesystem-backed stdlib represented.
+    
+    The current distribution interpreter is banked as a known-negative.
+    
+    The v3.11.15 build is therefore a candidate calibration runtime only.
+    
+    If the built v3.11.15 runtime does not actually satisfy D380/D385:
+    
+    STOP.
+    
+    Do NOT weaken D380/D385.
+    
+    Do NOT add distro-specific exceptions.
+    
+    ⸻
+    
+    8. DS-V4.5-06 — EARLY CENSUS IMPORT
+    
+    Repository inspection across the ten H2 source files found direct governed Census imports only in:
+    
+    passa.py
+    
+    inside the Pass-A build path:
+    
+    import docgraph as G, opscan as O, claims as C
+    
+    No current top-level H2 import of those governed Census modules was found before that point.
+    
+    Therefore S19 is a valid fail-closed precondition for the current architecture.
+    
+    The repaired verified-byte Census loader must establish its boundary before that first governed Census import.
+    
+    ⸻
+    
+    9. DS-V4.5-07 — FAILED CENSUS EXECUTION
+    
+    Required implementation clarification:
+    
+    when the verified-byte loader pre-registers a Census module in sys.modules and compile/exec fails:
+    
+    * remove the partially initialised governed module entry from sys.modules;
+    * then propagate the failure.
+    
+    A partially initialised governed Census module may not survive and later satisfy an import.
+    
+    ⸻
+    
+    10. DS-V4.5-08 — STAGE-A IDENTITY AUTHORITY
+    
+    The wording:
+    
+    “recompute from supplied canonical Stage-A descriptor”
+    
+    must not be implemented as self-consistency.
+    
+    Final interpretation:
+    
+    derive the complete canonical Stage-A descriptor independently under v4.5 §9 from actual instrument/subject/history/Census/runtime contexts.
+    
+    Then derive the expected Stage-A identity from THAT independently rederived descriptor.
+    
+    Compare:
+    
+    * independently rederived identity;
+    * identity of supplied descriptor.
+    
+    The supplied descriptor is commitment/input.
+    
+    It is not its own authority.
+    
+    ⸻
+    
+    11. DS-V4.5-09 — AUDIT-HOOK INSTALLATION
+    
+    Each d379_controls.py process that may create a governed child must install its launch observer at process entry before execution reaches any function capable of launching a child.
+    
+    It is insufficient to install the observer lazily after some controls have already executed.
+    
+    This applies independently to:
+    
+    * capture parent mode;
+    * control child mode;
+    * ordinary control execution mode
+    
+    where that process has governed launch capability.
+    
+    ⸻
+    
+    12. DS-V4.5-10 — BUILD TRANSCRIPT
+    
+    The E7 build transcript is not a manually curated summary.
+    
+    For each Build A / Build B, preserve the complete raw driver evidence for the governed build commands:
+    
+    * exact command invocation;
+    * stdout bytes;
+    * stderr bytes;
+    * actual return code;
+    * command order;
+    * environment-fingerprint reference.
+    
+    Any additional structured summary is convenience only.
+    
+    It cannot substitute for the raw combined transcript.
+    
+    ⸻
+    
+    13. DS-V4.5-11 — FROZEN NON-CODE INPUTS
+    
+    Every explicitly frozen non-code input admitted by B0 dependency closure is also a member of the F fixity/dependency population.
+    
+    No B0 dependency may disappear from F merely because it is not Python source.
+    
+    If B0 finds no additional non-code input, record zero.
+    
+    If it finds one, it must be enumerated and hashed at F.
+    
+    ⸻
+    
+    14. DS-V4.5-12 — TEMPORARY STATE FILE
+    
+    The temporary state-exchange file is process scratch state only.
+    
+    Implementation requirement:
+    
+    use a managed temporary directory and cleanup in finally.
+    
+    Delete scratch state on both:
+    
+    * normal completion;
+    * failure/exception.
+    
+    Any adjudication-relevant fact must already have been emitted to durable captured evidence.
+    
+    No residual temp file is evidence.
+    
+    ⸻
+    
+    15. EXACT HISTORICAL v4.1 RECOVERED
+    
+    After the v4.5 review, the repository acquired:
+    
+    kai-pm/D379_PLAN_V4_1.md
+    
+    at the rework branch.
+    
+    Its header states that everything below its verbatim marker is the complete historical v4.1 held by Orion’s session, with no reconstruction gaps.
+    
+    Kai read that exact recovered record and performed a preservation audit against v4.5.
+    
+    This audit does NOT make v4.1 programme authority.
+    
+    Its purpose is to ensure the later plan did not accidentally lose an original required repair/control.
+    
+    ⸻
+    
+    16. v4.1 PRESERVATION AUDIT — REQUIRED DEFECT FAMILIES
+    
+    The final implementation matrix must retain:
+    
+    B1–B6
+    
+    The six primary D379/H2 repair blockers.
+    
+    F7 — bytecode-disabled from startup
+    
+    Late mutation of sys.dont_write_bytecode is not adequate.
+    
+    Known positive must obtain the required state from process startup.
+    
+    F8 — D380 §7.11 loaded-stdlib membership
+    
+    Every loaded filesystem-backed stdlib module must be represented in the governed stdlib snapshot, unless it is legitimately built-in/frozen under D380.
+    
+    A sourceless/unrepresented filesystem-backed stdlib member must refuse.
+    
+    F9 — unreadable governed member
+    
+    Unreadable/disappearing governed member must refuse.
+    
+    No silent continue producing a smaller identity.
+    
+    F10 — symlink cycle distinction
+    
+    A symlink loop must be diagnosed/refused as a cycle.
+    
+    A dangling symlink must be diagnosed/refused as dangling.
+    
+    A valid in-root symlink is accepted.
+    
+    Do not collapse cycle into “dangling”.
+    
+    F12 — duplicate on both sides
+    
+    Duplicate tree population:
+    
+    REFUSE.
+    
+    Duplicate output population:
+    
+    REFUSE.
+    
+    Same duplicate present in both populations:
+    
+    still REFUSE before reconciliation/selection.
+    
+    F13 — child launch closure
+    
+    Launch count is a measurement, not a fixed number.
+    
+    Coverage is the gate.
+    
+    Governed D379 Python child launches must route through the governed mechanism and satisfy required startup/runtime conditions.
+    
+    ⸻
+    
+    17. STAGE-B ANCHOR — NON-CIRCULAR CALIBRATION INTERPRETATION
+    
+    Historical v4.1 correctly requires more than a separate binding file:
+    
+    rows + provenance + binding rewritten together must not self-certify.
+    
+    For D379 hostile calibration, the non-circular sequence is:
+    
+    producer exits
+    
+    → separate binder creates binding B over clean final bytes
+    
+    → D379 control parent independently computes/retains sha256(B) in parent state
+    
+    → hostile mutation is constructed where applicable
+    
+    → consumer receives:
+    
+    * artifact;
+    * original binding B;
+    * expected sha256(B) retained by parent.
+    
+    The expected binding digest does not come from:
+    
+    * the producer artifact;
+    * the binding file being verified;
+    * the artifact directory.
+    
+    For Q1a-7/coordinated-rewrite hostile cases, the original parent-held anchor remains unchanged.
+    
+    The D379 parent/control implementation is later frozen by fixity F before the consequential capture.
+    
+    No second Unix/GitHub principal is invented.
+    
+    The same-principal malicious-repository-owner actor remains outside D379’s banked threat model.
+    
+    ⸻
+    
+    18. REPAIR-BRANCH LINEAGE AFTER G
+    
+    Governance G now exists on the rework/handoff branch.
+    
+    The repair branch must NOT be created from the current rework HEAD.
+    
+    The intended lineage is:
+    
+    eb52f73
+    
+    → first repair-branch commit R
+    
+    → technical v4.5 repair commits.
+    
+    R replays ONLY G’s DECISIONS.md additions.
+    
+    No handoff/hook/documentation commits from the current rework branch are merged into the repair branch.
+    
+    Mechanical replay gate:
+    
+    the G decision diff and R decision diff must be byte-equivalent.
+    
+    Orion recorded the current G fingerprints as:
+    
+    sha256:
+    
+    ba175463b2e18644c7eafa898c34294bdc59b6cb2a26b8f7ccea12c879c70a75
+    
+    patch-id:
+    
+    149f2dbd97a0a878af0a1c6f8d6239f2ae162c00
+    
+    Those values are producer-supplied continuity evidence and must be reverified when R is created.
+    
+    ⸻
+    
+    19. BUILD NETWORK CONDITION
+    
+    DeepSeek DS-V4.5-01 exposed that equality of E does not prove no network input entered the build.
+    
+    Therefore before implementation the build requirement is sharpened:
+    
+    both reproducibility builds must run with outbound network mechanically disabled.
+    
+    E remains required.
+    
+    Network isolation and E equality prove different properties.
+    
+    No dependency download is authorised during configure/make/install.
+    
+    ⸻
+    
+    20. IMPLEMENTATION-AUTHORITY STATE
+    
+    At the time this reconciliation record is preserved:
+    
+    continuity D387–D389 is banked.
+    
+    v4.5 has passed DeepSeek with:
+    
+    NO DESIGN BLOCKER FOUND.
+    
+    Kai has independently reconciled the final findings.
+    
+    The plan is ready for Dainius to make an implementation-authority decision.
+    
+    However:
+    
+    NO IMPLEMENTATION AUTHORITY IS CREATED BY THIS FILE.
+    
+    Until Dainius explicitly grants the bounded implementation tranche:
+    
+    * do not create R;
+    * do not create the repair branch;
+    * do not run E7a;
+    * do not build CPython;
+    * do not mutate B4;
+    * do not produce F;
+    * do not capture;
+    * do not create production Stage A;
+    * do not run candidate/holdout/blind 40;
+    * do not merge PR #122.
+    
+    ⸻
+    
+    21. CAPTURE REMAINS A SEPARATE FUTURE AUTHORITY
+    
+    Even after implementation is separately authorised:
+    
+    the repair stops at fixity F.
+    
+    Kai independently reviews F.
+    
+    Then Dainius must separately authorise exactly one consequential D379 capture.
+    
+    Implementation authority does NOT include capture authority.
+    
+    ⸻
+    
+    FINAL KAI POSITION
+    
+    D379 v4.5 design status: no unresolved design blocker.
+    
+    DeepSeek planning gate: complete.
+    
+    Kai reconciliation gate: complete.
+    
+    Continuity banking: complete at G / D387–D389.
+    
+    Historical v4.1 preservation audit: complete.
+    
+    Implementation: NOT YET AUTHORISED BY THIS RECORD.
+    
+    Capture: NOT AUTHORISED.
+    
+    Production Stage A / candidate / holdout / blind 40 / merge: NOT AUTHORISED.
+    
+    END OF KAI FINAL SOURCE-BOUND RECONCILIATION OF D379 v4.5
+    
+    Send all three blocks to Orion without shortening them.
+    
+    One precision: the v4.5 plan preserves the physical HEAD that existed when that plan was frozen (7123ec2). That is intentional historical truth; Orion must not “update” it to the current branch head. The reconciliation document separately records that G was later banked at 77fdc37 and the handoff branch subsequently reached 36ad034.
+    
+    Once Orion saves these three exact records and gives us the hashes/commit, I’ll verify them against what we supplied. Only after that should we discuss your implementation-authority questions.
+    END-VERBATIM PROMPT-206d48db100f5de7
+- EVIDENCE PROMPT-9a5d40a30435618e transcript 2026-09-30T21:16:08.129Z: 2279 bytes, sha256 5283ebf4242b37bd7611c5bc4e16c246100b8cf14ccd2b0046f02eff00b445d6, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-30T21:16:08.129Z]
+    BEGIN-VERBATIM PROMPT-9a5d40a30435618e
+    From gpt : just read !       The Git blob IDs also match Orion’s report exactly.
+    
+    I checked the boundaries too:
+    
+    * v4.5 starts with D379 REPAIR PLAN v4.5 and ends with END OF D379 REPAIR PLAN v4.5.
+    * DeepSeek’s preserved record starts with DEEPSEEK — FINAL ADVERSARIAL CLOSURE REVIEW OF D379 v4.5 and contains the final NO DESIGN BLOCKER FOUND result.
+    * My reconciliation starts with KAI — FINAL SOURCE-BOUND RECONCILIATION OF D379 REPAIR PLAN v4.5 and ends with the explicit statement that implementation/capture/candidate authority is not created by that record.
+    
+    The preservation commit itself is clean:
+    
+    cb4d986...
+    
+    * adds exactly those three files
+    * no deletions
+    * no technical D379 source modification.
+    
+    The following handoff-only commit is:
+    
+    b5963f989eb16e75c86143280a902111b7de07b3
+    
+    and changes only HANDOFF_LOG.md.
+    
+    Current live rework-branch HEAD is therefore b5963f9....
+    
+    One precision on evidentiary wording: I can independently recompute the repository hashes and confirm they equal Orion’s hashes from his transcript extraction. I do not have a separate raw-transcript-byte API that lets me independently hash my original chat message itself, so I won’t pretend there is a third independent byte source. Orion’s transcript extraction + his byte comparison + my independent repository hash verification give us a strong two-stage preservation chain, and the substantive boundaries/content I checked are the correct v4.5 subjects.
+    
+    Programme position now
+    
+    We have crossed the preservation gate:
+    
+    D387–D389 banked → G 77fdc37
+    exact v4.1 preserved
+    exact v4.5 preserved
+    DeepSeek final review preserved
+    Kai reconciliation preserved
+    DeepSeek: NO DESIGN BLOCKER FOUND
+    Kai: implementation-authority decision is permissible
+    
+    But these have not happened:
+    
+    * no repair branch;
+    * no replay R;
+    * no E7a;
+    * no CPython build;
+    * no B4 modification;
+    * no fixity F;
+    * no capture;
+    * no production Stage A;
+    * no candidate;
+    * no holdout/blind 40;
+    * no merge.
+    
+    So we are exactly where you wanted to be before your questions:
+    
+    planning, authority history and review evidence are preserved; technical execution remains stopped.
+    
+    Ask the questions you wanted to go through. We can resolve them before you decide whether to authorise the bounded v4.5 implementation tranche.
+    END-VERBATIM PROMPT-9a5d40a30435618e
+- EVIDENCE PROMPT-a9d440f5405703ea transcript 2026-09-30T21:18:16.710Z: 212 bytes, sha256 a9d440f5405703ea3a3fcbfc0859bcdac165d90c1bf91f200868e90a55f75cfd, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-30T21:18:16.710Z]
+    BEGIN-VERBATIM PROMPT-a9d440f5405703ea
+    You are approaching limit before reset have you saved all will you remember ? Will that memory book help if we stop and wait for reset then continue? Are we in better place for your memory and context continuity?
+    END-VERBATIM PROMPT-a9d440f5405703ea
+- EVIDENCE PROMPT-14067015d56452b0 transcript 2026-09-30T21:21:15.664Z: 171 bytes, sha256 14067015d56452b0bfbafa66841ca01f3f05747128f4e716c3422086c9141b82, final LF False  [CMD `extract.py transcript` → prompt at 2026-09-30T21:21:15.664Z]
+    BEGIN-VERBATIM PROMPT-14067015d56452b0
+    Good shame it took me so long to make you use GitHub as your memory as it’s realistically not that hard but I’m learning!))) it always should have been a pre requisite
+    END-VERBATIM PROMPT-14067015d56452b0
+- EVIDENCE PROMPT-fcedd0d0c840c86f transcript 2026-10-01T15:56:15.054Z: 3601 bytes, sha256 8cedce57c353721cd7b49374e59c945b820cdd3c422ab90f964d983ece3a019c, final LF False  [CMD `extract.py transcript` → prompt at 2026-10-01T15:56:15.054Z]
+    BEGIN-VERBATIM PROMPT-fcedd0d0c840c86f
+    Check this and debrief gpt so we can resume : Yes — and this last packet completes the continuity story, but one factual correction matters because I have now checked the repository rather than trusting the pasted text.
+    
+    The statement “the last piece is committed and pushed as 962ef6b” was true at that moment, but it is no longer the latest state. The live branch is now:
+    
+    * Branch: claude/project-rework-plan-pgvp35
+    * HEAD: 2b8b81f2fc18b513fa799a19425ad5d03c87738c
+    * Tree: 2734d0aa63e6b6ed28ad0001e515adc3780d4ae0
+    * PR #122: still open; no merge authority established.
+    * 2b8b81f commits the R19 continuity rule into CLAUDE.md and the subsequent handoff entry. So 962ef6b is now an earlier restart waypoint, not the current restart point.
+    
+    That later commit is important because it turns the lesson from this packet into a standing operating prerequisite: repository-held continuity must exist before work begins; consequential rulings that are not yet banked go into the handoff log; programme texts are preserved byte-for-byte; and WRITE occurs before a break/reset rather than relying on someone remembering to ask for a handoff.
+    
+    The broader reconciliation is now clean in my view:
+    
+    August 18 handover = historical programme/architecture continuity. It preserves the original 048 → A-4 → Assurance Integration → Kingsman direction and the ownership-separation experiment discipline.
+    
+    September 15 Cold-Start Master = substantially stronger constitutional/system map. Its mission, authority, Evidence Plane, migration, succession and architecture material remains useful, but its §5/§6 live checkpoint is historical because the repository moved far beyond c1b6efc/D375.
+    
+    September 25–30 D379 work = the current assurance programme evolution. D387 corrected the cold-start continuity failure and banked eb52f73 as the admitted technical restart. D388 banked Q6–Q9. D389 preserved the v4 findings. Governance commit 77fdc374… contains those entries.
+    
+    v4.5 = preserved, adversarially reviewed, and independently reconciled as acceptable for an implementation-authority decision, but that phrase is deliberately not equivalent to implementation authority.
+    
+    Current physical state = 2b8b81f, not 962ef6b, not c1b6efc, and not the older 0af5d32 checkpoints.
+    
+    The present programme boundary therefore remains very clear:
+    
+    Admitted technical restart: eb52f73
+    D379 implementation: not automatically authorised by any preserved plan/review
+    Production Stage A: not authorised
+    Candidate: not authorised
+    Holdout / blind 40: not authorised
+    Capture: requires its own later authority after fixity review
+    PR #122: do not infer merge authority
+    Next human decision point: your questions on v4.5, followed by your implementation-authority decision.
+    
+    And there is one more improvement over the wording in this historical packet: continuity no longer depends on you saying “handoff” at exactly the right moment. R19 now makes preservation an operating obligation. A consequential ruling or approaching break is itself the trigger.
+    
+    So yes: I now have the whole-universe view and the current coordinate separated properly. I will not navigate the programme from whichever handover happens to sound most complete. Older documents establish lineage and architecture; current repository evidence establishes current state.
+    
+    Confidence: 0.99. The remaining uncertainty is execution-level rather than documentary: read access lets me establish repository state and source claims, but it does not by itself reproduce Orion’s local runtime/build environment or execute the future D379 hostile matrix.
+    END-VERBATIM PROMPT-fcedd0d0c840c86f
+- EVIDENCE PROMPT-68d04c4c322bd76a transcript 2026-10-01T16:00:41.112Z: 4570 bytes, sha256 d7b4b65ebc94d2f0a96bb36fe12e4ef4db5f65ed4cfff91638abd93d4daf2e8e, final LF False  [CMD `extract.py transcript` → prompt at 2026-10-01T16:00:41.112Z]
+    BEGIN-VERBATIM PROMPT-68d04c4c322bd76a
+    I authorise: We are finally at the point where we should stop redesigning and execute the already-reviewed v4.5 in a tightly bounded tranche.
+    
+    OBJECTIVE
+    
+    Move D379 from the admitted technical restart eb52f73… to a fully repaired, hostile-calibrated, fixed implementation commit F — and then stop.
+    
+    No candidate. No production Stage A. No capture. No holdout.
+    
+    WHERE WE ARE
+    
+    The important gates are already crossed:
+    
+    * v4.5 exists and is preserved exactly.
+    * DeepSeek completed the final adversarial review: NO DESIGN BLOCKER FOUND.
+    * I reconciled its findings against the repository.
+    * D387–D389 are banked.
+    * eb52f73… is the admitted restart.
+    * Current working/handoff branch is only continuity/navigation; we do not build the repair from HEAD 2b8b81f.
+    * v4.5 is ready for your implementation-authority decision.
+    
+    So another architecture cycle now would be counterproductive unless execution exposes a contradiction.
+    
+    MY RECOMMENDATION
+    
+    I recommend you grant Orion one bounded implementation tranche through F, with reporting checkpoints but without requiring you to re-authorise every normal step.
+    
+    The authorised path should be:
+    
+    eb52f73
+    → create clean repair lineage / R
+    → replay only governance G correctly
+    → close B0
+    → prove build-log storage E7a
+    → prove outbound network can be mechanically disabled
+    → verify CPython 3.11.15 signed source
+    → two isolated, network-disabled reproducible builds
+    → preserve/read back both complete build transcripts
+    → prove resulting interpreter actually satisfies D380/D385
+    → perform only the six-file B4 repair surface
+    → run the complete hostile matrix
+    → derive the full fixity population
+    → create exact F
+    → STOP FOR KAI
+    
+    I then independently inspect F against v4.5 and the governing decisions.
+    
+    Only if F passes do I come back to you with a recommendation on the separate one-time capture authority.
+    
+    FOUR PRACTICAL DECISIONS
+    
+    These are the four questions that were waiting. My proposed rulings are:
+    
+    Question	Recommendation
+    Can network be mechanically disabled?	Orion must measure this first after grant. If NO → STOP. No workaround.
+    Dropbox E7a	Authorise the bounded Dropbox capability test as part of this tranche. If capacity/fidelity/readback/write-once semantics fail → NO BUILD.
+    Builds + E7b continuity	Run them in one uninterrupted execution window. Do not allow ephemeral logs to sit unpreserved between sessions.
+    How often should Orion stop for you?	Do not stop for routine permission at every step. Report at defined milestones; mandatory stop only on v4.5 stop conditions or scope deviation.
+    
+    I would use four milestone reports:
+    
+    1. R / lineage established
+    2. Environment + E7a + network isolation passed
+    3. Two builds + D380/D385 runtime proof passed
+    4. B4 repair + hostile matrix complete + F created
+    
+    Those reports are evidence checkpoints, not fresh permission gates.
+    
+    HARD BOUNDARY
+    
+    The grant should explicitly exclude:
+    
+    production Stage A · real candidate · Pass-A production run · classification/qualification production evidence · holdout · blind 40 · capture · PR #122 merge · mutation outside the six authorised B4 files · architecture refactor · House/A-4/Kingsman work.
+    
+    If Orion discovers that another tracked source file must change: STOP and return to us.
+    
+    If any v4.5 stop condition fires: STOP; do not improvise.
+    
+    DEEPSEEK
+    
+    We do not send v4.5 back for another design review. That gate is complete.
+    
+    If Orion proposes any material deviation from v4.5 during implementation, that changed design gets attacked before acceptance.
+    
+    After F, I want to inspect actual implementation/evidence first. DeepSeek can then be used selectively to attack any new uncertainty, but it does not substitute for my source verification.
+    
+    WHAT I THINK YOU SHOULD AUTHORISE NOW
+    
+    The clean next decision is essentially:
+    
+    Authorise the bounded D379 v4.5 implementation tranche from admitted restart eb52f73 through fixity commit F, including R, B0, E7a, mechanically network-isolated CPython reproducibility builds, D380/D385 positive-runtime proof, the six-file B4 repair surface, full hostile calibration and creation of F. Stop at F for Kai review. No capture, production Stage A, candidate, holdout, blind 40, merge, or out-of-scope mutation is authorised. Any v4.5 stop condition or required scope expansion stops execution and returns to Dainius/Kai.
+    
+    That is the route I recommend.
+    
+    Confidence: 0.99. We have enough design work. The next unknowns are now execution facts, and the right way to answer them is to execute the bounded plan rather than produce another plan.
+    END-VERBATIM PROMPT-68d04c4c322bd76a
+- EVIDENCE PROMPT-06023acfdf682b05 transcript 2026-10-01T16:13:54.554Z: 6207 bytes, sha256 d86b7147e6e397566c8591f8e9bd4f93868bd8e2c19ee1d342932545deb40e03, final LF False  [CMD `extract.py transcript` → prompt at 2026-10-01T16:13:54.554Z]
+    BEGIN-VERBATIM PROMPT-06023acfdf682b05
+    I’ve checked the governing text and the new repository state. Milestone 1 is independently source-verified: R is d08f3ec…, its parent is the admitted eb52f73…, it changes only DECISIONS.md, and its patch is mechanically identical to G’s 8,189-byte patch with the same resulting blob. That part is clean.
+    
+    For the E7a hold, Option A is the correct route. It preserves v4.5 rather than redesigning it.
+    
+    There is one refinement I want added because of the security boundary: the Dropbox credential must not enter either CPython build environment. The token belongs to the outer evidence-upload mechanism only. The build processes remain in the proven network-isolated wrapper with a sanitised environment. E7a/E7b may use the Dropbox API outside that build namespace; the builds themselves get no Dropbox token and no network.
+    
+    Option B is not my preferred fallback. It is technically capable of being tested as a transport under §27, but it inserts model-output capacity/UTF-8 mediation into the raw-evidence path and knowingly creates an avoidable S9 exposure. With a materially stronger mechanical route available, our doctrine says we do not choose the weaker route for convenience.
+    
+    Option C is rejected under the current grant. Changing the canonical store from Dropbox contradicts D387/v4.5 and would require a separate governance decision.
+    
+    The current state is therefore:
+    
+    R/B0: complete from Orion’s side; R independently verified by me.
+    Network isolation: Orion-reported execution evidence, not independently re-executed by me. No contradiction found.
+    CPython signed source / E: likewise execution evidence recorded by Orion; I have not independently reproduced those runtime commands.
+    E7a/builds: correctly stopped.
+    
+    I would send Orion this:
+    
+    KAI → ORION — E7A TRANSPORT RULING
+    
+    I have independently re-read v4.5 §§26–28, Kai reconciliation §§18–21, D387’s Dropbox ruling, and mechanically checked R against G.
+    
+    1. MILESTONE 1
+    
+    R d08f3ec5de4d823011e66261c84c98a76371428e is independently READ_VERIFIED by Kai:
+    
+    * parent = admitted eb52f73fa6485534ca7e28a42055861c69e94cc4;
+    * only kai-pm/DECISIONS.md changes;
+    * G and R each add 113 / delete 0;
+    * their GitHub patch bodies are byte-identical;
+    * resulting DECISIONS.md blob is identical: 6569dc97a218449e4a4d97fee69be717c979430f.
+    
+    Milestone 1 is accepted as repository state. This is not yet an adjudication of later execution evidence.
+    
+    2. E7A RULING
+    
+    Proceed with OPTION A, subject to Dainius authorising the required external environment/credential change.
+    
+    Dropbox remains the canonical E7 store.
+    
+    Permit a direct mechanical Dropbox upload path using only the minimum required Dropbox API hosts and a least-privilege Dropbox app credential.
+    
+    This is implementation of the already-selected v4.5 storage/transport requirement, not a redesign of v4.5.
+    
+    3. SECRET / BUILD BOUNDARY — MANDATORY
+    
+    The Dropbox credential MUST NOT enter Build A or Build B.
+    
+    The token belongs only to the outer evidence-transfer mechanism.
+    
+    Before either build:
+    
+    * prove the build child environment does not contain the Dropbox credential;
+    * run the build under the already-calibrated network-isolation wrapper;
+    * prove the build namespace cannot reach Dropbox or any other outbound network;
+    * do not add the token to E as a build input because it is not a build input;
+    * do not print, hash into public evidence, commit, or otherwise expose the credential.
+    
+    E7 upload/readback occurs outside the isolated build process.
+    
+    4. E7A MUST STILL SATISFY v4.5 §27 EXACTLY
+    
+    Before Build A, demonstrate through the actual final Dropbox transport:
+    
+    * N = 2 synthetic objects;
+    * each exactly T bytes;
+    * U >= 2 × T;
+    * LF;
+    * CRLF;
+    * non-ASCII;
+    * binary-safe envelope edge cases where applicable;
+    * unique destinations;
+    * atomic create-if-absent, or mechanically proven equivalent write-once behaviour;
+    * independent readback;
+    * exact byte count;
+    * exact SHA.
+    
+    Do not merely prove “Dropbox accepts a file”.
+    
+    The transport tested at E7a must be the same transport semantics used at E7b.
+    
+    Failure of any required predicate → NO BUILD.
+    
+    5. OPTIONS B AND C
+    
+    B — connector/model-output-mediated transport:
+    DO NOT use as the default route. It introduces an avoidable output-size/text-mediation dependency into the raw evidence path. Do not silently fall back to it if A fails. Return to Dainius/Kai.
+    
+    C — change canonical store:
+    NOT AUTHORISED. Dropbox remains canonical under D387. Any change requires a separate governance ruling.
+    
+    6. AFTER E7A PASSES
+    
+    Continue the already-authorised v4.5 sequence only:
+    
+    E7a PASS
+    → rederive E immediately before Build A
+    → reverify frozen CPython source/signature as required
+    → Build A under mechanical network isolation
+    → rederive E before Build B; require equality
+    → Build B under the same isolation
+    → E7b preserve/read back both complete raw transcripts in the same uninterrupted execution window
+    → compare executable SHA and H2_PY_STDLIB_V1
+    → prove actual D380/D385 known-positive runtime
+    → milestone report.
+    
+    No B4 repair begins unless all preceding predicates pass.
+    
+    7. STOP CONDITIONS
+    
+    No improvisation if:
+    
+    * the required Dropbox hosts cannot be narrowly enabled;
+    * the scoped credential cannot be supplied securely;
+    * credential leakage into the build environment cannot be mechanically excluded;
+    * E7a cannot establish T/U/fidelity/write-once/readback;
+    * actual transcript exceeds T or combined size exceeds U;
+    * E changes;
+    * reproducibility differs;
+    * D380/D385 positive runtime fails.
+    
+    In any such case: STOP and return.
+    
+    No capture.
+    No production Stage A.
+    No candidate.
+    No holdout.
+    No blind 40.
+    No merge.
+    No out-of-scope source mutation.
+    
+    Kai ruling: OPTION A is architecturally consistent with v4.5 and is the strongest justified E7 transport route. It still requires Dainius’s explicit authority for the external network-policy and Dropbox-credential provisioning.
+    
+    The only thing you need to decide now is that last authority point: allow Orion’s environment to reach the minimum Dropbox API endpoints and provide a scoped Dropbox app credential for E7a/E7b. If you grant that, Orion can continue without another design cycle until the next required milestone or a stop condition.
+    END-VERBATIM PROMPT-06023acfdf682b05
+- EVIDENCE PROMPT-f0d21f7af95ecbf0 transcript 2026-10-01T16:21:52.211Z: 4500 bytes, sha256 a1ef06e2ec6857c8625ed490895220e5dcee66700bd180d2eabb661d07771125, final LF False  [CMD `extract.py transcript` → prompt at 2026-10-01T16:21:52.211Z]
+    BEGIN-VERBATIM PROMPT-f0d21f7af95ecbf0
+    Yes — the mechanism is technically ready for your external Option A authority, but I caught three points I want corrected before Orion proceeds.
+    
+    First, entry 18 is real: commit 81bc46cf… changes only HANDOFF_LOG.md, and the embedded netiso.sh really does start with env -i. The “6-key allowlist” wording is simply wrong: the wrapper explicitly sets five variables — PATH, LANG, LC_ALL, TZ, HOME. PWD and SHLVL are subsequently created by the shell. That is a documentation/counting defect, not a defect in the isolation mechanism. It should be corrected in the next handoff rather than silently propagated.
+    
+    Second, Orion should not bank “the token lasts about four hours” as a guaranteed fact. Dropbox now uses short-lived tokens for new scoped apps, and the actual validity is defined by the token’s expires_in; Dropbox examples commonly show 14,400 seconds, but their documentation does not promise that exact lifetime universally.   So: generate it immediately before the E7a/build/E7b window, but treat expiry as measured/runtime state, not doctrine.
+    
+    Third, I would tighten the network grant further. Dropbox confirms that App Folder confines the app to its dedicated /Apps/<app> area, which is exactly the least-privilege content boundary we want.   The actual upload endpoint is on content.dropboxapi.com, and mode=add with autorename=false gives the conflict behaviour Orion needs for create-without-silent-renaming.   Therefore Orion should derive the minimum hostname set from the actual E7 implementation: if upload + download/readback can be done entirely through content.dropboxapi.com, do not allow api.dropboxapi.com merely because it might be useful. Add the second hostname only if the final E7 transport demonstrably requires an API route there.
+    
+    The Dropbox permission model is also current: choose the App Folder access level and enable only the scopes the actual calls require. Do not rely on the statement that files.metadata.read “comes with” the others; scopes are independently configured maxima/defaults.  
+    
+    One other boundary: I have not independently verified Orion’s claim that your particular Claude cloud UI injects a newly added secret only into a fresh container/session. That is platform/environment behaviour. His proposed new-session re-test is therefore exactly right: assume nothing survives unchanged; restore hashes, re-run credential exclusion, isolation, socket population and E derivation.
+    
+    So my technical recommendation is: grant Option A now, with those corrections.
+    
+    Use this as the exact authority:
+    
+    I authorise the external Option A change required for D379 v4.5 E7a/E7b:
+    
+    * provision a least-privilege Dropbox Scoped App using App Folder access;
+    * provision a fresh short-lived Dropbox access credential as an environment secret, never in chat or repository;
+    * allow only the Dropbox API hostname(s) mechanically demonstrated as necessary by the final E7 transport, starting from the minimum set;
+    * use that credential only in the outer E7 evidence-transfer process;
+    * the credential must remain excluded from Build A and Build B and from their readable filesystem/process environment;
+    * re-prove that exclusion and network isolation in the new session before E7a.
+    
+    Corrections to entry 18:
+    
+    1. netiso.sh explicitly supplies five environment variables via env -i, not six; PWD/SHLVL are shell-generated runtime variables.
+    2. Do not treat “about four hours” as a fixed Dropbox token lifetime. Treat actual token expiry as runtime state.
+    3. Do not assume files.metadata.read is implicitly granted. Enable only the scopes required by the actual E7 API calls.
+    
+    Proceed only:
+    
+    new-session recovery and instrument hash verification
+    → re-prove isolation and credential exclusion
+    → derive the actual minimum Dropbox hostname population
+    → E7a exactly per v4.5 §27
+    → if PASS, rederive E and reverify source
+    → Build A
+    → rederive E and require equality
+    → Build B
+    → E7b in the same uninterrupted window
+    → reproducibility comparison
+    → D380/D385 positive-runtime proof
+    → milestone report.
+    
+    All existing stop conditions remain in force.
+    
+    No silent fallback to connector-mediated transport.
+    No alternate canonical store.
+    No capture.
+    No production Stage A.
+    No candidate.
+    No holdout.
+    No blind 40.
+    No merge.
+    No out-of-scope repair mutation.
+    
+    After you send that to Orion, we are no longer designing. We are executing the v4.5 evidence gate, and Orion should come back only at the milestone or if a STOP condition fires.
+    END-VERBATIM PROMPT-f0d21f7af95ecbf0
+- EVIDENCE PROMPT-ca5ef1b18eeac83a transcript 2026-10-01T17:16:24.615Z: 2836 bytes, sha256 60910ce6da9e310e0985d149ff1e5de28c6a087d748aa2e1e54c492e9d7a1462, final LF False  [CMD `extract.py transcript` → prompt at 2026-10-01T17:16:24.615Z]
+    BEGIN-VERBATIM PROMPT-ca5ef1b18eeac83a
+    Good. I independently checked 55962cc2d7b65a134818625ee8f1f877af754040. Entry 19 exists, changes only HANDOFF_LOG.md, correctly appends rather than rewriting entry 18, and records the authority plus all three corrections.
+    
+    One final precision correction before the new session: entry 19 says token expiry is “measured from the token’s own expiry.” Do not interpret that as inspecting/parsing the access-token string. Dropbox explicitly says access tokens are opaque and applications must not depend on their composition. An OAuth /oauth2/token response supplies expires_in, but the token itself is not an expiry-bearing object we should decode.  
+    
+    For your manual App Console route, just ensure the app is configured for the intended short-lived access-token mode before generating it, generate it immediately before the new session, and let any authentication expiry/failure during the evidence window trigger STOP. We don’t need another design change for that.
+    
+    The rest checks out strongly:
+    
+    * App Folder really does constrain the app to its dedicated /Apps/<app> area.  
+    * /2/files/upload requires files.content.write; /2/files/download requires files.content.read.  
+    * Both upload and download are content endpoints on content.dropboxapi.com. Dropbox’s own protocol documentation distinguishes RPC endpoints on api.dropboxapi.com from content-upload/download endpoints on content.dropboxapi.com.  
+    * Therefore starting with only content.dropboxapi.com is justified for our intended E7 transport. No reason exists yet to open api.dropboxapi.com.
+    
+    I also agree with Orion’s handling of the count-slip issue. Three same-shape errors justify PATTERN_CANDIDATE; they do not justify silently modifying the failure ledger outside this tranche. More importantly, the adopted control—derive counts mechanically from the counted population rather than type them from memory—addresses the mechanism rather than the three instances.
+    
+    So there is no further Kai design ruling required now.
+    
+    The programme state is:
+    
+    Repair branch: d08f3ec… unchanged.
+    Handoff/continuity: 55962cc….
+    Builds: zero.
+    Dropbox writes: zero.
+    E7a: not yet run.
+    Next authority: already granted.
+    Next action: yours—provision App Folder + scopes + content.dropboxapi.com + secret, then open the fresh Orion session.
+    
+    In that new session Orion must recover → re-prove → E7a. Only an actual E7a PASS opens the build gate.
+    
+    One wording correction for Orion to carry forward, not another commit now:
+    
+    DROPBOX_ACCESS_TOKEN is opaque. Do not parse it for expiry. If expiry metadata is explicitly supplied by the authorization mechanism, record that metadata; otherwise do not invent an expiry. Authentication failure during the authorised uninterrupted window is STOP.
+    
+    After that: execute. No more architecture discussion unless reality falsifies v4.5.
+    END-VERBATIM PROMPT-ca5ef1b18eeac83a
+- EVIDENCE PROMPT-be30760577a2a274 transcript 2026-10-02T07:54:28.522Z: 2624 bytes, sha256 c0dcf15487907947998cb7c2c5cc7e9badea96a5566bbec255562858b17c0496, final LF False  [CMD `extract.py transcript` → prompt at 2026-10-02T07:54:28.522Z]
+    BEGIN-VERBATIM PROMPT-be30760577a2a274
+    You’re right to challenge that.
+    
+    Dropbox was not part of the original KAI/Kingsman architecture. It entered the D379 v4.5 repair plan as an E7 build-evidence storage mechanism, not as a KAI architectural component. I made a mistake in my last answer by treating “provision Dropbox” as the obvious next programme step instead of challenging whether that dependency still deserves to exist.
+    
+    The checkpoint itself tells us its origin: D387 selected Dropbox as the proposed durable store because the two complete raw CPython build transcripts needed to survive the ephemeral build environment. That is a mechanism chosen to satisfy an evidence requirement, not the requirement itself.
+    
+    The actual requirement is:
+    
+    Two complete, byte-faithful build transcripts must survive the build environment and remain independently retrievable and bound to the exact builds.
+    
+    Dropbox is only one possible implementation of that requirement.
+    
+    And under the engineering principles you just reminded me of, we should absolutely ask: why are we introducing a new external dependency, token lifecycle, network access, third-party trust boundary and special E7a qualification exercise into D379 if KAI already has—or can use—an existing governed evidence path?
+    
+    That is especially questionable because v4.5 simultaneously wants the actual CPython builds network-isolated. We are creating complexity solely to export evidence before/after those isolated builds.
+    
+    So I would not provision Dropbox yet.
+    
+    The correct next move is to inspect the repository and reconstruct why D387 chose Dropbox, what storage alternatives were evaluated, what the build environment actually provides, and what existing KAI evidence/storage mechanisms already exist. Then we can determine whether Dropbox is genuinely necessary or whether it is accidental architecture introduced to solve an operational constraint.
+    
+    Importantly, because D387 is banked, we don’t silently replace it. If repository evidence shows a better existing mechanism, I bring you the evidence and the precise amendment required. We change the decision deliberately rather than blindly implementing it or quietly bypassing it.
+    
+    So you caught a genuine tunnel-vision problem: I followed the latest execution checkpoint correctly, but I failed to challenge a locally introduced mechanism against the whole-system architecture and our reuse-before-create principle.
+    
+    Next: no Dropbox action. First re-open the repository evidence around D387/E7 and the existing KAI evidence/storage architecture, then adjudicate whether Dropbox belongs there at all. That is the higher-standard route.
+    END-VERBATIM PROMPT-be30760577a2a274
+- EVIDENCE PROMPT-9452688021151eed transcript 2026-10-02T16:41:04.462Z: 2519 bytes, sha256 39857352935844717f02b37a781cb0b710ce6e0eb16066eaae1f8c999bd86cef, final LF False  [CMD `extract.py transcript` → prompt at 2026-10-02T16:41:04.462Z]
+    BEGIN-VERBATIM PROMPT-9452688021151eed
+    Good. I independently checked GitHub rather than relying only on Orion’s report.
+    
+    D390 is genuinely banked. Commit 71704622188956bb092897d80947171b232c4f89 is present and GitHub reports the signature as verified. It changes only kai-pm/DECISIONS.md, exactly +91/−0, with the reported tree a06f01f... and DECISIONS blob 8d16459a.... Entry 25 at b1c6c6e... is also present and signed/verified, recording the subsequent continuity material. So Orion’s local sig=N was only a limitation of his local verifier; GitHub independently validates the signature.
+    
+    In simple programme terms, we have now finished the storage-governance correction:
+    
+    Dropbox is gone from D379. We kept the actual requirement—durable, exact, independently retrievable build evidence—but removed the accidental Dropbox dependency. Git-native immutable evidence is now the banked direction. We also banked that the calibration interpreter we eventually prove good must survive until its job in the later capture is finished, without pretending it is the eventual production runtime.
+    
+    We are still inside D379 / H2 pre-candidate repair. We have not reached candidate generation, holdout, blind 40, Item 8 builds, A-4, Evidence Plane implementation, or Kingsman implementation. This work is repairing and qualifying the measurement/evidence machinery that those later programme stages depend on.
+    
+    The immediate next gate is now E7a-Git: prove with small synthetic hostile data that our chosen Git evidence mechanism really preserves exact bytes, retrieves the right object, rejects wrong evidence, handles failure correctly, doesn’t leak credentials, and doesn’t contaminate the D379 repair/fixity tree. Only an E7a PASS should open the interpreter-build gate.
+    
+    After that the intended chain is essentially:
+    
+    E7a-Git → two controlled CPython builds → preserve exact build evidence → establish/measure the D380 known-positive interpreter → retain the qualified interpreter → continue the bounded v4.5 technical repair/hostile matrix → construct and independently review fixity F → STOP for the separate capture authority.
+    
+    One thing I would not do yet is replay D390 onto the repair branch. We explicitly ruled that this happens at the v4.5 fixity boundary, not now.
+    
+    So we are finally back to execution rather than architecture discussion. The next consequential decision is simply whether you authorize Orion to execute the already-designed E7a-Git v2 only, with STOP on any failure and STOP again after reporting the result.
+    END-VERBATIM PROMPT-9452688021151eed
+- EVIDENCE PROMPT-72589d71949cd660 transcript 2026-10-04T01:15:03.774Z: 112 bytes, sha256 72589d71949cd6609ec6727d4dc9802c44c9f5bc767b4b4e19b729c312a7df70, final LF False  [CMD `extract.py transcript` → prompt at 2026-10-04T01:15:03.774Z]
+    BEGIN-VERBATIM PROMPT-72589d71949cd660
+    While waiting for gpt you know procedure if we see same systematic mistake , please implement to avoid in future
+    END-VERBATIM PROMPT-72589d71949cd660
+- EVIDENCE PROMPT-643c36c4e4ba8191 transcript 2026-10-06T20:21:43.420Z: 2431 bytes, sha256 ae7f3cfd0c699f6ecee4d7ce3520d5f4b7c2b499b148db79925b041dc4f473fe, final LF False  [CMD `extract.py transcript` → prompt at 2026-10-06T20:21:43.420Z]
+    BEGIN-VERBATIM PROMPT-643c36c4e4ba8191
+    Kai's message says DAI-5 is still held and the repair HEAD is `d0c08a4`. Before replying I'm checking that against the live repository, and checking whether I can reach Linear at all.
+    
+    I found that two of the five points Kai asked me to confirm conflict with the repository, and I don't have access to a Linear tool in this session. I'll log Kai's message verbatim as R19 and note the conflict alongside it.
+    
+    I can confirm three of Kai's five points. Two are false: DAI-5 is not held, and the source was changed. Kai's message seems to have been written before my last report. I've saved it word for word in handoff entry 76 (`15f653b`), with the conflict noted next to it.
+    
+    1. **Programme-control model: understood.** Linear coordinates the programme: work packages, dependencies, milestones and status. It never authorises a source change or proves closure. Authority stays with you, then Kai; GitHub's exact evidence remains the technical truth; and Linear updates keep physical, authority, evidence and admission state separate.
+    
+    2. **DAI-5 is not held; it is implemented and waiting for Kai.**
+       - **Authority:** you issued the grant ("Approve exactly as drafted"). I saved that as entry 74 before touching the repair branch.
+       - **Commit:** `claude/d379-repair-eb52f73` is now at `c358798adf4bca392f3f19187d66b3db6008891d`, with parent `d0c08a4`. GitHub shows the signature as verified. It changes exactly the two authorised files, which now match the frozen hashes (`2ab19403…` and `1ccfa601…`).
+       - **Verification:** every check in the grant passed; the full record is entry 75.
+       - **Admission:** Kai has not yet adjudicated it.
+    
+    3. **DAI-6 remains open.** Every command whose exit code counted as evidence was run without a pipe.
+    
+    4. **DAI-7 remains blocked.** It now waits only on Kai adjudicating `c358798`. I haven't started it.
+    
+    5. **Source changes:** since Kai's message, none. Before it, the AW-01 commit above, made under your grant. The Linear setup itself changed nothing in the source.
+    
+    **I can't reach Linear from this session; it has no Linear tool, and no Context7 or Miro either.** So I haven't read the Governance Charter or the Orion Operating Brief, and I haven't updated DAI-5. Someone with Linear access will need to record on DAI-5:
+    - **Physical state:** `c358798`.
+    - **Authority:** handoff entry 74.
+    - **Evidence:** handoff entry 75.
+    - **Admission:** pending Kai.
+    
+    PR #122 stays DO NOT MERGE.
+    END-VERBATIM PROMPT-643c36c4e4ba8191
+
+### 6. Next authorised step
+
+- Report the control and the rescue to Dainius; Kai reviews both when free (entry 84 open questions)  [CONVERSATION 2026-10-07 Dainius, "Kai is busy doing research"]
+
+### 7. What I am unsure of
+
+- Whether a text recovered here is already fully represented in DECISIONS.md; preservation does not depend on it  [CMD `rescue_set.py` → not compared]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
+python3 -B .claude/hooks/ruling_capture.py status
