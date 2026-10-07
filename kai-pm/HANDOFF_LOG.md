@@ -56457,3 +56457,179 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-07T21:55:55Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-07T21:55:55Z  [CMD `date -u +%FT%TZ` → 2026-10-07T21:55:55Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 6a9a6a229ccc0c5d400f49f2db6aae7921542c76  [CMD `git rev-parse HEAD` → 6a9a6a229ccc0c5d400f49f2db6aae7921542c76]
+- tree: 4c7a97569f4440c3bdee01542fef716244b77afc  [CMD `git rev-parse HEAD^{tree}` → 4c7a97569f4440c3bdee01542fef716244b77afc]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 6a9a6a229ccc0c5d400f49f2db6aae7921542c76  [CMD `git ls-remote --heads origin` → 6a9a6a229ccc0c5d400f49f2db6aae7921542c76]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 100  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 100]
+
+### 1. The four states
+
+- physical: unchanged since entry 100 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: as entry 100  [CONVERSATION 2026-10-07 Dainius, "Yes do that as it’s another Chanel of you two have to help working on this project"]
+- evidence: Orion's side of the v1.0 §16D reconciliation matrix, 52 rows in six sections with v1.0's exact columns; classes SAME 9 · MORE PRECISE 29 · CONFLICT 8 · SUPERSEDED BY EVIDENCE 1 · HISTORICAL LINEAGE 1 · UNVERIFIED 4; CONFLICT rows A10, B1, B2, B3, B7, C1, C7, D10; 14 rows need a Dainius decision. Preserved below  [CMD `parse rows of ORION_KAI_RECONCILIATION_MATRIX_v0_1.md` → 52 rows, 0 malformed]
+- admission: none; every disposition is a proposal  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `ruling_capture.py status` → OUTSTANDING=0]
+
+### 3. Authorised / Held / Forbidden
+
+- PAUSED / HELD (unchanged): all engineering per entry 99; ledger mutation, D390, F, capture, candidate, holdout, blind 40, Item 8, merge; code/tooling changes  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- The eight CONFLICT rows and fourteen decision rows in the matrix — owner: Kai / Dainius  [CONVERSATION 2026-10-07 Dainius, "Yes do that as it’s another Chanel of you two have to help working on this project"]
+
+### 5. Incidents and corrections
+
+- Own count corrected before transmission (R13): my hand-written totals said MORE PRECISE 28 and UNVERIFIED 5; the row-parsing derivation gives 29 and 4; the matrix states the derivation and the correction  [CMD `parse rows` → MORE PRECISE 29, UNVERIFIED 4]
+- Credential scan (calibrated): TOTAL HITS 0  [CMD `credscan.py matrix_scan.json` → TOTAL HITS 0]
+- EVIDENCE ORION-KAI-RECONCILIATION-MATRIX-V0-1 ORION_KAI_RECONCILIATION_MATRIX_v0_1.md: 19246 bytes, sha256 8533668c40af6c3f0d7b31553c6fe2beb0b80a300972c922323ea60b31ca51e6, final LF True  [CMD `sha256sum ORION_KAI_RECONCILIATION_MATRIX_v0_1.md` → 8533668c40af6c3f…]
+    BEGIN-VERBATIM ORION-KAI-RECONCILIATION-MATRIX-V0-1
+    # Orion ↔ Kai ↔ Repository ↔ Research Reconciliation Matrix — Orion side, v0.1
+    
+    > **Status:** Orion's input to the matrix required by *KAI Kingsman Master Plan v1.0 — Locked Planning Baseline* §16D
+    > (Linear document `a0fad986-5e60-4f80-9588-0713ce200da6`, updatedAt 2026-10-07T21:37:51.833Z). Read-only. **Not authority:**
+    > every "Final disposition" below is a **PROPOSAL** for Kai to reconcile and Dainius to decide. Engineering is paused
+    > (handoff entry 99); nothing here asks to resume it.
+    >
+    > **Sources.** *Orion note* = handoff entries 93 (citation check), 95 (review), 97 (candidate plan v0.1), 98 (Linear
+    > conflicts). *Kai* = v1.0 incl. Amendment A1 and §16. *Repo evidence* at commit `6a9a6a2` on
+    > `claude/project-rework-plan-pgvp35`; **[V]** = opened by Orion, **[S]** = subagent-reported, not re-read.
+    > *Research* = only sources Orion verified (entries 93, 95).
+    >
+    > **Difference classes (v1.0 §16C):** SAME · MORE PRECISE · SUPERSEDED BY EVIDENCE · CONFLICT · HISTORICAL LINEAGE · UNVERIFIED.
+    
+    Columns: `# | Topic | Original intent | Orion note | Current repo evidence | Current authority | Research recommendation | Difference class | Final disposition (PROPOSED) | Evidence needed | Owner decision needed`
+    
+    ## A. Programme and governance
+    
+    | # | Topic | Original intent | Orion note | Current repo evidence | Current authority | Research recommendation | Difference class | Final disposition (PROPOSED) | Evidence needed | Owner decision needed |
+    |---|---|---|---|---|---|---|---|---|---|---|
+    | A1 | Programme order | One governed sequence | Copy D359 verbatim; Kingsman work only after its last step (candidate §11.1) | D359 at DECISIONS.md:30299-30331 [V]; v1.0 §11 is a dependency order "does not replace" programme authority | D359 (sole canonical source) | — | MORE PRECISE | Show D359 verbatim beside v1.0 §11 in the canon; label §11 "architecture dependency, not permission" | none | No |
+    | A2 | Item 8 before A4 | Item 8 an upstream assurance obligation | Explicit in candidate §11.1; D290 implemented, not executed | DECISIONS.md:22284 D290 [V] | D359; canon plan §4.2 | — | MORE PRECISE (v1.0 §16B already concedes the omission) | Restore in v1.0 body | none | No |
+    | A3 | A-4 PROVENANCE vs FUTURE A4 SELF-DIAGNOSIS vs autonomy level A4 | Two separate concepts | Three-way collision; rename autonomy levels AUTONOMY_0…4 (candidate §5.6) | D359 forbids bare A4 (DEC:30389-30391) [S] | D359 | — | MORE PRECISE | Always write in full; adopt a non-colliding autonomy-level name | none | Yes (naming) |
+    | A4 | Current position | Where we actually are | House H2 (D379, dated 2026-09-18, still open); DAI-6/7 paused | DECISIONS.md:34967 [V]; entry 99 | D379; Dainius pause (entry 99) | — | SAME | Carry in canon §"Current position" | none | No |
+    | A5 | Engineering pause | Reconstruct the universe first | Confirmed by Dainius to Orion ("Ruling pause", entry 99) | Linear DAI-9/DAI-6; HANDOFF entry 99 | Dainius ruling (⚠ UNBANKED until a D-number) | — | SAME | Bank as a D-number when Kai next allocates | none | Yes (release criteria = v1.0 §15) |
+    | A6 | Canon process | C0→C9, freeze only after mapping, DeepSeek, Dainius, exact bytes | Candidate §13 + DoD self-assessment | canon plan §6, §9 [V] | canon plan; D351 | — | MORE PRECISE (v1.0 §16B: "preserve under DAI-10") | Make C0–C9 the DAI-10 checklist | none | No |
+    | A7 | D344–D353 append queue | Canonical ledger complete | D351/D353 not yet canonical D-numbers | DECISIONS_CANONICAL_APPEND_QUEUE_D344_D353.md [S]; cold-start §5.2 | D351/D353 pending append | — | MORE PRECISE (v1.0 §16B lists it as unrepresented) | Close the queue before canon freeze | exact bytes of D344–D353 | Yes |
+    | A8 | Roles | Dainius final; Kai adjudicates; Orion executes; GPT read-only; DeepSeek no access | Candidate §10.1 | cold-start §3 [V] | CLAUDE.md; cold-start §3 | — | MORE PRECISE (v1.0 §16B: omitted) | Restore role table in governance map | none | No |
+    | A9 | Tool boundaries | GitHub = truth; Linear/Miro = coordination/projection | Same; plus: Linear text is not banked until in the repo (entry 98) | DAI-8 description; entry 98 | DAI-8; R19 | — | MORE PRECISE | Every Linear ruling gets a repo bank (handoff ⚠ UNBANKED → D-number) | none | No |
+    | A10 | Effort estimates | Realistic planning | No engineer-week estimates; gates by evidence | D379 still open after 19 days [V] | — | — | CONFLICT (Kai's entry-89 plan gave 6–10 engineer-weeks; v1.0 has none) | Keep v1.0's omission; forbid estimates in canon | none | No |
+    
+    ## B. Constitution and vocabulary
+    
+    | # | Topic | Original intent | Orion note | Current repo evidence | Current authority | Research recommendation | Difference class | Final disposition (PROPOSED) | Evidence needed | Owner decision needed |
+    |---|---|---|---|---|---|---|---|---|---|---|
+    | B1 | Front door | Kai shown as a living organism | Eleven IDX organs at the front, engineering beneath (candidate §1–§3) | IDX:58-74 [V]; D351:213-229 [V] | D351 §6B; IDX | — | CONFLICT (v1.0 §3 has no Soul/Inner Life and no Growth/Dream organ; engineering planes are peers of organs) | Organs per IDX on top; v1.0 §3 planes as drill-down | none | Yes (D351 bar) |
+    | B2 | Presentation bar | TODAY / MATURE TO / CHANGE TYPE / STATUS / WHY per organ | Candidate §2–§4 per organ | D351:233-239 [V] | D351 §6C | — | CONFLICT (v1.0 has no per-organ delta view) | Adopt per-organ TODAY/MATURED table | E0 census to fill STATUS | No |
+    | B3 | Status vocabulary | One honest status set incl. UNKNOWN | IDX six states govern; PLANNED/DEGRADED only if approved; release states a separate axis | IDX:33, D351:238 [V] | IDX/D351 | — | CONFLICT (v1.0 §12: PLANNED…RETIRED drops BUILT-NOT-CUT-OVER, WORKING, BLOCKED, UNKNOWN) | IDX vocabulary + optional PLANNED/DEGRADED; release states separate | none | **Yes** |
+    | B4 | Risk tiers | One risk vocabulary | Code has 5 (`RiskTier`); spec R0–R4; README "8" are migration tiers | common/contracts/base.py:27-32 [V]; README.md:118 [V] | final product spec | — | SUPERSEDED BY EVIDENCE (Kai's entry-89 "eight risk tiers") | R0–R4 mapped to code enum; rename migration tiers | none | Yes (naming) |
+    | B5 | "H" naming | Unambiguous names | HOUSE_H0–H6 vs power "Mode H0–H3" | product spec:207-231 [V] | D359 bans bare H<n> | — | MORE PRECISE (not in v1.0) | Rename power modes (SENTINEL/PORTABLE/DOCKED/MAINTENANCE) | none | Yes (naming) |
+    | B6 | Constitution | Stable invariants | Nine laws + FP-INV-01…12 + continuity classes (candidate §5.1) | cold-start §7.1, §10 [V] | mission doctrine; final spec | — | MORE PRECISE (v1.0 §2 has 15 invariants; FP-INV and nine laws not cited) | Merge: v1.0 §2 + nine laws + FP-INV list, deduplicated | none | No |
+    | B7 | Control loop | One governed path incl. DURABLE WORKFLOW | Candidate §5.2 includes DURABLE WORKFLOW and the firewall | canon plan §3 [V]; cold-start §7.2 [V] | canon plan | — | CONFLICT (v1.0 §4 loop has no DURABLE WORKFLOW stage) | Add DURABLE WORKFLOW between capability and execute | none | No |
+    
+    ## C. Organs (TODAY ↔ matured)
+    
+    | # | Topic | Original intent | Orion note | Current repo evidence | Current authority | Research recommendation | Difference class | Final disposition (PROPOSED) | Evidence needed | Owner decision needed |
+    |---|---|---|---|---|---|---|---|---|---|---|
+    | C1 | Soul / Inner Life | Identity, values, narrative self | Core invariant with change control; SOUL as projection; `POST /soul` via governed hands | data/SOUL.md (do not touch); POST /soul outside catalogue [S]; CONSCIENCE_FILTER never read [S] | D60; mission doctrine | — | CONFLICT (v1.0 folds Soul into "narrative projection" only) | Keep Soul as a front-door organ; narrative = its projection | runtime check of POST /soul path | Yes |
+    | C2 | Memory | Continuity of the same Kai | Keep memu-core/Cognee/Letta/vault-sync; clarify source vs projection | pgvector+TurboVec; Cognee 1.1.3 & Letta 0.16.8 full compose only; Graphiti not in code (D29) [S] | D351:152; D353:59 | Graphiti-style temporal validity useful as design reference | MORE PRECISE (v1.0 §6 journal+outbox is a direction; must "trace first", COLD:780) | Journal/outbox as target only after ownership trace | E0 ownership trace | No |
+    | C3 | Senses / World State | Know the present honestly | Poll fallback must be READ-only and fenced | KAI_CORTEX_SOURCE=poll default, fallback cortex_source.py:17-21 [S]; perception shadow | IDX retained finding; migration invariants | — | MORE PRECISE | Name the fallback as a live defect in canon | runtime confirmation of default | No |
+    | C4 | Intelligence | Think well; never self-authorise | Conviction still drives cosign/FSM gate → must become information only | tool-gate cosign by conviction; FSM gate 7.0–8.0 [S] | FP-INV; "intelligence is not authority" | — | MORE PRECISE (v1.0 states the principle, not the live defect) | Carry as live defect | runtime check | No |
+    | C5 | Specialists | Many minds, one Kai | 5 teammates on disk (README says 4); Global Workspace coordinates only | data/teammates/ 5 files [V]; README.md:211 says 4 [V] | FP-INV-03 | — | MORE PRECISE | Correct count; GW holds no credentials | none | No |
+    | C6 | Proactivity | Notice without being asked | Nine stages, nine outcomes, PROACTIVE AWARENESS DEGRADED | 5-minute observer loop [R] | proactive doctrine §4, §15 | — | MORE PRECISE (v1.0 §3 has the organ, not the stages/outcomes) | Add nine outcomes + degraded-awareness state | none | No |
+    | C7 | Governed hands | Act only with exact authority | Legacy routes are the only live hands; capabilities one-use but not exact/signed/durable | capability.py:45,56 [V]; action.py:18-33 [V]; legacy_verification.py:16,52 [V]; dispatch() no non-test caller [V] | IDX:83 (evolve behind Tool Gate/ActuatorRegistry) | Tracked Capabilities (ACM CAIS 2026) as one candidate defence layer | CONFLICT (v1.0 §3 names Policy/Authority/Capability boxes, never Tool Gate or ActuatorRegistry) | A1.2 contract implemented behind Tool Gate/ActuatorRegistry | E0 + bypass proof | No |
+    | C8 | Doctor / resilience | Diagnose, contain, recover honestly | One SEE→…→LEARN loop; supervisor `/recover/{name}` unauthenticated (off by default) | supervisor/app.py:756-760 [V]; House Doctor diagnose-only [S] | canon §4.8 | — | MORE PRECISE | Carry defect; unified loop in canon | none | No |
+    | C9 | Growth / Dream | Kai discovers, never self-authorises | Proposal-only today; admission for skills AND model artifacts | skill-hunter writes probationary .md [S]; Evolver insights only [S] | North Star V | SSDF/SLSA as references | MORE PRECISE (v1.0 §3 "Evolution Lab" lacks Dream) | Keep Growth/Dream as organ name | none | No |
+    | C10 | Stewardship | Survive beyond Dainius | Restore = Postgres only; ledger backup = stats only; restore epoch needed | backup-service [S] | stewardship doctrine | — | MORE PRECISE | Resurrection drill incl. epoch before irreversible autonomy | restore drill | Yes (escrow, succession) |
+    | C11 | Mission Control | Operator sees the organism | Dashboard becomes Mission Control; approval screens rendered from exact fields | dashboard/app.py 2,862 lines, proxies [S] | D351:156; OV-7A | — | MORE PRECISE (approval-rendering integrity absent in v1.0) | Add approval-rendering rule | none | No |
+    
+    ## D. Mechanisms
+    
+    | # | Topic | Original intent | Orion note | Current repo evidence | Current authority | Research recommendation | Difference class | Final disposition (PROPOSED) | Evidence needed | Owner decision needed |
+    |---|---|---|---|---|---|---|---|---|---|---|
+    | D1 | Provenance binding | Memory never silently sets actions | Bind to source records; **derivation check** (value literally in record or from a declared non-model function) | none (no ParameterBinding today) | — | MEMDRIFT arXiv 2605.24941 | MORE PRECISE (v1.0 A1.1 binds to records but has no derivation rule) | Add derivation rule to A1.1 | prototype | No |
+    | D2 | Who mints operator instructions | Operator sovereignty | Only authenticated operator channels; key outside model's OS principal | Tool Gate HMAC shared key, caller supplies identity [S] | FP-INV-04 | — | MORE PRECISE (absent in v1.0) | Add to A1.1 | design | No |
+    | D3 | Capability contract | Exact authority at final hand | Reuse Ed25519 service identity; add restore epoch; crypto-agility fields | Ed25519 wired to one endpoint cortex/app.py:569 [S] | IDX:82; D353:60; R353-02 | — | MORE PRECISE (v1.0 A1.2 has revocation_epoch but no algorithm/proof version, no explicit restore epoch) | Add algorithm/key/proof version + restore epoch | none | No |
+    | D4 | Outcome verification | Actor never certifies itself | Executor's own record is not independent; UNVERIFIABLE closes only by acknowledgement | none | cold-start §5.5 | draft-das-execution-finality-deployment-01 | SAME (v1.0 A1.3 "independently derived" ≈ Orion) | Keep A1.3; add example "sent folder ≠ independent" | per-actuator matrix | No |
+    | D5 | Single-host trust boundary | Separations must be real | State the boundary; OS principals/containers; TPM-bound keys | none | FP-INV-09 | — | MORE PRECISE (absent in v1.0) | Add trust-boundary section | threat model | No |
+    | D6 | Restore vs one-use state | Restore must not revive permissions | Epoch bump on every restore | capability/nonce state not backed up [S] | R353-01 | — | MORE PRECISE (absent in v1.0) | Add to resurrection drill | drill | No |
+    | D7 | Time trust | Expiry cannot be fooled | Monotonic deadlines + trusted-time policy | monotonic use in perception lease (D353:101) [S] | R353-03 | — | MORE PRECISE (v1.0 lists temporal dimensions, not time trust) | Add | none | No |
+    | D8 | Approval integrity | What Dainius sees is what runs | Deterministic rendering; budgets vs approval fatigue | none | FP-INV-04 | — | MORE PRECISE (absent in v1.0) | Add | none | No |
+    | D9 | KaiBench calibration | Model choice by evidence | I-8: known +/−, held-out suite, cross-family judges | none | ENGINEERING_DOCTRINE I-8 | Inspect AI / garak / Promptfoo exist (verified) | MORE PRECISE | Add I-8 rule to WP4 | none | No |
+    | D10 | Runtime abstraction timing | Do not over-build | Ollama stays until multi-runtime pressure | ollama 0.6.8 + qwen2.5:0.5b live default [S] | D351:161 | Lemonade strong candidate (verified) | CONFLICT (v1.0 WP4 "replace fixed model council and framework dependency" without D351:161 condition) | WP4 gated on demonstrated pressure | pressure evidence | No |
+    | D11 | LangGraph | Workflow mechanism | Not used by services; CVE not applicable today | langgraph>=0.2.0 floor, imported only in scripts/agentic_integration_test.py [V]; langgraph-sdk absent [S] | — | CVE-2026-104873 fixed in 0.4.4 | MORE PRECISE (v1.0 A1.6 correct but implies LangGraph is in use) | Note "not used today" | none | No |
+    
+    ## E. Research sources (v1.0 A1.10 vs Orion's checks)
+    
+    | # | Topic | Original intent | Orion note | Current repo evidence | Current authority | Research recommendation | Difference class | Final disposition (PROPOSED) | Evidence needed | Owner decision needed |
+    |---|---|---|---|---|---|---|---|---|---|---|
+    | E1 | MEMDRIFT | Evidence-backed firewall | VERIFIED (arXiv 2605.24941; 6,062 tools / 288 servers / 608; up to +3.6) | — | R13 | — | SAME | Cite with arXiv id | none | No |
+    | E2 | PERSIST (46.2%→8.9%) | — | NOT FOUND; nearest SMSR arXiv 2606.12703 (65.3%→5.3%) | — | R13/R16 | SMSR | UNVERIFIED (A1.10 accepts it "after source verification") | Kai supplies link or replace with SMSR | source link | No |
+    | E3 | IETF "Execution Outcome Attestation" / COGITATOR | — | Title NOT FOUND; real related drafts exist | — | R13 | draft-das-execution-finality-deployment-01 | UNVERIFIED | Cite real drafts by name | source link | No |
+    | E4 | OECD Agent Evidence Conformance Suite | — | NOT FOUND | — | R13 | — | UNVERIFIED | Kai supplies link or remove | source link | No |
+    | E5 | MCPTox | — | "72.8%" is one model's ASR; average 36.5% | — | R13 | arXiv 2508.14925 | SAME (A1.10 scopes it correctly) | Keep A1.10 wording | none | No |
+    | E6 | ">90% chained MCP" | — | Tool-chaining (STAC), not MCP poisoning | — | R13 | arXiv 2509.25624 | SAME (A1.10 rejects it) | Keep rejected | none | No |
+    | E7 | eBPF "sub-100ns/200x" | — | NOT FOUND | — | R13 | — | SAME (A1.10 rejects) | Keep rejected | none | No |
+    | E8 | Kai's own `fileciteturn` references | — | Not resolvable from the repo | — | COLD:107-108 (locators, not evidence) | — | UNVERIFIED | Replace with repo paths in canon | paths | No |
+    
+    ## F. Stewardship, money, hardware
+    
+    | # | Topic | Original intent | Orion note | Current repo evidence | Current authority | Research recommendation | Difference class | Final disposition (PROPOSED) | Evidence needed | Owner decision needed |
+    |---|---|---|---|---|---|---|---|---|---|---|
+    | F1 | 70/30 provenance | 70% family / 30% KAI development fund | Not in any committed file; repo's only "70/30" is an unrelated WORK-mode checklist (sovereign_ai_spec.md:1268); Orion's earlier claim corrected (entry 97) | docs/sovereign_ai_spec.md:1268 [V] | Dainius intent (unbanked) | — | HISTORICAL LINEAGE (intent exists outside the repo) | Bank Dainius's own words as the source | Dainius statement | **Yes** |
+    | F2 | Succession / fund priority | Core mission, not optional | Requirements early, vehicles later | D270 "LOGGED, NOT PRIORITISED" DEC:19321-19325 [V] | D270 | — | SAME as v1.0 A1.9 (requirements early, legal vehicle after professional advice) | Adopt A1.9; Dainius confirms D270 is re-prioritised for requirements only | none | **Yes** |
+    | F3 | Key escrow / incapacity authority | Kai survives Dainius safely | Escrow model and trusted-human roles undecided | none | stewardship §19 | — | MORE PRECISE (v1.0 A1.11-7 requires requirements, not the 15 questions) | Carry the 15 stewardship questions into DAI-14 | none | Yes |
+    | F4 | Home-sensing privacy | Protect daughter/visitors | Consent, retention, deletion, egress | none | stewardship §14 | — | SAME in principle (v1.0 "always-on raw surveillance" uncommitted) | Add explicit privacy requirements to WP8 | none | Yes |
+    | F5 | Hardware generation | Buy the right body | Ryzen AI MAX 400 announced, ASUS partner Q3 2026; single-sided 2230 verified via ASUS spec (summary) | — | — | ASUS spec; AMD announcement | MORE PRECISE (v1.0 A1.7 keeps single-sided "until verified") | Re-check successor before purchase; confirm single-sided on the exact SKU | exact SKU docs | Yes (timing) |
+    
+    ## Totals (derived from the rows above)
+    
+    Derivation: a script parses every table row starting `| <A–F><n> |`, checks it has 11 cells (0 malformed), and
+    counts the Difference-class cell by its leading class name. Unit: matrix rows.
+    Rows: 52 (A 10 · B 7 · C 11 · D 11 · E 8 · F 5). Classes: SAME 9 · MORE PRECISE 29 · CONFLICT 8 · SUPERSEDED BY EVIDENCE 1 · HISTORICAL LINEAGE 1 · UNVERIFIED 4.
+    (My first hand count said MORE PRECISE 28 and UNVERIFIED 5; the derived count above replaces it.)
+    Rows needing a Dainius decision: A3, A5, A7, B1, B3, B4, B5, C1, C10, F1, F2, F3, F4, F5.
+    
+    **CONFLICT rows (need explicit disposition under v1.0 §16C):** A10, B1, B2, B3, B7, C1, C7, D10.
+    END-VERBATIM ORION-KAI-RECONCILIATION-MATRIX-V0-1
+
+### 6. Next authorised step
+
+- Publish the matrix as a new Linear document and link it from DAI-9 with one comment; record the URL  [CONVERSATION 2026-10-07 Dainius, "Yes do that as it’s another Chanel of you two have to help working on this project"]
+
+### 7. What I am unsure of
+
+- Rows marked [S] rest on subagent reads  [CMD `review entry 95` → [S] marks]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
