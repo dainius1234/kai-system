@@ -57975,3 +57975,69 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-07T22:23:46Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-07T22:23:46Z  [CMD `date -u +%FT%TZ` → 2026-10-07T22:23:46Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 7e9b46c3586a53ea98055526b11220a2ce82a910  [CMD `git rev-parse HEAD` → 7e9b46c3586a53ea98055526b11220a2ce82a910]
+- tree: e9aa993dc43c59bb35a69cf944f8dc87c1a61cf5  [CMD `git rev-parse HEAD^{tree}` → e9aa993dc43c59bb35a69cf944f8dc87c1a61cf5]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 7e9b46c3586a53ea98055526b11220a2ce82a910  [CMD `git ls-remote --heads origin` → 7e9b46c3586a53ea98055526b11220a2ce82a910]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 107  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 107]
+
+### 1. The four states
+
+- physical: unchanged since entry 107 apart from this entry; Linear: one attachment on DAI-10, one comment on DAI-9  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: as entry 105  [CONVERSATION 2026-10-07 Dainius, "Now I want to develop one master plan agree on it make sure none of features are missing  from read me. Take it to today’s available updates to reach common goal and stick to it"]
+- evidence: the corrected plan file (47,754 bytes, sha256 8c7d574e22cf7ebb2ae481a030a36699b2db334590ff67bf2b62633c1874857a) uploaded as a Linear attachment on DAI-10 via a signed PUT whose signed header fixed the length to exactly 47,754 bytes  [CMD `Linear prepare_attachment_upload + curl PUT + create_attachment_from_upload (issue DAI-10)` → HTTP 200; attachment id e5a6c488-2bfd-4bb6-b8dd-e16384ef7f48]
+- evidence: pointer comment for Kai on DAI-9  [CMD `Linear save_comment (issue DAI-9)` → id 87c92c6a-7c48-489a-9b11-4e6a15330cdc, createdAt 2026-10-07T22:23:31.812Z]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `ruling_capture.py status` → OUTSTANDING=0]
+
+### 3. Authorised / Held / Forbidden
+
+- PAUSED / HELD (unchanged): all engineering per entry 99  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- Kai's answers to the [ORION→KAI] marks; Dainius's [DAINIUS] marks  [CMD `Linear save_comment (issue DAI-9)` → id 87c92c6a-7c48-489a-9b11-4e6a15330cdc, createdAt 2026-10-07T22:23:31.812Z]
+
+### 5. Incidents and corrections
+
+- Verification limit, stated: byte count of the uploaded file is constrained by the signed upload (47,754 = local size) and the PUT returned HTTP 200; byte-for-byte equality was NOT read back — downloading from uploads.linear.app is denied by this environment's egress proxy (CONNECT 403, organization policy). Never disabled TLS or the proxy  [CMD `curl uploads.linear.app/...` → CONNECT tunnel failed, response 403]
+
+### 6. Next authorised step
+
+- Report to Dainius; await Kai's marks and Dainius's decisions; engineering stays paused  [CONVERSATION 2026-10-07 Dainius, "Now I want to develop one master plan agree on it make sure none of features are missing  from read me. Take it to today’s available updates to reach common goal and stick to it"]
+
+### 7. What I am unsure of
+
+- Exact byte equality of Linear's stored copy (see section 5)  [CMD `Linear prepare_attachment_upload + curl PUT + create_attachment_from_upload (issue DAI-10)` → HTTP 200; attachment id e5a6c488-2bfd-4bb6-b8dd-e16384ef7f48]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
