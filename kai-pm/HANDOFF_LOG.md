@@ -54662,3 +54662,627 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-07T21:17:00Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-07T21:17:00Z  [CMD `date -u +%FT%TZ` → 2026-10-07T21:17:00Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: c2097ff57a41b461ae39b1a1a62ec8eb88b736fd  [CMD `git rev-parse HEAD` → c2097ff57a41b461ae39b1a1a62ec8eb88b736fd]
+- tree: 397be54f7b217295ef6de934320506e6beecf746  [CMD `git rev-parse HEAD^{tree}` → 397be54f7b217295ef6de934320506e6beecf746]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/project-rework-plan-pgvp35: c2097ff57a41b461ae39b1a1a62ec8eb88b736fd  [CMD `git ls-remote --heads origin` → c2097ff57a41b461ae39b1a1a62ec8eb88b736fd]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 94  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 94]
+
+### 1. The four states
+
+- physical: unchanged since entry 94 apart from this entry; no source or tooling file touched  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: as entry 94 (read-only review and attack)  [CONVERSATION 2026-10-07 Dainius, "do your own review and checks and attack to make sure we cover from all sides /diffrent angles"]
+- evidence: Orion's consolidated review of the Kingsman baseline (entry 89) and the Deep Research Analysis (entry 92) from four angles — repository truth, governing doctrine, external claims, Orion's own design attacks — preserved below with the three subagent reports in full (R10). Key repository and doctrine findings re-verified by Orion by direct read; the rest are marked subagent-reported  [FILE kai-pm/DECISIONS.md:30299]
+- admission: none; findings are not admissions; Kai reconciles, Dainius decides  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `ruling_capture.py status` → OUTSTANDING=0]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD (unchanged): the plan as design authority until Dainius's review and the DeepSeek attack are reconciled; DAI-6 implementation, DAI-7, ledger mutation incl. INC-35, D390, F, capture, candidate, holdout, blind 40, Item 8, merge; Orion module design  [CONVERSATION 2026-10-07 Dainius, "Ruling this is only the base line pending review and adversary deep seeks attack"]
+
+### 4. Open questions
+
+- Headline for Kai's amendment: 2 BLOCKERS on the plan (front door not organism-first, IDX:58-74; D351 presentation bar not met, D351:198) and the plan's priority table must be D359's order (DECISIONS.md:30299-30331); full list in the review below — owner: Kai  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:74]
+- Live repository defects surfaced by the census, not repaired here (repair is not authorised): paper_trader trust gate fails open (agentic/paper_trader.py:168); supervisor POST /recover/{service_name} without auth decorator (supervisor/app.py:756, gated by SUPERVISOR_RECOVERY_ENABLED default false); capabilities in-memory, unsigned, not parameter-bound (common/policy_bridge/capability.py:45,56) — owner: Kai / Dainius  [FILE agentic/paper_trader.py:168]
+
+### 5. Incidents and corrections
+
+- Own correction before transmission: my draft attack A9 said D379 "opened before 2026-09-18"; the source says D379 is dated 2026-09-18 (DECISIONS.md:34967); corrected in the text below  [FILE kai-pm/DECISIONS.md:34967]
+- The doctrine subagent repeated the LangGraph "contradiction" (its finding 14); entry 93 established the advisory range excludes 0.4.4, and the census shows langgraph-sdk absent from the repository — the CVE does not apply today. Report preserved unedited; this line is the correction  [CMD `git grep -n "from langgraph" HEAD` → scripts/agentic_integration_test.py only]
+- Credential scan of all five texts (calibrated): TOTAL HITS 0  [CMD `credscan.py review_scan.json` → TOTAL HITS 0]
+- EVIDENCE ORION-REVIEW-KINGSMAN-BASELINE ORION_REVIEW_KINGSMAN_BASELINE.md: 15824 bytes, sha256 2780de0a7d34e6f6ff27ec58df6395ea16a85d8b632e736f26534be46314c2e3, final LF True  [CMD `sha256sum ORION_REVIEW_KINGSMAN_BASELINE.md` → 2780de0a7d34e6f6…]
+    BEGIN-VERBATIM ORION-REVIEW-KINGSMAN-BASELINE
+    # Orion — independent review and attack of the Kingsman baseline (entry 89) and the Deep Research Analysis (entry 92)
+    
+    Directed by Dainius 2026-10-07 (entry 94). Read-only. Review, not design. No finding here is an admission;
+    Kai reconciles, Dainius decides.
+    
+    ## Method and universe
+    
+    - Subject: plan text sha256 0cdc29ec… (62,486 bytes, entry 89); analysis text sha256 4b9e5c26… (14,382 bytes, entry 92).
+    - Angle 1 — repository truth: subagent census over the working tree at 213c714…/c2097ff (excluding .git and
+      kai-pm/HANDOFF_LOG.md; 50 requirements files, all Dockerfiles, 3 compose files, .github/workflows).
+      Key findings RE-VERIFIED BY ORION by direct read (marked [V]); others are subagent-reported (marked [S]).
+    - Angle 2 — governing doctrine: subagent read IDX, D351, D353, mission doctrine, canon plan, cold-start master,
+      NEXT_STINT_PLAN in full, D359/D387–D390/D270 in DECISIONS.md. Key quotes re-verified by Orion [V].
+    - Angle 3 — external claims: subagent web verification (search summaries; ASUS/ROCm pages not opened directly);
+      plus Orion's own six searches (entry 93).
+    - Angle 4 — Orion's own design attacks (reasoning; each states what would check it).
+    - The three subagent reports are preserved in full alongside this review (R10).
+    
+    Severity: BLOCKER = must be fixed before the plan can be considered for canon; MAJOR = must be resolved before
+    freeze; MINOR = fix in the amendment.
+    
+    ## 1. Programme and doctrine (BLOCKERS first)
+    
+    D1 BLOCKER (plan) — front door is not the organism. The nine "organs" are engineering planes; the product
+       groupings the index says MUST survive at the front door are demoted or missing: Senses, Proactivity/Goals/
+       Attention, Immune System/Doctor/Resilience, Growth/Dream/Evolution, Continuity/Stewardship/Sustainability,
+       Operator Relationship/Mission Control; Soul/Inner Life reduced to a "narrative projection".
+       [V] IDX:58-74 ("Engineering/control terminology is a drill-down beneath these concepts, not a replacement").
+    D2 BLOCKER (plan) — D351 presentation bar not met. No KAI TODAY → KAI MATURED → WHAT CHANGES → STATUS view per
+       organ; the migration matrix has no CHANGE TYPE and no STATUS column; yet the plan closes "comfortable
+       freezing". [V] D351:198 "unacceptable unless it beats the stale README on communication while beating it on
+       truth and engineering".
+    D3 MAJOR (plan) — priority table collapses D359. "Finish current assurance sequence" hides House H3–H6 + exit
+       ruling, the 048 path with ITEM8_GO, A-4_PROVENANCE, Assurance Integration Mapping, Professionalisation/CI
+       truth; Evidence Plane and Kingsman implementation are at P1, D359 puts them LAST.
+       [V] DECISIONS.md:30299-30303 ("D359 is the SOLE canonical source of programme order") and :30314-30331.
+    D4 MAJOR (plan) — bare "A4", never distinguished from A-4_PROVENANCE; Item 8 not in the roadmap. [S] DEC:30333-30335, 30389-30391.
+    D5 MAJOR (analysis) — revised priorities (fund/succession to P1, crypto to P0) contradict banked rulings.
+       [V] DECISIONS.md:19321-19325 (D270: succession "LOGGED, NOT PRIORITISED … does not outrank Stage 2 unless the
+       operator explicitly changes programme priority"). Only Dainius can change that.
+    D6 MAJOR (plan) — new boxes without lineage; organ list and migration matrix disagree (Perception, Mission
+       Control, Lineage/Resurrection, Sustainability, Evolution Lab appear only as matrix homes; Evidence Plane,
+       World State, Verification, Inference Fabric have no current-to-target row). [S] IDX:108.
+    D7 MAJOR (plan) — authority split drawn as new Policy/Approval/Issuer boxes; Tool Gate and ActuatorRegistry
+       (0 mentions) are the banked evolution path. [V] IDX:83 "Durable authority/workflow should evolve behind current
+       Tool Gate/ActuatorRegistry interfaces."
+    D8 MAJOR (plan) — Inference Fabric + Resource Governor at P1 runs ahead of D351's condition.
+       [V] D351:161 "Ollama/current model serving remains until actual multi-runtime pressure earns a larger runtime
+       abstraction." D353 forbids a central mega-scheduler [S D353:113-115].
+    D9 MAJOR (plan) — "Canonical Memory / Evidence Journal" merges memory and evidence (contradicting its own
+       "Evidence is not memory") and risks a second truth system. [S] D353:59, COLD:780 "trace first".
+    D10 MAJOR (analysis) — redesigns capability and memory crypto from scratch.
+       [V] IDX:82 "Existing signed-workload-identity replay/timestamp/nonce/body/path protections should be finished,
+       not rebuilt." Crypto-agility version fields (D353:93) missing from its formats [S].
+    D11 MAJOR (plan) — status vocabulary conflicts with IDX/D351 (LIVE / BUILT-NOT-CUT-OVER / WORKING / STUB /
+       BLOCKED / UNKNOWN). Drops BUILT-NOT-CUT-OVER (which Unified Hunter is) and UNKNOWN ("Unknown remains
+       unknown"). Four status vocabularies now coexist. [S] IDX:33, D351:238.
+    D12 MAJOR (plan) — canon-required items omitted [S, list in the doctrine report]: DURABLE WORKFLOW stage;
+       A4 reconciliation content; Evidence Plane applicability/attestations; Global Workspace / Socratic / Sage;
+       Ohana/values; unified self-diagnosis loop; autonomy levels A0–A4 and trust negotiation; secure-update
+       anti-rollback (R353-01); crypto agility (R353-02); decision-time/monotonic deadlines; data-classification
+       propagation; E0 census qualification; KAI-REV-018 durable grant state; general egress constraints;
+       Goal/Watch/Attention; PROACTIVE AWARENESS DEGRADED; the Mission/Kingsman/House hierarchy; the canon freeze
+       process (Orion mapping, DeepSeek review, Dainius approval, exact-byte freeze).
+    D13 MAJOR (analysis) — headed "Ruling" with verdict "NO DESIGN BLOCKER", but never tested against D351/IDX, so
+       it missed D1–D2. A reviewer's verdict is not an admission.
+    D14 MINOR (analysis) — misstates the plan's priorities (no "Independent verification" or "memory security" rows
+       exist in the plan's table). [S]
+    
+    ## 2. Repository truth — what KAI is today vs what the plan says
+    
+    R1 MAJOR — "eight risk tiers" is wrong: the code has FIVE risk tiers; the eight are migration tiers.
+       [V] common/contracts/base.py:27-32 (OBSERVE, ADVISE, PROPOSE, ACT_SUPERVISED, ACT_AUTONOMOUS). The plan copied
+       README:118. Any authority design keyed on eight risk tiers will not match the code.
+    R2 MAJOR — capabilities are one-use but NOT exact, NOT signed, NOT durable. [V] capability.py:45 in-memory dict;
+       issue() takes free-form `parameters` (:56,77); ActionProposal has no parameters or target field
+       (action.py:18-33). Tool Gate's HMAC signs actor|session|tool|nonce|ts, not parameters [S auth.py:70-71].
+    R3 MAJOR — the legacy paths are the ONLY live hands, guarded by a shared token, not a capability.
+       [V] legacy_verification.py:52 checks only for `require_service_auth`; its own line 16: "requiring a capability
+       token is the actual fix". [V] ActuatorRegistry.dispatch has no non-test caller.
+    R4 MAJOR — conviction still drives gate decisions today (tool-gate cosign; FSM conviction gate 7.0–8.0) [S];
+       the plan's "confidence must not authorise" is a change to live behaviour, not a restatement.
+    R5 MAJOR — world state: in-process library, perception defaults to shadow, cortex source defaults to POLL with a
+       deliberate fallback to the polled document [S cortex_source.py:17-21] — the exact failure the plan names.
+    R6 MINOR — Graphiti is not in code (rejected for Cognee, D29); Cognee and Letta run only in the full compose.
+       The plan's "atomic write across Cognee, Graphiti and pgvector" has no repository counterpart. [S]
+    R7 MINOR — LangGraph is a floor dependency (`langgraph>=0.2.0`, agentic/requirements.txt:8), imported only by
+       scripts/agentic_integration_test.py [V]; langgraph-sdk (the CVE-2026-104873 package) not found [S]. The CVE
+       does not apply today; the plan's assumption that LangGraph is the workflow mechanism is not current reality.
+    R8 MINOR — Ollama (qwen2.5:0.5b, ollama 0.6.8) is the live default backend, not a "placeholder"; model names are
+       hard-coded in model_registry.py, compose files and several services. [S]
+    R9 MINOR — no resurrection/restore drill exists; restore covers Postgres only; ledger backup saves stats not
+       entries. Capability/nonce state is not backed up (so restore cannot roll it back today — by accident, and it
+       also does not survive restart). [S]
+    R10 Hard constraint HOLDS today: BINANCE keys read only by broker-bridge (app.py:27-28), passed only to it
+       (minimal compose, finance profile); broker-bridge is GET-only. [S] Any future "credential vault" must keep this.
+    R11 Smaller live defects the plan should know about [V where marked]: paper_trader trust gate fails open
+       [V agentic/paper_trader.py:168]; supervisor POST /recover/{service_name} has no auth decorator (gated only by
+       SUPERVISOR_RECOVERY_ENABLED, default false) [V supervisor/app.py:756-760]; CONSCIENCE_FILTER flag never read
+       [S]; SOUL.md rewritable via POST /soul outside the actuator catalog [S]; README says 4 teammates, disk has 5 [S].
+    
+    ## 3. External claims
+    
+    E1 Plan's hardware/model/tool claims VERIFIED: Flow Z13 GZ302 spec incl. one M.2 2230 single-sided; Lemonade
+       (AMD-optimised, gfx1151 listed, vLLM paths experimental); Qwen3.6-35B-A3B; gpt-oss-20b/120b; Mistral Small 4
+       (119B MoE, ~6.5B active; BF16 ~238 GB, so quantisation required on 128 GB); Inspect AI, garak, Promptfoo.
+    E2 PARTLY: ROCm gfx1151 support is official but narrow (ROCm 7.2.1, Ubuntu 24.04.4); Linux NPU only via
+       FastFlowLM (proprietary kernels, needs amdxdna, kernel 7.0+ or backport); "automatic NPU/GPU/CPU selection"
+       not confirmed.
+    E3 PROCUREMENT TIMING: AMD Ryzen AI MAX 400 ("Gorgon Halo", up to 192 GB) announced with ASUS as partner from Q3
+       2026; no Z13 successor found yet — re-check before buying.
+    E4 Analysis citations: VERIFIED MEMDRIFT, CVE-2026-104873, Tracked Capabilities (entry 93). CONTRADICTED:
+       "70–73% of prominent LLM agents" misreads MCPTox (those are the two worst models' ASR; average 36.5%).
+       PARTLY: ">90% chained" is tool-chaining (STAC), not MCP poisoning. NOT FOUND: PERSIST 46.2%→8.9%, IETF
+       "Execution Outcome Attestation", COGITATOR Witness Protocol, OECD Agent Evidence Conformance Suite,
+       "Capability-Container Pattern" (idea real, name not), eBPF "sub-100ns/200x".
+    E5 Plan's memory-poisoning benchmark claim is uncited; nearest: MemSecBench, Hidden in Memory (preprints).
+    
+    ## 4. Orion's own attacks (design logic)
+    
+    A1 MAJOR — provenance laundering (breaks the ANALYSIS fix): a signed evidence record proves the record exists,
+       not that the value came from it. Require DERIVATION: value literally in the cited record or produced by a
+       declared non-model function; else provenance = MODEL_INFERENCE.
+    A2 MAJOR — who mints CURRENT_OPERATOR_INSTRUCTION: only an authenticated operator-channel adapter, never
+       cognition; key custody outside the model's OS principal (separate user/VM, TPM-bound). Neither document says.
+    A3 MAJOR — approval integrity: what Dainius reads at approval must be rendered deterministically from the exact
+       capability fields, not model prose; channel compromise/voice cloning; approval fatigue needs rate/batching.
+    A4 MAJOR — restore vs one-use state: once capabilities/nonces become durable (R2/R9), restoring a backup revives
+       consumed capabilities and un-closes executed actions. Needs an epoch bump on restore or a monotonic anchor
+       outside the restored set. Currently listed only as long-horizon anti-rollback.
+    A5 MINOR→MAJOR — clock trust for expiry/freshness (suspend/resume, RTC drift, NTP spoof).
+    A6 MAJOR — one host: cognition, authority, actuators and the "independent" verifier share one kernel on one
+       laptop. State the real trust boundary and the OS-level isolation; verification by the executor's principal
+       on its own host is not independent.
+    A7 MAJOR- — model artifacts are supply chain (weights, chat templates, backend builds) and need the same
+       admission as skills.
+    A8 MAJOR — KaiBench must obey I-8: known-positive/negative, held-out private suite, judges from a different
+       model family than the candidate.
+    A9 MINOR — effort estimates unanchored: D379 dated 2026-09-18 (DECISIONS.md:34967), H2 repair still not closed
+       2026-10-07. Do not sequence or promise on "6–10 engineer-weeks".
+    A10 MAJOR — money: FCA/tax implications; "UK limited company or trust" is legal advice (solicitor + accountant);
+       BINANCE keys stay in broker-bridge (R10).
+    A11 MAJOR — succession is more than an entity: who may approve/revoke/shut down on incapacity; key escrow
+       (lost keys = unrecoverable KAI; escrow = attack surface); dead-man procedure; a minor's data.
+    A12 MAJOR — privacy of always-on home sensing (daughter, visitors): consent, retention, deletion, egress.
+    A13 MINOR — standing preferences need expiry, scope and re-confirmation.
+    A14 MINOR — OUTCOME_UNKNOWN/UNVERIFIABLE escalations need a budget, or they feed approval fatigue (A3).
+    A15 MAJOR — the analysis's verification matrix repeats the flaw it names: "check sent folder via IMAP" and
+       "stat + hash" by the same principal are self-report; SMTP DSNs unreliable.
+    A16 MINOR — legal set-up can proceed in parallel without engineering authority; it should not reorder the
+       engineering or D-numbered sequence.
+    A17 MINOR — Scala capture checking / eBPF are not KAI's stack; the lesson is mediation at a boundary the model
+       cannot reach.
+    A18 MINOR — the canonical Postgres journal needs hash-chained append-only integrity and verified backups.
+    A19 MINOR→MAJOR — proactive notifications via Telegram are outward actions; they need the same policy check.
+    A20 PROCESS — neither document's figures can be adjudication inputs until sourced (R13): the plan cites files
+       we cannot open; the analysis carries unfound citations.
+    
+    ## 5. What survives (credit where due)
+    
+    The direction is sound and largely ALREADY the repository's direction: confidence ≠ authority; one-use exact
+    capability at the side-effecting hand; Evidence Plane / World State separation with explicit UNKNOWN; memory
+    ≠ evidence ≠ authority; independent outcome verification and OUTCOME_UNKNOWN; adapter→shadow→compare→cutover
+    migration; models as replaceable organs measured locally; the Memory→Action Firewall (strongly supported by
+    MEMDRIFT). The repository itself already names several of the gaps (legacy_verification.py:16; cortex poll
+    fallback documented). Hardware and model facts check out.
+    
+    ## 6. Recommendation (for Kai's amendment; Dainius decides)
+    
+    1. Rebuild the front door organism-first (D1, D2): the IDX product groupings as the top level, each with
+       TODAY / MATURED / CHANGE TYPE / STATUS (IDX vocabulary) / WHY; engineering planes as the drill-down.
+    2. Replace the priority table with D359's order verbatim, and present Kingsman work as the destination
+       timeline beneath it (D3, D4); keep succession/finance LOGGED unless Dainius explicitly re-prioritises (D5).
+    3. Anchor every new mechanism to its current home: Tool Gate/ActuatorRegistry, the existing Ed25519 service
+       identity and nonce protections, memu-core/Cognee, Ollama (D7–D10); one current-to-target row per box (D6).
+    4. Correct the repository facts (R1–R9) and carry the live defects (R11) as findings.
+    5. Strip or source every unverified citation (E4, E5, A20).
+    6. Add the missing joints from my attacks: derivation-checked provenance (A1), operator-channel minting and key
+       custody (A2), approval rendering integrity (A3), restore epochs (A4), trusted time (A5), an honest single-host
+       trust boundary (A6), model-artifact admission (A7), KaiBench calibration (A8), real independent verification
+       sources (A15), succession authority and key escrow (A11), home-sensing privacy (A12).
+    7. Then the DeepSeek adversarial attack on the amended text (entry 91), then Dainius's decision.
+    END-VERBATIM ORION-REVIEW-KINGSMAN-BASELINE
+- EVIDENCE ORION-ATTACKS-DRAFT orion_attacks.md: 6404 bytes, sha256 5cc774d6280516801a7376902ae9682d58c4bb63581a17791f4e652294168517, final LF True  [CMD `sha256sum orion_attacks.md` → 5cc774d628051680…]
+    BEGIN-VERBATIM ORION-ATTACKS-DRAFT
+    ORION ATTACKS — design-logic angle (reasoning; each names what would check it)
+    
+    A1 Provenance laundering (attacks the ANALYSIS fix). Binding a parameter to a real, signed evidence record
+       proves the record exists, not that the value came from it. The model can cite a genuine operator
+       instruction ("pay the plumber") while taking the amount from memory. The firewall must check
+       DERIVATION: the value literally present in the cited record, or produced by a declared non-model
+       function of it; otherwise the field's provenance is MODEL_INFERENCE. MAJOR.
+    A2 Who mints CURRENT_OPERATOR_INSTRUCTION records. If cognition can call the journal write path, a
+       signature is obtained by asking. Operator-instruction records must be minted only by an authenticated
+       operator channel adapter, never by cognition; key custody must sit outside the model's OS principal
+       (separate user/VM, TPM-bound). Neither document says where the key lives or who may write. MAJOR.
+    A3 Approval integrity ("what you see is what you approve"). If the approval prompt Dainius reads is
+       model-written prose, it can misdescribe the bound action. Approval screens must render
+       deterministically from the exact capability fields. Also: Telegram/voice channel compromise or voice
+       cloning; approval fatigue (rubber-stamping) needs rate/batching rules. Plan covers exact replay after
+       approval, not the integrity of what is shown at approval. MAJOR.
+    A4 Restore rolls back one-use state. Restoring a backup/journal restores the nonce cache and capability
+       state as of the backup: consumed capabilities become valid again and closed actions look unexecuted
+       (duplicate side effects). Needs an epoch bump that invalidates all pre-restore capabilities, or a
+       monotonic counter / consumed-nonce anchor outside the restored set. Plan lists anti-rollback only as
+       long-horizon. MAJOR. (Repo check: does any current restore path touch nonce state?)
+    A5 Clock trust. Expiry, freshness and validity windows depend on the system clock; a wrong or
+       manipulated clock (suspend/resume, RTC drift, NTP spoof) revives expired capabilities or stale claims.
+       Needs monotonic + trusted time policy. MINOR→MAJOR for money.
+    A6 One host, logical separation only. On a single Flow Z13 the cognition, authority, actuator and
+       "independent" verifier organs share a kernel. Code execution in the model runtime (malicious model
+       file, tokenizer/chat-template, skill, backend CVE) reaches them all; verification on the executor's
+       host by the executor's principal is not independent. The plan must state the real trust boundary and
+       the OS-level isolation (users/containers/VM, TPM-bound keys). MAJOR.
+    A7 Model artifacts are supply chain too. Weights/GGUF/quantisations, chat templates (Jinja), Lemonade and
+       llama.cpp builds need the same hash-pinning/provenance/sandbox admission as skills. Plan's skill
+       pipeline does not name them. MAJOR-.
+    A8 KaiBench must obey our own calibration rule (I-8). The instrument that promotes models needs
+       known-positive/negative cases, a held-out private suite (contamination), and LLM-judges from a
+       different family than the candidate (self-preference). Otherwise it is a check whose evidence comes
+       from the thing it checks. MAJOR.
+    A9 Effort estimates unanchored. "6–10 engineer-weeks" per package for a programme run by one operator and
+       LLM agents, where assurance (not coding) dominates: D379 is dated 2026-09-18 (kai-pm/DECISIONS.md:34967) and
+       its H2 repair is still not closed on 2026-10-07. Estimates must not be used for sequencing or promises. MINOR.
+    A10 Money: regulation + hard constraint. Automated trading/spending via a company or trust raises
+       FCA/tax questions; "UK limited company or trust" in the analysis is legal advice and needs a solicitor
+       and accountant. Hard constraint: BINANCE_API_KEY/SECRET never leave broker-bridge — a central
+       "credential vault"/capability container (analysis) must not move them, and Mission Control must never
+       receive them. MAJOR (constraint).
+    A11 Succession is more than a legal entity. Neither document defines: who may approve, revoke or shut KAI
+       down if Dainius is incapacitated; key escrow (keys dying with Dainius = KAI unrecoverable; escrow =
+       new attack surface); dead-man procedure; protection of a minor's data. MAJOR (core mission).
+    A12 Privacy of an always-on home sensor organ. Screen/mic/camera perception records other people
+       (daughter, visitors) — consent, retention, deletion, and what leaves the machine. Plan mentions
+       privacy controls only in passing. MAJOR for embodiment.
+    A13 Standing preferences need a lifecycle. APPROVED_STANDING_PREFERENCE needs expiry, scope and periodic
+       re-confirmation, or it becomes the same stale-memory channel the firewall exists to close. MINOR.
+    A14 OUTCOME_UNKNOWN / UNVERIFIABLE load lands on Dainius. Needs an escalation budget and batching, or
+       the operator becomes the bottleneck and starts rubber-stamping (feeds A3). MINOR.
+    A15 The analysis's verification matrix repeats the flaw it names. "Email: check sent folder via IMAP" is
+       the executor's own write, not independent; SMTP DSNs are unreliable; "File write: stat + hash" by the
+       same principal on the same host is self-report. MAJOR (on the analysis).
+    A16 Analysis conflates legal and engineering priority. Setting up a legal entity can run in parallel
+       with no engineering authority; it should not reorder the engineering P-sequence or the D-numbered
+       programme. MINOR.
+    A17 Scala 3 capture checking / eBPF are not KAI's stack (Python). The transferable lesson is mediation at
+       an enforcing boundary the model cannot reach, not a language or kernel switch. MINOR.
+    A18 The canonical Postgres journal is now the single point of truth: needs append-only integrity (hash
+       chain), verified backups, and corruption detection of its own, or projection-rebuild inherits silent
+       corruption. MINOR.
+    A19 Proactive notification is an outward action. A notification sent through Telegram puts private
+       content on a third-party service; proactive outputs need the same policy check as other actions.
+       MINOR→MAJOR.
+    A20 Evidence status of the two documents themselves. Kai's plan cites files we cannot open
+       (fileciteturn…); the analysis carries citations not found (entry 93). Under R13 neither document's
+       figures can be adjudication inputs until sourced. PROCESS.
+    END-VERBATIM ORION-ATTACKS-DRAFT
+- EVIDENCE SUBAGENT-REPORT-REPO-CENSUS agent_census.md: 15101 bytes, sha256 75cad3ad0d6f1aec2b1ea4f458417524c0749a8880cb9f26fc9cae6c8d29c4fe, final LF True  [CMD `sha256sum agent_census.md` → 75cad3ad0d6f1aec…]
+    BEGIN-VERBATIM SUBAGENT-REPORT-REPO-CENSUS
+    I checked all 13 items against the repo. The plan's descriptions are mostly right in direction. They are wrong on several facts: the "8 risk tiers" claim, how exact the capabilities are, whether the old paths are really closed, Graphiti, and what LangGraph actually does.
+    
+    **Where I searched:** the whole working tree, leaving out `.git/` and `kai-pm/HANDOFF_LOG.md`. For dependencies I checked all 50 `requirements*.txt` files, every Dockerfile, all three compose files and `.github/workflows`. There is no `pyproject.toml`, `setup.cfg`, Pipfile or poetry lock in the repo. I did not modify anything.
+    
+    | # | Item | Repo evidence (path:line) | What the repo says / status | Plan accurate? | Note |
+    |---|---|---|---|---|---|
+    | 1 | Unified Hunter / ActuatorRegistry | `common/actuator_registry/catalog.py:55-258` (the actuator lists); `common/contracts/base.py:27-32` (the `RiskTier` enum); `README.md:118-124, 1239`; `kai-pm/UH_PROGRESS_TRACKER.md:84,111` | I counted 34 actuators myself: tiers 1–8 hold 11+2+4+4+3+2+4+4. All start at `LEGACY` (`catalog.py:261-280`). README: "Built and tested. NOT cut over." `ActuatorRegistry.dispatch()` (`registry.py:204`) is never called by non-test code. At runtime `build_catalog()` is used only to report status (`agentic/app.py:621`). | PARTLY | The "8 tiers" are **migration** tiers. The code has only **5 risk tiers** (`RiskTier`: OBSERVE, ADVISE, PROPOSE, ACT_SUPERVISED, ACT_AUTONOMOUS). "34 actuators" and "not cut over" are correct. |
+    | 1a | Capabilities one-use / exact | `common/policy_bridge/capability.py:36-122`; `common/contracts/action.py:18-33, 72-83` | Capabilities are single-use (the `used` flag), tied to one actuator, expire after 30s, and can be revoked. But they live only in an in-memory dict (`capability.py:45`) and are not signed. `issue()` accepts `parameters` separately from the proposal (`:56,77`). `ActionProposal` has no parameters or target field, and nothing checks that the capability type matches the proposal's action type. | PARTLY | One-use: **yes**. Exact binding: **no**. The approved proposal's digest does not cover the action's parameters or target. |
+    | 1b | Tool Gate | `tool-gate/app.py:26-33, 493-572`; `common/auth.py:70-71, 106-133` | This is a separate older gate: HMAC request signing plus a nonce replay cache stored in `/tmp/tool-gate-nonces.json`. The signed string is only `actor_did\|session_id\|tool\|nonce\|ts`, so parameters are not signed. It also decides cosign by conviction score (`:40-46`). | PARTLY | Supports the plan's "confidence must not authorise" point: conviction still drives gate decisions today. |
+    | 1c | "Legacy path closed" | `common/actuator_registry/legacy_verification.py:24-50, 76-104` | "Closed" only means the route's decorator has `require_service_auth`, i.e. it needs the shared `KAI_SERVICE_TOKEN`. It does not need a capability. | NO (vs README's "every legacy path verified closed") | Anyone holding the shared token can still call `executor:/execute` or `browser-agent:/click` directly. Supports the plan's "prove legacy path dead" requirement. |
+    | 2 | World state / pollers | `common/world_state/snapshot_store.py`; `common/perception_spine/shadow.py:33-52`; `common/perception_spine/cortex_source.py:1-41`; `agentic/app.py:1832-1843, 3483-3530, 2226` | There is **no** separate world-state service. World state is an in-process library inside agentic. `KAI_PERCEPTION_MODE` defaults to `shadow`. `KAI_CORTEX_SOURCE` defaults to `poll`, and when the world state is empty it deliberately falls back to the polled document. The old point-to-point polling is kept even in active mode. | YES | The plan's "legacy source silently regaining authority" is exactly the documented fallback in `cortex_source.py:17-21`. |
+    | 3 | Memory | memu-core: `memu-core/app.py:293` (`PGVectorStore`), `:584` (`TurboVecStore`), `memu-core/requirements.txt`. pgvector image `pgvector/pgvector:pg15` in `docker-compose.minimal.yml:44`, `docker-compose.sovereign.yml:34`, `docker-compose.full.yml:47`. Cognee: `memu-graph/requirements.txt` (`cognee==1.1.3`), compose full:457, called from `memu-core/app.py:53,244,1851`. Letta: `letta-agent/requirements.txt` (`letta==0.16.8`), compose full:519, called from `agentic/app.py:93,1596`. | MemU, pgvector, Cognee and Letta are all in code. Graphiti appears only in the `memu-graph/app.py:3` comment ("Cognee picked over Graphiti", D29 at `kai-pm/DECISIONS.md:529`) and in design docs. | PARTLY | **Graphiti is not found in any code, requirements or compose file.** Graphiti is a design reference, not current code. Letta and Cognee run only in `docker-compose.full.yml`. |
+    | 4 | Soul / Diary / Conscience | `data/SOUL.md` (52 lines); `agentic/app.py:462-486` (`POST /soul` overwrites it), `:1425-1436`. Conscience: `memu-core/app.py:2317-2326, 6840-6913, 7070`; `agentic/app.py:2456-2471, 2830-2844`. Diary: `memu-core/app.py:5648-5708` (autobiography journal); dashboard memory diary (`scripts/test_j5_diary.py:1-10`). | Conscience is injected into the prompt, and `/memory/conscience/check` exists. Flag `CONSCIENCE_FILTER` ("value-gate on actions", default ON, `common/feature_flags.py:40`) is **never read** by any non-test `is_enabled` call. | YES | SOUL can be rewritten through an API that is not in the actuator catalog. That fits the plan's "accidental authority" concern. |
+    | 5 | D89 FSM / teammates | `agentic/cognitive_fsm.py:1-42` (GATHER→…→CONVICTION_GATE→PRESENT, MAX_RETRIES, HALT); `agentic/system_fsm.py`; `agentic/teammates.py`; `data/teammates/*.md`; flags at `feature_flags.py:63-73` | Built, flags on. The FSM has a bounded retry, HALT and escalation, and a conviction gate of 7.0–8.0 (`cognitive_fsm.py:88-116`). There are **5** teammate files on disk (auditor, doctor, oracle, sage, scout). README `:211` says 4. | YES | Minor drift: the README says 4 teammates, the disk has 5. |
+    | 6 | LLM layer | `common/llm.py:1-25, 216-382` (DeepSeek-V4, Kimi-2.5 and Dolphin endpoints with a deterministic stub fallback); `agentic/model_selector.py:1-40`; `common/model_registry.py:46-160` (hard-coded qwen2/2.5, llama3/3.1/3.3, deepseek-coder-v2, deepseek-v4), `:150` (default `qwen2.5:0.5b`); `agentic/app.py:1422-1423`. Ollama is `ollama/ollama:0.6.8` in minimal:77 and full:796, and commented out in sovereign:624. Models are hard-coded in compose files and in `perception/wake/app.py:29`, `letta-agent/app.py:15-16`, `kai-advisor/app.py:12`, `fusion-engine/app.py:51`. | Ollama with `qwen2.5:0.5b` is the real CPU backend. The specialist layer is a stub. **LangGraph:** `agentic/requirements.txt:8` has `langgraph>=0.2.0`, a floor not an exact pin. It is **never imported** by service code; the only import is `scripts/agentic_integration_test.py:53`. "langgraph" in the code is just the agentic service's name. `langgraph-sdk` was not found anywhere. llama.cpp, Lemonade and vLLM: not found in any code, requirements or compose file (only in docs and kai-pm). | PARTLY | "Ollama placeholder" undersells it: Ollama is the live default. The plan's line 541 assumes LangGraph is already the workflow mechanism; it is not used. |
+    | 7 | Skills Hub / Agent-Evolver | `skill-hunter/app.py:1-30, 160-176` (fetches PyPI metadata, writes probationary `.md` skill files); `agentic/router.py:603-675` (`load_skills`); `agentic/app.py:544-555` (`/skills/unload`, `/skills/scan`); `agentic/kai_config.py:1002-1169` (Evolver); `feature_flags.py:55,61` | The Evolver only produces insight files (`FF_EVOLVER_ENABLED` off; dream phase 7 on). No code installs packages. Hunted skills are written to `/data/skills`, but in minimal compose that volume is not mounted into agentic. Tier 8 is labelled "self-modifying", yet no self-modifying actuator is registered. | PARTLY | There is no automatic promotion to disable today. Skills are only discovered and written as markdown. |
+    | 8 | Supervisor / House Doctor | `supervisor/app.py:1-12, 100, 756-765`; `house-doctor/app.py:1-10` | House Doctor only diagnoses: it writes reports to memu and sends notifications. Supervisor can POST `/recover` to services, but only if `SUPERVISOR_RECOVERY_ENABLED` is true (default false). Its `/recover/{name}` route has **no** service auth. | YES | Diagnosis and repair are already separated, with repair off by default. |
+    | 9 | Perception / browser / computer use | `perception/{audio,camera,vision,wake,clipboard,files}/app.py`; `screen-capture/`, `screen-watcher/`; `browser-agent/app.py:122-250` (`navigate`/`click`/`type`/`run`/`search`, all requiring the shared service token) | Audio transcription is a stub unless `WHISPER_BACKEND` is set (`perception/audio/app.py:1-14`). Camera degrades gracefully when OpenCV is missing. Desktop computer use (pyautogui, xdotool, pynput) is not found outside a keyword map in `skill-hunter/app.py`. | PARTLY | There is browser use but no desktop computer use. Only `/click` is checked for browser-actor; `/type` and `/run` are not in `LEGACY_CHECKS`. |
+    | 10 | Dashboard / Mission Control | `dashboard/app.py` (2,862 lines, mostly proxies to other services); `dashboard/static/*.html` | "Mission Control" is not found in code or README, only in kai-pm docs. | YES (as a target name) | The dashboard exists. Mission Control is purely the plan's name for it. |
+    | 11 | Backup / restore | `backup-service/app.py:47-242`; only in `docker-compose.full.yml:752`; `scripts/backup_offsite.sh`, `scripts/monthly_paper_backup.py`, `scripts/kai-drill.sh`; checkpoint restore at `agentic/app.py:3413-3451` | Backs up Postgres (pg_dump), Redis (BGSAVE), memory, and the ledger. The ledger backup saves only `/ledger/stats`, not the entries. The full-backup "manifest" has per-file checksums only for Postgres and Redis. **Restore exists only for Postgres** (`psql -f`). Checkpoint restore resets only circuit-breaker state. No resurrection or restore drill was found. | YES | **Replay/nonce interaction:** see the note below the table. |
+    | 12 | Revenue / trading, Binance keys | Keys are read only at `broker-bridge/app.py:27-28`. Passed by compose only in `docker-compose.minimal.yml:525-526` (broker-bridge service, `finance` profile). No `env_file`, and the `&defaults` anchor carries no environment. All 25 files that name the keys are listed below the table. | broker-bridge is **GET-only** (`:86-397`), so it does reads only. Paper trading: `agentic/paper_trader.py:1-20` says its trust gate **fails open** (`:168`). `alpha_signals.py:35` and `dashboard/app.py:2554` call public Binance endpoints with no keys. | YES | No path other than broker-bridge receives the keys. broker-bridge is not in the full or sovereign compose files. |
+    | 13 | Signing keys | HMAC-SHA256 gate signing (`common/auth.py:70-133`, shared key, caller supplies its own identity). Ed25519 per-service identity (`common/service_identity.py:1-60, 493-560`; `scripts/security/generate_service_keys.py`). HMAC-SHA512 trust-ledger chain (`trust-ledger/ledger.py:49-72`). HMAC release bundle (`common/autonomy/release_bundle.py:88-135`). | Ed25519 is wired into exactly one endpoint, `cortex/app.py:569` (`require_service_identity`). Its own docstring says "Real service-image feasibility is UNKNOWN". **Capabilities are not signed** (in-memory pydantic objects). Signed memory records: not found in `memu-core/app.py`. | PARTLY | Workload identity is only beginning. Capability and memory signing do not exist. |
+    
+    **Backup and replay state (item 11):** no restore path rolls back consumed nonces or capability state, but only by accident:
+    - Capability state is in process memory only.
+    - The tool-gate nonce cache (`/tmp/tool-gate-nonces.json`) and the service-identity cache (`/tmp/kai-service-nonces.json`, or `/data/nonces/...` for cortex) are not backed up.
+    - Redis `idem:` idempotency keys (`tool-gate/app.py:236-281`) are inside the Redis RDB backup, but there is no Redis restore endpoint.
+    - The Postgres restore touches memu tables only.
+    
+    The flip side is that capability, nonce and grant state does not survive a restore or restart. If the plan wants a resurrection system, it has to persist this state and design for it explicitly.
+    
+    **Files naming `BINANCE_API_KEY`/`BINANCE_API_SECRET` (item 12):**
+    - Code and config: `broker-bridge/app.py`, `docker-compose.minimal.yml`, `README.md`, `CLAUDE.md`, `dashboard/static/app.html` (help text only).
+    - Scripts and tests: `scripts/test_secret_gates.py`, `test_broker_bridge.py`, `test_architecture_rules.py`, `test_dashboard_findings.py`, `test_broker_bridge_yfinance.py`, `security/check_test_isolation.py`, `security/check_secret_fallbacks.py`, `security/check_dashboard_findings.py`, `security/check_architecture_rules.py`.
+    - kai-pm docs: `KAI_KINGSMAN_COLD_START_MASTER.md`, `DECISIONS.md`, `W1_DASHBOARD_REMEDIATION_PLAN.md`, `INSTRUMENTATION_ARCHITECTURE.md`, `UH_PROGRESS_TRACKER.md`, `NEXT_STINT_PLAN.md`, `SESSION_BOOTSTRAP.md`.
+    - Compiled `.pyc` files under `scripts/security/__pycache__/`.
+    
+    **The 5 most important discrepancies**
+    
+    1. **"Eight risk tiers" is wrong.** The code has 5 risk tiers (`common/contracts/base.py:27-32`). The 8 are migration tiers (`catalog.py:6-13`), and the plan copied the README's wording. Any authority design keyed on 8 risk tiers will not match the code.
+    2. **Capabilities are one-use but not exact.** The plan says exact one-use binding "works" (line 758); in code only the one-use part does. There are no parameters or target in the proposal digest, and `issue()` accepts parameters freely (`capability.py:56,77`; `action.py:18-33`). Tool-gate signatures leave out parameters too (`common/auth.py:70-71`). Capabilities are unsigned and in memory only.
+    3. **The old paths are not dead; they are behind a shared token.** "Legacy closed" is an AST check for `require_service_auth`, which accepts the shared bearer token, not a capability (`legacy_verification.py:24-50`). Meanwhile `ActuatorRegistry.dispatch` has no runtime caller. The plan treats Unified Hunter as the direction and old paths as retirable; in fact the old routes are the only live way to act.
+    4. **Memory stack:** Graphiti is not in code. It was rejected in favour of Cognee (D29, `kai-pm/DECISIONS.md:529`). Cognee and Letta run only in `docker-compose.full.yml`, and memu-core's vector store is pgvector or TurboVec. The plan's mention of an old "atomic write across Cognee, Graphiti and pgvector" has no counterpart in the repo.
+    5. **LangGraph is not used.** It is a floor (`langgraph>=0.2.0`, not an exact pin), never imported by service code. `langgraph-sdk` is absent. Separately, Ollama is the live default backend (`ollama/ollama:0.6.8`, `qwen2.5:0.5b`), not a placeholder. Model names are hard-coded in `common/model_registry.py`, the compose files and several services, so "static model choice" is accurate but more spread out than the plan suggests.
+    
+    Smaller drift worth knowing about:
+    - Teammates: 5 on disk, 4 in the README.
+    - `CONSCIENCE_FILTER` is declared but never read.
+    - Paper-trader trust gate fails open.
+    - Supervisor `/recover/{name}` has no auth.
+    - backup-service exists only in the full compose and broker-bridge only in minimal, so neither compose file has both.
+    END-VERBATIM SUBAGENT-REPORT-REPO-CENSUS
+- EVIDENCE SUBAGENT-REPORT-DOCTRINE-CHECK agent_doctrine.md: 20157 bytes, sha256 50499b227dd78d96bb34f6c0e0bdc58e9ca904e7de5e0af33c28c9f4d25f4d74, final LF True  [CMD `sha256sum agent_doctrine.md` → 50499b227dd78d96…]
+    BEGIN-VERBATIM SUBAGENT-REPORT-DOCTRINE-CHECK
+    # Plan and analysis checked against the Kingsman governing documents
+    
+    Both documents claim the "refit, don't reinvent" posture. The plan still fails the D351 front-door bar and drops several items the canon says must be carried. Both documents put Kingsman implementation (and, in the analysis, finance and succession) ahead of the D359 order.
+    
+    **Paths used below:**
+    - PLAN = `/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/kai_kingsman_plan.txt`
+    - ANALYSIS = `/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/deep_research_analysis.txt`
+    - `IDX`, `D351`, `D353`, `DOCTRINE`, `CANON`, `COLD` and `DEC` are the files under `/home/user/kai-system/kai-pm/`: `KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md`, `D351_…md`, `D353_…md`, `KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md`, `KINGSMAN_FINAL_VISION_MASTER_CANON_PLAN.md`, `KAI_KINGSMAN_COLD_START_MASTER.md` and `DECISIONS.md`.
+    
+    **What I read:**
+    - **Read in full:** PLAN, ANALYSIS, IDX, D351, D353, DOCTRINE, CANON, COLD and `NEXT_STINT_PLAN.md`.
+    - **From DEC:** D359 (30275–30557), D387–D390 (39253–39453), D270 (19297–19339), the opening of D269, and the lines in DEC matching the four search phrases.
+    - **Across kai-pm:** a grep of all files for the four phrases.
+    
+    Every "0 hits" below means not found in PLAN or ANALYSIS by case-insensitive grep. I did not inspect `HANDOFF_LOG.md`.
+    
+    ---
+    
+    ## Q1: Product vocabulary and the D351 presentation bar
+    
+    **1. The front door replaces the product groupings with engineering organs.** | **BLOCKER** | PLAN
+    - The groupings that must survive: IDX:58-74 says "The front-door architecture must preserve recognisable groupings such as: …" and IDX:74 says "Engineering/control terminology is a drill-down beneath these concepts, not a replacement for them." D351:213-229 repeats this.
+    - PLAN:19 says "The mature architecture should have nine distinguishable organs". PLAN:21-31 lists them: Mission/Identity/Lineage · Evidence Plane · Qualified World State · Memory/Relationship · Cognition Runtime · Governance/Authority · Execution · Independent Verification · Resource/Inference Fabric. PLAN:33 adds "This separation is the single most important maturation step."
+    
+    How each required grouping fares in the nine-organ table:
+    
+    | Required grouping | Status in the plan |
+    |---|---|
+    | Soul / Identity / Inner Life | **Demoted.** Only "Mission / Identity / Lineage" is an organ. Soul/Diary becomes "explicitly labelled a **narrative projection**" (PLAN:509) and "Identity + Narrative Projection" (PLAN:762). Inner Life is not in the table. |
+    | Memory / Relationship / Continuity | Present as "Memory / Relationship". |
+    | Senses / World Awareness | **Demoted.** Not one of the nine. "Perception Organ" appears only in the diagram (PLAN:119) and the final map (PLAN:933). |
+    | Intelligence / Reasoning | Present as "Cognition Runtime". |
+    | Cognitive Depth / Specialists | **Merged** into Cognition Runtime (PLAN:27). |
+    | Proactivity / Goals / Attention | **Missing.** Appears only as an invariant paragraph (PLAN:79). |
+    | Governed Hands / Capabilities | **Renamed** and split into "Governance / Authority" and "Execution". |
+    | Immune System / Doctor / Resilience | **Missing** from the nine. Appears only as a migration row, "Self-Diagnosis & Recovery Organ" (PLAN:768). |
+    | Growth / Dream / Evolution | **Missing.** "Learning / Evolution Lab" is only in the diagram (PLAN:133). "Dream": 0 hits. |
+    | Continuity / Stewardship / Sustainability | **Missing** from the nine. Appears only in migration rows (PLAN:772-773) and as P3 work (PLAN:806, 809). |
+    | Operator Relationship / Mission Control | **Missing** from the nine. Mission Control appears only as a "projection" (PLAN:970). |
+    
+    "Resource / Inference Fabric" goes the other way: it is an engineering term promoted to the front door with no matching product grouping.
+    
+    **2. The D351 presentation bar is not met.** | **BLOCKER** | PLAN
+    - The bar: D351:198 says the master "is unacceptable unless it beats the stale README on **communication** while beating it on **truth and engineering**". D351:243-250 requires these views: "WHO KAI IS… KAI TODAY… KAI MATURED… WHAT CHANGES… ROADMAP / CURRENT POSITION… RISKS / BLOCKERS". D351:233-239 requires every organ to show "TODAY… MATURE TO… CHANGE TYPE… STATUS… WHY". IDX:28-36 says the same.
+    - PLAN:65 cites the bar ("expected to show **KAI TODAY → KAI MATURED → WHAT CHANGES → STATUS**"), and PLAN:67 says "That should be the organising principle". But the plan's sections are: executive summary, invariants, production architecture, hardware, memory/security, KaiBench, roadmap.
+    - The nearest thing to a delta view is the migration matrix (PLAN:755). Its columns are "Current KAI capability | Mature Kingsman home | Acceptance requirement | Cutover strategy". It has no CHANGE TYPE (KEEP/HARDEN/MERGE/MOVE/SPLIT/ADD-JOINT) column and no STATUS column.
+    - There is no one-glance identity view showing what is live, transitional or dormant (D351:202-211).
+    - PLAN:985 nonetheless says: "That is the architecture I would be comfortable freezing as the design basis for a production-grade Kingsman canon". D351:320 says "the professional master blueprint remains OPEN pending an organism-first synthesis that meets the acceptance bar".
+    
+    **3. The organ set contradicts itself, and new boxes have no lineage.** | **MAJOR** | PLAN
+    - The migration matrix creates homes that are not among the nine organs: "Self-Diagnosis & Recovery Organ" (PLAN:768), "Perception Organ" (PLAN:769), "Mission Control" (PLAN:771), "Lineage/Resurrection System" (PLAN:772), "Sustainability Organ" (PLAN:773) and "Governed Evolution Lab" (PLAN:767).
+    - Evidence Plane, Qualified World State, Independent Verification and Resource/Inference Fabric are presented as organs with no current-to-target row of their own.
+    - This conflicts with IDX:108 ("**NO NEW BOX WITHOUT CURRENT-TO-TARGET LINEAGE.**") and D351:98 (must "visibly distinguish 'existing organ being matured' from 'new architecture project'").
+    
+    ---
+    
+    ## Q2: Ordering
+    
+    **4. The plan's P0–P3 table leaves out D359 sequence steps and moves Evidence Plane earlier.** | **MAJOR** | PLAN
+    - **The D359 order (DEC:30314-30331):**
+      - HOUSE_H0…H6, then the "explicit DAINIUS HOUSE EXIT RULING"
+      - KAI-GATE-048 closure path: Phase B, then sentinel retirement, then exact-tree review, then "separate ITEM8_GO", then six builds, then formal closure
+      - then `A-4_PROVENANCE`
+      - then `ASSURANCE INTEGRATION MAPPING`
+      - then `PROFESSIONALISATION / CI TRUTH RESTORATION`
+      - then `EVIDENCE PLANE / KINGSMAN IMPLEMENTATION`
+    - DEC:30299-30303: "D359 is the SOLE canonical source of programme order. Any other document stating a sequence … is **subordinate and derived**". DEC:30496-30501: "**048** — not merely Item 8 — before A-4, Kingsman integration, repo consolidation, the assurance upgrade, Task 4 consolidation, RC/dev→main requalification and Evidence Plane work." The same lock appears at DEC:22171-22173 and DEC:19313-19315.
+    - Later decisions keep D359 in force: "D359 governs programme order" (DEC:37586, 38997). In the D360–D390 decisions, the D359-related lines I extracted show no supersession. I did not read every entry in full.
+    - **What the plan does:**
+      - PLAN:793 collapses all of the above into "Finish current assurance sequence".
+      - `A-4` has 0 hits in the plan. Assurance Integration, Professionalisation/CI truth, House H3–H6/exit and 048 are not named.
+      - PLAN:795 puts "Evidence Plane + Qualified World State" at P1. PLAN:796-800 puts other Kingsman implementation at P1: authority split, memory journal, KaiBench, Inference Fabric, Mission Control. D359 puts all of this **last**.
+    - **Mitigation:** PLAN:785-787 separates an "authorised programme timeline" from a "destination architecture timeline" and says "Kingsman does not override them". The table is still headed "Recommended priority order" (PLAN:789), and it is not labelled as derived from D359 as D359 §1 requires.
+    
+    **5. A4 self-diagnosis is slotted after Evidence Plane, uses bare "A4", and is never told apart from A-4 provenance.** | **MAJOR** | PLAN
+    - DEC:30333-30335: "`A4_SELF_DIAGNOSIS` … is NOT interchangeable with `A-4_PROVENANCE` and does NOT follow automatically after it."
+    - DEC:30389-30391: "Bare `H<n>`, `A-4` and `A4` are **not to be used** in new governance/recovery text". IDX:112 and COLD:338-347 say the same.
+    - PLAN:804 says "A4/self-diagnosis mature loop", with the dependency "Current programme specifically places prerequisite work before A4". It does not name Item 8 or 048. PLAN:973 uses bare "A4". Neither line says what the prerequisite is or that A-4_PROVENANCE is a separate thing.
+    
+    **6. The analysis's revised priorities conflict with banked rulings.** | **MAJOR** | ANALYSIS
+    - What it proposes:
+      - ANALYSIS:189: "Establish legal structure at P1, not P3."
+      - ANALYSIS:260-264: "70/30 fund at P3 → P1", "Succession at P3 → P1/P2", verification, provenance and memory security moved to "P0/P1".
+      - ANALYSIS:271-272: provenance signing and capability crypto at "P0".
+    - What it conflicts with:
+      - DEC:19321-19325 (D270): succession is "**LOGGED, NOT PRIORITISED**, and it does not outrank Stage 2 unless the operator explicitly changes programme priority". D270 withdrew an earlier recommendation of exactly this kind (DEC:19305-19306).
+      - DOCTRINE:428-432: "does not … authorise succession mechanisms; authorise autonomous financial activity".
+      - D351:314 and D353:165 rule out "succession, autonomous finance".
+      - COLD:815-817 lists as "Explicitly NOT next: … E0/E3/Kingsman runtime refactor · … finance / evolution expansion".
+    - In the plan, P0 means finishing the assurance sequence (PLAN:793). Putting crypto implementation into P0 puts Kingsman implementation ahead of D359's last step.
+    
+    **7. The analysis misstates the plan's priorities.** | **MINOR** | ANALYSIS
+    - ANALYSIS:262 says "Independent verification at P1" and ANALYSIS:264 says "Memory security at P1", both as the "Original Priority".
+    - The plan's table (PLAN:793-809) has no Independent Verification row and no memory-security row.
+    
+    **8. The plan's sources are unverifiable placeholders.** | **MINOR** | PLAN
+    - PLAN:109 cites "D379/H2, DAI-6". The string "DAI-6" is not found anywhere in the repo outside `HANDOFF_LOG.md` (which I did not inspect).
+    - Its citations are `fileciteturn…` placeholders, not repository paths. COLD:107-108 says such material is "locators. They are not evidence."
+    
+    ---
+    
+    ## Q3: Contradictions of standing doctrine
+    
+    **9. The Inference Fabric and Resource Governor at P1 run ahead of a D351 condition, and the governor drifts toward a central scheduler.** | **MAJOR** | PLAN
+    - D351:161: "Ollama/current model serving remains until actual multi-runtime pressure earns a larger runtime abstraction."
+    - D353:113-115: budgets are "enforced by the organs that own those resources. No central mega-scheduler is implied."
+    - PLAN:799 puts "Inference Fabric + Resource Governor" at P1. PLAN:415-432 has the Governor taking in task priority, concurrency and provider/privacy constraints, and PLAN:432 says it "emits feasible execution plans".
+    
+    **10. The memory journal merges memory and evidence and risks a parallel truth system.** | **MAJOR** | PLAN
+    - PLAN:462 names a "Canonical Memory / Evidence Journal — Postgres transaction log". This contradicts the plan's own heading at PLAN:207 ("Evidence is not memory").
+    - D353:59: maturation "must consume Evidence Plane/A-4 contracts when frozen, without creating another truth system". D353:161 says the same, and IDX:93 echoes it.
+    - COLD:780: "do not create a new memory system because ownership is messy — **trace first**". D351:152: "current memory family remains memory but source/projection ownership is clarified".
+    
+    **11. The authority split is drawn as new boxes without the existing Tool Gate / ActuatorRegistry.** | **MAJOR** | PLAN
+    - IDX:83: "Durable authority/workflow should evolve behind current Tool Gate/ActuatorRegistry interfaces." D351:154-155 keeps Tool Gate as the control point and ActuatorRegistry as the hands catalogue. COLD:779: "Do not create a second authority beside Tool Gate".
+    - "Tool Gate" and "ActuatorRegistry" have 0 hits in the plan. It introduces "Policy Engine", "Approval / Delegated Authority" and "Exact Capability Issuer" (PLAN:127-130).
+    - Partial mitigation: PLAN:758 says "Split responsibilities behind compatible API, not big-bang rewrite".
+    
+    **12. The analysis redesigns capability and memory crypto from scratch instead of finishing what exists.** | **MAJOR** | ANALYSIS
+    - ANALYSIS:94-119 specifies a new capability format, a new issuer key and a replay cache. ANALYSIS:232 proposes "Every memory record carries an HMAC signature".
+    - IDX:82: "Existing signed-workload-identity replay/timestamp/nonce/body/path protections should be finished, not rebuilt." D353:60: "reuse current service-identity/key registry rather than creating a parallel workload identity system". D353:46: "P1 already requires exact audience-bound one-use capability enforcement and atomic consumption". D353:25 names the main risk as "**fragmentation and rediscovery**", and IDX:16 says "do not rediscover them under new names".
+    - On Ed25519: ANALYSIS:108 uses `ed25519:`, which fits D353:91 ("Ed25519 remains the correct current service-identity direction"). It does not include the algorithm/key/proof version fields that D353:93 requires for crypto agility. The HMAC envelopes carry no version naming either.
+    - The plan has 0 hits for Ed25519 and does not contradict it.
+    
+    **13. The analysis issues a "Ruling" and a verdict it has no authority to give.** | **MAJOR** | ANALYSIS
+    - ANALYSIS:1 is headed "Ruling". ANALYSIS:5 says "Verdict: NO DESIGN BLOCKER FOUND, but four MAJOR findings require resolution before canon freeze."
+    - COLD:220: GPT "**Read access is not admission authority.** Cannot close findings, authorise scope". COLD:91: "A finding is not an admission".
+    - The analysis never tests the plan against D351 or IDX, so its "no blocker" result misses findings 1–2.
+    
+    **14. The analysis's LangGraph fix contradicts itself.** | **MINOR** | ANALYSIS
+    - ANALYSIS:218 says versions "0.1.45–0.4.4" are vulnerable. ANALYSIS:222 says "Pin to version ≥ 0.4.4", which allows a vulnerable version.
+    - The repo pins `langgraph>=0.2.0` (`/home/user/kai-system/agentic/requirements.txt:8`).
+    - The CVE and the other external citations (PERSIST, COGITATOR, the OECD suite) cannot be checked from the repo, so they count as hypotheses (COLD:74).
+    
+    **15. No conflict with D387–D390 (Dropbox and the evidence store).** | n/a | both
+    - "Dropbox" has 0 hits in the plan and the analysis, and neither proposes an external evidence store.
+    - D390 (DEC:39392, 39394) withdraws Dropbox and says "Dropbox is not a D379 or KAI architectural dependency". DEC:39405 fixes evidence identity as "(Git commit object ID, SHA-256 of canonical MANIFEST.json)".
+    - D390 is scoped to "D387's build-log store ONLY" (DEC:39436), so it does not bind the plan's Evidence Plane design. The plan's Configuration Baseline and Lineage Manifest (PLAN:652, 655) do not cite this banked identity form; that is an observation, not a conflict.
+    
+    **16. Evolution-not-redesign is stated in both documents but not applied consistently.** | n/a (affirms) | both
+    - PLAN:5 ("KAI should not be redesigned") and PLAN:17 quote the posture. ANALYSIS:281 says "achievable without redesign".
+    - Neither contradicts it in words. Findings 1, 3 and 9–12 are where the substance drifts.
+    
+    ---
+    
+    ## Q4: Items the canon says must be carried but the plan drops
+    
+    **17. The plan omits a list of required canon and doctrine items.** | **MAJOR** | PLAN
+    
+    | Required item | Source | Plan status |
+    |---|---|---|
+    | DURABLE WORKFLOW stage in the control loop | CANON:72, COLD:541 | Missing from the plan's loop (PLAN:302-327). "durable": 0 hits. |
+    | Item 8 as a pre-A4 programme/evidence dependency | CANON:99-117, CANON:439 | Mentioned only at PLAN:109. Not in the roadmap or the lineage list (PLAN:973). |
+    | A4 reconciliation (writer/reader/dependency relations, drift detection, diagnostic anti-patterns, root-cause reasoning, repair proposals) | CANON:125-137 | Reduced to one-liners at PLAN:768 and PLAN:804. |
+    | Evidence Plane: applicability, attestations, evidence graph, policy consumption | CANON:146-157 | "applicab" and "attest": 0 hits. |
+    | Global Workspace, Socratic decomposition, Sage/adversary | CANON:182-186 | 0 hits. The named capabilities in D351:61 (Dream State, Obsidian Brain, Temporal Projection, Ritual Discovery and others) are also absent. |
+    | Ohana / values / operator relationship | CANON:194-204 | "Ohana": 0 hits. No separation of values from evidence quality. |
+    | Unified self-diagnosis loop `SEE → UNDERSTAND → … → LEARN`, covering House Doctor, Doctor teammate, Supervisor, FSM recovery, anomaly detection, capability map | CANON:210-212 | Absent. |
+    | Reference to the canonical engineering doctrine | CANON:216-218 | Absent. |
+    | Hardware maintenance mode; proven-today vs planned | CANON:228-232 | Only battery/docked appear (PLAN:836). |
+    | Autonomy requests, trust negotiation, autonomy levels A0–A4 | CANON:240-242, COLD:670-674 | Absent. |
+    | Secure update / anti-rollback (R353-01) | D353:68-85, IDX:101 | Absent. |
+    | Crypto agility (R353-02) | D353:87-95, IDX:102 | Absent. |
+    | Time semantics: decision time and monotonic deadlines | D353:97-105 | Partial. PLAN:513-519 covers event, observed, recorded and validity only. |
+    | Data-classification propagation through egress | D353:117-123 | "classification": 0 hits. |
+    | E0 census qualification | IDX:94 | Absent. |
+    | KAI-REV-018 durable grant state; governed autonomy-grant bootstrap | IDX:80, D351:184-185 | Absent. |
+    | Egress/target constraints as a general obligation | IDX:84 | Only sandbox egress (PLAN:612, PLAN:767). |
+    | Durable Goal/Watch/Attention | D351:190 | Absent. |
+    | "PROACTIVE AWARENESS DEGRADED" and the nine proactive outcomes | COLD:556-563 | Absent. |
+    | Mission / Kingsman / House-in-Order / Phase 2 hierarchy, which "should appear in the final master canon" | DOCTRINE:342-350 | Absent. |
+    | Canon process before freeze (Orion mapping, DeepSeek review, Dainius approval, exact-byte freeze) | CANON:433-451 | Not acknowledged; PLAN:985 proposes freezing. |
+    
+    The analysis adds none of these items.
+    
+    ---
+    
+    ## Q5: Status vocabulary
+    
+    **18. The plan's status vocabulary conflicts with the index's.** | **MAJOR** | PLAN (the analysis says nothing about it)
+    - **The index's vocabulary:** IDX:33 and D351:238 both say "STATUS — LIVE / BUILT-NOT-CUT-OVER / WORKING / STUB / BLOCKED / UNKNOWN".
+    - **The plan's vocabulary:** PLAN:95-105 lists PLANNED / STUB / BUILT / QUALIFIED / SHADOW / LIVE / DEGRADED / QUARANTINED / RETIRED. PLAN:93 attributes it to the README, not the index.
+    - **Index states the plan drops:**
+      - **BUILT-NOT-CUT-OVER.** The plan itself says Unified Hunter "is not yet cut over" (PLAN:37) but has no state for it.
+      - **WORKING**.
+      - **BLOCKED**.
+      - **UNKNOWN.** This is the most serious gap, given "FP-INV-07 | **Unknown remains unknown.**" (COLD:661) and "A4 must never turn 'I cannot prove it' into 'it does not exist'" (COLD:349).
+    - **Same words, different meanings:** the plan's LIVE needs "explicit authority scope". Its BUILT means "Implementation and unit tests exist".
+    - **Partial support:** PLANNED and DEGRADED have some backing in D351:210 ("live, transitional, dormant, degraded or planned"). QUALIFIED, SHADOW, QUARANTINED and RETIRED have no lineage in the documents read.
+    - **Unreconciled vocabularies:** the plan also leaves its own KaiBench lifecycle (PLAN:719-735) and the final-spec release states (COLD:676-677: `LAB_ONLY` … `REVOKED`) unreconciled. That is a fourth status vocabulary.
+    
+    ---
+    
+    ## What was not found in the inspection universe
+    
+    - No entry from D360 to D390 among the D359-referencing lines I extracted from DEC changes the D359 order. D360–D375 is also covered by COLD:279-282.
+    - Neither document mentions Dropbox, D359, D387–D390, Tool Gate, ActuatorRegistry, CODE_AUDIT P1–P4, House-in-Order or E0.
+    END-VERBATIM SUBAGENT-REPORT-DOCTRINE-CHECK
+- EVIDENCE SUBAGENT-REPORT-EXTERNAL-CLAIMS agent_external.md: 8253 bytes, sha256 992de58169a118edfd126e11ad2dce0cc770c6f8d773a1c937edb235ff59d1f7, final LF True  [CMD `sha256sum agent_external.md` → 992de58169a118ed…]
+    BEGIN-VERBATIM SUBAGENT-REPORT-EXTERNAL-CLAIMS
+    The plan's hardware, model and tooling claims mostly hold up. Several of the analysis's claims do not: two references I could not find at all, one is misread, and one figure has the wrong source behind it.
+    
+    **How I checked:** I fetched one page directly, the Lemonade GitHub README. The proxy blocked direct fetches of rog.asus.com and rocm.docs.amd.com, so the ASUS and ROCm verdicts rest on search-result summaries of those pages, not on the pages themselves. Every other verdict also comes from web-search summaries. I did not open the PDFs of any arXiv paper.
+    
+    | # | Claim | Doc | Verdict | Source | Note |
+    |---|---|---|---|---|---|
+    | 1a | Lemonade is AMD-backed and focused on Ryzen AI / Radeon | both | VERIFIED | https://github.com/lemonade-sdk/lemonade | README: "built by the community… with optimizations by AMD engineers" for Ryzen AI, Radeon and Strix Halo PCs. |
+    | 1b | Lemonade has an OpenAI-compatible API | analysis | VERIFIED | same | It also offers Anthropic- and Ollama-compatible APIs. Default port 13305, path `/api/v1`. |
+    | 1c | llama.cpp and NPU backends | plan | VERIFIED | same | llama.cpp backends: vulkan, rocm, cpu, cuda, metal. NPU runs through `flm` (FastFlowLM, XDNA2). `ryzenai-llm` NPU is Windows-only. |
+    | 1d | Strix Halo support | both | VERIFIED | same | The table lists gfx1151 (STX Halo, Max+ 395) as supported. |
+    | 1e | Linux NPU (XDNA2) support | analysis ("XDNA2 NPU on Linux") | PARTLY | https://lemonade-server.ai/flm_npu_linux.html | Only through FastFlowLM (its NPU kernels are proprietary; per a forum post, free up to a revenue threshold). Needs an upstream `amdxdna` driver (Linux 7.0+, or a 6.x backport). The `amd_iommu=off` boot flag disables the NPU. The analysis's "automatic NPU/GPU/CPU backend selection" is not confirmed by the README. |
+    | 1f | "Strix Halo experimental ROCm/vLLM paths" | plan | VERIFIED | GitHub README | Labelled experimental: the `vllm` engine (rocm, gfx1151, Linux), `llamacpp-hrx` (gfx1100/gfx1151, Linux), `ds4`, and cloud offload. The plain llama.cpp `rocm` backend is not labelled experimental. |
+    | 2a | Z13 GZ302: Max+ 395, Radeon 8060S, 128 GB LPDDR5X-8000, NPU up to 50 TOPS | both | VERIFIED | https://rog.asus.com/bt/laptops/rog-flow/rog-flow-z13-2025/spec/ and the Micro Center GZ302EA-XS99 listing | ASUS lists the NPU as "AMD XDNA NPU up to 50 TOPS". The 128 GB memory is soldered. |
+    | 2b | Exactly one M.2 2230 slot, single-sided SSD only | both | VERIFIED | https://rog.asus.com/articles/guides/how-to-upgrade-the-ssd-in-your-rog-flow-z13/ ; Kingston GZ302 page | ASUS: "only one M.2 slot". The spec page says only single-sided SSDs are supported, because of surface-mounted components. |
+    | 2c | Newer successor as of late 2026 | (question) | NOT FOUND | queries: "ROG Flow Z13 2026 successor Ryzen AI MAX 400 Gorgon Halo"; "ROG Flow Z13 2026 GZ303 / Max+ 495 / 498" | AMD's Ryzen AI MAX 400 ("Gorgon Halo", up to 192 GB, LPDDR5X-8533) is announced, with ASUS named as an OEM partner from Q3 2026 (The Register, 2026-09-29; wccftech). No Z13 model using it was found. Worth re-checking at purchase time. |
+    | 3 | ROCm official support for gfx1151 on Linux | plan | PARTLY (official but narrow) | https://rocm.docs.amd.com/projects/radeon-ryzen/en/latest/docs/compatibility/compatibilityryz/native_linux/native_linux_compatibility.html (not opened; summary only) | The summary says the Ryzen Linux matrix lists gfx1151 / Max+ 395 for ROCm 7.2.1, Ubuntu 24.04.4 only, inbox kernel driver, PyTorch. Community reports note firmware and kernel regressions (kernel 6.18.4+ needed) and that upstream vLLM does not list gfx1151. Versions are inconsistent across sources (7.11 preview, 7.14, a "10.1.0" install page). Unresolved. |
+    | 4a | Qwen3.6-35B-A3B exists | plan | VERIFIED | https://huggingface.co/Qwen/Qwen3.6-35B-A3B | Released April 2026 under Apache 2.0. MoE with about 3B active parameters, vision input, 262K native context. |
+    | 4b | gpt-oss-20b / 120b: small active MoE, text-only, open weights | plan | VERIFIED | https://docs.api.nvidia.com/nim/reference/openai-gpt-oss-120b | 120b is 117B total / 5.1B active. 20b is 21B total / 3.6B active. Apache 2.0, 128K context. |
+    | 4c | Mistral Small 4: sparse, multimodal, long context | plan | VERIFIED | https://huggingface.co/mistralai/Mistral-Small-4-119B-2603 | 119B MoE, 128 experts with 4 active (about 6.5B active). Text and image input, 256K context, Apache 2.0. BF16 needs about 238 GB, so local use on a 128 GB machine needs quantisation. |
+    | 5 | Inspect AI (UK AISI), garak (NVIDIA), Promptfoo do what the plan says | plan | VERIFIED | https://pypi.org/project/inspect-ai ; https://www.garak.ai ; https://www.promptfoo.dev/red-teaming | All three match the plan's descriptions. One unconfirmed review says OpenAI acquired Promptfoo in March 2026; I found no second source. |
+    | 6a | MCP tool poisoning succeeds against "70–73% of prominent LLM agents" | analysis | CONTRADICTED (misread) | https://arxiv.org/pdf/2508.14925 (MCPTox, AAAI) | 72.8% (o1-mini) and 70.2% (Phi-4) are attack-success rates for the two most vulnerable models, not the share of agents that were vulnerable. The average across all settings was 36.5%. |
+    | 6b | Chained MCP attacks "above 90%" | analysis | PARTLY | https://arxiv.org/html/2509.25624v3 (STAC) ; pith.science/paper/2507.06323 | STAC reports a 91.2% average for chains of individually harmless tools. That is not MCP tool poisoning, though the authors say it carries over to MCP backends. 2507.06323 (seen only through a summary site) reports 91–96% for composed attacks. |
+    | 6c | "OECD Agent Evidence Conformance Suite (September 2026)" | analysis | NOT FOUND | query: `"Agent Evidence Conformance Suite" OECD` | Nothing by that name. The nearest is OECD AI Paper No. 65 on agentic AI, which is interview-based research and not a test suite. |
+    | 6d | "Capability-Container Pattern (2026)" | analysis | NOT FOUND as a named pattern | query: `"Capability-Container Pattern" AI agents…` | The idea it describes (a mediation layer with credential vault, audit and human approval) is real and common, e.g. CapSeal arXiv 2604.16762, Infisical agent-vault and NVIDIA's reference design. The name is not attested. |
+    | 6e | eBPF capability tokens "sub-100ns latency, 200x speedup" | analysis | NOT FOUND | query: "eBPF capability tokens AI agents sub-100ns latency 200x speedup access control" | No source found. The nearest eBPF agent work, AgentSight, reports under 3% overhead and is an observability tool, not access control. |
+    | 7 | 2026 benchmark: "high persistence of malicious memories, substantial later execution when retrieved" | plan | PARTLY (the plan does not name the paper) | https://arxiv.org/abs/2607.27080 (MemSecBench) ; https://arxiv.org/abs/2605.15338 (Hidden in Memory) ; https://arxiv.org/abs/2606.04329 (MPBench) ; https://arxiv.org/abs/2607.06595 (GhostWriter) | Several 2026 preprints fit the description. Closest phrasing: MemSecBench (poisoning success 84.2%, end-to-end 50.3%, 59.6% of poisoned cases complete execution) and Hidden in Memory (60–89% execution given retrieval). All are preprints, and their metrics use different denominators. |
+    
+    **The claims that need fixing:**
+    - **6a, contradicted.** "70–73% of prominent LLM agents" is a misreading of MCPTox. Those are the two worst per-model attack-success rates, and the average was 36.5%.
+    - **6c, not found.** "OECD Agent Evidence Conformance Suite (September 2026)".
+    - **6d, not found.** "Capability-Container Pattern (2026)" as a named pattern. The underlying idea is valid.
+    - **6e, not found.** The eBPF "sub-100ns, 200x" figures. The analysis attaches them to "Securing Agents With Tracked Capabilities", which was verified elsewhere, so the numbers should be checked against that paper's text.
+    - **2c, not found.** No Flow Z13 successor confirmed as of 2026-10-07, though AMD's newer chip line exists and names ASUS as a partner.
+    - **Partly correct:**
+      - 6b: the >90% figure comes from tool-chaining work, not MCP poisoning.
+      - 1e: Linux NPU support exists only through FastFlowLM.
+      - 3: ROCm's official gfx1151 support is narrow (ROCm 7.2.1, Ubuntu 24.04.4).
+      - 7: the plan's memory-benchmark claim is uncited; MemSecBench is the closest match.
+    
+    I modified no files.
+    END-VERBATIM SUBAGENT-REPORT-EXTERNAL-CLAIMS
+
+### 6. Next authorised step
+
+- Report the findings list to Dainius; it goes to Kai for the amendment, then the DeepSeek attack on the amended text  [CONVERSATION 2026-10-07 Dainius, "do your own review and checks and attack to make sure we cover from all sides /diffrent angles"]
+
+### 7. What I am unsure of
+
+- Findings marked [S] rest on subagent reads I did not repeat; the ASUS and ROCm verdicts rest on search summaries, not the pages  [CMD `WebSearch` → summaries]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
