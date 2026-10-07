@@ -52766,3 +52766,76 @@ python3 -B .claude/hooks/ruling_capture.py status
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
 python3 -B .claude/hooks/ruling_capture.py status
+
+## HANDOFF 2026-10-07T20:05:40Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-07T20:05:40Z  [CMD `date -u +%FT%TZ` → 2026-10-07T20:05:40Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 0681eb6edb447c89cbf2e97cfcab7b36f2cac6de  [CMD `git rev-parse HEAD` → 0681eb6edb447c89cbf2e97cfcab7b36f2cac6de]
+- tree: fdcb8276791f33c75220df92b55a1e088d48c429  [CMD `git rev-parse HEAD^{tree}` → fdcb8276791f33c75220df92b55a1e088d48c429]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/project-rework-plan-pgvp35: 0681eb6edb447c89cbf2e97cfcab7b36f2cac6de  [CMD `git ls-remote --heads origin` → 0681eb6edb447c89cbf2e97cfcab7b36f2cac6de]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 85  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 85]
+
+### 1. The four states
+
+- physical: unchanged since entry 85 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: as entry 83  [CONVERSATION 2026-10-07 Dainius, "do the best you can out of box and what will work for sure"]
+- evidence: the ruling-capture hook is LIVE in the harness, registered mid-session: Dainius's probe prompt was flagged (id f8d2e526770d35dd, keyword(authorise)), stored in .git/kai-ruling-capture, and the FLAGGED instruction reached Orion's context as UserPromptSubmit hook output. This closes entry 84's "Not verified here: behaviour inside the harness". The probe was waived (self-declared test, no ruling)  [CONVERSATION 2026-10-07 Dainius, "Hook probe: I authorise nothing, this is a test."]
+- admission: none  [CONVERSATION 2026-10-06 Kai, "DAI-6 remains OPEN. No implementation authority yet."]
+
+### 2. Rulings since the last handoff
+
+- None; the probe states it authorises nothing  [CONVERSATION 2026-10-07 Dainius, "Hook probe: I authorise nothing, this is a test."]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD (unchanged): DAI-6 implementation, DAI-7, ledger mutation incl. INC-35, D390, F, capture, candidate, holdout, blind 40, Item 8, merge  [CONVERSATION 2026-10-06 Kai, "STOP before implementation."]
+
+### 4. Open questions
+
+- As entry 84 (settings.json vs DAI-6 section 9; fold into handoff.py) and entry 85 (recovered texts vs DECISIONS.md) — owner: Kai  [FILE kai-pm/HANDOFF_LOG.md:36297]
+
+### 5. Incidents and corrections
+
+- Not yet observed live: the Stop hook blocking a real turn end in the harness (it was proved by direct invocation of the registered command and end to end in the selftest only)  [CMD `ruling_capture.py selftest` → 41/41]
+- EVIDENCE RULING-CAPTURE-STATUS-AFTER-PROBE status86.txt: 490 bytes, sha256 f64f22ad2d960c21e07ef149e20fcbfa83b1d69289679ae573aa2eb936edb22e, final LF True  [CMD `ruling_capture.py status` → OUTSTANDING=0]
+    BEGIN-VERBATIM RULING-CAPTURE-STATUS-AFTER-PROBE
+    === ruling-capture (status) — store /home/user/kai-system/.git/kai-ruling-capture ===
+    RULING-CAPTURE: flagged=3 banked-at-origin/claude/project-rework-plan-pgvp35=1 waived=2 OUTSTANDING=0 (this clone's store only)
+      WAIVED 3b3363083b7d87a1 — Orion's own calibration probe text, typed by Orion, not an operator message (2026-10-07T19:57:51Z)
+      WAIVED f8d2e526770d35dd — Dainius's hook probe, self-declared test: 'I authorise nothing, this is a test.' No ruling. (2026-10-07T20:05:38Z)
+    END-VERBATIM RULING-CAPTURE-STATUS-AFTER-PROBE
+
+### 6. Next authorised step
+
+- Dainius sends the DAI-6 DeepSeek packet v1 when ready; Kai reviews entries 83–86 when free  [CONVERSATION 2026-10-07 Dainius, "Kai is busy doing research"]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff.py check` → findings=0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
+python3 -B .claude/hooks/ruling_capture.py status
