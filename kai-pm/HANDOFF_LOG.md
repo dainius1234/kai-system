@@ -54173,3 +54173,352 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-07T21:08:10Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-07T21:08:10Z  [CMD `date -u +%FT%TZ` → 2026-10-07T21:08:10Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: e5900c6a72ffe5132983a72d941551f5c50f5047  [CMD `git rev-parse HEAD` → e5900c6a72ffe5132983a72d941551f5c50f5047]
+- tree: 05abd821121cb54d5c090cfc2800fd22ee744d64  [CMD `git rev-parse HEAD^{tree}` → 05abd821121cb54d5c090cfc2800fd22ee744d64]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- remote:claude/project-rework-plan-pgvp35: e5900c6a72ffe5132983a72d941551f5c50f5047  [CMD `git ls-remote --heads origin` → e5900c6a72ffe5132983a72d941551f5c50f5047]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 91  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 91]
+
+### 1. The four states
+
+- physical: unchanged since entry 91 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: nothing new for Orion; for information: GPT (Kai) is amending the entry-89 baseline in response to this analysis. The baseline stays non-authoritative (entry 91)  [CONVERSATION 2026-10-07 Dainius, "Ruling :For your info now gpt amending-Deep Research Analysis: Kingsman/KAI Architecture Plan"]
+- evidence: the analysis text, captured byte-exact by the ruling-capture hook (id 3d652da11afcc00b) and preserved below. Its author is not stated beyond the title; Orion does not attribute it  [CONVERSATION 2026-10-07 Dainius, "Ruling :For your info now gpt amending-Deep Research Analysis: Kingsman/KAI Architecture Plan"]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-07 · for information: "Deep Research Analysis: Kingsman/KAI Architecture Plan" (verdict NO DESIGN BLOCKER; four MAJOR findings before canon freeze: forgeable provenance labels, unspecified capability enforcement mechanism, no per-actuator outcome-verification matrix, 70/30 fund legal structure and succession placed too late; plus MCP, LangGraph CVE, memory-envelope, procurement and Lemonade recommendations and a revised priority table); GPT is amending the plan from it. Full operator message verbatim below, 14382 bytes, sha256 4b9e5c26624ed4d94cbf0cd6c0b38a847b64ea5c151d9e468d907d8c3c217694, final LF False ⚠ UNBANKED  [CONVERSATION 2026-10-07 Dainius, "Ruling :For your info now gpt amending-Deep Research Analysis: Kingsman/KAI Architecture Plan"]
+    BEGIN-VERBATIM KINGSMAN-PLAN-DEEP-RESEARCH-ANALYSIS
+    Ruling :For your info now gpt amending-Deep Research Analysis: Kingsman/KAI Architecture Plan
+    
+    Executive Summary
+    
+    Verdict: NO DESIGN BLOCKER FOUND, but four MAJOR findings require resolution before canon freeze.
+    
+    The plan's core direction is validated by current research. The Memory→Action Firewall is not merely prudent — it addresses a measured, persistent vulnerability class. However, the plan's current design has specific gaps that the research exposes:
+    
+    Finding Severity Research Basis
+    Provenance labels are forgeable by the same model they constrain MAJOR MEMDRIFT shows memory-induced tool-drift persists across frontier models; standard filters reduce but do not eliminate it
+    Capability enforcement lacks concrete mechanism MAJOR Tracked capabilities require static type enforcement or kernel-level validation; "exact capability" as a label is insufficient
+    Independent outcome verification is not feasible for all actuators MAJOR IETF draft defines execution outcome verification as first-class but notes realizations vary (SCITT, TEE, append-only logs); plan lacks per-actuator matrix
+    70/30 fund lacks legal structure and is placed too late MAJOR Mission-critical succession at P3 is inconsistent with "30-year mission" framing
+    Memory poisoning defenses need signed envelopes and retrieval-time gates MINOR (addressed in research) PERSIST defines six threat classes; HMAC-signed memory envelopes reduced poison exposure from 46.2% to 8.9%
+    
+    ---
+    
+    Critical Issue 1: Memory→Action Provenance Labels Are Forgeable
+    
+    The Problem
+    
+    The plan states:
+    
+    "every consequential action field eventually carries provenance such as CURRENT_VERIFIED_EVIDENCE, CURRENT_OPERATOR_INSTRUCTION, APPROVED_STANDING_PREFERENCE, RECALLED_MEMORY, MODEL_INFERENCE, DEFAULT, or EXTERNAL_UNVERIFIED."
+    
+    Research finding: MEMDRIFT demonstrates that personality biases stored in long-term memory silently alter tool-call parameters in contexts where those preferences are irrelevant. The effect persists across frontier models and production memory architectures. Standard relevance instructions and memory filters reduce but do not eliminate the vulnerability.
+    
+    A scan of 6,062 tools across 288 verified MCP servers flagged 608 with susceptible parameters.
+    
+    Concrete Failure Sequence
+    
+    1. A recalled memory contains: "Dainius prefers conservative spending."
+    2. The model constructs a bank transfer proposal.
+    3. The model labels the amount parameter as CURRENT_OPERATOR_INSTRUCTION because it "feels" like the operator's preference.
+    4. The Memory→Action Firewall sees a trusted provenance label and passes.
+    5. A remembered preference silently determined a consequential financial parameter.
+    
+    The firewall is only as strong as the provenance labels it consumes. If the cognition layer produces both the proposal and the provenance, the firewall is checking the model's self-report.
+    
+    Fix
+    
+    Bind provenance to signed source records, not to model-generated labels.
+    
+    ```python
+    # Instead of:
+    parameter_provenance = {"amount": "CURRENT_OPERATOR_INSTRUCTION"}
+    
+    # Require:
+    parameter_provenance = {
+        "amount": {
+            "label": "CURRENT_OPERATOR_INSTRUCTION",
+            "evidence_id": "ep_20261007_143022",  # FK to evidence journal
+            "evidence_hash": "sha256:abc123...",   # signed record
+            "parameter_hash": "sha256:def456..."   # binds value to provenance
+        }
+    }
+    ```
+    
+    The firewall must verify that the evidence record exists, is signed, matches the parameter hash, and is admissible for that actuator field under policy. The model cannot forge this because it does not hold the signing key and cannot create journal records.
+    
+    Additional research-backed defense: PERSIST (2026) demonstrated that HMAC-signed memory envelopes with retrieval-time policy gates reduced poison exposure from 46.2% to 8.9% and observed high-risk unsafe retrieval to 7.9%. This is the right model for memory provenance.
+    
+    ---
+    
+    Critical Issue 2: Capability Enforcement Lacks Concrete Mechanism
+    
+    The Problem
+    
+    The plan states:
+    
+    "A Capability is the machine-enforceable artefact permitting a narrow side effect."
+    
+    But it does not specify:
+    
+    · Key management and issuer identity
+    · Signature format and verification
+    · Replay nonce storage
+    · Revocation mechanism
+    · Hardware binding
+    · How the actuator verifies capability without trusting the model
+    
+    Research finding: The ACM paper "Securing Agents With Tracked Capabilities" (2026) shows that capability safety requires statically tracked capabilities in the type system (Scala 3 capture checking) or kernel-level enforcement (eBPF tokens with sub-100ns latency, 200x speedup over traditional access control). A capability that is merely a JSON field is not a control.
+    
+    Concrete Failure Sequence
+    
+    1. Model proposes: transfer(amount=500, recipient="X")
+    2. Capability issuer signs: cap_{id, amount≤500, recipient="X", expires=...}
+    3. Actuator receives capability, but does not verify the signature because the verification logic is in the same process as the model.
+    4. Model alters the capability object before submission.
+    5. Transfer executes with altered parameters.
+    
+    Fix
+    
+    Specify a cryptographic capability format and enforce at the actuator boundary.
+    
+    Minimum viable design:
+    
+    ```text
+    Capability {
+        issuer: "authority_service_public_key",
+        subject: "kai_agent_instance",
+        action: "bank_transfer",
+        target: "recipient_X",
+        max_amount: 500,
+        currency: "GBP",
+        nonce: "unique_per_use",
+        expires_at: "2026-10-07T15:00:00Z",
+        signature: "ed25519:..."
+    }
+    ```
+    
+    The actuator must:
+    
+    1. Verify signature against independently held issuer public key
+    2. Check nonce against replay cache (persisted, not in-memory)
+    3. Check expiry
+    4. Check target matches actual destination
+    5. Check amount ≤ max_amount
+    6. Consume nonce atomically before side effect
+    
+    Research-backed enhancement: The Capability-Container Pattern (2026) proposes that agents never directly access tools — all communication flows through a mediation layer with credential vaults, audit logging, and human-in-the-loop gates. This is the right architecture for KAI's actuators.
+    
+    ---
+    
+    Critical Issue 3: Independent Outcome Verification Is Not Feasible for All Actuators
+    
+    The Problem
+    
+    The plan correctly states:
+    
+    "An actuator cannot be the sole authority on whether its own consequential action succeeded."
+    
+    But it does not define:
+    
+    · Per-actuator verification sources
+    · Timeout and reconciliation procedures
+    · What happens when independent observation is unavailable
+    · Manual reconciliation paths
+    
+    Research finding: The IETF draft "Execution Outcome Attestation for AI Agents" (April 2026) defines execution outcome verification as a first-class concept, separate from identity attestation. It identifies realizations including SCITT transparency logs, tightly-coupled direct verification, append-only local logs, and TEE-internal receipts. The OECD's Agent Evidence Conformance Suite (September 2026) provides machine-checkable test suites for verifying signed evidence of agent execution.
+    
+    Concrete Failure Sequence
+    
+    1. KAI sends a bank transfer.
+    2. The banking API returns a timeout.
+    3. The actuator cannot confirm whether the transfer succeeded.
+    4. KAI marks the action as OUTCOME_UNKNOWN.
+    5. No reconciliation procedure exists.
+    6. KAI retries, potentially duplicating the transfer.
+    
+    Fix
+    
+    Per-actuator verification matrix with explicit OUTCOME_UNKNOWN handling.
+    
+    Actuator Independent Source Timeout Reconciliation Retry Policy
+    Bank transfer Bank API polling / statement 5 min Manual Dainius confirmation Never auto-retry
+    Email send SMTP delivery receipt 1 min Check sent folder via IMAP No auto-retry
+    File write Filesystem stat + hash 10 sec Re-read and compare Idempotent only
+    API call Response + subsequent GET 30 sec Poll until confirmed Exponential backoff, max 3
+    Calendar invite Calendar API read-back 1 min Check calendar No auto-retry
+    
+    For actions where independent verification is impossible, the action must be marked UNVERIFIABLE and require explicit operator acknowledgment before closure.
+    
+    Research-backed enhancement: The COGITATOR Witness Protocol (April 2026) specifies cryptographically verifiable, tamper-evident records of AI agent execution that any third party can independently recompute. KAI should adopt this model for its outcome verifier.
+    
+    ---
+    
+    Critical Issue 4: 70/30 Fund Lacks Legal Structure and Is Placed Too Late
+    
+    The Problem
+    
+    The plan states:
+    
+    "The phrase '70/30' should not be hard-coded into tax/accounting logic until professional treatment of revenue, costs and tax is determined."
+    
+    This is correct but insufficient. The plan places "Succession/stewardship implementation" at P3 despite calling it "Core 30-year mission."
+    
+    Concrete Failure Sequence
+    
+    1. KAI generates revenue through approved activities.
+    2. No legal entity exists to hold the 30% fund.
+    3. Funds are held in Dainius's personal account.
+    4. Dainius becomes incapacitated.
+    5. The fund has no legal existence independent of Dainius.
+    6. KAI's development continuity is legally frozen.
+    
+    Fix
+    
+    Establish legal structure at P1, not P3.
+    
+    Recommended structure:
+    
+    · Legal owner: A UK limited company or trust, with Dainius as director/trustee.
+    · Fiduciary duty: Defined purpose (KAI development and continuity).
+    · Spending authority: Dainius or a pre-approved mandate with exact capability.
+    · Audit: Annual independent review.
+    · Succession: Named successor trustee/director; if none, funds revert to family trust.
+    · Revocation: Dainius can revoke any delegated spending authority at any time.
+    
+    The 70/30 split can be a mission allocation rule documented in the governance charter, not hard-coded in accounting logic until the legal entity exists.
+    
+    ---
+    
+    Research-Backed Recommendations
+    
+    1. MCP Security Is Inadequate as Currently Designed
+    
+    Research finding: Tool poisoning attacks succeed against 70–73% of prominent LLM agents. Chained attacks through MCP tool interactions reach success rates above 90%. Malicious tool descriptions enable credential theft, surveillance, and data exfiltration.
+    
+    Fix: The Skill Admission pipeline in the plan is appropriate but needs:
+    
+    · Metadata sanitization: Convert all tool descriptions to strictly declarative informational text before forwarding to the model.
+    · Runtime API call pattern monitoring: Flag computation tools attempting network operations or file I/O.
+    · Rug-pull protection: Pin exact tool version/hash and re-verify at each session start; do not trust tools that change after installation.
+    
+    2. LangGraph Security Has a Live CVE
+    
+    Research finding: CVE-2026-104873 shows that LangGraph Python SDK versions 0.1.45–0.4.4 have an authorization bypass where resource-scoped decorators ignore the actions argument, allowing authenticated users to read, update, or delete another user's resources.
+    
+    Fix: If KAI uses LangGraph:
+    
+    · Pin to version ≥ 0.4.4.
+    · Do not rely solely on decorator-based authorization; enforce authorization independently.
+    · Treat LangGraph checkpoint state as cognition state, not authority state.
+    
+    3. Memory Poisoning Requires Signed Envelopes and Retrieval Gates
+    
+    Research finding: PERSIST defines six threat classes for memory-persistent agents: poisoning, exfiltration through retrieval, retrieval injection, state corruption, identity/provenance loss, and temporal drift exploitation. HMAC-signed memory envelopes with retrieval-time policy gates reduced poison exposure from 46.2% to 8.9%.
+    
+    Fix: Implement:
+    
+    · Every memory record carries an HMAC signature from its source.
+    · Retrieval-time policy gate checks provenance, scope, and freshness before returning.
+    · Provenance Entropy metric monitored at deployment time.
+    · No cross-scope retrieval without explicit policy exception.
+    
+    4. Flow Z13 Procurement Checklist Is Adequate but Incomplete
+    
+    Research finding: The ROG Flow Z13 (2025) GZ302 with Ryzen AI MAX+ 395 has 128GB LPDDR5X 8000 onboard, Radeon 8060S, XDNA2 NPU up to 50 TOPS, and 1x M.2 PCIe slot supporting 2230 form factor. The single-sided SSD requirement is real.
+    
+    Additional checks needed:
+    
+    · Confirm exact regional SKU (memory configurations vary)
+    · Benchmark sustained NVMe bandwidth after cache exhaustion and under thermal load
+    · Test suspend/resume with KAI services, encryption, and model runtimes
+    · Verify LUKS + TPM recovery procedure
+    · Test audio/camera under Linux for embodiment stack
+    
+    5. Lemonade Is Appropriate as Adapter, Not Foundation
+    
+    Research finding: Lemonade is an AMD-backed open-source project with OpenAI-compatible endpoint, automatic NPU/GPU/CPU backend selection, and Strix Halo support. It supports Ryzen AI 300/400/Max with XDNA2 NPU on Linux.
+    
+    Fix: Use Lemonade as the default hardware abstraction candidate but keep direct llama.cpp and ROCm adapters. Do not make KAI depend on Lemonade's lifecycle. The Inference Fabric contract should be KAI-owned.
+    
+    ---
+    
+    Updated Priority Recommendations
+    
+    Original Priority Revised Priority Change Rationale
+    70/30 fund at P3 P1 Legal structure must precede real money
+    Succession at P3 P1/P2 Core mission, not optional
+    Independent verification at P1 P0/P1 Research shows this is a first-class requirement
+    Provenance binding at P1 P0/P1 MEMDRIFT shows current approach is forgeable
+    Memory security at P1 P0/P1 PERSIST shows 46% baseline poison exposure
+    
+    ---
+    
+    Summary of Required Fixes
+    
+    Issue Fix Priority
+    Provenance labels forgeable Sign evidence records; bind to parameter hash; firewall verifies P0
+    Capability enforcement vague Specify cryptographic format; verify at actuator; replay cache P0
+    Outcome verification incomplete Per-actuator matrix; explicit OUTCOME_UNKNOWN handling P1
+    70/30 fund legal structure Establish entity before real money P1
+    MCP tool poisoning Metadata sanitization; runtime monitoring; version pinning P1
+    LangGraph CVE Pin ≥ 0.4.4; independent authorization P1
+    Memory poisoning HMAC envelopes; retrieval-time gates; provenance entropy P1
+    Flow Z13 procurement Add sustained I/O, thermal, suspend/resume, LUKS tests P2
+    Lemonade dependency Keep as adapter; KAI owns Inference Fabric contract P2
+    
+    The architecture is directionally correct. The research validates the Memory→Action Firewall, the Evidence Plane / Qualified World State separation, and the capability-based authority model. The gaps are in mechanism specification — the plan describes what must happen but not how the system enforces it cryptographically and operationally. These fixes are achievable without redesign.
+    END-VERBATIM KINGSMAN-PLAN-DEEP-RESEARCH-ANALYSIS
+
+### 3. Authorised / Held / Forbidden
+
+- HELD (unchanged): the entry-89 plan and any amended version as design authority, until Dainius's review and the adversarial attack are done and reconciled; DAI-6 implementation, DAI-7, ledger mutation incl. INC-35, D390, F, capture, candidate, holdout, blind 40, Item 8, merge; Orion module design  [CONVERSATION 2026-10-07 Dainius, "Ruling this is only the base line pending review and adversary deep seeks attack"]
+
+### 4. Open questions
+
+- R15 snag, internal to the analysis text: its LangGraph item gives the vulnerable range as "0.1.45–0.4.4" and then says "Pin to version ≥ 0.4.4", which includes 0.4.4; one of the two numbers is wrong. Not checked against any CVE record here — owner: Kai  [CONVERSATION 2026-10-07 Dainius, "Pin to version ≥ 0.4.4."]
+- The analysis cites external works (MEMDRIFT, PERSIST, "Securing Agents With Tracked Capabilities", IETF "Execution Outcome Attestation for AI Agents", OECD Agent Evidence Conformance Suite, COGITATOR Witness Protocol, Capability-Container Pattern, CVE-2026-104873) with figures; none is verified in this entry. Before any figure or citation enters the canon it needs a source check (doctrine: memory and relayed claims locate, never establish) — owner: Kai  [CONVERSATION 2026-10-07 Dainius, "Deep Research Analysis: Kingsman/KAI Architecture Plan"]
+
+### 5. Incidents and corrections
+
+- Preservation checks: calibrated credential scan TOTAL HITS 0; no verbatim-marker or `## HANDOFF` lines; no odd separators  [CMD `credscan.py dra_scan.json` → TOTAL HITS 0]
+
+### 6. Next authorised step
+
+- Wait for GPT's amended plan and Dainius's review outcome  [CONVERSATION 2026-10-07 Dainius, "Ruling :For your info now gpt amending-Deep Research Analysis: Kingsman/KAI Architecture Plan"]
+
+### 7. What I am unsure of
+
+- Whether this analysis is the DeepSeek adversarial attack required by entry 91 or a separate deep-research pass; to be stated by Dainius  [CONVERSATION 2026-10-07 Dainius, "Ruling :For your info now gpt amending-Deep Research Analysis: Kingsman/KAI Architecture Plan"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
