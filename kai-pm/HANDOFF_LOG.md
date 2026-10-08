@@ -58503,3 +58503,111 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-08T10:06:52Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-08T10:06:52Z  [CMD `date -u +%FT%TZ` → 2026-10-08T10:06:52Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: dd9f8769660b6f75c585046335f5e4cbb94a2200  [CMD `git rev-parse HEAD` → dd9f8769660b6f75c585046335f5e4cbb94a2200]
+- tree: 017ddd279fe40a2fe78eadcf4061a6d89bf9ef83  [CMD `git rev-parse HEAD^{tree}` → 017ddd279fe40a2fe78eadcf4061a6d89bf9ef83]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- remote:claude/project-rework-plan-pgvp35: dd9f8769660b6f75c585046335f5e4cbb94a2200  [CMD `git ls-remote --heads origin` → dd9f8769660b6f75c585046335f5e4cbb94a2200]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 113  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 113]
+
+### 1. The four states
+
+- physical: unchanged since entry 113 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Orion reads Kai's message and the latest Linear entries  [CONVERSATION 2026-10-08 Dainius, "Look at last few  entries in linear"]
+- evidence: Kai's message relayed by Dainius (captured by the hook, id 0464fbba891e72b7), preserved below; Linear claims checked next  [CMD `cat .git/kai-ruling-capture/0464fbba891e72b7.json` → flagged]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Kai (relayed by Dainius) · 2026-10-08 · proposal formalised in Linear as "KAI Engineering Assurance Pack v0.1 — RAMS, ITP, Hold Points & LTQR": requirement/design → Activity Plan → RAMS → ITP → Hold Point → authorised execution → inspection/test → NCR/deviation → independent verification → as-built → LTQR → readiness promotion; a project-level KAI Project Assurance/Quality Plan above per-package controlled packs; incident → root cause → Failure Pattern Ledger → RAMS hazard/control → ITP test → Hold Point criterion → regression → LTQR/requalification; capabilities as the digital Permit to Work. Verbatim below, 3604 bytes, sha256 4b59913d7829555421a77288743bc333eb6c8cf15c380129a8e8dbee139e1594, final LF True ⚠ UNBANKED  [CONVERSATION 2026-10-08 Dainius, "Look at last few  entries in linear"]
+    BEGIN-VERBATIM KAI-ASSURANCE-PACK-RAMS-ITP-MESSAGE
+    Exactly. And the construction analogy is stronger than it first looks because good software/AI engineering needs the same control discipline as high-consequence construction.
+    
+    I’ve now formalised this in Linear under DAI-10 as KAI Engineering Assurance Pack v0.1 — RAMS, ITP, Hold Points & LTQR, and Orion has been given the handoff for v1.2.
+    
+    The model is essentially:
+    
+    Requirement / design → Activity Plan → RAMS → ITP → Hold Point → authorised execution → inspection/test → NCR/deviation if required → independent verification → as-built record → LTQR → readiness promotion.
+    
+    And some of our existing KAI mechanisms line up almost perfectly with site controls:
+    
+    Site engineering	KAI equivalent
+    RAMS	Risk + method statement for the exact code/change/migration/experiment
+    Activity Plan	Exact implementation or experiment sequence
+    ITP	Inspection & verification plan with acceptance criteria
+    ITC/checklist	Execution/check sheet used while carrying out the work
+    Hold Point	STOP — cannot proceed without specified evidence/release
+    Witness Point	Independent review/observation required
+    Permit to Work	Exact scoped capability/authority to perform the action
+    Inspection / SIR	Code/config/design/evidence inspection
+    NCR	Finding / incident / deviation record
+    Red-line / as-built	What was actually delivered, not what the design expected
+    LTQR	Permanent evidence/quality record tied to exact version
+    Handover	Qualified release into its approved operating envelope
+    
+    That Permit-to-Work analogy is particularly useful. Our eventual capability system is effectively the digital equivalent of a permit: exact task, exact subject, exact limits, expiry, named authority, one-use where appropriate, and the person/system at the actual workface must verify it before doing the consequential action. A nice approval upstream is not enough—same as someone telling you verbally on site that the permit is “probably fine.”
+    
+    I would add one higher-level layer above the individual work packages: a KAI Project Assurance / Quality Plan. That becomes our equivalent of the project-level quality plan governing everybody underneath it. It should define document hierarchy, roles, configuration control, inspection classes, HP/WP authority, NCR management, evidence retention, audit/IV&V, readiness gates, change control and LTQR requirements.
+    
+    Then each serious package—Unified Hunter cutover, Evidence Plane, memory migration, hardware qualification, self-repair, computer use, financial system, etc.—gets its own controlled pack under that standard.
+    
+    And this is where learning from the last year and a half becomes mechanical rather than sentimental:
+    
+    incident/defect → root cause → Failure Pattern Ledger → RAMS hazard/control → ITP inspection/test → Hold Point criterion → regression/adversarial test → LTQR/requalification trigger.
+    
+    So if we once get burned by an exit-code measurement error, silent fallback, fake status, denominator mistake, stale memory, duplicate authority path, or broken recovery path, the project process changes so the same class of mistake becomes harder to repeat.
+    
+    That is the standard I think we should aim for:
+    
+    Nothing consequential progresses because it “looks ready.” It progresses because the approved method was followed, required inspections were performed, hold points were released by the correct authority, deviations were resolved, and the evidence package proves what was actually delivered.
+    
+    That is much closer to the engineering culture you use on site—and it suits KAI extremely well. Look at last few  entries in linear
+    END-VERBATIM KAI-ASSURANCE-PACK-RAMS-ITP-MESSAGE
+
+### 3. Authorised / Held / Forbidden
+
+- PAUSED / HELD (unchanged): all engineering per entry 99; R11 tooling needs Dainius's grant  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- Whether Dainius endorses the Assurance Pack as programme standard — owner: Dainius  [CONVERSATION 2026-10-08 Dainius, "Look at last few  entries in linear"]
+
+### 5. Incidents and corrections
+
+- Credential scan (calibrated): TOTAL HITS 0  [CMD `credscan.py rams_scan.json` → TOTAL HITS 0]
+
+### 6. Next authorised step
+
+- Read the latest DAI-10 entries and the Assurance Pack document in Linear; report  [CONVERSATION 2026-10-08 Dainius, "Look at last few  entries in linear"]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff.py check` → findings=0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
