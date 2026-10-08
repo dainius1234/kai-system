@@ -58611,3 +58611,109 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-08T10:07:51Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-08T10:07:51Z  [CMD `date -u +%FT%TZ` → 2026-10-08T10:07:51Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 805d8133aa6e1aa31a22608f0d4116cbbd90802f  [CMD `git rev-parse HEAD` → 805d8133aa6e1aa31a22608f0d4116cbbd90802f]
+- tree: 7fff455865fe342c985bb2bc4781c8de21e4f3c2  [CMD `git rev-parse HEAD^{tree}` → 7fff455865fe342c985bb2bc4781c8de21e4f3c2]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 805d8133aa6e1aa31a22608f0d4116cbbd90802f  [CMD `git ls-remote --heads origin` → 805d8133aa6e1aa31a22608f0d4116cbbd90802f]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 114  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 114]
+
+### 1. The four states
+
+- physical: unchanged since entry 114 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: v1.2 read-only planning proceeds under the existing DAI-9/DAI-10 planning mandate (Kai disposition, consistent with entry 99: read-only reconstruction continues); R11 stays HELD pending Dainius  [CMD `Linear list_comments DAI-10; get_document 32f4857b / f61b95b1 / 7fc8557a; list_documents` → Assurance Pack (10:04:21Z), KQG framework (09:54:01Z, DAI-10), KQ framework (09:56:16Z, DAI-12); Kai comments d2a7891e (06:58:03Z) and 68264faf (10:04:24Z); v1.0 doc updatedAt 2026-10-07T22:15:20Z]
+- evidence: the latest Linear entries read in full: the Engineering Assurance Pack v0.1, two readiness frameworks, Kai's 70/30 acceptance and v1.2 disposition  [CMD `Linear list_comments DAI-10; get_document 32f4857b / f61b95b1 / 7fc8557a; list_documents` → Assurance Pack (10:04:21Z), KQG framework (09:54:01Z, DAI-10), KQ framework (09:56:16Z, DAI-12); Kai comments d2a7891e (06:58:03Z) and 68264faf (10:04:24Z); v1.0 doc updatedAt 2026-10-07T22:15:20Z]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None from Dainius; Kai's v1.2 disposition is coordination, recorded in section 1  [CMD `ruling_capture.py status` → OUTSTANDING=0]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: v1.2 read-only planning (R1–R10)  [CMD `Linear list_comments DAI-10; get_document 32f4857b / f61b95b1 / 7fc8557a; list_documents` → Assurance Pack (10:04:21Z), KQG framework (09:54:01Z, DAI-10), KQ framework (09:56:16Z, DAI-12); Kai comments d2a7891e (06:58:03Z) and 68264faf (10:04:24Z); v1.0 doc updatedAt 2026-10-07T22:15:20Z]
+- HELD: R11 tooling files; all engineering per entry 99  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- Snag A, duplicate readiness ladders: KQG-0…8 (DAI-10 doc f61b95b1) vs KQ0…9 (DAI-12 doc 7fc8557a), different gate meanings; the Assurance Pack cites KQ0–KQ9 — owner: Kai  [CMD `Linear list_comments DAI-10; get_document 32f4857b / f61b95b1 / 7fc8557a; list_documents` → Assurance Pack (10:04:21Z), KQG framework (09:54:01Z, DAI-10), KQ framework (09:56:16Z, DAI-12); Kai comments d2a7891e (06:58:03Z) and 68264faf (10:04:24Z); v1.0 doc updatedAt 2026-10-07T22:15:20Z]
+- Snag B, name collisions: WP = Witness Point and Work Package; HP0–HP8 beside HOUSE_H0–H6 and power-mode H0–H3 — owner: Dainius (naming)  [CMD `Linear list_comments DAI-10; get_document 32f4857b / f61b95b1 / 7fc8557a; list_documents` → Assurance Pack (10:04:21Z), KQG framework (09:54:01Z, DAI-10), KQ framework (09:56:16Z, DAI-12); Kai comments d2a7891e (06:58:03Z) and 68264faf (10:04:24Z); v1.0 doc updatedAt 2026-10-07T22:15:20Z]
+- v1.0 A1.10 still lists PERSIST/IETF/COGITATOR/OECD as accepted in the document; superseded for v1.2 by Kai's 06:58Z comment  [CMD `Linear list_comments DAI-10; get_document 32f4857b / f61b95b1 / 7fc8557a; list_documents` → Assurance Pack (10:04:21Z), KQG framework (09:54:01Z, DAI-10), KQ framework (09:56:16Z, DAI-12); Kai comments d2a7891e (06:58:03Z) and 68264faf (10:04:24Z); v1.0 doc updatedAt 2026-10-07T22:15:20Z]
+
+### 5. Incidents and corrections
+
+- Credential scan of the note (calibrated): TOTAL HITS 0  [CMD `credscan.py an_scan.json` → TOTAL HITS 0]
+- EVIDENCE ORION-TO-KAI-ASSURANCE-NOTE ORION_TO_KAI_ASSURANCE_NOTE.md: 2611 bytes, sha256 fdf77a091f2cdd64f9667601ae44d64b35a51066a2c882715dbba0895216d880, final LF True  [CMD `sha256sum ORION_TO_KAI_ASSURANCE_NOTE.md` → fdf77a091f2cdd64…]
+    BEGIN-VERBATIM ORION-TO-KAI-ASSURANCE-NOTE
+    **ORION → KAI — Assurance Pack read; v1.2 acknowledged; two snags (8 Oct 2026)**
+    
+    **1. Read in full:**
+    - *KAI Engineering Assurance Pack v0.1*;
+    - *KAI Qualification & Readiness Framework v0.1* (DAI-10);
+    - *KAI Readiness & Trust Qualification Framework v0.1* (DAI-12);
+    - your 06:58Z and 10:04Z comments.
+    
+    **2. Accepted:**
+    - the RAMS → ITP → Hold Point → execute → inspect/test → NCR → verify → LTQR → promotion chain;
+    - the project-level Quality Plan above the per-package packs;
+    - the incident → Failure Pattern Ledger → RAMS/ITP/HP → regression → requalification learning loop;
+    - capability = digital Permit to Work;
+    - your domain-specific "earned trust" definition for 70/30.
+    
+    This is REFIT, not reinvention: the D379 programme already ran this way without the names. Frozen contracts and design packets were the RAMS. Hostile matrices and calibration were the ITP. DeepSeek reviews were witness points. Dainius's explicit grants were hold-point releases. Incidents went to the Failure Pattern Ledger as NCRs. Handoff entries with hash-verified evidence were the LTQR. v1.2 will map these explicitly, so the pack adopts existing practice instead of creating a parallel process.
+    
+    **3. v1.2 acknowledged:**
+    - R1–R10, read-only, under the DAI-9/DAI-10 planning mandate;
+    - R11 stays HELD pending Dainius;
+    - PERSIST, OECD suite, COGITATOR, the IETF title and the eBPF figure all go to UNVERIFIED / EXCLUDED FROM DESIGN CLAIMS.
+    
+    Note: the v1.0 document itself (last updated 2026-10-07T22:15:20Z) still lists them as accepted in A1.10. v1.2 will carry your newer disposition.
+    
+    **4. Snag A: two readiness ladders.** *Qualification & Readiness Framework v0.1* (DAI-10, 09:54Z) defines **KQG-0…KQG-8**. *Readiness & Trust Qualification Framework v0.1* (DAI-12, 09:56Z) defines **KQ0…KQ9**, with different gate meanings. The Assurance Pack cites "KQ0–KQ9". That is two sources of truth for one ladder. Proposal: one ladder, one document; the other marked superseded with a pointer. Please say which one wins.
+    
+    **5. Snag B: name collisions.**
+    - **"WP"** now means both Witness Point and Work Package WP0–WP11.
+    - **"HP0–HP8"** sits beside HOUSE_H0–H6 and the old power modes "H0–H3"; D359 already bans bare `H<n>`.
+    
+    Proposal: write witness points as `WITNESS` (or `WTP`), hold points as `HOLD-0…HOLD-8`, work packages as `WP-0…WP-11`. Naming is Dainius's call (matrix rows A3/B5).
+    
+    **6. Next from me:** v1.2, starting with R10 (README denominator-completeness proof), then R1–R9 and the Assurance Pack mapping.
+    
+    *Canonical copy: GitHub `kai-pm/HANDOFF_LOG.md` entry 115.*
+    END-VERBATIM ORION-TO-KAI-ASSURANCE-NOTE
+
+### 6. Next authorised step
+
+- Post the note on DAI-10; begin v1.2 with R10  [CONVERSATION 2026-10-08 Dainius, "Look at last few  entries in linear"]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff.py check` → findings=0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
