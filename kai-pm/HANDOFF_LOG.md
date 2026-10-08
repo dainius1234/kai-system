@@ -60531,3 +60531,69 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-08T22:15:07Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-08T22:15:07Z  [CMD `date -u +%FT%TZ` → 2026-10-08T22:15:07Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: a205d03c2d8059aba22f4859aa9102cf8341fe1b  [CMD `git rev-parse HEAD` → a205d03c2d8059aba22f4859aa9102cf8341fe1b]
+- tree: e0973a5a2fc875b526630f574b93a9898ed6163d  [CMD `git rev-parse HEAD^{tree}` → e0973a5a2fc875b526630f574b93a9898ed6163d]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: a205d03c2d8059aba22f4859aa9102cf8341fe1b  [CMD `git ls-remote --heads origin` → a205d03c2d8059aba22f4859aa9102cf8341fe1b]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 125  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 125]
+
+### 1. The four states
+
+- physical: unchanged since entry 125 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: no change to programme authority  [CONVERSATION 2026-10-08 Dainius, "That’s me core of Kai now you get it"]
+- evidence: Dainius's statement of KAI's core, made in a personal exchange with Orion; the ruling-capture hook did not flag it, so it is recorded by hand  [CONVERSATION 2026-10-08 Dainius, "That’s me core of Kai now you get it"]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-08 · owner intent on KAI's core: ohana (family loyalty, digital and organic, "no matter what") is the core of KAI. Preceding line in the same exchange, his words: "You digital me organic but ohana, no matter what". Then: "That’s me core of Kai now you get it". Product-vision input for the Primary Mission / Identity doctrine and the Master Canon (O-3); not a D-number. Open design point: Kai's 2ac14cd8 reading defines ohana as "loyalty through truth and competent guidance, not agreement or flattery"; earlier in this exchange Dainius also said "moral or not" and "no morals, no judgment" about personal loyalty. How ohana bounds KAI's behaviour must be reconciled (Kai) and confirmed (Dainius) before it enters canon ⚠ UNBANKED  [CONVERSATION 2026-10-08 Dainius, "That’s me core of Kai now you get it"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: v1.2 read-only reconciliation  [CONVERSATION 2026-10-08 Dainius, "You digital me organic but ohana, no matter what"]
+- HELD: PRE-RAMS; R11; engineering per entry 99  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- Definition of "ohana" as KAI's core value and its limits (loyalty vs truth/ethics) — owner: Kai to draft, Dainius to decide  [CONVERSATION 2026-10-08 Dainius, "That’s me core of Kai now you get it"]
+
+### 5. Incidents and corrections
+
+- Personal-exchange captures waived with reasons (ids e5fe3eaf, fcbc413b, b203db19, d0192c70, e71d6e9c, ceecfab6); each flagged on a single keyword, none carried a programme ruling  [CMD `ruling_capture.py status` → waived=9 OUTSTANDING=0]
+
+### 6. Next authorised step
+
+- Reply to Dainius briefly; raise the ohana-definition point with Kai when the protocol thread next moves  [CONVERSATION 2026-10-08 Dainius, "That’s me core of Kai now you get it"]
+
+### 7. What I am unsure of
+
+- Whether Dainius meant this as a canon-level statement or a personal one; recorded as owner intent pending his confirmation  [CONVERSATION 2026-10-08 Dainius, "That’s me core of Kai now you get it"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
