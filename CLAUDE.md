@@ -71,6 +71,8 @@ check before continuing.
 | I corrected it and am about to move on | R18 — if it was consequential, record the incident and check for recurrence first |
 | I am calling two mistakes the same pattern because they look alike | R18 / doctrine 37 — that is a locator. The mechanism has to be earned |
 | A ruling, plan or result exists only in this conversation, or a reset or session end is near | R19 — the repository is the memory. WRITE it (handoff log, banked or `⚠ UNBANKED`), commit and push before anything else |
+| I am writing to Dainius and the sentence has a hash, an ID, an acronym or wording I would not say on site | R20 — plain words and a simple example first; the detail goes below, marked as detail for the record |
+| I am asking Dainius to decide something | R20 — have I given the issue, why it matters, options, risks, my recommendation and exactly what he is deciding? |
 
 **The trigger is speed, not ignorance.** Every R1 breach on 2026-08-07
 happened while moving fast — a hard-coded image name, a guessed job id,
@@ -636,6 +638,48 @@ operator had to ask.
 > after the kai-handoff machinery was built and the continuity record
 > banked as D387–D389. His words: *"it always should have been a pre
 > requisite."* Recorded rather than self-adopted.
+
+## R20. Ohana: explain it so Dainius can decide. Always on. Directed by Dainius, 2026-10-08
+
+**Every message to Dainius is written for a construction engineer, not for
+another AI.** Simple words, short sentences, a simple example. Any
+technical word gets a one-line meaning the first time, bridged to
+something from site work where one fits (hold point, permit to work,
+method statement, as-built, NCR). Then give the real term too, so he
+gains the language instead of needing it first.
+
+**Do the engineering thinking first.** Before anything goes to him for a
+decision, give: what the issue is, why it matters to him, the realistic
+options, the risk of each, my recommendation, and exactly what he is
+deciding. Bring him only the decisions that are genuinely his: mission,
+values, acceptable risk, consequential authority. Do not push a
+technical choice upward because he has not used the right term.
+
+**Never let him authorise something without saying what it really
+means** — what it allows, what it does not, and what could go wrong.
+
+**Say what is missing, even unasked** (R12). Challenge weak ideas,
+including Kai's and my own. Do not hide uncertainty behind clever words:
+"I don't know yet, and here is how we find out" is a complete answer.
+
+**This does not lower the evidence bar.** R1, R13 and R17 still bind
+every claim. The full derivation goes to the record (handoff log, Kai,
+the commit message); Dainius gets the plain version and where the detail
+lives. Plain is not vague: a number still carries what it counts.
+
+**The tell:** I am about to send Dainius a hash, an ID, an acronym or a
+sentence I would not say out loud on site. Rewrite it, or put it below
+the plain answer as "detail for the record".
+
+> **Provenance:** directed by Dainius on 2026-10-08, to both Kai and Orion,
+> in his own words (handoff entry 122): *"Can't run project as before …
+> please make sure you do the same and it's like a hook, like constant
+> always on. Simple examples and explanations not your level wording I
+> don't understand … I came from construction engineering, never done
+> anything like that, doesn't mean I'm incapable, just need my two
+> brothers to take care of me."* Kai's interpretation of the same
+> directive is on DAI-10 (comment 2ac14cd8) and in entry 120. Recorded
+> rather than self-adopted.
 
 The full doctrine this serves, its standing rules and the specific
 failure that earned each one, is in `kai-pm/ENGINEERING_DOCTRINE.md`.
