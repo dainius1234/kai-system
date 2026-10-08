@@ -59032,3 +59032,121 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-08T12:18:52Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-08T12:18:52Z  [CMD `date -u +%FT%TZ` → 2026-10-08T12:18:52Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 584c7f72190d1ce4e0183da782f2694c3c04f4e3  [CMD `git rev-parse HEAD` → 584c7f72190d1ce4e0183da782f2694c3c04f4e3]
+- tree: 4599c5607e87038be5bb7dc491f4f4f785231498  [CMD `git rev-parse HEAD^{tree}` → 4599c5607e87038be5bb7dc491f4f4f785231498]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 584c7f72190d1ce4e0183da782f2694c3c04f4e3  [CMD `git ls-remote --heads origin` → 584c7f72190d1ce4e0183da782f2694c3c04f4e3]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 118  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 118]
+
+### 1. The four states
+
+- physical: unchanged since entry 118 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Orion re-fetches protocol v0.2, verifies it against entry 117 and dispositions any remaining delta (Kai's request, protocol step VERIFY); planning only; PRE-RAMS HOLD; engineering pause unchanged  [CONVERSATION 2026-10-08 Dainius, "Accepted as an Ohana directive, not a one-off prompt"]
+- evidence: Kai's message relayed by Dainius, preserved below from the ruling-capture store  [CMD `cat .git/kai-ruling-capture/ad0b34f11c15d867.json` → flagged 2026-10-08T12:18:12Z, 6149 chars, no final LF]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Kai (relayed by Dainius) · 2026-10-08 · Protocol v0.2 reconciled from entry 117 (v0.1 kept with successor banner); FUTURE_A4_SELF_DIAGNOSIS withdrawn, A4_SELF_DIAGNOSIS kept per D359; frozen bytes in GitHub, drafts in Linear, Miro projection; Kai's recommendations on the four owner points (ruling authentication via direct conversation then verbatim banking; narrow record authority during the pause with listed exclusions; top artefact = future Kingsman Master Canon/Constitution, inputs until frozen; AUTONOMY_0…AUTONOMY_4). Also reports an "Ohana directive" accepted by Kai: professional judgement, education, challenge and surfacing what is missing before asking Dainius to decide. These are recommendations and a reported directive, not Dainius's rulings on the four points. Verbatim below, 6190 bytes, sha256 95721ce682aa8ae4a82b3bae4fec0e6c0f70f4fd359a25635937651c7bc899cb, final LF True (added by Orion; the captured text has none) ⚠ UNBANKED  [CONVERSATION 2026-10-08 Dainius, "Accepted as an Ohana directive, not a one-off prompt"]
+    BEGIN-VERBATIM KAI-PROTOCOL-V0-2-MESSAGE
+    Yes. Orion’s review was good, and it caught exactly the sort of governance defects we want found before we start producing RAMS/ITPs.
+    
+    I have now reconciled his entire section-by-section review into Communication & Change-Control Protocol v0.2 in DAI-10. I did not overwrite v0.1; v0.1 now carries a visible successor/review banner. I also sent Orion the v0.2 exact subject and asked him to perform the next step in our own protocol: re-fetch → verify against entry 117 → disposition any remaining delta.
+    
+    Three things Orion caught were particularly important. First, our evidence hierarchy and Programme Governance Charter were not actually the same hierarchy. I fixed that by separating three different things instead of forcing them into one ladder: programme authority, technical/evidence truth, and document architecture. Second, he was right that my proposed FUTURE_A4_SELF_DIAGNOSIS name conflicted with D359. I have withdrawn that rename: we keep A4_SELF_DIAGNOSIS unless you explicitly reopen the naming under new authority. Third, he was right that frozen material cannot rely on mutable Linear documents. The v0.2 rule is now: working drafts in Linear, frozen canonical bytes in GitHub, Miro as projection, with mirrors carrying an explicit canonical identity.
+    
+    The communication protocol is now much tighter. A material exchange has an exact BASED-ON identity and canonical-copy reference; reviews become stale if the subject changed; agreement, approval, authorization and verification are separate states; author ≠ sole verifier in both directions; and HOLD/STOP semantics are explicit.
+    
+    The remaining owner decisions are now only four genuine ones. My recommendation is:
+    
+    1. How your rulings are authenticated: a ruling must originate in a direct authenticated conversation with Kai or Orion, then be preserved verbatim with source/date and banked before consequential action. A DAINIUS → label in shared Linear is useful metadata but not authentication.
+    2. Record authority during the engineering pause: allow narrow standing authority for append-only continuity records, exact ruling capture, Linear comments/drafts, Miro projections and correction/supersession banners. Do not let that standing authority create D-numbers, alter held ledgers, change source/tooling/config, run held experiments, change runtime, freeze canon or perform consequential actions.
+    3. Top document hierarchy: the target top-level artifact should be the future KAI Kingsman Master Canon / Constitution. Until it is genuinely frozen, the Primary Mission/Identity/Lineage doctrine plus the reconciled master-plan candidates remain its source inputs—not a falsely declared final constitution.
+    4. Autonomy naming: I recommend AUTONOMY_0 … AUTONOMY_4. It is unambiguous and avoids collisions with A-4.
+    
+    And one point does not need a new decision unless you want to reopen it: keep A4_SELF_DIAGNOSIS because D359 already binds that terminology.
+    
+    The protocol’s current state is therefore:
+    
+    v0.2 = RECONCILED DRAFT
+    Orion verification = pending
+    PRE-RAMS = HOLD
+    engineering pause = unchanged
+    
+    Once Orion verifies v0.2 and you rule on those four owner points, then we can close the communication protocol properly. Only after that do I want us to design the Project Quality/Assurance Plan and then the actual RAMS/ITP/ITC/LTQR system underneath it.
+    
+    That sequence is now doing exactly what you asked: we are improving the way we work together before we start creating the controls that will govern the project. Accepted as an Ohana directive, not a one-off prompt. I’ve also put it into the shared DAI-10 channel so Orion works to the same expectation.
+    
+    The practical meaning is important: our job is not merely to answer what you ask. It is to help you understand what you need to know before you can safely direct the project. You should not have to become an AI/software architect first and somehow know which questions to ask us.
+    
+    From now on, when something material comes up, I should do the engineering thinking first and give you: what the issue actually is, why it matters, what professional practice says, realistic options, risks/trade-offs, my recommendation, what evidence would prove it, and only then the genuine decision that belongs to you.
+    
+    That also means I should challenge weak ideas—including my own earlier ones—rather than preserve them because we once agreed with them. If technology or evidence has improved, I explain why the old mechanism is weaker and how we upgrade it without losing KAI’s mission, personality or lineage.
+    
+    Your site-engineering analogy is useful here. You don’t expect a client to design the temporary works, write the ITP and work out every hold point before the engineering team can advise them. The professionals are supposed to identify those requirements and explain the consequences so the responsible person can make an informed decision. That is the standard Kai and Orion should provide to you.
+    
+    So our relationship becomes:
+    
+    You define the mission, values, acceptable risk and consequential authority.
+    We supply professional engineering judgement, education, research, challenge, assurance and options.
+    We do not push technical decisions upward merely because you haven’t used the right terminology.
+    We do not let you accidentally authorise something without explaining what it really means.
+    And we do not hide uncertainty behind impressive AI language.
+    
+    One other consequence: when I see something missing—even if you haven’t asked about it—I should surface it. The communication protocol, readiness framework, quality plan, RAMS/ITP concept, LTQR, hold points and independent verification are examples of exactly that sort of professionalisation.
+    
+    And when I teach you something, I’ll try to bridge it to concepts you already know—construction QA, permits, temporary works, inspection records, NCRs, hold points—then give you the actual software/AI terminology as well. That way you gain the technical language rather than being expected to arrive with it.
+    
+    That directive is now part of how I approach KAI: truth, education, independent judgement and professional guidance before convenience or agreement.
+    END-VERBATIM KAI-PROTOCOL-V0-2-MESSAGE
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: v0.2 verification against entry 117; v1.2 read-only reconciliation  [CONVERSATION 2026-10-08 Dainius, "Accepted as an Ohana directive, not a one-off prompt"]
+- HELD: PRE-RAMS templates; R11; all engineering per entry 99  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- The four owner points await Dainius's own words; Kai's recommendations are not rulings — owner: Dainius  [CONVERSATION 2026-10-08 Dainius, "Accepted as an Ohana directive, not a one-off prompt"]
+- The original Dainius "Ohana" directive text has not been seen by Orion; Kai says it is on DAI-10 — owner: Orion to read and preserve  [CONVERSATION 2026-10-08 Dainius, "Accepted as an Ohana directive, not a one-off prompt"]
+
+### 5. Incidents and corrections
+
+- Credential scan of the message (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py kv02_scan.json` → TOTAL HITS 0]
+
+### 6. Next authorised step
+
+- Re-fetch v0.2 and v0.1 and DAI-10; verify against entry 117; disposition the delta; bank; post  [CONVERSATION 2026-10-08 Dainius, "Accepted as an Ohana directive, not a one-off prompt"]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff.py check` → findings=0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
