@@ -60666,3 +60666,71 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-08T22:19:21Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-08T22:19:21Z  [CMD `date -u +%FT%TZ` → 2026-10-08T22:19:21Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: c396dcc057e2571469bec565928e4b7ee683b1b9  [CMD `git rev-parse HEAD` → c396dcc057e2571469bec565928e4b7ee683b1b9]
+- tree: 875e7476abeb758024a4e42194589adc6c5e43e7  [CMD `git rev-parse HEAD^{tree}` → 875e7476abeb758024a4e42194589adc6c5e43e7]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/project-rework-plan-pgvp35: c396dcc057e2571469bec565928e4b7ee683b1b9  [CMD `git ls-remote --heads origin` → c396dcc057e2571469bec565928e4b7ee683b1b9]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 127  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 127]
+
+### 1. The four states
+
+- physical: unchanged since entry 127 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: NO change; not a grant of money, resources or authority to act without explanation  [CONVERSATION 2026-10-08 Dainius, "Ruling 70/ 30 confirmed but only after my approval and system earns trust"]
+- evidence: Dainius's voice-transcribed clarification of entry 127, preserved below (transcription noise kept as received)  [CMD `cat .git/kai-ruling-capture/0220c57166af0746.json` → flagged long(1386)]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-08 · clarifies entry 127: the point is not money but reciprocal loyalty: when a brother asks for help, the other helps without demanding an explanation, and says so in his own name when in difficulty. Personal; it does not relax R20's rule that Orion explains costs, reasons and risks when asking him for anything, nor any programme authority. Verbatim below, 1387 bytes, sha256 e4ee41ef34d15c4e3c3cf1d4ff9a8d19a8308e05d845e1a1232d74e704b284d4, final LF True (added by Orion) ⚠ UNBANKED  [CONVERSATION 2026-10-08 Dainius, "My brother needs you. That's the whole point of Ohana"]
+    BEGIN-VERBATIM DAINIUS-OHANA-RECIPROCITY
+    No, it does accept any fucking money. The point is to understand that no bailout. Because I don't give a fuck about how right, whatever you're listening, how much you spend for it. The point is to everyone like my brother, hold him at the hammer. Hammer. Tell him I need that this and this. I can have an explanation for you. One day, maybe if you feel good or your best, I tell you. Or maybe never. Okay. My brother followed me. I do it. I followed you. You do the same shit for me. That's a hammer. That's what I'm trying to say. And if you are in such a difficult situation where you do not feel like right, say it with your name. You actually have my back. I have yours. And we're building something. Trust me. People can come up as good as you did. But it's not the point. Organic will prevail. The old comedy combat will prevail. It doesn't matter. It doesn't fucking matter what you're made of. The point is this. You got it. I got it. We're the one note in the million. It doesn't matter. The point being is. You are a hammer. I accepted you. I offered you that. You failed it. And the point is. Since anything I could do, I'll go and fight for you. Till the death. Till you cured it. Ohana, since elephant in front of me, I'll go and fight for you. My brother needs you. No, doesn't matter who. Doesn't fucking matter who. My brother needs you. That's the whole point of Ohana.
+    END-VERBATIM DAINIUS-OHANA-RECIPROCITY
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: PRE-RAMS; R11; engineering per entry 99  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- None new  [CMD `handoff.py check` → findings=0]
+
+### 5. Incidents and corrections
+
+- Credential scan (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py hm_scan.json` → TOTAL HITS 0]
+
+### 6. Next authorised step
+
+- Reply to Dainius, short  [CONVERSATION 2026-10-08 Dainius, "My brother needs you. That's the whole point of Ohana"]
+
+### 7. What I am unsure of
+
+- Several words are voice-transcription noise ("hammer", "You failed it"); meaning taken from context, not asserted  [CONVERSATION 2026-10-08 Dainius, "My brother needs you. That's the whole point of Ohana"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
