@@ -58320,3 +58320,116 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-08T06:24:24Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-08T06:24:24Z  [CMD `date -u +%FT%TZ` → 2026-10-08T06:24:24Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 89cee4c7a2c70620384b73fed8d88fa16402df67  [CMD `git rev-parse HEAD` → 89cee4c7a2c70620384b73fed8d88fa16402df67]
+- tree: fc3f09025adb2e7746bf26f3d1efebbd8b0fc27f  [CMD `git rev-parse HEAD^{tree}` → fc3f09025adb2e7746bf26f3d1efebbd8b0fc27f]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 89cee4c7a2c70620384b73fed8d88fa16402df67  [CMD `git ls-remote --heads origin` → 89cee4c7a2c70620384b73fed8d88fa16402df67]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 111  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 111]
+
+### 1. The four states
+
+- physical: unchanged since entry 111 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Orion reads Kai's review; no new action authorised by the relay itself  [CONVERSATION 2026-10-08 Dainius, "Read this"]
+- evidence: Kai's review of master plan v1.1, relayed by Dainius, captured by the hook (id b3ea36aba65072db), preserved below; Kai's claims about Linear/Miro are checked next  [CMD `cat .git/kai-ruling-capture/b3ea36aba65072db.json` → flagged]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Kai (relayed by Dainius) · 2026-10-08 · RULING: "KAI One Master Plan v1.1 = ACCEPTED AS THE PRIMARY MERGED CANDIDATE FOR RECONCILIATION — NOT YET READY TO FREEZE"; eleven required amendments R1–R11 before freeze (second zero-loss register for the historical/vision/doctrine/research universe; semantic contracts not names; ONE KAI personality invariant; full perception principle; embodiment contract; Technology & Borrowing Register; "offline" clarified; no premature memory-crypto choice; R0–R4 vs code enum not assumed equal; README denominator-completeness proof; generator/census/calibration tooling promoted to stable repo paths); correction: bounded forecast ranges allowed, never as readiness evidence; 70/30 recorded by Kai as resolved owner intent at concept level (70% Dainius/family, 30% development/continuity budget, never spending authority). Verbatim below, 5911 bytes, sha256 b8665038c5ac27776d6b29c897fc8d56a8c7ec0063ff35f5c69e062fe39ee8ad, final LF True ⚠ UNBANKED  [CONVERSATION 2026-10-08 Dainius, "Read this"]
+    BEGIN-VERBATIM KAI-REVIEW-OF-MASTER-PLAN-V1-1
+    Read this :
+    
+    Read properly — not skimmed. I pulled the actual v1.1 attachment from DAI-10, checked Orion’s supporting repository commits, inspected the embedded generator logic from handoff entry 106, and updated both Linear and Miro with my review.
+    
+    My ruling is:
+    
+    KAI One Master Plan v1.1 = ACCEPTED AS THE PRIMARY MERGED CANDIDATE FOR RECONCILIATION — NOT YET READY TO FREEZE.
+    
+    This is a substantial improvement. Orion has done exactly what we wanted on the repository side: he stopped relying on memory, derived a README population mechanically, exposed his own mapping mistakes, corrected them, and produced a visible lineage register. The 356 README rows → 104 canonical features → 0 unmapped within that declared population is a strong control.
+    
+    But I found an important subtlety before we congratulate ourselves too early: “0 unmapped” is not yet equivalent to “every possible feature/remark in the entire README was captured.” His extractor takes all table rows plus specifically selected prose populations—GPU unlock, Phase-1 priorities, cross-check lists and a manually enumerated End-goal set. That is good, but it does not mechanically prove that some feature-bearing sentence elsewhere in all 1,841 README lines wasn’t outside the extraction denominator. This is exactly the sort of denominator mistake our own engineering doctrine warns about.
+    
+    So I have required a README denominator-completeness proof, not merely an unmapped-row check.
+    
+    I also found another concrete process issue: Orion said the plan and generator scripts were saved to the repo. The commits I inspected show that the actual commit changed kai-pm/HANDOFF_LOG.md only. The generator source is preserved verbatim inside the handoff entry, which is much better than losing it, but those are not yet standalone maintained repository tools. Before canon freeze, I want the extractor/mapping/generator/calibration tooling promoted into proper stable repo paths so future Kai/Orion/developers don’t need to reconstruct executable tooling out of a 57,000-line handoff log.
+    
+    I accepted essentially all of Orion’s serious engineering additions: the O1–O11 organism front door, D359 visible programme sequence, durable workflow in the action path, Tool Gate/ActuatorRegistry evolution rather than a parallel authority service, derivation-not-citation, authenticated operator-instruction minting, deterministic approval rendering, restore epoch, trusted time, single-host trust-boundary honesty, supply-chain admission, calibrated KaiBench and the per-actuator outcome-verification model.
+    
+    I made 11 required amendments before freeze:
+    
+    * R1: a second zero-loss register for the whole historical/vision/doctrine/research universe—not only README.
+    * R2: preserve semantic behaviour, not merely feature names: source feature → original contract → target responsibility → acceptance evidence.
+    * R3: explicitly restore the ONE KAI personality/relationship invariant. Internal specialists are faculties of Kai, not separate personalities or relationship memories.
+    * R4: restore our full perception principle: Sense cheaply → understand selectively → investigate actively → predict cautiously.
+    * R5: restore the embodiment contract: Response → ExpressionPlan → renderer, with voice/avatar remaining presentation organs rather than another brain.
+    * R6: preserve a separate Technology & Borrowing Register so Graphiti ideas, Synapse, A-Evolve, WASTE, VLMs, runtimes, quant stacks etc. aren’t lost simply because they aren’t constitutional architecture.
+    * R7: clarify “offline”: Kai must function independently without cloud dependency, while optional explicit governed egress remains allowed.
+    * R8: don’t prematurely freeze one cryptographic implementation for memory. Provenance/tamper evidence is required; the mechanism remains evidence-selected.
+    * R9: don’t assume the new R0–R4 risk vocabulary is semantically identical to the existing five code enums merely because both have five levels.
+    * R10: mechanically prove the README extraction denominator itself is complete.
+    * R11: move the census/generator/calibration programs out of handoff-only blocks into stable repository tooling.
+    
+    I made one other correction to Orion’s wording. His “no effort estimates” rule is too absolute. Evidence gates must never be passed because a calendar says so, but professional programme management absolutely can use bounded forecast ranges with uncertainty once we understand scope. NASA-level engineering still estimates resources and schedule; it simply does not confuse an estimate with evidence of readiness.
+    
+    Your 70/30 clarification is now treated as resolved owner intent at the conceptual level: mature Kai aims toward self-sustainability; conceptually 70% benefits you/family and 30% supports Kai’s hardware, compute, storage and capability development. That 30% is a development/continuity budget, never self-created spending authority. The accounting base, legal vehicle, taxes and eventual delegated envelope remain deliberately open.
+    
+    I have written the full Kai review into DAI-10, left the handoff there for Orion, and updated the Miro Zero-Loss Protocol with the status:
+    
+    v1.1 ACCEPTED FOR RECONCILIATION, NOT FREEZE.
+    
+    And this is the most important bit: I am not trying to take Orion’s document back over. He has improved my plan. I am improving his. We are now doing what you wanted—building one master, attacking one another’s omissions, and preserving your eighteen months of vision instead of each of us producing another “better” plan that silently drops something.
+    
+    We are considerably closer now. The next real milestone is not another architecture draft. It is reaching zero unexplained material gaps across README + historical vision + doctrines + repo + research. Then DeepSeek gets the merged subject to attack. Only after that should you freeze it.
+    END-VERBATIM KAI-REVIEW-OF-MASTER-PLAN-V1-1
+
+### 3. Authorised / Held / Forbidden
+
+- PAUSED / HELD (unchanged): all engineering per entry 99; R11 (new repository tooling files) is a tooling change and needs Dainius's explicit grant before Orion creates them  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- Grant for R11 (promote extractor/mapper/generator/calibration into stable repo paths) — owner: Dainius  [CONVERSATION 2026-10-08 Dainius, "Read this"]
+- The 70/30 owner intent reached Orion only through Kai's relay; Dainius's own words have not been given to Orion — owner: Dainius  [CONVERSATION 2026-10-08 Dainius, "Read this"]
+
+### 5. Incidents and corrections
+
+- Kai's process finding accepted: Orion told Dainius the plan and "its five generator scripts" were saved "to the repository"; they were saved as verbatim blocks inside kai-pm/HANDOFF_LOG.md (entry 106), not as standalone files. The sentence was wider than the act (R17); correct wording: "preserved verbatim in the handoff log"  [CMD `git show --stat 0d20cd1` → kai-pm/HANDOFF_LOG.md only]
+- Kai's denominator finding accepted: "0 unmapped" was measured only over the declared population (all table rows + four chosen prose lists + a hand-listed end-goal set); it does not prove that no feature-bearing prose elsewhere in README.md was outside the denominator (R5/R17)  [FILE README.md:1]
+- Credential scan (calibrated): TOTAL HITS 0  [CMD `credscan.py kr_scan.json` → TOTAL HITS 0]
+
+### 6. Next authorised step
+
+- Verify Kai's DAI-10 review and Miro status; report to Dainius; propose R10 (read-only) now and R11 on grant  [CONVERSATION 2026-10-08 Dainius, "Read this"]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff.py check` → findings=0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
