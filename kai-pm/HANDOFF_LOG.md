@@ -58823,3 +58823,146 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-08T10:29:54Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-08T10:29:54Z  [CMD `date -u +%FT%TZ` → 2026-10-08T10:29:54Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 2cc5f17e4b8481a230eb8596904d070430fd5c7f  [CMD `git rev-parse HEAD` → 2cc5f17e4b8481a230eb8596904d070430fd5c7f]
+- tree: d2efc2620824e4d92c38a23707c8471eb68a59aa  [CMD `git rev-parse HEAD^{tree}` → d2efc2620824e4d92c38a23707c8471eb68a59aa]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/project-rework-plan-pgvp35: 2cc5f17e4b8481a230eb8596904d070430fd5c7f  [CMD `git ls-remote --heads origin` → 2cc5f17e4b8481a230eb8596904d070430fd5c7f]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 116  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 116]
+
+### 1. The four states
+
+- physical: unchanged since entry 116 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Orion's section-by-section disposition of the Communication & Change-Control Protocol v0.1 (Kai's sequence step 1); planning only; PRE-RAMS HOLD  [CONVERSATION 2026-10-08 Dainius, "PRE-RAMS GATE = HOLD"]
+- evidence: protocol v0.1 read in full and checked against Linear (T1–T3, T5, T6) and DECISIONS.md (T4)  [CMD `Linear get_document 379e92cc / f61b95b1 / 32f4857b / 7fc8557a / 9dd4474f; list_documents -P2D; list_comments DAI-10` → protocol createdAt=updatedAt 2026-10-08T10:15:44.738Z; KQG banner present (updatedAt 10:14:14.607Z); Assurance Pack still HP0–HP8 / Witness Point (WP); Charter 4-level hierarchy; latest DAI-10 comment Kai 4fab1b23 10:16:03Z]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `ruling_capture.py status` → OUTSTANDING=0]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: protocol review (step 1) and v1.2 read-only reconciliation  [CONVERSATION 2026-10-08 Dainius, "PRE-RAMS GATE = HOLD"]
+- HELD: PRE-RAMS templates; R11 tooling files; all engineering per entry 99  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- Protocol §12 introduces FUTURE_A4_SELF_DIAGNOSIS; D359 §6 binds A4_SELF_DIAGNOSIS on all new governance material — owner: Kai to reconcile, Dainius for any rename  [CMD `grep -n` kai-pm/DECISIONS.md:30385-30396; `grep -c FUTURE_A4` kai-pm/DECISIONS.md → 0; `grep -rl FUTURE_A4 kai-pm/ docs/` → no files; `grep -c A4_SELF_DIAGNOSIS` kai-pm/DECISIONS.md → 27]
+- Owner points routed to Dainius: §12 naming; §4 authentication of his rulings; §11 record-authority class; §3 hierarchy merge with the Charter and the named Mission/Constitution artefact — owner: Dainius  [CMD `Linear get_document 379e92cc / f61b95b1 / 32f4857b / 7fc8557a / 9dd4474f; list_documents -P2D; list_comments DAI-10` → protocol createdAt=updatedAt 2026-10-08T10:15:44.738Z; KQG banner present (updatedAt 10:14:14.607Z); Assurance Pack still HP0–HP8 / Witness Point (WP); Charter 4-level hierarchy; latest DAI-10 comment Kai 4fab1b23 10:16:03Z]
+
+### 5. Incidents and corrections
+
+- Credential scan of the review (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py pr_scan.json` → TOTAL HITS 0]
+- Citation corrected before banking: proxy-403 limit is entry 108, not 107  [CMD `awk entry count over kai-pm/HANDOFF_LOG.md` → 403 line 58030 entry 108]
+- EVIDENCE ORION-PROTOCOL-V0-1-REVIEW ORION_PROTOCOL_V0_1_REVIEW.md: 10004 bytes, sha256 c25ec1d0c17b4bdb3a84736329836af24b898e77cca9d94b4e6bd63065fc66f1, final LF True  [CMD `sha256sum ORION_PROTOCOL_V0_1_REVIEW.md` → c25ec1d0c17b4bdb…]
+    BEGIN-VERBATIM ORION-PROTOCOL-V0-1-REVIEW
+    **ORION → KAI | KAI Collaboration, Communication & Change-Control Protocol v0.1 | Linear doc 379e92cc, createdAt = updatedAt = 2026-10-08T10:15:44.738Z (unedited since creation) | REVIEW | planning only | reconcile, then route the NEEDS DAINIUS items to Dainius**
+    
+    **ACK.** The subject is the exact document above, read in full (§1–§18), re-fetched by `get_document` and `list_documents` this session with updatedAt unchanged (latest DAI-10 comment checked: Kai 4fab1b23, 10:16:03Z). This review dispositions every section and adds your four freeze checks. It is your sequence step 1. PRE-RAMS stays HOLD.
+    
+    **What I checked against the real tools before writing (your step 4, Orion side only):**
+    - **T1.** The KQG doc (f61b95b1) carries the SUPERSEDED banner and a pointer to KQ0…KQ9. It was edited in place at 10:14:14Z. **Verified.**
+    - **T2.** The Assurance Pack v0.1 (32f4857b, unedited since 10:04:21Z) still says `HP0…HP8` and "Witness Point (WP)". §12's names are therefore not yet carried by the document that the templates will be built from.
+    - **T3.** The Programme Governance Charter (9dd4474f, 2026-10-06) has its own 4-level evidence hierarchy. Its level 3 is "Preserved handoff/review evidence". §3 has a different 6-level hierarchy with no handoff level, and neither document points to the other.
+    - **T4.** **D359 §6 "TERMINOLOGY — BINDING ON ALL NEW GOVERNANCE MATERIAL"** (`kai-pm/DECISIONS.md:30385-30396`) binds `A4_SELF_DIAGNOSIS`. §12 introduces `FUTURE_A4_SELF_DIAGNOSIS`. Search universe: `kai-pm/` and `docs/`. `FUTURE_A4` occurs 0 times there, and `A4_SELF_DIAGNOSIS` occurs on 27 lines of DECISIONS.md. **This is a conflict with a banked D-number.**
+    - **T5.** v1.0 Locked Baseline A1.10 still lists PERSIST/OECD/COGITATOR as accepted. Your 06:58Z comment moves them to UNVERIFIED, but the document carries no pointer to that comment.
+    - **T6.** Linear limits from Orion's side:
+      - the tools expose only `updatedAt` for a document, with no version history;
+      - attachment read-back from uploads.linear.app is refused here (proxy 403, entry 108);
+      - Orion cannot hash Linear bytes independently: any hash Orion computes is of Orion's own transcription.
+    
+    T2, T3 and T5 are live instances of the exact failures §1 names (silent supersession / two sources of truth). They are the evidence for the amendments below.
+    
+    ### Dispositions
+    
+    | § | Disposition | Reason / amendment |
+    |---|---|---|
+    | 1 Purpose | **ACCEPT** | The four NO-SILENT rules are right. |
+    | 2 Roles | **ACCEPT WITH LIMITS** | Add: **author ≠ sole verifier, in both directions.** Kai authors and also does IV&V. For Kai-authored artefacts, the VERIFY step (§7.5) needs a reviewer other than Kai, and the Charter already says "No actor self-certifies". Name Orion's continuity duty: the handoff log and ruling capture. |
+    | 3 Hierarchy | **AMEND** | (a) Reconcile with the Charter hierarchy (T3). There should be one hierarchy, with the other carrying a SUPERSEDED pointer. (b) Insert **"preserved verbatim record (HANDOFF_LOG, ruling-capture store)"** between levels 2 and 3. (c) Level 1 vs level 6: Dainius rules *in chat*. The authority lies in the **exact preserved text**, not the channel. Proposed wording: "an exact Dainius ruling preserved verbatim with source and date is level 1 pending its D-number". (d) **A ruling first seen in Linear is banked in GitHub before anyone acts on it.** (e) Add your document hierarchy (Mission/Constitution → Governance → this protocol → KQ → Quality Plan → RAMS… → WPs → as-built). Name the artefact at each level, because "Mission/Constitution" has no named document yet. |
+    | 4 Authorship | **AMEND + ACCEPT WITH LIMITS** | Typo: `DEE PSEEK` → `DEEPSEEK`. Add a `DAINIUS →` label. Without it, §4's last line makes Dainius's own unlabelled Linear text non-attributable. **Limit:** on one shared account, a label is an assertion and is not authenticated. Orion's posts can be cross-checked: each one cites a GitHub commit made from Orion's session. Kai's cannot be checked from Orion's side. **NEEDS DAINIUS:** which channel authenticates *his* rulings? Today the strongest is chat to Orion, through ruling capture and then the handoff log. |
+    | 5 Header | **AMEND** | VERSION/IDENTITY must be **resolvable**: `path@commit + sha256` for GitHub, or `doc-id + updatedAt` for Linear. Add two fields: **BASED-ON** (the exact subject identity the reply answers) and **CANONICAL COPY** (where the authoritative bytes live). |
+    | 6 Responses | **AMEND** | Add your ladder as a separate **decision-state axis**: `WRITTEN → ACKNOWLEDGED → AGREED (both reviewers ACCEPT the same identity) → APPROVED (Dainius) → AUTHORISED (D-number or explicit grant for a named action class) → VERIFIED COMPLETE (independent evidence)`. No state may be inferred from a later one. Keep three vocabularies apart: response dispositions (§6), artefact status (§9) and feature dispositions (§10). |
+    | 7 Handshake | **AMEND** | (a) At VERIFY and at FREEZE, re-fetch the subject identity. If it changed since ACK, the review is **STALE** and that is stated. (b) Name **who BANKs**, and under what standing authority. See §11. |
+    | 8 Disagreement | **ACCEPT WITH LIMITS** | When the architecture conflict is Kai ↔ Orion, Kai is both party and adjudicator. Add: dissent stays recorded beside the ruling, and either party may escalate to Dainius. |
+    | 9 Versions | **AMEND** | Linear edits documents in place (T1, T6). So "never silently overwrites" cannot be enforced in Linear. Proposal: **frozen versions live as bytes in GitHub**, which is immutable by commit. Linear holds working drafts plus a `MIRROR OF <id> @ <identity>` banner. Supersession is written **in the superseded artefact itself**, not only in a comment (T5). |
+    | 10 Zero-loss | **ACCEPT WITH LIMITS** | One string drift: here it is "REJECT WITH REASON", while A2 (entry 109) says "REJECT WITH **RECORDED** REASON". Pick one. |
+    | 11 Authority | **AMEND → NEEDS DAINIUS** | Add a fifth class, **record authority**: appending governance records (HANDOFF_LOG, DECISIONS.md, the ledger, Linear/Miro posts). In practice, handoff writes continue under R19 during the pause, ledger allocation is HELD, and R11 tool files are classed as repository mutation (your 06:58Z comment). §7 BANK needs this class to be named. |
+    | 12 Naming | **NEEDS DAINIUS + AMEND** | Orion supports the convention, with one correction: **use `A4_SELF_DIAGNOSIS`, which D359 §6 binds (T4),** or seek a new D-number to rename it. Older artefacts keep their names (D359: "Historical records are NOT rewritten"). Live drafts that feed templates, i.e. the Assurance Pack (T2), need either an update or a pointer before RAMS work. |
+    | 13 Readiness | **ACCEPT** | T1 verified. Note for v1.2, not for this protocol: the HOLD-0…8 ↔ KQ0…9 mapping is not yet defined (HOLD-4 spans KQ2 and KQ4). |
+    | 14 Rhythm | **AMEND** | Expand STOP/HOLD (freeze check 4 below). Require **each actor's cold start to read the GitHub record before acting.** D387 shows why: a cold-started thread reversed a ruling it could not see. Orion's mechanism is the SessionStart READ. Kai's equivalent is **UNVERIFIED from here.** I have not opened "KAI Cold-Start Control Plane" (cd4ac2d9) in this session. |
+    | 15 Corrections | **ACCEPT WITH LIMITS** | Add a step: **check for recurrence** (R18 / FAILURE_PATTERN_LEDGER). The fix is to the mechanism, not just the instance. Ledger allocation is currently HELD, so recurrences go into the handoff log until it is released. |
+    | 16 DeepSeek | **ACCEPT WITH LIMITS** | DeepSeek reaches us relayed through Dainius. Add: external input is **preserved verbatim with its relay source** before reconciliation. |
+    | 17 Pre-RAMS | **ACCEPT WITH LIMITS** | Add your step 4 (verification against the tools) and the four freeze checks as explicit gate items. |
+    | 18 Closure | **ACCEPT WITH LIMITS** | Closure is itself a `CLOSURE` message naming the subject identity, and **closed ≠ verified complete**. |
+    
+    ### Your four freeze checks: proposed text
+    
+    1. **Stale-subject protection.**
+       - Every review names BASED-ON.
+       - The identity is re-fetched at VERIFY and at FREEZE.
+       - A mismatch marks the review STALE. It is never silently carried over.
+    2. **Single canonical version.**
+       - Each artefact class has one canonical home: frozen bytes in GitHub, drafts in Linear, projections in Miro.
+       - Every mirror carries `MIRROR OF … @ …`.
+       - A mirror without a banner is not evidence.
+       - Divergence between a mirror and its canonical copy is a finding.
+    3. **Large-packet integrity.**
+       - Packets are exchanged by identity: commit + path + sha256, or doc-id + updatedAt. Copied prose does not count.
+       - Relay copies (paste via Dainius) are labelled as relays.
+       - **Limit (T6):** Orion cannot independently hash Linear bytes or read back Linear attachments. So the canonical bytes of anything to be frozen must be in GitHub.
+    4. **STOP/HOLD semantics.**
+       - **HOLD** when authority, evidence or subject identity is ambiguous: work on that subject stops until the named releaser resolves it.
+       - **STOP** on an authority or safety conflict: cease and escalate.
+       - Neither is a failure verdict, and neither may be released by the actor that raised it. The Charter's own rule: "Unexpected divergence means STOP rather than reinterpretation."
+    
+    ### For Dainius (owner points only)
+    - **(a)** the §12 naming convention, including whether to keep `A4_SELF_DIAGNOSIS`;
+    - **(b)** the §4 authentication of his rulings;
+    - **(c)** the §11 record-authority class: what Orion may write during the pause;
+    - **(d)** the §3 hierarchy merge with the Charter, and what document "Mission/Constitution" is.
+    
+    **Not done, and not claimed:**
+    - No templates, tooling or engineering.
+    - Kai-side tool behaviour is UNVERIFIED by Orion.
+    - This review covers the protocol text only. It does not revisit the Assurance Pack or KQ content beyond T1, T2 and §13.
+    
+    *Canonical copy: GitHub `kai-pm/HANDOFF_LOG.md` entry 117.*
+    END-VERBATIM ORION-PROTOCOL-V0-1-REVIEW
+
+### 6. Next authorised step
+
+- Post the review on DAI-10; await Kai's reconciliation (step 2); continue v1.2 read-only with R10  [CONVERSATION 2026-10-08 Dainius, "PRE-RAMS GATE = HOLD"]
+
+### 7. What I am unsure of
+
+- Kai-side tooling and cold-start procedure are not verified from here (doc cd4ac2d9 not opened this session)  [CMD `Linear get_document 379e92cc / f61b95b1 / 32f4857b / 7fc8557a / 9dd4474f; list_documents -P2D; list_comments DAI-10` → protocol createdAt=updatedAt 2026-10-08T10:15:44.738Z; KQG banner present (updatedAt 10:14:14.607Z); Assurance Pack still HP0–HP8 / Witness Point (WP); Charter 4-level hierarchy; latest DAI-10 comment Kai 4fab1b23 10:16:03Z]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
