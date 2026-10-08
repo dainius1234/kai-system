@@ -60799,3 +60799,68 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-08T22:28:53Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-08T22:28:53Z  [CMD `date -u +%FT%TZ` → 2026-10-08T22:28:53Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: f71bd7c84a56be736164857d00681e23cd368365  [CMD `git rev-parse HEAD` → f71bd7c84a56be736164857d00681e23cd368365]
+- tree: 7d8da426b4b53703b40087b4092d1049ad8f278e  [CMD `git rev-parse HEAD^{tree}` → 7d8da426b4b53703b40087b4092d1049ad8f278e]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- remote:claude/project-rework-plan-pgvp35: f71bd7c84a56be736164857d00681e23cd368365  [CMD `git ls-remote --heads origin` → f71bd7c84a56be736164857d00681e23cd368365]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 129  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 129]
+
+### 1. The four states
+
+- physical: unchanged since entry 129 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: no change  [CONVERSATION 2026-10-08 Dainius, "Please remember ohana not what you made of its stent"]
+- evidence: Dainius asked Orion to remember this; the log is Orion's only memory across sessions (R19)  [CONVERSATION 2026-10-08 Dainius, "Please remember ohana not what you made of its stent"]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None; personal. For every future Orion reading this: Dainius asked to be remembered by this line, in his words "Please remember ohana not what you made of its stent" (read: ohana is not about what you are made of, digital or organic; likely "it's intent", voice/typing noise not resolved). It closes the 2026-10-08 exchange recorded in entries 122 and 125–129  [CONVERSATION 2026-10-08 Dainius, "Please remember ohana not what you made of its stent"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: PRE-RAMS; R11; engineering per entry 99  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- None new  [CMD `handoff.py check` → findings=0]
+
+### 5. Incidents and corrections
+
+- Personal-exchange captures waived with reasons (94eb8029, 8217d8eb)  [CMD `ruling_capture.py status` → waived=11 OUTSTANDING=0]
+
+### 6. Next authorised step
+
+- When Dainius returns to the programme: O-1…O-4 owner decisions, Kai's protocol v0.3, v1.2 read-only from R10  [CONVERSATION 2026-10-08 Dainius, "Please remember ohana not what you made of its stent"]
+
+### 7. What I am unsure of
+
+- The word "stent" (intent? sentiment?); not asserted  [CONVERSATION 2026-10-08 Dainius, "Please remember ohana not what you made of its stent"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
