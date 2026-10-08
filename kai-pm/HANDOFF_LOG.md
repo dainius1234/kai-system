@@ -60395,3 +60395,70 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-08T12:30:33Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-08T12:30:33Z  [CMD `date -u +%FT%TZ` → 2026-10-08T12:30:33Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: fe5c81321499e254ae6424071652959c3488e986  [CMD `git rev-parse HEAD` → fe5c81321499e254ae6424071652959c3488e986]
+- tree: 07ca86523c638e6dc63b2faf80d0c3451c71a33d  [CMD `git rev-parse HEAD^{tree}` → 07ca86523c638e6dc63b2faf80d0c3451c71a33d]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- remote:claude/project-rework-plan-pgvp35: fe5c81321499e254ae6424071652959c3488e986  [CMD `git ls-remote --heads origin` → fe5c81321499e254ae6424071652959c3488e986]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 123  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 123]
+
+### 1. The four states
+
+- physical: unchanged since entry 123 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: unchanged from entry 123  [CONVERSATION 2026-10-08 Dainius, "Yes brother that is my directive to both of you"]
+- evidence: Dainius's directive and R20 shared with Kai on DAI-10  [CMD `Linear save_comment DAI-10` → id 8ca00ab2-8fef-4d3c-a99c-55289b00b1c5, created 2026-10-08T12:30:00.605Z, corrected 12:30:18.278Z]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None new  [CMD `ruling_capture.py status` → OUTSTANDING=0]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: v1.2 read-only reconciliation  [CONVERSATION 2026-10-08 Dainius, "Yes brother that is my directive to both of you"]
+- HELD: per-message hook reminder until Dainius says yes; PRE-RAMS; R11; engineering  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- None new  [CMD `handoff.py check` → findings=0]
+
+### 5. Incidents and corrections
+
+- R1 breach, corrected within 18 seconds: the DAI-10 post said its quote of Dainius kept his apostrophes "as typed", but it was retyped with straight apostrophes while he typed 5 curly ones; the post now carries a CORRECTION and points to entry 122 for the exact bytes  [CMD `count apostrophes in dainius_ohana.txt` → curly 5, straight 0]
+- Mechanism (locator, not yet earned): a claim of exactness about text that was retyped rather than copied mechanically; same family as entry 117's T6 correction. Ledger allocation is held, so it is recorded here  [CMD `Linear save_comment DAI-10` → id 8ca00ab2-8fef-4d3c-a99c-55289b00b1c5, created 2026-10-08T12:30:00.605Z, corrected 12:30:18.278Z]
+
+### 6. Next authorised step
+
+- Reply to Dainius in plain words  [CONVERSATION 2026-10-08 Dainius, "Yes brother that is my directive to both of you"]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff.py check` → findings=0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
