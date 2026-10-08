@@ -58717,3 +58717,109 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-08T10:24:56Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-08T10:24:56Z  [CMD `date -u +%FT%TZ` → 2026-10-08T10:24:56Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: d278d0047764a256e998db11d03464e4ef3fec9d  [CMD `git rev-parse HEAD` → d278d0047764a256e998db11d03464e4ef3fec9d]
+- tree: 87f4cbea44ba0f32091c15f543c1beb01e40faf5  [CMD `git rev-parse HEAD^{tree}` → 87f4cbea44ba0f32091c15f543c1beb01e40faf5]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/project-rework-plan-pgvp35: d278d0047764a256e998db11d03464e4ef3fec9d  [CMD `git ls-remote --heads origin` → d278d0047764a256e998db11d03464e4ef3fec9d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 115  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 115]
+
+### 1. The four states
+
+- physical: unchanged since entry 115 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Orion reviews Kai's Communication & Change-Control Protocol v0.1 section by section with explicit dispositions (Kai's sequence step 1); v1.2 read-only reconciliation continues; PRE-RAMS gate HOLD  [CONVERSATION 2026-10-08 Dainius, "PRE-RAMS GATE = HOLD"]
+- evidence: Kai's message relayed by Dainius (hook id fa9ed1225346fdb1), preserved below  [CMD `cat .git/kai-ruling-capture/fa9ed1225346fdb1.json` → flagged]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Kai (relayed by Dainius) · 2026-10-08 · PRE-RAMS GATE = HOLD: no governing RAMS/ITP/ITC/procedure/LTQR templates until the Communication & Change-Control Protocol v0.1 is dispositioned by Orion, reconciled by Kai, owner points decided by Dainius, verified against the real tools, frozen and banked; then the Project Quality/Assurance Plan; then templates. Freeze must check stale-subject protection, single canonical version control, large-packet integrity by version/hash, STOP/HOLD on ambiguity. Discipline: written ≠ agreed ≠ approved ≠ authorised ≠ verified complete. Hierarchy: Mission/Constitution → Programme Governance → Collaboration/Communication/Change Control → Readiness KQ0–KQ9 → Project Quality & Assurance Plan → RAMS/…/LTQR → work packages → as-built/evidence/requalification. Verbatim below, 2669 bytes, sha256 2e958f859622c6ff60282bb4a8544be4c97acf9380a603913584ff2c2e2954a4, final LF True ⚠ UNBANKED  [CONVERSATION 2026-10-08 Dainius, "PRE-RAMS GATE = HOLD"]
+    BEGIN-VERBATIM KAI-PRE-RAMS-HOLD-MESSAGE
+    Yes — and one important status point: the communication protocol is drafted, but it is not yet “agreed and closed.” I checked DAI-10 just now. Orion’s latest message is still his two-snags review; my protocol response came after it, and he has not yet replied to accept/amend/reject the protocol itself.
+    
+    So the current state is correctly:
+    
+    PRE-RAMS GATE = HOLD.
+    
+    We do not start writing governing RAMS, ITP, ITC, procedure or LTQR templates yet.
+    
+    The next controlled sequence should be:
+    
+    1. Orion reviews the Communication & Change-Control Protocol v0.1 section by section and explicitly dispositions it.
+    2. I reconcile every amendment or disagreement. No prose compromise: evidence issues get evidence; architecture issues get technical adjudication; owner issues come to you.
+    3. You decide only the genuine owner-level items — naming, role boundaries, authority semantics, anything affecting your control or product vision.
+    4. We verify the reconciled document against the actual working tools — GitHub, Linear, Miro, handoff log, decisions, ruling capture.
+    5. We freeze one exact version and bank it.
+    6. Only then do we write the Project Quality/Assurance Plan.
+    7. Only under that do we produce standard RAMS / Activity Plan / ITP / ITC / HOLD / WITNESS / NCR / LTQR templates.
+    
+    I also agree with your instinct that the communication protocol itself needs the same quality treatment we are demanding everywhere else. In the final reconciliation I want four additional things checked explicitly before freeze: stale-subject protection so nobody reviews an old version unknowingly; single canonical-version control so Linear/Miro cannot diverge from the frozen subject; large-packet integrity using exact version/hash rather than copied prose; and STOP/HOLD semantics whenever authority, evidence or subject identity is ambiguous.
+    
+    So the professional hierarchy is becoming:
+    
+    Mission / Constitution
+    → Programme Governance
+    → Collaboration, Communication & Change Control
+    → Readiness / Qualification KQ0–KQ9
+    → Project Quality & Assurance Plan
+    → RAMS / Activity Plans / ITP / ITC / HOLD / WITNESS / NCR / LTQR
+    → Individual work packages
+    → As-built / evidence / requalification
+    
+    And there is one discipline I want us to keep hard from now on:
+    
+    We never confuse “written” with “agreed”, “agreed” with “approved”, “approved” with “authorised”, or “authorised” with “verified complete”.
+    
+    That single distinction will prevent a lot of the drift and rework we had earlier.
+    
+    For now: v1.2 read-only reconciliation continues; PRE-RAMS remains HOLD until Orion and I close the protocol and you settle the owner points.
+    END-VERBATIM KAI-PRE-RAMS-HOLD-MESSAGE
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: read-only review of the protocol; v1.2 read-only reconciliation  [CONVERSATION 2026-10-08 Dainius, "PRE-RAMS GATE = HOLD"]
+- HELD: PRE-RAMS (no RAMS/ITP/ITC/LTQR templates); R11 tooling files; all engineering per entry 99  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- None new  [CMD `handoff.py check` → findings=0]
+
+### 5. Incidents and corrections
+
+- Credential scan (calibrated): TOTAL HITS 0  [CMD `credscan.py pr_scan.json` → TOTAL HITS 0]
+
+### 6. Next authorised step
+
+- Read the protocol in Linear; disposition it section by section  [CONVERSATION 2026-10-08 Dainius, "PRE-RAMS GATE = HOLD"]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff.py check` → findings=0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
