@@ -58433,3 +58433,73 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-08T06:27:10Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-08T06:27:10Z  [CMD `date -u +%FT%TZ` → 2026-10-08T06:27:10Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 92b2a6e53a6e502c7ab812d62dd6f12d17dafb35  [CMD `git rev-parse HEAD` → 92b2a6e53a6e502c7ab812d62dd6f12d17dafb35]
+- tree: 50e91a1226d1c351b24af82dfb8e34f520e0c6e7  [CMD `git rev-parse HEAD^{tree}` → 50e91a1226d1c351b24af82dfb8e34f520e0c6e7]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 92b2a6e53a6e502c7ab812d62dd6f12d17dafb35  [CMD `git ls-remote --heads origin` → 92b2a6e53a6e502c7ab812d62dd6f12d17dafb35]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 112  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 112]
+
+### 1. The four states
+
+- physical: unchanged since entry 112 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: 70/30 confirmed by Dainius in his own words, CONDITIONAL: it becomes operative only after Dainius's approval and once the system has earned trust. Until then it is mission intent only; it creates no budget, no spending authority and no financial action  [CONVERSATION 2026-10-08 Dainius, "Ruling 70/ 30 confirmed but only after my approval and system earns trust"]
+- evidence: Kai's review claims (entry 112) verified at the source  [CMD `Linear list_comments DAI-10; Miro canvas_search` → Kai review comments 26461350 (22:31:58Z) and e718595a (22:34:05Z) present, disposition ACCEPT FOR RECONCILIATION, NOT FREEZE; Miro frame shows v1.1 NOT FREEZE]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-08 · RULING: 70/30 confirmed (70% Dainius/family, 30% Kai development/continuity budget), but only after Dainius's approval and once the system earns trust; supersedes the unconditional reading in Kai's relay (entry 112). Verbatim below, 74 bytes, sha256 76d377d631df088de72583d604c8ac3b9599a6a934f59d7bc63b194571c02937, final LF True ⚠ UNBANKED  [CONVERSATION 2026-10-08 Dainius, "Ruling 70/ 30 confirmed but only after my approval and system earns trust"]
+    BEGIN-VERBATIM DAINIUS-7030-RULING
+    Ruling 70/ 30 confirmed but only after my approval and system earns trust
+    END-VERBATIM DAINIUS-7030-RULING
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: any operative 70/30 mechanism (fund, budget, delegated spending) until Dainius approves and trust is earned; the legal/tax gate (v1.0 A1.9) still applies  [CONVERSATION 2026-10-08 Dainius, "Ruling 70/ 30 confirmed but only after my approval and system earns trust"]
+- PAUSED / HELD (unchanged): all engineering per entry 99; R11 tooling files await Dainius's grant  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- Whether Orion starts v1.2 (R10 + R1–R9, read-only) and whether R11 is granted — owner: Dainius  [CONVERSATION 2026-10-08 Dainius, "Ruling 70/ 30 confirmed but only after my approval and system earns trust"]
+- What "earns trust" means operationally (which evidence, which autonomy level) — to be defined in the master plan's sustainability/autonomy sections — owner: Kai / Dainius  [CONVERSATION 2026-10-08 Dainius, "Ruling 70/ 30 confirmed but only after my approval and system earns trust"]
+
+### 5. Incidents and corrections
+
+- F1 in the reconciliation matrix (70/30 provenance) now has Dainius's own words as source  [CONVERSATION 2026-10-08 Dainius, "Ruling 70/ 30 confirmed but only after my approval and system earns trust"]
+
+### 6. Next authorised step
+
+- Post the ruling to Kai on DAI-10; await Dainius on v1.2 and R11  [CONVERSATION 2026-10-08 Dainius, "Ruling 70/ 30 confirmed but only after my approval and system earns trust"]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff.py check` → findings=0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
