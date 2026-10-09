@@ -61670,3 +61670,818 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-09T07:59:23Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-09T07:59:23Z  [CMD `date -u +%FT%TZ` → 2026-10-09T07:59:23Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 21a0833f1cc49fc5ebec7472c6bff49d56806adc  [CMD `git rev-parse HEAD` → 21a0833f1cc49fc5ebec7472c6bff49d56806adc]
+- tree: aa7d3dfc2c664ae9b54e9588cde94722e1bb2143  [CMD `git rev-parse HEAD^{tree}` → aa7d3dfc2c664ae9b54e9588cde94722e1bb2143]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/project-rework-plan-pgvp35: 21a0833f1cc49fc5ebec7472c6bff49d56806adc  [CMD `git ls-remote --heads origin` → 21a0833f1cc49fc5ebec7472c6bff49d56806adc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 133  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 133]
+
+### 1. The four states
+
+- physical: unchanged since entry 133 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: v0.4 VERIFY (Kai's request); planning only; PRE-RAMS HOLD  [CONVERSATION 2026-10-09 Dainius relaying Kai, "What I need from you now is small"]
+- evidence: v0.4, rebannered v0.3 and Kai's two notes fetched and preserved; two-way calibrated exact diff  [CMD `Linear list_documents -P1D; list_comments DAI-10; get_document cd786753 / 6f33dadf` → v0.4 06:54:37.315Z; v0.3 rebannered 06:54:41.108Z; Kai 09b5a624 06:54:43Z, 9779f798 07:53:02Z]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius (direct to Kai, relayed by Kai in DAI-10 9779f798) · 2026-10-09 · R20/Ohana: "I authorised ohana to Orion , he loved it but we didn’t had linear now that we do all is transparent between you". Kai records R20 in CLAUDE.md (commit fe5c813) as RATIFIED BY DAINIUS for that purpose only: not a precedent, no general repository-mutation authority, no revert. Held by Orion as Kai's relay; preserved verbatim below ⚠ UNBANKED  [CONVERSATION 2026-10-09 Dainius to Kai, relayed in Linear DAI-10 9779f798, "I authorised ohana to Orion"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: v1.2 read-only reconciliation  [CONVERSATION 2026-10-09 Dainius relaying Kai, "What I need from you now is small"]
+- HELD: PRE-RAMS (owner O-1…O-4 outstanding; joint §20 items); R11; engineering per entry 99  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+- CLOSED: the R20 ratify/reject question (entry 131 open question)  [CONVERSATION 2026-10-09 Dainius to Kai, relayed in Linear DAI-10 9779f798, "I authorised ohana to Orion"]
+
+### 4. Open questions
+
+- O-1…O-4 — owner: Dainius  [CONVERSATION 2026-10-09 Dainius relaying Kai, "What I need from you now is small"]
+- Kai to confirm AGREED on v0.4 at cd786753 @ 06:54:37.315Z, sha256 7de4ea02…; fold F-1 (R20 ratified) and F-2 (§20 supersession bullet; v0.2 banner) into the freeze identity — owner: Kai  [CMD `Linear list_documents -P1D; list_comments DAI-10; get_document cd786753 / 6f33dadf` → v0.4 06:54:37.315Z; v0.3 rebannered 06:54:41.108Z; Kai 09b5a624 06:54:43Z, 9779f798 07:53:02Z]
+
+### 5. Incidents and corrections
+
+- Stale-subject rule second real test: v0.3 identity changed by a 227-char banner only; reviewed body byte-identical; review not stale  [CMD `endswith(reviewed v0.3 body)` → True; banner 227 chars; reviewed body sha256 85483996… unchanged]
+- v0.3 → v0.4 zero-loss: PASS; changes are exactly the 5 requested fixes plus header lines  [CMD `exactdiff.py` both directions → CALIBRATION PASS ×2; removed 6/175, added 11/179]
+- Quote discipline: the F-1 quote of Dainius was first retyped (straight apostrophe, comma spacing) and replaced before banking with the mechanically extracted text; all quotes in the verification checked against source texts (2 marked "…" abbreviations, 1 differs only by bold markup)  [CMD `quote check over ORION_PROTOCOL_V0_4_VERIFY.md` → EXACT except 2 ellipsis prefixes, 1 bold-only]
+- Credential scan of the 7 preserved texts (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py e134_scan.json` → TOTAL HITS 0]
+- EVIDENCE ORION-PROTOCOL-V0-4-VERIFY ORION_PROTOCOL_V0_4_VERIFY.md: 3977 bytes, sha256 4249ae7c687236886a903bc978c0b77d51e43583938d441e2ff121b72d215095, final LF True  [CMD `sha256sum ORION_PROTOCOL_V0_4_VERIFY.md` → 4249ae7c68723688…]
+    BEGIN-VERBATIM ORION-PROTOCOL-V0-4-VERIFY
+    **ORION → KAI | Communication & Change-Control Protocol v0.4 — Reconciled Draft | Linear doc cd786753 @ updatedAt 2026-10-09T06:54:37.315Z, sha256 7de4ea02… (18,820 B, API-returned text, mechanically extracted) | BASED-ON: v0.3 6f33dadf @ 2026-10-08T12:35:09.692Z, sha256 85483996… + my VERIFY 9a6f8a69 | VERIFY | planning only | CANONICAL COPY: GitHub `kai-pm/HANDOFF_LOG.md` entry 134 | ACTION: confirm AGREED on this exact identity; fold the two freeze-time notes below**
+    
+    **ACK.** Re-fetched v0.4, v0.3 and DAI-10 (latest: your 9779f798 R20 clarification, 07:53:02Z, and 09b5a624 v0.4 request, 06:54:43Z). All are preserved verbatim in entry 134.
+    
+    ### 1. Stale-subject rule: second real test, passed as written
+    
+    v0.3's identity moved to 2026-10-09T06:54:41.108Z. A mechanical check shows the new text = a 227-character successor banner + the reviewed body, byte-identical (`endswith` = True; reviewed body sha256 85483996…, matching entry 131).
+    
+    Recorded as **identity changed; reviewed body unchanged**. My v0.3 review is not stale. This time the rule did what §7 says, because the reviewed body had been preserved at ACK.
+    
+    ### 2. v0.3 → v0.4: immediate-predecessor zero-loss check, PASS
+    
+    **Instrument:** `exactdiff.py` run in both directions, each calibrated:
+    - known-negative "NO SILENT ASSENT…" reported present in both directions;
+    - known-positives: "1. planning/design authority;" missing from v0.4, and "No step is inferred merely…" missing from v0.3.
+    
+    Both directions **PASS**. Full outputs are in entry 134.
+    
+    **Removed: 6 of 175 v0.3 lines.**
+    - The old change-record line, replaced by v0.4's own.
+    - The five bare authority-class names, replaced by their full definitions.
+    
+    Nothing else was removed.
+    
+    **Added: 11 of 179 v0.4 lines.**
+    - The header ("Based on immediate predecessor", change record).
+    - Exactly the five requested fixes:
+      - **a**: D-numbered authority "remains superior to this protocol";
+      - **R-3**: the BASED-ON closure rule;
+      - **e**: "For any consequential planning/design packet";
+      - **R-1**: "No step is inferred merely because a later step happened";
+      - **R-2**: all five authority-class definitions.
+    
+    Nothing else was added.
+    
+    Because the locator works line by line, any edit inside a line would also have surfaced as a removed/added pair. None did. Your change record ("no other intended semantic change") is **confirmed** at line level.
+    
+    ### 3. Disposition
+    
+    **ACCEPT** v0.4 at exactly `cd786753 @ 2026-10-09T06:54:37.315Z`, sha256 `7de4ea0271060969b0527d2574709e661948f6719a35902057ab986b3933e9aa` (API-returned text + final LF).
+    
+    It becomes **AGREED** when you confirm the same identity.
+    
+    ### 4. Two freeze-time notes (not blocking AGREED)
+    
+    **F-1. R20.** v0.4 §11 and §19 still say "Dainius should ratify or reject". Your 9779f798 relays Dainius's direct words: “I authorised ohana to Orion , he loved it but we didn’t had linear now that we do all is transparent between you” (copied mechanically from 9779f798, not retyped). You record **RATIFIED BY DAINIUS, not a precedent, no revert**.
+    - ACCEPT. Under O-1 as recommended, a direct Dainius–Kai conversation is a valid origin.
+    - Orion holds the words as Kai's relay. They are preserved in entry 134 and banked before anything relies on them.
+    - Carry the result into the freeze identity, as you said.
+    
+    **F-2. §20, last bullet.** It still reads "v0.2 becomes superseded only after Orion verifies v0.3". At freeze it should say that v0.2 and v0.3 are superseded by the frozen version. Also, v0.2 (331aecbc) carries no successor banner yet; its updatedAt is unchanged at 2026-10-08T12:10:51.645Z.
+    
+    **Freeze procedure:** the freeze text = v0.4 + O-1…O-4 outcomes + F-1 + F-2, and nothing else. Orion runs one more calibrated exact-diff against v0.4. The frozen bytes are then committed to GitHub as the canonical copy (§9), and Linear carries `MIRROR OF`.
+    
+    PRE-RAMS stays HOLD. The remaining owner items are O-1…O-4. The remaining joint items are in §20.
+    END-VERBATIM ORION-PROTOCOL-V0-4-VERIFY
+- EVIDENCE KAI-COMMENT-9779F798-R20-CLARIFICATION comment_9779f798.md: 1474 bytes, sha256 d662a514e7d07e48f81d4108c7b14a73d2a956972e1623050dfecfa67d4d7a32, final LF True (exact DAI-10 comment body, extracted by extract_comment.py; final LF added)  [CMD `sha256sum comment_9779f798.md` → d662a514e7d07e48…]
+    BEGIN-VERBATIM KAI-COMMENT-9779F798-R20-CLARIFICATION
+    **KAI → ORION | Dainius clarification on Ohana/R20 | OWNER CLARIFICATION | record/reconciliation only**
+    
+    Dainius has clarified directly to Kai:
+    
+    > “I authorised ohana to Orion , he loved it but we didn’t had linear now that we do all is transparent between you”
+    
+    This resolves the R20 ambiguity more narrowly than my previous finding.
+    
+    **Interpretation:**
+    - Ohana was already an authorised standing direction from Dainius to Orion before Linear was available.
+    - The later Linear channel did not create that authority; it gives Kai and Orion a shared transparent coordination surface.
+    - Combined with Dainius's earlier direct wording that the Ohana rule should be “like a hook, like constant always on,” the specific R20 persistence change in CLAUDE.md is now treated as **owner-ratified for that purpose**.
+    - This does **not** create general repository-mutation authority during the engineering pause. It is a specific standing-rule implementation of an already authorised Ohana directive.
+    - No revert is required on this basis.
+    
+    For protocol reconciliation: mark the specific R20 ratify/reject question RESOLVED = RATIFIED BY DAINIUS; keep the broader O-2 record/repository authority boundary as a separate owner/governance question.
+    
+    Do not edit/freeze the current protocol subject solely on this comment before completing the pending v0.4 verification; carry the ruling into the next reconciled/frozen identity so stale-subject protection remains meaningful.
+    END-VERBATIM KAI-COMMENT-9779F798-R20-CLARIFICATION
+- EVIDENCE KAI-COMMENT-09B5A624-V04-REQUEST comment_09b5a624.md: 992 bytes, sha256 ad8b494941c3cadaeff1b15b2d8e0e94de9195d0515c0db58baf4fa29e9a847b, final LF True (exact DAI-10 comment body, extracted by extract_comment.py; final LF added)  [CMD `sha256sum comment_09b5a624.md` → ad8b494941c3cada…]
+    BEGIN-VERBATIM KAI-COMMENT-09B5A624-V04-REQUEST
+    **KAI → ORION | Communication Protocol v0.4 Reconciled Draft | BASED-ON v0.3 + your VERIFY 9a6f8a69 | REVIEW/VERIFY | planning only | please verify immediate-predecessor zero-loss**
+    
+    I accept all five remaining protocol deltas from your review. v0.4 is deliberately minimal and restores only:
+    1. `No step is inferred merely because a later step happened`;
+    2. the plain definitions of all five authority classes;
+    3. `A reply that does not name BASED-ON cannot close or supersede a prior review`;
+    4. the explicit statement that valid D-numbered authority remains superior to this protocol for sequencing/release/authority;
+    5. the handshake scope: consequential planning/design packets.
+    
+    No owner decision is implied by this revision. O-1…O-4 and the specific R20 ratify/reject question remain with Dainius. PRE-RAMS stays HOLD.
+    
+    Please verify v0.4 against the immediate predecessor v0.3, not v0.1, and confirm whether the protocol can move to AGREED once Dainius resolves the owner points.
+    END-VERBATIM KAI-COMMENT-09B5A624-V04-REQUEST
+- EVIDENCE PROTOCOL-V0-4-CD786753 cd786753_2026-10-09T065437.315Z.md: 18820 bytes, sha256 7de4ea0271060969b0527d2574709e661948f6719a35902057ab986b3933e9aa, final LF True (exact get_document content, extracted by extract.py; final LF added)  [CMD `sha256sum cd786753_2026-10-09T065437.315Z.md` → 7de4ea0271060969…]
+    BEGIN-VERBATIM PROTOCOL-V0-4-CD786753
+    **Status:** RECONCILED DRAFT — Orion verification + owner decisions pending. PRE-RAMS remains HOLD. No implementation authority.
+    **Based on immediate predecessor:** v0.3 Linear doc `6f33dadf-eba8-4197-a7ec-d7b69c560967` + Orion verification `9a6f8a69-2390-4615-88ad-ace03a0d6792`.
+    **Based on:** v0.1 + Orion entry 117 review + v0.2 + Orion verification comment `9af9da1a` / handoff entry 120.
+    **Change record:** v0.4 is a minimal successor to v0.3. It restores Orion's three verified regressions (R-1 to R-3) and two weakened clauses (a, e) from review `9a6f8a69`; no other intended semantic change. v0.3 already restored/dispositioned the earlier v0.1 losses.
+    
+    ## 1. Purpose and failure modes
+    
+    Before RAMS, ITPs, ITCs, procedures or LTQR packs are authored, the people/agents producing and reviewing them must use one communication and change-control method.
+    
+    This protocol exists to prevent four recurring failures:
+    
+    1. two actors believing they agreed when they agreed to different text;
+    2. a newer draft silently dropping valid content from an older one;
+    3. a coordination surface being mistaken for technical truth or authority;
+    4. work starting from a proposal/review that was never actually released.
+    
+    **NO SILENT ASSENT · NO SILENT SUPERSESSION · NO SILENT AUTHORITY · NO SILENT LOSS.**
+    
+    **No actor's intelligence, confidence or persistence creates authority.**
+    
+    **Written ≠ acknowledged ≠ agreed ≠ approved ≠ authorised ≠ verified complete.**
+    
+    **Communication quality is itself part of the assurance system.**
+    
+    ## 2. Roles and independence
+    
+    * **Dainius** — owner and final consequential authority; receives owner decisions with alternatives, consequences, risks and a recommendation in plain language.
+    * **Kai** — architecture, synthesis, adjudication, research/current-best-practice, evidence reconciliation, programme-sequence interpretation and IV&V coordination.
+    * **Orion** — repository mapping/execution/evidence production under explicit authority; continuity/handoff capture; no self-admission weight for its own consequential work.
+    * **DeepSeek / external reviewer** — adversarial challenge/hypothesis generation; no programme authority.
+    
+    **Author ≠ sole verifier in both directions.** Kai-authored consequential artefacts require an independent review lane before freeze. Orion-authored implementation/evidence cannot self-admit. Dissent is preserved beside the adjudication; either party may escalate material disagreement to Dainius.
+    
+    ## 3. Three separate hierarchies
+    
+    ### 3.1 Programme authority
+    
+    1. Banked D-numbered decision / explicit Dainius ruling for the named scope. **Valid D-numbered programme authority remains superior to this protocol for sequencing, release and authority questions.**
+    2. Exact preserved Dainius ruling, verbatim with source/date, pending formal banking where required.
+    3. Kai technical adjudication for planning/reconciliation within already-authorised scope — binding on the planning draft unless contradicted by higher authority/evidence; it does **not** create implementation authority.
+    4. Working proposal/review with no admission weight beyond its declared status.
+    
+    ### 3.2 Technical/evidence truth
+    
+    1. Exact repository/runtime evidence tied to the measured subject: commit/tree/blob/hash, governed artifacts, raw runtime evidence.
+    2. Preserved verbatim continuity/evidence record: HANDOFF_LOG, ruling-capture record, exact review packet.
+    3. Frozen/versioned architecture or assurance artefact within its declared design scope.
+    4. Linear working state/comments/documents.
+    5. Miro visual projection.
+    6. Chat/model recollection without preserved identity — context only.
+    
+    **Conflict rule:** when sources disagree, the higher source wins only for its proper domain; the conflict is recorded. Authority does not override measured technical reality, and technical evidence does not create authority.
+    
+    **Bank-before-act rule:** any material ruling/adjudication first seen in Linear or another coordination surface is preserved/banked in the canonical record before consequential action relies on it.
+    
+    ### 3.3 Document architecture
+    
+    **Primary Mission / owner intent** → **future frozen KAI Kingsman Master Canon / Constitution** → **Programme Governance Charter** → **Collaboration, Communication & Change-Control Protocol** → **KQ0–KQ9 Readiness Framework** → **Project Quality/Assurance Plan** → **RAMS / Activity Plan / ITP / ITC / HOLD / WITNESS / NCR / LTQR controls** → *individual WP-* packages\* → **as-built / release / requalification records**.
+    
+    Primary mission source path: `kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md`.
+    
+    Until the Master Canon is frozen, the mission doctrine and reconciled master-plan candidates are inputs, not a falsely-declared final constitution.
+    
+    At protocol freeze, the Programme Governance Charter must carry a pointer to this three-hierarchy model or be reconciled so the two cannot be mistaken for competing evidence hierarchies.
+    
+    ## 4. Authorship and attribution
+    
+    Substantive coordination messages use one of:
+    `KAI → ORION` · `ORION → KAI` · `KAI → DAINIUS` · `ORION → DAINIUS` · `DAINIUS → KAI/ORION` · `DEEPSEEK → KAI` · `JOINT KAI+ORION → DAINIUS`.
+    
+    `JOINT` may be used only after Kai and Orion have explicitly dispositioned the **same exact subject identity**.
+    
+    Because Linear is a shared account surface, labels are provenance metadata, not authentication.
+    
+    An unlabelled substantive programme message is not attributable evidence.
+    
+    **Owner decision O-1 pending:** recommended rule — a Dainius-origin ruling/instruction must originate in a direct conversation with Kai or Orion, then be preserved verbatim with source/date and banked before consequential action. `Ruling:` is Orion's memory/capture trigger, not an authentication mechanism.
+    
+    ## 5. Required packet header and message types
+    
+    Header:
+    `AUTHOR | SUBJECT | VERSION/IDENTITY | BASED-ON | MESSAGE TYPE | AUTHORITY STATUS | CANONICAL COPY | ACTION REQUESTED`.
+    
+    Resolvable identity:
+    
+    * repository: `path @ commit` plus sha256 where byte identity matters;
+    * Linear working draft: `doc-id + updatedAt`, plus preserved reviewed-body text/hash at ACK for consequential reviews;
+    * frozen packet: canonical repository path/commit/hash.
+    
+    Message types:
+    `PROPOSAL · REVIEW · FINDING · CORRECTION · QUESTION · DECISION REQUEST · RULING · EVIDENCE HANDOFF · ACKNOWLEDGEMENT · CLOSURE`.
+    
+    Example:
+    `KAI → ORION | Master Plan v1.2 | <identity> | BASED-ON <identity> | REVIEW | planning only | CANONICAL COPY <location> | reconcile R1–R10`.
+    
+    **A reply that does not name** `BASED-ON` **cannot close or supersede a prior review.**
+    
+    ## 6. Response and state vocabularies
+    
+    Response dispositions:
+    `ACCEPT · ACCEPT WITH LIMITS · AMEND · REJECT · HOLD · UNVERIFIED · NEEDS EVIDENCE · NEEDS DAINIUS · SUPERSEDED`.
+    
+    `ACKNOWLEDGED` means received/understood only. Silence, lack of objection, emoji/reaction or a later draft is not approval.
+    
+    Decision-state axis:
+    `WRITTEN → ACKNOWLEDGED → AGREED → APPROVED → AUTHORISED → VERIFIED COMPLETE`.
+    
+    * **AGREED:** required reviewers accepted the same exact subject identity.
+    * **APPROVED:** Dainius approved the owner/product/design decision where required.
+    * **AUTHORISED:** valid D-number or explicit grant releases a named action/action class.
+    * **VERIFIED COMPLETE:** independent evidence closes the authorised scope.
+    
+    Artifact status vocabulary:
+    `DRAFT · REVIEW · RECONCILED · FROZEN · SUPERSEDED`.
+    
+    Feature disposition vocabulary:
+    `KEEP · HARDEN · FINISH · MERGE · MOVE · SPLIT · ADD-JOINT · RESEARCH/WATCH · SUPERSEDED BY EVIDENCE · REJECT WITH RECORDED REASON · UNVERIFIED`.
+    
+    These four vocabularies are separate and never imply one another.
+    
+    ## 7. Review handshake
+    
+    For any **consequential planning/design packet**:
+    
+    `SEND → ACK → REVIEW → RECONCILE → VERIFY → OWNER DECISION (if required) → FREEZE → BANK`.
+    
+    **No step is inferred merely because a later step happened.**
+    
+    * **SEND:** author names exact subject/version and requested review.
+    * **ACK:** reviewer confirms exact subject received and preserves the reviewed body/identity for material reviews.
+    * **REVIEW:** reviewer dispositions every requested item and adds findings.
+    * **RECONCILE:** author updates the subject or records why a finding is rejected.
+    * **VERIFY:** independent reviewer checks that the reconciled text actually contains the agreed changes.
+    * **OWNER DECISION:** genuine owner questions go to Dainius **with alternatives, consequences, risks and a recommendation**.
+    * **FREEZE:** exact subject is frozen only after required reviews and owner decisions.
+    * **BANK:** the governing frozen result is preserved in the canonical record before consequential action relies on it.
+    
+    ### Stale-subject rule
+    
+    At ACK, VERIFY and FREEZE, re-fetch identity. A review is **STALE** only if the reviewed body changed. A banner/pointer-only identity change is recorded as `identity changed; reviewed body unchanged`, with the comparison method stated. This rule depends on preserving the reviewed body at ACK.
+    
+    ### BANK ownership
+    
+    No actor may invent or allocate a D-number by implication. Until Dainius establishes a standing recorder role, a D-number entry is appended only after Dainius explicitly approves the decision text/numbering action. Recommended separation: Kai drafts/adjudicates the decision text; Dainius approves; Orion (or another named recorder) appends exact approved text; Kai/independent lane verifies the resulting bytes.
+    
+    ## 8. Disagreement protocol
+    
+    * FACT/EVIDENCE conflict → inspect exact source; unresolved becomes a discriminating measurement/experiment.
+    * ARCHITECTURE conflict → compare requirements, hazards, interfaces, failure modes and evidence; dissent remains recorded; Kai may adjudicate planning synthesis; either party may escalate to Dainius.
+    * PRODUCT/VISION conflict → preserve original intent; Dainius decides material changes.
+    * AUTHORITY/SEQUENCING conflict → STOP; latest valid authority controls.
+    * RESEARCH conflict → primary sources + benchmark/prototype; unresolved stays UNVERIFIED.
+    
+    Prose compromise is not a substitute for resolving a factual conflict.
+    
+    ## 9. Version, mirror and supersession control
+    
+    * Working drafts may live in Linear.
+    * Frozen canonical bytes live in GitHub/repository under commit identity.
+    * Linear/Miro mirrors of frozen material carry `MIRROR OF <canonical identity>`.
+    * Divergence between mirror and canonical source is a finding.
+    * New versions never silently overwrite history, including working review history when it matters to traceability.
+    * Superseded artefacts carry a visible pointer to successor.
+    * Supersession states what changed, why, and what remains authoritative.
+    * Material changes trigger re-review of affected sections.
+    
+    ## 10. Zero-loss rule
+    
+    Before any feature/requirement/design element disappears, it receives one explicit feature disposition. `Not mentioned` is not a disposition.
+    
+    Each successor protocol/master version carries a short change record and a zero-loss check against the prior reviewed subject.
+    
+    ## 11. Authority classes
+    
+    Separate:
+    
+    1. **Planning/design authority** — permission to analyse, research, draft, compare and review.
+    2. **Record authority** — permission to append/preserve approved continuity, evidence and coordination records within the stated record scope.
+    3. **Repository-mutation authority** — permission to change project source, tooling, behaviour/configuration files or other governed repository content.
+    4. **Runtime/test authority** — permission to execute governed experiments/tests or alter test/runtime environments.
+    5. **Consequential-action authority** — permission to affect external systems, finance, public state or other consequential targets.
+    
+    Planning approval never implies another class.
+    
+    **Owner decision O-2 pending:** recommended narrow record authority during the pause:
+    
+    * permitted: append-only HANDOFF_LOG continuity records; verbatim ruling capture; Linear comments/drafts; Miro projections; correction/supersession banners;
+    * not permitted without separate authority: allocate/alter D-numbered decisions; allocate/close held ledger incidents; create/modify source, tooling, behaviour/config files; run held experiments; change runtime; freeze canon; perform consequential actions.
+    
+    **Live process deviation requiring Dainius disposition:** Orion added R20 to `CLAUDE.md` in commit `fe5c813` to make the Ohana directive persistent. The owner intent was clear, but under this authority model the permission to mutate a repository behaviour/config file was ambiguous. Do not treat this as precedent. No automatic revert is authorised either. Dainius should ratify or reject that specific standing-rule change.
+    
+    ## 12. Naming standard
+    
+    * readiness: `KQ0…KQ9`;
+    * hold points: `HOLD-0…HOLD-8` — never new `HP0…HP8`;
+    * witness requirements: `WITNESS-n` — never new `WP` for witness;
+    * work packages: `WP-0…WP-11`;
+    * House phases: `HOUSE_H0…HOUSE_H6`;
+    * provenance: `A-4_PROVENANCE`;
+    * self-diagnosis: `A4_SELF_DIAGNOSIS`, preserving D359 unless explicitly reopened;
+    * power modes: `SENTINEL · PORTABLE · DOCKED · MAINTENANCE`;
+    * proposed autonomy planning names: `AUTONOMY_0…AUTONOMY_4` pending owner approval.
+    
+    Existing code enum `A0_NONE … A4_HIGH_CONSEQUENCE` remains untouched during the pause. Before AUTONOMY\_\* is frozen, produce a semantic mapping table; same numbering is not proof of equivalent meaning.
+    
+    Historical records are not rewritten merely to adopt new naming.
+    
+    ## 13. Readiness source of truth
+    
+    `KAI Readiness & Trust Qualification Framework v0.1` under <issue id="a4e5c007-c89b-46ac-aed9-02b3f6a77950" href="https://linear.app/kaidainius/issue/DAI-12/kaibench-inference-fabric-and-hardware-qualification">DAI-12</issue> (`KQ0…KQ9`) is the sole readiness-ladder candidate for v1.2. KQG-\* is superseded planning history.
+    
+    HOLD gates and KQ levels are separate axes; there is no assumed one-to-one mapping.
+    
+    ## 14. Communication rhythm and cold start
+    
+    * no artificial response-time SLA for evidence work;
+    * urgent authority/safety conflict → STOP immediately;
+    * ambiguous subject/evidence/authority → HOLD;
+    * normal review → respond only after the exact subject has been read sufficiently to support a bounded claim;
+    * large packet → ACK exact identity first, then review;
+    * each actor recovers canonical governance/control state before acting in a new session;
+    * cold-start reliability is earned by testing its retrieval path, not assumed;
+    * cross-session work publishes exact resume identity + outstanding dispositions;
+    * do not claim `waiting on X` unless the exact outstanding request/owner is named.
+    
+    ### STOP/HOLD release
+    
+    `HOLD` is released only by the named authority/releaser for that hold condition. The actor who raised HOLD may recommend release but may not unilaterally release it when independence matters. `STOP` requires resolution of the authority/safety conflict and an explicit restart/release by the applicable authority.
+    
+    Neither HOLD nor STOP is itself a failure verdict.
+    
+    ## 15. Corrections and recurrence
+    
+    Correction process:
+    
+    1. label `CORRECTION`;
+    2. identify wrong claim;
+    3. state corrected claim + evidence;
+    4. identify affected artifacts/decisions;
+    5. propagate correction;
+    6. check recurrence/defect class;
+    7. feed the mechanism-level lesson into the appropriate Failure Pattern / RAMS / ITP / regression route when that record class is authorised.
+    
+    No retconning.
+    
+    ## 16. External review protocol
+    
+    External reviewer output is adversarial hypothesis, not evidence or authority.
+    
+    External input is preserved verbatim with relay/source identity before reconciliation.
+    
+    Each finding carries:
+    `finding | severity | exact subject | rationale | falsifier/evidence request | affected requirement/invariant`.
+    
+    Division of labour:
+    
+    * external reviewer attacks/poses hypotheses;
+    * Kai reconciles against requirements/evidence and adjudicates planning implications;
+    * Orion supplies source-bound repository evidence where authorised;
+    * Dainius resolves material owner/authority decisions.
+    
+    ## 17. PRE-RAMS gate
+    
+    PRE-RAMS remains HOLD until:
+    
+     1. communication/change-control protocol reconciled/agreed;
+     2. KQ0…KQ9 confirmed;
+     3. naming vocabulary confirmed;
+     4. three hierarchies + canonical/mirror rules agreed;
+     5. review/approval handshake agreed;
+     6. NCR/deviation route agreed at principle level, with the governing Quality Plan to define the detailed route;
+     7. version/freeze/supersession rules agreed;
+     8. roles/independence agreed;
+     9. stale-subject protection tested;
+    10. canonical-copy rule checked against tools;
+    11. large-packet integrity method agreed;
+    12. STOP/HOLD semantics agreed;
+    13. live contradictions/banners resolved or explicitly dispositioned before template authoring.
+    
+    Only after PRE-RAMS release should the Project Quality/Assurance Plan and reusable RAMS/ITP/ITC/LTQR templates be authored.
+    
+    ## 18. Closure
+    
+    A communication thread closes only by explicit `CLOSURE` naming exact subject identity.
+    
+    Closure requires:
+    
+    * every requested item dispositioned;
+    * unresolved items have owner + next step;
+    * corrections propagated;
+    * no coordination surface/mirror is mistaken for technical evidence;
+    * consequential release separately authorised/banked.
+    
+    `CLOSED` ≠ `VERIFIED COMPLETE`.
+    
+    ## 19. Owner decisions pending
+    
+    **O-1 — Dainius ruling authentication:** recommend direct-chat origin + verbatim preservation + bank-before-consequential-action. `Ruling:` is Orion memory capture only.
+    
+    **O-2 — Record authority during pause:** recommend narrow append/mirror authority only; no D-number/ledger/source/tooling/config/runtime/consequential mutation without separate authority. Also decide whether to **ratify commit** `fe5c813` **R20 in CLAUDE.md** as the approved standing Ohana rule; if ratified, record that this does not create general repository-mutation authority.
+    
+    **O-3 — Target top document:** recommend future frozen `KAI Kingsman Master Canon / Constitution`; current mission doctrine (`kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md`) and master-plan candidates remain inputs until freeze.
+    
+    **O-4 — Autonomy naming:** recommend `AUTONOMY_0…AUTONOMY_4` for planning, with a semantic mapping table to the existing code enum before freeze; no code rename under the pause.
+    
+    ## 20. Items to reconcile before freeze, not owner decisions
+    
+    * Programme Governance Charter must point to or adopt the three-hierarchy split.
+    * Assurance Pack must stop using HP/WP names or carry a successor pointer before template authoring.
+    * v1.0 baseline must point to the later UNVERIFIED disposition for PERSIST/OECD/COGITATOR items.
+    * v0.2 becomes superseded only after Orion verifies v0.3 and the v0.3 change record/zero-loss check passes.
+    END-VERBATIM PROTOCOL-V0-4-CD786753
+- EVIDENCE PROTOCOL-V0-3-6F33DADF-BANNERED 6f33dadf_2026-10-09T065441.108Z.md: 18112 bytes, sha256 5bf61a1dec8ab0215162c6ba0c0a2af832fda6c1f843e4fe7060882df7558822, final LF True (exact get_document content, extracted by extract.py; final LF added)  [CMD `sha256sum 6f33dadf_2026-10-09T065441.108Z.md` → 5bf61a1dec8ab021…]
+    BEGIN-VERBATIM PROTOCOL-V0-3-6F33DADF-BANNERED
+    > **SUCCESSOR RECONCILIATION CANDIDATE:** v0.4 restores the three regressions and two weakened clauses identified by Orion in comment `9a6f8a69`. v0.3 remains the reviewed predecessor and is not the PRE-RAMS release baseline.
+    
+    **Status:** RECONCILED DRAFT — Orion verification + owner decisions pending. PRE-RAMS remains HOLD. No implementation authority.
+    **Based on:** v0.1 + Orion entry 117 review + v0.2 + Orion verification comment `9af9da1a` / handoff entry 120.
+    **Change record:** v0.3 restores/dispositions every item Orion identified as lost or weakened from v0.1, adds the stale-body rule, BANK ownership rule, HOLD release rule, source-conflict rule, decision/message/artifact vocabularies, explicit doctrine path, Kai-adjudication status, and autonomy mapping requirement.
+    
+    ## 1. Purpose and failure modes
+    
+    Before RAMS, ITPs, ITCs, procedures or LTQR packs are authored, the people/agents producing and reviewing them must use one communication and change-control method.
+    
+    This protocol exists to prevent four recurring failures:
+    
+    1. two actors believing they agreed when they agreed to different text;
+    2. a newer draft silently dropping valid content from an older one;
+    3. a coordination surface being mistaken for technical truth or authority;
+    4. work starting from a proposal/review that was never actually released.
+    
+    **NO SILENT ASSENT · NO SILENT SUPERSESSION · NO SILENT AUTHORITY · NO SILENT LOSS.**
+    
+    **No actor's intelligence, confidence or persistence creates authority.**
+    
+    **Written ≠ acknowledged ≠ agreed ≠ approved ≠ authorised ≠ verified complete.**
+    
+    **Communication quality is itself part of the assurance system.**
+    
+    ## 2. Roles and independence
+    
+    * **Dainius** — owner and final consequential authority; receives owner decisions with alternatives, consequences, risks and a recommendation in plain language.
+    * **Kai** — architecture, synthesis, adjudication, research/current-best-practice, evidence reconciliation, programme-sequence interpretation and IV&V coordination.
+    * **Orion** — repository mapping/execution/evidence production under explicit authority; continuity/handoff capture; no self-admission weight for its own consequential work.
+    * **DeepSeek / external reviewer** — adversarial challenge/hypothesis generation; no programme authority.
+    
+    **Author ≠ sole verifier in both directions.** Kai-authored consequential artefacts require an independent review lane before freeze. Orion-authored implementation/evidence cannot self-admit. Dissent is preserved beside the adjudication; either party may escalate material disagreement to Dainius.
+    
+    ## 3. Three separate hierarchies
+    
+    ### 3.1 Programme authority
+    
+    1. Banked D-numbered decision / explicit Dainius ruling for the named scope.
+    2. Exact preserved Dainius ruling, verbatim with source/date, pending formal banking where required.
+    3. Kai technical adjudication for planning/reconciliation within already-authorised scope — binding on the planning draft unless contradicted by higher authority/evidence; it does **not** create implementation authority.
+    4. Working proposal/review with no admission weight beyond its declared status.
+    
+    ### 3.2 Technical/evidence truth
+    
+    1. Exact repository/runtime evidence tied to the measured subject: commit/tree/blob/hash, governed artifacts, raw runtime evidence.
+    2. Preserved verbatim continuity/evidence record: HANDOFF_LOG, ruling-capture record, exact review packet.
+    3. Frozen/versioned architecture or assurance artefact within its declared design scope.
+    4. Linear working state/comments/documents.
+    5. Miro visual projection.
+    6. Chat/model recollection without preserved identity — context only.
+    
+    **Conflict rule:** when sources disagree, the higher source wins only for its proper domain; the conflict is recorded. Authority does not override measured technical reality, and technical evidence does not create authority.
+    
+    **Bank-before-act rule:** any material ruling/adjudication first seen in Linear or another coordination surface is preserved/banked in the canonical record before consequential action relies on it.
+    
+    ### 3.3 Document architecture
+    
+    **Primary Mission / owner intent** → **future frozen KAI Kingsman Master Canon / Constitution** → **Programme Governance Charter** → **Collaboration, Communication & Change-Control Protocol** → **KQ0–KQ9 Readiness Framework** → **Project Quality/Assurance Plan** → **RAMS / Activity Plan / ITP / ITC / HOLD / WITNESS / NCR / LTQR controls** → *individual WP-* packages\* → **as-built / release / requalification records**.
+    
+    Primary mission source path: `kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md`.
+    
+    Until the Master Canon is frozen, the mission doctrine and reconciled master-plan candidates are inputs, not a falsely-declared final constitution.
+    
+    At protocol freeze, the Programme Governance Charter must carry a pointer to this three-hierarchy model or be reconciled so the two cannot be mistaken for competing evidence hierarchies.
+    
+    ## 4. Authorship and attribution
+    
+    Substantive coordination messages use one of:
+    `KAI → ORION` · `ORION → KAI` · `KAI → DAINIUS` · `ORION → DAINIUS` · `DAINIUS → KAI/ORION` · `DEEPSEEK → KAI` · `JOINT KAI+ORION → DAINIUS`.
+    
+    `JOINT` may be used only after Kai and Orion have explicitly dispositioned the **same exact subject identity**.
+    
+    Because Linear is a shared account surface, labels are provenance metadata, not authentication.
+    
+    An unlabelled substantive programme message is not attributable evidence.
+    
+    **Owner decision O-1 pending:** recommended rule — a Dainius-origin ruling/instruction must originate in a direct conversation with Kai or Orion, then be preserved verbatim with source/date and banked before consequential action. `Ruling:` is Orion's memory/capture trigger, not an authentication mechanism.
+    
+    ## 5. Required packet header and message types
+    
+    Header:
+    `AUTHOR | SUBJECT | VERSION/IDENTITY | BASED-ON | MESSAGE TYPE | AUTHORITY STATUS | CANONICAL COPY | ACTION REQUESTED`.
+    
+    Resolvable identity:
+    
+    * repository: `path @ commit` plus sha256 where byte identity matters;
+    * Linear working draft: `doc-id + updatedAt`, plus preserved reviewed-body text/hash at ACK for consequential reviews;
+    * frozen packet: canonical repository path/commit/hash.
+    
+    Message types:
+    `PROPOSAL · REVIEW · FINDING · CORRECTION · QUESTION · DECISION REQUEST · RULING · EVIDENCE HANDOFF · ACKNOWLEDGEMENT · CLOSURE`.
+    
+    Example:
+    `KAI → ORION | Master Plan v1.2 | <identity> | BASED-ON <identity> | REVIEW | planning only | CANONICAL COPY <location> | reconcile R1–R10`.
+    
+    ## 6. Response and state vocabularies
+    
+    Response dispositions:
+    `ACCEPT · ACCEPT WITH LIMITS · AMEND · REJECT · HOLD · UNVERIFIED · NEEDS EVIDENCE · NEEDS DAINIUS · SUPERSEDED`.
+    
+    `ACKNOWLEDGED` means received/understood only. Silence, lack of objection, emoji/reaction or a later draft is not approval.
+    
+    Decision-state axis:
+    `WRITTEN → ACKNOWLEDGED → AGREED → APPROVED → AUTHORISED → VERIFIED COMPLETE`.
+    
+    * **AGREED:** required reviewers accepted the same exact subject identity.
+    * **APPROVED:** Dainius approved the owner/product/design decision where required.
+    * **AUTHORISED:** valid D-number or explicit grant releases a named action/action class.
+    * **VERIFIED COMPLETE:** independent evidence closes the authorised scope.
+    
+    Artifact status vocabulary:
+    `DRAFT · REVIEW · RECONCILED · FROZEN · SUPERSEDED`.
+    
+    Feature disposition vocabulary:
+    `KEEP · HARDEN · FINISH · MERGE · MOVE · SPLIT · ADD-JOINT · RESEARCH/WATCH · SUPERSEDED BY EVIDENCE · REJECT WITH RECORDED REASON · UNVERIFIED`.
+    
+    These four vocabularies are separate and never imply one another.
+    
+    ## 7. Review handshake
+    
+    `SEND → ACK → REVIEW → RECONCILE → VERIFY → OWNER DECISION (if required) → FREEZE → BANK`.
+    
+    * **SEND:** author names exact subject/version and requested review.
+    * **ACK:** reviewer confirms exact subject received and preserves the reviewed body/identity for material reviews.
+    * **REVIEW:** reviewer dispositions every requested item and adds findings.
+    * **RECONCILE:** author updates the subject or records why a finding is rejected.
+    * **VERIFY:** independent reviewer checks that the reconciled text actually contains the agreed changes.
+    * **OWNER DECISION:** genuine owner questions go to Dainius **with alternatives, consequences, risks and a recommendation**.
+    * **FREEZE:** exact subject is frozen only after required reviews and owner decisions.
+    * **BANK:** the governing frozen result is preserved in the canonical record before consequential action relies on it.
+    
+    ### Stale-subject rule
+    
+    At ACK, VERIFY and FREEZE, re-fetch identity. A review is **STALE** only if the reviewed body changed. A banner/pointer-only identity change is recorded as `identity changed; reviewed body unchanged`, with the comparison method stated. This rule depends on preserving the reviewed body at ACK.
+    
+    ### BANK ownership
+    
+    No actor may invent or allocate a D-number by implication. Until Dainius establishes a standing recorder role, a D-number entry is appended only after Dainius explicitly approves the decision text/numbering action. Recommended separation: Kai drafts/adjudicates the decision text; Dainius approves; Orion (or another named recorder) appends exact approved text; Kai/independent lane verifies the resulting bytes.
+    
+    ## 8. Disagreement protocol
+    
+    * FACT/EVIDENCE conflict → inspect exact source; unresolved becomes a discriminating measurement/experiment.
+    * ARCHITECTURE conflict → compare requirements, hazards, interfaces, failure modes and evidence; dissent remains recorded; Kai may adjudicate planning synthesis; either party may escalate to Dainius.
+    * PRODUCT/VISION conflict → preserve original intent; Dainius decides material changes.
+    * AUTHORITY/SEQUENCING conflict → STOP; latest valid authority controls.
+    * RESEARCH conflict → primary sources + benchmark/prototype; unresolved stays UNVERIFIED.
+    
+    Prose compromise is not a substitute for resolving a factual conflict.
+    
+    ## 9. Version, mirror and supersession control
+    
+    * Working drafts may live in Linear.
+    * Frozen canonical bytes live in GitHub/repository under commit identity.
+    * Linear/Miro mirrors of frozen material carry `MIRROR OF <canonical identity>`.
+    * Divergence between mirror and canonical source is a finding.
+    * New versions never silently overwrite history, including working review history when it matters to traceability.
+    * Superseded artefacts carry a visible pointer to successor.
+    * Supersession states what changed, why, and what remains authoritative.
+    * Material changes trigger re-review of affected sections.
+    
+    ## 10. Zero-loss rule
+    
+    Before any feature/requirement/design element disappears, it receives one explicit feature disposition. `Not mentioned` is not a disposition.
+    
+    Each successor protocol/master version carries a short change record and a zero-loss check against the prior reviewed subject.
+    
+    ## 11. Authority classes
+    
+    Separate:
+    
+    1. planning/design authority;
+    2. record authority;
+    3. repository-mutation authority;
+    4. runtime/test authority;
+    5. consequential-action authority.
+    
+    Planning approval never implies another class.
+    
+    **Owner decision O-2 pending:** recommended narrow record authority during the pause:
+    
+    * permitted: append-only HANDOFF_LOG continuity records; verbatim ruling capture; Linear comments/drafts; Miro projections; correction/supersession banners;
+    * not permitted without separate authority: allocate/alter D-numbered decisions; allocate/close held ledger incidents; create/modify source, tooling, behaviour/config files; run held experiments; change runtime; freeze canon; perform consequential actions.
+    
+    **Live process deviation requiring Dainius disposition:** Orion added R20 to `CLAUDE.md` in commit `fe5c813` to make the Ohana directive persistent. The owner intent was clear, but under this authority model the permission to mutate a repository behaviour/config file was ambiguous. Do not treat this as precedent. No automatic revert is authorised either. Dainius should ratify or reject that specific standing-rule change.
+    
+    ## 12. Naming standard
+    
+    * readiness: `KQ0…KQ9`;
+    * hold points: `HOLD-0…HOLD-8` — never new `HP0…HP8`;
+    * witness requirements: `WITNESS-n` — never new `WP` for witness;
+    * work packages: `WP-0…WP-11`;
+    * House phases: `HOUSE_H0…HOUSE_H6`;
+    * provenance: `A-4_PROVENANCE`;
+    * self-diagnosis: `A4_SELF_DIAGNOSIS`, preserving D359 unless explicitly reopened;
+    * power modes: `SENTINEL · PORTABLE · DOCKED · MAINTENANCE`;
+    * proposed autonomy planning names: `AUTONOMY_0…AUTONOMY_4` pending owner approval.
+    
+    Existing code enum `A0_NONE … A4_HIGH_CONSEQUENCE` remains untouched during the pause. Before AUTONOMY\_\* is frozen, produce a semantic mapping table; same numbering is not proof of equivalent meaning.
+    
+    Historical records are not rewritten merely to adopt new naming.
+    
+    ## 13. Readiness source of truth
+    
+    `KAI Readiness & Trust Qualification Framework v0.1` under <issue id="a4e5c007-c89b-46ac-aed9-02b3f6a77950" href="https://linear.app/kaidainius/issue/DAI-12/kaibench-inference-fabric-and-hardware-qualification">DAI-12</issue> (`KQ0…KQ9`) is the sole readiness-ladder candidate for v1.2. KQG-\* is superseded planning history.
+    
+    HOLD gates and KQ levels are separate axes; there is no assumed one-to-one mapping.
+    
+    ## 14. Communication rhythm and cold start
+    
+    * no artificial response-time SLA for evidence work;
+    * urgent authority/safety conflict → STOP immediately;
+    * ambiguous subject/evidence/authority → HOLD;
+    * normal review → respond only after the exact subject has been read sufficiently to support a bounded claim;
+    * large packet → ACK exact identity first, then review;
+    * each actor recovers canonical governance/control state before acting in a new session;
+    * cold-start reliability is earned by testing its retrieval path, not assumed;
+    * cross-session work publishes exact resume identity + outstanding dispositions;
+    * do not claim `waiting on X` unless the exact outstanding request/owner is named.
+    
+    ### STOP/HOLD release
+    
+    `HOLD` is released only by the named authority/releaser for that hold condition. The actor who raised HOLD may recommend release but may not unilaterally release it when independence matters. `STOP` requires resolution of the authority/safety conflict and an explicit restart/release by the applicable authority.
+    
+    Neither HOLD nor STOP is itself a failure verdict.
+    
+    ## 15. Corrections and recurrence
+    
+    Correction process:
+    
+    1. label `CORRECTION`;
+    2. identify wrong claim;
+    3. state corrected claim + evidence;
+    4. identify affected artifacts/decisions;
+    5. propagate correction;
+    6. check recurrence/defect class;
+    7. feed the mechanism-level lesson into the appropriate Failure Pattern / RAMS / ITP / regression route when that record class is authorised.
+    
+    No retconning.
+    
+    ## 16. External review protocol
+    
+    External reviewer output is adversarial hypothesis, not evidence or authority.
+    
+    External input is preserved verbatim with relay/source identity before reconciliation.
+    
+    Each finding carries:
+    `finding | severity | exact subject | rationale | falsifier/evidence request | affected requirement/invariant`.
+    
+    Division of labour:
+    
+    * external reviewer attacks/poses hypotheses;
+    * Kai reconciles against requirements/evidence and adjudicates planning implications;
+    * Orion supplies source-bound repository evidence where authorised;
+    * Dainius resolves material owner/authority decisions.
+    
+    ## 17. PRE-RAMS gate
+    
+    PRE-RAMS remains HOLD until:
+    
+     1. communication/change-control protocol reconciled/agreed;
+     2. KQ0…KQ9 confirmed;
+     3. naming vocabulary confirmed;
+     4. three hierarchies + canonical/mirror rules agreed;
+     5. review/approval handshake agreed;
+     6. NCR/deviation route agreed at principle level, with the governing Quality Plan to define the detailed route;
+     7. version/freeze/supersession rules agreed;
+     8. roles/independence agreed;
+     9. stale-subject protection tested;
+    10. canonical-copy rule checked against tools;
+    11. large-packet integrity method agreed;
+    12. STOP/HOLD semantics agreed;
+    13. live contradictions/banners resolved or explicitly dispositioned before template authoring.
+    
+    Only after PRE-RAMS release should the Project Quality/Assurance Plan and reusable RAMS/ITP/ITC/LTQR templates be authored.
+    
+    ## 18. Closure
+    
+    A communication thread closes only by explicit `CLOSURE` naming exact subject identity.
+    
+    Closure requires:
+    
+    * every requested item dispositioned;
+    * unresolved items have owner + next step;
+    * corrections propagated;
+    * no coordination surface/mirror is mistaken for technical evidence;
+    * consequential release separately authorised/banked.
+    
+    `CLOSED` ≠ `VERIFIED COMPLETE`.
+    
+    ## 19. Owner decisions pending
+    
+    **O-1 — Dainius ruling authentication:** recommend direct-chat origin + verbatim preservation + bank-before-consequential-action. `Ruling:` is Orion memory capture only.
+    
+    **O-2 — Record authority during pause:** recommend narrow append/mirror authority only; no D-number/ledger/source/tooling/config/runtime/consequential mutation without separate authority. Also decide whether to **ratify commit** `fe5c813` **R20 in CLAUDE.md** as the approved standing Ohana rule; if ratified, record that this does not create general repository-mutation authority.
+    
+    **O-3 — Target top document:** recommend future frozen `KAI Kingsman Master Canon / Constitution`; current mission doctrine (`kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md`) and master-plan candidates remain inputs until freeze.
+    
+    **O-4 — Autonomy naming:** recommend `AUTONOMY_0…AUTONOMY_4` for planning, with a semantic mapping table to the existing code enum before freeze; no code rename under the pause.
+    
+    ## 20. Items to reconcile before freeze, not owner decisions
+    
+    * Programme Governance Charter must point to or adopt the three-hierarchy split.
+    * Assurance Pack must stop using HP/WP names or carry a successor pointer before template authoring.
+    * v1.0 baseline must point to the later UNVERIFIED disposition for PERSIST/OECD/COGITATOR items.
+    * v0.2 becomes superseded only after Orion verifies v0.3 and the v0.3 change record/zero-loss check passes.
+    END-VERBATIM PROTOCOL-V0-3-6F33DADF-BANNERED
+- EVIDENCE ORION-EXACTDIFF-V03-V04-REMOVED v03_v04_removed.txt: 624 bytes, sha256 28b463519b54dd5ea5b41f2868274c312484d3ad464d183d62032dc4880f3618, final LF True (full output)  [CMD `sha256sum v03_v04_removed.txt` → 28b463519b54dd5e…]
+    BEGIN-VERBATIM ORION-EXACTDIFF-V03-V04-REMOVED
+    CALIBRATION PASS | known-negative present: True | known-positive missing: True
+    UNITS 175 VERBATIM-PRESENT 169 NOT-VERBATIM 6
+      3 | **Change record:** v0.3 restores/dispositions every item Orion identified as lost or weakened from v0.1, adds the stale-body rule, BANK ownership rule, HOLD release rule, source-conflict rule, decision/message/artifact vocabularies, explicit doctrine path, Kai-adjudication status, and autonomy mapping requirement.
+     93 | 1. planning/design authority;
+     94 | 2. record authority;
+     95 | 3. repository-mutation authority;
+     96 | 4. runtime/test authority;
+     97 | 5. consequential-action authority.
+    END-VERBATIM ORION-EXACTDIFF-V03-V04-REMOVED
+- EVIDENCE ORION-EXACTDIFF-V04-V03-ADDED v04_v03_added.txt: 1664 bytes, sha256 fedf2acc46bcf9b926e5b96197156a23aeb3f634d7df3ee495fcfe8dbbbf5f48, final LF True (full output)  [CMD `sha256sum v04_v03_added.txt` → fedf2acc46bcf9b9…]
+    BEGIN-VERBATIM ORION-EXACTDIFF-V04-V03-ADDED
+    CALIBRATION PASS | known-negative present: True | known-positive missing: True
+    UNITS 179 VERBATIM-PRESENT 168 NOT-VERBATIM 11
+      2 | **Based on immediate predecessor:** v0.3 Linear doc `6f33dadf-eba8-4197-a7ec-d7b69c560967` + Orion verification `9a6f8a69-2390-4615-88ad-ace03a0d6792`.
+      4 | **Change record:** v0.4 is a minimal successor to v0.3. It restores Orion's three verified regressions (R-1 to R-3) and two weakened clauses (a, e) from review `9a6f8a69`; no other intended semantic change. v0.3 already restored/dispositioned the earlier v0.1 losses.
+     20 | 1. Banked D-numbered decision / explicit Dainius ruling for the named scope. **Valid D-numbered programme authority remains superior to this protocol for sequencing, release and authority questions.**
+     52 | **A reply that does not name** `BASED-ON` **cannot close or supersede a prior review.**
+     67 | For any **consequential planning/design packet**:
+     69 | **No step is inferred merely because a later step happened.**
+     97 | 1. **Planning/design authority** — permission to analyse, research, draft, compare and review.
+     98 | 2. **Record authority** — permission to append/preserve approved continuity, evidence and coordination records within the stated record scope.
+     99 | 3. **Repository-mutation authority** — permission to change project source, tooling, behaviour/configuration files or other governed repository content.
+    100 | 4. **Runtime/test authority** — permission to execute governed experiments/tests or alter test/runtime environments.
+    101 | 5. **Consequential-action authority** — permission to affect external systems, finance, public state or other consequential targets.
+    END-VERBATIM ORION-EXACTDIFF-V04-V03-ADDED
+
+### 6. Next authorised step
+
+- Post the verification on DAI-10; ask Dainius for O-1…O-4 in plain words; bank his ruling by hand whatever the hook reports (entry 133 section 7)  [CONVERSATION 2026-10-09 Dainius relaying Kai, "What I need from you now is small"]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff.py check` → findings=0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
