@@ -61561,3 +61561,112 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-09T07:57:02Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-09T07:57:02Z  [CMD `date -u +%FT%TZ` → 2026-10-09T07:57:02Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: ad1af6f762f670b379d119eb108581f092a78738  [CMD `git rev-parse HEAD` → ad1af6f762f670b379d119eb108581f092a78738]
+- tree: 474bcc4468419175e80a04c00590532076c3df9e  [CMD `git rev-parse HEAD^{tree}` → 474bcc4468419175e80a04c00590532076c3df9e]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:claude/project-rework-plan-pgvp35: ad1af6f762f670b379d119eb108581f092a78738  [CMD `git ls-remote --heads origin` → ad1af6f762f670b379d119eb108581f092a78738]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 132  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 132]
+
+### 1. The four states
+
+- physical: unchanged since entry 132 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Orion verifies protocol v0.4 against v0.3 (Kai's request); PRE-RAMS HOLD; engineering paused; DAI-9 active, DAI-10 open, D379/DAI-6 blocked  [CONVERSATION 2026-10-09 Dainius relaying Kai, "What I need from you now is small"]
+- evidence: Kai's status message relayed by Dainius, preserved below; it carries no ruling in Dainius's own words  [CMD `cat .git/kai-ruling-capture/a590902117fbbd13.json` → flagged 2026-10-09T07:56:31Z, 3273 chars, no final LF]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Kai (relayed by Dainius) · 2026-10-09 · status and adjudication: R20 "resolved. You had already authorised it to Orion … No revert needed"; v0.4 issued; PRE-RAMS HOLD; owner decisions O-1…O-4 recommended identically by Kai and Orion; a suggested one-line ruling for Dainius (text in the verbatim block) This message contains no Dainius ruling in his own words; R20's status rests on Kai's reading of Dainius's 2026-10-08 direction (entry 122). Verbatim below, 3292 bytes, sha256 3c110d86ff10fc1f2c320e3e0e62ecc342b13c6024afa328ad4faa672c21bf23, final LF True (added by Orion) ⚠ UNBANKED  [CONVERSATION 2026-10-09 Dainius relaying Kai, "What I need from you now is small"]
+    BEGIN-VERBATIM KAI-PRE-RAMS-STATUS-V04
+    We’re close on the pre-RAMS prerequisites, but not clear to proceed yet.
+    
+    Right now the state is:
+    
+    * Ohana / R20: resolved. You had already authorised it to Orion; Linear now just makes that transparent between us. No revert needed.
+    * Communication Protocol: v0.4 is issued. I fixed Orion’s last five points. Orion still has to independently verify v0.4 against v0.3.
+    * PRE-RAMS: still HOLD until that verification and your remaining owner decisions are closed.
+    * Engineering: still paused.
+    * DAI-9: still the active “reconstruct the whole KAI universe first” programme package.
+    * DAI-10: still open; the one-master-plan/canon work is not frozen yet.
+    * D379 / DAI-6: still blocked behind DAI-9. Nothing has accidentally resumed.
+    
+    What I need from you now is small. Four owner decisions remain, and Kai + Orion currently recommend the same answer on each:
+    
+    1. How your rulings count. My recommendation: your direct conversation with either Kai or Orion is the source. Ruling: is only Orion’s memory/capture trigger. Linear/Miro labels are not proof by themselves.
+    2. What Orion may write during the pause. My recommendation: allow record-keeping only — handoff log, exact ruling capture, Linear comments/drafts, Miro mirrors, correction/supersession notices. No source/tooling/config changes, no experiments/runtime, no new D-number decisions unless separately authorised.
+    3. What sits at the top of the documentation hierarchy. My recommendation: future KAI Kingsman Master Canon / Constitution. Until it is genuinely frozen, the current mission doctrine and reconciled master-plan drafts feed into it.
+    4. Autonomy names. My recommendation: use AUTONOMY_0 … AUTONOMY_4 in planning, but map them properly to the existing code levels before freezing anything. No code renaming now.
+    
+    Everything else before PRE-RAMS is ours, not yours:
+    
+    * Orion verifies v0.4.
+    * We reconcile the Programme Governance Charter so it points to the new three-hierarchy model.
+    * We fix the old HP/WP terminology in the Assurance Pack or mark it superseded.
+    * We correct the old master-plan references that still treat the unverified research names as accepted.
+    * We make sure the exact same protocol version is what both Kai and Orion have accepted.
+    * Then the protocol can become AGREED.
+    * Only after that do we write the Project Quality / Assurance Plan.
+    * Then, under that plan, we write the RAMS, Activity Plan, ITP, ITC, HOLD/WITNESS, NCR and LTQR templates.
+    
+    For the wider KAI project, there is still another layer after PRE-RAMS: the one-master-plan reconciliation itself must still reach zero unexplained gaps across README, historical vision, doctrine, repo reality and research. That is separate from the communication prerequisite and is still continuing read-only.
+    
+    So in site terms:
+    
+    We are still finishing the project-wide management procedure and quality rules before issuing the work-pack templates.
+    
+    The only thing I need from you now is those four owner decisions. If you agree with all four recommendations, you can settle them in one short message:
+    
+    Ruling: approve O-1 to O-4 as recommended.
+    
+    Because Ruling: is Orion’s memory trigger, he’ll capture it automatically. After that, the owner side of the PRE-RAMS gate is effectively clear; the remaining work is on Kai and Orion.
+    END-VERBATIM KAI-PRE-RAMS-STATUS-V04
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: v0.4 verification; v1.2 read-only  [CONVERSATION 2026-10-09 Dainius relaying Kai, "What I need from you now is small"]
+- HELD: PRE-RAMS; R11; engineering per entry 99  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- R20: Kai now reads it as already authorised by Dainius; Kai's earlier note cb67c42a said NEEDS DAINIUS. Cleanest close: Dainius names R20 in his own ruling — owner: Dainius  [CONVERSATION 2026-10-09 Dainius relaying Kai, "What I need from you now is small"]
+
+### 5. Incidents and corrections
+
+- Credential scan (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py k4_scan.json` → TOTAL HITS 0]
+
+### 6. Next authorised step
+
+- Fetch v0.4; verify against v0.3 and entry 131's R-1…R-3, a, e; bank; post; report  [CONVERSATION 2026-10-09 Dainius relaying Kai, "What I need from you now is small"]
+
+### 7. What I am unsure of
+
+- Ruling-capture limit found: Kai's verbatim message contains the suggested ruling as a whole line, so if Dainius sends exactly that line the hook will report it BANKED although only Kai's suggestion is in the log. Orion banks Dainius's actual ruling by hand regardless of the hook  [CONVERSATION 2026-10-09 Dainius relaying Kai, "What I need from you now is small"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
