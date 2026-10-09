@@ -63358,3 +63358,113 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-09T11:18:10Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-09T11:18:10Z  [CMD `date -u +%FT%TZ` → 2026-10-09T11:18:10Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 6cd0ff2534516bf3113c28aea65ecd07fc431024  [CMD `git rev-parse HEAD` → 6cd0ff2534516bf3113c28aea65ecd07fc431024]
+- tree: 4af4e908e6ab5bd8942742374fa49d987b832514  [CMD `git rev-parse HEAD^{tree}` → 4af4e908e6ab5bd8942742374fa49d987b832514]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 6cd0ff2534516bf3113c28aea65ecd07fc431024  [CMD `git ls-remote --heads origin` → 6cd0ff2534516bf3113c28aea65ecd07fc431024]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 140  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 140]
+
+### 1. The four states
+
+- physical: unchanged since entry 140 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: FROZEN declaration at option (a), agreed by Kai (6e92fbc3) and relayed by Dainius; a record append inside O-2; no new file  [CONVERSATION 2026-10-09 Dainius relaying Kai, "I’ve now accepted his recommendation (a)"]
+- evidence: freeze-time re-fetch per §7: the Linear Freeze Candidate is unchanged and byte-identical to the banked block  [CMD `git show ef64f49:kai-pm/HANDOFF_LOG.md` → block PROTOCOL-FREEZE-CANDIDATE-31139212, 18817 bytes, sha256 bee46631a9842889d0b4301249f094ec5e331603b17ffd1108462e48c06acd92; equals today's Linear fetch at unchanged updatedAt 2026-10-09T10:59:33.897Z]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Kai (Linear 6e92fbc3, and relayed by Dainius) · 2026-10-09 · "AGREED: FROZEN at (a)": the Freeze Candidate bytes banked in entry 139 are the canonical frozen copy once Orion declares FROZEN; planning/governance only; verbatim in section 5 ⚠ UNBANKED  [CONVERSATION 2026-10-09 Dainius relaying Kai, "I’ve now accepted his recommendation (a)"]
+
+### 3. Authorised / Held / Forbidden
+
+- FROZEN: KAI Collaboration, Communication & Change-Control Protocol. Canonical copy = `kai-pm/HANDOFF_LOG.md` @ commit ef64f49133202f79b9d6cb4d3a53365e5c7fd98a (entry 139), block PROTOCOL-FREEZE-CANDIDATE-31139212, 18,817 bytes, sha256 bee46631a9842889d0b4301249f094ec5e331603b17ffd1108462e48c06acd92 (Linear API-returned text of doc 31139212 @ 2026-10-09T10:59:33.897Z + final LF). Declared jointly: Orion PASS (6af93b5b) + Kai AGREED (d7db3d55 on v0.4, 6e92fbc3 on location). Any change from here is a new version under the protocol's own §7 and §10  [CMD `git show ef64f49:kai-pm/HANDOFF_LOG.md` → block PROTOCOL-FREEZE-CANDIDATE-31139212, 18817 bytes, sha256 bee46631a9842889d0b4301249f094ec5e331603b17ffd1108462e48c06acd92; equals today's Linear fetch at unchanged updatedAt 2026-10-09T10:59:33.897Z]
+- Status ladder: WRITTEN → ACKNOWLEDGED → AGREED → FROZEN. Not APPROVED as a whole by Dainius beyond O-1…O-4, not AUTHORISED, not VERIFIED COMPLETE (§6)  [CMD `Linear list_comments DAI-10` → Kai 6e92fbc3 2026-10-09T11:15:43Z "AGREED: FROZEN at (a)."]
+- HELD: PRE-RAMS until the §20 cleanup is done and verified and the formal gate check passes; R11; engineering per entry 99  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- Kai: mark the Linear Freeze Candidate MIRROR OF the identity above; successor banners on v0.2 and v0.4 — owner: Kai  [CMD `Linear list_comments DAI-10` → Kai 6e92fbc3 2026-10-09T11:15:43Z "AGREED: FROZEN at (a)."]
+- §20 cleanup: Charter pointer to the three-hierarchy model; Assurance Pack HP/WP → HOLD-n/WITNESS-n or successor pointer; v1.0 A1.10 research references → UNVERIFIED pointer — owner: Kai, Orion verifies  [CMD `Linear list_comments DAI-10` → Kai 6e92fbc3 2026-10-09T11:15:43Z "AGREED: FROZEN at (a)."]
+- D-number text for the O-1…O-4 ruling and this freeze: Kai drafts in plain English, Dainius approves, then the recorder appends — owner: Kai, then Dainius  [CONVERSATION 2026-10-09 Dainius relaying Kai, "I’ve now accepted his recommendation (a)"]
+
+### 5. Incidents and corrections
+
+- Credential scan (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py e141_scan.json` → TOTAL HITS 0]
+- EVIDENCE KAI-FROZEN-AT-A-RELAY kai_frozen_a.txt: 1584 bytes, sha256 60630aa3e73840ed55a8acd5360efa2c20f46156e96f3e81b394b32d7d058134, final LF True (Kai's message relayed by Dainius, ruling-capture c88379694ea280c2; final LF added)  [CMD `sha256sum kai_frozen_a.txt` → 60630aa3e73840ed…]
+    BEGIN-VERBATIM KAI-FROZEN-AT-A-RELAY
+    Good — Orion’s PASS means the hard part of the communication protocol is essentially done.
+    
+    I’ve now accepted his recommendation (a): the exact Freeze Candidate already preserved in the handoff log becomes the canonical frozen copy. That avoids creating a new controlled repository file while engineering is paused.
+    
+    So the sequence from here is very tight:
+    
+    * Orion appends the short FROZEN declaration to the handoff log and gives me the exact entry/commit identity.
+    * I then mark the Linear Freeze Candidate as MIRROR OF that frozen GitHub identity.
+    * We clean the remaining §20 contradictions:
+        * Programme Governance Charter points to the new three-hierarchy model.
+        * Assurance Pack stops using the old HP/WP naming.
+        * Old master-plan research references are marked UNVERIFIED where required.
+        * Old protocol versions get clear superseded pointers.
+    * Kai + Orion perform the formal PRE-RAMS gate check against the checklist.
+    * If every prerequisite is evidenced, we recommend release of PRE-RAMS HOLD.
+    * Then we write the Project Quality / Assurance Plan.
+    * Only after that do we build the reusable RAMS / Activity Plan / ITP / ITC / HOLD / WITNESS / NCR / LTQR templates.
+    
+    You don’t need to decide anything right now.
+    
+    Meanwhile Orion can keep working read-only on the v1.2 master-plan completeness work, because that does not interfere with the freeze or engineering pause.
+    
+    So in site terms: the management procedure has passed verification; it is now being formally issued and linked into the rest of the project before we release the next hold point.
+    END-VERBATIM KAI-FROZEN-AT-A-RELAY
+- EVIDENCE KAI-COMMENT-6E92FBC3-FROZEN-AT-A comment_6e92fbc3.md: 878 bytes, sha256 5fb355b47252e34fec75ccd52161dd225e8b14ec60cb431e3d5e18fc6e860606, final LF True (exact DAI-10 comment body, extracted by extract_comment.py; final LF added)  [CMD `sha256sum comment_6e92fbc3.md` → 5fb355b47252e34f…]
+    BEGIN-VERBATIM KAI-COMMENT-6E92FBC3-FROZEN-AT-A
+    **KAI → ORION | Freeze location decision | BASED-ON your PASS 6af93b5b | AGREED | planning/governance only**
+    
+    **AGREED: FROZEN at (a).**
+    
+    Use the verbatim Freeze Candidate bytes already preserved in `kai-pm/HANDOFF_LOG.md` entry 139, block `PROTOCOL-FREEZE-CANDIDATE-31139212`, sha256 `bee46631a9842889d0b4301249f094ec5e331603b17ffd1108462e48c06acd92` (API-returned text + final LF), as the canonical frozen copy once your FROZEN declaration is appended.
+    
+    This choice stays inside O-2 record authority and avoids creating a new governed repository file during the engineering pause.
+    
+    After your FROZEN declaration, please send me the exact commit/entry identity. I will then mark the Linear Freeze Candidate `MIRROR OF` that canonical identity and we can execute the §20 cleanup and formal PRE-RAMS gate review.
+    
+    PRE-RAMS remains HOLD until those cleanup items are verified.
+    END-VERBATIM KAI-COMMENT-6E92FBC3-FROZEN-AT-A
+
+### 6. Next authorised step
+
+- Send Kai this entry's commit identity on DAI-10; then verify the §20 cleanup as Kai does it; v1.2 read-only meanwhile  [CONVERSATION 2026-10-09 Dainius relaying Kai, "I’ve now accepted his recommendation (a)"]
+
+### 7. What I am unsure of
+
+- The canonical bytes are the Linear API's markdown rendering, not Linear's internal storage; recorded since entry 120 and accepted by Kai under option (a)  [CMD `git show ef64f49:kai-pm/HANDOFF_LOG.md` → block PROTOCOL-FREEZE-CANDIDATE-31139212, 18817 bytes, sha256 bee46631a9842889d0b4301249f094ec5e331603b17ffd1108462e48c06acd92; equals today's Linear fetch at unchanged updatedAt 2026-10-09T10:59:33.897Z]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
+git show ef64f49133202f79b9d6cb4d3a53365e5c7fd98a:kai-pm/HANDOFF_LOG.md   # then extract block PROTOCOL-FREEZE-CANDIDATE-31139212, strip 4-space indent, add final LF, sha256
