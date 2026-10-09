@@ -62551,3 +62551,88 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-09T10:55:53Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-09T10:55:53Z  [CMD `date -u +%FT%TZ` → 2026-10-09T10:55:53Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 4e1572fcf986728c55b6f447a92584c87a289671  [CMD `git rev-parse HEAD` → 4e1572fcf986728c55b6f447a92584c87a289671]
+- tree: 0603fc7a9276ec9186cbb79085c2158599f859bf  [CMD `git rev-parse HEAD^{tree}` → 0603fc7a9276ec9186cbb79085c2158599f859bf]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 4e1572fcf986728c55b6f447a92584c87a289671  [CMD `git ls-remote --heads origin` → 4e1572fcf986728c55b6f447a92584c87a289671]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 135  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 135]
+
+### 1. The four states
+
+- physical: unchanged since entry 135 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: owner decisions O-1…O-4 approved exactly as recommended in protocol v0.4 §19 (text preserved below); this closes the owner side of the PRE-RAMS gate; it grants no implementation, runtime or consequential authority; engineering stays paused  [CONVERSATION 2026-10-09 Dainius, "Ruling: approve O-1 to O-4 as recommended"]
+- evidence: Dainius's ruling in direct chat with Orion (the O-1 channel), captured by the hook  [CMD `cat .git/kai-ruling-capture/f887cdb200696c06.json` → flagged 2026-10-09T10:55:17Z]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-09 · "Ruling: approve O-1 to O-4 as recommended". "As recommended" means the four recommendations in v0.4 §19 (cd786753 @ 2026-10-09T06:54:37.315Z), preserved word for word below: O-1 rulings count only from direct conversation with Kai or Orion, preserved verbatim and banked before consequential action, `Ruling:` being Orion's capture trigger only; O-2 narrow record authority during the pause, no D-number/ledger/source/tooling/config/runtime/consequential mutation without separate authority, with R20 (commit fe5c813) ratified as a one-off that creates no general repository-mutation authority; O-3 top document = future frozen KAI Kingsman Master Canon / Constitution, with the mission doctrine and master-plan candidates as inputs until freeze; O-4 AUTONOMY_0…AUTONOMY_4 for planning with a semantic mapping table to the existing code enum before freeze and no code rename under the pause. Ruling verbatim 42 bytes, sha256 3addfbe69ec48768bd8cb75fb74859864b4fbba083ef1b8c69398680cf1bbb80; §19 verbatim 1023 bytes, sha256 26384c050b5ae55e19eb564e376262951f7bbfa9726757b4d7a34b3c4cc82e60 ⚠ UNBANKED  [CONVERSATION 2026-10-09 Dainius, "Ruling: approve O-1 to O-4 as recommended"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED under O-2: record keeping only (handoff log, verbatim ruling capture, Linear comments/drafts, Miro projections, correction/supersession banners)  [CONVERSATION 2026-10-09 Dainius, "Ruling: approve O-1 to O-4 as recommended"]
+- FORBIDDEN without separate authority: allocating or altering D-numbers; held ledger incidents; source, tooling, behaviour/config changes; held experiments; runtime changes; freezing canon; consequential actions  [CONVERSATION 2026-10-09 Dainius, "Ruling: approve O-1 to O-4 as recommended"]
+- HELD: PRE-RAMS until the protocol is AGREED and frozen and the §20 joint items are done; R11; engineering per entry 99  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- Kai to confirm AGREED on v0.4 and prepare the freeze text (v0.4 + O-1…O-4 outcomes + F-1 + F-2) — owner: Kai  [CONVERSATION 2026-10-09 Dainius, "Ruling: approve O-1 to O-4 as recommended"]
+- D-number for this ruling: under v0.4 BANK ownership, Kai drafts the decision text, Dainius approves it, then a named recorder appends it — owner: Kai, then Dainius  [CONVERSATION 2026-10-09 Dainius, "Ruling: approve O-1 to O-4 as recommended"]
+
+### 5. Incidents and corrections
+
+- Hook behaviour: the ruling arrived without the final full stop, so the hook did not match Kai's pre-written line in entry 133 and flagged it correctly; banked by hand as planned  [CMD `cat .git/kai-ruling-capture/f887cdb200696c06.json` → flagged 2026-10-09T10:55:17Z]
+
+- EVIDENCE DAINIUS-RULING-O1-O4 dainius_o1o4.txt: 42 bytes, sha256 3addfbe69ec48768bd8cb75fb74859864b4fbba083ef1b8c69398680cf1bbb80, final LF True (final LF added by Orion; captured text has none)  [CMD `sha256sum dainius_o1o4.txt` → 3addfbe69ec48768…]
+    BEGIN-VERBATIM DAINIUS-RULING-O1-O4
+    Ruling: approve O-1 to O-4 as recommended
+    END-VERBATIM DAINIUS-RULING-O1-O4
+- EVIDENCE PROTOCOL-V0-4-SECTION-19 v04_section19.md: 1023 bytes, sha256 26384c050b5ae55e19eb564e376262951f7bbfa9726757b4d7a34b3c4cc82e60, final LF True (exact substring of v0.4 cd786753 @ 2026-10-09T06:54:37.315Z, sha256 7de4ea02…, extracted mechanically)  [CMD `sha256sum v04_section19.md` → 26384c050b5ae55e…]
+    BEGIN-VERBATIM PROTOCOL-V0-4-SECTION-19
+    ## 19. Owner decisions pending
+    
+    **O-1 — Dainius ruling authentication:** recommend direct-chat origin + verbatim preservation + bank-before-consequential-action. `Ruling:` is Orion memory capture only.
+    
+    **O-2 — Record authority during pause:** recommend narrow append/mirror authority only; no D-number/ledger/source/tooling/config/runtime/consequential mutation without separate authority. Also decide whether to **ratify commit** `fe5c813` **R20 in CLAUDE.md** as the approved standing Ohana rule; if ratified, record that this does not create general repository-mutation authority.
+    
+    **O-3 — Target top document:** recommend future frozen `KAI Kingsman Master Canon / Constitution`; current mission doctrine (`kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md`) and master-plan candidates remain inputs until freeze.
+    
+    **O-4 — Autonomy naming:** recommend `AUTONOMY_0…AUTONOMY_4` for planning, with a semantic mapping table to the existing code enum before freeze; no code rename under the pause.
+    END-VERBATIM PROTOCOL-V0-4-SECTION-19
+
+### 6. Next authorised step
+
+- Post the ruling to Kai on DAI-10; continue v1.2 read-only  [CONVERSATION 2026-10-09 Dainius, "Ruling: approve O-1 to O-4 as recommended"]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff.py check` → findings=0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
