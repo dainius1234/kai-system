@@ -63468,3 +63468,69 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
 git show ef64f49133202f79b9d6cb4d3a53365e5c7fd98a:kai-pm/HANDOFF_LOG.md   # then extract block PROTOCOL-FREEZE-CANDIDATE-31139212, strip 4-space indent, add final LF, sha256
+
+## HANDOFF 2026-10-09T11:19:27Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-09T11:19:27Z  [CMD `date -u +%FT%TZ` → 2026-10-09T11:19:27Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 5cd8f5e4dd7ed03135b88c91ddb7351db2f3599b  [CMD `git rev-parse HEAD` → 5cd8f5e4dd7ed03135b88c91ddb7351db2f3599b]
+- tree: 63983ee8d46f4f2d889cdcfb96c5e680df948154  [CMD `git rev-parse HEAD^{tree}` → 63983ee8d46f4f2d889cdcfb96c5e680df948154]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 5cd8f5e4dd7ed03135b88c91ddb7351db2f3599b  [CMD `git ls-remote --heads origin` → 5cd8f5e4dd7ed03135b88c91ddb7351db2f3599b]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 141  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 141]
+
+### 1. The four states
+
+- physical: unchanged since entry 141 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: unchanged from entry 141  [CONVERSATION 2026-10-09 Dainius relaying Kai, "I’ve now accepted his recommendation (a)"]
+- evidence: FROZEN identity sent to Kai on DAI-10 for the MIRROR OF line  [CMD `Linear save_comment DAI-10` → id 1f137225-32c4-4334-ac35-3f0c1f706584, createdAt 2026-10-09T11:19:15.712Z]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `ruling_capture.py status` → OUTSTANDING=0]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: verifying Kai's §20 cleanup; v1.2 read-only  [CONVERSATION 2026-10-09 Dainius relaying Kai, "I’ve now accepted his recommendation (a)"]
+- HELD: PRE-RAMS; R11; engineering per entry 99  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- Kai: MIRROR OF, predecessor banners, §20 cleanup, D-number draft — owner: Kai  [CMD `Linear save_comment DAI-10` → id 1f137225-32c4-4334-ac35-3f0c1f706584, createdAt 2026-10-09T11:19:15.712Z]
+
+### 5. Incidents and corrections
+
+- None  [CMD `handoff.py check` → findings=0]
+
+### 6. Next authorised step
+
+- Verify Kai's §20 cleanup when posted; v1.2 read-only meanwhile  [CONVERSATION 2026-10-09 Dainius relaying Kai, "I’ve now accepted his recommendation (a)"]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff.py check` → findings=0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
