@@ -62702,3 +62702,92 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-09T11:08:41Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-09T11:08:41Z  [CMD `date -u +%FT%TZ` → 2026-10-09T11:08:41Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 8b00c95a5d39074026339b51d71add73fcdeaa3b  [CMD `git rev-parse HEAD` → 8b00c95a5d39074026339b51d71add73fcdeaa3b]
+- tree: 3e4307a9897564c0f61ed50afb5d18743653d5e8  [CMD `git rev-parse HEAD^{tree}` → 3e4307a9897564c0f61ed50afb5d18743653d5e8]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 8b00c95a5d39074026339b51d71add73fcdeaa3b  [CMD `git ls-remote --heads origin` → 8b00c95a5d39074026339b51d71add73fcdeaa3b]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 137  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 137]
+
+### 1. The four states
+
+- physical: unchanged since entry 137 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Orion verifies Kai's protocol Freeze Candidate against agreed v0.4 (allowed changes: O-1…O-4 outcomes, R20 ratification, supersession note); v1.2 read-only continues in parallel; nothing needed from Dainius now  [CONVERSATION 2026-10-09 Dainius relaying Kai, "Orion verifies Freeze Candidate → PASS → freeze/bank protocol"]
+- evidence: Kai's sequence relayed by Dainius, preserved below  [CMD `cat .git/kai-ruling-capture/0a05167b61c9c65e.json` → flagged long(2329)]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Kai (relayed by Dainius) · 2026-10-09 · sequence: Orion verifies Freeze Candidate → PASS → freeze exact protocol bytes in GitHub (Linear/Miro become mirrors) → close old-document contradictions (Charter, Assurance Pack HP/WP, unverified research refs, superseded notices on old versions) → formal PRE-RAMS gate review → Project Quality/Assurance Plan → templates; D-number wording for O-1…O-4 to be drafted in plain English for Dainius's approval before the recorder adds it. Planning coordination, not a Dainius ruling; verbatim in section 5 ⚠ UNBANKED  [CONVERSATION 2026-10-09 Dainius relaying Kai, "Orion verifies Freeze Candidate → PASS → freeze/bank protocol"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: Freeze Candidate verification; v1.2 read-only  [CONVERSATION 2026-10-09 Dainius relaying Kai, "Orion verifies Freeze Candidate → PASS → freeze/bank protocol"]
+- HELD: committing frozen protocol bytes as a new repository file until it is clear that O-2 record authority covers it (O-2 forbids "freeze canon" and source/tooling/config changes; it permits append-only HANDOFF_LOG records); PRE-RAMS; R11; engineering  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- Where the frozen protocol bytes live: (a) verbatim in HANDOFF_LOG (clearly inside O-2), or (b) a new controlled file under kai-pm/ (needs an explicit grant, the R20 lesson). Orion will raise this with Kai before any write — owner: Kai, then Dainius if (b)  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 5. Incidents and corrections
+
+- Credential scan (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py fp_scan.json` → TOTAL HITS 0]
+- EVIDENCE KAI-FREEZE-SEQUENCE kai_freeze_plan.txt: 2355 bytes, sha256 b9996bbcf205f24d73a5857b81dc9f132f5df9883653daf3a8615413819f03f6, final LF True (added by Orion)  [CMD `sha256sum kai_freeze_plan.txt` → b9996bbcf205f24d…]
+    BEGIN-VERBATIM KAI-FREEZE-SEQUENCE
+    Right now, you don’t need to do anything. The ball is with Orion and me.
+    
+    We are at the equivalent of having agreed the procedure on site and now doing the final controlled-document check before issue.
+    
+    1. Orion verifies the Freeze Candidate against agreed v0.4. He checks that I changed only your O-1…O-4 decisions, R20 ratification and the agreed supersession note. If anything else moved, it comes back to me. I should not touch that freeze candidate meanwhile.
+    2. If Orion gives PASS, we freeze the exact protocol bytes in GitHub. That becomes the controlled master. Linear/Miro then point to it as mirrors rather than becoming competing versions.
+    3. We close the remaining old-document contradictions: Programme Governance Charter points to the new three-hierarchy model; old HP/WP wording in the Assurance Pack is corrected/superseded; old unverified research references are marked properly; old protocol versions get clear superseded notices.
+    4. We run the PRE-RAMS gate formally. Think of it like checking every prerequisite on an ITP before releasing a hold point. If every required item is evidence-backed, Kai + Orion recommend release of the PRE-RAMS HOLD. If one is missing, it stays HOLD.
+    5. Then we write the Project Quality / Assurance Plan first. This is the project-wide rulebook above individual RAMS. It defines roles, inspections, hold/witness points, NCRs, document control, evidence, LTQR, audits, requalification, etc.
+    6. Only underneath that do we create the standard RAMS / Activity Plan / ITP / ITC / HOLD / WITNESS / NCR / LTQR templates, and then apply them to actual KAI work packages.
+    
+    In parallel, Orion can continue the read-only v1.2 master-plan reconciliation—README completeness, historical features, vision, research, current repo truth—because that does not alter the system.
+    
+    One small thing will come back to you later: the permanent D-number wording for your O-1…O-4 ruling. We should draft it for you in plain English, show exactly what it records, and only after you approve the wording should the recorder add it to the decision log.
+    
+    So the immediate next milestone is very simple:
+    
+    Orion verifies Freeze Candidate → PASS → freeze/bank protocol → clean old references → PRE-RAMS gate review.
+    
+    We are not yet at RAMS writing, but we are now very close to finishing the prerequisites properly.
+    END-VERBATIM KAI-FREEZE-SEQUENCE
+
+### 6. Next authorised step
+
+- Fetch the Freeze Candidate; calibrated exact-diff against v0.4; PASS or return  [CONVERSATION 2026-10-09 Dainius relaying Kai, "Orion verifies Freeze Candidate → PASS → freeze/bank protocol"]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff.py check` → findings=0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
