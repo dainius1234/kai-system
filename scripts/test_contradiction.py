@@ -20,10 +20,31 @@ sys.path.insert(0, str(ROOT / "common"))
 # requiring the real sentence-transformers model download.
 os.environ.setdefault("MEMU_ALLOW_FAKE_EMBEDDINGS", "true")
 
+# A-05 / D375. Importing memu-core/app.py runs its module body, and that
+# body calls os.environ.setdefault("HF_HUB_OFFLINE"/"TRANSFORMERS_OFFLINE")
+# (memu-core/app.py:1052-1053, added by b5deaaa). Those two variables then
+# outlive this file and reach every test that runs after it — undeclared
+# cross-file state, which is exactly what the isolation ratchet exists to
+# refuse. The import is what this file needs; the residue is not.
+#
+# Restored rather than declared: a baseline entry would record the leak as
+# accepted debt, and this leak has no reason to be accepted. The variables
+# are still set FOR the import, so the module loads exactly as before —
+# only the process is left as it was found.
+_OFFLINE_KEYS = ("HF_HUB_OFFLINE", "TRANSFORMERS_OFFLINE")
+_offline_before = {k: os.environ.get(k) for k in _OFFLINE_KEYS}
+
 spec = importlib.util.spec_from_file_location("memu_app", ROOT / "memu-core" / "app.py")
 memu = importlib.util.module_from_spec(spec)
 sys.modules[spec.name] = memu
-spec.loader.exec_module(memu)
+try:
+    spec.loader.exec_module(memu)
+finally:
+    for _k, _v in _offline_before.items():
+        if _v is None:
+            os.environ.pop(_k, None)
+        else:
+            os.environ[_k] = _v
 
 detect_contradiction = memu.detect_contradiction
 ContradictionResult = memu.ContradictionResult

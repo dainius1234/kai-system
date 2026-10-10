@@ -1,0 +1,1238 @@
+#!/usr/bin/env python3
+"""HOUSE_H2 v1.2 — PASS A. WITNESSES, NOT BOOLEANS. NO VERDICTS.
+
+v1.1's Pass A emitted `has_sha=True`. That boolean threw away the token,
+its position, its kind and its scope -- everything a verdict would need
+in order not to over-claim -- and the verdict layer then had no choice
+but to guess. Six of the seventeen registered defects live in that one
+design decision.
+
+v1.2 emits `Witness` objects carrying the nine fields of D367 5. The
+verdict layer cannot widen them, because `envelope.conserve()` will not
+let it.
+
+WHAT IS REPAIRED HERE
+
+  D2  witness kind assumed from shape. `\\b[0-9a-f]{7,40}\\b` is not a
+      commit-shaped test: it matched 'ed25519' (an algorithm name), a
+      unix timestamp, three workflow run ids and a fragment of
+      `sha256:b5e68a3…` (a Docker digest). Kind is now DISCRIMINATED --
+      by prefix, by composition, and by RESOLUTION against the declared
+      history source -- never assumed from a character class.
+
+  D3  self-claims never checked. `last` was already in the row and was
+      never consulted. A currency claim the history contradicts now
+      produces BINDING_CONTRADICTION and cannot earn a verdict.
+
+  D4  the RUN detector could not fire. Its class `[ :#]*` admitted
+      space, colon and hash but not `*` or a backtick, so
+      `**Last run:** 31570714150` missed and the SHA pattern took the
+      digits first. RUN_ARTEFACT's population of 0 was a regex artefact
+      reported as a measurement. Discrimination is now by KIND, so
+      fixing precedence alone -- the instance -- is not what happened.
+
+  D5  the raw `present_tense` flag earned CURRENT_TREE on 7 documents,
+      0 of which carried the qualified SELF_ASSERTS_CURRENT fact. The
+      raw flag no longer exists as a verdict input at all.
+
+SCOPE IS DETERMINED, NOT ASSUMED. A witness sitting in an inline
+sentence is SPAN. Only an explicit structured binding whose subject is
+the document as a whole yields WHOLE_FILE. The binding predicates are a
+DECLARED CLOSED-WORLD SET (D367 6 / Kai's M2 ruling): declared as such,
+carrying a per-entry rationale, calibrated with known-positive and
+known-negative fixtures, and printing its own denominator. A closed-world
+list that announces itself is not the R5 defect; a list kept beside the
+thing and passed off as derived is.
+
+CYCLE 6 adds ONE further route, and it is a CONTEXTUAL one: a predicate
+that is not intrinsically document-binding may still take the document
+as its subject when the surrounding structure establishes it. That set
+is declared separately, in CONTEXTUAL_PREDICATES, and holds exactly one
+entry. Its conditions are structural and all required; see the block
+comment there for the defect it repairs.
+"""
+from __future__ import annotations
+import argparse
+import collections
+import hashlib
+import json
+import pathlib
+import re
+import subprocess
+import sys
+import typing
+
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+from envelope import Witness                                   # noqa: E402
+
+HEAD_BYTES = 6000
+
+# ── token recognisers. NONE of these decides a kind on its own ────────
+HEX = re.compile(r"\b[0-9a-f]{7,40}\b")
+DIGEST_PREFIX = re.compile(r"(?:sha256|sha512|sha1)\s*:\s*$", re.I)
+DECIMAL_RUN = re.compile(r"\b\d{8,}\b")
+# D4 REPAIRED. v1.1 admitted only [ :#], so markdown emphasis and code
+# spans defeated it. Enumerating the punctuation that may intervene is
+# how that defect was built, so the gap is defined NEGATIVELY instead:
+# anything up to 10 characters CONTAINING NO LETTERS. Emphasis, colons,
+# backticks, brackets and an ordinal ("Deployed run 1 (`…") all pass;
+# "the run took 3 seconds" does not, because the gap has letters in it.
+RUN_NEAR = re.compile(r"\brun\b(?:\s*(?:id|number))?[^A-Za-z]{0,10}$", re.I)
+RUN_URL = re.compile(r"actions/runs/\d+", re.I)
+
+DATE = re.compile(
+    r"\b20\d\d-\d\d-\d\d\b"
+    r"|\b\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)"
+    r"[a-z]*\.?,?\s+20\d\d\b"
+    r"|\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+"
+    r"\d{1,2},?\s+20\d\d\b", re.I)
+
+SUPBY = re.compile(r"superseded by\s+`?([A-Za-z0-9_./-]+\.md)`?", re.I)
+SUPES = re.compile(r"\bsupersedes\b", re.I)
+
+# ── the DECLARED CLOSED-WORLD binding predicates ──────────────────────
+# A label whose grammatical subject is THE DOCUMENT ITSELF. Declared,
+# not derived -- there is no tree to derive it from -- so it is declared
+# closed-world, carries a rationale per entry, and cal_fixtures.py holds
+# a known-negative for each family it must NOT match.
+#
+# D381 5.1 -- ONE GOVERNED REGISTRY. Every entry carries BOTH its
+# document-binding rationale AND its subject policy, because a predicate
+# is INSEPARABLE from its subject semantics. A second free-standing
+# subject map beside this one is expressly forbidden: that is a list kept
+# beside the thing it governs (R5), and it is how INC-31 survived --
+# `audited snapshot` granted whole-document APPLICABILITY while nothing
+# anywhere recorded that its SUBJECT is the audited tree, not the
+# document.
+
+# The recognised subject policies. A policy outside this set REFUSES.
+POLICY_SELF = "SELF"
+POLICY_AMBIGUOUS = "AMBIGUOUS"
+POLICY_NONSELF_GIT_COMMIT = "NONSELF_GIT_COMMIT"
+SUBJECT_POLICIES = (POLICY_SELF, POLICY_AMBIGUOUS, POLICY_NONSELF_GIT_COMMIT)
+
+
+class SubjectPolicyError(AssertionError):
+    """A binding predicate reached the producer without usable subject
+    semantics. D381 5.3: REFUSE -- never default SELF, never silently
+    default AMBIGUOUS."""
+
+
+class Binding(typing.NamedTuple):
+    rationale: str
+    subject_policy: str
+
+
+BINDING_PREDICATES = {
+    # NON-SELF. The label grants document-level APPLICABILITY and names a
+    # subject that is NOT this document. This is the INC-31 class.
+    r"audited snapshot": Binding(
+        "the document states the snapshot it audits",
+        POLICY_NONSELF_GIT_COMMIT),
+    r"findings-bearing[^:]*snapshot": Binding(
+        "the document states its findings base",
+        POLICY_NONSELF_GIT_COMMIT),
+    r"subject": Binding(
+        "the document names its measurement subject",
+        POLICY_NONSELF_GIT_COMMIT),
+    # SELF, for the CURRENTLY ADJUDICATED SOURCE FORMS. UH0_EVIDENCE_-
+    # MANIFEST.md states an immutable baseline acquired at that commit;
+    # SERVICE_IDENTITY_STATE.md states the authoritative engineering state
+    # at that checkpoint. The adjudication is of those forms, not of the
+    # words in the abstract.
+    r"acquisition commit": Binding(
+        "the document states the commit it was taken at", POLICY_SELF),
+    r"validated checkpoint": Binding(
+        "the document states its validated point", POLICY_SELF),
+    # AMBIGUOUS, EXPLICITLY AND BY RULING. Both have ZERO occurrences in
+    # the subject. A valid SHA token proves WHAT COMMIT WAS MENTIONED; it
+    # does not prove whether that commit is the document's own validity
+    # point or an external measurement target, so neither may earn SELF
+    # from the label alone. AMBIGUOUS here is a GOVERNED POLICY, not a
+    # fallback -- D381 5.3 forbids reaching it by default.
+    r"measured at": Binding(
+        "the document states its measurement point", POLICY_AMBIGUOUS),
+    r"snapshot": Binding(
+        "the document states its snapshot", POLICY_AMBIGUOUS),
+    # The DATE / current-state families. Their per-predicate governed role
+    # is unchanged: the statement is about THIS document's own date,
+    # currency, version or lifecycle point. D381 6 preserves the separate
+    # question of whether such a date ESTABLISHES VALIDITY -- being SELF
+    # is necessary there and is not sufficient.
+    r"last updated": Binding(
+        "the document states its own currency", POLICY_SELF),
+    r"last reviewed": Binding(
+        "the document states its own review point", POLICY_SELF),
+    r"reviewed": Binding(
+        "the document states its own review point", POLICY_SELF),
+    r"planning date": Binding(
+        "the document states its own authoring date", POLICY_SELF),
+    r"date": Binding(
+        "the document states its own date", POLICY_SELF),
+    r"version": Binding(
+        "the document states its own version point", POLICY_SELF),
+    # CYCLE 4. Document-lifecycle predicates, source-confirmed in the
+    # accepted regression set. Same declared closed-world standing and
+    # the same form of rationale as the entries above.
+    r"created": Binding(
+        "the document states its own creation point", POLICY_SELF),
+    r"generated": Binding(
+        "the document states its own generation point", POLICY_SELF),
+    r"opened": Binding(
+        "the document states when it was opened", POLICY_SELF),
+    r"updated": Binding(
+        "the document states its own currency", POLICY_SELF),
+    r"finali[sz]ed": Binding(
+        "the document states its own completion point", POLICY_SELF),
+    r"report completed": Binding(
+        "the document states its own completion point", POLICY_SELF),
+    r"(?:log|register) started": Binding(
+        "the document states when its record began", POLICY_SELF),
+    r"started": Binding(
+        "the document states when its record began", POLICY_SELF),
+    r"prepared": Binding(
+        "the document states its own preparation point", POLICY_SELF),
+    r"review date": Binding(
+        "the document states its own review point", POLICY_SELF),
+    r"sent": Binding(
+        "the document states when it was sent", POLICY_SELF),
+    r"written": Binding(
+        "the document states when it was written", POLICY_SELF),
+    r"agreed": Binding(
+        "the document states when it was agreed", POLICY_SELF),
+}
+
+
+def validate_registry(registry=None):
+    """D381 5.3, enforced AT IMPORT and re-runnable as a control.
+
+    > No binding predicate may exist in the governed registry without an
+    > explicit recognised subject policy / resolver.
+
+    Missing policy, unknown policy or a malformed entry REFUSES. There is
+    no default SELF and no silent default to AMBIGUOUS -- AMBIGUOUS is a
+    governed policy that an entry must CLAIM.
+    """
+    reg = BINDING_PREDICATES if registry is None else registry
+    for pattern, entry in reg.items():
+        if not isinstance(entry, Binding):
+            raise SubjectPolicyError(
+                f"binding predicate {pattern!r} carries {entry!r}, not a "
+                f"Binding(rationale, subject_policy). A predicate added "
+                f"without its subject semantics is REFUSED (D381 5.3/5.4).")
+        if not entry.rationale:
+            raise SubjectPolicyError(
+                f"binding predicate {pattern!r} has no rationale")
+        if entry.subject_policy not in SUBJECT_POLICIES:
+            raise SubjectPolicyError(
+                f"binding predicate {pattern!r} has subject policy "
+                f"{entry.subject_policy!r}, which is not one of "
+                f"{SUBJECT_POLICIES}. REFUSED — no default is applied.")
+    return len(reg)
+
+
+validate_registry()
+# The POSITIVE semantic authority for INPUT 3 at document root. Cycle 3
+# declared these predicates document-binding and then rejected several of
+# them through ARTEFACT_LABEL because their VALUES are artefacts --
+# "audited snapshot" was declared binding and refused for containing the
+# word "snapshot". That contradiction was the cycle-3 root cause.
+# ARTEFACT_LABEL is removed. The question is whether the field defines the
+# document's own provenance or scope, not whether the label names an
+# artefact.
+DOC_BINDING = re.compile(r"^(?:" + "|".join(BINDING_PREDICATES) + r")$", re.I)
+# A structured binding is LABEL, optional markdown emphasis, then a
+# colon, at the START OF A LINE. The requirement is structural-semantic
+# (a labelled field whose subject is the document), not "must be in the
+# first N lines" -- a header-layout rule would be a different defect
+# wearing the same clothes.
+BINDING_LINE = re.compile(
+    r"^\s{0,3}[>\-*|]?\s*[*_`]{0,2}\s*(" +
+    "|".join(BINDING_PREDICATES) + r")\s*[*_`]{0,2}\s*:", re.I)
+
+
+# ── M3 scope derivation: the four authorised inputs ───────────────────
+# Rev4: WHOLE_FILE requires BOTH a structural document-level binding AND
+# subject = the document as a whole. Detector is NOT an input.
+
+TABLE_ROW = re.compile(r"^\s{0,3}\|")
+H1 = re.compile(r"^#[^#]", re.M)
+SECTION = re.compile(r"^#{2,}\s", re.M)
+# A bounded parenthetical qualifier is part of the label, not a new
+# predicate: "Last updated (UTC):" is the same field as "Last updated:".
+LABEL_LINE = re.compile(r"^\s{0,3}>?\s*(?:[-*+]\s+)?[*_`]{0,2}\s*"
+                        r"([A-Za-z][A-Za-z0-9 ._/-]{0,40}?"
+                        r"(?:\s*\([^)]{0,20}\))?)"
+                        r"\s*[*_`]{0,2}\s*:[*_`]{0,2}\s")
+QUALIFIER = re.compile(r"\s*\([^)]*\)")
+SELF_SUBJECT = re.compile(
+    r"\bthis\s+(?:document|file|register|tracker|log|report|plan|brief|"
+    r"note|index|census|audit|spec|specification|record|policy|guide)\b",
+    re.I)
+# A root LIFECYCLE DATELINE carries the same meaning as a labelled field
+# without the colon: "Sent 2026-08-07", "Written 2026-08-07", "Agreed
+# with the operator on 2026-08-07", "Closed 2026-08-12". Bounded like
+# RUN_NEAR: the verb must sit within 40 characters before the witness and
+# in the same clause, so a date in ordinary prose does not qualify.
+ROOT_LIFECYCLE = re.compile(
+    r"\b(?:sent|written|agreed|closed|prepared|published|issued|completed|"
+    r"finali[sz]ed|recorded|measured|started|opened|created|generated|"
+    r"drafted|updated|reviewed)\b[^.;]{0,40}$", re.I)
+# A bare leading date IS the document's dateline when it opens the line
+# at root.
+# A bare leading date IS the document's dateline when it opens a root
+# line. CYCLE 5: this route is now restricted to the DATE detector.
+# Cycle 4 required only that nothing precede the witness on its line, so
+# a wrapped continuation of a run list --
+#   "31568526480 / `189500b`."
+# in EMBEDDING_BACKEND_STATE L16 -- promoted a RUN ID as though it were a
+# dateline. The defect was DETECTOR-CLASS LEAKAGE, not position: a
+# genuine dateline may legitimately follow other root metadata, so the
+# repair is to the detector class and not to the line's ordinal.
+BARE_DATELINE = re.compile(r"^\s{0,3}>?\s*[*_`]{0,2}\s*$")
+DATELINE_DETECTORS = ("DATE",)
+
+# ── CYCLE 6. CONTEXT-DEPENDENT DOCUMENT METADATA ──────────────────────
+# THE ROOT DEFECT REPAIRED HERE. Cycle 5 read a generic label as a
+# TERMINAL VETO -- `if not DOC_BINDING.match(lab): return "SPAN"` -- so
+# once a label failed the intrinsic test no further evidence could be
+# considered, however strong. That is a category error: the absence of
+# INTRINSIC document-binding evidence is not PROOF OF LOCAL SCOPE. The
+# veto is now a failed conjunct, and the remaining authorised evidence is
+# examined. That is the repair; the class below is what the repair lets
+# through, and nothing else is admitted by it.
+#
+# `Status` is neither intrinsically document-binding nor intrinsically
+# local. Under a task heading it is the task's status. In a document's
+# own root metadata block, beside a field that has ALREADY earned
+# document binding on its own terms, its subject is the document.
+#
+# IT IS DELIBERATELY NOT IN BINDING_PREDICATES. Adding it there would
+# promote every root `Status:` on label authority alone -- the same
+# defect in the opposite direction. `status` is the ONLY contextual
+# predicate; Owner, Purpose and Branch are NOT admitted.
+CONTEXTUAL_PREDICATES = {
+    "status": "document-level state, and ONLY inside the root metadata "
+              "block of a document that has independently earned an "
+              "intrinsic document-binding field",
+}
+# A root metadata line begins the line itself, with nothing but markdown
+# emphasis before the label. A bullet, a blockquote marker or leading
+# indentation introduces an ENTRY, and the entry is then a nearer subject
+# than the document (condition 4).
+ROOT_METADATA_LINE = re.compile(r"^[*_`]{0,2}[A-Za-z]")
+# Condition 5. The statement must describe the DOCUMENT's state, not an
+# artefact or a person it mentions. A handle, a link, a quoted
+# identifier, a named file or an issue reference in the value IS a
+# nearer subject. This test fails CLOSED -- toward SPAN, the pre-cycle-6
+# answer -- because an over-narrow contextual class costs a missed
+# promotion, while an over-broad one manufactures WHOLE_FILE.
+EMBEDDED_SUBJECT = re.compile(
+    r"@[A-Za-z0-9_-]+"
+    r"|\[[^\]]*\]\([^)]*\)"
+    r"|`[^`]*`"
+    r"|\b[\w./-]+\.(?:md|py|ya?ml|json|tsv|txt|sh|toml)\b"
+    r"|#\d+", re.I)
+
+
+def _preamble_end(text):
+    m = SECTION.search(text)
+    return m.start() if m else len(text)
+
+
+def _label_of(before):
+    """The normalised predicate of a labelled field, or None."""
+    m = LABEL_LINE.match(before)
+    if not m:
+        return None
+    return QUALIFIER.sub("", m.group(1)).strip().lower()
+
+
+def _label_hits(text, lab):
+    """INPUT 2's denominator: how many non-table lines carry this label."""
+    return sum(1 for ln in text.split("\n")
+               if not TABLE_ROW.match(ln) and _label_of(ln) == lab)
+
+
+def _block_of(text, ls):
+    """The contiguous non-blank block holding the line at offset `ls`.
+
+    Returns (lines, index of that line within them). Contiguity is the
+    structural expression of 'the same root metadata block': a blank line
+    ends the block, so a field further down the preamble is not a
+    neighbour.
+    """
+    lines = text.split("\n")
+    starts, off = [], 0
+    for ln in lines:
+        starts.append(off)
+        off += len(ln) + 1
+    i = max(k for k, s in enumerate(starts) if s <= ls)
+    a = i
+    while a > 0 and lines[a - 1].strip():
+        a -= 1
+    b = i
+    while b + 1 < len(lines) and lines[b + 1].strip():
+        b += 1
+    return lines[a:b + 1], i - a
+
+
+def _earned_binding_anchor(text, block, skip):
+    """A block member that earns document binding on its OWN terms.
+
+    Condition 3, and the word doing the work is INDEPENDENTLY: the
+    anchor must be an intrinsic BINDING_PREDICATES field that would
+    itself return WHOLE_FILE -- including INPUT 2's uniqueness test. A
+    repeated per-entry stamp is not an anchor, so anchor existence alone
+    cannot be borrowed by an arbitrary neighbour.
+    """
+    for k, ln in enumerate(block):
+        if k == skip:
+            continue
+        lab = _label_of(ln)
+        if lab is None or not DOC_BINDING.match(lab):
+            continue
+        if _label_hits(text, lab) <= 1:
+            return lab, ln
+    return None
+
+
+def _contextual_document_metadata(text, ls, lab, line):
+    """The five structural conditions, ALL required. Any one absent and
+    the answer stays SPAN.
+
+    1  root / pre-H2          -- established by the caller before this runs
+    2  not a table row        -- established by the caller before this runs
+    3  same contiguous root metadata block as an independently earned
+       intrinsic document-binding field
+    4  no nearer section, entry or register subject
+    5  the statement describes document-level state
+    """
+    if lab not in CONTEXTUAL_PREDICATES:
+        return False
+    if not ROOT_METADATA_LINE.match(line):          # 4: it is an entry
+        return False
+    block, idx = _block_of(text, ls)
+    # 4 again: prose, a heading, a table row or a list entry sharing the
+    # block means the block is not a root metadata block at all.
+    if any(_label_of(ln) is None or not ROOT_METADATA_LINE.match(ln)
+           for ln in block):
+        return False
+    if _earned_binding_anchor(text, block, idx) is None:    # 3
+        return False
+    _, _, value = line.partition(":")
+    return not EMBEDDED_SUBJECT.search(value)               # 5
+
+
+# ── D381 7: THE SEVEN WHOLE_FILE PRODUCER ROUTES, NAMED ───────────────
+# SIX are decided here in _route_of; the seventh, R7_SUPERSEDED_BY, is
+# hard-coded WHOLE_FILE in scan() and never reaches this function.
+#
+# In BOTH measured populations exactly ONE fires: R3. R1, R2, R4, R5, R6
+# and R7 produce ZERO witnesses -- which is why each needs explicit
+# subject semantics and hostile coverage rather than an assumption. R8:
+# never-executed code is where the defects are, and a dormant route is
+# not exempt because it is dormant.
+ROUTE_R1_H1 = "R1_H1"
+ROUTE_R2_SELF_SUBJECT = "R2_SELF_SUBJECT"
+ROUTE_R3_LABELLED = "R3_LABELLED"
+ROUTE_R4_CONTEXTUAL = "R4_CONTEXTUAL"
+ROUTE_R5_ROOT_LIFECYCLE = "R5_ROOT_LIFECYCLE"
+ROUTE_R6_BARE_DATELINE = "R6_BARE_DATELINE"
+ROUTE_R7_SUPERSEDED_BY = "R7_SUPERSEDED_BY"
+# Non-promoting routes. They return SPAN, and they still need an explicit
+# subject answer, because "this witness did not earn document scope" is
+# not the same statement as "this witness is about the document".
+ROUTE_TABLE_ROW = "TABLE_ROW"
+ROUTE_IN_SECTION = "IN_SECTION"
+ROUTE_LABELLED_REPEATED = "LABELLED_REPEATED"
+ROUTE_LABELLED_UNBOUND = "LABELLED_UNBOUND"
+ROUTE_UNLABELLED = "UNLABELLED"
+
+# The subject policy of each route, for a witness NO governed binding
+# predicate labels. EXPLICIT AND TOTAL -- a route missing from this table
+# REFUSES rather than inheriting anything.
+ROUTE_SUBJECT_POLICY = {
+    # D381 7: scope may be WHOLE_FILE, but the subject is NOT
+    # automatically SELF merely because the token sits in the H1. Fail
+    # closed unless SELF is earned some other way.
+    ROUTE_R1_H1: POLICY_AMBIGUOUS,
+    # the matched statement mechanically establishes SELF ("this document")
+    ROUTE_R2_SELF_SUBJECT: POLICY_SELF,
+    # decided by the registry; present here only for totality
+    ROUTE_R3_LABELLED: POLICY_AMBIGUOUS,
+    ROUTE_LABELLED_REPEATED: POLICY_AMBIGUOUS,
+    # the five contextual conditions already establish DOCUMENT-LEVEL STATE
+    ROUTE_R4_CONTEXTUAL: POLICY_SELF,
+    ROUTE_R5_ROOT_LIFECYCLE: POLICY_SELF,
+    ROUTE_R6_BARE_DATELINE: POLICY_SELF,
+    ROUTE_R7_SUPERSEDED_BY: POLICY_SELF,
+    # no governed predicate spoke for these, so no subject was established
+    ROUTE_TABLE_ROW: POLICY_AMBIGUOUS,
+    ROUTE_IN_SECTION: POLICY_AMBIGUOUS,
+    ROUTE_LABELLED_UNBOUND: POLICY_AMBIGUOUS,
+    ROUTE_UNLABELLED: POLICY_AMBIGUOUS,
+}
+
+
+def _route_of(text, start, detector=None):
+    """(scope, route, label) -- the Rev4 decision, with its ROUTE named.
+
+    THE SCOPE ANSWER IS BIT-FOR-BIT THE PRE-D381 ONE. The body below is
+    the previous `_scope_of` with a route label attached to each return;
+    no condition, no order and no threshold moved. D381 20.3 requires
+    that the subject repair leave `_eligible`/`_scope_of` membership
+    unchanged, so the scope decision is deliberately not touched here.
+    """
+    ls = text.rfind("\n", 0, start) + 1
+    le = text.find("\n", start)
+    line = text[ls:le if le >= 0 else len(text)]
+    before = text[ls:start]
+
+    # INPUT 4. A table row's subject is the row.
+    if TABLE_ROW.match(line):
+        return "SPAN", ROUTE_TABLE_ROW, None
+    # INPUT 1. Inside an H2+ section the section is a nearer subject.
+    if ls >= _preamble_end(text):
+        return "SPAN", ROUTE_IN_SECTION, _label_of(before)
+
+    # ---- document root ----
+    m1 = H1.search(text)
+    if m1 and m1.start() == ls:                 # the document names itself
+        return "WHOLE_FILE", ROUTE_R1_H1, None
+    if SELF_SUBJECT.search(line):               # INPUT 3, explicit
+        return "WHOLE_FILE", ROUTE_R2_SELF_SUBJECT, None
+
+    lab = _label_of(before)
+    if lab is not None:
+        # INPUT 3. A root label promotes ONLY on positive document-binding
+        # authority. A generic unique label proves nothing about subject.
+        if DOC_BINDING.match(lab):
+            # INPUT 2, and only now: one document-level field, or a
+            # repeated per-entry stamp?
+            if _label_hits(text, lab) <= 1:
+                return "WHOLE_FILE", ROUTE_R3_LABELLED, lab
+            return "SPAN", ROUTE_LABELLED_REPEATED, lab
+        # CYCLE 6. Failing the INTRINSIC test is a failed conjunct, NOT a
+        # terminal veto. Absence of intrinsic document-binding evidence is
+        # not proof of local scope, so the remaining authorised evidence is
+        # examined -- and for a labelled field that evidence is exactly one
+        # class, the contextual root metadata class above.
+        #
+        # It deliberately does NOT fall through to the label-free routes
+        # below. ROOT_LIFECYCLE and BARE_DATELINE read the text BEFORE the
+        # witness as an unlabelled dateline; a labelled field has already
+        # declared its own predicate, and letting it reach those routes
+        # would widen the repair past the class Kai demonstrated.
+        if _contextual_document_metadata(text, ls, lab, line):
+            return "WHOLE_FILE", ROUTE_R4_CONTEXTUAL, lab
+        return "SPAN", ROUTE_LABELLED_UNBOUND, lab
+
+    # INPUT 3 without a colon: a root lifecycle dateline.
+    if ROOT_LIFECYCLE.search(before):
+        return "WHOLE_FILE", ROUTE_R5_ROOT_LIFECYCLE, None
+    if BARE_DATELINE.match(before) and detector in DATELINE_DETECTORS:
+        return "WHOLE_FILE", ROUTE_R6_BARE_DATELINE, None
+
+    return "SPAN", ROUTE_UNLABELLED, None
+
+
+def _scope_of(text, start, detector=None):
+    """WHOLE_FILE iff BOTH conjuncts of the Rev4 rule hold, derived
+    separately. Uniqueness (INPUT 2) never promotes on its own.
+
+    `detector` gates the bare-dateline route only (cycle 5). It is NOT a
+    scope input anywhere else: Rev4 excludes it, and every other route
+    here decides on structure and subject alone.
+
+    The signature and the answer are UNCHANGED by D381. Eight files under
+    build_evidence/ call this with (head, offset, detector) and several
+    compare its output against committed pre-repair bytes; it stays a
+    pure scope predicate so those comparisons keep meaning what they meant.
+    """
+    return _route_of(text, start, detector)[0]
+
+
+def registry_lookup(label):
+    """The governed Binding for `label`, or None if no binding predicate
+    claims it.
+
+    FAILS CLOSED ON AMBIGUITY. If two declared patterns both fullmatch a
+    label the registry does not speak with one voice about that label, and
+    guessing which entry wins would be the defect this registry exists to
+    prevent.
+    """
+    if label is None:
+        return None
+    hits = [(p, e) for p, e in BINDING_PREDICATES.items()
+            if re.fullmatch(p, label, re.I)]
+    if not hits:
+        return None
+    if len(hits) > 1:
+        raise SubjectPolicyError(
+            f"label {label!r} is claimed by {len(hits)} binding predicates "
+            f"{[p for p, _ in hits]} — REFUSED. The governed registry must "
+            f"give one answer per label (D381 5.1).")
+    return hits[0][1]
+
+
+def _apply_policy(policy, *, resolve=None):
+    """A governed subject policy -> a grammar-valid subject string.
+
+    `resolve` is a zero-argument callable returning the FULL 40-hex commit
+    the witness token names, or None. It is a callable rather than a value
+    so the declared history source is consulted ONLY on the one policy
+    that needs it -- a SELF-policy date must not cost a subprocess.
+
+    NONSELF_GIT_COMMIT needs the full commit to name its subject in the
+    closed grammar. Where the token is abbreviated, or the declared
+    history source could not resolve it, the honest answer is AMBIGUOUS:
+    we know the subject is not this document, and we cannot name it. It
+    still cannot earn a SELF-gated verdict, so failing closed here costs
+    precision in the trace and nothing in the verdict.
+    """
+    if policy == POLICY_SELF:
+        return "SELF"
+    if policy == POLICY_AMBIGUOUS:
+        return "AMBIGUOUS"
+    if policy == POLICY_NONSELF_GIT_COMMIT:
+        resolved = resolve() if resolve is not None else None
+        if resolved and re.fullmatch(r"[0-9a-f]{40}", resolved):
+            return f"OTHER:GIT_COMMIT:{resolved}"
+        return "AMBIGUOUS"
+    raise SubjectPolicyError(
+        f"subject policy {policy!r} is not recognised — REFUSED. No "
+        f"default SELF and no silent default AMBIGUOUS (D381 5.3).")
+
+
+def _subject_of(text, start, detector=None, *, resolve=None):
+    """THE SEMANTIC SUBJECT of a witness at `start`. D381 5.
+
+    Determined ONCE, here, at the governed producer boundary, from the
+    source context -- never re-derived downstream (D381 5.5).
+
+    A GOVERNED BINDING PREDICATE DECIDES WHEREVER ONE LABELS THE WITNESS,
+    at any scope. That is deliberate and it is not the same question as
+    scope: an `**Audited snapshot:**` field inside an H2 section does not
+    earn document-level APPLICABILITY, but its SUBJECT is still the
+    audited tree. Only where no governed predicate speaks does the
+    producing route answer.
+    """
+    _scope, route, label = _route_of(text, start, detector)
+    entry = registry_lookup(label)
+    if entry is not None:
+        return _apply_policy(entry.subject_policy, resolve=resolve)
+    if route not in ROUTE_SUBJECT_POLICY:
+        raise SubjectPolicyError(
+            f"route {route!r} has no declared subject policy — REFUSED.")
+    return _apply_policy(ROUTE_SUBJECT_POLICY[route], resolve=resolve)
+
+
+def full_commit(history_repo, token):
+    """The full 40-hex commit a token names, or None.
+
+    Separate from `classify_token_kind` on purpose: that function's
+    contract (kind, is_commit) is consumed by cal_fixtures and by the
+    committed control files, and widening its arity would change a
+    surface D381 did not open. This only ever runs for a token the same
+    declared history source has ALREADY resolved as a commit.
+    """
+    r = git(history_repo, "rev-parse", "--verify", f"{token}^{{commit}}")
+    if r.returncode != 0:
+        return None
+    out = r.stdout.strip()
+    return out if re.fullmatch(r"[0-9a-f]{40}", out) else None
+
+
+def git(repo, *a):
+    return subprocess.run(["git", *a], cwd=str(repo),
+                          capture_output=True, text=True)
+
+
+def _selector(text, start, end=None):
+    line = text[:start].count("\n") + 1
+    if end is None:
+        return f"L{line}"
+    last = text[:end].count("\n") + 1
+    return f"L{line}" if last == line else f"L{line}-L{last}"
+
+
+def _context(text, start, end):
+    """The COMPLETE logical source line(s) the witness sits in. No cap.
+
+    D367 5: "local_context -- surrounding text sufficient to judge the
+    match", and "SILENT TRUNCATION IS FORBIDDEN. The evidence actually
+    responsible for the emitted cell must always be recoverable ...
+    without guessing which source fragment mattered."
+
+    v1.2 took `line[:200]` -- the first 200 characters OF THE LINE,
+    wherever the match sat. A long line with a late match shipped a
+    context that did not contain the witness at all: 40 clipped contexts,
+    of which 10 (every one a TECH_WATCH DATE row) lacked their own
+    `witness_value`, all declaring `truncated=False`.
+
+    A centred 200-character budget was the first repair. It proved
+    PRESENCE but not COMPLETENESS, so it left silent truncation in place
+    at the line's edges. THE CAP IS NOW GONE.
+
+    There is deliberately no tenth field and no reuse of `truncated`.
+    `truncated` is bound by envelope.py to `evidence_shown <
+    evidence_total` -- a row-count property -- and context clipping is a
+    different truncation wearing the same word. Carrying the complete
+    line dissolves the collision instead of encoding it. Where a source
+    region is genuinely too large to carry inline, D367 5's authorised
+    alternative is a stable selector plus a hash-bound sidecar -- never a
+    silent clip.
+    """
+    ls = text.rfind("\n", 0, start) + 1
+    le = text.find("\n", end)
+    return text[ls:le if le >= 0 else len(text)].strip()
+
+
+def classify_token_kind(text, m, history_repo, subject):
+    """D2: DISCRIMINATE the kind. Never assume it from the character class.
+
+    Order is by DISCRIMINATING EVIDENCE, not by rule precedence -- fixing
+    RUN-before-SHA would have been the instance, not the class.
+    """
+    tok = m.group(0)
+    before = text[max(0, m.start() - 24):m.start()]
+    window = text[max(0, m.start() - 24):m.end()]
+
+    if DIGEST_PREFIX.search(before):
+        return "DIGEST_FRAGMENT", False        # sha256:b5e68a3… is not a commit
+    if RUN_NEAR.search(before) or RUN_URL.search(window):
+        return "RUN_ID", False
+    if tok.isdigit():
+        return "DECIMAL_TOKEN", False          # 1700000000 is a timestamp
+    # the only positive commit test: does it RESOLVE in the declared
+    # history source? 'ed25519' does not, and neither does a digest.
+    resolved = git(history_repo, "cat-file", "-e",
+                   f"{tok}^{{commit}}").returncode == 0
+    if resolved:
+        return "COMMIT", True
+    return "HEX_SHAPED_UNRESOLVED", False
+
+
+def _eligible(m):
+    """D14 / A5-ii, START-BOUND. The boundary decides WHICH TOKENS ARE
+    ELIGIBLE; it must never decide WHAT AN ELIGIBLE TOKEN IS.
+
+    v1.2 matched against `text[:HEAD_BYTES]`, so a token straddling the
+    boundary was recognised in its cut form: 76dbba4... was emitted as a
+    29-character prefix with `truncated=False` (D14-A), and a token cut
+    below the recogniser's 7-character minimum vanished entirely (D14-B).
+    The character index was deciding what a token *was*.
+
+    Recognition now runs against the COMPLETE source and admission is by
+    the frozen start predicate alone. `token_end` MAY exceed HEAD_BYTES.
+    A token whose START is at or beyond the boundary is NOT admitted
+    merely because the scanner can now see it -- that would be A5-i,
+    which was rejected at a measured 491 -> ~1973 records.
+
+    This is not a larger HEAD_BYTES and not a guessed extension margin.
+    """
+    return m.start() < HEAD_BYTES
+
+
+def scan(path, text, history_repo, subject):
+    """Every witness whose token STARTS in the head window, carried whole.
+    NO verdict is formed here.
+
+    `head` survives for ONE purpose: _scope_of's uniqueness universe. Its
+    denominator is deliberately left unchanged here, because moving it is
+    an M3 decision (step 2) and step 1 may not shift applicability scope.
+    """
+    head = text[:HEAD_BYTES]
+    out = collections.defaultdict(list)
+
+    for m in HEX.finditer(text):
+        if not _eligible(m):
+            continue
+        kind, is_commit = classify_token_kind(text, m, history_repo, subject)
+        tok = m.group(0)
+        out["COMMIT" if is_commit else kind].append(Witness(
+            witness_type=kind, witness_value=tok, source_path=path,
+            source_selector=_selector(text, m.start()),
+            local_context=_context(text, m.start(), m.end()),
+            applicability_scope=_scope_of(head, m.start(), "HEX"),
+            subject=_subject_of(
+                head, m.start(), "HEX",
+                resolve=(lambda t=tok: full_commit(history_repo, t))
+                if is_commit else None),
+            evidence_total=1, evidence_shown=1, truncated=False,
+            polarity="POSITIVE", certainty="VERIFIED" if is_commit else "OBSERVED"))
+
+    for m in DECIMAL_RUN.finditer(text):
+        if not _eligible(m):
+            continue
+        before = text[max(0, m.start() - 24):m.start()]
+        window = text[max(0, m.start() - 24):m.end()]
+        if not (RUN_NEAR.search(before) or RUN_URL.search(window)):
+            continue
+        out["RUN_ID"].append(Witness(
+            witness_type="RUN_ID", witness_value=m.group(0), source_path=path,
+            source_selector=_selector(text, m.start()),
+            local_context=_context(text, m.start(), m.end()),
+            applicability_scope=_scope_of(head, m.start(), "DECIMAL_RUN"),
+            subject=_subject_of(head, m.start(), "DECIMAL_RUN"),
+            evidence_total=1, evidence_shown=1, truncated=False,
+            polarity="POSITIVE", certainty="OBSERVED"))
+
+    for m in DATE.finditer(text):
+        if not _eligible(m):
+            continue
+        out["DATE"].append(Witness(
+            witness_type="DATE_STAMP", witness_value=m.group(0),
+            source_path=path, source_selector=_selector(text, m.start()),
+            local_context=_context(text, m.start(), m.end()),
+            applicability_scope=_scope_of(head, m.start(), "DATE"),
+            subject=_subject_of(head, m.start(), "DATE"),
+            evidence_total=1, evidence_shown=1, truncated=False,
+            polarity="POSITIVE", certainty="OBSERVED"))
+
+    m = next((x for x in SUPBY.finditer(text) if _eligible(x)), None)
+    if m:
+        out["SUPERSEDED_BY"].append(Witness(
+            witness_type="NAMED_SUCCESSOR", witness_value=m.group(1),
+            source_path=path, source_selector=_selector(text, m.start()),
+            local_context=_context(text, m.start(), m.end()),
+            applicability_scope="WHOLE_FILE",   # supersession is file-level
+            # R7, the seventh WHOLE_FILE producer route and the only one
+            # decided outside _route_of. Its subject is SELF: the witness
+            # concerns THIS document's own successor relation, not the
+            # successor document. D381 7 requires it to say so explicitly
+            # rather than inherit SELF from a dataclass default, exactly
+            # as the six routes in _route_of now do.
+            subject=_apply_policy(ROUTE_SUBJECT_POLICY[ROUTE_R7_SUPERSEDED_BY]),
+            evidence_total=1, evidence_shown=1, truncated=False,
+            polarity="POSITIVE", certainty="OBSERVED"))
+    return dict(out)
+
+
+# ── S1: THE SOURCE-BINDING GATE ───────────────────────────────────────
+# Pass A enumerates from git and reads BYTES FROM THE WORKING FILESYSTEM.
+# That is correct only while the tree matches the frozen subject, and
+# nothing established or checked it. A dirty tree produced a full result
+# file, rc=0, with witnesses taken from uncommitted bytes and stamped
+# with the subject's identity -- demonstrated, not argued.
+#
+# THE GATE LIVES HERE, AT THE MEASUREMENT BOUNDARY, NOT AT THE ENTRYPOINT.
+# main() already asserted HEAD == subject, but build() is importable and
+# the caller census found live callers outside the CLI. An invariant
+# enforced at one entrypoint is not an invariant. Every CLI run passes
+# through build() too, so one gate here covers both.
+#
+# NO ENUMERATION AND NO FILESYSTEM READ MAY PRECEDE IT. Everything the
+# gate itself consults is a GIT OBJECT read.
+CLEAN_TREE_CMD = ("status", "--porcelain=v1", "--untracked-files=all")
+GIT_SYMLINK_MODE = "120000"
+
+
+def _source_binding_gate(subject_repo, subject):
+    """Establish source binding or REFUSE TO MEASURE (R11).
+
+    THREE PREREQUISITES, each failing closed with its own name.
+
+    1 SUBJECT IDENTITY. HEAD must be the frozen subject. Analysing a
+      non-HEAD subject is NOT SUPPORTED and must refuse rather than
+      silently analyse whatever HEAD happens to hold. That is a current
+      capability limit, not a permanent rule.
+
+    2 WORKTREE SOURCE IDENTITY. The abort fires on TRACKED divergence --
+      modification, staged modification, rename, deletion. UNTRACKED
+      FILES ARE RECORDED AND DO NOT ABORT, and the reason is measurable
+      rather than assumed: every byte Pass A reads comes from a path
+      enumerated by `git ls-tree`, so an untracked file is never opened
+      and cannot affect source identity. `--untracked-files=all` is used
+      anyway so the count travels with the evidence instead of being
+      invisible. Claiming untracked files corrupt the measurement would
+      be a wider claim than the reader population supports.
+
+    3 TRACKED SYMLINKS. Rejected on GIT MODE, read from the tree, BEFORE
+      any path is touched. git stores a symlink as a blob whose content
+      is the target PATH; a filesystem read FOLLOWS it instead and can
+      ingest bytes the commit does not contain -- including bytes from
+      outside the repository entirely. Asking Path.is_symlink() after
+      the fact would already have touched the filesystem.
+      THE CHECK IS DELIBERATELY OVER-APPROXIMATE: it rejects a tracked
+      symlink ANYWHERE in the subject, not only in the analysed subset.
+      Computing the exact analysed subset here would restate opscan's
+      population rules in a second place, and a rule kept beside the
+      thing it governs is the R5 defect. A superset cannot miss one; its
+      only cost is refusing a subject whose symlinks are never read.
+
+    Returns the evidence of what was checked, so the record carries the
+    exact command rather than a claim about it.
+    """
+    head = git(subject_repo, "rev-parse", "HEAD").stdout.strip()
+    if head != subject:
+        raise SystemExit(
+            f"R11 ABORT [SOURCE BINDING / SUBJECT IDENTITY]: repository HEAD "
+            f"{head[:12]} != frozen subject {subject[:12]}. Pass A reads "
+            f"bytes from the working tree, so it can only measure a subject "
+            f"that is checked out. Analysing a non-HEAD subject is not "
+            f"supported. Refusing to measure.")
+
+    st = git(subject_repo, *CLEAN_TREE_CMD).stdout
+    lines = [ln for ln in st.split("\n") if ln.strip()]
+    tracked_changes = [ln for ln in lines if not ln.startswith("??")]
+    untracked = [ln for ln in lines if ln.startswith("??")]
+    if tracked_changes:
+        shown = "; ".join(ln.strip() for ln in tracked_changes[:8])
+        raise SystemExit(
+            f"R11 ABORT [SOURCE BINDING / WORKTREE IDENTITY]: "
+            f"{len(tracked_changes)} tracked path(s) diverge from the frozen "
+            f"subject. Pass A would read the WORKING TREE bytes and stamp "
+            f"them with the subject's identity. "
+            f"`git {' '.join(CLEAN_TREE_CMD)}` reports: {shown}"
+            f"{' …' if len(tracked_changes) > 8 else ''}. Refusing to measure.")
+
+    links = []
+    for ln in git(subject_repo, "ls-tree", "-r", subject).stdout.split("\n"):
+        if not ln.strip():
+            continue
+        meta, _, path = ln.partition("\t")
+        if meta.split()[0] == GIT_SYMLINK_MODE:
+            links.append(path)
+    if links:
+        raise SystemExit(
+            f"R11 ABORT [SOURCE BINDING / TRACKED SYMLINK]: "
+            f"{len(links)} tracked symlink(s) in the frozen subject: "
+            f"{', '.join(links[:8])}{' …' if len(links) > 8 else ''}. "
+            f"git stores a symlink as a blob holding its TARGET PATH, and a "
+            f"filesystem read follows it instead, so the bytes analysed "
+            f"need not be represented by the subject at all. This candidate "
+            f"neither follows nor resolves them. Refusing to measure.")
+
+    return {"gate": "S1_SOURCE_BINDING",
+            "subject_identity": {"head": head, "subject": subject,
+                                 "equal": True},
+            "worktree_identity": {
+                "command": "git " + " ".join(CLEAN_TREE_CMD),
+                "git_version": git(subject_repo, "--version").stdout.strip(),
+                "tracked_divergences": 0,
+                "untracked_paths_recorded": len(untracked),
+                "untracked_abort": False,
+                "untracked_rationale":
+                    "every byte Pass A reads comes from a git-enumerated "
+                    "tracked path, so an untracked file is never opened"},
+            "tracked_symlinks": {"policy": "P1_REJECT",
+                                 "git_mode": GIT_SYMLINK_MODE,
+                                 "found": 0}}
+
+
+# ── S1 TOCTOU: CONSUMPTION-TIME SOURCE-IDENTITY VERIFICATION ──────────
+# The gate above establishes a clean tree BEFORE measurement. That is not
+# enough, and the gap was proven by execution, not argued: a tracked file
+# changed after the gate and restored the moment its bytes were consumed
+# left BOTH a clean pre-check and a clean post-check while foreign bytes
+# entered the measurement. A post-check is a cheap detector for the
+# careless case; it is not a proof.
+#
+# THE ORDER IS READ -> VERIFY THOSE BYTES -> USE. Not verify-then-read,
+# which re-opens the same window, and not read-use-then-verify, which
+# checks something other than what was consumed. The bytes compared are
+# THE SAME OBJECT the caller goes on to use.
+#
+# BYTE IDENTITY, NOT OBJECT-ID EQUALITY. A file's SHA-256 is not a git
+# blob id -- git hashes `blob <len>\0` ahead of the content -- so the
+# comparison is sha256(consumed bytes) against sha256(THE FROZEN BLOB'S
+# BYTES), both computed here by the same method. No git object id is
+# compared against a file hash anywhere.
+
+
+def _frozen_blobs(subject_repo, subject):
+    """Every blob at the frozen subject, path -> bytes, in one batch.
+
+    `git cat-file --batch` once rather than a process per file: ~1000
+    reads would otherwise dominate the run, and a slow verifier is a
+    verifier someone later turns off.
+    """
+    names = [p for p in git(subject_repo, "ls-tree", "-r", "--name-only",
+                            subject).stdout.split("\n") if p]
+    req = "".join(f"{subject}:{p}\n" for p in names).encode()
+    proc = subprocess.run(["git", "-C", str(subject_repo), "cat-file",
+                           "--batch"], input=req, capture_output=True)
+    if proc.returncode != 0:
+        raise SystemExit(f"R11 ABORT: git cat-file --batch failed: "
+                         f"{proc.stderr.decode(errors='replace')[:200]}")
+    out, pos, blobs = proc.stdout, 0, {}
+    for name in names:
+        nl = out.find(b"\n", pos)
+        if nl < 0:
+            raise SystemExit("R11 ABORT: truncated cat-file batch output.")
+        header = out[pos:nl].decode(errors="replace").split()
+        pos = nl + 1
+        if len(header) < 3 or header[1] != "blob":
+            continue                       # missing, or not a blob
+        size = int(header[2])
+        blobs[name] = out[pos:pos + size]
+        pos += size + 1                    # trailing newline
+    return blobs
+
+
+def make_verified_reader(subject_repo, subject):
+    """A reader that REFUSES to hand back bytes it cannot bind.
+
+    Injected into the census so that every filesystem consumption on the
+    Pass A path -- this module's document read, docgraph's link scan and
+    opscan's source read -- is verified at the moment of consumption.
+    Nothing about the census's semantics passes through here: it decides
+    no population, classifies nothing, and interprets nothing. It returns
+    the same text the old expression returned, or it aborts.
+    """
+    frozen = _frozen_blobs(subject_repo, subject)
+
+    def read_source(repo, rel):
+        rel = str(rel)
+        data = (pathlib.Path(repo) / rel).read_bytes()      # THE bytes
+        blob = frozen.get(rel)
+        if blob is None:
+            raise SystemExit(
+                f"R11 ABORT [SOURCE BINDING / PATH NOT IN SUBJECT]: "
+                f"{rel} was read during measurement but is not present in "
+                f"the frozen subject {subject[:12]}. Refusing to measure.")
+        got = hashlib.sha256(data).hexdigest()
+        want = hashlib.sha256(blob).hexdigest()
+        if got != want:
+            raise SystemExit(
+                f"R11 ABORT [SOURCE BINDING / CONSUMED BYTES DIVERGE]: "
+                f"{rel} — the bytes returned by this read do not match the "
+                f"frozen subject. sha256(consumed)={got[:16]} "
+                f"sha256(frozen blob)={want[:16]}. The working tree changed "
+                f"after the source-binding gate and during measurement. No "
+                f"result is written, nothing is retried against newer bytes "
+                f"and the file is not repaired. Refusing to measure.")
+        return data.decode(errors="ignore")
+
+    return read_source
+
+
+def build(subject_repo, history_repo, subject, census_pkg):
+    # S1: THE GATE RUNS FIRST. Before the census import, before any
+    # enumeration, before any filesystem read. If it returns, source
+    # binding holds; if it does not, nothing is measured.
+    #
+    # ITS RETURN VALUE IS DELIBERATELY NOT THREADED THROUGH build().
+    # Widening the signature would break banked control instruments that
+    # call build() directly, and -- more importantly -- adding a field to
+    # the Pass A payload would change its bytes, destroying the digest
+    # that currently PROVES the historical E2 run read the subject's own
+    # bytes. The gate's evidence is recorded by the controls and the
+    # result instead, from the hash-pinned module constants, which is
+    # where Kai's fingerprint requirement puts it.
+    _source_binding_gate(subject_repo, subject)
+
+    sys.path.insert(0, str(census_pkg))
+    import docgraph as G, opscan as O, claims as C     # frozen Census v1.1
+
+    # S1 TOCTOU: one verifier, injected into every consumption boundary
+    # on this path. The census decides everything it decided before; it
+    # simply obtains its bytes through a reader that cannot return
+    # unverified ones.
+    read_source = make_verified_reader(subject_repo, subject)
+
+    tracked = G.tracked_md(subject_repo)
+    edges = G.build_graph(subject_repo, tracked, read_source=read_source)
+    inc = G.incoming(edges)
+    out_deg = collections.Counter(s for s, d, k, _r, _c in edges if d)
+
+    ops = O.collect(subject_repo, tracked, read_source=read_source)[0]
+    C.classify(ops, tracked, set(O.tracked(subject_repo)))
+    exe, writers, readers = (collections.Counter(),
+                             collections.defaultdict(set),
+                             collections.defaultdict(set))
+    # E1: the census Op carries src AND line AND expr. v1.2 kept only the
+    # source path, so a CONSUMED_AT_SUBJECT fact had no locator anywhere
+    # in the package and could not be traced to the reference that made
+    # it true. The locator is retained; `readers` keeps its old shape so
+    # no existing consumer changes.
+    reader_ops = collections.defaultdict(list)
+    for o in ops:
+        if o.target and o.disposition in ("RESOLVED_READ", "RESOLVED_WRITE",
+                                          "READ_AND_WRITE"):
+            exe[o.target] += 1
+            (writers if o.disposition != "RESOLVED_READ"
+             else readers)[o.target].add(o.src)
+            if o.disposition == "RESOLVED_READ":
+                reader_ops[o.target].append(
+                    {"src": o.src, "line": int(o.line or 0),
+                     "mode": o.mode, "expr": o.expr,
+                     "disposition": o.disposition})
+
+    rows = []
+    for d in tracked:
+        txt = read_source(subject_repo, d)
+        title = ""
+        for ln in txt.splitlines():
+            if ln.startswith("#"):
+                title = ln.lstrip("#").strip()[:120]
+                break
+        n = git(history_repo, "rev-list", "--count", subject, "--",
+                d).stdout.strip()
+        last = git(history_repo, "log", "-1", "--format=%ad", "--date=short",
+                   subject, "--", d).stdout.strip()
+        rows.append({
+            "path": d, "title": title, "bytes": len(txt.encode()),
+            "sha256": hashlib.sha256(txt.encode()).hexdigest()[:16],
+            "commits_in_window": int(n or 0), "last": last,
+            "graphA_in": inc.get(d, 0), "graphA_out": out_deg.get(d, 0),
+            "exe_ops": exe.get(d, 0), "writers": sorted(writers.get(d, ())),
+            "readers": sorted(readers.get(d, ())),
+            "reader_ops": reader_ops.get(d, []),
+            "says_supersedes": bool(SUPES.search(txt[:HEAD_BYTES])),
+            "witnesses": {k: [w.asdict() for w in v] for k, v in
+                          scan(d, txt, history_repo, subject).items()},
+        })
+    assert len(rows) == len(tracked), "PASS A population mismatch"
+    return rows, tracked
+
+
+def _load_and_authorise(stage_a_path, repo_root):
+    """MOMENT 1 — D379 §2: verify the producer is AUTHORISED before it
+    produces anything. Returns the validated descriptor.
+
+    This runs before `build()`, so no irreversible, output-producing work
+    happens above it. It deliberately does NOT record the final producer
+    population: `build()` subsequently imports the hardened Census modules,
+    and a population captured here would be stale before Pass A had done
+    its work. That is MOMENT 2, below.
+    """
+    import stage_identity as SI
+    sp = pathlib.Path(stage_a_path)
+    if not sp.is_file():
+        raise SystemExit(f"REFUSE: no Stage-A descriptor at {stage_a_path}")
+    desc = json.loads(sp.read_bytes().decode("utf-8"))
+    SI.validate_descriptor(desc)
+    # D379 DEP-3 — OBSERVE the executing runtime and compare it against the
+    # identity Stage A expects. Copying desc["runtime"] would be attesting
+    # from the expected value and could never fail.
+    SI.verify_runtime_identity(desc)
+    _check_population(SI, desc, repo_root, "pre-production")
+    return desc
+
+
+def _check_population(SI, desc, repo_root, when):
+    """Delegate to the ONE authority. Kept as a named local seam so the
+    call sites and their `when` labels read unchanged; the policy itself
+    is not defined here and is not duplicated here."""
+    try:
+        return SI.check_population(repo_root, desc, when)
+    except SI.StageIdentityError as e:
+        raise SystemExit(str(e))
+
+
+def _producer_provenance(desc, repo_root):
+    """MOMENT 2 — the D379 §4 in-band block, recorded from the population
+    observed AFTER the work and BEFORE the output is written.
+
+    Every identity is CONSUMED from stage_identity.py. No closure policy
+    and no runtime identity is defined here.
+    """
+    import stage_identity as SI
+    ident = SI.stage_a_identity(desc)
+    observed_runtime = SI.verify_runtime_identity(desc)   # observed, not copied
+    members = _check_population(SI, desc, repo_root, "pre-write")
+    prov = {
+        "stage_a_identity": ident,
+        "stage_a_descriptor_digest": SI.stage_a_descriptor_digest(desc),
+        "producer_component": "PASS_A",
+        "producer_population": [{"class": c, "identity": i, "sha256": d}
+                                for c, i, d in members],
+        "producer_denominator": len(members),
+        "runtime_identity": observed_runtime,
+        "subject_commit": desc["subject"]["commit"],
+        "subject_tree": desc["subject"]["tree"],
+        "tree_paths_identity": desc["tree_paths"]["tree_paths_identity"],
+        "census_identity": desc["census"]["aggregate_sha256"],
+        "history_source_identity": desc["history"]["reachable_set_sha256"],
+    }
+    # D379 §5 — the emitted population must EQUAL the independently
+    # observed one, checked BEFORE the output is written.
+    SI.reconcile_provenance(prov["producer_population"], members)
+    return prov
+
+
+def main():
+    ap = argparse.ArgumentParser(description="HOUSE_H2 v1.2 Pass A")
+    ap.add_argument("--subject-repo", required=True)
+    ap.add_argument("--history-repo", required=True)
+    ap.add_argument("--subject", required=True)
+    ap.add_argument("--census-package", required=True)
+    ap.add_argument("--out", required=True)
+    ap.add_argument("--stage-a", required=True, dest="stage_a",
+                    help="the Stage-A descriptor this producer verifies "
+                         "ITSELF against BEFORE producing (D379 §2/§4).")
+    a = ap.parse_args()
+
+    # ── Q1a / D379 §2 — VERIFY SELF AGAINST STAGE A BEFORE PRODUCING ──
+    # The order matters and is D379's own: a producer that writes evidence
+    # first and checks afterwards has already emitted it. No irreversible,
+    # output-producing work happens above this point.
+    _stage_a_desc = _load_and_authorise(a.stage_a,
+                                        pathlib.Path(a.subject_repo))
+
+    sr, hr = pathlib.Path(a.subject_repo), pathlib.Path(a.history_repo)
+    head = git(sr, "rev-parse", "HEAD").stdout.strip()
+    if head != a.subject:
+        raise SystemExit(f"R11 ABORT: subject repo HEAD {head[:12]} != "
+                         f"subject {a.subject[:12]}")
+    if git(hr, "cat-file", "-e", f"{a.subject}^{{commit}}").returncode != 0:
+        raise SystemExit("R11 ABORT: subject commit absent from history source")
+    if git(hr, "rev-parse", "--is-shallow-repository").stdout.strip() != "false":
+        raise SystemExit(
+            "R11 ABORT: history source is SHALLOW. It does not fail on these "
+            "queries -- it returns its graft boundary as a plausible date. "
+            "Refusing to measure.")
+
+    rows, tracked = build(sr, hr, a.subject, pathlib.Path(a.census_package))
+    # MOMENT 2: the Census modules are loaded by build(), so the population
+    # is observed HERE, after the work and before any byte is written.
+    prov = _producer_provenance(_stage_a_desc, pathlib.Path(a.subject_repo))
+    cm = pathlib.Path(a.census_package) / "MANIFEST.sha256"
+    payload = {
+        "subject": a.subject,
+        "subject_tree": git(sr, "rev-parse", f"{a.subject}^{{tree}}").stdout.strip(),
+        "history_identity": {
+            "shallow": "false",
+            "oldest_reachable_commit": git(hr, "log", "--reverse",
+                "--format=%H").stdout.split("\n")[0],
+            "oldest_reachable_date": git(hr, "log", "--reverse",
+                "--format=%ad", "--date=short").stdout.split("\n")[0],
+            "newest_date": git(hr, "log", "-1", "--format=%ad",
+                               "--date=short").stdout.strip(),
+            "subject_ancestry_depth": int(git(hr, "rev-list", "--count",
+                                              a.subject).stdout.strip() or 0),
+        },
+        "census_dependency": {"package": str(a.census_package),
+                              "aggregate": hashlib.sha256(
+                                  cm.read_bytes()).hexdigest()},
+        "population": len(tracked), "rows": rows,
+        # D379 §4 — IN-BAND, and NEVER the digest of these very bytes.
+        "producer_provenance": prov,
+    }
+    pathlib.Path(a.out).write_text(json.dumps(payload, indent=1))
+
+    kinds = collections.Counter(k for r in rows for k in r["witnesses"]
+                                for _ in r["witnesses"][k])
+    print(f"PASS A v1.2 COMPLETE — {len(rows)} rows == population {len(tracked)}")
+    print("  WITNESS KINDS DISCRIMINATED (D2/D4), not assumed from shape:")
+    for k, n in kinds.most_common():
+        print(f"    {k:<26}{n:>5}")
+    wf = sum(1 for r in rows for v in r["witnesses"].values() for w in v
+             if w["applicability_scope"] == "WHOLE_FILE")
+    sp = sum(1 for r in rows for v in r["witnesses"].values() for w in v
+             if w["applicability_scope"] == "SPAN")
+    print(f"  scope determined: WHOLE_FILE {wf} · SPAN {sp}")
+    print(f"  binding predicates declared closed-world: "
+          f"{len(BINDING_PREDICATES)}")
+    print(f"  contextual predicates declared closed-world: "
+          f"{len(CONTEXTUAL_PREDICATES)} "
+          f"({', '.join(sorted(CONTEXTUAL_PREDICATES))})")
+    print("  NO VERDICT ASSIGNED IN PASS A.")
+
+
+if __name__ == "__main__":
+    main()

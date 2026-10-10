@@ -1,0 +1,410 @@
+#!/usr/bin/env python3
+"""Separate what a build STEP IS from what it PRINTED, structurally.
+
+WHY THIS REPLACES GREPPING A RENDERED LOG
+=========================================
+
+Item 8's verdicts rested on searching BuildKit's human-rendered output
+for strings. Three successive reviews found the same class of defect
+under three different disguises, and the last one names it exactly:
+
+> *"the parser is still capable of measuring BuildKit's presentation of
+> the command instead of execution of the command."*
+
+Every marker we searched for — `retrying in`, `REFUSING TO BUILD`, an
+injected `echo` line — **exists literally in the Dockerfile source**, and
+BuildKit's rendered progress interleaves instruction text with container
+output. Each round we made the string harder to forge; none of them
+changed the fact that instruction and output arrived in the same stream.
+
+`--progress=rawjson` emits BuildKit's `SolveStatus` events, in which the
+two are **different fields of different objects**:
+
+    vertexes[].name    INSTRUCTION METADATA. The text of the step. This
+                       is what BuildKit would echo back, and it is NEVER
+                       evidence that anything ran.
+    vertexes[].cached  whether the step was served from cache.
+    vertexes[].error   the step's own error, attributable to that step.
+    logs[].data        RUNTIME OUTPUT, base64, tagged with the vertex
+                       that produced it. Only execution creates this.
+
+So "did the fetch retry five times" becomes a question about
+`logs` belonging to one vertex, and it can no longer be answered by the
+instruction that would have retried. That is a structural separation
+rather than a cleverer pattern, which is why it ends the sequence.
+
+IT ALSO REMOVES INSTRUMENTATION FROM THE SUBJECT
+================================================
+
+The previous repair added `ITEM8-MARK ATTEMPT=$attempt` to all three
+derived Dockerfiles as scaffolding, and needed an argument about whether
+scaffolding counts against the frozen mutation cardinality. With runtime
+logs attributable per vertex, the Dockerfiles' OWN retry lines are
+sufficient — they are runtime output now, not searchable prose — so the
+markers are gone and B1's treatment count returns to a clean zero.
+
+The argument is not won. It is unnecessary.
+
+WHAT IT REFUSES
+===============
+
+R11 at the parse boundary: unparseable events, a missing target vertex,
+and a target matched by more than one vertex are all refusals. A parser
+that silently returns "no retries found" for a log it could not read is
+the `/dev/null` with better manners that R10 exists to stop.
+
+And one more, added in D295: **two event-bearing descriptors**. Both are
+captured because assuming which one buildx uses is how the previous
+round's defect happened — but merging them is a different act from
+capturing them. File order is not chronology, and B2's criterion is an
+order. Exactly one descriptor may carry events; the other may carry
+diagnostics or nothing.
+
+Exit 0 = the target vertex was located and its facts emitted.
+Exit 1 = refused, with the unmet prerequisite named.
+"""
+from __future__ import annotations
+
+import argparse
+import base64
+import json
+import pathlib
+import re
+import sys
+
+
+class Vertex:
+    __slots__ = ("digest", "name", "cached", "started", "completed",
+                 "error", "log")
+
+    def __init__(self, digest: str) -> None:
+        self.digest = digest
+        self.name = ""
+        self.cached = False
+        self.started = None
+        self.completed = None
+        self.error = ""
+        self.log: list[str] = []
+
+    def as_dict(self) -> dict:
+        return {
+            "digest": self.digest,
+            "name": self.name,
+            "cached": bool(self.cached),
+            "executed": bool(self.started),
+            "completed": bool(self.completed),
+            "error": self.error,
+            "runtime_log_lines": len(self.log),
+        }
+
+
+def parse(text: str, source: str = "stream"
+          ) -> tuple[dict[str, Vertex], list[str], str]:
+    """Every vertex, its RUNTIME output, and any non-event diagnostics.
+
+    THE TRANSPORT IS NOT ONE CLEAN STREAM. buildx writes its progress
+    printer -- including rawjson -- to STDERR, and ordinary CLI
+    diagnostics arrive on stderr too, especially on the failed build B3
+    deliberately causes. So a caller may hand us a file containing both.
+
+    A line beginning `{` that does not parse is a TRUNCATED EVENT and is
+    refused: silently skipping it would turn a partially-captured stream
+    into "no retries observed". A line not beginning `{` is a CLI
+    diagnostic; it is collected and reported, never discarded (R10).
+    """
+    vertices: dict[str, Vertex] = {}
+    diagnostics: list[str] = []
+    seen_any = False
+    for lineno, line in enumerate(text.splitlines(), 1):
+        line = line.strip()
+        if not line:
+            continue
+        if not line.startswith("{"):
+            diagnostics.append(line)
+            continue
+        try:
+            ev = json.loads(line)
+        except json.JSONDecodeError as e:
+            return {}, diagnostics, (
+                f"{source} line {lineno} begins '{{' but is not valid JSON "
+                f"({e}). A truncated event is not a diagnostic: skipped, a "
+                f"partial capture cannot be distinguished from an empty "
+                f"one, and 'no retries observed' would be the answer to "
+                f"both")
+        if not isinstance(ev, dict):
+            continue
+        seen_any = True
+        for v in ev.get("vertexes") or []:
+            d = v.get("digest")
+            if not d:
+                continue
+            vx = vertices.setdefault(d, Vertex(d))
+            # A later event may complete a vertex announced earlier.
+            if v.get("name"):
+                vx.name = v["name"]
+            vx.cached = bool(v.get("cached", vx.cached))
+            vx.started = v.get("started") or vx.started
+            vx.completed = v.get("completed") or vx.completed
+            if v.get("error"):
+                vx.error = v["error"]
+        for lg in ev.get("logs") or []:
+            d = lg.get("vertex")
+            if not d:
+                continue
+            vx = vertices.setdefault(d, Vertex(d))
+            data = lg.get("data") or ""
+            try:
+                vx.log.append(base64.b64decode(data).decode("utf-8", "replace"))
+            except Exception:
+                # Undecodable payload is a fact, not something to drop.
+                vx.log.append(f"<UNDECODABLE LOG PAYLOAD: {data[:40]!r}>")
+    if not seen_any:
+        return {}, diagnostics, (
+            f"{source} held no BuildKit events at all. Either the build "
+            f"produced none, --progress=rawjson was not in effect, or the "
+            f"events were written to a DIFFERENT FILE DESCRIPTOR than the "
+            f"one captured; none of those licenses a conclusion")
+    return vertices, diagnostics, ""
+
+
+def normalise_command(text: str) -> str:
+    """A Dockerfile RUN and a BuildKit vertex name, in one shape.
+
+    A Dockerfile instruction is written across continued lines with
+    whatever indentation the author used; BuildKit's vertex name carries
+    the command after the parser has joined it, prefixed by a stage and
+    step counter. The only difference that matters for identity is the
+    text of the command, so both sides collapse to it: continuations
+    joined, every run of whitespace reduced to one space.
+
+    Deliberately NOT a fuzzy match. This is the minimum normalisation
+    that lets two representations of the same instruction compare equal,
+    and the real-daemon preflight exercises this exact function before
+    any subject build, because a normalisation that has only ever been
+    applied to modelled data is a model. (D298)
+    """
+    return " ".join(text.replace("\\\n", " ").split())
+
+
+def strip_run_flags(command: str) -> tuple[str, list[str]]:
+    """Split `RUN --network=none for attempt …` into flags and body.
+
+    BuildKit's dockerfile frontend consumes RUN flags into the LLB op;
+    whether they survive into the vertex NAME is a property of the
+    daemon, not something to assume in either direction. So the two
+    parts are separated here and the caller decides what it can require
+    — after the preflight has measured which is available.
+    """
+    m = re.match(r"^RUN ((?:--\S+ )*)(.*)$", command, re.S)
+    if not m:
+        return command, []
+    return m.group(2).strip(), m.group(1).split()
+
+
+# ── THE TARGET INSTRUCTION, LOCATED IN A *DERIVED* DOCKERFILE ───────
+#
+# B3's derived Dockerfile carries `RUN --network=none for attempt …`, so
+# the shipped-source anchor above does not match it -- correctly, since
+# that anchor's job is to find something to derive FROM.
+#
+# The claim engine needs the opposite direction: given an archived
+# derived Dockerfile, which instruction is the subject? That is this,
+# and it is here rather than in the summariser so there is exactly ONE
+# statement in the tree of what Item 8's target instruction looks like.
+# (D298)
+_TARGET_OPEN = re.compile(
+    r"^RUN (?:--\S+ )*for attempt in 1 2 3 4 5; do \\\s*$", re.M)
+
+
+def find_target_run(text: str) -> str | None:
+    """The whole target RUN of a DERIVED Dockerfile, verbatim."""
+    m = _TARGET_OPEN.search(text)
+    if not m:
+        return None
+    start = m.start()
+    idx = start
+    for line in text[start:].splitlines(keepends=True):
+        idx += len(line)
+        if not line.rstrip("\n").endswith("\\"):
+            break
+    return text[start:idx]
+
+# NO INSTRUMENTATION MARKERS. An earlier repair added
+# `ITEM8-MARK ATTEMPT=$attempt` to all three branches, because the
+# verdict layer was grepping a rendered build log and needed a token
+# that could not be forged by the log echoing the instruction.
+#
+# `--progress=rawjson` makes that unnecessary: BuildKit attributes
+# RUNTIME OUTPUT to a vertex separately from the vertex's INSTRUCTION
+# TEXT, so the Dockerfiles' own retry lines are sufficient evidence and
+# the subject carries no instrumentation at all. The scaffolding is
+# removed, and with it the question of whether it counted against the
+# frozen mutation cardinality. (D293)
+
+# NO TREATMENT LOGIC LIVES HERE.
+#
+# A copy of the B2 shim ended up in this module when code was moved to
+# break a dependency edge, while the deriver kept its own. Two
+# definitions of one treatment is D272's shape, and moving code to
+# satisfy a reachability gate is not a licence to duplicate it -- the
+# gate would then be enforcing a boundary by creating a drift.
+#
+# This module owns the shared TARGET LOCATOR, because locating an
+# instruction is a property of reading a build. Producing the six
+# subjects belongs to the deriver and nowhere else -- named by role,
+# not by filename, because the reachability gate counts a mention as a
+# reference on purpose and a comment explaining the rule must not trip
+# it. Third time that shape has appeared in this chain. (D302)
+
+
+def find_target(vertices: dict[str, Vertex], needle: str
+                ) -> tuple[Vertex | None, str]:
+    """The ONE vertex whose INSTRUCTION TEXT contains `needle`.
+
+    Matching on the name is correct here and only here: we are asking
+    *which step is the subject*, not *what happened*. What happened is
+    read from that vertex's runtime log, which the name cannot forge.
+    """
+    hits = [v for v in vertices.values() if needle in v.name]
+    if not hits:
+        return None, (f"no vertex's instruction text contains {needle!r}. "
+                      f"The target step is not in this build, so nothing "
+                      f"about it can be measured")
+    if len(hits) > 1:
+        return None, (f"{len(hits)} vertices contain {needle!r}; the target "
+                      f"must be unambiguous or the evidence belongs to an "
+                      f"unknown step")
+    return hits[0], ""
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--events", action="append", required=True,
+                    metavar="PATH",
+                    help="repeatable. buildx writes rawjson to STDERR, and "
+                         "CLI diagnostics land there too, so BOTH captured "
+                         "descriptors are passed and neither is assumed")
+    ap.add_argument("--target-substring", required=True)
+    ap.add_argument("--count", action="append", default=[], metavar="STRING",
+                    help="count occurrences of STRING in the target's "
+                         "RUNTIME log; repeatable")
+    ap.add_argument("--emit-log", metavar="PATH",
+                    help="write ONLY the target vertex's runtime output "
+                         "here, so a caller may search it without ever "
+                         "touching instruction text")
+    ap.add_argument("--json", action="store_true")
+    args = ap.parse_args()
+
+    texts: list[tuple[str, str]] = []
+    for e in args.events:
+        path = pathlib.Path(e)
+        if not path.is_file():
+            print(f"REFUSED: {path} does not exist. There is no event "
+                  f"stream to read, and an absent stream is not an empty "
+                  f"one.")
+            return 1
+        texts.append((e, path.read_text()))
+
+    # Parse each capture separately. A truncated event in EITHER
+    # descriptor is a refusal.
+    vertices: dict[str, Vertex] = {}
+    diagnostics: list[str] = []
+    bearing: list[str] = []
+    per_fd: dict[str, dict[str, Vertex]] = {}
+    for name, text in texts:
+        vx, diag, err = parse(text, name)
+        diagnostics.extend(diag)
+        if err and "held no BuildKit events" not in err:
+            print(f"REFUSED: {err}.")
+            return 1
+        if vx:
+            bearing.append(name)
+            per_fd[name] = vx
+
+    # ── EXACTLY ONE DESCRIPTOR MAY CARRY EVENTS ──────────────────────
+    #
+    # Merging two event-bearing captures does not merge their
+    # chronology. Concatenating file A's logs then file B's imposes an
+    # order that nothing observed, and B2's whole criterion IS an order:
+    # injection -> retry -> BAKED. A split capture could manufacture that
+    # sequence, or destroy a real one, and the result would look
+    # identical to a measurement.
+    #
+    # There is no cross-descriptor timestamp to reconcile them with after
+    # the fact, so the honest move is to refuse rather than to invent.
+    # buildx puts rawjson on ONE stream, so this costs nothing in the
+    # production case and fails closed in the case we cannot interpret.
+    # (D295)
+    if len(bearing) > 1:
+        print(f"REFUSED: {len(bearing)} captured descriptors contain "
+              f"BuildKit events ({', '.join(bearing)}). Their chronology "
+              f"relative to one another is unestablished, and this "
+              f"experiment's B2 criterion is an ORDER -- injection, then a "
+              f"genuine retry, then success. Concatenating two streams "
+              f"imposes an order nothing observed: it could manufacture "
+              f"that sequence or destroy a real one, and either would be "
+              f"indistinguishable from a measurement.")
+        return 1
+    # ONE SOURCE, taken whole. Not a merge -- there is nothing left to
+    # merge once two event-bearing descriptors are refused above, and a
+    # merge loop kept here "just in case" would be the only code able to
+    # invent an order. The guard is the sole thing in this position, so
+    # removing it cannot be mistaken for a smaller change than it is.
+    if bearing:
+        vertices = per_fd[bearing[0]]
+    else:
+        print(f"REFUSED: none of the {len(texts)} captured descriptor(s) "
+              f"held BuildKit events. buildx writes rawjson to STDERR; a "
+              f"capture that watched only stdout would look exactly like "
+              f"this, and so would a build that never ran. Nothing here "
+              f"licenses a conclusion about either.")
+        if diagnostics:
+            print(f"  {len(diagnostics)} diagnostic line(s) were captured, "
+                  f"first: {diagnostics[0][:160]!r}")
+        return 1
+    target, err = find_target(vertices, args.target_substring)
+    if err:
+        print(f"REFUSED: {err}.")
+        return 1
+
+    runtime = "".join(target.log)
+    facts = target.as_dict()
+    facts["counts"] = {s: runtime.count(s) for s in args.count}
+    facts["vertices_total"] = len(vertices)
+    facts["cli_diagnostic_lines"] = len(diagnostics)
+
+    if args.emit_log:
+        # RUNTIME ONLY. A caller grepping this file cannot match a
+        # Dockerfile instruction, because no instruction text is in it.
+        pathlib.Path(args.emit_log).write_text(runtime)
+        facts["runtime_log_path"] = args.emit_log
+        facts["runtime_log_bytes"] = len(runtime.encode())
+
+    if args.json:
+        print(json.dumps(facts))
+        return 0
+
+    print("BUILDKIT TARGET VERTEX")
+    print("=" * 68)
+    print(f"  digest   : {target.digest}")
+    print(f"  name     : {target.name[:100]}")
+    print(f"  executed : {facts['executed']}   cached: {facts['cached']}")
+    print(f"  error    : {target.error[:120] or '(none)'}")
+    print(f"  runtime  : {len(target.log)} log chunk(s)")
+    for s, n in facts["counts"].items():
+        print(f"    {n:>3} x {s!r}  (RUNTIME output only)")
+    print()
+    print(f"  inspected: 1 target vertex of {len(vertices)} across "
+          f"{len(texts)} captured descriptor(s)")
+    if diagnostics:
+        print(f"  {len(diagnostics)} CLI diagnostic line(s), kept separate "
+              f"from events and not discarded")
+    print()
+    print("  Counts are over RUNTIME OUTPUT attributed to this vertex.")
+    print("  The instruction text above is metadata and is never counted,")
+    print("  which is what stops presentation being read as execution.")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

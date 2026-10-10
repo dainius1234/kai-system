@@ -33,7 +33,7 @@ from scripts.security import check_test_wiring as wiring  # noqa: E402
 passed = 0
 failed = 0
 
-EXPECTED_SCENARIOS = 10
+EXPECTED_SCENARIOS = 11
 executed: list[str] = []
 
 
@@ -189,11 +189,53 @@ def run_all() -> None:
     test_an_exit_gate_suite_that_nothing_runs_is_reported()
     test_the_rule_covers_the_suites_that_carry_the_marker()
 
+    # Dispatched EXPLICITLY, on purpose. This suite tests the
+    # dynamic-dispatch exemption, so it must not be exempt by it — a
+    # check whose own fixtures satisfy it proves nothing.
+    test_dynamic_dispatch_is_recognised_and_cannot_be_faked()
+
     check(f"all {EXPECTED_SCENARIOS} scenarios ran",
           len(executed) == EXPECTED_SCENARIOS,
           f"{len(executed)} ran: {executed}")
     check("no scenario ran twice", len(set(executed)) == len(executed),
           str(executed))
+
+
+# ── I-8 for the dynamic-dispatch exemption ───────────────────────────
+#
+# A suite that collects its own tests from `globals()` is a collector,
+# like unittest.main(): a new test is dispatched by existing. Enumerating
+# call sites cannot see that and reports every test in the file.
+#
+# The risk of the exemption is that it becomes a way to HIDE a suite, so
+# both a known-positive and a known-negative are pinned here, and the
+# two halves are proven insufficient alone.
+
+def test_dynamic_dispatch_is_recognised_and_cannot_be_faked():
+    scenario("dynamic-dispatch")
+    import tempfile
+    from scripts.security.check_test_wiring import (orphans,
+                                                    _dispatches_dynamically)
+    tmp = Path(tempfile.mkdtemp()) / "t.py"
+
+    # known-negative: a genuinely undispatched test is STILL reported
+    tmp.write_text("def test_a():\n    pass\ndef test_b():\n    pass\n"
+                   "def run():\n    test_a()\n")
+    check("an undispatched test is still an orphan", orphans(tmp) == ["test_b"])
+
+    # known-positive: dynamic dispatch reports none
+    tmp.write_text('def test_a():\n    pass\ndef run():\n'
+                   '    [f() for n, f in globals().items() '
+                   'if n.startswith("test_")]\n')
+    check("a suite that collects from globals() has no orphans",
+          orphans(tmp) == [])
+
+    # neither half alone may buy the exemption, or it becomes a way to
+    # hide a suite from this check by mentioning a word.
+    check("mentioning globals() alone is not dispatch",
+          not _dispatches_dynamically("x = globals()"))
+    check("a test_ prefix filter alone is not dispatch",
+          not _dispatches_dynamically('n.startswith("test_")'))
 
 
 if __name__ == "__main__":

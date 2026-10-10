@@ -1,0 +1,65 @@
+S1 TOCTOU HARDENING — CANONICAL REGRESSION. PRODUCED BY ORION.
+ZERO ADJUDICATION WEIGHT. NOT AN ANSWER KEY. NO TUNING TARGET.
+
+1. FINGERPRINT
+   implementation_commit     bd1cbb4b76790339c7da59829b4019621c09f17f
+   subject_commit            d8aac4d49e6ba997e3eb38062c0917186ee3f197
+   subject_tree              3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+   census_aggregate          29064d650a61296806df3c3bcab3322f7364da7df674ac93e79d0671475d757a
+   gate_command              git status --porcelain=v1 --untracked-files=all
+   git_version               git version 2.43.0
+   symlink_policy            P1_REJECT mode 120000
+   verification              sha256(consumed bytes) == sha256(frozen blob bytes); no git object id is compared
+   passa_digest              755f8b39a21aa586acb0260e803e423e2f5da1d8afd0a65580bf79a75ce0f9b7
+   classification_digest     e7324ad0fa6b88a8c19ddd0f452a2941a809cfe520e07b21680b129d1b65f52d
+   controls_digest           8eab84597860df6dd05217e949ea2d3b058334708bc7b49039913b9582ffbc9f
+   digest[passa.py]          a5ae00d0a3410cea56bce77f159cd654e2e77dc62a8e6a4e015f24b94d335372
+   digest[classify.py]       1cd4503361dfdb8b522a31ad92de51989e07b383b5177b1fea1f0cac52b351a2
+   digest[run_h2_v12.py]     ab6f54c54c5bdd82c83f9de013311c5771d7eaabad2cec91dd46521d881f7ec7
+   digest[ontology.py]       a92e68c7518578e177c6c67d95efdc1e8b4a92c4406aa2778678119babb721bc
+   digest[census/docgraph.py]7b502ca3df416a0916815c3935a41086fc3082cbf918467a74965d42222cc49b
+   digest[census/opscan.py]  1fe609d7d92568df5df2c7f620b7e91f99c2e96992957c6580a8cc348569fb6a
+   digest[census/claims.py]  2119916ee105ad6778945c43ea0f055d148b0613366ad7f75864c7220db4d234
+
+2. SEMANTIC INVARIANTS vs THE RULED FIGURES
+   OK  documents                                     272
+   OK  witnesses                                     492
+   OK  M3 scope                                      (201, 291)
+   OK  VALIDITY                                      {'UNKNOWN': 260, 'TIME_BOUND': 7, 'EXACT_SNA
+   OK  axis AUTHORITY                                {'UNKNOWN': 272}
+   OK  axis FUNCTION                                 {'UNKNOWN': 267, 'MARKER': 5}
+   OK  axis GENERATION                               {'UNKNOWN': 272}
+   OK  axis LIFECYCLE                                {'UNKNOWN': 262, 'HISTORICAL': 10}
+   OK  axis SCOPE                                    {'UNKNOWN': 78, 'WHOLE_FILE': 194}
+   OK  fact MAINTENANCE_OBSERVED                     71
+   OK  fact STATIC_REFERENCE_AT_SUBJECT              5
+   OK  fact CITES_COMMIT                             21
+   OK  fact CITES_RUN                                3
+   OK  fact CARRIES_DATE_STAMP                       206
+   OK  fact BINDING_CONTRADICTION                    5
+   OK  fact SELF_ASSERTS_AUTHORITY                   4
+   OK  fact SELF_ASSERTS_NON_AUTHORITY               1
+   OK  E2 identities                                 ['CHANGELOG.md', 'README.md', 'SESSION_BACKL
+
+3. THE PASS A DIGEST CHANGE — EXPECTED, AND PROVEN CONFINED
+   historical digest   24fb1f555560277fd4555087f22ed06ef4a72efee845a339bbc87b925730f51c
+   this run            755f8b39a21aa586acb0260e803e423e2f5da1d8afd0a65580bf79a75ce0f9b7
+   predecessor rerun   febc725fde8304c96daaf411061d029d1e3b9fd20eca57e7ead52022704dc063
+   <<< predecessor still reproduces the historical digestfebc725fde8304c96daaf411061d029d1e3b9fd20eca
+        RULED: 24fb1f555560277fd4555087f22ed06ef4a72efee845a339bbc87b925730f51c
+   OK  the new digest differs                        True
+   OK  payloads identical once the aggregate is normalisedTrue
+   OK  the ONLY differing top-level field is census_dependency['census_dependency']
+   The historical E2 source-byte proof is NOT invalidated: it was
+   established against the artefact as it stood and is banked. It
+   remains RE-DERIVABLE by checking out the pre-hardening lineage,
+   which this run does above -- the predecessor reproduces
+   24fb1f5555602 77f exactly.
+
+4. DOCUMENT IDENTITY AGAINST THE FROZEN TREE
+   OK  documents whose bytes match the frozen tree   0
+
+5. OUTCOME
+   checks 23   failures 1
+   UNEXPECTED DELTA. REPORTED, NOT REPAIRED:
+     <<< predecessor still reproduces the historical digest

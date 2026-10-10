@@ -1,0 +1,73 @@
+S1 — CANONICAL REGRESSION RESULT. PRODUCED BY ORION.
+ZERO ADJUDICATION WEIGHT. NOT AN ANSWER KEY. NO TUNING TARGET.
+Compared against the RULED figures, not against this run's output.
+
+1. FINGERPRINT
+   implementation_commit     ba258b8834ff8ff70789af67907b9f93e39b2527
+   subject_commit            d8aac4d49e6ba997e3eb38062c0917186ee3f197
+   subject_tree              3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+   census_aggregate          eb7aad7c1a565cb25fcf6a7e250133e95d210f3e8ceb8765489046e3d945fa0e
+   gate_command              git status --porcelain=v1 --untracked-files=all
+   git_version               git version 2.43.0
+   symlink_policy            P1_REJECT mode 120000
+   passa_digest              24fb1f555560277fd4555087f22ed06ef4a72efee845a339bbc87b925730f51c
+   classification_digest     f078597714829be5534e56f0cadd9459c44856636a25dea4e5d1485e137d9ca1
+   controls_digest           211bf1112aaf1aac61b2cf3e2199d3cebd43df8b9c8a47475d68a0e92ba8ac02
+   digest[passa.py]          0384a7627e1126b514dfed10b7049fee16315b9cbd8cba63262d0845fe34377c
+   digest[classify.py]       1cd4503361dfdb8b522a31ad92de51989e07b383b5177b1fea1f0cac52b351a2
+   digest[run_h2_v12.py]     ab6f54c54c5bdd82c83f9de013311c5771d7eaabad2cec91dd46521d881f7ec7
+   digest[ontology.py]       a92e68c7518578e177c6c67d95efdc1e8b4a92c4406aa2778678119babb721bc
+   digest[envelope.py]       cedb4205870da011c40a85ed1f1c8b2784202579b747a9f68f16e8b9c5af33f1
+   digest[subjectbind.py]    19f295d731183bf672061d60b17b0f7d01ce9d1aa3d340bdb2854b0bda4352fb
+
+2. REGRESSION INVARIANTS vs THE RULED FIGURES
+   OK  documents                                   272
+   OK  witnesses                                   492
+   OK  M3 scope WHOLE_FILE/SPAN                    (201, 291)
+   OK  VALIDITY                                    {'UNKNOWN': 260, 'TIME_BOUND': 7, 'EXACT_SNAPS
+   OK  axis AUTHORITY                              {'UNKNOWN': 272}
+   OK  axis FUNCTION                               {'UNKNOWN': 267, 'MARKER': 5}
+   OK  axis GENERATION                             {'UNKNOWN': 272}
+   OK  axis LIFECYCLE                              {'UNKNOWN': 262, 'HISTORICAL': 10}
+   OK  axis SCOPE                                  {'UNKNOWN': 78, 'WHOLE_FILE': 194}
+   OK  fact MAINTENANCE_OBSERVED                   71
+   OK  fact STATIC_REFERENCE_AT_SUBJECT            5
+   OK  fact CITES_COMMIT                           21
+   OK  fact CITES_RUN                              3
+   OK  fact CARRIES_DATE_STAMP                     206
+   OK  fact BINDING_CONTRADICTION                  5
+   OK  fact SELF_ASSERTS_AUTHORITY                 4
+   OK  fact SELF_ASSERTS_NON_AUTHORITY             1
+   OK  E2 static-reference identities              ['CHANGELOG.md', 'README.md', 'SESSION_BACKLOG
+   OK  passA payload digest                        24fb1f555560277fd4555087f22ed06ef4a72efee845a3
+
+3. DOCUMENT IDENTITY AGAINST THE FROZEN TREE
+   OK  documents whose bytes match the frozen tree 0
+
+4. THE GATE RAN
+   {
+   "gate": "S1_SOURCE_BINDING",
+   "subject_identity": {
+      "head": "d8aac4d49e6ba997e3eb38062c0917186ee3f197",
+      "subject": "d8aac4d49e6ba997e3eb38062c0917186ee3f197",
+      "equal": true
+   },
+   "worktree_identity": {
+      "command": "git status --porcelain=v1 --untracked-files=all",
+      "git_version": "git version 2.43.0",
+      "tracked_divergences": 0,
+      "untracked_paths_recorded": 0,
+      "untracked_abort": false,
+      "untracked_rationale": "every byte Pass A reads comes from a git-enumerated tracked path, so an untracked file is never opened"
+   },
+   "tracked_symlinks": {
+      "policy": "P1_REJECT",
+      "git_mode": "120000",
+      "found": 0
+   }
+}
+
+5. OUTCOME
+   invariants checked 20   failures 0
+   Every ruled invariant held. Nothing was repaired, and no
+   figure was used as a target.

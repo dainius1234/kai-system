@@ -55,10 +55,23 @@ to stop it eroding the way the things it watches did:
     would be this file quietly sampling fewer suites each time one was
     renamed. That is precisely case 5, rewritten in this file.
 
+**And it must not judge a run that did not happen.** A finding says the
+surface is wrong; a refusal says the surface was never adjudicated, and
+reporting the second as the first is how an incomplete run came to be
+published as five vanished suites. The evidence unit is LOG + the exit
+status of the run that produced it, so `--from-log` reads `<log>.status`
+and refuses without it. Four refusal codes, none of which is a finding:
+
+  - `aggregate_incomplete`      the run did not finish
+  - `required_input_missing`    the log, the status, or both are absent
+  - `status_unreadable`         a status that is not an integer
+  - `status_authority_conflict` the sidecar and `--status` disagree
+
 Exit codes:
   0  every suite met its floor
   1  a suite fell below its floor, produced no count, is unrecorded,
-     or reports a different count depending on context
+     reports a different count depending on context, or the evidence was
+     not adjudicable at all
 """
 from __future__ import annotations
 
@@ -72,6 +85,128 @@ from typing import Dict, List, Optional, Tuple
 
 REPO = Path(__file__).resolve().parent.parent.parent
 FLOORS = Path(__file__).resolve().parent / "assertion_floors.json"
+
+sys.path.insert(0, str(REPO))
+
+from scripts.security.gate_inputs import MissingInputs, resolve  # noqa: E402
+
+# The status of the run that produced a log, recorded beside it. A log on
+# its own says what ran; it cannot say whether the run FINISHED, and the
+# two questions have different answers and different fixes.
+#
+# `--from-log` used to bind the status to the literal 0, so the refusal
+# below was unreachable on the only path CI uses. On 1009f31 the aggregate
+# exited 2, `make` stopped at prerequisite 61 of 78, and this gate reported
+# the five suites that never started as `missing` — a run that stopped,
+# rendered as a surface that eroded. (WF-2)
+STATUS_SUFFIX = ".status"
+
+
+class Refusal(Exception):
+    """No verdict was reached, and why.
+
+    Distinct from a finding. A finding says the surface is wrong; a
+    refusal says the surface was never adjudicated. Reporting the second
+    as the first is the defect this class exists to prevent.
+    """
+
+    def __init__(self, code: str, message: str,
+                 status: Optional[int] = None, output: Optional[str] = None):
+        self.code = code
+        self.message = message
+        self.status = status
+        self.output = output
+        super().__init__(message)
+
+
+def parse_status(raw: str) -> int:
+    """The recorded exit status, or a refusal.
+
+    An exit status is an integer — the runner recorded 2, not 1 and not a
+    boolean. Anything else is unreadable rather than assumed-zero, because
+    assumed-zero is precisely the fabrication being removed here.
+    """
+    text = raw.strip()
+    if not text or "\n" in text or not re.fullmatch(r"-?\d+", text):
+        shown = raw[:80].replace("\n", "\\n")
+        raise Refusal(
+            "status_unreadable",
+            f"The recorded status is not an integer: {shown!r} "
+            f"({len(raw)} bytes). A status that cannot be read is not a "
+            f"status of zero.")
+    return int(text)
+
+
+def acquire_evidence(log: Path, explicit: Optional[int]) -> Tuple[str, int]:
+    """The log, and the authoritative status of the run that produced it.
+
+    The evidence unit is LOG + STATUS. Either half missing means there is
+    nothing to adjudicate, so both are required inputs in the sense
+    `gate_inputs` already defines — one refusal, naming whichever is
+    absent, rather than a second absence vocabulary.
+
+    Two authorities may speak: the sidecar `<log>.status`, which is what
+    CI writes, and an explicit `--status`, which exists so a caller
+    holding the number can say so. Neither may silently override the
+    other: if both are present and disagree, nothing is adjudicated.
+    """
+    sidecar = log.with_name(log.name + STATUS_SUFFIX)
+    required = [str(log)] if explicit is not None else [str(log), str(sidecar)]
+    try:
+        resolve(required)
+    except MissingInputs as exc:
+        raise Refusal(
+            "required_input_missing",
+            "This check cannot find the evidence it adjudicates: "
+            + ", ".join(exc.missing)
+            + ". A log without its status cannot say whether the run "
+              "finished, and a missing input is not a passing check.")
+
+    output = log.read_text(encoding="utf-8")
+    recorded = parse_status(sidecar.read_text(encoding="utf-8")) \
+        if sidecar.exists() else None
+
+    if recorded is not None and explicit is not None and recorded != explicit:
+        raise Refusal(
+            "status_authority_conflict",
+            f"Two authorities disagree about the aggregate's exit status: "
+            f"{sidecar.name} records {recorded}, --status says {explicit}. "
+            f"Neither overrides the other.",
+            output=output)
+
+    return output, recorded if recorded is not None else explicit
+
+
+def refusal_payload(refusal: "Refusal",
+                    counts: Optional[Dict[str, int]]) -> Dict[str, object]:
+    """The machine form of "no verdict was made".
+
+    `fallen`, `missing`, `unrecorded` and `drifted` are OMITTED rather
+    than emptied. An empty list is an adjudicated finding of none; their
+    absence, with `adjudicated: false`, is the truth.
+    """
+    payload: Dict[str, object] = {
+        "aggregate_status": refusal.status,
+        "admissible": False,
+        "adjudicated": False,
+        "refusal": {"code": refusal.code, "message": refusal.message},
+    }
+    if counts is not None:
+        payload["counts"] = counts
+    return payload
+
+
+def report_refusal(refusal: "Refusal", as_json: bool) -> int:
+    counts = parse_counts(refusal.output) if refusal.output is not None else None
+    if as_json:
+        print(json.dumps(refusal_payload(refusal, counts), indent=2))
+        return 1
+    print(f"REFUSED ({refusal.code}): {refusal.message}")
+    if counts is not None:
+        print(f"\n{len(counts)} suite(s) reported in the log, which is an "
+              f"observation and not a population.")
+    return 1
+
 
 # "Dashboard Auth Tests: 99 passed, 0 failed"
 _SUITE_LINE = re.compile(r"^(?P<name>[A-Za-z0-9][A-Za-z0-9 &/,§.\-]*?):\s+"
@@ -182,11 +317,23 @@ def main() -> int:
                         help="raise floors to the current counts (never lowers)")
     parser.add_argument("--determinism", action="store_true",
                         help="also verify each suite's count is context-free")
+    parser.add_argument("--status", type=int, default=None,
+                        help="the aggregate's exit status, for a caller that "
+                             "holds it; otherwise <log>.status is read")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
 
-    if args.from_log:
+    if args.from_log and args.update_floors:
+        # --update-floors is outside this repair and its semantics are
+        # unchanged. Recording floors from an unbound log therefore
+        # remains possible, and remains a weakness — recorded here rather
+        # than repaired, because the floor-writing path was not in scope.
         output, status = args.from_log.read_text(encoding="utf-8"), 0
+    elif args.from_log:
+        try:
+            output, status = acquire_evidence(args.from_log, args.status)
+        except Refusal as refusal:
+            return report_refusal(refusal, args.json)
     else:
         output, status = run_suites()
 
@@ -196,6 +343,14 @@ def main() -> int:
         # Say so plainly rather than letting it arrive disguised as
         # "suites vanished" — a red test run and an eroded test surface
         # are different problems with different fixes.
+        if args.json:
+            print(json.dumps(refusal_payload(Refusal(
+                "aggregate_incomplete",
+                f"The aggregate test run failed (make test-uh exited "
+                f"{status}). Fix the failing suite first; assertion floors "
+                f"cannot be judged against a run that did not complete.",
+                status=status), counts), indent=2))
+            return 1
         print("The aggregate test run failed "
               f"(make test-uh exited {status}).")
         print("Fix the failing suite first; assertion floors cannot be")
@@ -243,7 +398,9 @@ def main() -> int:
     drifted = check_determinism(counts) if args.determinism else []
 
     if args.json:
-        print(json.dumps({"counts": counts, "floors": floors,
+        print(json.dumps({"aggregate_status": status,
+                          "admissible": True, "adjudicated": True,
+                          "counts": counts, "floors": floors,
                           "fallen": fallen, "missing": missing,
                           "unrecorded": unrecorded, "drifted": drifted},
                          indent=2))
