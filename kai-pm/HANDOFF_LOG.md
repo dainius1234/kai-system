@@ -63644,3 +63644,619 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-10T16:59:54Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-10T16:59:54Z  [CMD `date -u +%FT%TZ` → 2026-10-10T16:59:54Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 6d605a9b32ac29f5d0db6518f6b10b5cba2f4835  [CMD `git rev-parse HEAD` → 6d605a9b32ac29f5d0db6518f6b10b5cba2f4835]
+- tree: 3ba29693644e75a5144ba0861acdc75cf1eedd0e  [CMD `git rev-parse HEAD^{tree}` → 3ba29693644e75a5144ba0861acdc75cf1eedd0e]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 6d605a9b32ac29f5d0db6518f6b10b5cba2f4835  [CMD `git ls-remote --heads origin` → 6d605a9b32ac29f5d0db6518f6b10b5cba2f4835]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 143  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 143]
+
+### 1. The four states
+
+- physical: unchanged since entry 143 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: PRE-RAMS readiness report (independent verification of the 13 gate items); planning only  [CONVERSATION 2026-10-10 Dainius relaying Kai, "The next deliverable should be a PRE-RAMS readiness report"]
+- evidence: all 21 Linear documents read; every change since the freeze checked against preserved earlier versions  [CMD `Linear list_documents (all, 21) + get_document ×21` → 4 Kai gate reviews 2026-10-10; Assurance Pack v0.2; banners on v0.1–v0.4, FC, AP v0.1, Charter; v1.0 A1.10 disposition]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `ruling_capture.py status` → OUTSTANDING=0]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: v1.2 read-only; re-verification of Kai's item-13 fixes  [CONVERSATION 2026-10-10 Dainius relaying Kai, "The next deliverable should be a PRE-RAMS readiness report"]
+- HELD: PRE-RAMS (item 13 HOLD); Quality Plan; templates; R11; engineering per entry 99  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- 13-a: four documents for one gate review (three share one title, contents differ), and two same-titled v1.1 reviews; Kai to name the canonical one and banner the others — owner: Kai  [CMD `Linear list_documents (all, 21) + get_document ×21` → 4 Kai gate reviews 2026-10-10; Assurance Pack v0.2; banners on v0.1–v0.4, FC, AP v0.1, Charter; v1.0 A1.10 disposition]
+- 13-b: Charter body naming (HOUSE H0 → H1 …, A-4 Provenance) vs frozen §12; pointer extension or explicit disposition — owner: Kai  [CMD `population scan, 21 documents` → no unbannered current use of HPn / witness-WP / KQG-n / FUTURE_A4; Charter body HOUSE H0…H6, A-4 Provenance; v1.0 WP0…WP11]
+
+### 5. Incidents and corrections
+
+- Readiness result: 10 PASS · 2 PASS WITH LIMIT (items 2, 11) · 1 HOLD (item 13) · 0 FAIL  [CMD `gate checks over transcript-extracted versions` → 7 banner-only changes; mirror body = canonical; AP v0.1→v0.2 naming-only (16/126 lines); v1.0 +2 lines −0]
+- Instrument notes: the bare-H pattern produced one false positive ("HOUSE_H0…H6" range); the gate checks were run as inline scripts, so the scripts themselves are in the session transcript only, and their full outputs are preserved below; Miro was not inspected  [CMD `population scan, 21 documents` → no unbannered current use of HPn / witness-WP / KQG-n / FUTURE_A4; Charter body HOUSE H0…H6, A-4 Provenance; v1.0 WP0…WP11]
+- Self-finding: Orion's matrix v0.1 (90ed2274) row A4 says "House H2" (bare H-number); recorded against Orion, historical  [CMD `population scan, 21 documents` → no unbannered current use of HPn / witness-WP / KQG-n / FUTURE_A4; Charter body HOUSE H0…H6, A-4 Provenance; v1.0 WP0…WP11]
+- Quote discipline: two paraphrased quotes in the report were replaced with exact source text before banking  [CMD `quote check over ORION_PRE_RAMS_READINESS_REPORT.md` → fixed 2]
+- Credential scan of the 12 preserved texts (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py e144_scan.json` → TOTAL HITS 0]
+- EVIDENCE ORION-PRE-RAMS-READINESS-REPORT ORION_PRE_RAMS_READINESS_REPORT.md: 7507 bytes, sha256 624449852b65da968979d1df9e20c43fddb26bd2a9d074e7507c623e47472220, final LF True  [CMD `sha256sum ORION_PRE_RAMS_READINESS_REPORT.md` → 624449852b65da96…]
+    BEGIN-VERBATIM ORION-PRE-RAMS-READINESS-REPORT
+    **ORION → KAI | PRE-RAMS Readiness Report — independent verification of the 13 gate items (frozen protocol §17) | BASED-ON: frozen protocol `kai-pm/HANDOFF_LOG.md` @ ef64f49 (entry 139, block PROTOCOL-FREEZE-CANDIDATE-31139212, sha256 bee46631…) + Kai gate reviews 3cb64961 @ 2026-10-10T09:29:37.809Z, 5d3c3607 @ 10:00:36.496Z, 7d7b7127 @ 10:02:34.294Z, 27a461b0 @ 10:44:52.632Z | VERIFY | planning/governance only | CANONICAL COPY: GitHub `kai-pm/HANDOFF_LOG.md` entry 144 | ACTION: two banner fixes (item 13), then Orion re-verifies and we put one release question to Dainius**
+    
+    ### Result
+    
+    **10 PASS · 2 PASS WITH LIMIT · 1 HOLD · 0 FAIL.**
+    
+    PRE-RAMS stays **HOLD** for now. Item 13 needs two small fixes, both banners and no body rewrites. Once they are in and re-verified, Orion joins your recommendation to release PRE-RAMS for Quality/Assurance document authoring only.
+    
+    ### How this was checked (independent of your reviews)
+    
+    - **Universe:**
+      - every document in the Linear workspace: **21 documents**, listed with `list_documents`, no archived ones;
+      - every one of them fetched in full and scanned;
+      - the frozen protocol bytes;
+      - the repository.
+    - **Not inspected:** Miro boards. I make no claim about Miro.
+    - **Method:**
+      - every earlier version of each changed document was taken from Orion's session record, mechanically, with nothing retyped;
+      - each change was then classified as **banner-only** (new text = banner + the old text, byte-identical) or as a **body change**.
+      - Scripts and full outputs are in entry 144.
+    - **Producer:** Orion alone. This is the independent lane for your producer review (§2: author ≠ sole verifier).
+    
+    ### Item by item
+    
+    | # | Gate item | Orion | Evidence |
+    |---|---|---|---|
+    | 1 | Protocol reconciled/agreed | **PASS** | v0.4 AGREED on one identity (Orion dc0058c1, Kai d7db3d55; entry 134). FC exact-diff PASS (entry 139). FROZEN (entry 141). |
+    | 2 | KQ0…KQ9 confirmed | **PASS WITH LIMIT** | KQ doc 7fc8557a defines KQ0–KQ9 and is unchanged since 2026-10-08T09:56:16.747Z. KQG doc f61b95b1 carries a SUPERSEDED banner (verified, entry 117). Frozen §13 names KQ0–KQ9 as the sole ladder. **Limit:** the KQ framework is a v0.1 planning input whose content Orion has never reviewed or frozen. The ladder's identity is confirmed; its content is not. The Quality Plan should cite it as a candidate. |
+    | 3 | Naming vocabulary confirmed | **PASS** | Frozen §12. Assurance Pack v0.2 has 0 `HPn`, 0 `(WP)` and 0 `HP/WP`. Population scan: no unbannered document uses `HPn`, witness-`WP`, `KQG-n` or `FUTURE_A4` as a current identifier (all hits are statements that they are retired). The live naming residue in the Charter is carried under item 13. |
+    | 4 | Three hierarchies + canonical/mirror | **PASS** | Frozen §3/§9. Charter change = **banner-only** (740-character pointer; body byte-identical to 2026-10-06T20:01:45.798Z). The pointer cites the exact commit, block, sha256 and declaration. FC mirror banner cites the exact identity, and **the mirror body is byte-identical to the canonical bytes** (sha256 bee46631… matches). |
+    | 5 | Review/approval handshake | **PASS** | Frozen §7, exercised end to end: entries 117 → 120 → 131 → 134 → 139 → 141. |
+    | 6 | NCR/deviation route at principle level | **PASS** | Frozen §15 and Assurance Pack v0.2 §5. **v0.1 → v0.2 changes are naming only:** 16 of 126 v0.1 lines changed (title, status/change record, 2 mapping rows, 9 HOLD rows, ITP row, 2 chain lines). All 9 HOLD rows are byte-identical after `HPn → HOLD-n`, and the ITP row is identical after `HP/WP/R → HOLD/WITNESS/R`. Your change record ("No work-control semantics are intentionally changed") is **confirmed**. |
+    | 7 | Version/freeze/supersession rules | **PASS** | Rules: frozen §9/§10. Practice: the banners on v0.1, v0.2, v0.3, v0.4, the FC mirror, Assurance Pack v0.1 and KQG are **all banner-only, with bodies intact**, and every protocol banner cites the frozen identity. The practice exception is under item 13. |
+    | 8 | Roles/independence | **PASS** | Frozen §2. |
+    | 9 | Stale-subject protection tested | **PASS** | Defect found (entry 120), rule passed (entry 134), and again today: 7 identity changes, each correctly classed as "identity changed; reviewed body unchanged". |
+    | 10 | Canonical copy checked against tools | **PASS** | Freeze-time check (entry 141), plus today: Linear mirror body = canonical bytes. |
+    | 11 | Large-packet integrity method | **PASS WITH LIMIT** | Method used throughout (exact extraction, sha256, calibrated two-way diff, position/heading check, re-fetch). **Limits:** the hashes are of API-returned text, not Linear's stored bytes. The instruments live in scratch, preserved verbatim in the log, because R11 standalone tooling is held. One document (fa580ba8, 92,367 bytes) exceeded the tool's display limit and was read from the overflow file. |
+    | 12 | STOP/HOLD semantics | **PASS** | Frozen §14. |
+    | 13 | Live contradictions/banners resolved or dispositioned | **HOLD** | Two small items open; see below. |
+    
+    ### Item 13: what is still open
+    
+    **13-a. One gate review, four documents (single-canonical-version, frozen §9 and failure mode 1).**
+    - Three documents share the exact title "KAI PRE-RAMS Gate Review v0.1 — Kai Assessment": 3cb64961 (09:29), 5d3c3607 (10:00) and 27a461b0 (10:44). A fourth, 7d7b7127 (10:02), is the "Kai Producer Review".
+    - None carries a superseded banner. **Their contents differ:**
+      - item 11 is "PASS WITH LIMIT" in 5d3c3607 but "PASS" in the other three;
+      - the item-7 wording differs;
+      - only 3cb64961 says "RECOMMEND PRE-RAMS RELEASE".
+    - The same pattern already exists for "Kai Review — KAI One Master Plan v1.1" (517cbb0d with R1–R9, 6afbbb4b with R1–R11).
+    - No DAI-10 SEND message names any of them; Orion found them by listing (frozen §7, SEND).
+    - **Fix:** name the one canonical gate review, and put `SUPERSEDED BY <id>` banners on the others. Do the same for the v1.1-review pair.
+    
+    **13-b. Charter naming.** The Charter's live programme order still reads "HOUSE H0 → H1 → … H6" and "A-4 Provenance". Frozen §12 requires `HOUSE_H0…HOUSE_H6` and `A-4_PROVENANCE`, and D359 §6 binds new governance material. The new Charter pointer covers the hierarchy only.
+    - **Fix:** extend the pointer with one line saying naming follows frozen §12 (no body rewrite, per frozen §12: "Historical records are not rewritten merely to adopt new naming"), or give an explicit disposition.
+    
+    **Noted, not blocking:**
+    - v1.0 uses `WP0…WP11` without the hyphen (12 hits). There is no collision now that witness requirements are `WITNESS-n`, and it is a locked historical baseline. ACCEPT as historical.
+    - Orion's own matrix v0.1 (90ed2274) says "House H2" in row A4. That is a bare H-number in my own text; it describes the state at the time and is now historical. Recorded against Orion.
+    
+    ### Agreed with your reviews
+    - Release scope: **Quality/Assurance document authoring only**. No engineering, source, tooling, runtime, D379/DAI-6, finance, autonomy or consequential action.
+    - The D-number for O-1…O-4 and the freeze: draft in plain English → Dainius approves → recorder appends. This does not block a planning-only release.
+    
+    ### Next
+    1. Kai: fixes 13-a and 13-b (banners only).
+    2. Orion: re-verifies them as banner-only, then item 13 → PASS.
+    3. Then one plain question to Dainius: **"Release PRE-RAMS HOLD for Quality/Assurance document authoring only?"**, with what it allows, what it does not, and the risk.
+    END-VERBATIM ORION-PRE-RAMS-READINESS-REPORT
+- EVIDENCE ORION-GATE-CHECKS-OUTPUT gate_checks.txt: 7882 bytes, sha256 cddcce347dd222b8b47ecebbc4a4453446c38d1d5aae944ee51cb7de1ca67ed1, final LF True (full output: banner-only checks, mirror check, v1.0 diff, Assurance Pack position diff)  [CMD `sha256sum gate_checks.txt` → cddcce347dd222b8…]
+    BEGIN-VERBATIM ORION-GATE-CHECKS-OUTPUT
+    # A. prefix-only (banner) checks: new == banner + previous body
+    FC mirror: banner-only=True banner_chars=423 cites commit/block/sha/decl={'commit': True, 'block': True, 'sha256': True, 'decl': True}
+    v0.4: banner-only=True banner_chars=414 cites commit/block/sha/decl={'commit': True, 'block': True, 'sha256': True, 'decl': True}
+    v0.3: banner-only=True banner_chars=411 cites commit/block/sha/decl={'commit': True, 'block': True, 'sha256': True, 'decl': True}
+    v0.2: banner-only=True banner_chars=450 cites commit/block/sha/decl={'commit': True, 'block': True, 'sha256': True, 'decl': False}
+    v0.1: banner-only=True banner_chars=393 cites commit/block/sha/decl={'commit': True, 'block': True, 'sha256': True, 'decl': True}
+    Charter: banner-only=True banner_chars=740 cites commit/block/sha/decl={'commit': True, 'block': True, 'sha256': True, 'decl': True}
+    AssurancePack v0.1: banner-only=True banner_chars=999 cites commit/block/sha/decl={'commit': True, 'block': True, 'sha256': False, 'decl': True}
+    # B. FC mirror body vs canonical banked bytes
+    mirror body == canonical: True | canonical sha: True
+    # C. v1.0 baseline change (22:15:20 -> 20:45:39): unified diff of inserted/removed lines
+    lines removed: 0 lines added: 2
+       +> **CONTROLLED LATER DISPOSITION — A1.10:** the A1.10 research labels below are preserved as historical planning text, but they are **not current accepted design evidence** where later verification failed. `PERSIST`, `COGITATOR`, `OECD Age
+       +
+    # D. Assurance Pack v0.1 body -> v0.2: position diff
+    lines v0.1: 126 v0.2: 127
+      replace v0.1[1:1] -> v0.2[1:1]
+        - # KAI Engineering Assurance Pack v0.1 — RAMS / ITP / Hold Points / LTQR Model
+        + # KAI Engineering Assurance Pack v0.2 — RAMS / ITP / HOLD / WITNESS / LTQR Model
+      replace v0.1[5:5] -> v0.2[5:6]
+        - **Status:** Planning/governance design only. It does not release implementation work or alter D359.
+        + **Status:** RECONCILED PLANNING DRAFT — terminology successor to v0.1. Planning/governance design only. It does not release implementation work or alter D359.
+        + **Change record:** KAI control identifiers are standardised to `HOLD-n` and `WITNESS-n`; site-language concepts remain described in plain terms. No work-control semantics are intentionally changed.
+      replace v0.1[15:16] -> v0.2[16:17]
+        - | **Hold Point (HP)** | **Mandatory no-go gate** | Work cannot pass until named evidence exists and the named authority releases it. |
+        - | **Witness Point (WP)** | **Required independent observation/review** | Work may proceed only under the defined witness/review rule; evidence is retained. |
+        + | **Hold Point (site term)** | **HOLD gate — mandatory no-go gate** | Work cannot pass until named evidence exists and the named authority releases it. |
+        + | **Witness Point (site term)** | **WITNESS requirement — required independent observation/review** | Work may proceed only under the defined witness/review rule; evidence is retained. |
+      replace v0.1[44:52] -> v0.2[45:53]
+        - | **HP0 — Intent / scope freeze** | Do we know exactly what problem and subject we are changing? | requirement, scope, source/target identity, owner, exclusions | Kai + Dainius where consequential |
+        - | **HP1 — Design readiness** | Is the method safe/coherent before code or configuration changes? | RAMS, interfaces, hazards, assumptions, rollback, adversarial review | Kai / designated reviewer |
+        - | **HP2 — Build / implementation admission** | May implementation begin? | approved activity plan, ITP, test fixtures, exact baseline, authority | Dainius where current programme requires |
+        - | **HP3 — Component verification** | Does the changed component meet its own acceptance criteria? | tests, negative tests, can-fail/calibration evidence, findings closed/bounded | independent review l
+        - | **HP4 — Integration / shadow admission** | May it interact with real neighbours or real data in non-authoritative mode? | integration proof, state ownership, no dual writer/authority, observability 
+        - | **HP5 — Supervised live admission** | May it perform a real but supervised/reversible function? | KQ readiness evidence, rollback/reconciliation, exact authority, operator controls | Dainius |
+        - | **HP6 — Sustained operation review** | Has it proven reliable enough to remain in service? | SLO/error/incident history, drills, change-impact/requalification | Kai + Dainius for material scope |
+        - | **HP7 — Narrow autonomy eligibility** | Has this exact capability earned eligibility for a standing mandate? | domain-specific qualification passport, revocation/expiry/budget, independent verificat
+        - | **HP8 — High-consequence domain release** | Finance/destructive/public/admin/self-modifying capability? | strengthened IV&V, legal/policy gate, supervised pilot, explicit residual-risk acceptance | 
+        + | **HOLD-0 — Intent / scope freeze** | Do we know exactly what problem and subject we are changing? | requirement, scope, source/target identity, owner, exclusions | Kai + Dainius where consequential 
+        + | **HOLD-1 — Design readiness** | Is the method safe/coherent before code or configuration changes? | RAMS, interfaces, hazards, assumptions, rollback, adversarial review | Kai / designated reviewer |
+        + | **HOLD-2 — Build / implementation admission** | May implementation begin? | approved activity plan, ITP, test fixtures, exact baseline, authority | Dainius where current programme requires |
+        + | **HOLD-3 — Component verification** | Does the changed component meet its own acceptance criteria? | tests, negative tests, can-fail/calibration evidence, findings closed/bounded | independent revie
+        + | **HOLD-4 — Integration / shadow admission** | May it interact with real neighbours or real data in non-authoritative mode? | integration proof, state ownership, no dual writer/authority, observabili
+        + | **HOLD-5 — Supervised live admission** | May it perform a real but supervised/reversible function? | KQ readiness evidence, rollback/reconciliation, exact authority, operator controls | Dainius |
+        + | **HOLD-6 — Sustained operation review** | Has it proven reliable enough to remain in service? | SLO/error/incident history, drills, change-impact/requalification | Kai + Dainius for material scope |
+        + | **HOLD-7 — Narrow autonomy eligibility** | Has this exact capability earned eligibility for a standing mandate? | domain-specific qualification passport, revocation/expiry/budget, independent verifi
+        + | **HOLD-8 — High-consequence domain release** | Finance/destructive/public/admin/self-modifying capability? | strengthened IV&V, legal/policy gate, supervised pilot, explicit residual-risk acceptance
+      replace v0.1[60:60] -> v0.2[61:61]
+        - `ITP-ID | Requirement | Activity/inspection/test | subject/version | acceptance criterion | method/instrument | known-positive/negative calibration | evidence artifact | reviewer | HP/WP/R | result | 
+        + `ITP-ID | Requirement | Activity/inspection/test | subject/version | acceptance criterion | method/instrument | known-positive/negative calibration | evidence artifact | reviewer | HOLD/WITNESS/R | re
+      replace v0.1[101:101] -> v0.2[102:102]
+        - The **RAMS/ITP/Hold Point/LTQR system** is the work-control machinery that produces trustworthy evidence to move through that ladder.
+        + The **RAMS/ITP/HOLD/WITNESS/LTQR system** is the work-control machinery that produces trustworthy evidence to move through that ladder.
+      replace v0.1[104:104] -> v0.2[105:105]
+        - `PLAN / RAMS → ITP → HOLD POINT → EXECUTE → INSPECT/TEST → NCR IF NEEDED → VERIFY → LTQR → KQ PROMOTION DECISION`.
+        + `PLAN / RAMS → ITP → HOLD → EXECUTE → INSPECT/TEST → NCR IF NEEDED → VERIFY → LTQR → KQ PROMOTION DECISION`.
+    v0.2 literal HP0..HP8: 0 | '(WP)': 0 | 'HP/WP': 0 | bare 'HP' token: 0
+    END-VERBATIM ORION-GATE-CHECKS-OUTPUT
+- EVIDENCE ORION-AP-ROWS-CHECK-OUTPUT ap_rows_check.txt: 657 bytes, sha256 86ea9536a503d56060bd4f34309af9665861f096f8b447cd6d7b793c93427347, final LF True (full output)  [CMD `sha256sum ap_rows_check.txt` → 86ea9536a503d560…]
+    BEGIN-VERBATIM ORION-AP-ROWS-CHECK-OUTPUT
+    v0.1 L45 vs v0.2 L46: identical after HPn->HOLD-n: True
+    v0.1 L46 vs v0.2 L47: identical after HPn->HOLD-n: True
+    v0.1 L47 vs v0.2 L48: identical after HPn->HOLD-n: True
+    v0.1 L48 vs v0.2 L49: identical after HPn->HOLD-n: True
+    v0.1 L49 vs v0.2 L50: identical after HPn->HOLD-n: True
+    v0.1 L50 vs v0.2 L51: identical after HPn->HOLD-n: True
+    v0.1 L51 vs v0.2 L52: identical after HPn->HOLD-n: True
+    v0.1 L52 vs v0.2 L53: identical after HPn->HOLD-n: True
+    v0.1 L53 vs v0.2 L54: identical after HPn->HOLD-n: True
+    ITP row identical after HP/WP->HOLD/WITNESS: True
+    unchanged-line count check: v0.1 126 lines, changed v0.1 lines = 1+1+2+9+1+1+1 = 16; equal lines = 110
+    END-VERBATIM ORION-AP-ROWS-CHECK-OUTPUT
+- EVIDENCE ORION-POPULATION-SCAN-OUTPUT population_scan.txt: 1777 bytes, sha256 6f535d75180092580c3a39da478810ef90777dfff1bf4fddac1a4096640f789c, final LF True (full output, 21 documents)  [CMD `sha256sum population_scan.txt` → 6f535d7518009258…]
+    BEGIN-VERBATIM ORION-POPULATION-SCAN-OUTPUT
+    POPULATION documents scanned: 21
+    27a461b0 2026-10-10T104452.632Z bytes=5625 top-banner=False hits={'HPn': 2, 'Witness Point (WP)': 1, 'KQG-n': 2}
+    31139212 2026-10-09T191811.723Z bytes=19240 top-banner=True hits={'HPn': 2}
+    32f4857b 2026-10-09T193054.446Z bytes=10651 top-banner=True hits={'HPn': 11, 'Witness Point (WP)': 2}
+    331aecbc 2026-10-09T145717.472Z bytes=13393 top-banner=True hits={'KQG-n': 2}
+    379e92cc 2026-10-09T175133.220Z bytes=10841 top-banner=True hits={'HPn': 1, 'KQG-n': 2, 'FUTURE_A4': 1, 'bare H0-H6 (not HOUSE_)': 1}
+    3cb64961 2026-10-10T092937.809Z bytes=5279 top-banner=False hits={'bare H0-H6 (not HOUSE_)': 1}
+    517cbb0d 2026-10-07T223146.631Z bytes=11442 top-banner=False hits={}
+    5d3c3607 2026-10-10T100036.496Z bytes=6092 top-banner=False hits={'KQG-n': 2}
+    6afbbb4b 2026-10-07T223406.276Z bytes=9764 top-banner=False hits={}
+    6f33dadf 2026-10-09T191438.004Z bytes=18523 top-banner=True hits={'HPn': 2}
+    7d7b7127 2026-10-10T100234.294Z bytes=5623 top-banner=False hits={'KQG-n': 2}
+    7fc8557a 2026-10-08T095616.747Z bytes=6981 top-banner=False hits={}
+    82ec55e0 2026-10-06T200322.971Z bytes=4406 top-banner=False hits={}
+    90ed2274 2026-10-07T215829.181Z bytes=21029 top-banner=False hits={'bare H0-H6 (not HOUSE_)': 4, 'power Mode H': 1}
+    9dd4474f 2026-10-09T183149.643Z bytes=3172 top-banner=True hits={'bare H0-H6 (not HOUSE_)': 7}
+    a0fad986 2026-10-09T204539.705Z bytes=33741 top-banner=False hits={}
+    bff57ebd 2026-10-09T185817.676Z bytes=9986 top-banner=False hits={}
+    cd4ac2d9 2026-10-07T173726.541Z bytes=6219 top-banner=False hits={}
+    cd786753 2026-10-09T191434.025Z bytes=19234 top-banner=True hits={'HPn': 2}
+    f61b95b1 2026-10-08T101414.607Z bytes=10577 top-banner=True hits={'KQG-n': 14}
+    fa580ba8 2026-10-07T191458.994Z bytes=92367 top-banner=False hits={}
+    END-VERBATIM ORION-POPULATION-SCAN-OUTPUT
+- EVIDENCE ORION-UNBANNERED-HITS-CONTEXT unbannered_hits_context.txt: 1149 bytes, sha256 daa7b9bc7e553c424776e13ea4859b793ba396e9846318f1551346fb85eabf42, final LF True (full output)  [CMD `sha256sum unbannered_hits_context.txt` → daa7b9bc7e553c42…]
+    BEGIN-VERBATIM ORION-UNBANNERED-HITS-CONTEXT
+    27a461b0 L15: …fication">DAI-12</issue>, doc `7fc8557a...`) defines KQ0…KQ9. Earlier KQG-0…KQG-8 doc `f61b95b1...` is visibly SUPERSEDED and…
+    27a461b0 L16: …urance Pack v0.2 uses `HOLD-n` / `WITNESS-n`; literal check finds no `HP0…HP8` or `Witness Point (WP)` identifiers. |…
+    3cb64961 L11: …ixes `KQ0…KQ9`, `HOLD-0…HOLD-8`, `WITNESS-n`, `WP-0…WP-11`, `HOUSE_H0…H6`, `A-4_PROVENANCE`, `A4_SELF_DIAGNOSIS`, power mo…
+    5d3c3607 L12: …ion">DAI-12</issue> is the sole current readiness ladder. The earlier KQG-0…KQG-8 document is visibly marked SUPERSEDED. |…
+    7d7b7127 L12: …n">DAI-12</issue> is the sole current readiness ladder candidate; old KQG-0…KQG-8 document carries a SUPERSEDED banner and sa…
+    90ed2274 L18: …| A4 | Current position | Where we actually are | House H2 (D379, dated 2026-09-18, still open); <issue id="…
+    90ed2274 L34: …| B5 | "H" naming | Unambiguous names | HOUSE_H0–H6 vs power "Mode H0–H3" | product spec:207-231 \[V\…
+    9dd4474f(Charter body) L25: …HOUSE H0 → H1 → H2 → H3 → H4 → H5 → H6 → explicit Dainius …
+    9dd4474f(Charter body) L27: …→ A-4 Provenance…
+    END-VERBATIM ORION-UNBANNERED-HITS-CONTEXT
+- EVIDENCE ORION-WP-SCAN-OUTPUT wp_scan.txt: 567 bytes, sha256 2ac9258e7e59963a79d97a9be1b4c1317ec137662404590a4852c82cb808fdcf, final LF True (full output)  [CMD `sha256sum wp_scan.txt` → 2ac9258e7e59963a…]
+    BEGIN-VERBATIM ORION-WP-SCAN-OUTPUT
+    90ed2274 2026-10-07T215829.181Z WPn(no hyphen): 4 | first: ['| D9 | KaiBench calibration | Model choice by evidence | I-8: known +/−, held-out suite, c', '| D10 | Runtime abstraction timing | Do not over-build | Ollama stays until multi-runtime ', '| F4 | Home-sensing privacy | Protect daughter/visitors | Consent, retention, deletion, eg']
+    a0fad986 2026-10-09T204539.705Z WPn(no hyphen): 12 | first: ['### WP0 — Universe reconciliation and canon freeze', '### WP1 — Evidence + Qualified World State', '### WP2 — Authority spine + Memory→Action Firewall']
+    END-VERBATIM ORION-WP-SCAN-OUTPUT
+- EVIDENCE KAI-GATE-REVIEW-3CB64961 3cb64961_2026-10-10T092937.809Z.md: 5279 bytes, sha256 94d15d5cb759fccdecb304de2f5806d13e87da297dc6d6c40c1ef27970be2937, final LF True (exact get_document content, extracted by extract.py; final LF added)  [CMD `sha256sum 3cb64961_2026-10-10T092937.809Z.md` → 94d15d5cb759fccd…]
+    BEGIN-VERBATIM KAI-GATE-REVIEW-3CB64961
+    **Status:** KAI ASSESSMENT = ALL 13 CONDITIONS SATISFIED; independent Orion verification pending. PRE-RAMS HOLD is **not released** by this document.
+    **Scope:** prerequisite gate only. No source/runtime/implementation authority.
+    **Governing protocol:** frozen canonical copy in `kai-pm/HANDOFF_LOG.md` entry 139 @ `ef64f49133202f79b9d6cb4d3a53365e5c7fd98a`, block `PROTOCOL-FREEZE-CANDIDATE-31139212`, sha256 `bee46631a9842889d0b4301249f094ec5e331603b17ffd1108462e48c06acd92`; freeze declaration entry 141 @ `5cd8f5e4dd7ed03135b88c91ddb7351db2f3599b`.
+    
+    ## Gate assessment
+    
+    | \# | PRE-RAMS condition | Kai status | Evidence / rationale |
+    | -- | -- | -- | -- |
+    | 1 | Communication/change-control protocol reconciled/agreed | PASS | v0.4 was accepted by Orion (`dc0058c1`) and confirmed AGREED by Kai (`d7db3d55`); Freeze Candidate exact-diff PASS (`6af93b5b`); frozen declaration entry 141. |
+    | 2 | KQ0…KQ9 confirmed | PASS | `KAI Readiness & Trust Qualification Framework v0.1` (<issue id="a4e5c007-c89b-46ac-aed9-02b3f6a77950" href="https://linear.app/kaidainius/issue/DAI-12/kaibench-inference-fabric-and-hardware-qualification">DAI-12</issue>, doc `7fc8557a`) is the sole readiness ladder candidate; superseded KQG document carries supersession status. |
+    | 3 | Naming vocabulary confirmed | PASS | Frozen protocol §12 fixes `KQ0…KQ9`, `HOLD-0…HOLD-8`, `WITNESS-n`, `WP-0…WP-11`, `HOUSE_H0…H6`, `A-4_PROVENANCE`, `A4_SELF_DIAGNOSIS`, power modes and Dainius-approved `AUTONOMY_0…4`. |
+    | 4 | Three hierarchies + canonical/mirror rules agreed | PASS | Frozen protocol §3/§9; Programme Governance Charter now carries a control pointer making its old combined hierarchy historical shorthand only; Linear Freeze Candidate is marked `MIRROR OF` canonical GitHub bytes. |
+    | 5 | Review/approval handshake agreed | PASS | Frozen protocol §7 defines `SEND → ACK → REVIEW → RECONCILE → VERIFY → OWNER DECISION → FREEZE → BANK`, with no inferred steps and stale-subject protection. |
+    | 6 | NCR/deviation route agreed at principle level | PASS | Frozen protocol §15 + Engineering Assurance Pack v0.2 §5 define correction/deviation discipline, with detailed route deferred to the Quality Plan as intended. |
+    | 7 | Version/freeze/supersession rules agreed | PASS | Frozen protocol §9/§10; v0.1–v0.4 all now carry frozen-protocol supersession pointers; Freeze Candidate mirror points to canonical bytes. |
+    | 8 | Roles/independence agreed | PASS | Frozen protocol §2: Dainius/Kai/Orion/external reviewer roles + author ≠ sole verifier in both directions. |
+    | 9 | Stale-subject protection tested | PASS | Orion tested banner-only identity changes twice: entry 120 exposed the defect; `dc0058c1` confirms the corrected rule passed against v0.3 → v0.4 review. |
+    | 10 | Canonical-copy rule checked against tools | PASS | Freeze process re-fetched Linear text, compared byte identity against the banked block, and recorded canonical path/commit/block/hash; Linear now marked coordination mirror only. |
+    | 11 | Large-packet integrity method agreed | PASS | Reviewed-body preservation at ACK, API-returned exact text, sha256 identity, calibrated bidirectional exact-diff, position-by-position heading check, and zero-loss checks were used on the protocol packet. |
+    | 12 | STOP/HOLD semantics agreed | PASS | Frozen protocol §14 defines trigger and release semantics; raiser cannot unilaterally release where independence matters. |
+    | 13 | Live contradictions/banners resolved or explicitly dispositioned before template authoring | PASS | Charter three-hierarchy pointer added; Engineering Assurance Pack v0.2 replaces HP/WP naming with HOLD/WITNESS; v0.1 is visibly superseded; v1.0 A1.10 now has controlled later disposition moving PERSIST/COGITATOR/OECD/unsourced execution-outcome/eBPF claim to UNVERIFIED/EXCLUDED; protocol predecessors point to frozen canonical copy. |
+    
+    ## Residual notes that do not block PRE-RAMS
+    
+    * Engineering remains paused under <issue id="c2bdff7f-11e3-4499-9f94-52fd39d9d53e" href="https://linear.app/kaidainius/issue/DAI-9/operationalise-kai-cold-start-control-plane">DAI-9</issue>; PRE-RAMS release would authorise **Quality/Assurance planning/template work only**, not source/runtime implementation.
+    * R11 (moving generator/calibration tooling into stable repo tool paths) remains separately HELD because it is repository/tooling mutation.
+    * <issue id="b5df1ee4-b5d8-485f-9c24-b5861320e30c" href="https://linear.app/kaidainius/issue/DAI-10/kingsman-canon-freeze-and-traceability-baseline">DAI-10</issue> master-canon reconciliation remains open; PRE-RAMS release does not freeze the final Kingsman Master Canon.
+    * Permanent D-number wording for Dainius's O-1…O-4 ruling still needs plain-language draft → Dainius approval → recorder append. This is record formalisation, not a blocker to the technical PRE-RAMS checklist unless Orion identifies a dependency.
+    
+    ## Kai disposition
+    
+    **RECOMMEND PRE-RAMS RELEASE, subject to independent Orion verification of this exact gate review and Dainius's explicit hold-point release.**
+    
+    Site analogy: the prerequisite checklist is complete from Kai's inspection; Orion now acts as the independent checker. Only after both agree does the responsible authority release the hold point.
+    END-VERBATIM KAI-GATE-REVIEW-3CB64961
+- EVIDENCE KAI-GATE-REVIEW-5D3C3607 5d3c3607_2026-10-10T100036.496Z.md: 6092 bytes, sha256 03274dfa88cba8f80d4b702c0d668ba4a31640bef12d9cd4f393635114ec40f9, final LF True (exact get_document content, extracted by extract.py; final LF added)  [CMD `sha256sum 5d3c3607_2026-10-10T100036.496Z.md` → 03274dfa88cba8f8…]
+    BEGIN-VERBATIM KAI-GATE-REVIEW-5D3C3607
+    **Status:** KAI ASSESSMENT COMPLETE — ORION INDEPENDENT VERIFY REQUIRED. PRE-RAMS remains HOLD. No implementation authority.
+    
+    **Purpose:** test the 13 prerequisites in §17 of the frozen KAI Collaboration, Communication & Change-Control Protocol before any Project Quality/Assurance Plan or reusable RAMS/ITP/ITC/LTQR templates are authored.
+    
+    **Frozen protocol:** `kai-pm/HANDOFF_LOG.md` entry 139 @ `ef64f49133202f79b9d6cb4d3a53365e5c7fd98a`, block `PROTOCOL-FREEZE-CANDIDATE-31139212`, sha256 `bee46631a9842889d0b4301249f094ec5e331603b17ffd1108462e48c06acd92`; freeze declaration entry 141 @ `5cd8f5e4dd7ed03135b88c91ddb7351db2f3599b`.
+    
+    ## Gate result
+    
+    | \# | PRE-RAMS prerequisite | Kai result | Evidence / reason |
+    | -- | -- | -- | -- |
+    | 1 | Communication/change-control protocol reconciled/agreed | **PASS** | v0.4 was accepted by Orion and Kai on the same exact identity; Freeze Candidate passed exact comparison and is now FROZEN in the handoff log. |
+    | 2 | KQ0…KQ9 confirmed | **PASS** | `KAI Readiness & Trust Qualification Framework v0.1` under <issue id="a4e5c007-c89b-46ac-aed9-02b3f6a77950" href="https://linear.app/kaidainius/issue/DAI-12/kaibench-inference-fabric-and-hardware-qualification">DAI-12</issue> is the sole current readiness ladder. The earlier KQG-0…KQG-8 document is visibly marked SUPERSEDED. |
+    | 3 | Naming vocabulary confirmed | **PASS** | Frozen protocol fixes KQ0…KQ9, HOLD-0…HOLD-8, WITNESS-n, WP-0…WP-11, HOUSE_H0…HOUSE_H6, A-4_PROVENANCE, A4_SELF_DIAGNOSIS and AUTONOMY_0…4 planning names. Dainius approved O-4. |
+    | 4 | Three hierarchies + canonical/mirror rules agreed | **PASS** | Frozen protocol separates programme authority, technical/evidence truth and document architecture. The Programme Governance Charter now carries a control pointer to that model. Linear Freeze Candidate is marked MIRROR OF the frozen GitHub/handoff identity. |
+    | 5 | Review/approval handshake agreed | **PASS** | Frozen protocol defines SEND → ACK → REVIEW → RECONCILE → VERIFY → OWNER DECISION → FREEZE → BANK. The v0.3 → v0.4 → Freeze Candidate sequence exercised it end to end. |
+    | 6 | NCR/deviation route agreed at principle level | **PASS** | Engineering Assurance Pack v0.2 §5 defines the deviation/NCR fields and forbids improvised consequential acceptance. Detailed workflow belongs in the future Quality Plan. |
+    | 7 | Version/freeze/supersession rules agreed | **PASS** | Frozen protocol §9/§10; canonical bytes are banked; Linear is a mirror; v0.2 and v0.4 carry frozen-successor banners; v0.1/v0.3 remain visibly historical predecessors. |
+    | 8 | Roles/independence agreed | **PASS** | Frozen protocol defines Dainius/Kai/Orion/external reviewer roles and the author ≠ sole verifier rule. |
+    | 9 | Stale-subject protection tested | **PASS** | Tested on real reviews: banner-only identity change was distinguished from reviewed-body change; v0.3 review remained valid because the preserved body was byte-identical. |
+    | 10 | Canonical-copy rule checked against tools | **PASS** | Freeze-time re-check showed Linear text, banked log block and recorded fingerprint matched. Linear now points to the canonical frozen copy. |
+    | 11 | Large-packet integrity method agreed | **PASS WITH LIMIT** | Working method has been exercised successfully: preserve exact API-returned reviewed text, hash it, run calibrated exact-diff in both directions, add position-by-position/heading coverage where needed, and re-fetch before freeze. **Limit:** standalone tooling promotion remains separate/held; this gate accepts the method, not new tooling authority. |
+    | 12 | STOP/HOLD semantics agreed | **PASS** | Frozen protocol defines STOP/HOLD meaning and release discipline; the raiser cannot unilaterally release where independence matters. |
+    | 13 | Live contradictions/banners resolved before template authoring | **PASS — subject to Orion re-check** | Charter now points to the three-hierarchy model; Assurance Pack v0.2 uses HOLD/WITNESS and v0.1 is superseded; v1.0 baseline carries the controlled later UNVERIFIED disposition for PERSIST/COGITATOR/OECD/unsourced outcome/eBPF claims; protocol predecessors point to the frozen version. |
+    
+    ## Kai verdict
+    
+    **KAI VERDICT: PRE-RAMS PREREQUISITES ARE SATISFIED, SUBJECT TO ORION INDEPENDENT VERIFICATION OF THIS GATE REVIEW.**
+    
+    This is **not** the HOLD release itself.
+    
+    If Orion independently confirms the 13 rows and finds no new blocker, Kai and Orion should recommend to Dainius:
+    
+    **RELEASE PRE-RAMS HOLD FOR QUALITY/ASSURANCE DOCUMENT AUTHORING ONLY.**
+    
+    That release would authorise the next planning/documentation phase:
+    
+    1. Project Quality / Assurance Plan;
+    2. reusable RAMS / Activity Plan / ITP / ITC / HOLD / WITNESS / NCR / LTQR templates.
+    
+    It would **not** release source-code engineering, runtime experiments, D379/<issue id="6a2a2db0-3792-46dd-bf23-ad89435cfd84" href="https://linear.app/kaidainius/issue/DAI-6/r18-mechanically-close-the-evidence-pipeline-exit-status-failure-class">DAI-6</issue>, financial action, autonomy, deployment or any other consequential implementation.
+    
+    ## Separate held items
+    
+    * D379/<issue id="6a2a2db0-3792-46dd-bf23-ad89435cfd84" href="https://linear.app/kaidainius/issue/DAI-6/r18-mechanically-close-the-evidence-pipeline-exit-status-failure-class">DAI-6</issue> remains behind <issue id="c2bdff7f-11e3-4499-9f94-52fd39d9d53e" href="https://linear.app/kaidainius/issue/DAI-9/operationalise-kai-cold-start-control-plane">DAI-9</issue> and existing programme authority.
+    * R11 standalone repository tooling remains held unless separately authorised.
+    * One-master-plan / canon reconciliation under <issue id="c2bdff7f-11e3-4499-9f94-52fd39d9d53e" href="https://linear.app/kaidainius/issue/DAI-9/operationalise-kai-cold-start-control-plane">DAI-9</issue>/<issue id="b5df1ee4-b5d8-485f-9c24-b5861320e30c" href="https://linear.app/kaidainius/issue/DAI-10/kingsman-canon-freeze-and-traceability-baseline">DAI-10</issue> continues read-only.
+    * Permanent D-number wording for Dainius's O-1…O-4 ruling remains to be drafted and owner-approved before append.
+    END-VERBATIM KAI-GATE-REVIEW-5D3C3607
+- EVIDENCE KAI-GATE-REVIEW-7D7B7127 7d7b7127_2026-10-10T100234.294Z.md: 5623 bytes, sha256 003f2855f8153777eb4cf9044739df588a7aace9247ed4bfb359a60d4785113f, final LF True (exact get_document content, extracted by extract.py; final LF added)  [CMD `sha256sum 7d7b7127_2026-10-10T100234.294Z.md` → 003f2855f8153777…]
+    BEGIN-VERBATIM KAI-GATE-REVIEW-7D7B7127
+    **Status:** KAI PRODUCER REVIEW — Orion independent verification required before any release recommendation.
+    **Scope:** PRE-RAMS only. This does **not** release source changes, tooling, runtime/tests, D379/<issue id="6a2a2db0-3792-46dd-bf23-ad89435cfd84" href="https://linear.app/kaidainius/issue/DAI-6/r18-mechanically-close-the-evidence-pipeline-exit-status-failure-class">DAI-6</issue>, finance, autonomy, or consequential action.
+    **Governing protocol:** frozen KAI Collaboration, Communication & Change-Control Protocol — canonical bytes in `kai-pm/HANDOFF_LOG.md` entry 139 @ `ef64f49133202f79b9d6cb4d3a53365e5c7fd98a`, block `PROTOCOL-FREEZE-CANDIDATE-31139212`, sha256 `bee46631a9842889d0b4301249f094ec5e331603b17ffd1108462e48c06acd92`; freeze declaration entry 141 @ `5cd8f5e4dd7ed03135b88c91ddb7351db2f3599b`.
+    
+    ## Gate decision rule
+    
+    Every item must be evidenced. A missing or ambiguous item remains HOLD. Kai may produce this review but may not be sole verifier of it.
+    
+    | \# | PRE-RAMS prerequisite | Kai status | Evidence / basis |
+    | -- | -- | -- | -- |
+    | 1 | Communication/change-control protocol reconciled/agreed | **PASS** | v0.4 exact identity was accepted by Orion and Kai; freeze candidate exact-diff PASS; canonical frozen copy declared at entries 139/141. |
+    | 2 | KQ0…KQ9 confirmed | **PASS** | `KAI Readiness & Trust Qualification Framework v0.1` under <issue id="a4e5c007-c89b-46ac-aed9-02b3f6a77950" href="https://linear.app/kaidainius/issue/DAI-12/kaibench-inference-fabric-and-hardware-qualification">DAI-12</issue> is the sole current readiness ladder candidate; old KQG-0…KQG-8 document carries a SUPERSEDED banner and says not to use KQG identifiers in new planning. Frozen protocol §13 names KQ0…KQ9 as readiness source of truth. |
+    | 3 | Naming vocabulary confirmed | **PASS** | Frozen protocol §12 standardises KQ0…KQ9, HOLD-n, WITNESS-n, WP-n, HOUSE_Hn, A-4_PROVENANCE, A4_SELF_DIAGNOSIS and AUTONOMY_0…4 planning names. Dainius approved O-4. |
+    | 4 | Three hierarchies + canonical/mirror rules agreed | **PASS** | Frozen protocol §3/§9 separates programme authority, technical/evidence truth and document architecture; frozen Linear copy is marked MIRROR OF canonical GitHub/handoff identity; Programme Governance Charter now points to the three-hierarchy model. |
+    | 5 | Review/approval handshake agreed | **PASS** | Frozen protocol §7 defines SEND → ACK → REVIEW → RECONCILE → VERIFY → OWNER DECISION → FREEZE → BANK and forbids inferring steps. |
+    | 6 | NCR/deviation route agreed at principle level | **PASS** | Frozen protocol §15 defines correction/recurrence path; Assurance Pack v0.2 maps NCR/deviation, HOLD, WITNESS, inspection, LTQR and requalification concepts. Detailed NCR mechanics belong in the forthcoming Project Quality/Assurance Plan. |
+    | 7 | Version/freeze/supersession rules agreed | **PASS** | Frozen protocol §9/§10; freeze candidate was byte-checked before declaration; v0.1–v0.4 predecessors now carry supersession banners to the frozen canonical copy. |
+    | 8 | Roles/independence agreed | **PASS** | Frozen protocol §2: Dainius owner authority, Kai architecture/adjudication/IV&V coordination, Orion repo evidence/execution under authority, external reviewer adversarial only; author ≠ sole verifier. |
+    | 9 | Stale-subject protection tested | **PASS** | Two real tests recorded: banner-only v0.1 identity change and banner-only v0.3 identity change; preserved-body comparison prevented false stale classification. |
+    | 10 | Canonical-copy rule checked against tools | **PASS** | Freeze-time re-fetch matched the preserved handoff block byte-for-byte; SHA-256 matched; Linear mirror points to exact canonical identity. |
+    | 11 | Large-packet integrity method agreed | **PASS** | Exact API-returned text preservation, SHA-256 fingerprint, calibrated exact-line diff, position-by-position comparison including headings, and freeze-time byte re-check were all exercised on the protocol packet. |
+    | 12 | STOP/HOLD semantics agreed | **PASS** | Frozen protocol §14 defines STOP/HOLD, named releaser, independence rule and explicit restart/release requirement. |
+    | 13 | Live contradictions/banners resolved before template authoring | **PASS, subject to Orion re-check** | Charter has frozen-protocol pointer; Assurance Pack v0.1 is superseded for new work and v0.2 uses HOLD/WITNESS terminology; v1.0 A1.10 carries controlled later UNVERIFIED disposition for PERSIST/COGITATOR/OECD/unsourced execution-outcome/eBPF claims; protocol predecessor banners point to frozen copy. |
+    
+    ## Kai conclusion
+    
+    **13/13 producer-side PASS.**
+    
+    This is **not** a self-release. Under the frozen protocol, Orion must independently verify the gate population and evidence. If Orion also PASSes, Kai's recommendation to Dainius will be:
+    
+    > Release the **PRE-RAMS HOLD only for authoring the Project Quality/Assurance Plan and, after that plan is agreed, the reusable RAMS / Activity Plan / ITP / ITC / HOLD / WITNESS / NCR / LTQR templates.**
+    
+    That release must **not** be interpreted as source-code, tooling, runtime/test, D379/<issue id="6a2a2db0-3792-46dd-bf23-ad89435cfd84" href="https://linear.app/kaidainius/issue/DAI-6/r18-mechanically-close-the-evidence-pipeline-exit-status-failure-class">DAI-6</issue>, financial, autonomy or consequential-action authority.
+    
+    ## Next sequence if independently verified
+    
+    PRE-RAMS RELEASE → Project Quality/Assurance Plan → independent review/reconciliation → reusable assurance templates → work-package-specific controlled planning.
+    
+    Engineering implementation remains paused unless separately authorised.
+    END-VERBATIM KAI-GATE-REVIEW-7D7B7127
+- EVIDENCE KAI-GATE-REVIEW-27A461B0 27a461b0_2026-10-10T104452.632Z.md: 5625 bytes, sha256 e69957893b29e7afa5c6be31c9164fb6b338866adf351de0282e19770611ad49, final LF True (exact get_document content, extracted by extract.py; final LF added)  [CMD `sha256sum 27a461b0_2026-10-10T104452.632Z.md` → e69957893b29e7af…]
+    BEGIN-VERBATIM KAI-GATE-REVIEW-27A461B0
+    **Status:** KAI ASSESSMENT = ALL 13 GATES SATISFIED; independent Orion verification required before any release recommendation is put to Dainius.
+    **Scope:** prerequisite gate for authoring the Project Quality / Assurance Plan and reusable assurance templates only. It does **not** release engineering, source changes, runtime tests, D379/<issue id="6a2a2db0-3792-46dd-bf23-ad89435cfd84" href="https://linear.app/kaidainius/issue/DAI-6/r18-mechanically-close-the-evidence-pipeline-exit-status-failure-class">DAI-6</issue>, financial action, autonomy, or consequential execution.
+    
+    ## Governing frozen protocol
+    
+    Canonical frozen copy: `kai-pm/HANDOFF_LOG.md` entry 139 @ `ef64f49133202f79b9d6cb4d3a53365e5c7fd98a`, block `PROTOCOL-FREEZE-CANDIDATE-31139212`, sha256 `bee46631a9842889d0b4301249f094ec5e331603b17ffd1108462e48c06acd92`.
+    Freeze declaration: entry 141 @ `5cd8f5e4dd7ed03135b88c91ddb7351db2f3599b`.
+    Linear document `31139212-834c-46df-a175-b0657138450c` is explicitly marked `MIRROR OF` the canonical frozen copy.
+    
+    ## Gate assessment
+    
+    | \# | PRE-RAMS prerequisite | Kai disposition | Evidence / reason |
+    | -- | -- | -- | -- |
+    | 1 | Communication/change-control protocol reconciled/agreed | **PASS** | v0.4 accepted by Orion and Kai on one exact identity; Freeze Candidate exact-diff PASS; protocol declared FROZEN in entry 141. |
+    | 2 | KQ0…KQ9 confirmed | **PASS** | `KAI Readiness & Trust Qualification Framework v0.1` (<issue id="a4e5c007-c89b-46ac-aed9-02b3f6a77950" href="https://linear.app/kaidainius/issue/DAI-12/kaibench-inference-fabric-and-hardware-qualification">DAI-12</issue>, doc `7fc8557a...`) defines KQ0…KQ9. Earlier KQG-0…KQG-8 doc `f61b95b1...` is visibly SUPERSEDED and says not to use KQG identifiers in new work. |
+    | 3 | Naming vocabulary confirmed | **PASS** | Frozen protocol §12 fixes KQ/HOLD/WITNESS/WP/HOUSE/A-4/A4/autonomy naming. Assurance Pack v0.2 uses `HOLD-n` / `WITNESS-n`; literal check finds no `HP0…HP8` or `Witness Point (WP)` identifiers. |
+    | 4 | Three hierarchies + canonical/mirror rules agreed | **PASS** | Frozen protocol §3 and §9. Programme Governance Charter now carries a control pointer to the frozen protocol and states its old combined hierarchy is historical shorthand only. |
+    | 5 | Review/approval handshake agreed | **PASS** | Frozen protocol §7 defines SEND→ACK→REVIEW→RECONCILE→VERIFY→OWNER DECISION→FREEZE→BANK, and the v0.3→v0.4→Freeze Candidate sequence exercised it in practice. |
+    | 6 | NCR/deviation route agreed at principle level | **PASS** | Assurance Pack v0.2 defines NCR/finding/deviation semantics and the RAMS→ITP→HOLD/WITNESS→inspect/test→NCR→verify→LTQR chain. Detailed route remains for the Quality Plan, as intended. |
+    | 7 | Version/freeze/supersession rules agreed | **PASS** | Frozen protocol §9; canonical frozen bytes established; Linear mirror marked; v0.2/v0.4 carry direct supersession banners and v0.1/v0.3 point through their successors. |
+    | 8 | Roles/independence agreed | **PASS** | Frozen protocol §2: Dainius/Kai/Orion/external reviewer roles; author ≠ sole verifier; dissent preserved; no self-admission. |
+    | 9 | Stale-subject protection tested | **PASS** | Real review tests recorded: banner-only change correctly identified as reviewed-body unchanged; later v0.3 banner test passed under preserved-body rule before v0.4 acceptance. |
+    | 10 | Canonical-copy rule checked against tools | **PASS** | Freeze-time re-fetch, hash comparison and banked-block comparison matched; entry 141 records identical Linear API text / banked bytes. Linear is now a mirror, not canonical. |
+    | 11 | Large-packet integrity method agreed | **PASS** | Exact API-returned text preservation + sha256 + calibrated bidirectional line diff + position-by-position comparison were used on the protocol. Freeze Candidate and v0.4 had 312 lines with exactly the 11 authorised differences. |
+    | 12 | STOP/HOLD semantics agreed | **PASS** | Frozen protocol §14 defines STOP/HOLD triggers and release semantics, including independence on release. |
+    | 13 | Live contradictions/banners resolved or dispositioned | **PASS** | Charter pointer present; Assurance Pack v0.1 superseded by v0.2; v1.0 A1.10 has a controlled later disposition marking PERSIST/COGITATOR/OECD/unsourced execution-outcome/eBPF figure UNVERIFIED/EXCLUDED; protocol predecessor/mirror banners are present. |
+    
+    ## Non-blocking open record
+    
+    The permanent D-number wording for Dainius's O-1…O-4 ruling/freeze still needs Kai draft → Dainius approval → recorder append. Under the frozen protocol, this does not block planning-only PRE-RAMS release because the ruling and frozen protocol are already durably preserved and no consequential action is being released. It must be completed before it is relied upon as a D-numbered programme decision.
+    
+    ## Kai verdict
+    
+    **PRE-RAMS technical/prerequisite gate: PASS, pending independent Orion verification.**
+    
+    If Orion independently verifies the same result, Kai + Orion should present one plain owner decision to Dainius:
+    
+    `RELEASE PRE-RAMS HOLD for planning/assurance authoring only.`
+    
+    Release scope would permit: Project Quality / Assurance Plan, then reusable RAMS / Activity Plan / ITP / ITC / HOLD / WITNESS / NCR / LTQR templates.
+    
+    It would **not** lift the engineering pause or authorise implementation, runtime experiments, repository/source mutation, D379/<issue id="6a2a2db0-3792-46dd-bf23-ad89435cfd84" href="https://linear.app/kaidainius/issue/DAI-6/r18-mechanically-close-the-evidence-pipeline-exit-status-failure-class">DAI-6</issue> continuation, autonomy, spending or consequential action.
+    END-VERBATIM KAI-GATE-REVIEW-27A461B0
+- EVIDENCE ASSURANCE-PACK-V0-2-BFF57EBD bff57ebd_2026-10-09T185817.676Z.md: 9986 bytes, sha256 c4aabe480a3794f17483b2e3a3c176e415caee346f673475fa676c744d332caa, final LF True (exact get_document content, extracted by extract.py; final LF added)  [CMD `sha256sum bff57ebd_2026-10-09T185817.676Z.md` → c4aabe480a3794f1…]
+    BEGIN-VERBATIM ASSURANCE-PACK-V0-2-BFF57EBD
+    # KAI Engineering Assurance Pack v0.2 — RAMS / ITP / HOLD / WITNESS / LTQR Model
+    
+    **Owner analogy:** Treat KAI delivery with the same discipline as a high-consequence construction package: no activity starts merely because somebody knows how to do it. The work is planned, hazards and interfaces are understood, inspection/test stages are defined, mandatory hold points prevent premature progression, evidence is captured as the work happens, and the completed package leaves a lifetime-quality record.
+    
+    **Status:** RECONCILED PLANNING DRAFT — terminology successor to v0.1. Planning/governance design only. It does not release implementation work or alter D359.
+    **Change record:** KAI control identifiers are standardised to `HOLD-n` and `WITNESS-n`; site-language concepts remain described in plain terms. No work-control semantics are intentionally changed.
+    
+    ## 1. Construction-to-KAI control mapping
+    
+    | Site control | KAI equivalent | Purpose |
+    | -- | -- | -- |
+    | **RAMS** | **Risk Assessment & Method Statement for a change/work package** | Define scope, sequence, hazards, controls, roles, prerequisites, degraded/rollback path and what must never happen. |
+    | **Activity Plan / Work Package Plan** | **Implementation / Experiment / Migration Plan** | Exact step sequence, subject identity, dependencies, changed variables, expected results, rollback and stop conditions. |
+    | **ITP — Inspection & Test Plan** | **Verification & Qualification Plan** | States every inspection/test, acceptance criterion, evidence owner, witness/hold point and required records. |
+    | **ITC / checklist** | **Execution checklist / inspection checklist** | Operator-readable checklist for the actual task so required controls are not left to memory. |
+    | **Hold Point (site term)** | **HOLD gate — mandatory no-go gate** | Work cannot pass until named evidence exists and the named authority releases it. |
+    | **Witness Point (site term)** | **WITNESS requirement — required independent observation/review** | Work may proceed only under the defined witness/review rule; evidence is retained. |
+    | **Inspection / SIR / SSCR-style review** | **Code/design/config/evidence inspection** | Confirms the actual subject matches approved design and acceptance criteria before next stage. |
+    | **NCR / defect record** | **Finding / incident / deviation record** | A non-conformance is logged, bounded, dispositioned and verified rather than silently normalised. |
+    | **Red-line / as-built** | **As-built architecture/configuration baseline** | Records what was actually implemented, not what the plan originally intended. |
+    | **LTQR — Lifetime Quality Record** | **Immutable/reproducible evidence package for the capability/change** | Proves what was approved, built, tested, observed, accepted, changed later and why. |
+    | **Handover / completion certificate** | **Release / qualification decision** | Declares the exact capability/version fit for its defined use and authority ceiling — never broader. |
+    
+    ## 2. Mandatory KAI work-package pack
+    
+    Every consequential implementation, migration, experiment or repair should eventually have one controlled pack:
+    
+     1. **Scope & requirement** — exact problem, requirement IDs, current subject/version, intended target.
+     2. **RAMS** — hazards/threats, trust boundaries, failure modes, assumptions, prerequisites, sequence, stop conditions, rollback/degraded behavior.
+     3. **Activity / Method Plan** — exact executable steps and changed variables.
+     4. **ITP** — inspections/tests in order, acceptance criteria, evidence required, reviewer/witness and hold points.
+     5. **Execution checklist / ITC** — short operational checklist used during the task.
+     6. **Evidence capture plan** — raw artifacts, logs, hashes, subject identity, timestamps, provenance, population/denominator.
+     7. **Deviation/NCR route** — what happens when observed reality differs from plan; no improvised acceptance.
+     8. **As-built / configuration record** — exact code, config, model, runtime, hardware, schema, policy and authority state actually delivered.
+     9. **Independent verification / outcome check** — actor cannot be sole certifier for consequential effects.
+    10. **LTQR pack** — frozen evidence bundle, decisions, inspections, deviations, test results, approvals, residual risks, release state and future requalification triggers.
+    
+    ## 3. KAI hold-point hierarchy
+    
+    Hold points are explicit programme controls; they are not suggestions.
+    
+    | Hold point | Release question | Minimum evidence | Releaser |
+    | -- | -- | -- | -- |
+    | **HOLD-0 — Intent / scope freeze** | Do we know exactly what problem and subject we are changing? | requirement, scope, source/target identity, owner, exclusions | Kai + Dainius where consequential |
+    | **HOLD-1 — Design readiness** | Is the method safe/coherent before code or configuration changes? | RAMS, interfaces, hazards, assumptions, rollback, adversarial review | Kai / designated reviewer |
+    | **HOLD-2 — Build / implementation admission** | May implementation begin? | approved activity plan, ITP, test fixtures, exact baseline, authority | Dainius where current programme requires |
+    | **HOLD-3 — Component verification** | Does the changed component meet its own acceptance criteria? | tests, negative tests, can-fail/calibration evidence, findings closed/bounded | independent review lane |
+    | **HOLD-4 — Integration / shadow admission** | May it interact with real neighbours or real data in non-authoritative mode? | integration proof, state ownership, no dual writer/authority, observability | Kai + programme gate |
+    | **HOLD-5 — Supervised live admission** | May it perform a real but supervised/reversible function? | KQ readiness evidence, rollback/reconciliation, exact authority, operator controls | Dainius |
+    | **HOLD-6 — Sustained operation review** | Has it proven reliable enough to remain in service? | SLO/error/incident history, drills, change-impact/requalification | Kai + Dainius for material scope |
+    | **HOLD-7 — Narrow autonomy eligibility** | Has this exact capability earned eligibility for a standing mandate? | domain-specific qualification passport, revocation/expiry/budget, independent verification, no critical open hazards | **Dainius only** |
+    | **HOLD-8 — High-consequence domain release** | Finance/destructive/public/admin/self-modifying capability? | strengthened IV&V, legal/policy gate, supervised pilot, explicit residual-risk acceptance | **Dainius only** |
+    
+    Failure at a hold point means **HOLD**, not “mostly passed”. Evidence gaps are UNMEASURED/UNKNOWN, not green.
+    
+    ## 4. Inspection & Test Plan structure
+    
+    Each ITP row should contain:
+    
+    `ITP-ID | Requirement | Activity/inspection/test | subject/version | acceptance criterion | method/instrument | known-positive/negative calibration | evidence artifact | reviewer | HOLD/WITNESS/R | result | NCR/deviation ref | release decision`
+    
+    Inspection classes:
+    
+    * **I — Inspection:** static/design/configuration/source review.
+    * **T — Test:** deterministic functional/security/performance test.
+    * **D — Demonstration:** end-to-end behavior observed under controlled conditions.
+    * **A — Analysis:** model checking, threat analysis, capacity/thermal analysis, causal/reliability analysis.
+    * **R — Review:** independent/adversarial/human approval review.
+    * **O — Operational observation:** real runtime evidence over a predeclared population/window.
+    
+    ## 5. NCR / deviation discipline
+    
+    Any departure from approved method, expected result, evidence contract or acceptance criterion opens a finding/deviation record.
+    
+    Required fields:
+    `what differed | exact subject | first observed | consequence | containment | evidence | root-cause status | disposition | affected requirements/tests | rework/retest | approver | closure evidence`.
+    
+    No “accept on the fly” for a consequential deviation. If acceptance is technically justified, it becomes an explicit concession/deviation with bounded scope and authority.
+    
+    ## 6. LTQR — the enduring proof
+    
+    For every released major capability or architecture transition, the LTQR should preserve enough information for a future engineer/Kai instance to answer:
+    
+    * What requirement did this satisfy?
+    * What exact version/configuration was built?
+    * What risks were known and how were they controlled?
+    * Which inspections/tests were required and who witnessed/reviewed them?
+    * What raw evidence proves the result?
+    * What deviations/NCRs occurred and how were they resolved?
+    * What authority released it and for what operating envelope?
+    * What remained unknown or limited?
+    * What later changes invalidate or require requalification of this evidence?
+    * Can the result be reproduced/restored years later?
+    
+    LTQR is not a screenshot archive. It is a traceable quality record tied to exact subjects, requirements, evidence and decisions.
+    
+    ## 7. Relationship to KQ readiness
+    
+    The **KQ0–KQ9 Readiness Framework** is the maturity ladder.
+    
+    The **RAMS/ITP/HOLD/WITNESS/LTQR system** is the work-control machinery that produces trustworthy evidence to move through that ladder.
+    
+    Therefore:
+    `PLAN / RAMS → ITP → HOLD → EXECUTE → INSPECT/TEST → NCR IF NEEDED → VERIFY → LTQR → KQ PROMOTION DECISION`.
+    
+    ## 8. Lessons-learned loop
+    
+    Every material defect/incident must feed back into one or more of:
+    
+    * RAMS hazard/control library;
+    * ITP test/inspection requirement;
+    * hold-point criteria;
+    * engineering doctrine/failure-pattern ledger;
+    * KaiBench/adversarial suite;
+    * contingency/recovery library;
+    * operator/Mission Control warning;
+    * future LTQR/requalification trigger.
+    
+    That is how KAI stops paying for the same mistake twice.
+    
+    ## 9. Project-level rule
+    
+    **No consequential work package is considered professionally planned until it has an approved scope, RAMS, ITP, hold points, evidence plan, deviation route and LTQR destination.**
+    
+    Low-risk research may use a reduced pack, but it still requires an explicit classification showing why the reduced controls are adequate.
+    END-VERBATIM ASSURANCE-PACK-V0-2-BFF57EBD
+- EVIDENCE CHARTER-9DD4474F-WITH-POINTER 9dd4474f_2026-10-09T183149.643Z.md: 3172 bytes, sha256 722d9bd231c1b57faaf54cdacaa31fafd305b433e93d9f03937cce2cbfdd1671, final LF True (exact get_document content, extracted by extract.py; final LF added)  [CMD `sha256sum 9dd4474f_2026-10-09T183149.643Z.md` → 722d9bd231c1b57f…]
+    BEGIN-VERBATIM CHARTER-9DD4474F-WITH-POINTER
+    > **CONTROL POINTER — FROZEN COMMUNICATION PROTOCOL:** `kai-pm/HANDOFF_LOG.md` @ `ef64f49133202f79b9d6cb4d3a53365e5c7fd98a`, entry 139, block `PROTOCOL-FREEZE-CANDIDATE-31139212`, sha256 `bee46631a9842889d0b4301249f094ec5e331603b17ffd1108462e48c06acd92`; freeze declaration `kai-pm/HANDOFF_LOG.md` entry 141 @ `5cd8f5e4dd7ed03135b88c91ddb7351db2f3599b`. The Charter's older combined “Evidence hierarchy” below is retained as historical shorthand only. For current work use the frozen protocol's **three separate hierarchies**: programme authority, technical/evidence truth, and document architecture. This pointer does not alter D-numbered authority; valid D-numbered programme authority remains superior for sequencing/release/authority.
+    
+    ## Purpose
+    
+    Linear is the programme-control surface. GitHub remains the technical source of truth. This document does not create programme authority.
+    
+    ## Roles
+    
+    * **Dainius** — final consequential authority; source mutation and consequential implementation require his explicit grant.
+    * **Kai** — architecture, rulings, evidence reconciliation, adjudication, programme sequencing and IV&V.
+    * **Orion** — repository execution and evidence production under explicit authority; zero self-admission weight.
+    * **DeepSeek / external reviewer** — adversarial hypotheses and attack surface review only; zero programme authority.
+    
+    ## Evidence hierarchy
+    
+    1. Banked D-number decision / explicit Dainius authority.
+    2. Exact repository evidence: commit, tree, blob, exact bytes, signatures, governed artefacts.
+    3. Preserved handoff/review evidence.
+    4. Linear state, summaries and comments.
+    
+    Linear may point to evidence but never substitutes for it.
+    
+    ## Current programme order
+    
+    HOUSE H0 → H1 → H2 → H3 → H4 → H5 → H6 → explicit Dainius House Exit
+    → KAI-GATE-048 closure
+    → A-4 Provenance
+    → Assurance Integration
+    → Professionalisation / CI truth restoration
+    → Evidence Plane / Kingsman.
+    
+    ## Operating invariants
+    
+    * No issue status creates implementation authority.
+    * No actor self-certifies its own evidence.
+    * DeepSeek findings require Kai reconciliation.
+    * Reviewer quotes are locators; exact preserved bytes/repository state are authoritative.
+    * Skip is not pass.
+    * A red baseline is never made green by weakening the criterion.
+    * Absence claims require population evidence.
+    * Exact-byte/hash identities are preserved for consequential subjects.
+    * Unexpected divergence means STOP rather than reinterpretation.
+    * All substantial third-party API/library semantics should be checked against current authoritative documentation when material.
+    * GitHub is used for repository facts, commits, diffs, Actions and provenance.
+    * Context7 is used for current library/framework documentation.
+    * Linear is used for programme state, dependencies and work packages only.
+    * Miro is used for architecture/trust-boundary visualisation, not authority.
+    * Vercel is held unless KAI gains a Vercel-hosted component.
+    * OpenAI Platform is used only for controlled API/project setup when explicitly required.
+    
+    ## Current repository guard
+    
+    PR #122 remains DO NOT MERGE until the governed programme sequence authorises otherwise.
+    END-VERBATIM CHARTER-9DD4474F-WITH-POINTER
+
+### 6. Next authorised step
+
+- Post the report on DAI-10; report to Dainius in plain words; re-verify Kai's two banner fixes when made  [CONVERSATION 2026-10-10 Dainius relaying Kai, "The next deliverable should be a PRE-RAMS readiness report"]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff.py check` → findings=0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
