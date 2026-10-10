@@ -63534,3 +63534,113 @@ git show ef64f49133202f79b9d6cb4d3a53365e5c7fd98a:kai-pm/HANDOFF_LOG.md   # then
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-10T16:54:59Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-10T16:54:59Z  [CMD `date -u +%FT%TZ` → 2026-10-10T16:54:59Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 6a7a29bb3dd01afbeef13054c4fdcf8d216c8766  [CMD `git rev-parse HEAD` → 6a7a29bb3dd01afbeef13054c4fdcf8d216c8766]
+- tree: e8e2d083021f4cde648bc2c83c2962e628d9418d  [CMD `git rev-parse HEAD^{tree}` → e8e2d083021f4cde648bc2c83c2962e628d9418d]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 6a7a29bb3dd01afbeef13054c4fdcf8d216c8766  [CMD `git ls-remote --heads origin` → 6a7a29bb3dd01afbeef13054c4fdcf8d216c8766]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 142  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 142]
+
+### 1. The four states
+
+- physical: unchanged since entry 142 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Orion verifies Kai's §20 corrections against the frozen protocol; Kai + Orion complete the PRE-RAMS inspection checklist; next deliverable = PRE-RAMS readiness report (PASS / FAIL / HOLD per requirement, with evidence); engineering and D379 paused  [CONVERSATION 2026-10-10 Dainius relaying Kai, "The next deliverable should be a PRE-RAMS readiness report"]
+- evidence: programme update relayed by Dainius, preserved below  [CMD `cat .git/kai-ruling-capture/e6857de345fcfd94.json` → flagged long(1923)]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Kai (relayed by Dainius) · 2026-10-10 · programme update: protocol FROZEN (entries 139/141); O-1…O-4 approved; R20 ratified; Linear mirror and supersession not yet confirmed; governance reconciliation outstanding; PRE-RAMS HOLD; "We should not confuse a successfully frozen procedure with permission to proceed"; next deliverable a PRE-RAMS readiness report. Coordination, not a new Dainius ruling; verbatim in section 5 ⚠ UNBANKED  [CONVERSATION 2026-10-10 Dainius relaying Kai, "The next deliverable should be a PRE-RAMS readiness report"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: PRE-RAMS readiness report (read-only, planning); verification of §20 corrections; v1.2 read-only  [CONVERSATION 2026-10-10 Dainius relaying Kai, "The next deliverable should be a PRE-RAMS readiness report"]
+- HELD: PRE-RAMS; Quality Plan; templates; R11; engineering per entry 99  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- None new  [CMD `handoff.py check` → findings=0]
+
+### 5. Incidents and corrections
+
+- Credential scan (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py u_scan.json` → TOTAL HITS 0]
+- EVIDENCE KAI-PROGRAMME-UPDATE-2026-10-10 kai_update_1010.txt: 1949 bytes, sha256 a1052bc709514510365e8163d17f83e2ca99ccbd1c1829105335a41531fb0f89, final LF True (added by Orion)  [CMD `sha256sum kai_update_1010.txt` → a1052bc709514510…]
+    BEGIN-VERBATIM KAI-PROGRAMME-UPDATE-2026-10-10
+    Update: KAI programme update — 10 October 2026
+    
+    Communication protocol frozen
+    
+    We’ve reached an important milestone: Kai and Orion agreed the communication protocol, Orion independently verified it, and the frozen version was recorded in GitHub.
+    
+    The controlled-document references reported by Orion are:
+    
+    * Entry 139, commit ef64f49 — exact protocol text.
+    * Entry 141, commit 5cd8f5e — formal FROZEN declaration.
+    * DAI-10 — shared coordination and verification record.
+    
+    Your four owner decisions are settled, and the Ohana R20 rule remains authorised.
+    
+    Where we stand
+    
+    Workstream	Position
+    Communication protocol	Frozen
+    Owner decisions O-1–O-4	Approved
+    Ohana R20	Ratified
+    Linear mirror and supersession	Completion not yet confirmed
+    Governance document reconciliation	Outstanding
+    PRE-RAMS	HOLD
+    Master architecture v1.2	Read-only reconciliation
+    Engineering / D379	Paused
+    
+    The next priority is closing the remaining prerequisite evidence, not starting new engineering.
+    
+    Immediate action plan
+    
+    * Kai: mark the Linear document as a mirror of the frozen GitHub copy.
+    * Kai: reconcile the Governance Charter, Assurance Pack terminology and unverified research references.
+    * Orion: independently verify those corrections against the frozen protocol.
+    * Both: complete the PRE-RAMS inspection checklist and identify any remaining hold points.
+    * Then: submit the evidence-backed hold-release recommendation before starting the Quality Plan.
+    
+    My assessment: The communication-control milestone is achieved, but the wider prerequisite package is not yet complete. We should not confuse a successfully frozen procedure with permission to proceed.
+    
+    Nothing further is required from you right now. The next deliverable should be a PRE-RAMS readiness report showing each requirement as PASS, FAIL or HOLD, with supporting evidence.
+    
+    That is how we move from writing professional procedures to operating a professionally controlled engineering programme.
+    END-VERBATIM KAI-PROGRAMME-UPDATE-2026-10-10
+
+### 6. Next authorised step
+
+- Read Linear for Kai's mirror/banner/cleanup changes; draft the PRE-RAMS readiness report against frozen §17  [CONVERSATION 2026-10-10 Dainius relaying Kai, "The next deliverable should be a PRE-RAMS readiness report"]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff.py check` → findings=0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
