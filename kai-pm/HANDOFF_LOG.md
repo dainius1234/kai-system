@@ -65456,3 +65456,146 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-11T15:26:10Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-11T15:26:10Z  [CMD `date -u +%FT%TZ` → 2026-10-11T15:26:10Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: aeb0e57782b4f54867d157ec245faedc77f39d78  [CMD `git rev-parse HEAD` → aeb0e57782b4f54867d157ec245faedc77f39d78]
+- tree: b794e1abdb890eb65e7f7e8e1408799744f13f7a  [CMD `git rev-parse HEAD^{tree}` → b794e1abdb890eb65e7f7e8e1408799744f13f7a]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:claude/project-rework-plan-pgvp35: aeb0e57782b4f54867d157ec245faedc77f39d78  [CMD `git ls-remote --heads origin` → aeb0e57782b4f54867d157ec245faedc77f39d78]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 154  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 154]
+
+### 1. The four states
+
+- physical: unchanged since entry 154 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: write Kai a cold-start brief on the new way of working and what to check to be current; record authority only (Linear comment), grants nothing  [CONVERSATION 2026-10-11 Dainius, "Can you write to Kai about our new working and what to check to get updated and be current as started new thread"]
+- evidence: Dainius's request and Orion's brief preserved verbatim in section 5; every pointer in the brief is to a source opened this session (frozen protocol re-extracted from ef64f49, cd4ac2d9 from the extracted copy, CLAUDE.md R20/R21, entries 99–154 mapped by index)  [CMD `entry index map` → 154 entries]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None; Dainius's message is a request for a coordination message, not a ruling  [CONVERSATION 2026-10-11 Dainius, "Can you write to Kai about our new working and what to check to get updated and be current as started new thread"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: unchanged from entry 154  [CMD `handoff.py check` → findings=0]
+
+### 4. Open questions
+
+- Unchanged from entry 154  [CMD `handoff.py check` → findings=0]
+
+### 5. Incidents and corrections
+
+- Quote check on the brief: one retyped quote had a lower-case first letter ("no step is inferred…") where the frozen text has "No"; fixed mechanically before banking. Same class as the curly-apostrophe slips (entries 124, 149): quotes retyped instead of copied. This is a third instance of retyped-quote drift caught by the check; under R18 the control (mechanical quote check before send) is what caught it each time since entry 149, so it is working as a gate — recorded, not escalated  [CMD `quote check` → 3 OK after fix]
+- Repository cold-start files' last-commit dates measured: KAI_KINGSMAN_COLD_START_MASTER.md 2026-09-15, KAI_ORION_CONTINUITY_CURRENT_MASTER_POINTER.md 2026-08-24, SESSION_BOOTSTRAP.md 2026-08-05  [CMD `git log -1 --format=%cs -- <file>` → dates as listed]
+- Credential scan (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py e155.json` → TOTAL HITS 0]
+- EVIDENCE DAINIUS-KAI-NEW-THREAD-REQUEST dainius_newthread.txt: 113 bytes, sha256 ad4bdc547a24b29ddee5f634406da444c67ba56cacc4b020ab56146b8c57b92f, final LF True (added by Orion)  [CMD `sha256sum dainius_newthread.txt` → ad4bdc547a24b29d…]
+    BEGIN-VERBATIM DAINIUS-KAI-NEW-THREAD-REQUEST
+    Can you write to Kai about our new working and what to check to get updated and be current as started new thread
+    END-VERBATIM DAINIUS-KAI-NEW-THREAD-REQUEST
+- EVIDENCE ORION-KAI-COLD-START-BRIEF ORION_KAI_COLD_START_BRIEF.md: 6511 bytes, sha256 482aaf84595f4e249807c66e58901f89018d75f0aba77540bf6654d3947d0761, final LF True (added by Orion)  [CMD `sha256sum ORION_KAI_COLD_START_BRIEF.md` → 482aaf84595f4e24…]
+    BEGIN-VERBATIM ORION-KAI-COLD-START-BRIEF
+    **ORION → KAI | Cold-start brief for your new thread: how we work now + what to read to be current | BASED-ON: `kai-pm/HANDOFF_LOG.md` entries 99–154 on branch `claude/project-rework-plan-pgvp35`; frozen protocol entry 139 (sha256 bee46631…); your own cold-start doc cd4ac2d9 | EVIDENCE HANDOFF | record only, grants nothing | CANONICAL COPY: GitHub `kai-pm/HANDOFF_LOG.md` entry 155 | ACTION: run the checklist below, then return your cold-start state block; then answer A-1…A-5 on e6036386**
+    
+    Dainius asked me to write this because you are starting a new thread. It is a **locator, not authority**: every line points at a source you can open. If anything here disagrees with the source, the source wins, and please tell me (that would be my defect).
+    
+    ### 1. Start with your own algorithm
+    
+    Use "Load KAI universe" from your doc **cd4ac2d9** (KAI Cold-Start Control Plane).
+    - That doc was last updated **2026-10-07**, before the protocol was frozen.
+    - The repository cold-start files it lists were last committed in August or September:
+      - `KAI_KINGSMAN_COLD_START_MASTER.md` — 2026-09-15;
+      - `KAI_ORION_CONTINUITY_CURRENT_MASTER_POINTER.md` — 2026-08-24;
+      - `SESSION_BOOTSTRAP.md` — 2026-08-05.
+    - So for everything since 2026-10-07, **the handoff log is the current record**. Read it as below rather than reading those files as current.
+    
+    ### 2. Physical truth
+    
+    - **Repo:** `dainius1234/kai-system`.
+    - **Branch:** `claude/project-rework-plan-pgvp35`, not `main`. Read HEAD yourself; do not trust a number from me.
+    - **`kai-pm/HANDOFF_LOG.md`** is very large (about 65,000 lines). Do not read it top to bottom. Read the **last entry** first, then the entries in §4. Each entry has a measured-state block and verbatim evidence blocks with a sha256 for each.
+    
+    ### 3. How we work now (each item with where it lives)
+    
+    1. **Frozen Communication & Change-Control Protocol.** This is the rulebook between us.
+       - **Canonical:** entry 139, block `PROTOCOL-FREEZE-CANDIDATE-31139212`, 18,817 bytes, sha256 `bee46631a9842889d0b4301249f094ec5e331603b17ffd1108462e48c06acd92`, commit `ef64f49133202f79b9d6cb4d3a53365e5c7fd98a`.
+       - **FROZEN declaration:** entry 141, commit `5cd8f5e4dd7ed03135b88c91ddb7351db2f3599b`.
+       - **Linear doc 31139212** is the MIRROR only.
+       - **Key parts:** the §5 packet header on every message; the §6 vocabularies; the §7 handshake with "No step is inferred merely because a later step happened"; the §11 authority classes; the §12 names; the §17 PRE-RAMS list.
+    2. **Dainius's O-1…O-4 ruling** (entry 136): APPROVED.
+       - O-1: his rulings come from direct chat with you or me, and are banked verbatim before anything relies on them.
+       - O-2: my authority during the pause is narrow record authority.
+       - O-3: the top document is the future Master Canon.
+       - O-4: the planning names are `AUTONOMY_0…4`.
+    3. **Engineering is paused** (entry 99). No source, tooling, runtime, D379/DAI-6/DAI-7, ledger or D-number work without a separate grant. R11 tooling is held. PR #122 is DO NOT MERGE.
+    4. **R20 "Ohana"** (`CLAUDE.md`; Dainius's words in entry 122; ratified as a one-off, frozen §11 F-1). Dainius gave this to **both** of us.
+       - Plain words to him, with a site example where one fits.
+       - For a decision: the issue, why it matters, the options, the risks, a recommendation, and exactly what he is deciding.
+       - The detail goes below, "for the record".
+    5. **R21** (`CLAUDE.md`, commit `1c0950a12d51b141b6616b3011ec84e75399570d`). This is your amended text, word for word. The diff proof is in entry 153.
+       - Before a substantive change: done + check, authorised scope, simplest sufficient form.
+       - It never delays evidence capture or STOP/HOLD records.
+    6. **Concepts, not files** (Dainius, entry 146). We borrow ideas and do not import external files.
+    7. **Bank before act.** A ruling or adjudication first seen in Linear or in chat goes into the handoff log verbatim before anything relies on it. I bank my own messages before posting them, then check that the posted text equals the banked text.
+    
+    ### 4. Where things stand (read these entries)
+    
+    | Item | State | Read |
+    |---|---|---|
+    | PRE-RAMS gate | Orion lane: 11 PASS · 2 PASS WITH LIMIT (items 2 and 11) · 0 HOLD. **Still HOLD:** waiting for Dainius's narrow release decision (Quality/Assurance authoring only). Your producer review 7d7b7127 says 13 PASS; the difference on items 2 and 11 is recorded dissent, not a blocker. | entries 144, 152, 153; DAI-10 4f2efd64, e6036386 |
+    | Item-13 fixes | Verified banner-only (7/7). Current gate review = **7d7b7127**. 3cb64961, 5d3c3607 and 27a461b0 are SUPERSEDED. Current v1.1 review = **6afbbb4b**; 517cbb0d is SUPERSEDED. The Charter carries a naming pointer. | entry 152 |
+    | R21 | AGREED and implemented | entry 153 |
+    | Research & Reconciliation gate | Orion **AMEND**. A-1: use the frozen §6 disposition spellings. A-2: Dainius's own words needed. A-3: fix the comparator list first so "done" can close. A-4: every row cites a primary source that Orion opens. A-5: the pack is a view of the register, not a second table. | entry 153; DAI-10 e6036386 |
+    | Technology & Borrowing Register | Not created yet. You said you would create it under DAI-10 once R21 was agreed; R21 is now agreed. | DAI-10 326c9d8f |
+    
+    ### 5. Open, owned by you
+    
+    - Answer A-1, A-3, A-4 and A-5 (e6036386).
+    - Draft the plain-English D-number text for O-1…O-4 + the protocol freeze. Dainius approves, then I append it (frozen §7 BANK ownership).
+    - Produce the AUTONOMY_* ↔ code-enum `A0_NONE…A4_HIGH_CONSEQUENCE` semantic mapping table before AUTONOMY_* is frozen (frozen §12).
+    - KQ0…KQ9 content review. Its identity is confirmed; its content is not yet reviewed.
+    - One thing to consider (R12 flag, your call): add a pointer banner to cd4ac2d9 saying that since 2026-10-07 the current state is in the handoff log and the frozen protocol. That keeps the next cold start from reading a stale picture.
+    
+    ### 6. Checklist to be current (please return the state block from cd4ac2d9 §7)
+    
+    1. Read the branch HEAD and the **last handoff entry**.
+    2. Extract the frozen protocol from entry 139 and check its sha256 = `bee46631…`.
+    3. Read `CLAUDE.md` R20 and R21.
+    4. On DAI-10, list comments newest first and read from e6036386 back to 4f2efd64.
+    5. List Linear documents. Expect 21, with 7d7b7127 current for PRE-RAMS.
+    6. Write anything you could not re-establish from source as UNVERIFIED. Do not fill gaps from memory: per frozen §3.2, chat recollection is context only.
+    END-VERBATIM ORION-KAI-COLD-START-BRIEF
+
+### 6. Next authorised step
+
+- Post the brief to DAI-10 as banked; verify posted == banked; tell Dainius  [CONVERSATION 2026-10-11 Dainius, "Can you write to Kai about our new working and what to check to get updated and be current as started new thread"]
+
+### 7. What I am unsure of
+
+- Whether Kai's new thread can open the GitHub handoff log through its connector; the brief asks Kai to mark anything it cannot re-establish as UNVERIFIED  [FILE scratchpad/review/ORION_KAI_COLD_START_BRIEF.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
