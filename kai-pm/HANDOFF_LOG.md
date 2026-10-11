@@ -64397,3 +64397,70 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-11T14:47:43Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-11T14:47:43Z  [CMD `date -u +%FT%TZ` → 2026-10-11T14:47:43Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: f7f7c399cb6fd9c34b4a47dbef0b23a407fe582f  [CMD `git rev-parse HEAD` → f7f7c399cb6fd9c34b4a47dbef0b23a407fe582f]
+- tree: 7d29d2cc0a96cfb61db6affa44e8a80778fb1717  [CMD `git rev-parse HEAD^{tree}` → 7d29d2cc0a96cfb61db6affa44e8a80778fb1717]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- remote:claude/project-rework-plan-pgvp35: f7f7c399cb6fd9c34b4a47dbef0b23a407fe582f  [CMD `git ls-remote --heads origin` → f7f7c399cb6fd9c34b4a47dbef0b23a407fe582f]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 146  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 146]
+
+### 1. The four states
+
+- physical: unchanged since entry 146 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: read-only check of the shared video's claims; concepts only, no files imported  [CONVERSATION 2026-10-11 Dainius, "Our goal is we're looking for concepts, good ideas, best practices, not the actual files"]
+- evidence: GitHub page and secondary sources checked  [CMD `WebFetch https://github.com/forrestchang/andrej-karpathy-skills` → repo multica-ai/andrej-karpathy-skills, MIT; "derived from Andrej Karpathy's observations"; not official; links x.com/karpathy/status/2015883857489522876; four principles named; CLAUDE.md text and line count not shown on the page]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None new; entry 146 holds the concepts-not-files direction  [CMD `ruling_capture.py status` → OUTSTANDING=0]
+
+### 3. Authorised / Held / Forbidden
+
+- FORBIDDEN: importing the external CLAUDE.md or installing its plugin  [CONVERSATION 2026-10-11 Dainius, "Our goal is we're looking for concepts, good ideas, best practices, not the actual files"]
+- HELD: PRE-RAMS; R11; engineering per entry 99  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- Candidate concept for a later, authorised CLAUDE.md change: a plain "define done and how it will be checked before starting" line in R0; needs Dainius's yes (O-2) — owner: Dainius  [CONVERSATION 2026-10-11 Dainius, "Our goal is we're looking for concepts, good ideas, best practices, not the actual files"]
+
+### 5. Incidents and corrections
+
+- Video claims checked. VERIFIED (primary page): a community CLAUDE.md "derived from" Karpathy's observations, MIT, not official; four principles Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution. CORRECTED: developer is Forrest Chang (video: "Zhang"); the GitHub page shows multica-ai as owner with install paths under forrestchang. UNVERIFIED: "65 lines" (page does not state it); "unofficial standard" (marketing); Karpathy's exact tweet wording (only secondary quotes). Concept candidates for the Technology & Borrowing Register (Kai R6): surface assumptions and confusion; minimum code; touch only what the task needs; success criteria before work  [CMD `WebFetch https://github.com/forrestchang/andrej-karpathy-skills` → repo multica-ai/andrej-karpathy-skills, MIT; "derived from Andrej Karpathy's observations"; not official; links x.com/karpathy/status/2015883857489522876; four principles named; CLAUDE.md text and line count not shown on the page]
+- Secondary sources consistent  [CMD `WebSearch (2 queries)` → secondary sources consistent on the four principles and Karpathy's three failure modes; original tweet text not retrieved]
+
+### 6. Next authorised step
+
+- Report to Dainius in plain words  [CONVERSATION 2026-10-11 Dainius, "Our goal is we're looking for concepts, good ideas, best practices, not the actual files"]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff.py check` → findings=0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
