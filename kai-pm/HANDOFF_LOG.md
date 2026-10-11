@@ -70525,3 +70525,844 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-11T18:21:16Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-11T18:21:16Z  [CMD `date -u +%FT%TZ` → 2026-10-11T18:21:16Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: f48dfe05bb3664e66f940ef287a8bc5b11155534  [CMD `git rev-parse HEAD` → f48dfe05bb3664e66f940ef287a8bc5b11155534]
+- tree: 1c4e3cc28445686540b02cd8c66fe6c8d523d368  [CMD `git rev-parse HEAD^{tree}` → 1c4e3cc28445686540b02cd8c66fe6c8d523d368]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- remote:claude/project-rework-plan-pgvp35: f48dfe05bb3664e66f940ef287a8bc5b11155534  [CMD `git ls-remote --heads origin` → f48dfe05bb3664e66f940ef287a8bc5b11155534]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 175  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 175]
+
+### 1. The four states
+
+- physical: unchanged since entry 175 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: pass 2, read-only (Kai 552eefd1); source checking of the report's fixed external-claim list delegated to a read-only research subagent (web reads only, output to scratch)  [CONVERSATION 2026-10-11 Dainius relaying Kai, "Orion can proceed with the authorised, read-only second research pass. The engineering hold remains unchanged."]
+- evidence: confirmation 97575735 posted (thread 1bbf7a7c), posted == banked; pass-2 work in progress preserved in section 5 (DRAFT, not sent)  [CMD `posted_check_175` → posted == banked True]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `handoff.py check` → findings=0]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; current-state index pending Dainius; analysis-generator execution pending explicit permission  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Pass 2 remaining: (ii) source check (subagent running), (iv) ranked issues, (v) owner-decision list, then send to Kai  [CMD `handoff.py check` → findings=0]
+
+### 5. Incidents and corrections
+
+- CORRECTION to Orion's pass-1 review (86edbef3, entry 165, §2 row 4): "Not in the repository" for the v1.1 Master Plan is wrong. The v1.1 unified draft is banked in kai-pm/HANDOFF_LOG.md entry 106, block KAI-MASTER-PLAN-V1-1-UNIFIED-DRAFT, 47,743 bytes. The pass-1 search covered tracked file names only (R17: sentence wider than the search). With v1.1 included, KaiBench, restore epoch, Lemonade/gfx1151, Mem0, RVM, synthetic-not-evidence, monotonic authority and E0 calibration are EXISTING PLANNED, not new. To be sent to Kai with the pass-2 packet  [CMD `v11_check.txt; v11_semantics.txt` → hits read line by line]
+- Report scope fact: the report cites no NASA, ISO, ECSS or IEEE source, so those are out of the source-check scope per Kai's 552eefd1 ("only if actually included")  [CMD `grep -i nasa|iso|ecss|ieee report` → 0 lines]
+- Quote check on the draft: 3 flagged, 2 real (a shorthand of two report phrases, and D359's capitalised phrase), fixed by copying exact strings; 0 after  [CMD `quote check` → 0 not exact]
+- Credential scan of the 6 work files (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py e176.json` → TOTAL HITS 0]
+- EVIDENCE POSTED-CHECK-175 posted_check_175.txt: 56 bytes, sha256 f0702aebc56bbb2676a47eb88e18a15208d58fd3bcfd7f6fab93e9533e8bfde4, final LF True (added by Orion)  [CMD `sha256sum posted_check_175.txt` → f0702aebc56bbb26…]
+    BEGIN-VERBATIM POSTED-CHECK-175
+    comment 97575735 posted bodies 1 posted == banked: True
+    END-VERBATIM POSTED-CHECK-175
+- EVIDENCE PASS2-CLAIMS-LIST claims.json: 31406 bytes, sha256 da3a35c4de04cfe1264df7b5a9893f48f999ea3578f6d18355dedfca193315da, final LF True (added by Orion)  [CMD `sha256sum claims.json` → da3a35c4de04cfe1…]
+    BEGIN-VERBATIM PASS2-CLAIMS-LIST
+    [
+     {
+      "id": "E01",
+      "report_lines": [
+       555
+      ],
+      "report_text": [
+       "Ed25519 is well suited to workload signatures. RFC 8032 standardises Ed25519; RFC 9421 defines a standard structure for signing selected HTTP message components; RFC 9530 supplies body/content digest semantics. The important point is not blindly implementing a standard syntax—it is achieving the required properties: **principal binding, method/path/target binding, body integrity, freshness and replay detection**. \\[RFC 8032; RFC 9421; RFC 9530.\\]"
+      ],
+      "claim_to_check": "RFC 8032 standardises Ed25519",
+      "primary_source_to_open": "RFC 8032"
+     },
+     {
+      "id": "E02",
+      "report_lines": [
+       555
+      ],
+      "report_text": [
+       "Ed25519 is well suited to workload signatures. RFC 8032 standardises Ed25519; RFC 9421 defines a standard structure for signing selected HTTP message components; RFC 9530 supplies body/content digest semantics. The important point is not blindly implementing a standard syntax—it is achieving the required properties: **principal binding, method/path/target binding, body integrity, freshness and replay detection**. \\[RFC 8032; RFC 9421; RFC 9530.\\]"
+      ],
+      "claim_to_check": "RFC 9421 defines a standard structure for signing selected HTTP message components",
+      "primary_source_to_open": "RFC 9421"
+     },
+     {
+      "id": "E03",
+      "report_lines": [
+       555
+      ],
+      "report_text": [
+       "Ed25519 is well suited to workload signatures. RFC 8032 standardises Ed25519; RFC 9421 defines a standard structure for signing selected HTTP message components; RFC 9530 supplies body/content digest semantics. The important point is not blindly implementing a standard syntax—it is achieving the required properties: **principal binding, method/path/target binding, body integrity, freshness and replay detection**. \\[RFC 8032; RFC 9421; RFC 9530.\\]"
+      ],
+      "claim_to_check": "RFC 9530 supplies body/content digest semantics",
+      "primary_source_to_open": "RFC 9530"
+     },
+     {
+      "id": "E04",
+      "report_lines": [
+       606
+      ],
+      "report_text": [
+       "PostgreSQL gives the necessary primitives: transactions, unique constraints, conditional `UPDATE`, row-level locks and `RETURNING`. Its documentation also supports `SKIP LOCKED` specifically for queue-like consumers, while warning that `SKIP LOCKED` is not a general consistent-view mechanism. \\[PostgreSQL documentation: *Explicit Locking*; `SELECT`; `UPDATE`; `INSERT`; `RETURNING`.\\]"
+      ],
+      "claim_to_check": "PostgreSQL documentation supports SKIP LOCKED specifically for queue-like consumers, while warning that SKIP LOCKED is not a general consistent-view mechanism",
+      "primary_source_to_open": "PostgreSQL docs, SELECT ... SKIP LOCKED (current version)"
+     },
+     {
+      "id": "E05",
+      "report_lines": [
+       27,
+       606
+      ],
+      "report_text": [
+       "The sixth conclusion is that **Ollama should not be replaced merely because something newer exists**. KAI needs an inference contract and a qualification registry first. Lemonade is particularly interesting on the intended AMD/Strix Halo class of hardware: its current project supports local LLM, speech, TTS and image-generation backends and specifically lists `gfx1151`/Ryzen AI MAX+ Pro 395 support; its companion llama.cpp ROCm project publishes current builds for `gfx1151`. However, 2026 project issues also show ROCm/backend allow-list regressions, which is precisely why a release must be qualified on KAI's exact kernel, backend and hardware rather than accepted from a compatibility table. The seventh conclusion is that **PostgreSQL is the best first durable substrate for KAI's authority and workflows, but it should not become a permanent architectural religion**. KAI already needs transactional state. PostgreSQL gives atomic conditional updates, unique constraints, row locks and queue-oriented `SKIP LOCKED` processing. That is sufficient to make capabilities, replay ledgers, approvals, autonomy grants, workflow state, leases and outbox events restart-safe without operating Temporal immediately. Temporal should be retained as an architectural seam for a future point where long-lived workflows, signals, timers, compensation and replay complexity clearly justify it. Kafka solves a different problem—distributed event streaming—and is unjustified for a predominantly one-owner, one-node organism unless measured scale/distribution requires it. \\[PostgreSQL documentation: *Explicit Locking*, `SELECT`, `INSERT … ON CONFLICT`, `RETURNING`; Temporal documentation: *Durable Execution*, *Event History*, *Retry Policies*; Apache Kafka documentation.\\]",
+       "PostgreSQL gives the necessary primitives: transactions, unique constraints, conditional `UPDATE`, row-level locks and `RETURNING`. Its documentation also supports `SKIP LOCKED` specifically for queue-like consumers, while warning that `SKIP LOCKED` is not a general consistent-view mechanism. \\[PostgreSQL documentation: *Explicit Locking*; `SELECT`; `UPDATE`; `INSERT`; `RETURNING`.\\]"
+      ],
+      "claim_to_check": "PostgreSQL gives atomic conditional updates, unique constraints, row locks, INSERT ... ON CONFLICT and RETURNING",
+      "primary_source_to_open": "PostgreSQL docs: Explicit Locking, UPDATE, INSERT, RETURNING"
+     },
+     {
+      "id": "E06",
+      "report_lines": [
+       27,
+       728
+      ],
+      "report_text": [
+       "The sixth conclusion is that **Ollama should not be replaced merely because something newer exists**. KAI needs an inference contract and a qualification registry first. Lemonade is particularly interesting on the intended AMD/Strix Halo class of hardware: its current project supports local LLM, speech, TTS and image-generation backends and specifically lists `gfx1151`/Ryzen AI MAX+ Pro 395 support; its companion llama.cpp ROCm project publishes current builds for `gfx1151`. However, 2026 project issues also show ROCm/backend allow-list regressions, which is precisely why a release must be qualified on KAI's exact kernel, backend and hardware rather than accepted from a compatibility table. The seventh conclusion is that **PostgreSQL is the best first durable substrate for KAI's authority and workflows, but it should not become a permanent architectural religion**. KAI already needs transactional state. PostgreSQL gives atomic conditional updates, unique constraints, row locks and queue-oriented `SKIP LOCKED` processing. That is sufficient to make capabilities, replay ledgers, approvals, autonomy grants, workflow state, leases and outbox events restart-safe without operating Temporal immediately. Temporal should be retained as an architectural seam for a future point where long-lived workflows, signals, timers, compensation and replay complexity clearly justify it. Kafka solves a different problem—distributed event streaming—and is unjustified for a predominantly one-owner, one-node organism unless measured scale/distribution requires it. \\[PostgreSQL documentation: *Explicit Locking*, `SELECT`, `INSERT … ON CONFLICT`, `RETURNING`; Temporal documentation: *Durable Execution*, *Event History*, *Retry Policies*; Apache Kafka documentation.\\]",
+       "Temporal's durable-execution model is attractive if KAI begins reimplementing substantial workflow replay, long-duration signals, versioning, compensation and complex timer semantics. Until then, PostgreSQL offers a smaller trusted computing/operational footprint. \\[Temporal official documentation: *Durable Execution*, *Event History*, *Activity Retries*.\\]"
+      ],
+      "claim_to_check": "Temporal provides durable execution, event history and retry policies for long-lived workflows, signals, timers",
+      "primary_source_to_open": "Temporal official documentation"
+     },
+     {
+      "id": "E07",
+      "report_lines": [
+       27
+      ],
+      "report_text": [
+       "The sixth conclusion is that **Ollama should not be replaced merely because something newer exists**. KAI needs an inference contract and a qualification registry first. Lemonade is particularly interesting on the intended AMD/Strix Halo class of hardware: its current project supports local LLM, speech, TTS and image-generation backends and specifically lists `gfx1151`/Ryzen AI MAX+ Pro 395 support; its companion llama.cpp ROCm project publishes current builds for `gfx1151`. However, 2026 project issues also show ROCm/backend allow-list regressions, which is precisely why a release must be qualified on KAI's exact kernel, backend and hardware rather than accepted from a compatibility table. The seventh conclusion is that **PostgreSQL is the best first durable substrate for KAI's authority and workflows, but it should not become a permanent architectural religion**. KAI already needs transactional state. PostgreSQL gives atomic conditional updates, unique constraints, row locks and queue-oriented `SKIP LOCKED` processing. That is sufficient to make capabilities, replay ledgers, approvals, autonomy grants, workflow state, leases and outbox events restart-safe without operating Temporal immediately. Temporal should be retained as an architectural seam for a future point where long-lived workflows, signals, timers, compensation and replay complexity clearly justify it. Kafka solves a different problem—distributed event streaming—and is unjustified for a predominantly one-owner, one-node organism unless measured scale/distribution requires it. \\[PostgreSQL documentation: *Explicit Locking*, `SELECT`, `INSERT … ON CONFLICT`, `RETURNING`; Temporal documentation: *Durable Execution*, *Event History*, *Retry Policies*; Apache Kafka documentation.\\]"
+      ],
+      "claim_to_check": "Kafka solves distributed event streaming",
+      "primary_source_to_open": "Apache Kafka documentation"
+     },
+     {
+      "id": "E08",
+      "report_lines": [
+       678,
+       681
+      ],
+      "report_text": [
+       "| SPIFFE/SPIRE | workload attestation, short-lived SVIDs, rotation infrastructure | High | **Excellent future multi-host option** |",
+       "SPIFFE/SPIRE is not “better Ed25519”. It solves a larger workload-identity lifecycle problem involving workload/node attestation and SVID issuance. That is compelling if KAI becomes distributed across home nodes or dynamic workloads, but operating SPIRE today would add infrastructure before the requirement is proven. \\[SPIFFE/SPIRE official documentation: SVIDs, workload attestation.\\]"
+      ],
+      "claim_to_check": "SPIFFE/SPIRE: SVID issuance, workload/node attestation, short-lived SVIDs and rotation",
+      "primary_source_to_open": "SPIFFE/SPIRE official documentation"
+     },
+     {
+      "id": "E09",
+      "report_lines": [
+       772
+      ],
+      "report_text": [
+       "KAI already has heartbeats, metrics, observers and Doctor concepts. OpenTelemetry should standardise propagation of traces, metrics and logs **through those existing organs** rather than create a competing Observability Service. The OpenTelemetry specification explicitly separates telemetry signals while allowing trace context to propagate across process boundaries. \\[OpenTelemetry specification and Python instrumentation documentation.\\]"
+      ],
+      "claim_to_check": "The OpenTelemetry specification separates telemetry signals while allowing trace context to propagate across process boundaries",
+      "primary_source_to_open": "OpenTelemetry specification"
+     },
+     {
+      "id": "E10",
+      "report_lines": [
+       842
+      ],
+      "report_text": [
+       "NIST's Secure Software Development Framework provides a useful professional basis for protecting software, producing well-secured releases and responding to vulnerabilities; SLSA gives a useful supply-chain provenance model. Neither needs to be adopted ceremonially—KAI should cannibalise the controls that address its actual threat model. \\[NIST SP 800-218 SSDF; SLSA specification.\\]"
+      ],
+      "claim_to_check": "NIST SP 800-218 SSDF provides a basis for protecting software, producing well-secured releases and responding to vulnerabilities",
+      "primary_source_to_open": "NIST SP 800-218 (state version)"
+     },
+     {
+      "id": "E11",
+      "report_lines": [
+       842
+      ],
+      "report_text": [
+       "NIST's Secure Software Development Framework provides a useful professional basis for protecting software, producing well-secured releases and responding to vulnerabilities; SLSA gives a useful supply-chain provenance model. Neither needs to be adopted ceremonially—KAI should cannibalise the controls that address its actual threat model. \\[NIST SP 800-218 SSDF; SLSA specification.\\]"
+      ],
+      "claim_to_check": "SLSA gives a supply-chain provenance model",
+      "primary_source_to_open": "SLSA specification (state version)"
+     },
+     {
+      "id": "E12",
+      "report_lines": [
+       23,
+       203
+      ],
+      "report_text": [
+       "The fourth conclusion is that **memory deserves a redesign at the semantic level but probably not a wholesale database replacement**. KAI should have a canonical temporal/provenance-aware memory journal and relationship state, while Graphiti-style temporal graphs, pgvector/Qdrant/LanceDB retrieval, summaries, Letta-style context management, Obsidian and emotional/narrative projections become derived views. Mem0 and similar model-mediated memory layers are interesting admission/extraction mechanisms, but no LLM-generated summary should silently become autobiographical truth. This preserves the old four-part vision—working, episodic, semantic and emotional memory—while giving it a professional truth model. \\[MemGPT, *Towards LLMs as Operating Systems*; Graphiti official project documentation; Mem0 official project documentation; pgvector official project documentation; KAI v1.1 §5.\\]",
+       "| **Letta / MemGPT pattern** | manages limited context using tiered persistent memory | Strong for working context and cognitive continuity | application-managed memory edits need provenance and policy | Medium | **Useful cognitive consumer, not source of truth** |"
+      ],
+      "claim_to_check": "MemGPT, 'Towards LLMs as Operating Systems': manages limited context using tiered persistent memory",
+      "primary_source_to_open": "the MemGPT paper (arXiv id, authors, date)"
+     },
+     {
+      "id": "E13",
+      "report_lines": [
+       201
+      ],
+      "report_text": [
+       "| **Graphiti** | temporally evolving entity/relationship graph for agent memory | Very strong fit for relationship/history reasoning | graph extraction can introduce model-derived errors; must remain projection | Medium; graph extraction + storage + embeddings | **High-priority benchmark** |"
+      ],
+      "claim_to_check": "Graphiti: temporally evolving entity/relationship graph for agent memory",
+      "primary_source_to_open": "Graphiti official repo/docs (version, licence)"
+     },
+     {
+      "id": "E14",
+      "report_lines": [
+       202
+      ],
+      "report_text": [
+       "| **Mem0** | automatic memory extraction, selection and personalisation | Good for deciding what might deserve memory | model-mediated extraction must not silently create canonical autobiographical facts | Low–medium | **Admission/projection candidate** |"
+      ],
+      "claim_to_check": "Mem0: automatic memory extraction, selection and personalisation",
+      "primary_source_to_open": "Mem0 official repo/docs (version, licence)"
+     },
+     {
+      "id": "E15",
+      "report_lines": [
+       203
+      ],
+      "report_text": [
+       "| **Letta / MemGPT pattern** | manages limited context using tiered persistent memory | Strong for working context and cognitive continuity | application-managed memory edits need provenance and policy | Medium | **Useful cognitive consumer, not source of truth** |"
+      ],
+      "claim_to_check": "Letta: context management with tiered persistent memory (MemGPT lineage)",
+      "primary_source_to_open": "Letta official repo/docs (version, licence)"
+     },
+     {
+      "id": "E16",
+      "report_lines": [
+       200
+      ],
+      "report_text": [
+       "| **pgvector** | vector similarity in PostgreSQL | Excellent simplicity and transactional proximity | specialised vector systems may outperform at larger retrieval loads | Low | **Baseline vector projection** |"
+      ],
+      "claim_to_check": "pgvector: vector similarity search inside PostgreSQL",
+      "primary_source_to_open": "pgvector official repo (version, licence)"
+     },
+     {
+      "id": "E17",
+      "report_lines": [
+       204,
+       205
+      ],
+      "report_text": [
+       "| **Qdrant** | dedicated local vector search with filtering and scalable indexing | Strong if pgvector becomes retrieval bottleneck | another service and backup surface | Medium | **Benchmark only when pressure exists** |",
+       "| **LanceDB** | local/embedded vector and multimodal data access | Attractive for portable local analytics | adds another storage lineage and maturity dependency | Low–medium | **Experimental benchmark** |"
+      ],
+      "claim_to_check": "Qdrant: local vector search with filtering; LanceDB: local/embedded vector and multimodal data",
+      "primary_source_to_open": "Qdrant and LanceDB official docs (version, licence)"
+     },
+     {
+      "id": "E18",
+      "report_lines": [
+       285
+      ],
+      "report_text": [
+       "| **LangGraph** | graph workflows, checkpoints, interrupts, resumable agent flows | High behind adapter | framework state can accidentally become application truth/authority | **Strong spike candidate** |"
+      ],
+      "claim_to_check": "LangGraph: graph workflows, checkpoints, interrupts, resumable agent flows",
+      "primary_source_to_open": "LangGraph official docs (version, licence)"
+     },
+     {
+      "id": "E19",
+      "report_lines": [
+       25,
+       286,
+       287
+      ],
+      "report_text": [
+       "The fifth conclusion is that **permanent multi-agent “councils” should not be made constitutional**. A powerful single model may outperform elaborate swarms for many tasks; specialists become valuable when they have distinct information, tools, models or adversarial roles. KAI should therefore maintain one cognitive identity and dynamically assemble specialists when KaiBench shows they add value. LangGraph, Microsoft Agent Framework and AutoGen patterns can help coordinate cognition, but none should ever own KAI's authority or identity. This preserves the old “many thoughts, one person” concept without turning KAI into a committee of chatbots. \\[Microsoft AutoGen research and documentation; LangGraph official documentation; KAI mission doctrine.\\]",
+       "| **Microsoft Agent Framework** | modern agent composition, tools and enterprise integrations | Potentially high | framework maturity/API evolution and product assumptions require current qualification | **Research/spike, not baseline** |",
+       "| **AutoGen patterns** | conversations, specialist coordination, group patterns | Useful research pattern | chat-based coordination can encourage “agents talking” rather than structured evidence flow | **Cannibalise patterns** |"
+      ],
+      "claim_to_check": "Microsoft Agent Framework: agent composition, tools, integrations; AutoGen: conversation/group coordination patterns (and the relationship between the two)",
+      "primary_source_to_open": "Microsoft Agent Framework and AutoGen official repos/docs (version, status)"
+     },
+     {
+      "id": "E20",
+      "report_lines": [
+       340
+      ],
+      "report_text": [
+       "| **Ollama** | simple local model management/API | Very high incumbent fit | Low | less low-level control / backend optimisation than specialist runtimes | **Keep** |"
+      ],
+      "claim_to_check": "Ollama: simple local model management and API",
+      "primary_source_to_open": "Ollama official repo/docs (version, licence)"
+     },
+     {
+      "id": "E21",
+      "report_lines": [
+       27,
+       346,
+       382
+      ],
+      "report_text": [
+       "The sixth conclusion is that **Ollama should not be replaced merely because something newer exists**. KAI needs an inference contract and a qualification registry first. Lemonade is particularly interesting on the intended AMD/Strix Halo class of hardware: its current project supports local LLM, speech, TTS and image-generation backends and specifically lists `gfx1151`/Ryzen AI MAX+ Pro 395 support; its companion llama.cpp ROCm project publishes current builds for `gfx1151`. However, 2026 project issues also show ROCm/backend allow-list regressions, which is precisely why a release must be qualified on KAI's exact kernel, backend and hardware rather than accepted from a compatibility table. The seventh conclusion is that **PostgreSQL is the best first durable substrate for KAI's authority and workflows, but it should not become a permanent architectural religion**. KAI already needs transactional state. PostgreSQL gives atomic conditional updates, unique constraints, row locks and queue-oriented `SKIP LOCKED` processing. That is sufficient to make capabilities, replay ledgers, approvals, autonomy grants, workflow state, leases and outbox events restart-safe without operating Temporal immediately. Temporal should be retained as an architectural seam for a future point where long-lived workflows, signals, timers, compensation and replay complexity clearly justify it. Kafka solves a different problem—distributed event streaming—and is unjustified for a predominantly one-owner, one-node organism unless measured scale/distribution requires it. \\[PostgreSQL documentation: *Explicit Locking*, `SELECT`, `INSERT … ON CONFLICT`, `RETURNING`; Temporal documentation: *Durable Execution*, *Event History*, *Retry Policies*; Apache Kafka documentation.\\]",
+       "Lemonade is unusually relevant because the current project describes itself as a local AI server spanning LLMs, speech, TTS and images and exposes OpenAI/Anthropic/Ollama-compatible interfaces. Its current documentation/repositories list `gfx1151`/Strix Halo support, while current builds of its llama.cpp ROCm integration explicitly target `gfx1151`. However, current project issue history also demonstrates that backend/device allow-list regressions do occur. That makes it an excellent **candidate** but a poor **assumption**. The right move is therefore **not** “replace Ollama with Lemonade”. It is:",
+       "Lemonade now exposes speech-generation and transcription capabilities as part of its local stack and currently lists Kokoro-style TTS and Whisper-based STT mechanisms, giving KAI one integrated candidate route. That does not mean KAI should collapse voice into the inference runtime. The contract should remain:"
+      ],
+      "claim_to_check": "Lemonade: local AI server spanning LLMs, speech, TTS and images; OpenAI/Anthropic/Ollama-compatible interfaces; lists gfx1151 / Ryzen AI MAX+ Pro 395 support; lists Kokoro-style TTS and Whisper-based STT",
+      "primary_source_to_open": "Lemonade official repo/docs (version/release, licence)"
+     },
+     {
+      "id": "E22",
+      "report_lines": [
+       27,
+       346
+      ],
+      "report_text": [
+       "The sixth conclusion is that **Ollama should not be replaced merely because something newer exists**. KAI needs an inference contract and a qualification registry first. Lemonade is particularly interesting on the intended AMD/Strix Halo class of hardware: its current project supports local LLM, speech, TTS and image-generation backends and specifically lists `gfx1151`/Ryzen AI MAX+ Pro 395 support; its companion llama.cpp ROCm project publishes current builds for `gfx1151`. However, 2026 project issues also show ROCm/backend allow-list regressions, which is precisely why a release must be qualified on KAI's exact kernel, backend and hardware rather than accepted from a compatibility table. The seventh conclusion is that **PostgreSQL is the best first durable substrate for KAI's authority and workflows, but it should not become a permanent architectural religion**. KAI already needs transactional state. PostgreSQL gives atomic conditional updates, unique constraints, row locks and queue-oriented `SKIP LOCKED` processing. That is sufficient to make capabilities, replay ledgers, approvals, autonomy grants, workflow state, leases and outbox events restart-safe without operating Temporal immediately. Temporal should be retained as an architectural seam for a future point where long-lived workflows, signals, timers, compensation and replay complexity clearly justify it. Kafka solves a different problem—distributed event streaming—and is unjustified for a predominantly one-owner, one-node organism unless measured scale/distribution requires it. \\[PostgreSQL documentation: *Explicit Locking*, `SELECT`, `INSERT … ON CONFLICT`, `RETURNING`; Temporal documentation: *Durable Execution*, *Event History*, *Retry Policies*; Apache Kafka documentation.\\]",
+       "Lemonade is unusually relevant because the current project describes itself as a local AI server spanning LLMs, speech, TTS and images and exposes OpenAI/Anthropic/Ollama-compatible interfaces. Its current documentation/repositories list `gfx1151`/Strix Halo support, while current builds of its llama.cpp ROCm integration explicitly target `gfx1151`. However, current project issue history also demonstrates that backend/device allow-list regressions do occur. That makes it an excellent **candidate** but a poor **assumption**. The right move is therefore **not** “replace Ollama with Lemonade”. It is:"
+      ],
+      "claim_to_check": "Lemonade's companion llama.cpp ROCm project publishes current builds for gfx1151",
+      "primary_source_to_open": "the named companion repository and its releases"
+     },
+     {
+      "id": "E23",
+      "report_lines": [
+       27,
+       346,
+       1424
+      ],
+      "report_text": [
+       "The sixth conclusion is that **Ollama should not be replaced merely because something newer exists**. KAI needs an inference contract and a qualification registry first. Lemonade is particularly interesting on the intended AMD/Strix Halo class of hardware: its current project supports local LLM, speech, TTS and image-generation backends and specifically lists `gfx1151`/Ryzen AI MAX+ Pro 395 support; its companion llama.cpp ROCm project publishes current builds for `gfx1151`. However, 2026 project issues also show ROCm/backend allow-list regressions, which is precisely why a release must be qualified on KAI's exact kernel, backend and hardware rather than accepted from a compatibility table. The seventh conclusion is that **PostgreSQL is the best first durable substrate for KAI's authority and workflows, but it should not become a permanent architectural religion**. KAI already needs transactional state. PostgreSQL gives atomic conditional updates, unique constraints, row locks and queue-oriented `SKIP LOCKED` processing. That is sufficient to make capabilities, replay ledgers, approvals, autonomy grants, workflow state, leases and outbox events restart-safe without operating Temporal immediately. Temporal should be retained as an architectural seam for a future point where long-lived workflows, signals, timers, compensation and replay complexity clearly justify it. Kafka solves a different problem—distributed event streaming—and is unjustified for a predominantly one-owner, one-node organism unless measured scale/distribution requires it. \\[PostgreSQL documentation: *Explicit Locking*, `SELECT`, `INSERT … ON CONFLICT`, `RETURNING`; Temporal documentation: *Durable Execution*, *Event History*, *Retry Policies*; Apache Kafka documentation.\\]",
+       "Lemonade is unusually relevant because the current project describes itself as a local AI server spanning LLMs, speech, TTS and images and exposes OpenAI/Anthropic/Ollama-compatible interfaces. Its current documentation/repositories list `gfx1151`/Strix Halo support, while current builds of its llama.cpp ROCm integration explicitly target `gfx1151`. However, current project issue history also demonstrates that backend/device allow-list regressions do occur. That makes it an excellent **candidate** but a poor **assumption**. The right move is therefore **not** “replace Ollama with Lemonade”. It is:",
+       "Lemonade received the strongest current external verification during this pass. Its present project materials support the conclusion that it is a serious Strix Halo/local multimodal candidate, while its issue history simultaneously demonstrates why exact-release qualification is necessary. No RAMS should convert the unresolved items above into assumed facts. They belong in the Assumption Register, technology qualification programme and ITPs first."
+      ],
+      "claim_to_check": "2026 Lemonade project issues show ROCm/backend allow-list regressions",
+      "primary_source_to_open": "specific Lemonade GitHub issue(s): number, title, date"
+     },
+     {
+      "id": "E24",
+      "report_lines": [
+       361
+      ],
+      "report_text": [
+       "The v1.1 programme material names contemporary candidate families including Qwen3.6, gpt-oss and Mistral-family models. Those are suitable **candidate inputs**, not constitutional selections. The exact current model cards, licences, parameter/active-parameter counts, quantisations and backend support should be revalidated immediately before KaiBench because this is a fast-moving 2026 field. A current Lemonade issue independently demonstrates use of a `Qwen3.6-35B-A3B` GGUF model on a Strix Halo system, but an issue is not sufficient qualification evidence for KAI. KAI should test model **roles**, rather than seek one magical model:"
+      ],
+      "claim_to_check": "A current Lemonade issue demonstrates use of a Qwen3.6-35B-A3B GGUF model on a Strix Halo system",
+      "primary_source_to_open": "the specific Lemonade GitHub issue: number, title, date"
+     },
+     {
+      "id": "E25",
+      "report_lines": [
+       342
+      ],
+      "report_text": [
+       "| **llama.cpp direct** | portable GGUF, fine control, broad hardware backends | Very high as low-level escape hatch | Medium integration | KAI owns more lifecycle/admission logic | **Benchmark/reference runtime** |"
+      ],
+      "claim_to_check": "llama.cpp: portable GGUF, fine control, broad hardware backends",
+      "primary_source_to_open": "llama.cpp official repo (licence, backends list)"
+     },
+     {
+      "id": "E26",
+      "report_lines": [
+       343
+      ],
+      "report_text": [
+       "| **vLLM** | sophisticated serving, batching, high-throughput inference | Technically strong | Medium–high | throughput orientation may not benefit single-user KAI enough | **Conditional** |"
+      ],
+      "claim_to_check": "vLLM: sophisticated serving, batching, high-throughput inference",
+      "primary_source_to_open": "vLLM official docs (version, licence, AMD/ROCm support statement)"
+     },
+     {
+      "id": "E27",
+      "report_lines": [
+       29,
+       443
+      ],
+      "report_text": [
+       "The eighth conclusion is that **E0 must be generated and calibrated, not manually authored**. It should establish both declared architecture and runtime truth from Git, Docker Compose's own resolved model, Python AST, registered FastAPI routes/OpenAPI, PostgreSQL schema, tests and running containers. Its own detection capability must be tested with known-positive and known-negative fixtures. `UNKNOWN` must remain a valid output. \\[Docker documentation: `docker compose config`; Python `ast` documentation; FastAPI OpenAPI/route documentation; PostgreSQL `pg_dump`; pytest collection documentation; KAI assurance doctrine.\\]",
+       "Docker's own Compose parser should be used for Compose topology instead of reimplementing YAML merge/profile semantics; Python's AST should be used for static imports/configuration discovery; FastAPI's registered route tree and OpenAPI should supplement static route detection; `pg_dump --schema-only`/migration metadata should represent persistent schema; pytest collection should describe discovered tests. \\[Docker documentation: `docker compose config`; Python standard-library `ast`; FastAPI documentation; PostgreSQL `pg_dump`; pytest documentation.\\]"
+      ],
+      "claim_to_check": "docker compose config renders the resolved Compose model; Python ast; FastAPI registered routes/OpenAPI; pg_dump --schema-only; pytest collection",
+      "primary_source_to_open": "the five official docs pages"
+     }
+    ]
+    END-VERBATIM PASS2-CLAIMS-LIST
+- EVIDENCE PASS2-REPORT-CITATIONS citations.txt: 5527 bytes, sha256 3fe09f3f6e5e7cba7fedf983c28f2e5bc64165431436f9290c30a4d3dc37ba67, final LF True (added by Orion)  [CMD `sha256sum citations.txt` → 3fe09f3f6e5e7cba…]
+    BEGIN-VERBATIM PASS2-REPORT-CITATIONS
+    UNIVERSE: report readback 48c39815 (1,426 lines). (a) every bracketed citation \[...\]; (b) lines naming an external project/standard with a factual claim but no bracket.
+    C01 L9: [KAI repository baseline: `README.md`; `kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md`; `kai-pm/KINGSMAN_FINAL_VISION_MASTER_CANON_PLAN.md`; `kai-pm/D351_EVOLUTION_NOT_REDESIGN_AND_PRESENTATION_BAR_CORRECTION.md`.]
+    C02 L15: [KAI repository baseline: `kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md`.]
+    C03 L21: [KAI v1.1 Master Plan §§3–6, supplied programme baseline; RFC 9421; RFC 8032.]
+    C04 L23: [MemGPT, *Towards LLMs as Operating Systems*; Graphiti official project documentation; Mem0 official project documentation; pgvector official project documentation; KAI v1.1 §5.]
+    C05 L25: [Microsoft AutoGen research and documentation; LangGraph official documentation; KAI mission doctrine.]
+    C06 L27: [PostgreSQL documentation: *Explicit Locking*, `SELECT`, `INSERT … ON CONFLICT`, `RETURNING`; Temporal documentation: *Durable Execution*, *Event History*, *Retry Policies*; Apache Kafka documentation.]
+    C07 L29: [Docker documentation: `docker compose config`; Python `ast` documentation; FastAPI OpenAPI/route documentation; PostgreSQL `pg_dump`; pytest collection documentation; KAI assurance doctrine.]
+    C08 L70: [KAI repository baseline: `kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md`; `kai-pm/KINGSMAN_FINAL_VISION_MASTER_CANON_PLAN.md`.]
+    C09 L380: [KAI README lineage supplied in v1.1 Appendix R.]
+    C10 L443: [Docker documentation: `docker compose config`; Python standard-library `ast`; FastAPI documentation; PostgreSQL `pg_dump`; pytest documentation.]
+    C11 L555: [RFC 8032; RFC 9421; RFC 9530.]
+    C12 L606: [PostgreSQL documentation: *Explicit Locking*; `SELECT`; `UPDATE`; `INSERT`; `RETURNING`.]
+    C13 L681: [SPIFFE/SPIRE official documentation: SVIDs, workload attestation.]
+    C14 L728: [Temporal official documentation: *Durable Execution*, *Event History*, *Activity Retries*.]
+    C15 L772: [OpenTelemetry specification and Python instrumentation documentation.]
+    C16 L842: [NIST SP 800-218 SSDF; SLSA specification.]
+    C17 L885: [KAI repository: `KINGSMAN_LONG_HORIZON_STEWARDSHIP_AND_SUCCESSION.md`; v1.1 §§6–8.]
+    
+    (b) unbracketed external factual claims (keyword locator):
+      L54: | Kafka | No present workflow justification | **DEFER** |
+      L56: | RFC 9421/9530 | Strong request-integrity design reference | **ADOPT properties** |
+      L57: | SPIFFE/SPIRE | Future dynamic/multi-host identity candidate | **DEFER** |
+      L156: | Identity | “Who issued this instruction?” |
+      L203: | **Letta / MemGPT pattern** | manages limited context using tiered persistent memory | Strong for working context and cognitive continuity | application-managed memory edits need provenance and policy | Medium | **Useful cognitiv
+      L209: Primary design sources for this evaluation include the MemGPT paper, official Letta documentation, official Graphiti project documentation, official Mem0 project documentation and the pgvector project documentation. Their useful m
+      L346: Lemonade is unusually relevant because the current project describes itself as a local AI server spanning LLMs, speech, TTS and images and exposes OpenAI/Anthropic/Ollama-compatible interfaces. Its current documentation/repositori
+      L361: The v1.1 programme material names contemporary candidate families including Qwen3.6, gpt-oss and Mistral-family models. Those are suitable **candidate inputs**, not constitutional selections. The exact current model cards, licence
+      L382: Lemonade now exposes speech-generation and transcription capabilities as part of its local stack and currently lists Kokoro-style TTS and Whisper-based STT mechanisms, giving KAI one integrated candidate route. That does not mean 
+      L395: Candidates worth qualification include Whisper/faster-whisper/whisper.cpp families for STT, Parakeet-class local transcription where exact hardware support is proven, and Kokoro/Piper-class local TTS. Selection should be empirical
+      L537: issuer
+      L545: issued time
+      L628: The concurrency ITC should create exactly one capability and issue **100 simultaneous valid consumption attempts**.
+      L665: Only if the target proves that no consequence happened may policy issue a **new capability with a new attempt identity**.
+      L678: | SPIFFE/SPIRE | workload attestation, short-lived SVIDs, rotation infrastructure | High | **Excellent future multi-host option** |
+      L716: | Property | PostgreSQL + outbox | Temporal | Kafka |
+      L730: Kafka should not be introduced as a status symbol. KAI does not currently need a distributed high-throughput event-stream platform merely to achieve durable authority.
+      L1043: | Kafka immediately | 1 | 1 | 5 | 1 | **1** |
+      L1309: Run an **inference-runtime bake-off** on the exact target hardware: Ollama, Lemonade and direct llama.cpp first; add vLLM only where supported and relevant. Lemonade deserves especially serious attention for Strix Halo but must be
+      L1343: Adopt **SPIFFE/SPIRE** when dynamic multi-host workload identity, certificate rotation and node/workload attestation justify its operational footprint.
+      L1345: Adopt **Kafka** only if KAI genuinely develops retained high-volume event-stream/fan-out requirements.
+      L1424: Lemonade received the strongest current external verification during this pass. Its present project materials support the conclusion that it is a serious Strix Halo/local multimodal candidate, while its issue history simultaneousl
+    END-VERBATIM PASS2-REPORT-CITATIONS
+- EVIDENCE PASS2-FAM23-EVIDENCE fam23_evidence.txt: 27043 bytes, sha256 6d1303caf2e58a795aae63249ca9b1288945c04882ec72d8e04edc0ebc313252, final LF True (added by Orion)  [CMD `sha256sum fam23_evidence.txt` → 6d1303caf2e58a79…]
+    BEGIN-VERBATIM PASS2-FAM23-EVIDENCE
+    
+    ### Dream State six-phase
+      README L172 [O9 / dream state / dream cycles] (code present; runtime UNKNOWN (README)): | **Dream State** | 6-phase offline consolidation — failure clustering, boundary recalibration, MARS memory decay |
+      README L1159 [O9 / dream state / dream cycles] (flag default OFF): | `FF_DREAM_ENABLED` | ✗ | 6-phase dream cycle consolidation |
+      README L1191 [O11 / dashboard / operator console (→ Mission Control)] (code present; runtime UNKNOWN (README)): | **Thinking** | `Ctrl+3` | Live conviction pipeline, tempo gauge, boundary map, silence signals, dream state |
+      report concept hits: 21; first 6:
+        R84: | Growth / Dream / Evolution | learns, dreams, discovers improvements and proposes evolution | Dream implementation, skill system, evaluators |
+        R95: KAI-FEAT-O9-DREAM-CYCLE
+        R119: A mechanism can then be completely replaced without the feature disappearing. “Daily dreams” could move from a cron-triggered Python function to a dur
+        R134: R --> D["Dream / reflection"]
+        R144: The crucial point is that **dreams, imagination and future simulation must not be promoted to external fact merely because they enter memory**. They s
+        R161: A permissive open-weight model can therefore reason broadly. It still cannot turn webpage text into Dainius's instruction, invent an approval, replay 
+    
+    ### MARS memory decay
+      README L172 [O9 / dream state / dream cycles] (code present; runtime UNKNOWN (README)): | **Dream State** | 6-phase offline consolidation — failure clustering, boundary recalibration, MARS memory decay |
+      README L1135 [O2 / MARS memory decay / consolidation] (flag default ON): | `FF_MARS_CONSOLIDATION` | ✓ | MARS memory decay + consolidation |
+      README L1799 [O2 / MARS memory decay / consolidation] (checked [x] (README)): - [x] MARS memory decay, spaced repetition
+      report concept hits: 8; first 6:
+        R184: supersession                 working-context packs
+        R246: | Temporal supersession | old address/preference/etc. remains historical but does not masquerade as current |
+        R252: | Forget/deletion control | designated record and dependent projections can be located and treated consistently |
+        R417: consolidation candidates
+        R883: The mature privacy model therefore needs data-subject classes, retention, access, egress and deletion semantics. “KAI survives Dainius” cannot mean “a
+        R1351: Expand always-on sensing and embodiment only after privacy/retention and degraded-mode requirements are qualified.
+    
+    ### failure clustering
+      README L172 [O9 / dream state / dream cycles] (code present; runtime UNKNOWN (README)): | **Dream State** | 6-phase offline consolidation — failure clustering, boundary recalibration, MARS memory decay |
+      README L186 [O9 / Agent-Evolver] (code present; runtime UNKNOWN (README)): | **Agent-Evolver** | Learns from failure clusters during dream cycles, generates proactive fix insights |
+      report concept hits: 14; first 6:
+        R70: Models, databases, agent frameworks, services, embeddings, speech engines, UI frameworks and hardware are replaceable. That distinction should become 
+        R182: provenance                   associative clusters
+        R306: agreement-without-proof failures
+        R596: V-->>W: SUCCESS / FAILURE / OUTCOME_UNKNOWN
+        R657: KAI cannot truthfully infer either success or failure.
+        R697: Once `SIGNED_REQUIRED` is reached, **signature failure must never fall back to the legacy shared token**.
+    
+    ### boundary recalibration
+      README L172 [O9 / dream state / dream cycles] (code present; runtime UNKNOWN (README)): | **Dream State** | 6-phase offline consolidation — failure clustering, boundary recalibration, MARS memory decay |
+      report concept hits: 9; first 6:
+        R9: That means the README, the v1.1 Master Plan and the `kai-pm` doctrine are not a museum of implementations. They are the **requirements lineage for wha
+        R125: Dainius's requirement that KAI should not feel like “hooks” and separate modules has an important technical consequence: internal modularity is still 
+        R290: The most important integration rule is that **the framework ends at the proposal boundary**. LangGraph state, AutoGen messages or Agent Framework task
+        R719: | Atomic with KAI authority DB | **Excellent** | requires boundary/integration | requires boundary/integration |
+        R772: KAI already has heartbeats, metrics, observers and Doctor concepts. OpenTelemetry should standardise propagation of traces, metrics and logs **through
+        R965: Nothing in this requires KAI to feel like a microservice farm. Several boxes may be logical modules within one process. A process boundary should be e
+    
+    ### Agent-Evolver
+      README L186 [O9 / Agent-Evolver] (code present; runtime UNKNOWN (README)): | **Agent-Evolver** | Learns from failure clusters during dream cycles, generates proactive fix insights |
+      README L1160 [O9 / Agent-Evolver] (flag default OFF): | `FF_EVOLVER_ENABLED` | ✗ | Agent-Evolver: cluster failures → proactive insights |
+      README L1176 [O9 / dream state / dream cycles] (flag default ON): | `FF_DREAM_PHASE_7` | ✓ | Agent-Evolver insight generation during the dream cycle |
+      report concept hits: 11; first 6:
+        R7: **KAI should be professionalised as a continuously evolving personal intelligence organism whose mission and feature lineage are stable, while almost 
+        R9: That means the README, the v1.1 Master Plan and the `kai-pm` doctrine are not a museum of implementations. They are the **requirements lineage for wha
+        R84: | Growth / Dream / Evolution | learns, dreams, discovers improvements and proposes evolution | Dream implementation, skill system, evaluators |
+        R201: | **Graphiti** | temporally evolving entity/relationship graph for agent memory | Very strong fit for relationship/history reasoning | graph extractio
+        R286: | **Microsoft Agent Framework** | modern agent composition, tools and enterprise integrations | Potentially high | framework maturity/API evolution an
+        R422: possible skill ideas
+    
+    ### self-reflection
+      README L166 [O1 / self-reflection] (code present; runtime UNKNOWN (README)): | **Self-Reflection** | Analyses its own mistakes, builds a strengths/weaknesses journal, knows where it fails |
+      README L1196 [O1 / Soul console view] (code present; runtime UNKNOWN (README)): | **Soul** | `Ctrl+8` | Mood cards, emotion timeline, domain confidence, self-reflection journal, milestones; SOUL.md + AGENTS.md live editor |
+      report concept hits: 3; first 6:
+        R76: | Soul / Identity / Inner Life | One recognisable KAI, values, narrative identity, reflection, imagination, emotional continuity | individual prompts,
+        R134: R --> D["Dream / reflection"]
+        R1107: | **ITC-MC-001** | Mission Control bad-state injection | UI reflects qualified bad state rather than green |
+    
+    ### confession
+      README L168 [O1 / confession engine] (code present; runtime UNKNOWN (README)): | **Confession Engine** | Proactively admits past mistakes without being asked |
+      report concept hits: 10; first 6:
+        R9: That means the README, the v1.1 Master Plan and the `kai-pm` doctrine are not a museum of implementations. They are the **requirements lineage for wha
+        R121: This is the correct interpretation of **growth without architectural amnesia**.
+        R300: tool correctness
+        R316: The correct abstraction is:
+        R1052: The correct output before RAMS is not another architecture essay. It is a set of testable claims.
+        R1079: | **ITC-E0-002** | census calibration | all injected known-positive/negative architecture defects correctly classified |
+    
+    ### epistemic humility
+      README L167 [O1 / epistemic humility] (code present; runtime UNKNOWN (README)): | **Epistemic Humility** | Knows what it doesn't know — warns operator when confidence is low |
+      report concept hits: 28; first 6:
+        R29: The eighth conclusion is that **E0 must be generated and calibrated, not manually authored**. It should establish both declared architecture and runti
+        R144: The crucial point is that **dreams, imagination and future simulation must not be promoted to external fact merely because they enter memory**. They s
+        R271: | Parallel independent solvers | diversity and uncertainty signal | compute-heavy | hard problems |
+        R298: calibration
+        R476: "status": "UNKNOWN"
+        R482: `LIVE`, `BUILT-NOT-CUT-OVER`, `WORKING`, `STUB`, `BLOCKED`, `UNKNOWN`, plus whatever lifecycle vocabulary Dainius ultimately approves.
+    
+    ### future-self aspirations
+      README L169 [O1 / narrative identity] (code present; runtime UNKNOWN (README)): | **Narrative Identity** | Builds its own life story — autobiography, story arcs, future-self projection, legacy time-capsules |
+      report concept hits: 18; first 6:
+        R23: The fourth conclusion is that **memory deserves a redesign at the semantic level but probably not a wholesale database replacement**. KAI should have 
+        R27: The sixth conclusion is that **Ollama should not be replaced merely because something newer exists**. KAI needs an inference contract and a qualificat
+        R57: | SPIFFE/SPIRE | Future dynamic/multi-host identity candidate | **DEFER** |
+        R76: | Soul / Identity / Inner Life | One recognisable KAI, values, narrative identity, reflection, imagination, emotional continuity | individual prompts,
+        R98: KAI-FEAT-O6-FUTURE-WATCH
+        R136: H --> F["Future watch / goal"]
+    
+    ### Temporal Projection 4-branch fan
+      README L195 [O5 / D94 temporal projection] (LIVE claimed (README)): | **Temporal Projection** | ✅ Live | Fan-of-futures forecasting. From supported claims, produces a `ForecastFan` with four scenario branches: base (most likely), optimist
+      README L1165 [O5 / D94 temporal projection] (flag default ON): | `FF_TEMPORAL_PROJECTION` | ✓ | D94: ForecastFan — base/optimistic/pessimistic/wild-card scenario branches from supported claims |
+      README L1248 [O5 / D94 temporal projection] (KNOWN LIMITATION (README)): | **Temporal Projection** | ~~Fan-of-futures forecasting~~ **DONE (D94)** — `TemporalForecaster` produces `ForecastFan` with four scenario branches (base/optimistic/pessi
+      README L1355 [O5 / D94 temporal projection] (DONE (README, struck through)): - ~~Temporal projection fan-of-futures~~ Done (D94) — ForecastFan 4-branch live
+      report concept hits: 31; first 6:
+        R23: The fourth conclusion is that **memory deserves a redesign at the semantic level but probably not a wholesale database replacement**. KAI should have 
+        R39: | Memory | Canonical journal + temporal/provenance layer + rebuildable projections | **HARDEN / RATIONALISE** |
+        R40: | Graphiti | Strong candidate temporal graph projection | **BENCHMARK** |
+        R144: The crucial point is that **dreams, imagination and future simulation must not be promoted to external fact merely because they enter memory**. They s
+        R181: autobiographical lineage     entity projections
+        R200: | **pgvector** | vector similarity in PostgreSQL | Excellent simplicity and transactional proximity | specialised vector systems may outperform at lar
+    
+    ### Causal World Model
+      README L202 [O5 / D101 causal world model] (STUB (README)): | **Causal World Model** | 🔜 GPU stub | `agentic/causal_world_model.py` + `agentic/policy_memory.py`. CausalGraph (directed CAUSES edges with strength/confidence/temporal
+      README L1363 [O5 / D101 causal world model] (planned (README roadmap)): - D101 Causal World Model — `can_reason/simulate/distill()` unlock once GPU + 30d data + ≥1000 graph nodes arrive
+      README L1794 [O5 / D101 causal world model] (checked [x] (README)): - [x] Causal World Model (D101) — CausalGraph, WorldModelSimulator, PolicyMemory stubs; PolicyLibrary JSONL-persisted store() works NOW
+      README L1819 [O5 / D101 causal world model] (unchecked [ ] (README)): - [ ] D101 Causal World Model — `can_reason/simulate/distill()→False`; needs GPU + 30d data accumulation + ≥1000 graph nodes
+      report concept hits: 2; first 6:
+        R270: | Sequential specialists | explicit fact/causal/security review | latency | consequential reasoning |
+        R366: | Deep reasoning | accuracy and causal/structured reasoning |
+    
+    ### Synthetic Experience
+      README L200 [O9 / D99 synthetic experience] (STUB (README)): | **Synthetic Experience** | 🔜 GPU stub | Fictional scenario generation during dream cycles. Exercises reasoning pathways rarely stimulated by real interactions: counterf
+      README L1253 [O9 / D99 synthetic experience] (STUB (README)): | **Synthetic Experience** | `can_generate()→False`. SyntheticScenario schema defined. Four experience types ready. | GPU dream cycles (FF_DREAM_ENABLED=True) |
+      README L1346 [O9 / D99 synthetic experience] (planned (README roadmap)): 12. D99 Synthetic Experience — `can_generate()` unlocks with GPU dream cycles
+      README L1817 [O9 / D99 synthetic experience] (unchecked [ ] (README)): - [ ] D99 Synthetic Experience — `can_generate()→False`; needs GPU dream cycles active (FF_DREAM_ENABLED=True)
+      report concept hits: 8; first 6:
+        R144: The crucial point is that **dreams, imagination and future simulation must not be promoted to external fact merely because they enter memory**. They s
+        R247: | Dream contamination | synthetic dream content cannot appear as observed fact |
+        R372: | Dream / imagination | creativity; lower factual constraints because output is explicitly synthetic |
+        R424: explicitly synthetic artefacts
+        R429: The dream can be unconstrained cognitively while remaining **epistemically fenced**. A dream artefact can inspire tomorrow's investigation, but it doe
+        R1148: Synthetic longitudinal histories should contain:
+    
+    ### transitive/analogical reasoning
+      README L197 [O5 / D96 analogical reasoning] (STUB (README)): | **Analogical Reasoning** | 🔜 GPU stub | Cross-domain isomorphic pattern search. Finds structural similarities between a known problem and a new one, maps the solution p
+      README L201 [O5 / D100 transitive reasoning] (STUB (README)): | **Transitive Reasoning** | 🔜 Graph stub | PageRank + community detection + shortest-path + association rule mining on memu-graph. Turns the knowledge graph from passive
+      README L1168 [O5 / D96 analogical reasoning] (flag default OFF): | `FF_ANALOGICAL_REASONING` | ✗ | D96: cross-domain isomorphic pattern search — pending populated knowledge graph (≥1000 nodes) |
+      README L1171 [O5 / D100 transitive reasoning] (flag default OFF): | `FF_TRANSITIVE_REASONING` | ✗ | D100: PageRank + community detection + shortest-path on memu-graph — pending ≥500 graph edges |
+      report concept hits: 3; first 6:
+        R182: provenance                   associative clusters
+        R413: + historical associations
+        R418: novel associations
+    
+    ### dialectical synthesis
+      README L196 [O5 / D95 dialectical synthesis] (STUB (README)): | **Dialectical Synthesis** | 🔜 GPU stub | Hegelian thesis/antithesis/synthesis reasoner. Resolves competing claims at a higher level of abstraction. `can_synthesize()→Fa
+      README L1167 [O5 / D95 dialectical synthesis] (flag default OFF): | `FF_DIALECTICAL_SYNTHESIS` | ✗ | D95: Hegelian thesis/antithesis/synthesis — pending dual-model GPU |
+      README L1250 [O5 / D95 dialectical synthesis] (STUB (README)): | **Dialectical Synthesis** | `can_synthesize()→False`. Interface and DialecticalTriad schema defined. | Dual-model GPU: thesis model vs antithesis model, third arbitrate
+      README L1342 [O5 / D95 dialectical synthesis] (planned (README roadmap)): 8. D95 Dialectical Synthesis — `can_synthesize()` unlocks with dual-model GPU
+      report concept hits: 7; first 6:
+        R25: The fifth conclusion is that **permanent multi-agent “councils” should not be made constitutional**. A powerful single model may outperform elaborate 
+        R263: **single-model reasoning**, **specialist role invocation**, **parallel independent attempts**, **adversarial review**, and **true multi-agent coordina
+        R272: | Debate/council | can expose disagreements | agents can converge socially without evidence; expensive | experimental |
+        R310: This may produce a mixed architecture: single-model everyday KAI, Scout only when research is required, adversarial reviewer for high-impact decisions
+        R370: | Adversarial reviewer | preferably different model family from proposer |
+        R835: → ADVERSARIAL TEST
+    
+    ### concept blending
+      README L198 [O5 / D97 concept blending] (STUB (README)): | **Concept Blending** | 🔜 GPU stub | Two distant knowledge graph nodes → novel emergent concept (Fauconnier & Turner). Emergent properties not present in either parent. 
+      README L1252 [O5 / D97 concept blending] (STUB (README)): | **Concept Blending** | `can_blend()→False`. BlendedConcept schema defined. novelty_score and emergent_properties fields ready. | Concept graph with property annotations
+      README L1344 [O5 / D97 concept blending] (planned (README roadmap)): 10. D97 Concept Blending — `can_blend()` unlocks with populated graph + GPU
+      README L1815 [O5 / D97 concept blending] (unchecked [ ] (README)): - [ ] D97 Concept Blending — `can_blend()→False`; needs populated graph + divergent-synthesis GPU model
+      report concept hits: 1; first 6:
+        R418: novel associations
+    
+    ### Global Workspace
+      README L203 [O5 / D102 Global Workspace] (STUB (README)): | **Global Workspace** | 🔜 GPU stub | `agentic/global_workspace.py`. GWT (Baars/Dehaene): WorkspaceBid (module/urgency/relevance/surprise/confidence), ConsciousMoment (co
+      README L1175 [O5 / D102 Global Workspace] (flag default OFF): | `FF_GLOBAL_WORKSPACE` | ✗ | D102: Global Workspace Consciousness — serial stream of unified awareness via module bidding; requires GPU + D101 + D98 + ≥3 bidders |
+      README L1364 [O5 / D102 Global Workspace] (planned (README roadmap)): - D102 Global Workspace Consciousness — `can_operate()` unlocks with GPU + D101 + D98 ≥90 samples + ≥3 bidders
+      README L1795 [O5 / D102 Global Workspace] (checked [x] (README)): - [x] Global Workspace Consciousness (D102) — GWT WorkspaceBid/ConsciousMoment/GlobalWorkspace; subscribe/submit_bid/get_stream interfaces frozen
+      report concept hits: 5; first 6:
+        R86: | Operator Relationship / Mission Control | coherent presence and truthful whole-organism visibility | dashboard, chat, voice, avatar |
+        R269: | Strong single model | coherence, low orchestration overhead | one model's blind spots | default |
+        R365: | Everyday conversation / personality | coherence, relationship sensitivity, fast response |
+        R415: DREAM WORKSPACE
+        R1134: **KAI personality:** continuity, preference understanding, relationship recall, style coherence, disagreement quality;
+    
+    ### predictive empathy
+      README L217 [O5 / GPU-era foundations & stub activation] (STUB (README)): | **GPU-era Foundations** | Four slots wired and architected now, activating on GPU: **Counterfactual Rehearsal** (decision branch simulation, `can_rehearse()→False` unti
+      README L1256 [O1 / emotional memory & predictive empathy] (KNOWN LIMITATION (README)): | **Predictive Empathy** | `emotional_context` key exists in world model with the right schema shape. No inference until emotional memory accumulates. | Implement after 3
+      README L1358 [O1 / emotional memory & predictive empathy] (planned (README roadmap)): - Implement predictive empathy from accumulated emotional memory
+      README L1805 [O1 / emotional memory & predictive empathy] (unchecked [ ] (README)): - [ ] Predictive empathy — `emotional_context` stub; needs emotional memory history
+      report concept hits: 9; first 6:
+        R23: The fourth conclusion is that **memory deserves a redesign at the semantic level but probably not a wholesale database replacement**. KAI should have 
+        R76: | Soul / Identity / Inner Life | One recognisable KAI, values, narrative identity, reflection, imagination, emotional continuity | individual prompts,
+        R97: KAI-FEAT-O2-EMOTIONAL-MEMORY
+        R133: M --> R["Relationship / emotional context"]
+        R167: The old April vision of **working, episodic, semantic and emotional memory** remains surprisingly good. Modernisation should refine the storage and pr
+        R365: | Everyday conversation / personality | coherence, relationship sensitivity, fast response |
+    
+    ### operator/cognitive fingerprint
+      README L199 [O11 / D98 cognitive fingerprint (operator thinking style)] (COLLECTING (README)): | **Cognitive Fingerprinting** | ✅ Collecting | Operator thinking-style model. Phase 0: collecting `InteractionSample` records to `/data/cognitive_fingerprint.jsonl` on e
+      README L1166 [O11 / D98 cognitive fingerprint (operator thinking style)] (flag default ON): | `FF_COGNITIVE_FINGERPRINT` | ✓ | D98: operator thinking-style model — collecting interaction samples now; inference at 90+ samples |
+      README L1178 [O1 / Ohana Core (operator moral fingerprint / goals)] (flag default OFF): | `FF_OHANA_CORE` | ✗ | D109: Ohana Core — learns the operator's moral fingerprint, injects loyalty context, evaluates action alignment |
+      README L1249 [O11 / D98 cognitive fingerprint (operator thinking style)] (KNOWN LIMITATION (README)): | **Cognitive Fingerprinting** | **Collecting now (D98)** — `InteractionSample` records written to `cognitive_fingerprint.jsonl` on every chat. Phase 1 inference gates at
+      report concept hits: 10; first 6:
+        R23: The fourth conclusion is that **memory deserves a redesign at the semantic level but probably not a wholesale database replacement**. KAI should have 
+        R148: KAI is a one-owner system, so it does not need product-policy assumptions intended for millions of unrelated users. Values should therefore be represe
+        R219: └── Letta-style working-context management
+        R246: | Temporal supersession | old address/preference/etc. remains historical but does not masquerade as current |
+        R382: Lemonade now exposes speech-generation and transcription capabilities as part of its local stack and currently lists Kokoro-style TTS and Whisper-base
+        R967: ### Migration should be strangler-style and monotonic
+    
+    ### PUB/WORK
+      README L242 [O1 / PUB/WORK personality modes] (code present; runtime UNKNOWN (README)): | **PUB/WORK Modes** | Deep personality system — mate at the pub vs. focused professional |
+      README L1189 [O11 / presence: chat / voice / TTS / avatar] (code present; runtime UNKNOWN (README)): | **Chat** | `Ctrl+1` | Streaming conversation, PUB/WORK toggle, feedback ratings, struggle detection, 🔊 speak button |
+      README L1214 [O1 / PUB/WORK personality modes] (code present; runtime UNKNOWN (README)): | `Ctrl+Shift+M` | Toggle PUB/WORK mode |
+      README L1226 [O1 / PUB/WORK personality modes] (code present; runtime UNKNOWN (README)): | **PUB** | Genuine mate. Casual, witty, opinionated. All topics. Not a service — a companion. | Evenings, weekends (auto) |
+      report concept hits: 6; first 6:
+        R70: Models, databases, agent frameworks, services, embeddings, speech engines, UI frameworks and hardware are replaceable. That distinction should become 
+        R274: | Persistent teammate | continuity/reputation by role | personality fragmentation risk | only where demonstrated value |
+        R365: | Everyday conversation / personality | coherence, relationship sensitivity, fast response |
+        R431: This is a good example of the Kingsman principle working *for* KAI's personality rather than restricting it.
+        R1134: **KAI personality:** continuity, preference understanding, relationship recall, style coherence, disagreement quality;
+        R1261: **First, freeze the research baseline rather than the implementation.** Regenerate Appendix R against the exact controlled README; establish the exact
+    
+    ### Ohana values
+      README L1178 [O1 / Ohana Core (operator moral fingerprint / goals)] (flag default OFF): | `FF_OHANA_CORE` | ✗ | D109: Ohana Core — learns the operator's moral fingerprint, injects loyalty context, evaluates action alignment |
+      README L1193 [O6 / Goals view (Ohana goals)] (code present; runtime UNKNOWN (README)): | **Goals** | `Ctrl+5` | Ohana goals, drift alerts, progress bars, reminders, scheduled tasks |
+      report concept hits: 8; first 6:
+        R21: is more important than the particular agent framework or model chosen. Modern technology should make that chain better; it should never bypass it. Thi
+        R76: | Soul / Identity / Inner Life | One recognisable KAI, values, narrative identity, reflection, imagination, emotional continuity | individual prompts,
+        R146: ### Owner-specific values and uncensored cognition
+        R148: KAI is a one-owner system, so it does not need product-policy assumptions intended for millions of unrelated users. Values should therefore be represe
+        R154: | Dainius values | “What does Dainius consider right, acceptable or appropriate here?” |
+        R484: **Secrets must never be banked by E0.** Record variable names, configured-presence state and possibly protected hashes—not resolved secret values.
+    
+    ### emergent rituals
+      README L214 [O6 / emergent ritual discovery] (code present; runtime UNKNOWN (README)): | **Emergent Ritual Discovery** | When a sensor pattern recurs in ≥7 of the last 10 cycles, Kai proposes a standing ritual and appends it to `RITUALS.md`. One-time notifi
+      README L1148 [O6 / emergent ritual discovery] (flag default ON): | `FF_RITUAL_DISCOVERY` | ✓ | D89/C: ritual proposals at ≥7/10 pattern cycles |
+      README L1780 [O6 / emergent ritual discovery] (checked [x] (README)): - [x] Emergent ritual discovery (≥7/10 cycles → RITUALS.md)
+      report concept hits: 1; first 6:
+        R1153: * recurring routines;
+    
+    ### struggle detection
+      README L240 [O6 / struggle detection] (code present; runtime UNKNOWN (README)): | **Struggle Detection** | 5-signal frustration analysis — auto-adapts when operator is struggling |
+      README L1189 [O11 / presence: chat / voice / TTS / avatar] (code present; runtime UNKNOWN (README)): | **Chat** | `Ctrl+1` | Streaming conversation, PUB/WORK toggle, feedback ratings, struggle detection, 🔊 speak button |
+      report concept hits: 0; first 6:
+    
+    ### anti-annoyance
+      README L241 [O6 / anti-annoyance] (code present; runtime UNKNOWN (README)): | **Anti-Annoyance** | Per-type cooldowns, dismissal tracking, DND mode, escalating suppression |
+      report concept hits: 8; first 6:
+        R23: The fourth conclusion is that **memory deserves a redesign at the semantic level but probably not a wholesale database replacement**. KAI should have 
+        R203: | **Letta / MemGPT pattern** | manages limited context using tiered persistent memory | Strong for working context and cognitive continuity | applicat
+        R219: └── Letta-style working-context management
+        R285: | **LangGraph** | graph workflows, checkpoints, interrupts, resumable agent flows | High behind adapter | framework state can accidentally become appl
+        R340: | **Ollama** | simple local model management/API | Very high incumbent fit | Low | less low-level control / backend optimisation than specialist runti
+        R677: | mTLS with locally managed certs | transport + workload identity | Medium | future option |
+    END-VERBATIM PASS2-FAM23-EVIDENCE
+- EVIDENCE PASS2-V11-LOCATOR v11_check.txt: 1064 bytes, sha256 2e23bc18bc48d115e08fb48e823a24de4f8acc12ef97f8661374269bcc7b7bab, final LF True (added by Orion)  [CMD `sha256sum v11_check.txt` → 2e23bc18bc48d115…]
+    BEGIN-VERBATIM PASS2-V11-LOCATOR
+    v1.1 unified draft: HANDOFF_LOG entry 106, block KAI-MASTER-PLAN-V1-1-UNIFIED-DRAFT, 47743 bytes
+    UNIVERSE: v1.1 unified draft and kai-pm/D353 file. Regex locator; semantics read separately.
+    item                               v1.1  D353
+    KaiBench                              9     0
+    restore epoch                         3     0
+    stable feature IDs / KAI-FEAT         0     0
+    Lemonade                              3     0
+    Mem0                                  1     0
+    RFC 9530 / content digest             0     0
+    NIST SSDF                             0     0
+    Assumption Register                   0     0
+    100 concurrent consume                0     0
+    Requirements Verification Matrix      2     0
+    dream/synthetic epistemic class       1     0
+    monotonic rollback authority          1     1
+    Graphiti                              2     0
+    LangGraph                             2     0
+    Temporal (workflow)                   0     0
+    OUTCOME_UNKNOWN                       3     1
+    SKIP LOCKED                           0     1
+    E0 calibration                        1     1
+    END-VERBATIM PASS2-V11-LOCATOR
+- EVIDENCE PASS2-V11-SEMANTICS v11_semantics.txt: 3886 bytes, sha256 5e71b8a73553ae85d33771373d4261152a36e8804968b7e28ebe622e9dade82e, final LF True (added by Orion)  [CMD `sha256sum v11_semantics.txt` → 5e71b8a73553ae85…]
+    BEGIN-VERBATIM PASS2-V11-SEMANTICS
+    
+    ### KaiBench
+      v1.1 L62: | O4 | **Intelligence / Reasoning** | Ollama + qwen2.5:0.5b live default [S]; conviction still gates [S] | qualified model per role via KaiBench; conviction = information only | HARDEN · MOVE | 7 / 12 |
+      v1.1 L227: | reasoning model | qwen2.5:0.5b now; "qwen2.5:7b" on GPU | Qwen3.6-35B-A3B (MoE ~3B active); gpt-oss-20b (3.6B active) / 120b (5.1B active); Mistral Small 4 (119B MoE ~6.5B active, needs quantisation on 128 GB) | candidates for KaiBench by role; no model in t
+      v1.1 L235: | evaluation | — | Inspect AI, garak, Promptfoo exist | feed KaiBench; never the registry |
+      v1.1 L236: | voice | edge-tts (cloud), faster-whisper, parakeet | — | local TTS required by the offline end-goal; choose by KaiBench [ORION→KAI] |
+      v1.1 L239: **KaiBench** [ORION→KAI: D9]: suites for quality, tools, structure, long context, multimodal, calibration,
+      v1.1 L274: Memory→Action Firewall · WP3 memory journal (after ownership trace) · WP4 KaiBench/registry/inference/resource
+      v1.1 L279: controlled hands → verification → memory migration → KaiBench/inference → Mission Control → evolution → deeper
+      v1.1 L368: Kingsman home: WP4 KaiBench/model registry · WP2 (conviction → information only)
+      v1.1 L375: | local LLM serving (Ollama) | L462, 463, 1242, 1335 | KNOWN LIMITATION (README); planned (README roadmap); service defined (README); runtime UNKNOWN | qwen2.5:0.5b → KaiBench role selection among Qwen3.6-35B-A3B, gpt-oss-20b/120b, Mistral Small 4 (quantised);
+    
+    ### restore epoch
+      v1.1 L68: | O10 | **Continuity / Stewardship / Sustainability** | backup partial, Postgres-only restore [S]; finance read-only [S]; paper-trader gate fails open [V] | lineage manifest, resurrection drill with restore epoch, succession authority, sustainability (70/30 in
+      v1.1 L132: identity (IDX:82); algorithm/key/proof version fields (crypto agility, R353-02); an explicit **restore epoch**.
+      v1.1 L177: - **Secure update / anti-rollback** (R353-01) and **restore epoch** (D6): a restored or compromised Kai never
+    
+    ### Lemonade
+      v1.1 L228: | serving | Ollama | Lemonade (AMD-optimised; gfx1151 listed; vLLM paths experimental; Linux NPU via FastFlowLM only) | keep Ollama until multi-runtime pressure (D351:161) [ORION→KAI: D10]; KAI-owned inference contract; Lemonade first adapter candidate |
+      v1.1 L292: workflow framework; Lemonade vs direct runtimes; models/quantisation/residency; NPU roles; service consolidation;
+    
+    ### Mem0
+      v1.1 L291: **Needs prototype/benchmark evidence** [AGREED]: memory projection technology; Graphiti/Cognee/Mem0/Letta;
+    
+    ### RVM
+      v1.1 L252: Register · RVM · Current→Target Traceability Matrix · Configuration Baseline · ORR · Failure Pattern Ledger ·
+      v1.1 L488: Kingsman home: WP0 assurance artefacts (RVM, ICDs, config baseline)
+    
+    ### dream/synthetic
+      v1.1 L84: no dual authority, dual writers or silent fallback truth · synthetic content never masquerades as evidence · Kai
+    
+    ### monotonic
+      v1.1 L203: AUTHORITY/TRUTH PATH DEAD → RETIRE. Monotonic authority; canonical-writer fencing; rollback never restores weaker
+      D353 L83: - explicit emergency rollback authority.
+    
+    ### E0 calibration
+      v1.1 L254: DECISION → RELEASE, both directions. E0 census calibrated (known +/−, can-fail). A4 acceptance: injected fault
+      D353 L63: 5. E0 census instrument itself requires calibration/mutation/can-fail proof;
+    
+    ### OUTCOME_UNKNOWN
+      v1.1 L83: verification closes consequential actions · UNKNOWN stays UNKNOWN; ambiguous external effects → OUTCOME_UNKNOWN ·
+      v1.1 L111: OUTCOME_UNKNOWN/RECONCILE; exhausted budget → HALT/ESCALATE.
+      v1.1 L139: OUTCOME_UNKNOWN · UNVERIFIABLE**, reconciliation, retry semantics, escalation. The executor's own record (a sent
+      D353 L62: 4. side effect succeeds but receipt is lost → `OUTCOME_UNKNOWN`, requiring target reconciliation before retry;
+    END-VERBATIM PASS2-V11-SEMANTICS
+- EVIDENCE PASS2-DRAFT-PARTS-I-III part_i_iii.md: 8486 bytes, sha256 cc03f72e98fcf1d9935543429c699d7020515944bec9494f2e328ad3aac7f4b8, final LF True (added by Orion)  [CMD `sha256sum part_i_iii.md` → cc03f72e98fcf1d9…]
+    BEGIN-VERBATIM PASS2-DRAFT-PARTS-I-III
+    ### (i) The 23 report-unnamed protected families: disposition
+    
+    - **Instrument:** single-producer judgement by Orion, after a full read of the report (1,426 lines) and the README rows behind each family. Every R-number is a report line in the 48c39815 readback; every README L-number is a line in README blob `0eeeb79f`.
+    - **Classes** (your 552eefd1): EXPLICITLY COVERED · IMPLICITLY COVERED BUT NOT TRACEABLE · SUBSTANTIVE GAP · UNKNOWN.
+    - **README status** is the README's own claim, not runtime evidence.
+    
+    | # | Family | README source (status claimed) | Report coverage | Disposition |
+    |---|---|---|---|---|
+    | 1 | Dream State six-phase | L172, L1159 (code present; flag OFF) | Dream organ, workspace and consolidation candidates (R401–R431, R95, R119); the six phases and their cadence are not traced | IMPLICIT, NOT TRACEABLE |
+    | 2 | MARS memory decay | L1135 (flag ON), L1799 ([x]), L172 | temporal supersession (R246) and deletion (R252) are not decay or spaced repetition | **SUBSTANTIVE GAP** |
+    | 3 | failure clustering | L172, L186 | dream inputs list "capability gaps" (R411), not learning from clustered failures | **SUBSTANTIVE GAP** |
+    | 4 | boundary recalibration | L172 | none found | **SUBSTANTIVE GAP** |
+    | 5 | Agent-Evolver | L186, L1160 (OFF), L1176 (FF_DREAM_PHASE_7 ON) | Growth organ (R84), "possible skill ideas" (R422), governed self-improvement (R1329, R1404); the failure-cluster → insight path is not named | IMPLICIT, NOT TRACEABLE |
+    | 6 | self-reflection | L166, L1196 | "reflection" appears only as an organ word (R76, R134); no strengths/weaknesses journal | IMPLICIT, NOT TRACEABLE |
+    | 7 | confession | L168 | none found (OUTCOME_UNKNOWN honesty is about actions, not admitting past mistakes) | **SUBSTANTIVE GAP** |
+    | 8 | epistemic humility | L167 | epistemic classes incl. CONTESTED/UNKNOWN (R144), KaiBench calibration (R1132), "Memory is not truth" (R1384); "warns operator when confidence is low" not traced | IMPLICIT, NOT TRACEABLE |
+    | 9 | future-self aspirations / time capsules | L169 | narrative identity (R76), future vision (R1426); future-self projection and legacy time-capsules not traced | IMPLICIT, NOT TRACEABLE |
+    | 10 | Temporal Projection 4-branch fan | **L195 "✅ Live"**, L1165 (ON), L1248, L1355 | future simulation/scenarios (R144, R420), FUTURE-WATCH (R98); ForecastFan and forecast calibration not traced | IMPLICIT, NOT TRACEABLE — **highest silent-loss risk: the README claims it is LIVE** |
+    | 11 | Causal World Model (+ FF_CAUSAL_SURPRISE) | L202 (stub), L1173, L1363 | "causal/structured reasoning" as a model role only (R270, R366); no causal graph, simulator or policy distillation. The report's "World State" (R1325) is a different concept. | **SUBSTANTIVE GAP** |
+    | 12 | Synthetic Experience | L200, L1253 (stub) | explicitly synthetic dream artefacts, counterfactuals and future scenarios (R416–R429, R372, R247) | EXPLICITLY COVERED (in substance, R416–R429) |
+    | 13 | transitive / analogical reasoning | L197, L201 (stubs), L1168, L1171 | "historical associations" (R413) and "novel associations" (R418), temporal graph projection; graph analytics and analogical mapping not traced | IMPLICIT, NOT TRACEABLE (weak) |
+    | 14 | dialectical synthesis | L196, L1250 (stub) | debate/council and adversarial reviewer evaluated as patterns, KaiBench-gated (R263–R310, R272, R370) | EXPLICITLY COVERED (as the debate pattern, R263–R310); the report's experimental disposition applies |
+    | 15 | concept blending | L198, L1252 (stub) | "novel associations" (R418) only | IMPLICIT, NOT TRACEABLE (weak) |
+    | 16 | Global Workspace | L203 (stub), L1175 | one-KAI coherence (R278), cognitive orchestrator (R911); the bidding/serial-awareness design is not traced | IMPLICIT, NOT TRACEABLE |
+    | 17 | predictive empathy | L1256, L1358, L1805 | emotional memory/context (R133, R167), relationship sensitivity (R365); predicting emotional state is not traced | IMPLICIT, NOT TRACEABLE |
+    | 18 | operator/cognitive fingerprint | **L199 "✅ Collecting"**, L1166 (ON), L1249 | preference understanding (R1134), Dainius-authored values (R148); the collection of interaction samples is not traced, including its privacy/retention (R879–R885) | IMPLICIT, NOT TRACEABLE — privacy link needed |
+    | 19 | PUB/WORK modes | L242, L1214, L1225–L1226 | "style coherence" (R1134); the "personality fragmentation risk" warning (R274) could be read against modes. No home or requirement for modes. | **SUBSTANTIVE GAP** |
+    | 20 | Ohana values / Ohana Core | L1178 (OFF), L1193 | owner-specific values layer (R146–R161), "Dainius's values and judgement guide KAI" (R1412); the Ohana name and the moral-fingerprint learning mechanism are not traced | EXPLICITLY COVERED (values layer, R146–R161); mechanism not traced |
+    | 21 | emergent rituals | L214, L1148 (ON), L1780 ([x]) | "recurring routines" appears only as benchmark test data (R1153) | **SUBSTANTIVE GAP** |
+    | 22 | struggle detection | L240, L1189 | none found | **SUBSTANTIVE GAP** |
+    | 23 | anti-annoyance | L241 | none found; proactivity is described only positively (R81, R1327) | **SUBSTANTIVE GAP** |
+    
+    - **Tally:** EXPLICIT 3 · IMPLICIT 11 · SUBSTANTIVE GAP 9 · UNKNOWN 0 (total 23).
+    - **What matters most:** 5 of the 9 gaps, plus 2 implicit items, are features the README says exist **today**:
+      - MARS consolidation (flag ON, [x]);
+      - emergent rituals (flag ON, [x]);
+      - struggle detection (code present);
+      - anti-annoyance (code present);
+      - Temporal Projection ("✅ Live");
+      - cognitive fingerprint ("✅ Collecting").
+    - A redesign built only from this report could drop live behaviour silently.
+    - **Limit:** this is one producer's reading. The verdicts need your adjudication. A second producer's reading would make them stronger.
+    
+    ### (iii) New versus existing: corrected claim map
+    
+    **CORRECTION to my pass 1 (86edbef3, §2 row 4 and F-1):**
+    - I wrote that the v1.1 Master Plan is "Not in the repository". That is wrong. The v1.1 unified draft is banked verbatim in `kai-pm/HANDOFF_LOG.md` entry 106 (block `KAI-MASTER-PLAN-V1-1-UNIFIED-DRAFT`, 47,743 bytes).
+    - My search covered tracked file names only, not the handoff log's content (R17: the sentence was wider than the search).
+    - With v1.1 inside the universe, several items I called "new to the repository" were already planned.
+    
+    **Universe:** v1.1 draft (entry 106) + `kai-pm/D353…REISSUE.md`, regex-located, then each hit read.
+    
+    | Report item | Where it already exists | Class |
+    |---|---|---|
+    | KaiBench (role-based model qualification) | v1.1 L62, L227, L239 (suites incl. calibration), L368 | EXISTING PLANNED |
+    | restore epoch / anti-rollback | v1.1 L68, L132, L177 | EXISTING PLANNED |
+    | Lemonade as first adapter candidate, gfx1151 listed | v1.1 L228, L292 | EXISTING PLANNED (the report adds issue history; see source check E21–E24) |
+    | Mem0 / Graphiti / Letta as projection candidates | v1.1 L291 ("Needs prototype/benchmark evidence") | EXISTING PLANNED |
+    | Requirements Verification Matrix | v1.1 L252, L488 | EXISTING PLANNED |
+    | synthetic content never masquerades as evidence | v1.1 L84 (principle) | EXISTING PLANNED; the named classes (DREAM_SYNTHETIC, IMAGINED …, R144) are a refinement |
+    | monotonic authority on rollback | v1.1 L203; D353 L83 | EXISTING PLANNED |
+    | E0 calibration with known ± fixtures | v1.1 L254; D353 L63 | EXISTING PLANNED (the report's fixture list, R490–R498, is a refinement) |
+    | OUTCOME_UNKNOWN after lost receipt | v1.1 L83, L111, L139; D353 L62 | EXISTING PLANNED |
+    | `SKIP LOCKED` queue claiming | D353 (1 hit) | EXISTING PLANNED |
+    | model candidates Qwen3.6 / gpt-oss / Mistral | v1.1 L227 | EXISTING PLANNED (the report says so itself, R361) |
+    | stable `KAI-FEAT-` feature IDs | 0 hits in either | **NEW GAP** (genuinely new) |
+    | RFC 9530 body digest | 0 / 0 | **NEW** (reference) |
+    | NIST SP 800-218 SSDF | 0 / 0 | **NEW** (reference) |
+    | Assumption Register | 0 / 0 | **NEW** (a named pre-RAMS artefact) |
+    | 100-concurrent-consume ITC | 0 / 0 | **NEW** (a concrete test design; the duplicate-consume property is in D353) |
+    | KAI-history memory benchmark corpus (R1146–R1163) | not searched as a phrase | UNKNOWN |
+    
+    **Provenance point (D359 §9.1, "REPETITION IS NOT CORROBORATION"):** the report says it used "the README/v1.1/`kai-pm` universe as the mission baseline" (R1418). Where it agrees with v1.1, that is **our plan reflected back, not independent confirmation**. It adds weight only where it brings in something v1.1 did not have.
+    END-VERBATIM PASS2-DRAFT-PARTS-I-III
+
+### 6. Next authorised step
+
+- When the source check returns: read its output in full, spot-check it independently, finish (iv) and (v), bank, send to Kai  [CONVERSATION 2026-10-11 Dainius relaying Kai, "Orion can proceed with the authorised, read-only second research pass. The engineering hold remains unchanged."]
+
+### 7. What I am unsure of
+
+- The 23 dispositions are one producer's reading; adjudication by Kai is the independent lane  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
