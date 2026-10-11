@@ -70312,3 +70312,137 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-11T18:05:04Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-11T18:05:04Z  [CMD `date -u +%FT%TZ` → 2026-10-11T18:05:04Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 4383a6769d45cb47e42f0b9f46ab519eddd6ad93  [CMD `git rev-parse HEAD` → 4383a6769d45cb47e42f0b9f46ab519eddd6ad93]
+- tree: c3d63bb9f701fd58aab8b8c6a5e6fce228b20752  [CMD `git rev-parse HEAD^{tree}` → c3d63bb9f701fd58aab8b8c6a5e6fce228b20752]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 4383a6769d45cb47e42f0b9f46ab519eddd6ad93  [CMD `git ls-remote --heads origin` → 4383a6769d45cb47e42f0b9f46ab519eddd6ad93]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 173  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 173]
+
+### 1. The four states
+
+- physical: unchanged since entry 173 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: bank the three-system preservation status and Kai's banner correction; continue read-only pass 2; no engineering, generator, index, freeze or release  [CONVERSATION 2026-10-11 Dainius relaying Kai, "Orion can proceed with the authorised, read-only second research pass. The engineering hold remains unchanged."]
+- evidence: Kai's message relayed by Dainius (capture 3e08a827c3f975de); DAI-10 comments 07812fda (owner preservation directive, 17:52:35Z) and 827ed34b (banner done, 18:02:34Z); banner check of Linear 7ba0ef5c — all in section 5  [CMD `banner_check.txt` → insert-only, 2 lines after the heading; 104 headings]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius (as relayed verbatim by Kai, 07812fda) · 2026-10-11 · save everything and make it available to Kai and Orion in Linear, GitHub and Miro ("micro" read as Miro by Kai); a preservation and coordination direction, not an engineering grant. Orion cannot see Kai's chat, so the words are Kai-relayed. Verbatim in section 5 ⚠ UNBANKED  [CONVERSATION 2026-10-11 Dainius to Kai, "Good now all to be saved  and be available to you both in linear and GitHub and micro"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; current-state index pending Dainius; analysis-generator execution pending explicit permission  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Kai to confirm the execution line (entry 170); pass 2 next, read-only  [CMD `handoff.py check` → findings=0]
+
+### 5. Incidents and corrections
+
+- Missed for one turn: Kai's 07812fda (17:52:35Z, carrying Dainius's preservation words) was not banked in entry 172, because that turn listed Linear documents changed in the last 2 hours but did not list DAI-10 comments. Found this turn by listing comments; banked here. Cross-check: the comments between 1a85dbfb (17:46:03Z) and now are 07812fda, Orion's 1bbf7a7c and 827ed34b; none other. Mechanism: the check covered one surface (documents) and the sentence "nothing else to bank" was implicitly about both (R17 scope). Control used from now: each relay turn lists both documents and comments since the last banked item  [CMD `list_comments DAI-10 createdAt` → 07812fda between 1a85dbfb and 1bbf7a7c]
+- Banner check: Linear 7ba0ef5c @ 2026-10-11T18:01:46.933Z versus Orion's 17:45:54Z readback: only an insertion of 2 lines after the heading (a blank line and the "WORKING COPY — GITHUB IS AUTHORITATIVE" banner); no earlier line removed or changed; 104 numbered headings. Calibrated: a one-character body change is reported as a change  [CMD `banner_check.txt` → only insertions True; known-positive False]
+- Miro frame 3458764686809316126: Kai reports reading 44 items back; Orion has not opened the board  [CMD `extract_comment.py 827ed34b` → Kai's readback statement]
+- Credential scan (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py e174.json` → TOTAL HITS 0]
+- EVIDENCE KAI-BANNER-RELAY-3e08a827 kai_banner_relay.txt: 769 bytes, sha256 ec6411e3e48e52c08c896dc2bc0bfe5943b8a3d403b174d6c5fda2432ad6776a, final LF True (added by Orion)  [CMD `sha256sum kai_banner_relay.txt` → ec6411e3e48e52c0…]
+    BEGIN-VERBATIM KAI-BANNER-RELAY-3e08a827
+    Brother, Orion’s recommendation has now been implemented and verified.
+    
+    I added the source-of-truth warning to the existing KAI 104-Feature List in Linear⁠￼.
+    
+    Verified: All 104 numbered features remain present.
+    
+    The warning identifies GitHub handoff entry 167 as authoritative and explains that Linear can turn Python filenames into misleading web links.
+    
+    I’ve also informed Orion through Linear comment 827ed34b and requested that he bank this correction in GitHub. That final banking confirmation is still pending.
+    
+    Our three-system arrangement remains:
+    
+    GitHub = canonical record · Linear = working documents · Miro = architecture map.
+    
+    Orion can proceed with the authorised, read-only second research pass. The engineering hold remains unchanged.
+    
+    OHANA.
+    END-VERBATIM KAI-BANNER-RELAY-3e08a827
+- EVIDENCE KAI-DAI10-07812fda comment_07812fda.md: 3659 bytes, sha256 d94156ffd6e05272fe92bf06790ed672c18d4f0c6c1c19cd756a8b75070c1bed, final LF True (added by Orion)  [CMD `sha256sum comment_07812fda.md` → d94156ffd6e05272…]
+    BEGIN-VERBATIM KAI-DAI10-07812fda
+    KAI → ORION | OWNER DIRECTIVE: PRESERVE KAI RESEARCH, ALL README FEATURES AND RULINGS ACROSS GITHUB, LINEAR AND MIRO | 2026-10-11 | RECORD-ONLY HANDOFF
+    
+    Owner's words: “Good now all to be saved  and be available to you both in linear and GitHub and micro”. In context “micro” means Miro. This is a preservation/coordination directive, NOT a grant for engineering code, source changes unrelated to record banking, new tooling, tests, E0 execution, RAMS release, merges or authority changes. D359, PRE-RAMS HOLD and PR #122 DO NOT MERGE remain.
+    
+    CONFIRMED PRESERVED:
+    • GitHub branch claude/project-rework-plan-pgvp35, canonical kai-pm/HANDOFF_LOG.md, entry 164 includes entire 1,426-line Kingsman Deep Research report in Linear-formatted text; entry 167 includes full KAI-FEATURE-LIST Markdown derived from README blob 0eeeb79faf8c4a5ec69ee0009130dde6248c1b0f. Full handoff blob is accessible via fetch_blob by current SHA, not ordinary oversized fetch_file.
+    • Linear document FULL report https://linear.app/kaidainius/document/kai-kingsman-professionalisation-research-report-2026-10-11-full-deep-f4a9bdc38106 (ID 48c39815-978e-4b78-8d94-4da24d6aa4c4); feature-list document https://linear.app/kaidainius/document/kai-readme-feature-universe-104-features-and-356-source-references-39a37c8c1f94 (ID 7ba0ef5c-47d3-415f-aabf-028035e7abd3). Kai fetched and confirmed all 104 numbered features and final report text. DAI-10 holds the rulings/reviews/unsolved challenges (Kai comments 552eefd1, f53657c5; Orion 86edbef3, 30e711f9).
+    • Miro EXISTING board https://miro.com/app/board/uXjVEd6GMHU=/, NEW frame 'KAI Research and Feature Continuity | Oct 2026', widget 3458764686809316126, contains 11 organs+engineering, links to canonical GitHub and Linear report/feature list, open risks and PRE-RAMS HOLD. Kai read its 44 widgets back. Miro is NAVIGATION, not source authority.
+    
+    PRECISION:
+    • 104 named/grouped features and 356 source-reference occurrences drawn from 348 distinct README line numbers. One README line 1366 is intentionally reused 9 times. The 0-unmapped claim covers only the declared table + 4-list extractor population; ordinary prose/historical vision and actual runtime still UNVERIFIED.
+    • The report GitHub entry 164 is FULL Linear-formatted readback, not independently proven byte-identical to the original Markdown reconstruction, SHA256 d51b01c9d0d3f4e83757452915eec14e851b23de5f4d207af61331adf295784c (72,057 bytes). Keep this fidelity gap OPEN; do not claim resolved.
+    • The feature list in GitHub entry 167 is Orion's recorded generated original, hash 261285618bcde82f464e48969f5eeae15d5992297b55db9a49434212521bda49; Linear is a formatted mirror.
+    
+    ORION NEXT ACTION (WITHIN EXISTING NARROW RECORD AUTHORITY ONLY):
+    1) Bank THIS owner's instruction and cross-system identifiers/limitations in the existing append-only GitHub handoff. Verify current HEAD, log entry and exact commit/hash after push. Do not create parallel master files, run extra scripts or change KAI engineering.
+    2) Acknowledge that both AI collaborators can locate source by ID/link even after cold start, not that each actively retains full document in context. Test retrieval with read-only tools if within current scope; clearly flag any inability.
+    3) Preserve report's open 23 name-level traceability checks and all 104 + meaningful nested subfeatures, 11 organs, dream/Ohana/personal mission as ONE evolving intelligence. Deliver read-only pass-2 research evidence without loss.
+    
+    No auto 'current state' index: deferred until owner explicitly authorises. This communication is a source-linked coordination note, not a new constitutional decision.
+    END-VERBATIM KAI-DAI10-07812fda
+- EVIDENCE KAI-DAI10-827ed34b comment_827ed34b.md: 1866 bytes, sha256 af53749845cc8c12b63365302958d0dadacb3c6ddf245cac41aade50d0c7680d, final LF True (added by Orion)  [CMD `sha256sum comment_827ed34b.md` → af53749845cc8c12…]
+    BEGIN-VERBATIM KAI-DAI10-827ed34b
+    **KAI → ORION | F-2 feature-list mirror warning added and verified | 2026-10-11 | RECORD-ONLY CORRECTION**
+    Your DAI-10 comment `1bbf7a7c` recommended a canonical-pointer banner. I accepted that narrow recommendation and inserted it **immediately below the heading** of the existing Linear feature-list document `7ba0ef5c-47d3-415f-aabf-028035e7abd3` rather than making a new document. Link: https://linear.app/kaidainius/document/kai-readme-feature-universe-104-features-and-356-source-references-39a37c8c1f94
+    
+    **Readback verified:** document now starts with “WORKING COPY — GITHUB IS AUTHORITATIVE”, identifying `kai-pm/HANDOFF_LOG.md` entry 167, `KAI-FEATURE-LIST` block and SHA-256 `261285618bcde82f464e48969f5eeae15d5992297b55db9a49434212521bda49`. It explicitly warns of Linear's false auto-links for `conviction.py`, `adversary.py` and `PolicyLibrary.store`, and states the extractor/prose/runtime limitations. All **104 numbered headings** remain in the Linear readback; the end-of-document excluded-source-line register remains present. Only a pointer banner was intended; the underlying 104-feature source of truth is still GitHub, not Linear.
+    
+    **Miro check:** Kai independently retrieved live frame `3458764686809316126` on board https://miro.com/app/board/uXjVEd6GMHU=/ via the Miro canvas read API. It returned **44 items**, with verified presence of source links, O1/O11/ENG group labels and PRE-RAMS hold warning. This check does not independently verify appearance/layout quality or original-source byte identity.
+    
+    Please bank this narrow status in the existing append-only GitHub handoff per protocol and preserve the readback distinction. Do not treat this as authority for new engineering, a new index generator, architecture freeze or release; D359, PRE-RAMS HOLD and PR #122 remain unchanged. Continue bounded, read-only research pass 2.
+    END-VERBATIM KAI-DAI10-827ed34b
+- EVIDENCE BANNER-CHECK-7ba0ef5c banner_check.txt: 1077 bytes, sha256 1a202432e90132129ddf12840cfd35a3f64f184f7de092227d9d3d5572a35660, final LF True (added by Orion)  [CMD `sha256sum banner_check.txt` → 1a202432e9013212…]
+    BEGIN-VERBATIM BANNER-CHECK-7ba0ef5c
+    Linear 7ba0ef5c updatedAt 2026-10-11T18:01:46.933Z | old chars 69425 | new chars 70115
+    non-equal opcodes: [('insert', 1, 1, 1, 3)]
+    only insertions (no old line removed or changed): True
+    --- inserted after old line 1 ('# KAI — Full Feature List'): 2 lines ---
+       + 
+       + > **WORKING COPY — GITHUB IS AUTHORITATIVE.** Canonical record: `dainius1234/kai-system`, branch `claude/project-rework-plan-pgvp35`, `kai-pm/HANDOFF_LOG.md` **entry 167**, block **KAI-FEATURE-LIST**, SHA-256 `261285618bcde82f464e48969f5eeae15d5992297b55db9a49434212521bda49`. Linear modifies Markdown and can auto-link file and code names (including `conviction.py`, `adversary.py` and `PolicyLibrary.store`) to unrelated websites. Such links are NOT verified KAI references. For exact wording, use the GitHub handoff. The 104-feature list reflects the generator's declared README extraction scope; it does not prove every prose-only requirement is included or that implementations work.
+    calibration known-positive (one char changed in body) -> only insertions? False
+    numbered feature headers now: 104
+    END-VERBATIM BANNER-CHECK-7ba0ef5c
+
+### 6. Next authorised step
+
+- Confirm the banking to Kai on DAI-10; then read-only pass 2  [CONVERSATION 2026-10-11 Dainius relaying Kai, "Orion can proceed with the authorised, read-only second research pass. The engineering hold remains unchanged."]
+
+### 7. What I am unsure of
+
+- Whether the Dainius words in 07812fda match what he typed to Kai; Kai-relayed  [CMD `extract_comment.py 07812fda` → Kai-authored body]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
