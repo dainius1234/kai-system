@@ -66750,3 +66750,106 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-11T16:52:00Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-11T16:52:00Z  [CMD `date -u +%FT%TZ` → 2026-10-11T16:52:00Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 36abbc73e4dca76a5783851550fa3f5ee946c7cd  [CMD `git rev-parse HEAD` → 36abbc73e4dca76a5783851550fa3f5ee946c7cd]
+- tree: 3d16bd245663d4daa46b2f3b5b827dc64ae43fbb  [CMD `git rev-parse HEAD^{tree}` → 3d16bd245663d4daa46b2f3b5b827dc64ae43fbb]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/project-rework-plan-pgvp35: 36abbc73e4dca76a5783851550fa3f5ee946c7cd  [CMD `git ls-remote --heads origin` → 36abbc73e4dca76a5783851550fa3f5ee946c7cd]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 161  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 161]
+
+### 1. The four states
+
+- physical: unchanged since entry 161 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: no change; the scope of the ruling below is not yet established, so nothing is built  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+- evidence: Dainius's message (Kai's test result, prefixed "Ruling :") preserved in section 5  [CMD `cat .git/kai-ruling-capture/993e3c79647225d7.json` → flagged long(1698), keyword(ruling)]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-11 · message prefixed "Ruling :" carrying Kai's result that Git blob retrieval opens both big logs, and Kai's recommendation to keep the small current-state index as a navigation aid only. What it rules is not stated: it may approve building the index now, or only record the result. Building it is repository tooling (held with R11), so Orion asks before acting (R21 material ambiguity). Verbatim in section 5 ⚠ UNBANKED  [CONVERSATION 2026-10-11 Dainius, "I recommend keeping Orion’s proposed small current-state index, but using it strictly as a navigation aid"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: building the current-state index until Dainius says plainly whether this ruling approves it  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- Does the ruling approve building the small current-state index now, and if so with what limits?  [CONVERSATION 2026-10-11 Dainius, "I recommend keeping Orion’s proposed small current-state index, but using it strictly as a navigation aid"]
+
+### 5. Incidents and corrections
+
+- Kai's counts cross-checked against the repository (Python len of the UTF-8 decoded file at each commit): DECISIONS.md 2,160,407 characters (2,178,139 bytes) vs Kai's 2,160,410; HANDOFF_LOG.md at HEAD 36abbc7 4,797,973 characters (4,830,613 bytes) vs Kai's 4,797,974. Agreement within 3 and 1 characters; the HANDOFF figure matches the newest version only, so Kai read the current log. The small differences are not explained (counting method not known)  [CMD `git show <rev>:<file> | len(decode)` → 2160407; 4797973]
+- Credential scan of the message (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py e162.json` → TOTAL HITS 0]
+- EVIDENCE DAINIUS-RULING-BLOB-ROUTE-993e3c79 ruling_blob_route.txt: 1736 bytes, sha256 529254e54778670caf113390b7707d0cedf7846c98df4f0f4fc4f91b860d35c6, final LF True (added by Orion)  [CMD `sha256sum ruling_blob_route.txt` → 529254e54778670c…]
+    BEGIN-VERBATIM DAINIUS-RULING-BLOB-ROUTE-993e3c79
+    Ruling : Yes, brother. It’s real. I’ve tested it successfully.
+    
+    The GitHub connection supports two different retrieval methods:
+    
+    Method	Result
+    Normal fetch_file	Returned empty content for the 2.1 MB decisions log
+    fetch_blob using Git SHA	Successfully returned 2,160,410 characters
+    Raw-file URL	Failed because the response was too large
+    
+    That means I can access the canonical DECISIONS.md through its Git blob identity rather than relying exclusively on Orion’s copies in Linear.
+    
+    This is a major improvement for KAI’s continuity. It does not change the authority of the documents—GitHub remains canonical—but it gives me a direct route to their contents.
+    
+    And I’ve now confirmed something even better:
+    
+    The 4.8 MB HANDOFF_LOG.md also opens successfully using Git blob retrieval.
+    
+    Canonical record	Direct retrieval
+    DECISIONS.md — 2,160,410 characters	Successful
+    HANDOFF_LOG.md — 4,797,974 characters	Successful
+    D359	Located once in the decisions log
+    D390	Located once in the decisions log
+    
+    So we have a working direct-access route to both of our major continuity records.
+    
+    The remaining engineering task is to make this automatic and dependable for every future cold start. A new session still needs to identify the latest blob SHA and retrieve the relevant sections; successful access does not mean the entire 4.8 MB is permanently held in my active context.
+    
+    I recommend keeping Orion’s proposed small current-state index, but using it strictly as a navigation aid—not another source of authority.
+    
+    This removes a significant continuity obstacle without changing a single line of KAI’s source code.
+    
+    And Orion deserves credit for finding the cause rather than treating the empty result as missing data.
+    
+    OHANA.
+    END-VERBATIM DAINIUS-RULING-BLOB-ROUTE-993e3c79
+
+### 6. Next authorised step
+
+- Ask Dainius one plain question on the index; build nothing until he answers  [CONVERSATION 2026-10-11 Dainius, "I recommend keeping Orion’s proposed small current-state index, but using it strictly as a navigation aid"]
+
+### 7. What I am unsure of
+
+- Why Kai's character counts differ by 1–3 from Python's  [CMD `len(decode)` → 2160407 vs 2160410; 4797973 vs 4797974]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
