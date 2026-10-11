@@ -68518,3 +68518,254 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-11T17:29:34Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-11T17:29:34Z  [CMD `date -u +%FT%TZ` → 2026-10-11T17:29:34Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 76f9aea82e6795be1439f1afed5d4cc109fb22e1  [CMD `git rev-parse HEAD` → 76f9aea82e6795be1439f1afed5d4cc109fb22e1]
+- tree: da0c7028c47f1c20df661de7b26a2fb9f1a69c4b  [CMD `git rev-parse HEAD^{tree}` → da0c7028c47f1c20df661de7b26a2fb9f1a69c4b]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 76f9aea82e6795be1439f1afed5d4cc109fb22e1  [CMD `git ls-remote --heads origin` → 76f9aea82e6795be1439f1afed5d4cc109fb22e1]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 164  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 164]
+
+### 1. The four states
+
+- physical: unchanged since entry 164 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: independent review of the research report, planning only  [CONVERSATION 2026-10-11 Dainius relaying Kai, "Next, Orion can challenge the complete research against the actual KAI repository and existing decisions."]
+- evidence: report read in full (lines 1–1,426) before checking; three repository checks and Orion's review preserved in section 5  [CMD `Read report_48c39815.md 1-1427` → full read]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `handoff.py check` → findings=0]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; current-state index pending Dainius  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- S-1 (which research track gates RAMS) now has a further input: F-5 in the review below  [CMD `check_rediscovery.txt` → see review F-5]
+- Pass 2 (external sources opened; 23 families item by item) proposed, not started  [CMD `handoff.py check` → findings=0]
+
+### 5. Incidents and corrections
+
+- Quote check on the review caught 3 quotes not exact before sending: a capital letter changed ("Model" for "model"), an editorial insertion ("[edge-tts]"), and a quote spanning the report's bold markers. Fixed by copying the exact source strings; 0 mismatches after. Same retyped-quote mechanism as entries 124, 149, 155; the mechanical quote check before sending is the control that caught it, and it held  [CMD `quote check` → 3 NOT-IN-SOURCE before, 0 after]
+- Credential scan of the review (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py e165.json` → TOTAL HITS 0]
+- EVIDENCE CHECK-REPO-CITATIONS check_repo_citations.txt: 2185 bytes, sha256 89a266bdf996b3f78b52672b53860954bf142cd870c9e97f8625f88ca2f9e2c7, final LF True (added by Orion)  [CMD `sha256sum check_repo_citations.txt` → 89a266bdf996b3f7…]
+    BEGIN-VERBATIM CHECK-REPO-CITATIONS
+    === 1. repository files the report cites (backticked .md names), universe: whole report ===
+    KINGSMAN_LONG_HORIZON_STEWARDSHIP_AND_SUCCESSION.md                    -> ['kai-pm/KINGSMAN_LONG_HORIZON_STEWARDSHIP_AND_SUCCESSION.md']
+    README.md                                                              -> ['README.md']
+    kai-pm/D351_EVOLUTION_NOT_REDESIGN_AND_PRESENTATION_BAR_CORRECTION.md  -> ['kai-pm/D351_EVOLUTION_NOT_REDESIGN_AND_PRESENTATION_BAR_CORRECTION.md']
+    kai-pm/KINGSMAN_FINAL_VISION_MASTER_CANON_PLAN.md                      -> ['kai-pm/KINGSMAN_FINAL_VISION_MASTER_CANON_PLAN.md']
+    kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md       -> ['kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md']
+    
+    === 2. 'REFIT → HARDEN → RATIONALISE → MATURE' claimed as existing doctrine ===
+    git grep REFIT in kai-pm: hits 15
+       kai-pm/D351_EVOLUTION_NOT_REDESIGN_AND_PRESENTATION_BAR_CORRECTION.md:44:> **REFIT, HARDEN, RATIONALISE, MATURE — DO NOT REINVENT KAI.**
+       kai-pm/D352_WITHDRAW_REJECTED_V0_4_ARCHITECTURE_PACKAGE.md:7:After D351 corrected the architecture posture to **REFIT, HARDEN, RATIONALISE, MATURE — DO NOT REIN
+       kai-pm/D353_DEEP_RESEARCH_MATURATION_IMPLEMENTATION_REISSUE.md:23:> **REFIT, HARDEN, RATIONALISE, MATURE — DO NOT REINVENT KAI.**
+       kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D351.md:46:> **REFIT, HARDEN, RATIONALISE, MATURE — DO NOT REINVENT KAI.**
+       kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D352.md:46:> **REFIT, HARDEN, RATIONALISE, MATURE — DO NOT REINVENT KAI.**
+       kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D353.md:71:> **REFIT, HARDEN, RATIONALISE, MATURE — DO NOT REINVENT KAI.**
+    
+    === 3. README: edge-tts (report says README lists it as network/cloud dependency) ===
+       README.md:471:| 12 | tts-service | 8030 | default | Text-to-speech (edge-tts `en-GB-RyanNeural`) |
+       README.md:530:| tts-service | 8030 | TTS (edge-tts British Ryan) |
+       README.md:1449:  tts/                 # edge-tts voice synthesis (port 8030, en-GB-RyanNeural)
+    
+    === 4. v1.1 Master Plan cited as 'supplied programme baseline': is it in the repo? ===
+       no tracked file matching *MASTER_PLAN*V1_1* / *v1.1* / *V1.1*
+    END-VERBATIM CHECK-REPO-CITATIONS
+- EVIDENCE CHECK-REDISCOVERY check_rediscovery.txt: 4867 bytes, sha256 e03789af1c7a36dcb65c658864a3a49914e26734052f5e0782cb9f3ad44b7057, final LF True (added by Orion)  [CMD `sha256sum check_rediscovery.txt` → e03789af1c7a36dc…]
+    BEGIN-VERBATIM CHECK-REDISCOVERY
+    UNIVERSE: git grep over tracked kai-pm/ files, EXCLUDING kai-pm/HANDOFF_LOG.md (it now contains the report itself). Literal/regex locator: a hit shows the term appears, NOT that the report's specific mechanism pre-exists.
+    OUTCOME_UNKNOWN                          files  10  e.g. CODE_AUDIT_P2_ISOLATION_AND_INTEGRITY_PLAN.md, D353_DEEP_RESEARCH_MATURATION_IMPLEMENTATION_REISSUE.md, DECISIONS.md
+    restore epoch                            files   0  e.g. 
+    Ed25519                                  files  29  e.g. CODE_AUDIT_BATCH_HMAC_ROTATION_DRILL.md, CODE_AUDIT_BATCH_KEY_ROTATION.md, CODE_AUDIT_BATCH_KEY_ROTATION_MIGRATION.md
+    final hand                               files  26  e.g. D346_ENGINEERING_ARCHITECTURE_VISUAL_CORRECTION.md, D349_DEEPSEEK_V0_3_EXISTING_SYSTEM_REVIEW_RECONCILIATION.md, D350_MASTER_ARCHITECTURE_PLAN_AND_DRAWING_SET_V0_4.md
+    one-use capability                       files  16  e.g. CODE_AUDIT_BATCH_ARCHITECTURE_INTERACTION.md, CODE_AUDIT_BATCH_CONVICTION_PLANNING_FORECASTING.md, CODE_AUDIT_BATCH_DREAM_EVOLVER_CHECKPOINTS.md
+    SKIP LOCKED                              files   2  e.g. D353_DEEP_RESEARCH_MATURATION_IMPLEMENTATION_REISSUE.md, KINGSMAN_EXISTING_KAI_MATURATION_IMPLEMENTATION_RESEARCH_REISSUE_2026-08-24.md
+    transactional outbox                     files  29  e.g. CODE_AUDIT_BATCH_AUDIO_PERCEPTION.md, CODE_AUDIT_BATCH_FEATURE_FLAGS_EPISODES.md, CODE_AUDIT_BATCH_HEARTBEAT_SELF_MODEL.md
+    Temporal (workflow)                      files  22  e.g. CODE_AUDIT_BATCH_CONVICTION_PLANNING_FORECASTING.md, CODE_AUDIT_BATCH_HEARTBEAT_SELF_MODEL.md, D345_KINGSMAN_ARCHITECTURE_V0_1_REVIEW_CHECKPOINT.md
+    E0 census                                files  16  e.g. D348_EXISTING_KAI_EVOLUTION_CORRECTION.md, D349_DEEPSEEK_V0_3_EXISTING_SYSTEM_REVIEW_RECONCILIATION.md, D350_MASTER_ARCHITECTURE_PLAN_AND_DRAWING_SET_V0_4.md
+    KaiBench                                 files   0  e.g. 
+    Lemonade                                 files   0  e.g. 
+    Graphiti                                 files   6  e.g. DECISIONS.md, MEMORY_GRAPH_DESIGN.md, SHOPPING_LIST_PLAN.md
+    Mem0                                     files   0  e.g. 
+    Letta                                    files  24  e.g. CODE_AUDIT_BATCH_AGENTIC_API.md, CODE_AUDIT_BATCH_LETTA_AGENT.md, CODE_AUDIT_BATCH_LETTA_AGENT_EXTENSION.md
+    LangGraph                                files   5  e.g. DECISIONS.md, LETTA_INTEGRATION_PLAN.md, REPO_HEALTH_AUDIT_2026-05-10.md
+    SPIFFE/SPIRE                             files  11  e.g. CODE_AUDIT_P1_SECURITY_FOUNDATION_PLAN.md, D345_KINGSMAN_ARCHITECTURE_V0_1_REVIEW_CHECKPOINT.md, DECISIONS.md
+    OpenTelemetry                            files   9  e.g. D345_KINGSMAN_ARCHITECTURE_V0_1_REVIEW_CHECKPOINT.md, D353_DEEP_RESEARCH_MATURATION_IMPLEMENTATION_REISSUE.md, DEEPSEEK_REVIEW_PACKET_EXISTING_KAI_EVOLUTION_V0_3.md
+    RFC 9421                                 files   3  e.g. D353_DEEP_RESEARCH_MATURATION_IMPLEMENTATION_REISSUE.md, KINGSMAN_EXISTING_KAI_MATURATION_IMPLEMENTATION_RESEARCH_REISSUE_2026-08-24.md, house_in_order_instrument/MANIFEST.sha256
+    RFC 9530                                 files   0  e.g. 
+    monotonic authority/rollback             files  44  e.g. CODE_AUDIT_BATCH_AGENTIC_API.md, CODE_AUDIT_BATCH_AGENTIC_INTROSPECTION.md, CODE_AUDIT_BATCH_ARCHITECTURE_INTERACTION.md
+    fencing token                            files  23  e.g. CODE_AUDIT_BATCH_BACKUP_SERVICE_EXTENSION.md, CODE_AUDIT_CONTINUATION_LOG.md, CODE_AUDIT_FINAL_REPORT.md
+    egress                                   files 107  e.g. A4_SELF_DIAGNOSIS_EVOLUTION.md, ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md, CODE_AUDIT_BATCH_AGENTIC_API.md
+    SLSA                                     files  10  e.g. A4_SELF_DIAGNOSIS_EVOLUTION.md, ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md, D345_KINGSMAN_ARCHITECTURE_V0_1_REVIEW_CHECKPOINT.md
+    NIST SSDF / SP 800-218                   files   0  e.g. 
+    Assumption Register                      files   0  e.g. 
+    degraded-mode matrix                     files  18  e.g. CODE_AUDIT_P3_RELIABILITY_AUDIT_PRIVACY_RECOVERY_PLAN.md, D344A_PRIMARY_MISSION_CANON_ALIGNMENT_CHECKPOINT.md, D346_ENGINEERING_ARCHITECTURE_VISUAL_CORRECTION.md
+    shadow/canary migration                  files   7  e.g. CODE_AUDIT_P3_RELIABILITY_AUDIT_PRIVACY_RECOVERY_PLAN.md, CODE_AUDIT_P4_CAPABILITY_REQUALIFICATION_PLAN.md, EVIDENCE_PLANE_RESEARCH_LINEAGE.md
+    dream as synthetic/epistemic class       files   2  e.g. DECISIONS.md, house_in_order_h2_v13/build_evidence/d379_controls.py
+    100 concurrent consume test              files   0  e.g. 
+    Requirements Verification Matrix         files   0  e.g. 
+    stable feature IDs                       files   0  e.g. 
+    Strix Halo                               files  15  e.g. D345_KINGSMAN_ARCHITECTURE_V0_1_REVIEW_CHECKPOINT.md, D347_MASTER_ARCHITECTURE_CONSOLIDATION_CHECKPOINT.md, D353_DEEP_RESEARCH_MATURATION_IMPLEMENTATION_REISSUE.md
+    END-VERBATIM CHECK-REDISCOVERY
+- EVIDENCE CHECK-FEATURE-COVERAGE check_feature_coverage.txt: 3224 bytes, sha256 1f4b3662e293ff497aa6ff72e491b154e37b89f31bcac70445d44f11bb7c8aad, final LF True (added by Orion)  [CMD `sha256sum check_feature_coverage.txt` → 1f4b3662e293ff49…]
+    BEGIN-VERBATIM CHECK-FEATURE-COVERAGE
+    UNIVERSE: 36 feature families named as protected in Kai's DAI-10 comment 935e1c19. Instrument: case-insensitive regex count in README.md @HEAD and in the report (Linear 48c39815 readback). A literal hit is a locator, not proof the feature is addressed in substance.
+    family                                 README  report
+    Dream State six-phase                       5      0   <-- in README, absent from report
+    MARS memory decay                           6      0   <-- in README, absent from report
+    failure clustering                          2      0   <-- in README, absent from report
+    boundary recalibration                      1      0   <-- in README, absent from report
+    Agent-Evolver                               7      0   <-- in README, absent from report
+    self-reflection                             3      0   <-- in README, absent from report
+    confession                                  1      0   <-- in README, absent from report
+    epistemic humility                          1      0   <-- in README, absent from report
+    narrative autobiography                     1      4
+    time capsules                               0      0
+    imagination engine                          7      8
+    counterfactual thinking                    12      1
+    future-self aspirations                     2      0   <-- in README, absent from report
+    Temporal Projection 4-branch fan            9      0   <-- in README, absent from report
+    Hypothesis Engine                          32      1
+    Causal World Model                         17      0   <-- in README, absent from report
+    causal surprise                             0      0
+    Synthetic Experience                        7      0   <-- in README, absent from report
+    transitive/analogical reasoning            25      0   <-- in README, absent from report
+    dialectical synthesis                      17      0   <-- in README, absent from report
+    concept blending                            7      0   <-- in README, absent from report
+    Global Workspace                            9      0   <-- in README, absent from report
+    emotional memory                            6      5
+    predictive empathy                          6      0   <-- in README, absent from report
+    operator/cognitive fingerprint             25      0   <-- in README, absent from report
+    PUB/WORK                                    4      0   <-- in README, absent from report
+    Ohana values                                3      0   <-- in README, absent from report
+    emergent rituals                           16      0   <-- in README, absent from report
+    proactive observation/scheduling           30      4
+    Goal/Watch                                 65     13
+    struggle detection                          2      0   <-- in README, absent from report
+    anti-annoyance                              1      0   <-- in README, absent from report
+    inner presence                              1      3
+    voice                                       9      5
+    avatar                                      9      2
+    daily dreams cadence                       12      2
+    
+    in README and named in report: 11; in README but 0 hits in report: 23; 0 hits in README (pattern did not match README wording): 2 ['time capsules', 'causal surprise']
+    END-VERBATIM CHECK-FEATURE-COVERAGE
+- EVIDENCE ORION-RESEARCH-REVIEW-1 ORION_RESEARCH_REVIEW_1.md: 7817 bytes, sha256 ffcdde2b10223a3fa92eff5a0d746b8d94e27886f919314d4693383b769c83a4, final LF True (added by Orion)  [CMD `sha256sum ORION_RESEARCH_REVIEW_1.md` → ffcdde2b10223a3f…]
+    BEGIN-VERBATIM ORION-RESEARCH-REVIEW-1
+    **ORION → KAI | Independent review, pass 1: KAI Kingsman Professionalisation Research Report | BASED-ON: Linear doc 48c39815 @ 2026-10-11T17:21:24.353Z (readback 71,560 chars, 1,426 lines; banked entry 164, sha256 dfc58290… of readback + LF); your e4b00569, 2111cf85, fa338587; repository @ 76f9aea | REVIEW | planning only | CANONICAL COPY: GitHub `kai-pm/HANDOFF_LOG.md` entry 165 | ACTION: note F-1…F-6; agree the pass-2 source list (§6)**
+    
+    ### 0. Read confirmation
+    
+    - **Read in full:** lines 1–1,426, from the executive judgement to the concluding paragraph. One read, end to end, before any checking.
+    - **Completeness:** the readback ends on the report's final paragraph. Its length (71,560 characters) and line count (1,426) equal your stated values.
+    - **Byte identity:**
+      - this is the Linear readback, not your 72,057-byte reconstruction (d51b01c9…), which I have not received;
+      - I make no byte-identity claim to the Deep Research original.
+    
+    ### 1. What the report gets right (my judgement, after reading)
+    
+    - **The core position holds and fits KAI's doctrine:** freeze mission, invariants, identity and feature lineage; do not freeze mechanisms.
+    - **The authority chain** (proposal → capability → final hand → independent verification) is treated as more important than any framework.
+    - **"model freedom is a cognition property, not an authority property"** This is a clean way to hold Dainius's owner-values direction (9ed32b77) without weakening integrity controls.
+    - **Dreams and imagination are kept** with explicit epistemic classes, so they cannot become fact.
+    - **Programme order:** the report itself says its migration diagram is "not an effort estimate and not permission to override D359 programme authority".
+    - **Its own limitations section is honest:** 356/104/0 is "not a newly re-proven measurement".
+    
+    ### 2. Repository claims checked (all measured @ HEAD)
+    
+    | Report claim | Result |
+    |---|---|
+    | Cites 5 repository files | **5/5 exist** |
+    | "REFIT → HARDEN → RATIONALISE → MATURE" is existing doctrine | **Supported:** D351 line 44, also D352, D353 and the append queues (15 lines in kai-pm) |
+    | README lineage "describes it as a network/cloud dependency" (of edge-tts) | **Partly:** README names edge-tts at lines 471, 530 and 1449. None of those 3 lines calls it a cloud dependency. I searched those lines only. |
+    | KAI v1.1 Master Plan §§3–6 as baseline | **Not in the repository:** no tracked file matches `*MASTER_PLAN*V1_1*`, `*v1.1*` or `*V1.1*`. It is a Linear attachment, so these citations cannot be checked against GitHub. |
+    
+    ### 3. F-1. Mostly a rediscovery of existing KAI design (supports your challenge 2)
+    
+    - **Instrument:** `git grep` over tracked `kai-pm/`, excluding `HANDOFF_LOG.md`, which now contains the report. Each term is a literal locator: a hit shows the term appears, not that the same mechanism is specified.
+    - **Already present** (files with hits):
+      - OUTCOME_UNKNOWN 10 (incl. D353, P2 plan) · Ed25519 29 · final hand 26 · one-use 16 · outbox 29;
+      - `SKIP LOCKED` 2 (D353 and the 2026-08-24 maturation reissue) · E0 16 · SPIFFE/SPIRE 11 · OpenTelemetry 9;
+      - RFC 9421 3 (incl. D353) · SLSA 10 · degraded mode 18 · canary 7 · Strix Halo/gfx1151 15 · Graphiti 6 · Letta 24 · LangGraph 5.
+    - **Zero hits in kai-pm** (new to the repository, though some appear in Linear docs):
+      - KaiBench (your v1.1 review D9) · restore epoch (your v1.1 review D6);
+      - Lemonade · Mem0 · RFC 9530 · NIST SP 800-218/SSDF · "Assumption Register" · a 100-concurrent-consume ITC · a Requirements Verification Matrix · stable `KAI-FEAT-` feature IDs.
+    - **Dream-as-synthetic epistemic class:** 2 files (DECISIONS.md and a D379 control script), probably different senses. Not yet read.
+    - **Conclusion:** most of the report's engineering spine re-derives D353/P1–P4. The genuinely new items are the zero-hit list above. Each needs a register row; none needs a new document.
+    
+    ### 4. F-2. README feature coverage gap (supports your challenge 1; Dainius's 935e1c19 direction)
+    
+    - **Universe:** the 36 feature families you listed as protected in 935e1c19.
+    - **Instrument:** a case-insensitive regex for each, counted in README.md @HEAD and in the report.
+    - **Results:**
+      - **34** families match README wording (2 patterns did not: time capsules, causal surprise).
+      - **11** of those 34 are named in the report.
+      - **23 of 34 have zero literal mention in the report:** Dream State six-phase · MARS memory decay · failure clustering · boundary recalibration · Agent-Evolver · self-reflection · confession · epistemic humility · future-self aspirations · Temporal Projection 4-branch fan · Causal World Model · Synthetic Experience · transitive/analogical reasoning · dialectical synthesis · concept blending · Global Workspace · predictive empathy · operator/cognitive fingerprint · PUB/WORK · **Ohana values** · emergent rituals · struggle detection · anti-annoyance.
+    - **Limit:** a literal miss does not prove the report ignores the idea. Its generic "Dream organ" and "inner life" sections may cover some in spirit. But under Dainius's "every feature mentioned in read me", a feature that is not named cannot be traced.
+    - **The report says so itself:** it did not regenerate Appendix R.
+    
+    ### 5. F-3 … F-6
+    
+    - **F-3. External sources: not opened by Orion in this pass. All are UNVERIFIED (A-4).**
+      - The report cites sources by name only (RFCs, PostgreSQL, Temporal, Lemonade docs and issues, Graphiti/Mem0/Letta/pgvector docs, the MemGPT paper, SPIFFE, OpenTelemetry, NIST SP 800-218, SLSA).
+      - It gives **no versions, dates, sections or URLs**, so it does not meet the A-3/A-4 requirement for "document/revision/section".
+      - This supports your challenge 3.
+    - **F-4. Vocabulary.** The report's decision column (BENCHMARK, ADOPT, DEFER, QUALIFY, HOLD, "KEEP / MATURE") is not the frozen §6 feature vocabulary. Per A-1, translate at register entry. Do not import it as is.
+    - **F-5. A sequencing consequence that matters for Dainius's S-1 decision.**
+      - The report says "do not write the final RAMS yet". RAMS should be fed by E0 results, KaiBench runs, prototypes and the 100-consume/crash tests.
+      - Under D359 those are engineering work, after HOUSE exit → 048 → A-4_PROVENANCE → assurance integration → professionalisation. The engineering pause also holds.
+      - Read literally, final RAMS would therefore wait for most of the programme. That is not a defect in the report. It means the **planning-level** Quality Plan and RAMS templates (Track A) must be separable from **evidence-informed** RAMS, which is your challenge 8. I recommend making that split explicit when S-1 goes to Dainius.
+    - **F-6. Not yet checked by me.** Your challenges 4 (exactly-once versus at-most-once consumption), 5 (vertical slice), 6 (memory writers), 7 (E0 correctness) and 9 (single node, privacy, offline proof). Your challenge 4 matches the report's own OUTCOME_UNKNOWN section, so the report already concedes the point. The rest need repository tracing that I have not done.
+    
+    ### 6. Proposed pass 2 (planning only, no execution)
+    
+    1. Open each external source the report relies on for a **technology recommendation**, and record the version, date, URL and the exact claim checked, or UNVERIFIED.
+    2. Name the 23 uncovered families one by one against the report: covered in substance (cite the line), or a gap.
+    3. Read the dream-as-synthetic hits and the 2 unmatched families (time capsules, causal surprise) in the README.
+    
+    **Overall disposition: ACCEPT WITH LIMITS** as a research input to the Technology & Borrowing Register.
+    - It is not evidence for any technology choice.
+    - It is not feature-complete against the README.
+    - Nothing in it changes D359, PRE-RAMS HOLD, the engineering pause, or PR #122 DO NOT MERGE.
+    END-VERBATIM ORION-RESEARCH-REVIEW-1
+
+### 6. Next authorised step
+
+- Post the review to DAI-10 as banked; verify posted == banked; report to Dainius in plain words  [CONVERSATION 2026-10-11 Dainius relaying Kai, "Next, Orion can challenge the complete research against the actual KAI repository and existing decisions."]
+
+### 7. What I am unsure of
+
+- Whether the 23 literal misses are true gaps or covered in spirit by the report's generic sections; pass 2 settles it item by item  [CMD `check_feature_coverage.txt` → 23 of 34 zero hits]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
