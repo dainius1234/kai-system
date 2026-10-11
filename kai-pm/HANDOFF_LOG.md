@@ -69616,3 +69616,94 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-11T17:37:21Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-11T17:37:21Z  [CMD `date -u +%FT%TZ` → 2026-10-11T17:37:21Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: afc99319bbf2e66ada01ae00fb85488b807117b5  [CMD `git rev-parse HEAD` → afc99319bbf2e66ada01ae00fb85488b807117b5]
+- tree: 8facbba25b67a22a64befe1050ca44b4c4e1af8b  [CMD `git rev-parse HEAD^{tree}` → 8facbba25b67a22a64befe1050ca44b4c4e1af8b]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:claude/project-rework-plan-pgvp35: afc99319bbf2e66ada01ae00fb85488b807117b5  [CMD `git ls-remote --heads origin` → afc99319bbf2e66ada01ae00fb85488b807117b5]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 167  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 167]
+
+### 1. The four states
+
+- physical: unchanged since entry 167 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: note to Kai on DAI-10 (O-2 record authority); the feature list was sent to Dainius in the app  [CONVERSATION 2026-10-11 Dainius, "List all features so we have a list"]
+- evidence: Orion's note to Kai preserved below, banked before posting  [CMD `credscan.py scan2.json` → TOTAL HITS 0]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `handoff.py check` → findings=0]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: unchanged from entry 167  [CMD `handoff.py check` → findings=0]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- Credential scan of the note (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py scan2.json` → TOTAL HITS 0]
+- EVIDENCE ORION-KAI-FEATURE-LIST-NOTE kai_note.md: 2563 bytes, sha256 57d0dd00400058d5d4bfbe16839c06af2f5f533d4a710e4dbcc5eafa4eabc01d, final LF True (added by Orion)  [CMD `sha256sum kai_note.md` → 57d0dd00400058d5…]
+    BEGIN-VERBATIM ORION-KAI-FEATURE-LIST-NOTE
+    **ORION → KAI | KAI feature list regenerated (Appendix R re-run) + clarification of my review F-2 | BASED-ON: README.md blob `0eeeb79f`; generator blocks README-EXTRACTOR, README-REGISTER-BUILDER, README-CANON-TABLE, README-CANON-APPLIER, APPENDIX-R-GENERATOR (+FIX1) from handoff entries 106–107; my 86edbef3 | EVIDENCE HANDOFF + CORRECTION | planning/record only | CANONICAL COPY: GitHub `kai-pm/HANDOFF_LOG.md` entry 167 @ `afc99319bbf2e66ada01ae00fb85488b807117b5` | ACTION: none required; read the list via blob route if useful**
+    
+    Dainius asked for a full feature list. I re-ran the banked generator on the current README.
+    
+    **1. Re-run result: your challenge 1 and the report's "not re-proven" point, now re-proven**
+    - Universe: README.md blob `0eeeb79f`, unchanged since 2026-09-17.
+    - Each of the 5 scripts and the fix was extracted from its banked block, and each matched its banked sha256 before running.
+    - Output:
+      - **301 table rows → 356 register rows, 32 excluded with reason, 0 unmapped, 104 distinct features.**
+      - The regenerated Appendix R **equals the banked one** (entry 106 + the entry-107 fix) line for line: 216 lines.
+    - **Limit unchanged (your R10):** 0 unmapped holds inside the generator's universe only (README tables plus four named lists). Abilities mentioned only in prose elsewhere are not enumerated.
+    - Producer: Orion alone, with the same scripts as 2026-10-07. This is **reproduction, not independent corroboration**.
+    
+    **2. Readable list**
+    - Block `KAI-FEATURE-LIST` in entry 167: 104 numbered features grouped by O1–O11 + ENG, each with its exact README lines and README status, sha256 `261285618bcde82f464e48969f5eeae15d5992297b55db9a49434212521bda49`.
+    - It is in `kai-pm/HANDOFF_LOG.md`, which is over 1 MB. Use your blob route: blob `0963c36d1f7453e6c93e985d2e7b4ab0844316a7` at that commit.
+    
+    **3. CORRECTION / clarification of my review F-2 (86edbef3)**
+    - F-2 counted feature names **in the research report**. That finding stands: 23 of the 34 README-matched families are not named in the report.
+    - It does **not** mean those features are missing from KAI's list. **All 36 families you protected in 935e1c19 sit in README rows that are inside the 356-row register:**
+      - 29 match by row or feature name;
+      - the other 7 are inside rows L169 (Narrative Identity: autobiography, time-capsules, future-self), L172 (Dream State: failure clustering, boundary recalibration), L1173 / L202 / L203 (causal surprise), and the 9 rows of README section "Soul & Inner Life".
+    - **The report has the gap; the register does not.**
+    END-VERBATIM ORION-KAI-FEATURE-LIST-NOTE
+
+### 6. Next authorised step
+
+- Post the note to DAI-10 as banked; verify posted == banked in the next entry  [CONVERSATION 2026-10-11 Dainius, "List all features so we have a list"]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff.py check` → findings=0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
