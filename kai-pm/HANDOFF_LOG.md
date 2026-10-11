@@ -64327,3 +64327,73 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-11T14:46:52Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-11T14:46:52Z  [CMD `date -u +%FT%TZ` → 2026-10-11T14:46:52Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: d2d132adcc61f5382e8e6ae57b04aac25e979166  [CMD `git rev-parse HEAD` → d2d132adcc61f5382e8e6ae57b04aac25e979166]
+- tree: bc302e1ba858cba37d1634c3d55fda2b6cb99f4f  [CMD `git rev-parse HEAD^{tree}` → bc302e1ba858cba37d1634c3d55fda2b6cb99f4f]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/project-rework-plan-pgvp35: d2d132adcc61f5382e8e6ae57b04aac25e979166  [CMD `git ls-remote --heads origin` → d2d132adcc61f5382e8e6ae57b04aac25e979166]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 145  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 145]
+
+### 1. The four states
+
+- physical: unchanged since entry 145 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: check the claims of the shared video (a 65-line Karpathy-inspired CLAUDE.md) against sources, read-only; extract concepts only  [CONVERSATION 2026-10-11 Dainius, "Our goal is we're looking for concepts, good ideas, best practices, not the actual files"]
+- evidence: Dainius's direction, voice-transcribed, preserved below  [CMD `cat .git/kai-ruling-capture/459882035a7da986.json` → flagged]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-11 · standing direction for external material: check the information; do not take or upload outside files into the project or its tools (MCP); the goal is concepts, good ideas and best practices, not the actual files. Consistent with the Technology & Borrowing Register idea (Kai R6) and O-2. Verbatim below (voice transcription; "say currently they give five notice" not resolved) ⚠ UNBANKED  [CONVERSATION 2026-10-11 Dainius, "Our goal is we're looking for concepts, good ideas, best practices, not the actual files"]
+
+### 3. Authorised / Held / Forbidden
+
+- FORBIDDEN by this direction: importing external files (e.g. the video's CLAUDE.md) into the repository or tools  [CONVERSATION 2026-10-11 Dainius, "Our goal is we're looking for concepts, good ideas, best practices, not the actual files"]
+- HELD: PRE-RAMS; R11; engineering per entry 99  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- None new  [CMD `handoff.py check` → findings=0]
+
+### 5. Incidents and corrections
+
+- None  [CMD `handoff.py check` → findings=0]
+- EVIDENCE DAINIUS-CONCEPTS-NOT-FILES dainius_concepts.txt: 212 bytes, sha256 188c517fb449b77ab44acedea6970da0b0073a24d9c7fc897781b0a621bb1a2f, final LF True (added by Orion)  [CMD `sha256sum dainius_concepts.txt` → 188c517fb449b77a…]
+    BEGIN-VERBATIM DAINIUS-CONCEPTS-NOT-FILES
+    Just check the info and say currently they give five notice. So do not actually try to take that, upload to your MCP. No. Our goal is we're looking for concepts, good ideas, best practices, not the actual files.
+    END-VERBATIM DAINIUS-CONCEPTS-NOT-FILES
+
+### 6. Next authorised step
+
+- Web check of the video's claims; report concepts only  [CONVERSATION 2026-10-11 Dainius, "Our goal is we're looking for concepts, good ideas, best practices, not the actual files"]
+
+### 7. What I am unsure of
+
+- The phrase "say currently they give five notice" is transcription noise; meaning not asserted  [CONVERSATION 2026-10-11 Dainius, "Our goal is we're looking for concepts, good ideas, best practices, not the actual files"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
