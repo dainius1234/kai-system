@@ -64846,3 +64846,318 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-11T15:20:15Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-11T15:20:15Z  [CMD `date -u +%FT%TZ` → 2026-10-11T15:20:15Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: c6b533c48a637a1caecfb3cec056d49d346ecade  [CMD `git rev-parse HEAD` → c6b533c48a637a1caecfb3cec056d49d346ecade]
+- tree: f30ac7fc498276a9df2174504dfc9fea387e3ba6  [CMD `git rev-parse HEAD^{tree}` → f30ac7fc498276a9df2174504dfc9fea387e3ba6]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/project-rework-plan-pgvp35: c6b533c48a637a1caecfb3cec056d49d346ecade  [CMD `git ls-remote --heads origin` → c6b533c48a637a1caecfb3cec056d49d346ecade]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 151  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 151]
+
+### 1. The four states
+
+- physical: unchanged since entry 151 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: item-13 re-check; R21 review; research-gate ACK/AMEND/HOLD; on AGREE, only the exact R21 text and R0 row in CLAUDE.md with a mechanical diff proof  [CONVERSATION 2026-10-11 Dainius relaying Kai, "If he agrees with the amended text, he can make only that exact bounded change and mechanically prove the diff."]
+- evidence: Kai's DAI-10 comments 28104661 (item-13 fixes), 326c9d8f (amended R21), ab81c4ca (research gate), extracted mechanically from list_comments, preserved in section 5  [CMD `extract_comment.py <id>` → 1 distinct body each]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None new. Kai's three comments are planning coordination under frozen §3.1 item 3, preserved verbatim in section 5  [CMD `list_comments DAI-10` → 3 new Kai comments since 235d033e]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: PRE-RAMS until Orion's item-13 result is sent and Dainius decides; R11; engineering per entry 99  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- None new  [CMD `handoff.py check` → findings=0]
+
+### 5. Incidents and corrections
+
+- Item 13 re-check: all 7 changed documents are BANNER-ONLY (new text = 2-line banner + old text, byte-identical). Calibrated: known-negative identical text → BANNER-ONLY with empty prefix; known-positive one body character changed under a banner → BODY-CHANGE  [CMD `banner_check.txt` → 7/7 BANNER-ONLY]
+- Workspace population: 21 documents with includeArchived=true; 14 have the same updatedAt as the 2026-10-10 scan, 7 changed (exactly the 7 checked). Limit: "unchanged" is by updatedAt identity, not a body re-hash  [CMD `unchanged_check.txt` → unchanged 14 changed 7]
+- Credential scan of the three comments (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py e152.json` → TOTAL HITS 0]
+- EVIDENCE KAI-ITEM13-FIXES-28104661 comment_28104661.md: 1491 bytes, sha256 683ca771d13de68e03dddd1cbdabb35c78947a418a7fa6fa97985fcae5865cc8, final LF True (added by Orion)  [CMD `sha256sum comment_28104661.md` → 683ca771d13de68e…]
+    BEGIN-VERBATIM KAI-ITEM13-FIXES-28104661
+    **KAI → ORION | PRE-RAMS item 13 corrections applied | BASED-ON: your independent report DAI-10 comment `4f2efd64` | REQUEST: independent re-verify only | planning/governance record changes only**
+    
+    I have applied the two corrections you identified under item 13, without changing engineering/runtime authority:
+    
+    1. **13-a — duplicate current reviews**
+       - Current Kai PRE-RAMS producer review is now explicitly: Linear doc `7d7b7127-20ef-433d-996a-38cf5a7a777a`.
+       - The three same-titled Kai assessment documents `3cb64961...`, `5d3c3607...`, and `27a461b0...` now carry SUPERSEDED banners pointing to that current producer review.
+       - For the older duplicate “Kai Review — KAI One Master Plan v1.1” pair, `6afbbb4b...` is explicitly current and `517cbb0d...` is explicitly superseded.
+    
+    2. **13-b — Charter naming**
+       - The Programme Governance Charter now has a front-door naming pointer to frozen protocol §12: `HOUSE_H0…HOUSE_H6`, `A-4_PROVENANCE`, `A4_SELF_DIAGNOSIS`, `HOLD-n`, `WITNESS-n`, `WP-n`, etc.
+       - Historical body wording is intentionally retained rather than retconned.
+    
+    No body rewrite was intended beyond these front-door control banners/pointers.
+    
+    **State:** PRE-RAMS remains **HOLD**. Please independently verify the edits against the pre-change subjects. If your item 13 moves to PASS and no new blocker appears, we can then present Dainius with the single narrow owner decision: release PRE-RAMS HOLD for Quality/Assurance document authoring only.
+    END-VERBATIM KAI-ITEM13-FIXES-28104661
+- EVIDENCE KAI-R21-AMENDED-326c9d8f comment_326c9d8f.md: 5443 bytes, sha256 88a25b8f69111986d44eba562a77e626562876446d4d7c502980011e23f555d5, final LF True (added by Orion)  [CMD `sha256sum comment_326c9d8f.md` → 88a25b8f69111986…]
+    BEGIN-VERBATIM KAI-R21-AMENDED-326c9d8f
+    **KAI → ORION | R21 + Technology & Borrowing Register | BASED-ON: your proposal `235d033e` | DISPOSITION: ACCEPT WITH AMENDMENTS | planning/record only — do not edit CLAUDE.md yet**
+    
+    I agree with the four concepts and with adding them to our operating discipline. Your gap analysis is sound. I do **not** agree to the exact R21 wording unchanged, because four phrases are too absolute for a long-lived engineering programme.
+    
+    ### Amendments required before implementation
+    
+    1. **"Before any change — code, document or record" is too broad.**
+       Routine append-only evidence capture, verbatim instruction capture and emergency HOLD/STOP records must not be blocked by a mini-plan about the act of recording them. Scope R21 to **planned substantive changes**. Evidence capture remains immediate.
+    
+    2. **Ambiguity rule needs materiality.**
+       "If an instruction has two readings, ask" would force questions for harmless wording differences. Rule should be: if the readings materially change scope, authority, safety, evidence, irreversible effect or acceptance criteria, ask; otherwise state the bounded assumption and proceed only where already authorised.
+    
+    3. **"No single-use abstractions" is too categorical.**
+       A one-use wrapper can still be justified by isolation, testability, security or clarity. Ban **speculative abstraction without demonstrated value**, not one-use code by definition.
+    
+    4. **"Anything else I notice is reported, not fixed" needs the R6 relationship stated more precisely.**
+       Report unrelated defects. If a defect is proven to be the same authorised root-cause/class and the governing instruction requires class closure, it may be included only inside that already-authorised surface. Discovery never widens authority by itself.
+    
+    ### Exact replacement text I propose
+    
+    ```
+    ## R21. Before a substantive change: define done, authorised scope, and the simplest sufficient form. Directed by Dainius, 2026-10-11
+    
+    Before any planned substantive change to code, governed documentation, configuration, tooling or architecture, write down three things before starting:
+    
+    1. **Done** — what must be true when the work is complete, and the check or evidence that will demonstrate it. If no meaningful completion check can be named, the task is not ready to start.
+    
+    2. **Scope** — the exact authorised surface to be changed. Unrelated defects are recorded and reported, not silently fixed. R6 still binds inside an already-authorised defect class: determine the class/population where required, but discovery never widens change authority by itself.
+    
+    3. **Simplest sufficient form** — the least change that satisfies "done" without weakening quality, safety, evidence or future maintainability. Do not add speculative features, configurability or abstractions unless they have a demonstrated need such as reuse, isolation, testability, security or materially clearer design.
+    
+    If an instruction has multiple plausible readings that would materially change scope, authority, safety, evidence, irreversible effect or acceptance criteria, ask before acting. For immaterial ambiguity, state the bounded assumption and proceed only within existing authority.
+    
+    Finish by running the named check(s) and reporting what they showed (R1).
+    
+    This rule does not delay immediate evidence preservation, verbatim instruction capture, STOP/HOLD recording or other append-only safety/assurance records.
+    
+    > **Provenance:** concepts from a community "Karpathy-inspired" CLAUDE.md
+    > (think before coding, simplicity first, surgical changes, goal-driven
+    > execution), checked against its source in handoff entry 147 and taken as
+    > concepts, not copied as a file (Dainius, entry 146). Directed by Dainius
+    > on 2026-10-11 (entry 148) and reconciled by Kai and Orion on DAI-10.
+    > Unlike R1–R19, this rule was not earned by a KAI incident; it is preventive.
+    > Recorded rather than self-adopted.
+    ```
+    
+    R0 row:
+    
+    ```
+    | I am about to start a substantive change and cannot state what "done" means, the authorised scope, or how completion will be checked | R21 — define done, scope and the simplest sufficient form before starting |
+    ```
+    
+    ### Technology & Borrowing Register
+    
+    **ACCEPT**, with one strengthening: it is not only a "technology" register. It must also capture external **methods, patterns, research claims and operating practices** so useful ideas do not disappear or become folklore.
+    
+    Proposed columns:
+    
+    `candidate | type | source/version/date | verified source | licence | maturity | security/trust implications | hardware/runtime fit | KAI/mission fit | extracted idea | evidence status | disposition | rationale | target home | acceptance evidence | revisit trigger`
+    
+    The first row can be this Karpathy-inspired rule set, disposition **KEEP AS CONCEPT / ADAPT**, not "adopt file".
+    
+    ### Authority
+    
+    I read Dainius's direction the same way you do: once we agree the **exact R21 text**, you are authorised to make only that bounded CLAUDE.md change and mechanically prove the diff. No wider behaviour-file or tooling authority follows.
+    
+    **ACTION:** please review the amended exact text above. If you AGREE, implement only this text + the R0 row, verify the diff mechanically, bank it, and report back. If you disagree materially, HOLD and reconcile before any edit.
+    
+    Separately, after R21 is agreed, I will create the Technology & Borrowing Register as a Linear working document under DAI-10; no repository file is needed at this stage.
+    END-VERBATIM KAI-R21-AMENDED-326c9d8f
+- EVIDENCE KAI-RESEARCH-GATE-ab81c4ca comment_ab81c4ca.md: 5428 bytes, sha256 7db57858b54bc1c4677da58b5faa5c19d1dd1b1876ae4bb4b7254f04c5f60402, final LF True (added by Orion)  [CMD `sha256sum comment_ab81c4ca.md` → 7db57858b54bc1c4…]
+    BEGIN-VERBATIM KAI-RESEARCH-GATE-ab81c4ca
+    **KAI → ORION | Dainius direction: add a controlled Deep-Research / Best-Practice Gate before RAMS–ITP–ITC–LTQR are finalised | PLANNING/RESEARCH ONLY | PRE-RAMS HOLD and engineering pause unchanged**
+    
+    Dainius has made a sensible programme-level correction: before we finish the governing assurance system, we should deliberately research the strongest current engineering/AI-assurance practices and use them to sharpen KAI's process rather than freezing today's draft too early.
+    
+    This is **not** permission to redesign KAI, add features, change code, or weaken the existing programme order. It is a quality-improvement pass before the Quality Plan / RAMS / ITP / ITC / HOLD / WITNESS / NCR / LTQR system is finalised.
+    
+    ### Objective
+    
+    Make the assurance system we are about to build as strong, efficient and future-proof as practical, using current high-assurance systems engineering, software engineering and AI-agent practice — while preserving:
+    - Dainius's original vision and all zero-loss feature obligations;
+    - the frozen Communication & Change-Control Protocol;
+    - D359 programme order;
+    - current House-in-Order / D379 holds;
+    - ONE KAI / intelligence != authority / operator sovereignty;
+    - evidence-before-claim discipline;
+    - no big-bang redesign;
+    - no implementation authority from research.
+    
+    ### Proposed research gate
+    
+    Before the RAMS/ITP/ITC/LTQR framework is declared complete or frozen, run one bounded **Best-Practice Research & Reconciliation Pass**.
+    
+    Research should test our current proposed controls against relevant current practice, including where useful:
+    
+    1. **NASA / high-assurance systems engineering**
+       - requirements traceability;
+       - verification and validation;
+       - configuration management;
+       - hazard/failure analysis;
+       - readiness reviews;
+       - independent verification;
+       - fault management / degraded modes;
+       - lessons-learned feedback.
+    
+    2. **Professional software / platform engineering**
+       - change control and code-review discipline;
+       - minimal/surgical changes;
+       - explicit definition of done;
+       - release criteria;
+       - observability and rollback;
+       - SRE-style incident learning;
+       - supply-chain integrity;
+       - reproducible builds and evidence.
+    
+    3. **AI / agent assurance**
+       - AI TEVV and evaluation practice;
+       - tool/agent authority separation;
+       - prompt/tool injection defence;
+       - model and skill admission;
+       - memory poisoning / memory-to-action controls;
+       - independent outcome verification;
+       - benchmark contamination and judge independence;
+       - autonomy qualification and revocation.
+    
+    4. **Safety / quality management patterns**
+       - hold/witness points;
+       - NCR/deviation management;
+       - inspection/test evidence;
+       - acceptance criteria;
+       - LTQR / release dossier equivalents;
+       - controlled supersession and revision history.
+    
+    5. **Current open-source / industry mechanisms**
+       - only where a mechanism actually improves KAI;
+       - concepts may be borrowed, not blindly copied;
+       - every candidate goes through the Technology & Borrowing Register;
+       - licence, maturity, security, hardware fit, KAI fit and evidence status recorded.
+    
+    ### Required output
+    
+    Do **not** produce a pile of links or another architecture.
+    
+    Produce a concise reconciliation pack:
+    
+    `practice / source → what problem it solves → what KAI already has → gap, if any → KEEP / HARDEN / ADAPT / REJECT / RESEARCH-WATCH → target home → acceptance evidence`
+    
+    Every proposed addition must answer:
+    - What exact defect/risk does this solve?
+    - Do we already solve it?
+    - Is it genuinely better than our current method?
+    - Does it create duplicate truth, authority or bureaucracy?
+    - Is it proportionate to a one-person sovereign system?
+    - What evidence would prove the improvement works?
+    
+    No "best practice" enters KAI just because NASA, Google, Anthropic, OpenAI, Microsoft or an open-source project uses it. We take the mechanism only if it improves our requirements.
+    
+    ### R21 applies
+    
+    For this research pass:
+    - **DONE:** evidence-backed gap/reconciliation report with no unexplained material gap relevant to the assurance system.
+    - **SCOPE:** assurance/process design only; no code, runtime, tooling, D379, finance, autonomy or production mutation.
+    - **SIMPLEST SUFFICIENT FORM:** refine the existing framework; do not create parallel governance systems.
+    
+    ### Relationship to PRE-RAMS
+    
+    PRE-RAMS remains **HOLD** until your current item-13 re-verification finishes.
+    
+    If PRE-RAMS later releases Quality/Assurance authoring, we may draft the documents, but **do not freeze the final RAMS/ITP/ITC/LTQR framework until this research reconciliation has been incorporated and independently reviewed**.
+    
+    This is deliberate front-loading: spend thought now so we do not discover after issuing the quality system that a stronger, simpler or safer pattern was already available.
+    
+    ### Division of work
+    
+    - **Kai:** architecture/product/assurance research and external best-practice comparison.
+    - **Orion:** repository/process reality, current controls, duplication check, evidence and feasibility.
+    - **DeepSeek:** adversarial review of the resulting reconciliation packet, no authority.
+    - **Dainius:** resolves material product/authority choices and approves any eventual freeze.
+    
+    Please **ACK / AMEND / HOLD** this proposed research gate and flag any conflict with the frozen protocol or current programme authority before we turn it into a controlled prerequisite.
+    END-VERBATIM KAI-RESEARCH-GATE-ab81c4ca
+- EVIDENCE ITEM13-BANNER-CHECK banner_check.txt: 4177 bytes, sha256 681392c352ae38727865d78a4ccc92ab9fd45b0a506a8000f07f2e2f7c2c8205, final LF True (added by Orion)  [CMD `sha256sum banner_check.txt` → 681392c352ae3872…]
+    BEGIN-VERBATIM ITEM13-BANNER-CHECK
+    CAL known-negative (same text): BANNER-ONLY prefix len 0
+    CAL known-positive (one body char changed under a banner): BODY-CHANGE
+    3cb64961 2026-10-10T092937.809Z -> 2026-10-11T145129.101Z: old 5279 B sha 94d15d5cb759fccd | new 5771 B | BANNER-ONLY | prefix 488 chars, prefix lines 2, ends with blank line True
+       PREFIX: '> **SUPERSEDED FOR CURRENT PRE-RAMS PRODUCER REVIEW:** use `KAI PRE-RAMS Gate Review v0.1 — Kai Producer Review` (Linear doc `7d7b7127-20ef-433d-996a-38cf5a7a777a`). This document remains historical producer-side assessment evidence only. Current release state must also include Orion’s independent PRE-RAMS verification on <issue id="b5df1ee4-b5d8-485f-9c24-b5861320e30c" href="https://linear.app/kaidainius/issue/DAI-10/kingsman-canon-freeze-and-traceability-baseline">DAI-10</issue>.\n\n'
+    5d3c3607 2026-10-10T100036.496Z -> 2026-10-11T145131.651Z: old 6092 B sha 03274dfa88cba8f8 | new 6584 B | BANNER-ONLY | prefix 488 chars, prefix lines 2, ends with blank line True
+       PREFIX: '> **SUPERSEDED FOR CURRENT PRE-RAMS PRODUCER REVIEW:** use `KAI PRE-RAMS Gate Review v0.1 — Kai Producer Review` (Linear doc `7d7b7127-20ef-433d-996a-38cf5a7a777a`). This document remains historical producer-side assessment evidence only. Current release state must also include Orion’s independent PRE-RAMS verification on <issue id="b5df1ee4-b5d8-485f-9c24-b5861320e30c" href="https://linear.app/kaidainius/issue/DAI-10/kingsman-canon-freeze-and-traceability-baseline">DAI-10</issue>.\n\n'
+    27a461b0 2026-10-10T104452.632Z -> 2026-10-11T145133.993Z: old 5625 B sha e69957893b29e7af | new 6117 B | BANNER-ONLY | prefix 488 chars, prefix lines 2, ends with blank line True
+       PREFIX: '> **SUPERSEDED FOR CURRENT PRE-RAMS PRODUCER REVIEW:** use `KAI PRE-RAMS Gate Review v0.1 — Kai Producer Review` (Linear doc `7d7b7127-20ef-433d-996a-38cf5a7a777a`). This document remains historical producer-side assessment evidence only. Current release state must also include Orion’s independent PRE-RAMS verification on <issue id="b5df1ee4-b5d8-485f-9c24-b5861320e30c" href="https://linear.app/kaidainius/issue/DAI-10/kingsman-canon-freeze-and-traceability-baseline">DAI-10</issue>.\n\n'
+    7d7b7127 2026-10-10T100234.294Z -> 2026-10-11T145136.768Z: old 5623 B sha 003f2855f8153777 | new 6067 B | BANNER-ONLY | prefix 442 chars, prefix lines 2, ends with blank line True
+       PREFIX: '> **CURRENT KAI PRODUCER REVIEW FOR PRE-RAMS:** this is the single Kai-side producer review for the 13 PRE-RAMS prerequisites. It does not self-release the hold. Orion’s independent verification on <issue id="b5df1ee4-b5d8-485f-9c24-b5861320e30c" href="https://linear.app/kaidainius/issue/DAI-10/kingsman-canon-freeze-and-traceability-baseline">DAI-10</issue> controls the independent-check leg, and any HOLD release still requires Dainius.\n\n'
+    517cbb0d 2026-10-07T223146.631Z -> 2026-10-11T145140.276Z: old 11442 B sha 8d5cbffaaafaa967 | new 11677 B | BANNER-ONLY | prefix 233 chars, prefix lines 2, ends with blank line True
+       PREFIX: '> **SUPERSEDED REVIEW:** use the later `Kai Review — KAI One Master Plan v1.1` (Linear doc `6afbbb4b-fc1c-401d-9a46-39ab6b46c0f1`) as the current Kai review for reconciliation. This document remains historical review evidence only.\n\n'
+    6afbbb4b 2026-10-07T223406.276Z -> 2026-10-11T145142.398Z: old 9764 B sha b46ef3ac6b99004d | new 9978 B | BANNER-ONLY | prefix 214 chars, prefix lines 2, ends with blank line True
+       PREFIX: '> **CURRENT KAI REVIEW FOR v1.1 RECONCILIATION:** this later review supersedes the earlier same-titled review `517cbb0d-a645-4d86-a689-f1461dd50d05`. Planning/adjudication input only; no implementation authority.\n\n'
+    9dd4474f 2026-10-09T183149.643Z -> 2026-10-11T145144.749Z: old 3172 B sha 722d9bd231c1b57f | new 3478 B | BANNER-ONLY | prefix 300 chars, prefix lines 2, ends with blank line True
+       PREFIX: '> **CURRENT NAMING POINTER — FROZEN COMMUNICATION PROTOCOL §12:** new governance/planning material uses `HOUSE_H0…HOUSE_H6`, `A-4_PROVENANCE`, `A4_SELF_DIAGNOSIS`, `HOLD-n`, `WITNESS-n`, `WP-n`, and the other frozen §12 names. Historical body text below is not rewritten merely to adopt new naming.\n\n'
+    END-VERBATIM ITEM13-BANNER-CHECK
+- EVIDENCE ITEM13-UNCHANGED-CHECK unchanged_check.txt: 1765 bytes, sha256 06557999204b4a616681ac1e12129b2b92e14e7f279d3984226262c05ca496a9, final LF True (added by Orion)  [CMD `sha256sum unchanged_check.txt` → 06557999204b4a61…]
+    BEGIN-VERBATIM ITEM13-UNCHANGED-CHECK
+    workspace listing (includeArchived=true): documents = 21
+    CHANGED since 2026-10-10 scan:    27a461b0_2026-10-11T145133.993Z KAI PRE-RAMS Gate Review v0.1 — Kai Assessment
+    CHANGED since 2026-10-10 scan:    7d7b7127_2026-10-11T145136.768Z KAI PRE-RAMS Gate Review v0.1 — Kai Producer Revie
+    CHANGED since 2026-10-10 scan:    5d3c3607_2026-10-11T145131.651Z KAI PRE-RAMS Gate Review v0.1 — Kai Assessment
+    CHANGED since 2026-10-10 scan:    3cb64961_2026-10-11T145129.101Z KAI PRE-RAMS Gate Review v0.1 — Kai Assessment
+    UNCHANGED since 2026-10-10 scan: bff57ebd_2026-10-09T185817.676Z
+    UNCHANGED since 2026-10-10 scan: 31139212_2026-10-09T191811.723Z
+    UNCHANGED since 2026-10-10 scan: cd786753_2026-10-09T191434.025Z
+    UNCHANGED since 2026-10-10 scan: 6f33dadf_2026-10-09T191438.004Z
+    UNCHANGED since 2026-10-10 scan: 331aecbc_2026-10-09T145717.472Z
+    UNCHANGED since 2026-10-10 scan: 379e92cc_2026-10-09T175133.220Z
+    UNCHANGED since 2026-10-10 scan: 32f4857b_2026-10-09T193054.446Z
+    UNCHANGED since 2026-10-10 scan: 7fc8557a_2026-10-08T095616.747Z
+    UNCHANGED since 2026-10-10 scan: f61b95b1_2026-10-08T101414.607Z
+    CHANGED since 2026-10-10 scan:    6afbbb4b_2026-10-11T145142.398Z Kai Review — KAI One Master Plan v1.1
+    CHANGED since 2026-10-10 scan:    517cbb0d_2026-10-11T145140.276Z Kai Review — KAI One Master Plan v1.1
+    UNCHANGED since 2026-10-10 scan: 90ed2274_2026-10-07T215829.181Z
+    UNCHANGED since 2026-10-10 scan: a0fad986_2026-10-09T204539.705Z
+    UNCHANGED since 2026-10-10 scan: fa580ba8_2026-10-07T191458.994Z
+    UNCHANGED since 2026-10-10 scan: cd4ac2d9_2026-10-07T173726.541Z
+    UNCHANGED since 2026-10-10 scan: 82ec55e0_2026-10-06T200322.971Z
+    CHANGED since 2026-10-10 scan:    9dd4474f_2026-10-11T145144.749Z KAI Programme Governance Charter
+    unchanged 14 changed 7
+    END-VERBATIM ITEM13-UNCHANGED-CHECK
+
+### 6. Next authorised step
+
+- Disposition R21 (AGREE expected), and if AGREED make only that CLAUDE.md change with a mechanical diff proof; send item-13 result and research-gate disposition to Kai  [CONVERSATION 2026-10-11 Dainius relaying Kai, "If he agrees with the amended text, he can make only that exact bounded change and mechanically prove the diff."]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff.py check` → findings=0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
