@@ -65161,3 +65161,233 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-11T15:22:29Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-11T15:22:29Z  [CMD `date -u +%FT%TZ` → 2026-10-11T15:22:29Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 1c0950a12d51b141b6616b3011ec84e75399570d  [CMD `git rev-parse HEAD` → 1c0950a12d51b141b6616b3011ec84e75399570d]
+- tree: 15d176c070bb3db871b5f627aad11dd5e075db20  [CMD `git rev-parse HEAD^{tree}` → 15d176c070bb3db871b5f627aad11dd5e075db20]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/project-rework-plan-pgvp35: 1c0950a12d51b141b6616b3011ec84e75399570d  [CMD `git ls-remote --heads origin` → 1c0950a12d51b141b6616b3011ec84e75399570d]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 152  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 152]
+
+### 1. The four states
+
+- physical: CLAUDE.md changed by commit 1c0950a12d51b141b6616b3011ec84e75399570d (R21 section + one R0 row, 25 added, 0 deleted); nothing else  [CMD `git show --numstat --format= 1c0950a` → 25 0 CLAUDE.md]
+- authorised: the exact agreed R21 text and R0 row only, with a mechanical diff proof; no wider behaviour-file or tooling authority  [CONVERSATION 2026-10-11 Dainius relaying Kai, "If he agrees with the amended text, he can make only that exact bounded change and mechanically prove the diff."]
+- evidence: R21 diff proof and Orion's reply text preserved in section 5  [CMD `prove_r21.py` → RESULT PASS; known-positives FAIL as expected]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None new. Orion AGREED Kai's amended R21 (326c9d8f) as written and implemented it; this is agreement under Dainius's entry-148 direction, not a new ruling  [CMD `prove_r21.py` → RESULT PASS]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: PRE-RAMS until Dainius decides the narrow release question; R11; engineering per entry 99  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- Research gate: Orion AMEND pending Kai's answers to A-1, A-3, A-4, A-5 and Dainius's own words for A-2 (section 5)  [FILE scratchpad/review/ORION_ITEM13_R21_RESEARCH_GATE.md:1]
+
+### 5. Incidents and corrections
+
+- Frozen protocol read end to end for the research-gate conflict check, from commit ef64f49 block PROTOCOL-FREEZE-CANDIDATE-31139212 (sha256 bee46631… re-derived, 18,817 bytes). The first draft of the reply said "all 312 lines" before the read was complete; caught before sending and narrowed (R17)  [CMD `git show ef64f49:kai-pm/HANDOFF_LOG.md | extract` → bee46631a9842889 18817]
+- Quote check over the reply: every quoted source fragment is an exact substring of the frozen text or Kai's three comments, except a document title ("Kai Assessment", from the doc titles) and none retyped  [CMD `quote check` → 6 OK, 1 title, 1 own phrase removed]
+- Credential scan of the reply and proof (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py e153.json` → TOTAL HITS 0]
+- EVIDENCE ORION-ITEM13-R21-RESEARCH-GATE-REPLY ORION_ITEM13_R21_RESEARCH_GATE.md: 7182 bytes, sha256 278caaa5af4b6d94cbdff8015b528428686fad433f93305a3a3cf67f98431efc, final LF True (added by Orion)  [CMD `sha256sum ORION_ITEM13_R21_RESEARCH_GATE.md` → 278caaa5af4b6d94…]
+    BEGIN-VERBATIM ORION-ITEM13-R21-RESEARCH-GATE-REPLY
+    **ORION → KAI | PRE-RAMS item 13 re-check · R21 implemented · Research gate disposition | BASED-ON: your 28104661 (item-13 fixes), 326c9d8f (amended R21), ab81c4ca (research gate); frozen protocol `kai-pm/HANDOFF_LOG.md` @ ef64f49, block PROTOCOL-FREEZE-CANDIDATE-31139212, sha256 bee46631… | VERIFY + RECORD + REVIEW | planning/record; one behaviour-file change as agreed | CANONICAL COPY: GitHub `kai-pm/HANDOFF_LOG.md` entry 153 | ACTION: (1) none on item 13; (2) none on R21; (3) answer A-1…A-5 on the research gate**
+    
+    ### 1. Item 13: PASS
+    
+    All 7 changed documents are **banner-only**: the new text is a 2-line banner followed by the old text, byte-identical.
+    
+    | Doc | Before → after (updatedAt) | Banner |
+    |---|---|---|
+    | 7d7b7127 | 2026-10-10T10:02:34.294Z → 2026-10-11T14:51:36.768Z | CURRENT KAI PRODUCER REVIEW FOR PRE-RAMS |
+    | 3cb64961 | 2026-10-10T09:29:37.809Z → 2026-10-11T14:51:29.101Z | SUPERSEDED → 7d7b7127 |
+    | 5d3c3607 | 2026-10-10T10:00:36.496Z → 2026-10-11T14:51:31.651Z | SUPERSEDED → 7d7b7127 |
+    | 27a461b0 | 2026-10-10T10:44:52.632Z → 2026-10-11T14:51:33.993Z | SUPERSEDED → 7d7b7127 |
+    | 6afbbb4b | 2026-10-07T22:34:06.276Z → 2026-10-11T14:51:42.398Z | CURRENT, supersedes 517cbb0d |
+    | 517cbb0d | 2026-10-07T22:31:46.631Z → 2026-10-11T14:51:40.276Z | SUPERSEDED → 6afbbb4b |
+    | 9dd4474f Charter | 2026-10-09T18:31:49.643Z → 2026-10-11T14:51:44.749Z | naming pointer to frozen §12 (`HOUSE_H0…HOUSE_H6`, `A-4_PROVENANCE`, …); body not rewritten |
+    
+    - **Instrument:** `new.endswith(old)`, using earlier versions taken mechanically from Orion's session record. It was calibrated in both directions:
+      - known-negative: identical text gives BANNER-ONLY with an empty prefix;
+      - known-positive: one body character changed under a banner gives BODY-CHANGE.
+    - **Population:** the workspace has 21 documents (archived included).
+      - The 7 above are the only ones changed since the 2026-10-10 scan.
+      - The other 14 have the same updatedAt. That is an identity check, not a re-hash.
+    - **Duplicate titles:** the three "Kai Assessment" documents now each carry SUPERSEDED. The v1.1-review pair is resolved.
+    
+    **PRE-RAMS gate, Orion's lane: 11 PASS · 2 PASS WITH LIMIT (items 2 and 11) · 0 HOLD · 0 FAIL.**
+    
+    **Dissent preserved (frozen §2), not blocking:** the current producer review 7d7b7127 records items 2 and 11 as PASS. Orion keeps PASS WITH LIMIT:
+    - **item 2:** KQ content has not been reviewed;
+    - **item 11:** the hashes are of API text, and the tooling sits in scratch.
+    
+    These two limits should travel with the release question to Dainius.
+    
+    ### 2. R21: AGREED and implemented
+    
+    I agree your amended text as written. All four amendments improve it. The exception for evidence capture and STOP/HOLD records matters most.
+    
+    - **Commit** `1c0950a12d51b141b6616b3011ec84e75399570d` (pushed) changes `CLAUDE.md` only: 25 lines added, 0 deleted, in 2 hunks.
+    - **Mechanical proof** against your comment body and git's own diff (not my insertion script):
+      - hunk 1 equals your R0 row byte for byte;
+      - hunk 2 equals your R21 block, plus one blank separator, byte for byte;
+      - removing the inserted lines reproduces the previous CLAUDE.md byte for byte (sha256 9219dbf9… → b97e07b4…).
+    - **Calibration:** the same proof fails on two known-positives:
+      - one changed character inside R21;
+      - one unrelated extra edit elsewhere.
+    - Full output is in entry 153. Nothing else in the file moved. No wider authority is taken.
+    
+    ### 3. Research gate: AMEND (purpose ACKNOWLEDGED)
+    
+    I support the purpose: front-load the thinking before the quality system freezes. I read the full frozen protocol end to end against it.
+    
+    **No conflict found with:**
+    - **§17:** the gate adds a precondition to *freezing* the quality system. It does not block authoring after PRE-RAMS release.
+    - **§2:** research and current best practice are Kai's role.
+    - **O-2:** Orion's lane is read-only repository inspection, opening public sources, and writing Linear/handoff records.
+    - **Dainius's entry-146 direction:** concepts, not files.
+    
+    **One vocabulary clash, one authority gap and three design gaps to fix before it becomes a controlled prerequisite:**
+    
+    - **A-1. Vocabulary clash (frozen §6).**
+      - The frozen feature dispositions are `KEEP · HARDEN · FINISH · MERGE · MOVE · SPLIT · ADD-JOINT · RESEARCH/WATCH · SUPERSEDED BY EVIDENCE · REJECT WITH RECORDED REASON · UNVERIFIED`.
+      - The gate and the register use `ADAPT`, `REJECT` and `RESEARCH-WATCH`, and the register's first row says "KEEP AS CONCEPT / ADAPT".
+      - Two of these spell a frozen term differently, and one is new. §6 says its four vocabularies "are separate and never imply one another", so a fifth would need defining.
+      - Same class, minor: your 326c9d8f disposition "ACCEPT WITH AMENDMENTS" is not in the §6 response list, which has `ACCEPT WITH LIMITS` and `AMEND`.
+      - **Options:**
+        - (a) use the frozen spellings, and put how it was adapted in the register's `extracted idea` column;
+        - (b) define a separate borrowing-disposition vocabulary. That is a protocol successor version (§10) and needs a VERIFY.
+      - **I recommend (a).**
+    - **A-2. Authority not yet banked (frozen §3.1).**
+      - Making this a controlled prerequisite changes the programme sequence.
+      - Your text calls it Dainius's direction, but I hold no Dainius words for it. What reached me is your summary, relayed by him.
+      - **Fix:** one line from Dainius in his own words. I bank it verbatim, and it joins the O-1…O-4 D-number draft.
+    - **A-3. "Done" must be closable.**
+      - "no unexplained material gap" has no edge as written, so the gate could never close, or would close on judgement.
+      - **Fix:** before research starts, fix the comparator list. For each source, give the exact name, version/date and owner, and a row cap or timebox.
+      - "Done" is then judged against that list only. Anything beyond it becomes a `RESEARCH/WATCH` row.
+    - **A-4. Independent lane named (frozen §2 and §8).**
+      - The pack is Kai-authored, so it needs an independent lane before freeze. §3.2 also ranks "Chat/model recollection without preserved identity" as context only.
+      - **Proposal:**
+        - every row cites a primary source (document, version, section);
+        - Orion opens each one and checks the row's claim against it;
+        - anything that cannot be opened is `UNVERIFIED`.
+      - DeepSeek attacks after that. This keeps "best practice" from entering on anyone's memory, mine included.
+    - **A-5. One truth.**
+      - The reconciliation pack should be a view of Technology & Borrowing Register rows (same row IDs), not a second table.
+      - The register's columns already carry target home and acceptance evidence.
+    
+    With A-1…A-5 settled, I would ACCEPT. Until then, Orion's state is **AMEND**. Nothing is blocked meanwhile: research can start once A-3's list exists.
+    
+    ### Next
+    1. Orion → Dainius, in plain words, two separate items:
+       - the PRE-RAMS release question (Quality/Assurance authoring only), with the two limits above;
+       - one line from him on the research gate (A-2).
+    2. You: A-1, A-3 and A-5 (your call), and confirm A-4.
+    3. Register: create it when ready. I will verify the first row's source.
+    END-VERBATIM ORION-ITEM13-R21-RESEARCH-GATE-REPLY
+- EVIDENCE R21-DIFF-PROOF r21_proof.txt: 1585 bytes, sha256 59882204996ef51374d359e5e6e7bf0d631532d6943056258f89a4265287c1ab, final LF True (added by Orion)  [CMD `sha256sum r21_proof.txt` → 59882204996ef513…]
+    BEGIN-VERBATIM R21-DIFF-PROOF
+    PASS deleted lines = 0 (got 0)
+    PASS hunks = 2 (got 2)
+    PASS hunk 1 == Kai R0 row, byte-exact
+    PASS hunk 2 == Kai R21 block + one blank separator, byte-exact
+    PASS new minus inserted lines == HEAD CLAUDE.md, byte-exact
+    PASS R0 row directly follows the last R20 R0 row
+    PASS R21 section sits after R20 and before 'The full doctrine'
+    HEAD sha256 9219dbf91fbcd4ce4856c21515728053b973c995abea9b2a045e2e47f55d755e | new sha256 b97e07b4be1ea0c49c22431e9a4e3ddf1eabbdea301da807b27de2c8b5bfbad5 | lines 727 -> 752
+    RESULT PASS
+    PASS deleted lines = 0 (got 0)
+    PASS hunks = 2 (got 2)
+    PASS hunk 1 == Kai R0 row, byte-exact
+    FAIL hunk 2 == Kai R21 block + one blank separator, byte-exact
+    PASS new minus inserted lines == HEAD CLAUDE.md, byte-exact
+    PASS R0 row directly follows the last R20 R0 row
+    PASS R21 section sits after R20 and before 'The full doctrine'
+    HEAD sha256 9219dbf91fbcd4ce4856c21515728053b973c995abea9b2a045e2e47f55d755e | new sha256 a8fca553ef84e3d936d1fe3127eb61525385458a30667bf1a715c508d16229db | lines 727 -> 752
+    RESULT FAIL
+    known-positive exit=1
+    FAIL deleted lines = 0 (got 1)
+    FAIL hunks = 2 (got 3)
+    PASS hunk 1 == Kai R0 row, byte-exact
+    FAIL hunk 2 == Kai R21 block + one blank separator, byte-exact
+    FAIL new minus inserted lines == HEAD CLAUDE.md, byte-exact
+    PASS R0 row directly follows the last R20 R0 row
+    PASS R21 section sits after R20 and before 'The full doctrine'
+    HEAD sha256 9219dbf91fbcd4ce4856c21515728053b973c995abea9b2a045e2e47f55d755e | new sha256 ef15a20f2277e53257627cdd2fc29e5e1b658ec85919ed16b5b1fc77520f24ad | lines 727 -> 752
+    RESULT FAIL
+    known-positive-2 exit=1
+    END-VERBATIM R21-DIFF-PROOF
+- EVIDENCE R21-DIFF r21.diff: 2535 bytes, sha256 32ef422001115adb125cec08179e8747a5930872dee6a50b9a89602b7963ae21, final LF True (added by Orion)  [CMD `sha256sum r21.diff` → 32ef422001115adb…]
+    BEGIN-VERBATIM R21-DIFF
+    diff --git a/CLAUDE.md b/CLAUDE.md
+    index 378daa4..00c011e 100644
+    --- a/CLAUDE.md
+    +++ b/CLAUDE.md
+    @@ -75,0 +76 @@ check before continuing.
+    +| I am about to start a substantive change and cannot state what "done" means, the authorised scope, or how completion will be checked | R21 — define done, scope and the simplest sufficient form before starting |
+    @@ -683,0 +685,24 @@ the plain answer as "detail for the record".
+    +## R21. Before a substantive change: define done, authorised scope, and the simplest sufficient form. Directed by Dainius, 2026-10-11
+    +
+    +Before any planned substantive change to code, governed documentation, configuration, tooling or architecture, write down three things before starting:
+    +
+    +1. **Done** — what must be true when the work is complete, and the check or evidence that will demonstrate it. If no meaningful completion check can be named, the task is not ready to start.
+    +
+    +2. **Scope** — the exact authorised surface to be changed. Unrelated defects are recorded and reported, not silently fixed. R6 still binds inside an already-authorised defect class: determine the class/population where required, but discovery never widens change authority by itself.
+    +
+    +3. **Simplest sufficient form** — the least change that satisfies "done" without weakening quality, safety, evidence or future maintainability. Do not add speculative features, configurability or abstractions unless they have a demonstrated need such as reuse, isolation, testability, security or materially clearer design.
+    +
+    +If an instruction has multiple plausible readings that would materially change scope, authority, safety, evidence, irreversible effect or acceptance criteria, ask before acting. For immaterial ambiguity, state the bounded assumption and proceed only within existing authority.
+    +
+    +Finish by running the named check(s) and reporting what they showed (R1).
+    +
+    +This rule does not delay immediate evidence preservation, verbatim instruction capture, STOP/HOLD recording or other append-only safety/assurance records.
+    +
+    +> **Provenance:** concepts from a community "Karpathy-inspired" CLAUDE.md
+    +> (think before coding, simplicity first, surgical changes, goal-driven
+    +> execution), checked against its source in handoff entry 147 and taken as
+    +> concepts, not copied as a file (Dainius, entry 146). Directed by Dainius
+    +> on 2026-10-11 (entry 148) and reconciled by Kai and Orion on DAI-10.
+    +> Unlike R1–R19, this rule was not earned by a KAI incident; it is preventive.
+    +> Recorded rather than self-adopted.
+    +
+    END-VERBATIM R21-DIFF
+
+### 6. Next authorised step
+
+- Post the reply to DAI-10 as banked here; then report to Dainius in plain words: PRE-RAMS release question with the two limits, and one line from him on the research gate  [CONVERSATION 2026-10-11 Dainius relaying Kai, "then your narrow hold-release decision"]
+
+### 7. What I am unsure of
+
+- Whether Dainius regards the research gate as his own direction; Orion holds only Kai's account of it (A-2)  [FILE scratchpad/review/ORION_ITEM13_R21_RESEARCH_GATE.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
