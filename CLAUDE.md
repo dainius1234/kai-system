@@ -73,6 +73,7 @@ check before continuing.
 | A ruling, plan or result exists only in this conversation, or a reset or session end is near | R19 — the repository is the memory. WRITE it (handoff log, banked or `⚠ UNBANKED`), commit and push before anything else |
 | I am writing to Dainius and the sentence has a hash, an ID, an acronym or wording I would not say on site | R20 — plain words and a simple example first; the detail goes below, marked as detail for the record |
 | I am asking Dainius to decide something | R20 — have I given the issue, why it matters, options, risks, my recommendation and exactly what he is deciding? |
+| I am about to start a substantive change and cannot state what "done" means, the authorised scope, or how completion will be checked | R21 — define done, scope and the simplest sufficient form before starting |
 
 **The trigger is speed, not ignorance.** Every R1 breach on 2026-08-07
 happened while moving fast — a hard-coded image name, a guessed job id,
@@ -680,6 +681,30 @@ the plain answer as "detail for the record".
 > brothers to take care of me."* Kai's interpretation of the same
 > directive is on DAI-10 (comment 2ac14cd8) and in entry 120. Recorded
 > rather than self-adopted.
+
+## R21. Before a substantive change: define done, authorised scope, and the simplest sufficient form. Directed by Dainius, 2026-10-11
+
+Before any planned substantive change to code, governed documentation, configuration, tooling or architecture, write down three things before starting:
+
+1. **Done** — what must be true when the work is complete, and the check or evidence that will demonstrate it. If no meaningful completion check can be named, the task is not ready to start.
+
+2. **Scope** — the exact authorised surface to be changed. Unrelated defects are recorded and reported, not silently fixed. R6 still binds inside an already-authorised defect class: determine the class/population where required, but discovery never widens change authority by itself.
+
+3. **Simplest sufficient form** — the least change that satisfies "done" without weakening quality, safety, evidence or future maintainability. Do not add speculative features, configurability or abstractions unless they have a demonstrated need such as reuse, isolation, testability, security or materially clearer design.
+
+If an instruction has multiple plausible readings that would materially change scope, authority, safety, evidence, irreversible effect or acceptance criteria, ask before acting. For immaterial ambiguity, state the bounded assumption and proceed only within existing authority.
+
+Finish by running the named check(s) and reporting what they showed (R1).
+
+This rule does not delay immediate evidence preservation, verbatim instruction capture, STOP/HOLD recording or other append-only safety/assurance records.
+
+> **Provenance:** concepts from a community "Karpathy-inspired" CLAUDE.md
+> (think before coding, simplicity first, surgical changes, goal-driven
+> execution), checked against its source in handoff entry 147 and taken as
+> concepts, not copied as a file (Dainius, entry 146). Directed by Dainius
+> on 2026-10-11 (entry 148) and reconciled by Kai and Orion on DAI-10.
+> Unlike R1–R19, this rule was not earned by a KAI incident; it is preventive.
+> Recorded rather than self-adopted.
 
 The full doctrine this serves, its standing rules and the specific
 failure that earned each one, is in `kai-pm/ENGINEERING_DOCTRINE.md`.
