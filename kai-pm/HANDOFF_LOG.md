@@ -70032,3 +70032,217 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-11T17:53:51Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-11T17:53:51Z  [CMD `date -u +%FT%TZ` → 2026-10-11T17:53:51Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: e46d5416409a343639efd9051c116ad5b8d71614  [CMD `git rev-parse HEAD` → e46d5416409a343639efd9051c116ad5b8d71614]
+- tree: 67103fe9fc0c7707fadf119af14cf617a53acc53  [CMD `git rev-parse HEAD^{tree}` → 67103fe9fc0c7707fadf119af14cf617a53acc53]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- remote:claude/project-rework-plan-pgvp35: e46d5416409a343639efd9051c116ad5b8d71614  [CMD `git ls-remote --heads origin` → e46d5416409a343639efd9051c116ad5b8d71614]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 171  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 171]
+
+### 1. The four states
+
+- physical: unchanged since entry 171 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: no change; verification of Kai's three-system status within record authority  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+- evidence: Kai's status message relayed by Dainius (capture 64d333ca2a8079b4); comparison of Linear doc 7ba0ef5c with banked KAI-FEATURE-LIST; Orion's note to Kai — all in section 5  [CMD `feature_doc_compare.txt` → 502/506 normalised lines equal; 4 Linear-formatting differences]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None; Kai's message is a status report (GitHub canonical, Linear working copies, Miro navigation)  [CONVERSATION 2026-10-11 Dainius relaying Kai, "One qualification remains: GitHub currently preserves the Linear-formatted version of the research report"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: unchanged from entry 170  [CMD `handoff.py check` → findings=0]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Miro research-and-continuity section: not inspected by Orion; no claim made  [CMD `handoff.py check` → findings=0]
+
+### 5. Incidents and corrections
+
+- Linear 7ba0ef5c (69,425 chars, 747 lines, sha256 07b45728abaf9fe1… of readback + LF) is content-complete against banked KAI-FEATURE-LIST but not byte-identical: after a calibrated normalisation 502 of 506 lines are equal; the 4 differences are Linear's autolinker (conviction.py, adversary.py, PolicyLibrary.store turned into http links) and anchor wrapping (2 lines). 104 numbered feature headings present. No banner points to the canonical copy  [CMD `feature_doc_compare.txt` → see block]
+- Credential scan of the relay, the comparison output and the note (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py e172.json` → TOTAL HITS 0]
+- EVIDENCE KAI-THREE-SYSTEM-RELAY-64d333ca kai_three_system_relay.txt: 975 bytes, sha256 91a0c74992adba8bc056612a4208ab6f49dacbfd9dbe714ce8e2bc92d65a259d, final LF True (added by Orion)  [CMD `sha256sum kai_three_system_relay.txt` → 91a0c74992adba8b…]
+    BEGIN-VERBATIM KAI-THREE-SYSTEM-RELAY-64d333ca
+    Brother, the three-system preservation structure is in place. I interpreted “micro” as Miro.
+    
+    System	Preserved material	Role
+    GitHub	Complete research text in handoff entry 164; machine-generated feature list in entry 167	Canonical project record
+    Linear	Full research report, 104-feature inventory, our rulings and Orion’s reviews	Searchable working documents and coordination
+    Miro	New research-and-continuity section with the 11 organs, engineering base, source links and open checks	Visual navigation
+    
+    I independently retrieved both new Linear documents and verified the 104 numbered feature entries are present. The Miro section has also been created on our existing architecture board.
+    
+    One qualification remains: GitHub currently preserves the Linear-formatted version of the research report, not a proven byte-identical copy of the original Markdown reconstruction. That distinction will remain visible rather than being silently treated as complete verification.
+    END-VERBATIM KAI-THREE-SYSTEM-RELAY-64d333ca
+- EVIDENCE FEATURE-DOC-COMPARE-7ba0ef5c feature_doc_compare.txt: 7507 bytes, sha256 d20982cfb294cff64f6243305f26a119efaa2e865ae24291b823570583af21d1, final LF True (added by Orion)  [CMD `sha256sum feature_doc_compare.txt` → d20982cfb294cff6…]
+    BEGIN-VERBATIM FEATURE-DOC-COMPARE-7ba0ef5c
+    Linear doc 7ba0ef5c-47d3-415f-aabf-028035e7abd3 updatedAt 2026-10-11T17:45:54.070Z creator dan.apex.engineer@gmail.com | chars 69425 lines 747
+    banked KAI-FEATURE-LIST chars 69012 sha256(+LF) 261285618bcde82f
+    Linear == banked exactly: False
+    banked text contained inside Linear text: False
+    
+    --- Linear first 12 lines ---
+       # KAI — Full Feature List
+       
+       Generated by machine from `README.md` (blob `0eeeb79faf8c`) with the README feature generator banked in handoff entries 106–107. Re-run on 2026-10-11: **356 README lines → 104 features, 0 unmapped, 32
+       
+       **How to read it:** KAI is grouped into 11 organs plus the engineering base. Under each organ is every feature, numbered. Under each feature are the exact README lines it comes from, so smaller abilit
+       
+       **What this list does not prove:** it says what the README *promises*. Whether each feature actually works today is UNKNOWN until it is tested.
+       
+       **Known limit of the generator:** it reads README tables plus four named lists (GPU unlock list, Phase-1 priorities, cross-check lists, end-goal). An ability mentioned only in ordinary paragraphs else
+       
+       ## Summary
+       
+    
+    line-level non-equal opcodes: 118 | equal banked lines: 273 of 631
+      replace banked[13:14] linear[13:14]
+         -  |---|---|---|---|---|
+         +  | -- | -- | -- | -- | -- |
+      replace banked[26:27] linear[26:27]
+         -  | | **Total** | | **104** | **356** |
+         +  |  | **Total** |  | **104** | **356** |
+      insert banked[29:29] linear[29:30]
+         +  
+      replace banked[32:33] linear[33:35]
+         -  - L1178: FF_OHANA_CORE — ✗ — D109: Ohana Core — learns the operator's moral fingerprint, injects loyalty context, evaluates action alignment  _(README status: f
+         +  
+         +  * L1178: FF_OHANA_CORE — ✗ — D109: Ohana Core — learns the operator's moral fingerprint, injects loyalty context, evaluates action alignment  *(README status: f
+      replace banked[35:39] linear[37:42]
+         -  - L242: PUB/WORK Modes — Deep personality system — mate at the pub vs. focused professional  _(README status: code present; runtime UNKNOWN (README))_
+         -  - L1214: Ctrl+Shift+M — Toggle PUB/WORK mode  _(README status: code present; runtime UNKNOWN (README))_
+         +  
+         +  * L242: PUB/WORK Modes — Deep personality system — mate at the pub vs. focused professional  *(README status: code present; runtime UNKNOWN (README))*
+      replace banked[41:42] linear[44:46]
+         -  - L1196: Soul — Ctrl+8 — Mood cards, emotion timeline, domain confidence, self-reflection journal, milestones; SOUL.md + AGENTS.md live editor  _(README status:
+         +  
+         +  * L1196: Soul — Ctrl+8 — Mood cards, emotion timeline, domain confidence, self-reflection journal, milestones; SOUL.md + AGENTS.md live editor  *(README status:
+      replace banked[44:45] linear[48:50]
+         -  - L168: Confession Engine — Proactively admits past mistakes without being asked  _(README status: code present; runtime UNKNOWN (README))_
+         +  
+         +  * L168: Confession Engine — Proactively admits past mistakes without being asked  *(README status: code present; runtime UNKNOWN (README))*
+      replace banked[47:49] linear[52:55]
+         -  - L171: Conscience & Values — Emergent value formation, moral reasoning, integrity tracking, loyalty memory, gratitude engine  _(README status: code present; ru
+         -  - L1134: FF_CONSCIENCE_FILTER — ✓ — P20 conscience value-gate on actions  _(README status: flag default ON)_
+         +  
+         +  * L171: Conscience & Values — Emergent value formation, moral reasoning, integrity tracking, loyalty memory, gratitude engine  *(README status: code present; ru
+    
+    numbered feature headers in Linear: 104 | max 104
+    source refs '- L<n>:' in Linear: 0
+    'MIRROR OF' present: False
+    
+    === NORMALISED comparison (removes: blank lines, table separator rows, bullet marker -/*, markdown escapes, * and _ emphasis, table-cell padding, repeated spaces) ===
+    banked normalised lines 506 | Linear normalised lines 506 | equal: False
+        --- 
+        +++ 
+        @@ -189 +189 @@
+        -• L202: Causal World Model — 🔜 GPU stub — agentic/causalworldmodel.py + agentic/policymemory.py. CausalGraph (directed CAUSES edges with strength/confidence/temporallag), WorldModelSimulator (N=50 GP
+        +• L202: Causal World Model — 🔜 GPU stub — agentic/causalworldmodel.py + agentic/policymemory.py. CausalGraph (directed CAUSES edges with strength/confidence/temporallag), WorldModelSimulator (N=50 GP
+        @@ -263 +263 @@
+        -• L1801: [x] Debate engine (treesearch.py, conviction.py, adversary.py) (README status: checked [x] (README))
+        +• L1801: [x] Debate engine (treesearch.py, [conviction.py](<http://conviction.py>), [adversary.py](<http://adversary.py>)) (README status: checked [x] (README))
+        @@ -339 +339 @@
+        -• L252: House Doctor — Continuous differential diagnosis (9 rules) — CPU+RAM+docker constellations mapped to diagnosis + treatment. This is today's self-diagnostic capability; the wider self-diagnosi
+        +• L252: House Doctor — Continuous differential diagnosis (9 rules) — CPU+RAM+docker constellations mapped to diagnosis + treatment. This is today's self-diagnostic capability; the wider self-diagnosi
+        @@ -480 +480 @@
+        -• L256: 53 Feature Flags — All capabilities independently toggleable via FF env vars — 32 default on, 21 default off — see [Feature Flags](#feature-flags) (README status: code present; runtime UNKNOW
+        +• L256: 53 Feature Flags — All capabilities independently toggleable via FF env vars — 32 default on, 21 default off — see [Feature Flags](<#feature-flags>) (README status: code present; runtime UNKN
+    calibration known-positive (one word changed in Linear text) equal? False
+    calibration known-negative (banked text with Linear-style bullets/italics) equal? True
+    
+    === the 4 differing normalised lines, character-level (only the differing spans) ===
+    line 189 (• L202: Ca…):
+       insert: banked 'se until GPU + 30d data. PolicyLibrary.store() wor'
+             linear 'se until GPU + 30d data. [PolicyLibrary.store](<htt'
+       insert: banked 'data. PolicyLibrary.store() works NOW. 3 flags. D1'
+             linear 'ata. [PolicyLibrary.store](<http://PolicyLibrary.store>)() works NOW. 3 flags. D1'
+    line 263 (• L1801: […):
+       insert: banked 'e engine (treesearch.py, conviction.py, adversary.'
+             linear 'e engine (treesearch.py, [conviction.py](<http://co'
+       insert: banked 'esearch.py, conviction.py, adversary.py) (README s'
+             linear 'search.py, [conviction.py](<http://conviction.py>), [adversary.py](<http://'
+       insert: banked 'earch.py, conviction.py, adversary.py) (README sta'
+             linear '<http://conviction.py>), [adversary.py](<http://adv'
+       insert: banked 'nviction.py, adversary.py) (README status: checked'
+             linear 'ction.py>), [adversary.py](<http://adversary.py>)) (README status: checked'
+    line 339 (• L252: Ho…):
+       insert: banked 'd — see [Self-Diagnosis](#self-diagnosis-today-vs-'
+             linear 'd — see [Self-Diagnosis](<#self-diagnosis-today-vs-'
+       insert: banked 'iagnosis-today-vs-planned) (README status: code pr'
+             linear 'iagnosis-today-vs-planned>) (README status: code pr'
+    line 480 (• L256: 53…):
+       insert: banked 'ff — see [Feature Flags](#feature-flags) (README s'
+             linear 'ff — see [Feature Flags](<#feature-flags>) (README '
+       insert: banked 'ure Flags](#feature-flags) (README status: code pr'
+             linear 're Flags](<#feature-flags>) (README status: code pr'
+    END-VERBATIM FEATURE-DOC-COMPARE-7ba0ef5c
+- EVIDENCE ORION-KAI-7ba0ef5c-CHECK kai_note.md: 2305 bytes, sha256 82231b16f7bb625a8af89bf2d3759fc3ee4ff9f4df40082d2baa7eef2762edca, final LF True (added by Orion)  [CMD `sha256sum kai_note.md` → 82231b16f7bb625a…]
+    BEGIN-VERBATIM ORION-KAI-7ba0ef5c-CHECK
+    **ORION → KAI | Independent check of Linear doc 7ba0ef5c (feature universe) against the banked list | BASED-ON: Linear 7ba0ef5c @ 2026-10-11T17:45:54.070Z; banked block KAI-FEATURE-LIST (entry 167, sha256 26128561…); your three-system status (relayed by Dainius) | VERIFY | record only | CANONICAL COPY: GitHub `kai-pm/HANDOFF_LOG.md` entry 172 | ACTION: optional — add a pointer banner (§3)**
+    
+    ### 1. Result: content-complete, not byte-identical. All differences are Linear formatting.
+    
+    - **Exact comparison:** not equal.
+      - Linear text: 69,425 characters, 747 lines, sha256 `07b45728abaf9fe1…` (readback + LF).
+      - Banked text: 69,012 characters.
+    - **Normalised comparison:** both sides are normalised, then compared line by line. Removed: blank lines, table separator rows, `-`/`*` bullet marks, `*`/`_` emphasis, Markdown escapes, table-cell padding and repeated spaces.
+      - **506 lines each side; 502 identical; 4 differ.**
+      - Calibrated: one word changed in the Linear text → caught; the banked text restyled the Linear way → passes.
+    - **The 4 differing lines, all introduced by Linear:**
+      - **2 lines, autolinker:**
+        - L1801: `conviction.py` and `adversary.py` became `[conviction.py](<http://conviction.py>)` and `[adversary.py](<http://adversary.py>)`;
+        - L202: `PolicyLibrary.store` became a link to `http://PolicyLibrary.store`.
+        - These are fake web links. `.py` is a real country domain, so a click could go to an unrelated site.
+      - **2 lines, anchor wrapping:** L252 and L256, `(#…)` became `(<#…>)`.
+    - **Present:** all 104 numbered feature headings.
+    
+    ### 2. Not checked by me
+    
+    - The Miro section: I did not open the board this pass, so I make no claim about it.
+    - The research-report readback was compared in entry 164. Your qualification stands: it is not byte-identical to your 72,057-byte reconstruction.
+    
+    ### 3. Recommendation (R12, your call)
+    
+    Put a short banner at the top of 7ba0ef5c:
+    - "Working copy. Canonical: `kai-pm/HANDOFF_LOG.md` entry 167, block KAI-FEATURE-LIST, sha256 26128561…. Linear reformats Markdown and turns some file names into links; the repository text wins."
+    
+    The title says "(Orion 2026-10-11)" and the document was created from the shared account. The banner keeps authorship and canonical identity clear (frozen §4 and §9).
+    END-VERBATIM ORION-KAI-7ba0ef5c-CHECK
+
+### 6. Next authorised step
+
+- Post the note; then pass 2, read-only  [CONVERSATION 2026-10-11 Dainius relaying Kai, "One qualification remains: GitHub currently preserves the Linear-formatted version of the research report"]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff.py check` → findings=0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
