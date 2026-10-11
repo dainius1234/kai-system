@@ -68835,3 +68835,784 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-11T17:36:48Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-11T17:36:48Z  [CMD `date -u +%FT%TZ` → 2026-10-11T17:36:48Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: aba10781f9073fb9a2a17596c6e29acef8f34d2f  [CMD `git rev-parse HEAD` → aba10781f9073fb9a2a17596c6e29acef8f34d2f]
+- tree: c1bebcd3ad4d65b13d8752446a4eea25ab25dcb0  [CMD `git rev-parse HEAD^{tree}` → c1bebcd3ad4d65b13d8752446a4eea25ab25dcb0]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:claude/project-rework-plan-pgvp35: aba10781f9073fb9a2a17596c6e29acef8f34d2f  [CMD `git ls-remote --heads origin` → aba10781f9073fb9a2a17596c6e29acef8f34d2f]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 166  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 166]
+
+### 1. The four states
+
+- physical: unchanged since entry 166 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: produce the full feature list from the README; planning/analysis only (read-only scripts run in scratch, no repository file created)  [CONVERSATION 2026-10-11 Dainius, "List all features so we have a list"]
+- evidence: the five generator scripts and the fix were extracted from their banked blocks (entries 106–107) and each matched its banked sha256; run against README.md blob 0eeeb79faf8c (unchanged since 2026-09-17): 301 table rows, 356 register rows, 32 excluded, 0 unmapped, 104 distinct features; the regenerated Appendix R equals the banked one (entry 106 + entry-107 fix) line for line, 216 lines  [CMD `extract_readme → register → apply_canon → appendix_r` → 356 / 104 / 0; banked == rerun True]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None; Dainius's message asks for a list  [CONVERSATION 2026-10-11 Dainius, "List all features so we have a list"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11 (the generator stays in the log, not a repository tool); PR #122 DO NOT MERGE; current-state index pending Dainius  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Kai's v1.1 review R10 stays open: the generator's universe is README tables plus four named lists; prose-only abilities elsewhere are not enumerated, so 0 unmapped holds inside that universe only  [CMD `appendix_r.py` → universe line]
+
+### 5. Incidents and corrections
+
+- Correction to Orion's review pass 1 (entry 165, F-2), recorded not yet sent: that check counted feature-family names in the research REPORT, which is correct as stated. But a reader could take it to mean the features are missing from KAI's list. They are not: all 36 protected families sit in README rows that are inside the 356-row register (29 by row or feature name; the other 7 inside rows L169, L172, L1173, L202, L203 and the 9 rows of section "Soul & Inner Life"). The report gap stands; the register gap does not  [CMD `seven_missing.txt` → 7 rows all IN register]
+- Feature list KAI_FEATURE_LIST.md generated from reg2.json + README lines: 104 features numbered, 356 README lines, totals per organ sum to 104 / 356; 261285618bcde82f… sha256 below. Credential scan TOTAL HITS 0 (calibrated 6/6, 0)  [CMD `credscan.py scan.json` → TOTAL HITS 0]
+- EVIDENCE DAINIUS-FEATURE-LIST-REQUEST dainius_list_request.txt: 36 bytes, sha256 1eb4fd54ebcee2431bd6e90832a64bceec0cac0a7b44d46a0edd975abc057085, final LF True (added by Orion)  [CMD `sha256sum dainius_list_request.txt` → 1eb4fd54ebcee243…]
+    BEGIN-VERBATIM DAINIUS-FEATURE-LIST-REQUEST
+    List all features so we have a list
+    END-VERBATIM DAINIUS-FEATURE-LIST-REQUEST
+- EVIDENCE FEATURE-GENERATOR-RERUN-OUTPUTS rerun_outputs.txt: 5561 bytes, sha256 e5f02ea25dfd9b4a287f224ba887dddba322537f096c86377aea4a7ecd0667cf, final LF True (added by Orion)  [CMD `sha256sum rerun_outputs.txt` → e5f02ea25dfd9b4a…]
+    BEGIN-VERBATIM FEATURE-GENERATOR-RERUN-OUTPUTS
+       7  Project Status (17 September 2026) / 
+       5  Project Status (17 September 2026) / Programme state
+       9  What Makes Kai Different / Soul & Inner Life
+       9  What Makes Kai Different / Intelligence & Reasoning
+      11  What Makes Kai Different / Intelligence Sprint (D92–D100)
+       9  What Makes Kai Different / Cognitive Depth (D89)
+       8  What Makes Kai Different / Sensory & World Awareness (D87 / D88)
+       9  What Makes Kai Different / Operator Relationship
+      12  What Makes Kai Different / Production & Security
+      36  Service Map / Minimal Stack (`docker-compose.minimal.yml`) — 36 defined, 18 start by default
+      22  Service Map / Full Stack Additions (`docker-compose.full.yml`) — 35 defined, 21 start by default
+      14  Service Map / Sovereign Stack (`docker-compose.sovereign.yml`) — 21 defined, 13 start by default
+       6  House Doctor Service (D89) / Self-diagnosis: today vs planned
+      53  Feature Flags / 
+      21  Operator Console / 
+       2  Personality Modes / 
+      25  Honest Limitations / 
+       8  Milestone History / Milestone Summary
+      12  Engineering Toolchain / 
+      11  Session Continuation Guide / Target Hardware
+      12  Session Continuation Guide / Key Docs (read in order)
+    TOTAL table data rows: 301 (all tables; fenced blocks excluded)
+    --- register.py ---
+    register rows: 356 excluded: 32 unmapped: 0
+    by organ: {'ENG': 24, 'O1': 31, 'O10': 26, 'O11': 14, 'O2': 61, 'O3': 30, 'O4': 6, 'O5': 41, 'O6': 14, 'O7': 22, 'O8': 50, 'O9': 37}
+    --- apply_canon.py ---
+    rows 356 unmapped 0
+    by organ {'ENG': 34, 'O1': 22, 'O10': 8, 'O11': 29, 'O2': 41, 'O3': 43, 'O4': 12, 'O5': 76, 'O6': 18, 'O7': 19, 'O8': 31, 'O9': 23}
+    distinct canonical features 104
+    --- appendix_r.py summary line ---
+    Generated by `appendix_r.py` from README.md at HEAD. Universe: every table data row outside fenced blocks (301), plus the Roadmap GPU-unlock list, Phase-1 priorities, Cross-check checklists and End-goal elements. **356 feature rows mapped, 0 unmapped; 104 distinct features; 32 rows excluded with reason** (listed at the end). Every revision of the plan must regenerate this appendix; a row that cannot be mapped stops the generator.
+    --- comparison with the banked list ---
+    banked Appendix R (entry 106 + entry-107 fix) == today's re-run: True | banked lines 216 rerun lines 216
+    
+    Protected families (Kai 935e1c19, 36) found in the 356 register row names/canonical names: 29; not found: 7 ['failure clustering', 'boundary recalibration', 'narrative autobiography', 'time capsules', 'future-self aspirations', 'causal surprise', 'inner presence']
+    --- protected families ---
+    UNIVERSE: README.md @HEAD (blob 0eeeb79f), every line, case-insensitive. Shows where each of the 7 families sits and whether that line is a table row (inside the generator's universe) or prose (outside it).
+    
+    failure clustering: 2 line(s)
+      L172 [table] | **Dream State** | 6-phase offline consolidation — failure clustering, boundary recalibration, MARS memory decay |
+      L186 [table] | **Agent-Evolver** | Learns from failure clusters during dream cycles, generates proactive fix insights |
+    
+    boundary recalibration: 1 line(s)
+      L172 [table] | **Dream State** | 6-phase offline consolidation — failure clustering, boundary recalibration, MARS memory decay |
+    
+    narrative autobiography: 1 line(s)
+      L169 [table] | **Narrative Identity** | Builds its own life story — autobiography, story arcs, future-self projection, legacy time-capsules |
+    
+    time capsules: 1 line(s)
+      L169 [table] | **Narrative Identity** | Builds its own life story — autobiography, story arcs, future-self projection, legacy time-capsules |
+    
+    future-self aspirations: 2 line(s)
+      L169 [table] | **Narrative Identity** | Builds its own life story — autobiography, story arcs, future-self projection, legacy time-capsules |
+      L777 [prose] **What is not built — FUTURE SELF-DIAGNOSIS ARCHITECTURE (A4)**
+    
+    causal surprise: 7 line(s)
+      L202 [table] | **Causal World Model** | 🔜 GPU stub | `agentic/causal_world_model.py` + `agentic/policy_memory.py`. CausalGraph (directed CAUSES edges with strength
+      L203 [table] | **Global Workspace** | 🔜 GPU stub | `agentic/global_workspace.py`. GWT (Baars/Dehaene): WorkspaceBid (module/urgency/relevance/surprise/confidence),
+      L1173 [table] | `FF_CAUSAL_SURPRISE` | ✗ | D101: prediction-error detection — fires hypothesis cycle on divergence; requires FF_CAUSAL_WORLD_MODEL |
+      L1321 [table] | **D101** | **Causal World Model & Policy Distillation** — `agentic/causal_world_model.py` + `agentic/policy_memory.py`. Four components: CausalGraph
+      L1322 [table] | **D102** | **Global Workspace Consciousness** — `agentic/global_workspace.py`. Based on Global Workspace Theory (Baars 1988, Dehaene 2014). Workspac
+      L1390 [prose] causal_world_model.py     # D101: CausalGraph + WorldModelSimulator + PolicyMemory + CausalSurpriseDetector stubs
+    
+    inner presence: 1 line(s)
+      L161 [prose] ### Soul & Inner Life
+    
+    ROW-LEVEL CHECK: are the README rows holding the 7 families inside the 356-row register?
+      L169 autobiography, time-capsules, future-self (Narrative Identity row): IN register → O1 / narrative identity
+      L172 failure clustering, boundary recalibration (Dream State row): IN register → O9 / dream state / dream cycles
+      L1173 FF_CAUSAL_SURPRISE flag row: IN register → O5 / D101 causal world model
+      L202 Causal World Model row (surprise): IN register → O5 / D101 causal world model
+      L203 Global Workspace row (surprise): IN register → O5 / D102 Global Workspace
+      'inner presence' = README section 'Soul & Inner Life' (L161): 9 register rows from that section
+    END-VERBATIM FEATURE-GENERATOR-RERUN-OUTPUTS
+- EVIDENCE KAI-FEATURE-LIST KAI_FEATURE_LIST.md: 70761 bytes, sha256 261285618bcde82f464e48969f5eeae15d5992297b55db9a49434212521bda49, final LF True (added by Orion)  [CMD `sha256sum KAI_FEATURE_LIST.md` → 261285618bcde82f…]
+    BEGIN-VERBATIM KAI-FEATURE-LIST
+    # KAI — Full Feature List
+    
+    Generated by machine from `README.md` (blob `0eeeb79faf8c`) with the README feature generator banked in handoff entries 106–107. Re-run on 2026-10-11: **356 README lines → 104 features, 0 unmapped, 32 lines left out because they are status, history or document links** (listed at the end). The result is identical, line for line, to the list made on 2026-10-07.
+    
+    **How to read it:** KAI is grouped into 11 organs plus the engineering base. Under each organ is every feature, numbered. Under each feature are the exact README lines it comes from, so smaller abilities (for example time capsules inside Narrative Identity) stay visible.
+    
+    **What this list does not prove:** it says what the README *promises*. Whether each feature actually works today is UNKNOWN until it is tested.
+    
+    **Known limit of the generator:** it reads README tables plus four named lists (GPU unlock list, Phase-1 priorities, cross-check lists, end-goal). An ability mentioned only in ordinary paragraphs elsewhere could be missed. A paragraph-by-paragraph completeness check is still open (Kai's review item R10).
+    
+    ## Summary
+    
+    | Organ | Name | In plain words | Features | README lines |
+    |---|---|---|---|---|
+    | O1 | Soul / Identity / Inner Life | who KAI is: personality, values, feelings, life story | 11 | 22 |
+    | O2 | Memory / Relationship / Continuity | what KAI remembers and its relationships | 8 | 41 |
+    | O3 | Senses / World Awareness | what KAI sees, hears and notices | 7 | 43 |
+    | O4 | Intelligence / Reasoning | how KAI thinks and which AI models it uses | 7 | 12 |
+    | O5 | Cognitive Depth / Specialists | deeper thinking: specialists, debate, imagination, cause and effect | 19 | 76 |
+    | O6 | Proactivity / Goals / Attention | KAI acting on its own initiative: goals, reminders, routines | 9 | 18 |
+    | O7 | Governed Hands / Capabilities | KAI's hands: doing things, only with permission | 8 | 19 |
+    | O8 | Immune System / Doctor / Resilience | KAI's immune system: spotting and fixing problems | 10 | 31 |
+    | O9 | Growth / Dream / Evolution | growing and learning: dreams, new skills, self-improvement | 6 | 23 |
+    | O10 | Continuity / Stewardship / Sustainability | lasting for the long term: backups, money awareness, working offline | 4 | 8 |
+    | O11 | Operator Relationship / Mission Control | how you meet KAI: chat, voice, avatar, dashboard | 9 | 29 |
+    | ENG | Engineering / Assurance substrate | the engineering base underneath everything | 6 | 34 |
+    | | **Total** | | **104** | **356** |
+    
+    ## O1 — Soul / Identity / Inner Life
+    *who KAI is: personality, values, feelings, life story* — 11 features, 22 README lines
+    
+    **1. Ohana Core (operator moral fingerprint / goals)**
+    - L1178: FF_OHANA_CORE — ✗ — D109: Ohana Core — learns the operator's moral fingerprint, injects loyalty context, evaluates action alignment  _(README status: flag default OFF)_
+    
+    **2. PUB/WORK personality modes**
+    - L242: PUB/WORK Modes — Deep personality system — mate at the pub vs. focused professional  _(README status: code present; runtime UNKNOWN (README))_
+    - L1214: Ctrl+Shift+M — Toggle PUB/WORK mode  _(README status: code present; runtime UNKNOWN (README))_
+    - L1225: WORK — Professional, focused, precise. Never lies, never sugarcoats. Proactive but concise. — Mon-Fri 08–18 (auto)  _(README status: code present; runtime UNKNOWN (README))_
+    - L1226: PUB — Genuine mate. Casual, witty, opinionated. All topics. Not a service — a companion. — Evenings, weekends (auto)  _(README status: code present; runtime UNKNOWN (README))_
+    
+    **3. Soul console view**
+    - L1196: Soul — Ctrl+8 — Mood cards, emotion timeline, domain confidence, self-reflection journal, milestones; SOUL.md + AGENTS.md live editor  _(README status: code present; runtime UNKNOWN (README))_
+    
+    **4. confession engine**
+    - L168: Confession Engine — Proactively admits past mistakes without being asked  _(README status: code present; runtime UNKNOWN (README))_
+    
+    **5. conscience & values**
+    - L171: Conscience & Values — Emergent value formation, moral reasoning, integrity tracking, loyalty memory, gratitude engine  _(README status: code present; runtime UNKNOWN (README))_
+    - L1134: FF_CONSCIENCE_FILTER — ✓ — P20 conscience value-gate on actions  _(README status: flag default ON)_
+    
+    **6. emotional memory & predictive empathy**
+    - L165: Emotional Memory — Detects 8 emotions in conversation, tracks mood arcs over time, surfaces emotional continuity  _(README status: code present; runtime UNKNOWN (README))_
+    - L1151: FF_PREDICTIVE_EMPATHY — ✓ — D89/D: emotional_context key in world model (stub)  _(README status: flag default ON)_
+    - L1256: Predictive Empathy — emotional_context key exists in world model with the right schema shape. No inference until emotional memory accumulates. — Implement after 30+ days of real emotional memory history  _(README status: KNOWN LIMITATION (README))_
+    - L1358: Implement predictive empathy from accumulated emotional memory  _(README status: planned (README roadmap))_
+    - L1805: [ ] Predictive empathy — emotional_context stub; needs emotional memory history  _(README status: unchecked [ ] (README))_
+    - L1811: [ ] Emotional intelligence quality — code works, qwen2.5:0.5b too small to detect emotions well  _(README status: unchecked [ ] (README))_
+    
+    **7. epistemic humility**
+    - L167: Epistemic Humility — Knows what it doesn't know — warns operator when confidence is low  _(README status: code present; runtime UNKNOWN (README))_
+    
+    **8. imagination engine**
+    - L170: Imagination Engine — Counterfactual replay, theory of mind, creative synthesis, inner monologue, aspirational futures  _(README status: code present; runtime UNKNOWN (README))_
+    - L1130: FF_IMAGINATION_ENGINE — ✓ — P19 imagination / scenario simulation  _(README status: flag default ON)_
+    
+    **9. narrative identity**
+    - L169: Narrative Identity — Builds its own life story — autobiography, story arcs, future-self projection, legacy time-capsules  _(README status: code present; runtime UNKNOWN (README))_
+    - L1133: FF_NARRATIVE_IDENTITY — ✓ — P18 narrative identity context injection  _(README status: flag default ON)_
+    
+    **10. self-reflection**
+    - L166: Self-Reflection — Analyses its own mistakes, builds a strengths/weaknesses journal, knows where it fails  _(README status: code present; runtime UNKNOWN (README))_
+    
+    **11. temporal self-model (self-assessment)**
+    - L1136: FF_SELF_ASSESSMENT — ✓ — P14 temporal self-model  _(README status: flag default ON)_
+    
+    ## O2 — Memory / Relationship / Continuity
+    *what KAI remembers and its relationships* — 8 features, 41 README lines
+    
+    **12. Letta archival memory**
+    - L523: letta-agent — 8062 — Letta archival memory controller (FF_LETTA_TASKS=false default)  _(README status: service defined (README); runtime UNKNOWN)_
+    - L1157: FF_LETTA_TASKS — ✗ — Delegate tasks to letta-agent memory controller  _(README status: flag default OFF)_
+    - L1158: FF_LETTA_MEMORY_SYNC — ✗ — Sync Letta archival memories back to memu-core  _(README status: flag default OFF)_
+    - L1336: FF_LETTA_TASKS=true — archival memory activation  _(README status: planned (README roadmap))_
+    - L1809: [ ] FF_LETTA_TASKS=true — pending live Ollama verification  _(README status: unchecked [ ] (README))_
+    
+    **13. MARS memory decay / consolidation**
+    - L1135: FF_MARS_CONSOLIDATION — ✓ — MARS memory decay + consolidation  _(README status: flag default ON)_
+    - L1799: [x] MARS memory decay, spaced repetition  _(README status: checked [x] (README))_
+    
+    **14. Obsidian Brain / vault-sync**
+    - L173: Obsidian Brain — Bidirectional sync between the operator's Obsidian vault and the knowledge graph. Every markdown note becomes a memory node; Kai's high-conviction insights (≥9.0 gate) are exported back as structured notes. File watcher + SHA256 deduplication, wikilink extraction, 4 Jinja2 templates.  _(README status: code present; runtime UNKNOWN (README))_
+    - L491: 32 — vault-sync — 8047 — vault — Obsidian Brain — bidirectional vault↔memu-core sync  _(README status: service defined (README); runtime UNKNOWN)_
+    - L1154: FF_VAULT_SYNC — ✓ — D91: vault-sync service enabled — file watcher, ingest, export, mapper  _(README status: flag default ON)_
+    - L1162: FF_VAULT_CONTEXT — ✗ — D91: inject vault recent note into world-context gather (adds latency — enable once vault is populated)  _(README status: flag default OFF)_
+    - L1245: Obsidian Brain — ~~No external knowledge sync~~ DONE (D91) — vault-sync service live (port 8047). SHA256-deduped watchdog watcher, bidirectional ingest/export, conviction ≥9.0 export gate, 3 memu-core vault endpoints, FF_VAULT_CONTEXT injection. — Populate vault; enable FF_VAULT_CONTEXT once notes accumulate  _(README status: KNOWN LIMITATION (README))_
+    - L1341: FF_VAULT_CONTEXT=true — Obsidian Brain active in every conversation  _(README status: planned (README roadmap))_
+    - L1352: ~~Obsidian Brain vault sync~~ Done (D91) — vault-sync service live  _(README status: DONE (README, struck through))_
+    - L1361: Enable FF_VAULT_CONTEXT — start injecting recent vault notes into every chat  _(README status: planned (README roadmap))_
+    - L1366: Obsidian Brain closed loop operator↔knowledge graph  _(README status: end-goal (README))_
+    - L1788: [x] Vault-Sync (D91) — port 8047; watchdog watcher, SHA256 dedup, conviction ≥9.0 export gate, 3 memu-core vault endpoints, agentic proxy  _(README status: checked [x] (README))_
+    - L1808: [ ] FF_VAULT_CONTEXT=true — vault context injection (enable once vault is populated)  _(README status: unchecked [ ] (README))_
+    
+    **15. knowledge graph (memu-graph, Cognee/Kuzu)**
+    - L522: memu-graph — 8061 — Cognee/Kuzu knowledge graph — entity/relation ingest→query→forget  _(README status: service defined (README); runtime UNKNOWN)_
+    - L1156: FF_GRAPH_INGEST — ✗ — Fan-out memorize/forget to memu-graph  _(README status: flag default OFF)_
+    - L1200: Memory Map — — — Knowledge-graph view (memu-graph)  _(README status: code present; runtime UNKNOWN (README))_
+    - L1337: FF_GRAPH_INGEST=true — production graph memory  _(README status: planned (README roadmap))_
+    - L1787: [x] memu-graph (Cognee/Kuzu) — CI-verified against live Ollama stack  _(README status: checked [x] (README))_
+    - L1810: [ ] FF_GRAPH_INGEST=true in production — pending GPU workload validation  _(README status: unchecked [ ] (README))_
+    
+    **16. memory diary / mind-map views**
+    - L1197: Canvas — — — D3 v7 SVG: force-simulation mind-map (drag+zoom), emotion timeline area chart, plan-flow with arrows, memory graph (trust-tier colours, category hubs)  _(README status: code present; runtime UNKNOWN (README))_
+    - L1198: Diary — — — Memory diary — browse recent, date groups, rich cards with emotion/pin/trust badges  _(README status: code present; runtime UNKNOWN (README))_
+    
+    **17. memory stores (Postgres/pgvector/TurboVec/Redis)**
+    - L460: 1 — postgres — internal — default — pgvector DB — memories, ledger, embeddings  _(README status: service defined (README); runtime UNKNOWN)_
+    - L461: 2 — redis — internal — default — Session buffer, caches  _(README status: service defined (README); runtime UNKNOWN)_
+    - L551: postgres — pgvector production DB  _(README status: service defined (README); runtime UNKNOWN)_
+    - L560: redis — Session buffer  _(README status: service defined (README); runtime UNKNOWN)_
+    - L1261: Memory Persistence — Default: TurboVec ANN index + Postgres metadata (dev/CI). Sovereign: pgvector. Graph memory (memu-graph) is feature-flagged off by default (FF_GRAPH_INGEST=false) — Set VECTOR_STORE, TURBOVEC_INDEX_PATH in .env  _(README status: KNOWN LIMITATION (README))_
+    - L1770: [x] TurboVec ANN persistence (default; no pgvector extension needed)  _(README status: checked [x] (README))_
+    - L1771: [x] pgvector persistence (sovereign stack; opt-in via VECTOR_STORE=postgres)  _(README status: checked [x] (README))_
+    
+    **18. memu-core memory service**
+    - L465: 6 — memu-core — 8001 — default — Memory engine hot path: memorize / retrieve / rank  _(README status: service defined (README); runtime UNKNOWN)_
+    - L466: 7 — memu-core-introspect — 8009 — default — Store maintenance cold path: compress / decay / quarantine  _(README status: service defined (README); runtime UNKNOWN)_
+    - L527: memory-compressor — 8057 — Memory summarisation  _(README status: service defined (README); runtime UNKNOWN)_
+    - L556: memu-core + memu-core-introspect — Memory hot + cold paths  _(README status: service defined (README); runtime UNKNOWN)_
+    - L1194: Memory — Ctrl+6 — Memory browser — search by query or category, scores, stats  _(README status: code present; runtime UNKNOWN (README))_
+    - L1366: memory  _(README status: end-goal (README))_
+    
+    **19. per-teammate memory slices**
+    - L1357: Add per-teammate memory slices (top-k retrieval scoped to specialty)  _(README status: planned (README roadmap))_
+    - L1807: [ ] Per-teammate memory slices — top-k retrieval scoped to teammate specialty  _(README status: unchecked [ ] (README))_
+    
+    ## O3 — Senses / World Awareness
+    *what KAI sees, hears and notices* — 7 features, 43 README lines
+    
+    **20. anomaly detection**
+    - L225: Anomaly Detection — Rolling 48-reading (≈4 hour) z-score baselines per sensor. Alerts when \ — z\ — > 2.0 after ≥6 readings warm-up. Moves Kai from snapshot to trend awareness.  _(README status: code present; runtime UNKNOWN (README))_
+    - L769: Anomaly detection — rolling 2σ sensor baselines — ✅ Live  _(README status: LIVE claimed (README))_
+    - L1140: FF_ANOMALY_DETECTION — ✓ — D88/M1: 2σ rolling baselines per sensor  _(README status: flag default ON)_
+    - L1783: [x] Anomaly detection with rolling 2σ baselines  _(README status: checked [x] (README))_
+    
+    **21. cortex (perception spine / NPU inference)**
+    - L495: 36 — cortex — 8048 (internal) — introspection — D113 continuous interpretive layer — situational model, intent inference, context-shift detection  _(README status: service defined (README); runtime UNKNOWN)_
+    - L1177: FF_CORTEX_NPU — ✗ — D114: Cortex Phase 1 — NPU inference on Strix Halo (AMD XDNA 2); moves Level 2/3 synthesis from HTTP delegation to on-device. Pending the target device and Linux/driver qualification of the NPU  _(README status: flag default OFF)_
+    
+    **22. cross-sensor correlation**
+    - L226: Cross-Sensor Correlation — After each observation cycle, reasons across the full sensor set: cpu_high + docker_unhealthy → resource cascade; RAM + docker → memory leak; git dirty + email backlog → operator mid-task (tread lightly).  _(README status: code present; runtime UNKNOWN (README))_
+    - L1784: [x] Cross-sensor correlation reasoning  _(README status: checked [x] (README))_
+    
+    **23. multi-modal fusion**
+    - L260: Multi-modal Fusion — Combined audio + video signals interpreted by LLM for proactive voice  _(README status: code present; runtime UNKNOWN (README))_
+    - L521: fusion-engine — 8053 — Multi-signal consensus (embedding cosine + Jaccard fallback)  _(README status: service defined (README); runtime UNKNOWN)_
+    
+    **24. sensors & perception services**
+    - L470: 11 — audio-service — 8021 — sensors — STT (faster-whisper)  _(README status: service defined (README); runtime UNKNOWN)_
+    - L473: 14 — vision-service — 8023 — sensors — OpenCV face detect + DeepFace emotion  _(README status: service defined (README); runtime UNKNOWN)_
+    - L474: 15 — clipboard-service — 8024 — sensors — Clipboard read/write  _(README status: service defined (README); runtime UNKNOWN)_
+    - L475: 16 — files-service — 8025 — sensors — File system read (allowlisted paths)  _(README status: service defined (README); runtime UNKNOWN)_
+    - L477: 18 — document-parser — 8032 — default — PDF / DOCX / XLSX / PPTX / DXF / ZIP / CSV  _(README status: service defined (README); runtime UNKNOWN)_
+    - L478: 19 — monitor-service — 8033 — watchers — Background rule engine — HTTP/scrape + notify + TTS  _(README status: service defined (README); runtime UNKNOWN)_
+    - L480: 21 — sysmetrics — 8035 — watchers — CPU / RAM / disk / network / processes via psutil  _(README status: service defined (README); runtime UNKNOWN)_
+    - L481: 22 — screen-watcher — 8036 — sensors — Periodic screenshot diff + change alert  _(README status: service defined (README); runtime UNKNOWN)_
+    - L482: 23 — email-reader — 8037 — external-egress — IMAP read-only polling  _(README status: service defined (README); runtime UNKNOWN)_
+    - L483: 24 — news-feed — 8038 — external-egress — RSS aggregation + keyword search  _(README status: service defined (README); runtime UNKNOWN)_
+    - L484: 25 — weather-service — 8039 — default — Weather data (mocked httpx in CI)  _(README status: service defined (README); runtime UNKNOWN)_
+    - L485: 26 — docker-watcher — 8041 — watchers — Docker container health monitoring  _(README status: service defined (README); runtime UNKNOWN)_
+    - L486: 27 — airquality-service — 8042 — default — Air quality index  _(README status: service defined (README); runtime UNKNOWN)_
+    - L487: 28 — calendar-service — 8043 — default — CalDAV calendar — events, summaries  _(README status: service defined (README); runtime UNKNOWN)_
+    - L488: 29 — git-watcher — 8044 — watchers — Git repo dirty/stash/branch status  _(README status: service defined (README); runtime UNKNOWN)_
+    - L528: camera-service — 8020 — Camera capture  _(README status: service defined (README); runtime UNKNOWN)_
+    - L529: audio-service — 8021 — STT (faster-whisper)  _(README status: service defined (README); runtime UNKNOWN)_
+    - L532: screen-capture — 8059 — Screen OCR pipeline  _(README status: service defined (README); runtime UNKNOWN)_
+    - L534: calendar-sync — 8055 — Calendar synchronisation  _(README status: service defined (README); runtime UNKNOWN)_
+    - L538: parakeet-server — 8080 — Optional CPU ASR sidecar — opt-in (--profile parakeet)  _(README status: service defined (README); runtime UNKNOWN)_
+    - L561: perception-telegram — Telegram perception  _(README status: service defined (README); runtime UNKNOWN)_
+    - L563: camera-service + audio-service — Sensory perception  _(README status: service defined (README); runtime UNKNOWN)_
+    - L1203: Body — — — Sysmetrics gauges (CPU/RAM/disk), process table, screen-watcher controls  _(README status: code present; runtime UNKNOWN (README))_
+    - L1204: Feeds — — — Email inbox, RSS articles + search, weather, air quality, docker containers, calendar widget  _(README status: code present; runtime UNKNOWN (README))_
+    - L1366: perception  _(README status: end-goal (README))_
+    
+    **25. sensory pattern learning**
+    - L227: Sensory Pattern Learning — Tracks 10 recent observation cycles. Recurring types (≥3/10) written as sensor_pattern memories — future context retrieval surfaces predictable recurrences before they escalate.  _(README status: code present; runtime UNKNOWN (README))_
+    - L1142: FF_SENSORY_LEARNING — ✓ — D88/M5: detect recurring patterns across 10 cycles  _(README status: flag default ON)_
+    
+    **26. world state & provenance**
+    - L213: World Model Provenance — Every field in world_state carries {value, source, timestamp, confidence}. Origin service, read time, and reliability score travel with every sensor reading. Enables temporal queries and trust-weighted reasoning.  _(README status: code present; runtime UNKNOWN (README))_
+    - L223: World Context Injection — Every /chat call triggers a parallel 9-service probe with 2s per-service timeout. Result injected as "World State" system block into LLM prompt. Kai knows the environment it's operating in.  _(README status: code present; runtime UNKNOWN (README))_
+    - L261: World Anchor — Daily date/time/context fetch cached locally — Kai knows what day it is  _(README status: code present; runtime UNKNOWN (README))_
+    - L1141: FF_WORLD_MODEL_PERSISTENCE — ✓ — D88/M4: write world_state to memu-core each cycle  _(README status: flag default ON)_
+    - L1778: [x] World model provenance ({value, source, timestamp, confidence} per field)  _(README status: checked [x] (README))_
+    - L1782: [x] 14-way context gather, world context injection, proactive observer  _(README status: checked [x] (README))_
+    
+    ## O4 — Intelligence / Reasoning
+    *how KAI thinks and which AI models it uses* — 7 features, 12 README lines
+    
+    **27. 14-way context gather**
+    - L179: 14-Way Context Gather — Every response enriched with: memories + session + goals + topics + EQ + narrative + imagination + conscience + agent + operator model + world state + financial context + Letta archival + graph memory  _(README status: code present; runtime UNKNOWN (README))_
+    - L1139: FF_CONTEXT_ENRICHMENT — ✓ — Master toggle: 14-way context gather + world state injection  _(README status: flag default ON)_
+    
+    **28. agentic reasoning service**
+    - L467: 8 — agentic — 8007 — default — Reasoning brain: chat / conviction / teammates / skills / swarm  _(README status: service defined (README); runtime UNKNOWN)_
+    
+    **29. conviction scoring (→ information only)**
+    - L184: Conviction Scoring — 5-signal + modifiers gate; below 8.0 triggers rethink (max 3 retries)  _(README status: code present; runtime UNKNOWN (README))_
+    
+    **30. local LLM serving (Ollama)**
+    - L462: 3 — ollama — 11434 — default — Local LLM (qwen2.5:0.5b CPU default)  _(README status: service defined (README); runtime UNKNOWN)_
+    - L463: 4 — ollama-pull — — — default — One-shot init container — pulls model on first boot  _(README status: service defined (README); runtime UNKNOWN)_
+    - L1242: LLM Model — Default qwen2.5:0.5b (~500M params) is a test placeholder — too small for meaningful reasoning, planning, or emotional intelligence — Upgrade to a 7B+ model (qwen2.5:7b, llama3:8b) — a few env vars once the target device exists. Model registry auto-adapts context, prompts, timeouts  _(README status: KNOWN LIMITATION (README))_
+    - L1335: OLLAMA_MODEL=qwen2.5:7b — real reasoning quality  _(README status: planned (README roadmap))_
+    
+    **31. memory-driven planner**
+    - L182: Memory-Driven Planner — Gap-aware plans with preference constraints and history-informed conviction modifiers  _(README status: code present; runtime UNKNOWN (README))_
+    
+    **32. priority queue**
+    - L1128: FF_PRIORITY_QUEUE — ✓ — Latency-sensitive priority queue  _(README status: flag default ON)_
+    
+    **33. specialist router**
+    - L181: Specialist Router — Classifies queries into 8 UK construction domains for category-aware retrieval  _(README status: code present; runtime UNKNOWN (README))_
+    - L1258: Specialist Routing — Keyword regex classification, not ML-based. All 3 specialists currently route to the same Ollama endpoint — Wire separate model endpoints when GPU arrives  _(README status: KNOWN LIMITATION (README))_
+    
+    ## O5 — Cognitive Depth / Specialists
+    *deeper thinking: specialists, debate, imagination, cause and effect* — 19 features, 76 README lines
+    
+    **34. D100 transitive reasoning**
+    - L201: Transitive Reasoning — 🔜 Graph stub — PageRank + community detection + shortest-path + association rule mining on memu-graph. Turns the knowledge graph from passive storage into active inference. can_reason()→False until ≥500 graph edges. FF_TRANSITIVE_REASONING=False.  _(README status: STUB (README))_
+    - L1171: FF_TRANSITIVE_REASONING — ✗ — D100: PageRank + community detection + shortest-path on memu-graph — pending ≥500 graph edges  _(README status: flag default OFF)_
+    - L1254: Transitive Reasoning — can_reason()→False. TransitiveReasoner with 4 inference modes (shortest-path, PageRank, community, rule-mining) defined. — memu-graph ≥500 edges (MIN_EDGES_FOR_REASONING)  _(README status: STUB (README))_
+    - L1347: D100 Transitive Reasoning — can_reason() unlocks when graph ≥500 edges  _(README status: planned (README roadmap))_
+    - L1818: [ ] D100 Transitive Reasoning — can_reason()→False; needs memu-graph ≥500 edges for PageRank to be meaningful  _(README status: unchecked [ ] (README))_
+    
+    **35. D101 causal world model**
+    - L202: Causal World Model — 🔜 GPU stub — agentic/causal_world_model.py + agentic/policy_memory.py. CausalGraph (directed CAUSES edges with strength/confidence/temporal_lag), WorldModelSimulator (N=50 GPU scenario variants, utility-ranked), PolicyMemory (in-memory + JSONL-persisted), CausalSurpriseDetector (divergence→hypothesis trigger). can_reason/simulate/distill()→False until GPU + 30d data. PolicyLibrary.store() works NOW. 3 flags. D101.  _(README status: STUB (README))_
+    - L1172: FF_CAUSAL_WORLD_MODEL — ✗ — D101: persistent causal graph + GPU mental simulations + policy distillation — pending GPU + 30d data  _(README status: flag default OFF)_
+    - L1173: FF_CAUSAL_SURPRISE — ✗ — D101: prediction-error detection — fires hypothesis cycle on divergence; requires FF_CAUSAL_WORLD_MODEL  _(README status: flag default OFF)_
+    - L1174: FF_POLICY_MEMORY — ✗ — D101: auto-distillation of simulation outcomes into ranked strategies — requires FF_CAUSAL_WORLD_MODEL  _(README status: flag default OFF)_
+    - L1363: D101 Causal World Model — can_reason/simulate/distill() unlock once GPU + 30d data + ≥1000 graph nodes arrive  _(README status: planned (README roadmap))_
+    - L1794: [x] Causal World Model (D101) — CausalGraph, WorldModelSimulator, PolicyMemory stubs; PolicyLibrary JSONL-persisted store() works NOW  _(README status: checked [x] (README))_
+    - L1819: [ ] D101 Causal World Model — can_reason/simulate/distill()→False; needs GPU + 30d data accumulation + ≥1000 graph nodes  _(README status: unchecked [ ] (README))_
+    
+    **36. D102 Global Workspace**
+    - L203: Global Workspace — 🔜 GPU stub — agentic/global_workspace.py. GWT (Baars/Dehaene): WorkspaceBid (module/urgency/relevance/surprise/confidence), ConsciousMoment (content/source/salience/valence), GlobalWorkspace (serial 100ms bidding cycle, salience-weighted winner, broadcast→all subscribers). Creates KAI's unified stream of consciousness — every module bids, one wins per cycle, broadcast fires all others. Dashboard "Stream" view in Phase 3. can_operate()→False. 1 flag. D102.  _(README status: STUB (README))_
+    - L1175: FF_GLOBAL_WORKSPACE — ✗ — D102: Global Workspace Consciousness — serial stream of unified awareness via module bidding; requires GPU + D101 + D98 + ≥3 bidders  _(README status: flag default OFF)_
+    - L1364: D102 Global Workspace Consciousness — can_operate() unlocks with GPU + D101 + D98 ≥90 samples + ≥3 bidders  _(README status: planned (README roadmap))_
+    - L1795: [x] Global Workspace Consciousness (D102) — GWT WorkspaceBid/ConsciousMoment/GlobalWorkspace; subscribe/submit_bid/get_stream interfaces frozen  _(README status: checked [x] (README))_
+    - L1820: [ ] D102 Global Workspace Consciousness — can_operate()→False; needs GPU + D101 + D98 ≥90 samples + ≥3 module bidders  _(README status: unchecked [ ] (README))_
+    
+    **37. D90 swarm assembly**
+    - L180: Swarm Assembly — Full cognitive pipeline executed by real stage functions: Scout gathers evidence, Sage debates, Doctor fact-checks, Oracle traces consequence chains, Sage scores conviction. Shared SwarmContext, per-teammate TeammateRep reputation tracking, 5-signal resolve_conflict().  _(README status: code present; runtime UNKNOWN (README))_
+    - L1153: FF_SWARM — ✓ — D90: CognitiveFSM swarm pipeline — real stage functions, SwarmContext, reputation tracking  _(README status: flag default ON)_
+    - L1775: [x] Swarm Assembly (D90) — POST /chat/swarm live; Scout/Sage/Doctor/Oracle stage functions real; reputation tracking  _(README status: checked [x] (README))_
+    
+    **38. D92 Socratic self-questioning**
+    - L193: Socratic Self-Questioning — ✅ Live — Pre-GATHER stage decomposes every query into 3–5 precision questions (hidden assumptions, disproof evidence, simplest explanation, second-order consequences, surface clarification). Injected into SwarmContext.enriched_query — every downstream stage reasons against a richer problem statement. CPU-safe. FF_SOCRATIC=True.  _(README status: LIVE claimed (README))_
+    - L1163: FF_SOCRATIC — ✓ — D92: pre-GATHER Socratic decomposition — 3-5 questions reframe the query before Scout gathers evidence  _(README status: flag default ON)_
+    - L1246: Socratic Questioning — ~~Pre-GATHER decomposition~~ DONE (D92) — SocraticQuestioner wired into swarm pipeline. Every query decomposed into 3-5 precision questions before Scout gathers evidence. SwarmContext.enriched_query carries the richer problem statement to all stages. — —  _(README status: KNOWN LIMITATION (README))_
+    - L1353: ~~Socratic pre-GATHER decomposition~~ Done (D92) — enriched_query wired into swarm pipeline  _(README status: DONE (README, struck through))_
+    - L1789: [x] Socratic Questioning (D92) — SocraticQuestioner, 3-5 decomposition Qs, enriched_query, non-fatal pre-GATHER stage wired into build_swarm_pipeline()  _(README status: checked [x] (README))_
+    
+    **39. D93 hypothesis engine**
+    - L194: Hypothesis Engine — ✅ Live — Idle-cycle gap scanner. Scans seed topics, forms "If X is true, Y should follow" hypotheses, tests them against memory evidence via LLM, logs SUPPORTED/REFUTED/INCONCLUSIVE verdicts to /data/CURIOSITY.md. Wired into idle_curiosity_tick(). CPU-safe. FF_HYPOTHESIS_ENGINE=True.  _(README status: LIVE claimed (README))_
+    - L1164: FF_HYPOTHESIS_ENGINE — ✓ — D93: idle-cycle gap scanner — forms testable hypotheses from seed topics, tests against memory evidence  _(README status: flag default ON)_
+    - L1247: Hypothesis Engine — ~~Idle-cycle learning~~ DONE (D93) — HypothesisEngine.run_cycle() wired into idle_curiosity_tick(). CPU-safe: forms + tests hypotheses from seed topics, logs to /data/CURIOSITY.md. — Accumulate enough memories for hypothesis quality to improve  _(README status: KNOWN LIMITATION (README))_
+    - L1354: ~~Autonomous hypothesis formation~~ Done (D93) — idle-cycle gap scanner writing to CURIOSITY.md  _(README status: DONE (README, struck through))_
+    - L1790: [x] Hypothesis Engine (D93) — idle-cycle "If X then Y" gap formation + LLM test + verdict log to CURIOSITY.md, wired into idle_curiosity_tick()  _(README status: checked [x] (README))_
+    
+    **40. D94 temporal projection**
+    - L195: Temporal Projection — ✅ Live — Fan-of-futures forecasting. From supported claims, produces a ForecastFan with four scenario branches: base (most likely), optimistic (best-case assumptions hold), pessimistic (tail risks materialise), wild\_card (low-probability high-impact discontinuity). Each branch has probability + key assumptions. CPU-safe. FF_TEMPORAL_PROJECTION=True.  _(README status: LIVE claimed (README))_
+    - L1165: FF_TEMPORAL_PROJECTION — ✓ — D94: ForecastFan — base/optimistic/pessimistic/wild-card scenario branches from supported claims  _(README status: flag default ON)_
+    - L1248: Temporal Projection — ~~Fan-of-futures forecasting~~ DONE (D94) — TemporalForecaster produces ForecastFan with four scenario branches (base/optimistic/pessimistic/wild_card). POST /forecast endpoint can expose it. — Wire ForecastFan into swarm CONVICTION_GATE output  _(README status: KNOWN LIMITATION (README))_
+    - L1355: ~~Temporal projection fan-of-futures~~ Done (D94) — ForecastFan 4-branch live  _(README status: DONE (README, struck through))_
+    - L1791: [x] Temporal Projection (D94) — ForecastFan: 4-branch probability fan (base/optimistic/pessimistic/wild_card), causal-chain input, robust JSON parse with static fallback  _(README status: checked [x] (README))_
+    
+    **41. D95 dialectical synthesis**
+    - L196: Dialectical Synthesis — 🔜 GPU stub — Hegelian thesis/antithesis/synthesis reasoner. Resolves competing claims at a higher level of abstraction. can_synthesize()→False until dual-model GPU is provisioned. FF_DIALECTICAL_SYNTHESIS=False.  _(README status: STUB (README))_
+    - L1167: FF_DIALECTICAL_SYNTHESIS — ✗ — D95: Hegelian thesis/antithesis/synthesis — pending dual-model GPU  _(README status: flag default OFF)_
+    - L1250: Dialectical Synthesis — can_synthesize()→False. Interface and DialecticalTriad schema defined. — Dual-model GPU: thesis model vs antithesis model, third arbitrates  _(README status: STUB (README))_
+    - L1342: D95 Dialectical Synthesis — can_synthesize() unlocks with dual-model GPU  _(README status: planned (README roadmap))_
+    - L1813: [ ] D95 Dialectical Synthesis — can_synthesize()→False; needs dual-model GPU (thesis model ≠ antithesis model)  _(README status: unchecked [ ] (README))_
+    
+    **42. D96 analogical reasoning**
+    - L197: Analogical Reasoning — 🔜 GPU stub — Cross-domain isomorphic pattern search. Finds structural similarities between a known problem and a new one, maps the solution pattern across domains. can_find()→False until memu-graph has ≥1000 concept nodes + GPU embedding search. FF_ANALOGICAL_REASONING=False.  _(README status: STUB (README))_
+    - L1168: FF_ANALOGICAL_REASONING — ✗ — D96: cross-domain isomorphic pattern search — pending populated knowledge graph (≥1000 nodes)  _(README status: flag default OFF)_
+    - L1251: Analogical Reasoning — can_find()→False. AnalogyEngine and AnalogyMapping schema defined. — memu-graph ≥1000 concept nodes + GPU embedding similarity search  _(README status: STUB (README))_
+    - L1343: D96 Analogical Reasoning — can_find() unlocks when concept graph ≥1000 nodes  _(README status: planned (README roadmap))_
+    - L1814: [ ] D96 Analogical Reasoning — can_find()→False; needs memu-graph populated with ≥1000 concept nodes  _(README status: unchecked [ ] (README))_
+    
+    **43. D97 concept blending**
+    - L198: Concept Blending — 🔜 GPU stub — Two distant knowledge graph nodes → novel emergent concept (Fauconnier & Turner). Emergent properties not present in either parent. can_blend()→False until graph + GPU. FF_CONCEPT_BLENDING=False.  _(README status: STUB (README))_
+    - L1169: FF_CONCEPT_BLENDING — ✗ — D97: two distant graph nodes → novel emergent concept — pending graph + GPU  _(README status: flag default OFF)_
+    - L1252: Concept Blending — can_blend()→False. BlendedConcept schema defined. novelty_score and emergent_properties fields ready. — Concept graph with property annotations + GPU generative model  _(README status: STUB (README))_
+    - L1344: D97 Concept Blending — can_blend() unlocks with populated graph + GPU  _(README status: planned (README roadmap))_
+    - L1815: [ ] D97 Concept Blending — can_blend()→False; needs populated graph + divergent-synthesis GPU model  _(README status: unchecked [ ] (README))_
+    
+    **44. GPU-era foundations & stub activation**
+    - L217: GPU-era Foundations — Four slots wired and architected now, activating on GPU: Counterfactual Rehearsal (decision branch simulation, can_rehearse()→False until Phase 1), Trust Negotiation (/gate/autonomy/request, currently pending_approval), Predictive Empathy (emotional_context in world model, activates when emotional memory accumulates), Resource-Aware Curiosity (idle tick no-ops on CPU, CURIOSITY.md seed questions ready).  _(README status: STUB (README))_
+    - L1362: Activate D95–D97, D99–D100 GPU-era stubs once hardware arrives  _(README status: planned (README roadmap))_
+    
+    **45. SAGE critique / self-review**
+    - L185: SAGE Critique — Verifier self-critique + adversary self-review — AI arguing with itself for quality  _(README status: code present; runtime UNKNOWN (README))_
+    - L1129: FF_SAGE_CRITIQUE — ✓ — Verifier self-critique + adversary self-review  _(README status: flag default ON)_
+    - L1161: FF_SAGE_SELF_REVIEW — ✗ — SAGE critique on all plans (not just high-stakes)  _(README status: flag default OFF)_
+    
+    **46. adversary engine**
+    - L183: Adversary Engine — 7 challenge types (incl. SAGE self-review) test every plan before execution  _(README status: code present; runtime UNKNOWN (README))_
+    
+    **47. cognitive reasoning FSM**
+    - L210: Cognitive Reasoning FSM — Deterministic reasoning pipeline: GATHER → DEBATE → FACT_CHECK → CAUSAL_CHECK → CONVICTION_GATE → PRESENT. Bounded retry loops: RETHINK (max 3) → ESCALATE_LOOP (max 3) → HALT. Per-swarm configs (trading / research / skill_forge / default). Schema-validated AgentHandoff handoffs — never parses free text.  _(README status: code present; runtime UNKNOWN (README))_
+    - L1243: Cognitive FSM wiring — ~~Not wired~~ DONE (D90) — POST /chat/swarm runs the full pipeline. Scout→GATHER, Sage→DEBATE+CONVICTION_GATE, Doctor→FACT_CHECK, Oracle→CAUSAL_CHECK. All 5 stage functions are real implementations calling live memory/LLM/adversary dependencies. — —  _(README status: KNOWN LIMITATION (README))_
+    - L1350: ~~Wire cognitive FSM stage functions~~ Done (D90) — POST /chat/swarm live  _(README status: DONE (README, struck through))_
+    - L1774: [x] Cognitive reasoning FSM framework (GATHER→PRESENT, HALT, per-swarm configs, schema-validated)  _(README status: checked [x] (README))_
+    
+    **48. counterfactual rehearsal**
+    - L1255: Counterfactual Rehearsal — can_rehearse()→False, rehearse()→stub_pending_gpu. Interface and schema are correct. — Activate in Phase 1 when GPU enables real decision-branch simulation  _(README status: STUB (README))_
+    - L1338: Counterfactual rehearsal + curiosity tick activate automatically  _(README status: planned (README roadmap))_
+    - L1804: [ ] Counterfactual rehearsal — can_rehearse()→False until Phase 1  _(README status: unchecked [ ] (README))_
+    
+    **49. debate / tree search**
+    - L187: Tree Search — Chain-of-thought pruning with priority queue + counterargument debate gating  _(README status: code present; runtime UNKNOWN (README))_
+    - L1127: FF_TREE_SEARCH — ✓ — CoT tree search with conviction pruning  _(README status: flag default ON)_
+    - L1801: [x] Debate engine (tree_search.py, conviction.py, adversary.py)  _(README status: checked [x] (README))_
+    
+    **50. multi-model consensus / specialist endpoints**
+    - L1339: Multi-specialist routing with separate model endpoints  _(README status: planned (README roadmap))_
+    - L1360: Real multi-model consensus (3 specialist endpoints, once GPU enables 7B+ models)  _(README status: planned (README roadmap))_
+    - L1812: [ ] Multi-model consensus — architecture ready, all 3 specialists route to same model  _(README status: unchecked [ ] (README))_
+    
+    **51. persistent teammates & reputation**
+    - L211: Persistent Teammates — 4 named cognitive personas invokable via POST /chat/teammate/{name}: Scout (skill discovery + package evaluation), Doctor (system health differential diagnosis), Sage (reflection + counterargument, steward of quality thinking), Oracle (probabilistic trend extrapolation from world model). Each has a specialty, system prompt, and world-state injection.  _(README status: code present; runtime UNKNOWN (README))_
+    - L771: Doctor teammate — conversational differential diagnosis — ✅ Live  _(README status: LIVE claimed (README))_
+    - L1146: FF_PERSISTENT_TEAMMATES — ✓ — D89: load teammate personas + /chat/teammate/{name}  _(README status: flag default ON)_
+    - L1244: Teammate reputation — ~~No reputation tracking~~ DONE (D90) — per-teammate TeammateRep (total_calls, successful_handoffs, avg_confidence, reliability). Weights applied in resolve_conflict(). Persisted to data/teammate_reputation.json. — Add per-teammate memory slice (top-k retrieval scoped to teammate specialty)  _(README status: KNOWN LIMITATION (README))_
+    - L1351: ~~Build teammate reputation scores~~ Done (D90) — per-teammate TeammateRep + resolve_conflict()  _(README status: DONE (README, struck through))_
+    - L1776: [x] Persistent teammates (Scout/Doctor/Sage/Oracle) — loaded and invokable  _(README status: checked [x] (README))_
+    
+    **52. verifier (SAGE semantic fact-check)**
+    - L494: 35 — verifier — 8052 — recovery — Semantic fact-checking (embedding + keyword), SAGE  _(README status: service defined (README); runtime UNKNOWN)_
+    
+    ## O6 — Proactivity / Goals / Attention
+    *KAI acting on its own initiative: goals, reminders, routines* — 9 features, 18 README lines
+    
+    **53. Goals view (Ohana goals)**
+    - L1193: Goals — Ctrl+5 — Ohana goals, drift alerts, progress bars, reminders, scheduled tasks  _(README status: code present; runtime UNKNOWN (README))_
+    
+    **54. Watch rule engine**
+    - L1201: Watch — — — Background rule engine — add/delete rules, live alert feed  _(README status: code present; runtime UNKNOWN (README))_
+    
+    **55. anti-annoyance**
+    - L241: Anti-Annoyance — Per-type cooldowns, dismissal tracking, DND mode, escalating suppression  _(README status: code present; runtime UNKNOWN (README))_
+    
+    **56. emergent ritual discovery**
+    - L214: Emergent Ritual Discovery — When a sensor pattern recurs in ≥7 of the last 10 cycles, Kai proposes a standing ritual and appends it to RITUALS.md. One-time notification to operator for co-authorship.  _(README status: code present; runtime UNKNOWN (README))_
+    - L1148: FF_RITUAL_DISCOVERY — ✓ — D89/C: ritual proposals at ≥7/10 pattern cycles  _(README status: flag default ON)_
+    - L1780: [x] Emergent ritual discovery (≥7/10 cycles → RITUALS.md)  _(README status: checked [x] (README))_
+    
+    **57. proactive observer / agent**
+    - L224: Proactive Observer — Background asyncio task runs every 5 minutes. Reads Docker health, email, AQ, git, calendar, sysmetrics, weather, news. Detects notable changes. Writes proactive_observation memories to memu-core for spontaneous awareness.  _(README status: code present; runtime UNKNOWN (README))_
+    - L239: Proactive Agent — Scheduled tasks, reminders, morning briefing, evening check-in, 13-action registry  _(README status: code present; runtime UNKNOWN (README))_
+    - L1131: FF_PROACTIVE_AGENT — ✓ — Background proactive observer (anomaly + world model, every 5 min)  _(README status: flag default ON)_
+    
+    **58. proactive scheduling**
+    - L228: Proactive Scheduling — Fuses calendar events (within 30 min) with current sensor state into proactive_schedule memories: "Meeting in 20 min + AQ poor → consider indoor location." Surfaces naturally via memory retrieval.  _(README status: code present; runtime UNKNOWN (README))_
+    - L1144: FF_PROACTIVE_SCHEDULING — ✓ — D88/M7: calendar + sensor fusion → schedule memories  _(README status: flag default ON)_
+    
+    **59. resource-aware curiosity**
+    - L1152: FF_CURIOSITY — ✓ — D89/F: idle curiosity tick (GPU-gated no-op in Phase 0)  _(README status: flag default ON)_
+    - L1257: Resource-Aware Curiosity — idle_curiosity_tick() now runs D93 HypothesisEngine on CPU. Full research cycle (pick question → research → append) needs GPU. — Activate GPU research on Phase 1  _(README status: KNOWN LIMITATION (README))_
+    - L1806: [ ] Resource-aware curiosity — idle_curiosity_tick() no-ops on CPU  _(README status: unchecked [ ] (README))_
+    
+    **60. struggle detection**
+    - L240: Struggle Detection — 5-signal frustration analysis — auto-adapts when operator is struggling  _(README status: code present; runtime UNKNOWN (README))_
+    
+    **61. wake word & intent**
+    - L243: Wake & Intent — Wake-word detection (/wake/detect) + tiny-model intent judge (/wake/intent) with safe heuristic fallback  _(README status: code present; runtime UNKNOWN (README))_
+    - L492: 33 — wake-service — 8022 — sensors — Wake-word + intent routing  _(README status: service defined (README); runtime UNKNOWN)_
+    - L1155: FF_WAKE_INTENT_ROUTING — ✗ — Pre-classify chat intent via wake-intent before routing  _(README status: flag default OFF)_
+    
+    ## O7 — Governed Hands / Capabilities
+    *KAI's hands: doing things, only with permission* — 8 features, 19 README lines
+    
+    **62. Tool Gate + HMAC/Ed25519 auth**
+    - L254: HMAC Auth — Inter-service HMAC signing, Ed25519, dual-sign rotation, nonce replay protection. Dev secret requires explicit HMAC_ALLOW_DEV_SECRET=true  _(README status: code present; runtime UNKNOWN (README))_
+    - L464: 5 — tool-gate — 8000 — default — Policy enforcement, HMAC auth, autonomy gate  _(README status: service defined (README); runtime UNKNOWN)_
+    - L555: tool-gate — Policy + HMAC (production keys via Vault)  _(README status: service defined (README); runtime UNKNOWN)_
+    - L1262: Security Defaults — HMAC enforced. DB password is localdev by default. Dev HMAC secret blocked unless HMAC_ALLOW_DEV_SECRET=true — Set DB_PASSWORD, INTERSERVICE_HMAC_SECRET for production  _(README status: KNOWN LIMITATION (README))_
+    - L1772: [x] HMAC auth enforced, dev secret blocked by default  _(README status: checked [x] (README))_
+    
+    **63. Unified Hunter (34 actuators, not cut over)**
+    - L1239: Unified Hunter — Built and tested, not cut over. Every migration flag still defaults to the legacy path, so the canonical decision path is not what runs. KAI_AUTONOMY_ENFORCE must stay off — no grants exist, so it would deny everything — Operator decision per kai-pm/UH_PROGRESS_TRACKER.md §5–6, once a deployment exists to cut over  _(README status: KNOWN LIMITATION (README))_
+    
+    **64. action audit ledger**
+    - L525: ledger-worker — 8056 — Action audit trail persistence  _(README status: service defined (README); runtime UNKNOWN)_
+    
+    **65. browser agent**
+    - L472: 13 — browser-agent — 8040 — external-egress — Playwright Chromium — navigate / scrape / click  _(README status: service defined (README); runtime UNKNOWN)_
+    - L1216: browse: <url> in chat — Navigate browser-agent to URL  _(README status: code present; runtime UNKNOWN (README))_
+    - L1217: search: <query> in chat — Browser search shortcut  _(README status: code present; runtime UNKNOWN (README))_
+    
+    **66. governed decision path (end-goal)**
+    - L1366: gated by conviction/trust loop and circuit breakers  _(README status: end-goal (README))_
+    
+    **67. sandboxed executor**
+    - L520: executor — 8002 — Sandboxed code execution (AST validation + allowlist)  _(README status: service defined (README); runtime UNKNOWN)_
+    - L557: executor — Sandboxed execution  _(README status: service defined (README); runtime UNKNOWN)_
+    - L1786: [x] Executor sandboxing (allowlist + AST validation + shell=False)  _(README status: checked [x] (README))_
+    
+    **68. secret management & rotation**
+    - L553: vault + vault-rotator — Secret management + key rotation  _(README status: service defined (README); runtime UNKNOWN)_
+    
+    **69. trust negotiation / autonomy requests**
+    - L244: Trust Negotiation — Kai can formally request elevated autonomy via POST /gate/autonomy/request. All requests currently require human approval and are ledger-logged.  _(README status: code present; runtime UNKNOWN (README))_
+    - L1150: FF_TRUST_NEGOTIATION — ✓ — D89/B: autonomy request endpoint (always pending_approval)  _(README status: flag default ON)_
+    - L1259: Trust Negotiation — POST /gate/autonomy/request always returns pending_approval. Human-approval flow not built yet. — Build approval UI + operator feedback loop in Phase 2  _(README status: KNOWN LIMITATION (README))_
+    - L1359: Build trust negotiation approval UI (human-in-the-loop autonomy gate)  _(README status: planned (README roadmap))_
+    
+    ## O8 — Immune System / Doctor / Resilience
+    *KAI's immune system: spotting and fixing problems* — 10 features, 31 README lines
+    
+    **70. House Doctor / self-diagnosis**
+    - L212: House Doctor — Continuous differential diagnosis service (port 8046). 9 rules (D001–D009) map symptom-tag constellations (cpu_high, ram_high, docker_unhealthy, aq_degraded, sensor_anomaly, calendar_soon) to severity/diagnosis/treatment. Fires medical_report memories to memu-core; notifies on WARNING/CRITICAL.  _(README status: code present; runtime UNKNOWN (README))_
+    - L252: House Doctor — Continuous differential diagnosis (9 rules) — CPU+RAM+docker constellations mapped to diagnosis + treatment. This is today's self-diagnostic capability; the wider self-diagnosis programme is separate and planned — see [Self-Diagnosis](#self-diagnosis-today-vs-planned)  _(README status: code present; runtime UNKNOWN (README))_
+    - L490: 31 — house-doctor — 8046 — default — Differential system diagnosis (9 rules D001–D009)  _(README status: service defined (README); runtime UNKNOWN)_
+    - L540: house-doctor — 8046 — System differential diagnosis  _(README status: service defined (README); runtime UNKNOWN)_
+    - L766: House Doctor service — 9 rules, POST /diagnose, port 8046 — ✅ Live  _(README status: LIVE claimed (README))_
+    - L1147: FF_HOUSE_DOCTOR — ✓ — D89/E: House Doctor differential diagnosis calls  _(README status: flag default ON)_
+    - L1240: Self-diagnosis — Rule-based symptom matching (House Doctor, 9 rules) plus health probing and restart. Kai does not reason about its own source and does not repair itself — The A4 architecture note — design only, unimplemented, unauthorised  _(README status: KNOWN LIMITATION (README))_
+    - L1777: [x] House Doctor service (port 8046) — 9 diagnostic rules, wired into proactive observer  _(README status: checked [x] (README))_
+    
+    **71. checkpoint / time-travel debug**
+    - L255: Time-Travel Debug — Checkpoint any state, diff between snapshots, rollback to any previous state  _(README status: code present; runtime UNKNOWN (README))_
+    - L1126: FF_CHECKPOINT_AUTO — ✓ — Auto-checkpoint on /recover and /dream  _(README status: flag default ON)_
+    
+    **72. heartbeat / pulse**
+    - L468: 9 — heartbeat — 8010 — default — System pulse, world anchor, auto-sleep  _(README status: service defined (README); runtime UNKNOWN)_
+    - L562: heartbeat — System pulse  _(README status: service defined (README); runtime UNKNOWN)_
+    - L1190: Pulse — Ctrl+2 — Service health grid, pipeline status, fusion metrics  _(README status: code present; runtime UNKNOWN (README))_
+    
+    **73. no single point of failure (end-goal)**
+    - L1366: no single point of failure  _(README status: end-goal (README))_
+    
+    **74. observability (metrics/alerts)**
+    - L526: metrics-gateway — 8058 — Prometheus metrics aggregation  _(README status: service defined (README); runtime UNKNOWN)_
+    - L554: prometheus + alertmanager + grafana — Observability stack  _(README status: service defined (README); runtime UNKNOWN)_
+    
+    **75. security self-hacking**
+    - L253: Security Self-Hacking — Fuzzes own APIs with 34 payloads, adversary challenges, SAGE self-review  _(README status: code present; runtime UNKNOWN (README))_
+    - L1137: FF_SECURITY_AUDIT — ✓ — P9 automated security self-hacking  _(README status: flag default ON)_
+    
+    **76. self-capability map**
+    - L230: Self-Capability Map — GET /introspect/capabilities exposes: live service reachability, loaded skills, feature flag states, anomaly baseline keys, active FSM state, teammate registry, gap log top-5, counterfactual availability.  _(README status: code present; runtime UNKNOWN (README))_
+    - L770: Self-Capability Map — GET /introspect/capabilities — ✅ Live  _(README status: LIVE claimed (README))_
+    
+    **77. structured errors / circuit breakers**
+    - L257: Structured Errors — 20 enumerated codes (E1001–E4004) — no more "something broke"  _(README status: code present; runtime UNKNOWN (README))_
+    - L1798: [x] Circuit breakers, exponential backoff, resilient_call()  _(README status: checked [x] (README))_
+    
+    **78. supervisor self-healing & recovery log**
+    - L250: Self-Healing — Deep /health + /recover + supervisor auto-heal loop every 15s. The supervisor service is behind the recovery compose profile — it does not start with a bare make core-up  _(README status: code present; runtime UNKNOWN (README))_
+    - L251: Recovery Log — Every self-heal event logged to conscience — ties resilience to narrative  _(README status: code present; runtime UNKNOWN (README))_
+    - L493: 34 — supervisor — 8051 — recovery — Watchdog, auto-heal, proactive checks  _(README status: service defined (README); runtime UNKNOWN)_
+    - L767: Supervisor auto-heal — deep /health + /recover every 15s — ✅ Live (recovery profile)  _(README status: LIVE claimed (README))_
+    - L1785: [x] Supervisor auto-healing loop (deep /health + /recover every 15s)  _(README status: checked [x] (README))_
+    
+    **79. system FSM (operational state)**
+    - L209: System FSM — Kai tracks its own operational state: IDLE → ACTIVE → FOCUSED / DEGRADED → RECOVERING. Thread-safe asyncio singleton. 5 states, 9 events, 16 transitions. Curiosity and autonomy only fire from IDLE.  _(README status: code present; runtime UNKNOWN (README))_
+    - L768: System FSM — DEGRADED / RECOVERING states — ✅ Live  _(README status: LIVE claimed (README))_
+    - L1145: FF_FSM — ✓ — D89: system FSM (IDLE/ACTIVE/FOCUSED/DEGRADED/RECOVERING)  _(README status: flag default ON)_
+    - L1773: [x] System FSM (IDLE/ACTIVE/FOCUSED/DEGRADED/RECOVERING) — wired into /chat + observer  _(README status: checked [x] (README))_
+    
+    ## O9 — Growth / Dream / Evolution
+    *growing and learning: dreams, new skills, self-improvement* — 6 features, 23 README lines
+    
+    **80. Agent-Evolver**
+    - L186: Agent-Evolver — Learns from failure clusters during dream cycles, generates proactive fix insights  _(README status: code present; runtime UNKNOWN (README))_
+    - L1160: FF_EVOLVER_ENABLED — ✗ — Agent-Evolver: cluster failures → proactive insights  _(README status: flag default OFF)_
+    
+    **81. D99 synthetic experience**
+    - L200: Synthetic Experience — 🔜 GPU stub — Fictional scenario generation during dream cycles. Exercises reasoning pathways rarely stimulated by real interactions: counterfactual, perspective\_shift, edge\_case, stress\_test. can_generate()→False until GPU dream cycles active. FF_SYNTHETIC_EXPERIENCE=False.  _(README status: STUB (README))_
+    - L1170: FF_SYNTHETIC_EXPERIENCE — ✗ — D99: fictional scenario generation during dream cycles — pending GPU  _(README status: flag default OFF)_
+    - L1253: Synthetic Experience — can_generate()→False. SyntheticScenario schema defined. Four experience types ready. — GPU dream cycles (FF_DREAM_ENABLED=True)  _(README status: STUB (README))_
+    - L1346: D99 Synthetic Experience — can_generate() unlocks with GPU dream cycles  _(README status: planned (README roadmap))_
+    - L1817: [ ] D99 Synthetic Experience — can_generate()→False; needs GPU dream cycles active (FF_DREAM_ENABLED=True)  _(README status: unchecked [ ] (README))_
+    
+    **82. agentic cold path (dream/evolve/audit)**
+    - L519: agentic-introspect — 8023 — Dream / evolve / security-audit — cold path split off agentic  _(README status: service defined (README); runtime UNKNOWN)_
+    - L559: agentic + agentic-introspect — Reasoning brain + cold-path split  _(README status: service defined (README); runtime UNKNOWN)_
+    
+    **83. capability gap logging**
+    - L215: Capability Gap Logging — Each missed skill match increments a counter. Reactive skill acquisition fires only after GAP_HUNT_THRESHOLD (default 3) consecutive misses for the same intent — prevents wasted hunts on one-off requests.  _(README status: code present; runtime UNKNOWN (README))_
+    - L1149: FF_GAP_LOGGING — ✓ — D89/C1: gap counter, hunt only after 3 misses  _(README status: flag default ON)_
+    - L1779: [x] Gap logging + threshold-gated reactive skill acquisition  _(README status: checked [x] (README))_
+    
+    **84. dream state / dream cycles**
+    - L172: Dream State — 6-phase offline consolidation — failure clustering, boundary recalibration, MARS memory decay  _(README status: code present; runtime UNKNOWN (README))_
+    - L1159: FF_DREAM_ENABLED — ✗ — 6-phase dream cycle consolidation  _(README status: flag default OFF)_
+    - L1176: FF_DREAM_PHASE_7 — ✓ — Agent-Evolver insight generation during the dream cycle  _(README status: flag default ON)_
+    
+    **85. skills hub / skill hunter / skill provenance**
+    - L216: Skill Provenance — Every auto-hunted skill file carries YAML front-matter (hunted_at, pypi_package, pypi_verified, probationary: true). Sidecar .meta.json tracks runtime error count. Auto-disables at ≥3 errors.  _(README status: code present; runtime UNKNOWN (README))_
+    - L229: Autonomous Skill Growth — When /chat has no skill match and confidence < 0.4, fires _hunt_skill_for_gap() in background. Skill Hunter queries PyPI, generates a .md skill file, hot-reloads — Kai grows its own capabilities during conversation.  _(README status: code present; runtime UNKNOWN (README))_
+    - L259: Skills Hub — Hot-loadable .md skill files with security scanning, TTL pruning, unload, and provenance front-matter  _(README status: code present; runtime UNKNOWN (README))_
+    - L489: 30 — skill-hunter — 8045 — default — Autonomous skill discovery via PyPI  _(README status: service defined (README); runtime UNKNOWN)_
+    - L539: skill-hunter — 8045 — Autonomous skill acquisition  _(README status: service defined (README); runtime UNKNOWN)_
+    - L564: skill-hunter + house-doctor — Skill growth + system diagnosis  _(README status: service defined (README); runtime UNKNOWN)_
+    - L1143: FF_SKILL_HUNTER — ✓ — D88/M6+M8: skill-hunter integration + reactive acquisition  _(README status: flag default ON)_
+    - L1781: [x] Skill provenance (YAML front-matter + .meta.json sidecars, auto-disable at 3 errors)  _(README status: checked [x] (README))_
+    
+    ## O10 — Continuity / Stewardship / Sustainability
+    *lasting for the long term: backups, money awareness, working offline* — 4 features, 8 README lines
+    
+    **86. backup service**
+    - L533: backup-service — 8054 — pg / redis / memory backup  _(README status: service defined (README); runtime UNKNOWN)_
+    
+    **87. broker-bridge (Binance, read-only) + Broker view**
+    - L479: 20 — broker-bridge — 8034 — finance — Binance REST (spot/futures), HMAC-signed  _(README status: service defined (README); runtime UNKNOWN)_
+    - L1202: Broker — — — Binance tickers, balance, positions, orders, PnL, Quick Watch → monitor rules  _(README status: code present; runtime UNKNOWN (README))_
+    
+    **88. financial awareness / UK self-employment advisor**
+    - L524: financial-awareness — 8063 — CIS/VAT/tax arithmetic (offline, UK-focused)  _(README status: service defined (README); runtime UNKNOWN)_
+    - L535: kai-advisor — 8090 — Self-employment advisor (UK, offline)  _(README status: service defined (README); runtime UNKNOWN)_
+    - L1138: FF_FINANCIAL_CONTEXT — ✓ — Inject CIS/VAT/tax summary on finance queries  _(README status: flag default ON)_
+    - L1199: Finance — — — Financial-awareness view  _(README status: code present; runtime UNKNOWN (README))_
+    
+    **89. sovereign offline operation (end-goal)**
+    - L1366: offline self-hosted sovereign companion (no cloud dependency)  _(README status: end-goal (README))_
+    
+    ## O11 — Operator Relationship / Mission Control
+    *how you meet KAI: chat, voice, avatar, dashboard* — 9 features, 29 README lines
+    
+    **90. D98 cognitive fingerprint (operator thinking style)**
+    - L199: Cognitive Fingerprinting — ✅ Collecting — Operator thinking-style model. Phase 0: collecting InteractionSample records to /data/cognitive_fingerprint.jsonl on every chat interaction. Phase 1: k-means clustering → dominant_style, risk_tolerance, preferred_abstraction, decision_velocity dimensions. can_infer()→True at 90+ samples. FF_COGNITIVE_FINGERPRINT=True.  _(README status: COLLECTING (README))_
+    - L1166: FF_COGNITIVE_FINGERPRINT — ✓ — D98: operator thinking-style model — collecting interaction samples now; inference at 90+ samples  _(README status: flag default ON)_
+    - L1249: Cognitive Fingerprinting — Collecting now (D98) — InteractionSample records written to cognitive_fingerprint.jsonl on every chat. Phase 1 inference gates at 90+ samples. collector.progress() tracks readiness. — Reach 90+ samples; implement k-means clustering on GPU  _(README status: KNOWN LIMITATION (README))_
+    - L1345: D98 Cognitive Fingerprint — inference unlocks at 90 collected samples (collecting now)  _(README status: planned (README roadmap))_
+    - L1356: ~~Cognitive fingerprint collection~~ Done (D98) — InteractionSample collector live  _(README status: DONE (README, struck through))_
+    - L1792: [x] Cognitive Fingerprint collecting (D98) — InteractionSample records appending to /data/cognitive_fingerprint.jsonl now; quick_sample() helper ready to wire into chat handler  _(README status: checked [x] (README))_
+    - L1816: [ ] D98 Cognitive Fingerprint inference — can_infer()→False until 90 InteractionSample records collected (collecting now)  _(README status: unchecked [ ] (README))_
+    
+    **91. Telegram interface**
+    - L536: telegram-bot — 8025 — Telegram voice + text interface  _(README status: service defined (README); runtime UNKNOWN)_
+    
+    **92. dashboard / operator console (→ Mission Control)**
+    - L469: 10 — dashboard — 8080 — default — 10-view operator console  _(README status: service defined (README); runtime UNKNOWN)_
+    - L558: dashboard — Operator console  _(README status: service defined (README); runtime UNKNOWN)_
+    - L1191: Thinking — Ctrl+3 — Live conviction pipeline, tempo gauge, boundary map, silence signals, dream state  _(README status: code present; runtime UNKNOWN (README))_
+    - L1192: Configure — Ctrl+4 — Mode, notifications, markdown toggle, PWA install  _(README status: code present; runtime UNKNOWN (README))_
+    - L1195: Trace — Ctrl+7 — Ring-buffer log viewer — level/time filter, monospace, colour-coded  _(README status: code present; runtime UNKNOWN (README))_
+    - L1213: Ctrl+K — Focus chat input  _(README status: code present; runtime UNKNOWN (README))_
+    - L1215: Escape — Close dropdown / stop generation  _(README status: code present; runtime UNKNOWN (README))_
+    
+    **93. impact oracle**
+    - L237: Impact Oracle — Predicts consequences of actions on goals and emotions — "if you skip X, Y suffers"  _(README status: code present; runtime UNKNOWN (README))_
+    
+    **94. notifications**
+    - L476: 17 — notify-service — 8031 — default — Push notifications  _(README status: service defined (README); runtime UNKNOWN)_
+    
+    **95. operator model**
+    - L236: Operator Model — Echo-response engine, nudge escalation ladder (4-tier), cross-mode insight bridge  _(README status: code present; runtime UNKNOWN (README))_
+    - L1132: FF_OPERATOR_MODEL — ✓ — P22 operator preference learning  _(README status: flag default ON)_
+    
+    **96. presence: chat / voice / TTS / avatar**
+    - L471: 12 — tts-service — 8030 — default — Text-to-speech (edge-tts en-GB-RyanNeural)  _(README status: service defined (README); runtime UNKNOWN)_
+    - L530: tts-service — 8030 — TTS (edge-tts British Ryan)  _(README status: service defined (README); runtime UNKNOWN)_
+    - L531: avatar-service — 8081 — Avatar generation  _(README status: service defined (README); runtime UNKNOWN)_
+    - L1189: Chat — Ctrl+1 — Streaming conversation, PUB/WORK toggle, feedback ratings, struggle detection, 🔊 speak button  _(README status: code present; runtime UNKNOWN (README))_
+    - L1340: Real STT (faster-whisper large), TTS with voice quality, avatar  _(README status: planned (README roadmap))_
+    - L1366: chat  _(README status: end-goal (README))_
+    - L1366: voice  _(README status: end-goal (README))_
+    - L1366: avatar  _(README status: end-goal (README))_
+    
+    **97. shadow branches**
+    - L238: Shadow Branches — Persistent what-if timelines from counterfactuals, queryable alternate histories  _(README status: code present; runtime UNKNOWN (README))_
+    
+    **98. workspace manager**
+    - L537: workspace-manager — 8060 — Workspace lifecycle manager  _(README status: service defined (README); runtime UNKNOWN)_
+    
+    ## ENG — Engineering / Assurance substrate
+    *the engineering base underneath everything* — 6 features, 34 README lines
+    
+    **99. engineering toolchain / CI gates**
+    - L1260: Coverage — ~63% combined across 5 modules. agentic/app.py (34%) and memu-core/app.py (53%) anchor the total down — service-route-heavy files unreachable offline — CI gate: 60% (--cov-fail-under=60). make coverage enforces locally  _(README status: KNOWN LIMITATION (README))_
+    - L1490: sync-docs — Patch README/backlog metrics from codebase scan — make sync-docs — On demand, gates merge  _(README status: code present; runtime UNKNOWN (README))_
+    - L1491: check-docs — Read-only freshness check (exit 1 if stale) — make check-docs — In merge-gate + CI  _(README status: code present; runtime UNKNOWN (README))_
+    - L1492: go_no_go — py_compile all service entry points — make go_no_go — Pre-commit hook + CI  _(README status: code present; runtime UNKNOWN (README))_
+    - L1493: merge-gate — Full validation: lint + docs + tests + quality — make merge-gate — Manual before merge  _(README status: code present; runtime UNKNOWN (README))_
+    - L1494: pre-commit — Flake8, mypy, secret-detect, YAML, go_no_go — Auto on git commit — Yes  _(README status: code present; runtime UNKNOWN (README))_
+    - L1495: dep-audit — pip-audit for known CVEs — make dep-audit — CI  _(README status: code present; runtime UNKNOWN (README))_
+    - L1496: coverage — pytest-cov HTML report (60% floor) — make coverage — On demand  _(README status: code present; runtime UNKNOWN (README))_
+    - L1497: coverage-floors — Per-module coverage gates (agentic ≥45%, memu-core ≥60%) — make coverage-floors — CI  _(README status: code present; runtime UNKNOWN (README))_
+    - L1498: Trivy — Container image scanning (CRITICAL+HIGH, exit 1) — CI auto — core-tests.yml  _(README status: code present; runtime UNKNOWN (README))_
+    - L1499: health-sweep — Hit /health on all running services — make health-sweep — On demand  _(README status: code present; runtime UNKNOWN (README))_
+    - L1500: chaos-ci — Fault injection for resilience testing — python scripts/chaos_ci.py — On demand  _(README status: code present; runtime UNKNOWN (README))_
+    - L1501: test-github-models — GitHub Models CI LLM smoke test (best-effort) — make test-github-models — CI (non-breaking)  _(README status: code present; runtime UNKNOWN (README))_
+    
+    **100. feature-flag system (53 flags)**
+    - L256: 53 Feature Flags — All capabilities independently toggleable via FF_ env vars — 32 default on, 21 default off — see [Feature Flags](#feature-flags)  _(README status: code present; runtime UNKNOWN (README))_
+    - L1800: [x] Context budget trimming, structured errors, 53 feature flags  _(README status: checked [x] (README))_
+    
+    **101. honest status / build & test substrate**
+    - L1238: What actually starts — make core-up brings up 18 of the 36 services the minimal file defines. Half the sensory, watcher, egress, vault, cortex and recovery layer sits behind compose profiles and does not start unless named — Name the profiles you want, or --profile "". Verify with docker compose -f docker-compose.minimal.yml config --services  _(README status: KNOWN LIMITATION (README))_
+    - L1241: This page — Counts here are re-derived from the tree, but capability rows describe code that exists, not observed runtime behaviour. Only the seven Project Status rows are machine-enforced — A running stack, and per-capability runtime evidence. Neither exists yet  _(README status: KNOWN LIMITATION (README))_
+    - L1769: [x] 36 services defined in the minimal stack, 18 starting by default, compose validated  _(README status: checked [x] (README))_
+    - L1793: [x] GPU-era stub interfaces fixed (D95–D97, D99–D102) — can_()→False in Phase 0; interfaces frozen, ready to implement once GPU arrives  _(README status: checked [x] (README))_
+    - L1796: [x] 91 test targets, 4,759 test functions (make test-core); pass/fail is the CI badges, not this page  _(README status: checked [x] (README))_
+    - L1797: [x] Pre-commit, dep scanning, container scanning (Trivy)  _(README status: checked [x] (README))_
+    
+    **102. private overlay network**
+    - L552: tailscale — Overlay network (private mesh)  _(README status: service defined (README); runtime UNKNOWN)_
+    
+    **103. target hardware (Flow Z13 / Strix Halo)**
+    - L1676: Device — ASUS ROG Flow Z13 (2025)  _(README status: code present; runtime UNKNOWN (README))_
+    - L1677: SoC — AMD Ryzen AI MAX+ 395 / Strix Halo (Zen 5)  _(README status: code present; runtime UNKNOWN (README))_
+    - L1678: iGPU — Radeon 8060S  _(README status: code present; runtime UNKNOWN (README))_
+    - L1679: Memory — 128GB unified — this is the programme target  _(README status: code present; runtime UNKNOWN (README))_
+    - L1680: Storage — ≥2TB NVMe target  _(README status: code present; runtime UNKNOWN (README))_
+    - L1681: OS — Ubuntu production runtime  _(README status: code present; runtime UNKNOWN (README))_
+    - L1682: NPU — XDNA 2 present; production use subject to Linux/driver qualification  _(README status: code present; runtime UNKNOWN (README))_
+    - L1715: CPU (Zen 5) — Orchestration, deterministic controls, services, databases, tool execution  _(README status: code present; runtime UNKNOWN (README))_
+    - L1716: Radeon / ROCm — Primary candidate for heavy local inference and ML acceleration  _(README status: code present; runtime UNKNOWN (README))_
+    - L1717: XDNA 2 NPU — Future low-power accelerator / sentinel candidate — activation only after Linux qualification  _(README status: code present; runtime UNKNOWN (README))_
+    - L1718: 128GB unified memory — A governed shared resource across models and system workloads  _(README status: code present; runtime UNKNOWN (README))_
+    
+    **104. zero telemetry / local core (constitution)**
+    - L258: Zero Telemetry — No corporate control, no data exfiltration, no resets. Ever.  _(README status: code present; runtime UNKNOWN (README))_
+    
+    ## Lines left out (not features)
+    
+    L36 (status snapshot, not a feature), L37 (status snapshot, not a feature), L38 (status snapshot, not a feature), L39 (status snapshot, not a feature), L40 (status snapshot, not a feature), L41 (status snapshot, not a feature), L42 (status snapshot, not a feature), L61 (status snapshot, not a feature), L62 (status snapshot, not a feature), L63 (status snapshot, not a feature), L64 (status snapshot, not a feature), L65 (status snapshot, not a feature), L1315 (history, not a feature), L1316 (history, not a feature), L1317 (history, not a feature), L1318 (history, not a feature), L1319 (history, not a feature), L1320 (history, not a feature), L1321 (history, not a feature), L1322 (history, not a feature), L1753 (documentation index, not a feature), L1754 (documentation index, not a feature), L1755 (documentation index, not a feature), L1756 (documentation index, not a feature), L1757 (documentation index, not a feature), L1758 (documentation index, not a feature), L1759 (documentation index, not a feature), L1760 (documentation index, not a feature), L1761 (documentation index, not a feature), L1762 (documentation index, not a feature), L1763 (documentation index, not a feature), L1764 (documentation index, not a feature)
+    END-VERBATIM KAI-FEATURE-LIST
+
+### 6. Next authorised step
+
+- Send the list to Dainius; place it on Linear as a working document for Kai (O-2 Linear draft) with its banked identity; tell Kai about the F-2 clarification  [CONVERSATION 2026-10-11 Dainius, "List all features so we have a list"]
+
+### 7. What I am unsure of
+
+- Whether the README holds abilities in ordinary paragraphs that no table or named list carries (R10)  [CMD `appendix_r.py` → universe line]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
