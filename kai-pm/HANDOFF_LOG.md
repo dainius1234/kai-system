@@ -66677,3 +66677,76 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-11T16:32:08Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-11T16:32:08Z  [CMD `date -u +%FT%TZ` → 2026-10-11T16:32:08Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: de319299146941ee6ed64d39d22edd5d9ebd6a3e  [CMD `git rev-parse HEAD` → de319299146941ee6ed64d39d22edd5d9ebd6a3e]
+- tree: b872a3663f66235da84ffde00328f50c051d336c  [CMD `git rev-parse HEAD^{tree}` → b872a3663f66235da84ffde00328f50c051d336c]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- remote:claude/project-rework-plan-pgvp35: de319299146941ee6ed64d39d22edd5d9ebd6a3e  [CMD `git ls-remote --heads origin` → de319299146941ee6ed64d39d22edd5d9ebd6a3e]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 160  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 160]
+
+### 1. The four states
+
+- physical: unchanged since entry 160 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: no change  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+- evidence: entry-160 texts posted to DAI-10 as e2b6d0f8 (main), 418e8b89 (D359 mirror), 14b8be2d (D390 mirror); each posted body equals its banked block, and each mirror's fenced text is an exact substring of kai-pm/DECISIONS.md at HEAD  [CMD `posted_check` → 3/3 posted == banked; 2/2 mirror text in DECISIONS.md]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `handoff.py check` → findings=0]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: unchanged from entry 160  [CMD `handoff.py check` → findings=0]
+
+### 4. Open questions
+
+- For Dainius: lasting fix for the over-1 MB files (generated small current-state file) — needs his decision; for Kai: which fetch options his connector has  [CMD `handoff.py check` → findings=0]
+
+### 5. Incidents and corrections
+
+- Cosmetic, recorded not fixed: in the main message the "On request" line follows the index table with no blank line, so Markdown may render it as a last table row. Text content is unaffected  [FILE kai-pm/HANDOFF_LOG.md:1]
+- EVIDENCE POSTED-CHECK-E160 posted_check.txt: 359 bytes, sha256 3f34801fa171c02257ba641df76c1a59a5f93a764bb0724fbbc0ceee36d05fd2, final LF True (added by Orion)  [CMD `sha256sum posted_check.txt` → 3f34801fa171c022…]
+    BEGIN-VERBATIM POSTED-CHECK-E160
+    ORION-KAI-EMPTY-FETCH-MAIN e2b6d0f8 posted bodies 1 posted == banked: True
+    ORION-KAI-MIRROR-D359 418e8b89 posted bodies 1 posted == banked: True
+       mirror text is in DECISIONS.md @HEAD: True | sha256 26834c299bfb969c
+    ORION-KAI-MIRROR-D390 14b8be2d posted bodies 1 posted == banked: True
+       mirror text is in DECISIONS.md @HEAD: True | sha256 7a713c08d0097e3c
+    END-VERBATIM POSTED-CHECK-E160
+
+### 6. Next authorised step
+
+- Report to Dainius in plain words  [CONVERSATION 2026-10-11 Dainius, "If you can help him with what came up empty"]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff.py check` → findings=0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
