@@ -71853,3 +71853,116 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-11T19:11:46Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-11T19:11:46Z  [CMD `date -u +%FT%TZ` → 2026-10-11T19:11:46Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 9b1afbf3ecb3e21e7dd88b807d42f0b5c4e677f2  [CMD `git rev-parse HEAD` → 9b1afbf3ecb3e21e7dd88b807d42f0b5c4e677f2]
+- tree: 0b172f75b090b3eda28acdda8ff3d553e7b188df  [CMD `git rev-parse HEAD^{tree}` → 0b172f75b090b3eda28acdda8ff3d553e7b188df]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 9b1afbf3ecb3e21e7dd88b807d42f0b5c4e677f2  [CMD `git ls-remote --heads origin` → 9b1afbf3ecb3e21e7dd88b807d42f0b5c4e677f2]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 178  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 178]
+
+### 1. The four states
+
+- physical: unchanged since entry 178 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Orion builds the Gold-Tier Miro structure (seven views) on the existing board, preserving earlier work; documentation and architecture modelling only, no code, engineering hold unchanged. Within O-2 record authority ("Miro projections")  [CONVERSATION 2026-10-11 Dainius, "GPT keeps timed off need you to do this ruling"]
+- evidence: Dainius's message (his request plus Kai's pasted assessment and recommendation) preserved in section 5  [CMD `cat .git/kai-ruling-capture/8329c3ea703ded96.json` → flagged long(2722), keyword(ruling)]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-11 · asks Orion to carry out Kai's Miro recommendation because Kai keeps timing out: develop the existing board into a structured engineering reference with seven connected views (constitution and mission; complete feature architecture; organic cognitive architecture; technical system architecture; security and resilience; current-to-target migration; engineering assurance), each element linking to its authoritative GitHub source; documentation only; Gold Tier only after an independent completeness check. Verbatim in section 5 ⚠ UNBANKED  [CONVERSATION 2026-10-11 Dainius, "GPT keeps timed off need you to do this ruling"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; any code change  [CONVERSATION 2026-10-11 Dainius, "That would be a documentation and architecture-modelling upgrade only. It would not change KAI’s code or release the engineering hold."]
+- HELD: "Gold Tier" certification. Orion is now the builder, so Orion cannot also be the independent checker (frozen §2, author ≠ sole verifier); Kai or another reviewer must do the completeness check  [CONVERSATION 2026-10-11 Dainius, "My recommendation is to build this on our existing Miro board, preserving its previous work, and subject the result to Orion’s independent completeness check before calling it Gold Tier."]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- R21 for the Miro build. DONE per view = every element sourced to a GitHub block, line or file, and a mechanical readback of the board against that source list. SCOPE = new frames on the existing board only; existing items are not moved or deleted. SIMPLEST = one index frame plus one frame per view, built view by view, the grounded views first (feature architecture from entry 167, assurance gates from D359)  [CONVERSATION 2026-10-11 Dainius, "GPT keeps timed off need you to do this ruling"]
+
+### 5. Incidents and corrections
+
+- Credential scan of the message (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py e179.json` → TOTAL HITS 0]
+- EVIDENCE DAINIUS-MIRO-RULING-8329c3ea dainius_miro_ruling.txt: 2770 bytes, sha256 29290b4ab0727e42dc5ee1c687d7b3fcca610ecfc5305277b34420326d21e152, final LF True (added by Orion)  [CMD `sha256sum dainius_miro_ruling.txt` → 29290b4ab0727e42…]
+    BEGIN-VERBATIM DAINIUS-MIRO-RULING-8329c3ea
+    GPT keeps timed off need you to do this ruling , begging asking brother for help……..; Brother, no—not yet. Miro has been updated, but I would not honestly certify it as Kingsman Gold Tier.
+    
+    I’ve inspected the live board, including the new research-continuity section and the existing Kingsman architecture, assurance, and zero-loss sections.
+    
+    Current assessment
+    
+    Miro professionalisation status
+    
+    Not gold-tier verified
+    
+    Architecture overview	Present
+    Research and GitHub/Linear links	Present
+    11 organs + engineering	Listed
+    All 104 features individually traceable	Not yet
+    Complete inter-organ architecture	Not yet
+    Current versus target and migration	Incomplete
+    Verification and evidence linkage	Incomplete
+    
+    The latest section has 44 Miro items. It’s a useful navigation layer, not the complete professional system model.
+    
+    What Gold Tier should contain
+    
+    I recommend developing the existing board into a structured engineering reference with seven connected views:
+    
+    * Constitution and mission: one KAI, identity, original vision, owner authority and evolution principles.
+    * Complete feature architecture: all 104 grouped features, independently meaningful subfeatures, requirements and current status.
+    * Organic cognitive architecture: senses → memory → reasoning → dreams → imagination → future vision → initiative → verification → learning.
+    * Technical system architecture: actual repository components, APIs, databases, services, model runtimes, hardware and trust boundaries.
+    * Security and resilience: identity, exact capabilities, final-hand enforcement, workflows, degraded modes and recovery.
+    * Current-to-target migration: evidence-qualified candidate technologies, dependencies, preserved functionality, cutover and rollback.
+    * Engineering assurance: D359 programme gates, traceability, ITP/ITC evidence, hazards, unresolved findings and decision status.
+    
+    Each meaningful diagram element should link back to its authoritative GitHub requirement, implementation or evidence—not merely look convincing.
+    
+    Most importantly, we need a complete end-to-end diagram proving how one KAI experiences, remembers, dreams, reasons, anticipates, acts and learns without fragmenting its identity.
+    
+    Professional quality means navigable layers and verified completeness, not cramming thousands of boxes onto one canvas.
+    
+    My recommendation is to build this on our existing Miro board, preserving its previous work, and subject the result to Orion’s independent completeness check before calling it Gold Tier.
+    
+    That would be a documentation and architecture-modelling upgrade only. It would not change KAI’s code or release the engineering hold.
+    
+    Verdict: Miro is a good foundation, but it still needs substantial work before Gold Tier certification.
+    END-VERBATIM DAINIUS-MIRO-RULING-8329c3ea
+
+### 6. Next authorised step
+
+- Read the existing board structure (read-only), then build the index frame and View 2 (feature architecture) first  [CONVERSATION 2026-10-11 Dainius, "GPT keeps timed off need you to do this ruling"]
+
+### 7. What I am unsure of
+
+- How much of views 4–6 can be sourced without engineering evidence; elements that cannot be sourced will be marked UNKNOWN on the board, not drawn as fact  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
