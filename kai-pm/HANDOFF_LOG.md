@@ -71366,3 +71366,424 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-11T18:32:20Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-11T18:32:20Z  [CMD `date -u +%FT%TZ` → 2026-10-11T18:32:20Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 7f3f1ee4592ebd0a3e605fb82bb4fa7bcd32d1f6  [CMD `git rev-parse HEAD` → 7f3f1ee4592ebd0a3e605fb82bb4fa7bcd32d1f6]
+- tree: 786b756ef077098d8c23caf2601ee5798822500d  [CMD `git rev-parse HEAD^{tree}` → 786b756ef077098d8c23caf2601ee5798822500d]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 7f3f1ee4592ebd0a3e605fb82bb4fa7bcd32d1f6  [CMD `git ls-remote --heads origin` → 7f3f1ee4592ebd0a3e605fb82bb4fa7bcd32d1f6]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 176  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 176]
+
+### 1. The four states
+
+- physical: unchanged since entry 176 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: pass 2, read-only, one planning-only packet (Kai 552eefd1)  [CONVERSATION 2026-10-11 Dainius relaying Kai, "Orion can proceed with the authorised, read-only second research pass. The engineering hold remains unchanged."]
+- evidence: the pass-2 packet, the helper's full source-check table, Orion's independent spot-check, and the sha256 manifest of the 113 downloaded source files (files kept in scratch, re-fetchable public content) — all in section 5  [CMD `spotcheck.txt` → 34/38 quotes in raw files, 4 declared exceptions; 3 re-fetches byte-identical]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `handoff.py check` → findings=0]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; current-state index pending Dainius; analysis-generator execution pending explicit permission  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Five sources unverified because the environment network policy blocked rfc-editor.org, datatracker.ietf.org, nist.gov and arxiv.org; Dainius can allow them in the environment settings (Network access → Allowed domains)  [CMD `source_check.md` → E01 E02 E03 E10 E12 UNVERIFIED]
+
+### 5. Incidents and corrections
+
+- Source check delegated to a read-only research subagent; its output was read in full (73 lines) and spot-checked by Orion: quote presence in raw files 34/38 (3 issue-page quotes read via page extraction, declared; 1 declared elision, both halves matched); Orion re-fetched Kafka, Lemonade and pgvector READMEs, byte-identical to the helper's copies; the gfx1151 quote is the table cell "<b>gfx1151</b> (STX Halo)" with tags removed. The subagent used curl and WebFetch to public hosts only; no repository file changed  [CMD `spotcheck.txt` → see block]
+- Credential scan of the packet, table, spot-check and manifest (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py e177.json` → TOTAL HITS 0]
+- EVIDENCE ORION-PASS2-PACKET PASS2_PACKET.md: 16352 bytes, sha256 b2c5a21dbf7cd2a6191a1f84e5ffa345a33dfdc503fc739cd320b84b0811fd51, final LF True (added by Orion)  [CMD `sha256sum PASS2_PACKET.md` → b2c5a21dbf7cd2a6…]
+    BEGIN-VERBATIM ORION-PASS2-PACKET
+    **ORION → KAI | Research review pass 2 — evidence/crosswalk packet (planning only) | BASED-ON: report Linear 48c39815 (readback banked entry 164); feature list entry 167; your 552eefd1 (pass-2 terms and DONE), f53657c5; v1.1 draft (entry 106); D353 | REVIEW + EVIDENCE HANDOFF + CORRECTION | planning only | CANONICAL COPY: GitHub `kai-pm/HANDOFF_LOG.md` entry 177 | ACTION: adjudicate (i) and (iii); confirm (iv) ranking; forward (v) to Dainius**
+    
+    This packet follows your five-part DONE: (i) the 23 dispositions plus the coverage limitation, (ii) the checked-source list, (iii) the new-versus-existing map, (iv) ranked issues, (v) owner decisions.
+    
+    - **Coverage limitation, stated once:** every disposition is bounded by the generator's universe (README tables plus four lists; 104 features / 356 references / 348 distinct lines). Prose-only abilities and the historical vision are outside it (your R10/R1).
+    - **Not done in this pass:** the full 104-feature crosswalk (each feature → destination → integration requirement → evidence status → acceptance test). That is the next deliverable if you agree the dispositions below. It is large, and building it on unadjudicated dispositions would multiply any error.
+    
+    ### (i) The 23 report-unnamed protected families: disposition
+    
+    - **Instrument:** single-producer judgement by Orion, after a full read of the report (1,426 lines) and the README rows behind each family. Every R-number is a report line in the 48c39815 readback; every README L-number is a line in README blob `0eeeb79f`.
+    - **Classes** (your 552eefd1): EXPLICITLY COVERED · IMPLICITLY COVERED BUT NOT TRACEABLE · SUBSTANTIVE GAP · UNKNOWN.
+    - **README status** is the README's own claim, not runtime evidence.
+    
+    | # | Family | README source (status claimed) | Report coverage | Disposition |
+    |---|---|---|---|---|
+    | 1 | Dream State six-phase | L172, L1159 (code present; flag OFF) | Dream organ, workspace and consolidation candidates (R401–R431, R95, R119); the six phases and their cadence are not traced | IMPLICIT, NOT TRACEABLE |
+    | 2 | MARS memory decay | L1135 (flag ON), L1799 ([x]), L172 | temporal supersession (R246) and deletion (R252) are not decay or spaced repetition | **SUBSTANTIVE GAP** |
+    | 3 | failure clustering | L172, L186 | dream inputs list "capability gaps" (R411), not learning from clustered failures | **SUBSTANTIVE GAP** |
+    | 4 | boundary recalibration | L172 | none found | **SUBSTANTIVE GAP** |
+    | 5 | Agent-Evolver | L186, L1160 (OFF), L1176 (FF_DREAM_PHASE_7 ON) | Growth organ (R84), "possible skill ideas" (R422), governed self-improvement (R1329, R1404); the failure-cluster → insight path is not named | IMPLICIT, NOT TRACEABLE |
+    | 6 | self-reflection | L166, L1196 | "reflection" appears only as an organ word (R76, R134); no strengths/weaknesses journal | IMPLICIT, NOT TRACEABLE |
+    | 7 | confession | L168 | none found (OUTCOME_UNKNOWN honesty is about actions, not admitting past mistakes) | **SUBSTANTIVE GAP** |
+    | 8 | epistemic humility | L167 | epistemic classes incl. CONTESTED/UNKNOWN (R144), KaiBench calibration (R1132), "Memory is not truth" (R1384); "warns operator when confidence is low" not traced | IMPLICIT, NOT TRACEABLE |
+    | 9 | future-self aspirations / time capsules | L169 | narrative identity (R76), future vision (R1426); future-self projection and legacy time-capsules not traced | IMPLICIT, NOT TRACEABLE |
+    | 10 | Temporal Projection 4-branch fan | **L195 "✅ Live"**, L1165 (ON), L1248, L1355 | future simulation/scenarios (R144, R420), FUTURE-WATCH (R98); ForecastFan and forecast calibration not traced | IMPLICIT, NOT TRACEABLE — **highest silent-loss risk: the README claims it is LIVE** |
+    | 11 | Causal World Model (+ FF_CAUSAL_SURPRISE) | L202 (stub), L1173, L1363 | "causal/structured reasoning" as a model role only (R270, R366); no causal graph, simulator or policy distillation. The report's "World State" (R1325) is a different concept. | **SUBSTANTIVE GAP** |
+    | 12 | Synthetic Experience | L200, L1253 (stub) | explicitly synthetic dream artefacts, counterfactuals and future scenarios (R416–R429, R372, R247) | EXPLICITLY COVERED (in substance, R416–R429) |
+    | 13 | transitive / analogical reasoning | L197, L201 (stubs), L1168, L1171 | "historical associations" (R413) and "novel associations" (R418), temporal graph projection; graph analytics and analogical mapping not traced | IMPLICIT, NOT TRACEABLE (weak) |
+    | 14 | dialectical synthesis | L196, L1250 (stub) | debate/council and adversarial reviewer evaluated as patterns, KaiBench-gated (R263–R310, R272, R370) | EXPLICITLY COVERED (as the debate pattern, R263–R310); the report's experimental disposition applies |
+    | 15 | concept blending | L198, L1252 (stub) | "novel associations" (R418) only | IMPLICIT, NOT TRACEABLE (weak) |
+    | 16 | Global Workspace | L203 (stub), L1175 | one-KAI coherence (R278), cognitive orchestrator (R911); the bidding/serial-awareness design is not traced | IMPLICIT, NOT TRACEABLE |
+    | 17 | predictive empathy | L1256, L1358, L1805 | emotional memory/context (R133, R167), relationship sensitivity (R365); predicting emotional state is not traced | IMPLICIT, NOT TRACEABLE |
+    | 18 | operator/cognitive fingerprint | **L199 "✅ Collecting"**, L1166 (ON), L1249 | preference understanding (R1134), Dainius-authored values (R148); the collection of interaction samples is not traced, including its privacy/retention (R879–R885) | IMPLICIT, NOT TRACEABLE — privacy link needed |
+    | 19 | PUB/WORK modes | L242, L1214, L1225–L1226 | "style coherence" (R1134); the "personality fragmentation risk" warning (R274) could be read against modes. No home or requirement for modes. | **SUBSTANTIVE GAP** |
+    | 20 | Ohana values / Ohana Core | L1178 (OFF), L1193 | owner-specific values layer (R146–R161), "Dainius's values and judgement guide KAI" (R1412); the Ohana name and the moral-fingerprint learning mechanism are not traced | EXPLICITLY COVERED (values layer, R146–R161); mechanism not traced |
+    | 21 | emergent rituals | L214, L1148 (ON), L1780 ([x]) | "recurring routines" appears only as benchmark test data (R1153) | **SUBSTANTIVE GAP** |
+    | 22 | struggle detection | L240, L1189 | none found | **SUBSTANTIVE GAP** |
+    | 23 | anti-annoyance | L241 | none found; proactivity is described only positively (R81, R1327) | **SUBSTANTIVE GAP** |
+    
+    - **Tally:** EXPLICIT 3 · IMPLICIT 11 · SUBSTANTIVE GAP 9 · UNKNOWN 0 (total 23).
+    - **What matters most:** 5 of the 9 gaps, plus 2 implicit items, are features the README says exist **today**:
+      - MARS consolidation (flag ON, [x]);
+      - emergent rituals (flag ON, [x]);
+      - struggle detection (code present);
+      - anti-annoyance (code present);
+      - Temporal Projection ("✅ Live");
+      - cognitive fingerprint ("✅ Collecting").
+    - A redesign built only from this report could drop live behaviour silently.
+    - **Limit:** this is one producer's reading. The verdicts need your adjudication. A second producer's reading would make them stronger.
+    
+    ### (ii) Source check: the fixed list of 27 external claims (E01–E27)
+    
+    **Method:**
+    - The universe is every external claim the report makes, taken from its 17 bracketed citations and its unbracketed external statements. It is fixed at 27 items, listed with exact report lines in entry 176 (block PASS2-CLAIMS-LIST).
+    - A read-only research helper under Orion opened each primary source and recorded the identity/version, URL, licence and an exact quote.
+    - **Orion then spot-checked it independently:**
+      - 34 of 38 quotes were found in the 113 downloaded raw files. The other 4 are: 3 issue-page quotes, which the helper read through a page reader rather than a raw file (declared), and 1 quote with a declared "…" elision whose two halves both match.
+      - Orion re-fetched three sources itself (Kafka, Lemonade and pgvector READMEs). All three are byte-identical to the helper's copies, and the quotes check out. The gfx1151 quote is the README table cell `<b>gfx1151</b> (STX Halo)` with the tags removed.
+    
+    **Result: SUPPORTED 18 · PARTLY 4 · NOT SUPPORTED 0 · UNVERIFIED 5** (total 27). The full table is in this entry, block PASS2-SOURCE-CHECK.
+    
+    - **UNVERIFIED (5):** E01 RFC 8032, E02 RFC 9421, E03 RFC 9530, E10 NIST SP 800-218, E12 MemGPT paper.
+      - This session's network policy blocked rfc-editor.org, datatracker.ietf.org, nist.gov and arxiv.org (DNS failure / proxy 403).
+      - Nothing was filled in from memory. These need re-checking once those hosts are reachable.
+    - **PARTLY (4):**
+      - **E14 Mem0:** extraction and personalisation are stated. "Selection" is not, and v2 is "ADD-only … nothing is overwritten".
+      - **E15 Letta:** the MemGPT lineage is stated; "tiered persistent memory" is not found in the three READMEs inspected.
+      - **E17:** Qdrant is local and filtering; LanceDB is local and multimodal, but "embedded" is not stated.
+      - **E25 llama.cpp:** broad backends are stated; GGUF portability is in the ggml repo; "fine control" is not stated anywhere.
+    - **SUPPORTED, but read with care:**
+      - **E23 (Lemonade allow-list regressions):**
+        - #2319 is a ROCm breakage for gfx103X/110X/120X, **not gfx1151**.
+        - #3662 is gfx1151 "Unsupported GPU", but its allow-list cause is the reporter's guess ("Likely"), and it is not called a regression.
+        - Both are user reports; maintainer confirmation was not checked.
+      - **E24 (Qwen3.6-35B-A3B on Strix Halo):** issue #2977 shows the model **loaded on an AI MAX 395+ and failing** at tool calling under the bundled ROCm build. It shows use, not a working qualified setup.
+      - **E21/E22 (Lemonade, gfx1151 builds):** these are the vendor's own claims. They are build/listing evidence, not qualification on KAI hardware.
+    - **Most other support is the vendor describing itself.** That establishes only that the project says so, not independent performance or fitness for KAI.
+    - **Versions and licences** are recorded per row: all checked projects are open licences (MIT, Apache-2.0, PostgreSQL, CSL-1.0).
+    - **Limit:** commit SHAs could not be recorded (GitHub API 403 for repositories outside this session). Versions come from files inside each repository.
+    
+    **Outside the fixed list → RESEARCH/WATCH (not blockers):**
+    - AutoGen is now in maintenance mode; Microsoft Agent Framework is its successor.
+    - Letta's active source has moved to letta-code.
+    - Mem0 v2 is ADD-only.
+    - LangGraph's default checkpoint deserialiser accepts any Python type (an unsafe-deserialisation risk if spiked).
+    - The gfx1151 llama.cpp binaries are published under a second owner (`aigdat`), so binary provenance must be pinned before any qualification.
+    
+    ### (iii) New versus existing: corrected claim map
+    
+    **CORRECTION to my pass 1 (86edbef3, §2 row 4 and F-1):**
+    - I wrote that the v1.1 Master Plan is "Not in the repository". That is wrong. The v1.1 unified draft is banked verbatim in `kai-pm/HANDOFF_LOG.md` entry 106 (block `KAI-MASTER-PLAN-V1-1-UNIFIED-DRAFT`, 47,743 bytes).
+    - My search covered tracked file names only, not the handoff log's content (R17: the sentence was wider than the search).
+    - With v1.1 inside the universe, several items I called "new to the repository" were already planned.
+    
+    **Universe:** v1.1 draft (entry 106) + `kai-pm/D353…REISSUE.md`, regex-located, then each hit read.
+    
+    | Report item | Where it already exists | Class |
+    |---|---|---|
+    | KaiBench (role-based model qualification) | v1.1 L62, L227, L239 (suites incl. calibration), L368 | EXISTING PLANNED |
+    | restore epoch / anti-rollback | v1.1 L68, L132, L177 | EXISTING PLANNED |
+    | Lemonade as first adapter candidate, gfx1151 listed | v1.1 L228, L292 | EXISTING PLANNED (the report adds issue history; see source check E21–E24) |
+    | Mem0 / Graphiti / Letta as projection candidates | v1.1 L291 ("Needs prototype/benchmark evidence") | EXISTING PLANNED |
+    | Requirements Verification Matrix | v1.1 L252, L488 | EXISTING PLANNED |
+    | synthetic content never masquerades as evidence | v1.1 L84 (principle) | EXISTING PLANNED; the named classes (DREAM_SYNTHETIC, IMAGINED …, R144) are a refinement |
+    | monotonic authority on rollback | v1.1 L203; D353 L83 | EXISTING PLANNED |
+    | E0 calibration with known ± fixtures | v1.1 L254; D353 L63 | EXISTING PLANNED (the report's fixture list, R490–R498, is a refinement) |
+    | OUTCOME_UNKNOWN after lost receipt | v1.1 L83, L111, L139; D353 L62 | EXISTING PLANNED |
+    | `SKIP LOCKED` queue claiming | D353 (1 hit) | EXISTING PLANNED |
+    | model candidates Qwen3.6 / gpt-oss / Mistral | v1.1 L227 | EXISTING PLANNED (the report says so itself, R361) |
+    | stable `KAI-FEAT-` feature IDs | 0 hits in either | **NEW GAP** (genuinely new) |
+    | RFC 9530 body digest | 0 / 0 | **NEW** (reference) |
+    | NIST SP 800-218 SSDF | 0 / 0 | **NEW** (reference) |
+    | Assumption Register | 0 / 0 | **NEW** (a named pre-RAMS artefact) |
+    | 100-concurrent-consume ITC | 0 / 0 | **NEW** (a concrete test design; the duplicate-consume property is in D353) |
+    | KAI-history memory benchmark corpus (R1146–R1163) | not searched as a phrase | UNKNOWN |
+    
+    **Provenance point (D359 §9.1, "REPETITION IS NOT CORROBORATION"):** the report says it used "the README/v1.1/`kai-pm` universe as the mission baseline" (R1418). Where it agrees with v1.1, that is **our plan reflected back, not independent confirmation**. It adds weight only where it brings in something v1.1 did not have.
+    
+    ### (iv) Material unresolved issues, ranked by risk (Orion's ranking; Kai adjudicates)
+    
+    1. **HIGH: silent loss of features the README says work today.**
+       - Six report-unnamed features are claimed live or switched on: MARS consolidation, emergent rituals, struggle detection, anti-annoyance, Temporal Projection ("✅ Live") and cognitive fingerprint ("✅ Collecting").
+       - An architecture drawn from the report alone could drop them without anyone deciding to.
+       - **Control:** no organ redesign is accepted until every one of the 104 features, and each meaningful nested item, has a named destination (your crosswalk requirement).
+    2. **HIGH: the denominator is incomplete beyond the tables.**
+       - The feature universe covers README tables plus four lists. Prose-only abilities and the historical vision (bootstrap master plan, April plan, June v2.1) are not enumerated (your R10/R1).
+       - Until that is closed, "every feature" is unproven.
+    3. **MEDIUM: cognitive fingerprint collects data now, and its privacy is not addressed.** The README says interaction samples are written to `/data/cognitive_fingerprint.jsonl` on every chat (L199, L1249). The report's privacy section (R879–R885) does not link to it. This touches Dainius's family and visitors.
+    4. **MEDIUM: the report's agreement with v1.1 is circular.** The report used v1.1 as its baseline (R1418). Treating its agreement as confirmation would be "REPETITION IS NOT CORROBORATION" (D359 §9.1). Only its genuinely new items add evidence.
+    5. **MEDIUM: open engineering questions are blocked by the pause.** Your F-6 items (memory writers, consume versus external effect, calibrated E0, cross-organ vertical slices, single-node recovery, offline proof) need repository and runtime evidence. Research cannot close them; they wait for D359's order.
+    6. **MEDIUM: final RAMS depends on evidence that D359 places late** (my F-5). The two-stage split is agreed in your 552eefd1; Dainius's S-1 decision is still needed.
+    7. **MEDIUM: technology evidence is mostly vendor self-description, and 5 standard/paper sources are unverified** (see (ii)). No technology choice can rest on the report's citations alone. Lemonade's gfx1151 status is listed and built but shows open user-reported ROCm problems (E23, E24).
+    8. **LOW: research-report byte identity.** The banked text is the Linear readback, not your 72,057-byte reconstruction. It stays labelled.
+    
+    ### (v) Short owner-decision list (for Dainius, after your adjudication)
+    
+    1. **S-1:** which research must finish before the Quality Plan / RAMS — assurance research only (recommended), or the whole-organism technology scan as well.
+    2. **Execution line:** may Orion run read-only analysis scripts over project text (for example, a paragraph-by-paragraph README completeness check for issue 2)? Without it, issue 2 can only be done by hand reading, which is slower and itself less checkable.
+    3. **Reminder carried:** the small current-state index is still waiting for Dainius's decision after this research. Not due yet.
+    END-VERBATIM ORION-PASS2-PACKET
+- EVIDENCE PASS2-SOURCE-CHECK source_check.md: 21911 bytes, sha256 cb6c8456040127e18770a5f4cfd101256c49350b8dd79d089523e1aea9182872, final LF True (added by Orion)  [CMD `sha256sum source_check.md` → cb6c8456040127e1…]
+    BEGIN-VERBATIM PASS2-SOURCE-CHECK
+    # Source check: claims E01–E27 against primary sources
+    
+    Retrieval date for every row: 2026-10-11. Universe: the 27 claims in `claims.json`, no others.
+    Raw copies of every file fetched with curl are kept in `pass2/src/` (113 files), so each quote can be checked again.
+    
+    **Network limit (read first):** in this session only GitHub was reachable. rfc-editor.org, datatracker.ietf.org, ietf.org, httpwg.org, nist.gov (csrc and nvlpubs), arxiv.org (abs and export), postgresql.org, slsa.dev, docs.temporal.io, kafka.apache.org and opentelemetry.io all failed: WebFetch returned `getaddrinfo ENOTFOUND`, and curl returned `CONNECT tunnel failed, response 403`, which the egress policy denied. For that reason:
+    - where a project keeps its official docs or spec source in its own GitHub repository, I read that source (marked "repo source" below);
+    - where no such source exists (RFCs, NIST SP, the arXiv paper), the claim is marked UNVERIFIED.
+    
+    Quote provenance: quotes from repository files were copied exactly from the raw files with grep/sed. Quotes from GitHub issue and release pages (E22 releases, E23, E24) came through WebFetch's page extraction, which says it reproduced them verbatim; I did not see the raw HTML, because issue_read and api.github.com were refused (403) for repositories outside this session.
+    
+    | ID | Claim (short) | Verdict | Vendor claim? | Source identity (title, version/date) | URL | Licence | Exact quote |
+    |---|---|---|---|---|---|---|---|
+    | E01 | RFC 8032 standardises Ed25519 | UNVERIFIED | n/a (standard) | RFC 8032. Could not be opened | https://www.rfc-editor.org/rfc/rfc8032 (also tried datatracker.ietf.org, www.ietf.org/rfc/rfc8032.txt) | n/a | n/a. Fetch error: `getaddrinfo ENOTFOUND www.rfc-editor.org` / `datatracker.ietf.org` / `www.ietf.org`; curl: `CONNECT tunnel failed, response 403` |
+    | E02 | RFC 9421 = standard structure for signing selected HTTP message components | UNVERIFIED | n/a (standard) | RFC 9421. Could not be opened | https://www.rfc-editor.org/rfc/rfc9421 (also tried datatracker, httpwg.org/specs/rfc9421.html) | n/a | n/a. Fetch error `getaddrinfo ENOTFOUND` (all three hosts) |
+    | E03 | RFC 9530 supplies body/content digest semantics | UNVERIFIED | n/a (standard) | RFC 9530. Could not be opened | https://www.rfc-editor.org/rfc/rfc9530 (also tried datatracker) | n/a | n/a. Fetch error `getaddrinfo ENOTFOUND` |
+    | E04 | PG docs: SKIP LOCKED for queue-like consumers; warns it gives an inconsistent view | SUPPORTED | Project's own docs | PostgreSQL docs source `doc/src/sgml/ref/select.sgml`, branch REL_18_STABLE (configure.ac `18.6`). Same text on REL_19_STABLE (`19beta4`) and master (`20devel`) | https://raw.githubusercontent.com/postgres/postgres/REL_18_STABLE/doc/src/sgml/ref/select.sgml | PostgreSQL Licence | "Skipping locked rows provides an inconsistent view of the data, so this is not suitable for general purpose work, but can be used to avoid lock contention with multiple consumers accessing a queue-like table." |
+    | E05 | PG: atomic conditional updates, unique constraints, row locks, ON CONFLICT, RETURNING | SUPPORTED | Project's own docs | PG docs source REL_18_STABLE: `ref/insert.sgml`, `mvcc.sgml` ("Explicit Locking" l.851, "Row-Level Locks" l.1242, WHERE re-evaluation l.349), `ddl.sgml` ("Unique Constraints" l.894), `dml.sgml` ("Returning Data from Modified Rows" l.265) | https://raw.githubusercontent.com/postgres/postgres/REL_18_STABLE/doc/src/sgml/ref/insert.sgml (+ mvcc.sgml, ddl.sgml, dml.sgml on same branch) | PostgreSQL Licence | "`ON CONFLICT DO UPDATE` guarantees an atomic `INSERT` or `UPDATE` outcome; provided there is no independent error, one of those two outcomes is guaranteed, even under high concurrency." (SGML tags removed) |
+    | E06 | Temporal: durable execution, event history, retry policies; signals, timers, long-lived workflows | SUPPORTED | Vendor's own docs | temporalio/documentation repo, default branch HEAD: `docs/encyclopedia/temporal.mdx`, `retry-policies.mdx`, `workflow/workflow-execution/{event,timers-delays,workflow-execution}.mdx`, `workflow-message-passing/sending-messages.mdx` | https://raw.githubusercontent.com/temporalio/documentation/HEAD/docs/encyclopedia/temporal.mdx | MIT (docs repo LICENSE.md) | "Durable Execution in the context of Temporal refers to the ability of a Workflow Execution to maintain its state and progress even in the face of failures, crashes, or server outages." |
+    | E07 | Kafka = distributed event streaming | SUPPORTED | Vendor's own description | apache/kafka README.md, trunk HEAD (gradle.properties `version=4.5.0-SNAPSHOT`) | https://raw.githubusercontent.com/apache/kafka/HEAD/README.md | Apache-2.0 | "Apache Kafka … is an open-source distributed event streaming platform used by thousands of companies for high-performance data pipelines" |
+    | E08 | SPIFFE/SPIRE: SVID issuance, workload/node attestation, short-lived SVIDs, rotation | SUPPORTED | Project's own docs/spec | spiffe/spire README.md + `doc/spire_server.md` (version.go `Base = "1.16.0"`); spiffe/spiffe `standards/SPIFFE_Workload_API.md`, HEAD | https://raw.githubusercontent.com/spiffe/spire/HEAD/README.md ; https://raw.githubusercontent.com/spiffe/spiffe/HEAD/standards/SPIFFE_Workload_API.md | Apache-2.0 (both) | "SPIRE exposes the SPIFFE Workload API, which can attest running software systems and issue SPIFFE IDs and SVIDs to them." (link markup removed) / "The `FetchJWTSVID` RPC allows clients to request one or more short-lived JWT-SVIDs" |
+    | E09 | OTel spec separates signals; trace context propagates across process boundaries | SUPPORTED | Standard (CNCF spec) | opentelemetry-specification `specification/overview.md`, HEAD (latest CHANGELOG release v1.61.0, 2026-09-14) | https://raw.githubusercontent.com/open-telemetry/opentelemetry-specification/HEAD/specification/overview.md | Apache-2.0 | "Signals share a common subsystem – **context propagation** – but they function independently from each other." / SpanContext "MUST be propagated to child Spans and across process boundaries." |
+    | E10 | NIST SP 800-218 SSDF: protect software, well-secured releases, respond to vulnerabilities | UNVERIFIED | n/a (standard) | NIST SP 800-218. Could not be opened | https://csrc.nist.gov/pubs/sp/800/218/final ; https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-218.pdf | n/a | n/a. Fetch error `getaddrinfo ENOTFOUND csrc.nist.gov` / `nvlpubs.nist.gov`. Version not established |
+    | E11 | SLSA gives a supply-chain provenance model | SUPPORTED | Standard (OpenSSF spec) | SLSA spec **v1.2**, `spec/build-provenance.md` and `spec/index.md` on branch `releases/v1.2` (index: "This is **Version 1.2** of the SLSA specification") | https://raw.githubusercontent.com/slsa-framework/slsa/releases/v1.2/spec/build-provenance.md | Community Specification License 1.0 | "It's the verifiable information about software artifacts describing where, when, and how something was produced." |
+    | E12 | MemGPT paper: manages limited context with tiered persistent memory | UNVERIFIED | n/a (paper) | MemGPT, *Towards LLMs as Operating Systems*. Could not be opened. letta-code README links it as arXiv `2310.08560`, but I did not open the paper, so title, authors, date and content are not confirmed | https://arxiv.org/abs/2310.08560 (also export.arxiv.org) | n/a | n/a. Fetch error `getaddrinfo ENOTFOUND arxiv.org` / `export.arxiv.org` |
+    | E13 | Graphiti: temporally evolving entity/relationship graph for agent memory | SUPPORTED | Vendor's own claim | getzep/graphiti README.md, HEAD; pyproject `version = "0.31.0"` | https://raw.githubusercontent.com/getzep/graphiti/HEAD/README.md | Apache-2.0 | "Graphiti is a framework for building and querying temporal context graphs for AI agents." / "A **context graph** is a temporal graph of entities, relationships, and facts" |
+    | E14 | Mem0: automatic memory extraction, selection and personalisation | PARTLY | Vendor's own claim | mem0ai/mem0 README.md, HEAD; pyproject `version = "2.2.1"` | https://raw.githubusercontent.com/mem0ai/mem0/HEAD/README.md | Apache-2.0 | "**Single-pass ADD-only extraction** -- one LLM call, no UPDATE/DELETE. Memories accumulate; nothing is overwritten." / "an intelligent memory layer, enabling personalized AI interactions" |
+    | E15 | Letta: context management with tiered persistent memory (MemGPT lineage) | PARTLY | Vendor's own claim | letta-ai/letta README.md HEAD (says the current source is letta-ai/letta-code); `archive` branch README; letta-ai/letta-code README.md HEAD (latest release v0.34.10, 09 Oct) | https://raw.githubusercontent.com/letta-ai/letta/HEAD/README.md ; https://raw.githubusercontent.com/letta-ai/letta-code/HEAD/README.md | Apache-2.0 (letta and letta-code) | "Letta (f.k.a. MemGPT) is actively developed." / "Agents programmatically rewrite their context to improve and adapt over time" |
+    | E16 | pgvector: vector similarity search in PostgreSQL | SUPPORTED | Vendor's own claim | pgvector/pgvector README.md, HEAD; CHANGELOG top entry `0.8.7 (2026-10-01)` | https://raw.githubusercontent.com/pgvector/pgvector/master/README.md | PostgreSQL Licence | "Open-source vector similarity search for Postgres" |
+    | E17 | Qdrant: local vector search with filtering; LanceDB: local/embedded vector + multimodal | PARTLY | Vendor's own claims | qdrant/qdrant README.md HEAD (Cargo `version = "1.19.2"`); lancedb/lancedb README.md HEAD (latest release v0.40.0, 07 Oct) | https://raw.githubusercontent.com/qdrant/qdrant/HEAD/README.md ; https://raw.githubusercontent.com/lancedb/lancedb/HEAD/README.md | Apache-2.0 (both) | Qdrant: "Qdrant is tailored for extended filtering support" / LanceDB: "Store, query and filter vectors, metadata and multimodal data (text, images, videos, point clouds, and more)." |
+    | E18 | LangGraph: graph workflows, checkpoints, interrupts, resumable agent flows | SUPPORTED | Vendor's own claim | langchain-ai/langgraph README.md + `libs/checkpoint/README.md`, HEAD; `libs/langgraph/pyproject.toml` `version = "1.2.14"` | https://raw.githubusercontent.com/langchain-ai/langgraph/HEAD/README.md ; …/libs/checkpoint/README.md | MIT | "Checkpointers provide a persistence layer for LangGraph: they save graph state at every superstep, enabling human-in-the-loop, memory between interactions, durable execution, and more." |
+    | E19 | MS Agent Framework: composition/tools/integrations; AutoGen: conversation/group patterns; relationship | SUPPORTED | Vendor's own claims | microsoft/agent-framework README.md HEAD (latest release python-1.21.0, 8 Oct 2026); microsoft/autogen README.md HEAD (latest release python-v0.7.5, 30 Sep) | https://raw.githubusercontent.com/microsoft/agent-framework/HEAD/README.md ; https://raw.githubusercontent.com/microsoft/autogen/HEAD/README.md | MIT (both) | AutoGen: "supports common multi-agent patterns such as two-agent chat or group chats." / "Microsoft Agent Framework (MAF) is the enterprise‑ready successor to AutoGen." |
+    | E20 | Ollama: simple local model management and API | SUPPORTED | Vendor's own claim | ollama/ollama README.md HEAD (latest release v0.40.3, 11 Oct) | https://raw.githubusercontent.com/ollama/ollama/HEAD/README.md | MIT | "Ollama has a REST API for running and managing models." |
+    | E21 | Lemonade: local AI server (LLM, speech, TTS, images); OpenAI/Anthropic/Ollama APIs; gfx1151 / Ryzen AI MAX+ Pro 395; Kokoro TTS, Whisper STT | SUPPORTED | Vendor's own claim | lemonade-sdk/lemonade README.md HEAD (latest release v2026.41.1, 7 Oct 2026) | https://raw.githubusercontent.com/lemonade-sdk/lemonade/HEAD/README.md | Apache-2.0 (+ third-party notices in LICENSE) | "Lemonade is the local AI server that gives you the same capabilities as cloud APIs" … "using standard OpenAI, Anthropic, and Ollama APIs." Table row: "gfx1151 (STX Halo)" / "Ryzen AI MAX+ Pro 395" |
+    | E22 | Companion llama.cpp ROCm project publishes current gfx1151 builds | SUPPORTED | Vendor's own claim, plus a release asset I saw listed (not downloaded) | lemonade-sdk/llamacpp-rocm README.md HEAD; releases page: latest b1342, 08 Oct 2026 | https://raw.githubusercontent.com/lemonade-sdk/llamacpp-rocm/HEAD/README.md ; https://github.com/lemonade-sdk/llamacpp-rocm/releases | MIT | "This build specifically targets the following GPU architectures: - **gfx1151** (STX Halo APU) - Ryzen AI MAX+ Pro 395". Release asset: `llama-b1342-ubuntu-rocm-gfx1151-x64.zip` |
+    | E23 | 2026 Lemonade issues show ROCm/backend allow-list regressions | SUPPORTED (as reported by issue authors and commenters) | Third-party user reports on the vendor's tracker | **#2319** "ROCm unavailable for gfx103X, gfx110X and gfx120X", opened 2026-06-19, open, Lemonade 10.8.0. **#3662** "ROCm backend reports "Unsupported GPU" on Ryzen AI Max+ 8065S (Gorgon Halo, gfx1151) while native llama.cpp ROCm works", opened 2026-09-23, open, Lemonade 26.39.1 | https://github.com/lemonade-sdk/lemonade/issues/2319 ; https://github.com/lemonade-sdk/lemonade/issues/3662 | n/a | #2319: "broke the rocm backend for any AMD GPU from the gfx103X, gfx110X and gfx120X families." #3662: "Likely related to gfx-arch allow-list/wildcard matching discussed in #2296, #2319, #2624, #2686, #1990, and #3402." |
+    | E24 | A Lemonade issue shows Qwen3.6-35B-A3B GGUF used on Strix Halo | SUPPORTED | Third-party user report on the vendor's tracker | **#2977** "the builtin ROCM version (b10236) breaks support of tool calling with cline 4.1.x and QWEN3.6 (both 35b-3ba and 27b)", opened 2026-08-08 by MetalKnight, open, Lemonade 11.5.2. GPU/APU field: "AMD AI MAX 395+ 64 GB"; gfx1151 named | https://github.com/lemonade-sdk/lemonade/issues/2977 | n/a | "(Server) Ensuring model loaded: Qwen3.6-35B-A3B-GGUF ctx_size=262144" |
+    | E25 | llama.cpp: portable GGUF, fine control, broad hardware backends | PARTLY | Vendor's own claim | ggml-org/llama.cpp README.md HEAD (latest release v0.6.0, 05 Oct); ggml-org/ggml `docs/gguf.md` HEAD for GGUF | https://raw.githubusercontent.com/ggml-org/llama.cpp/HEAD/README.md ; https://raw.githubusercontent.com/ggml-org/ggml/HEAD/docs/gguf.md | MIT | "enable LLM (and VLM) inference with minimal setup and state-of-the-art performance on a wide range of hardware" / GGUF: "Single-file deployment: they can be easily distributed and loaded" |
+    | E26 | vLLM: sophisticated serving, batching, high-throughput inference | SUPPORTED | Vendor's own claim | vllm-project/vllm README.md HEAD (latest release v0.31.0, 05 Oct) | https://raw.githubusercontent.com/vllm-project/vllm/HEAD/README.md | Apache-2.0 | "State-of-the-art serving throughput" / "Continuous batching of incoming requests, chunked prefill, prefix caching" / "Support for NVIDIA GPUs, AMD GPUs, Intel GPUs" |
+    | E27 | `docker compose config` renders the resolved model; Python `ast`; FastAPI routes/OpenAPI; `pg_dump --schema-only`; pytest collection | SUPPORTED (all five) | Each project's own docs | docker/compose `docs/reference/compose_config.md` HEAD; cpython `Doc/library/ast.rst` main (dev docs); fastapi `docs/en/docs/how-to/extending-openapi.md` HEAD; postgres `ref/pg_dump.sgml` REL_18_STABLE; pytest `doc/en/reference/reference.rst` HEAD | https://raw.githubusercontent.com/docker/compose/HEAD/docs/reference/compose_config.md (others in Notes) | Apache-2.0 / PSF-2.0 / MIT / PostgreSQL / MIT | "`docker compose config` renders the actual data model to be applied on the Docker Engine." / pg_dump: "Dump only the object definitions (schema), not data or statistics." / pytest: "Only collect tests, don't execute them." |
+    
+    ## Notes
+    
+    - **General:** "HEAD" means the default branch as fetched on 2026-10-11. I could not record commit SHAs or commit dates, because api.github.com and `gh api` returned 403 for repositories outside this session. Version numbers come from files inside the repositories (pyproject, Cargo, configure.ac, version.go, CHANGELOG). "Latest release" tags and dates come from WebFetch of the GitHub releases pages; some of those pages do not show the year.
+    - **E01–E03, E10, E12:** I made two or more attempts on different hosts (listed in the table). All failed on DNS or proxy policy. Nothing was filled in from memory. Once the network allows, these five need re-checking against rfc-editor.org, nist.gov and arxiv.org.
+    - **E04/E05/E27 (PostgreSQL):** read from the project's own SGML documentation source on its GitHub mirror, not the rendered postgresql.org pages. E05 "conditional UPDATE": mvcc.sgml l.349 says the WHERE clause "is re-evaluated to see if the updated version of the row still matches the search condition."
+    - **E06:** a Retry Policy is not attached to a Workflow Execution by default; activities have one by default (retry-policies.mdx l.25). The claim as worded is still supported.
+    - **E07:** the source is the Kafka repository README, not kafka.apache.org/documentation, which could not be reached.
+    - **E08:** node attestation is supported by spire_server.md l.12: "NodeAttestor | Implements validation logic for nodes attempting to assert their identity." Rotation is supported by the Workload API ("such as an SVID rotation").
+    - **E11:** read from the `releases/v1.2` branch on GitHub, not slsa.dev. I did not check whether a release later than v1.2 exists.
+    - **E14:** extraction and personalisation are stated. *Selection* (deciding what deserves memory) is not stated in the README, and the current design says "ADD-only … nothing is overwritten". That cuts against selection more than it supports it. Inspected range: README only.
+    - **E15:** MemGPT lineage is stated. "Tiered persistent memory" is **not** stated in any of the three inspected READMEs (letta HEAD, letta `archive` branch, letta-code HEAD), which talk about "memory blocks" and MemFS. docs.letta.com was not inspected. This is NOT_FOUND_IN_INSPECTED_RANGE, not a contradiction.
+    - **E17:** Qdrant filtering is stated, and local running is stated ("run the container… locally"; Qdrant Edge "runs inside the application process"). For LanceDB, local and multimodal are stated ("runs locally or in your cloud"), but "embedded" does not appear in the README. Inspected range: README only.
+    - **E19:** MAF tools and integrations are stated ("tools, middleware, providers"; Foundry, Azure OpenAI, OpenAI, GitHub Copilot SDK). The relationship is stated by both READMEs: AutoGen is in **maintenance mode** and MAF is its successor. MAF describes itself as a "production-ready release". The report rates MAF "Research/spike, not baseline". That is the report's judgment, and the claim checked here does not cover it.
+    - **E22:** the lemonade-sdk/llamacpp-rocm README links its downloads to `github.com/aigdat/llamacpp-rocm/releases`. Both release pages showed the same b1342 / b1341 / b1340 builds (08 / 07 / 06 Oct 2026). For b1341 and b1340, WebFetch could not expand the asset lists, so a gfx1151 asset was seen only for b1342.
+    - **E23:** found with semantic `search_issues` over lemonade-sdk/lemonade (42 and 53 total hits for two queries). I read #2319, #3662, #1787 and #2624, not every hit. #2319 is called a breakage ("broke") by its reporter. A commenter attributes it to commit 2a7aa18 (PR #2093), which removed `ROCM_ARCH_MAPPING`. That issue concerns gfx103X/110X/120X, **not gfx1151**. #3662 does concern gfx1151, but it is not described as a regression, and its allow-list cause is the reporter's suspicion ("Likely"). I did not inspect maintainer confirmation or fix status. #1787 (2026-05-03) is a ROCm regression on gfx1201 caused by missing HIP support in the default channels, not by an allow-list.
+    - **E24:** the model strings appear in server log lines in the issue body, written by the issue author. The issue itself reports a *failure* (tool calling broken under the bundled ROCm build), not a qualified working setup.
+    - **E25:** broad backends are stated (17-row "Supported backends" table). GGUF portability is stated in the ggml repository's `docs/gguf.md`; the llama.cpp README mentions GGUF only in model names. "Fine control" is an evaluative phrase that no source states.
+    - **E27 other URLs:** https://raw.githubusercontent.com/python/cpython/HEAD/Doc/library/ast.rst ("The `ast` module helps Python applications to process trees of the Python abstract syntax grammar."); https://raw.githubusercontent.com/fastapi/fastapi/HEAD/docs/en/docs/how-to/extending-openapi.md ("`app.routes` is a lower-level route tree." / "FastAPI will traverse that route tree to collect the effective path operations."); https://raw.githubusercontent.com/postgres/postgres/REL_18_STABLE/doc/src/sgml/ref/pg_dump.sgml; https://raw.githubusercontent.com/pytest-dev/pytest/HEAD/doc/en/reference/reference.rst. docs.docker.com could not be reached. The Docker text is the CLI reference generated in the docker/compose repository (`<!---MARKER_GEN_START-->`).
+    
+    Counts: SUPPORTED 18 / PARTLY 4 / NOT SUPPORTED 0 / UNVERIFIED 5 (total 27)
+    
+    - SUPPORTED: E04 E05 E06 E07 E08 E09 E11 E13 E16 E18 E19 E20 E21 E22 E23 E24 E26 E27
+    - PARTLY: E14 E15 E17 E25
+    - UNVERIFIED: E01 E02 E03 E10 E12
+    
+    ## OUTSIDE SCOPE (RESEARCH/WATCH)
+    
+    - AutoGen README: "AutoGen is now in maintenance mode. It will not receive new features". Any AutoGen-pattern work should cite MAF as the maintained line.
+    - letta-ai/letta README: "The current source code lives in `letta-ai/letta-code`", and the V1 API server is retired to the `archive` branch. Any Letta benchmark must name which line it tests.
+    - Mem0 v2 README: "Single-pass ADD-only extraction -- one LLM call, no UPDATE/DELETE". This matters to the report's "admission/projection candidate" framing.
+    - LangGraph checkpoint README: "By default the serializer allows any Python type found in checkpoint data". This is a deserialisation risk if LangGraph is spiked (set `LANGGRAPH_STRICT_MSGPACK=true`).
+    - llamacpp-rocm release links point to `aigdat/llamacpp-rocm` while the repository is `lemonade-sdk/llamacpp-rocm`. Ownership and provenance of the gfx1151 binaries should be pinned before qualification.
+    END-VERBATIM PASS2-SOURCE-CHECK
+- EVIDENCE PASS2-ORION-SPOTCHECK spotcheck.txt: 1517 bytes, sha256 53a1e626c6613143fe82ae0bcfe2e1042e4e4e8c2b9ac490c416ac0e1ebde5c0, final LF True (added by Orion)  [CMD `sha256sum spotcheck.txt` → 53a1e626c6613143…]
+    BEGIN-VERBATIM PASS2-ORION-SPOTCHECK
+    UNIVERSE: the 27 table rows; quotes = text inside straight double quotes in the 'Exact quote' column; corpus = all 113 downloaded raw files; normalisation strips tags, link markup, ** and backticks, collapses whitespace.
+      NOT IN RAW FILES: E07: Apache Kafka … is an open-source distributed event streaming platform used by thousands of companies for high-
+      NOT IN RAW FILES: E23: broke the rocm backend for any AMD GPU from the gfx103X, gfx110X and gfx120X families.
+      NOT IN RAW FILES: E23: Likely related to gfx-arch allow-list/wildcard matching discussed in #2296, #2319, #2624, #2686, #1990, and #3
+      NOT IN RAW FILES: E24: (Server) Ensuring model loaded: Qwen3.6-35B-A3B-GGUF ctx_size=262144
+    quotes checked 38, found in raw files 34, not found 4
+    
+    Orion independent re-fetch (curl, 2026-10-11):
+      E07 part in Orion's Kafka README: 'Apache Kafka' True
+      E07 part in Orion's Kafka README: 'is an open-source distributed event streaming platform used ' True
+      E21 in Orion's Lemonade README: 'gfx1151 (STX Halo)' False
+      E21 in Orion's Lemonade README: 'Ryzen AI MAX+ Pro 395' True
+      E21 in Orion's Lemonade README: 'using standard OpenAI, Anthropic, and Ollama APIs' True
+      E16 in Orion's pgvector README: True
+      kafka_README.md: sha256 5550c38ce0519656…, identical helper copies: ['src/kafka_README.md']
+      lemonade_README.md: sha256 56fa2edc78cbace8…, identical helper copies: ['src/lemonade_README.md']
+      pgvector_README.md: sha256 19cebadeeb8d3181…, identical helper copies: ['src/pgvector_README.md']
+    END-VERBATIM PASS2-ORION-SPOTCHECK
+- EVIDENCE PASS2-SOURCE-FILES-MANIFEST src_manifest.txt: 10231 bytes, sha256 e62896f3bec47daf7982e329b81a4be4003838fd3962cc711a9c4da651175934, final LF True (added by Orion)  [CMD `sha256sum src_manifest.txt` → e62896f3bec47daf…]
+    BEGIN-VERBATIM PASS2-SOURCE-FILES-MANIFEST
+    c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383  ./autogen_LICENSE
+    5d300aa3304aeecf1a48f68ac76a1af255b8645d666b8aa154790cb30f1dbb94  ./autogen_README.md
+    58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd  ./compose_LICENSE
+    06315e29049d07541511371c186e14f019baab0a138f7c84440f1cc7ec60ef3d  ./compose_config.md
+    b0e25a78cffb43f4d92de8b61ccfa1f1f98ecbc22330b54b5251e7b6ba010231  ./cpython_LICENSE
+    6b852484d7a4b6706fc3672eb07352ec3662ee0e4fb3d33f21b6a773471716dc  ./cpython_ast.rst
+    d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed  ./dockerdocs_config.md
+    4ec89ffc81485b97fec584b2d4a961032eeffe834453894fd9c1274906cc744e  ./fastapi_LICENSE
+    96ed076601792a2c2564b8453e85d094b84c25d6b347be4dec70135fe179da2b  ./fastapi_metadata.md
+    5c685bf0627b38937f38dce0a8365f1070559465868c1fa7ca8f7c27c037e798  ./fastapi_openapi_extend.md
+    1dead27b6a522709f0127d194e58c21dbbbf00ba1c64fe37c54d1a9048b05020  ./ggml_gguf.md
+    2825300b20d7b951209835a4a331f29e24725a39d65168e4b831df53aa372650  ./graphiti_LICENSE
+    72c09aa0f12b7835f8c2919000788bca43306cf847269d4c3a7f35c957218689  ./graphiti_README.md
+    b95a5450b3dbd705541da5a1006fea79ee61067a6a5287bd1e1b72c1d5a0e054  ./graphiti_pyproject.toml
+    cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30  ./kafka_LICENSE
+    5550c38ce0519656f04aab69250ae7cdff499040bcb67c95bfb34f1b0dfc7e9a  ./kafka_README.md
+    d5976f9464d803d928be998e7f1bc2910d8ec1c4bac5f10ba838de074fc4c7ca  ./kafka_gradle.properties
+    297937ee09f793c7b75246339ae5d50c1a4a603c05c2050d5221f7052052b5c5  ./lancedb_Cargo.toml
+    58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd  ./lancedb_LICENSE
+    1bc4fef6b6dc7919593d05c6a4fda051fd5d09450bb78ca4022af48f986c9cde  ./lancedb_README.md
+    d9bb52f2e3540d60ff50d8f0f5b6ba649b7fd346948c4c3d086c8afb120763c7  ./langgraph_LICENSE
+    3a13e257af1216962d53d72414a7f44ac1fc5cea34d994bdff60ea2a3b045933  ./langgraph_README.md
+    efedc0a489d4ab9147d69c8575a9cfd2344d01040322ec6330302887c65aa80e  ./langgraph_checkpoint_README.md
+    fb81b0a8f8da9e6d9d570f5e78143966e8c96c79adaf6d420fe2b6a464ae3c03  ./langgraph_pyproject.toml
+    83f746cbc5a64bc4f93a0f20304d1a50403bdd6e7f5e7bf739854caf6d3018a4  ./lemonade_LICENSE
+    56fa2edc78cbace80bf7c81f00d93a676a49099eb42cfff4421d000e7082fa62  ./lemonade_README.md
+    984c6db99fc6609803108dfc196762118662cd94b82a456dd9217583f18f3612  ./letta_LICENSE
+    1d624e8fd383c1198c8d42da87b055d591a5760e19607692eb46bbbfe2a58f03  ./letta_README.md
+    41722ff4c19be2ca7b7a36e1e9fdbfe09d5003f9c74defca74d7ee50b2ec8073  ./letta_archive_README.md
+    d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed  ./letta_pyproject.toml
+    036e78b9d7dd33ae5b378fdda973b4aad7901c8d8371a0ae40fae1f6659a89d0  ./lettacode_LICENSE
+    61811b022086eeb9d0bdab91cce960f193e9b1bec544c36f64cf6a1f5eb9382c  ./lettacode_README.md
+    94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d  ./llamacpp_LICENSE
+    dc2d34687c844ecf929d9e9a9c9c78e8023b52abf3b2b3d039600c79016673b6  ./llamacpp_README.md
+    97a58a014be2386c149a4c754003cdb2b480e484049477758fa933774d77049b  ./llamacpp_build.md
+    14e32ba54b95fc1b064a510ad7103b4593b35de776628c228ffc9f5cb1b23e03  ./llamacpprocm_LICENSE
+    40502c57871c57e7ccc2b7f443d7725af2eda8c6ce0ec9228de6b1139737af7d  ./llamacpprocm_README.md
+    c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383  ./maf_LICENSE
+    09f5d446e64a0e7e34ce2d6a7f5acbf1580317f943be83c60676daa1e070d514  ./maf_README.md
+    0bbcbe931c353293a2fafce08326181dfeea0e568c566afd4ce8337a70f5e219  ./mem0_LICENSE
+    7509347d34a767a2ef37ceb6cf6c714de9e8d84fe66ad5eea92bbae824a8fbeb  ./mem0_README.md
+    d4bc078a05cc7b9d677bbf4d0b262cfc532495b5aadeded053ac84fd90b6e974  ./mem0_pyproject.toml
+    5934ed2ce0d15154bcdb9c85203210abac0da4314af34081e36df4599f90b226  ./ollama_LICENSE
+    bda5d9ac28354e3effc6cb7059672425b87fdbc760051918d17022a0b7aeeeec  ./ollama_README.md
+    5c2a53b7fbe3449a1e792f7ef7d0884dbf16505692257c7a797982d7fb824d7b  ./otel_CHANGELOG.md
+    c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4  ./otel_LICENSE
+    6b0b9825b6c06dc42b2bd26665bc695536e700beed337dde930b940e31b1e79e  ./otel_overview.md
+    ce1919d9236f2e71672660e1a347146472e966e4d19b77fde5ae345dd1db6ec7  ./pg18_ddl.sgml
+    7d63ea98c09b08908ec9e038a8a2ec3d5d34ee66f9e79a9c10c82dbe0c321cf7  ./pg18_dml.sgml
+    f93403779fb1d980cd5995a1e2741bbdae8404584407610f9aba33ec4724a39f  ./pg18_insert.sgml
+    4b7bf77ee0af4b86052330ff2421d567df3604b75fe7d4f522bec84fdea87340  ./pg18_mvcc.sgml
+    4ba2f79f2a2d5d8b63baa7aa94ef3ca4a2a8dccd8603427a31beaae38061f1c5  ./pg18_pg_dump.sgml
+    47dd724cd724bd77478215a4853aa1f985996a0e5bba9b2451a1ad1ebb6e51fc  ./pg18_update.sgml
+    6a84060a4c90dbaf97ec1ab5f356e075e2ea4e8046dd8f9ffe3ca613b4f44b01  ./pg_configure.ac
+    b4099e01d760d08bff5bdba8c9d0a41ca4b54b648415e9cecdaff448817d1585  ./pg_ddl.sgml
+    a94031bb345ccf10d1fb4d449af3af4d4afcf0ded2c2727d017757e77677aeea  ./pg_dml.sgml
+    962624a83ed9053d2427d6f0501c7babae47db34bd739e697202ac99c8cad35d  ./pg_dump.sgml
+    138bc04f2c53dfdda71d9ee43c1a6bb48f524d4cb0fc3d27bf7b78b4436a9b01  ./pg_insert.sgml
+    02542fc297db5b5932858b609cd4bc8f815453cd33ca6e7232a5cc9046e585a5  ./pg_mvcc.sgml
+    5025ac9a4053c8a92726628b24d173552c7d699291ea7181f751c16fe58476a5  ./pg_select.sgml
+    300d0d5eb2bc5b7a1ef69f528c2a673c11819bb4dc975f9a7f82dff7fe2c560d  ./pg_select_REL_18_STABLE.sgml
+    d0cb56bb00287cd7d896159434f25adab301fb9aa391736830f64bc1e3dd47f1  ./pg_select_REL_19_STABLE.sgml
+    47dd724cd724bd77478215a4853aa1f985996a0e5bba9b2451a1ad1ebb6e51fc  ./pg_update.sgml
+    2a33406b276433ec78b998fe1f6d1200f05c638f44fa9ac6517315b290c85aa4  ./pgvector_CHANGELOG.md
+    6bba9ebeb73e27477463b05e5ef1bf303bccbddb3db9bbc95905d351604d6a87  ./pgvector_LICENSE
+    19cebadeeb8d3181d01ef00399674ec41bd2f0363850cdccc7685d4260c5a1c6  ./pgvector_README.md
+    ca836a5f9ecca3b2f350230faa20a48fb8b145653b5568d784862df864706b9b  ./pytest_LICENSE
+    fe8d58220365cb1b2eb6b3af953e4301680977a754457e6d883106eb3937095c  ./pytest_reference.rst
+    b2ac180feff59141cb09a3f12546f46a3369a8941fd994c82be33abf12394623  ./pytest_usage.rst
+    bc53e1604f8dae3edf1c45a211fcf1f49614b6d67343cf6fd506647079d19e6e  ./qdrant_Cargo.toml
+    210b508429e913d9de5301f90508bc2cbf5b2281de5b45e607c04d58f0f3bd8f  ./qdrant_LICENSE
+    f1455d12252bf40235ad0128d8e98b2cd6d42583e441ac832b01f4daf08df2e4  ./qdrant_README.md
+    8a77569a635525cfd036b7847a01f142301ec3ce843f80fa065a892a2d073857  ./slsa12_spec_about.md
+    182ab5cf823c374874136371466ba43f99f0a9ba87a8046757d26a2ed74854a0  ./slsa12_spec_build-provenance.md
+    34b57d8975d02fde8519f857da3fb61bc184d110800d257e4228e0072547ff8f  ./slsa12_spec_build-track-basics.md
+    9f5d7a2d247e8a23cfc9d26c152015ba786ba7542384631676ade5cba017465f  ./slsa12_spec_index.md
+    89cae36d81bdd593b728ca09ff6804e87b07a762a36704c591ab784da5c9395e  ./slsa12_spec_provenance.md
+    c306d645caaa060cc9ca5d987a819f2860fec74fccbe7c06e5a55f82ab38818b  ./slsa12_spec_terminology.md
+    d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed  ./slsa_LICENSE
+    aeff12d58ae18e38178775a9514cba2bcc6f244f4d0d724a099531ca99118952  ./slsa_README.md
+    d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed  ./slsa_docs_spec_v1.0_about.md
+    d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed  ./slsa_docs_spec_v1.0_index.md
+    d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed  ./slsa_docs_spec_v1.0_provenance.md
+    d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed  ./slsa_docs_spec_v1.1_about.md
+    d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed  ./slsa_docs_spec_v1.1_index.md
+    d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed  ./slsa_docs_spec_v1.1_provenance.md
+    d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed  ./slsa_docs_spec_v1.2_about.md
+    d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed  ./slsa_docs_spec_v1.2_index.md
+    d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed  ./slsa_docs_spec_v1.2_provenance.md
+    39ce806fa2687a8d8d6a8a8d57bfec8b2fc29fe2a9ae2023020390aabb2de82d  ./spiffe_LICENSE
+    b24ae474c28fc3772ee602a8ac3c4ef5934e43fdcca7cc32698c05643499c847  ./spiffe_README.md
+    eaeabf4075fe4e7b75e19c0819bf676fd3a6d7673d3b36750f53a766ef93495b  ./spiffe_SPIFFE.md
+    a7dc93995458b750ad6622b3520e91aba21ff9712fa9ec3d16cefce234c9176e  ./spiffe_X509SVID.md
+    87450640b9f93a45a11aeb69b5093c574169621e5c6ebf36a6ad07c3ff6a96fb  ./spiffe_wlapi.md
+    39ce806fa2687a8d8d6a8a8d57bfec8b2fc29fe2a9ae2023020390aabb2de82d  ./spire_LICENSE
+    7d9bcc916751a44905c66ee389a1a0d5a37545b2b206d19578c973bd8d26abc9  ./spire_README.md
+    20ee51897aa8084552eb9cb484da5f97e8a6738e2c8f10ada6941f627f025e07  ./spire_server.md
+    264cf1b5565efc46c33558e82cd95f6174d1609d8bd4868e3763df353af69e43  ./spire_version.go
+    e807d852b395ebd320881f256ac22d15631e0004617fbf8b3450e04651fa0b7a  ./temporal_LICENSE.md
+    d3eb612f723c1d0b1949e2bb91de8c203353b484db3f92050fed61a36c0dfe90  ./temporal_README.md
+    d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed  ./temporal_docs_encyclopedia_workflow-execution_event.mdx
+    d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed  ./temporal_docs_encyclopedia_workflow-message-passing_index.mdx
+    531d2ab740e6b11729f7c5eafe34d142120afbe7ba1e9aac98fe9be3b5fa4b39  ./temporal_docs_encyclopedia_workflow-message-passing_sending-messages.mdx
+    d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed  ./temporal_docs_encyclopedia_workflow_timers.mdx
+    a2504ab90683a6ca711ba6cbbc59ebc56eb61e64cd6084ca91f275cb28fd4b79  ./temporal_docs_encyclopedia_workflow_workflow-execution_event.mdx
+    d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed  ./temporal_docs_encyclopedia_workflow_workflow-execution_index.mdx
+    558b2f76b24ca24a4827b063a2d64619759725d7016fa423995bfaac4f96d7d9  ./temporal_docs_encyclopedia_workflow_workflow-execution_timers-delays.mdx
+    4c5516e886ea283cfec97277c071da118da8d7a013df98d6e37a08111e68e8fc  ./temporal_docs_encyclopedia_workflow_workflow-execution_workflow-execution.mdx
+    e3ccce335b4fedbf73c3298bd8ca87e2395bd6ee190958572dd45d7569140193  ./temporal_durable.mdx
+    d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed  ./temporal_eventhistory.mdx
+    f9bcb83a2ee256c6fe32fb02bf60d41ddf087f4cfa406507e347fd05779b1bc9  ./temporal_retry.mdx
+    c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4  ./vllm_LICENSE
+    4dc7399323b9660117f8cc1226afb7a81cdbb912dbb4ae74b66d89052417d11c  ./vllm_README.md
+    END-VERBATIM PASS2-SOURCE-FILES-MANIFEST
+
+### 6. Next authorised step
+
+- Post the packet to DAI-10 as banked; verify posted == banked; report to Dainius in plain words with the two decisions and the network option  [CONVERSATION 2026-10-11 Dainius relaying Kai, "Orion can proceed with the authorised, read-only second research pass. The engineering hold remains unchanged."]
+
+### 7. What I am unsure of
+
+- The 23 dispositions are one producer's judgement until Kai adjudicates  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
