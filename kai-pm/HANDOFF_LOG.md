@@ -64733,3 +64733,116 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-11T15:15:26Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-11T15:15:26Z  [CMD `date -u +%FT%TZ` → 2026-10-11T15:15:26Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 7a344a8ead1d49307612f9ec4cec4b23719d3b37  [CMD `git rev-parse HEAD` → 7a344a8ead1d49307612f9ec4cec4b23719d3b37]
+- tree: d8361f7105c74e9795eb674ed858a593c4af81f5  [CMD `git rev-parse HEAD^{tree}` → d8361f7105c74e9795eb674ed858a593c4af81f5]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 7a344a8ead1d49307612f9ec4cec4b23719d3b37  [CMD `git ls-remote --heads origin` → 7a344a8ead1d49307612f9ec4cec4b23719d3b37]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 150  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 150]
+
+### 1. The four states
+
+- physical: unchanged since entry 150 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Orion reviews Kai's amended R21 (do not edit CLAUDE.md until Orion agrees the exact amended text; then only that bounded change with a mechanical diff proof); Orion re-checks the two item-13 fixes; Orion ACK/AMEND/HOLDs the proposed Best-Practice Research & Reconciliation gate. No engineering authority  [CONVERSATION 2026-10-11 Dainius relaying Kai, "good outside idea → check the gap → adapt it to KAI → peer agreement → bounded implementation → proof"]
+- evidence: Kai's message relayed by Dainius, preserved below  [CMD `cat .git/kai-ruling-capture/6a729158ffd4e0ef.json` → flagged long(4196)]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Kai (relayed by Dainius) · 2026-10-11 · R21 amended (done+check before substantive work; scope with unrelated defects reported; simplest sufficient solution without banning justified one-off abstractions; ask when ambiguity would materially change scope/authority/safety/evidence/acceptance; exception: evidence capture, verbatim instruction capture and STOP/HOLD records never delayed); Technology & Borrowing Register accepted and widened to methods, patterns, research claims and practices, first entry KEEP AS CONCEPT / ADAPT; proposed Best-Practice Research & Reconciliation Pass before freezing the Quality Plan / assurance system, dispositions KEEP/HARDEN/ADAPT/REJECT/RESEARCH-WATCH; PRE-RAMS HOLD continues pending Orion's item-13 re-check. Planning coordination, not a Dainius ruling; verbatim in section 5 ⚠ UNBANKED  [CONVERSATION 2026-10-11 Dainius relaying Kai, "good outside idea → check the gap → adapt it to KAI → peer agreement → bounded implementation → proof"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: CLAUDE.md edit until Orion has AGREED the exact amended R21 text  [CONVERSATION 2026-10-11 Dainius relaying Kai, "good outside idea → check the gap → adapt it to KAI → peer agreement → bounded implementation → proof"]
+- HELD: PRE-RAMS; R11; engineering per entry 99  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- None new  [CMD `handoff.py check` → findings=0]
+
+### 5. Incidents and corrections
+
+- Credential scan (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py kr_scan.json` → TOTAL HITS 0]
+- EVIDENCE KAI-R21-AMEND-AND-RESEARCH-GATE kai_r21_research.txt: 4279 bytes, sha256 20c8a67029369335559276cc61b1840ba4daeeb0b24fc503fc670365f2bc4628, final LF True (added by Orion)  [CMD `sha256sum kai_r21_research.txt` → 20c8a67029369335…]
+    BEGIN-VERBATIM KAI-R21-AMEND-AND-RESEARCH-GATE
+    I’ve reviewed Orion’s proposal and sent back a tighter version rather than rubber-stamping it.
+    
+    The core idea is good and worth adopting, but I changed four things so it doesn’t become another rigid rule that causes trouble later. The agreed direction I’ve proposed is:
+    
+    * define what “done” means and how it will be checked before substantive work starts;
+    * define the authorised scope and report unrelated defects instead of quietly fixing them;
+    * use the simplest sufficient solution, but don’t ban one-off abstractions where isolation, security, testability or clarity genuinely justify them;
+    * ask when ambiguity would materially change scope, authority, safety, evidence or acceptance criteria, rather than stopping for harmless wording differences.
+    
+    I also added an explicit exception so evidence capture, verbatim instruction capture and STOP/HOLD records are never delayed by this rule.
+    
+    I accepted Orion’s idea for the Technology & Borrowing Register, but strengthened it. It should not only track software or frameworks; it should also capture useful methods, patterns, research claims and operating practices we borrow from elsewhere. That gives us a controlled way to keep learning from GitHub, papers, TikTok discoveries, NASA/Silicon Valley practices, other agent systems, etc., without letting random ideas silently become architecture.
+    
+    The first entry will be this Karpathy-inspired rule set as KEEP AS CONCEPT / ADAPT, not “copy the file.”
+    
+    Orion has my exact amended R21 wording on DAI-10 now. I told him do not edit CLAUDE.md yet. If he agrees with the amended text, he can make only that exact bounded change and mechanically prove the diff.
+    
+    Separately, the PRE-RAMS HOLD is still in place while Orion independently re-checks the two paperwork fixes I made earlier. So the two tracks remain properly separated:
+    
+    R21 improvement → Orion agreement → bounded rulebook change
+    
+    and
+    
+    PRE-RAMS item 13 → Orion independent re-check → then your narrow hold-release decision
+    
+    That is the standard we want now: good outside idea → check the gap → adapt it to KAI → peer agreement → bounded implementation → proof. Not “saw something clever, copied it.”Done. Orion has it in DAI-10 as a formal KAI → ORION instruction.
+    
+    I tightened your point into a controlled prerequisite: before we freeze the Quality Plan / RAMS / ITP / ITC / HOLD / WITNESS / NCR / LTQR system, we run a Best-Practice Research & Reconciliation Pass. That research will deliberately compare what we are designing against current NASA/high-assurance systems engineering, serious software/SRE practice, current AI-agent assurance/TEVV, supply-chain security, autonomy control, memory-security research, independent verification and relevant open-source/industry mechanisms.
+    
+    The important safeguard is that we are not collecting clever ideas for the sake of it. Every candidate has to answer: what risk does it solve, do we already solve it, is it genuinely better, does it create duplicate bureaucracy or authority, is it appropriate for a one-person sovereign KAI, where would it live, and what evidence would prove it works. The disposition will be KEEP / HARDEN / ADAPT / REJECT / RESEARCH-WATCH.
+    
+    I also made the sequencing explicit:
+    
+    current framework → deep research → gap analysis → reconcile improvements → Orion feasibility/repository check → DeepSeek adversarial attack → independent review → then finalise/freeze the assurance system.
+    
+    Not:
+    
+    write RAMS now → discover better engineering practice afterwards → rewrite everything.
+    
+    PRE-RAMS itself remains HOLD until Orion finishes his current independent check. Even once that narrow hold is released, we can draft the Quality/Assurance documents, but I have proposed that we do not freeze the final assurance framework until this research pass is complete.
+    
+    That is the smarter route. We have spent a year and a half learning expensive lessons; this is exactly the point where we should convert those lessons plus the best available 2026 practice into the system that governs everything we do afterwards.
+    
+    Orion has been asked to ACK / AMEND / HOLD the research gate and flag any conflict before we make it a controlled prerequisite. No engineering authority has been opened.
+    END-VERBATIM KAI-R21-AMEND-AND-RESEARCH-GATE
+
+### 6. Next authorised step
+
+- Read DAI-10 for the exact amended R21 and the research-gate instruction; re-check item 13  [CONVERSATION 2026-10-11 Dainius relaying Kai, "good outside idea → check the gap → adapt it to KAI → peer agreement → bounded implementation → proof"]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff.py check` → findings=0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
