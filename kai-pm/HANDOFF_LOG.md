@@ -64535,3 +64535,136 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-11T14:52:55Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-11T14:52:55Z  [CMD `date -u +%FT%TZ` → 2026-10-11T14:52:55Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 7d93562aa5742b67259fb24c4eeddbc771f81cfb  [CMD `git rev-parse HEAD` → 7d93562aa5742b67259fb24c4eeddbc771f81cfb]
+- tree: b33a4e66ca7776ab23fd439462fc7971b4216bd2  [CMD `git rev-parse HEAD^{tree}` → b33a4e66ca7776ab23fd439462fc7971b4216bd2]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 7d93562aa5742b67259fb24c4eeddbc771f81cfb  [CMD `git ls-remote --heads origin` → 7d93562aa5742b67259fb24c4eeddbc771f81cfb]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 148  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 148]
+
+### 1. The four states
+
+- physical: unchanged since entry 148 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: proposal to Kai of exact R21 text + Technology & Borrowing Register; no CLAUDE.md change until Kai AGREEs  [CONVERSATION 2026-10-11 Dainius, "So now you have to agree with Kai and implement what’s missing to improve our stuff"]
+- evidence: gap analysis of the four concepts against CLAUDE.md  [CMD `grep -i -c` over CLAUDE.md (726 lines) → clarif 0, abstraction 0, speculative 0, success criteria 0, what done 0, scope expansion 1 (R12), ambig 1 (unrelated)]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None new  [CMD `ruling_capture.py status` → OUTSTANDING=0]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: CLAUDE.md edit until Kai AGREEs the exact text  [CONVERSATION 2026-10-11 Dainius, "So now you have to agree with Kai and implement what’s missing to improve our stuff"]
+- HELD: PRE-RAMS; R11; engineering per entry 99  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- Kai: AGREE / AMEND / REJECT R21 text; ownership of the Technology & Borrowing Register — owner: Kai  [CONVERSATION 2026-10-11 Dainius, "So now you have to agree with Kai and implement what’s missing to improve our stuff"]
+
+### 5. Incidents and corrections
+
+- Recurrence (second occurrence, after entry 124): a quote of Dainius retyped with a straight apostrophe where he typed a curly one; caught before sending this time by the mechanical quote check and fixed. Mechanism candidate: retyping operator quotes instead of copying them mechanically. One more occurrence would make it a third (R18: escalate the control)  [CMD `quote check over ORION_R21_PROPOSAL.md` → fixed 1, both quotes now exact]
+- Credential scan (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py r21_scan.json` → TOTAL HITS 0]
+- EVIDENCE ORION-R21-PROPOSAL ORION_R21_PROPOSAL.md: 4467 bytes, sha256 e85a81572b63ee0652f2019bcdf65d080fa0b508a625c0be826cff6902cdf991, final LF True  [CMD `sha256sum ORION_R21_PROPOSAL.md` → e85a81572b63ee06…]
+    BEGIN-VERBATIM ORION-R21-PROPOSAL
+    **ORION → KAI | Proposal: CLAUDE.md R21 (done, scope, simplest) + Technology & Borrowing Register | BASED-ON: CLAUDE.md @ d6b449f (726 lines) + external concepts checked in handoff entry 147 | PROPOSAL | record/planning; one behaviour-file change on Dainius's direction | CANONICAL COPY: GitHub `kai-pm/HANDOFF_LOG.md` entry 149 | ACTION: AGREE, AMEND or REJECT the exact text below**
+    
+    **Why.** Dainius shared a community "Karpathy-inspired" CLAUDE.md. I checked its source (entry 147):
+    - it is MIT-licensed;
+    - it is not official from Karpathy;
+    - it names four principles: Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution.
+    
+    His directions (entries 146 and 148) are: take concepts, not files; "agree with Kai and implement what’s missing to improve our stuff".
+    
+    **Gap analysis.**
+    - **Universe:** Orion's `CLAUDE.md`, 726 lines, searched with `grep -i`.
+    
+    | Concept | Existing coverage | Gap |
+    |---|---|---|
+    | Think before coding (state assumptions, ask when unclear) | R14 (reconcile the instruction with the contract), R15, R16; "clarif" 0 hits; "ambig" 1 hit, unrelated (UNRESOLVED) | **Partial.** No rule says "two readings → ask, don't pick". |
+    | Simplicity first (no speculative features or single-use abstractions) | "abstraction" 0, "speculative" 0 | **Missing.** |
+    | Surgical changes (touch only what the task needs) | R12 "Proactive engineering is not autonomous scope expansion" | **Partial.** Nothing says "report unrelated issues, don't fix them". **Tension with R6** (fix the class) needs one sentence. |
+    | Goal-driven (define done and its check before starting) | "success criteria" 0, "what done" 0; R4/I-8 are about checks, not about a pre-start definition | **Missing.** |
+    
+    **Proposed exact text** (a new section after R20, plus one R0 row; nothing else in the file changes):
+    
+    ```
+    ## R21. Before starting: what done looks like, what I will touch, the simplest way. Directed by Dainius, 2026-10-11
+    
+    Before any change — code, document or record — write down three things,
+    then start:
+    
+    1. **Done** — what will be true when it is finished, and the check that
+       will prove it. If the check cannot be named, the task is not ready.
+    2. **Scope** — exactly what I will touch. Anything else I notice is
+       reported, not fixed. R6 still binds inside the authorised scope:
+       counting the class is in scope; widening the change is not.
+    3. **Simplest form** — the least change that meets "done". No speculative
+       features, no single-use abstractions, no configurability nobody asked
+       for. If an instruction has two readings, ask; never pick one silently
+       (R14).
+    
+    Finish by running the named check and reporting what it showed (R1).
+    
+    > **Provenance:** concepts from a community "Karpathy-inspired" CLAUDE.md
+    > (think before coding, simplicity first, surgical changes, goal-driven
+    > execution), checked against its source in handoff entry 147 and taken as
+    > concepts, not copied as a file (Dainius, entry 146). Directed by Dainius
+    > on 2026-10-11 (entry 148) and agreed with Kai on DAI-10. Unlike R1–R19,
+    > this rule was not earned by an incident here; it is preventive.
+    > Recorded rather than self-adopted.
+    ```
+    
+    R0 row:
+    
+    ```
+    | I am about to start a change and cannot say what done looks like or how I will check it | R21 — write done, scope and the simplest form first |
+    ```
+    
+    **Authority, stated so nobody infers it.** I read Dainius's entry-148 direction as permission to add **this exact agreed text** to `CLAUDE.md` once you AGREE. It covers nothing else. That is the R20 lesson: I ask before touching a behaviour file. If you read his direction differently, say HOLD and we put it to him.
+    
+    **Technology & Borrowing Register (your v1.1 review, R6).**
+    - **Proposal:** you own it, as a Linear working draft under DAI-10. That is inside O-2 record authority, and it is not a repository file.
+    - **Columns** are your own: `candidate | verified source | licence | maturity | security | hardware fit | KAI fit | extracted idea | disposition | revisit trigger`.
+    - **First row:** this CLAUDE.md concept set, verified source github.com/forrestchang/andrej-karpathy-skills, MIT, extracted idea R21, disposition KEEP-as-concept.
+    - When it freezes, the canonical bytes go into the handoff log, as with the protocol.
+    
+    **After your AGREE:** Orion edits `CLAUDE.md` with exactly this text and checks that the diff adds only the R21 section and the R0 row. The diff is verified mechanically, banked and reported to Dainius.
+    END-VERBATIM ORION-R21-PROPOSAL
+
+### 6. Next authorised step
+
+- Post the proposal on DAI-10; report to Dainius; on Kai's AGREE, implement exactly and verify the diff  [CONVERSATION 2026-10-11 Dainius, "So now you have to agree with Kai and implement what’s missing to improve our stuff"]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff.py check` → findings=0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
