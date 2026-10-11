@@ -71966,3 +71966,536 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-11T22:37:40Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-11T22:37:40Z  [CMD `date -u +%FT%TZ` → 2026-10-11T22:37:40Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 2d6a087f6f6ff1b93fa22c0ca97421c9dde5a1ba  [CMD `git rev-parse HEAD` → 2d6a087f6f6ff1b93fa22c0ca97421c9dde5a1ba]
+- tree: 4ed5eb738660a0ff5be8a0090f9c9900b9de76d8  [CMD `git rev-parse HEAD^{tree}` → 4ed5eb738660a0ff5be8a0090f9c9900b9de76d8]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/project-rework-plan-pgvp35: 2d6a087f6f6ff1b93fa22c0ca97421c9dde5a1ba  [CMD `git ls-remote --heads origin` → 2d6a087f6f6ff1b93fa22c0ca97421c9dde5a1ba]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 179  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 179]
+
+### 1. The four states
+
+- physical: unchanged since entry 179 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: unchanged from entry 179 — Orion builds the Gold-Tier Miro structure (seven views) on the existing board; documentation only; Miro projections are within O-2 record authority  [CONVERSATION 2026-10-11 Dainius, "GPT keeps timed off need you to do this ruling"]
+- evidence: the Miro create result (66 items, 0 failed), the board's own echo of what it holds (result SVG with item ids), the prepared name correction and the Miro limit error, all preserved in section 5  [CMD `sha256sum atlas_o9_eng_result.svg` → 3ee1824d026fcd08…]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None; Dainius said only "Continue", continuing the work authorised in entry 179  [CONVERSATION 2026-10-11 Dainius, "Continue"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; any code change  [CONVERSATION 2026-10-11 Dainius, "That would be a documentation and architecture-modelling upgrade only. It would not change KAI’s code or release the engineering hold."]
+- HELD: "Gold Tier" certification. Orion is the builder, so Kai or another reviewer must do the independent completeness check  [CONVERSATION 2026-10-11 Dainius, "subject the result to Orion’s independent completeness check before calling it Gold Tier"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- BLOCKED until tomorrow: the Miro free plan allows 100 tool calls a day across the organisation, and the limit was reached on the first readback call after the build. No board read or write is possible until it resets. Paid plan upgrade is Dainius's choice, not Orion's  [CMD `cat miro_limit_error.txt` → "daily Miro MCP tool call limit of 100 calls on the Free plan"]
+- The readback of Kai's existing frames O1–O8 (cards #1–#79) has NOT been done. Only the four new frames are checked, and only through the create call's own echo, not an independent read  [CMD `canvas_search` → limit error, no data]
+
+### 5. Incidents and corrections
+
+- BUILT on the board: four frames, "KINGSMAN FEATURE ATLAS" O9, O10, O11 and ENG, at y=13530 below Kai's O1–O8 rows; 66 items created, 0 failed, 0 skipped; cards #80–#104 (25 cards), each linking to its README line at commit f48dfe05  [CMD `canvas_create_from_svg atlas_o9_eng.svg` → success true, created_count 66, failed_items []]
+- CHECKED (create echo vs canonical entry 167 KAI-FEATURE-LIST block in this log): 25 of 25 card numbers are #80–#104 in order; 25 of 25 source line lists equal the entry-167 line lists exactly; 25 of 25 links point at the first listed line  [CMD `python3 -I verify cards vs KAI-FEATURE-LIST` → cards checked 25]
+- MY ERROR: 21 of the 25 card names have the first letter capitalised (for example "Backup service" where entry 167 has "backup service"). The four that match are #80, #81, #90, #91. The frame footer says "names as in the list there", so it is false for those 21 cards until corrected. Cause: my generator capitalised names for display and I did not compare against the canonical block before uploading. Correction prepared as atlas_o9_eng_namefix.svg (21 card text items, ids from the board echo); not yet applied because of the Miro limit  [CMD `python3 -I verify cards vs KAI-FEATURE-LIST` → mismatches 21, all first-letter case only]
+- MY FILTER ERROR, caught before reporting: my first count found 29 "numbered cards" because the filter `title starts with a digit` also matched the four subtitles ("6 source obligations…"). Re-run with the subtitles excluded and shown: 25 cards, #80–#104 in order  [CMD `python3 -I recount` → text items 37 ; card titles 25]
+- The SVG Orion sent (atlas_o9_eng.svg, 16,860 bytes, sha256 ffebf87c0bf36a808ef244dde2eb03efc6012be2269b7bfba93d3a5e594ab26e) is not banked separately; the board's echo below holds the same 25 card names and 25 links (checked identical) plus the item ids  [CMD `python3 -I compare sent vs echo` → identical True, links 25 25 True]
+- Credential scan of the four files banked below (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py e180.json` → TOTAL HITS 0]
+- EVIDENCE MIRO-ATLAS-O9-ENG-BOARD-ECHO atlas_o9_eng_result.svg: 19246 bytes, sha256 3ee1824d026fcd0897d7177eba9cbcb79765c78949dba6e6dd6ffe06469dfd43, final LF True (added by Orion)  [CMD `sha256sum atlas_o9_eng_result.svg` → 3ee1824d026fcd08…]
+    BEGIN-VERBATIM MIRO-ATLAS-O9-ENG-BOARD-ECHO
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3840 2160">
+    <g id="fO9" transform="translate(100,13530)" data-frame="KINGSMAN FEATURE ATLAS O9 | Growth / Dream / Evolution" data-miro-id="3458764686814635517">
+    <rect data-type="frame" x="0" y="0" width="3330" height="3840" fill="#ffffff" data-title="KINGSMAN FEATURE ATLAS O9 | Growth / Dream / Evolution" />
+    <textArea id="hO9" x="64" y="61.5" width="3200" fill="#1a1a1a" font-family="noto_sans" font-size="55" text-align="left" font-weight="bold" data-miro-id="3458764686814635523">O9 | Growth / Dream / Evolution</textArea>
+    <textArea id="sO9" x="64" y="179" width="3150" fill="#595959" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635524">6 source obligations. Actual operational state remains unverified.</textArea>
+    <rect id="cO90" x="60" y="290" width="1570" height="292" rx="12" fill="#f0f5fd" stroke="#c6dcff" data-miro-id="3458764686814635525" />
+    <textArea id="tO90" x="90" y="360" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635526"><b>#80 Agent-Evolver</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L186">Source: L186, L1160</a><br />Lineage: O9 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <rect id="cO91" x="1680" y="290" width="1570" height="292" rx="12" fill="#f0f5fd" stroke="#c6dcff" data-miro-id="3458764686814635527" />
+    <textArea id="tO91" x="1710" y="360" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635528"><b>#81 D99 synthetic experience</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L200">Source: L200, L1170, L1253, L1346, L1817</a><br />Lineage: O9 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <rect id="cO92" x="60" y="618" width="1570" height="292" rx="12" fill="#f0f5fd" stroke="#c6dcff" data-miro-id="3458764686814635529" />
+    <textArea id="tO92" x="90" y="688" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635530"><b>#82 Agentic cold path (dream/evolve/audit)</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L519">Source: L519, L559</a><br />Lineage: O9 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <rect id="cO93" x="1680" y="618" width="1570" height="292" rx="12" fill="#f0f5fd" stroke="#c6dcff" data-miro-id="3458764686814635531" />
+    <textArea id="tO93" x="1710" y="688" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635532"><b>#83 Capability gap logging</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L215">Source: L215, L1149, L1779</a><br />Lineage: O9 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <rect id="cO94" x="60" y="946" width="1570" height="292" rx="12" fill="#f0f5fd" stroke="#c6dcff" data-miro-id="3458764686814635533" />
+    <textArea id="tO94" x="90" y="1016" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635534"><b>#84 Dream state / dream cycles</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L172">Source: L172, L1159, L1176</a><br />Lineage: O9 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <rect id="cO95" x="1680" y="946" width="1570" height="292" rx="12" fill="#f0f5fd" stroke="#c6dcff" data-miro-id="3458764686814635535" />
+    <textArea id="tO95" x="1710" y="1016" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635536"><b>#85 Skills hub / skill hunter / skill provenance</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L216">Source: L216, L229, L259, L489, L539, L564, L1143, L1781</a><br />Lineage: O9 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <textArea id="footO9" x="64" y="3720.5" width="3200" fill="#595959" font-family="noto_sans" font-size="24" text-align="left" data-miro-id="3458764686814635537">Index from canonical handoff entry 167 (names as in the list there). Exact feature wording and nested details remain in GitHub.</textArea>
+    </g>
+    <g id="fO10" transform="translate(3600,13530)" data-frame="KINGSMAN FEATURE ATLAS O10 | Continuity / Stewardship / Sustainability" data-miro-id="3458764686814635518">
+    <rect data-type="frame" x="0" y="0" width="3330" height="3840" fill="#ffffff" data-title="KINGSMAN FEATURE ATLAS O10 | Continuity / Stewardship / Sustainability" />
+    <textArea id="hO10" x="64" y="61.5" width="3200" fill="#1a1a1a" font-family="noto_sans" font-size="55" text-align="left" font-weight="bold" data-miro-id="3458764686814635538">O10 | Continuity / Stewardship / Sustainability</textArea>
+    <textArea id="sO10" x="64" y="179" width="3150" fill="#595959" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635539">4 source obligations. Actual operational state remains unverified.</textArea>
+    <rect id="cO100" x="60" y="290" width="1570" height="292" rx="12" fill="#f0f5fd" stroke="#c6dcff" data-miro-id="3458764686814635540" />
+    <textArea id="tO100" x="90" y="360" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635541"><b>#86 Backup service</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L533">Source: L533</a><br />Lineage: O10 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <rect id="cO101" x="1680" y="290" width="1570" height="292" rx="12" fill="#f0f5fd" stroke="#c6dcff" data-miro-id="3458764686814635542" />
+    <textArea id="tO101" x="1710" y="360" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635544"><b>#87 Broker-bridge (Binance, read-only) + Broker view</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L479">Source: L479, L1202</a><br />Lineage: O10 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <rect id="cO102" x="60" y="618" width="1570" height="292" rx="12" fill="#f0f5fd" stroke="#c6dcff" data-miro-id="3458764686814635546" />
+    <textArea id="tO102" x="90" y="688" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635547"><b>#88 Financial awareness / UK self-employment advisor</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L524">Source: L524, L535, L1138, L1199</a><br />Lineage: O10 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <rect id="cO103" x="1680" y="618" width="1570" height="292" rx="12" fill="#f0f5fd" stroke="#c6dcff" data-miro-id="3458764686814635548" />
+    <textArea id="tO103" x="1710" y="688" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635549"><b>#89 Sovereign offline operation (end-goal)</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L1366">Source: L1366</a><br />Lineage: O10 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <textArea id="footO10" x="64" y="3720.5" width="3200" fill="#595959" font-family="noto_sans" font-size="24" text-align="left" data-miro-id="3458764686814635550">Index from canonical handoff entry 167 (names as in the list there). Exact feature wording and nested details remain in GitHub.</textArea>
+    </g>
+    <g id="fO11" transform="translate(7100,13530)" data-frame="KINGSMAN FEATURE ATLAS O11 | Operator Relationship / Mission Control" data-miro-id="3458764686814635519">
+    <rect data-type="frame" x="0" y="0" width="3330" height="3840" fill="#ffffff" data-title="KINGSMAN FEATURE ATLAS O11 | Operator Relationship / Mission Control" />
+    <textArea id="hO11" x="64" y="61.5" width="3200" fill="#1a1a1a" font-family="noto_sans" font-size="55" text-align="left" font-weight="bold" data-miro-id="3458764686814635551">O11 | Operator Relationship / Mission Control</textArea>
+    <textArea id="sO11" x="64" y="179" width="3150" fill="#595959" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635552">9 source obligations. Actual operational state remains unverified.</textArea>
+    <rect id="cO110" x="60" y="290" width="1570" height="292" rx="12" fill="#f0f5fd" stroke="#c6dcff" data-miro-id="3458764686814635553" />
+    <textArea id="tO110" x="90" y="360" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635554"><b>#90 D98 cognitive fingerprint (operator thinking style)</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L199">Source: L199, L1166, L1249, L1345, L1356, L1792, L1816</a><br />Lineage: O11 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <rect id="cO111" x="1680" y="290" width="1570" height="292" rx="12" fill="#f0f5fd" stroke="#c6dcff" data-miro-id="3458764686814635555" />
+    <textArea id="tO111" x="1710" y="360" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635556"><b>#91 Telegram interface</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L536">Source: L536</a><br />Lineage: O11 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <rect id="cO112" x="60" y="618" width="1570" height="292" rx="12" fill="#f0f5fd" stroke="#c6dcff" data-miro-id="3458764686814635557" />
+    <textArea id="tO112" x="90" y="688" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635558"><b>#92 Dashboard / operator console (→ Mission Control)</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L469">Source: L469, L558, L1191, L1192, L1195, L1213, L1215</a><br />Lineage: O11 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <rect id="cO113" x="1680" y="618" width="1570" height="292" rx="12" fill="#f0f5fd" stroke="#c6dcff" data-miro-id="3458764686814635559" />
+    <textArea id="tO113" x="1710" y="688" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635560"><b>#93 Impact oracle</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L237">Source: L237</a><br />Lineage: O11 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <rect id="cO114" x="60" y="946" width="1570" height="292" rx="12" fill="#f0f5fd" stroke="#c6dcff" data-miro-id="3458764686814635561" />
+    <textArea id="tO114" x="90" y="1016" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635562"><b>#94 Notifications</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L476">Source: L476</a><br />Lineage: O11 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <rect id="cO115" x="1680" y="946" width="1570" height="292" rx="12" fill="#f0f5fd" stroke="#c6dcff" data-miro-id="3458764686814635563" />
+    <textArea id="tO115" x="1710" y="1016" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635564"><b>#95 Operator model</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L236">Source: L236, L1132</a><br />Lineage: O11 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <rect id="cO116" x="60" y="1274" width="1570" height="292" rx="12" fill="#f0f5fd" stroke="#c6dcff" data-miro-id="3458764686814635570" />
+    <textArea id="tO116" x="90" y="1344" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635571"><b>#96 Presence: chat / voice / TTS / avatar</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L471">Source: L471, L530, L531, L1189, L1340, L1366</a><br />Lineage: O11 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <rect id="cO117" x="1680" y="1274" width="1570" height="292" rx="12" fill="#f0f5fd" stroke="#c6dcff" data-miro-id="3458764686814635572" />
+    <textArea id="tO117" x="1710" y="1344" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635573"><b>#97 Shadow branches</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L238">Source: L238</a><br />Lineage: O11 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <rect id="cO118" x="60" y="1602" width="1570" height="292" rx="12" fill="#f0f5fd" stroke="#c6dcff" data-miro-id="3458764686814635574" />
+    <textArea id="tO118" x="90" y="1672" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635575"><b>#98 Workspace manager</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L537">Source: L537</a><br />Lineage: O11 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <textArea id="footO11" x="64" y="3720.5" width="3200" fill="#595959" font-family="noto_sans" font-size="24" text-align="left" data-miro-id="3458764686814635576">Index from canonical handoff entry 167 (names as in the list there). Exact feature wording and nested details remain in GitHub.</textArea>
+    </g>
+    <g id="fENG" transform="translate(10600,13530)" data-frame="KINGSMAN FEATURE ATLAS ENG | Engineering / Assurance substrate" data-miro-id="3458764686814635520">
+    <rect data-type="frame" x="0" y="0" width="3330" height="3840" fill="#ffffff" data-title="KINGSMAN FEATURE ATLAS ENG | Engineering / Assurance substrate" />
+    <textArea id="hENG" x="64" y="61.5" width="3200" fill="#1a1a1a" font-family="noto_sans" font-size="55" text-align="left" font-weight="bold" data-miro-id="3458764686814635577">ENG | Engineering / Assurance substrate</textArea>
+    <textArea id="sENG" x="64" y="179" width="3150" fill="#595959" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635579">6 source obligations. Actual operational state remains unverified.</textArea>
+    <rect id="cENG0" x="60" y="290" width="1570" height="292" rx="12" fill="#f0f5fd" stroke="#c6dcff" data-miro-id="3458764686814635580" />
+    <textArea id="tENG0" x="90" y="360" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635581"><b>#99 Engineering toolchain / CI gates</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L1260">Source: L1260, L1490, L1491, L1492, L1493, L1494, L1495, L1496, L1497, L1498, L1499, L1500, L1501</a><br />Lineage: ENG | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <rect id="cENG1" x="1680" y="290" width="1570" height="292" rx="12" fill="#f0f5fd" stroke="#c6dcff" data-miro-id="3458764686814635582" />
+    <textArea id="tENG1" x="1710" y="360" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635583"><b>#100 Feature-flag system (53 flags)</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L256">Source: L256, L1800</a><br />Lineage: ENG | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <rect id="cENG2" x="60" y="618" width="1570" height="292" rx="12" fill="#f0f5fd" stroke="#c6dcff" data-miro-id="3458764686814635584" />
+    <textArea id="tENG2" x="90" y="688" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635585"><b>#101 Honest status / build &amp; test substrate</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L1238">Source: L1238, L1241, L1769, L1793, L1796, L1797</a><br />Lineage: ENG | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <rect id="cENG3" x="1680" y="618" width="1570" height="292" rx="12" fill="#f0f5fd" stroke="#c6dcff" data-miro-id="3458764686814635586" />
+    <textArea id="tENG3" x="1710" y="688" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635587"><b>#102 Private overlay network</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L552">Source: L552</a><br />Lineage: ENG | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <rect id="cENG4" x="60" y="946" width="1570" height="292" rx="12" fill="#f0f5fd" stroke="#c6dcff" data-miro-id="3458764686814635588" />
+    <textArea id="tENG4" x="90" y="1016" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635589"><b>#103 Target hardware (Flow Z13 / Strix Halo)</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L1676">Source: L1676, L1677, L1678, L1679, L1680, L1681, L1682, L1715, L1716, L1717, L1718</a><br />Lineage: ENG | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <rect id="cENG5" x="1680" y="946" width="1570" height="292" rx="12" fill="#f0f5fd" stroke="#c6dcff" data-miro-id="3458764686814635590" />
+    <textArea id="tENG5" x="1710" y="1016" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635591"><b>#104 Zero telemetry / local core (constitution)</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L258">Source: L258</a><br />Lineage: ENG | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <textArea id="footENG" x="64" y="3720.5" width="3200" fill="#595959" font-family="noto_sans" font-size="24" text-align="left" data-miro-id="3458764686814635592">Index from canonical handoff entry 167 (names as in the list there). Exact feature wording and nested details remain in GitHub.</textArea>
+    </g>
+    </svg>
+    END-VERBATIM MIRO-ATLAS-O9-ENG-BOARD-ECHO
+- EVIDENCE MIRO-ATLAS-O9-ENG-CREATE-RESULT atlas_o9_eng_create_result.json: 6944 bytes, sha256 e11cb6adcbefd97ecc686950b54badb6cd690d344b131b57d03640b5e940c431, final LF True (added by Orion)  [CMD `sha256sum atlas_o9_eng_create_result.json` → e11cb6adcbefd97e…]
+    BEGIN-VERBATIM MIRO-ATLAS-O9-ENG-CREATE-RESULT
+    {
+     "transcript_line": 16924,
+     "success": true,
+     "created_count": 66,
+     "failed_items": [],
+     "skipped": [],
+     "created_items": [
+      {
+       "id": "3458764686814635517",
+       "type": "frame",
+       "title": "KINGSMAN FEATURE ATLAS O9 | Growth / Dream / Evolution"
+      },
+      {
+       "id": "3458764686814635518",
+       "type": "frame",
+       "title": "KINGSMAN FEATURE ATLAS O10 | Continuity / Stewardship / Sustainability"
+      },
+      {
+       "id": "3458764686814635519",
+       "type": "frame",
+       "title": "KINGSMAN FEATURE ATLAS O11 | Operator Relationship / Mission Control"
+      },
+      {
+       "id": "3458764686814635520",
+       "type": "frame",
+       "title": "KINGSMAN FEATURE ATLAS ENG | Engineering / Assurance substrate"
+      },
+      {
+       "id": "3458764686814635523",
+       "type": "text",
+       "title": "O9 | Growth / Dream / Evolution"
+      },
+      {
+       "id": "3458764686814635524",
+       "type": "text",
+       "title": "6 source obligations. Actual operational state remains unverified."
+      },
+      {
+       "id": "3458764686814635525",
+       "type": "shape",
+       "title": ""
+      },
+      {
+       "id": "3458764686814635526",
+       "type": "text",
+       "title": "80 Agent-Evolver"
+      },
+      {
+       "id": "3458764686814635527",
+       "type": "shape",
+       "title": ""
+      },
+      {
+       "id": "3458764686814635528",
+       "type": "text",
+       "title": "81 D99 synthetic experience"
+      },
+      {
+       "id": "3458764686814635529",
+       "type": "shape",
+       "title": ""
+      },
+      {
+       "id": "3458764686814635530",
+       "type": "text",
+       "title": "82 Agentic cold path (dream/evolve/audit)"
+      },
+      {
+       "id": "3458764686814635531",
+       "type": "shape",
+       "title": ""
+      },
+      {
+       "id": "3458764686814635532",
+       "type": "text",
+       "title": "83 Capability gap logging"
+      },
+      {
+       "id": "3458764686814635533",
+       "type": "shape",
+       "title": ""
+      },
+      {
+       "id": "3458764686814635534",
+       "type": "text",
+       "title": "84 Dream state / dream cycles"
+      },
+      {
+       "id": "3458764686814635535",
+       "type": "shape",
+       "title": ""
+      },
+      {
+       "id": "3458764686814635536",
+       "type": "text",
+       "title": "85 Skills hub / skill hunter / skill provenance"
+      },
+      {
+       "id": "3458764686814635537",
+       "type": "text",
+       "title": "Index from canonical handoff entry 167 (names as in the list there). Exact feat…"
+      },
+      {
+       "id": "3458764686814635538",
+       "type": "text",
+       "title": "O10 | Continuity / Stewardship / Sustainability"
+      },
+      {
+       "id": "3458764686814635539",
+       "type": "text",
+       "title": "4 source obligations. Actual operational state remains unverified."
+      },
+      {
+       "id": "3458764686814635540",
+       "type": "shape",
+       "title": ""
+      },
+      {
+       "id": "3458764686814635541",
+       "type": "text",
+       "title": "86 Backup service"
+      },
+      {
+       "id": "3458764686814635542",
+       "type": "shape",
+       "title": ""
+      },
+      {
+       "id": "3458764686814635544",
+       "type": "text",
+       "title": "87 Broker-bridge (Binance, read-only) + Broker view"
+      },
+      {
+       "id": "3458764686814635546",
+       "type": "shape",
+       "title": ""
+      },
+      {
+       "id": "3458764686814635547",
+       "type": "text",
+       "title": "88 Financial awareness / UK self-employment advisor"
+      },
+      {
+       "id": "3458764686814635548",
+       "type": "shape",
+       "title": ""
+      },
+      {
+       "id": "3458764686814635549",
+       "type": "text",
+       "title": "89 Sovereign offline operation (end-goal)"
+      },
+      {
+       "id": "3458764686814635550",
+       "type": "text",
+       "title": "Index from canonical handoff entry 167 (names as in the list there). Exact feat…"
+      },
+      {
+       "id": "3458764686814635551",
+       "type": "text",
+       "title": "O11 | Operator Relationship / Mission Control"
+      },
+      {
+       "id": "3458764686814635552",
+       "type": "text",
+       "title": "9 source obligations. Actual operational state remains unverified."
+      },
+      {
+       "id": "3458764686814635553",
+       "type": "shape",
+       "title": ""
+      },
+      {
+       "id": "3458764686814635554",
+       "type": "text",
+       "title": "90 D98 cognitive fingerprint (operator thinking style)"
+      },
+      {
+       "id": "3458764686814635555",
+       "type": "shape",
+       "title": ""
+      },
+      {
+       "id": "3458764686814635556",
+       "type": "text",
+       "title": "91 Telegram interface"
+      },
+      {
+       "id": "3458764686814635557",
+       "type": "shape",
+       "title": ""
+      },
+      {
+       "id": "3458764686814635558",
+       "type": "text",
+       "title": "92 Dashboard / operator console (→ Mission Control)"
+      },
+      {
+       "id": "3458764686814635559",
+       "type": "shape",
+       "title": ""
+      },
+      {
+       "id": "3458764686814635560",
+       "type": "text",
+       "title": "93 Impact oracle"
+      },
+      {
+       "id": "3458764686814635561",
+       "type": "shape",
+       "title": ""
+      },
+      {
+       "id": "3458764686814635562",
+       "type": "text",
+       "title": "94 Notifications"
+      },
+      {
+       "id": "3458764686814635563",
+       "type": "shape",
+       "title": ""
+      },
+      {
+       "id": "3458764686814635564",
+       "type": "text",
+       "title": "95 Operator model"
+      },
+      {
+       "id": "3458764686814635570",
+       "type": "shape",
+       "title": ""
+      },
+      {
+       "id": "3458764686814635571",
+       "type": "text",
+       "title": "96 Presence: chat / voice / TTS / avatar"
+      },
+      {
+       "id": "3458764686814635572",
+       "type": "shape",
+       "title": ""
+      },
+      {
+       "id": "3458764686814635573",
+       "type": "text",
+       "title": "97 Shadow branches"
+      },
+      {
+       "id": "3458764686814635574",
+       "type": "shape",
+       "title": ""
+      },
+      {
+       "id": "3458764686814635575",
+       "type": "text",
+       "title": "98 Workspace manager"
+      },
+      {
+       "id": "3458764686814635576",
+       "type": "text",
+       "title": "Index from canonical handoff entry 167 (names as in the list there). Exact feat…"
+      },
+      {
+       "id": "3458764686814635577",
+       "type": "text",
+       "title": "ENG | Engineering / Assurance substrate"
+      },
+      {
+       "id": "3458764686814635579",
+       "type": "text",
+       "title": "6 source obligations. Actual operational state remains unverified."
+      },
+      {
+       "id": "3458764686814635580",
+       "type": "shape",
+       "title": ""
+      },
+      {
+       "id": "3458764686814635581",
+       "type": "text",
+       "title": "99 Engineering toolchain / CI gates"
+      },
+      {
+       "id": "3458764686814635582",
+       "type": "shape",
+       "title": ""
+      },
+      {
+       "id": "3458764686814635583",
+       "type": "text",
+       "title": "100 Feature-flag system (53 flags)"
+      },
+      {
+       "id": "3458764686814635584",
+       "type": "shape",
+       "title": ""
+      },
+      {
+       "id": "3458764686814635585",
+       "type": "text",
+       "title": "101 Honest status / build & test substrate"
+      },
+      {
+       "id": "3458764686814635586",
+       "type": "shape",
+       "title": ""
+      },
+      {
+       "id": "3458764686814635587",
+       "type": "text",
+       "title": "102 Private overlay network"
+      },
+      {
+       "id": "3458764686814635588",
+       "type": "shape",
+       "title": ""
+      },
+      {
+       "id": "3458764686814635589",
+       "type": "text",
+       "title": "103 Target hardware (Flow Z13 / Strix Halo)"
+      },
+      {
+       "id": "3458764686814635590",
+       "type": "shape",
+       "title": ""
+      },
+      {
+       "id": "3458764686814635591",
+       "type": "text",
+       "title": "104 Zero telemetry / local core (constitution)"
+      },
+      {
+       "id": "3458764686814635592",
+       "type": "text",
+       "title": "Index from canonical handoff entry 167 (names as in the list there). Exact feat…"
+      }
+     ]
+    }
+    END-VERBATIM MIRO-ATLAS-O9-ENG-CREATE-RESULT
+- EVIDENCE MIRO-ATLAS-O9-ENG-NAMEFIX atlas_o9_eng_namefix.svg: 10341 bytes, sha256 af340da9e6a528f5179e2f71ffea47570c47ac7a37a26ab3fb612749ca4dec3e, final LF True (added by Orion)  [CMD `sha256sum atlas_o9_eng_namefix.svg` → af340da9e6a528f5…]
+    BEGIN-VERBATIM MIRO-ATLAS-O9-ENG-NAMEFIX
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3840 2160">
+    <g id="fO9" transform="translate(100,13530)" data-frame="KINGSMAN FEATURE ATLAS O9 | Growth / Dream / Evolution" data-miro-id="3458764686814635517">
+    <textArea id="tO92" x="90" y="688" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635530"><b>#82 agentic cold path (dream/evolve/audit)</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L519">Source: L519, L559</a><br />Lineage: O9 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <textArea id="tO93" x="1710" y="688" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635532"><b>#83 capability gap logging</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L215">Source: L215, L1149, L1779</a><br />Lineage: O9 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <textArea id="tO94" x="90" y="1016" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635534"><b>#84 dream state / dream cycles</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L172">Source: L172, L1159, L1176</a><br />Lineage: O9 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <textArea id="tO95" x="1710" y="1016" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635536"><b>#85 skills hub / skill hunter / skill provenance</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L216">Source: L216, L229, L259, L489, L539, L564, L1143, L1781</a><br />Lineage: O9 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    </g>
+    <g id="fO10" transform="translate(3600,13530)" data-frame="KINGSMAN FEATURE ATLAS O10 | Continuity / Stewardship / Sustainability" data-miro-id="3458764686814635518">
+    <textArea id="tO100" x="90" y="360" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635541"><b>#86 backup service</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L533">Source: L533</a><br />Lineage: O10 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <textArea id="tO101" x="1710" y="360" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635544"><b>#87 broker-bridge (Binance, read-only) + Broker view</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L479">Source: L479, L1202</a><br />Lineage: O10 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <textArea id="tO102" x="90" y="688" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635547"><b>#88 financial awareness / UK self-employment advisor</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L524">Source: L524, L535, L1138, L1199</a><br />Lineage: O10 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <textArea id="tO103" x="1710" y="688" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635549"><b>#89 sovereign offline operation (end-goal)</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L1366">Source: L1366</a><br />Lineage: O10 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    </g>
+    <g id="fO11" transform="translate(7100,13530)" data-frame="KINGSMAN FEATURE ATLAS O11 | Operator Relationship / Mission Control" data-miro-id="3458764686814635519">
+    <textArea id="tO112" x="90" y="688" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635558"><b>#92 dashboard / operator console (→ Mission Control)</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L469">Source: L469, L558, L1191, L1192, L1195, L1213, L1215</a><br />Lineage: O11 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <textArea id="tO113" x="1710" y="688" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635560"><b>#93 impact oracle</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L237">Source: L237</a><br />Lineage: O11 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <textArea id="tO114" x="90" y="1016" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635562"><b>#94 notifications</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L476">Source: L476</a><br />Lineage: O11 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <textArea id="tO115" x="1710" y="1016" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635564"><b>#95 operator model</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L236">Source: L236, L1132</a><br />Lineage: O11 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <textArea id="tO116" x="90" y="1344" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635571"><b>#96 presence: chat / voice / TTS / avatar</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L471">Source: L471, L530, L531, L1189, L1340, L1366</a><br />Lineage: O11 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <textArea id="tO117" x="1710" y="1344" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635573"><b>#97 shadow branches</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L238">Source: L238</a><br />Lineage: O11 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <textArea id="tO118" x="90" y="1672" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635575"><b>#98 workspace manager</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L537">Source: L537</a><br />Lineage: O11 | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    </g>
+    <g id="fENG" transform="translate(10600,13530)" data-frame="KINGSMAN FEATURE ATLAS ENG | Engineering / Assurance substrate" data-miro-id="3458764686814635520">
+    <textArea id="tENG0" x="90" y="360" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635581"><b>#99 engineering toolchain / CI gates</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L1260">Source: L1260, L1490, L1491, L1492, L1493, L1494, L1495, L1496, L1497, L1498, L1499, L1500, L1501</a><br />Lineage: ENG | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <textArea id="tENG1" x="1710" y="360" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635583"><b>#100 feature-flag system (53 flags)</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L256">Source: L256, L1800</a><br />Lineage: ENG | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <textArea id="tENG2" x="90" y="688" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635585"><b>#101 honest status / build &amp; test substrate</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L1238">Source: L1238, L1241, L1769, L1793, L1796, L1797</a><br />Lineage: ENG | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <textArea id="tENG3" x="1710" y="688" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635587"><b>#102 private overlay network</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L552">Source: L552</a><br />Lineage: ENG | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <textArea id="tENG4" x="90" y="1016" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635589"><b>#103 target hardware (Flow Z13 / Strix Halo)</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L1676">Source: L1676, L1677, L1678, L1679, L1680, L1681, L1682, L1715, L1716, L1717, L1718</a><br />Lineage: ENG | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    <textArea id="tENG5" x="1710" y="1016" width="1500" fill="#313131" font-family="noto_sans" font-size="26" text-align="left" data-miro-id="3458764686814635591"><b>#104 zero telemetry / local core (constitution)</b><br /><a href="https://github.com/dainius1234/kai-system/blob/f48dfe05bb3664e66f940ef287a8bc5b11155534/README.md#L258">Source: L258</a><br />Lineage: ENG | Evidence: README only<br />Implementation status: UNKNOWN (not verified)</textArea>
+    </g>
+    </svg>
+    END-VERBATIM MIRO-ATLAS-O9-ENG-NAMEFIX
+- EVIDENCE MIRO-LIMIT-ERROR miro_limit_error.txt: 261 bytes, sha256 1a44b05cef4eb28faf3c4c6b0edb81454a72207581c9744097b5306c4a5eb437, final LF True (added by Orion)  [CMD `sha256sum miro_limit_error.txt` → 1a44b05cef4eb28f…]
+    BEGIN-VERBATIM MIRO-LIMIT-ERROR
+    Your organization has reached its daily Miro MCP tool call limit of 100 calls on the Free plan. The limit resets tomorrow.
+    Show this upgrade link to the user as a clickable hyperlink: https://miro.com/app/dashboard?inAppPricing.visible=true&mcpClient=claude-ai
+    END-VERBATIM MIRO-LIMIT-ERROR
+
+### 6. Next authorised step
+
+- When the Miro limit resets: (1) apply atlas_o9_eng_namefix.svg with canvas_update_from_svg; (2) read back every FEATURE ATLAS frame O1–ENG and check all 104 cards against entry 167; (3) then build the index frame and the remaining views, grounded views first  [CONVERSATION 2026-10-11 Dainius, "GPT keeps timed off need you to do this ruling"]
+
+### 7. What I am unsure of
+
+- Whether Kai's O1–O8 cards use the canonical lowercase names or capitalised display names; that decides whether the footer wording or the card names should change to make the whole atlas consistent. Unknown until the readback  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
