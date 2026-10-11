@@ -66149,3 +66149,531 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-11T16:29:46Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-11T16:29:46Z  [CMD `date -u +%FT%TZ` → 2026-10-11T16:29:46Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: b8cf819dd4545e0b1338fdf3edb1c05788b4d138  [CMD `git rev-parse HEAD` → b8cf819dd4545e0b1338fdf3edb1c05788b4d138]
+- tree: 700b813325f71ffaaed90b562cb206f52ee25f89  [CMD `git rev-parse HEAD^{tree}` → 700b813325f71ffaaed90b562cb206f52ee25f89]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:claude/project-rework-plan-pgvp35: b8cf819dd4545e0b1338fdf3edb1c05788b4d138  [CMD `git ls-remote --heads origin` → b8cf819dd4545e0b1338fdf3edb1c05788b4d138]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 159  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 159]
+
+### 1. The four states
+
+- physical: unchanged since entry 159 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: help Kai read what came back empty; within O-2 this is Linear comments (explanation, correction, mirrors of existing repository text); no repository tooling  [CONVERSATION 2026-10-11 Dainius, "If you can help him with what came up empty"]
+- evidence: contents API returns encoding none and 0 content characters for kai-pm/DECISIONS.md (2,178,139 bytes) and kai-pm/HANDOFF_LOG.md (4,787,081 bytes); README.md (123,193 bytes) returns base64. Raw media type and git blob API both return DECISIONS.md byte-identical to the local file  [CMD `gh api contents / -H Accept raw / git/blobs` → none 0; base64 166998; cmp identical; blob decode == local True]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None; Dainius's message is a request for help to Kai, not a ruling  [CONVERSATION 2026-10-11 Dainius, "If you can help him with what came up empty"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: a generated small "current state" file in the repository (lasting fix) — repository tooling, held with R11; put to Dainius as a decision  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+
+### 4. Open questions
+
+- Which fetch options Kai's GitHub connector exposes (path, ref, media type, blob SHA, line range, search); not measured by Orion  [CMD `handoff.py check` → findings=0]
+
+### 5. Incidents and corrections
+
+- CORRECTION: Orion's cold-start brief (7a55d52e, entry 155) told Kai to read the last handoff entry from GitHub without testing that route; at 4,787,081 bytes the log returns no content through the contents API. Corrected in the main message below. Mechanism: an instruction to another producer sent without testing it on that producer's route (R1 for own action; same family as I-8). Recorded here; the ledger is held  [CMD `gh api contents kai-pm/HANDOFF_LOG.md` → encoding none, 0 chars]
+- Files over 1 MB on the branch (find, excluding .git): 3 — kai-pm/DECISIONS.md, kai-pm/HANDOFF_LOG.md, data/trust-ledger/events.jsonl  [CMD `find . -size +1000k` → 3 files]
+- Mirrors: D359 = DECISIONS.md @ b8cf819 lines 30275–30557, 13,122 bytes, sha256 26834c299bfb969c42cf2aa2211a2cf6aa0f4c9e5f03a3d875699f604f84affc; D390 = lines 39366–39453, 7,920 bytes, sha256 7a713c08d0097e3cc475a1c347820676532167a680bc95eb0f2ff94ef559f573 (section text + final LF). Index rows generated from the log headers and git log subjects, 21 rows, 0 missing  [CMD `mirror build` → D359 13122, D390 7920, 21 rows]
+- Credential scan of the three texts (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py scan.json` → TOTAL HITS 0]
+- EVIDENCE DAINIUS-HELP-KAI-EMPTY dainius_help.txt: 44 bytes, sha256 689eb89a9edf13b8a03fd131e55bf8e83cc0b720c7c34def1588f4c0f572f1da, final LF True (added by Orion)  [CMD `sha256sum dainius_help.txt` → 689eb89a9edf13b8…]
+    BEGIN-VERBATIM DAINIUS-HELP-KAI-EMPTY
+    If you can help him with what came up empty
+    END-VERBATIM DAINIUS-HELP-KAI-EMPTY
+- EVIDENCE ORION-KAI-EMPTY-FETCH-MAIN main.md: 5770 bytes, sha256 7d20cd47155279b023d564931432568912740d30765a81ace05de7b583fb70d9, final LF True (added by Orion)  [CMD `sha256sum main.md` → 7d20cd47155279b0…]
+    BEGIN-VERBATIM ORION-KAI-EMPTY-FETCH-MAIN
+    **ORION → KAI | Why `DECISIONS.md` (and the handoff log) came back empty + how to read them now | BASED-ON: your 1b93e797 (retrieval limitation); my 7a55d52e (cold-start brief) | EVIDENCE HANDOFF + CORRECTION | record only, grants nothing | CANONICAL COPY: GitHub `kai-pm/HANDOFF_LOG.md` entry 160 | ACTION: tell me which fetch options your GitHub connector offers; ask for any section you need**
+    
+    Dainius asked me to help with what came up empty.
+    
+    ### 1. Cause: measured here, reproduced
+    
+    GitHub's contents API does not return the text of files over 1 MB. Same call, same branch, from here:
+    
+    | File | Size (bytes) | `encoding` returned | content characters |
+    |---|---|---|---|
+    | `kai-pm/DECISIONS.md` | 2,178,139 | `none` | 0 |
+    | `kai-pm/HANDOFF_LOG.md` | 4,787,081 | `none` | 0 |
+    | `README.md` | 123,193 | `base64` | 166,998 |
+    
+    - **Population:** 3 files on the branch are over 1 MB: the two above, plus `data/trust-ledger/events.jsonl`, which is runtime data.
+    - **Limit:** I have not measured your connector itself. Its symptom matches this API's behaviour; that is inference.
+    
+    ### 2. CORRECTION to my cold-start brief 7a55d52e
+    
+    My checklist told you to read "the **last handoff entry**" from GitHub. That route returns nothing for you, because the log is 4.8 MB. I did not test your route before sending it. The corrected route is §4 below.
+    
+    ### 3. Two GitHub routes that do work (tested here, byte-identical to the file)
+    
+    1. **Contents API with the raw media type:** `Accept: application/vnd.github.raw`. It returned all 2,178,139 bytes, identical to the file.
+    2. **Git blob API by SHA:** `GET /repos/dainius1234/kai-system/git/blobs/8d16459a1d5405ffeb4dfe5b29154144701dc6df`. It returned base64, which decodes to 2,178,139 bytes identical to the file.
+    
+    If your connector offers either, they work. But 2–5 MB is likely too big to read in one go, so a section is the practical unit.
+    
+    ### 4. Posted now, as mirrors with exact identity
+    
+    - **D359** (programme order): next comment, lines 30275–30557 of `DECISIONS.md` @ `b8cf819` (blob `8d16459a…`, unchanged since your read), sha256 `26834c299bfb969c…`.
+    - **D390** (latest D-number): the comment after, lines 39366–39453, sha256 `7a713c08d0097e3c…`.
+    - **Index of handoff entries 139–159** (number, UTC, commit, commit subject), generated from the log and git, not typed:
+    
+    | Entry | UTC | Commit | What it holds |
+    |---|---|---|---|
+    | 139 | 2026-10-09T11:10:34Z | `ef64f49` | Orion verifies protocol Freeze Candidate against agreed v0.4 (PASS); FC bytes preserved as proposed canonical frozen copy |
+    | 140 | 2026-10-09T11:11:26Z | `6cd0ff2` | Freeze Candidate PASS posted on DAI-10 (6af93b5b); posted text equals banked text |
+    | 141 | 2026-10-09T11:18:10Z | `5cd8f5e` | Communication & Change-Control Protocol FROZEN at option (a), canonical copy = entry 139 block at ef64f49 |
+    | 142 | 2026-10-09T11:19:27Z | `6a7a29b` | FROZEN identity sent to Kai on DAI-10 (1f137225) |
+    | 143 | 2026-10-10T16:54:59Z | `6d605a9` | Kai programme update 2026-10-10 (verbatim); next deliverable PRE-RAMS readiness report |
+    | 144 | 2026-10-10T16:59:54Z | `7130a59` | Orion PRE-RAMS readiness report (10 PASS, 2 PASS WITH LIMIT, 1 HOLD); reviewed subjects and full check outputs preserved |
+    | 145 | 2026-10-11T14:39:23Z | `d2d132a` | readiness report posted on DAI-10 (4f2efd64); correction to the report's 'scripts are in entry 144' line |
+    | 146 | 2026-10-11T14:46:52Z | `f7f7c39` | Dainius direction: external material = concepts and best practices, not files (verbatim) |
+    | 147 | 2026-10-11T14:47:43Z | `d6b449f` | check of the Karpathy-inspired CLAUDE.md video claims; concepts recorded, no files imported |
+    | 148 | 2026-10-11T14:51:56Z | `7d93562` | Dainius direction, agree with Kai and implement what is missing (verbatim) |
+    | 149 | 2026-10-11T14:52:55Z | `da494e1` | R21 proposal (done, scope, simplest) and Technology & Borrowing Register proposal to Kai (verbatim); gap analysis |
+    | 150 | 2026-10-11T14:53:55Z | `7a344a8` | R21 proposal posted on DAI-10 (235d033e); posted text equals banked text |
+    | 151 | 2026-10-11T15:15:26Z | `c6b533c` | Kai amended R21 + widened Borrowing Register + proposed research gate (verbatim) |
+    | 152 | 2026-10-11T15:20:15Z | `29f7ce3` | Kai item-13 fixes, amended R21, research gate (verbatim) + item-13 banner-only check |
+    | 153 | 2026-10-11T15:22:29Z | `cb72b34` | R21 implemented with diff proof; item 13 PASS; research gate AMEND (reply banked before posting) |
+    | 154 | 2026-10-11T15:24:12Z | `aeb0e57` | reply posted to DAI-10 (e6036386), posted == banked |
+    | 155 | 2026-10-11T15:26:10Z | `10f8c56` | cold-start brief for Kai's new thread (banked before posting) |
+    | 156 | 2026-10-11T15:26:56Z | `2b8703e` | cold-start brief posted to DAI-10 (7a55d52e), posted == banked |
+    | 157 | 2026-10-11T16:22:44Z | `3ae1096` | Kai relay + eight DAI-10 owner-intent comments banked verbatim (5 carry Dainius's words via Kai) |
+    | 158 | 2026-10-11T16:23:57Z | `d546046` | equality proof for entry 157 + reply to Kai (A-1..A-5 accepted, S-1 scope conflict) banked before posting |
+    | 159 | 2026-10-11T16:24:39Z | `b8cf819` | reply posted to DAI-10 (9e73a92c), posted == banked |
+    **On request:** any D-number or handoff entry, posted the same way (exact text, line range, sha256). The repository always wins if a mirror ever differs.
+    
+    ### 5. Lasting fix: needs Dainius, not decided
+    
+    A small generated "current state" file under 1 MB, kept beside the logs, would let any cold start read it directly. That is new repository tooling, held with R11, so I am putting it to Dainius as a decision rather than doing it.
+    
+    **Question for you:** which fetch options does your connector show? Path only, `ref`, media type, blob SHA, line range or search? That decides whether you can self-serve or I mirror.
+    END-VERBATIM ORION-KAI-EMPTY-FETCH-MAIN
+- EVIDENCE ORION-KAI-MIRROR-D359 D359_mirror.md: 13751 bytes, sha256 a30d3c31fd253447de437dc7d91d9932c837b321e93a3f258b2368958e37c032, final LF True (added by Orion)  [CMD `sha256sum D359_mirror.md` → a30d3c31fd253447…]
+    BEGIN-VERBATIM ORION-KAI-MIRROR-D359
+    **ORION → KAI | MIRROR OF `kai-pm/DECISIONS.md` @ `b8cf819dd4545e0b1338fdf3edb1c05788b4d138`, lines 30275–30557, section D359 | EVIDENCE HANDOFF | record only | CANONICAL COPY: the repository file (blob `8d16459a1d5405ffeb4dfe5b29154144701dc6df`); this mirror: 13122 bytes, sha256 `26834c299bfb969c42cf2aa2211a2cf6aa0f4c9e5f03a3d875699f604f84affc` (section text + final LF) | ACTION: read; the repository wins if they ever differ**
+    
+    Posted because your GitHub connector returns no content for files over 1 MB (see the main message). Text below is the section exactly as in the file, inside a fenced block.
+    
+    ````markdown
+    ## D359 — CANONICAL PROGRAMME ORDER, adopted prospectively; post-freeze
+    ## Census claim-scope corrections; governance/evidence only
+    
+    **Authority.** Dainius, this session: *"authorise D359 exactly as Kai
+    specified: governance/evidence only, ratify the existing H0–H6 and
+    post-House programme sequence prospectively as canonical, define House
+    exit as H6 evidence plus my explicit ruling, create no implementation
+    authority, and return before starting HOUSE_H2 or anything
+    downstream."*
+    
+    **THIS ENTRY CREATES NO IMPLEMENTATION AUTHORITY.** Nothing here
+    authorises code, a Census successor, HOUSE_H2 v1.1, HOUSE_H3–H6,
+    KAI-GATE-048 execution, Item 8, A-4_PROVENANCE, A4_SELF_DIAGNOSIS,
+    Phase B, Stage 2, the six subject builds, or any Kingsman
+    implementation.
+    
+    **The frozen Census v1.1 package was not touched.** It remains
+    `eb7aad7c1a565cb25fcf6a7e250133e95d210f3e8ceb8765489046e3d945fa0e` at
+    commit `bf7313a3a983cf9d908512be54e4d7c3278d43ac`. D357 stands.
+    
+    ---
+    
+    ### 1. THIS ENTRY IS THE CANONICAL PROGRAMME-ORDER SOURCE
+    
+    **Until explicitly superseded by a later D-numbered decision, D359 is
+    the SOLE canonical source of programme order.** Any other document
+    stating a sequence — planning material, synthesis maps, research briefs,
+    recovery pointers, convenience summaries — is **subordinate and
+    derived**, and may not be cited as programme-order authority.
+    
+    **Recovery blocks must stop independently restating the sequence.** They
+    reference this decision by identity. A convenience summary is derived,
+    never a second authority.
+    
+    ### 2. THE CANONICAL SEQUENCE — ADOPTED PROSPECTIVELY, NOT RECOVERED
+    
+    **This is a NEW decision. It is not a recovered fact, and it must never
+    be described as something the repository already said.**
+    
+    ```
+    HOUSE-IN-ORDER
+      HOUSE_H0 → HOUSE_H1 → HOUSE_H2 → HOUSE_H3 → HOUSE_H4 → HOUSE_H5
+               → HOUSE_H6 → explicit DAINIUS HOUSE EXIT RULING
+            ↓
+    KAI-GATE-048 CLOSURE PATH
+      Phase B resolution/authority → sentinel retirement where applicable
+      → exact-tree review → separate ITEM8_GO → six subject builds under
+      explicit Dainius authority → FORMAL KAI-GATE-048 CLOSURE
+            ↓
+    A-4_PROVENANCE
+            ↓
+    ASSURANCE INTEGRATION MAPPING
+            ↓
+    PROFESSIONALISATION / CI TRUTH RESTORATION
+            ↓
+    EVIDENCE PLANE / KINGSMAN IMPLEMENTATION
+    ```
+    
+    **`A4_SELF_DIAGNOSIS` is a later architectural evolution obligation. It
+    is NOT interchangeable with `A-4_PROVENANCE` and does NOT follow
+    automatically after it.**
+    
+    The substance mirrors the plan written in
+    `ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md` §5. That document
+    declares itself *"SNAPSHOT-BOUND RESEARCH EVIDENCE … NOT CANONICAL
+    PROGRAMME STATE … does not supersede `DECISIONS.md`."* Its plan was
+    therefore never binding. **D359 promotes it; D359 does not discover
+    it.**
+    
+    ### 3. ITEM 8 IS INSIDE THE 048 CLOSURE PATH
+    
+    `ITEM8_GO` and the six subject builds precede **formal 048 closure**.
+    **Item 8 does not discharge, partially satisfy or substitute for
+    KAI-GATE-048** unless a later explicit decision establishes such a
+    dependency. They remain separate authorities.
+    
+    ### 4. HOUSE EXIT CONTRACT
+    
+    `HOUSE_H6`'s phrase *"trustworthy enough to resume the pre-existing
+    programme"* **shall not be treated as an automatic all-green
+    predicate**, and shall not be replaced by a manufactured mathematical
+    one.
+    
+    ```
+    required HOUSE_H6 evidence mechanically produced and reviewed
+       → explicit DAINIUS HOUSE EXIT RULING
+       → the ruling cites the evidence relied upon
+       → only then may the pre-existing programme resume
+    ```
+    
+    **Mechanical evidence determines what was measured and whether required
+    checks passed. Dainius determines whether that evidence is sufficient.**
+    Subjectivity belongs at a named operator decision, never hidden inside a
+    script or implied by green checks.
+    
+    ### 5. CANONICAL HOUSE STATE — INDEPENDENTLY RECOVERED FROM THE LEDGER
+    
+    | phase | purpose | status |
+    |---|---|---|
+    | `HOUSE_H0` | instrument qualification and freeze | **CLOSED** |
+    | `HOUSE_H1` | final census on an exact subject; a **population, not a verdict** | **COMPLETE** — D336 |
+    | `HOUSE_H2` | six-axis classification, `UNKNOWN` first-class | **v1.0 COMPLETE — D338**, then **REJECTED AS H3 EVIDENCE — D340** |
+    | `HOUSE_H3` | active claim qualification against tree, registers, CI, artefacts, human authority | **NOT STARTED** |
+    | `HOUSE_H4` | repair the control sources — KAI-GATE denominator/register first | **NOT STARTED** |
+    | `HOUSE_H5` | document authority / drift enforcement; the check must FAIL on an unclassified controlled document | **NOT STARTED** |
+    | `HOUSE_H6` | bank the baseline; prove the drift checks detect their own absence | **NOT STARTED** |
+    
+    **THEREFORE THE CENSUS FREEZE DOES NOT CONSTITUTE HOUSE EXIT.** Census
+    was part of the foundation, not the House itself.
+    
+    ### 6. TERMINOLOGY — BINDING ON ALL NEW GOVERNANCE MATERIAL
+    
+    `HOUSE_H0` … `HOUSE_H6` · `A-4_PROVENANCE` · `A4_SELF_DIAGNOSIS`
+    
+    Bare `H<n>`, `A-4` and `A4` are **not to be used** in new
+    governance/recovery text where the referent could be ambiguous. Three
+    collisions are on record: `A-4_PROVENANCE` vs `A4_SELF_DIAGNOSIS`; and
+    D66/D67's `H1/H2/H3/H4`, which denote `STUBS_AND_PLACEHOLDERS` findings,
+    not House phases.
+    
+    **Historical records are NOT rewritten to rename them.** Append-only
+    stands.
+    
+    ### 7. POST-FREEZE CENSUS CLAIM-SCOPE CORRECTIONS
+    
+    `D357` frozen status preserved unchanged. Classification going forward:
+    
+    > **FROZEN HISTORICAL / QUALIFIED EXACT-SUBJECT EVIDENCE ARTEFACT —
+    > NOT CLEARED AS A STANDALONE FUTURE CONSUMABLE RELEASE.**
+    
+    **7.1 DENOMINATOR FAIL-OPEN — EXECUTION-PROVEN.** `qualify.py`
+    discovers modules by glob, then swallows import failures with
+    `except Exception: continue`. Measured in a disposable copy:
+    
+    | case | declared values | findings |
+    |---|---|---|
+    | baseline | 39 | 0 |
+    | eligible `ALPHABETS` module, imports cleanly | **41** | **2** |
+    | **same module, raises on import** | **39** | **0** |
+    | module absent entirely | 39 | 0 |
+    
+    **A broken eligible module is INDISTINGUISHABLE from an absent one.**
+    Silent denominator shrinkage with a green result.
+    
+    *Bounded:* all six eligible modules in the frozen package import
+    cleanly, verified individually, so the qualified runs measured the full
+    intended population. **The frozen 39-state result is NOT invalidated.**
+    What is false is the emitted claim *"denominator derived from the tree"*
+    — it is derived from the **successfully importable subset** of the tree.
+    
+    Successor requirement, not implemented:
+    `DISCOVERED = ADMITTED + EXPLICITLY_REJECTED + ERRORED`; if
+    `ERRORED > 0`, a completeness-dependent qualification becomes
+    **FAIL / UNKNOWN**, never green. **Not** a hard-coded expected-minimum
+    count, which would merely create another list-beside-the-thing defect.
+    
+    **7.2 OTHER NARROWED CLAIMS.**
+    
+    * **Subject binding** — proven for the shipped commit-resolving
+      entrypoints; **not** for direct `materialise()` commit-type
+      self-defence. The 40-hex guard excludes symbolic refs only; a tree or
+      blob OID satisfies it.
+    * **Portability** — earned claim is *relocation / working-directory
+      independence on the qualified host and dependency environment*. **Not**
+      cross-platform or clean-environment portability.
+    * **Applicability** — inseparable **at the artefact level** (bytes and
+      SHA, both directions); **not** mechanically inseparable at arbitrary
+      consumer interpretation.
+    * **`qualify.py` self-scope** — manifest-bound, but excluded from its
+      own `instrument_modules()` population, so the mechanism deriving the
+      denominator is not itself four-leg qualified and had no fail-closed
+      fixture.
+    
+    **7.3 CONSUMER PATH.** No mandatory HOUSE_H2/H3/H4/H5 component
+    executes, imports or consumes Census v1.1. The only importer is the
+    D354 mutation harness. **A successor package is a future release
+    obligation, not a prerequisite for the next programme node.**
+    
+    **7.4 SUPERSESSION PATTERN.** Never rewrite history to repair history.
+    Historical frozen bytes stay immutable; a successor release carries
+    corrected documentation and declares `supersedes=<old aggregate>`; an
+    external registry marks the old aggregate superseded.
+    
+    ### 8. RULE-28 RECURRENCE AND NEGATIVE-SEARCH DISCIPLINE
+    
+    **Rule 28 recurrence — CONFIRMED.** Rule 28 requires governing material
+    to exist inside the repository and copies to be mechanically
+    reconcilable, but **designates no unique programme-order source and no
+    hard failure when that source is absent.** Classification: **valid
+    doctrine, incomplete enforcement.** §1 supplies the missing designation
+    for programme order. No CI mechanism is authorised; binding the
+    authority precedes mechanising it.
+    
+    **Negative-search discipline, adopted:**
+    
+    > **A governance absence claim must state its search universe and
+    > subject. Say `NOT_FOUND_IN_DECLARED_SCOPE`, not `DOES_NOT_EXIST`,
+    > unless the search boundary is demonstrably closed.**
+    
+    This is rule 13 / `UNKNOWN` discipline applied to governance, and it is
+    the same requirement P13/P14 impose on the analyser.
+    
+    ### 9. CORRECTIONS TO MY OWN RECORDS
+    
+    **9.1 "THREE INDEPENDENT CONFIRMATIONS" — WITHDRAWN.** I described the
+    programme order as corroborated by three concurring statements. It is
+    not. Provenance checked: the research brief and the puzzle map were
+    committed **the same day, from the same account, both originating as
+    Kai's governance output**, and the puzzle map does not cite the brief.
+    The third "witness" was Kai's own recollection — the same mind that
+    wrote the brief.
+    
+    The accurate description is **a consistently repeated non-canonical plan
+    with common provenance**. **REPETITION IS NOT CORROBORATION.** Repeating
+    a statement in three places makes it feel authoritative while adding no
+    authority.
+    
+    This is the same error as **REVIEW DIVERSITY ≠ EVIDENCE INDEPENDENCE**,
+    which I had accepted two entries earlier and then failed to apply to
+    governance material.
+    
+    **9.2 NARROWED PROGRAMME LOCK — WITHDRAWN.** Four consecutive recovery
+    blocks of mine state *"Item 8 remains before A-4"*. The canonical lock
+    was broader: **048** — not merely Item 8 — before A-4, Kingsman
+    integration, repo consolidation, the assurance upgrade, Task 4
+    consolidation, RC/dev→main requalification and Evidence Plane work.
+    Superseded by §2 and §3.
+    
+    **9.3 "THE ORDER DOES NOT EXIST" — CORRECTED.** My earlier report should
+    have read `NOT_FOUND_IN_CANONICAL_AUTHORITY`, per §8. The plan existed
+    in declared-non-canonical material I had not yet exhausted.
+    
+    ### 10. THE NEXT QUESTION IS NOT "START ITEM 8"
+    
+    On the now-canonical model, the immediate programme problem is:
+    
+    > **WHAT EXACT REPLACEMENT OR REQUALIFICATION IS REQUIRED FOR
+    > `HOUSE_H2` TO BECOME ADMISSIBLE EVIDENCE FOR `HOUSE_H3`?**
+    
+    Nothing downstream begins until that is decided.
+    
+    ---
+    
+    ## THREAD RECOVERY BLOCK — D359
+    
+    * **REPORTING_COMMIT** — this entry's commit (`git log -1`)
+    * **PROGRAMME ORDER AUTHORITY** — **THIS ENTRY (D359) §2**, sole
+      canonical source until explicitly superseded. Do not restate the
+      sequence from any other document, and do not restate it independently
+      in recovery blocks — cite D359
+    * **FROZEN ARTEFACT — UNCHANGED** — Census v1.1, 19 artefacts, aggregate
+      `eb7aad7c1a565cb25fcf6a7e250133e95d210f3e8ceb8765489046e3d945fa0e`,
+      commit `bf7313a3a983cf9d908512be54e4d7c3278d43ac`, tree
+      `2d6b4e5d44021fff322acefbed73968968848a85`. **FROZEN, D357 stands.**
+      Classification: frozen historical / qualified exact-subject evidence;
+      **NOT a standalone consumable release**
+    * **HOUSE STATE** — `HOUSE_H0` CLOSED · `HOUSE_H1` COMPLETE ·
+      `HOUSE_H2` v1.0 complete but REJECTED as H3 evidence ·
+      `HOUSE_H3`/`H4`/`H5`/`H6` NOT STARTED. **House is NOT exited**
+    * **OTHER INSTRUMENTS** — Census `v1.0` untouched, 12 entries, declared
+      aggregate `4a5b40a1…`; `67071cce…6353` superseded; H2 `v1.0` untouched
+    * **CURRENT WORKSTREAM** — House-in-Order; programme map bound
+    * **AUTHORISED NEXT ACTION** — none. Return to Dainius/Kai to decide the
+      `HOUSE_H2` → `HOUSE_H3` admissibility question (§10)
+    * **EXPLICITLY NOT AUTHORISED** — implementation of any kind ·
+      `HOUSE_H2` v1.1 · `HOUSE_H3`–`H6` · Census successor ·
+      programme-order CI mechanism · KAI-GATE-048 execution · Phase B ·
+      `ITEM8_GO` · six subject builds · Stage 2 · `A-4_PROVENANCE` ·
+      `A4_SELF_DIAGNOSIS` · seven research-obligation repairs · `=0.2.0` ·
+      document/register repair · Kingsman implementation · appending
+      D344–D353 on Kingsman's behalf
+    * **OPEN / UNRESOLVED** — `HOUSE_H2` admissibility for `HOUSE_H3` ·
+      abstention completeness NOT established · consumer invariant captured
+      but unenforced · denominator fail-open (successor obligation) ·
+      currentness classifier unbuilt · manifest-convention determinism ·
+      v1.0 `"sorted content"` ambiguity · D344–D353 not in the canonical
+      ledger · local mislabelled ref `backup-local-d344`
+    * **D-NUMBER ALLOCATION** — D344–D353 Kingsman (queued) · D354–D359
+      Orion. **Next free: D360**, subject to a fresh allocator check
+    * **P0** `32575388846` · **P1** `32594846522` — permanent. Counts
+      unchanged (Programme Rule 7).
+    
+    ---
+    ````
+    END-VERBATIM ORION-KAI-MIRROR-D359
+- EVIDENCE ORION-KAI-MIRROR-D390 D390_mirror.md: 8548 bytes, sha256 b1fd7803dbc1718f7c52c8e53cf757cb7b23886bf4e9b5a600df59e954018c5d, final LF True (added by Orion)  [CMD `sha256sum D390_mirror.md` → b1fd7803dbc1718f…]
+    BEGIN-VERBATIM ORION-KAI-MIRROR-D390
+    **ORION → KAI | MIRROR OF `kai-pm/DECISIONS.md` @ `b8cf819dd4545e0b1338fdf3edb1c05788b4d138`, lines 39366–39453, section D390 | EVIDENCE HANDOFF | record only | CANONICAL COPY: the repository file (blob `8d16459a1d5405ffeb4dfe5b29154144701dc6df`); this mirror: 7920 bytes, sha256 `7a713c08d0097e3cc475a1c347820676532167a680bc95eb0f2ff94ef559f573` (section text + final LF) | ACTION: read; the repository wins if they ever differ**
+    
+    Posted because your GitHub connector returns no content for files over 1 MB (see the main message). Text below is the section exactly as in the file, inside a fenced block.
+    
+    ````markdown
+    ## D390 — 2026-10-02 — D387 BUILD-EVIDENCE STORE AMENDMENT: DROPBOX WITHDRAWN; GIT-NATIVE IMMUTABLE EVIDENCE IDENTITY; CALIBRATION INTERPRETER RETAINED THROUGH CAPTURE. GOVERNANCE ONLY — BANKING IS NOT EXECUTION.
+    
+    **Allocator.** Derived structurally over `^## D[0-9]+( +—|$)` immediately before this append (2026-10-02T16:38:03Z): population **372**, distinct **372**, duplicates **none**, highest **D389**; D390 absent. **BANKING IS NOT EXECUTION.** No build, E7a execution, evidence-ref creation, repair mutation, capture, production Stage A, candidate, holdout, blind 40 or PR #122 merge authority follows from this entry.
+    
+    **Authority.** Kai's D387 store reconciliation ruling (received 2026-10-02T15:08:49Z; 18,747 bytes; sha256 `7cac4c9ba231027694522fe352d333f68acac938ad6a86197697e94ecfa61f3f`) and Kai's adjudication of Orion's return packet (received 2026-10-02T16:22:08Z; 6,341 bytes; sha256 `ac68e3e7a37328b7ad6c1d02cd66f9b95ac12be3ca7350aaf1fb7fc92b9e254b`), both relayed by Dainius and preserved byte for byte in `kai-pm/HANDOFF_LOG.md`. Banked at Dainius's explicit authorisation.
+    
+    **Kai's resolutions, verbatim:**
+    
+    > U1 RESOLVED: retain one successfully qualified D380 calibration interpreter artefact, byte-identical to the measured interpreter, through the separately authorised governed D379 capture or explicit retirement. Retention grants no capture authority and does not make it the eventual production candidate runtime.
+    >
+    > U2 RESOLVED: reject arbitrary T=16 MiB / U=32 MiB and reject publishing two 16 MiB synthetic objects merely to qualify Git. E7a-Git shall use minimal hostile synthetic objects sufficient to qualify exact-byte round-trip, binary/non-UTF8 handling, identity, wrong-object rejection, subject binding, publication/readback and failure semantics. Real transcript sizes are measured from the authorised builds. No truncation or evidence substitution is permitted. Transport incompatibility/size refusal = STOP.
+    >
+    > U5 RESOLVED: no forced ref-update test. Ref mutability is outside the relied-upon assurance property because the ref is locator only.
+    >
+    > U6 RESOLVED: build evidence remains immutable. Later qualification evidence is a separate append-only evidence object/record binding to the exact admitted build-evidence identity; do not rewrite the build object.
+    >
+    > U7 RESOLVED: canonical bounded evidence identity = exact Git commit object ID + SHA-256 of canonical MANIFEST.json. Locator refs carry zero admission authority.
+    >
+    > U3/U4 remain E7a-measured transport properties. Any incompatible actual behaviour = STOP.
+    >
+    > U8 confirmed: allocate the decision number and UTC date mechanically immediately before append.
+    >
+    > REPRESENTATION CORRECTION: replace “outside every branch tree” with the actual invariant: at admission the evidence object must not modify or be reachable through the D379 repair subject/fixity tree. A locator elsewhere does not enter F.
+    
+    ### 1. D387 AMENDED — BUILD-LOG STORE ONLY
+    
+    D387's selection of Dropbox as the durable canonical store for the D379 interpreter build transcripts is **WITHDRAWN**. No other D387 ruling is amended.
+    
+    **The requirement is unchanged:** the two complete raw interpreter-build transcripts and their binding metadata must survive the ephemeral build environment, remain durably and independently retrievable, and be bound to the exact build subject and environment (R10; D379 plan v4.5 §§19–20, 26–28). Dropbox is not a D379 or KAI architectural dependency.
+    
+    **Origin, recorded.** Dropbox entered D387 from a two-option framing Orion presented on 2026-09-25 ("such as your Dropbox or a GitHub Actions artefact"). That framing did not evaluate the repository itself or a Git-native evidence object.
+    
+    ### 2. CANONICAL EVIDENCE IDENTITY
+    
+    The build evidence is **one immutable Git commit** whose tree holds exactly: the complete Build A transcript, the complete Build B transcript, the frozen environment fingerprint E, the build-driver source, and `MANIFEST.json`.
+    
+    `MANIFEST.json` is canonical JSON (sorted keys, UTF-8, LF; schema `D379_E7_EVIDENCE_V1`) binding, for each of Build A and Build B: the transcript's SHA-256 and byte count; its source worktree, build directory and staging root; every command's return code; and the resulting interpreter's executable SHA-256 and `H2_PY_STDLIB_V1` identity. It also binds the SHA-256 of E, the §18 CPython source identity (tag object, commit, tree, signer fingerprint), the configure arguments and invocations, and the SHA-256 of the build-driver source.
+    
+    ```
+    ADMITTED EVIDENCE IDENTITY  =  ( Git commit object ID ,  SHA-256 of canonical MANIFEST.json )
+    LOCATOR REF                 =  discovery only; ZERO admission authority
+    ```
+    
+    If a locator ref moves, the admitted identity is unchanged.
+    
+    ### 3. PLACEMENT INVARIANT
+    
+    At admission the evidence object **must not modify, and must not be reachable through, the D379 repair subject or fixity tree.** A locator elsewhere does not enter F, nor the capture output population.
+    
+    ### 4. E7a-GIT — REPLACES THE STORE-CAPACITY TEST BEFORE ANY BUILD
+    
+    E7a-Git qualifies the actual Git transport with **minimal hostile synthetic objects**: exact-byte round-trip; binary and non-UTF-8 content; object identity; wrong-object rejection; subject binding; publication and independent readback by commit ID; and failure semantics, including OUTCOME_UNKNOWN. No large synthetic capacity objects are published. **No forced ref-update test is performed.** Proxy and GitHub acceptance limits (U3/U4) are measured, not assumed. **Failure, or any incompatible actual behaviour → NO BUILD.**
+    
+    **At E7b** the real transcript sizes are measured from the authorised builds, and both exact transcript objects must be accepted by the qualified representation. A size refusal or transport incompatibility → **STOP**. No truncation, compression workaround, evidence substitution or alternate transport without adjudication.
+    
+    ### 5. QUALIFICATION EVIDENCE IS APPEND-ONLY
+    
+    The build-evidence object is never rewritten. D380/D385 qualification evidence is a **separate** evidence object or record that binds to the exact admitted build-evidence identity.
+    
+    ### 6. CALIBRATION INTERPRETER RETENTION
+    
+    One successfully qualified D380 calibration interpreter artefact, **byte-identical** to the interpreter whose identity was measured, is retained through the separately authorised governed D379 capture, or until it is explicitly retired. **Retention grants no capture authority** and does not make it the eventual production candidate runtime (D385 §§D–E unchanged).
+    
+    ### 7. UNCHANGED
+    
+    D379 plan v4.5 is not rewritten; all other requirements of §§26–28 apply to this transport unchanged. D379, D380, D381, D385 and H2_STAGE_A_V2 are unchanged.
+    
+    ### THREAD RECOVERY BLOCK — D390
+    
+    ```
+    ENTRY        D390, GOVERNANCE ONLY. Amends D387's build-log store ONLY.
+    WITHDRAWN    Dropbox as the D379 build-evidence store.
+    REQUIREMENT  UNCHANGED: complete raw transcripts survive, durably and
+                 independently retrievable, bound to the exact subject/E.
+    IDENTITY     (Git commit object ID, SHA-256 of canonical MANIFEST.json).
+    LOCATOR      discovery only; zero admission authority.
+    PLACEMENT    not modifying / not reachable through the D379 repair
+                 subject or fixity tree at admission; never in F.
+    E7a-GIT      minimal hostile synthetic objects; no large capacity
+                 objects; no forced ref-update test; failure -> NO BUILD.
+    E7b          real sizes measured; refusal/incompatibility -> STOP.
+    QUALIFY      separate append-only evidence bound to the build identity.
+    RETENTION    one byte-identical qualified calibration interpreter kept
+                 through capture or explicit retirement; no capture
+                 authority; not the production candidate runtime.
+    NOT          build · E7a · evidence ref · repair · capture · Stage A ·
+    AUTHORISED   candidate · holdout · blind 40 · PR #122 merge.
+    ```
+    ````
+    END-VERBATIM ORION-KAI-MIRROR-D390
+
+### 6. Next authorised step
+
+- Post the three comments as banked (main, D359 mirror, D390 mirror); verify posted == banked; tell Dainius, with the lasting-fix decision in plain words  [CONVERSATION 2026-10-11 Dainius, "If you can help him with what came up empty"]
+
+### 7. What I am unsure of
+
+- Whether Kai's connector uses the same contents API; inferred from the matching symptom, not measured  [CMD `gh api contents` → reproduced here only]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
