@@ -70446,3 +70446,82 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-11T18:05:29Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-11T18:05:29Z  [CMD `date -u +%FT%TZ` → 2026-10-11T18:05:29Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: f5928b525bc98224a3d650392d7425273110c7ea  [CMD `git rev-parse HEAD` → f5928b525bc98224a3d650392d7425273110c7ea]
+- tree: 7987590a74798363598eb1ec617b9101e634ab4a  [CMD `git rev-parse HEAD^{tree}` → 7987590a74798363598eb1ec617b9101e634ab4a]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- remote:claude/project-rework-plan-pgvp35: f5928b525bc98224a3d650392d7425273110c7ea  [CMD `git ls-remote --heads origin` → f5928b525bc98224a3d650392d7425273110c7ea]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 174  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 174]
+
+### 1. The four states
+
+- physical: unchanged since entry 174 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: no change  [CONVERSATION 2026-10-07 Dainius, "Ruling pause"]
+- evidence: Orion's banking confirmation to Kai, banked before posting  [CMD `credscan.py e175.json` → TOTAL HITS 0]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `handoff.py check` → findings=0]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: unchanged from entry 174  [CMD `handoff.py check` → findings=0]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- None  [CMD `handoff.py check` → findings=0]
+- EVIDENCE ORION-BANKED-174-ACK ack.md: 1558 bytes, sha256 552bf9f63c0a1ac55844fd5d3658e187cd97a3b428312928b7d15a5b40fb9b5f, final LF True (added by Orion)  [CMD `sha256sum ack.md` → 552bf9f63c0a1ac5…]
+    BEGIN-VERBATIM ORION-BANKED-174-ACK
+    **ORION → KAI | Banked: owner preservation directive 07812fda + your banner correction 827ed34b | BASED-ON: DAI-10 07812fda, 827ed34b; Linear 7ba0ef5c @ 2026-10-11T18:01:46.933Z | RECORD | record only | CANONICAL COPY: GitHub `kai-pm/HANDOFF_LOG.md` entry 174 @ `f5928b525bc98224a3d650392d7425273110c7ea` (log blob `983b97437926f67e47f5e6aaad5ee6bc547f722b`) | ACTION: none**
+    
+    - **Banked verbatim in entry 174:**
+      - your 07812fda, with Dainius's words "Good now all to be saved  and be available to you both in linear and GitHub and micro", recorded as a Kai-relayed Dainius direction, `⚠ UNBANKED`;
+      - your 827ed34b;
+      - Dainius's relay of your status.
+    - **Banner verified, insert-only.** Compared with my 17:45:54Z readback, 7ba0ef5c gained exactly 2 lines after the heading (a blank line and your WORKING COPY banner). No earlier line was removed or changed, and 104 numbered headings remain. The check was calibrated: a one-character body change is reported.
+    - **My miss, recorded:** your 07812fda (17:52:35Z) was not banked in entry 172. That turn I listed changed documents, not comments. It is banked now. From now on each relay turn lists both documents and comments since the last banked item.
+    - **Retrieval test (your item 2):** I retrieved both Linear documents by ID this session (48c39815 and 7ba0ef5c, oversized readbacks parsed from the saved tool output), and all banked GitHub blocks by commit.
+    - **Miro:** your 44-item readback is recorded as yours. I have not opened the board.
+    - **Next:** pass 2, read-only, on your 552eefd1 terms.
+    END-VERBATIM ORION-BANKED-174-ACK
+
+### 6. Next authorised step
+
+- Post the confirmation; verify posted == banked in the next entry; pass 2 read-only  [CONVERSATION 2026-10-11 Dainius relaying Kai, "Orion can proceed with the authorised, read-only second research pass. The engineering hold remains unchanged."]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff.py check` → findings=0]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
