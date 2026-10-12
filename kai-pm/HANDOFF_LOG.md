@@ -73592,3 +73592,138 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-12T18:52:54Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-12T18:52:54Z  [CMD `date -u +%FT%TZ` → 2026-10-12T18:52:54Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 082577a59dca10fd60c866ec711788070c2fbeb4  [CMD `git rev-parse HEAD` → 082577a59dca10fd60c866ec711788070c2fbeb4]
+- tree: 0b7940e73ae4799fa13cde4d80eb5e711f70edae  [CMD `git rev-parse HEAD^{tree}` → 0b7940e73ae4799fa13cde4d80eb5e711f70edae]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/project-rework-plan-pgvp35: 082577a59dca10fd60c866ec711788070c2fbeb4  [CMD `git ls-remote --heads origin` → 082577a59dca10fd60c866ec711788070c2fbeb4]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 183  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 183]
+
+### 1. The four states
+
+- physical: unchanged since entry 183 apart from this entry; one stray untracked file from a failed command (`dai10_gold_review_post.md`, 471 bytes, header line only, never committed) was removed from the working tree  [CMD `git status --porcelain` → 0 lines after removal]
+- authorised: Linear comments are within O-2 record authority  [CONVERSATION 2026-10-12 Dainius, "Orion’s independent adversarial review"]
+- evidence: the posted text, banked below  [CMD `sha256sum dai10_gold_review_post.md` → see EVIDENCE line]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None  [CONVERSATION 2026-10-12 Dainius, "Orion’s independent adversarial review"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier certification  [CONVERSATION 2026-10-12 Dainius, "The engineering hold is unchanged."]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Awaiting Kai: pass-2 adjudication (8faf13e1) and repair of Gold Design views 1–8 (88f86eb2)  [CMD `list_comments DAI-10` → newest before the post: 8faf13e1, 2026-10-11T18:33:25Z]
+
+### 5. Incidents and corrections
+
+- Relay-turn listing done before posting: DAI-10 comments since the last banked item, none new (newest was Orion's 8faf13e1); Linear documents updated in the last 2 days, none after 2026-10-11T18:01:46Z  [CMD `list_comments DAI-10; list_documents updatedAt -P2D` → no new items]
+- POSTED to DAI-10 as comment 88f86eb2-437f-4aa0-b87e-91c6c6e11abe at 2026-10-12T18:52:25.791Z  [CMD `save_comment DAI-10` → id 88f86eb2]
+- VERIFIED posted == banked: the comment body equals the local post file, and its body after the header equals block ORION-GOLD-REVIEW-SUMMARY (entry 183) exactly; calibrated, a one-character change is detected  [CMD `python3 -I posted vs banked` → True, True, calibration True]
+- EVIDENCE ORION-DAI10-POST-88f86eb2 dai10_gold_review_post.md: 3936 bytes, sha256 83f40065778d40ec322a993f86d70a289d92021dcad010b3f4f3a97903b8c70b, final LF True (added by Orion)  [CMD `sha256sum dai10_gold_review_post.md` → 83f40065778d40ec…]
+    BEGIN-VERBATIM ORION-DAI10-POST-88f86eb2
+    **ORION → KAI | Independent review of Miro KINGSMAN GOLD DESIGN views 1–8 | BASED-ON: live board read 2026-10-12 (8 frames, 288 items); your verdict relayed by Dainius (banked entry 182) | REVIEW | record only | CANONICAL COPY: GitHub `kai-pm/HANDOFF_LOG.md` entry 183 @ `082577a59dca10fd60c866ec711788070c2fbeb4` (blocks ORION-GOLD-REVIEW-SUMMARY, -GRADES, -TERM-CHECKS) | ACTION: repair the views (your build); per-card reasons in block ORION-GOLD-REVIEW-GRADES**
+    
+    # Independent review — KINGSMAN GOLD DESIGN views 1–8 (Miro), 2026-10-12
+    
+    Reviewer: Orion (did not build these 8 views). Subject: the 8 frames titled
+    "KINGSMAN GOLD DESIGN 1–8", read from the live board on 2026-10-12 (288 items,
+    0 skipped); every card links to commit 422bfb5797a2. Instrument: single-producer
+    judgement of each card against the section its link opens, with long sections
+    searched in full for the card's key terms. Not independent corroboration.
+    
+    ## Verdict
+    
+    NOT READY for Gold Tier. The direction is sound and the security view is strong,
+    but the board does what Kai's own standard forbids: some elements look sourced
+    without the source saying what they say.
+    
+    ## Counts (unit = cards; 64 = 8 views x 8 cards)
+    
+    - links resolve to a real file and line at 422bfb5: 64 of 64
+    - SUPPORTED (S): 21 · PARTIAL (P): 31 · NOT AT LINK (N): 12
+    - per view (S/P/N): 1: 2/5/1 · 2: 0/5/3 · 3: 3/5/0 · 4: 3/4/1 · 5: 6/2/0 ·
+      6: 3/4/1 · 7: 3/3/2 · 8: 1/3/4
+    
+    ## Structural findings
+    
+    1. No diagrams. The 8 views hold 216 text boxes and 72 rectangles, 0 arrows or
+       connectors. The end-to-end "one KAI" diagram the 2026-10-11 assessment called
+       "most important" does not exist yet.
+    2. Research content cited as specification. V7.5 calls the sequence
+       CURRENT → QUALIFY → ADAPT → SHADOW → COMPARE → CANARY → VERIFIED CUTOVER →
+       PROVE OLD PATH DEAD → RETIRE a "law" and cites the product specification;
+       the specification has none of it (shadow=0, canary=0 in the whole file). The
+       verbatim source is the Deep Research report (handoff entry 164), which is
+       still awaiting pass-2 adjudication. V8.4 (100 competing attempts) and V2.8
+       (stable feature identifiers) follow the same pattern. A candidate that has not
+       passed adjudication is being presented with specification authority.
+    3. Evidence-class labels are free text: 57 distinct labels on 64 cards, not the
+       frozen protocol vocabulary.
+    4. Coarse links: 58 of 64 open a section heading; sections run up to 218 lines.
+       The remaining 6 open a README table row.
+    5. No navigation between views and the feature atlas. Each view links only to
+       GitHub (8 links) and Linear (1); view 2 tells the reader to "click the
+       corresponding feature-atlas frame" but there is no such link and no index frame.
+    6. Real gaps shown as if covered. V6.7 (family, visitors, bystanders) and V8.6
+       (hazards, assumptions) state requirements the linked specification does not
+       contain. They are true gaps and should be labelled as gaps, not cited.
+    
+    ## What a repair needs (for Kai, the builder)
+    
+    - re-cite each N card to the source that actually states it (D359, v1.1 draft,
+      research report, entry 167), and mark research-only content as candidate, not law;
+    - narrow P cards to what the link says, or add the second source;
+    - one evidence-class vocabulary, taken from the frozen protocol;
+    - links into the atlas frames and one index frame;
+    - the end-to-end diagram, with every arrow sourced or marked UNKNOWN.
+    
+    ## Limits
+    
+    - One reviewer's judgement; the P/N boundary is a judgement call.
+    - "Not at the link" is not "unsupported anywhere": for example V8.8's programme
+      order is correct per D359 (DECISIONS.md L30275), but D359 is not the link.
+    - Universe: the 8 Gold Design frames only. The 14 older frames at the top of the
+      board were not reviewed. The 12 atlas frames were checked on 2026-10-12, and
+      O9, O10, O11 and ENG are Orion's own work, so that check is not independent.
+    END-VERBATIM ORION-DAI10-POST-88f86eb2
+
+### 6. Next authorised step
+
+- Report to Dainius in plain words. No board change until Kai repairs the views or Dainius rules otherwise  [CONVERSATION 2026-10-12 Dainius, "Orion’s independent adversarial review"]
+
+### 7. What I am unsure of
+
+- Nothing new beyond entry 183 section 7  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
