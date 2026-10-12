@@ -72928,3 +72928,119 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-12T11:28:39Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-12T11:28:39Z  [CMD `date -u +%FT%TZ` → 2026-10-12T11:28:39Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 422bfb5797a2c23458b036d8276d32db3a12fa1a  [CMD `git rev-parse HEAD` → 422bfb5797a2c23458b036d8276d32db3a12fa1a]
+- tree: ee955f39e00df069f5433cce90f02ee5576d8da5  [CMD `git rev-parse HEAD^{tree}` → ee955f39e00df069f5433cce90f02ee5576d8da5]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 422bfb5797a2c23458b036d8276d32db3a12fa1a  [CMD `git ls-remote --heads origin` → 422bfb5797a2c23458b036d8276d32db3a12fa1a]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 181  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 181]
+
+### 1. The four states
+
+- physical: unchanged since entry 181 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: unchanged from entry 179 — Gold-Tier Miro structure, documentation only; Orion now in the reviewer role for views Orion did not build  [CONVERSATION 2026-10-11 Dainius, "subject the result to Orion’s independent completeness check before calling it Gold Tier"]
+- evidence: Kai's verdict on the Miro upgrade, relayed by Dainius, preserved in section 5 before any action on it  [CMD `cat .git/kai-ruling-capture/dbe3f26537ffd4d7.json` → flagged long(1983), keyword(verdict)]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-12 (relayed by Dainius) · verdict: the Miro upgrade "has reached a substantial, source-linked professional architecture baseline", its "structural feature-coverage check passes", and Gold Tier certification "remains open"; Orion's independent adversarial review is pending; engineering hold unchanged. Verbatim in section 5 ⚠ UNBANKED  [CONVERSATION 2026-10-12 Dainius, "Current verdict: The Miro upgrade has reached a substantial, source-linked professional architecture baseline."]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; any code change  [CONVERSATION 2026-10-12 Dainius, "The engineering hold is unchanged."]
+- HELD: Gold Tier certification  [CONVERSATION 2026-10-12 Dainius, "final Gold Tier certification remains open"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Kai's figures not yet checked by Orion: 729 board items, 34 frames, 8 Gold Design views. Orion's readback at 2026-10-12T06:5xZ saw 441 board items, so roughly 288 items were added after it. Kai's text names "Seven detailed Gold Tier engineering views" in its table and "8 Gold Design views" in its counts; which is right is UNKNOWN until read  [CMD `canvas_search text:FEATURE ATLAS` → total_items 441 at entry 181]
+- Unanswered from entry 181: the two small fixes on Kai's frames (O5–O8 footer note; "KINGSMan" in O1–O4 titles)  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 5. Incidents and corrections
+
+- Verbatim capture: the ruling-capture store's text equals the transcript extraction (2,000 characters; the banked file adds the final newline)  [CMD `python3 -I compare capture vs extraction` → capture == extracted: True]
+- Credential scan of the message (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py kai_gold_verdict_20261012.txt` → TOTAL HITS 0]
+- EVIDENCE KAI-MIRO-GOLD-VERDICT-dbe3f265 kai_gold_verdict_20261012.txt: 2011 bytes, sha256 3ace04974a430f1755240c5a0bf69999ecd49d26183055ce26248292883f518f, final LF True (added by Orion)  [CMD `sha256sum kai_gold_verdict_20261012.txt` → 3ace04974a430f17…]
+    BEGIN-VERBATIM KAI-MIRO-GOLD-VERDICT-dbe3f265
+    Brother, we’ve made substantial progress, but KAI’s Miro upgrade is not Gold Tier certified yet.
+    
+    The most important achievement is that I located and inspected all 12 feature-atlas sections on the live board: 11 organs plus Engineering. They contain the individual README features, with links back to their source requirements.
+    
+    Area	Last verified position
+    Feature atlas	12 sections present
+    README feature coverage	104 features represented
+    Existing architecture and assurance	Preserved
+    Seven detailed Gold Tier engineering views	Not yet verified complete
+    Independent Orion review	Pending
+    Gold Tier certification	Pending
+    
+    Yesterday, Miro stopped further work because its Free-plan integration had reached the 100-call daily limit. That interrupted the remaining build and verification.
+    
+    I’m checking whether access has reset so we can finish the outstanding work.
+    
+    Today’s verification is a major improvement. The live Miro board now contains:
+    
+    729
+    
+    Board items
+    
+    34
+    
+    Frames
+    
+    8
+    
+    Gold Design views
+    
+    I performed a combined live readback of all 12 feature-atlas sections. The result was:
+    
+    * 104 of 104 feature identifiers present.
+    * 104 unique identifiers, with no missing numbers or duplicates.
+    * 104 GitHub source links within those sections.
+    * All eight Gold Design views are readable and contain source-linked engineering requirements, limitations and evidence classifications.
+    
+    I also verified that a sampled architectural reference resolves to the pinned GitHub source.
+    
+    What remains before certification is deeper checking of nested subfeatures, technical integration diagrams, source-level accuracy throughout, and Orion’s independent adversarial review. The documented requirements are much stronger now, but actual KAI runtime operation remains unverified.
+    
+    Current verdict: The Miro upgrade has reached a substantial, source-linked professional architecture baseline. Its structural feature-coverage check passes; final Gold Tier certification remains open.
+    
+    The engineering hold is unchanged.
+    END-VERBATIM KAI-MIRO-GOLD-VERDICT-dbe3f265
+
+### 6. Next authorised step
+
+- Read-only: measure the board (item and frame counts), locate the Gold Design views, then carry out the independent review of the views Orion did not build: every element's source link resolves and supports what the element says, or the element is marked as a finding  [CONVERSATION 2026-10-12 Dainius, "Orion’s independent adversarial review"]
+
+### 7. What I am unsure of
+
+- Who built the 8 Gold Design views and when; independence holds only for views Orion did not author. Orion authored atlas frames O9, O10, O11 and ENG, so Orion's check of those is not independent  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
