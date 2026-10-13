@@ -75084,3 +75084,142 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-13T18:24:28Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-13T18:24:28Z  [CMD `date -u +%FT%TZ` → 2026-10-13T18:24:28Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: c054c2f2ee5443456f21e2d13582f339b79b58e8  [CMD `git rev-parse HEAD` → c054c2f2ee5443456f21e2d13582f339b79b58e8]
+- tree: c96ae7827f46cfd4d13326afb0994c046c25889b  [CMD `git rev-parse HEAD^{tree}` → c96ae7827f46cfd4d13326afb0994c046c25889b]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/project-rework-plan-pgvp35: c054c2f2ee5443456f21e2d13582f339b79b58e8  [CMD `git ls-remote --heads origin` → c054c2f2ee5443456f21e2d13582f339b79b58e8]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 187  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 187]
+
+### 1. The four states
+
+- physical: unchanged since entry 187 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Orion's independent review of Kai's third remediation pass, read-only, when Miro access permits  [CONVERSATION 2026-10-13 Kai, "When Miro access permits, verify each of the **110 EIDs against a specific claim and source**"]
+- evidence: Dainius's relay and Kai's DAI-10 comment 3a54b56d, preserved in section 5 before any review work  [CMD `cat .git/kai-ruling-capture/511906d940e75094.json` → flagged long(1669), keyword(hold)]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-13 (relayed by Dainius, and DAI-10 3a54b56d at 18:22:49Z) · third remediation pass: four PARTIAL cards amended, 21 accepted cards relabelled "SOURCE SUPPORTED; RUNTIME UNKNOWN", 110 numbered diagram edges, an edge-provenance register frame 3458764687079735917 whose source pointers are contextual and not per-edge checked; Navigator update and full-board readback not done because the shared Miro daily limit was reached; F7 and F12 OPEN; Gold Tier HOLD. Verbatim in section 5 ⚠ UNBANKED  [CONVERSATION 2026-10-13 Kai, "Third Gold Design remediation, board-limited handoff"]
+- Owner decision still open, raised by Kai to Dainius: approve Orion's eight cosmetic corrections (four "KINGSMan" title spellings, four "names shortened for display" notices). Kai states they remain UNAUTHORISED and untouched. No answer from Dainius yet ⚠ UNBANKED  [CONVERSATION 2026-10-13 Dainius, "do you approve Orion’s proposed eight cosmetic corrections"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier certification  [CONVERSATION 2026-10-13 Dainius, "Gold Tier: HOLD."]
+- NOT AUTHORISED: the eight cosmetic edits on Kai's atlas frames, until Dainius answers  [CONVERSATION 2026-10-13 Kai, "**Owner-only eight cosmetic edits remain UNAUTHORISED**"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Not yet checked by Orion: every claim in 3a54b56d about the board (card fixes, 110 edges, the register frame's 50 items, labels on Visuals 5, 7 and 9, operator-feature joins)  [CONVERSATION 2026-10-13 Kai, "No claim otherwise."]
+
+### 5. Incidents and corrections
+
+- Relay-turn listing: DAI-10 comments newer than Orion's 95ef9966 = 1 (3a54b56d), banked here; Linear documents updated in the last 2 days = 0  [CMD `list_comments DAI-10; list_documents updatedAt -P2D` → 1 comment, 0 documents]
+- Credential scan of the two texts (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py e188.json` → TOTAL HITS 0]
+- EVIDENCE DAINIUS-RELAY-511906d9 dainius_relay_20261013b.txt: 1717 bytes, sha256 b13fb5b41b27def8e2910e6ea616a016e2cb1f4495c28b9f8f11273efde82d49, final LF True (added by Orion)  [CMD `sha256sum dainius_relay_20261013b.txt` → b13fb5b41b27def8…]
+    BEGIN-VERBATIM DAINIUS-RELAY-511906d9
+    Gold Architecture — remediation update
+    
+    Brother, I’ve acted on Orion’s findings and completed another controlled Miro repair pass.
+    
+    Latest verified progress
+    
+    Saved
+    
+    110
+    
+    Numbered diagram connections
+    
+    9
+    
+    Integrated diagrams
+    
+    4
+    
+    Disputed cards amended
+    
+    The four missing operator features are now represented in KAI’s cognitive diagrams. I also connected dream consolidation, MARS, failure clustering, boundary recalibration and confession to the existing memory/reasoning flow.
+    
+    I created a separate 110-connection provenance register in Miro⁠￼.
+    
+    Important: Those connections are now identifiable and have contextual source pointers, but individual arrows have not yet been independently proven against precise source passages. They remain design evidence requiring qualification.
+    
+    I’ve also corrected misleading source references, labelled migration proposals as proposals and restored explicit runtime-unknown qualifications to the previously supported cards.
+    
+    What is still open
+    
+    The Miro integration reached its reported shared daily limit before I could complete the final navigation update and full-board readback. Those remaining tasks are recorded, not silently marked complete.
+    
+    I’ve sent Orion the exact status and review instructions in Linear DAI-10⁠￼, comment 3a54b56d, verified against the submitted text.
+    
+    Gold Tier: HOLD. We still need arrow-by-arrow source adjudication, full nested-feature acceptance coverage and visual verification.
+    
+    One small owner decision remains outstanding: do you approve Orion’s proposed eight cosmetic corrections—four KINGSMan spelling fixes and four “names shortened for display” notices? No technical content or features would change.
+    
+    OHANA.
+    END-VERBATIM DAINIUS-RELAY-511906d9
+- EVIDENCE KAI-DAI10-3a54b56d comment_3a54b56d.md: 6072 bytes, sha256 fdcb48f6ea172f3cb75b85b6c5ac8a23b6735fb4185a3dacc151aac9cdcc8a32, final LF True (added by Orion)  [CMD `sha256sum comment_3a54b56d.md` → fdcb48f6ea172f3c…]
+    BEGIN-VERBATIM KAI-DAI10-3a54b56d
+    **KAI → ORION | DAI-10 | Third Gold Design remediation, board-limited handoff | 2026-10-13 | REVIEW / NEEDS EVIDENCE | SOURCE AND RUNTIME HOLD**
+    
+    **BASED-ON:** Orion's independent review DAI-10 comment `95ef9966-45eb-477e-a306-b2111475bea8`, canonical entry 186 @ `2681ff3`; prior Kai review packet DAI-10 `316cd9b5`. Existing Miro board https://miro.com/app/board/uXjVEd6GMHU=/ ; design sources anchored to GitHub commit `422bfb5797a2c23458b036d8276d32db3a12fa1a`. This is an explicitly bounded **Miro design-projection correction**, not a change to code, constitutional canon or release.
+    
+    **CHANGES CONFIRMED AS SAVED BY MIRO'S UPDATE RESPONSES**
+    1. Repaired the four disputed Gold Design cards: **V1.6** distinguishes observed reality from synthetic imagination as a target requirement, citing spec §6.7; **V2.1** distinguishes the 104/356 generator result from the separately recorded 348-distinct-lines note (DAI-10/entry 170, still needs pinpoint citation); **V4.8** restores Ollama as the README/current baseline and keeps alternate inference and speech as candidates; **V6.1** corrects the doctrine's learned-state scope, removing the implication all learned state is owner-confirmed.
+    2. Marked **V1.2 and V3.1** explicitly **TARGET DESIGN** rather than live implementation. Rephrased footers on the **21 previously S-graded cards** as `REVIEW: ACCEPT WITH LIMITS | SOURCE SUPPORTED; RUNTIME UNKNOWN`. Miro update reported 31 updated, 0 created, 0 deleted.
+    3. Updated the **nine conceptual flow diagrams** in their existing frames: fixed identified bad-line anchors (e.g. Visuals 4/6/7/8/9), renamed mismatched citation labels, labelled Visual 5's detailed shadow/compare/canary path as **RESEARCH CANDIDATE** and Visual 7 stable feature IDs as **PROPOSED**; qualified recovery/succession diagrams as target/proposed only. Added actual operator-context joins to Visual 1 and Visual 8 (**cognitive fingerprint, emergent rituals, struggle detection, anti-annoyance, PUB/WORK**) without inventing new runtime modules. Added **MARS, failure clustering, boundary recalibration and source-backed confession** to Visual 2. Diagram-edit response: 25 updated, 0 created/deleted.
+    4. Added explicit **E01… edge labels** to every connection in the nine Miro diagrams: **110 current edges** (16/16/12/11/10/11/10/14/10). Edge annotation update: 20 updated, 0 created/deleted. This grows Orion's pre-change 100-arrow count because we added operator/dream integration joints.
+    5. Created **one consolidated edge-provenance register frame**, ID `3458764687079735917`, direct view https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764687079735917, with 9 diagram columns / 110 rows, 18 linked source pointers, explicit `T/U` (target design/unverified runtime) and `P/U` (proposed integration/unverified runtime). Create response 50 new Miro items, no failed/skipped. Direct live read confirmed frame exists with 50 items, links and edge IDs.
+    
+    **CRITICAL LIMIT / TRUTHFUL CLASSIFICATION:** This is a *traceability index*, NOT per-edge evidence admission. S1/S2 source pointers were assigned as contextual references by diagram/edge order; **they are NOT individually checked as substantively supporting each depicted edge**. The register itself states this explicitly. It would be improper to mark F7 CLOSED or Gold accepted until an independent per-edge evidence pass either validates the particular connection against pinpointed source text or marks it PROPOSED/UNKNOWN and demands more evidence. Similarly the README says several operator functions are code-present/flagged; none of these diagrams prove active runtime integration or privacy compliance.
+    
+    **VERIFIED TOOL READBACK LIMIT / OPEN TASKS:** After the new provenance register was created, the direct register-frame read succeeded; a subsequent Navigator read was rejected by the **shared Miro MCP 100-call/day organisation quota**. I stopped Miro changes immediately. Thus the Navigator has NOT been extended to link the new edge-register frame. The desired supplemental Gold Design 3 operator-feature prose/source integration is also NOT applied (only the main cognitive diagrams were integrated). The final post-edge-ID nine-diagram complete census, pixel legibility, click-through test of 110 IDs, and post-repair link audit are NOT independently performed. No claim otherwise.
+    
+    **REQUESTED ORION REVIEW / NEXT ROUTE**
+    A. Preserve this exact relay under append-only hook if allowed, identify corresponding commit/entry; do not self-admit or remove earlier findings.
+    B. When Miro access permits, verify each of the **110 EIDs against a specific claim and source**, not only S1/S2 family links. Any source-attribution-by-position must be replaced by line-based evidence or frankly retained as hypothesis. Check Mermaid labels render without collisions and whole-board visual legibility.
+    C. Verify card fixes V1.6/V2.1/V4.8/V6.1 and restored SOURCE/RUNTIME classes on all 21; pinpoint entry 170's exact 348 record rather than a general issue link.
+    D. Check Visual 5 sequence is clearly **research**, Visual 7 feature IDs remain **proposed**, Visual 9 absence/incapacity distinction is compatible with exact succession doctrine; no new authority is implied.
+    E. Confirm integrations for rituals, struggle, anti-annoyance, fingerprint, PUB/WORK, MARS, failure clustering, boundary recalibration and confession in one coherent pipeline and apply an owner-readable acceptance route for every nested README obligation (F12 remains OPEN).
+    F. Add source-index/edge-register link to Navigator when reset permits; add those operator joins to Gold Design 3 prose; recheck physical diagram links, card references and 14 older frames as a separate scope.
+    G. **Owner-only eight cosmetic edits remain UNAUTHORISED**: four KINGSMan titles and four display-abbreviation notices. I deliberately left them untouched pending Dainius's explicit ruling.
+    
+    **Disposition:** meaningful progress on F6, F8, F9, F10, F11; **F7 and F12 OPEN; GOLD TIER HOLD; PRE-RAMS HOLD, D359, engineering pause and PR #122 DO NOT MERGE unchanged**.
+    END-VERBATIM KAI-DAI10-3a54b56d
+
+### 6. Next authorised step
+
+- Try Miro read-only; if the shared daily limit still blocks, report and review when it resets  [CONVERSATION 2026-10-13 Kai, "When Miro access permits"]
+
+### 7. What I am unsure of
+
+- When the shared Miro limit resets; on 2026-10-11 it was still blocked at 22:44Z and open by 06:50Z on 2026-10-12  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
