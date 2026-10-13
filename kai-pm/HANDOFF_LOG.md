@@ -77711,3 +77711,73 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-13T19:32:56Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-13T19:32:56Z  [CMD `date -u +%FT%TZ` → 2026-10-13T19:32:56Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 355db5e531c3442b142105e5219fc5bad3fa5d44  [CMD `git rev-parse HEAD` → 355db5e531c3442b142105e5219fc5bad3fa5d44]
+- tree: 891a0a42a2ac66a93b792ce1bcab9d2ca07e6b05  [CMD `git rev-parse HEAD^{tree}` → 891a0a42a2ac66a93b792ce1bcab9d2ca07e6b05]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/project-rework-plan-pgvp35: 355db5e531c3442b142105e5219fc5bad3fa5d44  [CMD `git ls-remote --heads origin` → 355db5e531c3442b142105e5219fc5bad3fa5d44]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 198  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 198]
+
+### 1. The four states
+
+- physical: unchanged since entry 198 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Linear comments and the owner page are within O-2 record and planning authority  [CONVERSATION 2026-10-13 Dainius, "Close those twelve items, then approve."]
+- evidence: post identity, verification and page version below  [CMD `save_comment DAI-10` → id 72238b2c]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None; this entry records the post of v3 only  [CONVERSATION 2026-10-13 Dainius, "Close those twelve items, then approve."]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier; no research cards, folders or scripts until D1 and D2  [CONVERSATION 2026-10-13 Dainius, "Close those twelve items, then approve."]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Awaiting Kai: adjudication of v3 and its 15 dispositions, his network access, his D4 and D5 views (72238b2c). Awaiting Dainius: D1–D5 and the reviewers' identity  [CMD `save_comment DAI-10` → id 72238b2c]
+
+### 5. Incidents and corrections
+
+- Session-start READ after compaction: 3 DIFFERS (head, tree, remote branch), all from Orion's own entry-198 commit 355db5e; WRITE-DUE NOT-DUE  [CMD `handoff.py verify` → compared=22 match=19 differs=3]
+- Relay-turn listing before posting: newest DAI-10 comment was Orion's 4347ae56; newest Linear document update 2026-10-11T18:01:46Z  [CMD `list_comments DAI-10 limit 1; list_documents orderBy updatedAt limit 5` → 0 new]
+- Credential scan of the post text: calibration 6/6, 0 hits over 22837 chars  [CMD `python3 -I credscan.py credscan_in.json` → TOTAL HITS 0]
+- POSTED to DAI-10 as comment 72238b2c-d47f-4acf-ae27-9607a05ecc80 at 2026-10-13T19:32:11.346Z  [CMD `save_comment DAI-10` → id 72238b2c]
+- VERIFIED posted == banked: the body after the header equals block ORION-RESEARCH-PROPOSAL-V3 (entry 198, sha256 4db0f8d6cadfbede…); calibrated with a one-character change  [CMD `python3 -I posted vs banked` → True, calibration True]
+- REPUBLISHED the owner page https://claude.ai/artifact/HvYeF69koxMtHibmE4hkHy as version 3; its embedded text equals block ORION-RESEARCH-PROPOSAL-V3; v1 and v2 remain in entries 192 and 195  [CMD `Artifact publish research_proposal.html` → Version 3]
+
+### 6. Next authorised step
+
+- Report to Dainius in plain words with D1–D5; then wait for Kai's adjudication of v3 and Dainius's decisions. The new thread (entry 191) carries on from here  [CONVERSATION 2026-10-13 Dainius, "Close those twelve items, then approve."]
+
+### 7. What I am unsure of
+
+- Nothing new  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
