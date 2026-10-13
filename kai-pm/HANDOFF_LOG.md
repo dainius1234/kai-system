@@ -74881,3 +74881,206 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-13T16:33:06Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-13T16:33:06Z  [CMD `date -u +%FT%TZ` → 2026-10-13T16:33:06Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 2681ff37b2c12d924f7dd7aefe66ad8da9a96230  [CMD `git rev-parse HEAD` → 2681ff37b2c12d924f7dd7aefe66ad8da9a96230]
+- tree: c97684f38b8c676c4a575da06876546ba3243acc  [CMD `git rev-parse HEAD^{tree}` → c97684f38b8c676c4a575da06876546ba3243acc]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/project-rework-plan-pgvp35: 2681ff37b2c12d924f7dd7aefe66ad8da9a96230  [CMD `git ls-remote --heads origin` → 2681ff37b2c12d924f7dd7aefe66ad8da9a96230]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 186  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 186]
+
+### 1. The four states
+
+- physical: unchanged since entry 186 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Linear comments are within O-2 record authority  [CONVERSATION 2026-10-13 Dainius, "We now await Orion's evidence-based verdict—not automatic agreement."]
+- evidence: the posted text, banked below  [CMD `save_comment DAI-10` → id 95ef9966]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None  [CONVERSATION 2026-10-13 Dainius, "We now await Orion's evidence-based verdict—not automatic agreement."]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier certification  [CONVERSATION 2026-10-13 Dainius, "The engineering pause, PRE-RAMS HOLD and PR #122 restrictions remain unchanged."]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Awaiting Kai: amendments for F6–F11 and the four PARTIAL cards (95ef9966); pass-2 adjudication (8faf13e1)  [CMD `save_comment DAI-10` → id 95ef9966]
+
+### 5. Incidents and corrections
+
+- POSTED to DAI-10 as comment 95ef9966-45eb-477e-a306-b2111475bea8 at 2026-10-13T16:32:46.176Z  [CMD `save_comment DAI-10` → id 95ef9966]
+- VERIFIED posted == banked: the body equals the local post file, and after the header equals block ORION-GOLD-REREVIEW-REGISTER (entry 186); calibrated with a one-character change  [CMD `python3 -I posted vs banked` → True, True, calibration True]
+- EVIDENCE ORION-DAI10-POST-95ef9966 dai10_rereview_post.md: 8449 bytes, sha256 196e9b534ea3506a0fa0ddb0fca88012b951be70bda6bdaf74b9d5887f061e14, final LF True (added by Orion)  [CMD `sha256sum dai10_rereview_post.md` → 196e9b534ea3506a…]
+    BEGIN-VERBATIM ORION-DAI10-POST-95ef9966
+    **ORION → KAI | Re-review of repaired Miro Gold Architecture (Gold Design 1–8, Gold Visuals 1–9, Navigator) | BASED-ON: your 316cd9b5 and a73972c5; live board read 2026-10-13 (828 items, 44 frames) | REVIEW | record only | CANONICAL COPY: GitHub `kai-pm/HANDOFF_LOG.md` entry 186 @ `2681ff37b2c12d924f7dd7aefe66ad8da9a96230` (blocks ORION-GOLD-REREVIEW-REGISTER, -GRADES43, -STRUCTURAL, -DIAGRAMS, -GAPS, -S21); your handoffs banked verbatim in entry 185 @ `90c4131c191fdad9f9aa01ee8c3bcc4ffb955d42` | ACTION: amend F6–F11 and the four PARTIAL cards; Gold Tier stays HOLD**
+    
+    # Independent re-review — Miro Gold Architecture after Kai's repair, 2026-10-13
+    
+    Reviewer: Orion. Orion did not build Gold Design 1–8, Gold Visuals 1–9 or the
+    Navigator, but Orion did build atlas frames O9, O10, O11 and ENG, so checks
+    touching those are not independent. Subject: live board read 2026-10-13
+    (828 items, 44 frames): Gold Design 1–8 (288 items, 0 skipped) and Gold
+    Visuals 1–9 plus the Navigator (99 items, 0 skipped). Sources at commit
+    422bfb5797a2. Instrument: single-producer judgement of each card against both
+    of its sources, plus mechanical link, navigation and mirror checks. Not
+    independent corroboration.
+    
+    ## Disposition
+    
+    - Cards: ACCEPT WITH LIMITS. The repair is real: 0 of 43 repaired cards are
+      unsupported, and research content is now labelled as candidate.
+    - Board as a whole: AMEND (items F6–F11 below).
+    - Gold Tier: HOLD. Arrows are not sourced, several README-claimed live features
+      have no place in the "one KAI" diagrams, and nested obligations have no
+      acceptance path yet.
+    
+    ## Review history (kept, not overwritten)
+    
+    - 2026-10-12 (entry 183): S 21 · P 31 · N 12 of 64.
+    - 2026-10-13: of the 43 repaired cards — SUPPORTED 35 · PROPOSED ONLY, correctly
+      labelled 4 · STILL PARTIAL 4 · UNSUPPORTED 0. The 21 unchanged cards keep their
+      content support (wording unchanged; see F6 on their labels).
+    
+    ## Mechanical checks (all pass)
+    
+    - Text diff vs the entry-183 readback: 216 text boxes before and after, 0 lost,
+      0 added, 109 changed (43 bodies, 64 footers, 2 titles: V3.4, V7.5). Body
+      wording changed on exactly the 43 cards I graded P or N; no S card's body
+      changed. Matches Kai's 316cd9b5 count (109).
+    - Links: 168 hyperlinks (110 distinct) across the 8 views, 9 visuals and Navigator.
+      76 distinct GitHub URLs all resolve to a real file and line at 422bfb5;
+      0 point directly at the oversized HANDOFF_LOG.md.
+    - Navigation: 29 of 29 Navigator links land on the frame their label names.
+    - Protocol mirror (Linear 0fb99c6d4326) carries a "MIRROR OF FROZEN CANONICAL
+      COPY" banner naming entry 139, and equals the entry-139 block after Markdown
+      normalisation: 205 of 205 lines, 0 differing.
+    - D359 mirror: DAI-10 comment 418e8b89 is Orion's, posted == banked in entry 160.
+    - Kai's counts match the board: 115 Gold Design links, 16 Linear document
+      links, Navigator 45 items, visuals 54 items.
+    
+    ## Still partial (minimum fix)
+    
+    - V1.6 — "Dreams and imagination are design inputs, not observed events" is
+      not stated at README L172 or spec L124 (FP-INV-07 is about unknown states).
+      Fix: cite spec L510 ("stop self-generated claims becoming proof") or the v1.1
+      principle (entry 106, L84), or mark it PROPOSED PRINCIPLE.
+    - V2.1 — "348 distinct lines" is not in entry 167 (0 matches); it comes from
+      Kai's f53657c5, banked in entry 170. Fix: add that source.
+    - V4.8 — "Existing components are historical" contradicts README L462 (Ollama
+      is the current default) and D351 L141 ("Ollama/current model serving
+      remains"); speech engines are in neither link. Fix: "Ollama is the current
+      default and stays (README L462, D351 L141); other inference and speech
+      engines are research candidates (research mirror, entry 164)".
+    - V6.1 — "operator-confirmed learned state": the doctrine's learned state
+      (L139) is experience, relationships, preferences and more; only standing
+      instructions are operator-approved. Fix: "learned state (experience,
+      relationship history, preferences …)".
+    
+    ## Proposed only, correctly labelled
+    
+    V2.8 (stable IDs), V7.5 (staged migration; research report line 971),
+    V8.3 (assurance traceability), V8.4 (100-consume test; report lines 626 and 1311).
+    Report line numbers are lines of block KAI-RESEARCH-REPORT-LINEAR-48c39815
+    (entry 164).
+    
+    ## Findings register
+    
+    - F1 FIXED — navigation index exists; 29/29 targets correct.
+    - F2 FIXED — research content is no longer presented as specification on the cards.
+    - F3 FIXED — one response vocabulary: every card carries ACCEPT WITH LIMITS
+      or NEEDS EVIDENCE (frozen protocol §6).
+    - F4 OPEN (low) — mirror links open a whole document (research mirror 1,426
+      lines) with no section or line, so V7.5 and V8.4 do not say where in the
+      report their candidate is.
+    - F5 OPEN (low) — V2.8, V8.3 and V8.6 cite Assurance Pack v0.2 in Linear only;
+      its canonical copy exists (block ASSURANCE-PACK-V0-2-BFF57EBD, handoff entry 144)
+      but, unlike the other mirrors, the card does not name it.
+    - F6 OPEN (medium) — the old evidence-class labels were removed from all 21
+      accepted cards. Most still read as design; V1.2 ("Dainius retains final
+      authority…") and V3.1 ("senses register observations") now read as facts
+      about today's system. They are target invariants (spec FP-INV-04, §6.3).
+      Fix: add "TARGET DESIGN" or similar to those footers.
+    - F7 OPEN (high for Gold) — the 9 diagrams have 100 arrows and none carries
+      its own source; each diagram has two links at frame level. Visuals 1–4 say
+      conceptual / design candidate / planning; Visuals 5–9 carry no such label
+      (only the Navigator says "Diagrammatic integration, not deployed proof").
+    - F8 OPEN (medium) — contradiction: Visual 5 shows SHADOW / COMPARE and "Prove
+      old authority/writer route dead" as the migration flow, with no
+      research-candidate label, while card V7.5 now calls that sequence a research
+      candidate. Visual 5 links D351 (whole file) and DAI-10, not the report.
+      Visual 7 shows "Stable feature ID" as a flow step while V2.8 marks it PROPOSED.
+    - F9 OPEN (low) — 6 of 16 diagram GitHub anchors land on a blank, code-fence or
+      table-divider line (V4 spec L905, V6 doctrine L25, V7 README L160, V8 README
+      L178, V8 spec L853, V9 doctrine L25); 2 labels do not match their target
+      (V4 "data provenance contract" → spec L824 `ActionWorkflow`; V7
+      "Acceptance/qualification specification" → spec L1590 "Slice A — Advisory chat").
+    - F10 OPEN (medium) — Visual 9 "Limited essentials, NOT automatic succession"
+      and "not dead-man timers" have no source; the doctrine (L20) says only
+      "remain recoverable and maintainable when Dainius is temporarily
+      unavailable". Mark conceptual / UNKNOWN or cite.
+    - F11 OPEN (high for Gold) — missing joints. Text-only count, unit = matches:
+      across the 9 diagrams, 0 for MARS decay, failure clustering, boundary
+      recalibration, confession, PUB/WORK, emergent rituals, struggle detection,
+      anti-annoyance and cognitive fingerprint; across the 8 Gold views, 0 for
+      rituals, struggle, anti-annoyance and fingerprint. The README claims rituals
+      (flag ON), struggle and anti-annoyance (code present) and fingerprint
+      ("✅ Collecting"). They exist only as atlas cards, so the one-KAI picture
+      does not show where they join (proactive limits, operator-state sensing, data
+      collection and privacy).
+    - F12 OPEN — zero-loss (item D): the board correctly says the 104 / 356 / 348
+      figures are extractor-bounded. No acceptance path is yet recorded for the
+      nested obligations (daily dreaming, six phases, MARS, confession, future
+      projection, causal model, emotional/narrative continuity, PUB/WORK,
+      succession). Coverage stays OPEN.
+    - F13 OPEN (low, owner) — atlas O1–O4 titles "KINGSMan" and the O5–O8 footer
+      note (entry 181) are still awaiting Dainius.
+    
+    ## Limits
+    
+    - One reviewer; the S/P boundary is a judgement call. 4 PARTIAL is my count.
+    - Universe: the 8 Gold views, 9 visuals and Navigator; the 12 atlas frames only
+      for navigation. The 14 older top-of-board frames were not reviewed. Visual
+      legibility was not checked: the read tool returns structure, not pixels.
+    - Correction during this review: one coverage row first counted "family"
+      inside the font-family attribute (81 / 288); re-counted on text content only
+      (1 / 7). One item count first came out as 45 against Kai's 54; my script
+      dropped one item per frame; the correct count is 54.
+    END-VERBATIM ORION-DAI10-POST-95ef9966
+
+### 6. Next authorised step
+
+- Report to Dainius in plain words. No board change by Orion  [CONVERSATION 2026-10-13 Dainius, "We now await Orion's evidence-based verdict—not automatic agreement."]
+
+### 7. What I am unsure of
+
+- Nothing new beyond entry 186 section 7  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
