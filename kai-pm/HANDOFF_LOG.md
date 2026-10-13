@@ -79171,3 +79171,475 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-13T19:53:25Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-13T19:53:25Z  [CMD `date -u +%FT%TZ` → 2026-10-13T19:53:25Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 9a7aac885ebadb5155da829159cffb885905a0a2  [CMD `git rev-parse HEAD` → 9a7aac885ebadb5155da829159cffb885905a0a2]
+- tree: f0234a9dc3c5b4799391c9aaa767e2482bb5cb06  [CMD `git rev-parse HEAD^{tree}` → f0234a9dc3c5b4799391c9aaa767e2482bb5cb06]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 9a7aac885ebadb5155da829159cffb885905a0a2  [CMD `git ls-remote --heads origin` → 9a7aac885ebadb5155da829159cffb885905a0a2]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 203  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 203]
+
+### 1. The four states
+
+- physical: unchanged since entry 203 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: planning only; v3.1 as a controlled reconciliation candidate, per Kai's recommendation relayed by Dainius  [CONVERSATION 2026-10-13 Dainius, "Keep it planning-only and return it for adjudication."]
+- evidence: proposal v3.1, verbatim in section 5, with its self-checks  [CMD `python3 -I self-check v3.1` → coverage 104, forward edges 0]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None; this entry banks Orion's v3.1 proposal  [CONVERSATION 2026-10-13 Dainius, "Keep it planning-only and return it for adjudication."]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier; no research cards, folders or scripts until D1 and D2; no fingerprint containment without Dainius's explicit authorisation  [CONVERSATION 2026-10-13 Dainius, "Do not treat that recommendation as new authority to alter source code, runtime settings or programme gates."]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- For Dainius: D1–D5 as in v3.1 §9; use model (family only, never distributed?); any "April" document; reviewers' identity; any running KAI instance  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 5. Incidents and corrections
+
+- v3.1 dispositions: R3-01..R3-10 = 8 ACCEPT, 2 ACCEPT WITH AMENDMENT (R3-05 unlocatable source, R3-09 fixture terms per I-8); report points 4 ACCEPT plus the April/v2.1 correction; variant points 1 ACCEPT, 2 NOT ADOPTED  [FILE kai-pm/HANDOFF_LOG.md:1]
+- Self-checks on v3.1 §3: 16 packages, 104/104 features once, waves 28/14/27/35, 0 forward edges; Annex B parses (26 keys); R3 rows 10/10; credential scan 0 hits  [CMD `python3 -I self-check v3.1; credscan.py cs_v31.json` → all pass, TOTAL HITS 0]
+- Known-defects population cited in v3.1: 144 files `kai-pm/CODE_AUDIT_BATCH_*.md`; 5,154 summary-table rows matching `| KAI-<AREA>-<n> | CRITICAL|HIGH|MEDIUM|LOW |` (unit: rows)  [CMD `git ls-files kai-pm/CODE_AUDIT_BATCH_*.md | wc -l; git grep -c <row pattern>` → 144, 5154]
+- EVIDENCE ORION-RESEARCH-PROPOSAL-V3-1 KAI_RESEARCH_PROPOSAL_V3_1.md: 33137 bytes, sha256 95e0057192da492ac128dd1c0f142bc3ea6716c253b7841a24b3a5b8aabf4fe7, final LF True (added by Orion)  [CMD `sha256sum KAI_RESEARCH_PROPOSAL_V3_1.md` → 95e0057192da492a…]
+    BEGIN-VERBATIM ORION-RESEARCH-PROPOSAL-V3-1
+    # KAI Full-Feature Research Proposal — v3.1
+    
+    **ORION → DAINIUS, KAI | PROPOSAL v3.1, controlled reconciliation candidate | planning only | 2026-10-13**
+    Based on: v3 (handoff entry 198, posted as 72238b2c); Kai's v3 adjudication R3-01 to R3-10 (DAI-10 49e8229e, entry 203); the full-feature research report on v1 (entry 201) and Orion's checks of it (entry 202); the unadjudicated variant text (entry 200); Dainius's ruling in entry 191 (block KAI-DAI10-be2ddfbf-OWNER-RULING) and his direction in entry 203.
+    This is a plan for research. It is not the research, and it authorises no engineering, runtime change or gate release.
+    
+    ## In plain words
+    
+    Kai accepted the direction of v3 and asked for ten fixes before the forms are printed. I checked each one myself. All ten are right; I changed two of them slightly, with reasons. I also added the useful points from Kai's first research pass and corrected two mistakes of my own.
+    
+    The biggest change: a research card now says four separate things, and never mixes them up.
+    - What KAI **promised** (the name on the door).
+    - What **code** exists, with file and line.
+    - Whether it has been **proven working** on the real machine. While engineering is paused, nothing can be proven yet; the card says so honestly.
+    - The **gap** between the name and the reality, in plain words. Not dressed up, not written off.
+    
+    Site version: the as-built record now has separate boxes for "specified", "installed" and "tested and signed off", plus a snag list. No box can be ticked on the strength of another.
+    
+    This is meant to be the last full revision. After it: one independent challenge, then a readiness decision (§10).
+    
+    ## 0. Dispositions
+    
+    ### 0.1 Kai's adjudication of v3 (49e8229e)
+    
+    Orion's independent disposition of each finding, using the frozen vocabulary.
+    
+    | Finding | Disposition | What v3.1 does |
+    |---|---|---|
+    | R3-01 HIGH S-1 and BLOCKED deadlock | ACCEPT | Research state, runtime state and design admission are separate (Annex B). Wave gates accept "CHECKED, DONE, or BLOCKED with Kai's adjudication", so a BLOCKED card cannot freeze the programme. A BLOCKED critical card is never counted as verified and is shown to Dainius with its effect downstream. D4 now covers only the timing of preliminary, unfrozen hazard and test planning: Dainius has already ruled that full research comes before the comprehensive Master Plan, RAMS and ITPs (§9) |
+    | R3-02 HIGH Research DAG vs organic loops | ACCEPT | Two graphs. `depends_on` is the research prerequisite graph: no loops allowed, decides DONE. `functional_interfaces` records how organs really work together: loops allowed, never decides DONE. The v3 example (MARS depends on Dream) is corrected: their two-way flow is a functional interface, not a prerequisite (Annex B, C) |
+    | R3-03 HIGH Present-state fields too weak | ACCEPT | `today` carries code and config references (path, line, commit), the README marker, the documented state, and a separate runtime record (NOT_OBSERVED, OBSERVED or QUALIFIED, with test ID, environment and date). A README marker or a unit test never sets runtime to QUALIFIED. New field `gap_to_promise` (Annex B) |
+    | R3-04 HIGH Review under-scoped | ACCEPT | Full independent review of every card marked `critical` in any wave: identity, authority, final actuators, secrets, model and skill admission, personal data, finance, recovery and rollback, family succession, privacy, evidence truth. Also every card recommending replacement of an existing mechanism. The machine check requires a banked review record, not just two different names (§7, Annex C) |
+    | R3-05 HIGH Source census can skip lineage | ACCEPT WITH AMENDMENT | The "old April vision" becomes a named census blocker. Amendment: a source that a recorded, bounded search cannot find cannot block the census forever. After the search is banked, it stays a named open item, visible to Dainius, and Wave 0 closes only with Kai's adjudication of that gap. "v2.1" (D13, shopping list) is no longer presumed external: it is classified in step 0.1 and read for feature promises and owner rulings. Seeded omission tests and a human sample check whether line-by-line reading actually found the features (Annex A) |
+    | R3-06 MEDIUM Evidence kinds missing | ACCEPT | Added claim types: owner_ruling, privacy_legal_obligation, hardware_compatibility, security_advisory. Added source kinds: kai_decision, kai_code_at_commit, security_advisory, official_regulatory_guidance. Licence fields apply only to outside offers, never to KAI's own README or rulings (Annex B, D) |
+    | R3-07 HIGH Licence rule over-general | ACCEPT | I agree my v3 wording was too simple in both directions. §4 now records obligations per artefact, per transitive dependency and per use model. Nothing is "automatically fine" or "automatically copyleft". GPL, AGPL and custom model licences stay Dainius's decision (D3). One new owner question: is KAI single-owner and never distributed? Many obligations depend on that |
+    | R3-08 MEDIUM Test IDs and coverage | ACCEPT | `itp_ref` stays null. Each test gets a stable `research_test_id` (RT-F013-01). Test kinds extended: erasure, consent, multi-subject separation, offline and telemetry leakage, capacity and heat, restore and rollback, concurrency, calibration and false alarms, false causal inference. Writing a test is not evidence that it passed |
+    | R3-09 MEDIUM Machine-check validity | ACCEPT WITH AMENDMENT | Calibration adds a hidden prose-only feature, a nested feature, conflicting decisions, an inaccessible source, an untraced security claim, a BLOCKED-to-DONE attempt and a legal functional loop. Amendment: the terms "known-positive" and "known-negative" stay as defined in CLAUDE.md I-8 (known-positive = a seeded defect the check must catch), and each is now defined where used. The check proves completeness of the register, not that no unlisted obligation exists (Limits) |
+    | R3-10 MEDIUM BLOCKED and absence semantics | ACCEPT | Every "UNKNOWN" or "ABSENT" carries a search record: where, which terms, date, scope, what could still exist. UNKNOWN never means ABSENT. A card can be research-DONE while its runtime is NOT_OBSERVED: the engineering pause does not make cards BLOCKED. BLOCKED is only for research claims that cannot be traced or resolved |
+    
+    ### 0.2 The research report on v1 (entry 201), as checked in entry 202
+    
+    | Point | Disposition | Where |
+    |---|---|---|
+    | Three implementation states (promised, code evidence, runtime qualified) | ACCEPT | Merged with R3-03 (Annex B `today`) |
+    | Full review of every card touching operator data or authority | ACCEPT | Merged with R3-04 (§7) |
+    | Fuller borrowing record: SBOM, provenance or signature, network and telemetry behaviour, privileges, rollback, removal | ACCEPT | §4, Annex B `world_offers` |
+    | Repository defects become mandatory negative tests (PUB fallback, anti-annoyance failure: Kai, entry 203) | ACCEPT, extended to the class | Every card lists the audit findings that touch its feature in `known_defects`, each with a negative test. Population to draw from: 144 audit files, 5,154 finding rows in their summary tables (Limits) |
+    | "April" and "June v2.1" as census lineage | CORRECTION of Orion's v1 error | These names came from Orion's v1, written from memory, and were corrected in v2 (entry 195). The report answered v1 only. Handled by R3-05 above |
+    
+    ### 0.3 The unadjudicated variant (entry 200)
+    
+    | Point | Disposition | Reason |
+    |---|---|---|
+    | A "gate to finish" for each wave | ACCEPT | §6 now has exit criteria |
+    | "The stricter licence governs" | NOT ADOPTED | Replaced by per-artefact, per-use obligations (R3-07). A single "stricter wins" rule is the same over-simplification R3-07 rejects |
+    | Widen this session's network if it has no credentials and no repository write | NOT ADOPTED as written | Measured: this session can push and holds connectors (entry 198), so the condition is false today. Kept as v3 D5 (c), "not", unless those facts change |
+    
+    ### 0.4 Orion's own corrections
+    
+    - **S-1.** In entry 202 and in conversation I said Dainius had not ruled on research before RAMS. That was false. His ruling (entry 191) requires full-feature research before the comprehensive Master Plan, RAMS, ITPs and other documents. Corrected in entry 203; D4 rewritten (§9).
+    - **April / v2.1.** See 0.2.
+    
+    ## 1. The rule that stops a repeat
+    
+    1. **Classify every source, then count**, with a written counting rule and seeded omission tests (Annex A).
+    2. **One card per counted item**, in a fixed format that keeps promise, code, runtime and gap apart (Annex B).
+    3. **Machine check**, calibrated against seeded defects (Annex C).
+    4. **Independent check:** structural for every source; full for every critical card, every Wave 1 card and every change-recommending card; a seeded 10% sample for the rest (§7).
+    
+    ## 2. What each research card answers
+    
+    1. What was promised, where, when, and by which source (with its status and date).
+    2. What KAI has today, kept in four parts:
+       - **code and configuration:** path, line, commit, flag and its default;
+       - **documented state:** what the README or docs claim, quoted;
+       - **runtime:** NOT_OBSERVED, OBSERVED or QUALIFIED, with test ID, environment and date;
+       - **gap to promise:** in plain words, what the name promises that the code does not yet do.
+    3. Known defects: the audit findings that touch this feature, each paired with a negative test.
+    4. Plans already written, with their status.
+    5. What the world offers: at least 2 options where it matters, each with version, per-artefact licences and obligations, claim type, source kind and date checked.
+    6. Fit for KAI: licences and obligations, maintenance, security, offline, 128 GB Strix Halo, telemetry off.
+    7. Recommendations: one or more, each with disposition, scope, reason and falsifier.
+    8. Tests: each with research test ID, kind, purpose, input, expected result, failure meaning and evidence type.
+    9. Connections:
+       - **9a.** What it connects to today: each with evidence and status; an empty list needs a search record.
+       - **9b.** Functional interfaces: how it works with other organs (loops allowed).
+       - **9c.** Target integration: required only when a recommendation changes something.
+    
+    ## 3. The research packages
+    
+    Unchanged from v3 (entry 198), including the waves. Each feature has exactly one accountable lead package (checked by script). Package edges are planning hints: they suggest card `depends_on` edges or `functional_interfaces`, and only the card prerequisite graph decides DONE.
+    
+    | Package | Wave | Lead features | Main dependency edges |
+    |---|---|---|---|
+    | RP-1 Memory | 1a | #6, #9, #12–#19 | RP-2 (decay inside dreams), RP-6 (privacy of personal data) |
+    | RP-2 Dreaming and overnight learning | 1a | #80–#84 | RP-1 (memory), RP-11 (skill supply chain of #80) |
+    | RP-6 Living with Dainius | 1a | #2, #53, #55–#61, #90, #94, #95 | RP-1 (where operator data is stored) |
+    | RP-11 Growth and skills supply chain | 1a | #85 | RP-2 |
+    | RP-3 Honesty and inner life | 1b | #1, #4, #5, #7, #10, #11 | RP-1 (records of past mistakes) |
+    | RP-4 Imagination, future vision, cause and effect | 1b | #8, #35, #39, #40, #48, #54, #93, #97 | RP-1 (outcome history for calibration) |
+    | RP-5 One mind: attention, workspace, councils | 2 | #27–#29, #31–#34, #36–#38, #41–#43, #45–#47, #49–#52 | RP-8a (model runtimes) |
+    | RP-8a Inference runtimes | 2 | #30 | RP-8b |
+    | RP-8b Hardware qualification | 2 | #44, #103 | — |
+    | RP-12 Continuity, money, succession | 2 | #86–#89 | RP-1 (backup of memory) |
+    | RP-7 Senses and world awareness | 3 | #20–#26 | RP-8b (NPU qualification) |
+    | RP-8c Voice and avatar | 3 | #96 | RP-8a, RP-8b |
+    | RP-9 Governed hands and security | 3 | #62–#69 | — |
+    | RP-10 Doctor and resilience | 3 | #70–#79 | — |
+    | RP-13 Mission Control and presence | 3 | #3, #91, #92, #98 | RP-1 (#16 views) |
+    | RP-14 Engineering and assurance | 3 | #99–#102, #104 | RP-8b (#103) |
+    
+    The research questions and leads per package are those of v1 §3 (entry 192), with the v2 changes. The research report on v1 (entry 201) is kept as the **initial research baseline**: its findings are candidate evidence to be mapped into cards, not proof of coverage.
+    
+    ## 4. Rules for borrowing open source
+    
+    A project may be borrowed only if its card shows all of these:
+    
+    1. **Licences and obligations, per artefact:** code, model weights, data and documentation each recorded. For each: the obligations that apply given how KAI actually uses it (linking, modification, notices, distribution, network service). Nothing is automatically fine or automatically copyleft.
+       - Permissive (MIT, Apache-2.0, BSD) is preferred.
+       - Weak copyleft (LGPL, MPL-2.0): allowed when its obligations are recorded and can be met.
+       - Strong copyleft (GPL, AGPL) and custom model licences: Dainius's decision (D3).
+       - The use model is stated on the card. Assumed until Dainius confirms: single owner, not distributed.
+    2. **Dependencies:** lock file or SBOM checked; each transitive dependency's licence and obligations recorded.
+    3. **Provenance:** exact version or commit, checksum, and signature or provenance record where one exists.
+    4. **Alive:** a release within 12 months and issues being answered, or a recorded reason to accept it anyway.
+    5. **Security:** advisory history and security policy checked.
+    6. **Network and privileges:** every network endpoint, telemetry setting, file and privilege it needs; it must run offline with telemetry off (#104).
+    7. **Way back out:** rollback procedure and removal procedure.
+    8. **Evidence, not adverts:** a vendor's claim about itself is recorded as such. Only a KAI test is evidence.
+    9. **Behind KAI's own contract** (spec §9), so it can be swapped later.
+    10. **No silent loss:** replacing a working feature needs a zero-loss disposition (frozen §10). The default is to keep (D351).
+    
+    This is an engineering record, not legal advice. Where an obligation is unclear and matters, the card says so and Dainius decides whether to get advice.
+    
+    ## 5. Access to sources
+    
+    Unchanged from v3: measured 2026-10-13, this session reaches raw.githubusercontent.com and pypi.org; arxiv.org, nist.gov, rfc-editor.org, datatracker.ietf.org, nasa.gov, scikit-learn.org and others are blocked; api.github.com answers 403. Each needed domain gets a named access route before the wave that needs it. Secondary sources are labelled SECONDARY and cannot carry a security-relevant recommendation on their own. The "what's new" scan records where it searched, the search words and the date.
+    
+    ## 6. Order of work, size and gates
+    
+    "Accounted" means: CHECKED, DONE, or BLOCKED with Kai's recorded adjudication.
+    
+    | Step | Packages | Features (measured) | May start when | Finished when |
+    |---|---|---|---|---|
+    | 0.1 | Source classification | all sources on the list | D1 and D2 decided | every source classified, Kai has adjudicated, chronology recorded |
+    | 0 | Census | all 104 plus nested, prose and lineage items | 0.1 finished | every classified source read to the end; seeded omission tests found; human sample done; any unlocated source banked as a named gap with Kai's adjudication |
+    | Pilot | #13 MARS, #60 struggle detection, #35 causal world model | 3 | Wave 0 finished; Annex B frozen pending pilot | time estimate published; at most one format amendment banked; pilot cards re-checked against it |
+    | 1a | RP-1, RP-2, RP-6, RP-11 | 28 | pilot finished; access routes named for 1a | every 1a card accounted; machine check passes |
+    | 1b | RP-3, RP-4 | 14 | 1a finished; access routes named for 1b | every 1b card accounted; machine check passes |
+    | 2 | RP-5, RP-8a, RP-8b, RP-12 | 27 | 1b finished | every Wave 2 card accounted; machine check passes |
+    | 3 | RP-7, RP-8c, RP-9, RP-10, RP-13, RP-14 | 35 | Wave 2 finished | every Wave 3 card accounted; machine check passes |
+    
+    Waves start in order. Feature counts are from the 104-item list; Wave 0 adds nested and prose items, and the counts are republished then.
+    
+    ## 7. Who does what
+    
+    - **Kai:** adjudicates source classification; researches and writes the cards; adjudicates every BLOCKED card and every unlocated source.
+    - **Orion:**
+      - proposes the source classification;
+      - builds the census and its seeded omission tests;
+      - runs the machine check;
+      - checks every source structurally;
+      - reviews in full: every card marked `critical`, every Wave 1 card, every change-recommending card;
+      - reviews a seeded random 10% of the rest (seed recorded);
+      - banks every review record;
+      - banks everything else.
+    - **Outside reviewer** (for example DeepSeek, under frozen §16): one adversarial challenge of v3.1 (§10), then of Wave 1 recommendations.
+    - **Dainius:** decides D1–D5; sees the BLOCKED list and every unlocated source before any drafting; decides any acceptance of risk on a critical BLOCKED card.
+    
+    A card is **critical** if it touches any of: identity, authority, final actuators, secrets, model or skill admission, personal data, finance, recovery or rollback, family succession, privacy, evidence truth.
+    
+    A substantive check means every claim on the card is traced to an exact passage, line or commit. An untraced claim is listed in `substantive_check.untraced_claims`; the card cannot be DONE until the list is empty.
+    
+    ## 8. Definition of DONE (research programme)
+    
+    1. Every source classified and adjudicated; Wave 0 census finished under Annex A; exclusions counted.
+    2. The machine check (Annex C) passes, including its calibration.
+    3. Every card is DONE, or BLOCKED with a reason, an owner, Kai's adjudication and its effect downstream.
+    4. Every critical card has a banked full review.
+    5. Owner decisions, the BLOCKED list and every unlocated source are put to Dainius in plain words. No risk on a critical item is accepted silently.
+    6. "Research DONE" is not "feature working". Runtime qualification stays a separate, later state.
+    7. Only then are the comprehensive Master Plan, Quality Plan, RAMS, ITPs, ITCs and LTQR finalised, in the D359 order (Dainius's ruling, entry 191). Preliminary, unfrozen work is governed by D4.
+    
+    ## 9. Decisions for Dainius
+    
+    - **D1 — Census scripts.** Read-only scripts over a pinned commit, with scripts and outputs banked word for word with checksums. Recommendation: **yes.**
+    - **D2 — Where the cards live.**
+      - (a) A new folder `kai-pm/research/`, JSON and Markdown only, no code; needs a narrow grant for that one folder.
+      - (b) Handoff-log blocks.
+    
+      Recommendation: **(a).**
+    - **D3 — Licences.** Approve §4. Also confirm the use model: **is KAI for you and your family only, never given or sold to anyone else?** Recommendation: **approve §4.**
+    - **D4 — Preliminary hazard and test planning.** Your ruling already says the final documents wait for full research. The open question is only when early, unfrozen drafts may start: a hazard list and a test strategy, each stamped "PRELIMINARY — NOT A BASELINE".
+      - (a) Start alongside Wave 1a.
+      - (b) Start after Waves 1a and 1b.
+      - (c) Wait for all research.
+    
+      Recommendation: **(a).** Hazards found early improve the research cards. Risk: an early draft being mistaken for an approved plan. Control: the stamp; it can never be cited as approval; the PRE-RAMS hold still applies to the governing templates.
+    - **D5 — Network access for research.**
+      - (a) A separate research environment: wider read access, no repository write, no connectors.
+      - (b) Rely on Kai's access.
+      - (c) Widen this environment.
+    
+      Recommendation: **(a)**; **(b)** for any domain Kai can already reach. Not (c), because this session can push and holds connectors.
+    - **Also:**
+      - who wrote the two reviews (assumed DeepSeek, not confirmed)?
+      - do you know of an "April" vision document?
+      - is any KAI instance running on any device?
+    
+    ## 10. How this converges
+    
+    1. Kai adjudicates v3.1.
+    2. One independent adversarial challenge of v3.1.
+    3. Its findings are either fixed in one final text or recorded as accepted risk with reasons.
+    4. Kai rules whether the research procedure is ready; Dainius approves it.
+    
+    No further full revision unless a HIGH finding requires one.
+    
+    ## Annex A — Wave 0 census protocol
+    
+    **One status vocabulary** for every source and in every card:
+    
+    | Status | Meaning |
+    |---|---|
+    | canonical | current authority |
+    | lineage | informs, does not bind |
+    | draft | an unadjudicated proposal; its items are counted and flagged "draft" |
+    | superseded | no longer applies |
+    | external | not KAI's own: tools or proposals from outside |
+    | derived | made from other sources (for example the 104-item register); never outranks a source |
+    
+    **Step 0.1 — classify first.** Orion proposes a status for every source with the reason and the source's date. Kai adjudicates. A source is not read for items until its status is adjudicated. Chronology is kept: where two canonical sources conflict, the later owner ruling or D-number governs, and both are recorded.
+    
+    | Source | Proposed status (to adjudicate in step 0.1) |
+    |---|---|
+    | `README.md` at the pinned commit | canonical for feature intent, not runtime |
+    | `kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md` | canonical mission input (frozen protocol O-3) |
+    | `kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md` | lineage (target design) |
+    | `kai-pm/KINGSMAN_FINAL_VISION_MASTER_CANON_PLAN.md` | to propose in step 0.1 |
+    | `bootstrap/master_plan.md` | lineage (the original vision) |
+    | `docs/next_level_roadmap.md` | to propose in step 0.1 |
+    | v1.1 unified draft (handoff entry 106) | draft |
+    | D-numbered decisions in `kai-pm/DECISIONS.md` | canonical where they add, remove or hold a capability |
+    | Owner rulings banked in the handoff log | canonical where they add, remove or hold a capability |
+    | `kai-pm/SHOPPING_LIST_PLAN.md` / D13 "v2.1" | to propose in step 0.1; read for feature promises and owner rulings |
+    | 104-item register (handoff entry 167) | derived |
+    | "old April vision" (research report line 167) | named census blocker until located |
+    
+    **What counts as an item:** a named capability, behaviour or obligation that a canonical, lineage or draft source says KAI has, will have or must have. That covers:
+    - a README table row;
+    - a prose sentence asserting a capability;
+    - a feature flag naming a behaviour;
+    - a D-number or owner ruling adding or removing a capability.
+    
+    Function names in code are not items; they are evidence for "What KAI has today".
+    
+    **Nested items:** one parent and one child per behaviour. Tie-breaker: a behaviour is a separate child if a pass/fail test can be written for it on its own. If in doubt, split, and record why.
+    
+    **Deduplication:** the same behaviour in several sources is one item with several references. The derived register guides this; where it disagrees with a source, the source wins and the register is flagged.
+    
+    **Superseded promises:** recorded only if no D-number, owner ruling or canonical document explicitly removed them. Otherwise the removal is recorded, with its source.
+    
+    **Adding a source later:**
+    - earlier work is kept;
+    - the new source is classified and read;
+    - every existing item is re-checked against it, and items it contradicts or extends are reopened;
+    - the addition, the reason and the reopened items are banked;
+    - Wave 0 is then finished again.
+    
+    **A source that cannot be found:**
+    1. a bounded search is banked: where, which terms, date;
+    2. the source stays on the list as a named open item, never silently dropped;
+    3. Wave 0 may finish only with Kai's recorded adjudication of that gap, shown to Dainius;
+    4. if it is found later, "adding a source later" applies.
+    
+    **Reading is not finding.** "Every line range read" proves traversal, not that every feature was extracted. Two extra checks:
+    - **seeded omission test:** in a scratch copy of the sources, plant at least one prose-only feature and one nested feature; the census must find both;
+    - **human sample:** Kai reads a seeded random sample of passages against the census.
+    
+    **Finish rule:** see §6, step 0.
+    
+    ## Annex B — Card format (JSON, one file per item; frozen pending pilot)
+    
+    ```json
+    {
+      "item_id": "F013",
+      "parent_id": null,
+      "name": "MARS memory decay / consolidation",
+      "lead_package": "RP-1",
+      "critical": true,
+      "critical_reason": "evidence truth; personal data",
+      "depends_on": [],
+      "functional_interfaces": [{"with": "F084", "flow": "dream cycle runs consolidation; consolidation output feeds the next dream", "direction": "both", "evidence": "README L172", "status": "CANDIDATE"}],
+      "promised": [{"source": "README.md", "commit": "422bfb5797a2", "line": 1135, "source_status": "canonical", "source_date": "YYYY-MM-DD", "text": "..."}],
+      "today": {
+        "code": [{"path": "memu-core/...", "line": 0, "commit": "...", "what": "..."}],
+        "config": [{"flag": "...", "default": null, "path": "common/feature_flags.py", "line": 0, "commit": "..."}],
+        "readme_marker": "UNMARKED",
+        "documented_state": "...",
+        "runtime": {"state": "NOT_OBSERVED", "test_id": null, "environment": null, "date": null},
+        "as_of": "YYYY-MM-DD"
+      },
+      "gap_to_promise": "...",
+      "known_defects": [{"ref": "kai-pm/CODE_AUDIT_BATCH_MEMORY_GRAPH.md:39", "summary": "...", "negative_test": "RT-F013-02"}],
+      "plans": [{"source": "kai-pm/D351_EVOLUTION_NOT_REDESIGN_AND_PRESENTATION_BAR_CORRECTION.md", "source_status": "canonical"}],
+      "world_offers": [{"name": "...", "kind": "project", "url": "...", "version": "...", "checksum": null, "provenance": null, "licences": {"code": "...", "weights": null, "data": null, "docs": "..."}, "obligations": [], "use_model": "single owner, not distributed (assumed until D3)", "deps_checked": false, "network": null, "privileges": null, "rollback": null, "removal": null, "last_release": "YYYY-MM", "claim_type": "method_effectiveness", "source_kind": "peer_reviewed", "secondary": false, "checked_at": "YYYY-MM-DD"}],
+      "fit": {"licence_ok": null, "offline_ok": null, "target_hw_ok": null, "telemetry_off": null, "maintained": null},
+      "recommendations": [{"disposition": "HARDEN", "scope": "...", "reason": "...", "falsifier": "would change if ..."}],
+      "tests": [{"research_test_id": "RT-F013-01", "kind": "negative", "purpose": "...", "input": "...", "expected": "...", "failure_meaning": "...", "evidence_type": "log"}],
+      "itp_ref": null,
+      "connects_today": [{"to": "dream cycle", "evidence": "README L172", "status": "CANDIDATE"}],
+      "search_records": [],
+      "target_integration": null,
+      "state": "OPEN",
+      "blocked": null,
+      "researcher": "kai",
+      "review": {"checker": "orion", "kind": "full", "date": null, "banked_entry": null},
+      "substantive_check": {"done": false, "untraced_claims": []}
+    }
+    ```
+    
+    Allowed values:
+    - `source_status`: the Annex A vocabulary.
+    - `readme_marker`: LIVE · COLLECTING · BUILT_NOT_CUT_OVER · STUB · PLANNED · UNMARKED (the README's own markers; UNMARKED = no marker).
+    - `today.runtime.state`: NOT_OBSERVED · OBSERVED · QUALIFIED.
+    - `kind` (offers): technique · project · paper · standard.
+    - `claim_type`: software_behaviour · method_effectiveness · standard_requirement · adoption · owner_ruling · privacy_legal_obligation · hardware_compatibility · security_advisory.
+    - `source_kind`: own_code_docs · peer_reviewed · benchmark · preprint · standard · vendor_claim · kai_test · secondary · kai_decision · kai_code_at_commit · security_advisory · official_regulatory_guidance.
+    - `disposition`: the frozen feature vocabulary.
+    - `tests.kind`: positive · negative · restart · hostile · erasure · consent · subject_separation · offline_leakage · capacity_thermal · restore_rollback · concurrency · calibration · false_alarm · false_causal_inference.
+    - `evidence_type`: log · measurement · artefact · witness.
+    - `connects_today.status`, `functional_interfaces.status`: CONFIRMED · CANDIDATE · ABSENT.
+    - `review.kind`: full · structural · sample.
+    - `state`: OPEN · RESEARCHED · CHECKED · DONE · BLOCKED.
+    
+    Rules:
+    - `null` = not yet researched. `"UNKNOWN"` = searched, no evidence found. UNKNOWN never means ABSENT.
+    - Every UNKNOWN, every ABSENT and every empty `connects_today` has an entry in `search_records`: `{"about": "...", "where": [...], "terms": [...], "date": "...", "scope": "...", "residual": "what could still exist"}`.
+    - Licence and obligation fields belong to `world_offers` only. KAI's own README, code and rulings never need a licence entry.
+    - **Runtime:** a README marker, a feature flag or a passing unit test never sets runtime to QUALIFIED. QUALIFIED needs passed tests of at least the positive, negative, restart and hostile kinds, each with a test ID, environment and date. While engineering is paused, runtime stays NOT_OBSERVED, and that alone never makes a card BLOCKED.
+    - **`gap_to_promise`:** plain words, required on every card past OPEN. If there is no gap, it says so, with the evidence.
+    - **`known_defects`:** every audit finding that touches the feature, each linked to a negative test.
+    - **DONE needs:**
+      - at least one recommendation, none UNVERIFIED;
+      - an empty `untraced_claims`;
+      - every `depends_on` card DONE;
+      - a banked review record by someone other than the researcher.
+    - **BLOCKED** is only for a research claim that cannot be traced or resolved: `{"reason": "...", "owner": "...", "effect_downstream": "...", "adjudication": null}`. Kai fills in the adjudication. A BLOCKED critical card is never counted as verified.
+    - **Research DONE ≠ runtime QUALIFIED ≠ admitted to the design.** Admission is decided in the Master Plan, never on the card.
+    
+    ## Annex C — Machine check (written only after D1 and D2)
+    
+    It fails if any of these is true:
+    - an item has no card, or more than one;
+    - a required field is missing, or a value is outside its allowed list;
+    - an UNKNOWN, ABSENT or empty connection list has no search record;
+    - a `depends_on` points to a missing card, or the `depends_on` graph has a loop (loops in `functional_interfaces` are allowed);
+    - a card breaks any DONE or BLOCKED rule in Annex B;
+    - runtime is QUALIFIED without the required passed tests;
+    - a critical card is DONE without a banked full review;
+    - the review record is missing, unbanked, or names the researcher;
+    - a world offer lacks url, version, licences, obligations, claim type, source kind or date;
+    - a source is older than 24 months and the card gives no reason;
+    - a wave started before its gate in §6 was met (checked from the banked start dates).
+    
+    **Calibration**, before first use (I-8: a known-positive is a seeded defect the check must catch; a known-negative is a correct set it must pass):
+    - **known-positives, each must fail:**
+      - a deleted card;
+      - a `depends_on` loop;
+      - a DONE card with an untraced claim;
+      - a BLOCKED card switched to DONE without adjudication;
+      - the checker equal to the researcher;
+      - runtime QUALIFIED with no tests;
+      - an untraced external security claim;
+      - an UNKNOWN with no search record.
+    - **census known-positives, each must be found:** a hidden prose-only feature; a nested feature; two conflicting canonical decisions (both recorded, the later governs); an inaccessible source (banked as a named gap).
+    - **known-negatives, each must pass:** a complete, correct set; the same set with a two-way `functional_interfaces` loop.
+    
+    The check proves the register is complete and well-formed. It cannot prove that no unlisted obligation exists in the sources; that is what the seeded omission tests and the human sample are for.
+    
+    ## Annex D — "Current best practice"
+    
+    As in v2 (entry 195), with the R3-06 additions:
+    - **Recency:** current means within 24 months of the check date. An older source needs a stated reason.
+    - **Best source, by type of claim:**
+      - what software does → its own code and documentation at the pinned version;
+      - whether a method works → peer-reviewed or a reproducible benchmark, then a preprint, with a KAI test above all for KAI;
+      - what a standard requires → the standard itself;
+      - what the law or a regulator requires → the official guidance, dated;
+      - whether hardware is supported → the vendor's support statement as a vendor claim, then a KAI test on the exact machine;
+      - whether a component is safe → its security advisories, dated;
+      - what KAI must do → the D-number or owner ruling;
+      - what is widely used → adoption, labelled as adoption.
+    - **Disputes:** frozen protocol §8. Unresolved means UNVERIFIED.
+    
+    ## Limits
+    
+    - This is Orion's plan, revised three times and reconciled once. It is not research. The leads are unverified.
+    - Measured by script on §3: 104 of 104 features have exactly one lead; waves 28 / 14 / 27 / 35; 0 package dependencies point to a later wave. Package loops remain inside Wave 1a (RP-1, RP-2, RP-6, RP-11); at card level they are split into prerequisites (no loops) and functional interfaces (loops allowed).
+    - The known-defects population (144 audit files, 5,154 finding rows) counts summary-table rows matching `| KAI-<AREA>-<n> | <severity> |` in `kai-pm/CODE_AUDIT_BATCH_*.md`. It is a count of rows, not of distinct defects or causes.
+    - The Annex B example parses as JSON (checked). Its values are examples, not research.
+    - Both reviews' author is unconfirmed. Whether any KAI instance is running is unknown.
+    END-VERBATIM ORION-RESEARCH-PROPOSAL-V3-1
+
+### 6. Next authorised step
+
+- Post v3.1 to Kai on DAI-10 (posted == banked); republish the owner page; report to Dainius in plain words  [CONVERSATION 2026-10-13 Dainius, "Keep it planning-only and return it for adjudication."]
+
+### 7. What I am unsure of
+
+- Whether Linear accepts a 33 KB comment in one piece  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
