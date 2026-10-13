@@ -81114,3 +81114,421 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-13T20:57:47Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-13T20:57:47Z  [CMD `date -u +%FT%TZ` → 2026-10-13T20:57:47Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: f08865136fae5485620ff0e65bb32b96293ce800  [CMD `git rev-parse HEAD` → f08865136fae5485620ff0e65bb32b96293ce800]
+- tree: ff91902eed2f850a4e357b2126da93fae4417bd6  [CMD `git rev-parse HEAD^{tree}` → ff91902eed2f850a4e357b2126da93fae4417bd6]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- remote:claude/project-rework-plan-pgvp35: f08865136fae5485620ff0e65bb32b96293ce800  [CMD `git ls-remote --heads origin` → f08865136fae5485620ff0e65bb32b96293ce800]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 213  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 213]
+
+### 1. The four states
+
+- physical: unchanged since entry 213 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: verbatim capture (O-2 record authority), checklist item 2  [CONVERSATION 2026-10-13 Dainius, "Adversarial Review: KAI Full-Feature Research Programme v3.1 + A1"]
+- evidence: the review, verbatim in section 5, from the ruling-capture store  [CMD `cat .git/kai-ruling-capture/84d2c4a93d3a6a40.json` → flagged long(21550), keyword(verdict)]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- DeepSeek (relayed by Dainius; author confirmed as DeepSeek by Dainius, entry 208) · 2026-10-13 · adversarial review of v3.1 + A1: "STRONGER THAN v3, BUT FOUR UNEXPLAINED CHANGES AND SEVERAL SCHEMA DRIFTS"; 6 MAJOR, 9 MINOR (DS-KAI-V31-01..15); "NO DESIGN BLOCKER FOUND, MAJOR/MINOR FINDINGS REMAIN". Verbatim in section 5 as block DEEPSEEK-REVIEW-V3-1-A1 ⚠ UNBANKED  [CONVERSATION 2026-10-13 DeepSeek, "NO DESIGN BLOCKER FOUND, MAJOR/MINOR FINDINGS REMAIN."]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier; no research cards, folders or scripts until D1 and D2; no fingerprint containment without Dainius's explicit authorisation  [CONVERSATION 2026-10-13 Dainius, "Do not treat that recommendation as new authority to alter source code, runtime settings or programme gates."]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Checklist item 2 IN PROGRESS: review banked here; dispositions and the one final text follow  [FILE kai-pm/HANDOFF_LOG.md:1]
+- Still unanswered by Dainius: is KAI running on any machine today?  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 5. Incidents and corrections
+
+- Session resumed: READ found 3 DIFFERS, all from Orion's own entry-213 commit f088651; WRITE-DUE NOT-DUE  [CMD `handoff.py verify` → compared=22 match=19 differs=3]
+- Credential scan of the review: calibration 6/6, TOTAL HITS 0  [CMD `credscan.py item2/cs.json` → TOTAL HITS 0]
+- EVIDENCE DEEPSEEK-REVIEW-V3-1-A1 deepseek_review_v31.txt: 21794 bytes, sha256 4894fc915352866305b30d61002c4ed4736ba88f07af26a1f6b14eea2dfb977d, final LF True (added by Orion)  [CMD `sha256sum deepseek_review_v31.txt` → 4894fc9153528663…]
+    BEGIN-VERBATIM DEEPSEEK-REVIEW-V3-1-A1
+    Adversarial Review: KAI Full-Feature Research Programme v3.1 + A1
+    
+    Overall Assessment
+    
+    Verdict: STRONGER THAN v3, BUT FOUR UNEXPLAINED CHANGES AND SEVERAL SCHEMA DRIFTS SURFACE BETWEEN v3 AND v3.1 THAT MUST BE RECONCILED BEFORE FREEZING.
+    
+    v3.1 + A1 is a genuine improvement over v3. The execution specification (detached worktree, hash before and after, banks SHA256SUMS), the exact failure conditions table, the calibration fixtures, the A1 schema, the wave gates with explicit "accounted ≠ working", the search-records discipline, and the split between functional loops and research DAG cycles are all correct and should be preserved.
+    
+    But v3.1 is not simply "v3 with execution detail". It contains silent substantive changes to wave sequencing, D-decision semantics, and the card schema. Each of these is defensible in isolation; none is explained. The pattern is the v2 problem at a higher layer: the reviewer cannot tell whether a change is intentional or drift.
+    
+    # Finding Severity
+    01 Wave resequencing (RP-2, RP-11 → 1a; RP-8a, RP-8b → 2) is not explained MAJOR
+    02 D4 semantics changed from "S-1 two-stage" to "preliminary assurance"; S-1 marked "resolved in principle" with no adjudication record MAJOR
+    03 claim_tier → claim_type + source_kind schema change is undocumented MAJOR
+    04 connects_today_unknown_reason replaced by search_records without rename note MAJOR
+    05 Wave 0 10% human sample is stated as recommendation, not frozen MAJOR
+    06 Checker source is "banked as Markdown + SHA-256" — reproducibility depends on a copy, not a runnable artefact MAJOR
+    07 critical taxonomy undefined MINOR
+    08 blocked field allowed values not specified MINOR
+    09 search_records schema not given MINOR
+    10 intended_behaviour.refs[].source_status vocabulary not aligned with Annex A MINOR
+    11 Miro 100-call daily limit will recur; no fallback or scheduling plan MINOR
+    12 "April document" named gap has no closure path MINOR
+    13 Feature counts 28/14/27/35 not traced to the 104 list in the same block MINOR
+    14 D5 assumes the two environments differ in credentials/write access; stated as fact, not verified MINOR
+    15 New known_defects block in the schema example has no corresponding check in the failure table MINOR
+    
+    ---
+    
+    MAJOR Findings
+    
+    DS-KAI-V31-01 — Wave resequencing is silent
+    
+    Attacked text:
+    
+    "The current v3.1 allocation still covers all 104 grouped features exactly once at package level, split 28 / 14 / 27 / 35 across Waves 1a through 3."
+    
+    Problem: v3 specified:
+    
+    · Wave 1a: RP-1, RP-6 — 22
+    · Wave 1b: RP-2, RP-3, RP-4 — 19
+    · Wave 2: RP-5, RP-11, RP-12 — 25
+    · Wave 3: RP-7, RP-8a/b/c, RP-9, RP-10, RP-13, RP-14 — 38
+    
+    v3.1 specifies:
+    
+    · Wave 1a: RP-1, RP-2, RP-6, RP-11 — 28
+    · Wave 1b: RP-3, RP-4 — 14
+    · Wave 2: RP-5, RP-8a, RP-8b, RP-12 — 27
+    · Wave 3: RP-7, RP-8c, RP-9, RP-10, RP-13, RP-14 — 35
+    
+    Four packages moved: RP-2 and RP-11 earlier; RP-8a and RP-8b earlier. The rationale is plausible (RP-2 depends on RP-11; RP-5 depends on RP-8a), but none of the movements is stated, and v3's "wave gates" rationale changes with them. A reader cannot tell whether the resequencing is deliberate or an artefact of transcription.
+    
+    Remedy: Add a short "Changes from v3" table listing every wave assignment change with its reason. If the resequencing is deliberate, that is a legitimate finding of its own and should be visible. If not, revert to v3's assignments.
+    
+    ---
+    
+    DS-KAI-V31-02 — D4 semantics changed; S-1 "resolved in principle" without adjudication
+    
+    Attacked text:
+    
+    "D4 — preliminary assurance | Whether preliminary hazard/test work can begin before all research is finished | Recommend alongside Wave 1a, clearly non-baseline"
+    and, in the owner-decision brief: "S-1 — final documentation sequencing | Resolved in principle"
+    
+    Problem: In v3, D4 was the S-1 two-stage decision. In v3.1, D4 is a new "preliminary assurance" decision and S-1 has moved to "resolved in principle". The v3 review explicitly recommended Option (ii) — defer until Wave 1 is DONE. v3.1 does not show what happened to that recommendation. It is neither accepted, rejected, nor reconciled.
+    
+    The "resolved in principle" wording is the same phrase the plan uses elsewhere for things the reviewer has not seen adjudicated.
+    
+    Remedy: Either:
+    
+    · (a) Show the adjudication record that changed D4 and closed S-1; or
+    · (b) Split them cleanly: D4 remains the S-1 decision (defer, as v3 recommended); D6 is the new preliminary-assurance decision, presented as a separate line in the owner brief with its own recommendation and reasoning.
+    
+    Do not silently overwrite an unresolved decision.
+    
+    ---
+    
+    DS-KAI-V31-03 — claim_tier → claim_type + source_kind is undocumented
+    
+    Attacked text:
+    
+    v3.1 schema example:
+    "claim_type": "method_effectiveness",
+    "source_kind": "peer_reviewed",
+    
+    Problem: v3's card schema had a single field:
+    
+    "claim_tier": "software_documentation|peer_reviewed|standard|preprint|vendor_claim|KAI_test"
+    
+    v3.1 replaces it with two fields whose enumerations are not given. claim_type = "method_effectiveness" appears nowhere in v3. source_kind = "peer_reviewed" appears in v3's enumeration but was mixed with non-source values (e.g., KAI_test), which is exactly the confusion the split might be trying to fix. Without an enumerated list for each field, the machine check cannot validate either.
+    
+    Remedy: Document the split. Give the full enumeration for claim_type (what kind of claim is being made — effectiveness, existence, requirement, etc.) and for source_kind (where the claim came from — peer_reviewed, standard, preprint, vendor_claim, software_documentation, KAI_test). Confirm whether KAI_test belongs in source_kind or is a separate concept. Update Annex D.
+    
+    ---
+    
+    DS-KAI-V31-04 — connects_today_unknown_reason disappears; search_records appears
+    
+    Attacked text:
+    
+    v3's schema:
+    "connects_today_unknown_reason": null,
+    
+    v3.1's schema: no such field; instead "search_records": [].
+    
+    Problem: v3 added connects_today_unknown_reason to close a specific finding from the v2 review (that UNKNOWN was over-permissive). v3.1 silently drops that field. The new search_records field appears to serve a broader purpose but is never defined and never referenced in the failure-conditions table (except as an implicit "Search semantics" check that is not shown with a specific field name).
+    
+    If search_records replaces connects_today_unknown_reason, the replacement should be stated. If search_records is additional, then connects_today_unknown_reason should not have been removed. Either way, a v2 finding is being silently re-litigated.
+    
+    Remedy: State which is true. If search_records subsumes the earlier field, state that it now carries the required reason for UNKNOWN cases. If both are needed, restore connects_today_unknown_reason. Define the search_records schema: at minimum {query, engines, date, results_summary, reason_for_negative_finding}.
+    
+    ---
+    
+    DS-KAI-V31-05 — Wave 0 human sample is not frozen
+    
+    Attacked text:
+    
+    "For Wave 0's human extraction check, v3.1 requires a seeded human sample but does not specify its size. I recommend making that precise before the protocol is frozen: 10% of feature-bearing source passages, minimum 30 passages, with at least two passages from every canonical/lineage/draft source class ..."
+    
+    Problem: This is the same pattern the v2 review flagged for the pilot: a key gate parameter is stated as a recommendation inside the review text, not as a rule in the frozen proposal. If it is not frozen before Wave 0 starts, Wave 0 will run without it, and the "human extraction check" becomes a paragraph in a plan.
+    
+    Remedy: Add the 10%/minimum-30/two-per-source-class rule to Annex A of the proposal itself, with the same status as the "closed source list" rule. The text can say "the sample size was determined by the v3.1 review and is hereby adopted" or similar — the point is that it is no longer a recommendation.
+    
+    ---
+    
+    DS-KAI-V31-06 — Checker source is a banked copy, not a runnable artefact
+    
+    Attacked text:
+    
+    "D2 says the repository research folder contains JSON and Markdown only, so an executable check_cards.py should not quietly appear there. My recommendation is that executable tooling runs from the isolated scratch/research environment and its exact source is banked as a Markdown evidence artefact plus SHA-256 under a run directory."
+    
+    Problem: This is a real tension: the reviewer previously recommended D2 = "JSON and Markdown only" to keep the research folder non-executable. But the checker needs to be reproducible. Banking source as Markdown + SHA-256 preserves the evidence but does not preserve the ability to re-run. Anyone wanting to verify the check would have to:
+    
+    1. Extract the source from the Markdown.
+    2. Reconstruct the environment.
+    3. Re-run.
+    
+    These are all possible but they weaken the "anyone can re-run the check" claim. For a programme whose whole point is verifiability, this is a real concern.
+    
+    Remedy: Two options:
+    
+    · (a) Narrowly amend D2 so kai-pm/research/tools/ is an allowed exception for scripts (JSON + MD + PY, no product code).
+    · (b) Keep D2 as-is, but require the banked Markdown artefact to include an exact pip freeze / environment hash and a one-line reproduction command. Bank the script's SHA-256 with the artefact.
+    
+    Option (a) is cleaner. Option (b) preserves the "no code in the research folder" boundary at the cost of operational friction. Either is fine; the current state — a workaround acknowledged in a review paragraph — should not be the frozen state.
+    
+    ---
+    
+    MINOR Findings
+    
+    DS-KAI-V31-07 — critical taxonomy undefined
+    
+    Attacked text:
+    
+    "critical": true,
+    "critical_reason": ["evidence_truth", "personal_data"],
+    
+    Problem: The criticality flag is new in v3.1. What values can critical_reason take? What makes a feature critical? Is "critical" the same as "must be reviewed by the outside reviewer"? The failure table references "Critical card is DONE without banked full independent review" but does not say what makes a card critical.
+    
+    Remedy: Define the criticality taxonomy. Suggested values: evidence_truth, personal_data, actuator_authority, financial, memory_integrity, safety_of_person, identity_continuity. State whether "critical" implies the outside reviewer's involvement.
+    
+    ---
+    
+    DS-KAI-V31-08 — blocked field has no allowed values
+    
+    Attacked text:
+    
+    "blocked": null,
+    
+    Problem: When a card is BLOCKED, what does this field contain? A reason? A search-records list? A link to a BLOCKED register entry? The BLOCKED register schema later in the doc has its own structure, but the card does not say how it refers to it.
+    
+    Remedy: Define blocked as {reason, search_records_ref, adjudication} or as a reference to the register entry, and align the card schema with the register schema.
+    
+    ---
+    
+    DS-KAI-V31-09 — search_records schema not given
+    
+    Attacked text:
+    
+    "search_records": [],
+    
+    Problem: Same as above. What fields does a search record carry? Query string, search engines used, date, summary of results, reason no positive finding was made?
+    
+    Remedy: Define the schema in Annex B. It should be reusable across connects_today, implementation_state: ABSENT|UNKNOWN, and blocked entries.
+    
+    ---
+    
+    DS-KAI-V31-10 — intended_behaviour.refs[].source_status vocabulary not aligned
+    
+    Attacked text:
+    
+    "source_status": "canonical" in intended_behaviour.refs[0]
+    
+    Problem: Annex A's source-status vocabulary is canonical | lineage | superseded | external | draft | UNKNOWN. The card schema example uses canonical in intended_behaviour.refs, promised.source_status, and plans.status. Does the card enforce the same vocabulary everywhere? Is external allowed in promised (which claims source-promises the feature)? Some values may not make sense in some contexts.
+    
+    Remedy: State per-field whether the full vocabulary is required or a subset. For example, promised.source_status should be restricted to canonical | lineage | draft (a promise cannot come from a superseded source; if it does, it is not a promise).
+    
+    ---
+    
+    DS-KAI-V31-11 — Miro 100-call daily limit will recur
+    
+    Attacked text:
+    
+    "I attempted the supplied KAI board again in this research session and the Miro MCP returned the organisation-wide 100-call daily-limit refusal."
+    
+    Problem: The limit is organisation-wide. Any future Miro read for reconciliation will hit the same wall. No fallback, no scheduling plan, no budget.
+    
+    Remedy: Either budget the 100-call limit explicitly (e.g., "reserve 20 calls per day for KAI reconciliation work" or "do all Miro reads in a single scheduled burst") or define a fallback (export the board to PDF/Markdown once, and read the export).
+    
+    ---
+    
+    DS-KAI-V31-12 — "April document" has no closure path
+    
+    Attacked text:
+    
+    "The unresolved 'April' source remains a named gap rather than being reconstructed from memory; the Linear owner record says it could not be found and requires adjudication under the v3.1 rule."
+    
+    Problem: Naming a gap is fine. Not saying when or how it will be closed means it stays a gap indefinitely. The v3.1 rule for UNKNOWN sources says they are read-then-classified, but if the document cannot be found at all, no reading is possible.
+    
+    Remedy: Add a closure clause: "If the April document is not located by the end of Wave 0, the item remains UNKNOWN and is listed in the closure report as an open source gap, alongside a stated search record. It does not block Wave 0 completion."
+    
+    ---
+    
+    DS-KAI-V31-13 — Feature counts not traced in the same block
+    
+    Attacked text:
+    
+    "The current v3.1 allocation still covers all 104 grouped features exactly once at package level, split 28 / 14 / 27 / 35 across Waves 1a through 3."
+    
+    Problem: The claim "104 = 28+14+27+35" is correct (I verified by counting the package table), but the derivation is not shown next to the claim. A reviewer without the package table in front of them cannot confirm it.
+    
+    Remedy: Add a small table next to the wave table showing the per-wave feature-list count and the sum. This is one line of work and closes the traceability loop.
+    
+    ---
+    
+    DS-KAI-V31-14 — D5 assumes environment differences without verification
+    
+    Attacked text:
+    
+    "This Deep Research environment has successfully reached official NASA, NIST, RFC Editor, scikit-learn and arXiv sources, even though Orion's connected environment reports those domains blocked. That demonstrates D5(a) is workable: research in a wider-read/no-write/no-connectors environment, then hand an evidence manifest to Orion for verification and banking. It does not justify widening the environment that can write to the KAI repository and access personal connectors."
+    
+    Problem: This recommendation depends on the claim that the Deep Research environment has no repository write access and no credentials. That is asserted, not demonstrated. If the Deep Research environment has a Linear connector (it seems to, from the cited file references), the "no connectors" claim is already false.
+    
+    Remedy: Either verify the claim before adopting D5(a), or restate the recommendation to require a specifically provisioned isolated research environment with a documented capability list, rather than relying on the current environment's assumed properties.
+    
+    ---
+    
+    DS-KAI-V31-15 — known_defects has no corresponding check
+    
+    Attacked text:
+    
+    "known_defects": [{"ref": "<audit-id-or-path:line>", "summary": "<finding>", "negative_test": "RT-F013-02"}]
+    
+    Problem: v3.1 introduces known_defects in the schema example but does not add a check for it to Annex C's failure conditions. A card can have known_defects: [] and pass; a card can have populated defects and also pass; there is no rule.
+    
+    Remedy: Add a check: "A DONE card with non-empty known_defects must have, for each defect, either a linked negative_test with execution.status: PASS, or an explicit recommendation entry that names the defect as accepted risk." Without this, known_defects is descriptive only.
+    
+    ---
+    
+    What v3.1 Got Right
+    
+    Preserve these unchanged:
+    
+    1. Immutable SHA as research subject; never a branch name. Correct and overdue.
+    2. Detached worktree pattern with before/after git status --porcelain and git diff --exit-code. This is the right reproducibility discipline.
+    3. Hash script before execution; bank SHA256SUMS. Correct.
+    4. Exact failure-condition table in Annex C. This is what makes the machine check real.
+    5. Calibration fixtures with 16 known-positives and 5 known-negatives. Strong.
+    6. A1 intent vs implementation state separation. This is the substantive conceptual addition and it is right.
+    7. implementation_state: GENUINE|PARTIAL|SIMULATED|NAME_ONLY|ABSENT|UNKNOWN. Correct vocabulary. ABSENT (searched and not found) vs UNKNOWN (searched and could not settle) is a real distinction.
+    8. tests[].execution.status. Necessary for the QUALIFIED rule to be decidable.
+    9. Functional loops ≠ DAG cycles. Good clarification.
+    10. search_records as a requirement for UNKNOWN/ABSENT. Correct instinct.
+    11. Wave gates with "accounted" defined as CHECKED/DONE/BLOCKED, never as working. Strong.
+    12. The "what was intended → what exists → gap → route → falsifier → how we will prove it" chain. This is the core of A1 and it is correct.
+    13. The Letta v1 vs Letta Code distinction. Excellent example of A1 in action.
+    14. The scikit-learn native HDBSCAN vs scikit-learn-contrib HDBSCAN distinction. Correct.
+    15. NIST SSDF 1.1 + 800-218A final; 1.2 draft. Correct.
+    16. RFC 9421's security model caveat. Correct.
+    17. The single-owner, non-sold use-model recorded as assumption, not as licence-irrelevance. Correct.
+    
+    ---
+    
+    Answers to Section 9 Decisions (owner-decision brief)
+    
+    Decision Recommendation
+    D1 — census scripts Yes, with the detached-worktree and SHA256SUMS discipline already specified.
+    D2 — kai-pm/research/ Yes, but resolve the checker-source problem (Finding 06): either narrow the exception to allow tools/ scripts, or require the banked Markdown to include a reproduction command and environment hash.
+    D3 — licence/borrowing protocol Yes, with one addition: for ML projects, record code, weights, data, docs licences separately.
+    D4 — preliminary hazard/test planning Yes alongside Wave 1a, unfrozen, but make sure D4 is genuinely the preliminary-assurance decision and S-1 is a separate, explicitly resolved line (Finding 02).
+    D5 — research access Yes to isolated environment. Verify the "no credentials / no connectors" claim before adopting (Finding 14).
+    S-1 Resolved in principle, but show the adjudication. If the previous deferral is now closed, state how and by whom.
+    
+    ---
+    
+    Recommended Pre-Freeze Actions
+    
+    Before v3.1 is frozen as the research procedure:
+    
+    1. Add a "Changes from v3" table listing every wave resequencing and every D-decision change, with reasons (Findings 01, 02).
+    2. Restore or replace connects_today_unknown_reason and define search_records (Finding 04).
+    3. Define the claim_type / source_kind split with full enumerations and update Annex D (Finding 03).
+    4. Freeze the Wave 0 human sample rule in the proposal, not in a review paragraph (Finding 05).
+    5. Resolve the checker-source problem by narrow D2 amendment or by requiring a reproduction command in the banked artefact (Finding 06).
+    6. Define critical_reason, blocked, search_records, and known_defects handling (Findings 07, 08, 09, 15).
+    7. Align source_status vocabularies across all card fields (Finding 10).
+    8. Add a Miro scheduling or fallback plan (Finding 11).
+    9. Add an "April document" closure clause (Finding 12).
+    10. Add the per-wave feature-count derivation next to the wave table (Finding 13).
+    11. Verify the D5 environment claims (Finding 14).
+    
+    These are all documentation changes, not new research. They can be closed in a single revision.
+    
+    ---
+    
+    Unverified Claims Register
+    
+    1. That the branch claude/project-rework-plan-pgvp35 is at commit 9cf85e4d0b277c092d61f84cf14e0ce2b91d23ea.
+    2. That the GitHub comparison shows eight commits ahead of 1a7a551 with changes confined to HANDOFF_LOG.md.
+    3. That Linear DAI-10 records the owner facts cited.
+    4. That the Miro MCP returned a 100-call organisation-wide daily limit.
+    5. That Letta v1 server behaviour differs from current Letta Code as described.
+    6. That letta==0.16.8 is the pinned version in the KAI integration.
+    7. That Deep Research environment access to NASA, NIST, RFC Editor, scikit-learn, arXiv is reliably available.
+    8. That the Deep Research environment has no credentials and no repository write access.
+    9. That Cognitive Fingerprinting is enabled by default in the feature-flags module.
+    10. That the April document is genuinely absent rather than misnamed.
+    11. That the live branch product tree was unchanged by the eight intervening commits.
+    
+    ---
+    
+    Evidence Requests
+    
+    1. Show the adjudication record that changed D4 and closed S-1.
+    2. Show the "Changes from v3" rationale for the four wave resequencing moves.
+    3. Confirm whether the Deep Research environment has a Linear connector (which would contradict "no connectors").
+    4. Provide the claim_type and source_kind enumerations from the intended schema.
+    5. Confirm whether connects_today_unknown_reason is deliberately dropped or accidentally lost.
+    6. Provide the final frozen Wave 0 human sample rule if it differs from the recommendation in this review.
+    
+    ---
+    
+    Executive Advisory Verdict
+    
+    NO DESIGN BLOCKER FOUND, MAJOR/MINOR FINDINGS REMAIN.
+    
+    v3.1 + A1 is a genuinely stronger document than v3. The A1 schema, the execution specification, the exact failure conditions, the calibration fixtures, and the honest naming of unresolved gaps (April document, Miro access, Letta version drift) all move the programme forward.
+    
+    The remaining MAJOR findings are all reconciliation issues between v3 and v3.1, not new conceptual problems. They can be closed in a single revision without new research. Closing them before freeze prevents the pattern that produced the v3 review in the first place: substantive changes slipping through without being named.
+    END-VERBATIM DEEPSEEK-REVIEW-V3-1-A1
+
+### 6. Next authorised step
+
+- Disposition each of the 15 findings against the banked texts; write the one final text (v3.1 §10 step 3); bank; post to Kai; report to Dainius  [CONVERSATION 2026-10-13 Dainius, "follow through with this"]
+
+### 7. What I am unsure of
+
+- Which texts DeepSeek was given; its "v3" baseline matches the variant of entry 200 rather than v3 of entry 198  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
