@@ -76014,3 +76014,513 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-13T19:14:48Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-13T19:14:48Z  [CMD `date -u +%FT%TZ` → 2026-10-13T19:14:48Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: fc28602cf30bfadd124a43ebb7efa7f5d9108073  [CMD `git rev-parse HEAD` → fc28602cf30bfadd124a43ebb7efa7f5d9108073]
+- tree: 367d4bddbc3905e5a47c622290ed53876ba06034  [CMD `git rev-parse HEAD^{tree}` → 367d4bddbc3905e5a47c622290ed53876ba06034]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- remote:claude/project-rework-plan-pgvp35: fc28602cf30bfadd124a43ebb7efa7f5d9108073  [CMD `git ls-remote --heads origin` → fc28602cf30bfadd124a43ebb7efa7f5d9108073]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 193  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 193]
+
+### 1. The four states
+
+- physical: unchanged since entry 193 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: planning authority; as author of the proposal, Orion reconciles the review (frozen §7 RECONCILE) for Kai's adjudication  [CONVERSATION 2026-10-13 Dainius, "Adversarial Review: KAI Full-Feature Research Proposal v1"]
+- evidence: the review, verbatim in section 5, before any reconciliation  [CMD `cat .git/kai-ruling-capture/8d65297116c2f8de.json` → flagged long(19938), keyword(verdict)]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- External adversarial review of Orion's research proposal v1, relayed by Dainius 2026-10-13; author not stated in the text (finding IDs use the prefix "DS-KAI-RESEARCH"; that DeepSeek wrote it is UNVERIFIED). Verdict "DIRECTION CORRECT, PLAN NOT YET EXECUTABLE"; 8 MAJOR and 6 MINOR findings; seven pre-approval deliverables. Under frozen §16 this is adversarial hypothesis, not evidence or authority. Verbatim in section 5 ⚠ UNBANKED  [CONVERSATION 2026-10-13 Dainius, "Verdict: DIRECTION CORRECT, PLAN NOT YET EXECUTABLE."]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier  [CONVERSATION 2026-10-13 Dainius, "We must understand and account for everything KAI is supposed to become before writing the engineering documentation"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Who wrote the review (for attribution under frozen §4 and §16)  [CONVERSATION 2026-10-13 Dainius, "Adversarial Review: KAI Full-Feature Research Proposal v1"]
+
+### 5. Incidents and corrections
+
+- Credential scan of the review (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py e194a.json` → TOTAL HITS 0]
+- EVIDENCE EXTERNAL-REVIEW-RESEARCH-PROPOSAL-V1 adversarial_review_v1.txt: 20320 bytes, sha256 7765aa6159cc31534dfc217c1ddada573a6888e1aeec18caad93a9a9c44d0455, final LF True (added by Orion)  [CMD `sha256sum adversarial_review_v1.txt` → 7765aa6159cc3153…]
+    BEGIN-VERBATIM EXTERNAL-REVIEW-RESEARCH-PROPOSAL-V1
+    Adversarial Review: KAI Full-Feature Research Proposal v1
+    
+    Overall Assessment
+    
+    Verdict: DIRECTION CORRECT, PLAN NOT YET EXECUTABLE.
+    
+    The core discipline is right: start from KAI's own feature list, one card per item, machine-checked coverage, independent verification, honest limitations. This directly addresses the failure mode of the last research pass (technology-first, 23 families never named, 9 with no research at all).
+    
+    But the plan has eight MAJOR gaps that will cause the same failure again at a different layer: the census denominator is undefined, the card schema is unspecified, the "independent check" only verifies links not claims, and the decision in Section 9 is circular.
+    
+    # Finding Severity
+    01 Wave 0 (census) has no definition of done MAJOR
+    02 Card schema is not specified — the machine check cannot work without one MAJOR
+    03 "Exactly one lead package" is artificial; some features genuinely span packages MAJOR
+    04 Independent verification checks links, not research claims MAJOR
+    05 No total card count estimate — Wave 1 is ~41 features plus nested items MAJOR
+    06 Network blocks materially limit the "what's new" scan; no fallback defined MAJOR
+    07 Section 9 decision 3 (S-1) is circular — Kai is asked to recommend and Dainius to decide, but the decision point is undefined MAJOR
+    08 "Current best practice" is undefined — no cutoff, no authority, no schema MAJOR
+    09 Weak-copyleft (LGPL, MPL) and dual-licensing not addressed MINOR
+    10 Transitive dependency licensing not addressed MINOR
+    11 Historical documents' status (canonical vs. superseded) is unclear MINOR
+    12 Card mixes research questions with architecture questions ("how it joins the one KAI") MINOR
+    13 RP-8 lead is narrower than the feature scope it covers MINOR
+    14 Role workload is unrealistic — "Orion checks every source" for 200+ cards MINOR
+    
+    ---
+    
+    MAJOR Findings
+    
+    DS-KAI-RESEARCH-01 — Wave 0 has no definition of done
+    
+    Attacked text:
+    
+    "0 | Full feature census: nested items, prose-only promises, historical vision | The denominator. Without it, 'complete' cannot be checked"
+    
+    Problem: The proposal says Wave 0 produces "the denominator" but never defines what counts as an item.
+    
+    · What is a "nested item"? A single sentence in README prose? A function name in code? A feature flag? A D-number decision?
+    · What is a "prose-only promise"? Any claim of capability in any document? Only claims in canonical documents?
+    · Are superseded historical documents (bootstrap plan, April plan, June v2.1) counted as promises, or as lineage?
+    
+    Without this definition, Wave 0 can never "complete" because the researcher cannot know when to stop counting.
+    
+    Concrete failure: Wave 0 produces 104 cards, then Wave 1 discovers the April plan had 30 promises not in the README, so Wave 0 reopens. The plan produces exactly the failure it was designed to prevent.
+    
+    Remedy: Wave 0 must produce a census protocol before producing items:
+    
+    · Exact source documents and their status (canonical / lineage / superseded)
+    · Rule for what counts as an item (e.g., "a named capability, flag, D-number, or sentence in a canonical document that asserts a capability")
+    · Rule for deduplication across documents
+    · Rule for handling nested items (one card or multiple?)
+    
+    This protocol itself is a Dainius decision (Section 9).
+    
+    ---
+    
+    DS-KAI-RESEARCH-02 — Card schema is not specified
+    
+    Attacked text:
+    
+    "Machine check. A script counts items without a card. Any count above 0 fails the gate."
+    
+    Problem: The machine check cannot exist without a card schema. The proposal lists 8 questions each card must answer, but does not specify:
+    
+    · File format (JSON? YAML? Markdown frontmatter?)
+    · Where cards live
+    · Required vs. optional fields
+    · How to represent "UNKNOWN" vs. "not yet researched"
+    · How to reference sources (URL? DOI? GitHub permalink?)
+    · How to represent the disposition enum
+    
+    Without a schema, the "machine check" is prose dressed as a check.
+    
+    Concrete failure: Orion writes a script that counts cards by filename. Kai writes cards in a different directory. The check passes but coverage is wrong.
+    
+    Remedy: Define the card schema before Wave 1. Minimum fields:
+    
+    ```yaml
+    feature_id: "13"
+    feature_name: "MARS memory decay"
+    lead_package: "RP-1"
+    promised:
+      - source: "README.md"
+        line: 172
+        text: "..."
+        status: "canonical"
+    today:
+      - component: "memu-core"
+        location: "..."
+        runtime_status: "UNKNOWN"  # enum: LIVE | BUILT | STUB | UNKNOWN | ABSENT
+    plans:
+      - source: "D351"
+        status: "superseded"  # enum: canonical | lineage | superseded | draft
+    world_offers:
+      - name: "FSRS"
+        type: "algorithm"  # enum: algorithm | project | paper | standard
+        url: "..."
+        licence: "MIT"
+        last_release: "2025-08"
+        checked_at: "2026-10-13"
+    fits_kai:
+      licence_ok: true
+      offline_ok: true
+      target_hardware_ok: true
+      telemetry: false
+    recommendation: "HARDEN"  # enum from §2.6
+    test_plan:
+      positive: "..."
+      negative: "..."
+      restart: "..."
+      hostile: "..."
+      itp_line: "..."
+    joins_kai:
+      talks_to: [...]
+      must_never: [...]
+    researcher: "kai"
+    checker: "orion"
+    checked_at: "..."
+    ```
+    
+    Only then can the script be written, and only then can "0 items without a card" mean anything.
+    
+    ---
+    
+    DS-KAI-RESEARCH-03 — "Exactly one lead package" is artificial
+    
+    Attacked text:
+    
+    "Each of the 104 features has exactly one lead package (checked by script); a package may still consult others."
+    
+    Problem: Some features genuinely span packages. Examples from the proposal itself:
+    
+    · #26 world state — assigned to RP-7, but the proposal admits "World state and provenance, #26, is led by RP-7" while RP-1 also discusses temporal truth.
+    · #80 Agent-Evolver — assigned to RP-2, but RP-11 explicitly checks "its skill supply chain."
+    · #84 dream cycles — assigned to RP-2, but Phase 6 (memory decay) directly depends on RP-1.
+    · #44 GPU-era stub activation — assigned to RP-8, but RP-7 leads the NPU, which is the same hardware question.
+    
+    The "exactly one" rule forces artificial primary assignments to satisfy the script, rather than reflecting the real dependency structure.
+    
+    Concrete failure: A feature is led by RP-1 (memory), but its actual blocking question is answered in RP-8 (hardware). The RP-1 card sits "done" while the feature is unresearchable.
+    
+    Remedy: Change to "at least one lead package, plus dependency edges." The script checks:
+    
+    · Every feature has ≥1 lead
+    · Every dependency edge points to a real card
+    · Every feature is reachable from Wave 0 census
+    
+    The script becomes a graph checker, not a counting checker. That's stronger.
+    
+    ---
+    
+    DS-KAI-RESEARCH-04 — Independent verification checks links, not claims
+    
+    Attacked text:
+    
+    "Orion: builds the census; checks every source link, version and licence; runs the coverage check; challenges weak cards"
+    
+    Problem: Orion checks that a URL resolves and a licence string matches. Orion does not verify that Kai's claim ("FSRS is a good fit for KAI memory decay") is correct. The verification is structural, not substantive.
+    
+    Concrete failure: Kai cites a paper that says X. The paper exists. The link resolves. The licence is Apache-2.0. But the paper's conclusion is that X does not work at scale, and Kai misrepresented it.
+    
+    Remedy: Add a second reviewer for substantive claims — either a different LLM (with a different training base) or a human reviewer for Wave 1 cards. Orion's role becomes:
+    
+    1. Structural verification (links, licences, versions)
+       2 . Adversarial challenge ("why1 is this recommended?")
+       3 contains. Sample substantive verification (pick 10% of cards, check the claim against the source)
+    
+    Document the sample rate. Document when a card fails substantive verification.
+    
+    ---
+    
+    DS-KAI-RESEARCH-05 — No total card count estimate
+    
+    Attacked text:
+    
+    "Wave 1: RP-1, RP-2, RP-3, RP-4, RP-6" with features listed per package.
+    
+    Problem: Wave:
+    
+    · RP-1: 10 features (+ nested items)
+    · RP-2: 5 features + "inside the dream: failure clustering, boundary recalibration, MARS decay"
+    · RP-3: 6 features
+    · RP-4: 8 features
+    · RP-6: 12 features
+    
+    That is ~41 features in Wave 1, each with a full 8-question card, plus nested items discovered in Wave 0. If Wave 0 finds 50% more nested items (conservative), Wave 1 becomes 60+ cards.
+    
+    At the level of detail in the example card (MARS Memory Decay), each card is a substantial research effort. Wave 1 alone is likely 150–300 hours of focused work.
+    
+    Concrete failure: The plan is approved. Wave 1 is started. After 3 weeks, 12 cards are done. Wave 2 is never reached. The same failure mode as last time, at a smaller scale.
+    
+    Remedy: Before approving the plan, estimate the total card count and per-card effort. Publish the estimate. Decide whether the plan is achievable in the intended timeframe, or whether Wave 1 should be split further (e.g., RP-1 alone as Wave 1a, RP-6 as Wave 1b).
+    
+    ---
+    
+    DS-KAI-RESEARCH-06 — Network blocks materially limit the scan
+    
+    Attacked text:
+    
+    "Limit: this session's network blocks arxiv.org, nist.gov, rfc-editor.org and datatracker.ietf.org. Kai, or a session with a wider allow-list, covers those."
+    
+    Problem: Three of the four blocked domains are core sources for the research:
+    
+    · arxiv.org — the primary source for recent papers (RP-1 through RP-12)
+    · nist.gov — the primary source for NIST SP 800-218 SSDF (RP-11)
+    · rfc-editor.org and datatracker.ietf.org — the primary source for RFC 8032, 9421, 9530 (RP-9)
+    
+    Saying "Kai covers those" is fine, but:
+    
+    1. Kai may also be blocked (the proposal does not say).
+    2. No fallback is defined if Kai is also blocked.
+    3. No indication of whether Kai's results are checked by Orion.
+    
+    Concrete failure: The plan proceeds. Waves 1–3 complete. Every security-relevant card cites secondary sources ("an article about RFC 8032") because the RFC itself was unreachable. The plan produces lower-quality research than the previous pass, in exactly the domains where quality matters most.
+    
+    Remedy: Before starting Wave 1, confirm Kai's access to the four blocked domains. If Kai is also blocked, define a fallback: a specific session with a wider allow-list, a mirror, or an off-peak request to Dainius to run the fetches. Do not start Wave 1 until access is confirmed.
+    
+    ---
+    
+    DS-KAI-RESEARCH-07 — Section 9 decision 3 is circular
+    
+    Attacked text:
+    
+    "S-1: must all of this finish before RAMS? Kai to recommend; your decision."
+    
+    Problem: The decision point is unclear. Kai recommends; Dainius decides. But:
+    
+    · When does Kai recommend? Before or after Wave 1?
+    · What is the input to the recommendation?
+    · What if Kai does not recommend? Does Dainius decide blind?
+    · What if Dainius decides before Kai recommends?
+    
+    Concrete failure: The plan is approved. Wave 1 starts. Midway, someone asks "do we need all of this before RAMS?" Nobody knows who is supposed to have answered that.
+    
+    Remedy: Rewrite as a two-stage decision:
+    
+    Dainius (pre-Wave 1): Decide whether to run Wave 1 first and receive Kai's S-1 recommendation after, OR decide S-1 now based on the plan as written.
+    
+    Kai (if Dainius defers): Deliver S-1 recommendation within 2 weeks of Wave 1 completion, with reasoning.
+    
+    Dainius (post-Wave 1, if deferred): Decide S-1.
+    
+    This makes the decision path unambiguous.
+    
+    ---
+    
+    DS-KAI-RESEARCH-08 — "Current best practice" is undefined
+    
+    Attacked text:
+    
+    "Kai: researches and writes the cards (his protocol role: research and current best practice)."
+    
+    Problem: "Current best practice" is the entire standard of quality for the research output, and it is undefined. Questions:
+    
+    · What is the cutoff date for "current"? 2024? 2025? 2026?
+    · Which venues count (peer-reviewed only? arXiv preprints? vendor docs?)
+    · Who decides what counts as "best practice" when sources disagree?
+    · What if the best practice contradicts a Kai or Dainius preference?
+    
+    Concrete failure: Kai writes a card citing a 2022 survey. Orion challenges it. Kai says the survey is still current best practice. Orion disagrees. No rule resolves the dispute.
+    
+    Remedy: Define "current best practice" in the research protocol:
+    
+    "Current" = published or released within the last 24 months (as of the card's checked_at date), unless:
+    
+    · No newer source exists, AND
+    · The card explicitly states the source's age and why it is still the best available.
+    
+    "Best practice" = preference order: (1) peer-reviewed papers, (2) official standards (ISO, NIST, IETF, W3C), (3) widely-deployed open-source projects, (4) arXiv preprints, (5) vendor documentation. A card that uses a lower-tier source must state why.
+    
+    Document the standard. Apply it consistently.
+    
+    ---
+    
+    MINOR Findings
+    
+    DS-KAI-RESEARCH-09 — Weak-copyleft and dual-licensing not addressed
+    
+    Attacked text: Section 4:
+    
+    "Permissive (MIT, Apache-2.0, BSD) is preferred. Copyleft (GPL, AGPL) needs Dainius's decision."
+    
+    Problem: LGPL, MPL 2.0, and dual-licensed projects (e.g., AGPL + commercial) are not addressed. These are common in the target spaces:
+    
+    · Qdrant: Apache-2.0 (fine)
+    · FSRS: MIT (fine)
+    · Some ML libraries: LGPL or MPL
+    · Some memory/graph projects: AGPL with commercial alternative
+    
+    Remedy: Add:
+    
+    "Weak-copyleft (LGPL, MPL 2.0) is allowed if the project is used as a library without modification, and the licence text is preserved. Dual-licensed projects are treated as their most permissive option for evaluation, with the chosen licence recorded."
+    
+    ---
+    
+    DS-KAI-RESEARCH-10 — Transitive dependencies not addressed
+    
+    Attacked text: Section 4:
+    
+    "A project may be borrowed only if its card shows all of these: Licence recorded. ... Pinned: an exact version or commit and a checksum."
+    
+    Problem: A MIT project may depend on a GPL library. The MIT licence does not cover the transitive dependency. KAI inherits the GPL obligation.
+    
+    Remedy: Add to Section 4:
+    
+    "Transitive dependencies are checked via the project's lock file or SBOM. If any direct or transitive dependency is copyleft, the project is treated as copyleft for Dainius's decision, unless the dependency is optional and can be excluded."
+    
+    ---
+    
+    DS-KAI-RESEARCH-11 — Historical documents' status is unclear
+    
+    Attacked text:
+    
+    "Every feature: the 104 grouped features, their nested items, promises made only in README prose, and the historical vision (bootstrap plan, April plan, June v2.1)."
+    
+    Problem: What is the status of the historical vision?
+    
+    · Is the bootstrap plan canonical, or lineage, or superseded?
+    · If the bootstrap plan promised feature X and the README does not mention it, is X a "feature"?
+    · If the April plan promised a capability that D-number decisions later removed, is it still a promise?
+    
+    Remedy: Add to the Wave 0 census protocol:
+    
+    "Each source document is classified as: canonical (current authority), lineage (informs but does not bind), or superseded (no longer applies). Promises from lineage documents are recorded with that status. Promises from superseded documents are recorded only if the removal itself is undocumented."
+    
+    ---
+    
+    DS-KAI-RESEARCH-12 — Card mixes research and architecture questions
+    
+    Attacked text: Card question 8:
+    
+    "How it joins the one KAI: which organs it talks to, and what it must never do."
+    
+    Problem: This is an architecture question, not a research question. Answering it requires the Kingsman architecture to be settled, which the plan does not assume. Mixing the two causes either:
+    
+    · The card answers question 8 with a guess, or
+    · The card blocks on architecture that does not exist.
+    
+    Remedy: Move question 8 to a separate "integration note" that is required only for cards whose recommendation is not KEEP or RESEARCH/WATCH. For KEEP and WATCH cards, question 8 can be N/A.
+    
+    ---
+    
+    DS-KAI-RESEARCH-13 — RP-8 lead is narrower than the feature scope
+    
+    Attacked text:
+    
+    "RP-8 ... Leads: Lemonade, llama.cpp, Qwen3.6, gpt-oss, Mistral [R]. Pass 2 found open ROCm issues for gfx1151 (E23, E24) and a second binary publisher (aigdat), so pin provenance before any test."
+    
+    Problem: The lead is a list of products, not a research question. The feature scope is:
+    
+    · #30 Ollama (a runtime)
+    · #44 GPU-era stub activation (an architecture question)
+    · #103 Flow Z13 / Strix Halo (a hardware question)
+    · #96 chat, voice, TTS, avatar (four different capabilities)
+    
+    Conflating these into one lead package is too coarse. The card will either be enormous or superficial.
+    
+    Remedy: Split RP-8 into:
+    
+    · RP-8a: Inference runtimes (Ollama, Lemonade, llama.cpp, vLLM)
+    · RP-8b: Hardware qualification (Flow Z13, ROCm, thermal, storage)
+    · RP-8c: Voice and avatar (STT, TTS, embodiment)
+    
+    Each with its own card scope.
+    
+    ---
+    
+    DS-KAI-RESEARCH-14 — Orion's workload is unrealistic
+    
+    Attacked text:
+    
+    "Orion: builds the census; checks every source link, version and licence; runs the coverage check; challenges weak cards; banks everything in GitHub."
+    
+    Problem: If Wave 1 has 40+ cards, each with 2+ sources, and Waves 2–3 add 60+ more, Orion checks 300–500 sources. At 15 minutes per source (link check, licence check, version check), that is 75–125 hours of work — before challenging weak cards.
+    
+    Remedy: Change to:
+    
+    "Orion checks every source's existence and licence, and performs substantive verification on a 10% sample of cards per wave, chosen randomly. Every card that recommends a change is checked substantively in full."
+    
+    This is achievable and defensible.
+    
+    ---
+    
+    What Is Genuinely Strong
+    
+    To be fair to the plan, the following are strong and should not be lost in revision:
+    
+    1. Start from the feature list, not from technology. This is the right response to the previous failure.
+    2. One card per item, machine-checked. The discipline is correct even if the schema is missing.
+    3. Calibration check (removing a feature is caught). This is a good practice.
+    4. Honest limitations section. The plan admits its own network blocks and unknowns.
+    5. Explicit decisions for Dainius. The plan does not pretend to decide what only the owner can decide.
+    6. Borrowing rules. The list is strong and should be kept, with the minor additions above.
+    7. Wave ordering rationale. Memory first, then dream, then honesty, then imagination, then operator — this is defensible.
+    8. Fixed constraint on BINANCE keys. Good.
+    
+    ---
+    
+    Answers to Section 9 Decisions
+    
+    Question My recommendation
+    Census scripts — may Orion run read-only scripts? Yes, with conditions: scripts run on a snapshot of the repository, not the live tree; outputs to scratch; every script is committed to GitHub alongside its output; scripts are parameterized so they are reproducible.
+    Copyleft licences — allowed? Permissive by default; weak-copyleft allowed as library; strong copyleft (GPL/AGPL) case-by-case with Dainius's explicit yes. Add transitive dependency rule (Finding 10).
+    S-1 — must all finish before RAMS? Restructure as a two-stage decision (Finding 07). My recommendation: no, RAMS does not need to wait for all 104 cards, but it needs Wave 0 (census) and Wave 1 (the 9 gaps) to complete. Waves 2–3 can proceed in parallel with RAMS drafting.
+    
+    ---
+    
+    Recommended Pre-Approval Actions
+    
+    Before Dainius approves, the following should be delivered:
+    
+    1. Wave 0 census protocol (Finding 01)
+    2. Card schema (Finding 02)
+    3. Total card count estimate with per-wave breakdown (Finding 05)
+    4. Confirmation of Kai's network access to arxiv.org, nist.gov, rfc-editor.org, datatracker.ietf.org (Finding 06)
+    5. Restructured S-1 decision (Finding 07)
+    6. Definition of "current best practice" (Finding 08)
+    7. Split of RP-8 into RP-8a/b/c (Finding 13)
+    
+    These are all deliverables before the plan is approved, not during execution. Approving the plan without them is approving a plan whose denominator is unknown and whose machine check cannot exist.
+    
+    ---
+    
+    Summary
+    
+    Aspect Verdict
+    Overall direction Correct — start from KAI's own features
+    Wave ordering Defensible
+    Card content Strong, but mixed research and architecture
+    Machine check Cannot exist without a schema
+    Independent verification Structural only, not substantive
+    Coverage claim Self-referential until census protocol is defined
+    Scope realism No total estimate — likely 3–5x Wave 1
+    Decision structure One circular decision needs restructuring
+    Borrowing rules Strong, needs two additions
+    Network limitations Material, unmitigated
+    
+    The plan should not be approved as-is. It should be revised with the seven pre-approval deliverables above, then re-reviewed. The direction is right; the mechanics are not yet ready.
+    
+    NO DESIGN BLOCKER FOUND, MAJOR/MINOR FINDINGS REMAIN.
+    END-VERBATIM EXTERNAL-REVIEW-RESEARCH-PROPOSAL-V1
+
+### 6. Next authorised step
+
+- Reconcile: a per-finding disposition and a revised proposal v2, banked; then to Kai for adjudication  [CONVERSATION 2026-10-13 Dainius, "The plan should not be approved as-is."]
+
+### 7. What I am unsure of
+
+- Nothing new  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
