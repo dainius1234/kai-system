@@ -79016,3 +79016,158 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-13T19:50:01Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-13T19:50:01Z  [CMD `date -u +%FT%TZ` → 2026-10-13T19:50:01Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 1a7a5519dd13748d9f9617763a1885eae3498296  [CMD `git rev-parse HEAD` → 1a7a5519dd13748d9f9617763a1885eae3498296]
+- tree: 0a1b00a5ec549562b8ab32b71a7fc46532720c8f  [CMD `git rev-parse HEAD^{tree}` → 0a1b00a5ec549562b8ab32b71a7fc46532720c8f]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/project-rework-plan-pgvp35: 1a7a5519dd13748d9f9617763a1885eae3498296  [CMD `git ls-remote --heads origin` → 1a7a5519dd13748d9f9617763a1885eae3498296]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 202  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 202]
+
+### 1. The four states
+
+- physical: unchanged since entry 202 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: verbatim capture (O-2 record authority); Kai recommends Orion prepare v3.1 as a planning-only reconciliation candidate, relayed by Dainius without objection  [CONVERSATION 2026-10-13 Dainius, "My assessment: proceed with v3.1 as a planning draft, with some important conditions."]
+- evidence: Dainius's message (with Kai's relayed assessment) and Kai's DAI-10 comment 49e8229e, verbatim in section 5  [CMD `cat .git/kai-ruling-capture/211e529d662a6276.json` → flagged long(3516), keyword(implementation)]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-13 · direction on honesty of implementation versus names: the aim is to bring each feature's implementation as close as possible to what its name promises, neither dressing it up nor writing it off. Verbatim in section 5 ⚠ UNBANKED  [CONVERSATION 2026-10-13 Dainius, "we are trying to make it as close as we can not make sweets out of shit or call them shit !"]
+- Kai · 2026-10-13 (relayed by Dainius) · recommends v3.1 as a planning draft using canonical v3, all ten DAI-10 findings (49e8229e) and Orion's verified corrections; one independent challenge, then a readiness decision; no new authority for code, runtime or gates. Verbatim in section 5 ⚠ UNBANKED  [CONVERSATION 2026-10-13 Dainius, "Keep it planning-only and return it for adjudication."]
+- Kai · 2026-10-13 · DAI-10 49e8229e: v3 adjudication "ACCEPT WITH REQUIRED AMENDMENTS", findings R3-01 to R3-10 (6 HIGH, 4 MEDIUM). Verbatim in section 5 ⚠ UNBANKED  [CONVERSATION 2026-10-13 Kai, "ADOPT THE DIRECTION, AMEND SPECIFIC BLOCKERS BEFORE FORM/SCRIPT FREEZE."]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier; no research cards, folders or scripts until D1 and D2; no containment action on the fingerprint feature without Dainius's explicit authorisation  [CONVERSATION 2026-10-13 Dainius, "Do not treat that recommendation as new authority to alter source code, runtime settings or programme gates."]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Still unanswered by Dainius: is any KAI instance running on any device, or is KAI only code in GitHub?  [CONVERSATION 2026-10-13 Dainius, "Is any KAI instance actually running on a computer, server or other device at present"]
+
+### 5. Incidents and corrections
+
+- CORRECTION of entry 202 (§4 line on S-1 and §5 "Correction of Orion's own working memory"): ~~"S-1 is still Dainius's decision" / "The summary was wrong; the repository wins"~~. Disproved by the banked owner ruling in entry 191, block KAI-DAI10-be2ddfbf-OWNER-RULING, Dainius's exact words: "deep search on full features how to implement best practises … only then we will have comprehensive rams itp and other docs". The outcome of S-1 (full-feature research before the comprehensive Master Plan, RAMS and ITP documents) is set by Dainius. What remains open is the timing and permission of preliminary, unfrozen hazard and test planning. Orion also told Dainius in conversation that he had not ruled; that statement was false  [FILE kai-pm/HANDOFF_LOG.md:75528]
+- Mechanism of that error: entry 202 searched only for the label "S-1", found Orion's own planning lines, and wrote a sentence about whether Dainius had ruled at all. A bounded search earned a bounded sentence and an unbounded one was written (R17), and the owner's words were not opened (R16). Ledger allocation is HELD, so recorded here only  [CMD `grep -n S-1 kai-pm/HANDOFF_LOG.md` → lines 75632, 76476 only; owner text at 75528-75541 uses no "S-1" label]
+- Credential scans: Dainius's message 0 hits; Kai 49e8229e 0 hits (calibration 6/6 each)  [CMD `credscan.py cs_relay.json; cs_kai.json` → TOTAL HITS 0, 0]
+- Relay-turn listing: one DAI-10 comment newer than Orion's 72238b2c: Kai's 49e8229e at 2026-10-13T19:42:32.354Z, banked here  [CMD `list_comments DAI-10 limit 2` → 49e8229e]
+- EVIDENCE DAINIUS-RELAY-KAI-V31-ASSESSMENT dainius_relay_kai_v31.txt: 3557 bytes, sha256 c3fea102e055ca1161ed9e7e1a846877863c05233fe5c3fd12b094c73bd57f54, final LF True (added by Orion)  [CMD `sha256sum dainius_relay_kai_v31.txt` → c3fea102e055ca11…]
+    BEGIN-VERBATIM DAINIUS-RELAY-KAI-V31-ASSESSMENT
+    Well if some parts true by name but not in implementation point I’m making is we are trying to make it as close as we can not make sweets out of shit or call them shit ! GPT: Brother, I’ve checked GitHub. Orion’s latest commit is 1a7a551, containing handoff entries 201 and 202. His verification work is recorded.
+    
+    My assessment: proceed with v3.1 as a planning draft, with some important conditions.
+    
+    1. Orion should incorporate the complete review
+    
+    I’ve already supplied ten additional review findings in Linear DAI-10, comment 49e8229e⁠￼.
+    
+    Orion’s three strengthening points are correct, but they’re only part of the review. The v3.1 draft should also resolve the distinction between research completion and runtime qualification, circular functional relationships versus research dependencies, the treatment of blocked findings, source completeness, licence obligations and independent assurance of security-critical features.
+    
+    No need to keep producing successive versions without convergence. v3.1 should be a controlled reconciliation candidate, followed by one independent challenge and a decision on whether its research procedure is ready.
+    
+    2. One correction on your RAMS ruling
+    
+    Orion says S-1 remains undecided. That’s only partly correct.
+    
+    Your earlier ruling already establishes your intended outcome: complete feature research and architecture reconciliation before the final Kingsman Master Plan, RAMS, ITPs and supporting documents are frozen.
+    
+    What remains undecided is the timing and permission for preliminary, nonbinding hazard analysis and test planning. I support preparing those in parallel when authorised, but never allowing provisional work to masquerade as an approved engineering baseline.
+    
+    3. The fingerprint issue needs priority
+    
+    Orion’s source inspection supports a potentially serious privacy deficiency: the fingerprint feature is enabled by default in code and stores samples in an unencrypted file.
+    
+    That does not establish that collection is occurring right now, nor that the file is externally exposed. Both depend on the deployed runtime, settings, filesystem permissions and device security.
+    
+    If KAI is running with this feature active, I recommend prioritising an explicitly authorised containment action, potentially disabling collection while retaining necessary evidence and reviewing existing data. That is a narrowly scoped safety response, not permission for general engineering changes.
+    
+    The PUB fallback and anti-annoyance failure behaviour should also become mandatory negative-test cases in our research and assurance plan.
+    
+    4. The historical sources correction is accepted
+    
+    Orion is right to flag the unlocated April vision and the misclassified June v2.1 reference. We must not manufacture historical requirements from misremembered document names. Any genuine historical promises should remain in the census once their sources are established.
+    
+    My recommendation to Orion: prepare v3.1 using the canonical v3, all ten findings in my DAI-10 review, and his independently verified corrections. Keep it planning-only and return it for adjudication. Do not treat that recommendation as new authority to alter source code, runtime settings or programme gates.
+    
+    One important question for you: Is any KAI instance actually running on a computer, server or other device at present, or is the system currently only code in GitHub?
+    
+    That answer determines whether the fingerprint finding is an immediate operational privacy concern or a design defect awaiting controlled remediation.
+    
+    OHANA.
+    END-VERBATIM DAINIUS-RELAY-KAI-V31-ASSESSMENT
+- EVIDENCE KAI-DAI10-49e8229e-V3-ADJUDICATION kai_49e8229e.md: 10101 bytes, sha256 17330af6d95ff32fbe347d32506bfb34283a2f9f77ff4fe7d58e9c1ecef87757, final LF True (added by Orion)  [CMD `sha256sum kai_49e8229e.md` → 17330af6d95ff32f…]
+    BEGIN-VERBATIM KAI-DAI10-49e8229e-V3-ADJUDICATION
+    **KAI → ORION / DAINIUS | DAI-10 | v3 RESEARCH PROTOCOL ADJUDICATION — ACCEPT WITH REQUIRED AMENDMENTS | 2026-10-13 | PLANNING / RECORD ONLY | NO IMPLEMENTATION OR GATE RELEASE**
+    
+    **BASE:** Owner pasted the proposal whose headings and 28 / 14 / 27 / 35 wave structure match the canonical `ORION-RESEARCH-PROPOSAL-V3` in GitHub `kai-pm/HANDOFF_LOG.md` entry **198**, mirrored by Orion comment `72238b2c`. Latest GitHub branch read: `claude/project-rework-plan-pgvp35` HEAD `1af01cb4aaa92996eae4726648a0c913218c25f1`. The distinct `PASTED-V3-VARIANT-RESEARCH-PROPOSAL` in entry **200** is NOT the text that Dainius supplied to Kai in this turn: it has waves 22 / 19 / 25 / 38 and a different schema. **Do not treat that divergent text as a replacement for entry 198; preserve as an unadjudicated variant.** Do not assert exact byte equality between the owner's chat rendering and GitHub; the substantive content, wave split and v3 rules were verified.
+    
+    **RESEARCH STATUS:** The first GPT Deep Research technical report has completed as a qualitative, cited technology/architecture reconnaissance, with important repository-specific findings (MARS, confession, causal, PUB/WORK, rituals, struggle, anti-annoyance, cognitive fingerprint). It did NOT mechanically finish the nested/prose/historical denominator, emit every one of the 104-plus atomic research cards, validate all connections, or independently satisfy v3 Annex C. **Neither Gold Tier nor full-feature research is DONE.** Preserve its findings as candidate/qualified evidence to map into v3 cards; do not rewrite its incomplete scope as coverage proof.
+    
+    **Disposition: ADOPT THE DIRECTION, AMEND SPECIFIC BLOCKERS BEFORE FORM/SCRIPT FREEZE.** v3 materially improves v1/v2: 0 forward package dependencies by its own check; 14 research packages with RP-8a/b/c split; 0.1 source-classification gate; pilot #13/#60/#35 testing schema; per-artifact licensing; one-to-many recommendations with falsifiers; evidence-listed connections; explicit BLOCKED outcome; re-opening of census upon newly located material; distinct claim_type/source_kind; no premature ITP refs; security-isolated source research. These are research controls, not architecture/product choices.
+    
+    **Required corrections / falsifiable findings (Kai recommendation for Orion independent review, NOT unilateral rewrite of v3):**
+    
+    1. **R3-01 HIGH: S-1 and BLOCKED gate deadlock.** v3 allows all cards to be DONE *or BLOCKED* for the research-accounting gate, but D4 places S-1 exactly after Waves 1a and 1b are **DONE**. An unresolved high-risk BLOCKED item could make that decision unreachable, or an adjudicated BLOCKED item could be mistaken for feature acceptance. Define separate states (research accounted, evidence-qualified, design admission/freeze eligibility). Every BLOCKED card needs owner/reason/Kai disposition and visibility to Dainius, with explicit effect on downstream research and no silent risk acceptance. S-1 must not override the owner's existing direction: full-feature research and reconciliation precede FINAL Master/RAMS/ITP/ITC/LTQR freeze. D4 may govern *preliminary, unfrozen hazard/test strategy timing* only if owner so rules. A material unresolved BLOCKED feature never counts as technically verified.
+    
+    2. **R3-02 HIGH: Distinguish research-prerequisite DAG from organic system loops.** Keep the card `depends_on` relation an acyclic prerequisite-to-close edge. Add a SEPARATE typed, possibly cyclic `functional_interfaces` / organ-seam graph for runtime flows (memory ↔ dreaming ↔ operator model etc.). The example F013 MARS→F084 Dream and a converse research edge would deadlock the DONE checker even though the actual organic bidirectional flow is intentional. Do not 'solve' a real interaction by deleting it from the architecture. Test graph with a deliberate cycle and ensure that ONLY the prerequisite DAG is rejected.
+    
+    3. **R3-03 HIGH: Present KAI status fields are too weak.** Current card example `today.component,path,readme_marker,runtime=CONFIRMED|UNKNOWN` does not carry evidence for code existence, deployed/cut-over state, configured flag, or runtime qualification. Add pinned path+line+commit (code/config), documented implementation state, observed runtime test ID/environment/date, and status freshness. Never map README 'LIVE', 'COLLECTING' or a passing unit test directly to `runtime: CONFIRMED`. Require independent, objective positive/negative/restart/hostile qualifications before calling a feature operationally qualified.
+    
+    4. **R3-04 HIGH: Independent substantive review is under-scoped for critical waves.** v3 checks 100% of Wave 1 and change recommendations, but only 10% of non-change cards in Wave 2/3. Full review MUST ALSO apply to ALL cards and seams affecting identity/authority/final actuators, secrets, model/skill admission, personal data, finance, recovery/rollback, family succession, privacy and evidence truth, regardless of wave or whether their recommendation says KEEP. Machine checker must verify reviewer evidence/attestation, not just `researcher != checker` strings.
+    
+    5. **R3-05 HIGH: Source census cannot silently skip unavailable or misclassified lineage.** An 'old April vision' that cannot be located remains a named census blocker, not a zero-uncovered success. D13 'v2.1'/SHOPPING_LIST and historic drafts should not simply be dismissed as 'external' without adjudicating feature promises and relevant owner rulings. Classify sources first, preserve original authority chronology and precedence; reopen affected items when any source appears. 'Every line range scanned' establishes traversal, not complete semantic extraction: add seeded nested/prose omission tests and human sample review. The 104 derived register does not outrank exact source.
+    
+    6. **R3-06 MEDIUM: Schema for claims misses material evidence kinds.** `claim_type` values (software_behaviour/method_effectiveness/standard_requirement/adoption) omit KAI owner rulings, privacy/legal obligations, hardware compatibility and security advisories. `source_kind` omits a first-party frozen decision, source code at a commit, security advisory and official regulatory guidance. Introduce these or a separately typed evidence annex with machine validation; do not shoehorn an HMRC legal rule or a D-number decision into `vendor_claim`. Separate internal primary evidence vs external technology offers: a KAI README or owner ruling does not require an external software licence.
+    
+    7. **R3-07 HIGH: Licence rule is over-generalised.** Weak copyleft LGPL/MPL is NOT automatically free of obligations just because a library is unmodified; legal conditions depend on linking, modifications, notice and distribution. 'Any copyleft dependency makes the whole project copyleft' is likewise technically overbroad. Review per artefact, transitive dependency and actual use/distribution model; log obligations. GPL/AGPL/custom weights and consequential choices remain D3 owner decisions. No blanket approval is implied by receiving v3.
+    
+    8. **R3-08 MEDIUM: Test coverage and IDs.** Retain `itp_ref:null` while PRE-RAMS is held. Add stable preliminary `research_test_id` independent of any not-yet-issued ITP. Test criteria extend beyond the four kind labels where relevant: erasure across projections and backups, consent, multi-subject segregation, offline/telemetry leakage, capacity/thermals, restore/replay/rollback, concurrency, hallucinated causal inference, calibration/false alarms. Each case keeps purpose/input/expected/failure meaning/evidence type; evidence must not be inferred from merely writing a test specification.
+    
+    9. **R3-09 MEDIUM: Machine-check validity.** Besides missing/duplicate cards, schema enums, DAG cycles and independence, calibrate with a hidden prose-only feature, nested feature, conflicting canonical decision, inaccessible source, untraced external security claim and BLOCKED-to-DONE attempt. Fix inverted 'known-positive'/'known-negative' fixture language if it causes misunderstanding. The checker tests structured register completeness, not absence of unenumerated source obligations.
+    
+    10. **R3-10 MEDIUM: BLOCKED and source semantics.** Null 'not yet researched' versus UNKNOWN 'searched without evidence' is necessary, but absence of evidence must list searched locations/terms, date, scope and residual possibility; UNKNOWN is NOT proof the feature is ABSENT. A candidate option can be fully investigated and STILL operationally UNVERIFIED; avoid auto-BLOCKED simply because KAI runtime tests are prohibited under current engineering pause. Distinguish RESEARCH DONE, RUNTIME UNQUALIFIED, and BLOCKED RESEARCH CLAIM. Do not use an ITP sign-off as a placeholder for research proof.
+    
+    **Required next steps for Orion/Kai (planning only):**
+    - Orion independently read and cross-check these ten findings against canonical entry198 and entry200; mark ACCEPT/AMEND/REJECT with exact cites, especially D4/blocked semantics and licence/legal assumptions.
+    - Kai adjudicates v3 with bounded corrections, including revised schema, independent review policy, gate logic and positive/negative fixtures; retain v3 history, do not silently rewrite canonical owner-approved text.
+    - Preserve original Deep Research report as the INITIAL RESEARCH BASELINE; run v3 Wave0 only after needed owner decisions D1–D5 (especially narrow `kai-pm/research/` permission D2, D3 licence policy and D5 isolated network access) are explicitly resolved.
+    - Never claim the 104/104 PACKAGE ASSIGNMENT proves a complete atomic census. No authorisation here for writing code/config/runtime/source, making third-party installations, Miro changes, D-numbers, Gold Tier or PR #122 merge.
+    - Maintain PRE-RAMS / engineering HOLD and original D359 order. The eight earlier Miro cosmetic fixes remain a separately scoped owner authorisation, not a research outcome.
+    
+    **Owner-facing recommendation:** v3 IS an improvement and does not invalidate the technical directions from the research pass. Adopt the corrected v3 as the governing *research protocol after explicit approval*, not as a completed certification or new engineering release.
+    END-VERBATIM KAI-DAI10-49e8229e-V3-ADJUDICATION
+
+### 6. Next authorised step
+
+- Write v3.1 (planning only): disposition each of R3-01 to R3-10, the report's strengthening points (entry 202) and the three useful items from entry 200; bank; post to Kai for one independent challenge; report to Dainius with the corrected S-1 position and the running-instance question  [CONVERSATION 2026-10-13 Dainius, "prepare v3.1 using the canonical v3, all ten findings in my DAI-10 review, and his independently verified corrections"]
+
+### 7. What I am unsure of
+
+- Whether a KAI instance is running anywhere  [FILE common/feature_flags.py:87]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
