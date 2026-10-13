@@ -76926,3 +76926,397 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-13T19:26:52Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-13T19:26:52Z  [CMD `date -u +%FT%TZ` → 2026-10-13T19:26:52Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 034dda27021c4a67158845c6f1fa980b827df4a5  [CMD `git rev-parse HEAD` → 034dda27021c4a67158845c6f1fa980b827df4a5]
+- tree: 9683f829bff99fa22bc1eb5c75f3d7d9c1c0c7e9  [CMD `git rev-parse HEAD^{tree}` → 9683f829bff99fa22bc1eb5c75f3d7d9c1c0c7e9]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/project-rework-plan-pgvp35: 034dda27021c4a67158845c6f1fa980b827df4a5  [CMD `git ls-remote --heads origin` → 034dda27021c4a67158845c6f1fa980b827df4a5]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 196  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 196]
+
+### 1. The four states
+
+- physical: unchanged since entry 196 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: planning authority; Orion reconciles its own proposal (frozen §7 RECONCILE)  [CONVERSATION 2026-10-13 Dainius, "Adversarial Review: KAI Full-Feature Research Proposal v2"]
+- evidence: the review, verbatim in section 5, before any reconciliation  [CMD `cat .git/kai-ruling-capture/746e4b77aa0ecdda.json` → flagged long(18860), keyword(verdict)]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- External adversarial review of proposal v2, relayed by Dainius 2026-10-13; author not stated (finding IDs "DS-KAI-RESEARCH-V2-…"; DeepSeek UNVERIFIED). Verdict "DIRECTION SOLID, MAJOR GAPS REMAIN"; 6 MAJOR, 9 MINOR; twelve pre-approval actions; adversarial hypothesis under frozen §16. Verbatim in section 5 ⚠ UNBANKED  [CONVERSATION 2026-10-13 Dainius, "Verdict: DIRECTION SOLID, MAJOR GAPS REMAIN."]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier; no research cards, folders or scripts until D1 and D2  [CONVERSATION 2026-10-13 Dainius, "Close those twelve items, then approve."]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- Credential scan of the review (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py e197.json` → TOTAL HITS 0]
+- EVIDENCE EXTERNAL-REVIEW-RESEARCH-PROPOSAL-V2 adversarial_review_v2.txt: 19130 bytes, sha256 056d0c4071c184c7fd251d8a3fad089886b995258dceff7aeb2f8102e198ed9a, final LF True (added by Orion)  [CMD `sha256sum adversarial_review_v2.txt` → 056d0c4071c184c7…]
+    BEGIN-VERBATIM EXTERNAL-REVIEW-RESEARCH-PROPOSAL-V2
+    Adversarial Review: KAI Full-Feature Research Proposal v2
+    
+    Overall Assessment
+    
+    Verdict: DIRECTION SOLID, MAJOR GAPS REMAIN.
+    
+    v2 genuinely reconciles almost every finding from the v1 review. The finding-by-finding disposition table (§0) is honest and well-calibrated. The census protocol (Annex A), the JSON card schema (Annex B), the machine check (Annex C), the source-tier rules (Annex D), the pilot gate, the two-stage S-1 decision, and the substantive-check definition all close real gaps.
+    
+    The remaining gaps are mostly at the schema edges, the source-list boundaries, and the gate definitions. None is a BLOCKER, but several will surface as disputes mid-execution if not resolved before Dainius approves.
+    
+    # Finding Severity
+    01 Pilot is a schema test in disguise, but the schema is frozen before the pilot MAJOR
+    02 Wave 1b, 2, and 3 have no gate before starting MAJOR
+    03 Source-list closure rule is ambiguous: does reopening Wave 0 invalidate prior work? MAJOR
+    04 Two source entries are "to classify in Wave 0"; item status while unclassified is undefined MAJOR
+    05 The 104-item register is not in the source list but is used as dedup authority MAJOR
+    06 Recommendation enum cannot express multi-recommendation cards MAJOR
+    07 connects_today: UNKNOWN is over-permissive and reduces the field's value MINOR
+    08 No falsification field paired with the "frozen" recommendation MINOR
+    09 Test-plan schema is undefined ("positive/negative/restart/hostile") MINOR
+    10 tier: T1..T5 in Annex B is not defined by Annex D MINOR
+    11 Package dependency graph (§3) and card dependency graph (Annex B) are two different graphs MINOR
+    12 Nested-item rule ("could be tested separately") is subjective MINOR
+    13 D5 network-widening recommendation ignores environment side effects MINOR
+    14 Substantive check failure does not block DONE — "UNVERIFIED" is a note, not a state MINOR
+    15 Status vocabularies differ between Annex A (sources) and Annex B (plans) MINOR
+    
+    ---
+    
+    MAJOR Findings
+    
+    DS-KAI-RESEARCH-V2-01 — Pilot is a schema test in disguise
+    
+    Attacked text:
+    
+    §6: "Pilot | 3 timed cards: #13 MARS, #60 struggle detection, #35 causal world model | 3 | Wave 0 done; Annex B fixed"
+    
+    Problem: Annex B is "fixed" before the pilot runs. But the pilot's purpose is to time three cards against the real schema. If the pilot reveals that Annex B cannot express something material — for example, that a card needs multiple recommendations, or that connects_today needs a structured form — the schema cannot be amended without breaking the "fixed" gate.
+    
+    The proposal says the pilot measures time. It does not say the pilot measures schema adequacy. These are two different tests, and only one is gated.
+    
+    Concrete failure: Pilot card #35 (causal world model) needs to record two recommendations: KEEP the current stub and RESEARCH/WATCH DoWhy. The single recommendation field cannot hold both. The pilot amends the schema. Now the "Annex B fixed" gate has failed, but the gate has already been passed, so either the gate is re-run (extra work) or the schema drifts (inconsistent cards).
+    
+    Remedy: Change the pilot gate from "Annex B fixed" to "Annex B frozen pending pilot; pilot may amend once; amendment is committed and re-checked." Or, state explicitly that the pilot's purpose is both timing and schema validation, and that schema amendment during the pilot is expected.
+    
+    ---
+    
+    DS-KAI-RESEARCH-V2-02 — Waves 1b, 2, and 3 have no gate before starting
+    
+    Attacked text:
+    
+    §6 table:
+    1b | RP-2, RP-3, RP-4 | 19 | 1a checked
+    2 | RP-5, RP-11, RP-12 | 25 | —
+    3 | RP-7, RP-8a/b/c, RP-9, RP-10, RP-13, RP-14 | 38 | —
+    
+    Problem: Wave 1a is properly gated behind the pilot. Wave 1b is gated behind "1a checked". Waves 2 and 3 have no gate — the em-dash is not a gate. This means Wave 2 can start while Wave 1 is still open, and Wave 3 can start while Wave 2 is open.
+    
+    Because the packages have dependency edges (RP-2 depends on RP-1 and RP-11, RP-12 depends on RP-1, etc.), starting Wave 2 before Wave 1b is DONE violates the "a card cannot be DONE while a card it depends on is open" rule at the package level.
+    
+    Concrete failure: Wave 2 begins while Wave 1a is still open. RP-5 (One mind) depends on RP-8a (model runtimes), which is Wave 3. RP-5 cards cannot be DONE until RP-8a cards are DONE. Wave 2 stalls silently, or the dependency edges are quietly ignored.
+    
+    Remedy: Define gates for every wave:
+    
+    · Wave 2 gate: "Wave 1a and 1b checked, and every dependency edge from Wave 2 into Wave 1 resolved or formally deferred with recorded reason."
+    · Wave 3 gate: same, for Waves 1 and 2.
+    
+    Or, if waves may overlap, state that explicitly and explain how dependency DONE rules still apply.
+    
+    ---
+    
+    DS-KAI-RESEARCH-V2-03 — Source-list closure rule is ambiguous
+    
+    Attacked text:
+    
+    Annex A: "The list is closed at the start of Wave 0. Adding a source later reopens Wave 0 visibly, with the reason recorded."
+    
+    Problem: "Reopens Wave 0" is ambiguous. Two readings:
+    
+    (a) Wave 0 work already done is invalidated and must be redone against the new source list. All items and cards produced under the old list are suspect.
+    
+    (b) Wave 0 work already done is preserved; the new source is added and its items are recorded; previously discovered items are checked once more against the new source.
+    
+    The two readings produce very different cost estimates and very different definitions of DONE.
+    
+    Concrete failure: Wave 0 completes at 120 items. A previously undiscovered source is added. Under reading (a), 120 items must be re-derived. Under reading (b), the source is read and any new items are added.
+    
+    Remedy: State which reading applies. My recommendation: reading (b), with an explicit step: "When a source is added, every existing item is re-scanned against the new source for missed or contradicted claims. Items so flagged are re-opened. Wave 0 is then DONE again."
+    
+    ---
+    
+    DS-KAI-RESEARCH-V2-04 — Unclassified sources: item status is undefined
+    
+    Attacked text:
+    
+    Annex A source list:
+    kai-pm/KINGSMAN_FINAL_VISION_MASTER_CANON_PLAN.md | to classify in Wave 0
+    docs/next_level_roadmap.md | to classify in Wave 0
+    
+    Problem: Two sources are on the list but their status (canonical / lineage / superseded / external) is "to classify in Wave 0". If a card cites an item from one of these sources before classification, what status does the item carry? Does it count toward the 104, or not? Is it canonical, lineage, or pending?
+    
+    Annex A says items come from "a canonical or lineage source". If the status of a source is UNKNOWN, items from it are in limbo — they cannot be counted as items, but they also cannot be ignored.
+    
+    Concrete failure: Wave 0 reads KINGSMAN_FINAL_VISION_MASTER_CANON_PLAN.md and finds 15 feature promises. If the source is later classified as "superseded", those 15 items are dropped. If classified as "lineage", they stay. The classification decision changes the size of the census, but the ordering (read-then-classify vs classify-then-read) is not defined.
+    
+    Remedy: Annex A must state the order explicitly. Two options:
+    
+    · (A) Classify every source before reading it for items. Unclassified sources are not read.
+    · (B) Read sources first, then classify. Items from "pending" sources are marked status: PENDING and re-evaluated after classification.
+    
+    Either is fine, but the rule must be written.
+    
+    ---
+    
+    DS-KAI-RESEARCH-V2-05 — The 104-item register is not in the source list but is used as dedup authority
+    
+    Attacked text:
+    
+    Annex A: "Deduplication: the same behaviour in several sources is one item with several source references. The 104-feature register's mapping is the starting point."
+    
+    Problem: The 104-feature register is used as the dedup authority, but it is not itself in the closed source list. This means:
+    
+    · If the register contains a feature that no source supports, is it still an item?
+    · If the register omits a feature that a canonical source clearly promises, is the register wrong?
+    · Who verifies the register? Is it canonical, lineage, or external?
+    
+    The register is not a document; it is a derived artifact (entry 167 in the handoff log). Its authority over deduplication is asserted but not established.
+    
+    Concrete failure: The register lists "MARS decay" as one item; the README splits it into "MARS decay" and "MARS consolidation" as two behaviours. The dedup rule says the register wins. But if the register is wrong, the census is wrong from the start.
+    
+    Remedy: Add the register to Annex A with an explicit status. My recommendation: classify the register as a derived aid, not a source. The register informs dedup but cannot override a canonical or lineage source. If the register and a source disagree, the source wins, and the register is flagged for reconciliation.
+    
+    ---
+    
+    DS-KAI-RESEARCH-V2-06 — Recommendation enum cannot express multi-recommendation cards
+    
+    Attacked text:
+    
+    §2: "Recommendation: one frozen disposition (KEEP · HARDEN · FINISH · MERGE · MOVE · SPLIT · ADD-JOINT · RESEARCH/WATCH · SUPERSEDED BY EVIDENCE · REJECT WITH RECORDED REASON · UNVERIFIED)."
+    
+    Problem: Some cards will genuinely need more than one recommendation. Examples from the proposal's own features:
+    
+    · #13 MARS decay: KEEP the current memu-core decay logic AND ADD-JOINT a scheduler (FSRS-style) for review cadence.
+    · #17 memory stores: SPLIT into event store and relationship store AND ADD-JOINT a projection layer.
+    · #85 skills hub: MERGE with the existing hunter AND HARDEN the provenance checks.
+    · #103 Flow Z13: KEEP the target but ADD-JOINT an SSD-procurement gate.
+    
+    The single-value enum forces the researcher to either pick one (losing information) or write a compound string (breaking the machine check).
+    
+    Remedy: Change the field to recommendations: [] — a list of dispositions. Machine check requires ≥1 valid entry; each entry must be from the enum. The state cannot be DONE unless at least one recommendation is present and none is UNVERIFIED.
+    
+    ---
+    
+    MINOR Findings
+    
+    DS-KAI-RESEARCH-V2-07 — connects_today: UNKNOWN is over-permissive
+    
+    Attacked text:
+    
+    §2 (question 8a): "What it connects to today (fact). Always required; UNKNOWN is allowed."
+    
+    Problem: "UNKNOWN" is too easy. A researcher can write connects_today: ["UNKNOWN"] and satisfy the field, hiding the fact that they did not look. This defeats the field's purpose.
+    
+    Remedy: Require the researcher to enumerate candidate connections even if none is confirmed. Format: connects_today: [{to: "...", evidence: "...", status: "CONFIRMED|CANDIDATE|ABSENT"}]. UNKNOWN is only allowed if the researcher states what they searched for and why they found nothing.
+    
+    ---
+    
+    DS-KAI-RESEARCH-V2-08 — No falsification field paired with the frozen recommendation
+    
+    Attacked text:
+    
+    §2: "Recommendation: one frozen disposition ..."
+    
+    Problem: The recommendation is "frozen", but a frozen recommendation is only useful if it can be changed by evidence. There is no field for "what would change this recommendation". Without it, the freeze is a brake on new evidence, not a discipline.
+    
+    Remedy: Add a field: falsifier: "would change if X evidence appears". This pairs the freeze with the escape route. It also prevents a card from being re-opened on speculation.
+    
+    ---
+    
+    DS-KAI-RESEARCH-V2-09 — Test-plan schema is undefined
+    
+    Attacked text:
+    
+    Annex B: "tests": {"positive": "…", "negative": "…", "restart": "…", "hostile": "…", "itp_line": "…"}
+    
+    Problem: These are strings, not test plans. What does a "positive test" look like for a memory-decay feature? What does a "hostile test" look like for a voice avatar? What is an itp_line and where does it come from? Without a schema, the test plans will be prose and cannot be checked.
+    
+    Remedy: Define a test-plan schema. Minimum fields per test: purpose, input, expected, failure_meaning, evidence_type. The itp_line should reference an ITP/ITC document by ID and section, not by free text.
+    
+    ---
+    
+    DS-KAI-RESEARCH-V2-10 — tier: T1..T5 is not defined by Annex D
+    
+    Attacked text:
+    
+    Annex B: "tier": "T1|T2|T3|T4|T5"
+    Annex D: source ranking is by type of claim, not by tier.
+    
+    Problem: Annex B uses a five-tier source taxonomy; Annex D defines source authority by claim type. These are two different models. The card writer will not know which to use.
+    
+    Remedy: Pick one. My recommendation: keep Annex D's type-of-claim model and replace tier with claim_tier: {software_documentation, peer_reviewed, standard, preprint, vendor_claim, KAI_test}.
+    
+    ---
+    
+    DS-KAI-RESEARCH-V2-11 — Package graph and card graph are two different graphs
+    
+    Attacked text:
+    
+    §3 table: "MAIN DEPENDENCY EDGES" at the package level.
+    Annex B: "depends_on": ["F084"] at the card level.
+    
+    Problem: Two dependency graphs exist. A package dependency edge (RP-1 depends on RP-2) is not the same as a card dependency (F013 depends on F084). It is not clear how they relate. Does RP-1's dependency on RP-2 mean all RP-1 cards depend on all RP-2 cards? Or just some?
+    
+    Remedy: State the relationship. My recommendation: the package graph is a planning aid; only the card graph is authoritative for DONE. A card can be DONE without any other card being DONE, but the packager must justify that. Package dependencies generate candidate card edges but do not force them.
+    
+    ---
+    
+    DS-KAI-RESEARCH-V2-12 — Nested-item rule is subjective
+    
+    Attacked text:
+    
+    Annex A: "a row or sentence naming several distinct behaviours ... gives one parent item plus one child item per behaviour that could be tested separately."
+    
+    Problem: "Could be tested separately" is a judgement call. Two researchers reading the same sentence will draw the line differently. This undermines the machine-checked denominator.
+    
+    Remedy: Add a tie-breaker rule. For example: "A behaviour is a separate child item if a distinct, independently pass/failable test can be written for it without the other behaviour." If in doubt, split. Document the split.
+    
+    ---
+    
+    DS-KAI-RESEARCH-V2-13 — D5 network-widening recommendation ignores environment side effects
+    
+    Attacked text:
+    
+    D5: "Recommendation: widen, for reading only. This is an environment setting Dainius controls."
+    
+    Problem: Widening the network allow-list on a session that also runs CI checks, has access to the repo, and may hold credentials is not just an "environment setting". It changes the blast radius of any compromise of that session. "Reading only" is not a security control — an exfiltration channel is an exfiltration channel.
+    
+    Remedy: Note the security consequence explicitly. Recommendation: perform research reading in a separate, dedicated environment with no repo write access and no credentials, not by widening the main environment's allow-list. Or, state that the main environment has no credentials and no repo write access, and widen with that assurance.
+    
+    ---
+    
+    DS-KAI-RESEARCH-V2-14 — Substantive-check failure does not block DONE
+    
+    Attacked text:
+    
+    §7: "A claim that cannot be traced is marked UNVERIFIED on the card, with the reason."
+    
+    Problem: If a claim is untraced, the card is marked UNVERIFIED — but the state field (OPEN|RESEARCHED|CHECKED|DONE) is separate. A card can be DONE with untraced claims. This means "DONE" does not mean "all claims traced".
+    
+    Remedy: State the rule explicitly: a card cannot be DONE while substantive_check.untraced_claims is non-empty. If a claim cannot be traced, the card stays RESEARCHED or CHECKED, not DONE.
+    
+    ---
+    
+    DS-KAI-RESEARCH-V2-15 — Status vocabularies differ between Annex A and Annex B
+    
+    Attacked text:
+    
+    Annex A: canonical | lineage | superseded | external (plus UNKNOWN).
+    Annex B plans: canonical|lineage|superseded|draft|external.
+    
+    Problem: Annex B adds draft to the plan-source vocabulary. Annex A does not have draft. The v1.1 unified draft is described in Annex A as "lineage (unadjudicated draft)", so it appears Annex A treats draft as lineage, while Annex B treats draft as a separate category.
+    
+    Remedy: Unify the vocabulary. Either add draft to Annex A, or note that "draft" is a special case of "lineage".
+    
+    ---
+    
+    What v2 Got Right
+    
+    Noting what should be preserved:
+    
+    1. Finding-by-finding disposition table — the right way to reconcile a review.
+    2. Annex A census protocol — closed source list, item rule, dedup, nested, stop rule.
+    3. Annex B JSON card schema — machine-checkable.
+    4. Annex C machine check with calibration — known-positive and known-negative.
+    5. Annex D source authority by claim type — better than a flat tier list.
+    6. Pilot before Wave 1 — correct discipline.
+    7. Self-correction on "April plan" and "v2.1" — honesty about v1's errors.
+    8. Wave 1 split into 1a/1b — reflects real complexity.
+    9. Substantive check defined, seeded random 10%, outside reviewer — closes the v1 gap.
+    10. Two-stage S-1 decision — unambiguous.
+    11. D1–D5 are concrete and bounded — clear choices for Dainius.
+    12. null vs UNKNOWN distinction — small but important.
+    
+    ---
+    
+    Answers to Section 9 Decisions
+    
+    Decision Recommendation
+    D1 — Census scripts Yes, with conditions already stated (pinned commit, banked outputs, checksums).
+    D2 — Where cards live (a) — kai-pm/research/ with a narrow grant. Handoff log is unwieldy at 100+ cards.
+    D3 — Licences Approve §4, but add the "documentation is Apache, weights are custom" case (some model releases split licence by artifact).
+    D4 — S-1 two stages (ii), defer. Recommend explicit: "S-1 decision point is after Wave 1a and 1b are DONE."
+    D5 — Network access Prefer a dedicated research environment over widening the main one. If not possible, widen with an explicit statement that the main environment holds no credentials and has no repo write access.
+    
+    ---
+    
+    Recommended Pre-Approval Actions
+    
+    Before Dainius approves v2, close these:
+    
+    1. Pilot purpose stated (schema validation AND timing), and the "Annex B fixed" gate adjusted.
+    2. Every wave gated, including 1b, 2, 3.
+    3. Source-list closure semantics written: does reopening invalidate prior work?
+    4. Unclassified-source ordering written: classify-then-read, or read-then-classify.
+    5. 104-item register classified and added to Annex A, or explicitly demoted to "derived aid".
+    6. Recommendation list — schema change to recommendations: [].
+    7. Test-plan schema written, or the field replaced with a reference to a separate test-plan document format.
+    8. tier replaced with claim_tier in Annex B.
+    9. Package vs card dependency relationship stated.
+    10. Nested-rule tie-breaker written.
+    11. Substantive-check failure blocks DONE — explicit.
+    12. Annex A / Annex B status vocabularies unified.
+    
+    These are all schema-level and can be closed in one revised draft without new research.
+    
+    ---
+    
+    Summary
+    
+    v2 is a serious, honest reconciliation of v1. It earns the right to move forward with minor revisions. It does not earn the right to skip the remaining schema work.
+    
+    NO DESIGN BLOCKER FOUND, MAJOR/MINOR FINDINGS REMAIN.
+    
+    The direction is right. The size is now measured rather than assumed. The pilot is the correct discipline. The remaining issues are the kind that surface in week three of Wave 1 if not closed now: what "DONE" means when a claim is untraced, what happens when a new source is discovered, what "1a checked" means, and what a card looks like when it has two recommendations.
+    
+    Close those twelve items, then approve.
+    END-VERBATIM EXTERNAL-REVIEW-RESEARCH-PROPOSAL-V2
+
+### 6. Next authorised step
+
+- Reconcile into proposal v3, banked; then to Kai  [CONVERSATION 2026-10-13 Dainius, "Close those twelve items, then approve."]
+
+### 7. What I am unsure of
+
+- The reviewer's identity  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
