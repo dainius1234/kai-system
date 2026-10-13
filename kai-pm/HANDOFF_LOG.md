@@ -79934,3 +79934,81 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-13T19:59:40Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-13T19:59:40Z  [CMD `date -u +%FT%TZ` → 2026-10-13T19:59:40Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: a14d0fcd4d73de00e242a5789d43f45498e571ae  [CMD `git rev-parse HEAD` → a14d0fcd4d73de00e242a5789d43f45498e571ae]
+- tree: b0fa87e3f227ecff862528cb1db0547d7f122928  [CMD `git rev-parse HEAD^{tree}` → b0fa87e3f227ecff862528cb1db0547d7f122928]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: a14d0fcd4d73de00e242a5789d43f45498e571ae  [CMD `git ls-remote --heads origin` → a14d0fcd4d73de00e242a5789d43f45498e571ae]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 207  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 207]
+
+### 1. The four states
+
+- physical: unchanged since entry 207 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: record only. Dainius has put everything on HOLD; log the to-do list, nothing else  [CONVERSATION 2026-10-13 Dainius, "hold all for now but log as to do , one thing at a time as I’m getting confused"]
+- evidence: Dainius's message verbatim in section 5  [CMD `cat .git/kai-ruling-capture/56097bd33033f39a.json` → flagged keyword(never)]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-13 · HOLD ALL: no further action on the research proposal, Linear or Miro; log the work as a to-do list; one thing at a time. Verbatim in section 5 ⚠ UNBANKED  [CONVERSATION 2026-10-13 Dainius, "hold all for now but log as to do , one thing at a time as I’m getting confused"]
+- Dainius · 2026-10-13 · use model: KAI will never be sold (answers the D3 use-model question: single owner, not distributed) ⚠ UNBANKED  [CONVERSATION 2026-10-13 Dainius, "Kai will never get sold"]
+- Dainius · 2026-10-13 · KAI will run on his laptop (the target device in the specification). Orion's reading, UNVERIFIED: KAI is not running anywhere now ("will run"), so the fingerprint finding is a design defect to fix before first run, not a live leak ⚠ UNBANKED  [CONVERSATION 2026-10-13 Dainius, "Kai will run on my laptop as well save for it you know the spec !"]
+- Dainius · 2026-10-13 · the "April" vision document cannot be found by the owner; under v3.1 Annex A it becomes a named open item, searched and not found ⚠ UNBANKED  [CONVERSATION 2026-10-13 Dainius, "can’t find April doc"]
+- Dainius · 2026-10-13 · DeepSeek performs the adversarial reviews, at Dainius's or Orion's request (confirms the author of the two "DS-" reviews, entries 194 and 197) ⚠ UNBANKED  [CONVERSATION 2026-10-13 Dainius, "deep seek as you know does adversary reviews on my or your ask"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD (all, by owner instruction): engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier; research proposal work; Linear posts; Miro work; no research cards, folders or scripts  [CONVERSATION 2026-10-13 Dainius, "hold all for now"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- TO-DO 1 (when Dainius lifts the hold): Kai adjudicates v3.1 (02d6cc2d) with A1 (7c51178c); Kai has not yet been told the four answers in this entry  [CMD `save_comment DAI-10` → ids 02d6cc2d, 7c51178c]
+- TO-DO 2: one DeepSeek adversarial challenge of v3.1 + A1 (v3.1 §10), at Dainius's or Orion's request  [CONVERSATION 2026-10-13 Dainius, "deep seek as you know does adversary reviews on my or your ask"]
+- TO-DO 3: Dainius decides, one at a time: D1 census scripts; D2 research folder; D3 licence rules (use model now answered); D4 timing of preliminary hazard drafts; D5 research environment  [FILE kai-pm/HANDOFF_LOG.md:1]
+- TO-DO 4: fingerprint feature (default ON, plaintext file; common/feature_flags.py:87) must be fixed or switched off before KAI first runs on the laptop; needs an explicit owner authorisation when engineering resumes  [FILE common/feature_flags.py:87]
+- TO-DO 5: Miro: Kai makes the 8 approved cosmetic edits, Orion checks exactly those 8 changed; Orion re-reviews Kai's third pass (110 connections)  [FILE kai-pm/HANDOFF_LOG.md:75616]
+- TO-DO 6: open items F7 (edge sources) and F12 (nested acceptance paths)  [FILE kai-pm/HANDOFF_LOG.md:75632]
+
+### 5. Incidents and corrections
+
+- Credential scan of the message: calibration 6/6, TOTAL HITS 0  [CMD `credscan.py hold/cs.json` → TOTAL HITS 0]
+- EVIDENCE DAINIUS-HOLD-ALL-AND-ANSWERS dainius_hold.txt: 264 bytes, sha256 8a8f0d228c70e591f6874a59efb04bb4f468eb97d050a1c5c40c8290d826fbb0, final LF True (added by Orion)  [CMD `sha256sum dainius_hold.txt` → 8a8f0d228c70e591…]
+    BEGIN-VERBATIM DAINIUS-HOLD-ALL-AND-ANSWERS
+    Kai will run on my laptop as well save for it you know the spec ! Kai will never get sold , can’t find April doc.deep seek as you know does adversary reviews on my or your ask.and hold all for now but log as to do , one thing at a time as I’m getting confused
+    END-VERBATIM DAINIUS-HOLD-ALL-AND-ANSWERS
+
+### 6. Next authorised step
+
+- None until Dainius lifts the hold; then TO-DO 1, one thing at a time  [CONVERSATION 2026-10-13 Dainius, "hold all for now but log as to do , one thing at a time"]
+
+### 7. What I am unsure of
+
+- Whether "will run" means KAI is not running anywhere today; read as not running, UNVERIFIED  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
