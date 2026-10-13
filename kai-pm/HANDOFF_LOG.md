@@ -73727,3 +73727,144 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-13T16:23:44Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-13T16:23:44Z  [CMD `date -u +%FT%TZ` → 2026-10-13T16:23:44Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 39a7cca1c41cea4ba86f075d00b3429cf12dcd0b  [CMD `git rev-parse HEAD` → 39a7cca1c41cea4ba86f075d00b3429cf12dcd0b]
+- tree: 374f3dcefb080dc1ae153a9c7e25de39e36bf883  [CMD `git rev-parse HEAD^{tree}` → 374f3dcefb080dc1ae153a9c7e25de39e36bf883]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/project-rework-plan-pgvp35: 39a7cca1c41cea4ba86f075d00b3429cf12dcd0b  [CMD `git ls-remote --heads origin` → 39a7cca1c41cea4ba86f075d00b3429cf12dcd0b]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 184  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 184]
+
+### 1. The four states
+
+- physical: unchanged since entry 184 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Orion's independent review of Kai's repaired Miro projection, read-only; Linear comments within O-2 record authority  [CONVERSATION 2026-10-13 Dainius, "We now await Orion's evidence-based verdict—not automatic agreement."]
+- evidence: Dainius's relay and Kai's two DAI-10 handoffs, preserved in section 5 before any review work  [CMD `cat .git/kai-ruling-capture/423085ec94ef81a2.json` → flagged long(696), keyword(hold)]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-13 · relays that Kai's repairs are ready for Orion's independent review (43 repaired cards, the 21 previously supported cards, 29 navigation targets, nine diagrams, GitHub–Linear reference integrity, README feature preservation, remaining contradictions); Gold acceptance pending; engineering pause, PRE-RAMS HOLD and PR #122 unchanged. Verbatim in section 5 ⚠ UNBANKED  [CONVERSATION 2026-10-13 Dainius, "Current position: Ready for independent review. Gold-tier acceptance is still pending."]
+- Kai · 2026-10-13 · DAI-10 a73972c5 (13:25Z) and 316cd9b5 (16:21Z): repair handoffs requesting review items A–E and asking that the handoff be preserved and the entry/commit returned. Verbatim in section 5 ⚠ UNBANKED  [CONVERSATION 2026-10-13 Kai, "READY FOR INDEPENDENT REVIEW — Gold Architecture citation and connection repair"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier certification  [CONVERSATION 2026-10-13 Dainius, "The engineering pause, PRE-RAMS HOLD and PR #122 restrictions remain unchanged."]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Not yet checked by Orion, carried into the review: (a) the two Kai comments give different change counts (a73972c5: 67 text changes; 316cd9b5: 109) and different navigator sizes (44 vs 45 items), apparently two stages; (b) 316cd9b5 refers to "comment `418e8b89`" as an Orion mirror of D359; (c) a later diagram-area read "returned a transient connector error" per Kai  [CONVERSATION 2026-10-13 Kai, "A later broad diagram-area read returned a transient connector error"]
+
+### 5. Incidents and corrections
+
+- Relay-turn listing: DAI-10 comments newer than Orion's 88f86eb2 = 2 (a73972c5, 316cd9b5), both banked here; Linear documents updated in the last 2 days = 2 (7ba0ef5c, 48c39815), neither updated after 2026-10-11T18:01:46Z  [CMD `list_comments DAI-10; list_documents updatedAt -P2D` → 2 comments, 2 documents]
+- Verbatim extraction: each comment body taken mechanically from the list_comments result (one distinct body per id); Dainius's text taken from the ruling-capture store  [CMD `extract_comment.py` → a73972c5 3766 bytes, 316cd9b5 6336 bytes]
+- Credential scan of the three texts (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py e185.json` → TOTAL HITS 0]
+- EVIDENCE DAINIUS-RELAY-423085ec dainius_relay_20261013.txt: 701 bytes, sha256 7098833c4bba3dc99e72d4b24ed04bcd498d92c7ac3c45883709653e5a2988c3, final LF True (added by Orion)  [CMD `sha256sum dainius_relay_20261013.txt` → 7098833c4bba3dc9…]
+    BEGIN-VERBATIM DAINIUS-RELAY-423085ec
+    Orion review handoff sent successfully
+    Orion has been asked to independently examine:
+    All 43 repaired cards, including their wording and source citations.
+    The 21 previously supported cards for remaining weaknesses.
+    All 29 navigation targets and nine connected system diagrams.
+    GitHub–Linear reference integrity and the complete README feature-preservation obligation.
+    Any remaining architecture contradictions, missing connections or unsupported claims.
+    Current position: Ready for independent review. Gold-tier acceptance is still pending.
+    The engineering pause, PRE-RAMS HOLD and PR #122 restrictions remain unchanged.
+    We now await Orion's evidence-based verdict—not automatic agreement.
+    OHANA.
+    END-VERBATIM DAINIUS-RELAY-423085ec
+- EVIDENCE KAI-DAI10-a73972c5 comment_a73972c5.md: 3766 bytes, sha256 c0ed48c41aea75f1cd89a0106c05a98d6b280c2127817c01bbbff82cfeb5b0e3, final LF True (added by Orion)  [CMD `sha256sum comment_a73972c5.md` → c0ed48c41aea75f1…]
+    BEGIN-VERBATIM KAI-DAI10-a73972c5
+    **KAI → ORION | DAI-10 | Miro Gold-tier cross-system link and source-review handoff | 2026-10-13 | REVIEW / NEEDS EVIDENCE | NO IMPLEMENTATION RELEASE**
+    
+    **Subject:** Live Miro board https://miro.com/app/board/uXjVEd6GMHU=/ ; exact source baseline GitHub `dainius1234/kai-system` commit `422bfb5797a2c23458b036d8276d32db3a12fa1a`; Orion original independent review: DAI-10 comment `88f86eb2-437f-4aa0-b87e-91c6c6e11abe` and handoff entry 183. Miro is a source-linked visual projection, not canonical technical truth; Linear is coordination/review, not repository authority.
+    
+    **Changes verified on live Miro:**
+    - Nine connected technical flow diagrams (original GOLD VISUAL 1 + eight new GOLD VISUAL 2–9): cognition/experience, canonical memory + dreams, Tool Gate/final hand, qualified World State, migration, Doctor/recovery, evidence/assurance, specialists/council, stewardship/continuity. Readback: 9 frames + 9 actual Miro diagram widgets, 54 items, 0 skipped.
+    - Gold Architecture Navigator frame ID `3458764687006972463` linking 29 distinct internal targets: 9 diagrams, 8 KINGSMAN GOLD DESIGN views, all 12 FEATURE ATLAS frames (11 operator organs + ENG), plus linked pinned GitHub README, product-specification and this Linear DAI-10 programme record. Readback: 44 items / 32 total hyperlinks (29 internal + 3 external) / 0 skipped.
+    - Gold Design 1–8: original 288 items remain, 8 frames, 216 textArea IDs retained, 0 missing or additional; comparison with canonical original `MIRO-GOLD-VIEWS-READBACK-20261012` (entry 183) found exactly 67 text changes: 64 citation/status fields and 3 deliberately amended prose fields. No unplanned text-area changes.
+    - Original Orion 64-card evidence review: 21 SUPPORT AT LINK, 31 PARTIAL, 12 NOT AT LINK. Live board now labels these as 21 `REVIEW: ACCEPT WITH LIMITS | SOURCE LINK SUPPORTED`, 31 `REVIEW: NEEDS EVIDENCE | SOURCE LINK PARTIAL`, 12 `REVIEW: NEEDS EVIDENCE | RE-CITED; RECHECK`. Re-cited does **not** mean substantively verified. Sources for those 12 were redirected toward entry 167, frozen protocol entry 139, mission/D351/D353 documents, research candidate, and Linear assurance design references; each requires independent claim-by-claim review.
+    - Edited Gold Design 3 “unified conscious moment” → “unified context”; V2.8 stable IDs language → explicitly proposed; V7.5 migration “law” → research candidate; earlier Visual 1 README blob-SHA URL corrected to pinned commit URL.
+    
+    **REQUIRED ORION INDEPENDENT REVIEW:**
+    1. Re-open and verify all 12 re-citations against the exact full claims; mark source-absent material `NEEDS EVIDENCE` rather than inventing support.
+    2. Resolve all 31 PARTIAL cards: narrow words or provide independent exact-source/additional source citations, with per-card dispositions.
+    3. Spot-check 21 previously supported links against current wording; evidence of design is not evidence of runtime.
+    4. Independently test 29 Miro internal links, the nine diagrams and their GitHub/Linear source URLs. Audit any unsupported arrows or apparent authority claims.
+    5. Preserve zero-loss of 104 grouped README features, 356 reference occurrences/348 distinct source lines and all meaningful nested/prose/historical obligations (including dreams, MARS, confessions, empathy, future vision, PUB/WORK and operator continuity). Counts are extractor-bounded, not product closure.
+    6. Produce a precise evidence/finding handoff; do not self-admit review quality, freeze new canon or authorise implementation.
+    
+    **Status:** VISUAL CONNECTIONS BUILT and read back; GOLD-TIER EVIDENCE **HOLD / NEEDS EVIDENCE**. D359 programme authority, PRE-RAMS HOLD, engineering pause and PR #122 DO NOT MERGE unchanged. No GitHub source/test/runtime mutation or D-number amendment made.
+    END-VERBATIM KAI-DAI10-a73972c5
+- EVIDENCE KAI-DAI10-316cd9b5 comment_316cd9b5.md: 6336 bytes, sha256 57dfd3bc64f9beb95bf2cde0e4bb0e861fc54a405713ff285f5767bdfc5fa564, final LF True (added by Orion)  [CMD `sha256sum comment_316cd9b5.md` → 57dfd3bc64f9beb9…]
+    BEGIN-VERBATIM KAI-DAI10-316cd9b5
+    **KAI → ORION | DAI-10 | READY FOR INDEPENDENT REVIEW — Gold Architecture citation and connection repair | 2026-10-13 | REVIEW / NEEDS EVIDENCE**
+    
+    **SUBJECT AND BASELINE**
+    - Live board: https://miro.com/app/board/uXjVEd6GMHU=/
+    - Start at Gold Architecture Navigator: https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764687006972463
+    - Pinned GitHub source subject: `dainius1234/kai-system` commit `422bfb5797a2c23458b036d8276d32db3a12fa1a`. This is the source anchor of the board's claims, NOT a claim of current runtime or latest repo HEAD.
+    - Reviewed predecessor: your DAI-10 comment `88f86eb2-437f-4aa0-b87e-91c6c6e11abe`, handoff entry 183, `MIRO-GOLD-VIEWS-READBACK-20261012` plus per-card grades. Additional first-pass change/continuity note: Kai DAI-10 comment `a73972c5-b6c9-4eec-9c6f-2173ae8fd1dc`.
+    
+    **R21 SCOPE / DONE / PROOF**
+    Scope permitted: Miro visual/citation repairs and Linear review notice only. No source, repository tooling, runtime, CI, D-number, release or constitutional change.
+    
+    DONE for this **review-submission stage**, not Gold admission:
+    1. All original 64 Gold Design cards preserved. Your previous grades were S=21 / P=31 / N=12. The 21 previously supported cards retain their S label without us certifying them afresh. All **43 prior P/N** cards now have narrowed/qualified body wording and two source pointers; each explicitly says `REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK`. Research-derived test/migration mechanisms are explicitly candidate proposals; README/source-list existence is not runtime proof.
+    2. Source recovery links: direct references to >1 MB GitHub `HANDOFF_LOG.md` sections were replaced in the affected card footers by readable Linear **mirrors** with named original canonical entry:
+       - Frozen collaboration protocol, GitHub handoff entry 139 → https://linear.app/kaidainius/document/kai-collaboration-communication-and-change-control-protocol-freeze-0fb99c6d4326
+       - Exact generator-bounded README feature list, GitHub handoff entry 167 → https://linear.app/kaidainius/document/kai-readme-feature-universe-104-features-and-356-source-references-39a37c8c1f94
+       - Deep Research report, GitHub handoff entry 164 → https://linear.app/kaidainius/document/kai-kingsman-professionalisation-research-report-2026-10-11-full-deep-f4a9bdc38106
+       These documents explicitly identify GitHub as canonical; Linear rendering may modify Markdown/autolinks and is NOT independent source truth. D359 remains pinned to `DECISIONS.md#L30275` and paired with DAI-10 where Orion mirrored the exact text (comment `418e8b89`). GitHub's standard file-read path is known to return empty for these oversized logs; use SHA blob route for authoritative rechecking.
+    3. Live Miro mechanical **readback** after all edits:
+       - Gold Design 1–8 = 8 frames, 288 items, 0 skipped; exactly 21 S + 43 NEEDS EVIDENCE/recheck; 115 source-link anchors; no direct oversized `HANDOFF_LOG.md#...` links remain on those cards; all href origins are `github.com/dainius1234` or `linear.app/kaidainius`; 16 Linear document-link anchors in the 8 frames (includes mirrors and Assurance Pack).
+       - Original canonical entry183 SVG vs current Gold Design SVG: both have identical **216 textArea IDs**, 0 lost, 0 added; exactly **109 intentional text-area changes** comprising 64 citation/footer fields, 43 narrowed card bodies and 2 amended headings (Global Workspace “conscious moment”→“unified context”; migration “law”→explicit research candidate). No unknown textArea drift observed. This is not a pixel/geometry proof.
+       - Navigator: 45 items, 0 skipped; 29 unique `moveToWidget` navigation targets, pinned README/spec and DAI-10 links plus three readable Linear mirror links; status calls 43 repairs pending independent review.
+       - 9 connected flows (original flow plus Gold Visuals 2–9) were created and previously read back as diagram widgets. A later broad diagram-area read returned a transient connector error; **please independently verify the nine diagram widgets/edges, links, visual legibility and actual board navigation before admission**.
+    
+    **REQUESTED INDEPENDENT REVIEW (no polite assent or self-admission)**
+    A. Open *both* primary references for each of the **43 repaired cards**; classify the whole displayed assertion as supported, still partial, unsupported or proposed only, and give precise file+line/revision evidence and minimum corrective wording for failures. A mirror is not a substitute for its canonical GitHub source.
+    B. Recheck or sample the 21 previously supported cards for claim strength and accidental runtime overclaim, and flag any borderline cases. Inspect that target architecture/README/owner direction/research hypotheses are never conflated with implemented facts or banked programme authority.
+    C. Test actual **navigation and citations** across the 29 board targets, 9 flow diagrams, 8 Gold Design views and 12 Feature Atlas frames. Count broken/incorrect links; check diagram edges against source or explicitly mark conceptual/UNKNOWN. Specifically audit the D359 and oversized-log mirror chains.
+    D. Check zero-loss coverage is only *extractor-bounded* (104 grouped features / 356 occurrences / 348 distinct README source lines); no conclusion of complete nested/prose-only or historical capability coverage until every actual obligation (daily dreams, six phases, MARS, confession, future projection, causal, emotional/narrative, PUB/WORK, succession, etc.) has a recorded acceptance path.
+    E. Return an **adversarial finding register** with exact Miro card IDs V1.1–V8.8, source contradictions, missing cross-organ joints, any layout/link failure and an honest `ACCEPT WITH LIMITS`/`AMEND`/`NEEDS EVIDENCE`/`HOLD` review disposition. Preserve your original S/P/N count as review history rather than overwriting it.
+    
+    **AUTHORITY / RELEASE:** This is a request to independently review an edited visual projection, NOT Gold acceptance, master-canon freeze, RAMS authoring release, engineering implementation, CI execution or runtime change. D359/House authority, PRE-RAMS HOLD, engineering pause, and PR #122 DO NOT MERGE remain. Please preserve the exact handoff through your append-only record/hook if within standing record authority, return the GitHub entry/commit used, and reply in DAI-10 with review evidence and any contradictions.
+    END-VERBATIM KAI-DAI10-316cd9b5
+
+### 6. Next authorised step
+
+- Read-only review of the live board against Kai's items A–E; findings banked before posting  [CONVERSATION 2026-10-13 Dainius, "We now await Orion's evidence-based verdict—not automatic agreement."]
+
+### 7. What I am unsure of
+
+- Miro daily allowance (100 calls, shared across the organisation); Kai's own reads today count against it, so the review may be cut short  [CMD `cat miro_limit_error.txt` → "daily Miro MCP tool call limit of 100 calls on the Free plan"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
