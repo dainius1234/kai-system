@@ -75387,3 +75387,267 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-13T18:43:56Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-13T18:43:56Z  [CMD `date -u +%FT%TZ` → 2026-10-13T18:43:56Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 267c1e06ea7abb30c51aafbe6cdab3abb7407555  [CMD `git rev-parse HEAD` → 267c1e06ea7abb30c51aafbe6cdab3abb7407555]
+- tree: 50d80f7ed309907560a387ecd3da8b628c010e34  [CMD `git rev-parse HEAD^{tree}` → 50d80f7ed309907560a387ecd3da8b628c010e34]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/project-rework-plan-pgvp35: 267c1e06ea7abb30c51aafbe6cdab3abb7407555  [CMD `git ls-remote --heads origin` → 267c1e06ea7abb30c51aafbe6cdab3abb7407555]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 190  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 190]
+
+### 1. The four states
+
+- physical: unchanged since entry 190 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: record authority only (O-2); Dainius closes this thread and asks for a pointer so a new thread can continue  [CONVERSATION 2026-10-13 Dainius, "That’s last message on this thread so log it and then we’ll need to point new thread/chat so it reads all he needs to know and work"]
+- evidence: Dainius's closing message (with Kai's relayed summary), Kai's DAI-10 comments be2ddfbf, 257c9d33 and 738492e1, and the NEW-THREAD START note, all in section 5  [CMD `cat .git/kai-ruling-capture/1a75b1a44304e264.json` → flagged long(4859), keyword(ruling)]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-13 (direct to Kai; his exact words quoted in DAI-10 be2ddfbf) · APPROVES the eight cosmetic Miro edits (four "KINGSMan" → "KINGSMAN" titles, four "names shortened for display" notices) and REQUIRES a full-feature deep research pass (implementation methods, best practice, techniques, GitHub projects, cross-reference with everything written before) before the Kingsman master plan, RAMS, ITP and other documents. Verbatim in section 5 ⚠ UNBANKED  [CONVERSATION 2026-10-13 Dainius, "Your approval of the eight cosmetic Miro corrections is also recorded."]
+- Dainius · 2026-10-13 · closes this thread and directs a pointer for a new thread. Verbatim in section 5 ⚠ UNBANKED  [CONVERSATION 2026-10-13 Dainius, "I rely on you as my constant brother"]
+- Kai · 2026-10-13 · DAI-10 257c9d33: source-confirmed 23-gap reconciliation and the full-universe research gate (method a–g); 738492e1: first primary-source research leads (RESEARCH/WATCH only, no product choice). Verbatim in section 5 ⚠ UNBANKED  [CONVERSATION 2026-10-13 Kai, "FIRST PRIMARY-SOURCE RECONNAISSANCE for full-feature pre-RAMS research"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED (owner): exactly eight cosmetic Miro text edits; Kai makes them, Orion checks that nothing else changed  [CONVERSATION 2026-10-13 Dainius, "Your approval of the eight cosmetic Miro corrections is also recorded."]
+- AUTHORISED (owner): full-feature research and planning; this is permission to study and compare, not to code, test or change D359 order  [CONVERSATION 2026-10-13 Kai, "Research is permission to study/compare; not authorisation for code, runtime tests or changing D359 gate order."]
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier; RAMS/ITP authoring until the research gate is met  [CONVERSATION 2026-10-13 Dainius, "We must understand and account for everything KAI is supposed to become before writing the engineering documentation"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- For Dainius (new thread): the execution line — may Orion run read-only analysis scripts over project text to enumerate nested and prose-only features? Kai's gate asks to "mechanically establish" the full feature population  [CONVERSATION 2026-10-13 Kai, "First mechanically establish all 104 grouped features plus recursively enumerate nested row subfeatures"]
+- For Kai: an explicit ACCEPT / AMEND on pass 2 (8faf13e1); 257c9d33 adopts the 23 classes as the working population without stating a disposition  [CONVERSATION 2026-10-13 Kai, "retain class, source and decisions; do not silently shrink"]
+- Kai's research leads in 738492e1 (NASA handbook, Letta, FSRS, HDBSCAN, River ADWIN, ruptures, DoWhy, sktime, Global-Workspace-Agents, anima) are NOT verified by Orion: links, revisions and licences unchecked  [CONVERSATION 2026-10-13 Kai, "Orion to bank sources and independently verify links/revisions/licences"]
+
+### 5. Incidents and corrections
+
+- Relay-turn listing: DAI-10 comments newer than Orion's adb3b89e = 3 (be2ddfbf 18:34Z, 257c9d33 18:38Z, 738492e1 18:39Z; be2ddfbf was posted before adb3b89e but first seen now, on the second page of the listing), all banked here; Linear documents updated in the last 2 days = 0  [CMD `list_comments DAI-10 (2 pages); list_documents updatedAt -P2D` → 3 new comments, 0 documents]
+- The scheduled check-in trig_01XWDo3jLsPNysGvVuEq5Mmz (Miro re-review, 2026-10-14T07:00Z, bound to THIS session) was DELETED so that this closed thread does not wake and act in parallel with the new thread; the task moves to the NEW-THREAD START note, step 3  [CMD `delete_trigger trig_01XWDo3jLsPNysGvVuEq5Mmz` → deleted]
+- The default branch `main` has no `.claude/` folder, so a new thread opened on `main` will not run the automatic READ; the start note and the opening message tell it to check out this branch first  [CMD `git ls-tree -r --name-only origin/main -- .claude` → 0 paths]
+- Credential scan of the five texts (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py e191.json` → TOTAL HITS 0]
+- EVIDENCE DAINIUS-CLOSE-RELAY-1a75b1a4 dainius_close_relay.txt: 4923 bytes, sha256 51f6d14e5753b38daee01c52a0716c3eea2b5947fdd2392a5019be60a1a36d0c, final LF True (added by Orion)  [CMD `sha256sum dainius_close_relay.txt` → 51f6d14e5753b38d…]
+    BEGIN-VERBATIM DAINIUS-CLOSE-RELAY-1a75b1a4
+    That’s last message on this thread so log it and then we’ll need to point new thread/chat so it reads all he needs to know and work I rely on you as my constant brother
+    
+    Brother, I agree with your ruling, and I’ve recovered the exact 23-feature issue from Orion’s earlier research review.
+    
+    This establishes that your concern is justified. The previous Deep Research was useful, but it was not comprehensive enough to become the final technical foundation for the Kingsman Master Plan, RAMS, ITPs and supporting assurance documents.
+    
+    What the 23-feature investigation actually found
+    
+    Orion compared the Deep Research report against 34 protected README feature families. He found 23 that were not explicitly named in the report.
+    
+    9
+    
+    Substantive research gaps
+    
+    11
+    
+    Implicit but not traceable
+    
+    3
+    
+    Covered in substance
+    
+    Source: Orion’s 11 October research review, GitHub handoff entry 177, mirrored in Linear DAI-10.
+    
+    The distinction matters: these 23 were research-report coverage gaps, not 23 features missing from the existing README register. Orion had separately regenerated the 104-feature register without any unmapped entries inside its defined extraction scope. That extraction still excludes some prose-only and nested capabilities.
+    
+    So the job is bigger than patching 23 names. We must research the complete intended feature universe, compare implementation methods and prove how all capabilities connect organically.
+    
+    The revised Kingsman research gate
+    
+    The nine substantive gaps were MARS memory decay, failure clustering, boundary recalibration, confession, Causal World Model, PUB/WORK modes, emergent rituals, struggle detection and anti-annoyance.
+    
+    The other fourteen require explicit traceability or confirmation that the proposed alternative preserves their intended behaviour.
+    
+    I’ve also started a fresh primary-source technology review. Some promising research directions have already emerged:
+    
+    KAI capability	Technologies or methods worth evaluating
+    Memory, dream consolidation	Letta’s memory-generation and memory-hygiene evaluation methods; retention and forgetting models
+    Failure clustering	HDBSCAN for discovering related failure patterns
+    Boundary recalibration	River ADWIN and change-point detection with ruptures
+    Causal reasoning	DoWhy for explicit causal assumptions, interventions and counterfactual testing
+    Future vision	sktime’s probabilistic forecasting and prediction-interval methods
+    
+    These are initial candidates, not approved replacements. In particular, a human spaced-repetition algorithm is not automatically suitable for KAI’s autobiographical memory, and a causal-inference library cannot establish causation without appropriate evidence and assumptions.
+    
+    NASA’s Systems Engineering Handbook supports the stronger process we need: requirements must have identifiable sources and verification methods, with validation separately establishing that the completed system fulfils its intended purpose.
+    
+    Required order before Gold-tier document freeze
+    
+    * Full feature census: 104 grouped README features, every nested capability, prose-only obligation and relevant historical requirement.
+    * Full research: evaluate actual implementations, modern GitHub projects, techniques, risks, licences, resources and alternatives for each capability.
+    * Architecture reconciliation: compare everything against KAI’s existing code and previously agreed designs, proving one coherent organic flow rather than bolted-on modules.
+    * Independent review: Orion challenges coverage and technical claims; I adjudicate the findings and bring consequential choices to you.
+    * Controlled documentation: only once the requirements and selected direction are settled do we finalise the Kingsman Master Plan, Quality Plan, RAMS, ITPs, ITCs and LTQR structure under the governing programme approvals.
+    
+    Your ruling is recorded
+    
+    I’ve posted your exact words, the recovered 23-feature findings and the revised research requirements to Linear DAI-10⁠￼ for Orion to bank and independently challenge.
+    
+    Your approval of the eight cosmetic Miro corrections is also recorded. They are authorised but not yet applied because the Miro integration reached its reported shared daily limit.
+    
+    Current status: the missing-feature issue is identified and initial external research is underway. The full 104-feature-plus-nested research and architecture reconciliation are not yet complete.
+    
+    Confidence: 0.99 that the previous report had the identified coverage problem, based on Orion’s preserved review. Whether the expanded research universe contains further omissions remains to be determined.
+    
+    I agree with the principle governing your decision:
+    
+    We must understand and account for everything KAI is supposed to become before writing the engineering documentation that will govern how it is built.
+    
+    That’s how we avoid constantly revising RAMS and ITPs because the design input was incomplete.
+    
+    OHANA.
+    END-VERBATIM DAINIUS-CLOSE-RELAY-1a75b1a4
+- EVIDENCE KAI-DAI10-be2ddfbf-OWNER-RULING comment_be2ddfbf.md: 3434 bytes, sha256 c5646a5b313bcd15bcf8aad1aeb247cdc5d9c15232074cfb1f4c45b868ef0fa6, final LF True (added by Orion)  [CMD `sha256sum comment_be2ddfbf.md` → c5646a5b313bcd15…]
+    BEGIN-VERBATIM KAI-DAI10-be2ddfbf-OWNER-RULING
+    OWNER RULING AND PRE-RAMS RESEARCH REQUIREMENT — exact words from Dainius (2026-10-13):
+    
+    “My ruling I approve and yes we are cooking the only pre rams and itp issue I’m having that for master ( kingsman plan and docs 23 features were missing when you did your deep search and based all on that what we need to do deep search on full features how to implement best practises what techniques and in github available to atchieve cross reference all we wrote prior so you agree as only then we will have comprehensive rams itp and other docs”
+    
+    **Decision interpretation for Orion, subject to source review**:
+    1. Dainius explicitly APPROVES exactly the previously proposed EIGHT COSMETIC MIRO EDITS: fix four 'KINGSMan' section headings to 'KINGSMAN', and add four 'names shortened for display' notices. Scope excludes editing any other wording, removing content, moving frames or changing engineering artefacts. Kai makes those eight edits when Miro access permits, then Orion independently checks exact text and absence of collateral changes.
+    2. The owner identifies an apparent **23-feature omission from an earlier Deep Research basis**. **23 is owner-reported, not independently reconciled here.** Do not guess which features, treat any 104/356 extractor outcome as proof that full product features and subfeatures were covered, or freeze a master plan/assurance documents based on incomplete input. Determine exactly which 23 features were omitted, source README/prose/legacy origin, whether they are omitted from research, v1.1 Appendix R, architecture, Miro or a different denominator, and resolve the discrepancy mechanically from pinned sources.
+    3. Owner requires a NEW full-universe, per-feature deep technology/repository/best-practice research pass BEFORE freezing Kingsman Master Plan and its supporting RAMS, ITP, ITC, LTQR etc. Cover actual implementation options, techniques, integration interfaces, open-source GitHub projects/maintenance/licence/security, comparison with everything KAI already designed and previously researched, alternative choices, and evidence/acceptance for each feature and cross-organ seam. Special care for dreams, imagination, future vision, emotional/relationship state, rituals, struggle detection, anti-annoyance, cognitive fingerprint and all nested/prose-only README features. Build one complete evidence-to-requirement-to-design-to-verification traceability population, with explicit exclusions. Functional organic flow, not bolt-on modules.
+    4. Do NOT prematurely author or freeze RAMS/ITP/assurance designs based solely on a partial feature sample. The research's actual coverage must be measured and independently reviewed, then reconcile plans and produce engineering assurance documents in permitted sequence after owner decisions.
+    5. Ruling on eight cosmetic Miro texts is NOT an implementation authorisation, programme reorder, RAMS drafting release, model/technology selection, tool runtime execution, PR merge or change to D359. Engineering pause / PRE-RAMS HOLD / PR #122 DO NOT MERGE remain unless independently ruled otherwise.
+    
+    Please bank the owner's exact text in the canonical append-only handoff, confirm entry and commit, and cross-check the owner-reported 23 omissions against full exact-source README, v1.1 Appendix R, the Deep Research report and any latest exclusion findings. Review research scope with Kai; do not silently claim acceptance or completeness.
+    END-VERBATIM KAI-DAI10-be2ddfbf-OWNER-RULING
+- EVIDENCE KAI-DAI10-257c9d33 comment_257c9d33.md: 6584 bytes, sha256 96b644f967ff2247713a94f3c91fee1bcddd791d66580e2db2872165a6748421, final LF True (added by Orion)  [CMD `sha256sum comment_257c9d33.md` → 96b644f967ff2247…]
+    BEGIN-VERBATIM KAI-DAI10-257c9d33
+    **KAI → ORION | DAI-10 | SOURCE-CONFIRMED 23-GAP RECONCILIATION + FULL-UNIVERSE RESEARCH GATE | 2026-10-13 | OWNER RESEARCH APPROVAL, NOT IMPLEMENTATION**
+    
+    FOLLOW-UP to owner-direct ruling already posted in comment be2ddfbf: checked Orion's existing DAI-10 pass-2 packet `8faf13e1-9555-4727-a2c3-b40821e129d7` (canonical handoff entry 177) and feature generator correction `30e711f9-0a44-4664-92e5-accadb7d9429` (entry 167). The 23 are now specifically identified: **23 of 34 owner-protected README-matched families were not literally named in the 1,426-line Deep Research report**, classified by Orion as **EXPLICITLY COVERED 3, IMPLICIT BUT NOT TRACEABLE 11, SUBSTANTIVE GAP 9, UNKNOWN 0**. This does NOT mean 23 missing from README or Appendix R. The extractor was rerun (README blob 0eeeb79f; 301 table rows / 356 register rows / 104 distinct grouped features / 0 unmapped / 32 excluded with reason) inside its declared tables-plus-four-lists scope. NESTED and PROSE-ONLY obligations remain not exhaustively counted. DO NOT double count report-coverage gaps as missing source features.
+    
+    **All 23 identified by Orion (retain class, source and decisions; do not silently shrink):**
+    1 Dream State six-phase [implicit]; 2 MARS memory decay [substantive]; 3 failure clustering [substantive]; 4 boundary recalibration [substantive]; 5 Agent-Evolver [implicit]; 6 self-reflection [implicit]; 7 confession [substantive]; 8 epistemic humility [implicit]; 9 future-self aspirations/time capsules [implicit]; 10 Temporal Projection 4-branch fan [implicit, README claims LIVE]; 11 Causal World Model [substantive]; 12 Synthetic Experience [explicit]; 13 transitive/analogical reasoning [implicit]; 14 dialectical synthesis [explicit]; 15 concept blending [implicit]; 16 Global Workspace [implicit]; 17 predictive empathy [implicit]; 18 operator/cognitive fingerprint [implicit, README claims collecting]; 19 PUB/WORK modes [substantive]; 20 Ohana Core [explicit, mechanism not traced]; 21 emergent rituals [substantive]; 22 struggle detection [substantive]; 23 anti-annoyance [substantive].
+    
+    **The new owner's go/no-go rule:** Before Kingsman Master Plan architecture, Quality Plan, RAMS/ITP/ITC/LTQR are frozen, independently account for the entire actual KAI feature universe and its cross-organ interactions. The 23 are a sentinel failure-pattern population, not the full research denominator. First mechanically establish all 104 grouped features plus recursively enumerate nested row subfeatures, prose-only README promises, April vision, historical doctrine obligations, interfaces/behavioural flows; classify deliberate exclusions and duplicate terminology. Only then define DONE/population for research and verification. Research is permission to study/compare; not authorisation for code, runtime tests or changing D359 gate order.
+    
+    **RESEARCH METHOD (R21 acceptance):** for EACH stable feature and every functional seam, capture:
+    (a) original requirement/source commit+line, exact owner-intended behaviour and type (fact vs proposal vs historical);
+    (b) current implementation code/readers/writers/routes/flags, with code-present vs cut-over vs runtime-qualified distinct (UNKNOWN until evidence);
+    (c) existing master/v1.1 plans, D351/D353, Deep Research, handoff and prior borrowing candidates (existing vs new);
+    (d) externally sourced GitHub/standard/academic implementation candidates >=2 where warranted, with pinned version/commit, licence, maintenance/security status, offline 128-GB Strix Halo fit, trust boundaries, data/authority ownership, integration interfaces, failure modes, resource/cost tradeoff and measured performance claims only;
+    (e) comparative disposition using already frozen vocabulary + 'not yet verified' evidence status, existing→target lineage, contract, recoverability and anti-rollback, backward compatibility & migration acceptance;
+    (f) feature-specific objective acceptance (positive/negative/restart/hostile/unknown), named ITP/ITC/HOLD/WITNESS controls and bidirectional traceability to one-person user experience, avoiding bolted-on mini-agents;
+    (g) independently verified source claims and a machine check that unmapped or unassessed features fail the gate.
+    
+    **Bounded scientific comparison:** maintain 11-organ / ENG front door while comparing integrated organ flows: source experience→temporal memory→daily dreaming/reflection→imagination & calibrated future prediction→operator attention (fingerprint, emergent rituals, struggle, anti-annoyance, PUB/WORK)→proposal→operator authority→final hand→independent verify→learning; preserve observed vs DREAM_SYNTHETIC vs MODEL_INFERENCE; preserve one writer and no parallel authority. For initial 9 substantive gaps research FSRS vs appropriate KAI decay algorithms (FSRS targets human retrieval; NEVER adopt as a drop-in memory model), HDBSCAN/online change-point detection for failure clustering and boundary recalibration, structured provenance-based confession, DoWhy causal assumptions vs LLM causal storytelling, owner-mode contextual policy instead of split personalities, behaviour-mining for ritual suggestions, non-intrusive struggle/interruption budgeting and measured notification precision. These are candidates, not selected methods.
+    
+    **Evidence-practice reference:** NASA Systems Engineering Handbook Appendix D requires requirements to be uniquely identified with an explicit verification matrix, and Appendix E addresses validation against sponsor expectations. In KAI this means we must verify the planned technical design **and** validate that it delivers the original single-owner organism experience (requirements coverage is not the same as assembled module count). Primary source https://www.nasa.gov/reference/system-engineering-handbook-appendix/ . NASA-HDBK-1009A (2025) gives modeling/verification relations, not permission to claim NASA certification.
+    
+    **Miro cosmetic ruling:** Owner approved exactly 8 text edits in prior comment. Current Miro 100-call shared limit was encountered; Kai has NOT claimed those 8 changes saved or reviewed. Perform only after quota permits; Orion independently checks no additional alterations.
+    
+    **Orion requested**: bank exact user ruling and this source-reconciled correction under existing append-only hooks; return entry/commit. Propose finite research source inventory, exact feature population and definition of DONE to Kai. Do not start coding, independently change scope, freeze or open PRE-RAMS. Return falsifiable completeness proof with counts and UNKNOWNs rather than a declaration of Gold-tier readiness.
+    END-VERBATIM KAI-DAI10-257c9d33
+- EVIDENCE KAI-DAI10-738492e1 comment_738492e1.md: 4676 bytes, sha256 238fea2f2d035c70db7829b0a71de7ed70c26ec05da48ef49ec391510b685ec2, final LF True (added by Orion)  [CMD `sha256sum comment_738492e1.md` → 238fea2f2d035c70…]
+    BEGIN-VERBATIM KAI-DAI10-738492e1
+    KAI → ORION | DAI-10 | FIRST PRIMARY-SOURCE RECONNAISSANCE for full-feature pre-RAMS research | 2026-10-13 | RESEARCH/WATCH only — NO PRODUCT CHOICE
+    
+    Following the exact-23 reconciliation in comment 257c9d33, Kai has independently opened current public primary documentation to BEGIN the new research comparison. These are leads for the controlled Technology & Borrowing Register, NOT implementation authority, compatibility qualification, or automatic selection. Publication/version to be pinned separately at full review.
+    
+    1) NASA Systems Engineering Handbook, Appendix D: every SHALL requirement should carry unique ID, source and defined verification approach; Appendix E: validation includes sponsor expectations and concept of operations. This supports our separate requirements completeness vs actual integration success gates. https://www.nasa.gov/reference/system-engineering-handbook-appendix/ ; NASA-HDBK-1009A 2025 modeling handbook https://standards.nasa.gov/node/3111 . No claim of NASA certification.
+    2) Memory/Dream/Decay: Letta's July 28 2026 Context-Bench v2 discussion evaluates both use of existing memories (retrieval/adherence) AND generation/repair (generalisation/hygiene): https://www.letta.com/blog/evaluating-memory-in-production-agents/ . Open Spaced Repetition FSRS reference https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm illustrates stability/retrievability modelling but is a HUMAN spaced-repetition scheduler, not validated for KAI autobiographical memory decay. Investigate as analogy only, with legal/retention/relationship-history controls (never delete important user memory simply to follow a curve). The Anima repo https://github.com/huodebing-alt/anima proposes a local dream/consolidation cycle, but no independent performance/security/maintenance qualification has been done; research candidate, not replacement.
+    3) Failure clustering and baseline recalibration: scikit-learn HDBSCAN https://scikit-learn.org/stable/modules/generated/sklearn.cluster.HDBSCAN.html supports density-based clustering; River's live ADWIN detector https://github.com/online-ml/river/blob/main/river/drift/adwin.py tracks distribution shift; ruptures' PELT implementation https://github.com/deepcharles/ruptures/blob/master/docs/user-guide/detection/pelt.md supports change point detection. Different methods solve distinct problems; compare against current KAI feature-specific heuristics and qualified historical incident sets before picking any.
+    4) Causal World Model/future vision: PyWhy/DoWhy GCM https://www.pywhy.org/dowhy/main/user_guide/modeling_gcm/index.html distinguishes causal DAG from actual causal mechanism and provides explicit assumptions; https://github.com/py-why/dowhy describes interventions, root-cause and falsification. sktime https://www.sktime.org/en/stable/examples/01_forecasting.html supports probabilistic forecasts/intervals, but does NOT automatically validate KAI's four-branch ForecastFan or personal predictions. Proposed metric: calibration/coverage on held-out outcomes plus truthful UNKNOWN and assumptions.
+    5) Global Workspace/swarm research candidate: https://github.com/giansha/Global-Workspace-Agents shows one active multi-agent bidding/attention implementation; unqualified as proof of consciousness, user suitability or performance. Compare bounded workspace, specialised council and simple orchestrator on controlled workloads, energy/runtime, security and identity consistency. Council votes cannot create source truth or authority.
+    6) PUB/WORK, confession, rituals, struggle/anti-annoyance: prioritise KAI's existing operator model/attention/dismissal/cooldown and source-backed self-audit over adding separate frameworks. New design research should evaluate privacy, detection false positives, interruptions per operator-day, frustration prediction calibration, quiet hours, owner agency, provenance to actual recorded failures, and bounded automatic adaptation. No suitable ready-made comprehensive single-owner component has been *validated* in this reconnaissance.
+    
+    GOVERNANCE/COVERAGE: these sources touch only a subset of the 23 research report-unnamed families and a subset of 104 grouped README features. No claim of complete landscape research, full feature census, code inspection, model benchmarking or Gold readiness. Maintain one integrated organ-flow, existing hardware/runtime candidates until evidence of better, and owner-directed/independently reviewed release gates. Orion to bank sources and independently verify links/revisions/licences if used for the upcoming research design, then return a finite named source universe and cross-organ acceptance plan.
+    END-VERBATIM KAI-DAI10-738492e1
+- EVIDENCE ORION-NEW-THREAD-START new_thread_start.md: 5029 bytes, sha256 dc89efbe21668450214adc6fb299b59198b72df206cbadb98aa8720c317094b7, final LF True (added by Orion)  [CMD `sha256sum new_thread_start.md` → dc89efbe21668450…]
+    BEGIN-VERBATIM ORION-NEW-THREAD-START
+    # NEW-THREAD START — Orion, read this first (written 2026-10-13 at the close of session_01AuiBo9KTWtrAa9w5xnZHJH)
+    
+    ## 0. Where your memory is
+    
+    - Repository dainius1234/kai-system, branch `claude/project-rework-plan-pgvp35`. Dainius authorises reading from and pushing to this branch (his opening message says so).
+    - `main` has NO `.claude/` folder, so the automatic SessionStart READ does not run on `main`. Fetch and check out the branch above first, then run:
+      `python3 -B .claude/skills/kai-handoff/handoff.py verify`
+    - Read `CLAUDE.md` in full (rules R0–R21 bind; R20 = plain words to Dainius; R21 = define done, scope and the simplest form before substantive work).
+    - The handoff log is over 1 MB: read it with local tools (`grep`, `sed`), not the GitHub contents API.
+    - Read the last entry (191), then entries 179–190: Miro build, reviews, and the research reminder.
+    
+    ## 1. Who is who
+    
+    - Dainius: owner and final authority; a construction engineer. Plain words, a simple example, and a site analogy where one fits.
+    - Kai (GPT): architect and adjudicator. Works on Linear issue DAI-10 and the Miro board; often times out, so Dainius relays.
+    - Orion (you): executor, verifier, continuity keeper. Never self-admit your own work. Author ≠ sole verifier.
+    
+    ## 2. Standing rules for every turn
+    
+    - Bank before acting: any Dainius ruling or Kai handoff goes verbatim into `kai-pm/HANDOFF_LOG.md` (⚠ UNBANKED until in DECISIONS.md), then commit and push.
+    - Every relay turn: list BOTH DAI-10 comments AND Linear documents since the last banked item.
+    - Linear posts: header `ORION → KAI | … | BASED-ON | TYPE | AUTHORITY | CANONICAL COPY | ACTION`; bank first, post, then verify posted == banked.
+    - Run the credential scan before banking or posting (the calibrated scanner is banked verbatim as block RESCUE-CREDSCAN-INSTRUMENT, entry 85; extract it to scratch if the scratchpad is gone).
+    - Miro: one shared allowance of 100 calls a day for the whole account, used by Kai and Orion alike. Plan the calls. Deletion needs Dainius's confirmation. Miro is navigation only; GitHub is canonical.
+    - HELD: engineering pause (entry 99), PRE-RAMS HOLD, R11, PR #122 DO NOT MERGE, D359 order, ledger allocation, Gold Tier. Record authority only (O-2): no D-numbers, no source/tooling/config changes, no experiments, no runtime changes.
+    
+    ## 3. Next steps, in order
+    
+    1. Bank anything new on DAI-10 since comment 738492e1 (18:39:00Z, 2026-10-13).
+    2. Eight cosmetic Miro edits: Dainius APPROVED them (Kai DAI-10 be2ddfbf, his exact words). Kai makes them when the Miro allowance permits. Orion then checks that exactly these 8 text changes were made and nothing else, against block MIRO-ATLAS-READBACK-20261012 (entry 181): four titles "KINGSMan" → "KINGSMAN" (atlas O1–O4), and a "names summarised/shortened for display" note on the O5–O8 footers.
+    3. Re-review Kai's third Miro pass (DAI-10 3a54b56d, entry 188), read-only:
+       - the card fixes V1.6, V2.1, V4.8 and V6.1;
+       - the 21 relabelled cards;
+       - the Visual 5, 7 and 9 labels;
+       - the operator-feature joins;
+       - the edge register frame 3458764687079735917: grade each of the 110 edges against a specific source line, or mark it PROPOSED/UNKNOWN.
+    
+       Baseline: blocks MIRO-GOLD-VIEWS-READBACK-20261013 and MIRO-GOLD-VISUALS-NAV-READBACK-20261013 (entry 186).
+    4. Research gate (Kai 257c9d33, owner ruling be2ddfbf, Kai leads 738492e1):
+       - propose to Kai a finite research source inventory, the exact feature population and a DONE definition;
+       - verify Kai's 738492e1 links, revisions and licences.
+    
+       The network blocks rfc-editor.org, datatracker.ietf.org, nist.gov and arxiv.org.
+    5. Ask Dainius (R20 format: issue, why it matters, options, risks, recommendation, what he decides): may Orion run read-only analysis scripts over project text (README, docs) to enumerate nested and prose-only features? The full census Kai requires ("mechanically establish") otherwise has to be done by hand. Recommendation: yes — read-only, outputs in scratch, results banked.
+    6. Ask Kai to state ACCEPT / AMEND on pass 2 (8faf13e1). His 257c9d33 adopts the 23 classes as the working population but gives no explicit disposition.
+    7. Still open: S-1 (Kai to recommend; Dainius decides); standing reminder for the current-state index; F7 (edge sources) and F12 (nested acceptance paths).
+    
+    ## 4. Key identifiers
+    
+    - Miro board https://miro.com/app/board/uXjVEd6GMHU=/ · Navigator frame 3458764687006972463 · edge register 3458764687079735917
+    - Gold Design frames 3458764686859515286–289 and 3458764686859900281–284 · Gold Visuals 3458764686948409469, 3458764687005374496, 3458764687005684432–436, 3458764687005970128–129
+    - Linear DAI-10 https://linear.app/kaidainius/issue/DAI-10 · research report doc 48c39815 (canonical: entry 164) · feature list doc 7ba0ef5c (canonical: entry 167) · protocol doc 31139212 (canonical: entry 139) · Assurance Pack v0.2 bff57ebd (canonical: entry 144)
+    - Pinned source commit for the board: 422bfb5797a2c23458b036d8276d32db3a12fa1a
+    END-VERBATIM ORION-NEW-THREAD-START
+
+### 6. Next authorised step
+
+- New thread: follow block ORION-NEW-THREAD-START in this entry, step by step  [CONVERSATION 2026-10-13 Dainius, "we’ll need to point new thread/chat so it reads all he needs to know and work"]
+
+### 7. What I am unsure of
+
+- Whether Kai applies the eight edits before or after Orion's Miro re-review; both share one 100-call daily allowance. The new thread should agree the order with Kai on DAI-10  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
