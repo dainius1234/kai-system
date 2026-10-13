@@ -80188,3 +80188,729 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-13T20:40:42Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-13T20:40:42Z  [CMD `date -u +%FT%TZ` → 2026-10-13T20:40:42Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 9cf85e4d0b277c092d61f84cf14e0ce2b91d23ea  [CMD `git rev-parse HEAD` → 9cf85e4d0b277c092d61f84cf14e0ce2b91d23ea]
+- tree: 3030fda8eecc187024dd700cfdd7338a6a82d6f8  [CMD `git rev-parse HEAD^{tree}` → 3030fda8eecc187024dd700cfdd7338a6a82d6f8]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 9cf85e4d0b277c092d61f84cf14e0ce2b91d23ea  [CMD `git ls-remote --heads origin` → 9cf85e4d0b277c092d61f84cf14e0ce2b91d23ea]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 210  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 210]
+
+### 1. The four states
+
+- physical: unchanged since entry 210 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: verbatim capture (O-2 record authority), checklist item 1  [CONVERSATION 2026-10-13 Dainius, "GPT done"]
+- evidence: Kai's verdict, verbatim in section 5, from the ruling-capture store  [CMD `cat .git/kai-ruling-capture/5911e4a1911881fe.json` → flagged long(44200), keyword(proceed)]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Kai (relayed by Dainius as "GPT done") · 2026-10-13 · verdict on v3.1 + A1, "KAI Full-Feature Research Programme v3.1 — Execution Research Plan": v3.1+A1 suitable as the controlled reconciliation candidate; four hardenings before freeze (machine-readable solution route and D351 conditions; test execution status; 24-month rule scoped to external evidence; where executable scripts are kept); recommendations on D1–D5. Verbatim in section 5 as block KAI-VERDICT-V3-1-A1 ⚠ UNBANKED  [CONVERSATION 2026-10-13 Kai, "v3.1+A1 is suitable as the controlled reconciliation candidate."]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier; no research cards, folders or scripts until D1 and D2; no fingerprint containment without Dainius's explicit authorisation  [CONVERSATION 2026-10-13 Dainius, "Do not treat that recommendation as new authority to alter source code, runtime settings or programme gates."]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Checklist item 1: verdict banked here; Orion's independent check follows in the next entry  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 5. Incidents and corrections
+
+- Session resumed: READ found 3 DIFFERS (head, tree, remote branch), all from Orion's own entry-210 commit 9cf85e4; WRITE-DUE NOT-DUE  [CMD `handoff.py verify` → compared=22 match=19 differs=3]
+- Capture: 45177 chars, 45680 bytes, raw sha256 95281ae3bf8e8066…; hook long(44200) is the whitespace-collapsed length; 32 "cite" tokens are the producer's citation markers, not resolvable here  [CMD `python3 len(text)` → 45177]
+- Credential scan of the verdict: calibration 6/6, TOTAL HITS 0  [CMD `credscan.py item1/cs.json` → TOTAL HITS 0]
+- EVIDENCE KAI-VERDICT-V3-1-A1 kai_verdict_v31.txt: 45681 bytes, sha256 6864d0533a318f0db0ff55b655243e5e0fe975864e0d803cefd3e63709382811, final LF True (added by Orion)  [CMD `sha256sum kai_verdict_v31.txt` → 6864d0533a318f0d…]
+    BEGIN-VERBATIM KAI-VERDICT-V3-1-A1
+    GPT done
+    
+    # KAI Full-Feature Research Programme v3.1 — Execution Research Plan
+    
+    ## Executive position
+    
+    The programme is now conceptually strong enough to proceed to **controlled research execution once its explicit gates are released**, but it is **not yet authorised to run the census scripts or create the research-card repository structure**. The current record still requires the agreed sequence: Kai adjudicates v3.1+A1, DeepSeek performs the independent adversarial challenge, and Dainius then resolves D1–D5 one at a time. Linear DAI-10 records that sequence and also records the owner facts that KAI is intended for Dainius rather than sale/distribution, the missing “April” document has not been found, and DeepSeek is the independent challenger. fileciteturn8file0
+    
+    There is also a small but important state update to the commit references in the research brief. `d12bedd` was the closing-thread handover snapshot and `1a7a551` was the later research-check snapshot, but the live branch `claude/project-rework-plan-pgvp35` has since advanced to **`9cf85e4d0b277c092d61f84cf14e0ce2b91d23ea`**. That commit records handoff entry 210 and the DAI-10 owner-answer post. fileciteturn1file0L2-L10 GitHub comparison shows the branch is eight commits ahead of `1a7a551`, with the intervening changes confined to `kai-pm/HANDOFF_LOG.md`; the product/code tree was not changed by those eight commits. fileciteturn16file0L1-L2
+    
+    That matters for reproducibility. **The census must never run against a moving branch name.** Once D1/D2 are approved, Orion should record one full 40-character commit SHA as the research subject and every source reference, line number, checksum and card must point back to that immutable subject.
+    
+    The architecture authority map independently supports the principle Dainius has just reinforced: exact repository/runtime evidence outranks stale presentation claims; the README remains mandatory capability/intent lineage rather than present-state fact authority; and there is still no accepted professional Kingsman master blueprint. The governing posture is to mature the existing organism, not blindly preserve weak internals or replace everything with a generic architecture. fileciteturn11file0L2-L6 D351 explicitly permits immature internals to be replaced behind stable concepts/interfaces where evidence justifies it, while setting “keep the concept/capability” as the default and defining concrete conditions for major structural change. fileciteturn12file0L2-L6
+    
+    That gives v3.1 Amendment A1 the right interpretation of Gold Tier:
+    
+    > **The feature name is not the feature. The promise is not the implementation. The implementation is not proof that it works. And bad internals do not become sacred merely because they already exist.**
+    
+    A1 is therefore not cosmetic. Its `intended_behaviour` and `implementation_state` fields are the mechanism that prevents “NAME_ONLY”, simulated and partial features being polished into documentation instead of being brought as close as practicable to Dainius’s intended KAI. Linear records that exact A1 principle: separate intended behaviour from source wording, classify what the code actually does, require a credible closure route, and justify any rebuild against D351 rather than hiding it behind a rename. fileciteturn8file0L1-L1 fileciteturn8file1
+    
+    The full-feature denominator remains **104 grouped features plus whatever Wave 0 discovers as nested, prose-only and lineage obligations**. The 104/104 package assignment proves that every existing grouped feature has a research home; it does **not** prove that all atomic requirements have already been found. That distinction must survive all the way into the Master Plan.
+    
+    Miro is not presently available as a live evidence surface. I attempted the supplied KAI board again in this research session and the Miro MCP returned the organisation-wide 100-call daily-limit refusal. The same failure is preserved in the handoff record. fileciteturn7file8 Consequently, Miro should not block Wave 0 because it is an architecture projection rather than primary programme authority, but it **must** be reread during architecture reconciliation before the Gold-tier board is accepted.
+    
+    The strongest process support for this approach comes from NASA’s Systems Engineering Handbook. NASA’s verification-matrix guidance calls for unique requirement identifiers, definitive requirement sources and defined verification approaches; its validation guidance separately asks how the finished system will be shown to satisfy stakeholder/customer needs. citeturn10search0turn10search2 That maps closely to KAI’s necessary separation of **intended/promise → implementation evidence → verification → runtime qualification → owner validation**. It is process guidance, not a claim of NASA certification.
+    
+    **Research verdict:** v3.1+A1 is suitable as the controlled reconciliation candidate. I would make four small schema/automation hardenings before freezing the research procedure, but none requires a new conceptual v3.2:
+    
+    - make A1’s “credible solution route” and D351 rebuild justification machine-readable rather than buried in prose;
+    - add explicit test-execution status because a checker cannot prove `QUALIFIED` merely from a test-plan object;
+    - scope the “older than 24 months” freshness rule to external current-best-practice evidence, not historical KAI canonical/lineage sources;
+    - resolve where executable research scripts are kept, because D2 proposes `kai-pm/research/` as **JSON and Markdown only**, while D1 requires script source to be banked.
+    
+    These are implementation details of the research protocol, not changes to the vision.
+    
+    ## Preconditions and controlled research environment
+    
+    No read-only census script should run until the following checklist has been satisfied and banked.
+    
+    | Gate | Required decision or evidence | Recommended disposition |
+    |---|---|---|
+    | **Kai adjudication** | Kai rules on v3.1 plus A1 as the final research-procedure candidate | Complete before owner D1–D5 |
+    | **DeepSeek challenge** | One adversarial review of the procedure, with HIGH findings either repaired or explicitly adjudicated | Required |
+    | **D1 — census scripts** | Permission for deterministic read-only scripts over a pinned commit; script source, invocation, outputs and checksums banked | **Approve** |
+    | **D2 — card storage** | Permission for `kai-pm/research/`, JSON + Markdown only, and no product/source code | **Approve narrowly** |
+    | **D3 — licences** | Per-artefact and dependency obligations, provenance, security, network/telemetry and rollback/removal research; GPL/AGPL/custom model licence remains owner decision | **Approve** |
+    | **D4 — preliminary assurance** | Whether preliminary hazard/test work can begin before all research is finished | **Recommend alongside Wave 1a, clearly non-baseline** |
+    | **D5 — research access** | Wider-read research environment that has no repository write authority and no personal connectors | **Approve isolated environment; do not widen Orion’s connected environment** |
+    | **Research subject** | One full immutable Git SHA, not a branch name | Record immediately after D1/D2 |
+    | **Source manifest** | Every KAI source classified before feature extraction | Required before Wave 0 |
+    | **Network-route manifest** | Named path for every externally required primary source | Required before the wave using it |
+    
+    The owner decision on the final documentation sequence is already substantively settled: **the comprehensive Kingsman Master Plan, RAMS, ITPs and associated final assurance baseline wait until full-feature research and reconciliation are complete.** The remaining D4 question is only whether a preliminary hazard list and preliminary test strategy can be developed while research is under way. Those preliminary artefacts should carry a visible `PRELIMINARY — NOT A BASELINE` status and must not be cited as approval authority.
+    
+    ### Reproducible read-only execution
+    
+    After D1 and D2, the exact operating pattern should be:
+    
+    1. Fetch the approved branch, resolve it once to a full SHA, and record that SHA in a run manifest.
+    2. Construct a detached subject tree at that SHA. The research tools must write output only to an external scratch directory.
+    3. Hash every research script **before execution**.
+    4. Record command line, interpreter version, current working directory, input SHA, start/end time and exit code.
+    5. Run the source-classifier and census extractor.
+    6. Record `git status --porcelain` and `git diff --exit-code` before and after the run. Both must demonstrate that the subject repository was untouched.
+    7. Hash every output.
+    8. Bank the scripts, manifest, stdout/stderr, resulting census and SHA-256 manifest before any human edits are made to the derived data.
+    
+    The conceptual command sequence should be equivalent to:
+    
+    ```bash
+    git fetch origin claude/project-rework-plan-pgvp35
+    
+    PIN="<approved-40-character-commit-sha>"
+    
+    git worktree add --detach "/tmp/kai-subject-${PIN}" "${PIN}"
+    mkdir -p "/tmp/kai-research-${PIN}"
+    
+    git -C "/tmp/kai-subject-${PIN}" status --porcelain
+    
+    python3 -I census.py \
+      --repo "/tmp/kai-subject-${PIN}" \
+      --output "/tmp/kai-research-${PIN}"
+    
+    git -C "/tmp/kai-subject-${PIN}" status --porcelain
+    git -C "/tmp/kai-subject-${PIN}" diff --exit-code
+    
+    sha256sum census.py check_cards.py \
+      /tmp/kai-research-${PIN}/* \
+      > "/tmp/kai-research-${PIN}/SHA256SUMS"
+    ```
+    
+    That is an execution specification, **not current permission to execute it**.
+    
+    There is a D1/D2 ambiguity worth closing explicitly. D2 says the repository research folder contains JSON and Markdown only, so an executable `check_cards.py` should not quietly appear there. My recommendation is that executable tooling runs from the isolated scratch/research environment and its **exact source is banked as a Markdown evidence artefact plus SHA-256** under a run directory. If later you want executable tooling under version control, give a separate narrow grant for a dedicated tooling path rather than weakening D2 by implication.
+    
+    ### Source and network routes
+    
+    The isolated research environment should carry a source-route manifest rather than treating “internet access” as one permission:
+    
+    | Source class | Preferred route | Role |
+    |---|---|---|
+    | KAI GitHub | GitHub connector/raw immutable commit | Canonical repository evidence |
+    | Linear DAI-10 | Linear connector + exact banked GitHub mirror | Review/adjudication history |
+    | Miro | Miro MCP after quota reset | Architecture projection and edge reconciliation |
+    | PyPI metadata | Direct read-only PyPI | Release/package metadata; still verify project repository |
+    | External GitHub | Primary project repository/release/tag | Code, licence, release, security evidence |
+    | NASA | Isolated web-research route to official NASA pages | V&V/process guidance |
+    | NIST | Isolated web-research route to CSRC/NIST | Security/supply-chain standards |
+    | RFC Editor / IETF | Isolated web-research route | Protocol standards |
+    | scikit-learn | Isolated web-research route to official docs/repo | HDBSCAN candidate |
+    | arXiv | Isolated web-research route, papers labelled preprint | Emerging methods/attacks; never sole security authority |
+    | Vendor sites | Read-only isolated route | Vendor claims, always labelled as such |
+    
+    This Deep Research environment has successfully reached official NASA, NIST, RFC Editor, scikit-learn and arXiv sources, even though Orion’s connected environment reports those domains blocked. That demonstrates D5(a) is workable: **research in a wider-read/no-write/no-connectors environment, then hand an evidence manifest to Orion for verification and banking.** It does not justify widening the environment that can write to the KAI repository and access personal connectors.
+    
+    ## Machine assurance and research-card contract
+    
+    The machine checker should be deterministic. No LLM should decide whether the gate “passes”. An LLM may help *propose* candidate feature extraction or classify prose for human review, but the authoritative checker should operate over explicit JSON, enumerations, references, graph structure and banked review records.
+    
+    I recommend two cooperating checks:
+    
+    **Census assurance** proves that classified sources were traversed, every counted item has exactly one card, parent/child relationships are coherent, seeded omissions are detected and the source/card population reconciles.
+    
+    **Card assurance** proves schema correctness, state-machine rules, evidence/search-record requirements, dependency acyclicity, review independence, wave gates and A1 closure requirements.
+    
+    ### Exact failure conditions
+    
+    The v3.1 Annex C conditions should be implemented literally. The run fails when:
+    
+    | Check | Failure condition |
+    |---|---|
+    | Census/card bijection | A census item has zero cards or more than one card |
+    | Schema | Required field absent or enum/value invalid |
+    | Search semantics | `UNKNOWN`, `ABSENT`, or an empty current-connection result has no `search_records` evidence |
+    | Research dependency | `depends_on` references a missing card |
+    | Research graph | `depends_on` contains a directed cycle |
+    | Functional graph | **Must not fail merely because `functional_interfaces` contains a loop** |
+    | State | `DONE` or `BLOCKED` violates its state rules |
+    | Runtime qualification | `QUALIFIED` asserted without required passed positive, negative, restart and hostile tests |
+    | Critical review | Critical card is `DONE` without banked full independent review |
+    | Independence | Reviewer record absent/unbanked or reviewer is researcher |
+    | External candidate record | Required URL/version/licence obligations/claim/source/date fields absent |
+    | Freshness | External current-best-practice evidence is >24 months old without recorded reason |
+    | Wave ordering | A wave’s recorded start precedes its gate |
+    | A1 intent | Card past `OPEN` lacks `intended_behaviour` |
+    | A1 honesty | Card past `OPEN` lacks `implementation_state` |
+    | A1 absence | `ABSENT` or `UNKNOWN` has no bounded search record |
+    | A1 closure route | Non-`GENUINE` or defect-bearing `DONE` card has no concrete, evidenced, falsifiable closure route |
+    | D351 replacement | Replacement/rebuild recommendation has no qualifying D351 structural-change condition |
+    
+    The last two checks need a minor schema hardening. Machine code cannot robustly decide whether a prose paragraph “sounds concrete enough”. I therefore recommend structuring a recommendation like this:
+    
+    ```json
+    {
+      "disposition": "FINISH",
+      "scope": "existing feature implementation",
+      "reason": "Current implementation is PARTIAL.",
+      "falsifier": "Change recommendation if evidence demonstrates the missing behaviour already exists.",
+      "solution_route": {
+        "approach": "Complete the missing behaviour behind the existing KAI contract.",
+        "changes": [
+          "named implementation change"
+        ],
+        "evidence_refs": [
+          "WO-F013-01",
+          "RT-F013-03"
+        ]
+      },
+      "rebuild_or_replace": false,
+      "d351_conditions": []
+    }
+    ```
+    
+    For a replacement, `rebuild_or_replace=true` makes `d351_conditions` mandatory. Valid values should map directly to D351’s accepted reasons: duplicate sovereignty, conflicting truth sources, unsafe trust boundary, shared-fate failure, incorrect state ownership, lifecycle/deployment conflict, resource/hardware isolation, irreducible contract mismatch or maintenance burden not fixable in place. D351 provides those conditions and explicitly allows replacement of immature internals while preserving stable concepts. fileciteturn12file0L2-L6
+    
+    ### Calibration and sample sizes
+    
+    Every known-positive fixture below is a deliberately broken data set and **must fail**:
+    
+    | Seeded defect | Expected detector |
+    |---|---|
+    | Delete one card | Census/card bijection |
+    | Duplicate one card | Census/card bijection |
+    | Add `depends_on` A→B→A | DAG cycle |
+    | Mark DONE with one untraced claim | DONE rule |
+    | Turn unresolved BLOCKED card into DONE | Adjudication/state rule |
+    | Set researcher == reviewer | Independent-review rule |
+    | Set runtime `QUALIFIED` with no executed tests | Qualification rule |
+    | Add untraced external security claim | Traceability |
+    | Set `UNKNOWN` with no search record | Search semantics |
+    | Hide one prose-only feature | Census omission test |
+    | Hide one nested independently testable behaviour | Nested census test |
+    | Seed two conflicting canonical decisions | Chronology/conflict handling |
+    | Add inaccessible required source | Named-gap handling |
+    | Mark SIMULATED as DONE with only `RESEARCH/WATCH` | A1 solution-route rule |
+    | Mark NAME_ONLY as GENUINE from README alone | A1 evidence rule |
+    | Recommend replacement without D351 condition | D351 rule |
+    
+    Every known-negative fixture below **must pass**:
+    
+    - a fully correct card set;
+    - the same set with a legitimate two-way `functional_interfaces` loop;
+    - a research-DONE card whose runtime is still `NOT_OBSERVED`;
+    - a correctly adjudicated BLOCKED research card;
+    - a non-GENUINE card with a concrete, evidenced, falsifiable closure route.
+    
+    For the machine tests themselves, all seeded cases should run on **every checker build**; this is not a statistical sample.
+    
+    For Orion’s substantive review, retain v3.1’s policy: **100% of Wave 1, 100% of critical cards in every wave, 100% of cards recommending replacement/change, plus a deterministic seeded 10% sample of the remaining population.** The sample size is therefore:
+    
+    `ceil(0.10 × eligible_nonmandatory_cards)`
+    
+    with sampling without replacement and the seed banked. It cannot be turned into an exact card number until Wave 0 establishes the true denominator.
+    
+    For Wave 0’s human extraction check, v3.1 requires a seeded human sample but does not specify its size. I recommend making that precise before the protocol is frozen: **10% of feature-bearing source passages, minimum 30 passages, with at least two passages from every canonical/lineage/draft source class that has enough material, plus 100% review of planted prose-only/nested fixtures and known source conflicts.** The random seed and selected source ranges must be banked. This sample tests the extractor; it does not substitute for the requirement that every classified source be traversed.
+    
+    ### Research-card JSON contract
+    
+    The following is a **schema example**, not a finding that MARS currently has these values:
+    
+    ```json
+    {
+      "item_id": "F013",
+      "parent_id": null,
+      "name": "MARS memory decay / consolidation",
+      "lead_package": "RP-1",
+    
+      "critical": true,
+      "critical_reason": [
+        "evidence_truth",
+        "personal_data"
+      ],
+    
+      "intended_behaviour": {
+        "statement": "Plain-language statement of what Dainius intends this capability to do.",
+        "refs": [
+          {
+            "source": "README.md",
+            "commit": "<PINNED_SHA>",
+            "line": 0,
+            "source_status": "canonical"
+          }
+        ]
+      },
+    
+      "implementation_state": null,
+    
+      "depends_on": [],
+    
+      "functional_interfaces": [
+        {
+          "with": "F084",
+          "flow": "Dream processing and memory consolidation exchange state.",
+          "direction": "both",
+          "evidence": "<exact source reference>",
+          "status": "CANDIDATE"
+        }
+      ],
+    
+      "promised": [
+        {
+          "source": "README.md",
+          "commit": "<PINNED_SHA>",
+          "line": 0,
+          "source_status": "canonical",
+          "source_date": "YYYY-MM-DD",
+          "text": "<source excerpt within quotation limits>"
+        }
+      ],
+    
+      "today": {
+        "code": [],
+        "config": [],
+        "readme_marker": "UNMARKED",
+        "documented_state": null,
+        "runtime": {
+          "state": "NOT_OBSERVED",
+          "test_id": null,
+          "environment": null,
+          "date": null
+        },
+        "as_of": "2026-10-13"
+      },
+    
+      "gap_to_promise": null,
+    
+      "known_defects": [
+        {
+          "ref": "<audit-id-or-path:line>",
+          "summary": "<finding>",
+          "negative_test": "RT-F013-02"
+        }
+      ],
+    
+      "plans": [],
+    
+      "world_offers": [
+        {
+          "offer_id": "WO-F013-01",
+          "name": "<candidate>",
+          "kind": "project",
+          "url": "<canonical-source-url>",
+          "version": "<version-or-commit>",
+          "checksum": null,
+          "provenance": null,
+          "licences": {
+            "code": null,
+            "weights": null,
+            "data": null,
+            "docs": null
+          },
+          "obligations": [],
+          "use_model": "single-owner / family; not sold or distributed",
+          "deps_checked": false,
+          "network": null,
+          "privileges": null,
+          "telemetry": null,
+          "rollback": null,
+          "removal": null,
+          "last_release": null,
+          "claim_type": "method_effectiveness",
+          "source_kind": "peer_reviewed",
+          "secondary": false,
+          "checked_at": "2026-10-13"
+        }
+      ],
+    
+      "fit": {
+        "licence_ok": null,
+        "offline_ok": null,
+        "target_hw_ok": null,
+        "telemetry_off": null,
+        "maintained": null
+      },
+    
+      "recommendations": [],
+    
+      "tests": [
+        {
+          "research_test_id": "RT-F013-01",
+          "kind": "positive",
+          "purpose": "<what this proves>",
+          "input": "<controlled input>",
+          "expected": "<expected behaviour>",
+          "failure_meaning": "<what failure disproves>",
+          "evidence_type": "log",
+          "execution": {
+            "status": "NOT_RUN",
+            "environment": null,
+            "date": null,
+            "evidence_ref": null
+          }
+        }
+      ],
+    
+      "itp_ref": null,
+    
+      "connects_today": [
+        {
+          "to": "F084",
+          "evidence": "<exact source>",
+          "status": "CANDIDATE"
+        }
+      ],
+    
+      "search_records": [],
+    
+      "target_integration": null,
+    
+      "state": "OPEN",
+    
+      "blocked": null,
+    
+      "researcher": "kai",
+    
+      "review": {
+        "checker": "orion",
+        "kind": "full",
+        "date": null,
+        "banked_entry": null
+      },
+    
+      "substantive_check": {
+        "done": false,
+        "untraced_claims": []
+      }
+    }
+    ```
+    
+    `implementation_state` becomes exactly one of `GENUINE`, `PARTIAL`, `SIMULATED`, `NAME_ONLY`, `ABSENT`, `UNKNOWN` once researched. `ABSENT` means a bounded search found nothing; `UNKNOWN` means the bounded search could not settle the matter. Neither is represented by `null`, because `null` means “not researched yet”.
+    
+    Runtime remains independent: `NOT_OBSERVED`, `OBSERVED`, `QUALIFIED`. A README tick, feature flag, unit test or static inspection may contribute evidence to implementation state; none makes runtime `QUALIFIED`.
+    
+    I added one field not yet explicit in Annex B: `tests[].execution.status`. It is necessary because Annex C says `QUALIFIED` requires **passed** tests, while the existing example only represents a test definition, not whether it ran. Recommended values are `NOT_RUN`, `PASS`, `FAIL`, `BLOCKED`. Without a result field, the qualification rule is not mechanically decidable.
+    
+    ## Waves, packages and sequencing
+    
+    The current v3.1 allocation still covers all 104 grouped features exactly once at package level, split 28 / 14 / 27 / 35 across Waves 1a through 3. Nested and prose-only features discovered during Wave 0 enlarge those figures rather than being squeezed into the old denominator.
+    
+    | Stage | Packages / scope | Current grouped count | Start gate | Finish gate | Lead / independent check |
+    |---|---|---:|---|---|---|
+    | Source classification | Annex A source list | All sources | D1 + D2 decided | Every source classified; chronology recorded; Kai adjudicates status | Orion proposes / Kai adjudicates |
+    | Wave 0 | Full census | 104 + newly discovered items | Classification complete | All sources traversed; seeded omissions caught; human sample complete; missing sources openly adjudicated | Orion / Kai |
+    | Pilot | F013, F060, F035 | 3 | Wave 0 complete | Timed cards complete; ≤1 schema amendment; pilot rechecked; effort forecast published | Kai / Orion |
+    | Wave 1a | RP-1, RP-2, RP-6, RP-11 | 28 | Pilot complete; source routes ready | Every card accounted; full reviews complete; checker passes | Kai / Orion |
+    | Wave 1b | RP-3, RP-4 | 14 | Wave 1a accounted | Every card accounted; checker passes | Kai / Orion |
+    | Wave 2 | RP-5, RP-8a, RP-8b, RP-12 | 27 | Wave 1 complete | Every card accounted; required reviews + checker pass | Kai / Orion |
+    | Wave 3 | RP-7, RP-8c, RP-9, RP-10, RP-13, RP-14 | 35 | Wave 2 complete | Every card accounted; required reviews + checker pass | Kai / Orion |
+    | Research closure | Entire census | New final denominator | Wave 3 complete | DONE/BLOCKED population transparent; owner decisions presented | Kai + Orion + Dainius |
+    
+    “Accounted” must never mean “working”. It means the research state is explicitly `CHECKED`, `DONE`, or `BLOCKED` with adjudication. A feature may be research-DONE while runtime remains `NOT_OBSERVED`.
+    
+    ### Package-to-feature map
+    
+    | Package | Wave | Grouped feature ownership |
+    |---|---|---|
+    | RP-1 Memory | 1a | #6, #9, #12–#19 |
+    | RP-2 Dreaming / overnight learning | 1a | #80–#84 |
+    | RP-6 Living with Dainius | 1a | #2, #53, #55–#61, #90, #94, #95 |
+    | RP-11 Growth / skill supply chain | 1a | #85 |
+    | RP-3 Honesty / inner life | 1b | #1, #4, #5, #7, #10, #11 |
+    | RP-4 Imagination / future / causality | 1b | #8, #35, #39, #40, #48, #54, #93, #97 |
+    | RP-5 One mind / workspace / councils | 2 | #27–#29, #31–#34, #36–#38, #41–#43, #45–#47, #49–#52 |
+    | RP-8a Inference runtimes | 2 | #30 |
+    | RP-8b Hardware qualification | 2 | #44, #103 |
+    | RP-12 Continuity / money / succession | 2 | #86–#89 |
+    | RP-7 Senses / world awareness | 3 | #20–#26 |
+    | RP-8c Voice / avatar | 3 | #96 |
+    | RP-9 Governed hands / security | 3 | #62–#69 |
+    | RP-10 Doctor / resilience | 3 | #70–#79 |
+    | RP-13 Mission Control / presence | 3 | #3, #91, #92, #98 |
+    | RP-14 Engineering / assurance | 3 | #99–#102, #104 |
+    
+    The timeline should be treated as gate-driven rather than calendar-driven. A fixed promise such as “Wave 1 will take three weeks” would be guesswork before the three pilot cards have measured real card cost. The pilot exists precisely to replace that guesswork with observed effort.
+    
+    ```mermaid
+    flowchart LR
+        A["Kai adjudicates v3.1 + A1"]
+        B["DeepSeek adversarial challenge"]
+        C["Dainius resolves D1–D5"]
+        D["Pin immutable Git SHA"]
+        E["Source classification"]
+        F["Wave 0 full census"]
+        G["Pilot: #13 MARS · #60 struggle · #35 causal"]
+        H["Wave 1a · 28 grouped features"]
+        I["Wave 1b · 14 grouped features"]
+        J["Wave 2 · 27 grouped features"]
+        K["Wave 3 · 35 grouped features"]
+        L["Research closure: DONE + BLOCKED fully exposed"]
+        M["Comprehensive Master / Quality / RAMS / ITP / ITC / LTQR finalisation"]
+    
+        A --> B --> C --> D --> E --> F --> G --> H --> I --> J --> K --> L --> M
+    ```
+    
+    After the pilot, publish three empirical quantities: elapsed researcher time per pilot card, elapsed independent-check time per pilot card, and external-source/access delay. Use the observed minimum/median/maximum to estimate Wave 1 rather than inventing an estimate beforehand.
+    
+    ## Wave-one research programme
+    
+    Wave 1 should be the deepest part of the first execution because it contains the most important previously under-researched behaviour: memory and forgetting, dreaming/learning, operator privacy and interaction, skill acquisition, honesty/self-model, and causal/future reasoning.
+    
+    ### Mechanical work before the first card
+    
+    The first automation run should generate:
+    
+    `source_manifest.json` — path, status, date, Git blob/SHA, line count and adjudication.
+    
+    `census.json` and `census.md` — every parent/child item, source references and deduplication.
+    
+    `source_coverage.json` — line ranges traversed and excluded ranges with reason.
+    
+    `census_seed_results.json` — proof that planted prose-only and nested capabilities were found.
+    
+    `feature_to_audit_map.json` — candidate mapping of code-audit IDs to feature cards, requiring human confirmation.
+    
+    `card_backlog.json` — one row per census item with package, criticality and initial state.
+    
+    `machine_check.json` — deterministic checker results and calibration.
+    
+    `SHA256SUMS` — all scripts and outputs.
+    
+    The mechanically generated backlog is not a research conclusion. Kai still has to determine what the feature genuinely means and what the code genuinely does.
+    
+    ### Pilot research
+    
+    **F013 — MARS memory decay/consolidation**
+    
+    Repository searches should include `MARS`, `decay`, `forget`, `consolidat`, `dream`, `memory-compressor`, `retention`, `supersed`, `prune`, `salience`, `recency`, `reinforce`, every writer to memory stores and every restart/persistence path.
+    
+    External search families should include agent-memory evaluation, memory generation, memory hygiene, selective forgetting, temporal supersession, poisoning, provenance, retention, erasure and long-horizon consistency.
+    
+    A significant current external-research change is that **Letta itself has evolved materially**. Letta’s current organisation centres active development on `letta-code`; its legacy repository explicitly warns researchers not to present old V1-server behaviour as current Letta. citeturn11search7turn11search8turn11search14 This matters because KAI’s repository research previously identified `letta==0.16.8` in the existing Letta integration. The research card therefore cannot ask simply “use Letta or not?” It must distinguish:
+    
+    `KAI’s pinned legacy Letta integration`  
+    versus  
+    `current Letta/Letta Code architecture`  
+    versus  
+    `methods worth borrowing without adopting Letta`.
+    
+    That is exactly the kind of “same name, different reality” mistake A1 is designed to prevent.
+    
+    Letta’s 2026 evaluation work is useful as **methodology input**, not proof that Letta is the correct backend. Context-Bench V2 evaluates both use of existing memory and generation of new memory from experience; earlier Letta memory benchmarks separately test reading, writing and updating memory. citeturn14search6turn14search1 Its newer context-repository design also uses local git-backed context versioning, which is relevant to provenance/rollback research. citeturn14search5
+    
+    Recent arXiv work also makes memory poisoning a first-class test concern. 2026 papers study persistent memory poisoning, provenance-based defences and environment-induced cross-session poisoning. These are preprints rather than standards, so they should seed hostile tests rather than determine architecture on their own. citeturn15academia0turn15academia1turn15academia2
+    
+    The F013 pilot should therefore produce tests for, at minimum, protected-memory retention, permissible decay, superseded-fact handling, restart persistence, deletion propagation, poisoned-memory rejection/quarantine, dream-output provenance and the guarantee that synthetic dream material does not silently become an autobiographical event.
+    
+    **F060 — struggle detection**
+    
+    Repository searches should include `struggle`, `frustrat`, `sentiment`, `difficulty`, `retry`, `help`, `nudge`, `dismiss`, `cooldown`, `notification`, `anti_annoyance`, `operator_model`, `emotion`, `visitor`, `household` and all handlers that can trigger unsolicited interaction.
+    
+    The research question is not “can an LLM label frustration?” It is whether KAI can provide genuinely useful assistance **without turning ordinary behaviour into invasive psychological inference or nagging**. A Gold-tier solution needs a defined intervention budget, bounded confidence, easy dismissal, false-alarm measurement, quiet contexts, household/visitor separation and explicit behaviour when the classifier is uncertain.
+    
+    Tests should therefore include false positives, false negatives, repeated dismissal, quiet-hours suppression, visitor/family separation, ambiguous language, temporary frustration versus persistent struggle, and failure of the detector itself. The previously discovered anti-annoyance fail-open behaviour belongs in this card family as a mandatory negative case.
+    
+    **F035 — causal world model**
+    
+    Repository searches should include `causal_world_model`, `CausalGraph`, `CAUSES`, `causal`, `cooccurrence`, `temporal_lag`, `PolicyMemory`, `CausalSurprise`, `counterfactual`, `simulate`, `intervention`, `confound`, `hypothesis`.
+    
+    The decisive Gold-tier question is whether KAI possesses evidence for causality or merely produces a plausible causal story. DoWhy is valuable here because its primary design explicitly requires causal assumptions to be represented and provides identification, estimation and refutation machinery; it does not turn correlation into causal knowledge automatically. citeturn11search5turn11search6
+    
+    The causal card should therefore require abstention when assumptions are unavailable and add a dedicated `false_causal_inference` research test. Tests should deliberately introduce common causes, temporal coincidence and non-interventional observational correlations. A causal edge should never become trusted merely because an LLM used the word “causes”.
+    
+    For forecasting, `sktime` remains a credible evaluation candidate because its current forecasting interface supports intervals, quantiles, variance and predictive distributions, enabling KAI to expose uncertainty rather than only point predictions. citeturn12search2turn12search3 But its use should be validated against KAI’s own historical forecast/outcome data, not accepted because the library has a probabilistic API.
+    
+    ### Wave-one technical deltas discovered in this research
+    
+    Several initial leads should now be sharpened before research cards are written.
+    
+    **Failure clustering:** “HDBSCAN” is not one implementation choice. Current scikit-learn has a native `sklearn.cluster.HDBSCAN`, added in 1.3, while the separate `scikit-learn-contrib/hdbscan` implementation remains BSD-3-Clause and has different parameter semantics and extra ecosystem history. citeturn12search1turn12search0 RP-2 should compare them explicitly rather than putting “HDBSCAN” on a card as though that settles the dependency.
+    
+    **Boundary recalibration:** River’s ADWIN is an online concept-drift detector using a variable-length recent window and statistical comparison of subwindows. citeturn11search3 That makes it a plausible mechanism for *online* threshold-change detection. It should not be treated as equivalent to an offline change-point method used during dream/post-hoc analysis; the two may be complementary.
+    
+    **Supply-chain rules:** NIST’s official publication index currently lists SSDF 1.1 as final, SP 800-218A as the final AI-specific community profile, and SSDF 1.2 / SP 800-218 Rev.1 as a **draft**, not a final replacement. citeturn10search7turn10search6turn10search4 RP-11 should therefore use SSDF 1.1 plus 800-218A as stable primary guidance and track 1.2 as draft/watch material. Calling 1.2 “the current final standard” would be incorrect.
+    
+    **Final-hand integrity:** RFC 9421 can support research on signed requests, but its own security model makes clear that the application has to decide which components are covered; unsigned portions remain modifiable, and content integrity needs the associated digest mechanism rather than assuming the signature magically covers everything. citeturn10search5 That aligns closely with KAI’s existing “exact final hand” concern and should be part of RP-9 later rather than reduced to “use Ed25519”.
+    
+    These are candidate directions. None is an approved replacement or implementation.
+    
+    ## Privacy, governance and owner decisions
+    
+    ### Cognitive fingerprint
+    
+    The runtime question is now resolved by the owner for present planning purposes: **KAI is a work in progress in GitHub, Linear and Miro and is not running on a machine.** The Linear owner-answer relay also records the intended future target as Dainius’s laptop and classifies the fingerprint issue as pre-first-run design work rather than an active leak. fileciteturn8file0
+    
+    So there is **no live containment operation to perform** and no justification for changing a flag, deleting a file or touching runtime configuration now.
+    
+    The static design finding is nevertheless real. The current repository README labels Cognitive Fingerprinting “Collecting” and says it writes interaction samples to `/data/cognitive_fingerprint.jsonl`; the feature-flag table enables `COGNITIVE_FINGERPRINT` by default. fileciteturn13file0L2-L6 The actual feature-flags module likewise sets it to `True`. fileciteturn14file0L2-L6 The collector implementation defines that JSONL path and includes the operator query plus inferred attributes such as abstraction level, time horizon, risk signal and decision information; the shown code appends JSON directly, while the later inference path remains a stub. fileciteturn15file0L2-L6
+    
+    That is an excellent example of why A1 is needed. “Cognitive fingerprint” is neither wholly absent nor genuinely complete. Static research needs to decide its implementation state based on the whole call path, but what is already visible suggests a distinction between a real **collector** and an unfinished **fingerprint inference capability** rather than treating the feature family as one green checkbox.
+    
+    Before first commissioning, the fingerprint card should settle:
+    
+    - exactly what data is collected and why;
+    - whether raw query text is actually necessary;
+    - where every copy can propagate, including memory, summaries and backup;
+    - default-on versus explicit owner enablement;
+    - local filesystem permissions and encryption-at-rest design;
+    - retention and automatic expiry;
+    - complete erasure and correction;
+    - household/visitor subject separation;
+    - whether inferred attributes can ever influence authority, permissions, finance or other consequential actions;
+    - false inference and calibration;
+    - zero-telemetry proof.
+    
+    Current ICO guidance emphasises that privacy/data-protection controls should be considered from design through lifecycle and that default processing should be limited in amount, extent, duration and accessibility to what is necessary for the purpose. citeturn13search8 ICO AI guidance also treats data contained in or used by AI models as a privacy consideration and recommends assessing risks at design time. citeturn13search3turn13search4 Encryption is one possible design control, but ICO explicitly notes that it reduces rather than eliminates risk. citeturn13search7
+    
+    Those sources provide good engineering/privacy practice. They do **not** by themselves determine the exact legal status of a private single-owner household KAI deployment; that legal applicability should remain a separate question if it becomes consequential.
+    
+    The safe present action is therefore **read-only research only**. A future pre-first-run commissioning gate should verify that the agreed privacy disposition has actually been implemented before the fingerprint collector can run.
+    
+    ### Roles and independence
+    
+    The governance should remain:
+    
+    | Role | Authority in the research programme |
+    |---|---|
+    | **Dainius** | Defines intended KAI; resolves D1–D5; decides consequential trade-offs, licences needing owner decision and critical accepted risks |
+    | **Kai** | Researcher; writes cards; evaluates modern methods; adjudicates source classification and BLOCKED research claims |
+    | **Orion** | Builds census/checker; independently verifies sources/cards; runs coverage/calibration; banks evidence |
+    | **DeepSeek** | Independent adversarial challenge of final research procedure and later Wave-1 recommendations |
+    | **Miro** | Visual projection only; never silently upgrades a design arrow into evidence |
+    | **GitHub** | Canonical technical/evidence record under the existing authority hierarchy |
+    | **Linear DAI-10** | Review/adjudication coordination mirrored to the canonical record |
+    
+    No researcher should sign their own substantive check. The current Linear record confirms DeepSeek as the adversarial reviewer and records the agreed ordering of the next control decisions. fileciteturn8file0
+    
+    ### Owner-decision brief
+    
+    The eventual one-page owner brief should present the decisions in this form:
+    
+    | Decision | Recommended answer | Why |
+    |---|---|---|
+    | D1 — read-only census tooling | **YES** | Automation makes omission/duplication detectable and reproducible |
+    | D2 — `kai-pm/research/` JSON+MD | **YES, narrow scope** | Cards become reviewable first-class records without granting engineering authority |
+    | D3 — licence/borrowing protocol | **YES** | Per-artefact, transitive dependency, provenance and use-model assessment prevents “MIT project” shorthand from hiding obligations |
+    | D4 — preliminary hazard/test planning | **YES alongside Wave 1a, unfrozen** | Hazards improve research questions; final RAMS/ITPs remain held |
+    | D5 — wider research access | **YES to isolated read-only environment; NO to widening repository-connected Orion environment** | Provides primary sources without increasing the blast radius of a credentialed/write-capable session |
+    | S-1 — final documentation sequencing | **Resolved in principle** | Full-feature research/reconciliation precedes final comprehensive Master/RAMS/ITP baseline |
+    
+    The owner’s “KAI will never be sold” statement should be recorded as the current use-model assumption for licence analysis, but it must **not** be converted into the rule “private use means licences do not matter.” Code, weights, datasets and documentation can carry different obligations, and network-service or modification clauses can matter independently of conventional sale.
+    
+    ## Deliverables and acceptance criteria
+    
+    The first controlled execution should produce six concrete deliverable classes.
+    
+    **The census evidence pack** contains the pinned-SHA manifest, classified source list, complete atomic census, source coverage, exclusion register, deduplication map, seeded-omission results and human-sample results. The unresolved “April” source remains a named gap rather than being reconstructed from memory; the Linear owner record says it could not be found and requires adjudication under the v3.1 rule. fileciteturn8file0
+    
+    **The machine-check package** contains the deterministic checker specification/source, exact SHA-256, all known-positive and known-negative fixtures, calibration output, DAG checks, card/card-census reconciliation, review-independence checks and wave-gate checks. Its own source and output are banked before the checker is trusted.
+    
+    **The three pilot cards** are complete research cards for F013 MARS, F060 struggle detection and F035 causal world model. Each must explicitly answer the Gold-tier question:
+    
+    `What was intended? → What actually exists? → Is it genuine/partial/simulated/name-only/absent/unknown? → What is missing? → What credible route could close that gap? → What evidence would falsify that route? → How will KAI eventually prove it?`
+    
+    The pilot also produces the measured cost model used to forecast the rest of the research.
+    
+    **The Wave-1 backlog** contains every Wave-1 item, newly discovered child items, criticality, package, prerequisite edges, functional interfaces, known-audit references and research status. It must distinguish research prerequisite edges from organic architecture loops; “memory ↔ dreaming” can be a genuine two-way functional relationship without making the research DAG cyclic.
+    
+    **The BLOCKED register** should use a simple explicit object rather than burying unresolved research in prose:
+    
+    ```json
+    {
+      "item_id": "FXXX",
+      "critical": true,
+      "claim": "<claim that could not be resolved>",
+      "reason": "<why evidence was insufficient>",
+      "search_records": [
+        "<bounded search reference>"
+      ],
+      "owner": "kai",
+      "effect_downstream": "<which recommendations/cards/docs this blocks>",
+      "adjudication": null,
+      "owner_decision_required": false
+    }
+    ```
+    
+    A BLOCKED card is visible incompleteness, **not failure of the research programme**. What is forbidden is treating BLOCKED as verified.
+    
+    **The owner decision brief** distils D1–D5, all critical BLOCKED matters, missing sources, proposed replacements and any genuine choice between alternative routes into plain language. Dainius should not have to read 150 JSON cards to discover one consequential trade-off.
+    
+    The research programme itself should be declared complete only when:
+    
+    every classified source has been dealt with under the census protocol;  
+    every discovered item has exactly one card;  
+    machine-check calibration passes;  
+    every card is DONE or transparently BLOCKED with adjudication;  
+    every critical card has full independent review;  
+    every non-GENUINE/defect-bearing DONE card carries a credible evidence-backed closure route;  
+    every proposed rebuild cites a D351 reason and preserves intended behaviour;  
+    every outstanding consequential choice has been presented to Dainius; and  
+    the final census denominator, exclusions and unresolved sources are visible.
+    
+    Only after that point should the comprehensive Kingsman documentation be frozen.
+    
+    The core conclusion of this Deep Research is therefore stronger than “v3.1 looks good”. **v3.1+A1 establishes the correct research philosophy and can be made mechanically enforceable.** It begins from Dainius’s intended KAI, refuses to confuse labels with function, measures the existing implementation honestly, searches current primary sources for better techniques, and requires every weakness to end in either a credible route to Gold Tier or an openly BLOCKED finding.
+    
+    That is the right foundation for the Master Plan and the later RAMS/ITP/ITC/LTQR set: not a prettier description of what happens to exist today, but an evidence-controlled route from **the KAI you intended → the KAI that actually exists → the specific engineering needed to make the two converge**.
+    END-VERBATIM KAI-VERDICT-V3-1-A1
+
+### 6. Next authorised step
+
+- Check the verdict independently (repository facts, internal consistency, the four hardenings, reachable external claims); bank the check; report to Dainius (checklist item 1 done criterion)  [CONVERSATION 2026-10-13 Dainius, "follow through with this"]
+
+### 7. What I am unsure of
+
+- Nothing new  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
