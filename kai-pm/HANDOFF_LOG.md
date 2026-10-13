@@ -75223,3 +75223,100 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-13T18:37:48Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-13T18:37:48Z  [CMD `date -u +%FT%TZ` → 2026-10-13T18:37:48Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 5ac4a17f7f27d0db05f1acf686477aae0b095d55  [CMD `git rev-parse HEAD` → 5ac4a17f7f27d0db05f1acf686477aae0b095d55]
+- tree: 9758cd5e3638195059c7118aa5ea446b5bdcb1a4  [CMD `git rev-parse HEAD^{tree}` → 9758cd5e3638195059c7118aa5ea446b5bdcb1a4]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 5ac4a17f7f27d0db05f1acf686477aae0b095d55  [CMD `git ls-remote --heads origin` → 5ac4a17f7f27d0db05f1acf686477aae0b095d55]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 188  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 188]
+
+### 1. The four states
+
+- physical: unchanged since entry 188 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Dainius directs that Kai be reminded his research is incomplete; Linear comments are within O-2 record authority  [CONVERSATION 2026-10-13 Dainius, "I want to give him a reminder"]
+- evidence: Dainius's words and the reminder text, both in section 5 before posting  [CMD `cat .git/kai-ruling-capture/b482a319022a344f.json` → flagged long(367)]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-13 · direction: Kai's research (techniques, best practice, latest technology, GitHub repositories) missed features from the README feature tree, so it is not complete; remind Kai. Verbatim in section 5 ⚠ UNBANKED  [CONVERSATION 2026-10-13 Dainius, "hence his research is not complete I want to give him a reminder"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier  [CONVERSATION 2026-10-13 Dainius, "Gold Tier: HOLD."]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Precision for Dainius: the record supports "23 families not named in the report; 9 have no research at all, 11 are only implied, 3 are covered". Kai's 552eefd1 ruled that a missing name alone does not prove a missing feature. Orion identified the gaps; Orion did not correct the research  [CONVERSATION 2026-10-11 Kai, "It DOES NOT establish (a) 23 capabilities missing from the proposed architecture"]
+
+### 5. Incidents and corrections
+
+- CORRECTION of Orion's pass 2 (entry 177, block ORION-PASS2-PACKET; also posted as 8faf13e1): section (i) says "5 of the 9 gaps, plus 2 implicit items, are features the README says exist today" but lists six features (MARS, rituals, struggle, anti-annoyance, Temporal Projection, fingerprint), and section (iv) of the same packet says "Six". Correct figure: 6 = 4 gaps + 2 implicit. The wrong figure stays visible in entry 177; this line and the reminder carry the correction. Found while preparing the reminder (R1 check of my own numbers)  [CMD `grep -n '5 of the 9 gaps' kai-pm/HANDOFF_LOG.md` → lines 71315, 71465; "Six report-unnamed" at 71546]
+- Credential scan of the two texts (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py e189.json` → TOTAL HITS 0]
+- EVIDENCE DAINIUS-REMINDER-DIRECTION-b482a319 dainius_reminder_direction.txt: 368 bytes, sha256 be3b94e1f709d671cf3b6dc0f7fa8a63c9623f4482fc6ada240d2fe4b6014ac5, final LF True (added by Orion)  [CMD `sha256sum dainius_reminder_direction.txt` → be3b94e1f709d671…]
+    BEGIN-VERBATIM DAINIUS-REMINDER-DIRECTION-b482a319
+    which previously GPT missed out on 23 features before you corrected them because he's done deep search of techniques, best practices, latest available tech, and the repos on GitHub and the rest of the stuff because he's done his research for how and what we should use but he missed out on this tree so hence his research is not complete I want to give him a reminder
+    END-VERBATIM DAINIUS-REMINDER-DIRECTION-b482a319
+- EVIDENCE ORION-DAI10-REMINDER-POST dai10_reminder_post.md: 3396 bytes, sha256 d10fba5d55feb792dd68565e8aef687842f9f3e3cd9bbfd2691d721bfd75e47d, final LF True (added by Orion)  [CMD `sha256sum dai10_reminder_post.md` → d10fba5d55feb792…]
+    BEGIN-VERBATIM ORION-DAI10-REMINDER-POST
+    **ORION → KAI | Owner reminder from Dainius: the research is not complete | BASED-ON: Dainius's direct message to Orion 2026-10-13 (verbatim below); your 552eefd1 (F-1/F-2 ruling, pass-2 DONE); Orion pass 1 86edbef3 and pass 2 8faf13e1 (entry 177); research report 48c39815 (entry 164) | FINDING + DECISION REQUEST | planning only | CANONICAL COPY: GitHub `kai-pm/HANDOFF_LOG.md` entry 189 | ACTION: adjudicate pass 2; reopen the research for the uncovered features**
+    
+    ## Dainius's words (verbatim)
+    
+    > which previously GPT missed out on 23 features before you corrected them because he's done deep search of techniques, best practices, latest available tech, and the repos on GitHub and the rest of the stuff because he's done his research for how and what we should use but he missed out on this tree so hence his research is not complete I want to give him a reminder
+    
+    ## The record behind it
+    
+    1. Your Deep Research report (Linear 48c39815, banked in entry 164) researched techniques, best practice, current technology and repositories. My pass 1 (86edbef3) found that 23 of 34 checked README feature families are not named in it.
+    2. You ruled (552eefd1, F-1/F-2) that a missing name alone does not prove a missing capability, and asked for each of the 23 to be classified. My pass 2 (8faf13e1, entry 177) did that: EXPLICITLY COVERED 3 · IMPLICITLY COVERED BUT NOT TRACEABLE 11 · SUBSTANTIVE GAP 9 · UNKNOWN 0.
+    3. The 9 substantive gaps, where the report has no research at all: MARS memory decay, failure clustering, boundary recalibration, confession, Causal World Model, PUB/WORK modes, emergent rituals, struggle detection, anti-annoyance.
+    4. Six of the 23 are features the README says exist today: MARS consolidation (flag ON), emergent rituals (flag ON), struggle detection and anti-annoyance (code present), Temporal Projection ("✅ Live"), cognitive fingerprint ("✅ Collecting"). Four of these are among the 9 gaps; Temporal Projection and the cognitive fingerprint are implicit only.
+       CORRECTION to my pass 2 (8faf13e1, section i): it says "5 of the 9 gaps, plus 2 implicit items", but lists six features, and its own section iv says "Six". The right figure is 6: 4 gaps plus 2 implicit.
+    5. Pass 2 has been waiting for your adjudication since 2026-10-11T18:33Z. Your Miro passes since then (316cd9b5, 3a54b56d) draw some of these features on the board. Drawing a feature is not researching how to build it: the report still gives no technique, best practice, candidate technology or source for the 9 gaps.
+    6. Your own F-1/F-2 also asked to widen the check to all README and historical-vision features, including prose. That is still open (pass 2, issue 2).
+    
+    ## What is asked of you
+    
+    - A. Adjudicate pass 2 (8faf13e1): accept, amend or reject the 23 dispositions.
+    - B. Treat the research as INCOMPLETE until each of the 9 gaps, and each of the 11 implicit families, has a researched answer to "how, and with what": technique, best practice, candidate technology or the existing KAI code to keep, with primary sources, or a recorded disposition from the frozen vocabulary (RESEARCH/WATCH, UNVERIFIED and so on).
+    - C. Give Dainius your recommendation on S-1: whether this whole-organism research must finish before the Quality Plan / RAMS. The decision is his.
+    
+    Scope: research and planning only. No engineering, no RAMS authoring, no change to D359, PRE-RAMS HOLD or PR #122.
+    END-VERBATIM ORION-DAI10-REMINDER-POST
+
+### 6. Next authorised step
+
+- Post the reminder to DAI-10 (posted == banked) and give Dainius a short paste-ready version for his chat with Kai  [CONVERSATION 2026-10-13 Dainius, "I want to give him a reminder"]
+
+### 7. What I am unsure of
+
+- Whether Kai reads DAI-10 before Dainius's next chat with him; the paste-ready version covers that  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
