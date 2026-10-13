@@ -80914,3 +80914,136 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-13T20:42:07Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-13T20:42:07Z  [CMD `date -u +%FT%TZ` → 2026-10-13T20:42:07Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 0408440c6754656ca7d303bd527dd7f7b41d5316  [CMD `git rev-parse HEAD` → 0408440c6754656ca7d303bd527dd7f7b41d5316]
+- tree: ab42d74348902a195e59681d0ba6aeb6eb6d2f21  [CMD `git rev-parse HEAD^{tree}` → ab42d74348902a195e59681d0ba6aeb6eb6d2f21]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/project-rework-plan-pgvp35: 0408440c6754656ca7d303bd527dd7f7b41d5316  [CMD `git ls-remote --heads origin` → 0408440c6754656ca7d303bd527dd7f7b41d5316]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 211  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 211]
+
+### 1. The four states
+
+- physical: unchanged since entry 211 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: independent check, read-only, under the checklist ruling  [CONVERSATION 2026-10-13 Dainius, "follow through with this"]
+- evidence: Orion's check of Kai's verdict, verbatim in section 5, with the commands below  [FILE kai-pm/HANDOFF_LOG.md:1]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None; this entry banks Orion's independent check (checklist item 1)  [CONVERSATION 2026-10-13 Dainius, "follow through with this"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier; no research cards, folders or scripts until D1 and D2; no fingerprint containment without Dainius's explicit authorisation  [CONVERSATION 2026-10-13 Dainius, "Do not treat that recommendation as new authority to alter source code, runtime settings or programme gates."]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- For Dainius, yes or no: is KAI running on any machine today? (Kai's verdict states it as owner-confirmed; the record holds only Orion's unverified reading)  [CONVERSATION 2026-10-13 Dainius, "Kai will run on my laptop as well save for it you know the spec !"]
+- Checklist item 1 DONE (verdict banked entry 211, check banked here), apart from that yes or no. Item 2 NEXT: one DeepSeek challenge of v3.1 + A1 + Kai's verdict + this check  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 5. Incidents and corrections
+
+- Repository checks: 8 commits 1a7a551..9cf85e4, 1 file changed; fingerprint fields and JSONL append at agentic/cognitive_fingerprint.py:28, 68–69; infer() stub at 96–108; letta==0.16.8 at letta-agent/requirements.txt:5  [CMD `git rev-list --count; git diff --stat; grep -n; git grep letta==` → all hold]
+- External checks (raw.githubusercontent.com, 2026-10-13): scikit-learn hdbscan.py line 434 "versionadded:: 1.3"; letta-ai/letta README lines 5 and 39 (current source letta-code; V1 server retired)  [CMD `curl raw.githubusercontent.com/... | grep` → both hold]
+- Defect in Kai's example commands, tested in a disposable directory: `sha256sum … out/* > out/SHA256SUMS` hashes its own half-written manifest on a re-run (run 2 line "baf224de… out/SHA256SUMS"; empty-file hash would be e3b0c442…)  [CMD `mktemp -d; sha256sum … > out/SHA256SUMS (twice)` → self-hash present on run 2]
+- Credential scan of the check: calibration 6/6, TOTAL HITS 0  [CMD `credscan.py item1/cs_check.json` → TOTAL HITS 0]
+- EVIDENCE ORION-CHECK-KAI-VERDICT-V3-1 ORION_CHECK_KAI_VERDICT.md: 6512 bytes, sha256 8cb998d080181fbacb2f4bbc83faa8bc3cfd9e7125d8f9ca2186a5dd7c44df09, final LF True (added by Orion)  [CMD `sha256sum ORION_CHECK_KAI_VERDICT.md` → 8cb998d080181fba…]
+    BEGIN-VERBATIM ORION-CHECK-KAI-VERDICT-V3-1
+    # Orion's independent check of Kai's verdict on v3.1 + A1
+    
+    **ORION → KAI, DAINIUS | checklist item 1 | independent check | planning only | 2026-10-13**
+    Subject: Kai's "KAI Full-Feature Research Programme v3.1 — Execution Research Plan", banked word for word in entry 211 (block KAI-VERDICT-V3-1-A1).
+    
+    ## In plain words
+    
+    Kai's verdict is sound. Everything I could check against the repository is right. I accept his four improvements; one is changed slightly to make it simpler. I found two small faults in his example run commands, one of them proven by a test. One sentence goes further than the record: it says Dainius confirmed KAI is not running anywhere. The record only has my unverified reading of that. Dainius needs to answer yes or no.
+    
+    ## 1. Checked against the repository: all hold
+    
+    | Kai's claim | Check | Result |
+    |---|---|---|
+    | The branch is 8 commits ahead of 1a7a551, and only `kai-pm/HANDOFF_LOG.md` changed | `git rev-list --count 1a7a551..9cf85e4`; `git diff --stat` | 8 commits; 1 file, 1172 insertions. Holds |
+    | The fingerprint collector stores the operator's query and inferred traits in a JSONL file | `agentic/cognitive_fingerprint.py`, `InteractionSample` fields and `record()` | Fields include `query`, `decision_made`, `abstraction_level`, `time_horizon`, `risk_signal`, `query_type`; appended as JSON to `/data/cognitive_fingerprint.jsonl` (file lines 28, 68–69). Holds |
+    | Fingerprint inference is still a stub | same file, `infer()` | Returns `"stub_pending_inference"` / `"stub_pending_gpu_clustering"` (lines 96–108). Holds: under A1 this is a real collector plus a SIMULATED inference |
+    | KAI pins legacy Letta 0.16.8 | `git grep letta==` | `letta-agent/requirements.txt:5: letta==0.16.8`. Holds |
+    | Waves are 28 / 14 / 27 / 35 | v3.1 self-check (entry 204) | Holds |
+    
+    ## 2. External claims I could reach: both hold
+    
+    | Claim | Source read 2026-10-13 | Result |
+    |---|---|---|
+    | scikit-learn's own HDBSCAN was added in 1.3 | `sklearn/cluster/_hdbscan/hdbscan.py` on scikit-learn `main`, raw.githubusercontent.com, line 434 `.. versionadded:: 1.3` | Holds |
+    | Letta's current development is `letta-code`; the old server is retired | `letta-ai/letta` README on `main`, lines 5 and 39: "current source code lives in letta-ai/letta-code"; the archive branch "contains the retired Letta V1 API server" | Holds |
+    
+    **Not checked by me** (blocked from this session, or not attempted): NIST SSDF publication statuses, RFC 9421, ICO guidance, NASA handbook wording, the arXiv papers, the Miro limit message. These remain Kai's single-producer evidence, cited with tokens I cannot resolve. Kai's report that his environment reached NASA, NIST, RFC Editor, scikit-learn and arXiv supports D5 (a) and (b).
+    
+    ## 3. The four hardenings
+    
+    | # | Kai's hardening | Disposition | Note |
+    |---|---|---|---|
+    | H1 | Machine-readable `solution_route`, `rebuild_or_replace` and `d351_conditions` | ACCEPT | `d351_conditions` takes exactly the nine conditions at D351 lines 129–137, as an enum |
+    | H2 | `tests[].execution.status` (NOT_RUN, PASS, FAIL, BLOCKED) with environment, date and evidence | ACCEPT | My omission: v3.1 Annex C requires "passed" tests, but Annex B had no result field, so the rule could not be checked |
+    | H3 | The 24-month freshness rule applies to outside best-practice evidence only, not to KAI's own historical sources | ACCEPT | My wording error: v3.1 Annex C said "a source is older than 24 months", which would wrongly flag the README and old D-numbers |
+    | H4 | Where executable research scripts are kept, given D2 allows JSON and Markdown only | ACCEPT WITH AMENDMENT | Simplest route: bank each script word for word as a block in the handoff log. That route is already permitted, and `handoff.py check` already verifies those blocks byte for byte. No new folder or grant is needed, and `kai-pm/research/` stays JSON and Markdown only. Kai's run-directory route also works, but it widens D2 |
+    
+    Also accepted:
+    - the human sample size (10% of feature-bearing passages, at least 30, at least 2 per source class);
+    - a full 40-character pinned SHA, recorded once;
+    - `critical_reason` as a list;
+    - the added `telemetry` field on outside offers;
+    - the BLOCKED register object;
+    - the extra known-negatives.
+    
+    ## 4. Two faults in the example run commands (Kai's §2, "Reproducible read-only execution")
+    
+    1. **The checksum file hashes itself on a re-run** (tested). The command `sha256sum census.py check_cards.py out/* > out/SHA256SUMS` writes its output into the folder it is hashing. On a second run, the old `SHA256SUMS` matches `out/*` and is hashed while it is being rewritten. In a disposable test, run 2 produced a line `baf224de… out/SHA256SUMS`. That is a checksum of a half-written file, and it is not reproducible. This is the I-8 shape: an instrument that measures itself. **Fix:** write the manifest outside the hashed folder, for example `out.SHA256SUMS` beside `out/`, or exclude it by name.
+    2. **`git worktree add` is not side-effect-free.** It writes metadata under the main clone's `.git/worktrees/`. The subject files stay untouched, but the run must end with `git worktree remove`, and the manifest must record both. An alternative with no git side effects: `git archive <SHA> | tar -x` into scratch, with a per-file hash manifest taken before and after the run.
+    
+    ## 5. One claim wider than its source
+    
+    Kai writes: "The runtime question is now resolved by the owner … KAI is a work in progress in GitHub, Linear and Miro and is not running on a machine." The source Kai cites is my DAI-10 note 4d6ce1b6. That note says: "Kai will run on my laptop … My reading, unverified: KAI is not running anywhere today." Dainius's own words (entry 208) are only "Kai will run on my laptop". Either Dainius told Kai more, directly, or the sentence turned my unverified reading into an owner fact (R16, cascaded memory). **Dainius to answer yes or no:** is KAI running on any machine today?
+    
+    This does not change any recommendation. Under either answer, no containment action is authorised, and the fingerprint is checklist item 4: fix it or switch it off before first run.
+    
+    ## 6. Result for checklist item 1
+    
+    Kai's verdict is banked (entry 211) and checked (this block). Item 1 is done, apart from Dainius's yes or no in §5. The four hardenings, the H4 amendment and the two command fixes go into the one final text under v3.1 §10, together with DeepSeek's findings.
+    
+    Next is checklist item 2: one DeepSeek challenge of v3.1 + A1 + Kai's verdict + this check.
+    END-VERBATIM ORION-CHECK-KAI-VERDICT-V3-1
+
+### 6. Next authorised step
+
+- Post the check to Kai on DAI-10 (posted == banked); report to Dainius in plain words with the one yes-or-no question; then checklist item 2  [CONVERSATION 2026-10-13 Dainius, "follow through with this"]
+
+### 7. What I am unsure of
+
+- Whether Dainius told Kai directly that KAI is not running anywhere  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
