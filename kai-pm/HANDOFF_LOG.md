@@ -75651,3 +75651,298 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-13T19:07:21Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-13T19:07:21Z  [CMD `date -u +%FT%TZ` → 2026-10-13T19:07:21Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: d12bedd59b48bb7715c8c574cc69666cc109c75e  [CMD `git rev-parse HEAD` → d12bedd59b48bb7715c8c574cc69666cc109c75e]
+- tree: f462d876181b9ffe42f2e005e538d0fc12718b74  [CMD `git rev-parse HEAD^{tree}` → f462d876181b9ffe42f2e005e538d0fc12718b74]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/project-rework-plan-pgvp35: d12bedd59b48bb7715c8c574cc69666cc109c75e  [CMD `git ls-remote --heads origin` → d12bedd59b48bb7715c8c574cc69666cc109c75e]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 191  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 191]
+
+### 1. The four states
+
+- physical: unchanged since entry 191 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: planning authority (frozen §11 class 1: analyse, draft); Dainius asked for a research proposal, and Kai asked Orion to propose the research source inventory, feature population and DONE  [CONVERSATION 2026-10-13 Dainius, "Can you write a proposal as to what needs research into"]
+- evidence: the proposal text, banked below  [CMD `sha256sum KAI_RESEARCH_PROPOSAL.md` → see EVIDENCE line]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None. Dainius's request is a direction to draft, recorded here; it grants nothing beyond planning  [CONVERSATION 2026-10-13 Dainius, "best open source we can borrow"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier; RAMS/ITP authoring until the research gate is met  [CONVERSATION 2026-10-13 Dainius, "We must understand and account for everything KAI is supposed to become before writing the engineering documentation"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Decisions the proposal asks of Dainius: (1) read-only census scripts, (2) copyleft licence policy, (3) S-1  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 5. Incidents and corrections
+
+- PROPOSAL written: 14 research packages (RP-1 to RP-14), each feature 1–104 assigned to exactly one lead package; a research-card template of 8 questions; open-source borrowing rules (8); a repeatable "what's new" scan; waves 0–3; who does what; DONE; owner decisions; limits. Leads are tagged by source ([K] Kai 738492e1, [R] research report, [?] direction only) and are unverified  [CMD `python3 -I package coverage check` → covered 104 of 104, missing [], in >1 package {}]
+- MY ERRORS caught by the check before banking: the first draft left 5 features without a package (#28, #29, #31, #32, #54) and placed 6 in two packages (#16, #21, #26, #48, #80, #103). Fixed; the check is calibrated (removing #54 is caught). A second error, caught before publishing: the HTML page first escaped the Markdown inside a script tag, which would have displayed "&amp;"; fixed, and the page's embedded text now equals the banked text  [CMD `python3 -I embed check` → embedded text == banked markdown: True]
+- Credential scan of the proposal (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py e192.json` → TOTAL HITS 0]
+- EVIDENCE ORION-RESEARCH-PROPOSAL-V1 KAI_RESEARCH_PROPOSAL.md: 16793 bytes, sha256 c363765e5f265e1263a2df59f499ab65deb094369e4b4a1d473c841c82b1bc30, final LF True (added by Orion)  [CMD `sha256sum KAI_RESEARCH_PROPOSAL.md` → c363765e5f265e12…]
+    BEGIN-VERBATIM ORION-RESEARCH-PROPOSAL-V1
+    # KAI Full-Feature Research Proposal
+    
+    **ORION → DAINIUS, KAI | PROPOSAL | planning only | 2026-10-13**
+    Based on: the 104-feature list (handoff entry 167), the 23-family check (entry 177), Dainius's ruling and Kai's research gate (entry 191: be2ddfbf, 257c9d33, 738492e1).
+    This is a plan for research. It is not the research, and it authorises no engineering.
+    
+    ## In plain words
+    
+    Last time the research started from technology and worked towards KAI. It looked at the parts of KAI it noticed, and 23 feature families were never named. 9 of them got no research at all.
+    
+    This time the research starts from **KAI's own feature list** and works outwards. Every feature gets a research card. Nothing is finished while any feature has no card.
+    
+    Site version: last time the survey covered the rooms on the drawing someone happened to have open. This time we take the full room schedule first, then survey every room against it.
+    
+    ## 1. The rule that stops a repeat
+    
+    1. **List first.** Every feature: the 104 grouped features, their nested items, promises made only in README prose, and the historical vision (bootstrap plan, April plan, June v2.1).
+    2. **One card per item.** Each card answers: what was promised, what KAI has today, what the world offers, what we recommend, and how we will test it.
+    3. **Machine check.** A script counts items without a card. Any count above 0 fails the gate.
+    4. **Independent check.** The researcher (Kai) and the checker (Orion) are different. Neither signs off their own work.
+    
+    ## 2. What each research card must answer
+    
+    | # | Question | Example (MARS memory decay, #13) |
+    |---|---|---|
+    | 1 | What was promised, and where? | README L172 and L1135: memory decay inside the dream cycle; flag ON |
+    | 2 | What does KAI have today? | memu-core, memory-compressor; runtime UNKNOWN until checked |
+    | 3 | Plans already written | v1.1 draft, D351/D353, product spec, Deep Research report |
+    | 4 | What the world offers (at least 2 where it matters) | techniques, open-source projects, papers, standards |
+    | 5 | Does it fit KAI? | licence, maintenance, security, offline, 128 GB Strix Halo, zero telemetry |
+    | 6 | Recommendation | a frozen disposition: KEEP · HARDEN · FINISH · MERGE · MOVE · SPLIT · ADD-JOINT · RESEARCH/WATCH · UNVERIFIED |
+    | 7 | How we will test it | positive, negative, restart and hostile tests; the ITP/ITC line it feeds |
+    | 8 | How it joins the one KAI | which organs it talks to, and what it must never do |
+    
+    ## 3. The research packages
+    
+    Lead tags: **[K]** named by Kai (738492e1) · **[R]** named in the Deep Research report (entry 164, source-checked in entry 176) · **[?]** a direction to search, with no product named yet.
+    Every lead is unverified until its card is done. A lead is a place to look, not a choice.
+    Each of the 104 features has exactly one lead package (checked by script); a package may still consult others.
+    
+    ### RP-1 Memory: the heart of it (Wave 1)
+    
+    **Features:** #12 Letta archival · #13 MARS decay/consolidation · #14 Obsidian Brain · #15 knowledge graph · #16 memory diary/mind-map · #17 memory stores · #18 memu-core · #19 per-teammate slices · #6 emotional memory · #9 narrative identity. (World state and provenance, #26, is led by RP-7.)
+    **Today (README claims):** MARS flag ON; memu-core, memu-graph, memory-compressor, letta-agent and vault-sync exist as services in the repository.
+    
+    **Research questions:**
+    - **Kinds of memory:** life events, facts, skills, feelings and relationships. Should they live in one store or several, and how does KAI stay one mind across them?
+    - **Keeping and forgetting:** what must never be forgotten (family, promises, owner rulings), what may fade, and how fading is decided. Human flashcard schedulers are an analogy only.
+    - **Recall quality:** combining vector, graph, keyword and time-aware search; ranking; measured on KAI's own history, not on vendor benchmarks.
+    - **Truth:** source record versus summary; corrections and superseded facts; dreams and guesses never stored as events.
+    - **Hygiene and attack:** poisoned memories, contradictions, duplicates, stale preferences.
+    - **Privacy and deletion:** deleting a memory everywhere it was copied: index, graph, summaries, backups.
+    - **Storage engines:** keep the current Postgres/pgvector unless evidence says otherwise.
+    
+    **Leads:** Letta memory evaluation (Context-Bench) [K] · Letta/MemGPT, Mem0, Graphiti/Zep [R] · pgvector, Qdrant, LanceDB [R] · FSRS, analogy only [K] · temporal knowledge-graph and memory-poisoning research [?] · personal-knowledge tools that sync with Obsidian [?].
+    
+    ### RP-2 Dreaming and learning overnight (Wave 1)
+    
+    **Features:** #84 dream cycles (six phases) · #82 agentic cold path · #81 synthetic experience · #80 Agent-Evolver · #83 capability gap logging · and inside the dream: failure clustering, boundary recalibration, MARS decay.
+    
+    **Research questions:**
+    - What is each of the six phases for, and what is the proof that each one helps?
+    - **Failure clustering:** grouping similar mistakes so KAI learns the pattern, not the instance.
+    - **Boundary recalibration:** spotting when "normal" has changed (drift and change detection) and adjusting thresholds safely.
+    - Labelling everything dreamt as synthetic, and never letting a dream become a memory of something that happened.
+    - Running daily on a portable device: time, power and heat.
+    
+    **Leads:** HDBSCAN [K] · River ADWIN drift detection [K] · ruptures PELT change points [K] · anima local dream cycle, unqualified [K] · agent reflection and self-improvement research [?].
+    
+    ### RP-3 Honesty and inner life (Wave 1)
+    
+    **Features:** #4 confession · #7 epistemic humility · #10 self-reflection · #11 temporal self-model · #5 conscience & values · #1 Ohana Core.
+    
+    **Research questions:**
+    - **Confession:** admitting a past mistake, tied to the recorded failure, without false apologies.
+    - **Calibration:** does KAI's stated confidence match how often it is right? How is "I don't know" shown?
+    - Self-critique that improves answers rather than just sounding humble.
+    - Learning the owner's values without KAI learning values from its own replies (spec §12.4).
+    
+    **Leads:** confidence-calibration and uncertainty research [?] · provenance-backed self-audit, preferring KAI's own records [K].
+    
+    ### RP-4 Imagination, future vision and cause-and-effect (Wave 1)
+    
+    **Features:** #35 causal world model · #40 temporal projection · #48 counterfactual rehearsal · #8 imagination engine · #97 shadow branches · #93 impact oracle · #39 hypothesis engine · #54 Watch rule engine.
+    **Today:** the README says Temporal Projection is "✅ Live" and the causal world model is a GPU stub.
+    
+    **Research questions:**
+    - Real cause-and-effect versus an LLM telling a convincing story.
+    - Forecasts that state their assumptions, time horizon and uncertainty, and that are later checked against what actually happened.
+    - When does a prediction become a "watch" that KAI keeps an eye on, and how are false alarms limited?
+    
+    **Leads:** DoWhy / PyWhy [K] · sktime probabilistic forecasting [K] · forecast-calibration scoring methods [?].
+    
+    ### RP-5 One mind: attention, workspace and councils (Wave 2)
+    
+    **Features:** #36 Global Workspace · #37 swarm assembly · #27 14-way context gather · #28 agentic reasoning service · #29 conviction scoring (information only) · #31 memory-driven planner · #32 priority queue · #33 specialist router · #45–#47 SAGE critique, adversary, reasoning FSM · #49–#52 debate, consensus, teammates, verifier · #38 Socratic questioning · #41–#43 dialectic, analogy, concept blending · #34 transitive reasoning.
+    
+    **Research questions:**
+    - When does a council of models beat one strong model, and at what cost in time and power?
+    - How does KAI stay one personality while several specialists contribute?
+    - Can a model vote ever create a fact or a permission? It must not.
+    
+    **Leads:** Global-Workspace-Agents, unqualified [K] · KaiBench role qualification [R] · AutoGen → Microsoft Agent Framework and LangGraph, watch only [R].
+    
+    ### RP-6 Living with Dainius: attention, mood and rhythm (Wave 1)
+    
+    **Features:** #55 anti-annoyance · #56 emergent rituals · #60 struggle detection · #2 PUB/WORK modes · #90 cognitive fingerprint · #95 operator model · #94 notifications · #53 goals · #57–#59 proactive observer, scheduling, curiosity · #61 wake word.
+    **Today:** the README says rituals are flag ON, struggle detection and anti-annoyance are code present, and the fingerprint is "✅ Collecting" (it records data about Dainius now).
+    
+    **Research questions:**
+    - An interruption budget: how many nudges a day is helpful, quiet hours, and learning from dismissals.
+    - Spotting frustration without false alarms, and what KAI does when it is wrong.
+    - Finding real routines worth suggesting, never inventing them.
+    - PUB/WORK as one personality in two contexts, not two split personalities.
+    - **Privacy of the fingerprint:** what is collected, where it is kept, who can see it, how it is deleted, and family and visitors in the house.
+    
+    **Leads:** prefer KAI's own operator-model, cooldown and dismissal code first [K] · interruption-management and notification-fatigue research [?] · routine-mining research [?] · privacy-by-design guidance for home sensing [?].
+    
+    ### RP-7 Senses and world awareness (Wave 3)
+    
+    **Features:** #20–#26: anomaly detection, Cortex/NPU, cross-sensor correlation, multi-modal fusion, sensors, pattern learning, world state.
+    **Questions:** event journals, sensor provenance, detecting stale or faulty sensors, and on-device (NPU) perception models.
+    **Leads:** typed ingress and event journal, as in the product spec [R] · NPU perception toolchains for XDNA 2 [?].
+    
+    ### RP-8 Local brains and voice on the target device (Wave 3)
+    
+    **Features:** #30 Ollama · #44 GPU-era stub activation · #103 Flow Z13 / Strix Halo · #96 chat, voice, TTS, avatar. (The NPU, #21, is led by RP-7.)
+    **Questions:** keep Ollama as the baseline; which runtime and models fit 128 GB unified memory; local speech-to-text and text-to-speech; power and heat.
+    **Leads:** Lemonade, llama.cpp, Qwen3.6, gpt-oss, Mistral [R]. Pass 2 found open ROCm issues for gfx1151 (E23, E24) and a second binary publisher (`aigdat`), so pin provenance before any test.
+    
+    ### RP-9 Governed hands and security (Wave 3: mostly verify)
+    
+    **Features:** #62–#69: Tool Gate, Unified Hunter, audit ledger, browser agent, decision path, sandbox, secrets, trust negotiation.
+    **Questions:** already well covered by the report and the spec. Confirm one-use capabilities at the final hand, request signing, sandboxing and secret rotation.
+    **Leads:** RFC 8032 Ed25519, RFC 9421 HTTP signatures, RFC 9530 digests [R] (unverified: the network blocked these sites for Orion).
+    
+    ### RP-10 Doctor and resilience (Wave 3)
+    
+    **Features:** #70–#79: House Doctor, checkpoints, heartbeat, no single point of failure, observability, self-hacking, capability map, circuit breakers, supervisor, system FSM.
+    **Questions:** self-diagnosis that cannot grant itself power; recovery drills; honest health states ("ok" never hides a missing capability).
+    
+    ### RP-11 Growth and skills supply chain (Wave 2)
+    
+    **Features:** #85 skills hub/hunter/provenance. (Agent-Evolver, #80, is led by RP-2; its skill supply chain is checked here.)
+    **Questions:** pulling code or skills from the internet safely: provenance, signing, review, probation.
+    **Leads:** NIST SP 800-218 SSDF [R] (unverified) · software supply-chain frameworks [?].
+    
+    ### RP-12 Continuity, money and succession (Wave 2)
+    
+    **Features:** #86 backup · #87 broker-bridge (read-only) · #88 financial awareness / UK self-employment · #89 sovereign offline.
+    **Questions:** restore without reviving old permissions (anti-rollback); offline operation; UK tax and self-employment rules from official sources; succession and family stewardship as owner and legal decisions.
+    **Leads:** anti-rollback update principles (D353 R353-01) [R] · official UK guidance (GOV.UK, HMRC) [?].
+    **Fixed constraint:** `BINANCE_API_KEY` and `BINANCE_API_SECRET` never leave the broker-bridge.
+    
+    ### RP-13 Mission Control and presence (Wave 3)
+    
+    **Features:** #92 dashboard → Mission Control · #91 Telegram · #98 workspace manager · #3 Soul console. (Memory diary and mind-map views, #16, are led by RP-1.)
+    **Questions:** the screen shows evidence, not green labels; how Dainius sees what KAI is doing and why.
+    
+    ### RP-14 Engineering and assurance (Wave 3)
+    
+    **Features:** #99–#102 and #104: CI gates, feature flags, honest status, overlay network, zero telemetry. (Target hardware, #103, is led by RP-8.)
+    **Questions:** requirement → test traceability; verification versus validation.
+    **Leads:** NASA Systems Engineering Handbook, appendices D and E [K]; no claim of NASA certification.
+    
+    ## 4. Rules for borrowing open source
+    
+    A project may be borrowed only if its card shows all of these:
+    
+    1. **Licence** recorded. Permissive (MIT, Apache-2.0, BSD) is preferred. Copyleft (GPL, AGPL) needs Dainius's decision.
+    2. **Alive:** a release within the last 12 months and issues being answered; or a recorded reason to accept it anyway.
+    3. **Security:** its advisory history checked.
+    4. **Local and private:** runs offline on the target device, with **telemetry off by default** (feature #104).
+    5. **Pinned:** an exact version or commit and a checksum.
+    6. **Evidence, not adverts:** what a vendor says about itself is recorded as the vendor's claim. Only a KAI test is evidence.
+    7. **Behind KAI's own contract:** borrowed code sits behind KAI's interfaces (spec §9), so it can be swapped later.
+    8. **No silent loss:** replacing a working KAI feature needs a zero-loss disposition (frozen protocol §10). The default is to keep (D351).
+    
+    ## 5. "What's new" scan, made repeatable
+    
+    For each package, record **where** we searched, **what words** we used and **when**: GitHub topics and recent releases, papers from 2025–2026, standards bodies. Anyone can then re-run the search and see what changed.
+    Limit: this session's network blocks arxiv.org, nist.gov, rfc-editor.org and datatracker.ietf.org. Kai, or a session with a wider allow-list, covers those.
+    
+    ## 6. Order of work
+    
+    | Wave | What | Why first |
+    |---|---|---|
+    | 0 | Full feature census: nested items, prose-only promises, historical vision | The denominator. Without it, "complete" cannot be checked |
+    | 1 | RP-1, RP-2, RP-3, RP-4, RP-6 | The 9 gaps, the 6 features the README says work today, and the privacy of data being collected now |
+    | 2 | RP-5, RP-11, RP-12, and the 11 "implied only" families | Covered in spirit by the old report but not traceable |
+    | 3 | RP-7 to RP-10, RP-13, RP-14 | Mostly covered by the report: verify and confirm |
+    
+    ## 7. Who does what
+    
+    - **Kai:** researches and writes the cards (his protocol role: research and current best practice).
+    - **Orion:**
+      - builds the census;
+      - checks every source link, version and licence;
+      - runs the coverage check;
+      - challenges weak cards;
+      - banks everything in GitHub.
+    - **Dainius:** decides the questions in section 9.
+    
+    ## 8. Definition of DONE
+    
+    1. The census exists, with every exclusion stated and counted.
+    2. Every census item has a card. The machine check reports 0 items without a card.
+    3. Every external source is recorded with link, version or commit, licence and date read; vendor claims are marked.
+    4. Wave 1 cards: every card independently checked. Waves 2–3: a stated sample, plus every card that recommends a change.
+    5. Owner decisions are listed for Dainius in plain words.
+    6. Only then may the master plan, Quality Plan, RAMS, ITPs, ITCs and LTQR be drafted, and in the D359 order.
+    
+    ## 9. Decisions for Dainius
+    
+    1. **Census scripts:** may Orion run read-only scripts over the README and documents to build the full feature list? Recommendation: **yes**. They read text only, write to scratch, and the results are banked. Without them, the census is done by hand: slower, and harder to check.
+    2. **Copyleft licences (GPL/AGPL):** allowed? Recommendation: **permissive by default; copyleft case by case, with your yes.**
+    3. **S-1:** must all of this finish before RAMS? Kai to recommend; your decision.
+    
+    ## 10. Limits of this proposal
+    
+    - It is Orion's plan, written from the banked record. The leads are unverified until their cards are done.
+    - Feature numbers and "today" states come from the README and the entry-167 list. They are claims, not runtime evidence.
+    - It covers the 104 grouped features. Nested and prose-only items are found in Wave 0, so package scopes may grow.
+    - Coverage of the 104 was checked by script: 104 of 104 have exactly one lead package. The check was calibrated: removing #54 from its package is caught. My first draft missed 5 features (#28, #29, #31, #32, #54) and double-assigned 6; the script caught both before this version.
+    END-VERBATIM ORION-RESEARCH-PROPOSAL-V1
+
+### 6. Next authorised step
+
+- Publish the page for Dainius; post the proposal to Kai on DAI-10 (posted == banked). The new thread (entry 191, ORION-NEW-THREAD-START) should treat this proposal as Orion's answer to Kai's 257c9d33 request  [CONVERSATION 2026-10-13 Kai, "Propose finite research source inventory, exact feature population and definition of DONE to Kai."]
+
+### 7. What I am unsure of
+
+- Whether Kai accepts the package split and the wave order; both are proposals for his adjudication and Dainius's decision  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
