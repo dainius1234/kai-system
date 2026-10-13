@@ -78946,3 +78946,73 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-13T19:40:00Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-13T19:40:00Z  [CMD `date -u +%FT%TZ` → 2026-10-13T19:40:00Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: b246dcdef764b8e34c1a1edd22b266a786164710  [CMD `git rev-parse HEAD` → b246dcdef764b8e34c1a1edd22b266a786164710]
+- tree: e2fbb8c8e06e8b6b65c2cd0a4ac8ad64723e38e4  [CMD `git rev-parse HEAD^{tree}` → e2fbb8c8e06e8b6b65c2cd0a4ac8ad64723e38e4]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:claude/project-rework-plan-pgvp35: b246dcdef764b8e34c1a1edd22b266a786164710  [CMD `git ls-remote --heads origin` → b246dcdef764b8e34c1a1edd22b266a786164710]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 201  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 201]
+
+### 1. The four states
+
+- physical: unchanged since entry 201 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: read-only checks of the entry-201 report; no repository change beyond this entry  [CONVERSATION 2026-10-13 Dainius, "He didn’t see your proposal that research done on v1:"]
+- evidence: checks below, each with its command  [FILE kai-pm/HANDOFF_LOG.md:1]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None; this entry records Orion's checks of the report banked in entry 201  [CONVERSATION 2026-10-13 Dainius, "He didn’t see your proposal that research done on v1:"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier; no research cards, folders or scripts until D1 and D2  [CONVERSATION 2026-10-13 Dainius, "Close those twelve items, then approve."]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- S-1 is still Dainius's decision: entry 191 records "S-1 (Kai to recommend; Dainius decides)". The entry-201 report recommends YES (full research before the frozen Master Plan, RAMS, ITP, ITC, LTQR; preliminary hazard and test work may proceed unfrozen); the v1 reviewer recommended RAMS wait only for Waves 0 and 1; Orion's v3 D4 recommends deciding after Waves 1a and 1b  [CMD `grep -n S-1 kai-pm/HANDOFF_LOG.md` → lines 75632, 76476]
+- Live-privacy question for Dainius: is any KAI instance running anywhere? If so, per the repository it writes chat samples to /data/cognitive_fingerprint.jsonl in plaintext. Runtime UNKNOWN; no action taken  [FILE common/feature_flags.py:87]
+
+### 5. Incidents and corrections
+
+- Repository claims in the report, checked read-only on this branch: 8 of 8 found. Fingerprint flag default True (common/feature_flags.py:87; agentic/cognitive_fingerprint.py:15, :28; audit KAI-COGFOUND-038 HIGH). Graph forget lost on restart (kai-pm/CODE_AUDIT_BATCH_MEMORY_GRAPH.md:39). Unknown mode falls to PUB (common/prompt_templates.py:87-90; agentic/app.py:1552). Anti-annoyance bypass on failure (KAI-SUP-037). Caller-triggered confession (KAI-PERSONA-026, -028). Co-occurrence stored as causal edges (agentic/app.py:1922; KAI-COGFOUND-010). Ritual rule ≥7/10 (README.md:214). MARS consolidation 30+ s (docs/known_issues.md:96-97). These are repository statements and audits, not runtime observations  [CMD `git grep -n -i <claim patterns>` → 8/8 located]
+- Licences the report states, checked against PyPI's declared metadata (the projects' own declarations, fetched 2026-10-13): river BSD-3-Clause; ruptures BSD-2-Clause; dowhy MIT; sktime BSD 3-Clause; hdbscan BSD; mem0ai, graphiti-core, letta Apache-2.0; pgvector (Python client) MIT. 9 of 9 consistent. Not checked: the pgvector PostgreSQL extension, Lemonade, llama.cpp, whisper.cpp, gpt-oss, Qwen3-TTS, Microsoft Agent Framework; transitive dependencies; all "cite" sources (network-blocked and unresolvable tokens)  [CMD `curl https://pypi.org/pypi/<pkg>/json` → 9/9 consistent]
+- Propagated error of Orion's: the report lists "April" and "June v2.1" as census lineage (report lines 17, 560). Those names came from Orion's v1 (entry 192), written from memory, and were corrected in v2 (entry 195): no "April plan" document found; "v2.1" is an external tool proposal (D13). The report answers v1 only, so it inherited the error. Mechanism: a memory-written name in a producer's document became another producer's premise (R16, no cascaded memory authority). Ledger allocation is HELD, so recorded here only  [CMD `grep -n April|v2.1 kai_research_on_v1.txt` → lines 17, 560]
+- Correction of Orion's own working memory: the compaction summary said Dainius ruled "Full research is required before RAMS" in be2ddfbf. The banked record says S-1 is open (line 75632). The summary was wrong; the repository wins  [CMD `grep -n S-1 kai-pm/HANDOFF_LOG.md` → line 75632]
+- Items in the report that strengthen v3 (candidate v3.1, not yet written): three implementation states per card (PROMISED / CODE EVIDENCE / RUNTIME QUALIFIED); full independent review also for every card touching operator data or authority; expanded borrowing record (SBOM, provenance or signature, network and telemetry behaviour, privileges, rollback, removal)  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 6. Next authorised step
+
+- Report to Dainius in plain words; ask whether Orion writes v3.1 (v3 plus the report's strengthening and the three useful items from the entry-200 text) and posts it to Kai with the April/v2.1 correction  [CONVERSATION 2026-10-13 Dainius, "He didn’t see your proposal that research done on v1:"]
+
+### 7. What I am unsure of
+
+- Whether a KAI instance is running anywhere, and so whether the fingerprint collection is live  [FILE common/feature_flags.py:87]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
