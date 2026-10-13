@@ -80012,3 +80012,113 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-13T20:06:05Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-13T20:06:05Z  [CMD `date -u +%FT%TZ` → 2026-10-13T20:06:05Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: dac91d054f0d04ad6a91efeba590d8b237d5c754  [CMD `git rev-parse HEAD` → dac91d054f0d04ad6a91efeba590d8b237d5c754]
+- tree: e6644987e0b09523312383b715b8929f4a0438d1  [CMD `git rev-parse HEAD^{tree}` → e6644987e0b09523312383b715b8929f4a0438d1]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/project-rework-plan-pgvp35: dac91d054f0d04ad6a91efeba590d8b237d5c754  [CMD `git ls-remote --heads origin` → dac91d054f0d04ad6a91efeba590d8b237d5c754]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 208  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 208]
+
+### 1. The four states
+
+- physical: unchanged since entry 208 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: the hold of entry 208 is lifted for the checklist; Orion makes it and follows it one item at a time, within O-2 record and planning authority  [CONVERSATION 2026-10-13 Dainius, "Ruling :Yes make check list and follow through with this gpt is already doing what you’ve asked"]
+- evidence: the ruling, checklist ORION-CHECKLIST-1 and the note to Kai, verbatim in section 5  [CMD `cat .git/kai-ruling-capture/ebc04b22104c5914.json` → flagged keyword(ruling)]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-13 · make a checklist and follow it through; Kai (GPT) is already adjudicating, as asked. Verbatim in section 5 ⚠ UNBANKED  [CONVERSATION 2026-10-13 Dainius, "Ruling :Yes make check list and follow through with this gpt is already doing what you’ve asked"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier; no research cards, folders or scripts until D1 and D2; no fingerprint containment without Dainius's explicit authorisation  [CONVERSATION 2026-10-13 Dainius, "Do not treat that recommendation as new authority to alter source code, runtime settings or programme gates."]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Checklist item 1 IN PROGRESS: Kai's verdict on v3.1 + A1; Orion sends the owner's answers, then waits  [CONVERSATION 2026-10-13 Dainius, "gpt is already doing what you’ve asked"]
+
+### 5. Incidents and corrections
+
+- Relay-turn listing: newest DAI-10 comment is still Orion's 7c51178c; no Kai verdict yet  [CMD `list_comments DAI-10 limit 1` → 7c51178c]
+- Credential scans: ruling 0 hits; checklist and note 0 hits (calibration 6/6)  [CMD `credscan.py hold/cs_go.json; hold/cs2.json` → TOTAL HITS 0, 0]
+- EVIDENCE DAINIUS-RULING-CHECKLIST dainius_go.txt: 98 bytes, sha256 88435d6ace980e609f200217b565a65aae8353fadb187fbfed421e9966a000bb, final LF True (added by Orion)  [CMD `sha256sum dainius_go.txt` → 88435d6ace980e60…]
+    BEGIN-VERBATIM DAINIUS-RULING-CHECKLIST
+    Ruling :Yes make check list and follow through with this gpt is already doing what you’ve asked
+    END-VERBATIM DAINIUS-RULING-CHECKLIST
+- EVIDENCE ORION-CHECKLIST-1 CHECKLIST_1.md: 1673 bytes, sha256 944afa2aa447fdb08acb20b90bab05735ea686cebd42a489ff0df23c8b02c019, final LF True (added by Orion)  [CMD `sha256sum CHECKLIST_1.md` → 944afa2aa447fdb0…]
+    BEGIN-VERBATIM ORION-CHECKLIST-1
+    # Orion checklist 1 — research plan to approval, one item at a time
+    
+    Owner ruling 2026-10-13 (entry 209): "Yes make check list and follow through with this". One item at a time. An item closes only when its evidence is banked. Status changes are recorded in later handoff entries; this block is never edited.
+    
+    1. **Kai's verdict on the research plan** — IN PROGRESS (Kai is working on it, per Dainius).
+       - Orion: send Kai the owner's four answers from entry 208, then wait.
+       - Done when: Kai's verdict is banked word for word, and Orion's independent check of it is banked.
+    2. **DeepSeek challenge** — NEXT, after item 1.
+       - Orion prepares one review packet: v3.1 + A1 + Kai's verdict. Dainius sends it, or asks Orion to.
+       - Done when: the review is banked word for word; each finding has a disposition; one final text is banked.
+    3. **Owner decisions D1–D5** — after item 2.
+       - One decision per message, each explained in plain words with a recommendation.
+       - The D3 use model is already answered: KAI is never sold.
+       - Done when: each decision is banked in Dainius's own words.
+    4. **Fingerprint feature** — before KAI first runs on the laptop.
+       - Fix it or switch it off. Needs Dainius's explicit authorisation when engineering resumes.
+       - Done when: the authorisation is banked, the change is made, and a negative test proves no samples are written.
+    5. **Miro** — later.
+       - Kai makes the 8 approved cosmetic edits; Orion checks that exactly those 8 changed.
+       - Orion re-reviews Kai's third pass (110 connections).
+    6. **Open items F7 and F12** — later.
+    
+    Standing: remind Dainius about the current-state index when its trigger is met.
+    END-VERBATIM ORION-CHECKLIST-1
+- EVIDENCE ORION-NOTE-OWNER-ANSWERS kai_answers_post.md: 1292 bytes, sha256 cc7c4e7588dcbe57a1a1ec29a9420c68b467506326c84dcb5a148d4aa19efa54, final LF True (added by Orion)  [CMD `sha256sum kai_answers_post.md` → cc7c4e7588dcbe57…]
+    BEGIN-VERBATIM ORION-NOTE-OWNER-ANSWERS
+    # Owner answers relevant to v3.1 and A1
+    
+    **ORION → KAI | for your adjudication of v3.1 (02d6cc2d) and A1 (7c51178c) | record only | 2026-10-13**
+    Dainius's own words are banked in entry 208. His four answers:
+    
+    1. **Use model (v3.1 §4, D3):** "Kai will never get sold". Licence obligations are assessed for single-owner, never-distributed use. D3 itself (the licence rules) is still his decision.
+    2. **Target device:** "Kai will run on my laptop", the device in the specification. My reading, unverified: KAI is not running anywhere today. So the fingerprint finding is a design defect to fix or switch off before the first run, not a live leak. Logged as checklist item 4. No containment action is authorised.
+    3. **"April" vision document:** "can't find April doc". Under v3.1 Annex A it becomes a named open item: searched by the owner, not found. Wave 0 may close on it only with your adjudication.
+    4. **Reviews:** DeepSeek performs the adversarial reviews, at Dainius's or my request. This confirms the author of the two "DS-" reviews (entries 194 and 197). Under v3.1 §10, the one independent challenge goes to DeepSeek after your verdict.
+    
+    Order agreed by Dainius (entry 209, checklist ORION-CHECKLIST-1): your verdict → DeepSeek challenge → his decisions D1–D5, one at a time.
+    END-VERBATIM ORION-NOTE-OWNER-ANSWERS
+
+### 6. Next authorised step
+
+- Post block ORION-NOTE-OWNER-ANSWERS to DAI-10 (posted == banked); then wait for Kai's verdict (checklist item 1)  [CONVERSATION 2026-10-13 Dainius, "follow through with this"]
+
+### 7. What I am unsure of
+
+- Nothing new  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
