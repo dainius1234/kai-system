@@ -79711,3 +79711,158 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-13T19:57:39Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-13T19:57:39Z  [CMD `date -u +%FT%TZ` → 2026-10-13T19:57:39Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: a29fc14e5be66d618fa3fd62c9cf3b33749b6306  [CMD `git rev-parse HEAD` → a29fc14e5be66d618fa3fd62c9cf3b33749b6306]
+- tree: 265cf2d180781e6486e04ca37cfe32d9a060b50c  [CMD `git rev-parse HEAD^{tree}` → 265cf2d180781e6486e04ca37cfe32d9a060b50c]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: a29fc14e5be66d618fa3fd62c9cf3b33749b6306  [CMD `git ls-remote --heads origin` → a29fc14e5be66d618fa3fd62c9cf3b33749b6306]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 205  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 205]
+
+### 1. The four states
+
+- physical: unchanged since entry 205 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: verbatim capture (O-2 record authority) and a bounded planning amendment under v3.1 §10  [CONVERSATION 2026-10-13 Dainius, "research must find credible solutions, not merely catalogue faults"]
+- evidence: the relayed principle and amendment A1, verbatim in section 5  [CMD `cat .git/kai-ruling-capture/20206808f31b7182.json` → flagged long(1106), keyword(implementations)]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Gold Tier principle, relayed by Dainius without covering words (voice reads as Kai's; author UNVERIFIED): KAI preserves the intended vision and capabilities, not poor implementations, obsolete libraries, empty feature names or historical mistakes; research must establish what was intended, what exists (genuine, partial, simulated, name only) and how to reach Gold Tier; substantial reconstruction may be recommended where necessary; research must find credible solutions. Verbatim in section 5 ⚠ UNBANKED  [CONVERSATION 2026-10-13 Dainius, "The principle of evolution rather than reinvention is not a requirement to preserve defective engineering."]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier; no research cards, folders or scripts until D1 and D2; no fingerprint containment without Dainius's explicit authorisation  [CONVERSATION 2026-10-13 Dainius, "Do not treat that recommendation as new authority to alter source code, runtime settings or programme gates."]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- For Kai: whether the frozen disposition vocabulary needs a REDESIGN term (Orion recommends no; D351 line 120 already allows a replaced backend)  [FILE kai-pm/D351_EVOLUTION_NOT_REDESIGN_AND_PRESENTATION_BAR_CORRECTION.md:120]
+
+### 5. Incidents and corrections
+
+- Consistency with D351, checked: D351 keeps "the default is not replacement" (line 125), allows "replace immature internals behind stable concepts/interfaces" (line 38) and "have its backend replaced" (line 120), and lists nine evidence conditions for major structural change (lines 129–137). The principle fits D351 read in full; A1-4 ties every rebuild recommendation to those conditions  [CMD `sed -n 30,40p; 112,140p D351_…md` → lines 38, 120, 125, 127–137]
+- Frozen disposition vocabulary located: 11 terms, KEEP … UNVERIFIED (handoff log line 58095, Amendment A2; restated at line 59469); it has no REPLACE or REDESIGN term  [CMD `grep -n "REJECT WITH RECORDED REASON" kai-pm/HANDOFF_LOG.md` → 58095, 59469]
+- Credential scans: principle 0 hits; A1 0 hits (calibration 6/6 each)  [CMD `credscan.py a1/cs.json; a1/cs_a1.json` → TOTAL HITS 0, 0]
+- EVIDENCE GOLD-TIER-PRINCIPLE-RELAY gold_tier_principle.txt: 1117 bytes, sha256 ef240a3d051ef1f22ce07ef2467d63b064123cb00b16d53f931db9b242d6ae2e, final LF True (added by Orion)  [CMD `sha256sum gold_tier_principle.txt` → ef240a3d051ef1f2…]
+    BEGIN-VERBATIM GOLD-TIER-PRINCIPLE-RELAY
+    Brother, that is a fundamental Kingsman requirement, and I agree with it.
+    
+    We preserve your vision and the capabilities KAI is meant to deliver—not poor implementations, obsolete libraries, empty feature names or historical mistakes.
+    
+    A feature appearing in the README, having a service named after it, or passing a superficial test does not make it Gold Tier.
+    
+    For every capability, I want the research to establish three different things:
+    
+    * What you intended: The actual behaviour and experience KAI should deliver.
+    * What exists: Whether the code genuinely implements that behaviour, partly implements it, simulates it, or merely carries its name.
+    * How to reach Gold Tier: Keep and harden what works; complete, redesign, merge or replace what does not—with technically justified solutions.
+    
+    We should be prepared to recommend substantial reconstruction where necessary. The principle of evolution rather than reinvention is not a requirement to preserve defective engineering.
+    
+    Most importantly, research must find credible solutions, not merely catalogue faults or produce attractive architecture diagrams.
+    END-VERBATIM GOLD-TIER-PRINCIPLE-RELAY
+- EVIDENCE ORION-V3-1-AMENDMENT-A1 V3_1_AMENDMENT_A1.md: 4408 bytes, sha256 a4a5406377c505e3fa52aa38f79f1f0e04cb4ba8b9dfb8ef438a744a601dd608, final LF True (added by Orion)  [CMD `sha256sum V3_1_AMENDMENT_A1.md` → a4a5406377c505e3…]
+    BEGIN-VERBATIM ORION-V3-1-AMENDMENT-A1
+    # v3.1 Amendment A1 — intended, existing, route to Gold Tier
+    
+    **ORION → KAI, DAINIUS | bounded amendment to v3.1 (entry 204, 02d6cc2d) | planning only | 2026-10-13**
+    Answers the Gold Tier principle relayed by Dainius (banked in entry 206). Under v3.1 §10 this is folded into the one final text; it is not a v3.2.
+    
+    ## In plain words
+    
+    The principle: KAI keeps Dainius's vision, not bad code that happens to carry the right name. v3.1 already keeps "promised", "code", "proven working" and "gap" apart. Four things were still missing:
+    1. a plain statement of the experience Dainius actually wants, separate from source quotes;
+    2. one honest label for what the code really does: genuine, partial, simulated, name only, or missing;
+    3. a rule that research must bring a credible way to close the gap, not just a list of faults;
+    4. a rule for when a rebuild is justified.
+    
+    Site version: the survey must not stop at the snag list. Each snag needs a proposed remedy with a reason it will work.
+    
+    ## A1-1 Intended behaviour
+    
+    New card field `intended_behaviour`: in plain words, what KAI should do and what using it should feel like. It is built from the `promised` sources and owner rulings, and cites them. It is not a quote, and it is never inferred from what the code happens to do.
+    
+    ## A1-2 What the code really does
+    
+    New card field `implementation_state`, with evidence (code references) and, where needed, a search record:
+    
+    | Value | Meaning |
+    |---|---|
+    | GENUINE | the code implements the intended behaviour (runtime may still be NOT_OBSERVED) |
+    | PARTIAL | the code implements part of it; the missing part is named in `gap_to_promise` |
+    | SIMULATED | the code produces plausible output without doing the behaviour: fixed defaults, stubs, readiness reported while the core is a stub |
+    | NAME_ONLY | a service, flag, file or README row carries the name; the behaviour is not there |
+    | ABSENT | searched; nothing found (search record required) |
+    | UNKNOWN | searched; the evidence does not settle it (search record required) |
+    
+    A README marker, a feature flag or a passing test never sets GENUINE on its own.
+    
+    ## A1-3 Research must bring a solution
+    
+    A card whose `implementation_state` is not GENUINE, or which lists `known_defects`, may be DONE only if at least one recommendation:
+    - states a concrete route that closes the gap (approach, scope, what changes);
+    - gives evidence that the route can work: a world offer with its evidence, a published method, or a KAI test plan with research test IDs;
+    - carries a falsifier.
+    
+    RESEARCH/WATCH alone does not meet this rule. If no credible route can be found, the card is BLOCKED with the reason; it is never DONE on a list of faults. A credible route is a candidate, not a choice: selection happens in the Master Plan.
+    
+    ## A1-4 When a rebuild is justified
+    
+    D351 sets the default as "not replacement" and allows "replace immature internals behind stable concepts/interfaces" (D351 line 38; "have its backend replaced", line 120). Major structural change needs evidence of one or more of the nine conditions at D351 lines 127–137. A recommendation that replaces, redesigns or rebuilds a mechanism must:
+    - name the D351 condition or conditions its evidence meets;
+    - keep the feature's intent, recorded in `intended_behaviour`;
+    - show zero loss of intended behaviour (frozen §10).
+    
+    No new disposition term is proposed. Rebuilding a mechanism while keeping the feature is expressed with the frozen vocabulary: HARDEN or FINISH with the replacement in its scope, or SUPERSEDED BY EVIDENCE for the old mechanism. For Kai to adjudicate: whether the frozen vocabulary needs a separate REDESIGN term. My recommendation is no, because D351 already covers it.
+    
+    ## A1-5 Machine check and calibration
+    
+    Annex C gains three failure conditions:
+    - `intended_behaviour` or `implementation_state` missing on a card past OPEN;
+    - ABSENT or UNKNOWN without a search record;
+    - a DONE card breaking A1-3, or a rebuild recommendation without a D351 condition.
+    
+    New known-positives (each must fail):
+    - a SIMULATED card marked DONE with only RESEARCH/WATCH;
+    - a NAME_ONLY card marked GENUINE on a README marker alone;
+    - a "replace" recommendation with no D351 condition.
+    
+    ## Not changed
+    
+    Waves, packages, gates, D1–D5 and the convergence rule are as in v3.1. Gold Tier is not certified on a card; a card supplies the evidence and the route, and admission is decided in the Master Plan.
+    END-VERBATIM ORION-V3-1-AMENDMENT-A1
+
+### 6. Next authorised step
+
+- Post A1 to Kai on DAI-10 (posted == banked); republish the owner page with A1 appended; report to Dainius in plain words  [CONVERSATION 2026-10-13 Dainius, "research must find credible solutions, not merely catalogue faults"]
+
+### 7. What I am unsure of
+
+- Who wrote the relayed principle (Kai's voice; not stated)  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
