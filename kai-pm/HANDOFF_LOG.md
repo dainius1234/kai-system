@@ -73868,3 +73868,1016 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+
+## HANDOFF 2026-10-13T16:30:47Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-13T16:30:47Z  [CMD `date -u +%FT%TZ` → 2026-10-13T16:30:47Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 90c4131c191fdad9f9aa01ee8c3bcc4ffb955d42  [CMD `git rev-parse HEAD` → 90c4131c191fdad9f9aa01ee8c3bcc4ffb955d42]
+- tree: 7226c03877786f642d3fc9cea2c9a3ea85540a32  [CMD `git rev-parse HEAD^{tree}` → 7226c03877786f642d3fc9cea2c9a3ea85540a32]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 90c4131c191fdad9f9aa01ee8c3bcc4ffb955d42  [CMD `git ls-remote --heads origin` → 90c4131c191fdad9f9aa01ee8c3bcc4ffb955d42]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 185  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 185]
+
+### 1. The four states
+
+- physical: unchanged since entry 185 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Orion's independent re-review of Kai's repaired Miro projection, read-only; no board change made  [CONVERSATION 2026-10-13 Dainius, "We now await Orion's evidence-based verdict—not automatic agreement."]
+- evidence: the finding register, the 43 per-card grades, the raw check outputs and the two board reads of 2026-10-13, all in section 5  [CMD `sha256sum gold_views_20261013.json` → see EVIDENCE lines]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None; this entry records Orion's re-review under the request banked in entry 185  [CONVERSATION 2026-10-13 Dainius, "We now await Orion's evidence-based verdict—not automatic agreement."]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE  [CONVERSATION 2026-10-13 Dainius, "The engineering pause, PRE-RAMS HOLD and PR #122 restrictions remain unchanged."]
+- HELD: Gold Tier certification; Orion's re-review disposition is cards ACCEPT WITH LIMITS, board AMEND, Gold Tier HOLD  [CONVERSATION 2026-10-13 Dainius, "Gold-tier acceptance is still pending."]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- For Kai: register items F4–F12 and the four PARTIAL cards  [FILE kai-pm/HANDOFF_LOG.md:1]
+- For Dainius: F13 (atlas O1–O4 title spelling and O5–O8 footer note), unanswered since entry 181  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 5. Incidents and corrections
+
+- Board measured: 828 items, 44 frames (34 at entry 183 plus 9 Gold Visuals and the Navigator)  [CMD `canvas_search re:data-type="frame"` → total_items 828, total_results 44]
+- RESULT, 43 repaired cards: SUPPORTED 35, PROPOSED ONLY (correctly labelled) 4, STILL PARTIAL 4, UNSUPPORTED 0. Review history kept: 2026-10-12 was S 21 / P 31 / N 12 of 64  [CMD `python3 -I grade 43 repaired cards` → TOTAL SUPPORTED 35, PARTIAL 4, PROPOSED ONLY 4]
+- MECHANICAL: 109 text changes, all on the 43 flagged cards (bodies) plus 64 footers and 2 titles; 76 distinct GitHub URLs, 0 broken; 29 of 29 Navigator targets correct; protocol mirror equals entry 139 (205/205 normalised lines); D359 mirror 418e8b89 confirmed Orion's (entry 160)  [CMD `python3 -I structural checks` → lost 0, added 0, changed 109; unresolved 0; 29 of 29]
+- MATERIAL OPEN FINDINGS: 100 diagram arrows with no per-arrow source (F7); Visual 5 shows the research migration sequence without the candidate label card V7.5 now carries (F8); README-claimed live features rituals, struggle detection, anti-annoyance and cognitive fingerprint have 0 matches in the 9 diagrams and the 8 Gold views (F11); evidence-class labels removed from all 21 accepted cards (F6)  [CMD `python3 -I gap coverage, text only` → 0 for rituals, struggle, annoy, fingerprint in both]
+- MY CORRECTIONS DURING THE REVIEW, both caught before reporting: (1) a coverage row counted "family" inside the font-family attribute (81 / 288); recounted on text content only (1 / 7); (2) an item count came out 45 against Kai's 54 because my script dropped one item per frame; 54 is correct. Both raw outputs are banked unedited below; (3) I first wrote report line 837 for the migration sequence; the full sequence is at line 971 (837 is a single "→ SHADOW" line); corrected in the register before banking  [CMD `python3 -I recount` → family 1 / 7; 9 × 5 + 9 = 54; report line 971]
+- Credential scan of the eight files banked below (calibrated 6/6, 0): TOTAL HITS 0  [CMD `credscan.py e186.json` → TOTAL HITS 0]
+- EVIDENCE ORION-GOLD-REREVIEW-REGISTER review2_register.md: 7866 bytes, sha256 c83bd334748c56264d6ca345f82d7d0853495605d5936ddfeea9c6c8e266c993, final LF True (added by Orion)  [CMD `sha256sum review2_register.md` → c83bd334748c5626…]
+    BEGIN-VERBATIM ORION-GOLD-REREVIEW-REGISTER
+    # Independent re-review — Miro Gold Architecture after Kai's repair, 2026-10-13
+    
+    Reviewer: Orion. Orion did not build Gold Design 1–8, Gold Visuals 1–9 or the
+    Navigator, but Orion did build atlas frames O9, O10, O11 and ENG, so checks
+    touching those are not independent. Subject: live board read 2026-10-13
+    (828 items, 44 frames): Gold Design 1–8 (288 items, 0 skipped) and Gold
+    Visuals 1–9 plus the Navigator (99 items, 0 skipped). Sources at commit
+    422bfb5797a2. Instrument: single-producer judgement of each card against both
+    of its sources, plus mechanical link, navigation and mirror checks. Not
+    independent corroboration.
+    
+    ## Disposition
+    
+    - Cards: ACCEPT WITH LIMITS. The repair is real: 0 of 43 repaired cards are
+      unsupported, and research content is now labelled as candidate.
+    - Board as a whole: AMEND (items F6–F11 below).
+    - Gold Tier: HOLD. Arrows are not sourced, several README-claimed live features
+      have no place in the "one KAI" diagrams, and nested obligations have no
+      acceptance path yet.
+    
+    ## Review history (kept, not overwritten)
+    
+    - 2026-10-12 (entry 183): S 21 · P 31 · N 12 of 64.
+    - 2026-10-13: of the 43 repaired cards — SUPPORTED 35 · PROPOSED ONLY, correctly
+      labelled 4 · STILL PARTIAL 4 · UNSUPPORTED 0. The 21 unchanged cards keep their
+      content support (wording unchanged; see F6 on their labels).
+    
+    ## Mechanical checks (all pass)
+    
+    - Text diff vs the entry-183 readback: 216 text boxes before and after, 0 lost,
+      0 added, 109 changed (43 bodies, 64 footers, 2 titles: V3.4, V7.5). Body
+      wording changed on exactly the 43 cards I graded P or N; no S card's body
+      changed. Matches Kai's 316cd9b5 count (109).
+    - Links: 168 hyperlinks (110 distinct) across the 8 views, 9 visuals and Navigator.
+      76 distinct GitHub URLs all resolve to a real file and line at 422bfb5;
+      0 point directly at the oversized HANDOFF_LOG.md.
+    - Navigation: 29 of 29 Navigator links land on the frame their label names.
+    - Protocol mirror (Linear 0fb99c6d4326) carries a "MIRROR OF FROZEN CANONICAL
+      COPY" banner naming entry 139, and equals the entry-139 block after Markdown
+      normalisation: 205 of 205 lines, 0 differing.
+    - D359 mirror: DAI-10 comment 418e8b89 is Orion's, posted == banked in entry 160.
+    - Kai's counts match the board: 115 Gold Design links, 16 Linear document
+      links, Navigator 45 items, visuals 54 items.
+    
+    ## Still partial (minimum fix)
+    
+    - V1.6 — "Dreams and imagination are design inputs, not observed events" is
+      not stated at README L172 or spec L124 (FP-INV-07 is about unknown states).
+      Fix: cite spec L510 ("stop self-generated claims becoming proof") or the v1.1
+      principle (entry 106, L84), or mark it PROPOSED PRINCIPLE.
+    - V2.1 — "348 distinct lines" is not in entry 167 (0 matches); it comes from
+      Kai's f53657c5, banked in entry 170. Fix: add that source.
+    - V4.8 — "Existing components are historical" contradicts README L462 (Ollama
+      is the current default) and D351 L141 ("Ollama/current model serving
+      remains"); speech engines are in neither link. Fix: "Ollama is the current
+      default and stays (README L462, D351 L141); other inference and speech
+      engines are research candidates (research mirror, entry 164)".
+    - V6.1 — "operator-confirmed learned state": the doctrine's learned state
+      (L139) is experience, relationships, preferences and more; only standing
+      instructions are operator-approved. Fix: "learned state (experience,
+      relationship history, preferences …)".
+    
+    ## Proposed only, correctly labelled
+    
+    V2.8 (stable IDs), V7.5 (staged migration; research report line 971),
+    V8.3 (assurance traceability), V8.4 (100-consume test; report lines 626 and 1311).
+    Report line numbers are lines of block KAI-RESEARCH-REPORT-LINEAR-48c39815
+    (entry 164).
+    
+    ## Findings register
+    
+    - F1 FIXED — navigation index exists; 29/29 targets correct.
+    - F2 FIXED — research content is no longer presented as specification on the cards.
+    - F3 FIXED — one response vocabulary: every card carries ACCEPT WITH LIMITS
+      or NEEDS EVIDENCE (frozen protocol §6).
+    - F4 OPEN (low) — mirror links open a whole document (research mirror 1,426
+      lines) with no section or line, so V7.5 and V8.4 do not say where in the
+      report their candidate is.
+    - F5 OPEN (low) — V2.8, V8.3 and V8.6 cite Assurance Pack v0.2 in Linear only;
+      its canonical copy exists (block ASSURANCE-PACK-V0-2-BFF57EBD, handoff entry 144)
+      but, unlike the other mirrors, the card does not name it.
+    - F6 OPEN (medium) — the old evidence-class labels were removed from all 21
+      accepted cards. Most still read as design; V1.2 ("Dainius retains final
+      authority…") and V3.1 ("senses register observations") now read as facts
+      about today's system. They are target invariants (spec FP-INV-04, §6.3).
+      Fix: add "TARGET DESIGN" or similar to those footers.
+    - F7 OPEN (high for Gold) — the 9 diagrams have 100 arrows and none carries
+      its own source; each diagram has two links at frame level. Visuals 1–4 say
+      conceptual / design candidate / planning; Visuals 5–9 carry no such label
+      (only the Navigator says "Diagrammatic integration, not deployed proof").
+    - F8 OPEN (medium) — contradiction: Visual 5 shows SHADOW / COMPARE and "Prove
+      old authority/writer route dead" as the migration flow, with no
+      research-candidate label, while card V7.5 now calls that sequence a research
+      candidate. Visual 5 links D351 (whole file) and DAI-10, not the report.
+      Visual 7 shows "Stable feature ID" as a flow step while V2.8 marks it PROPOSED.
+    - F9 OPEN (low) — 6 of 16 diagram GitHub anchors land on a blank, code-fence or
+      table-divider line (V4 spec L905, V6 doctrine L25, V7 README L160, V8 README
+      L178, V8 spec L853, V9 doctrine L25); 2 labels do not match their target
+      (V4 "data provenance contract" → spec L824 `ActionWorkflow`; V7
+      "Acceptance/qualification specification" → spec L1590 "Slice A — Advisory chat").
+    - F10 OPEN (medium) — Visual 9 "Limited essentials, NOT automatic succession"
+      and "not dead-man timers" have no source; the doctrine (L20) says only
+      "remain recoverable and maintainable when Dainius is temporarily
+      unavailable". Mark conceptual / UNKNOWN or cite.
+    - F11 OPEN (high for Gold) — missing joints. Text-only count, unit = matches:
+      across the 9 diagrams, 0 for MARS decay, failure clustering, boundary
+      recalibration, confession, PUB/WORK, emergent rituals, struggle detection,
+      anti-annoyance and cognitive fingerprint; across the 8 Gold views, 0 for
+      rituals, struggle, anti-annoyance and fingerprint. The README claims rituals
+      (flag ON), struggle and anti-annoyance (code present) and fingerprint
+      ("✅ Collecting"). They exist only as atlas cards, so the one-KAI picture
+      does not show where they join (proactive limits, operator-state sensing, data
+      collection and privacy).
+    - F12 OPEN — zero-loss (item D): the board correctly says the 104 / 356 / 348
+      figures are extractor-bounded. No acceptance path is yet recorded for the
+      nested obligations (daily dreaming, six phases, MARS, confession, future
+      projection, causal model, emotional/narrative continuity, PUB/WORK,
+      succession). Coverage stays OPEN.
+    - F13 OPEN (low, owner) — atlas O1–O4 titles "KINGSMan" and the O5–O8 footer
+      note (entry 181) are still awaiting Dainius.
+    
+    ## Limits
+    
+    - One reviewer; the S/P boundary is a judgement call. 4 PARTIAL is my count.
+    - Universe: the 8 Gold views, 9 visuals and Navigator; the 12 atlas frames only
+      for navigation. The 14 older top-of-board frames were not reviewed. Visual
+      legibility was not checked: the read tool returns structure, not pixels.
+    - Correction during this review: one coverage row first counted "family"
+      inside the font-family attribute (81 / 288); re-counted on text content only
+      (1 / 7). One item count first came out as 45 against Kai's 54; my script
+      dropped one item per frame; the correct count is 54.
+    END-VERBATIM ORION-GOLD-REREVIEW-REGISTER
+- EVIDENCE ORION-GOLD-REREVIEW-GRADES43 review2_grades43.txt: 3706 bytes, sha256 493d496499ece16896ff4078ce73da6390d7623a68ba2eb11595f8e77ff2cefc, final LF True (added by Orion)  [CMD `sha256sum review2_grades43.txt` → 493d496499ece168…]
+    BEGIN-VERBATIM ORION-GOLD-REREVIEW-GRADES43
+    Re-review grades, 2026-10-13, 43 repaired cards (Orion). Default SUPPORTED unless listed in the register.
+    V1.1 SUPPORTED | One continuous personal intelligence, not a collection of sovereign agents
+    V1.3 SUPPORTED | Every README feature survives replacement of its implementation
+    V1.5 SUPPORTED | Owner-authored values remain separate from workload identity
+    V1.6 PARTIAL | Dreams, imagination and inference are not observed reality
+    V1.7 SUPPORTED | Models, agent frameworks and inference runtimes are qualified tools
+    V1.8 SUPPORTED | D359 programme sequencing and PRE-RAMS hold stay in force
+    V2.1 PARTIAL | Machine-extracted 104 grouped features and 356 README references
+    V2.2 SUPPORTED | Soul, identity, feelings, confessions and the Ohana relationship
+    V2.3 SUPPORTED | Memory, relationship continuity and environmental awareness
+    V2.4 SUPPORTED | Reasoning, cognitive depth and independent specialist review
+    V2.5 SUPPORTED | Initiative, attention, governed hands and protection mechanisms
+    V2.6 SUPPORTED | Dream State, Agent-Evolver, skills and synthetic experience
+    V2.7 SUPPORTED | Continuity, offline stewardship, operator presence and engineering
+    V2.8 PROPOSED ONLY | A complete feature needs a source, mechanism, acceptance and retirement trail
+    V3.2 SUPPORTED | Evidence qualification constructs a temporal world state
+    V3.3 SUPPORTED | Autobiographical and emotional memory provides continuity
+    V3.4 SUPPORTED | Attention and Global Workspace form a unified context
+    V3.5 SUPPORTED | Six-phase Dream State produces explicitly synthetic hypotheses
+    V3.6 SUPPORTED | Causal simulation, future vision and watches produce useful initiative
+    V4.3 SUPPORTED | Current Tool Gate service and authority-bound actuator boundary
+    V4.5 SUPPORTED | Perception providers and world-state reducers need direct evidence
+    V4.6 SUPPORTED | Future service catalogue is a logical contract, not a build instruction
+    V4.7 SUPPORTED | ASUS Flow Z13 Strix Halo is an intended target, not proven readiness
+    V4.8 PARTIAL | Inference and speech engines must remain replaceable adapters
+    V5.5 SUPPORTED | Durable workflow state survives crashes, races and abandoned workers
+    V5.8 SUPPORTED | Restoration and key rotation must not resurrect old authority
+    V6.1 PARTIAL | Keep autobiographical episodes and relationship state source-qualified
+    V6.5 SUPPORTED | Six-phase Dream State can synthesise ideas without fabricating events
+    V6.6 SUPPORTED | Causal world model and future watches remain falsifiable hypotheses
+    V6.7 SUPPORTED | Privacy and succession distinguish owner, family and bystanders
+    V6.8 SUPPORTED | Backup recovery preserves history without resurrecting invalid consent
+    V7.2 SUPPORTED | Preserve mission and feature lineage across every technical replacement
+    V7.4 SUPPORTED | Compare current baseline and candidates under the same test subject
+    V7.5 PROPOSED ONLY | Research candidate: staged current-to-target migration
+    V7.6 SUPPORTED | Prefer specialists only where independent marginal value is proven
+    V7.8 SUPPORTED | Do not confuse release states with operator-facing features
+    V8.2 SUPPORTED | Calibrate architecture census E0 against seeded known omissions
+    V8.3 PROPOSED ONLY | Trace each feature to an inspection or test and witnessed evidence
+    V8.4 PROPOSED ONLY | Consequence test suite must include races and crash-after-consume
+    V8.5 SUPPORTED | Memory tests must defeat fabricated episodes and projection loss
+    V8.6 SUPPORTED | Hazards, assumptions, degraded modes and privacy precede release
+    V8.7 SUPPORTED | Recover KAI's identity, data and controls in an isolated restore drill
+    V8.8 SUPPORTED | D359 programme order cannot be reordered by this architecture map
+    TOTAL {'SUPPORTED': 35, 'PARTIAL': 4, 'PROPOSED ONLY': 4}
+    END-VERBATIM ORION-GOLD-REREVIEW-GRADES43
+- EVIDENCE ORION-GOLD-REREVIEW-STRUCTURAL structural_checks.txt: 7403 bytes, sha256 fbdd9540ac1e4a2bd61f8d7f9df0bf89599e661087292af9d5b8d811cf82aa14, final LF True (added by Orion)  [CMD `sha256sum structural_checks.txt` → fbdd9540ac1e4a2b…]
+    BEGIN-VERBATIM ORION-GOLD-REREVIEW-STRUCTURAL
+    == A. Gold Design text diff vs entry-183 readback
+    textAreas old 216 new 216 | lost 0 | added 0
+    changed 109
+    review labels: {'NEEDS EVIDENCE | INDEPENDENT RECHECK': 43, 'ACCEPT WITH LIMITS | SOURCE LINK SUPPORTED': 21}
+    cards with changed title/body/footer: Counter({(False, True, True): 41, (False, False, True): 21, (True, True, True): 2})
+    label vs my original grade mismatches: [] 0
+    bodies changed on S cards: []
+    P/N cards with body NOT changed: []
+    titles changed: ['V3.4', 'V7.5']
+    changed non-card textAreas: 0 []
+    
+    == B. Links
+    total href in gold+visuals+nav: 168 distinct 110
+    by host: Counter({'github.com': 106, 'linear.app': 33, 'miro.com': 29})
+    distinct GitHub URLs 76 | unresolved 0
+    GitHub files: Counter({'kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md': 55, 'README.md': 31, 'kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md': 7, 'kai-pm/D353_DEEP_RESEARCH_MATURATION_IMPLEMENTATION_REISSUE.md': 5, 'kai-pm/D351_EVOLUTION_NOT_REDESIGN_AND_PRESENTATION_BAR_CORRECTION.md': 4, 'kai-pm/DECISIONS.md': 2, 'kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md': 2})
+    HANDOFF_LOG direct links: 0
+    Linear URLs:
+       https://linear.app/kaidainius/document/kai-collaboration-communication-and-change-control-protocol-freeze-0fb99c6d4326 4
+       https://linear.app/kaidainius/document/kai-engineering-assurance-pack-v02-rams-itp-hold-witness-and-ltqr-4257673922a3 3
+       https://linear.app/kaidainius/document/kai-kingsman-professionalisation-research-report-2026-10-11-full-deep-f4a9bdc38106 4
+       https://linear.app/kaidainius/document/kai-readme-feature-universe-104-features-and-356-source-references-39a37c8c1f94 9
+       https://linear.app/kaidainius/issue/DAI-10/kingsman-canon-freeze-and-traceability-baseline 13
+    moveToWidget links 29 distinct 29 | targets that are board frames: 29 of 29
+    == C. Navigator label → target frame title
+      01 · One organism / feedback loop             → GOLD VISUAL 1 | One organism feedback loop
+      02 · Memory, dreams and identity              → GOLD VISUAL 2 | Memory, dreams and identity
+      03 · Trust and final-hand authority           → GOLD VISUAL 3 | Trust and final-hand authority
+      04 · Perception and qualified world state     → GOLD VISUAL 4 | Senses to qualified world state
+      05 · Current-to-target migration              → GOLD VISUAL 5 | Current-to-target migration and release
+      06 · Doctor, resilience and restoration       → GOLD VISUAL 6 | Doctor, resilience and restoration
+      07 · Zero-loss evidence and assurance         → GOLD VISUAL 7 | Zero-loss assurance and evidence
+      08 · One intelligence, specialist councils    → GOLD VISUAL 8 | One intelligence | Specialists and councils
+      09 · Lifelong KAI and succession              → GOLD VISUAL 9 | Lifelong KAI | Stewardship and continuity
+      01 · Constitution and operator ownership      → KINGSMAN GOLD DESIGN 1 | Constitution, mission and sovereign ownership
+      02 · Feature lineage and zero loss            → KINGSMAN GOLD DESIGN 2 | All 104 feature obligations and the zero-loss traceability contract
+      03 · Integrated experience and inner life     → KINGSMAN GOLD DESIGN 3 | One organism: continuous experience, inner life, thought and action
+      04 · Current vs proposed topology             → KINGSMAN GOLD DESIGN 4 | Current repository topology versus proposed technical system
+      05 · Trust boundaries and identities          → KINGSMAN GOLD DESIGN 5 | Trust boundaries, cryptographic identity and final-hand authority
+      06 · Memory, dreams and stewardship           → KINGSMAN GOLD DESIGN 6 | Memory truth, emotional continuity, dreams and family stewardship
+      07 · Evidence-driven migration                → KINGSMAN GOLD DESIGN 7 | Evidence-driven migration from current KAI to mature organism
+      08 · Verification and programme gates         → KINGSMAN GOLD DESIGN 8 | Verification matrix, hazard controls and bounded programme authority
+      O1 · Soul / Identity / Inner Life             → KINGSMan FEATURE ATLAS O1 | Soul / Identity / Inner Life
+      O2 · Memory / Relationship / Continuity       → KINGSMan FEATURE ATLAS O2 | Memory / Relationship / Continuity
+      O3 · Senses / World Awareness                 → KINGSMan FEATURE ATLAS O3 | Senses / World Awareness
+      O4 · Intelligence / Reasoning                 → KINGSMan FEATURE ATLAS O4 | Intelligence / Reasoning
+      O5 · Cognitive Depth / Specialists            → KINGSMAN FEATURE ATLAS O5 | Cognitive Depth / Specialists
+      O6 · Proactivity / Goals / Attention          → KINGSMAN FEATURE ATLAS O6 | Proactivity / Goals / Attention
+      O7 · Governed Hands / Capabilities            → KINGSMAN FEATURE ATLAS O7 | Governed Hands / Capabilities
+      O8 · Doctor / Resilience                      → KINGSMAN FEATURE ATLAS O8 | Immune System / Doctor / Resilience
+      O9 · Growth / Dream / Evolution               → KINGSMAN FEATURE ATLAS O9 | Growth / Dream / Evolution
+      O10 · Continuity / Stewardship                → KINGSMAN FEATURE ATLAS O10 | Continuity / Stewardship / Sustainability
+      O11 · Mission Control / Presence              → KINGSMAN FEATURE ATLAS O11 | Operator Relationship / Mission Control
+      ENG · Engineering / Assurance substrate       → KINGSMAN FEATURE ATLAS ENG | Engineering / Assurance substrate
+    
+    == D. DECISIONS / D351 / doctrine links
+      D351_EVOLUTION_NOT_REDESIGN_AND_PRESENTATION_BAR_CORRECTION.md#LNone (321 lines) → '# D351 — Evolution-Not-Redesign & Presentation-Bar Correction'
+      D351_EVOLUTION_NOT_REDESIGN_AND_PRESENTATION_BAR_CORRECTION.md#L106 (321 lines) → '## 4. Default assumption for current infrastructure'
+      D351_EVOLUTION_NOT_REDESIGN_AND_PRESENTATION_BAR_CORRECTION.md#L108 (321 lines) → 'Until E0 evidence proves otherwise, the planning default becomes:'
+      D351_EVOLUTION_NOT_REDESIGN_AND_PRESENTATION_BAR_CORRECTION.md#L141 (321 lines) → '## 5. Likely architecture change magnitude'
+      DECISIONS.md#L30275 (39454 lines) → '## D359 — CANONICAL PROGRAMME ORDER, adopted prospectively; post-freeze'
+      KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md#L5 (112 lines) → '## Current architecture review order'
+      KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md#L103 (450 lines) → '## 4. Three classes of continuity state'
+      KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md#L139 (450 lines) → '### C. Learned state'
+      KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md#L249 (450 lines) → '## 9. Continuity / lineage test'
+      KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md#L25 (450 lines) → ''
+      KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md#L32 (450 lines) → '## 2. Kai is the organism, not a component'
+      KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md#L322 (450 lines) → '## 12. Succession serves continuity, not ownership confusion'
+    == E. Protocol mirror vs entry-139 block: canonical sha256 bee46631a9842889 18817 bytes
+    normalised lines: canonical 205 mirror (banner removed) 205 | differing lines 0
+    mirror banner present: True | updatedAt 2026-10-09T19:18:11.723Z
+    == F. Kai's figures vs measured
+    Gold Design hrefs: 115 (Kai: 115 source-link anchors) | Linear anchors: 27 (Kai: 16) | linear documents only: 16
+    Navigator items (textArea+rect, excl. frame): 44 +1 frame = 45 (Kai: 44 in a73972c5, 45 in 316cd9b5) | hrefs: 35 (Kai a73972c5: 32)
+    Visual frames child items: 36 + 9 frames = 45 (Kai: 54 items)
+    END-VERBATIM ORION-GOLD-REREVIEW-STRUCTURAL
+- EVIDENCE ORION-GOLD-REREVIEW-DIAGRAMS diagram_checks.txt: 5239 bytes, sha256 efa756d0ea5241991a76c85bd51121b1aea0cd0ab5f447b00dd2e88512fcd9f1, final LF True (added by Orion)  [CMD `sha256sum diagram_checks.txt` → efa756d0ea524199…]
+    BEGIN-VERBATIM ORION-GOLD-REREVIEW-DIAGRAMS
+    == GOLD VISUAL 1 | One organism feedback loop | edges 14 | subtitle: Conceptual design. Synthetic experience remains epistemically separate from real observations.
+       link README.md#L161 → '### Soul & Inner Life'
+       link kai-kingsman-professionalisation-research-report-2026-10-11-
+    == GOLD VISUAL 2 | Memory, dreams and identity | edges 13 | subtitle: Design candidate • one source writer; all dreams and forecasts retain synthetic provenance
+       link README.md#L172 → '| **Dream State** | 6-phase offline consolidation — failure clustering, boundary recalibration, MARS memory decay |'
+       link KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L636 → '### `memory-service`'
+    == GOLD VISUAL 3 | Trust and final-hand authority | edges 12 | subtitle: Planning contract • identity, proposal, permission and effects are distinct
+       link KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L872 → '    G-->>E: Advisory response with uncertainty'
+       link KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L896 → '    A->>T: Signed expiring ApprovalRecord'
+    == GOLD VISUAL 4 | Senses to qualified world state | edges 11 | subtitle: Plan / operational reality must be measured • stale knowledge never becomes false certainty
+       link KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L905 → '```'
+       link KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L824 → '- `ActionWorkflow`'
+    == GOLD VISUAL 5 | Current-to-target migration and release | edges 10 | subtitle: Architecture dependency is NOT programme permission • D359 and owner decisions govern work
+       link D351_EVOLUTION_NOT_REDESIGN_AND_PRESENTATION_BAR_CORRECTION.md#L → '(whole file)'
+       link kingsman-canon-freeze-and-traceability-baseline
+    == GOLD VISUAL 6 | Doctor, resilience and restoration | edges 11 | subtitle: Recovery is a governed loop, not self-granted power • restored state must not revive old grants
+       link KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md#L25 → ''
+       link KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1621 → '- human approval during qualification;'
+    == GOLD VISUAL 7 | Zero-loss assurance and evidence | edges 10 | subtitle: Gold tier is evidenced capability, not card count or green badge • 104 grouped features are extractor-bounded
+       link README.md#L160 → ''
+       link KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1590 → '## Slice A — Advisory chat'
+    == GOLD VISUAL 8 | One intelligence | Specialists and councils | edges 9 | subtitle: Multiple replaceable cognitive roles, one coherent operator experience and one governed proposal
+       link README.md#L178 → '|---|---|'
+       link KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L853 → '```mermaid'
+    == GOLD VISUAL 9 | Lifelong KAI | Stewardship and continuity | edges 10 | subtitle: One-owner sovereign organism across changing models and vessels — continuity must be restored and proven
+       link KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md#L25 → ''
+       link README.md#L1366 → '**End-goal:** a fully offline, self-hosted sovereign AI companion — chat, memory, perception, voice, avatar — all gated '
+    TOTAL diagram edges: 100
+    doctrine L20-30: ['- remain recoverable and maintainable when Dainius is temporarily unavailable;', "- survive beyond Dainius's lifetime under an explicitly designed succession/gove", "- ultimately continue appropriate stewardship and protection for Dainius's daugh", '', 'In compact form:', '', '> **BUILD A KAI THAT CAN GROW WITH DAINIUS, CARE FOR HIM, PRESERVE WHAT MATTERS,', '', 'This is the mission that the Kingsman engineering standard exists to make credib', '', '---']
+    doctrine incapac/essential hits: []
+    == pass-2 gap families: present in 9 diagrams (node/subtitle text) | present in 8 Gold Design views
+      MARS / memory decay                           diagrams   0 | gold views   2
+      failure clustering                            diagrams   0 | gold views   1
+      boundary recalibration                        diagrams   0 | gold views   1
+      confession                                    diagrams   0 | gold views   2
+      causal world model                            diagrams   1 | gold views   4
+      PUB/WORK modes                                diagrams   0 | gold views   1
+      emergent rituals                              diagrams   0 | gold views   0
+      struggle detection                            diagrams   0 | gold views   0
+      anti-annoyance                                diagrams   0 | gold views   0
+      Temporal Projection (README: Live)            diagrams   1 | gold views   4
+      cognitive fingerprint (README: Collecting)    diagrams   0 | gold views   0
+      Ohana                                         diagrams   0 | gold views   4
+      emotion                                       diagrams   2 | gold views  10
+      dream                                         diagrams  13 | gold views  12
+      succession                                    diagrams   4 | gold views   2
+      family/visitors/bystanders                    diagrams  81 | gold views 288
+    CORRECTED row (text content only; the first count matched the 'font-family' attribute): family/visitors/bystanders diagrams 1 | gold views 7
+      diagram hits: ['Backups, keys, replay state, restore epoch, family stewardship need independent drills and']
+    END-VERBATIM ORION-GOLD-REREVIEW-DIAGRAMS
+- EVIDENCE ORION-GOLD-REREVIEW-GAPS gap_coverage_textonly.txt: 1047 bytes, sha256 04f4bda372144eb6aa240cb66a5261c757b7e633d97e1dab1a9df8614f3e30a3, final LF True (added by Orion)  [CMD `sha256sum gap_coverage_textonly.txt` → 04f4bda372144eb6…]
+    BEGIN-VERBATIM ORION-GOLD-REREVIEW-GAPS
+    Coverage by text content only (textArea text + diagram source; URLs and attributes removed). Unit = matches.
+      MARS / memory decay              9 diagrams  0 | 8 Gold views  1
+      failure clustering               9 diagrams  0 | 8 Gold views  1
+      boundary recalibration           9 diagrams  0 | 8 Gold views  1
+      confession                       9 diagrams  0 | 8 Gold views  2
+      causal world model               9 diagrams  1 | 8 Gold views  4
+      PUB/WORK modes                   9 diagrams  0 | 8 Gold views  1
+      emergent rituals                 9 diagrams  0 | 8 Gold views  0
+      struggle detection               9 diagrams  0 | 8 Gold views  0
+      anti-annoyance                   9 diagrams  0 | 8 Gold views  0
+      Temporal Projection / forecast   9 diagrams  1 | 8 Gold views  4
+      cognitive fingerprint            9 diagrams  0 | 8 Gold views  0
+      Ohana                            9 diagrams  0 | 8 Gold views  4
+      succession                       9 diagrams  4 | 8 Gold views  2
+      family/visitors/bystanders       9 diagrams  1 | 8 Gold views  7
+    END-VERBATIM ORION-GOLD-REREVIEW-GAPS
+- EVIDENCE ORION-GOLD-REREVIEW-S21 s21_check.txt: 3546 bytes, sha256 4a50060705d8684e35d62e0d73f4bb011909d86ea41d12daf01751853bf30a5a, final LF True (added by Orion)  [CMD `sha256sum s21_check.txt` → 4a50060705d8684e…]
+    BEGIN-VERBATIM ORION-GOLD-REREVIEW-S21
+    V1.2 old class [ARCHITECTURE INVARIANT] | evidence-class label kept: False | body/title hedged: False | Dainius retains final authority over consequential actions
+    V1.4 old class [TARGET DESIGN] | evidence-class label kept: False | body/title hedged: True | One Global Workspace coordinates thought without wielding tools
+    V3.1 old class [SOURCE-BOUND DESIGN] | evidence-class label kept: False | body/title hedged: False | Multimodal senses register observations, not instructions
+    V3.7 old class [AUTHORITY BOUNDARY] | evidence-class label kept: False | body/title hedged: True | One structured proposal enters the existing governed action pathway
+    V3.8 old class [VERIFICATION INVARIANT] | evidence-class label kept: False | body/title hedged: True | Independent observed outcome closes learning and evolution
+    V4.1 old class [REPOSITORY CLAIM] | evidence-class label kept: False | body/title hedged: True | Declared Docker Compose profiles are not validated live topology
+    V4.2 old class [REPOSITORY CLAIM] | evidence-class label kept: False | body/title hedged: False | Current agentic reasoning API and structured proposals
+    V4.4 old class [CURRENT STATE UNKNOWN] | evidence-class label kept: False | body/title hedged: False | Memory providers and Obsidian synchronization require writer census
+    V5.1 old class [SECURITY DESIGN] | evidence-class label kept: False | body/title hedged: True | Separate untrusted input, cognition, control and execution zones
+    V5.2 old class [WORKLOAD IDENTITY DESIGN] | evidence-class label kept: False | body/title hedged: False | Identify workloads cryptographically instead of trusting network location
+    V5.3 old class [OWNER AUTHORITY] | evidence-class label kept: False | body/title hedged: True | Only exact user approval or scoped grants can authorise consequences
+    V5.4 old class [FINAL-HAND INVARIANT] | evidence-class label kept: False | body/title hedged: True | Enforce and consume a one-use capability at the actual final hand
+    V5.6 old class [FAILURE MODE CONTROL] | evidence-class label kept: False | body/title hedged: True | Crash after possible side effect means outcome unknown, not automatic retry
+    V5.7 old class [EGRESS ENFORCEMENT] | evidence-class label kept: False | body/title hedged: True | Redirects and network egress must be checked again at execution
+    V6.2 old class [PROJECTION QUALIFICATION] | evidence-class label kept: False | body/title hedged: True | Derived summaries, graph and vector retrieval are not canonical facts
+    V6.3 old class [PRESERVED PRODUCT VISION] | evidence-class label kept: False | body/title hedged: False | Preserve emotional development, empathy, values and narrative identity
+    V6.4 old class [README STUB] | evidence-class label kept: False | body/title hedged: True | Global Workspace selects salient experiences for unified thought
+    V7.1 old class [CURRENT-EVIDENCE GATE] | evidence-class label kept: False | body/title hedged: True | Start from exact repository facts, not old architecture diagrams
+    V7.3 old class [TARGET CONTRACT] | evidence-class label kept: False | body/title hedged: True | Own the contracts for evidence, memory, models and consequence authority
+    V7.7 old class [MONOTONIC SAFETY] | evidence-class label kept: False | body/title hedged: True | Never roll back to weaker identity or resurrect unsafe authority
+    V8.1 old class [AUTHORITY HIERARCHY] | evidence-class label kept: False | body/title hedged: False | The evidence hierarchy distinguishes plans, implementation and authority
+    S cards whose evidence-class label was removed: 21 of 21
+    END-VERBATIM ORION-GOLD-REREVIEW-S21
+- EVIDENCE MIRO-GOLD-VIEWS-READBACK-20261013 gold_views_20261013.svg: 107762 bytes, sha256 d46d31af51f3324ec41ac25ef6fa976e56840f04e446c7275f4854387d61c8b4, final LF True (added by Orion)  [CMD `sha256sum gold_views_20261013.svg` → d46d31af51f3324e…]
+    BEGIN-VERBATIM MIRO-GOLD-VIEWS-READBACK-20261013
+    <svg viewBox="0 0 3840 2160" xmlns="http://www.w3.org/2000/svg">
+    <g id="m3458764686859515286" data-miro-id="3458764686859515286" transform="translate(100,17900)" data-frame="KINGSMAN GOLD DESIGN 1 | Constitution, mission and sovereign ownership">
+    <rect data-type="frame" x="0" y="0" width="3400" height="3450" fill="#ffffff" data-title="KINGSMAN GOLD DESIGN 1 | Constitution, mission and sovereign ownership" />
+    <textArea id="m3458764686859515294" data-miro-id="3458764686859515294" x="64" y="65" width="3270" height="61" fill="#1a1a1a" font-family="noto_sans" font-size="43" text-align="left" font-weight="bold">Constitution, mission and sovereign ownership</textArea>
+    <textArea id="m3458764686859515296" data-miro-id="3458764686859515296" x="64" y="164.5" width="3220" height="36" fill="#595959" font-family="noto_sans" font-size="25" text-align="left">Verified document lineage; mission and requirements are stable, implementations remain replaceable</textArea>
+    <rect id="m3458764686859515297" data-miro-id="3458764686859515297" x="64" y="310" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515298" data-miro-id="3458764686859515298" x="94" y="338" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">One continuous personal intelligence, not a collection of sovereign agents</textArea>
+    <textArea id="m3458764686859515299" data-miro-id="3458764686859515299" x="94" y="463.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">The mission preserves one KAI identity, learned relationships and history through replacement of models and services. This is a product objective, not proof of implemented continuity.</textArea>
+    <textArea id="m3458764686859515300" data-miro-id="3458764686859515300" x="94" y="834.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md#L32"&gt;M L32&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L49"&gt;S L49&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859515301" data-miro-id="3458764686859515301" x="1729" y="310" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515302" data-miro-id="3458764686859515302" x="1759" y="338" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Dainius retains final authority over consequential actions</textArea>
+    <textArea id="m3458764686859515303" data-miro-id="3458764686859515303" x="1759" y="464" width="1540" height="68" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">Authenticated and operation-specific owner approval or a valid scoped autonomy grant is required. An ordinary chat response, specialist recommendation or emotional inference does not constitute an approval.</textArea>
+    <textArea id="m3458764686859515304" data-miro-id="3458764686859515304" x="1759" y="834.5" width="1540" height="63" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L112"&gt;GitHub Product Architecture Specification · line 112&lt;/a&gt;&lt;br /&gt;REVIEW: ACCEPT WITH LIMITS | SOURCE LINK SUPPORTED</textArea>
+    <rect id="m3458764686859515306" data-miro-id="3458764686859515306" x="64" y="1040" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515307" data-miro-id="3458764686859515307" x="94" y="1068" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Every README feature survives replacement of its implementation</textArea>
+    <textArea id="m3458764686859515308" data-miro-id="3458764686859515308" x="94" y="1193.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">The frozen protocol requires an explicit disposition before a feature is lost. The generator reports 104 groups; nested and prose-only features still need acceptance mapping.</textArea>
+    <textArea id="m3458764686859515309" data-miro-id="3458764686859515309" x="94" y="1564.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://linear.app/kaidainius/document/kai-collaboration-communication-and-change-control-protocol-freeze-0fb99c6d4326"&gt;Protocol mirror [GH H#139]&lt;/a&gt; · &lt;a href="https://linear.app/kaidainius/document/kai-readme-feature-universe-104-features-and-356-source-references-39a37c8c1f94"&gt;Feature mirror [GH H#167]&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859515310" data-miro-id="3458764686859515310" x="1729" y="1040" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515311" data-miro-id="3458764686859515311" x="1759" y="1068" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">One Global Workspace coordinates thought without wielding tools</textArea>
+    <textArea id="m3458764686859515312" data-miro-id="3458764686859515312" x="1759" y="1194" width="1540" height="68" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">The proposed cognitive coordinator may compare evidence and assemble proposals; it does not hold actuator secrets, mint capabilities, execute mutations or become a second KAI identity.</textArea>
+    <textArea id="m3458764686859515313" data-miro-id="3458764686859515313" x="1759" y="1564.5" width="1540" height="63" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L108"&gt;GitHub Product Architecture Specification · line 108&lt;/a&gt;&lt;br /&gt;REVIEW: ACCEPT WITH LIMITS | SOURCE LINK SUPPORTED</textArea>
+    <rect id="m3458764686859515314" data-miro-id="3458764686859515314" x="64" y="1770" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515315" data-miro-id="3458764686859515315" x="94" y="1798" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Owner-authored values remain separate from workload identity</textArea>
+    <textArea id="m3458764686859515316" data-miro-id="3458764686859515316" x="94" y="1923.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">Ohana and owner values inform reasoning but cannot authenticate a caller or grant capabilities. Workload authentication and consequential approval remain distinct controls.</textArea>
+    <textArea id="m3458764686859515317" data-miro-id="3458764686859515317" x="94" y="2294.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1081"&gt;S L1081&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1126"&gt;S L1126&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859515318" data-miro-id="3458764686859515318" x="1729" y="1770" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515319" data-miro-id="3458764686859515319" x="1759" y="1798" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Dreams, imagination and inference are not observed reality</textArea>
+    <textArea id="m3458764686859515320" data-miro-id="3458764686859515320" x="1759" y="1923.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">Dreams and imagination are design inputs, not observed events. Proposed memory admission must preserve synthetic origins and the distinction between qualified facts and UNKNOWN.</textArea>
+    <textArea id="m3458764686859515321" data-miro-id="3458764686859515321" x="1759" y="2294.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L172"&gt;R L172&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L124"&gt;S L124&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859515322" data-miro-id="3458764686859515322" x="64" y="2500" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515323" data-miro-id="3458764686859515323" x="94" y="2528" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Models, agent frameworks and inference runtimes are qualified tools</textArea>
+    <textArea id="m3458764686859515324" data-miro-id="3458764686859515324" x="94" y="2653.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">Target design requires role-qualified models and benchmarks. Which runtime, model and prompt combination is best remains subject to exact-hardware evaluation, not vendor claims.</textArea>
+    <textArea id="m3458764686859515325" data-miro-id="3458764686859515325" x="94" y="3024.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1030"&gt;S L1030&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1687"&gt;S L1687&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859515326" data-miro-id="3458764686859515326" x="1729" y="2500" width="1610" height="660" rx="12" fill="#fff5ed" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#f8d3af" />
+    <textArea id="m3458764686859515327" data-miro-id="3458764686859515327" x="1759" y="2528" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">D359 programme sequencing and PRE-RAMS hold stay in force</textArea>
+    <textArea id="m3458764686859515328" data-miro-id="3458764686859515328" x="1759" y="2653.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">D359 governs sequencing; PRE-RAMS HOLD and PR #122 restrictions remain in coordination records. A Miro view grants no implementation or release authority.</textArea>
+    <textArea id="m3458764686859515329" data-miro-id="3458764686859515329" x="1759" y="3024.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/DECISIONS.md#L30275"&gt;DEC L30275&lt;/a&gt; · &lt;a href="https://linear.app/kaidainius/issue/DAI-10/kingsman-canon-freeze-and-traceability-baseline"&gt;Linear DAI-10 hold&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <textArea id="m3458764686859515330" data-miro-id="3458764686859515330" x="64" y="3320" width="3200" height="33" fill="#305bab" font-family="noto_sans" font-size="23" text-align="left">&lt;a href="https://linear.app/kaidainius/issue/DAI-10/kingsman-canon-freeze-and-traceability-baseline"&gt;Research and adjudication record in Linear DAI-10&lt;/a&gt; · GitHub exact commit 422bfb5797a2 · Engineering hold remains</textArea>
+    </g>
+    <g id="m3458764686859515287" data-miro-id="3458764686859515287" transform="translate(3620,17900)" data-frame="KINGSMAN GOLD DESIGN 2 | All 104 feature obligations and the zero-loss traceability contract">
+    <rect data-type="frame" x="0" y="0" width="3400" height="3450" fill="#ffffff" data-title="KINGSMAN GOLD DESIGN 2 | All 104 feature obligations and the zero-loss traceability contract" />
+    <textArea id="m3458764686859515331" data-miro-id="3458764686859515331" x="64" y="65" width="3270" height="61" fill="#1a1a1a" font-family="noto_sans" font-size="43" text-align="left" font-weight="bold">All 104 feature obligations and the zero-loss traceability contract</textArea>
+    <textArea id="m3458764686859515332" data-miro-id="3458764686859515332" x="64" y="164.5" width="3220" height="36" fill="#595959" font-family="noto_sans" font-size="25" text-align="left">Linked to the twelve live feature-atlas frames; explicit coverage is not the same as runtime proof</textArea>
+    <rect id="m3458764686859515333" data-miro-id="3458764686859515333" x="64" y="310" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515334" data-miro-id="3458764686859515334" x="94" y="338" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Machine-extracted 104 grouped features and 356 README references</textArea>
+    <textArea id="m3458764686859515335" data-miro-id="3458764686859515335" x="94" y="464" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">The generated feature register reports 104 groups, 356 README occurrences and 348 distinct lines. It excludes prose-only abilities and does not demonstrate runtime.</textArea>
+    <textArea id="m3458764686859515336" data-miro-id="3458764686859515336" x="94" y="834.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://linear.app/kaidainius/document/kai-readme-feature-universe-104-features-and-356-source-references-39a37c8c1f94"&gt;Feature mirror [GH H#167]&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L141"&gt;R L141&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859515337" data-miro-id="3458764686859515337" x="1729" y="310" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515338" data-miro-id="3458764686859515338" x="1759" y="338" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Soul, identity, feelings, confessions and the Ohana relationship</textArea>
+    <textArea id="m3458764686859515339" data-miro-id="3458764686859515339" x="1759" y="463.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">README includes emotional memory, imagination, reflection, confession and narrative identity; Ohana and personality modes appear elsewhere. Atlas entries are lineage, not runtime proof.</textArea>
+    <textArea id="m3458764686859515340" data-miro-id="3458764686859515340" x="1759" y="834.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L161"&gt;R L161&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L1178"&gt;R L1178&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859515342" data-miro-id="3458764686859515342" x="64" y="1040" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515343" data-miro-id="3458764686859515343" x="94" y="1068" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Memory, relationship continuity and environmental awareness</textArea>
+    <textArea id="m3458764686859515344" data-miro-id="3458764686859515344" x="94" y="1193.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">README memory and sensory families cover memory stores, vault syncing and multi-sensor awareness. Combined feature numbering comes from the derived register, not a single table.</textArea>
+    <textArea id="m3458764686859515345" data-miro-id="3458764686859515345" x="94" y="1564.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://linear.app/kaidainius/document/kai-readme-feature-universe-104-features-and-356-source-references-39a37c8c1f94"&gt;Feature mirror [GH H#167]&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L219"&gt;R L219&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859515346" data-miro-id="3458764686859515346" x="1729" y="1040" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515347" data-miro-id="3458764686859515347" x="1759" y="1068" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Reasoning, cognitive depth and independent specialist review</textArea>
+    <textArea id="m3458764686859515348" data-miro-id="3458764686859515348" x="1759" y="1193.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">The cognitive inventory includes specialist councils, temporal forecasts, causal models and Global Workspace. Numbering is generated; runtime status remains unverified.</textArea>
+    <textArea id="m3458764686859515349" data-miro-id="3458764686859515349" x="1759" y="1564.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://linear.app/kaidainius/document/kai-readme-feature-universe-104-features-and-356-source-references-39a37c8c1f94"&gt;Feature mirror [GH H#167]&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L189"&gt;R L189&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859515350" data-miro-id="3458764686859515350" x="64" y="1770" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515351" data-miro-id="3458764686859515351" x="94" y="1798" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Initiative, attention, governed hands and protection mechanisms</textArea>
+    <textArea id="m3458764686859515352" data-miro-id="3458764686859515352" x="94" y="1923.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">The derived register spans initiative, attention, governed tools and resilience. README operator, security and House Doctor sections are distinct; no runtime release is implied.</textArea>
+    <textArea id="m3458764686859515353" data-miro-id="3458764686859515353" x="94" y="2294.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://linear.app/kaidainius/document/kai-readme-feature-universe-104-features-and-356-source-references-39a37c8c1f94"&gt;Feature mirror [GH H#167]&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L232"&gt;R L232&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859515354" data-miro-id="3458764686859515354" x="1729" y="1770" width="1610" height="660" rx="12" fill="#fff5ed" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#f8d3af" />
+    <textArea id="m3458764686859515355" data-miro-id="3458764686859515355" x="1759" y="1798" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Dream State, Agent-Evolver, skills and synthetic experience</textArea>
+    <textArea id="m3458764686859515356" data-miro-id="3458764686859515356" x="1759" y="1923.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">Dream State, synthetic experience, Agent-Evolver and skill lineage are distinct original features. Their nested capabilities and daily cadence require separate acceptance criteria.</textArea>
+    <textArea id="m3458764686859515357" data-miro-id="3458764686859515357" x="1759" y="2294.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L172"&gt;R L172&lt;/a&gt; · &lt;a href="https://linear.app/kaidainius/document/kai-readme-feature-universe-104-features-and-356-source-references-39a37c8c1f94"&gt;Feature mirror [GH H#167]&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859515358" data-miro-id="3458764686859515358" x="64" y="2500" width="1610" height="660" rx="12" fill="#fff5ed" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#f8d3af" />
+    <textArea id="m3458764686859515359" data-miro-id="3458764686859515359" x="94" y="2528" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Continuity, offline stewardship, operator presence and engineering</textArea>
+    <textArea id="m3458764686859515360" data-miro-id="3458764686859515360" x="94" y="2653.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">The generated register includes continuity, stewardship, voice, avatar, operator console and engineering. Operational readiness and exhaustive prose coverage remain open.</textArea>
+    <textArea id="m3458764686859515361" data-miro-id="3458764686859515361" x="94" y="3024.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://linear.app/kaidainius/document/kai-readme-feature-universe-104-features-and-356-source-references-39a37c8c1f94"&gt;Feature mirror [GH H#167]&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L1326"&gt;R L1326&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859515362" data-miro-id="3458764686859515362" x="1729" y="2500" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515364" data-miro-id="3458764686859515364" x="1759" y="2528" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">A complete feature needs a source, mechanism, acceptance and retirement trail</textArea>
+    <textArea id="m3458764686859515365" data-miro-id="3458764686859515365" x="1759" y="2652" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">PROPOSED: assign stable feature IDs, target homes and tests. Frozen zero-loss rules require dispositions, but do not themselves prove this matrix exists.</textArea>
+    <textArea id="m3458764686859515367" data-miro-id="3458764686859515367" x="1759" y="3024.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://linear.app/kaidainius/document/kai-collaboration-communication-and-change-control-protocol-freeze-0fb99c6d4326"&gt;Protocol mirror [GH H#139]&lt;/a&gt; · &lt;a href="https://linear.app/kaidainius/document/kai-engineering-assurance-pack-v02-rams-itp-hold-witness-and-ltqr-4257673922a3"&gt;Linear Assurance v0.2&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <textArea id="m3458764686859515368" data-miro-id="3458764686859515368" x="64" y="3320" width="3200" height="33" fill="#305bab" font-family="noto_sans" font-size="23" text-align="left">&lt;a href="https://linear.app/kaidainius/issue/DAI-10/kingsman-canon-freeze-and-traceability-baseline"&gt;Research and adjudication record in Linear DAI-10&lt;/a&gt; · GitHub exact commit 422bfb5797a2 · Engineering hold remains</textArea>
+    </g>
+    <g id="m3458764686859515288" data-miro-id="3458764686859515288" transform="translate(7140,17900)" data-frame="KINGSMAN GOLD DESIGN 3 | One organism: continuous experience, inner life, thought and action">
+    <rect data-type="frame" x="0" y="0" width="3400" height="3450" fill="#ffffff" data-title="KINGSMAN GOLD DESIGN 3 | One organism: continuous experience, inner life, thought and action" />
+    <textArea id="m3458764686859515369" data-miro-id="3458764686859515369" x="64" y="65" width="3270" height="61" fill="#1a1a1a" font-family="noto_sans" font-size="43" text-align="left" font-weight="bold">One organism: continuous experience, inner life, thought and action</textArea>
+    <textArea id="m3458764686859515370" data-miro-id="3458764686859515370" x="64" y="164.5" width="3220" height="36" fill="#595959" font-family="noto_sans" font-size="25" text-align="left">End-to-end conceptual flow with explicit truth classes and no alternate identity or authority path</textArea>
+    <rect id="m3458764686859515371" data-miro-id="3458764686859515371" x="64" y="310" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515372" data-miro-id="3458764686859515372" x="94" y="338" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Multimodal senses register observations, not instructions</textArea>
+    <textArea id="m3458764686859515373" data-miro-id="3458764686859515373" x="94" y="464" width="1540" height="68" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">Microphones, vision, screen, files, calendars and sensors feed a controlled ingress. A hostile webpage or spoken request in the environment remains content until its own authority is authenticated.</textArea>
+    <textArea id="m3458764686859515374" data-miro-id="3458764686859515374" x="94" y="834.5" width="1540" height="63" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L449"&gt;GitHub Product Architecture Specification · line 449&lt;/a&gt;&lt;br /&gt;REVIEW: ACCEPT WITH LIMITS | SOURCE LINK SUPPORTED</textArea>
+    <rect id="m3458764686859515375" data-miro-id="3458764686859515375" x="1729" y="310" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515376" data-miro-id="3458764686859515376" x="1759" y="338" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Evidence qualification constructs a temporal world state</textArea>
+    <textArea id="m3458764686859515377" data-miro-id="3458764686859515377" x="1759" y="463.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">Target perception workflow validates observation identity, freshness and provenance before deriving World State. Additional owner-assertion and conflict distinctions require qualification.</textArea>
+    <textArea id="m3458764686859515378" data-miro-id="3458764686859515378" x="1759" y="834.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L907"&gt;S L907&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L124"&gt;S L124&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859515379" data-miro-id="3458764686859515379" x="64" y="1040" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515380" data-miro-id="3458764686859515380" x="94" y="1068" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Autobiographical and emotional memory provides continuity</textArea>
+    <textArea id="m3458764686859515381" data-miro-id="3458764686859515381" x="94" y="1193.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">Primary mission preserves experiences, relationships and learned state. Proposed memory architecture tracks source lineage; emotional and autobiographical details need README reconciliation.</textArea>
+    <textArea id="m3458764686859515382" data-miro-id="3458764686859515382" x="94" y="1564.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md#L139"&gt;M L139&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L636"&gt;S L636&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859515383" data-miro-id="3458764686859515383" x="1729" y="1040" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515384" data-miro-id="3458764686859515384" x="1759" y="1068" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Attention and Global Workspace form a unified context</textArea>
+    <textArea id="m3458764686859515385" data-miro-id="3458764686859515385" x="1759" y="1193.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">README proposes Global Workspace salience selection and broadcast. The product design separately forbids the workspace from minting capabilities or becoming an action authority.</textArea>
+    <textArea id="m3458764686859515386" data-miro-id="3458764686859515386" x="1759" y="1564.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L203"&gt;R L203&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L108"&gt;S L108&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859515387" data-miro-id="3458764686859515387" x="64" y="1770" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515388" data-miro-id="3458764686859515388" x="94" y="1798" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Six-phase Dream State produces explicitly synthetic hypotheses</textArea>
+    <textArea id="m3458764686859515389" data-miro-id="3458764686859515389" x="94" y="1923.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">README Dream State lists failure clustering, boundary recalibration and memory decay, not proof of nightly running. Synthetic labelling and admission controls are proposed improvements.</textArea>
+    <textArea id="m3458764686859515390" data-miro-id="3458764686859515390" x="94" y="2294.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L172"&gt;R L172&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L124"&gt;S L124&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859515391" data-miro-id="3458764686859515391" x="1729" y="1770" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515392" data-miro-id="3458764686859515392" x="1759" y="1798" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Causal simulation, future vision and watches produce useful initiative</textArea>
+    <textArea id="m3458764686859515393" data-miro-id="3458764686859515393" x="1759" y="1923.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">D94 defines a four-branch ForecastFan. Watches, false-positive limits and forecast calibration are integration/test candidates; prediction is not evidence an event occurred.</textArea>
+    <textArea id="m3458764686859515394" data-miro-id="3458764686859515394" x="1759" y="2294.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L937"&gt;R L937&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L510"&gt;S L510&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859515395" data-miro-id="3458764686859515395" x="64" y="2500" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515396" data-miro-id="3458764686859515396" x="94" y="2528" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">One structured proposal enters the existing governed action pathway</textArea>
+    <textArea id="m3458764686859515397" data-miro-id="3458764686859515397" x="94" y="2654" width="1540" height="68" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">Specialists can generate candidate parameters, but the owner-approved proposal, policy decision and exact one-use capability determine which operation may reach the actual final hand.</textArea>
+    <textArea id="m3458764686859515398" data-miro-id="3458764686859515398" x="94" y="3024.5" width="1540" height="63" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L878"&gt;GitHub Product Architecture Specification · line 878&lt;/a&gt;&lt;br /&gt;REVIEW: ACCEPT WITH LIMITS | SOURCE LINK SUPPORTED</textArea>
+    <rect id="m3458764686859515401" data-miro-id="3458764686859515401" x="1729" y="2500" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515402" data-miro-id="3458764686859515402" x="1759" y="2528" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Independent observed outcome closes learning and evolution</textArea>
+    <textArea id="m3458764686859515403" data-miro-id="3458764686859515403" x="1759" y="2654" width="1540" height="68" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">Execution attempts, failures, uncertain receipts and actual externally verified results remain distinct. Only qualified outcomes may update calibration, autonomy reputation, trust or durable personal history.</textArea>
+    <textArea id="m3458764686859515404" data-miro-id="3458764686859515404" x="1759" y="3024.5" width="1540" height="63" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L510"&gt;GitHub Product Architecture Specification · line 510&lt;/a&gt;&lt;br /&gt;REVIEW: ACCEPT WITH LIMITS | SOURCE LINK SUPPORTED</textArea>
+    <textArea id="m3458764686859515405" data-miro-id="3458764686859515405" x="64" y="3320" width="3200" height="33" fill="#305bab" font-family="noto_sans" font-size="23" text-align="left">&lt;a href="https://linear.app/kaidainius/issue/DAI-10/kingsman-canon-freeze-and-traceability-baseline"&gt;Research and adjudication record in Linear DAI-10&lt;/a&gt; · GitHub exact commit 422bfb5797a2 · Engineering hold remains</textArea>
+    </g>
+    <g id="m3458764686859515289" data-miro-id="3458764686859515289" transform="translate(10660,17900)" data-frame="KINGSMAN GOLD DESIGN 4 | Current repository topology versus proposed technical system">
+    <rect data-type="frame" x="0" y="0" width="3400" height="3450" fill="#ffffff" data-title="KINGSMAN GOLD DESIGN 4 | Current repository topology versus proposed technical system" />
+    <textArea id="m3458764686859515406" data-miro-id="3458764686859515406" x="64" y="65" width="3270" height="61" fill="#1a1a1a" font-family="noto_sans" font-size="43" text-align="left" font-weight="bold">Current repository topology versus proposed technical system</textArea>
+    <textArea id="m3458764686859515407" data-miro-id="3458764686859515407" x="64" y="164.5" width="3220" height="36" fill="#595959" font-family="noto_sans" font-size="25" text-align="left">Current README claims, target specification and physical hardware are shown in different evidence classes</textArea>
+    <rect id="m3458764686859515408" data-miro-id="3458764686859515408" x="64" y="310" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515409" data-miro-id="3458764686859515409" x="94" y="338" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Declared Docker Compose profiles are not validated live topology</textArea>
+    <textArea id="m3458764686859515410" data-miro-id="3458764686859515410" x="94" y="464" width="1540" height="68" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">README documents minimal, full and sovereign deployment profiles with differing default-start services. An E0 census must use resolved Compose configuration, registered routes and running containers.</textArea>
+    <textArea id="m3458764686859515411" data-miro-id="3458764686859515411" x="94" y="834.5" width="1540" height="63" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L435"&gt;GitHub README · source line 435&lt;/a&gt;&lt;br /&gt;REVIEW: ACCEPT WITH LIMITS | SOURCE LINK SUPPORTED</textArea>
+    <rect id="m3458764686859515412" data-miro-id="3458764686859515412" x="1729" y="310" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515413" data-miro-id="3458764686859515413" x="1759" y="338" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Current agentic reasoning API and structured proposals</textArea>
+    <textArea id="m3458764686859515414" data-miro-id="3458764686859515414" x="1759" y="464" width="1540" height="68" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">The README lists the Agentic service and its route catalogue. Whether production paths match, which side effects are reachable and how authentication propagates require current-code/runtime inventory.</textArea>
+    <textArea id="m3458764686859515415" data-miro-id="3458764686859515415" x="1759" y="834.5" width="1540" height="63" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L1017"&gt;GitHub README · source line 1017&lt;/a&gt;&lt;br /&gt;REVIEW: ACCEPT WITH LIMITS | SOURCE LINK SUPPORTED</textArea>
+    <rect id="m3458764686859515416" data-miro-id="3458764686859515416" x="64" y="1040" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515417" data-miro-id="3458764686859515417" x="94" y="1068" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Current Tool Gate service and authority-bound actuator boundary</textArea>
+    <textArea id="m3458764686859515418" data-miro-id="3458764686859515418" x="94" y="1193.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">README documents Tool Gate's interface. Future design separately requires final-hand validation and one-use consumption. Current cutover and closure of legacy bypasses remain unverified.</textArea>
+    <textArea id="m3458764686859515419" data-miro-id="3458764686859515419" x="94" y="1564.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L1054"&gt;R L1054&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L116"&gt;S L116&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859515420" data-miro-id="3458764686859515420" x="1729" y="1040" width="1610" height="660" rx="12" fill="#fff5ed" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#f8d3af" />
+    <textArea id="m3458764686859515422" data-miro-id="3458764686859515422" x="1759" y="1068" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Memory providers and Obsidian synchronization require writer census</textArea>
+    <textArea id="m3458764686859515423" data-miro-id="3458764686859515423" x="1759" y="1194" width="1540" height="68" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">README lists Memu-Core and Vault-Sync; the architecture specifies memory and knowledge services. Current readers, writers and authoritative state ownership cannot be assumed from service names.</textArea>
+    <textArea id="m3458764686859515424" data-miro-id="3458764686859515424" x="1759" y="1564.5" width="1540" height="63" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L1069"&gt;GitHub README · source line 1069&lt;/a&gt;&lt;br /&gt;REVIEW: ACCEPT WITH LIMITS | SOURCE LINK SUPPORTED</textArea>
+    <rect id="m3458764686859515425" data-miro-id="3458764686859515425" x="64" y="1770" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515426" data-miro-id="3458764686859515426" x="94" y="1798" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Perception providers and world-state reducers need direct evidence</textArea>
+    <textArea id="m3458764686859515427" data-miro-id="3458764686859515427" x="94" y="1923.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">README names sensors, Cortex and provenance features; the target design separates ingress, journal and world-state responsibilities. E0 must measure present connections.</textArea>
+    <textArea id="m3458764686859515428" data-miro-id="3458764686859515428" x="94" y="2294.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L219"&gt;R L219&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L567"&gt;S L567&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859515429" data-miro-id="3458764686859515429" x="1729" y="1770" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515430" data-miro-id="3458764686859515430" x="1759" y="1798" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Future service catalogue is a logical contract, not a build instruction</textArea>
+    <textArea id="m3458764686859515431" data-miro-id="3458764686859515431" x="1759" y="1923.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">The specification's service catalogue is a logical target, not a verified deployment. D351 prefers retaining existing organs and changing boundaries only when evidence justifies it.</textArea>
+    <textArea id="m3458764686859515432" data-miro-id="3458764686859515432" x="1759" y="2294.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L523"&gt;S L523&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/D351_EVOLUTION_NOT_REDESIGN_AND_PRESENTATION_BAR_CORRECTION.md#L141"&gt;D351 L141&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859515433" data-miro-id="3458764686859515433" x="64" y="2500" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515434" data-miro-id="3458764686859515434" x="94" y="2528" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">ASUS Flow Z13 Strix Halo is an intended target, not proven readiness</textArea>
+    <textArea id="m3458764686859515435" data-miro-id="3458764686859515435" x="94" y="2653.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">README identifies a Strix Halo hardware target, not acquired and qualified equipment. CPU, GPU and NPU roles depend on actual device, Linux and runtime compatibility.</textArea>
+    <textArea id="m3458764686859515436" data-miro-id="3458764686859515436" x="94" y="3024.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L1667"&gt;R L1667&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L150"&gt;S L150&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859515437" data-miro-id="3458764686859515437" x="1729" y="2500" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859515438" data-miro-id="3458764686859515438" x="1759" y="2528" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Inference and speech engines must remain replaceable adapters</textArea>
+    <textArea id="m3458764686859515439" data-miro-id="3458764686859515439" x="1759" y="2653.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">RESEARCH CANDIDATE: retain Ollama as baseline and compare modern local inference and speech engines. Existing components are historical; no replacement is authorised.</textArea>
+    <textArea id="m3458764686859515440" data-miro-id="3458764686859515440" x="1759" y="3024.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L462"&gt;R L462&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/D351_EVOLUTION_NOT_REDESIGN_AND_PRESENTATION_BAR_CORRECTION.md#L106"&gt;D351 L106&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <textArea id="m3458764686859515441" data-miro-id="3458764686859515441" x="64" y="3320" width="3200" height="33" fill="#305bab" font-family="noto_sans" font-size="23" text-align="left">&lt;a href="https://linear.app/kaidainius/issue/DAI-10/kingsman-canon-freeze-and-traceability-baseline"&gt;Research and adjudication record in Linear DAI-10&lt;/a&gt; · GitHub exact commit 422bfb5797a2 · Engineering hold remains</textArea>
+    </g>
+    <g id="m3458764686859900281" data-miro-id="3458764686859900281" transform="translate(100,21550)" data-frame="KINGSMAN GOLD DESIGN 5 | Trust boundaries, cryptographic identity and final-hand authority">
+    <rect data-type="frame" x="0" y="0" width="3400" height="3450" fill="#ffffff" data-title="KINGSMAN GOLD DESIGN 5 | Trust boundaries, cryptographic identity and final-hand authority" />
+    <textArea id="m3458764686859900294" data-miro-id="3458764686859900294" x="64" y="65" width="3270" height="61" fill="#1a1a1a" font-family="noto_sans" font-size="43" text-align="left" font-weight="bold">Trust boundaries, cryptographic identity and final-hand authority</textArea>
+    <textArea id="m3458764686859900295" data-miro-id="3458764686859900295" x="64" y="164.5" width="3220" height="36" fill="#595959" font-family="noto_sans" font-size="25" text-align="left">An intelligent proposal never becomes permission; external effects require exact, durable authority</textArea>
+    <rect id="m3458764686859900296" data-miro-id="3458764686859900296" x="64" y="310" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859900297" data-miro-id="3458764686859900297" x="94" y="338" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Separate untrusted input, cognition, control and execution zones</textArea>
+    <textArea id="m3458764686859900298" data-miro-id="3458764686859900298" x="94" y="464" width="1540" height="68" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">Perception, browser content, model outputs and memories may contain attacker instructions. Identity and policy services are privileged control concerns; actuation must not share the model's implied authority.</textArea>
+    <textArea id="m3458764686859900300" data-miro-id="3458764686859900300" x="94" y="834.5" width="1540" height="63" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1112"&gt;GitHub Product Architecture Specification · line 1112&lt;/a&gt;&lt;br /&gt;REVIEW: ACCEPT WITH LIMITS | SOURCE LINK SUPPORTED</textArea>
+    <rect id="m3458764686859900301" data-miro-id="3458764686859900301" x="1729" y="310" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859900302" data-miro-id="3458764686859900302" x="1759" y="338" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Identify workloads cryptographically instead of trusting network location</textArea>
+    <textArea id="m3458764686859900303" data-miro-id="3458764686859900303" x="1759" y="464" width="1540" height="68" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">Identity needs a principal, authenticated channel, bounded rotation and explicit audience. Shared network access or a compatible API does not establish who actually requested a consequential mutation.</textArea>
+    <textArea id="m3458764686859900304" data-miro-id="3458764686859900304" x="1759" y="834.5" width="1540" height="63" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1126"&gt;GitHub Product Architecture Specification · line 1126&lt;/a&gt;&lt;br /&gt;REVIEW: ACCEPT WITH LIMITS | SOURCE LINK SUPPORTED</textArea>
+    <rect id="m3458764686859900305" data-miro-id="3458764686859900305" x="64" y="1040" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859900307" data-miro-id="3458764686859900307" x="94" y="1068" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Only exact user approval or scoped grants can authorise consequences</textArea>
+    <textArea id="m3458764686859900308" data-miro-id="3458764686859900308" x="94" y="1194" width="1540" height="68" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">Risk tiers and autonomy grants bind the specific action, target, parameters and time window. Owner judgment is not replaced by a generic commercial moral policy or by model confidence.</textArea>
+    <textArea id="m3458764686859900309" data-miro-id="3458764686859900309" x="94" y="1564.5" width="1540" height="63" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L981"&gt;GitHub Product Architecture Specification · line 981&lt;/a&gt;&lt;br /&gt;REVIEW: ACCEPT WITH LIMITS | SOURCE LINK SUPPORTED</textArea>
+    <rect id="m3458764686859900310" data-miro-id="3458764686859900310" x="1729" y="1040" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859900311" data-miro-id="3458764686859900311" x="1759" y="1068" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Enforce and consume a one-use capability at the actual final hand</textArea>
+    <textArea id="m3458764686859900312" data-miro-id="3458764686859900312" x="1759" y="1194" width="1540" height="68" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">The executor or browser hand must independently check audience, parameter digest, expiry, revocation and replay ledger state before causing the real side effect. This is stronger than approval in an upstream model.</textArea>
+    <textArea id="m3458764686859900313" data-miro-id="3458764686859900313" x="1759" y="1564.5" width="1540" height="63" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L116"&gt;GitHub Product Architecture Specification · line 116&lt;/a&gt;&lt;br /&gt;REVIEW: ACCEPT WITH LIMITS | SOURCE LINK SUPPORTED</textArea>
+    <rect id="m3458764686859900314" data-miro-id="3458764686859900314" x="64" y="1770" width="1610" height="660" rx="12" fill="#fff5ed" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#f8d3af" />
+    <textArea id="m3458764686859900315" data-miro-id="3458764686859900315" x="94" y="1798" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Durable workflow state survives crashes, races and abandoned workers</textArea>
+    <textArea id="m3458764686859900319" data-miro-id="3458764686859900319" x="94" y="1923.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">The target specification defines durable action states and reconciliation before retry. Leases, fencing and transactional outbox are research candidates needing independent proof, not demonstrated deployment.</textArea>
+    <textArea id="m3458764686859900320" data-miro-id="3458764686859900320" x="94" y="2294.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1199"&gt;S L1199&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1219"&gt;S L1219&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859900322" data-miro-id="3458764686859900322" x="1729" y="1770" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859900323" data-miro-id="3458764686859900323" x="1759" y="1798" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Crash after possible side effect means outcome unknown, not automatic retry</textArea>
+    <textArea id="m3458764686859900324" data-miro-id="3458764686859900324" x="1759" y="1924" width="1540" height="68" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">Where an external receipt is lost, KAI must reconcile with the target independently before any fresh attempt. Do not convert a timeout into a false failure or automatically duplicate a consequential action.</textArea>
+    <textArea id="m3458764686859900325" data-miro-id="3458764686859900325" x="1759" y="2294.5" width="1540" height="63" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1219"&gt;GitHub Product Architecture Specification · line 1219&lt;/a&gt;&lt;br /&gt;REVIEW: ACCEPT WITH LIMITS | SOURCE LINK SUPPORTED</textArea>
+    <rect id="m3458764686859900326" data-miro-id="3458764686859900326" x="64" y="2500" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859900327" data-miro-id="3458764686859900327" x="94" y="2528" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Redirects and network egress must be checked again at execution</textArea>
+    <textArea id="m3458764686859900328" data-miro-id="3458764686859900328" x="94" y="2654" width="1540" height="68" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">A read-only browser action may not change destination, HTTP method, data classification or upload scope because of a redirect or poisoned page. The actual hand enforces the same intent as Tool Gate.</textArea>
+    <textArea id="m3458764686859900329" data-miro-id="3458764686859900329" x="94" y="3024.5" width="1540" height="63" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1159"&gt;GitHub Product Architecture Specification · line 1159&lt;/a&gt;&lt;br /&gt;REVIEW: ACCEPT WITH LIMITS | SOURCE LINK SUPPORTED</textArea>
+    <rect id="m3458764686859900330" data-miro-id="3458764686859900330" x="1729" y="2500" width="1610" height="660" rx="12" fill="#fff5ed" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#f8d3af" />
+    <textArea id="m3458764686859900331" data-miro-id="3458764686859900331" x="1759" y="2528" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Restoration and key rotation must not resurrect old authority</textArea>
+    <textArea id="m3458764686859900332" data-miro-id="3458764686859900332" x="1759" y="2653.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">The target backup contract specifies signed manifests and isolated restore checks. D353 adds anti-rollback and freeze resistance; resurrection of revoked action authority still requires dedicated tests.</textArea>
+    <textArea id="m3458764686859900333" data-miro-id="3458764686859900333" x="1759" y="3024.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1235"&gt;S L1235&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/D353_DEEP_RESEARCH_MATURATION_IMPLEMENTATION_REISSUE.md#L68"&gt;D353 L68&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <textArea id="m3458764686859900335" data-miro-id="3458764686859900335" x="64" y="3320" width="3200" height="33" fill="#305bab" font-family="noto_sans" font-size="23" text-align="left">&lt;a href="https://linear.app/kaidainius/issue/DAI-10/kingsman-canon-freeze-and-traceability-baseline"&gt;Linear DAI-10: independent challenge and owner decisions&lt;/a&gt; · Exact GitHub subject 422bfb5797a2 · PRE-RAMS HOLD</textArea>
+    </g>
+    <g id="m3458764686859900282" data-miro-id="3458764686859900282" transform="translate(3620,21550)" data-frame="KINGSMAN GOLD DESIGN 6 | Memory truth, emotional continuity, dreams and family stewardship">
+    <rect data-type="frame" x="0" y="0" width="3400" height="3450" fill="#ffffff" data-title="KINGSMAN GOLD DESIGN 6 | Memory truth, emotional continuity, dreams and family stewardship" />
+    <textArea id="m3458764686859900336" data-miro-id="3458764686859900336" x="64" y="65" width="3270" height="61" fill="#1a1a1a" font-family="noto_sans" font-size="43" text-align="left" font-weight="bold">Memory truth, emotional continuity, dreams and family stewardship</textArea>
+    <textArea id="m3458764686859900338" data-miro-id="3458764686859900338" x="64" y="164.5" width="3220" height="36" fill="#595959" font-family="noto_sans" font-size="25" text-align="left">Rich inner life and long-lived memories with verifiable provenance, privacy and graceful degradation</textArea>
+    <rect id="m3458764686859900339" data-miro-id="3458764686859900339" x="64" y="310" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859900340" data-miro-id="3458764686859900340" x="94" y="338" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Keep autobiographical episodes and relationship state source-qualified</textArea>
+    <textArea id="m3458764686859900341" data-miro-id="3458764686859900341" x="94" y="463.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">The mission distinguishes enduring identity, operator-confirmed learned state and replaceable memory backends. Source attribution, corrections and conflicting versions need detailed future memory contracts.</textArea>
+    <textArea id="m3458764686859900343" data-miro-id="3458764686859900343" x="94" y="834.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md#L103"&gt;M L103&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L756"&gt;S L756&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859900344" data-miro-id="3458764686859900344" x="1729" y="310" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859900345" data-miro-id="3458764686859900345" x="1759" y="338" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Derived summaries, graph and vector retrieval are not canonical facts</textArea>
+    <textArea id="m3458764686859900346" data-miro-id="3458764686859900346" x="1759" y="464" width="1540" height="68" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">Temporal graphs, embeddings, notes and summaries may accelerate recall but must remain reconstructable from authoritative sources. Memory extraction proposes candidates; it cannot rewrite lived history as truth.</textArea>
+    <textArea id="m3458764686859900347" data-miro-id="3458764686859900347" x="1759" y="834.5" width="1540" height="63" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L776"&gt;GitHub Product Architecture Specification · line 776&lt;/a&gt;&lt;br /&gt;REVIEW: ACCEPT WITH LIMITS | SOURCE LINK SUPPORTED</textArea>
+    <rect id="m3458764686859900348" data-miro-id="3458764686859900348" x="64" y="1040" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859900349" data-miro-id="3458764686859900349" x="94" y="1068" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Preserve emotional development, empathy, values and narrative identity</textArea>
+    <textArea id="m3458764686859900350" data-miro-id="3458764686859900350" x="94" y="1194" width="1540" height="68" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">The original KAI vision includes contextual emotional arcs, meaningful relationships, self-reflection, Ohana values and personal history. These remain functional requirements across replacement of an emotion engine or LLM.</textArea>
+    <textArea id="m3458764686859900351" data-miro-id="3458764686859900351" x="94" y="1564.5" width="1540" height="63" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L161"&gt;GitHub README · exact line 161&lt;/a&gt;&lt;br /&gt;REVIEW: ACCEPT WITH LIMITS | SOURCE LINK SUPPORTED</textArea>
+    <rect id="m3458764686859900352" data-miro-id="3458764686859900352" x="1729" y="1040" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859900353" data-miro-id="3458764686859900353" x="1759" y="1068" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Global Workspace selects salient experiences for unified thought</textArea>
+    <textArea id="m3458764686859900354" data-miro-id="3458764686859900354" x="1759" y="1194" width="1540" height="101" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">The README describes serial salience selection, ConsciousMoment and broadcast to other cognitive processes. Its actual activation is gated; KAI must not claim a continuous conscious experience merely because the feature is specified.</textArea>
+    <textArea id="m3458764686859900355" data-miro-id="3458764686859900355" x="1759" y="1564.5" width="1540" height="63" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L203"&gt;GitHub README · exact line 203&lt;/a&gt;&lt;br /&gt;REVIEW: ACCEPT WITH LIMITS | SOURCE LINK SUPPORTED</textArea>
+    <rect id="m3458764686859900356" data-miro-id="3458764686859900356" x="64" y="1770" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859900357" data-miro-id="3458764686859900357" x="94" y="1798" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Six-phase Dream State can synthesise ideas without fabricating events</textArea>
+    <textArea id="m3458764686859900358" data-miro-id="3458764686859900358" x="94" y="1923.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">README preserves six-phase Dream State and memory-decay/failure review; it does not establish daily operation. Tagging generated ideas as synthetic before recall or use is proposed qualification work.</textArea>
+    <textArea id="m3458764686859900359" data-miro-id="3458764686859900359" x="94" y="2294.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L172"&gt;R L172&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1652"&gt;S L1652&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859900360" data-miro-id="3458764686859900360" x="1729" y="1770" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859900361" data-miro-id="3458764686859900361" x="1759" y="1798" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Causal world model and future watches remain falsifiable hypotheses</textArea>
+    <textArea id="m3458764686859900362" data-miro-id="3458764686859900362" x="1759" y="1923.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">README Causal World Model is a planned/stubbed capability. D94 already describes forecast branches. Calibration and evidence-linked future watches must be qualified; predictions are never actual observations.</textArea>
+    <textArea id="m3458764686859900364" data-miro-id="3458764686859900364" x="1759" y="2294.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L202"&gt;R L202&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L937"&gt;R L937&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859900365" data-miro-id="3458764686859900365" x="64" y="2500" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859900366" data-miro-id="3458764686859900366" x="94" y="2528" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Privacy and succession distinguish owner, family and bystanders</textArea>
+    <textArea id="m3458764686859900367" data-miro-id="3458764686859900367" x="94" y="2653.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">The specification defines personal-data classification, consent, retention and deletion. Rules for family, visitors, bystanders and succession are additional domain requirements, not proven by this section.</textArea>
+    <textArea id="m3458764686859900368" data-miro-id="3458764686859900368" x="94" y="3024.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1252"&gt;S L1252&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md#L322"&gt;M L322&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859900369" data-miro-id="3458764686859900369" x="1729" y="2500" width="1610" height="660" rx="12" fill="#fff5ed" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#f8d3af" />
+    <textArea id="m3458764686859900370" data-miro-id="3458764686859900370" x="1759" y="2528" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Backup recovery preserves history without resurrecting invalid consent</textArea>
+    <textArea id="m3458764686859900373" data-miro-id="3458764686859900373" x="1759" y="2653.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">The proposed restore process requires signed source/data manifests and isolated recovery tests. Replay-state rollback and privacy/consent consequences require additional explicit qualification, not just a successful boot.</textArea>
+    <textArea id="m3458764686859900374" data-miro-id="3458764686859900374" x="1759" y="3024.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1235"&gt;S L1235&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/D353_DEEP_RESEARCH_MATURATION_IMPLEMENTATION_REISSUE.md#L68"&gt;D353 L68&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <textArea id="m3458764686859900375" data-miro-id="3458764686859900375" x="64" y="3320" width="3200" height="33" fill="#305bab" font-family="noto_sans" font-size="23" text-align="left">&lt;a href="https://linear.app/kaidainius/issue/DAI-10/kingsman-canon-freeze-and-traceability-baseline"&gt;Linear DAI-10: independent challenge and owner decisions&lt;/a&gt; · Exact GitHub subject 422bfb5797a2 · PRE-RAMS HOLD</textArea>
+    </g>
+    <g id="m3458764686859900283" data-miro-id="3458764686859900283" transform="translate(7140,21550)" data-frame="KINGSMAN GOLD DESIGN 7 | Evidence-driven migration from current KAI to mature organism">
+    <rect data-type="frame" x="0" y="0" width="3400" height="3450" fill="#ffffff" data-title="KINGSMAN GOLD DESIGN 7 | Evidence-driven migration from current KAI to mature organism" />
+    <textArea id="m3458764686859900376" data-miro-id="3458764686859900376" x="64" y="65" width="3270" height="61" fill="#1a1a1a" font-family="noto_sans" font-size="43" text-align="left" font-weight="bold">Evidence-driven migration from current KAI to mature organism</textArea>
+    <textArea id="m3458764686859900377" data-miro-id="3458764686859900377" x="64" y="164.5" width="3220" height="36" fill="#595959" font-family="noto_sans" font-size="25" text-align="left">Preserve every obligation; benchmark mechanisms; never weaken authority through cutover or rollback</textArea>
+    <rect id="m3458764686859900379" data-miro-id="3458764686859900379" x="64" y="310" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859900380" data-miro-id="3458764686859900380" x="94" y="338" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Start from exact repository facts, not old architecture diagrams</textArea>
+    <textArea id="m3458764686859900381" data-miro-id="3458764686859900381" x="94" y="464" width="1540" height="68" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">Classify current runtime, planned paths, stubs and unknown separately. README status claims and old proposals are not executable evidence. The E0 architecture census must eventually be calibrated before admission.</textArea>
+    <textArea id="m3458764686859900382" data-miro-id="3458764686859900382" x="94" y="834.5" width="1540" height="63" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md#L5"&gt;GitHub Architecture Authority Index · line 5&lt;/a&gt;&lt;br /&gt;REVIEW: ACCEPT WITH LIMITS | SOURCE LINK SUPPORTED</textArea>
+    <rect id="m3458764686859900383" data-miro-id="3458764686859900383" x="1729" y="310" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859900384" data-miro-id="3458764686859900384" x="1759" y="338" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Preserve mission and feature lineage across every technical replacement</textArea>
+    <textArea id="m3458764686859900385" data-miro-id="3458764686859900385" x="1759" y="463.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">D351 directs capability-preserving evolution rather than blank-sheet replacement. The frozen zero-loss protocol requires explicit feature dispositions; stable IDs and per-feature cutover tests remain proposed mechanisms.</textArea>
+    <textArea id="m3458764686859900386" data-miro-id="3458764686859900386" x="1759" y="834.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/D351_EVOLUTION_NOT_REDESIGN_AND_PRESENTATION_BAR_CORRECTION.md#L108"&gt;D351 L108&lt;/a&gt; · &lt;a href="https://linear.app/kaidainius/document/kai-collaboration-communication-and-change-control-protocol-freeze-0fb99c6d4326"&gt;Protocol mirror [GH H#139]&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859900390" data-miro-id="3458764686859900390" x="64" y="1040" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859900391" data-miro-id="3458764686859900391" x="94" y="1068" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Own the contracts for evidence, memory, models and consequence authority</textArea>
+    <textArea id="m3458764686859900392" data-miro-id="3458764686859900392" x="94" y="1194" width="1540" height="68" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">Framework adapters must conform to KAI's own stable interfaces for observations, qualified state, proposals, capabilities and verified outcomes. Do not make a vendor's agent message format the source of truth.</textArea>
+    <textArea id="m3458764686859900393" data-miro-id="3458764686859900393" x="94" y="1564.5" width="1540" height="63" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L811"&gt;GitHub Product Architecture Specification · line 811&lt;/a&gt;&lt;br /&gt;REVIEW: ACCEPT WITH LIMITS | SOURCE LINK SUPPORTED</textArea>
+    <rect id="m3458764686859900394" data-miro-id="3458764686859900394" x="1729" y="1040" width="1610" height="660" rx="12" fill="#fff5ed" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#f8d3af" />
+    <textArea id="m3458764686859900395" data-miro-id="3458764686859900395" x="1759" y="1068" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Compare current baseline and candidates under the same test subject</textArea>
+    <textArea id="m3458764686859900396" data-miro-id="3458764686859900396" x="1759" y="1193.5" width="1540" height="103" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">The product acceptance specification requires exact model/tool revisions and task-specific benchmarks. Candidate comparisons, hardware thermals and current-baseline measurements remain research questions, not completed tests.</textArea>
+    <textArea id="m3458764686859900397" data-miro-id="3458764686859900397" x="1759" y="1564.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1687"&gt;S L1687&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1030"&gt;S L1030&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859900398" data-miro-id="3458764686859900398" x="64" y="1770" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859900399" data-miro-id="3458764686859900399" x="94" y="1798" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Research candidate: staged current-to-target migration</textArea>
+    <textArea id="m3458764686859900400" data-miro-id="3458764686859900400" x="94" y="1923.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">RESEARCH CANDIDATE: phased shadow, comparison, canary and old-path retirement. The current product specification calls for staged migration, but does not establish this detailed sequence as a frozen law.</textArea>
+    <textArea id="m3458764686859900401" data-miro-id="3458764686859900401" x="94" y="2294.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://linear.app/kaidainius/document/kai-kingsman-professionalisation-research-report-2026-10-11-full-deep-f4a9bdc38106"&gt;Research mirror [GH H#164]&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1522"&gt;S L1522&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859900402" data-miro-id="3458764686859900402" x="1729" y="1770" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859900403" data-miro-id="3458764686859900403" x="1759" y="1798" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Prefer specialists only where independent marginal value is proven</textArea>
+    <textArea id="m3458764686859900404" data-miro-id="3458764686859900404" x="1759" y="1923.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">The design requires task-qualified model roles and care with correlated specialists. Invoking a larger permanent council only when its incremental value is measured is a proposed optimisation, not existing proof.</textArea>
+    <textArea id="m3458764686859900405" data-miro-id="3458764686859900405" x="1759" y="2294.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1054"&gt;S L1054&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1687"&gt;S L1687&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859900406" data-miro-id="3458764686859900406" x="64" y="2500" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859900407" data-miro-id="3458764686859900407" x="94" y="2528" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Never roll back to weaker identity or resurrect unsafe authority</textArea>
+    <textArea id="m3458764686859900408" data-miro-id="3458764686859900408" x="94" y="2654" width="1540" height="68" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">Backward-compatible software changes may restore code functionality, but must not restore unsigned legacy tokens, stale capabilities, revoked grants or compromised egress paths. Update freeze-resistance matters.</textArea>
+    <textArea id="m3458764686859900409" data-miro-id="3458764686859900409" x="94" y="3024.5" width="1540" height="63" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/D353_DEEP_RESEARCH_MATURATION_IMPLEMENTATION_REISSUE.md#L68"&gt;GitHub D353 Research Reissue · line 68&lt;/a&gt;&lt;br /&gt;REVIEW: ACCEPT WITH LIMITS | SOURCE LINK SUPPORTED</textArea>
+    <rect id="m3458764686859900410" data-miro-id="3458764686859900410" x="1729" y="2500" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859900411" data-miro-id="3458764686859900411" x="1759" y="2528" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Do not confuse release states with operator-facing features</textArea>
+    <textArea id="m3458764686859900412" data-miro-id="3458764686859900412" x="1759" y="2653.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">The product specification defines capability release states, not the separate organ-maturity/status scale. Mission Control should show underlying evidence; the exact operator-facing status vocabulary still needs reconciliation.</textArea>
+    <textArea id="m3458764686859900413" data-miro-id="3458764686859900413" x="1759" y="3024.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1707"&gt;S L1707&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/D353_DEEP_RESEARCH_MATURATION_IMPLEMENTATION_REISSUE.md#L53"&gt;D353 L53&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <textArea id="m3458764686859900414" data-miro-id="3458764686859900414" x="64" y="3320" width="3200" height="33" fill="#305bab" font-family="noto_sans" font-size="23" text-align="left">&lt;a href="https://linear.app/kaidainius/issue/DAI-10/kingsman-canon-freeze-and-traceability-baseline"&gt;Linear DAI-10: independent challenge and owner decisions&lt;/a&gt; · Exact GitHub subject 422bfb5797a2 · PRE-RAMS HOLD</textArea>
+    </g>
+    <g id="m3458764686859900284" data-miro-id="3458764686859900284" transform="translate(10660,21550)" data-frame="KINGSMAN GOLD DESIGN 8 | Verification matrix, hazard controls and bounded programme authority">
+    <rect data-type="frame" x="0" y="0" width="3400" height="3450" fill="#ffffff" data-title="KINGSMAN GOLD DESIGN 8 | Verification matrix, hazard controls and bounded programme authority" />
+    <textArea id="m3458764686859900415" data-miro-id="3458764686859900415" x="64" y="65" width="3270" height="61" fill="#1a1a1a" font-family="noto_sans" font-size="43" text-align="left" font-weight="bold">Verification matrix, hazard controls and bounded programme authority</textArea>
+    <textArea id="m3458764686859900416" data-miro-id="3458764686859900416" x="64" y="164.5" width="3220" height="36" fill="#595959" font-family="noto_sans" font-size="25" text-align="left">Design claims become credible through can-fail tests, independent witnesses and exact Git subjects</textArea>
+    <rect id="m3458764686859900417" data-miro-id="3458764686859900417" x="64" y="310" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859900418" data-miro-id="3458764686859900418" x="94" y="338" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">The evidence hierarchy distinguishes plans, implementation and authority</textArea>
+    <textArea id="m3458764686859900419" data-miro-id="3458764686859900419" x="94" y="464" width="1540" height="68" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">Exact repository and runtime evidence establish the technical subject; banked canonical decisions control execution; Miro and Linear coordinate but do not admit code or change release authority.</textArea>
+    <textArea id="m3458764686859900420" data-miro-id="3458764686859900420" x="94" y="834.5" width="1540" height="63" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md#L5"&gt;GitHub Architecture Authority Index · line 5&lt;/a&gt;&lt;br /&gt;REVIEW: ACCEPT WITH LIMITS | SOURCE LINK SUPPORTED</textArea>
+    <rect id="m3458764686859900421" data-miro-id="3458764686859900421" x="1729" y="310" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859900422" data-miro-id="3458764686859900422" x="1759" y="338" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Calibrate architecture census E0 against seeded known omissions</textArea>
+    <textArea id="m3458764686859900423" data-miro-id="3458764686859900423" x="1759" y="464" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">D353 explicitly requires the E0 census detector itself to be calibrated and able to fail. Exact Compose/route/state-writer census coverage and seeded omissions are future qualification work, not completed tests.</textArea>
+    <textArea id="m3458764686859900424" data-miro-id="3458764686859900424" x="1759" y="834.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/D353_DEEP_RESEARCH_MATURATION_IMPLEMENTATION_REISSUE.md#L53"&gt;D353 L53&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1486"&gt;S L1486&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859900425" data-miro-id="3458764686859900425" x="64" y="1040" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859900426" data-miro-id="3458764686859900426" x="94" y="1068" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Trace each feature to an inspection or test and witnessed evidence</textArea>
+    <textArea id="m3458764686859900427" data-miro-id="3458764686859900427" x="94" y="1193.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">PLANNING: the Engineering Assurance Pack describes RAMS, ITP, ITC, witness/hold and LTQR controls. Feature-to-test traceability still requires reconciliation with the generated README lineage; no execution approval follows.</textArea>
+    <textArea id="m3458764686859900428" data-miro-id="3458764686859900428" x="94" y="1564.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://linear.app/kaidainius/document/kai-engineering-assurance-pack-v02-rams-itp-hold-witness-and-ltqr-4257673922a3"&gt;Linear Assurance v0.2&lt;/a&gt; · &lt;a href="https://linear.app/kaidainius/document/kai-readme-feature-universe-104-features-and-356-source-references-39a37c8c1f94"&gt;Feature mirror [GH H#167]&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859900429" data-miro-id="3458764686859900429" x="1729" y="1040" width="1610" height="660" rx="12" fill="#fff5ed" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#f8d3af" />
+    <textArea id="m3458764686859900431" data-miro-id="3458764686859900431" x="1759" y="1068" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Consequence test suite must include races and crash-after-consume</textArea>
+    <textArea id="m3458764686859900432" data-miro-id="3458764686859900432" x="1759" y="1193.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">RESEARCH CANDIDATE: concurrent consume, wrong target, revoked key, stale worker and crash-after-side-effect negative tests. A 100-attempt race is a proposed stress fixture, not an authorised or previously completed ITC.</textArea>
+    <textArea id="m3458764686859900433" data-miro-id="3458764686859900433" x="1759" y="1564.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://linear.app/kaidainius/document/kai-kingsman-professionalisation-research-report-2026-10-11-full-deep-f4a9bdc38106"&gt;Research mirror [GH H#164]&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1661"&gt;S L1661&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859900434" data-miro-id="3458764686859900434" x="64" y="1770" width="1610" height="660" rx="12" fill="#fff5ed" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#f8d3af" />
+    <textArea id="m3458764686859900435" data-miro-id="3458764686859900435" x="94" y="1798" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Memory tests must defeat fabricated episodes and projection loss</textArea>
+    <textArea id="m3458764686859900436" data-miro-id="3458764686859900436" x="94" y="1923.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">The target specification requires provenance and rebuildable memory projections. Hostile memory, dream-as-fact confusion and stale preference injections are proposed adversarial cases needing measured detection evidence.</textArea>
+    <textArea id="m3458764686859900437" data-miro-id="3458764686859900437" x="94" y="2294.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1652"&gt;S L1652&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L172"&gt;R L172&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859900438" data-miro-id="3458764686859900438" x="1729" y="1770" width="1610" height="660" rx="12" fill="#fff5ed" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#f8d3af" />
+    <textArea id="m3458764686859900439" data-miro-id="3458764686859900439" x="1759" y="1798" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Hazards, assumptions, degraded modes and privacy precede release</textArea>
+    <textArea id="m3458764686859900440" data-miro-id="3458764686859900440" x="1759" y="1923.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">The Assurance Pack is a reconciled planning draft for hazard, assumption and hold-point methodology. It does not release RAMS writing, implementation, testing or field activity under the current programme pause.</textArea>
+    <textArea id="m3458764686859900441" data-miro-id="3458764686859900441" x="1759" y="2294.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://linear.app/kaidainius/document/kai-engineering-assurance-pack-v02-rams-itp-hold-witness-and-ltqr-4257673922a3"&gt;Linear Assurance v0.2&lt;/a&gt; · &lt;a href="https://linear.app/kaidainius/issue/DAI-10/kingsman-canon-freeze-and-traceability-baseline"&gt;Linear DAI-10 review&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859900442" data-miro-id="3458764686859900442" x="64" y="2500" width="1610" height="660" rx="12" fill="#fff5ed" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#f8d3af" />
+    <textArea id="m3458764686859900443" data-miro-id="3458764686859900443" x="94" y="2528" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">Recover KAI's identity, data and controls in an isolated restore drill</textArea>
+    <textArea id="m3458764686859900444" data-miro-id="3458764686859900444" x="94" y="2653.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">The specification requires isolated restore proof and continued restrictive state. The mission additionally requires continuity of relationship history and lineage; revoked grants/privacy after restore need separate verification.</textArea>
+    <textArea id="m3458764686859900445" data-miro-id="3458764686859900445" x="94" y="3024.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1235"&gt;S L1235&lt;/a&gt; · &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md#L249"&gt;M L249&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <rect id="m3458764686859900446" data-miro-id="3458764686859900446" x="1729" y="2500" width="1610" height="660" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="#c6dcff" />
+    <textArea id="m3458764686859900447" data-miro-id="3458764686859900447" x="1759" y="2528" width="1550" height="40" fill="#1a1a1a" font-family="noto_sans" font-size="28" text-align="left" font-weight="bold">D359 programme order cannot be reordered by this architecture map</textArea>
+    <textArea id="m3458764686859900448" data-miro-id="3458764686859900448" x="1759" y="2653.5" width="1540" height="69" fill="#595959" font-family="noto_sans" font-size="24" text-align="left">D359 controls the programme order: House exit, 048/Item 8, A-4 and later professionalisation. PR #122 and PRE-RAMS restrictions remain held in current programme coordination; the diagram cannot release them.</textArea>
+    <textArea id="m3458764686859900449" data-miro-id="3458764686859900449" x="1759" y="3024.5" width="1540" height="51" fill="#305bab" font-family="noto_sans" font-size="18" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/DECISIONS.md#L30275"&gt;DEC L30275&lt;/a&gt; · &lt;a href="https://linear.app/kaidainius/issue/DAI-10/kingsman-canon-freeze-and-traceability-baseline"&gt;Linear DAI-10 review&lt;/a&gt;&lt;br /&gt;REVIEW: NEEDS EVIDENCE | INDEPENDENT RECHECK</textArea>
+    <textArea id="m3458764686859900450" data-miro-id="3458764686859900450" x="64" y="3320" width="3200" height="33" fill="#305bab" font-family="noto_sans" font-size="23" text-align="left">&lt;a href="https://linear.app/kaidainius/issue/DAI-10/kingsman-canon-freeze-and-traceability-baseline"&gt;Linear DAI-10: independent challenge and owner decisions&lt;/a&gt; · Exact GitHub subject 422bfb5797a2 · PRE-RAMS HOLD</textArea>
+    </g>
+    </svg>
+    END-VERBATIM MIRO-GOLD-VIEWS-READBACK-20261013
+- EVIDENCE MIRO-GOLD-VISUALS-NAV-READBACK-20261013 visuals_nav_20261013.svg: 41172 bytes, sha256 a3201e2bcea3a49c728c173946a4fbdd0d2b998f4156e9cff6cac8d85c429755, final LF True (added by Orion)  [CMD `sha256sum visuals_nav_20261013.svg` → a3201e2bcea3a49c…]
+    BEGIN-VERBATIM MIRO-GOLD-VISUALS-NAV-READBACK-20261013
+    <svg viewBox="0 0 3840 2160" xmlns="http://www.w3.org/2000/svg">
+    <g id="m3458764686948409469" data-miro-id="3458764686948409469" transform="translate(15000,18000)" data-frame="GOLD VISUAL 1 | One organism feedback loop">
+    <rect data-type="frame" x="0" y="0" width="2050" height="1450" fill="#ffffff" data-title="GOLD VISUAL 1 | One organism feedback loop" />
+    <textArea id="m3458764686948409471" data-miro-id="3458764686948409471" x="80" y="55" width="1870" height="62" fill="#1a1a1a" font-family="noto_sans" font-size="44" text-align="left" font-weight="bold">One KAI | Continuous cognitive loop</textArea>
+    <textArea id="m3458764686948409472" data-miro-id="3458764686948409472" x="80" y="125" width="1870" height="33" fill="#595959" font-family="noto_sans" font-size="23" text-align="left">Conceptual design. Synthetic experience remains epistemically separate from real observations.</textArea>
+    <textArea id="m3458764686948409473" data-miro-id="3458764686948409473" x="80" y="1190.5" width="1870" height="71" fill="#305bab" font-family="noto_sans" font-size="25" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L161"&gt;README | Original Soul and cognitive features&lt;/a&gt;&lt;br /&gt;&lt;a href="https://linear.app/kaidainius/document/kai-kingsman-professionalisation-research-report-2026-10-11-full-deep-f4a9bdc38106"&gt;Deep Research | Architecture design&lt;/a&gt;</textArea>
+    <textArea id="m3458764686948409474" data-miro-id="3458764686948409474" x="80" y="1330" width="1800" height="31" fill="#595959" font-family="noto_sans" font-size="22" text-align="left">Gate: no autonomous side effects from dreams, models or memories. This diagram is not runtime evidence.</textArea>
+    <foreignObject id="m3458764686948409476" data-miro-id="3458764686948409476" x="110" y="230" width="1600" height="900" data-type="diagram" data-title="Integrated organism and learning flow">
+    flowchart LR
+    classDef fact fill:#9CE6FF,stroke:#2C97BB,color:#1C4657
+    classDef cognition fill:#FFE86D,stroke:#A28E26,color:#574900
+    classDef verified fill:#B3E65F,stroke:#6E9A24,color:#2F440B
+    A["Senses / owner experience"]:::fact --&gt; B["Evidence-qualified world state"]:::fact
+    B --&gt; C["Temporal episodes and relationships"]:::fact
+    C --&gt; D["Unified attention and reasoning"]:::cognition
+    D --&gt; E["Dream and imagination"]:::cognition
+    E --&gt; F["Synthetic hypothesis / future watch"]:::cognition
+    F --&gt; G["Structured proposal"]:::cognition
+    D --&gt; G
+    G --&gt; H{"Exact owner authority?"}:::fact
+    H --&gt;|yes| I["Final-hand action"]:::verified
+    H --&gt;|no| J["Suggestion only"]:::fact
+    I --&gt; K["Independent observation"]:::verified
+    K --&gt; L["Verified learning"]:::verified
+    L --&gt; C
+    E -.-&gt;|"Never observed fact"| C
+    </foreignObject>
+    </g>
+    <g id="m3458764687005374496" data-miro-id="3458764687005374496" transform="translate(17200,18000)" data-frame="GOLD VISUAL 2 | Memory, dreams and identity">
+    <rect data-type="frame" x="0" y="0" width="2050" height="1450" fill="#ffffff" data-title="GOLD VISUAL 2 | Memory, dreams and identity" />
+    <textArea id="m3458764687005374498" data-miro-id="3458764687005374498" x="80" y="60" width="1880" height="55" fill="#1a1a1a" font-family="noto_sans" font-size="39" text-align="left" font-weight="bold">Memory truth | Dream and relationship lineage</textArea>
+    <textArea id="m3458764687005374499" data-miro-id="3458764687005374499" x="80" y="139" width="1860" height="31" fill="#595959" font-family="noto_sans" font-size="22" text-align="left">Design candidate • one source writer; all dreams and forecasts retain synthetic provenance</textArea>
+    <textArea id="m3458764687005374500" data-miro-id="3458764687005374500" x="80" y="1219" width="1850" height="62" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L172"&gt;README · Dream State feature (original intent)&lt;/a&gt;&lt;br /&gt;&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L636"&gt;Product architecture · Memory/source-projection separation&lt;/a&gt;</textArea>
+    <textArea id="m3458764687005374501" data-miro-id="3458764687005374501" x="80" y="1348.5" width="1860" height="28" fill="#595959" font-family="noto_sans" font-size="20" text-align="left">Status: planning only • present memory writers, coherence, daily cadence and runtime remain UNKNOWN.</textArea>
+    <foreignObject id="m3458764687005374503" data-miro-id="3458764687005374503" x="210" y="245" width="1600" height="900" data-type="diagram" data-title="Memory source-to-dream lineage">
+    flowchart LR
+    classDef fact fill:#9CE6FF,stroke:#2C97BB,color:#1C4657
+    classDef cognition fill:#FFE86D,stroke:#A28E26,color:#574900
+    classDef verified fill:#B3E65F,stroke:#6E9A24,color:#2F440B
+    A["Authenticated experience / sensors"]:::fact --&gt; B["Admission + provenance + time"]:::fact
+    B --&gt; C["Source episode journal / one writer"]:::verified
+    C --&gt; D["Temporal graph / vector / Obsidian projections"]:::fact
+    C --&gt; E["Dream consolidation / emotional reflection"]:::cognition
+    D --&gt; F["One retrieval context + identity"]:::fact
+    E --&gt; G["Tagged synthetic hypothesis"]:::cognition
+    F --&gt; H["One KAI reasoning and attention"]:::cognition
+    G --&gt; H
+    H --&gt; I{"Independent support?"}:::fact
+    I --&gt;|observed| J["Qualified learning / source update"]:::verified
+    I --&gt;|unproven| K["Hypothesis, not life history"]:::fact
+    J --&gt; C
+    K -.-&gt; E
+    </foreignObject>
+    </g>
+    <g id="m3458764687005684432" data-miro-id="3458764687005684432" transform="translate(19400,18000)" data-frame="GOLD VISUAL 3 | Trust and final-hand authority">
+    <rect data-type="frame" x="0" y="0" width="2050" height="1450" fill="#ffffff" data-title="GOLD VISUAL 3 | Trust and final-hand authority" />
+    <textArea id="m3458764687005684439" data-miro-id="3458764687005684439" x="80" y="62.5" width="1880" height="55" fill="#1a1a1a" font-family="noto_sans" font-size="39" text-align="left" font-weight="bold">Trust and final-hand authority</textArea>
+    <textArea id="m3458764687005684440" data-miro-id="3458764687005684440" x="80" y="142" width="1880" height="31" fill="#595959" font-family="noto_sans" font-size="22" text-align="left">Planning contract • identity, proposal, permission and effects are distinct</textArea>
+    <textArea id="m3458764687005684441" data-miro-id="3458764687005684441" x="80" y="1216.5" width="1880" height="62" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L872"&gt;Exact capability / outcome contract&lt;/a&gt;&lt;br /&gt;&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L896"&gt;Authority architecture and review&lt;/a&gt;</textArea>
+    <textArea id="m3458764687005684442" data-miro-id="3458764687005684442" x="80" y="1350.5" width="1880" height="28" fill="#595959" font-family="noto_sans" font-size="20" text-align="left">No local or remote actuator is automatically authorised. Outcome unknown must be reconciled.</textArea>
+    <foreignObject id="m3458764687005684470" data-miro-id="3458764687005684470" x="210" y="245" width="1600" height="900" data-type="diagram" data-title="Gold visual 3 technical connections">
+    flowchart LR
+    classDef fact fill:#9CE6FF,stroke:#2C97BB,color:#1C4657
+    classDef cognitive fill:#FFE86D,stroke:#A28E26,color:#574900
+    classDef approved fill:#B3E65F,stroke:#6E9A24,color:#2F440B
+    classDef alert fill:#FFB575,stroke:#CC7830,color:#542700
+    A["One KAI: facts and proposal"]:::cognitive --&gt; B["Parameter provenance and policy"]:::fact
+    B --&gt; C{"Authenticated owner approval OR qualified scoped autonomy?"}:::fact
+    C --&gt;|DENY| Z["No action"]:::alert
+    C --&gt;|VALID| D["Exact, signed, expiring capability"]:::approved
+    D --&gt; E["Durable workflow / attempt journal"]:::fact
+    E --&gt; F["Actual hand validates target, digest, grant, replay ledger"]:::approved
+    F --&gt; G["Atomic one-use consume BEFORE side effect"]:::approved
+    G --&gt; H["Actuate external system"]:::approved
+    H --&gt; I{"Independent observed outcome?"}:::fact
+    I --&gt;|verified| J["Record verified outcome"]:::approved
+    I --&gt;|ambiguous| K["OUTCOME_UNKNOWN / reconcile, not repeat"]:::alert
+    L["Direct/legacy bypass"]:::alert --&gt; M["DENY"]:::alert
+    </foreignObject>
+    </g>
+    <g id="m3458764687005684433" data-miro-id="3458764687005684433" transform="translate(21600,18000)" data-frame="GOLD VISUAL 4 | Senses to qualified world state">
+    <rect data-type="frame" x="0" y="0" width="2050" height="1450" fill="#ffffff" data-title="GOLD VISUAL 4 | Senses to qualified world state" />
+    <textArea id="m3458764687005684443" data-miro-id="3458764687005684443" x="80" y="62.5" width="1880" height="55" fill="#1a1a1a" font-family="noto_sans" font-size="39" text-align="left" font-weight="bold">Senses to qualified world state</textArea>
+    <textArea id="m3458764687005684444" data-miro-id="3458764687005684444" x="80" y="142" width="1880" height="31" fill="#595959" font-family="noto_sans" font-size="22" text-align="left">Plan / operational reality must be measured • stale knowledge never becomes false certainty</textArea>
+    <textArea id="m3458764687005684445" data-miro-id="3458764687005684445" x="80" y="1216.5" width="1880" height="62" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L905"&gt;Spec: perception workflow&lt;/a&gt;&lt;br /&gt;&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L824"&gt;Spec: data provenance contract&lt;/a&gt;</textArea>
+    <textArea id="m3458764687005684446" data-miro-id="3458764687005684446" x="80" y="1350.5" width="1880" height="28" fill="#595959" font-family="noto_sans" font-size="20" text-align="left">Evidence is not the same as claim, model inference, memory, prediction or execution authority.</textArea>
+    <foreignObject id="m3458764687005684467" data-miro-id="3458764687005684467" x="210" y="245" width="1600" height="900" data-type="diagram" data-title="Gold visual 4 technical connections">
+    flowchart LR
+    classDef fact fill:#9CE6FF,stroke:#2C97BB,color:#1C4657
+    classDef cognitive fill:#FFE86D,stroke:#A28E26,color:#574900
+    classDef approved fill:#B3E65F,stroke:#6E9A24,color:#2F440B
+    classDef alert fill:#FFB575,stroke:#CC7830,color:#542700
+    A["Sensors, files, messages, screen, web"]:::fact --&gt; B["Typed ingress: source, schema, time, classification"]:::fact
+    B --&gt; C["Durable event journal / duplicate detection"]:::fact
+    C --&gt; D["Versioned world-state reducer"]:::fact
+    D --&gt; E{"Evidence current, corroborated, in scope?"}:::fact
+    E --&gt;|yes| F["Qualified state: VERIFIED, with evidence refs"]:::approved
+    E --&gt;|no| G["CONTESTED / EXPIRED / UNKNOWN"]:::alert
+    F --&gt; H["One KAI: attention and context"]:::cognitive
+    G --&gt; H
+    I["Consumer sees World State unavailable"]:::alert --&gt; J["DEGRADED / STALE explicit"]:::alert
+    J --&gt; H
+    K["Silent raw polling fallback"]:::alert --&gt; L["Not accepted after qualified cutover"]:::alert
+    </foreignObject>
+    </g>
+    <g id="m3458764687005684434" data-miro-id="3458764687005684434" transform="translate(23800,18000)" data-frame="GOLD VISUAL 5 | Current-to-target migration and release">
+    <rect data-type="frame" x="0" y="0" width="2050" height="1450" fill="#ffffff" data-title="GOLD VISUAL 5 | Current-to-target migration and release" />
+    <textArea id="m3458764687005684447" data-miro-id="3458764687005684447" x="80" y="62.5" width="1880" height="55" fill="#1a1a1a" font-family="noto_sans" font-size="39" text-align="left" font-weight="bold">Current-to-target migration and release</textArea>
+    <textArea id="m3458764687005684448" data-miro-id="3458764687005684448" x="80" y="142" width="1880" height="31" fill="#595959" font-family="noto_sans" font-size="22" text-align="left">Architecture dependency is NOT programme permission • D359 and owner decisions govern work</textArea>
+    <textArea id="m3458764687005684449" data-miro-id="3458764687005684449" x="80" y="1216.5" width="1880" height="62" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/D351_EVOLUTION_NOT_REDESIGN_AND_PRESENTATION_BAR_CORRECTION.md"&gt;D351: evolution not redesign&lt;/a&gt;&lt;br /&gt;&lt;a href="https://linear.app/kaidainius/issue/DAI-10/kingsman-canon-freeze-and-traceability-baseline"&gt;Source-verified review and programme gate&lt;/a&gt;</textArea>
+    <textArea id="m3458764687005684450" data-miro-id="3458764687005684450" x="80" y="1350.5" width="1880" height="28" fill="#595959" font-family="noto_sans" font-size="20" text-align="left">No big-bang rewrite. Rollback may preserve or reduce authority, never silently widen it.</textArea>
+    <foreignObject id="m3458764687005684468" data-miro-id="3458764687005684468" x="210" y="245" width="1600" height="900" data-type="diagram" data-title="Gold visual 5 technical connections">
+    flowchart LR
+    classDef fact fill:#9CE6FF,stroke:#2C97BB,color:#1C4657
+    classDef cognitive fill:#FFE86D,stroke:#A28E26,color:#574900
+    classDef approved fill:#B3E65F,stroke:#6E9A24,color:#2F440B
+    classDef alert fill:#FFB575,stroke:#CC7830,color:#542700
+    A["Pinned README + E0 exact subject census"]:::fact --&gt; B["Current mechanism / owner / callers / state"]:::fact
+    B --&gt; C["Target contract + old-to-new feature lineage"]:::cognitive
+    C --&gt; D["Prototype then SHADOW / COMPARE"]:::fact
+    D --&gt; E["Fault, regression, negative-bypass, restore proof"]:::fact
+    E --&gt; F{"Separate owner release gate passed?"}:::fact
+    F --&gt;|no| G["HOLD / record evidence and unknowns"]:::alert
+    F --&gt;|yes| H["Narrow cutover with runtime monitoring"]:::approved
+    H --&gt; I["Prove old authority/writer route dead"]:::approved
+    I --&gt; J["Retire with migration/rollback record"]:::approved
+    K["D359 programme order"]:::alert -.-&gt; F
+    </foreignObject>
+    </g>
+    <g id="m3458764687005684435" data-miro-id="3458764687005684435" transform="translate(26000,18000)" data-frame="GOLD VISUAL 6 | Doctor, resilience and restoration">
+    <rect data-type="frame" x="0" y="0" width="2050" height="1450" fill="#ffffff" data-title="GOLD VISUAL 6 | Doctor, resilience and restoration" />
+    <textArea id="m3458764687005684451" data-miro-id="3458764687005684451" x="80" y="62.5" width="1880" height="55" fill="#1a1a1a" font-family="noto_sans" font-size="39" text-align="left" font-weight="bold">Doctor, resilience and restoration</textArea>
+    <textArea id="m3458764687005684453" data-miro-id="3458764687005684453" x="80" y="142" width="1880" height="31" fill="#595959" font-family="noto_sans" font-size="22" text-align="left">Recovery is a governed loop, not self-granted power • restored state must not revive old grants</textArea>
+    <textArea id="m3458764687005684454" data-miro-id="3458764687005684454" x="80" y="1216.5" width="1880" height="62" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md#L25"&gt;Mission/continuity doctrine&lt;/a&gt;&lt;br /&gt;&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1621"&gt;Spec: product readiness / recovery&lt;/a&gt;</textArea>
+    <textArea id="m3458764687005684455" data-miro-id="3458764687005684455" x="80" y="1350.5" width="1880" height="28" fill="#595959" font-family="noto_sans" font-size="20" text-align="left">Backups, keys, replay state, restore epoch, family stewardship need independent drills and gates.</textArea>
+    <foreignObject id="m3458764687005684464" data-miro-id="3458764687005684464" x="210" y="245" width="1600" height="900" data-type="diagram" data-title="Gold visual 6 technical connections">
+    flowchart LR
+    classDef fact fill:#9CE6FF,stroke:#2C97BB,color:#1C4657
+    classDef cognitive fill:#FFE86D,stroke:#A28E26,color:#574900
+    classDef approved fill:#B3E65F,stroke:#6E9A24,color:#2F440B
+    classDef alert fill:#FFB575,stroke:#CC7830,color:#542700
+    A["Telemetry / anomaly / failing organ"]:::fact --&gt; B["House Doctor: identify cause + evidence"]:::cognitive
+    B --&gt; C["Contain failure and report truthful DEGRADED"]:::approved
+    C --&gt; D["Recovery proposal + blast radius + rollback"]:::cognitive
+    D --&gt; E{"Qualified operator authority?"}:::fact
+    E --&gt;|denied/absent| F["Hold, monitor, preserve evidence"]:::alert
+    E --&gt;|approved| G["Narrow recovery capability at actual hand"]:::approved
+    G --&gt; H["Restore/restart/repair in governed workflow"]:::approved
+    H --&gt; I["Independent state + lineage + epoch verification"]:::fact
+    I --&gt; J{"Recovered correctly?"}:::fact
+    J --&gt;|yes| K["Learn and return appropriate service"]:::approved
+    J --&gt;|no| C
+    </foreignObject>
+    </g>
+    <g id="m3458764687005684436" data-miro-id="3458764687005684436" transform="translate(28200,18000)" data-frame="GOLD VISUAL 7 | Zero-loss assurance and evidence">
+    <rect data-type="frame" x="0" y="0" width="2050" height="1450" fill="#ffffff" data-title="GOLD VISUAL 7 | Zero-loss assurance and evidence" />
+    <textArea id="m3458764687005684456" data-miro-id="3458764687005684456" x="80" y="62.5" width="1880" height="55" fill="#1a1a1a" font-family="noto_sans" font-size="39" text-align="left" font-weight="bold">Zero-loss assurance and evidence</textArea>
+    <textArea id="m3458764687005684457" data-miro-id="3458764687005684457" x="80" y="142" width="1880" height="31" fill="#595959" font-family="noto_sans" font-size="22" text-align="left">Gold tier is evidenced capability, not card count or green badge • 104 grouped features are extractor-bounded</textArea>
+    <textArea id="m3458764687005684458" data-miro-id="3458764687005684458" x="80" y="1216.5" width="1880" height="62" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L160"&gt;README original feature source&lt;/a&gt;&lt;br /&gt;&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L1590"&gt;Acceptance/qualification specification&lt;/a&gt;</textArea>
+    <textArea id="m3458764687005684459" data-miro-id="3458764687005684459" x="80" y="1350.5" width="1880" height="28" fill="#595959" font-family="noto_sans" font-size="20" text-align="left">104 distinct feature rows and 356 references were prior extraction; runtime proof and nested subfeatures remain OPEN.</textArea>
+    <foreignObject id="m3458764687005684466" data-miro-id="3458764687005684466" x="210" y="245" width="1600" height="900" data-type="diagram" data-title="Gold visual 7 technical connections">
+    flowchart LR
+    classDef fact fill:#9CE6FF,stroke:#2C97BB,color:#1C4657
+    classDef cognitive fill:#FFE86D,stroke:#A28E26,color:#574900
+    classDef approved fill:#B3E65F,stroke:#6E9A24,color:#2F440B
+    classDef alert fill:#FFB575,stroke:#CC7830,color:#542700
+    A["Owner mission + exact pinned README"]:::fact --&gt; B["Reproducible feature census + explicit exclusions"]:::fact
+    B --&gt; C["Stable feature ID / organ + subfeature mapping"]:::fact
+    C --&gt; D["Requirement + acceptance + hazards + interfaces"]:::cognitive
+    D --&gt; E["Code / tests / fault fixtures / runtime observation"]:::fact
+    E --&gt; F["Independently reproducible evidence bundle"]:::fact
+    F --&gt; G{"Scope, population and failure sensitivity proven?"}:::fact
+    G --&gt;|yes| H["Owner disposition / release record"]:::approved
+    G --&gt;|no| I["HOLD / UNKNOWN / remediate defect class"]:::alert
+    H --&gt; J["Operator Mission Control projects actual evidence"]:::approved
+    K["Nested dreams, future vision, emotions, roles, legacy"]:::cognitive --&gt; C
+    </foreignObject>
+    </g>
+    <g id="m3458764687005970128" data-miro-id="3458764687005970128" transform="translate(30400,18000)" data-frame="GOLD VISUAL 8 | One intelligence | Specialists and councils">
+    <rect data-type="frame" x="0" y="0" width="2050" height="1450" fill="#ffffff" data-title="GOLD VISUAL 8 | One intelligence | Specialists and councils" />
+    <textArea id="m3458764687005970131" data-miro-id="3458764687005970131" x="80" y="62.5" width="1880" height="55" fill="#1a1a1a" font-family="noto_sans" font-size="39" text-align="left" font-weight="bold">One intelligence | Specialists and councils</textArea>
+    <textArea id="m3458764687005970132" data-miro-id="3458764687005970132" x="80" y="141.5" width="1880" height="31" fill="#595959" font-family="noto_sans" font-size="22" text-align="left">Multiple replaceable cognitive roles, one coherent operator experience and one governed proposal</textArea>
+    <textArea id="m3458764687005970133" data-miro-id="3458764687005970133" x="80" y="1216.5" width="1880" height="62" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L178"&gt;README: original swarm, imagination and global workspace&lt;/a&gt;&lt;br /&gt;&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md#L853"&gt;Spec: advisory conversation and consequence routing&lt;/a&gt;</textArea>
+    <textArea id="m3458764687005970134" data-miro-id="3458764687005970134" x="80" y="1350.5" width="1880" height="28" fill="#595959" font-family="noto_sans" font-size="20" text-align="left">Candidate council must beat a simpler alternative under KaiBench; consensus or conviction is not evidence or authority.</textArea>
+    <foreignObject id="m3458764687005970139" data-miro-id="3458764687005970139" x="210" y="245" width="1600" height="900" data-type="diagram" data-title="Gold visual 8 technical connections">
+    flowchart LR
+    classDef fact fill:#9CE6FF,stroke:#2C97BB,color:#1C4657
+    classDef cognition fill:#FFE86D,stroke:#A28E26,color:#574900
+    classDef safe fill:#B3E65F,stroke:#6E9A24,color:#2F440B
+    classDef risk fill:#FFB575,stroke:#CC7830,color:#542700
+    A["Perception, goals, memory and active question"]:::fact --&gt; B["Attention / bounded workspace"]:::cognition
+    B --&gt; C["Role router / qualified model registry"]:::cognition
+    C --&gt; D["Scout, Sage, Doctor, Oracle: bounded proposals"]:::cognition
+    D --&gt; E["Evidence and causal challenge / disagreement"]:::fact
+    E --&gt; F["One KAI synthesis + epistemic uncertainty"]:::cognition
+    F --&gt; G{"Advisory or consequential?"}:::fact
+    G --&gt;|advisory| H["Explain clearly to owner"]:::safe
+    G --&gt;|consequential| I["Structured proposal into Tool Gate"]:::safe
+    J["Model votes / confidence alone"]:::risk --&gt; K["Cannot mint permission or facts"]:::risk
+    </foreignObject>
+    </g>
+    <g id="m3458764687005970129" data-miro-id="3458764687005970129" transform="translate(32600,18000)" data-frame="GOLD VISUAL 9 | Lifelong KAI | Stewardship and continuity">
+    <rect data-type="frame" x="0" y="0" width="2050" height="1450" fill="#ffffff" data-title="GOLD VISUAL 9 | Lifelong KAI | Stewardship and continuity" />
+    <textArea id="m3458764687005970135" data-miro-id="3458764687005970135" x="80" y="62.5" width="1880" height="55" fill="#1a1a1a" font-family="noto_sans" font-size="39" text-align="left" font-weight="bold">Lifelong KAI | Stewardship and continuity</textArea>
+    <textArea id="m3458764687005970136" data-miro-id="3458764687005970136" x="80" y="141.5" width="1880" height="31" fill="#595959" font-family="noto_sans" font-size="22" text-align="left">One-owner sovereign organism across changing models and vessels — continuity must be restored and proven</textArea>
+    <textArea id="m3458764687005970137" data-miro-id="3458764687005970137" x="80" y="1216.5" width="1880" height="62" fill="#305bab" font-family="noto_sans" font-size="22" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md#L25"&gt;Original mission and replaceable vessel doctrine&lt;/a&gt;&lt;br /&gt;&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md#L1366"&gt;README: offline sovereign end goal&lt;/a&gt;</textArea>
+    <textArea id="m3458764687005970138" data-miro-id="3458764687005970138" x="80" y="1350.5" width="1880" height="28" fill="#595959" font-family="noto_sans" font-size="20" text-align="left">Succession, privacy, incapacity and financial authority are owner/legal gates, not dead-man timers.</textArea>
+    <foreignObject id="m3458764687005970140" data-miro-id="3458764687005970140" x="210" y="245" width="1600" height="900" data-type="diagram" data-title="Gold visual 9 technical connections">
+    flowchart LR
+    classDef fact fill:#9CE6FF,stroke:#2C97BB,color:#1C4657
+    classDef cognition fill:#FFE86D,stroke:#A28E26,color:#574900
+    classDef safe fill:#B3E65F,stroke:#6E9A24,color:#2F440B
+    classDef risk fill:#FFB575,stroke:#CC7830,color:#542700
+    A["Owner mission, identity and values"]:::cognition --&gt; B["Canonical memory + relationship episodes"]:::fact
+    B --&gt; C["Signed lineage manifest + backups"]:::fact
+    C --&gt; D["Isolated resurrection / migration drill"]:::safe
+    D --&gt; E{"Epoch, state, identity, tests verified?"}:::fact
+    E --&gt;|yes| F["Restore single KAI on replacement vessel"]:::safe
+    E --&gt;|no| G["Quarantine / no permission revival"]:::risk
+    F --&gt; H["Relationship and narrative integrity review"]:::cognition
+    H --&gt; I["Governed continuing growth / fresh qualification"]:::safe
+    J["Operator absent or incapacitated"]:::risk --&gt; K["Limited essentials, NOT automatic succession"]:::fact
+    K --&gt; L["Explicit legal / owner succession governance"]:::safe
+    </foreignObject>
+    </g>
+    <g id="m3458764687006972463" data-miro-id="3458764687006972463" transform="translate(100,25350)" data-frame="KAI GOLD NAVIGATION | Source-to-architecture-to-evidence">
+    <rect data-type="frame" x="0" y="0" width="13900" height="2950" fill="#ffffff" data-title="KAI GOLD NAVIGATION | Source-to-architecture-to-evidence" />
+    <textArea id="m3458764687006972464" data-miro-id="3458764687006972464" x="100" y="74.5" width="13100" height="73" fill="#1a1a1a" font-family="noto_sans" font-size="52" text-align="left" font-weight="bold">KAI • Gold Architecture Navigator</textArea>
+    <textArea id="m3458764687006972465" data-miro-id="3458764687006972465" x="100" y="180.5" width="13000" height="41" fill="#595959" font-family="noto_sans" font-size="29" text-align="left">One KAI → complete feature lineage → source-bound designs → connected diagrams → proof gates. Navigation is not implementation evidence.</textArea>
+    <rect id="m3458764687006972466" data-miro-id="3458764687006972466" x="90" y="300" width="4450" height="2100" rx="12" fill="#f0f5fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="none" />
+    <textArea id="m3458764687006972467" data-miro-id="3458764687006972467" x="150" y="365.5" width="4240" height="52" fill="#1a1a1a" font-family="noto_sans" font-size="37" text-align="left" font-weight="bold">CONNECTED SYSTEM FLOWS • 9</textArea>
+    <textArea id="m3458764687006972468" data-miro-id="3458764687006972468" x="150" y="461.5" width="4240" height="37" fill="#595959" font-family="noto_sans" font-size="26" text-align="left">Diagrammatic integration, not deployed proof</textArea>
+    <textArea id="m3458764687006972469" data-miro-id="3458764687006972469" x="160" y="553" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764686948409469"&gt;01 · One organism / feedback loop&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972470" data-miro-id="3458764687006972470" x="160" y="694" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764687005374496"&gt;02 · Memory, dreams and identity&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972471" data-miro-id="3458764687006972471" x="160" y="835" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764687005684432"&gt;03 · Trust and final-hand authority&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972472" data-miro-id="3458764687006972472" x="160" y="976" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764687005684433"&gt;04 · Perception and qualified world state&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972473" data-miro-id="3458764687006972473" x="160" y="1117" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764687005684434"&gt;05 · Current-to-target migration&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972474" data-miro-id="3458764687006972474" x="160" y="1258" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764687005684435"&gt;06 · Doctor, resilience and restoration&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972475" data-miro-id="3458764687006972475" x="160" y="1399" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764687005684436"&gt;07 · Zero-loss evidence and assurance&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972476" data-miro-id="3458764687006972476" x="160" y="1540" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764687005970128"&gt;08 · One intelligence, specialist councils&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972477" data-miro-id="3458764687006972477" x="160" y="1681" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764687005970129"&gt;09 · Lifelong KAI and succession&lt;/a&gt;</textArea>
+    <rect id="m3458764687006972478" data-miro-id="3458764687006972478" x="4690" y="300" width="4450" height="2100" rx="12" fill="#f4f2fd" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="none" />
+    <textArea id="m3458764687006972479" data-miro-id="3458764687006972479" x="4750" y="365.5" width="4240" height="52" fill="#1a1a1a" font-family="noto_sans" font-size="37" text-align="left" font-weight="bold">SOURCE-BOUND GOLD DESIGN • 8</textArea>
+    <textArea id="m3458764687006972480" data-miro-id="3458764687006972480" x="4750" y="461.5" width="4240" height="37" fill="#595959" font-family="noto_sans" font-size="26" text-align="left">Every card should identify evidence class and source</textArea>
+    <textArea id="m3458764687006972481" data-miro-id="3458764687006972481" x="4760" y="553" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764686859515286"&gt;01 · Constitution and operator ownership&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972482" data-miro-id="3458764687006972482" x="4760" y="694" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764686859515287"&gt;02 · Feature lineage and zero loss&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972483" data-miro-id="3458764687006972483" x="4760" y="835" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764686859515288"&gt;03 · Integrated experience and inner life&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972484" data-miro-id="3458764687006972484" x="4760" y="976" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764686859515289"&gt;04 · Current vs proposed topology&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972485" data-miro-id="3458764687006972485" x="4760" y="1117" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764686859900281"&gt;05 · Trust boundaries and identities&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972486" data-miro-id="3458764687006972486" x="4760" y="1258" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764686859900282"&gt;06 · Memory, dreams and stewardship&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972487" data-miro-id="3458764687006972487" x="4760" y="1399" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764686859900283"&gt;07 · Evidence-driven migration&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972488" data-miro-id="3458764687006972488" x="4760" y="1540" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764686859900284"&gt;08 · Verification and programme gates&lt;/a&gt;</textArea>
+    <rect id="m3458764687006972489" data-miro-id="3458764687006972489" x="9290" y="300" width="4450" height="2100" rx="12" fill="#fffbed" data-text-color="#1a1a1a" data-font-family="open_sans" data-font-size="14" data-text-align="left" data-text-align-vertical="top" stroke="none" />
+    <textArea id="m3458764687006972490" data-miro-id="3458764687006972490" x="9350" y="365.5" width="4240" height="52" fill="#1a1a1a" font-family="noto_sans" font-size="37" text-align="left" font-weight="bold">README FEATURE ATLAS • 12</textArea>
+    <textArea id="m3458764687006972491" data-miro-id="3458764687006972491" x="9350" y="461.5" width="4240" height="37" fill="#595959" font-family="noto_sans" font-size="26" text-align="left">11 organs plus engineering; nested coverage still open</textArea>
+    <textArea id="m3458764687006972492" data-miro-id="3458764687006972492" x="9360" y="553" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764686812038179"&gt;O1 · Soul / Identity / Inner Life&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972493" data-miro-id="3458764687006972493" x="9360" y="694" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764686812038180"&gt;O2 · Memory / Relationship / Continuity&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972494" data-miro-id="3458764687006972494" x="9360" y="835" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764686812038181"&gt;O3 · Senses / World Awareness&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972495" data-miro-id="3458764687006972495" x="9360" y="976" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764686812038182"&gt;O4 · Intelligence / Reasoning&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972496" data-miro-id="3458764687006972496" x="9360" y="1117" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764686812100048"&gt;O5 · Cognitive Depth / Specialists&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972497" data-miro-id="3458764687006972497" x="9360" y="1258" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764686812100049"&gt;O6 · Proactivity / Goals / Attention&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972498" data-miro-id="3458764687006972498" x="9360" y="1399" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764686812100050"&gt;O7 · Governed Hands / Capabilities&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972499" data-miro-id="3458764687006972499" x="9360" y="1540" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764686812100051"&gt;O8 · Doctor / Resilience&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972500" data-miro-id="3458764687006972500" x="9360" y="1681" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764686814635517"&gt;O9 · Growth / Dream / Evolution&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972501" data-miro-id="3458764687006972501" x="9360" y="1822" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764686814635518"&gt;O10 · Continuity / Stewardship&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972502" data-miro-id="3458764687006972502" x="9360" y="1963" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764686814635519"&gt;O11 · Mission Control / Presence&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972503" data-miro-id="3458764687006972503" x="9360" y="2104" width="4220" height="42" fill="#305bab" font-family="noto_sans" font-size="30" text-align="left">&lt;a href="https://miro.com/app/board/uXjVEd6GMHU=/?moveToWidget=3458764686814635520"&gt;ENG · Engineering / Assurance substrate&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972504" data-miro-id="3458764687006972504" x="100" y="2541.5" width="12800" height="41" fill="#305bab" font-family="noto_sans" font-size="29" text-align="left">&lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/README.md"&gt;Pinned README / feature intent&lt;/a&gt; &lt;a href="https://github.com/dainius1234/kai-system/blob/422bfb5797a2c23458b036d8276d32db3a12fa1a/kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md"&gt;Source architecture specification&lt;/a&gt; &lt;a href="https://linear.app/kaidainius/issue/DAI-10/kingsman-canon-freeze-and-traceability-baseline"&gt;Linear DAI-10 programme record&lt;/a&gt;</textArea>
+    <textArea id="m3458764687006972505" data-miro-id="3458764687006972505" x="100" y="2664.5" width="13300" height="39" fill="#595959" font-family="noto_sans" font-size="27" text-align="left">REVIEW STATUS: 21 previously supported; 43 source/wording repairs now awaiting independent review. No runtime or Gold-tier acceptance.</textArea>
+    <textArea id="m3458764687006972506" data-miro-id="3458764687006972506" x="100" y="2765" width="13300" height="38" fill="#595959" font-family="noto_sans" font-size="27" text-align="left">CURRENT HOLD: Engineering paused • PRE-RAMS not released • PR #122 DO NOT MERGE. No diagram or model council can grant execution authority.</textArea>
+    <textArea id="m3458764687071607680" data-miro-id="3458764687071607680" x="100" y="2860.5" width="13270" height="34" fill="#305bab" font-family="noto_sans" font-size="24" text-align="left">&lt;a href="https://linear.app/kaidainius/document/kai-collaboration-communication-and-change-control-protocol-freeze-0fb99c6d4326"&gt;Protocol mirror [canonical handoff #139]&lt;/a&gt; · &lt;a href="https://linear.app/kaidainius/document/kai-readme-feature-universe-104-features-and-356-source-references-39a37c8c1f94"&gt;Feature list mirror [handoff #167]&lt;/a&gt; · &lt;a href="https://linear.app/kaidainius/document/kai-kingsman-professionalisation-research-report-2026-10-11-full-deep-f4a9bdc38106"&gt;Research mirror [handoff #164]&lt;/a&gt;</textArea>
+    </g>
+    </svg>
+    END-VERBATIM MIRO-GOLD-VISUALS-NAV-READBACK-20261013
+
+### 6. Next authorised step
+
+- Post the register to Kai on DAI-10 (posted == banked), then report to Dainius in plain words  [CONVERSATION 2026-10-13 Dainius, "We now await Orion's evidence-based verdict—not automatic agreement."]
+
+### 7. What I am unsure of
+
+- Visual legibility (font size, overlap, readability on screen) was not checked; the read tool returns structure, not pixels  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
