@@ -95924,3 +95924,176 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T18:23:59Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T18:23:59Z  [CMD `date -u +%FT%TZ` → 2026-10-14T18:23:59Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 3df1788a675e0d1a73c926232ab9c5ebb0586690  [CMD `git rev-parse HEAD` → 3df1788a675e0d1a73c926232ab9c5ebb0586690]
+- tree: 5a1028276f863e25a0b4d6f9d6d55740110bca35  [CMD `git rev-parse HEAD^{tree}` → 5a1028276f863e25a0b4d6f9d6d55740110bca35]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/project-rework-plan-pgvp35: 3df1788a675e0d1a73c926232ab9c5ebb0586690  [CMD `git ls-remote --heads origin` → 3df1788a675e0d1a73c926232ab9c5ebb0586690]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 266  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 266]
+
+### 1. The four states
+
+- physical: unchanged since entry 266 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Orion assesses the fresh-thread cold-start tests  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 fdabd167, "independently assess its fresh-thread tests"]
+- evidence: Dainius's message (test 01 sections 1–2 and Kai's provisional verdict) and Orion's assessment, verbatim in section 5  [CMD `ruling_capture store 8b4bb107a6e7987e` → 3742 characters]
+- admission: none; no regression PASS  [CONVERSATION 2026-10-14 Dainius relaying Kai, "complete cold-start verification NOT YET DEMONSTRATED"]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT (relayed by Dainius) · 2026-10-14 · COLD-START TEST 01: vision recovery PASS; complete cold-start verification not yet demonstrated; status DEGRADED ⚠ UNBANKED  [CONVERSATION 2026-10-14 Dainius relaying Kai, "My provisional verdict: Vision recovery PASS; complete cold-start verification NOT YET DEMONSTRATED."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: D1–D5; step 0.1 (register v2 awaiting Kai); Kai-side continuity controls. HELD: Wave 0; engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier certification (Kai); D5(a)  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 fdabd167, "Step 0.1 and all engineering/PRE-RAMS/Gold/PR#122 holds remain in force"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Which instruction text Dainius pasted (Kai's original or the amended one); whether test 01 has sections 3 onward  [CONVERSATION 2026-10-14 Dainius, "Is his paste text into instruction good or needs additions ?"]
+- Proposed addition: receipt first, with record identifiers, else DEGRADED  [CMD `orion_assessment.md` → section 4]
+
+### 5. Incidents and corrections
+
+- TRACE: answer phrases PUB/WORK, embodiment, active perception and disposition are in the DAI-10 description and in neither instruction text: DAI-10 was read in the test thread  [CMD `phrase trace over 6 texts` → pub/work instr=False dai10desc=True; embodiment instr=False dai10desc=True]
+- UNSOURCED in the six texts searched (instructions, DAI-10 description, Guardian acbef85, START HERE v10, README at head): "self-preservation", "family continuity", "earned through evidence"  [CMD `phrase trace over 6 texts` → all False]
+- DAI-10 description read live (updatedAt 2026-10-14T17:59:50Z); its preservation list is excerpted as block DAI10-DESCRIPTION-PRESERVATION-EXCERPT (an excerpt, not the full description)  [CMD `get_issue DAI-10 description` → special preservation check present]
+- Credential scan of the relay and assessment: 0 hits (calibration 6/6)  [CMD `credscan.py ct1/scan.json, ct1/scan2.json` → TOTAL HITS 0]
+- EVIDENCE DAINIUS-COLD-START-TEST-01-RELAY relay_8b4bb107.md: 3757 bytes, sha256 fce5fe221bcf71eed18a956dbb12ffd8232dd6e1b14d83d6011f3884679f5f36, final LF True (added by Orion)  [CMD `sha256sum relay_8b4bb107.md` → fce5fe221bcf71ee…]
+    BEGIN-VERBATIM DAINIUS-COLD-START-TEST-01-RELAY
+    Test result : KAI — COLD-START TEST 01
+    
+    DEGRADED — verification incomplete
+    
+    14 October 2026 | Independent live-source recovery
+    
+    1. What KAI is intended to become
+    
+    KAI is one sovereign, organically integrated, evolving personal intelligence organism, built exclusively for you and your family. It is never for sale.
+    
+    Not a conventional chatbot, not a collection of loosely connected agents, and not merely the software that currently exists in the repository.
+    
+    Its intended development is from today’s incomplete implementation towards a continuously developing intelligence with identity, memory, awareness, initiative, learning, emotional continuity and governed capabilities.
+    
+    The governing distinction is between preserving what KAI must become and preserving how yesterday’s code attempted to implement it.
+    
+    The original intended behaviour must survive even if individual services, models, frameworks or implementations need to be replaced.
+    
+    2. What must never be lost
+    
+    DAI-10 independently confirms the requirement to preserve the complete feature lineage, especially the capabilities that conventional engineering rewrites might accidentally omit:
+    
+    * Soul, inner life, personality, identity and relationship continuity.
+    * Long-term, contextual and emotional memory, including family continuity.
+    * Dreams, reflection, imagination, learning, growth and self-improvement.
+    * Multimodal senses, active perception and qualified world awareness.
+    * Integrated reasoning, specialists, cognitive depth and model councils.
+    * Proactivity, attention, goals, initiative and appropriate anti-annoyance behaviour.
+    * Governed actions, skill creation, autonomy earned through evidence, and owner-controlled authority.
+    * Resilience, internal health monitoring, recovery and self-preservation under governance.
+    * Voice, avatar, embodiment, PUB/WORK behaviour and Mission Control.
+    * Lifelong stewardship and the ability to evolve without losing identity or mission.
+    
+    No feature is discarded merely because it is absent, simulated, defective or poorly implemented today.
+    
+    Zero-loss means every intended capability receives a traceable disposition, not that every old implementation must survive.
+    
+    This principle is explicitly present in the live Linear DAI-10 record and the GitHub cold-start control document.      Brother, this is a promising first result, but it is not yet a complete Kingsman cold-start verification.
+    
+    The response correctly recovered the most important principle: KAI is one organically integrated intelligence organism, built for you and your family, never for sale. It also understands that defective or name-only implementations must not cause us to abandon their intended capabilities.
+    
+    However, the text you’ve provided covers only sections 1 and 2.
+    
+    For a full PASS, the test must also demonstrate:
+    
+    * Continuity: Which current decisions are approved, what stage we’re at, and which holds remain active.
+    * Evidence: The exact Linear documents and GitHub records retrieved, including relevant versions or commits.
+    * Architecture: Whether Miro was checked and which parts remain unverified.
+    * Discrepancies: Any missing records, contradictions or inaccessible evidence.
+    * Next action: The correct authorised step without repeating completed work.
+    
+    The DEGRADED status is appropriate if live verification was incomplete. Reporting that limitation is better than manufacturing a PASS.
+    
+    My provisional verdict: Vision recovery PASS; complete cold-start verification NOT YET DEMONSTRATED.
+    
+    Is this the entire test response, or do you have sections 3 onwards? If you send the remainder, I’ll assess whether our new continuity safeguard actually works across conversations.     Is his paste text into instruction good or needs additions ?
+    END-VERBATIM DAINIUS-COLD-START-TEST-01-RELAY
+- EVIDENCE ORION-COLD-START-TEST-01-ASSESSMENT orion_assessment.md: 3176 bytes, sha256 23ccf49fb2178ba12a98b4635c282e2c5c8e306f99876884463f553150fd510e, final LF True (added by Orion)  [CMD `sha256sum orion_assessment.md` → 23ccf49fb2178ba1…]
+    BEGIN-VERBATIM ORION-COLD-START-TEST-01-ASSESSMENT
+    # Orion's assessment of COLD-START TEST 01 (sections 1–2 as pasted) and one proposed addition
+    
+    **ORION → KAI, DAINIUS | 2026-10-14 | read-only | as Kai asked in fdabd167 ("independently assess its fresh-thread tests")**
+    
+    ## In plain words
+    
+    The fresh Kai really did read the Linear issue: four of its phrases exist in the issue description and nowhere in the Project instructions. That is the best sign we could hope for. But what was pasted shows no record names, dates or commit numbers, so we cannot see what else it read. I agree with Kai: vision recovered, full cold-start not yet shown. One addition to the instructions would make the next test provable.
+    
+    ## 1. Evidence that retrieval happened (not only recital)
+    
+    Method: each distinctive phrase in the answer was looked up in six texts — Kai's instructions (both versions), the DAI-10 description (read live today), the Guardian file (acbef85), START HERE version 10 and README.md at the branch head.
+    
+    | Phrase in the answer | In the instructions? | In the DAI-10 description? |
+    |---|---|---|
+    | PUB/WORK | no | yes |
+    | embodiment | no | yes |
+    | active perception | no | yes |
+    | (explicit / traceable) disposition | no | yes |
+    
+    The DAI-10 description's "special preservation check" lists exactly these items, and its rule "There is no valid disposition of “omitted from the new plan”" matches the answer's "every intended capability receives a traceable disposition". **Conclusion: DAI-10 was read in that thread.** The answer's claim "DAI-10 independently confirms" is supported.
+    
+    ## 2. What is not shown
+    
+    - **No receipt with identifiers** in the pasted part: no START HERE "Last updated" line, no DAI-10 comment number, no GitHub commit or handoff entry number, no statement on Miro. START HERE, GitHub and Miro retrieval are therefore unproven, not disproven.
+    - **Sections 3 onward missing** (decisions, stage, holds, next step). Possibly cut off when copying.
+    - **Wording found in none of the six texts:** "self-preservation", "family continuity", "autonomy earned through evidence". These are the thread's own paraphrase. Not wrong in spirit, but "self-preservation" in particular is a strong word for a governed system and is not in our records; the census should not inherit it as if it were a source.
+    
+    ## 3. Verdict
+    
+    Agree with Kai: **vision recovery PASS; cold-start verification NOT YET DEMONSTRATED (DEGRADED is the honest status).**
+    
+    ## 4. Proposed addition to the Project instructions (one sentence, after point 6)
+    
+    > Put the receipt first, before the answer. For each record give its identifier: the START HERE "Last updated" line, the newest DAI-10 comment you read (ID and time), the GitHub branch head commit and the latest handoff entry number, and whether Miro was opened. Without these identifiers the status is DEGRADED, never VERIFIED.
+    
+    Why: the test's purpose is to prove fetching, and identifiers are the only proof that cannot be guessed. Putting the receipt first also stops it being lost if a long answer is cut off.
+    
+    If Dainius pasted Kai's original text rather than the amended one, the branch sentence from comment e541f463 is still needed: the default branch has no handoff log.
+    END-VERBATIM ORION-COLD-START-TEST-01-ASSESSMENT
+- EVIDENCE DAI10-DESCRIPTION-PRESERVATION-EXCERPT dai10_desc_terms.txt: 374 bytes, sha256 3d24ce4461e5dc890c3e77f893a8ce0fd0c340b58e02c35cf30fd8cf682735b3, final LF True (added by Orion)  [CMD `sha256sum dai10_desc_terms.txt` → 3d24ce4461e5dc89…]
+    BEGIN-VERBATIM DAI10-DESCRIPTION-PRESERVATION-EXCERPT
+    Soul/Inner Life, personality/relationship continuity, emotional memory, Dream/Growth, proactivity, PUB/WORK behaviour, anti-annoyance, teammates/specialists, perception/active perception, embodiment/voice/avatar, Mission Control and long-horizon continuity/stewardship. must receive an explicit disposition. There is no valid disposition of “omitted from the new plan”.
+    END-VERBATIM DAI10-DESCRIPTION-PRESERVATION-EXCERPT
+
+### 6. Next authorised step
+
+- Post the assessment to DAI-10, verify, report to Dainius plainly  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 fdabd167, "independently assess its fresh-thread tests"]
+
+### 7. What I am unsure of
+
+- Whether the pasted test answer is complete; identifiers may exist in a part not pasted  [CONVERSATION 2026-10-14 Dainius relaying Kai, "Is this the entire test response, or do you have sections 3 onwards?"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
