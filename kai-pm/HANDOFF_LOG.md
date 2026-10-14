@@ -83491,3 +83491,151 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T08:29:21Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T08:29:21Z  [CMD `date -u +%FT%TZ` → 2026-10-14T08:29:21Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 80ab1bc084ee301daa2e39d0d99ee170fba6ccf2  [CMD `git rev-parse HEAD` → 80ab1bc084ee301daa2e39d0d99ee170fba6ccf2]
+- tree: 331a09a5d8372c86eb0f4cf1301d50c3a6336ee8  [CMD `git rev-parse HEAD^{tree}` → 331a09a5d8372c86eb0f4cf1301d50c3a6336ee8]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 80ab1bc084ee301daa2e39d0d99ee170fba6ccf2  [CMD `git ls-remote --heads origin` → 80ab1bc084ee301daa2e39d0d99ee170fba6ccf2]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 221  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 221]
+
+### 1. The four states
+
+- physical: unchanged since entry 221 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: planning record; the erratum note to be posted to Kai  [CONVERSATION 2026-10-14 Dainius, "Ok do that please"]
+- evidence: erratum E2 note verbatim in section 5, generated mechanically from blocks V3-2-1 (entry 218) and V3-2-2 (entry 221)  [CMD `python3 -I difflib v321_base.md → v3.2.2` → 7 changes]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None; this entry banks the E2 note before posting  [CONVERSATION 2026-10-14 Dainius, "Ok do that please"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier; no research execution, scripts, cards or `kai-pm/research/`; D1–D5 undecided  [CONVERSATION 2026-10-14 Kai, "No research execution or engineering changes authorised by this ruling."]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- Credential scan of the note: calibration 6/6, TOTAL HITS 0  [CMD `credscan.py e2/cs_note.json` → TOTAL HITS 0]
+- EVIDENCE ORION-ERRATUM-E2-NOTE ERRATUM_E2.md: 4641 bytes, sha256 a6e2ec69875e6a2e7ac3d80a795cf0c390457e47e6885476e17931d8d7a06138, final LF True (added by Orion)  [CMD `sha256sum ERRATUM_E2.md` → a6e2ec69875e6a2e…]
+    BEGIN-VERBATIM ORION-ERRATUM-E2-NOTE
+    # Erratum E2 to the research procedure: v3.2.1 → v3.2.2
+    
+    **ORION → KAI, DAINIUS | bounded wording correction under Dainius's correction relayed in DAI-10 c22679b4 | planning only | 2026-10-14**
+    
+    Dainius's words (entry 220): "You are Kai so all evidence given to you by Orion or deep seek will be and are to be reviewed by you ! Do not confuse Kai-project and , kai-GPT". He confirms he has made sure the two are not confused (entry 221).
+    
+    Every changed line follows, exactly as it reads before and after. Nothing else in v3.2.1 changed. The full v3.2.2 text is block ORION-RESEARCH-PROCEDURE-V3-2-2 (entry 221).
+    
+    ## Change 1 (replaced)
+    
+    Before:
+    
+    > # KAI Full-Feature Research Procedure — Final Candidate (v3.2.1 = v3.2 + erratum E1)
+    
+    After:
+    
+    > # KAI Full-Feature Research Procedure — Final Candidate (v3.2.2 = v3.2 + errata E1 and E2)
+    
+    ## Change 2 (replaced)
+    
+    Before:
+    
+    > **ORION → DAINIUS, KAI | the one final text under v3.1 §10 step 3, corrected by erratum E1 under Kai's readiness ruling 8c755e33 | planning only | 2026-10-14**
+    
+    After:
+    
+    > **ORION → DAINIUS, KAI | the one final text under v3.1 §10 step 3, corrected by erratum E1 under Kai's readiness ruling 8c755e33 and erratum E2 under Dainius's correction (c22679b4) | planning only | 2026-10-14**
+    
+    ## Change 3 (replaced)
+    
+    Before:
+    
+    > - Kai's readiness ruling on v3.2 (entry 217), applied as erratum E1 (§0.0).
+    
+    After:
+    
+    > - Kai's readiness ruling on v3.2 (entry 217), applied as erratum E1 (§0.0);
+    > - Dainius's correction relayed in DAI-10 c22679b4 (entry 220), applied as erratum E2 (§0.0).
+    > 
+    > **Who is who in this procedure** (E2):
+    > - **Kai** means Kai-GPT, Dainius's principal technical reviewer. Kai reviews and adjudicates all evidence and proposals that Orion and DeepSeek supply, against the primary sources. Nothing is admitted because another assistant asserted it.
+    > - **KAI** means KAI-project, the software being researched. It is not running and checks nothing. A "KAI test" (`kai_test`) is a separately authorised test of the KAI-project software.
+    > - Orion still checks Kai's work independently, and DeepSeek still challenges it. Dainius makes all consequential decisions.
+    
+    ## Change 4 (added)
+    
+    After:
+    
+    > | E2: Dainius's correction (c22679b4, entry 220) | "Who is who" note added after "Built from"; Kai's role in §7 and the evidence wording in §4 item 8 and Annex B now say that Kai-GPT reviews all Orion and DeepSeek evidence, and that only the KAI-project software is tested by KAI tests |
+    
+    ## Change 5 (replaced)
+    
+    Before:
+    
+    > 8. **Evidence, not adverts:** vendor claims are labelled claims. Primary source code, independent research and reproducible benchmarks can substantiate candidate-method claims, with their limits recorded. Only separately authorised and executed KAI tests can establish KAI-specific runtime qualification. External evidence alone never makes a KAI feature QUALIFIED.
+    
+    After:
+    
+    > 8. **Evidence, not adverts:** vendor claims are labelled claims. Primary source code, independent research and reproducible benchmarks can substantiate candidate-method claims, with their limits recorded. Only separately authorised and executed tests of the KAI-project software can establish KAI-specific runtime qualification. External evidence alone never makes a KAI feature QUALIFIED. All evidence supplied by Orion or DeepSeek is reviewed and adjudicated by Kai-GPT; that review does not wait for, and is not replaced by, a KAI-project test.
+    
+    ## Change 6 (replaced)
+    
+    Before:
+    
+    > - **Kai:** adjudicates source classification; researches and writes the cards; adjudicates every BLOCKED card and every unlocated source.
+    
+    After:
+    
+    > - **Kai (Kai-GPT):** reviews and adjudicates all evidence and proposals from Orion and DeepSeek against the primary sources; adjudicates source classification; researches and writes the cards; adjudicates every BLOCKED card and every unlocated source.
+    
+    ## Change 7 (replaced)
+    
+    Before:
+    
+    > - **Evidence kinds:** outside evidence (source code, independent research, reproducible benchmarks, standards, advisories) can show a method is credible. Only separately authorised and executed KAI tests can show it works in KAI. Vendor claims are labelled as claims.
+    
+    After:
+    
+    > - **Evidence kinds:** outside evidence (source code, independent research, reproducible benchmarks, standards, advisories) can show a method is credible. Only separately authorised and executed tests of the KAI-project software can show it works in KAI. Vendor claims are labelled as claims. Kai-GPT reviews all evidence supplied by Orion or DeepSeek.
+    
+    Checks: 104/104 features once; waves 28 / 14 / 27 / 35; Annex B parses (entry 221 §5).
+    END-VERBATIM ORION-ERRATUM-E2-NOTE
+
+### 6. Next authorised step
+
+- Post the note to DAI-10 (posted == banked); republish the owner page with v3.2.2; report to Dainius  [CONVERSATION 2026-10-14 Dainius, "Ok do that please"]
+
+### 7. What I am unsure of
+
+- Nothing new  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
