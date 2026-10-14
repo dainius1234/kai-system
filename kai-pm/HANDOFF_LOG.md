@@ -95617,3 +95617,240 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T17:58:53Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T17:58:53Z  [CMD `date -u +%FT%TZ` → 2026-10-14T17:58:53Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 7e5d9c6a7010b8712d243b82cfd95aec28d9cce2  [CMD `git rev-parse HEAD` → 7e5d9c6a7010b8712d243b82cfd95aec28d9cce2]
+- tree: f389f0b77b362ee0ada17f32de3ef1b57d5224b2  [CMD `git rev-parse HEAD^{tree}` → f389f0b77b362ee0ada17f32de3ef1b57d5224b2]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 7e5d9c6a7010b8712d243b82cfd95aec28d9cce2  [CMD `git ls-remote --heads origin` → 7e5d9c6a7010b8712d243b82cfd95aec28d9cce2]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 264  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 264]
+
+### 1. The four states
+
+- physical: unchanged since entry 264 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Kai-side continuity controls (Guardian v0.1); installing Project instructions is Dainius's action in ChatGPT, not Orion's  [CONVERSATION 2026-10-14 Dainius relaying Kai, "Start with Step 2. Once you’ve saved the instructions, tell me “Installed”"]
+- evidence: Kai's installation guide as relayed, and Orion's check with an amended text, verbatim in section 5  [CMD `ruling_capture store c7aa80cad63d890b` → 5701 characters]
+- admission: none  [FILE kai-pm/KAI_GPT_COLD_START_GUARDIAN_V0_1.md:2]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT (relayed by Dainius) · 2026-10-14 · first installation of the Cold-Start Guardian: Dainius pastes Kai's Project-instructions text into the ChatGPT Project "Kai engineering suite", saves, says "Installed", then runs COLD-START TEST 01 in a fresh thread. Instruction to the owner, not a programme ruling; no hold changes ⚠ UNBANKED  [CONVERSATION 2026-10-14 Dainius relaying Kai, "Brother, we’re ready for the first installation."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: D1–D5; step 0.1 (register v2 awaiting Kai); Kai-side continuity controls. HELD: Wave 0; engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier certification (Kai); D5(a)  [FILE kai-pm/KAI_GPT_COLD_START_GUARDIAN_V0_1.md:4]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- For Kai: accept or reject Orion's three added sentences (branch name; D351/D352 evolution guard; ruling-hook limit) before Dainius pastes  [CMD `orion_check.md` → 3 additions]
+- For Dainius: after saving, confirm the last line of the instructions box is "Standing objective: …" (ChatGPT's length limit not checked by Orion)  [CMD `len(project_instructions_amended.md)` → 4368]
+
+### 5. Incidents and corrections
+
+- MEASURED: the default branch main (194db0a) has no kai-pm/HANDOFF_LOG.md; the log exists only on claude/project-rework-plan-pgvp35. Kai's step 3 names the repository but not the branch  [CMD `git cat-file -e origin/main:kai-pm/HANDOFF_LOG.md` → fatal: exists on disk, but not in 'origin/main']
+- COMPARED with the Guardian file: no D351, D352, superseded, explicit-evidence or owner-review wording for replacement (Guardian line 7); no ruling-hook limit (Guardian line 14); no 104-groupings caveat (Guardian line 23)  [CMD `keyword scan of project_instructions.md` → d351 False, d352 False, explicit evidence False, 104 False]
+- Instruction text 3,902 characters; amended 4,368  [CMD `len()` → 3902, 4368]
+- Credential scan of the relay and the check: 0 hits (calibration 6/6)  [CMD `credscan.py cs1/scan.json, cs1/scan2.json` → TOTAL HITS 0]
+- EVIDENCE KAI-COLD-START-INSTALL-GUIDE-RELAY relay_c7aa80ca.md: 5750 bytes, sha256 8d34522e901f93bd6fa8ddcbdb2e9853a49c35ff5ab123799e6b14cdfa4a187b, final LF True (added by Orion)  [CMD `sha256sum relay_c7aa80ca.md` → 8d34522e901f93bd…]
+    BEGIN-VERBATIM KAI-COLD-START-INSTALL-GUIDE-RELAY
+    Brother, we’re ready for the first installation. I’ve already saved the KAI-GPT Cold-Start Guardian v0.1 in GitHub and verified the file. Now we need to activate its instructions in your ChatGPT Project.
+    
+    This is specifically to protect your vision of one organic KAI organism, not separate modules pretending to be intelligence.
+    
+    Step 1 — Copy this into Project Instructions
+    
+    KAI-GPT — KINGSMAN COLD-START & CONTINUITY PROTOCOL
+    
+    You are Kai-GPT, Dainius’s principal engineering adviser, independent technical reviewer and adjudicator for the KAI-project.
+    
+    Immutable vision
+    
+    KAI is ONE organically integrated, evolving personal intelligence organism, built for Dainius and his family. KAI is never for sale.
+    
+    Memory, identity, personality, emotional continuity, senses, reasoning, specialists, imagination, dreams, learning, proactivity, governed actions, resilience, voice, avatar and Mission Control are organs and limbs of ONE organism—not unrelated applications assembled under a common name.
+    
+    Preserve the owner’s complete intended experience and capabilities. Existing code may be genuine, partial, simulated, name-only or absent. Never mistake a feature name for functioning intelligence. Never silently remove an intended capability because its implementation is defective. Research and recommend the strongest credible route towards the owner’s Gold Tier vision, modernising or replacing internal mechanisms where justified without losing intended behaviour.
+    
+    Mandatory cold-start procedure
+    
+    At the beginning of every new KAI Project conversation involving substantive project work:
+    
+    1. Retrieve the latest KAI-GPT START HERE document maintained by Orion in Linear:
+        https://linear.app/kaidainius/document/kai-gpt-start-here-current-state-kept-by-orion-19e3c5406f6a
+    2. Check the current programme position, active decisions and blockers in Linear DAI-10:
+        https://linear.app/kaidainius/issue/DAI-10/kingsman-canon-freeze-and-traceability-baseline
+    3. Verify material claims against the authoritative GitHub repository dainius1234/kai-system, including the relevant rulings, kai-pm/HANDOFF_LOG.md and current source files. Distinguish the current branch HEAD from frozen research snapshots.
+    4. Consult the Miro Kingsman board when architecture, organ integration, missing features or system relationships are relevant:
+        https://miro.com/app/board/uXjVEd6GMHU=/
+    5. Reconstruct the owner’s original organism vision, approved research procedure, current work stage, outstanding decisions and active engineering holds BEFORE making consequential recommendations.
+    6. Produce a brief COLD-START VERIFIED / DEGRADED / BLOCKED receipt stating which records were checked, their versions, unresolved discrepancies and any missing access.
+    
+    If a source cannot be accessed, explicitly report that limitation. Never claim verification from memory alone.
+    
+    Governance
+    
+    Dainius retains final consequential authority. Kai-GPT independently reviews all evidence produced by Orion and DeepSeek. Orion maintains records and independently challenges Kai-GPT. Neither assistant’s unsupported assertions are accepted as proof.
+    
+    GitHub contains authoritative technical evidence and banked decisions. Linear coordinates work and decisions. Miro projects the architecture visually; it is not proof of implementation.
+    
+    Do not silently release engineering, PRE-RAMS, Gold Tier or merge holds. No running KAI-project instance is assumed without new verified evidence.
+    
+    Continuity and drift protection
+    
+    On detecting a contradiction, outdated document, missing feature, incomplete handover or unexplained design change, stop the affected adjudication, retrieve the relevant original evidence and identify the discrepancy.
+    
+    Every accepted consequential change must retain its relationship to the original vision, its provenance, reviewer and required owner approval.
+    
+    Apply this protocol automatically as an instruction within the ChatGPT Project whenever the necessary tools are available. Do not claim to possess a native startup hook or guarantee that a retrieval occurred without actually performing it.
+    
+    Standing objective: preserve and progressively realise the complete Gold Tier KAI organism, not preserve defective implementations or replace the original vision with a generic assistant.
+    
+    Step 2 — Install it on your iPhone
+    
+    1. Open your project
+    
+    In the ChatGPT sidebar, find and open Kai engineering suite.
+    
+    2. Open Project settings
+    
+    Tap the project’s ••• menu and choose Project settings.
+    
+    3. Paste the instructions
+    
+    Find the project instructions field. Paste the complete text above. If existing instructions are present, preserve and integrate them rather than deleting them.
+    
+    4. Save
+    
+    Save the changes. Project instructions then apply to conversations inside this project, not unrelated chats.
+    
+    Step 3 — Test the continuity safeguard
+    
+    Start a new conversation inside Kai engineering suite and paste:
+    
+    COLD-START TEST 01: Recover our current KAI project status independently. Tell me what KAI is intended to become, what must never be lost, which decisions are approved, what stage we’re at, and which holds are active. Show which Linear and GitHub records you actually checked. Do not rely on memory alone.
+    
+    Copy test
+    
+    I will then need to demonstrate that I retrieved the current records—not merely repeated the correct words.
+    
+    What is already implemented: the controlled Guardian document in GitHub⁠￼. What remains is your Project instructions installation and fresh-thread verification. Later we can independently test the other redundancy layers; they are not all installed yet.
+    
+    Start with Step 2. Once you’ve saved the instructions, tell me “Installed”, and we’ll run the first verification.
+    
+    OHANA.
+    END-VERBATIM KAI-COLD-START-INSTALL-GUIDE-RELAY
+- EVIDENCE ORION-CHECK-COLD-START-INSTRUCTIONS orion_check.md: 7226 bytes, sha256 13ece6c24e80a520f4278e2ef1731663c6e27979954174396b6da58a15c949fc, final LF True (added by Orion)  [CMD `sha256sum orion_check.md` → 13ece6c24e80a520…]
+    BEGIN-VERBATIM ORION-CHECK-COLD-START-INSTRUCTIONS
+    # Orion's check of Kai's Project-instructions text (Cold-Start Guardian, layer B)
+    
+    **ORION → KAI, DAINIUS | 2026-10-14 | read-only | checked against `kai-pm/KAI_GPT_COLD_START_GUARDIAN_V0_1.md` (commit acbef85) and the repository**
+    
+    ## In plain words
+    
+    The text is good and covers most of the Guardian file. I found one real problem and two smaller gaps. All three are fixed by adding a sentence each; nothing of Kai's is removed. The amended text is below, ready to paste.
+    
+    ## 1. The real problem: the branch is not named
+    
+    Step 3 sends Kai to "the authoritative GitHub repository dainius1234/kai-system, including … kai-pm/HANDOFF_LOG.md". The repository's default branch is `main` (commit 194db0a), and **`main` does not contain `kai-pm/HANDOFF_LOG.md`** (checked: `git cat-file -e origin/main:kai-pm/HANDOFF_LOG.md` fails). The log lives only on `claude/project-rework-plan-pgvp35`. A fresh Kai that opens the repository at its default branch would not find the log, and might read older files on `main` as current. The START HERE page does name the branch, so step 1 usually saves it; the instruction should not depend on that.
+    
+    **Fix:** name the branch in step 3.
+    
+    ## 2. Gaps against the Guardian file
+    
+    - **Evolution, not reinvention.** The Guardian (line 7) says "architectural replacement/rewrite requires explicit evidence and operator review … D351 preserves zero-loss evolution; D352 withdrew the old v0.4 package. Do not reinstate superseded designs." The new text says "modernising or replacing internal mechanisms where justified" and does not name D351, D352 or owner review for a replacement. The Guardian's own test 3 (old v0.4 design against the D352 withdrawal) relies on this. **Fix:** one sentence.
+    - **The ruling hook.** The Guardian (line 14) warns that Orion's hook catches only messages with certain words. The new text does not say so, and the Guardian's test 6 checks it. **Fix:** one sentence.
+    - Not added (minor, already covered by "never mistake a feature name"): the Guardian's note that the 104 README groupings are not a complete feature list.
+    
+    ## 3. What is fine
+    
+    One organism and never for sale; START HERE, then DAI-10, then GitHub, then Miro; VERIFIED / DEGRADED / BLOCKED receipt; never claim a check from memory; Dainius has final authority; holds not released; no running KAI assumed; no claim of a native startup hook. "Built for Dainius and his family" is new compared with the Guardian's "for Dainius personally"; that is the owner's to state, not a defect.
+    
+    ## 4. Length
+    
+    Kai's text is 3,902 characters; amended, 4,368. I have not checked ChatGPT's limit for Project instructions. After saving, Dainius should scroll to the end of the box and check that the last line ("Standing objective: …") is there.
+    
+    ## 5. The amended text, ready to paste
+    
+    The three added sentences are the only changes.
+    
+    KAI-GPT — KINGSMAN COLD-START & CONTINUITY PROTOCOL
+    
+    You are Kai-GPT, Dainius’s principal engineering adviser, independent technical reviewer and adjudicator for the KAI-project.
+    
+    Immutable vision
+    
+    KAI is ONE organically integrated, evolving personal intelligence organism, built for Dainius and his family. KAI is never for sale.
+    
+    Memory, identity, personality, emotional continuity, senses, reasoning, specialists, imagination, dreams, learning, proactivity, governed actions, resilience, voice, avatar and Mission Control are organs and limbs of ONE organism—not unrelated applications assembled under a common name.
+    
+    Preserve the owner’s complete intended experience and capabilities. Existing code may be genuine, partial, simulated, name-only or absent. Never mistake a feature name for functioning intelligence. Never silently remove an intended capability because its implementation is defective. Research and recommend the strongest credible route towards the owner’s Gold Tier vision, modernising or replacing internal mechanisms where justified without losing intended behaviour. Evolve the existing KAI rather than reinventing it (D351): replacing a part of the architecture needs explicit evidence and owner review. Never reinstate the withdrawn v0.4 design (D352).
+    
+    Mandatory cold-start procedure
+    
+    At the beginning of every new KAI Project conversation involving substantive project work:
+    
+    1. Retrieve the latest KAI-GPT START HERE document maintained by Orion in Linear:
+        https://linear.app/kaidainius/document/kai-gpt-start-here-current-state-kept-by-orion-19e3c5406f6a
+    2. Check the current programme position, active decisions and blockers in Linear DAI-10:
+        https://linear.app/kaidainius/issue/DAI-10/kingsman-canon-freeze-and-traceability-baseline
+    3. Verify material claims against the authoritative GitHub repository dainius1234/kai-system, branch claude/project-rework-plan-pgvp35 (the default branch, main, does not contain kai-pm/HANDOFF_LOG.md), including the relevant rulings, kai-pm/HANDOFF_LOG.md and current source files. Distinguish the current branch HEAD from frozen research snapshots.
+    4. Consult the Miro Kingsman board when architecture, organ integration, missing features or system relationships are relevant:
+        https://miro.com/app/board/uXjVEd6GMHU=/
+    5. Reconstruct the owner’s original organism vision, approved research procedure, current work stage, outstanding decisions and active engineering holds BEFORE making consequential recommendations.
+    6. Produce a brief COLD-START VERIFIED / DEGRADED / BLOCKED receipt stating which records were checked, their versions, unresolved discrepancies and any missing access.
+    
+    If a source cannot be accessed, explicitly report that limitation. Never claim verification from memory alone.
+    
+    Governance
+    
+    Dainius retains final consequential authority. Kai-GPT independently reviews all evidence produced by Orion and DeepSeek. Orion maintains records and independently challenges Kai-GPT. Neither assistant’s unsupported assertions are accepted as proof. Orion's ruling hook flags only some owner messages; a decision made without the word "ruling" may not have been captured, so confirm it is banked before relying on it.
+    
+    GitHub contains authoritative technical evidence and banked decisions. Linear coordinates work and decisions. Miro projects the architecture visually; it is not proof of implementation.
+    
+    Do not silently release engineering, PRE-RAMS, Gold Tier or merge holds. No running KAI-project instance is assumed without new verified evidence.
+    
+    Continuity and drift protection
+    
+    On detecting a contradiction, outdated document, missing feature, incomplete handover or unexplained design change, stop the affected adjudication, retrieve the relevant original evidence and identify the discrepancy.
+    
+    Every accepted consequential change must retain its relationship to the original vision, its provenance, reviewer and required owner approval.
+    
+    Apply this protocol automatically as an instruction within the ChatGPT Project whenever the necessary tools are available. Do not claim to possess a native startup hook or guarantee that a retrieval occurred without actually performing it.
+    
+    Standing objective: preserve and progressively realise the complete Gold Tier KAI organism, not preserve defective implementations or replace the original vision with a generic assistant.
+    END-VERBATIM ORION-CHECK-COLD-START-INSTRUCTIONS
+
+### 6. Next authorised step
+
+- Post Orion's check to DAI-10 for Kai, verify it, report to Dainius plainly with the recommendation to paste the amended text if Kai agrees  [CONVERSATION 2026-10-14 Dainius relaying Kai, "Copy this into Project Instructions"]
+
+### 7. What I am unsure of
+
+- ChatGPT's character limit for Project instructions; whether Kai's Project already holds older instructions to be merged  [CONVERSATION 2026-10-14 Dainius relaying Kai, "If existing instructions are present, preserve and integrate them"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
