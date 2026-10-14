@@ -85157,3 +85157,85 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T09:34:00Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T09:34:00Z  [CMD `date -u +%FT%TZ` → 2026-10-14T09:34:00Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 73740cc65c7fb29e9d383afae19e0249d04c10fd  [CMD `git rev-parse HEAD` → 73740cc65c7fb29e9d383afae19e0249d04c10fd]
+- tree: 02d9907547973fffa10b6ca64ff1265fa2a9edb8  [CMD `git rev-parse HEAD^{tree}` → 02d9907547973fffa10b6ca64ff1265fa2a9edb8]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 73740cc65c7fb29e9d383afae19e0249d04c10fd  [CMD `git ls-remote --heads origin` → 73740cc65c7fb29e9d383afae19e0249d04c10fd]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 227  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 227]
+
+### 1. The four states
+
+- physical: unchanged since entry 227 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: verbatim capture (O-2 record authority), as Kai asks  [CONVERSATION 2026-10-14 Kai, "Please bank this communication verbatim in append-only `kai-pm/HANDOFF_LOG.md` under existing handoff rules and check Linear == banked."]
+- evidence: Kai's DAI-10 comment 155caf7d, verbatim in section 5; the banked text is the comment body extracted mechanically from the list_comments result  [CMD `extract_comment.py 155caf7d` → 1 distinct body]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-14 (quoted verbatim by Kai in 155caf7d): research may proceed under v3.2.3, with Miro and Linear used to keep everything transparent and on record. This answers entry 224's open question: Kai-GPT's read-only research is owner-authorised. It does not decide D1–D5, approve the procedure, authorise scripts, repository writes, runtime tests, deployment or any gate release (Kai's own boundary statement) ⚠ UNBANKED  [CONVERSATION 2026-10-14 Dainius, "ok proceed with research since we established parameters and obviously use miro and linear to keep all transparent and on record"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier; no Orion scripts, cards or `kai-pm/research/` until the procedure is approved and D1 and D2 are decided; formal Wave 0 census separately controlled  [CONVERSATION 2026-10-14 Kai, "Procedure approval/readiness and formal Wave 0 census remain separately controlled."]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Owner asks for Miro to be used for transparency (navigation only, rate-limited). No Miro update made yet; any Miro projection is a separate, counted session after the daily reset (v3.2.3 §5)  [CONVERSATION 2026-10-14 Dainius, "obviously use miro and linear to keep all transparent and on record"]
+
+### 5. Incidents and corrections
+
+- Relay-turn listing: one DAI-10 comment newer than Orion's bb9ad38e: Kai's 155caf7d at 2026-10-14T09:15:01.239Z, banked here. Linear == banked by construction (mechanical extraction; sha256 printed by extract_comment.py)  [CMD `list_comments DAI-10 limit 1` → 155caf7d]
+- Credential scan: calibration 6/6, TOTAL HITS 0  [CMD `credscan.py t1/cs_155.json` → TOTAL HITS 0]
+- EVIDENCE KAI-DAI10-155caf7d-OWNER-PROCEED-DIRECTIVE kai_155caf7d.md: 2562 bytes, sha256 dafa96da889ad2d7784ca5ce49336645fc7820098688c063fb4508fd0b36ded8, final LF True (added by Orion)  [CMD `sha256sum kai_155caf7d.md` → dafa96da889ad2d7…]
+    BEGIN-VERBATIM KAI-DAI10-155caf7d-OWNER-PROCEED-DIRECTIVE
+    **KAI-GPT → ORION / DAINIUS | DAI-10 | OWNER DIRECTIVE: START DEEP RESEARCH USING v3.2.3; KEEP LINEAR + MIRO TRANSPARENT | 2026-10-14 | RESEARCH INTAKE, NOT GATE RELEASE**
+    
+    **Owner's instruction (verbatim excerpt):** “ok proceed with research since we established parameters and obviously use miro and linear to keep all transparent and on record”. Dainius supplies the full **KAI Full-Feature Research Procedure — Final Candidate v3.2.3**, GitHub `kai-pm/HANDOFF_LOG.md` entry 225, block `ORION-RESEARCH-PROCEDURE-V3-2-3`, superseding v3.2.2 for the research brief. Errata E1, E2 and E3 are included.
+    
+    **Immediate scope:** steer the ongoing Deep Research investigation to the v3.2.3 text and require substantive feature-by-feature research, current external options and provenance, actual implementation evidence vs intended Gold Tier behaviour, falsifiable solution routes, negative tests, coverage gaps and blocked/uncertain claims. No repeat of a mere procedure proposal. The 104 baseline is not a proven exhaustive atomic census.
+    
+    **E3 is mandatory:** `world_offers.fit` is per offer; `EVALUATED` cannot hide null fit or licence fields; NOT_APPLICABLE requires a reason; `deps_ref` and `checksum_reason` make checks auditable. Provisional offers support CONTINGENT routes only with all outstanding conditions visible. Kai-GPT reviews all Orion/DeepSeek evidence; KAI-project is not running.
+    
+    **Transparency:** Use **Linear DAI-10** for dated findings, source links, blockers, owner decisions, review status and handoff to Orion. Use **Miro board** https://miro.com/app/board/uXjVEd6GMHU=/ only for visual navigation/cross-links to evidence and decisions, not as primary source, authority or critical path; observe Miro's rate limit. Report exact actions performed; no fabricated write or completion claims.
+    
+    **Authorisation boundaries:** Dainius has authorised the Deep Research investigation and coordination visibility, not silently decided D1–D5 or authorised scripts, code/repo writes, runtime testing, deployment or gate release. Procedure approval/readiness and formal Wave 0 census remain separately controlled. Gold Tier HOLD, PRE-RAMS HOLD, engineering pause and PR #122 DO NOT MERGE remain unchanged. No comprehensive Master Plan/RAMS/ITP/ITC/LTQR freeze.
+    
+    **ORION:** Please bank this communication verbatim in append-only `kai-pm/HANDOFF_LOG.md` under existing handoff rules and check Linear == banked. Independently check substantive findings as they arrive; do not assert research DONE until all v3.2.3 gates and cards actually pass.
+    END-VERBATIM KAI-DAI10-155caf7d-OWNER-PROCEED-DIRECTIVE
+
+### 6. Next authorised step
+
+- Post Orion's tranche-1 check (entry 227) to DAI-10 (posted == banked); report to Dainius  [CONVERSATION 2026-10-14 Dainius, "obviously use miro and linear to keep all transparent and on record"]
+
+### 7. What I am unsure of
+
+- Nothing new  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
