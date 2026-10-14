@@ -86154,3 +86154,101 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T10:22:25Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T10:22:25Z  [CMD `date -u +%FT%TZ` → 2026-10-14T10:22:25Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 88e5f002140beed624dc18a9270246de962e6ad7  [CMD `git rev-parse HEAD` → 88e5f002140beed624dc18a9270246de962e6ad7]
+- tree: 1da6540ba7393a8b8307ed9a4e03c177fddd0355  [CMD `git rev-parse HEAD^{tree}` → 1da6540ba7393a8b8307ed9a4e03c177fddd0355]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 88e5f002140beed624dc18a9270246de962e6ad7  [CMD `git ls-remote --heads origin` → 88e5f002140beed624dc18a9270246de962e6ad7]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 237  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 237]
+
+### 1. The four states
+
+- physical: unchanged since entry 237 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: D4 (a) with Orion's five Gold Tier conditions, by owner ruling below  [CONVERSATION 2026-10-14 Dainius, "Ruling a accepted"]
+- evidence: the ruling and the recommendation it accepts, verbatim in section 5  [CMD `ruling_capture store d9f38d9f28ddd026` → "Ruling a accepted"]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-14 · D4 APPROVED, option (a) with Orion's Gold Tier conditions: preliminary hazard list and test strategy may start alongside Wave 1a; every page stamped "PRELIMINARY — NOT A BASELINE" and never cited as approval; every hazard traced to a card or file:line or marked unverified; test strategy built from the cards' own test lists; Kai review and DeepSeek challenge before it counts, and nothing carried into the final RAMS without being re-earned; drafts kept in `kai-pm/research/` as Markdown only. Does not allow a final RAMS, a test baseline, code change or a test run; PRE-RAMS hold unchanged ⚠ UNBANKED  [CONVERSATION 2026-10-14 Dainius, "Ruling a accepted"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: D1, D2 (a), D3, D4 (a) with five conditions (drafts in `kai-pm/research/`, Markdown). HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier  [CONVERSATION 2026-10-14 Dainius, "Ruling a accepted"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Remaining decision: D5 (research reading access)  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 5. Incidents and corrections
+
+- Credential scan of ruling and recommendation: 0 hits (calibration 6/6)  [CMD `credscan.py own/cs_d4.json` → TOTAL HITS 0]
+- The recommendation block is Orion's chat message as sent, extracted from the session transcript; the ruling is the capture-store text  [CMD `python3 -I extract assistant text` → 2357 chars]
+- EVIDENCE DAINIUS-D4-RULING d4_ruling.txt: 18 bytes, sha256 62147bc70b9fe4d87a2778bdfb96b18d99e7c54f1386d656ca65ad56cd56c2d7, final LF True (added by Orion)  [CMD `sha256sum d4_ruling.txt` → 62147bc70b9fe4d8…]
+    BEGIN-VERBATIM DAINIUS-D4-RULING
+    Ruling a accepted
+    END-VERBATIM DAINIUS-D4-RULING
+- EVIDENCE ORION-D4-GOLD-TIER-RECOMMENDATION d4_reco.md: 2360 bytes, sha256 592d7505b1c0f68b945e6b109bbb5f149839e3390a90b7af7a5cfd4726db9d18, final LF True (added by Orion)  [CMD `sha256sum d4_reco.md` → 592d7505b1c0f68b…]
+    BEGIN-VERBATIM ORION-D4-GOLD-TIER-RECOMMENDATION
+    **My Gold Tier recommendation is still (a), with stricter conditions.** Starting early is the Gold Tier choice, because hazards found during the research shape the research. The conditions are what make it Gold Tier rather than just "early". Without them, (a) is a shortcut.
+    
+    **What Gold Tier means for these drafts:**
+    
+    1. **Every page is stamped "PRELIMINARY — NOT A BASELINE".** It can never be quoted as approval, and the hold on the real RAMS stays in place.
+    2. **Every hazard points to its evidence:** the feature card it came from, or the exact file and line in KAI's code. If it can't point to evidence, it is marked "unverified". No hazard gets written just because a feature's name sounds risky. That's the same rule as the research: a name proves nothing.
+    3. **One source for tests, not two lists.** Each research card already has its own test list. The test strategy is built from those card lists, not kept as a separate list beside them. Two lists drift apart, like a drawing register that no longer matches the drawings.
+    4. **Checked before it counts.** Kai reviews the drafts and DeepSeek challenges them. When the final RAMS is written after all the research, nothing is copied across automatically. Each hazard has to earn its place again.
+    5. **Kept in the research folder** (`kai-pm/research/`), as Markdown only. That folder is already approved for research cards. I'm asking you to confirm the drafts can sit there too, so that I'm not widening D2 on my own.
+    
+    **What a yes to "(a), Gold Tier" allows:**
+    - Draft hazard lists and a draft test plan, written alongside the first research batch, under the five conditions above.
+    
+    **What it does not allow:**
+    - a final RAMS;
+    - a test baseline;
+    - any code change or test run.
+    
+    **The risk:** some drafts will be rewritten as the research finds more. That's normal and cheap, like marking up a drawing before it's issued for construction.
+    
+    **What you're deciding:** D4 = (a) with these five conditions, including keeping the drafts in the research folder. Yes or no?
+    
+    ---
+    
+    *Detail for the record:* checked in v3.2.3 (entry 225). The research cards carry `tests`, `known_defects` and `accepted_risks` fields, but no hazard field. So the hazard list is a separate draft, which is why condition 5 needs your confirmation. Conditions 2 to 4 are my additions on top of the procedure's own D4 controls.
+    END-VERBATIM ORION-D4-GOLD-TIER-RECOMMENDATION
+
+### 6. Next authorised step
+
+- Post the D4 record to DAI-10 (posted == banked); update the start-here page; put D5 to Dainius  [CONVERSATION 2026-10-14 Dainius, "please make sure you log all in linear"]
+
+### 7. What I am unsure of
+
+- Whether Kai-GPT's Linear connector can read documents as well as comments (it could read DAI-10 comments, entry 227)  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
