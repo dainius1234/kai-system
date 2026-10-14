@@ -85681,3 +85681,73 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T09:59:39Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T09:59:39Z  [CMD `date -u +%FT%TZ` → 2026-10-14T09:59:39Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: f0ddd5eb0e9c33de31763767aff35d2b09a70c92  [CMD `git rev-parse HEAD` → f0ddd5eb0e9c33de31763767aff35d2b09a70c92]
+- tree: c43dfae058949354a9794956514af3daf818c99d  [CMD `git rev-parse HEAD^{tree}` → c43dfae058949354a9794956514af3daf818c99d]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- remote:claude/project-rework-plan-pgvp35: f0ddd5eb0e9c33de31763767aff35d2b09a70c92  [CMD `git ls-remote --heads origin` → f0ddd5eb0e9c33de31763767aff35d2b09a70c92]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 234  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 234]
+
+### 1. The four states
+
+- physical: unchanged since entry 234 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: D3 granted; owner directs that everything is logged in Linear so Kai-GPT can resume in any new thread  [CONVERSATION 2026-10-14 Dainius, "Ruling :yes but please make sure you log all in linear"]
+- evidence: Dainius's ruling verbatim in section 5  [CMD `cat .git/kai-ruling-capture/3e8cc68913fd9240.json` → flagged keyword(ruling)]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-14 · D3 APPROVED: the borrowing rules of v3.2.3 §4 (per-artefact licences and obligations, dependencies, provenance, maintenance, security, network and telemetry, offline fit, rollback and removal; GPL, AGPL and custom model licences decided by Dainius case by case; use model "never sold") ⚠ UNBANKED  [CONVERSATION 2026-10-14 Dainius, "Ruling :yes"]
+- Dainius · 2026-10-14 · DIRECTION: log everything in Linear so Kai-GPT, who has no restart hook or carried memory, sees the full picture in every new thread without Dainius re-explaining ⚠ UNBANKED  [CONVERSATION 2026-10-14 Dainius, "please make sure you log all in linear as I’m tired to explain to gpt all in new thread as he is good in planing but only as he is fully aware of all and sees the picture , we have resolved your memory issue he isn’t that lucky and relies on you , he hasn’t got restart hook ect"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: D1, D2 (a), D3; Linear records and a Linear start-here document for Kai-GPT (O-2 Linear drafts). HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier  [CONVERSATION 2026-10-14 Dainius, "please make sure you log all in linear"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision. Note: the owner's new direction asks for the same purpose in Linear; Orion meets it with a Linear start-here document, not a repository file, so the reminder stands for the repository form  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Remaining decisions: D4, D5  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 5. Incidents and corrections
+
+- Credential scan of the ruling: calibration 6/6, TOTAL HITS 0  [CMD `credscan.py own/cs_d3.json` → TOTAL HITS 0]
+- EVIDENCE DAINIUS-D3-RULING-AND-LINEAR-DIRECTION d3_ruling.txt: 301 bytes, sha256 f5369b84d8efa2530bebb5abc80d9bb9967b549da7b7b550364a8db77e993f14, final LF True (added by Orion)  [CMD `sha256sum d3_ruling.txt` → f5369b84d8efa253…]
+    BEGIN-VERBATIM DAINIUS-D3-RULING-AND-LINEAR-DIRECTION
+    Ruling :yes but please make sure you log all in linear as I’m tired to explain to gpt all in new thread as he is good in planing but only as he is fully aware of all and sees the picture , we have resolved your memory issue he isn’t that lucky and relies on you , he hasn’t got restart hook ect
+    END-VERBATIM DAINIUS-D3-RULING-AND-LINEAR-DIRECTION
+
+### 6. Next authorised step
+
+- Create a Linear document "KAI-GPT START HERE" on DAI-10 with the full current state, sourced to handoff entries; read it back; post a pointer comment; keep it updated after every step  [CONVERSATION 2026-10-14 Dainius, "please make sure you log all in linear"]
+
+### 7. What I am unsure of
+
+- Nothing new  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
