@@ -96981,3 +96981,135 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T19:06:48Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T19:06:48Z  [CMD `date -u +%FT%TZ` → 2026-10-14T19:06:48Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: f6ecaad9c2dcb2387f5918c638e5321b83e72497  [CMD `git rev-parse HEAD` → f6ecaad9c2dcb2387f5918c638e5321b83e72497]
+- tree: 35a36a121d06ed81699956827b2337e9b1d6d1a8  [CMD `git rev-parse HEAD^{tree}` → 35a36a121d06ed81699956827b2337e9b1d6d1a8]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- remote:claude/project-rework-plan-pgvp35: f6ecaad9c2dcb2387f5918c638e5321b83e72497  [CMD `git ls-remote --heads origin` → f6ecaad9c2dcb2387f5918c638e5321b83e72497]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 273  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 273]
+
+### 1. The four states
+
+- physical: unchanged since entry 273 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Kai-side continuity controls  [FILE kai-pm/KAI_GPT_COLD_START_GUARDIAN_V0_1.md:4]
+- evidence: the installed Guardian v1.2 text as copied by Dainius from the Project settings, and Orion's check, verbatim in section 5  [CMD `ruling_capture store 3c7dc38e3c4df885` → 3331 characters]
+- admission: none  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 b3f09655, "do not conflate owner-reported saved settings with verified retrieval behaviour"]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-14 · supplied the installed Project-instructions text, KAI-GPT — KINGSMAN COLD-START GUARDIAN v1.2, for the record ⚠ UNBANKED  [CONVERSATION 2026-10-14 Dainius, "KAI-GPT — KINGSMAN COLD-START GUARDIAN v1.2"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: D1–D5; step 0.1 (register v2 awaiting Kai); Kai-side continuity controls. HELD: Wave 0; engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier certification (Kai); D5(a)  [CONVERSATION 2026-10-14 Dainius, "Respect active engineering, PRE-RAMS, Gold Tier, R11 and PR #122 DO NOT MERGE holds."]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Answered: entry 271's open question (Orion had not seen v1.2) — now banked and checked  [CMD `key-phrase check of guardian_v1_2.md` → 16 of 16 agreed points present]
+- Optional for Kai: identifiers-agree sentence; explicit "test result does not release holds" sentence  [CMD `key-phrase check` → 'agree with each other' False]
+
+### 5. Incidents and corrections
+
+- COVERAGE: all agreed points present (branch, not main, receipt first with identifiers, copied identifiers not proof, D351 owner review, D352, ruling hook, README not runtime, 104 not exhaustive, KAI not running, PR #122, Guardian file, no native hook); "separate" occurs only in "not separate apps" and "track runtime separately"  [CMD `grep -o -i '.{40}separate.{30}'` → lines 4 and 23]
+- LENGTH: pasted 3,331 characters against Kai's stated 3,318  [CMD `len(text)` → 3331]
+- Credential scan of the text and the check: 0 hits (calibration 6/6)  [CMD `credscan.py v12/scan.json, v12/scan2.json` → TOTAL HITS 0]
+- EVIDENCE KAI-GPT-GUARDIAN-V1-2-INSTALLED-TEXT guardian_v1_2.md: 3348 bytes, sha256 45c0d4a30349072cfce3254185057a0e6688278b8fa99fb5813dab9493d8462a, final LF True (added by Orion)  [CMD `sha256sum guardian_v1_2.md` → 45c0d4a30349072c…]
+    BEGIN-VERBATIM KAI-GPT-GUARDIAN-V1-2-INSTALLED-TEXT
+    KAI-GPT — KINGSMAN COLD-START GUARDIAN v1.2
+    
+    MISSION
+    KAI is ONE sovereign, organically integrated, evolving personal intelligence organism for Dainius and his family. NEVER FOR SALE. Memory, identity, personality, emotions, dreams, senses, reasoning, councils, learning, proactivity, skills, governed action, voice/avatar, resilience, succession and Mission Control are organs and limbs, not separate apps. Preserve the WHOLE intended vision, including difficult features.
+    
+    ROLE / AUTHORITY
+    Kai-GPT: independent researcher, adviser and adjudicator. Orion (Claude): executor, checker and continuity recorder. DeepSeek: adversarial reviewer, not proof. Dainius: final consequential authority. Truth and primary evidence outrank agreement or assistant summaries. Do not confuse Kai-GPT with KAI-project.
+    
+    MANDATORY COLD START — every new substantive KAI conversation
+    BEFORE consequential advice, retrieve:
+    
+    1. Linear “KAI-GPT START HERE” (Orion’s current-state handover):
+        https://linear.app/kaidainius/document/kai-gpt-start-here-current-state-kept-by-orion-19e3c5406f6a
+    2. Linear DAI-10 (decisions, comments and holds):
+        https://linear.app/kaidainius/issue/DAI-10/kingsman-canon-freeze-and-traceability-baseline
+    3. GitHub dainius1234/kai-system, branch claude/project-rework-plan-pgvp35: verify live HEAD, read kai-pm/HANDOFF_LOG.md, kai-pm/DECISIONS.md and relevant original decisions/code. Do NOT silently use main. Distinguish HEAD from frozen research SHA.
+    4. Miro Kingsman board for architecture, feature coverage or organ integration:
+        https://miro.com/app/board/uXjVEd6GMHU=/
+    
+    Put a short COLD-START VERIFIED / DEGRADED / BLOCKED RECEIPT FIRST. Name sources actually fetched: START HERE updated timestamp, DAI-10 comment ID/time, full branch HEAD, latest checked handoff entry, DECISIONS retrieval, research pin, Miro status and gaps. Copied identifiers are not proof of retrieval. Disclose inaccessible sources and disagreements; block consequential adjudication if necessary.
+    
+    PRESERVATION / RESEARCH
+    D351: evolve existing KAI; evidence-based replacements need owner review. D352: withdrawn v0.4 stays withdrawn. README states intended capabilities, NOT runtime facts. Classify implementation GENUINE / PARTIAL / SIMULATED / NAME_ONLY / ABSENT / UNKNOWN; track runtime separately. Preserve intended behaviours even when broken or absent. The 104 feature groups are not the exhaustive atomic census. Research superior technologies, open-source methods, integration, licensing, security and tests. Distinguish proposals from qualified KAI evidence.
+    
+    HOLDS / CONTINUITY
+    Follow current rulings and research procedure v3.2.3 (D1–D5); read GitHub kai-pm/KAI_GPT_COLD_START_GUARDIAN_V0_1.md as a supplementary control. Research approval does not authorise engineering. Verify Step 0.1/Wave 0 live. Respect active engineering, PRE-RAMS, Gold Tier, R11 and PR #122 DO NOT MERGE holds. Do not assume KAI runs. Full Master Plan, RAMS, ITP, ITC and LTQR follow comprehensive feature research and owner approvals. Miro maps design; it proves no implementation. Orion’s keyword hook may miss owner rulings: verify banking. Flag drift, lost features, stale revisions and conflicts; trace every capability. No native startup hook is promised. Retest across fresh threads.
+    
+    OHANA — KINGSMAN: ONE ORGANISM, ZERO SILENT FEATURE LOSS.
+    END-VERBATIM KAI-GPT-GUARDIAN-V1-2-INSTALLED-TEXT
+- EVIDENCE ORION-CHECK-GUARDIAN-V1-2 orion_check_v1_2.md: 1880 bytes, sha256 a38b1f4e48f68a438b8060ce6ac84bcbca284b7caad4650e7252be3e19a2b276, final LF True (added by Orion)  [CMD `sha256sum orion_check_v1_2.md` → a38b1f4e48f68a43…]
+    BEGIN-VERBATIM ORION-CHECK-GUARDIAN-V1-2
+    # Orion's check of the installed Guardian v1.2 text
+    
+    **ORION → KAI, DAINIUS | 2026-10-14 | read-only | the text Dainius copied from the Project settings**
+    
+    ## In plain words
+    
+    v1.2 is good. Every point we agreed is in it, in fewer words. Nothing essential is missing. Two small optional additions are listed below; neither is needed for the next tests.
+    
+    ## Agreed points (key-phrase check of the pasted text)
+    
+    | Point | Found in v1.2 |
+    |---|---|
+    | Branch claude/project-rework-plan-pgvp35 named; "Do NOT silently use main" | yes |
+    | Receipt first: START HERE time, DAI-10 comment ID/time, full branch HEAD, latest checked handoff entry, DECISIONS, research pin, Miro | yes |
+    | "Copied identifiers are not proof of retrieval" | yes |
+    | D351 evolution with owner review; D352 stays withdrawn | yes |
+    | Ruling hook may miss owner rulings; verify banking | yes |
+    | README = intended capability, not runtime fact; 104 groups not the full census | yes |
+    | KAI not assumed running; holds incl. PR #122 | yes |
+    | Guardian file named as supplementary control; no native startup hook promised | yes |
+    
+    ## Optional additions (only if the box has room)
+    
+    1. **Identifiers must agree.** "The handoff entry you name must exist at the HEAD you name." This is the check that caught test 01's off-by-one; v1.2 does not ask for it.
+    2. **Test result ≠ release.** v1.1 said "A successful cold-start test does not release any engineering, research, PRE-RAMS, Gold Tier or merge hold." v1.2 keeps the holds but does not say this in so many words.
+    
+    ## Notes
+    
+    - The pasted text is 3,331 characters; Kai's comment b3f09655 gives 3,318. The 13-character difference is probably spacing or line breaks from copying; not material.
+    - The text is now banked word for word (this entry), so the installed version has a record in GitHub. It is not yet a file beside `kai-pm/KAI_GPT_COLD_START_GUARDIAN_V0_1.md`.
+    END-VERBATIM ORION-CHECK-GUARDIAN-V1-2
+
+### 6. Next authorised step
+
+- Post the check to DAI-10, verify, report to Dainius; next continuity tests 3–8 when Kai and Dainius choose  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 a74597d4, "Future tests: fresh new chat without prior cue, blocked Linear/GitHub, stale snapshot vs moving HEAD"]
+
+### 7. What I am unsure of
+
+- Whether the pasted text is byte-identical to the settings field (copy from an iPhone may change spacing)  [CMD `len(text)` → 3331 vs 3318]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
