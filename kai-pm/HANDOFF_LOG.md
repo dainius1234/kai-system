@@ -85305,3 +85305,73 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T09:42:33Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T09:42:33Z  [CMD `date -u +%FT%TZ` → 2026-10-14T09:42:33Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 9073a60cbc9b50e68fc3a4c3137e2b232f59a460  [CMD `git rev-parse HEAD` → 9073a60cbc9b50e68fc3a4c3137e2b232f59a460]
+- tree: 9b3fee3fa2890f2728ef21ee2f020eea29f9e836  [CMD `git rev-parse HEAD^{tree}` → 9b3fee3fa2890f2728ef21ee2f020eea29f9e836]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 9073a60cbc9b50e68fc3a4c3137e2b232f59a460  [CMD `git ls-remote --heads origin` → 9073a60cbc9b50e68fc3a4c3137e2b232f59a460]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 229  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 229]
+
+### 1. The four states
+
+- physical: unchanged since entry 229 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: verbatim capture of the owner's own words, given directly to Orion "for your records"  [CONVERSATION 2026-10-14 Dainius, "For your records"]
+- evidence: Dainius's message verbatim in section 5  [CMD `cat .git/kai-ruling-capture/a8825151816bf701.json` → flagged keyword(proceed)]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-14 · gives Orion directly the words he gave Deep Research (first recorded second-hand in 155caf7d, entry 228): research proceeds under "KAI Full-Feature Research Procedure — Final Candidate (v3.2.3 = v3.2 + errata E1, E2 and E3)", using Miro and Linear for transparency. Orion's reading: the owner accepts v3.2.3 as the governing research procedure ("since we established parameters"). The word "approve" is not used; recorded as acceptance unless Dainius says otherwise. D1–D5 are not decided by this ⚠ UNBANKED  [CONVERSATION 2026-10-14 Dainius, "@Deep research ok proceed with research since we established parameters and obviously use miro and linear to keep all transparent and on record : KAI Full-Feature Research Procedure — Final Candidate (v3.2.3 = v3.2 + errata E1, E2 and E3)"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier; no Orion scripts, cards or `kai-pm/research/` until D1 and D2 are decided  [CONVERSATION 2026-10-14 Kai, "Dainius has authorised the Deep Research investigation and coordination visibility, not silently decided D1–D5"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Checklist item 2 closed on Orion's reading above; item 3 next: D1 (read-only research scripts), one decision per message  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 5. Incidents and corrections
+
+- The owner's direct words match the excerpt Kai quoted in 155caf7d ("ok proceed with research since we established parameters and obviously use miro and linear to keep all transparent and on record"): Kai's quote is a byte-exact substring  [CMD `python3 substring check` → True]
+- Credential scan: calibration 6/6, TOTAL HITS 0  [CMD `credscan.py own/cs.json` → TOTAL HITS 0]
+- EVIDENCE DAINIUS-PROCEED-UNDER-V3-2-3 dainius_proceed.txt: 260 bytes, sha256 f45368efd5b7185df40f23e0bf34d746e3ac7b935bf957b483b08da3ed4d52b1, final LF True (added by Orion)  [CMD `sha256sum dainius_proceed.txt` → f45368efd5b7185d…]
+    BEGIN-VERBATIM DAINIUS-PROCEED-UNDER-V3-2-3
+    For your records : @Deep research ok proceed with research since we established parameters and obviously use miro and linear to keep all transparent and on record : KAI Full-Feature Research Procedure — Final Candidate (v3.2.3 = v3.2 + errata E1, E2 and E3)
+    END-VERBATIM DAINIUS-PROCEED-UNDER-V3-2-3
+
+### 6. Next authorised step
+
+- Tell Dainius plainly what was recorded and how it was read; then put D1 to him on its own  [CONVERSATION 2026-10-13 Dainius, "one thing at a time"]
+
+### 7. What I am unsure of
+
+- Whether Dainius means this as formal approval of v3.2.3; recorded as acceptance, open to his correction  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
