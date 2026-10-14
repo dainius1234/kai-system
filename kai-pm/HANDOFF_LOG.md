@@ -87840,3 +87840,88 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T13:54:51Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T13:54:51Z  [CMD `date -u +%FT%TZ` → 2026-10-14T13:54:51Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 24297b7d39c0f91a88a119e0c50eea4aebffb2f6  [CMD `git rev-parse HEAD` → 24297b7d39c0f91a88a119e0c50eea4aebffb2f6]
+- tree: d40ab72e5b681b95fce95306b0fef74059938bbd  [CMD `git rev-parse HEAD^{tree}` → d40ab72e5b681b95fce95306b0fef74059938bbd]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/project-rework-plan-pgvp35: 24297b7d39c0f91a88a119e0c50eea4aebffb2f6  [CMD `git ls-remote --heads origin` → 24297b7d39c0f91a88a119e0c50eea4aebffb2f6]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 248  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 248]
+
+### 1. The four states
+
+- physical: unchanged since entry 248 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: the eight cosmetic Miro edits approved 2026-10-13 (entry 191), now to be made by Orion at Dainius's request; Kai checks  [CONVERSATION 2026-10-14 Dainius, "any chance you can finish it ?as we have credit reset"]
+- evidence: the request and Orion's done/scope plan, verbatim in section 5  [CMD `extract user text from transcript` → 109 characters]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-14 · asks Orion to finish to-do item 5, the eight approved cosmetic Miro edits (four "KINGSMan" → "KINGSMAN" titles on atlas O1–O4; "Names summarised for display." added to the O5–O8 footers), now the Miro allowance has reset. Changes who makes the edits (Kai → Orion), not what is approved; Kai becomes the independent checker. Orion reads "8 teams" as these eight edits, not programme Item 8 ⚠ UNBANKED  [CONVERSATION 2026-10-14 Dainius, "Ok regarding unfinished 8 teams from to do list on miro any chance you can finish it ?as we have credit reset"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: the eight cosmetic Miro edits, exactly as in block ORION-MIRO-8-EDITS-PLAN; D1–D5; step 0.1. HELD: Wave 0 until Kai's amended source list; engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier  [CONVERSATION 2026-10-14 Dainius, "any chance you can finish it"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Waiting on Kai: the amended step 0.1 source list. To do (Orion): the D5(a) setup route; Kai's third Miro pass re-review (to-do 5, second half) is not part of this request  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 5. Incidents and corrections
+
+- Credential scan of request and plan: 0 hits (calibration 6/6)  [CMD `credscan.py own/cs_m8.json` → TOTAL HITS 0]
+- EVIDENCE DAINIUS-MIRO-8-EDITS-REQUEST miro8_direction.txt: 110 bytes, sha256 4b36c0c27398d85bd20b5aa7ac75e04d4e01ee42cf2b936cec52a20f5d61b5fa, final LF True (added by Orion)  [CMD `sha256sum miro8_direction.txt` → 4b36c0c27398d85b…]
+    BEGIN-VERBATIM DAINIUS-MIRO-8-EDITS-REQUEST
+    Ok regarding unfinished 8 teams from to do list on miro any chance you can finish it ?as we have credit reset
+    END-VERBATIM DAINIUS-MIRO-8-EDITS-REQUEST
+- EVIDENCE ORION-MIRO-8-EDITS-PLAN miro8_plan.md: 1816 bytes, sha256 f6e0ce4673f1cd6916e0977baeba5ca2d7742c595339329c89a9c257e3912766, final LF True (added by Orion)  [CMD `sha256sum miro8_plan.md` → f6e0ce4673f1cd69…]
+    BEGIN-VERBATIM ORION-MIRO-8-EDITS-PLAN
+    # Eight cosmetic Miro edits — done, scope, simplest form (R21)
+    
+    **Reading of the request:** "8 teams from to do list on miro" = to-do item 5, the eight cosmetic edits Dainius approved on 2026-10-13 (DAI-10 be2ddfbf, banked in entry 191, block KAI-DAI10-be2ddfbf-OWNER-RULING, point 1). Not programme Item 8 (engineering, paused). The approval said Kai makes them; Dainius now asks Orion to finish them. Because Orion makes them, Orion cannot be the independent checker: Kai checks afterwards against the read-back Orion banks.
+    
+    **Done** when, on board uXjVEd6GMHU=:
+    1. Frame titles O1–O4 read "KINGSMAN FEATURE ATLAS O1 | Soul / Identity / Inner Life", "… O2 | Memory / Relationship / Continuity", "… O3 | Senses / World Awareness", "… O4 | Intelligence / Reasoning" (only "KINGSMan" → "KINGSMAN").
+    2. The footers of O5–O8 read "Canonical entry 167. Names summarised for display. Feature IDs are list indices; deeply nested subfeatures still require standalone verification criteria." (one sentence inserted, the same sentence the O1–O4 footers carry).
+    3. Nothing else on the board changed: a before and after read-back of the eight frames, compared mechanically, differs only in those 8 texts.
+    4. The before read-back, the change list and the after read-back are banked; the result is posted to DAI-10 for Kai's check.
+    
+    **Scope:** exactly those 8 texts. No moving, resizing, deleting, re-colouring or rewording anything else. If the current board differs from the 2026-10-12 read-back in a way that makes an edit unclear (for example a title already fixed, or a footer reworded by Kai's third pass), that edit is skipped and reported, not improvised.
+    
+    **Miro budget:** about 6 calls (search, read before, update, read after), counted, against the shared 100-a-day limit. Stop on any limit or error.
+    END-VERBATIM ORION-MIRO-8-EDITS-PLAN
+
+### 6. Next authorised step
+
+- Read the eight frames, make the eight edits, read back and compare, bank, post to DAI-10 for Kai's check  [CONVERSATION 2026-10-14 Dainius, "any chance you can finish it"]
+
+### 7. What I am unsure of
+
+- Whether Kai's third Miro pass (entry 188) changed any of these eight texts since the 2026-10-12 read-back; the before read-back will show it  [FILE kai-pm/HANDOFF_LOG.md:72634]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
