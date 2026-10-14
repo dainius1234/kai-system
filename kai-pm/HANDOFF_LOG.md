@@ -82113,3 +82113,118 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T06:30:48Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T06:30:48Z  [CMD `date -u +%FT%TZ` → 2026-10-14T06:30:48Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 3ade325adc494d4d47ea9ad666e897436406a98d  [CMD `git rev-parse HEAD` → 3ade325adc494d4d47ea9ad666e897436406a98d]
+- tree: edbcfeffe2e16ead36bae082f431fa9dd4909d28  [CMD `git rev-parse HEAD^{tree}` → edbcfeffe2e16ead36bae082f431fa9dd4909d28]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/project-rework-plan-pgvp35: 3ade325adc494d4d47ea9ad666e897436406a98d  [CMD `git ls-remote --heads origin` → 3ade325adc494d4d47ea9ad666e897436406a98d]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 216  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 216]
+
+### 1. The four states
+
+- physical: unchanged since entry 216 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: verbatim capture (O-2 record authority); Kai's instruction is a bounded erratum, one independent recheck, return to Kai  [CONVERSATION 2026-10-14 Kai, "Correct the two evidence-control weaknesses, independently verify those changes, and return the final text for readiness approval."]
+- evidence: Dainius's relay and Kai's DAI-10 comment 8c755e33, verbatim in section 5  [CMD `cat .git/kai-ruling-capture/d9e1da2354c37f57.json` → flagged long(1622), keyword(required)]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Kai · 2026-10-14 · readiness ruling on v3.2: "ACCEPT WITH BOUNDED CORRECTIONS"; two HIGH evidence-control findings (KAI-FC32-01 §4 item 8; KAI-FC32-02 false-green candidate fit), one owner-fact edit (FC32-03), one tracker note (FC32-04), one sample-size detail; no v3.3 rewrite. Verbatim in section 5 ⚠ UNBANKED  [CONVERSATION 2026-10-14 Kai, "v3.2: ACCEPT WITH BOUNDED CORRECTIONS."]
+- Dainius (as quoted by Kai in 8c755e33, relayed by Dainius) · KAI is not running anywhere: "nothing is running its work in progress". Answers the open yes-or-no of entries 212–216 ⚠ UNBANKED  [CONVERSATION 2026-10-14 Kai, "Dainius already explicitly told Kai: 'nothing is running its work in progress'."]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier; no research execution, scripts, cards or `kai-pm/research/`; D1–D5 undecided; no fingerprint containment without Dainius's explicit authorisation  [CONVERSATION 2026-10-14 Kai, "No research execution or engineering changes authorised by this ruling."]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- FC32-04 noted: Kai's Deep Research tracker widget is not a gate record; Wave 0 is NOT STARTED in the governed programme; nothing is marked DONE from it  [CONVERSATION 2026-10-14 Kai, "Wave 0 remains NOT STARTED/NOT DEMONSTRATED in the governed programme."]
+
+### 5. Incidents and corrections
+
+- Kai's quotes checked against block ORION-RESEARCH-PROCEDURE-FINAL-CANDIDATE: §4 item 8 "only a KAI test is evidence" at block line 153; Limits "awaits Dainius's yes or no" at block line 439 of 439 (Kai's "line 440 of 441" counts the BEGIN and END marker lines); his subject blob 63714f7c… equals `git rev-parse 3ade325:kai-pm/HANDOFF_LOG.md`  [CMD `python3 -I block line search; git rev-parse 3ade325:kai-pm/HANDOFF_LOG.md` → 153, 439; 63714f7c133b0f40…]
+- Session resumed: READ found 3 DIFFERS, all from Orion's own entry-216 commit 3ade325; WRITE-DUE NOT-DUE  [CMD `handoff.py verify` → compared=22 match=19 differs=3]
+- Relay-turn listing: one DAI-10 comment newer than Orion's 9d00e393: Kai's 8c755e33 at 2026-10-14T06:28:12.265Z, banked here  [CMD `list_comments DAI-10 limit 2` → 8c755e33]
+- Credential scans: relay and comment 0 hits (calibration 6/6)  [CMD `credscan.py e1/cs.json` → TOTAL HITS 0]
+- EVIDENCE DAINIUS-RELAY-KAI-READINESS-V3-2 relay_ruling_v32.txt: 1649 bytes, sha256 38cae8792e73dfef45314c2b2fb62d4611f1670506ea76d252c630a93f6fd0af, final LF True (added by Orion)  [CMD `sha256sum relay_ruling_v32.txt` → 38cae8792e73dfef…]
+    BEGIN-VERBATIM DAINIUS-RELAY-KAI-READINESS-V3-2
+    Corrections required before approval
+    
+    1. Evidence must be classified correctly. Section 4 says only a KAI test is evidence. That is too restrictive. Independent research, source code and reproducible benchmarks can establish whether a proposed method is credible. Only separately authorised KAI testing can establish that the method actually works in KAI.
+    
+    2. An unqualified technology must not pass as a verified solution. The current checker could accept a recommendation even where material licensing, dependencies, telemetry or security checks remain unresolved. Those fields need explicit evidence or a recorded qualification condition—not merely an existing JSON field.
+    
+    I also identified two smaller corrections: replace the outdated claim that KAI’s running status is unknown with your explicit confirmation that nothing is running, and make the census sampling rule handle source populations smaller than 30.
+    
+    I’ve recorded the complete review in DAI-10, comment 8c755e33⁠￼ for Orion’s independent examination.
+    
+    My ruling
+    
+    v3.2: ACCEPT WITH BOUNDED CORRECTIONS.
+    
+    I do not want another lengthy cycle of rewriting the procedure. Correct the two evidence-control weaknesses, independently verify those changes, and return the final text for readiness approval.
+    
+    Your Gold Tier standard remains the governing objective: a credible engineering route from the present code to every intended KAI capability—not a collection of attractive names and incomplete implementations.
+    
+    No research execution or engineering changes authorised by this ruling. D1–D5 remain subject to your decisions, and PRE-RAMS HOLD remains active.
+    
+    OHANA.
+    END-VERBATIM DAINIUS-RELAY-KAI-READINESS-V3-2
+- EVIDENCE KAI-DAI10-8c755e33-READINESS-V3-2 kai_8c755e33.md: 6375 bytes, sha256 abe04d1435d7ff45d318547895411c58041909f58eb73aaa2128364469deae9b, final LF True (added by Orion)  [CMD `sha256sum kai_8c755e33.md` → abe04d1435d7ff45…]
+    BEGIN-VERBATIM KAI-DAI10-8c755e33-READINESS-V3-2
+    **KAI → ORION / DAINIUS | DAI-10 | Independent readiness ruling on FULL v3.2 research procedure | 2026-10-14 | CONDITIONAL ACCEPT — TWO MATERIAL EVIDENCE-CONTROL CORRECTIONS BEFORE OWNER APPROVAL | PLANNING ONLY**
+    
+    **Grounded subject:** GitHub `dainius1234/kai-system` branch `claude/project-rework-plan-pgvp35` checked at `3ade325adc494d4d47ea9ad666e897436406a98d`, `kai-pm/HANDOFF_LOG.md` blob `63714f7c133b0f4001241f1ea552f25352441aa1`. I fetched the entire >6 MB log by blob and read the complete 441-line `ORION-RESEARCH-PROCEDURE-FINAL-CANDIDATE` block (canonical entry 215); entry 216 documents the posted==banked check, correct DeepSeek disposition tally 6 ACCEPT / 3 ACCEPT WITH AMENDMENT / 6 REJECT premise. The excerpt Dainius pasted is consistent with this canonical version. This ruling is independent and narrower than authorising research.
+    
+    **Verdict:** v3.2 resolves the dominant v1–v3.1 procedure gaps. Its source classification, nested/prose census, research-vs-runtime distinction, intended_behaviour and GENUINE/PARTIAL/SIMULATED/NAME_ONLY/ABSENT/UNKNOWN classifications, solution route and D351 falsifier, research DAG distinct from organic interfaces, scoped reproducible Python, review controls and explicit holds are sound as a procedural direction. **No new wholesale v3.3 rewrite requested.** However, two MATERIAL inconsistencies can admit misleading evidence, so **NOT YET READY FOR UNCONDITIONAL OWNER PROCEDURE APPROVAL** until bounded amendments are checked.
+    
+    **KAI-FC32-01 [HIGH, source-evidence semantics] — §4 item 8 versus Annex D and A1:** §4 says 'Only a KAI test is evidence'. Annex D rightly recognises pinned source code, peer-reviewed work, reproducible benchmarks, advisories and standards as evidence about external candidates; a KAI test later qualifies *KAI-specific function/performance*, not every research hypothesis. As written, the phrase risks disqualifying all useful external research at a time no KAI runtime tests are authorised, conflicting with the requirement for evidenced credible closure routes on non-GENUINE cards. **Precise repair:** replace with 'Vendor claims are labelled claims. Primary source code, independent research and reproducible benchmarks can substantiate candidate-method claims with recorded limits; only separately authorised and executed KAI tests can establish KAI-specific runtime qualification. External evidence alone never makes a KAI feature QUALIFIED.' Test: DONE research card cites a valid external method with runtime NOT_OBSERVED and passes research-evidence semantics; fabricated vendor assertion alone fails qualification.
+    
+    **KAI-FC32-02 [HIGH, false-green candidate fit] — Annex B example and Annex C checker:** Example `world_offers` carries `licences.code/weights/data/docs = null`, `deps_checked:false`, `network:null`, `telemetry:null`, and `fit.licence_ok/offline_ok/target_hw_ok/... = null`. Annex C checks presence of URL/version/'licences'/obligations etc., not whether a recommended solution's MATERIAL licensing, provenance, security, telemetry/offline and usage obligations have been evaluated or explicitly marked conditional. A formally DONE card could cite an under-qualified external candidate as its Gold-tier solution merely because the keys exist. **Precise repair:** distinguish option `EVALUATED`, `PROVISIONAL`, `REJECTED/WATCH` (or equivalent existing frozen statuses), machine-check source and qualified-fit record for an offer used as evidence in `solution_route.evidence_refs`. Provisional/unresolved external candidates MAY stay documented, but MUST NOT silently count as a validated solution; retain the ability to mark a RESEARCH-DONE card with conditional target hardware testing pending, explicitly stated limitations, falsifiers and owner-facing gates. This is NOT permission to execute hardware/runtime tests or require all options to be installed. Test: a candidate with all fields present but `deps_checked:false`, no licence/evidence and required telemetry UNKNOWN cannot be recommended as verified; a properly evidenced contingent research route can still pass without runtime testing.
+    
+    **KAI-FC32-03 [EDITORIAL / OWNER FACT] — Limits last line:** Canonical entry 215 line 440 reads 'Whether any KAI instance is running today awaits Dainius's yes or no'. Dainius already explicitly told Kai: 'nothing is running its work in progress'. Replace with '**Owner-confirmed: KAI is not deployed/running anywhere; code flags are static potential pre-first-run risks, not live collection. Runtime QUALIFIED remains NOT_OBSERVED.**' Do not re-open that question without new contrary evidence.
+    
+    **KAI-FC32-04 [TRACKER INTEGRITY] — Deep Research widget is not a gate record:** its step 1 'read-only census completed' reason relies on conversations/handoff entries, while its completed report says census scripts are **not authorised and have not been executed** and there is no published full nested/prose census/card population or calibrated checker. Treat tracker status as erroneous/unverified. Wave 0 remains NOT STARTED/NOT DEMONSTRATED in the governed programme. No machine check, card, pilot or wave should be marked DONE from that widget.
+    
+    **Minor implementation detail, no further rewrite needed:** Annex A's 10% minimum 30 human sample should state bounded sample `min(total feature-bearing passages, max(30, ceil(0.10×total)))` when population <30, without replacement, and stratify by source class. Do not let sample size exceed the actual population.
+    
+    **Instruction to Orion:** Bank this readiness ruling verbatim in append-only handoff, verify source quotes against entry 215, propose only these bounded corrective lines/validation semantics in a narrow erratum or final corrected copy according to frozen process; submit for ONE independent recheck and return to Kai for READY/NOT READY ruling. Do not rewrite v3 history, alter engineering/code, run scripts, create `kai-pm/research/`, lift holds, grant network rights or assume D1–D5 answers. Exact procedural approval remains Dainius's. Proven research results may feed cards once approved but are NOT a complete feature census.
+    
+    **Status:** PROCEDURE ACCEPTED IN DIRECTION; OWNER APPROVAL HOLD ON TWO MATERIAL EVIDENCE REPAIRS; 104 plus nested/prose/historical full feature research NOT DONE; PRE-RAMS / Gold Tier / engineering pause / PR #122 DO NOT MERGE unchanged.
+    END-VERBATIM KAI-DAI10-8c755e33-READINESS-V3-2
+
+### 6. Next authorised step
+
+- Write erratum E1 and the corrected copy (v3.2.1) limited to FC32-01, -02, -03 and the sample bound; verify the change set by diff against entry 215; bank; return to Kai; report to Dainius  [CONVERSATION 2026-10-14 Kai, "propose only these bounded corrective lines/validation semantics in a narrow erratum or final corrected copy"]
+
+### 7. What I am unsure of
+
+- Nothing new  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
