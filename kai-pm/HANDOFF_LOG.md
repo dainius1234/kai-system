@@ -86455,3 +86455,99 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T10:25:29Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T10:25:29Z  [CMD `date -u +%FT%TZ` → 2026-10-14T10:25:29Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: d90a3122a2efe0507dfe71d716c0c0b210bfd425  [CMD `git rev-parse HEAD` → d90a3122a2efe0507dfe71d716c0c0b210bfd425]
+- tree: 3e570161e10af0f7168d45133f2b509cacf21a55  [CMD `git rev-parse HEAD^{tree}` → 3e570161e10af0f7168d45133f2b509cacf21a55]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/project-rework-plan-pgvp35: d90a3122a2efe0507dfe71d716c0c0b210bfd425  [CMD `git ls-remote --heads origin` → d90a3122a2efe0507dfe71d716c0c0b210bfd425]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 239  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 239]
+
+### 1. The four states
+
+- physical: unchanged since entry 239 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: a summary for Dainius to send to Kai-GPT, at his request  [CONVERSATION 2026-10-14 Dainius, "decisions , changes Kai reminder where to find so I can send to gpt"]
+- evidence: the summary, verbatim in section 5  [CMD `sha256sum kai_update_1.md` → see EVIDENCE line]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None; Dainius asked for a summary to send to Kai-GPT. D5 was put to him and is open  [CONVERSATION 2026-10-14 Dainius, "so I can send to gpt"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: D1, D2 (a), D3, D4 (a) with five conditions. HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier  [CONVERSATION 2026-10-14 Dainius, "Ruling a accepted"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- D5 put to Dainius with v3.2.3 §9 options; Orion recommends (a). Unverified: whether a new cloud environment can be set up with connectors off  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 5. Incidents and corrections
+
+- Credential scan of the summary: 0 hits (calibration 6/6)  [CMD `credscan.py own/cs_u1.json` → TOTAL HITS 0]
+- EVIDENCE ORION-KAI-UPDATE-1 kai_update_1.md: 3016 bytes, sha256 0040e7b9a3f646791c656dca05e5bd5cc86fdf2f79d4c12f298d60a0d9b154e8, final LF True (added by Orion)  [CMD `sha256sum kai_update_1.md` → 0040e7b9a3f64679…]
+    BEGIN-VERBATIM ORION-KAI-UPDATE-1
+    **Kai — update from Orion, 2026-10-14 (D3, D4 decided; D5 put to Dainius; new start-here page)**
+    
+    **1. Where to find everything (read this first in every new thread)**
+    - Linear document "KAI-GPT START HERE — current state (kept by Orion)", attached to DAI-10: https://linear.app/kaidainius/document/kai-gpt-start-here-current-state-kept-by-orion-19e3c5406f6a
+    - It holds who is who, the standing holds, procedure v3.2.3, every owner decision, research findings to date, the checklist and next steps. Orion updates it after every step.
+    - Canonical record: GitHub `dainius1234/kai-system`, branch `claude/project-rework-plan-pgvp35`, `kai-pm/HANDOFF_LOG.md`, entries 235–239 for this update (latest commit d90a3122a2efe0507dfe71d716c0c0b210bfd425). Where Linear and GitHub differ, GitHub wins.
+    - Dainius's direction behind this (entry 235): log everything in Linear, because you have no restart hook or carried memory and he should not have to re-explain in each new thread.
+    
+    **2. Decisions**
+    - **D3 APPROVED** — borrowing rules, v3.2.3 §4. Entry 235; DAI-10 comment 35b75a22.
+    - **D4 APPROVED, option (a) with five Gold Tier conditions** — entry 238; DAI-10 comments b1d9b5bf (ruling) and 4bc53c3e (the recommendation he accepted, word for word). A preliminary hazard list and test strategy may start alongside Wave 1a, on these conditions:
+      1. every page stamped "PRELIMINARY — NOT A BASELINE", never cited as approval;
+      2. every hazard traced to a card or file:line, or marked unverified;
+      3. the test strategy is built from the cards' own `tests` lists, not a second list;
+      4. you review and DeepSeek challenges before it counts; nothing enters the final RAMS without being re-earned;
+      5. drafts are Markdown in `kai-pm/research/`.
+    
+      Not allowed: final RAMS, test baseline, code change, test run. PRE-RAMS hold unchanged.
+    - **D5 OPEN** — research reading access, put to Dainius with v3.2.3 §9 options: (a) a research environment set up for the job, wide read access, no repository write, no connectors, capability list checked before first use; (b) your environment, after you state its connectors and write access; (c) widening Orion's session. Orion recommends (a), not (c). Unverified: whether a new cloud environment can be set up with connectors off. D5 does not block step 0.1 or the Wave 0 census (repository only).
+    
+    **3. Changes**
+    - No code, configuration or runtime change. Only handoff log entries 235–239 (append-only) and Linear: the start-here document (now version 3) and DAI-10 comments 35b75a22, ac8d3984 (pointer to the start-here page), b1d9b5bf and 4bc53c3e. Every post was checked equal to the banked text.
+    
+    **4. Next**
+    - Dainius decides D5. Then step 0.1 under v3.2.3 §6: Orion pins one SHA and proposes a status for every source; you adjudicate. Then the Wave 0 census.
+    
+    **5. One thing to confirm**
+    - Please confirm you can open the Linear document itself, not just DAI-10 comments. If you cannot, tell Dainius and Orion will post the same content as a DAI-10 comment.
+    END-VERBATIM ORION-KAI-UPDATE-1
+
+### 6. Next authorised step
+
+- Post the summary to DAI-10 (posted == banked); await Dainius's D5  [CONVERSATION 2026-10-14 Dainius, "please make sure you log all in linear"]
+
+### 7. What I am unsure of
+
+- Whether Kai-GPT's Linear connector can read documents as well as comments (it could read DAI-10 comments, entry 227)  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
