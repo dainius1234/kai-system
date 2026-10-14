@@ -88815,3 +88815,90 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T14:13:18Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T14:13:18Z  [CMD `date -u +%FT%TZ` → 2026-10-14T14:13:18Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 9eeb0d930d179884b576a7fe9ddb2adcaf8a7a7c  [CMD `git rev-parse HEAD` → 9eeb0d930d179884b576a7fe9ddb2adcaf8a7a7c]
+- tree: 2b469bc60a087aa9a1ead1ccc1fe740226363e0f  [CMD `git rev-parse HEAD^{tree}` → 2b469bc60a087aa9a1ead1ccc1fe740226363e0f]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 9eeb0d930d179884b576a7fe9ddb2adcaf8a7a7c  [CMD `git ls-remote --heads origin` → 9eeb0d930d179884b576a7fe9ddb2adcaf8a7a7c]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 252  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 252]
+
+### 1. The four states
+
+- physical: unchanged since entry 252 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: re-review of Kai's third Miro pass and bringing the board up to date for this stage, additive only, linked to Linear and GitHub  [CONVERSATION 2026-10-14 Dainius, "Ruling : go please make sure the glitter standard is observed"]
+- evidence: the ruling and Orion's plan, verbatim in section 5  [CMD `ruling_capture store 56aa125613c6d3f0` → captured]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-14 · GO for Orion's re-review of Kai's third Miro pass, to the Gold Tier standard ("glitter standard", read as Gold Tier), and make the Miro board as complete as possible for this stage of the works, all linked to Linear and GitHub references. Read by Orion as additive only: no card status changes, no deletions, no rewording of Kai's frames ⚠ UNBANKED  [CONVERSATION 2026-10-14 Dainius, "Ruling : go please make sure the glitter standard is observed, and finally miro is as complete to this stage of works as possible and all linked to linear and GitHub references"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: Miro work per block ORION-MIRO-COMPLETION-PLAN; D1–D5; step 0.1. HELD: Wave 0 until Kai's amended source list; engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier certification (Kai checks)  [CONVERSATION 2026-10-14 Dainius, "Ruling : go"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Waiting on Kai: amended step 0.1 source list; check of the 8 Miro edits  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 5. Incidents and corrections
+
+- Credential scan of ruling and plan: 0 hits (calibration 6/6)  [CMD `credscan.py own/cs_mg.json` → TOTAL HITS 0]
+- EVIDENCE DAINIUS-MIRO-COMPLETION-GO miro_go_ruling.txt: 177 bytes, sha256 5a3f1d40e9cb54d4e27a8273663415d6da70b28966d7241d20795ddc07139fbc, final LF True (added by Orion)  [CMD `sha256sum miro_go_ruling.txt` → 5a3f1d40e9cb54d4…]
+    BEGIN-VERBATIM DAINIUS-MIRO-COMPLETION-GO
+    Ruling : go please make sure the glitter standard is observed, and finally miro is as complete to this stage of works as possible and all linked to linear and GitHub references
+    END-VERBATIM DAINIUS-MIRO-COMPLETION-GO
+- EVIDENCE ORION-MIRO-COMPLETION-PLAN miro_go_plan.md: 2257 bytes, sha256 86166de0f512e0c8281ffa320dcd994c2fd5688797ae2a6f7dac592899d9f9da, final LF True (added by Orion)  [CMD `sha256sum miro_go_plan.md` → 86166de0f512e0c8…]
+    BEGIN-VERBATIM ORION-MIRO-COMPLETION-PLAN
+    # Miro completion for this stage — reading, done, scope (R21)
+    
+    **Reading of the ruling.** "go" answers Orion's offer to re-review Kai's third Miro pass. "glitter standard" is read as the Gold Tier standard (speech-to-text). "miro is as complete to this stage of works as possible and all linked to linear and GitHub references" extends the go: bring the board up to date with where the programme stands on 2026-10-14, with every new or checked item pointing to its Linear and GitHub record.
+    
+    **Gold Tier here means:** nothing on the board claims more than the record shows; every claim points to a GitHub commit, entry or file line and to the Linear record; UNKNOWN stays UNKNOWN; every change is read back and checked; Orion does not certify his own work as Gold (Kai checks).
+    
+    **Done** when:
+    1. **Review of Kai's third pass** (DAI-10 3a54b56d, requests B–F) is written and banked, read-only: the four card fixes (V1.6, V2.1, V4.8, V6.1), the 21 relabelled cards, Visual 5/7/9 labels, the 110-arrow register against the 9 diagrams (count and identity), and an arrow-by-arrow source check as far as the record allows, each arrow marked SUPPORTED (with file:line), NOT SUPPORTED, or UNVERIFIED.
+    2. **Kai's two board leftovers** that are additive navigation only: the Navigator links to the edge register. The Gold Design 3 prose change is Kai's design wording; Orion drafts it for Kai rather than writing it into Kai's frame.
+    3. **A "Programme status and links" frame** is added: procedure v3.2.3, owner decisions S-1 and D1–D5, step 0.1 status, the pilot baseline evidence (#13, #60, #35 PARTIAL, not DONE cards), open items F7, F12, the April gap, the 23-gap; each line linked to its GitHub commit/entry and to Linear (DAI-10, the start-here page). The Navigator links to it.
+    4. Every board change is read back and compared, banked, posted to DAI-10 for Kai's check, and the start-here page is updated.
+    
+    **Scope:** additive only. No card statuses changed (all 104 stay "UNKNOWN (not verified)" until research cards exist). No deletion, no moving of existing items, no rewording of Kai's frames. Miro calls counted; stop at the limit.
+    
+    **Not in scope:** research results that do not exist yet; nested features not yet found (Wave 0); certifying Gold.
+    END-VERBATIM ORION-MIRO-COMPLETION-PLAN
+
+### 6. Next authorised step
+
+- Survey the board (overview, the 9 diagrams, the register, Gold Design frames, Navigator), then review, then additive updates  [CONVERSATION 2026-10-14 Dainius, "Ruling : go"]
+
+### 7. What I am unsure of
+
+- How far the arrow-by-arrow source check can go: the register's pointers are by family, not by line, so some arrows may only reach UNVERIFIED  [CONVERSATION 2026-10-13 Kai on DAI-10 3a54b56d, "they are NOT individually checked"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
