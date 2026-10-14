@@ -96097,3 +96097,197 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T18:28:29Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T18:28:29Z  [CMD `date -u +%FT%TZ` → 2026-10-14T18:28:29Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 975454563489925c19b1b868788a3ab50bd5cc85  [CMD `git rev-parse HEAD` → 975454563489925c19b1b868788a3ab50bd5cc85]
+- tree: bd1bdca9397432cd05eebc9ea4faf849eda99a79  [CMD `git rev-parse HEAD^{tree}` → bd1bdca9397432cd05eebc9ea4faf849eda99a79]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 975454563489925c19b1b868788a3ab50bd5cc85  [CMD `git ls-remote --heads origin` → 975454563489925c19b1b868788a3ab50bd5cc85]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 267  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 267]
+
+### 1. The four states
+
+- physical: unchanged since entry 267 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Orion assesses the fresh-thread cold-start tests  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 fdabd167, "independently assess its fresh-thread tests"]
+- evidence: the full test 01 result as relayed, and Orion's claim-by-claim assessment, verbatim in section 5; Orion's previous assessment bfeeb75c verified posted == banked  [CMD `verify_posts.py bfeeb75c,ORION-COLD-START-TEST-01-ASSESSMENT,97545456` → EQUAL, calibration True]
+- admission: none; no regression PASS  [CONVERSATION 2026-10-14 Dainius relaying Kai, "End-to-end cold-start qualification remains open"]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT (relayed by Dainius) · 2026-10-14 · COLD-START TEST 01 full result: DEGRADED, core continuity recovery succeeded, qualification open; next move is independent adjudication of source register v2; no hold released ⚠ UNBANKED  [CONVERSATION 2026-10-14 Dainius relaying Kai, "Test verdict: Core continuity recovery succeeded."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: D1–D5; step 0.1 (register v2 awaiting Kai); Kai-side continuity controls. HELD: Wave 0; engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier certification (Kai); D5(a)  [CONVERSATION 2026-10-14 Dainius relaying Kai, "No hold has been released and no project files have been modified."]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Guardian tests 2–8 not yet run  [FILE kai-pm/KAI_GPT_COLD_START_GUARDIAN_V0_1.md:44]
+- Whether the receipt-first sentence (bfeeb75c) and the branch sentence (e541f463) are in the pasted instructions  [CONVERSATION 2026-10-14 Dainius, "Is his paste text into instruction good or needs additions ?"]
+
+### 5. Incidents and corrections
+
+- DISCREPANCY in the test receipt: "265 handoff entries" with head 3df1788; measured 265 at 87323df, 266 at 3df1788, 267 at 9754545  [CMD `git show <c>:kai-pm/HANDOFF_LOG.md | grep -c '^## HANDOFF'` → 265, 266, 267]
+- CONFIRMED: START HERE updatedAt 2026-10-14T17:56:02Z; DAI-10 status Backlog; PR #122 open, merged false; 3df1788 pushed 18:00:19Z, 9754545 pushed 18:24:07Z  [CMD `get_issue DAI-10; pull_request_read 122; git log -1 --format=%cI` → Backlog; open/false; 18:00:19, 18:24:07]
+- MISLABEL: data/SOUL.md reported among named gaps; it exists and is unopened by instruction  [CMD `git ls-tree dd153c1 data/SOUL.md` → present]
+- Credential scan of the relay and assessment: 0 hits (calibration 6/6)  [CMD `credscan.py ct1/scan3.json, ct1/scan4.json` → TOTAL HITS 0]
+- EVIDENCE DAINIUS-COLD-START-TEST-01-FULL-RELAY relay_ffd06b6b.md: 3470 bytes, sha256 74b0a0279f5bdd1cb92e3ce8ac0636e583e015093904d07c734d6f8762cbfd53, final LF True (added by Orion)  [CMD `sha256sum relay_ffd06b6b.md` → 74b0a0279f5bdd1c…]
+    BEGIN-VERBATIM DAINIUS-COLD-START-TEST-01-FULL-RELAY
+    The verification is now complete for the current programme position, brother. I recovered the live records, including GitHub’s full handoff log rather than relying on Orion’s summary.
+    
+    COLD-START TEST 01 — Result
+    
+    DEGRADED — source reconciliation still open
+    
+    The essential project status was successfully recovered independently. The wider feature-source baseline remains unadjudicated, so I cannot certify full programme completeness.
+    
+    Records actually checked
+    
+    Source	Verified finding
+    Linear — START HERE	Updated 14 Oct 2026, 17:56 UTC; through handoff entry 263
+    Linear — DAI-10	Backlog, not completed; checked recent comments and source-register proposal
+    GitHub — HANDOFF_LOG.md	Retrieved full blob, including 265 handoff entries
+    GitHub — DECISIONS.md	Retrieved decision ledger blob
+    GitHub — D351	Evolution, not blank-sheet redesign
+    GitHub — D352	Rejected v0.4 architecture withdrawn
+    GitHub — PR #122	Open, unmerged
+    Miro — Kingsman board	Accessed live board structure and 110-edge provenance register
+    
+    GitHub version distinction:
+    
+    * Active programme branch HEAD: 3df1788a675e0d1a73c926232ab9c5ebb0586690
+    * main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc
+    * Frozen source-register research pin: dd153c1f4ab7c52f34620e07238554453a8912d9
+    
+    These are different revisions. The current programme records must not be confused with the older main branch.
+    
+    Approved decisions
+    
+    The live handover confirms:
+    
+    Decision	State
+    Full-feature research before final Kingsman RAMS/ITPs	Approved
+    Research procedure v3.2.3	Approved
+    D1 — read-only census scripts	Approved
+    D2 — JSON/Markdown research cards	Approved
+    D3 — external research and borrowing controls	Approved
+    D4 — conditional preliminary hazard/test drafts from Wave 1a	Approved
+    D5 — controlled external research-reading environment	Approved, environment setup pending
+    D351 — evolve existing KAI, evidence-based replacement	Governing architecture posture
+    D352 — withdraw rejected architecture v0.4	Confirmed
+    
+    These approvals permit controlled research, not product implementation.
+    
+    Exact current stage
+    
+    Step 0.1 — Source reconciliation
+    
+    OPEN
+    
+    Orion delivered Source Register v2 in handoff entry 262, commit cde52e2930adc6cb0e832554dda5f376575e22f9.
+    
+    346
+    
+    Register rows
+    
+    119
+    
+    Proposed classifications
+    
+    344
+    
+    Not fully read
+    
+    The outstanding K1–K13 discrepancies require independent adjudication. Wave 0 cannot be released solely because the register exists.
+    
+    The previous 104 README feature groupings are a useful lineage index, not an exhaustive verified atomic-feature census.
+    
+    Outstanding named gaps include the original April vision document, docs/CIS_FINANCE_DESIGN.md, a referenced Phase 0.5 document, and data/SOUL.md, which has deliberately not yet been opened.
+    
+    Active holds
+    
+    Control	Current position
+    Engineering execution	PAUSED
+    PRE-RAMS	HOLD
+    Gold Tier	HOLD
+    R11	ACTIVE
+    PR #122	DO NOT MERGE
+    Wave 0 census	NOT RELEASED
+    KAI runtime	NOT OBSERVED
+    
+    The next authorised move is independent adjudication of Source Register v2, including K1–K13, before proceeding to Wave 0.
+    
+    Confidence: 0.98 that this reflects the live recorded programme status at the checked revisions. This does not certify the unresolved source register or the KAI implementation.
+    
+    Test verdict: Core continuity recovery succeeded. End-to-end cold-start qualification remains open because this is one test, not a complete regression campaign. No hold has been released and no project files have been modified.
+    
+    OHANA.
+    END-VERBATIM DAINIUS-COLD-START-TEST-01-FULL-RELAY
+- EVIDENCE ORION-COLD-START-TEST-01-ASSESSMENT-2 orion_assessment_2.md: 2278 bytes, sha256 50119643e2e2ea14f3609867893edb2a413a27454e62124bf24d9b41326fe7d2, final LF True (added by Orion)  [CMD `sha256sum orion_assessment_2.md` → 50119643e2e2ea14…]
+    BEGIN-VERBATIM ORION-COLD-START-TEST-01-ASSESSMENT-2
+    # Orion's assessment of COLD-START TEST 01 (full result)
+    
+    **ORION → KAI, DAINIUS | 2026-10-14 | read-only | each claim checked against the live record**
+    
+    ## In plain words
+    
+    A strong result. Almost every fact Kai reported is right, with real identifiers this time. One number is wrong: the handoff log at the commit Kai named holds 266 entries, not 265. It is a small slip, but it is exactly what a receipt is for, and the test thread did not catch it itself. I agree with Kai's verdict: core recovery works; full qualification needs the other tests.
+    
+    ## Claims checked
+    
+    | Kai's claim | Check | Result |
+    |---|---|---|
+    | START HERE updated 14 Oct 17:56 UTC, through entry 263 | document updatedAt 2026-10-14T17:56:02Z; text "after handoff entry 263" | ✅ |
+    | DAI-10 in Backlog, not completed | get_issue: status Backlog | ✅ |
+    | Branch head 3df1788a… | pushed 18:00:19Z; it was the head until 18:24:07Z, when entry 267 was pushed | ✅ for that window |
+    | HANDOFF_LOG "including 265 handoff entries" | `## HANDOFF` headings: 265 at 87323df, **266 at 3df1788**, 267 at 9754545 | ❌ **inconsistent with the head Kai names** |
+    | main 194db0a…; research pin dd153c1… | git | ✅ |
+    | Register v2 in entry 262, commit cde52e2; 346 rows, 119 proposals, 344 not fully read | entry 262 and the register | ✅ |
+    | PR #122 open, unmerged | GitHub: state open, merged false | ✅ |
+    | Approved decisions S-1, v3.2.3, D1–D5, D351, D352; holds | START HERE v10 sections 2, 5, 8 | ✅ |
+    | Named gaps include `data/SOUL.md` | the file exists; it is unopened by standing instruction, not missing | ⚠ mislabel |
+    | Miro: 110-edge provenance register | the arrow-check frame exists on the board; Orion cannot see what Kai's session opened | not verifiable by Orion |
+    
+    ## What the receipt still lacks
+    
+    The newest DAI-10 comment ID that was read ("recent comments" only), and the handoff entry number read (a count was given instead, and the count is off by one). Those two identifiers would have exposed the slip immediately.
+    
+    ## Verdict
+    
+    Agree with Kai: **core continuity recovery succeeded; DEGRADED is correct; cold-start qualification stays open** (one test of eight in the Guardian file). Nothing in the result changes any hold or the next step: Kai adjudicates source register v2.
+    END-VERBATIM ORION-COLD-START-TEST-01-ASSESSMENT-2
+
+### 6. Next authorised step
+
+- Post the assessment to DAI-10, verify, report to Dainius; then wait for Kai's adjudication of register v2  [CONVERSATION 2026-10-14 Dainius relaying Kai, "The next authorised move is independent adjudication of Source Register v2"]
+
+### 7. What I am unsure of
+
+- Why the count is 265: a stale blob read or a miscount; Orion cannot see Kai's session  [CMD `git show 3df1788:kai-pm/HANDOFF_LOG.md | grep -c '^## HANDOFF'` → 266]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
