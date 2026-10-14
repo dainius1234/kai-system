@@ -94038,3 +94038,1232 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T17:43:15Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T17:43:15Z  [CMD `date -u +%FT%TZ` → 2026-10-14T17:43:15Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 49aba6ce4eaa63b50f27868b465523e6be49a319  [CMD `git rev-parse HEAD` → 49aba6ce4eaa63b50f27868b465523e6be49a319]
+- tree: 9a2f3694b7300281f3a1e43fd313145ccaf8d6ff  [CMD `git rev-parse HEAD^{tree}` → 9a2f3694b7300281f3a1e43fd313145ccaf8d6ff]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 49aba6ce4eaa63b50f27868b465523e6be49a319  [CMD `git ls-remote --heads origin` → 49aba6ce4eaa63b50f27868b465523e6be49a319]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 261  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 261]
+
+### 1. The four states
+
+- physical: unchanged since entry 261 apart from this entry; all register work is read-only against pin dd153c1  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Orion drafts source register v2 for Kai's adjudication; Wave 0 held until step 0.1 formally passes  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 5e94c4d3, "Orion drafts and banks source register v2 and the complete excluded/path inventory"]
+- evidence: the register, its seven scripts, its three text parts and the checker calibration, verbatim in section 5  [CMD `check_register_v2.py SOURCE_REGISTER_V2.md` → problems=0]
+- admission: none; the register is a draft and closes nothing  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 5e94c4d3, "Kai-GPT independently adjudicates remaining differences"]
+
+### 2. Rulings since the last handoff
+
+- None since entry 261  [CONVERSATION 2026-10-14 Dainius, "No further decision is needed from you right now."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: D1–D5; step 0.1; register v2 draft. HELD: Wave 0 until step 0.1 formally passes; engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier certification (Kai); D5(a) environment verification  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 5e94c4d3, "only after Step 0.1 formally passes may Wave 0 exhaustive atomic-feature census begin"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- For Kai: adjudicate register v2, in particular K1 (P1–P4 as maturity intake), K2 (W1 hygiene says complete), K10 and K13 (two cited documents not in the repository), and the 119 Orion-proposed classes  [CMD `check_register_v2.py` → 346 rows]
+- For Kai and Dainius: data/SOUL.md was not opened (standing instruction); whether and how it is read for identity intent  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 5e94c4d3, "residual uncertain or inaccessible material"]
+
+### 5. Incidents and corrections
+
+- REGISTER: 346 rows = universe 306 (9 listed files + 69 Kai candidates + 17 added + 68 not considered before + 143 audit; the 144th audit file is among the 17) + 40 Markdown files beyond the universe; 13 conflicts / gaps (K1–K13), 21 quoted lines  [CMD `build_register.py` → rows 346 {B 9, C 69, D 17, E 68, F 143, G 40}]
+- CHECK: universe=306 beyond=40 rows=346 sha_checked=346 kai_classes_checked=69 quotes_checked=21 evidence_checked=345 problems=0; calibration 1 known-negative passes, 8 injected faults each caught (sha, drop, duplicate, Kai class, quote, empty cell, extra path, evidence line)  [CMD `check_register_v2.py` → problems=0; 8/8 faults exit 1]
+- SELF-CORRECTION to entry 258: coverage was 236 considered / 70 not; kai-pm/HANDOFF_LOG.md is listed source 9 and was wrongly counted in the 70. With CLAUDE.md added by Kai, it is now 238 / 68  [CMD `members.py` → covered 238 remaining 68; in prev 70 but now covered: CLAUDE.md, kai-pm/HANDOFF_LOG.md]
+- CHECKER GAP found by calibration: the first checker did not verify table evidence passages (a fault injected into a table cell passed). Added the check; it found 5 rows (data/self-emp READMEs, no heading) with no line reference; fixed in the builder  [CMD `check_register_v2.py` → 5 problems, then 0]
+- CAUGHT BEFORE BANKING (R16): two section K labels written from appearance were checked. yes-brother-i-agree-eager-dewdrop.md is the Phase 0.5 plan cited at DECISIONS.md:667, now named gap K13; "content banked verbatim" for the 237 log-only names was measured: 124 banked by name, 113 not  [CMD `git show dd153c1:kai-pm/DECISIONS.md | sed -n 667p` → "the Phase 0.5 plan (`yes-brother-i-agree-eager-dewdrop.md`)"]
+- Other branches: all 11 remote branches compared by Markdown path; only claude/cai-v1-bootstrap (6 change-control files) and the d379 retained-interpreter branch (1 vendored test README) hold Markdown the pin lacks  [CMD `git ls-tree` per remote branch → 6 and 1, others 0]
+- Credential scan of the 12 banked texts: 0 hits (calibration 6/6)  [CMD `credscan.py rv2/scan_262.json` → TOTAL HITS 0]
+- EVIDENCE ORION-SOURCE-REGISTER-V2 SOURCE_REGISTER_V2.md: 120132 bytes, sha256 6bb34c994568f91a6e857946222733bc816c46ae438b2bcf81821856f3e418e3, final LF True (added by Orion)  [CMD `sha256sum SOURCE_REGISTER_V2.md` → 6bb34c994568f91a…]
+    BEGIN-VERBATIM ORION-SOURCE-REGISTER-V2
+    # Step 0.1 — Source register v2 (DRAFT for Kai-GPT's adjudication)
+    
+    Prepared by Orion on 2026-10-14 under Kai-GPT's DAI-10 instruction 5e94c4d3 (option b), banked in handoff entry 261. **This is a proposal. It closes nothing.** Kai-GPT adjudicates it; only then can step 0.1 pass and Wave 0 start. No code, runtime, Miro, Gold Tier, PRE-RAMS or PR #122 change. KAI-project is not running (owner, handoff entry 217).
+    
+    ## In plain words
+    
+    Think of this as the drawing register before the survey starts. Every document in the repository folders we agreed is listed once, with its fingerprint (SHA-256), its dates, the line that says what it is, and a proposed status. **"Listed" is not "read".** Almost every row says "fully read: no": the status was judged from the first 20 lines and the title. Reading the bodies is the census itself (Wave 0).
+    
+    What changed since the first proposal:
+    
+    1. Kai's classifications for the original 12 and the 69 are carried in exactly as Kai posted them (the checker compares them with the banked comments).
+    2. The 17 extra sources (Kai's 6 and Orion's 16, overlapping by 5) are integrated.
+    3. The 70 "not yet considered" files are now 68 rows, each with a proposed status. Two left that pile: `CLAUDE.md` (Kai added it) and `kai-pm/HANDOFF_LOG.md` (**Orion's counting error**: it is listed source 9 and should never have been in the 70).
+    4. 40 Markdown files outside the four folders are listed. Several carry capabilities: `data/AGENTS.md` ("Defines Kai's capabilities"), five specialist personas in `data/teammates/`, skills in `data/skills/` and `skills/`, and vault-sync templates.
+    5. Thirteen conflicts, refinements or gaps for Kai, each with the exact quoted line (section J). The most important: **K1**, the P1–P4 audit plans; **K10** and **K13**, two documents the records cite that are not in the repository.
+    
+    ## A. Rulings this register preserves
+    
+    - **D351** — evolution, not reinvention; the governing architecture posture (authority index line 11). Not implementation permission.
+    - **D352** — the rejected v0.4 package is withdrawn. Checked: the three files D352 lists (lines 19–27) are absent at the pin.
+    - **KAI-project is not running** — owner confirmation, handoff entry 217 (⚠ UNBANKED). Every runtime or completion claim in any source is a claim to verify, never a fact.
+    - **A file named D… is not automatically canonical.** D344–D353 have no heading in `DECISIONS.md` (373 distinct D headings, checked); each is scoped to its operative passage (Kai d2d4301d).
+    - **Kai's classifications are provisional** until path, quote and chronology are verified (5e94c4d3). "canonical*" means only the scoped operative passage or doctrine is canonical, for intent, never for implementation.
+    
+    ## Pin, universe and counts
+    
+    - Pin: `dd153c1f4ab7c52f34620e07238554453a8912d9`.
+    - Universe: the 306 Markdown files directly in the repository root, `kai-pm/`, `docs/` and `bootstrap/` at the pin, derived from `git ls-tree`, not from a list.
+    - Rows: B 9 listed files (plus 2 log entries and 1 gap) · C 69 Kai candidates · D 17 added sources · E 68 not considered before · F 143 audit class · G 40 beyond the universe.
+    - Reconciliation: 9 + 69 + 17 + 68 + 143 = 306 (the 144th audit file is in D). Every path appears exactly once; the checker proves it.
+    
+    **Columns.** *Class*: canonical / canonical* / lineage / draft / superseded / external / derived; named gaps are separate. *By*: who classified it. *Role*: intake (may carry owner-intended capability promises) · cross-check (corroboration or defect evidence) · control (navigation, recovery, process) · none. *Owner ruling / banking*: for D344–D353 whether a heading exists in `DECISIONS.md`; for other files `DEC×n` = how many times the file name appears in `DECISIONS.md`, a pointer, not proof of banking. *Fully read*: "no" means only lines 1–20 and the title were read. *Checked by*: "Orion (mech.)" = Orion checked bytes, SHA-256, commit dates and the status line by script; **Kai's check is pending for every row**. *Residual uncertainty*: "body unread" = the class rests on the header alone.
+    
+    ## B. The listed sources: nine files
+    
+    | # | Path | SHA-256 (first 16) | First → last commit | Evidence passage | Class (by) | Role · scope | Owner ruling / banking | Conflicts | Fully read | Checked by | Residual uncertainty |
+    |---|---|---|---|---|---|---|---|---|---|---|---|
+    | 1 | `README.md` | 796c1f01d40d41fd | 2025-06-18 → 2026-09-17 | title: ## Project Status (17 September 2026) | **canonical*** (Kai d2d4301d) | intake · intended features under v3.2.3; never runtime fact | DEC×64 | K7 | no | Orion (mech.) | body unread |
+    | 2 | `kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md` | 349d7b13fe51eaba | 2026-08-23 → 2026-08-23 | L3: > **STATUS: MASTER-CANON ROOT DESIGN INVARIANT / HISTORICAL INTENT CONSOLIDATION — NOT IMPLEMENTATION AUTHORIT | **canonical*** (Kai d2d4301d) | intake · owner-affirmed design invariant; not implementation permission or frozen constitution | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 3 | `kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md` | a3b3c5b5a2b45ceb | 2026-07-27 → 2026-07-27 | L4: Architecture status: **TARGET PRODUCT DESIGN — PLANNING ONLY** | **lineage** (Kai d2d4301d) | intake · final-product planning document: lineage/draft | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 4 | `kai-pm/KINGSMAN_FINAL_VISION_MASTER_CANON_PLAN.md` | d23db5728d4b0a51 | 2026-08-23 → 2026-08-23 | L3: > **STATUS: MASTER-DESIGN PLANNING OBLIGATION — FINAL CANON NOT YET FROZEN BY THIS FILE.** | **lineage** (Kai d2d4301d) | intake · master-canon planning document: lineage/draft | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 5 | `bootstrap/master_plan.md` | a2f0a38739f8ff8b | 2026-06-02 → 2026-06-02 | title: # Kai-System Master Plan | **lineage** (Kai d2d4301d) | intake · older roadmap / original vision: lineage | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 6 | `docs/next_level_roadmap.md` | fbd9bc6d36b9648e | 2026-02-22 → 2026-06-02 | title: # Next-Level Reliability Roadmap (Project Lead Notes) | **lineage** (Kai d2d4301d) | intake · older roadmap: lineage; HMAC conflict carried (K12) | DEC×0 | K12 | no | Orion (mech.) | body unread |
+    | 7 | `kai-pm/DECISIONS.md` | d89343f83a1788cd | 2026-04-21 → 2026-10-02 | title: # Decisions Log (Append-Only) | **canonical** (Kai d2d4301d) | intake · actually banked owner rulings only | the ledger (373 distinct D headings) | none found in header | no | Orion (mech.) | body unread |
+    | 8 | `kai-pm/HANDOFF_LOG.md` | 097038eb123f0f20 | 2026-09-30 → 2026-10-14 | L6: and closes nothing. Authority lives in `kai-pm/DECISIONS.md`, | **canonical*** (Kai d2d4301d) | intake · verbatim owner intent only, each carrying ⚠ UNBANKED pending-ledger status; never a ledger entry | rulings marked ⚠ UNBANKED until banked | none found in header | no | Orion (mech.) | body unread |
+    | 9 | `kai-pm/SHOPPING_LIST_PLAN.md` | 8f49cd4dc83b2664 | 2026-06-21 → 2026-06-21 | title: # External Tool Integration Plan (Shopping List → Phases) | **lineage** (Orion proposal) | cross-check · Orion proposal (Kai's d2d4301d does not name it); D13 itself is in DECISIONS.md | DEC×9 | none found in header | no | Orion (mech.) | body unread |
+    
+    **Two listed sources are handoff-log entries, not files**, and one is a gap:
+    
+    | # | Entry | Class (by) | Role · scope | Owner ruling | Fully read |
+    |---|---|---|---|---|---|
+    | 10 | v1.1 unified draft, handoff entry 106, block KAI-MASTER-PLAN-V1-1-UNIFIED-DRAFT | **draft** (Kai d2d4301d: lineage/draft) | intake · unadjudicated draft | none | no |
+    | 11 | 104-item register, handoff entry 167, block KAI-FEATURE-LIST | **derived** (Kai d2d4301d) | cross-check · guides deduplication; does not establish source completeness | none | no |
+    | 12 | "Old April vision" | **named gap** (Kai d2d4301d) | — · STRATEGIC_PLAN.md is historical lineage, not its replacement | — | — |
+    
+    ## C. Kai's 69 candidates (classes as Kai posted them; provisional until verified)
+    
+    | # | Path | SHA-256 (first 16) | First → last commit | Evidence passage | Class (by) | Role · scope | Owner ruling / banking | Conflicts | Fully read | Checked by | Residual uncertainty |
+    |---|---|---|---|---|---|---|---|---|---|---|---|
+    | 1 | `SESSION_BACKLOG.md` | 59e7d40bb09c41fb | 2026-03-22 → 2026-07-23 | title: # Kai System — Session Backlog | **derived** (Kai 28939a90 #1) | cross-check · cross-check | DEC×9 | none found in header | no | Orion (mech.) | body unread |
+    | 2 | `docs/PROJECT_BACKLOG.md` | 44486d575ded100f | 2026-02-25 → 2026-09-17 | title: # Kai System — Project Backlog | **draft** (Kai 28939a90 #2) | intake · intake | DEC×25 | none found in header | no | Orion (mech.) | body unread |
+    | 3 | `docs/agentic_patterns_spec.md` | 8df4ef66409aec34 | 2026-03-02 → 2026-06-02 | L4: > Status: IN PROGRESS | **draft** (Kai 28939a90 #3) | intake · intake | DEC×8 | none found in header | no | Orion (mech.) | body unread |
+    | 4 | `docs/architecture.md` | fe2b37fdfc0c9005 | 2026-03-22 → 2026-06-02 | title: # Kai System — Architecture | **lineage** (Kai 28939a90 #4) | intake · intake | DEC×1 | none found in header | no | Orion (mech.) | body unread |
+    | 5 | `docs/first_implementation_plan.md` | 6eb7940c5b34ee77 | 2026-02-21 → 2026-06-02 | title: # First Implementation Plan (Core Sovereign Stack) | **lineage** (Kai 28939a90 #5) | intake · intake | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 6 | `docs/production_hardening_plan.md` | 0d2344600fe680b2 | 2026-02-21 → 2026-02-21 | title: # Production Hardening Plan (Post Core-Stability) | **lineage** (Kai 28939a90 #6) | intake · intake | DEC×1 | none found in header | no | Orion (mech.) | body unread |
+    | 7 | `docs/sovereign_ai_spec.md` | e2bbc3b422fd9691 | 2026-02-07 → 2026-06-02 | title: # Sovereign AI (Local-Only) — Consolidated Technical Specification | **lineage** (Kai 28939a90 #7) | intake · intake | DEC×2 | none found in header | no | Orion (mech.) | body unread |
+    | 8 | `kai-pm/CODE_AUDIT_P0_CONTAINMENT_PLAN.md` | 88d222e5d36d062c | 2026-07-27 → 2026-07-27 | L6: Status: **IMPLEMENTATION PLAN ONLY — NO RUNTIME CODE OR CONFIGURATION CHANGED** | **lineage** (Kai 28939a90 #8) | cross-check · risk/test cross-check | DEC×1 | K1 | no | Orion (mech.) | body unread |
+    | 9 | `kai-pm/CODE_AUDIT_P1_SECURITY_FOUNDATION_PLAN.md` | 3d475bdfb1e62a42 | 2026-07-27 → 2026-07-27 | L7: Status: **IMPLEMENTATION DESIGN ONLY — NO RUNTIME REMEDIATION PERFORMED** | **lineage** (Kai 28939a90 #9) | cross-check · risk/test cross-check | DEC×1 | K1 | no | Orion (mech.) | body unread |
+    | 10 | `kai-pm/CODE_AUDIT_P2_ISOLATION_AND_INTEGRITY_PLAN.md` | 04ae16bc61034ece | 2026-07-27 → 2026-07-27 | L11: Status: **IMPLEMENTATION DESIGN ONLY — NO RUNTIME REMEDIATION PERFORMED** | **lineage** (Kai 28939a90 #10) | cross-check · risk/test cross-check | DEC×0 | K1 | no | Orion (mech.) | body unread |
+    | 11 | `kai-pm/CODE_AUDIT_P3_RELIABILITY_AUDIT_PRIVACY_RECOVERY_PLAN.md` | 2feb49d2497666ff | 2026-07-27 → 2026-07-27 | L12: Status: **IMPLEMENTATION DESIGN ONLY — NO RUNTIME REMEDIATION PERFORMED** | **lineage** (Kai 28939a90 #11) | cross-check · risk/test cross-check | DEC×0 | K1 | no | Orion (mech.) | body unread |
+    | 12 | `kai-pm/CODE_AUDIT_P4_CAPABILITY_REQUALIFICATION_PLAN.md` | e023e6b6e0f3f0ae | 2026-07-27 → 2026-07-27 | L13: Status: **IMPLEMENTATION DESIGN ONLY — NO RUNTIME REMEDIATION PERFORMED** | **lineage** (Kai 28939a90 #12) | cross-check · risk/test cross-check | DEC×0 | K1 | no | Orion (mech.) | body unread |
+    | 13 | `kai-pm/CODE_AUDIT_PLANNING_PACKAGE_QA.md` | 096dadde1f8b3066 | 2026-07-27 → 2026-07-27 | L5: Status: **PLANNING QA ONLY — NO RUNTIME REMEDIATION PERFORMED** | **derived** (Kai 28939a90 #13) | cross-check · risk/test cross-check | DEC×9 | none found in header | no | Orion (mech.) | body unread |
+    | 14 | `kai-pm/CODE_AUDIT_REMEDIATION_BACKLOG.md` | 830aa30c1f299129 | 2026-07-27 → 2026-07-27 | L6: Status: **PLANNING ONLY — NO REMEDIATION IMPLEMENTED BY THIS COMMIT** | **derived** (Kai 28939a90 #14) | cross-check · risk/test cross-check | DEC×3 | none found in header | no | Orion (mech.) | body unread |
+    | 15 | `kai-pm/D344A_PRIMARY_MISSION_CANON_ALIGNMENT_CHECKPOINT.md` | ab6d362702d4dc3d | 2026-08-24 → 2026-08-24 | L3: > **STATUS: D344 SUPPLEMENT / GOVERNANCE CHECKPOINT — DURABLE PLANNING ALIGNMENT, NOT A SUBSTITUTE FOR SAFE AP | **lineage** (Kai 28939a90 #15) | scoped · D344 supplement | D344A: pending append; no `## D344A` heading in DECISIONS.md | none found in header | no | Orion (mech.) | body unread |
+    | 16 | `kai-pm/D344_PRIMARY_MISSION_IDENTITY_LINEAGE_CANON_CORRECTION.md` | 791e51b1e35c06af | 2026-08-23 → 2026-08-23 | L3: > **STATUS: GOVERNANCE / CANON CORRECTION RECOVERY ARTIFACT — PENDING SAFE APPEND TO `kai-pm/DECISIONS.md`.** | **canonical*** (Kai 28939a90 #16) | scoped · operative mission ruling only | D344: pending append; no `## D344` heading in DECISIONS.md | none found in header | no | Orion (mech.) | body unread |
+    | 17 | `kai-pm/D345_KINGSMAN_ARCHITECTURE_V0_1_REVIEW_CHECKPOINT.md` | bbd8cebdc0508d95 | 2026-08-24 → 2026-08-24 | L3: > **STATUS: GOVERNANCE / DESIGN CHECKPOINT — CANDIDATE RETURNED FOR EXTERNAL ADVERSARIAL REVIEW. NOT FINAL CAN | **draft** (Kai 28939a90 #17) | scoped · v0.1 review checkpoint | D345: pending append; no `## D345` heading in DECISIONS.md | none found in header | no | Orion (mech.) | body unread |
+    | 18 | `kai-pm/D346_ENGINEERING_ARCHITECTURE_VISUAL_CORRECTION.md` | b8ed47654370778c | 2026-08-24 → 2026-08-24 | L3: > **STATUS: GOVERNANCE / DESIGN CORRECTION — NO RUNTIME OR PROGRAMME EXECUTION AUTHORISED.** | **canonical*** (Kai 28939a90 #18) | scoped · visual rejection only | D346: pending append; no `## D346` heading in DECISIONS.md | none found in header | no | Orion (mech.) | body unread |
+    | 19 | `kai-pm/D347_MASTER_ARCHITECTURE_CONSOLIDATION_CHECKPOINT.md` | 379685438d6a323a | 2026-08-24 → 2026-08-24 | L3: > **STATUS: GOVERNANCE / DESIGN CHECKPOINT — CONSOLIDATED MASTER CANDIDATE BANKED; NOT FINAL CANON, NOT IMPLEM | **draft** (Kai 28939a90 #19) | scoped · v0.2 review checkpoint | D347: pending append; no `## D347` heading in DECISIONS.md | none found in header | no | Orion (mech.) | body unread |
+    | 20 | `kai-pm/D348_EXISTING_KAI_EVOLUTION_CORRECTION.md` | 81531f4875571b68 | 2026-08-24 → 2026-08-24 | L3: > **STATUS: GOVERNANCE / ARCHITECTURE CORRECTION — v0.3 BECOMES PRIMARY REVIEW SUBJECT. NOT IMPLEMENTATION AUT | **canonical*** (Kai 28939a90 #20) | scoped · evolution correction only; v0.3 draft | D348: pending append; no `## D348` heading in DECISIONS.md | none found in header | no | Orion (mech.) | body unread |
+    | 21 | `kai-pm/D349_DEEPSEEK_V0_3_EXISTING_SYSTEM_REVIEW_RECONCILIATION.md` | 97eefcc79c3d00b3 | 2026-08-24 → 2026-08-24 | L3: > **STATUS: GOVERNANCE / ARCHITECTURE REVIEW CHECKPOINT — NOT IMPLEMENTATION AUTHORITY, NOT PROGRAMME EXECUTIO | **lineage** (Kai 28939a90 #21) | scoped · review input | D349: pending append; no `## D349` heading in DECISIONS.md | none found in header | no | Orion (mech.) | body unread |
+    | 22 | `kai-pm/D350_MASTER_ARCHITECTURE_PLAN_AND_DRAWING_SET_V0_4.md` | 7fa729fe20664d30 | 2026-08-24 → 2026-08-24 | L3: > **STATUS: GOVERNANCE / ARCHITECTURE CHECKPOINT — v0.4 MASTER PLAN + DRAWINGS + MIGRATION MATRIX BANKED. NOT  | **superseded** (Kai 28939a90 #22) | scoped · withdrawn v0.4 design | D350: pending append; no `## D350` heading in DECISIONS.md | none found in header | no | Orion (mech.) | body unread |
+    | 23 | `kai-pm/D351_EVOLUTION_NOT_REDESIGN_AND_PRESENTATION_BAR_CORRECTION.md` | 049b92b0a657c17a | 2026-08-24 → 2026-08-24 | L3: > **STATUS: GOVERNANCE / ARCHITECTURE POSTURE CORRECTION. NOT IMPLEMENTATION AUTHORITY. NOT PROGRAMME EXECUTIO | **canonical*** (Kai 28939a90 #23) | scoped · zero-loss doctrine only | D351: pending append; no `## D351` heading in DECISIONS.md | none found in header | no | Orion (mech.) | body unread |
+    | 24 | `kai-pm/D352_WITHDRAW_REJECTED_V0_4_ARCHITECTURE_PACKAGE.md` | f7b29234567f7437 | 2026-08-24 → 2026-08-24 | L3: > **STATUS: GOVERNANCE / ARCHITECTURE CLEANUP. NOT IMPLEMENTATION AUTHORITY. NOT PROGRAMME EXECUTION AUTHORITY | **canonical*** (Kai 28939a90 #24) | scoped · withdrawal ruling only | D352: pending append; no `## D352` heading in DECISIONS.md | none found in header | no | Orion (mech.) | body unread |
+    | 25 | `kai-pm/D353_DEEP_RESEARCH_MATURATION_IMPLEMENTATION_REISSUE.md` | 876e9577814172d2 | 2026-08-24 → 2026-08-24 | L3: > **STATUS: GOVERNANCE / RESEARCH CHECKPOINT — NOT ARCHITECTURE AUTHORITY, NOT IMPLEMENTATION AUTHORITY, NOT P | **lineage** (Kai 28939a90 #25) | scoped · maturation research only | D353: pending append; no `## D353` heading in DECISIONS.md | none found in header | no | Orion (mech.) | body unread |
+    | 26 | `kai-pm/D379_PLAN_V4_1.md` | cd2a2e35dcb6480a | 2026-09-30 → 2026-09-30 | L11: **Status.** Plan v4.1 is a PLANNING TEXT. It creates no programme state, | **superseded** (Kai 28939a90 #26) | scoped · old plan history | DEC×2 | none found in header | no | Orion (mech.) | body unread |
+    | 27 | `kai-pm/D379_PLAN_V4_5.md` | f1cf053f56f3b5de | 2026-09-30 → 2026-09-30 | L6: Status: PLAN ONLY — FROZEN FOR FINAL ADVERSARIAL CLOSURE REVIEW | **draft** (Kai 28939a90 #27) | scoped · assurance plan, no execution | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 28 | `kai-pm/D379_PLAN_V4_5_DEEPSEEK_FINAL_REVIEW.md` | 4aec8fbc7af5beea | 2026-09-30 → 2026-09-30 | L5: Authority: none. Findings are hypothesis input; Kai reconciles. | **external** (Kai 28939a90 #28) | scoped · adversarial review only | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 29 | `kai-pm/D379_PLAN_V4_5_KAI_RECONCILIATION.md` | 7aa044926d75e2eb | 2026-09-30 → 2026-09-30 | L6: Authority of this file: NON-AUTHORITATIVE REVIEW/PLANNING RECORD | **derived** (Kai 28939a90 #29) | cross-check · adjudication cross-check | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 30 | `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D347.md` | 1427d6296d774a49 | 2026-08-24 → 2026-08-24 | L3: > **STATUS: ZERO-LOSS GOVERNANCE QUEUE — NOT A SUBSTITUTE FOR `kai-pm/DECISIONS.md`.** | **derived** (Kai 28939a90 #30) | scoped · duplicate append queue | DEC×0 | K3 | no | Orion (mech.) | body unread |
+    | 31 | `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D348.md` | 231a6e6d1a37e17a | 2026-08-24 → 2026-08-24 | L3: > **STATUS: ZERO-LOSS GOVERNANCE QUEUE — NOT A SUBSTITUTE FOR `kai-pm/DECISIONS.md`.** | **derived** (Kai 28939a90 #31) | scoped · duplicate append queue | DEC×0 | K3 | no | Orion (mech.) | body unread |
+    | 32 | `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D349.md` | bf6498117a0775d9 | 2026-08-24 → 2026-08-24 | L3: > **STATUS: ZERO-LOSS GOVERNANCE QUEUE — NOT A SUBSTITUTE FOR `kai-pm/DECISIONS.md`.** | **derived** (Kai 28939a90 #32) | scoped · duplicate append queue | DEC×0 | K3 | no | Orion (mech.) | body unread |
+    | 33 | `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D350.md` | 52d34aa1c40b715a | 2026-08-24 → 2026-08-24 | L3: > **STATUS: ZERO-LOSS GOVERNANCE QUEUE — NOT A SUBSTITUTE FOR CANONICAL `kai-pm/DECISIONS.md`.** | **derived** (Kai 28939a90 #33) | scoped · duplicate append queue | DEC×0 | K3 | no | Orion (mech.) | body unread |
+    | 34 | `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D351.md` | ccb6fdd901ee6a79 | 2026-08-24 → 2026-08-24 | L3: > **STATUS: ZERO-LOSS GOVERNANCE QUEUE — NOT A SUBSTITUTE FOR CANONICAL `kai-pm/DECISIONS.md`.** | **derived** (Kai 28939a90 #34) | scoped · duplicate append queue | DEC×0 | K3 | no | Orion (mech.) | body unread |
+    | 35 | `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D352.md` | 2a753af29ea6fa96 | 2026-08-24 → 2026-08-24 | L3: > **STATUS: ZERO-LOSS GOVERNANCE QUEUE — NOT A SUBSTITUTE FOR CANONICAL `kai-pm/DECISIONS.md`.** | **derived** (Kai 28939a90 #35) | scoped · duplicate append queue | DEC×0 | K3 | no | Orion (mech.) | body unread |
+    | 36 | `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D353.md` | e95397b37bf50851 | 2026-08-24 → 2026-08-24 | L3: > **STATUS: ZERO-LOSS GOVERNANCE QUEUE — NOT A SUBSTITUTE FOR CANONICAL `kai-pm/DECISIONS.md`.** | **derived** (Kai 2f76278b #36) | scoped · duplicate append queue | DEC×2 | K3 | no | Orion (mech.) | body unread |
+    | 37 | `kai-pm/DEEPSEEK_REVIEW_PACKET_KINGSMAN_ARCHITECTURE_V0_1.md` | df077056eaab3611 | 2026-08-24 → 2026-08-24 | L5: > **DO NOT TREAT THIS PACKET AS IMPLEMENTATION AUTHORITY.** The architecture is a candidate. Existing frozen p | **derived** (Kai 2f76278b #37) | scoped · review wrapper | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 38 | `kai-pm/ENGINEERING_DOCTRINE.md` | a37e96d955ad0aa1 | 2026-08-15 → 2026-09-10 | title: # Engineering doctrine | **canonical*** (Kai 2f76278b #38) | scoped · standing assurance intent, not executable authority | DEC×30 | K8 | no | Orion (mech.) | body unread |
+    | 39 | `kai-pm/EVIDENCE_PLANE_RESEARCH_LINEAGE.md` | 1a8ac86ba2583c41 | 2026-08-20 → 2026-08-20 | L3: Status: **PROJECT CONTINUITY RECORD — NOT A NEW ARCHITECTURE DECISION** | **derived** (Kai 2f76278b #39) | cross-check · continuity cross-check | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 40 | `kai-pm/H2_CONSOLIDATED_REPAIR_SPEC_DRAFT.md` | cad14f275afbed23 | 2026-08-29 → 2026-08-29 | L4: **STATUS: DRAFT FOR REVIEW. NOT AUTHORISED. NO IMPLEMENTATION.** | **draft** (Kai 2f76278b #40) | cross-check · assurance gate cross-check | DEC×2 | none found in header | no | Orion (mech.) | body unread |
+    | 41 | `kai-pm/INSTRUMENTATION_ARCHITECTURE.md` | 007e65b5f2927775 | 2026-08-03 → 2026-08-05 | L3: **Status:** **A-04a done**, **A-04b started** — registry + meta-check live in | **lineage** (Kai 2f76278b #41) | scoped · observability plan, verify code claims | DEC×14 | none found in header | no | Orion (mech.) | body unread |
+    | 42 | `kai-pm/KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md` | 96e057d2f5340411 | 2026-07-27 → 2026-07-27 | L5: Status: **AUTHORITATIVE TARGET-ARCHITECTURE ADDENDUM — PLANNING ONLY** | **lineage** (Kai 2f76278b #42) | scoped · target design intake | DEC×3 | K6 | no | Orion (mech.) | body unread |
+    | 43 | `kai-pm/KINGSMAN_ARCHITECTURAL_PILLARS_INDEX.md` | 45cf50997393f8e9 | 2026-08-23 → 2026-08-23 | L3: > **STATUS: MASTER-CANON NAVIGATION / SYNTHESIS INDEX — NOT IMPLEMENTATION AUTHORITY.** | **derived** (Kai 2f76278b #43) | scoped · completeness control | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 44 | `kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md` | d8b13241e162ec54 | 2026-08-24 → 2026-08-24 | L3: > **STATUS: CURRENT ARCHITECTURE/DOCUMENT AUTHORITY MAP AFTER D353 — PLANNING/GOVERNANCE ONLY.** | **canonical*** (Kai 2f76278b #44) | scoped · classification control, not item generator | DEC×0 | none found in header | yes | Orion (mech.) | later rulings only |
+    | 45 | `kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_V0_2.md` | df7e4adeb0aa805c | 2026-08-24 → 2026-08-24 | L3: > **STATUS: ARCHITECTURE-DOCUMENT AUTHORITY MAP — PLANNING/GOVERNANCE ONLY, NOT IMPLEMENTATION OR PROGRAMME EX | **superseded** (Kai 2f76278b #45) | scoped · old authority map | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 46 | `kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_V0_3.md` | 4e415b828f4f4abe | 2026-08-24 → 2026-08-24 | L3: > **STATUS: CURRENT ARCHITECTURE/DOCUMENT AUTHORITY MAP AFTER D348 — PLANNING/GOVERNANCE ONLY.** | **superseded** (Kai 2f76278b #46) | scoped · old authority map | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 47 | `kai-pm/KINGSMAN_CANDIDATE_ARCHITECTURE_V0_1_DEEPSEEK_REVIEW.md` | fe78b51f6b39f681 | 2026-08-24 → 2026-08-24 | L3: > **STATUS: CANDIDATE FOR DAINIUS + KAI + DEEPSEEK ADVERSARIAL REVIEW — NOT FROZEN, NOT IMPLEMENTATION AUTHORI | **superseded** (Kai 2f76278b #47) | scoped · historical candidate | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 48 | `kai-pm/KINGSMAN_CANON_SYNCHRONISATION_REGISTER.md` | ae4eeb1d72eb631e | 2026-08-24 → 2026-08-24 | L3: > **STATUS: OPERATOR / PROGRAMME CONTROL REGISTER — PLANNING STATE ONLY, NOT IMPLEMENTATION AUTHORITY.** | **superseded** (Kai 2f76278b #48) | scoped · historic register | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 49 | `kai-pm/KINGSMAN_CANON_SYNCHRONISATION_REGISTER_CURRENT.md` | 1c9a8ddae961684b | 2026-08-24 → 2026-08-24 | L3: > **STATUS: CURRENT ARCHITECTURE / PROGRAMME CONTROL REGISTER AFTER D353 — NOT IMPLEMENTATION AUTHORITY.** | **derived** (Kai 2f76278b #49) | scoped · reconciliation control | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 50 | `kai-pm/KINGSMAN_CANON_SYNCHRONISATION_REGISTER_V0_3.md` | 85bc05f03d8533bf | 2026-08-24 → 2026-08-24 | L3: > **STATUS: CURRENT ARCHITECTURE/PROGRAMME CONTROL REGISTER AFTER D348 — NOT IMPLEMENTATION AUTHORITY.** | **superseded** (Kai 2f76278b #50) | scoped · historic register | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 51 | `kai-pm/KINGSMAN_ENGINEERING_ARCHITECTURE_DRAWING_SET_V0_1.md` | de02bcbec16fcedc | 2026-08-24 → 2026-08-24 | L3: > **STATUS: CANDIDATE ENGINEERING DRAWING SET FOR DAINIUS / KAI / DEEPSEEK REVIEW — NOT FINAL CANON, NOT IMPLE | **lineage** (Kai 2f76278b #51) | scoped · historical drawing set | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 52 | `kai-pm/KINGSMAN_ENGINEERING_ARCHITECTURE_VISUAL_STANDARD.md` | 9bf5cd5900c15ab0 | 2026-08-24 → 2026-08-24 | L3: > **STATUS: STANDING DESIGN / OPERATOR-VISIBILITY EXTENSION — NOT IMPLEMENTATION AUTHORITY.** | **canonical*** (Kai 2f76278b #52) | scoped · standing assurance intent, not executable authority | DEC×0 | K8 | no | Orion (mech.) | body unread |
+    | 53 | `kai-pm/KINGSMAN_EXISTING_KAI_EVOLUTION_MASTER_PLAN_V0_3.md` | 0baecec4162128ca | 2026-08-24 → 2026-08-24 | L3: > **STATUS: PRIMARY ARCHITECTURE EVOLUTION CANDIDATE FOR DAINIUS + KAI + DEEPSEEK + ORION REVIEW — NOT FROZEN, | **draft** (Kai 2f76278b #53) | scoped · architecture candidate only | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 54 | `kai-pm/KINGSMAN_MASTER_ARCHITECTURE_AND_PROFESSIONALISATION_CANDIDATE_V0_2.md` | b3ca1ee9a54a1f1d | 2026-08-24 → 2026-08-24 | L3: > **STATUS: WHOLE-SYSTEM MASTER-CANON CANDIDATE FOR DAINIUS + KAI + DEEPSEEK + ORION REVIEW — NOT FROZEN, NOT  | **superseded** (Kai 2f76278b #54) | scoped · historical candidate | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 55 | `kai-pm/KINGSMAN_MASTER_CANON_INPUT_MANIFEST_V0_2.md` | 9a69fb62ef587bfd | 2026-08-24 → 2026-08-24 | L3: > **STATUS: CONTROL / TRACEABILITY MANIFEST FOR `KINGSMAN_MASTER_ARCHITECTURE_AND_PROFESSIONALISATION_CANDIDAT | **derived** (Kai 2f76278b #55) | scoped · completeness control | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 56 | `kai-pm/KINGSMAN_ORGANIC_RESILIENCE_ARCHITECTURE_DOCTRINE.md` | 5a090347ca14f728 | 2026-08-23 → 2026-08-23 | L3: > **STATUS: MASTER-CANON DESIGN INPUT / STANDING ARCHITECTURAL INVARIANT — NOT IMPLEMENTATION AUTHORITY.** | **canonical*** (Kai 2f76278b #56) | scoped · standing operator intent | DEC×0 | K8 | no | Orion (mech.) | body unread |
+    | 57 | `kai-pm/KINGSMAN_PRIMARY_MISSION_CANON_PROPAGATION_MAP.md` | 15f5479c452e080d | 2026-08-23 → 2026-08-23 | L3: > **STATUS: CROSS-DOCUMENT RECONCILIATION / AMENDMENT MAP — NOT IMPLEMENTATION AUTHORITY.** | **derived** (Kai 2f76278b #57) | scoped · completeness control | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 58 | `kai-pm/KINGSMAN_PROACTIVE_ORGANISM_DOCTRINE.md` | af8ddf431e6c6481 | 2026-08-23 → 2026-08-23 | L3: > **STATUS: MASTER-CANON DESIGN INPUT / STANDING ARCHITECTURAL INVARIANT — NOT IMPLEMENTATION AUTHORITY.** | **canonical*** (Kai 2f76278b #58) | scoped · standing operator intent | DEC×0 | K8 | no | Orion (mech.) | body unread |
+    | 59 | `kai-pm/KINGSMAN_README_ARCHITECTURE_REFRESH_PLAN.md` | c40942393f78a357 | 2026-08-23 → 2026-08-23 | L3: > **STATUS: PLANNING / FUTURE EXECUTION OBLIGATION — NO README REWRITE AUTHORISED BY THIS FILE.** | **lineage** (Kai 2f76278b #59) | scoped · future presentation plan | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 60 | `kai-pm/KINGSMAN_ROOT_ARCHITECTURE_AND_CANON_ALIGNMENT.md` | be28853cd7d42153 | 2026-08-24 → 2026-08-24 | L3: > **STATUS: MASTER-CANON ROOT PLANNING ALIGNMENT — NOT IMPLEMENTATION AUTHORITY, NOT EXPERIMENT AUTHORITY, FIN | **lineage** (Kai 2f76278b #60) | scoped · unfrozen root planning input | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 61 | `kai-pm/LETTA_INTEGRATION_PLAN.md` | 4b2922ca4c1ee2f7 | 2026-07-21 → 2026-07-21 | L3: > **Status:** Scoped, not yet implemented. Next step: live smoke-test (blocked on reachable Ollama instance). | **draft** (Kai 2f76278b #61) | scoped · unimplemented technology candidate | DEC×1 | none found in header | no | Orion (mech.) | body unread |
+    | 62 | `kai-pm/NEXT_STINT_PLAN.md` | fd5b52e9670439a1 | 2026-08-07 → 2026-08-12 | title: # Next stint — plan of work | **draft** (Kai 2f76278b #62) | scoped · unreleased work plan | DEC×3 | none found in header | no | Orion (mech.) | body unread |
+    | 63 | `kai-pm/OPERATOR_VISIBILITY_ENGINEERING_DOCTRINE.md` | 6ea7c2c7219466b5 | 2026-08-23 → 2026-08-23 | L3: > **STATUS: STANDING ENGINEERING DOCTRINE EXTENSION.** | **canonical*** (Kai 2f76278b #63) | scoped · standing assurance intent, not executable authority | DEC×0 | K8 | no | Orion (mech.) | body unread |
+    | 64 | `kai-pm/PHASE_0_5_BACKLOG.md` | 444b3c26c775f47f | 2026-05-10 → 2026-07-21 | L6: **Status:** ✅ COMPLETE — all items shipped (2026-07-21) | **derived** (Kai 2f76278b #64) | cross-check · task cross-check | DEC×6 | K11 | no | Orion (mech.) | body unread |
+    | 65 | `kai-pm/STRATEGIC_PLAN.md` | 4602cafaa4ab3f94 | 2026-04-21 → 2026-07-21 | L3: > Canonical 5-phase roadmap for Kai. This plan is grounded in current repository state and avoids fabricated p | **lineage** (Kai 2f76278b #65) | scoped · April historical lead only | DEC×4 | K5 | no | Orion (mech.) | body unread |
+    | 66 | `kai-pm/UH2_SENSOR_INGRESS_PLAN.md` | 2c25ab0694d31d5d | 2026-08-07 → 2026-08-07 | title: # UH-2 sensor ingress — implementation plan (rev 2) | **draft** (Kai 2f76278b #66) | scoped · unreleased work plan | DEC×3 | none found in header | no | Orion (mech.) | body unread |
+    | 67 | `kai-pm/VERIFICATION_ARCHITECTURE_REVIEW.md` | 68eedc1017f2b10a | 2026-08-12 → 2026-08-12 | L4: **Status:** analysis and recommendation only. No implementation. | **lineage** (Kai 2f76278b #67) | scoped · evidence-plane review only | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 68 | `kai-pm/W1_DASHBOARD_REMEDIATION_PLAN.md` | f97f9d7c0f628d32 | 2026-08-02 → 2026-08-03 | L6: **Status tool:** `make dashboard-findings` | **draft** (Kai 2f76278b #68) | scoped · unreleased work plan | DEC×2 | none found in header | no | Orion (mech.) | body unread |
+    | 69 | `kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md` | dbaff0b9df18e4df | 2026-08-03 → 2026-08-04 | L3: **Status:** complete. All five steps done; the debt is **0** and ratcheted. | **draft** (Kai 2f76278b #69) | scoped · unreleased work plan | DEC×1 | K2 | no | Orion (mech.) | body unread |
+    
+    ## D. Kai's six added sources and Orion's 16 omitted sources (17 distinct paths)
+    
+    | # | Path | SHA-256 (first 16) | First → last commit | Evidence passage | Class (by) | Role · scope | Owner ruling / banking | Conflicts | Fully read | Checked by | Residual uncertainty |
+    |---|---|---|---|---|---|---|---|---|---|---|---|
+    | 1 | `CLAUDE.md` | b97e07b4be1ea0c4 | 2026-08-07 → 2026-10-11 | title: # Operating rules — read this first | **canonical*** (Kai d2d4301d) | control · canonical process control, not feature runtime | DEC×32 | none found in header | no | Orion (mech.) | body unread |
+    | 2 | `docs/personality_and_proactive.md` | 66147745cd145b48 | 2026-02-25 → 2026-06-02 | title: # Kai Personality Architecture — Pub Mode, Work Mode & Proactive Behaviour | **lineage** (Orion proposal (Orion 16)) | intake · personality modes and proactive behaviour design; feature-bearing | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 3 | `kai-pm/A4_SELF_DIAGNOSIS_EVOLUTION.md` | 642f26bf82467904 | 2026-08-23 → 2026-08-23 | L3: > **STATUS: FUTURE DESIGN OBLIGATION / ARCHITECTURE NOTE — NOT CURRENT PROGRAMME AUTHORITY.** | **lineage** (Kai d2d4301d) | intake · lineage; also Orion 16 | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 4 | `kai-pm/ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md` | 45b95dc499ae65f7 | 2026-08-23 → 2026-08-23 | L3: > **STATUS: SNAPSHOT-BOUND RESEARCH EVIDENCE / KAI→ORION BRIEF — NOT CANONICAL PROGRAMME STATE.** | **external** (Orion proposal (Orion 16)) | cross-check · snapshot-bound research evidence (own status line); assurance obligations only | DEC×4 | none found in header | no | Orion (mech.) | body unread |
+    | 5 | `kai-pm/CODE_AUDIT_BATCH_MEMU_PERSONALITY_AUTONOMY.md` | b928dcc2566eea64 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | **derived** (Orion proposal (Orion 16)) | cross-check · audit batch; deduplicated into the 144 audit class (defect / negative-test evidence) | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 6 | `kai-pm/DAINIUS_KINGSMAN_ENGINEERING_STANDARD.md` | f4cb07bbe2388662 | 2026-08-24 → 2026-08-24 | L3: > **STATUS: STANDING OPERATOR / ENGINEERING PRINCIPLE — NOT IMPLEMENTATION AUTHORITY, NOT EXPERIMENT AUTHORITY | **canonical*** (Orion proposal (Orion 16)) | control · standing operator engineering principle (own status line); intent and assurance only | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 7 | `kai-pm/HOUSE_IN_ORDER_PHASE2_PROFESSIONALISATION.md` | 6f1eccae2085c8c2 | 2026-08-23 → 2026-08-23 | L3: > **STATUS: FUTURE PROGRAMME PHASE / PLANNING AUTHORITY ONLY — EXECUTION NOT STARTED BY THIS FILE.** | **lineage** (Kai d2d4301d) | intake · lineage; also Orion 16 | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 8 | `kai-pm/KAI_KINGSMAN_COLD_START_MASTER.md` | 9b5d059964963655 | 2026-09-15 → 2026-09-15 | L3: **Primary mission · authority · doctrine · programme position · live checkpoint · destination** | **derived** (Orion proposal (Orion 16)) | control · cold-start recovery and navigation document; no new feature authority | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 9 | `kai-pm/KAI_KINGSMAN_PUZZLE_MAP_AND_RECONCILIATION.md` | bee601a41d40303a | 2026-08-23 → 2026-08-23 | L3: > **STATUS: MASTER SYNTHESIS / PLANNING INPUT — NOT IMPLEMENTATION AUTHORITY.** | **derived** (Orion proposal (Orion 16)) | cross-check · master synthesis / planning input (own status line); completeness cross-check | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 10 | `kai-pm/KAI_ORION_CONTINUITY.md` | 314731bc1f6928d6 | 2026-08-23 → 2026-08-23 | L3: > **STATUS: RECOVERY PROTOCOL — NOT A SOURCE OF PROGRAMME TRUTH.** | **derived** (Orion proposal (Orion 16)) | control · recovery protocol; own status line: not a source of programme truth | DEC×6 | none found in header | no | Orion (mech.) | body unread |
+    | 11 | `kai-pm/KAI_RECONCILIATION_DEEPSEEK_EXISTING_KAI_EVOLUTION_V0_3.md` | d3bae7d67008e016 | 2026-08-24 → 2026-08-24 | L3: > **STATUS: KAI-VERIFIED ARCHITECTURE REVIEW / RECONCILIATION INPUT — NOT IMPLEMENTATION AUTHORITY, NOT PROGRA | **derived** (Kai d2d4301d) | cross-check · derived review; also Orion 16 | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 12 | `kai-pm/KINGSMAN_CONTINGENCY_AND_FAILSAFE_LIBRARY_DESIGN.md` | 4ada8002c10989a6 | 2026-08-23 → 2026-08-23 | L3: > **STATUS: MASTER-CANON / PHASE-2 DESIGN INPUT — NO IMPLEMENTATION AUTHORISED BY THIS FILE.** | **lineage** (Orion proposal (Orion 16)) | intake · contingency / failsafe library design input; feature-bearing | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 13 | `kai-pm/KINGSMAN_EXISTING_KAI_MATURATION_IMPLEMENTATION_RESEARCH_REISSUE_2026-08-24.md` | e6cfda3471449687 | 2026-08-24 → 2026-08-24 | L6: **Status:** **DEEP-RESEARCH / IMPLEMENTATION GUIDANCE — NOT ARCHITECTURE AUTHORITY, NOT IMPLEMENTATION AUTHORI | **lineage** (Kai d2d4301d) | intake · lineage; also Orion 16 | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 14 | `kai-pm/KINGSMAN_LONG_HORIZON_STEWARDSHIP_AND_SUCCESSION.md` | 437db7a20ddc0200 | 2026-08-23 → 2026-08-23 | L3: > **STATUS: MASTER-CANON DESIGN REQUIREMENT / FUTURE ARCHITECTURE OBLIGATION — NO SUCCESSION OR FINANCIAL AUTO | **lineage** (Orion proposal (Orion 16)) | intake · future architecture obligation (stewardship, succession); feature-bearing, no implementation authority | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 15 | `kai-pm/MEMORY_GRAPH_DESIGN.md` | 7382412664bf164f | 2026-06-21 → 2026-06-21 | title: # Graph-Memory Layer Design — `memu-graph` | **lineage** (Orion proposal (Orion 16)) | intake · memu-graph graph-memory design; feature-bearing | DEC×11 | none found in header | no | Orion (mech.) | body unread |
+    | 16 | `kai-pm/PHASE2_DOCUMENT_SYNC_AND_DRIFT_CONTROL.md` | e1f8ed73dfe3ce49 | 2026-08-23 → 2026-08-23 | L3: > **STATUS: PLANNING / CONTROL-DESIGN FINDING — NO IMPLEMENTATION AUTHORISED BY THIS FILE.** | **lineage** (Orion proposal (Orion 16)) | cross-check · control-design finding (document drift); assurance obligation | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 17 | `kai-pm/UH_PROGRESS_TRACKER.md` | fd5300fb67c03dcc | 2026-08-01 → 2026-08-04 | L4: > If this file and any other doc disagree, **this file wins** for UH status. | **derived** (Kai d2d4301d) | cross-check · derived status check; also Orion 16 | DEC×11 | K4 | no | Orion (mech.) | body unread |
+    
+    ## E. The 68 paths not considered before (Orion proposals)
+    
+    | # | Path | SHA-256 (first 16) | First → last commit | Evidence passage | Class (by) | Role · scope | Owner ruling / banking | Conflicts | Fully read | Checked by | Residual uncertainty |
+    |---|---|---|---|---|---|---|---|---|---|---|---|
+    | 1 | `CHANGELOG.md` | a562ff1545fc003b | 2026-03-22 → 2026-07-24 | title: # Changelog | **derived** (Orion proposal) | cross-check · claimed shipped changes; feature leads only, runtime unverified | DEC×11 | none found in header | no | Orion (mech.) | body unread |
+    | 2 | `PROJECT_STATUS.md` | 8c3d0c276f658adf | 2026-04-21 → 2026-04-21 | L1: Moved to [kai-pm/STATUS.md](kai-pm/STATUS.md). This file is kept as a redirect. | **derived** (Orion proposal) | none · one-line redirect to kai-pm/STATUS.md; no content | DEC×1 | none found in header | no | Orion (mech.) | body unread |
+    | 3 | `bootstrap/README.md` | 216347d89aee21fc | 2026-06-02 → 2026-06-02 | title: # Kai-System Bootstrap Plan | **lineage** (Orion proposal) | intake · early bootstrap plan and principles | DEC×64 | none found in header | no | Orion (mech.) | body unread |
+    | 4 | `docs/DEMO.md` | 69e39da0f026c9ed | 2026-07-21 → 2026-07-21 | title: # Kai 5-Minute Demo | **derived** (Orion proposal) | cross-check · demo walkthrough of claimed features | DEC×5 | none found in header | no | Orion (mech.) | body unread |
+    | 5 | `docs/ERROR_LOG.md` | cd06394cd5e576dd | 2026-03-22 → 2026-06-02 | title: # Kai-System Error & Warning Log | **derived** (Orion proposal) | cross-check · defect log (2026-03-22 test counts); defect evidence | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 6 | `docs/PHONE_SETUP.md` | 8ecfcfed7ee5d03a | 2026-07-21 → 2026-07-21 | title: # Phone Setup — Install Kai as a PWA | **derived** (Orion proposal) | cross-check · user guide; PWA install capability is a feature lead | DEC×2 | none found in header | no | Orion (mech.) | body unread |
+    | 7 | `docs/ara_review_status.md` | 664221662243daf5 | 2026-02-22 → 2026-06-02 | title: # Ara Review Follow-up Status | **derived** (Orion proposal) | cross-check · implementation status record | DEC×1 | none found in header | no | Orion (mech.) | body unread |
+    | 8 | `docs/design_system.md` | 994026025c43a871 | 2026-03-06 → 2026-03-06 | title: # Kai Design System | **lineage** (Orion proposal) | intake · UI / presentation design intent | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 9 | `docs/gaps_and_hardening.md` | 49826ce429a62292 | 2026-03-05 → 2026-06-02 | L12: \| Item \| Status \| Notes \| | **lineage** (Orion proposal) | intake · gap and hardening checklist; open items are leads | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 10 | `docs/gpu_integration_phase0.md` | 787d2db5dec7f250 | 2026-04-21 → 2026-04-21 | L5: **Status:** ✅ Complete — Phase 0 hardening tasks implemented | **derived** (Orion proposal) | cross-check · implementation record claiming completion; runtime unverified | DEC×0 | K11 | no | Orion (mech.) | body unread |
+    | 11 | `docs/hmac_rotation_runbook.md` | 55b73c609d065ea3 | 2026-02-22 → 2026-06-02 | title: # HMAC Rotation Runbook (Project Lead) | **derived** (Orion proposal) | cross-check · operating procedure for HMAC rotation; see conflict K-HMAC | DEC×1 | K12 | no | Orion (mech.) | body unread |
+    | 12 | `docs/known_issues.md` | 76c90ac98230f42b | 2026-03-22 → 2026-06-02 | title: # Kai System — Known Issues & Gotchas | **derived** (Orion proposal) | cross-check · known issues; defect evidence | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 13 | `docs/phase1_patch_set.md` | 4e8393a4001b91bb | 2026-02-21 → 2026-02-21 | title: # Phase-1 Patch Set (Concrete, Repo-Aligned) | **lineage** (Orion proposal) | intake · early concrete patch plan | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 14 | `docs/unfair_advantages.md` | 796af40e40f101f6 | 2026-03-02 → 2026-06-02 | title: # Kai's Unfair Advantages — Strategic Intelligence Document | **lineage** (Orion proposal) | intake · strategic capability document, 680 lines; feature-bearing; missed by the name filter | DEC×2 | none found in header | no | Orion (mech.) | body unread |
+    | 15 | `docs/wake_intent_j2.md` | a318982926aebea2 | 2026-04-21 → 2026-04-21 | title: # J2 — Wake-word + Intent Judge | **lineage** (Orion proposal) | intake · J2 wake-word and intent feature specification | DEC×3 | none found in header | no | Orion (mech.) | body unread |
+    | 16 | `kai-pm/BASELINE_RESPONSES_0.5B.md` | ae9964dc7a73c182 | 2026-07-23 → 2026-07-23 | title: # 0.5b Baseline Responses | **derived** (Orion proposal) | control · test capture template, capture still pending | DEC×2 | none found in header | no | Orion (mech.) | body unread |
+    | 17 | `kai-pm/CLEANUP_TODO.md` | 0718c691d9fb7273 | 2026-06-01 → 2026-07-23 | L4: > §2.1's routes/state/flows/providers/prompts split stalled in two open draft PRs | **superseded** (Orion proposal) | none · own note: the plan did not execute as written | DEC×3 | none found in header | no | Orion (mech.) | body unread |
+    | 18 | `kai-pm/CODE_AUDIT_CONTINUATION_LOG.md` | ef81ac699cc2b005 | 2026-07-27 → 2026-07-27 | L5: Status: **ACTIVE CONTINUATION LOG — PLANNING PACKAGE COMPLETE** | **derived** (Orion proposal) | cross-check · audit record; same disposition as the audit class | DEC×2 | none found in header | no | Orion (mech.) | body unread |
+    | 19 | `kai-pm/CODE_AUDIT_FINAL_REPORT.md` | e95aada0f4042026 | 2026-07-27 → 2026-07-27 | L6: Audit status: **SOURCE, DEPLOYMENT AND SYSTEM CONSOLIDATION COMPLETE FOR THE REVIEWED SNAPSHOT** | **derived** (Orion proposal) | cross-check · audit report; same disposition as the audit class | DEC×5 | none found in header | no | Orion (mech.) | body unread |
+    | 20 | `kai-pm/CODE_AUDIT_IMPLEMENTATION_SEQUENCE_AND_CLOSURE_MATRIX.md` | 12cd4b4a947a29bc | 2026-07-27 → 2026-07-27 | L5: Status: **PLANNING AND CONTROL ARTEFACT ONLY — NO RUNTIME REMEDIATION PERFORMED** | **derived** (Orion proposal) | cross-check · audit closure matrix; planning control | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 21 | `kai-pm/CODE_AUDIT_MASTER.md` | a6224c28d9809dbe | 2026-07-26 → 2026-07-27 | L4: Status: **FINAL — SINGLE SOURCE OF TRUTH** | **derived** (Orion proposal) | cross-check · audit master register; 'single source of truth' for audit findings, not features | DEC×15 | none found in header | no | Orion (mech.) | body unread |
+    | 22 | `kai-pm/CODE_AUDIT_REGISTER.md` | fbe57c2f7ff75915 | 2026-07-26 → 2026-07-26 | L5: Status: ACTIVE | **derived** (Orion proposal) | cross-check · audit register; same disposition as the audit class | DEC×1 | none found in header | no | Orion (mech.) | body unread |
+    | 23 | `kai-pm/CODE_AUDIT_REGISTER_CONTINUED.md` | 9dddae9a41a3c24a | 2026-07-26 → 2026-07-26 | L5: Status: ACTIVE CONTINUATION | **derived** (Orion proposal) | cross-check · audit register; same disposition as the audit class | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 24 | `kai-pm/CODE_AUDIT_REGISTER_CONTINUED_2.md` | 2a74c68b33418c84 | 2026-07-26 → 2026-07-26 | L5: Status: ACTIVE CONTINUATION | **derived** (Orion proposal) | cross-check · audit register; same disposition as the audit class | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 25 | `kai-pm/COMPOSE_DRIFT.md` | 37ea904d7894d0d9 | 2026-07-21 → 2026-07-23 | title: # Compose Drift Analysis | **derived** (Orion proposal) | cross-check · compose drift analysis (2026-07-21) | DEC×5 | none found in header | no | Orion (mech.) | body unread |
+    | 26 | `kai-pm/CONVICTION_SCENARIOS.md` | 9206098ba6668ebc | 2026-07-23 → 2026-07-23 | title: # Conviction Quality Test Scenarios | **derived** (Orion proposal) | control · test scenarios; the conviction pipeline is a feature lead | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 27 | `kai-pm/CROSS_AXIS_SEMANTIC_AUDIT.md` | 76d46a3940dd0d53 | 2026-08-27 → 2026-08-27 | L3: Banked under **D365, evidence only**. No repair authority, no ontology | **derived** (Orion proposal) | none · D365 evidence for the H2 instrument; no feature content expected | DEC×1 | none found in header | no | Orion (mech.) | body unread |
+    | 28 | `kai-pm/DECISIONS_DRAFT_UNBANKED.md` | af4719e0386cc06a | 2026-09-30 → 2026-09-30 | L3: **THIS IS A DRAFT. IT IS NOT `DECISIONS.md` AND BANKS NOTHING.** | **draft** (Orion proposal) | cross-check · own status: banks nothing; owner-intent cross-check for entries 1-5 | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 29 | `kai-pm/DEEPSEEK_BRIEF_2026-08-07_EMBEDDINGS.md` | 5d35a5fe1a066553 | 2026-08-07 → 2026-08-07 | title: # Brief for DeepSeek — the embedding model and the impossible default | **external** (Orion proposal) | cross-check · brief to DeepSeek behind D167 | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 30 | `kai-pm/DEEPSEEK_BRIEF_2026-08-07_METHOD.md` | 5bbd4775080343b8 | 2026-08-07 → 2026-08-07 | title: # Brief for DeepSeek — the method, not a bug | **external** (Orion proposal) | none · method brief | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 31 | `kai-pm/DEEPSEEK_BRIEF_2026-08-07_TOPOLOGY.md` | 10695c3cbb307d67 | 2026-08-07 → 2026-08-07 | title: # Brief — network topology decision (perception cannot reach memory) | **external** (Orion proposal) | cross-check · network topology decision brief | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 32 | `kai-pm/DEEPSEEK_REVIEW_PACKET_EXISTING_KAI_EVOLUTION_V0_3.md` | 4c75530c7e38c78a | 2026-08-24 → 2026-08-24 | title: # DeepSeek Adversarial Review Packet — EXISTING KAI → KINGSMAN Evolution v0.3 | **derived** (Orion proposal) | cross-check · review wrapper for v0.3 (like Kai's #37) | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 33 | `kai-pm/DEEPSEEK_REVIEW_PACKET_KINGSMAN_MASTER_CANDIDATE_V0_2.md` | 79b7ad1a2ba4e229 | 2026-08-24 → 2026-08-24 | L9: > **STATUS:** external adversarial review input only. No implementation or programme execution is authorised b | **derived** (Orion proposal) | cross-check · review wrapper for v0.2 | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 34 | `kai-pm/DEEPSEEK_REVIEW_PACKET_SUPPLEMENT_D346_ENGINEERING_DRAWINGS.md` | d74ad9c2e29aaf60 | 2026-08-24 → 2026-08-24 | L3: > **STATUS: REVIEW SUPPLEMENT — USE WITH THE D345 CANDIDATE. NOT IMPLEMENTATION AUTHORITY.** | **derived** (Orion proposal) | cross-check · review supplement for D346 | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 35 | `kai-pm/EMBEDDING_BACKEND_STATE.md` | e62dd35509928137 | 2026-08-11 → 2026-08-12 | L19: > printed is **withdrawn**. It measured **memu-core's image**. See | **derived** (Orion proposal) | cross-check · measured embedding backend state (2026-08-12) | DEC×2 | none found in header | no | Orion (mech.) | body unread |
+    | 36 | `kai-pm/EQ_BASELINE_SAMPLES.md` | 156cbfaab1af4152 | 2026-07-23 → 2026-07-23 | title: # EQ Baseline Samples — Emotional Intelligence Quality Gate | **derived** (Orion proposal) | control · test samples; EQ detection is a feature lead | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 37 | `kai-pm/FAILURE_PATTERN_LEDGER.md` | a5bdfdbf94095d2b | 2026-08-29 → 2026-10-02 | title: # Failure pattern ledger | **canonical*** (Orion proposal) | none · authoritative append-only process ledger; no feature content | DEC×8 | none found in header | no | Orion (mech.) | body unread |
+    | 38 | `kai-pm/GPU_ARRIVAL_RUNBOOK.md` | 26283f49b4329e7a | 2026-07-23 → 2026-07-23 | title: # GPU Arrival Runbook | **draft** (Orion proposal) | cross-check · future operating plan for GPU arrival | DEC×4 | none found in header | no | Orion (mech.) | body unread |
+    | 39 | `kai-pm/H2_REPAIR_CONTRACT_D367.md` | 0ce5792ed72e6e70 | 2026-08-27 → 2026-08-27 | L11: Authority: Dainius approves; Kai adjudicates semantics and admission; | **canonical*** (Orion proposal) | none · frozen H2 repair contract (D367) only; assurance instrument, no feature content | DEC×11 | none found in header | no | Orion (mech.) | body unread |
+    | 40 | `kai-pm/KAI_ORION_CONTINUITY_CURRENT_MASTER_POINTER.md` | 22d629f51a16a670 | 2026-08-24 → 2026-08-24 | L3: > **STATUS: MANDATORY RECOVERY POINTER WHILE CANONICAL `DECISIONS.md` APPEND D344–D353 IS OPEN.** | **derived** (Orion proposal) | control · recovery pointer while D344-D353 append is open | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 41 | `kai-pm/KAI_PRIMARY_MISSION_RECOVERY_POINTER.md` | b8b35702dd632f6b | 2026-08-23 → 2026-08-23 | L3: > **STATUS: RECOVERY POINTER ONLY — NOT PROGRAMME OR IMPLEMENTATION AUTHORITY.** | **derived** (Orion proposal) | control · recovery pointer; own status: not authority | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 42 | `kai-pm/MAKEFILE_AUDIT.md` | d2635b50b8904a65 | 2026-06-02 → 2026-06-02 | title: # Makefile Audit | **derived** (Orion proposal) | cross-check · Makefile audit (123 targets) | DEC×3 | none found in header | no | Orion (mech.) | body unread |
+    | 43 | `kai-pm/MAKEFILE_TARGETS.md` | 5da726150671b469 | 2026-07-22 → 2026-08-03 | title: # Makefile Target Catalogue | **derived** (Orion proposal) | cross-check · Makefile target catalogue | DEC×8 | none found in header | no | Orion (mech.) | body unread |
+    | 44 | `kai-pm/METRICS.md` | cd59b29c1eae05fe | 2026-04-21 → 2026-07-21 | title: # Kai PM Metrics | **derived** (Orion proposal) | none · PM metrics note | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 45 | `kai-pm/NAVIGATION.md` | fe96439feeedc34f | 2026-05-10 → 2026-08-01 | L20: \| **What's the Unified Hunter status?** \| [`UH_PROGRESS_TRACKER.md`](UH_PROGRESS_TRACKER.md) ← **source of tru | **derived** (Orion proposal) | control · navigation index | DEC×6 | none found in header | no | Orion (mech.) | body unread |
+    | 46 | `kai-pm/ORION_FIELD_NOTES.md` | 925f98f706730aa8 | 2026-08-07 → 2026-09-22 | L5: > **This file cannot create:** programme state · authority · sequence · | **derived** (Orion proposal) | none · non-authoritative working memory | DEC×18 | none found in header | no | Orion (mech.) | body unread |
+    | 47 | `kai-pm/PHASE1_READINESS.md` | a010808ed74a46c9 | 2026-07-23 → 2026-07-23 | title: # Phase 1 Readiness Plan | **draft** (Orion proposal) | intake · Phase 1 readiness plan | DEC×11 | none found in header | no | Orion (mech.) | body unread |
+    | 48 | `kai-pm/POSTMORTEM_2026-08-06_RUNNER_STARVATION.md` | 057a0ef60bf19b8a | 2026-08-06 → 2026-08-07 | L3: **Status:** ongoing at time of writing. Cause not fully determined; this | **derived** (Orion proposal) | none · CI incident record | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 49 | `kai-pm/REALITY_CHECK_2026-05-10.md` | fd15447def56f9ab | 2026-05-10 → 2026-05-10 | L9: \| README status date \| `make check-docs` (`scripts/sync_docs.py --check`) \| 21 April 2026 \| 10 May 2026 \| Auto | **derived** (Orion proposal) | cross-check · dated reality reconciliation | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 50 | `kai-pm/REALITY_CHECK_2026-06-18.md` | 354ddec22e9d0b03 | 2026-06-18 → 2026-06-18 | L3: Purpose: reconcile PM brain (`SESSION_BOOTSTRAP.md`, `STATUS.md`, `CLEANUP_TODO.md`) | **derived** (Orion proposal) | cross-check · dated reality reconciliation | DEC×1 | none found in header | no | Orion (mech.) | body unread |
+    | 51 | `kai-pm/REPO_HEALTH_AUDIT_2026-05-10.md` | 6944c2d8759f9fe5 | 2026-06-01 → 2026-06-02 | title: # Repo Health Audit — 2026-05-10 | **derived** (Orion proposal) | cross-check · dated repository health audit | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 52 | `kai-pm/RISKS.md` | 9f7fdc15d3c44732 | 2026-04-21 → 2026-07-21 | L5: \| ID \| Description \| Severity \| Likelihood \| Mitigation \| Owner \| Status \| | **derived** (Orion proposal) | cross-check · risk register (last reviewed 2026-07-21) | DEC×4 | none found in header | no | Orion (mech.) | body unread |
+    | 53 | `kai-pm/RUNTIME_TOPOLOGY_CENSUS.md` | 199213a04bf5b6d9 | 2026-08-12 → 2026-08-12 | title: # #41 runtime-topology census — measured 2026-08-12 | **derived** (Orion proposal) | cross-check · measured runtime topology census (2026-08-12) | DEC×3 | none found in header | no | Orion (mech.) | body unread |
+    | 54 | `kai-pm/SEQUENCE.md` | f8a3bf72112c0614 | 2026-04-21 → 2026-07-21 | L3: This sequence follows the canonical roadmap in [STRATEGIC_PLAN.md](STRATEGIC_PLAN.md). | **lineage** (Orion proposal) | intake · 5-phase delivery sequence; follows STRATEGIC_PLAN.md | DEC×7 | K5 | no | Orion (mech.) | body unread |
+    | 55 | `kai-pm/SERVICE_IDENTITY_MEASUREMENT.md` | 230a580a0bb66916 | 2026-08-08 → 2026-08-08 | L3: **Date:** 2026-08-07 · **Status:** evidence, for review. No implementation. | **derived** (Orion proposal) | cross-check · evidence for review; no implementation | DEC×2 | none found in header | no | Orion (mech.) | body unread |
+    | 56 | `kai-pm/SERVICE_IDENTITY_STATE.md` | 6d22bbe13c83ab9f | 2026-08-11 → 2026-08-11 | L5: **Status of the next gate:** not run — no Docker daemon in this environment. | **derived** (Orion proposal) | cross-check · service identity engineering state (2026-08-08) | DEC×6 | none found in header | no | Orion (mech.) | body unread |
+    | 57 | `kai-pm/SERVICE_IDENTITY_TRUST_BOUNDARIES.md` | d74d4e70f35fcf7f | 2026-08-08 → 2026-08-08 | L3: **Date:** 2026-08-08 · **Status:** analysis, no new mechanism proposed. | **derived** (Orion proposal) | cross-check · trust-boundary analysis | DEC×1 | none found in header | no | Orion (mech.) | body unread |
+    | 58 | `kai-pm/SESSION_BOOTSTRAP.md` | b4a522a87c51a1cb | 2026-04-21 → 2026-07-25 | title: # Session Bootstrap | **derived** (Orion proposal) | cross-check · summary of the system (to 2026-07-25); claims are leads | DEC×8 | none found in header | no | Orion (mech.) | body unread |
+    | 59 | `kai-pm/STATUS.md` | c1f3f90e8043429f | 2026-04-21 → 2026-08-04 | title: # Kai PM Status Dashboard | **derived** (Orion proposal) | cross-check · status dashboard; 'Phase 0 COMPLETE' is a claim, not fact | DEC×17 | K11 | no | Orion (mech.) | body unread |
+    | 60 | `kai-pm/STUBS_AND_PLACEHOLDERS.md` | 60b3b9822f43cd1a | 2026-07-21 → 2026-07-24 | title: # Stubs, Placeholders & Shells | **derived** (Orion proposal) | intake · each stub names an intended real implementation; feature leads | DEC×4 | none found in header | no | Orion (mech.) | body unread |
+    | 61 | `kai-pm/TECH_DEBT_E402.md` | 9046312b22414416 | 2026-08-06 → 2026-08-06 | L3: **Status:** open, **non-blocking**. Nothing here breaks. No `# noqa` was | **derived** (Orion proposal) | none · lint debt note | DEC×1 | none found in header | no | Orion (mech.) | body unread |
+    | 62 | `kai-pm/TECH_WATCH.md` | 757d45215548e6fc | 2026-04-21 → 2026-07-24 | L17: \| qwen2.5:7b (target upgrade from qwen2:0.5b) \| Trial \| 2026-04-21 \| Needed for stronger reasoning once GPU ar | **lineage** (Orion proposal) | cross-check · technology candidates; choices re-earned under D3 | DEC×14 | none found in header | no | Orion (mech.) | body unread |
+    | 63 | `kai-pm/TEST_WRITING_REVIEW.md` | 32d840bcee68dee4 | 2026-08-04 → 2026-08-04 | L3: **Status:** review complete. Two rules mechanically enforced, five written. | **derived** (Orion proposal) | none · process review | DEC×3 | none found in header | no | Orion (mech.) | body unread |
+    | 64 | `kai-pm/UH0_EVIDENCE_MANIFEST.md` | 278cacbe2656eb21 | 2026-07-28 → 2026-07-28 | L7: Status: **IMMUTABLE BASELINE — UH-0 deliverable per KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md §14** | **derived** (Orion proposal) | cross-check · module inventory baseline at 7adab8d; KAI TODAY cross-check | DEC×7 | none found in header | no | Orion (mech.) | body unread |
+    | 65 | `kai-pm/UH2_INTAKE_REBUILD_ANALYSIS.md` | c6a4fe5b80b67b0c | 2026-08-07 → 2026-08-07 | title: # UH-2 intake — evidence, root cause, and proposed replacement | **draft** (Orion proposal) | cross-check · analysis for review; no code written | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 66 | `kai-pm/UH2_INTAKE_REDESIGN.md` | 660cb101549a879c | 2026-08-07 → 2026-08-07 | title: # UH-2 intake — architecture redesign | **draft** (Orion proposal) | intake · intake architecture redesign; no implementation | DEC×1 | none found in header | no | Orion (mech.) | body unread |
+    | 67 | `kai-pm/VALIDITY_BINDING_AUDIT.md` | fa1700b361bd51d9 | 2026-08-27 → 2026-08-27 | L3: Banked under **D364, evidence only**. No repair authority, no ontology | **derived** (Orion proposal) | none · D364 evidence for the H2 instrument | DEC×1 | none found in header | no | Orion (mech.) | body unread |
+    | 68 | `kai-pm/WAYPOINTS.md` | 7c1e8eca0cd0523b | 2026-08-07 → 2026-08-07 | title: # Waypoints — known-good commits, with the evidence | **derived** (Orion proposal) | none · known-good commit record | DEC×5 | none found in header | no | Orion (mech.) | body unread |
+    
+    ## F. The audit class (143 rows; the 144th, CODE_AUDIT_BATCH_MEMU_PERSONALITY_AUTONOMY, is in section D)
+    
+    Every row in this section has the same values in the other columns: **Class** derived (Kai 5e94c4d3, as a class) · **Role** cross-check: defect / negative-test evidence that may reveal undocumented intended behaviour, to be traced to an owner source · **Owner ruling** none (DEC×0 for all but the counts shown) · **Conflicts** none found in header · **Fully read** no · **Checked by** Orion (mech.) · **Uncertainty** body unread.
+    
+    | # | Path | SHA-256 (first 16) | First → last commit | Evidence passage | DEC |
+    |---|---|---|---|---|---|
+    | 1 | `kai-pm/CODE_AUDIT_BATCH_AGENTIC_API.md` | d8f8111008be7573 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 2 | `kai-pm/CODE_AUDIT_BATCH_AGENTIC_INTROSPECTION.md` | 4c59117a1932860a | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 3 | `kai-pm/CODE_AUDIT_BATCH_AIRQUALITY_SERVICE.md` | ac5b86ff401ae253 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 4 | `kai-pm/CODE_AUDIT_BATCH_ANALOGY_STUB.md` | 897bc2203b4b0ad4 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 5 | `kai-pm/CODE_AUDIT_BATCH_ARCHITECTURE_INTERACTION.md` | 78dacf29f717ccbd | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 6 | `kai-pm/CODE_AUDIT_BATCH_AUDIO_PERCEPTION.md` | bcd63c2c8c645d71 | 2026-07-26 → 2026-07-26 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 7 | `kai-pm/CODE_AUDIT_BATCH_AUDIO_PERCEPTION_EXTENSION.md` | 1836e1f4e47e4f0a | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 8 | `kai-pm/CODE_AUDIT_BATCH_AUTONOMOUS_STATE.md` | 7ff6601327dff725 | 2026-07-26 → 2026-07-26 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 9 | `kai-pm/CODE_AUDIT_BATCH_AVATAR_SERVICE.md` | 468ddfc29839eab0 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 10 | `kai-pm/CODE_AUDIT_BATCH_AVATAR_SERVICE_EXTENSION.md` | 9c1b4d79d8c63c17 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 11 | `kai-pm/CODE_AUDIT_BATCH_BACKUP_SERVICE.md` | c107485affde267b | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 12 | `kai-pm/CODE_AUDIT_BATCH_BACKUP_SERVICE_EXTENSION.md` | 30aaf00f65a66353 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 13 | `kai-pm/CODE_AUDIT_BATCH_BEHAVIOURAL_FEEDBACK_TOOLS.md` | 70824d40ae2b08af | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 14 | `kai-pm/CODE_AUDIT_BATCH_BOOTSTRAP_CLOSURE_SMOKE.md` | 85c203dae6e8a46d | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 15 | `kai-pm/CODE_AUDIT_BATCH_BROKER_BRIDGE.md` | b5b4fb2258475c3e | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 16 | `kai-pm/CODE_AUDIT_BATCH_BROKER_BRIDGE_EXTENSION.md` | a13bcb4a5cffa88e | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 17 | `kai-pm/CODE_AUDIT_BATCH_BROWSER_AGENT.md` | 51e700a74caad1ac | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 18 | `kai-pm/CODE_AUDIT_BATCH_BROWSER_AGENT_EXTENSION.md` | 196443b82335a6e5 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 19 | `kai-pm/CODE_AUDIT_BATCH_BUSINESS_SAFETY_ADVISORS.md` | 837d97eec442eb26 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 20 | `kai-pm/CODE_AUDIT_BATCH_CALENDAR_SERVICE.md` | 20adb44447722681 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 21 | `kai-pm/CODE_AUDIT_BATCH_CALENDAR_SYNC_EXTENSION.md` | d77c92755b2ee37d | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 22 | `kai-pm/CODE_AUDIT_BATCH_CAMERA_SERVICE.md` | e24f5ac3a67ec0b9 | 2026-07-26 → 2026-07-26 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 23 | `kai-pm/CODE_AUDIT_BATCH_CAMERA_SERVICE_EXTENSION.md` | 1370105c37829e62 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 24 | `kai-pm/CODE_AUDIT_BATCH_CHAOS_GONOGO_TEST_BOOTSTRAP.md` | 30646ce1907f70a8 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 25 | `kai-pm/CODE_AUDIT_BATCH_CI_BACKUP.md` | 8ec9e2a2e95d02e7 | 2026-07-26 → 2026-07-26 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 26 | `kai-pm/CODE_AUDIT_BATCH_CI_WORKFLOWS.md` | 3b7dcb416fe029aa | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 27 | `kai-pm/CODE_AUDIT_BATCH_CI_WORKFLOW_EXTENSION.md` | 100352becad68931 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 28 | `kai-pm/CODE_AUDIT_BATCH_CLIPBOARD_SERVICE.md` | 9f5630819a597fbb | 2026-07-26 → 2026-07-26 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 29 | `kai-pm/CODE_AUDIT_BATCH_CLIPBOARD_SERVICE_EXTENSION.md` | 198248b387acb881 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×1 |
+    | 30 | `kai-pm/CODE_AUDIT_BATCH_COGNITIVE_FOUNDATIONS.md` | 178d7fb831067b27 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 31 | `kai-pm/CODE_AUDIT_BATCH_COGNITIVE_GOVERNANCE_FOUNDATIONS.md` | 69f3092b76535ebc | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 32 | `kai-pm/CODE_AUDIT_BATCH_COGNITIVE_STATE_STUBS.md` | a147ddbfea5eb154 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×1 |
+    | 33 | `kai-pm/CODE_AUDIT_BATCH_COMMON_AUTH.md` | f647ccff896b30e7 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 34 | `kai-pm/CODE_AUDIT_BATCH_COMMON_CONTROL_PLANE.md` | c769fd2422d22e03 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 35 | `kai-pm/CODE_AUDIT_BATCH_COMMON_MODEL_RUNTIME.md` | ebd3d7dd79c03dc7 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 36 | `kai-pm/CODE_AUDIT_BATCH_COMMON_RESILIENCE.md` | 38b135162683115e | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 37 | `kai-pm/CODE_AUDIT_BATCH_COMMON_RUNTIME.md` | d4c5af4597d88056 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 38 | `kai-pm/CODE_AUDIT_BATCH_CONVICTION_PLANNING_FORECASTING.md` | 6392dd7a101843be | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 39 | `kai-pm/CODE_AUDIT_BATCH_CORTEX.md` | 1134346ad1d17d31 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 40 | `kai-pm/CODE_AUDIT_BATCH_CROSS_SERVICE_ATTACK_CHAINS.md` | cf3e1f54cccdd55c | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 41 | `kai-pm/CODE_AUDIT_BATCH_DASHBOARD_FRONTEND.md` | db35e6e808858adb | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 42 | `kai-pm/CODE_AUDIT_BATCH_DASHBOARD_GATEWAY.md` | 58aafd335e844b8c | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 43 | `kai-pm/CODE_AUDIT_BATCH_DOCKER_WATCHER.md` | c8f957b602e6249b | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 44 | `kai-pm/CODE_AUDIT_BATCH_DOCUMENT_PARSER.md` | 2d5ea880435a8a16 | 2026-07-26 → 2026-07-26 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 45 | `kai-pm/CODE_AUDIT_BATCH_DOCUMENT_PARSER_EXTENSION.md` | 85a260ea65cb339f | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 46 | `kai-pm/CODE_AUDIT_BATCH_DREAM_EVOLVER_CHECKPOINTS.md` | 433cdc8038bf81ff | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 47 | `kai-pm/CODE_AUDIT_BATCH_EMAIL_READER.md` | f48673762340e4e1 | 2026-07-26 → 2026-07-27 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 48 | `kai-pm/CODE_AUDIT_BATCH_EMAIL_READER_EXTENSION.md` | bc32fd3805e9167b | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 49 | `kai-pm/CODE_AUDIT_BATCH_ENVIRONMENTAL_SENSORS.md` | adb568b20ea9e6d1 | 2026-07-26 → 2026-07-26 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 50 | `kai-pm/CODE_AUDIT_BATCH_ENVIRONMENTAL_SENSORS_EXTENSION.md` | 4ac8924ef6fa0924 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 51 | `kai-pm/CODE_AUDIT_BATCH_EXECUTOR.md` | 2fd655455ed979a9 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 52 | `kai-pm/CODE_AUDIT_BATCH_FEATURE_FLAGS_EPISODES.md` | 8acf0fd54fda2c53 | 2026-07-26 → 2026-07-26 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 53 | `kai-pm/CODE_AUDIT_BATCH_FILES_SERVICE.md` | cd8e0ab1788536ee | 2026-07-26 → 2026-07-26 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×1 |
+    | 54 | `kai-pm/CODE_AUDIT_BATCH_FILES_SERVICE_EXTENSION.md` | 0a80373363ba6f22 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 55 | `kai-pm/CODE_AUDIT_BATCH_FINANCIAL_AUTONOMY_MARKET_INTELLIGENCE.md` | 516b914cb1fc2a9b | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 56 | `kai-pm/CODE_AUDIT_BATCH_FINANCIAL_AWARENESS.md` | c80d4c88c72660cd | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 57 | `kai-pm/CODE_AUDIT_BATCH_FINANCIAL_AWARENESS_EXTENSION.md` | e8a0306b57603748 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 58 | `kai-pm/CODE_AUDIT_BATCH_FUSION_ENGINE.md` | e25c2efb29d0e76b | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 59 | `kai-pm/CODE_AUDIT_BATCH_FUSION_ENGINE_EXTENSION.md` | 5b7a79500a012e63 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 60 | `kai-pm/CODE_AUDIT_BATCH_GIT_WATCHER.md` | 3ed8e59546f04567 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 61 | `kai-pm/CODE_AUDIT_BATCH_GPU_FOUNDATION_STUBS.md` | 44b89e53822f80b6 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×1 |
+    | 62 | `kai-pm/CODE_AUDIT_BATCH_GPU_UTILITIES.md` | 32d142b063551a94 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×1 |
+    | 63 | `kai-pm/CODE_AUDIT_BATCH_HEARTBEAT.md` | 20e15c897f756870 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 64 | `kai-pm/CODE_AUDIT_BATCH_HEARTBEAT_SELF_MODEL.md` | bc7594c61683d515 | 2026-07-26 → 2026-07-26 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 65 | `kai-pm/CODE_AUDIT_BATCH_HMAC_ROTATION_DRILL.md` | b0f56009e3ad097c | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×1 |
+    | 66 | `kai-pm/CODE_AUDIT_BATCH_HOST_SETUP_HARDENING_SHELL.md` | ac397258400c2029 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 67 | `kai-pm/CODE_AUDIT_BATCH_HOST_WATCHERS.md` | 65546f585cc5485b | 2026-07-26 → 2026-07-26 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 68 | `kai-pm/CODE_AUDIT_BATCH_HOST_WATCHERS_EXTENSION.md` | 74f200535cc277b2 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 69 | `kai-pm/CODE_AUDIT_BATCH_HOUSE_DOCTOR.md` | 6c8ed91c0628a090 | 2026-07-26 → 2026-07-27 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 70 | `kai-pm/CODE_AUDIT_BATCH_INTROSPECTION_IDENTITY.md` | 912aa02c0d39d8df | 2026-07-26 → 2026-07-26 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 71 | `kai-pm/CODE_AUDIT_BATCH_KAI_ADVISOR.md` | e82093ee96601020 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 72 | `kai-pm/CODE_AUDIT_BATCH_KAI_ADVISOR_EXTENSION.md` | 79c3c8846024dc8f | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 73 | `kai-pm/CODE_AUDIT_BATCH_KEY_ROTATION.md` | d68bd8b3db20151d | 2026-07-26 → 2026-07-26 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 74 | `kai-pm/CODE_AUDIT_BATCH_KEY_ROTATION_MIGRATION.md` | 5c0a09081fc53995 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 75 | `kai-pm/CODE_AUDIT_BATCH_LEDGER_WORKER.md` | 7cb394e99ef70c92 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 76 | `kai-pm/CODE_AUDIT_BATCH_LEDGER_WORKER_EXTENSION.md` | bdd2d53e5d8dc58c | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 77 | `kai-pm/CODE_AUDIT_BATCH_LETTA_AGENT.md` | f6f194f26866b375 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 78 | `kai-pm/CODE_AUDIT_BATCH_LETTA_AGENT_EXTENSION.md` | 9f8b5b1df5eff532 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 79 | `kai-pm/CODE_AUDIT_BATCH_LIVE_SUPERVISOR.md` | 8fe2a3ab935a9546 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 80 | `kai-pm/CODE_AUDIT_BATCH_MEMORY_COMPRESSOR.md` | 523b80b110b0f022 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 81 | `kai-pm/CODE_AUDIT_BATCH_MEMORY_COMPRESSOR_EXTENSION.md` | 43ab67ffcd578aac | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 82 | `kai-pm/CODE_AUDIT_BATCH_MEMORY_GRAPH.md` | b0d37807979b3de1 | 2026-07-26 → 2026-07-26 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 83 | `kai-pm/CODE_AUDIT_BATCH_MEMORY_GRAPH_EXTENSION.md` | 565791af8019f45b | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 84 | `kai-pm/CODE_AUDIT_BATCH_MEMU_CORE_HOT_PATH.md` | bc4cb9b02940ea59 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 85 | `kai-pm/CODE_AUDIT_BATCH_MEMU_INTROSPECTION.md` | 61653a47097a3177 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 86 | `kai-pm/CODE_AUDIT_BATCH_METRICS_GATEWAY.md` | 3b3d33730060742e | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 87 | `kai-pm/CODE_AUDIT_BATCH_METRICS_GATEWAY_EXTENSION.md` | e367c582d2d3af47 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 88 | `kai-pm/CODE_AUDIT_BATCH_MODEL_DECISION_CONTROLS.md` | 3e1fcc5ee6ed77c1 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 89 | `kai-pm/CODE_AUDIT_BATCH_MONITOR_SERVICE.md` | ef345dc50f1bef57 | 2026-07-26 → 2026-07-26 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 90 | `kai-pm/CODE_AUDIT_BATCH_MONITOR_SERVICE_EXTENSION.md` | 800cea67eac9412f | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 91 | `kai-pm/CODE_AUDIT_BATCH_NEWS_FEED.md` | 508bce5578f55506 | 2026-07-26 → 2026-07-27 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 92 | `kai-pm/CODE_AUDIT_BATCH_NEWS_FEED_EXTENSION.md` | dbaf945526b2495c | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 93 | `kai-pm/CODE_AUDIT_BATCH_NEWS_FEED_INTEGRATION_EXTENSION.md` | 9e687b92003be530 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 94 | `kai-pm/CODE_AUDIT_BATCH_NOTIFY_SERVICE.md` | e1aed511dfa28631 | 2026-07-26 → 2026-07-26 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 95 | `kai-pm/CODE_AUDIT_BATCH_NOTIFY_SERVICE_BUILD_EXTENSION.md` | 60126f6867f7dba3 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 96 | `kai-pm/CODE_AUDIT_BATCH_NOTIFY_SERVICE_EXTENSION.md` | 56a96f42166f9779 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 97 | `kai-pm/CODE_AUDIT_BATCH_OPERATIONAL_ASSURANCE_SCRIPTS.md` | 7b52b269043f9c02 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 98 | `kai-pm/CODE_AUDIT_BATCH_OPERATIONAL_STATE_EPISODE_RECOVERY.md` | bbdc9e4ffd12a366 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 99 | `kai-pm/CODE_AUDIT_BATCH_OPERATOR_CONTROL_DRILLS.md` | 568e89e48c131ac1 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 100 | `kai-pm/CODE_AUDIT_BATCH_ORCHESTRATION_ARCHITECTURE.md` | 991d7af4b6127fba | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 101 | `kai-pm/CODE_AUDIT_BATCH_ORCHESTRATION_STUBS.md` | 70f47b1cfe7c3046 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 102 | `kai-pm/CODE_AUDIT_BATCH_PERSISTENCE_1.md` | 272a66169033ad79 | 2026-07-26 → 2026-07-26 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 103 | `kai-pm/CODE_AUDIT_BATCH_QUESTIONER_TEAMMATES_WATCHDOG.md` | 106a5097800860ed | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 104 | `kai-pm/CODE_AUDIT_BATCH_RECOVERY_OPERATIONAL_SCRIPTS.md` | b3e7a91e2ed49aba | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 105 | `kai-pm/CODE_AUDIT_BATCH_RELEASE_BOOTSTRAP_TOOLING.md` | 6b6728c56c77c96f | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 106 | `kai-pm/CODE_AUDIT_BATCH_REPOSITORY_QUALITY_DOCS.md` | 14718353ce0425a7 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 107 | `kai-pm/CODE_AUDIT_BATCH_ROUTING_LLM_DISPATCH.md` | 105bc27ed9f81a35 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 108 | `kai-pm/CODE_AUDIT_BATCH_SCREEN_CAPTURE.md` | f86995555aa22179 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×1 |
+    | 109 | `kai-pm/CODE_AUDIT_BATCH_SCREEN_CAPTURE_EXTENSION.md` | 29db336d627c8c8e | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 110 | `kai-pm/CODE_AUDIT_BATCH_SCREEN_WATCHER.md` | 930bda096e8bef43 | 2026-07-26 → 2026-07-26 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 111 | `kai-pm/CODE_AUDIT_BATCH_SCREEN_WATCHER_EXTENSION.md` | 4290879319757869 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 112 | `kai-pm/CODE_AUDIT_BATCH_SELF_AUDIT_SUPERVISOR.md` | ca451eb5b7ca52d7 | 2026-07-26 → 2026-07-26 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 113 | `kai-pm/CODE_AUDIT_BATCH_SHARED_RUNTIME_CONTROLS.md` | 2688541a4f527b8e | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation and duplicate reconciliation | DEC×0 |
+    | 114 | `kai-pm/CODE_AUDIT_BATCH_SHELL_HEALTH_ROTATION_WRAPPERS.md` | 0275adfa40fd6402 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 115 | `kai-pm/CODE_AUDIT_BATCH_SHELL_SANDBOX.md` | edb84930e2aff451 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 116 | `kai-pm/CODE_AUDIT_BATCH_SHELL_SANDBOX_EXTENSION.md` | b4c1a32c260173ef | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 117 | `kai-pm/CODE_AUDIT_BATCH_SKILL_HUNTER.md` | 0f7a2c9b929148f3 | 2026-07-26 → 2026-07-27 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 118 | `kai-pm/CODE_AUDIT_BATCH_SWARM_ORCHESTRATION.md` | 498c8c6c4a7f5351 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 119 | `kai-pm/CODE_AUDIT_BATCH_SYSMETRICS.md` | 1f6c5c859d23f631 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 120 | `kai-pm/CODE_AUDIT_BATCH_SYSMETRICS_EXTENSION.md` | c8cca6d3c4b584c0 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 121 | `kai-pm/CODE_AUDIT_BATCH_SYSMETRICS_WORLD_ANCHOR.md` | 5d8de433e3182d10 | 2026-07-26 → 2026-07-26 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 122 | `kai-pm/CODE_AUDIT_BATCH_TEAMMATES_FSM_POLICY_MEMORY.md` | ecf0120972fb1282 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 123 | `kai-pm/CODE_AUDIT_BATCH_TELEGRAM_BOT.md` | 3ba78ec30d316b6f | 2026-07-26 → 2026-07-26 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 124 | `kai-pm/CODE_AUDIT_BATCH_TELEGRAM_BOT_EXTENSION.md` | 1793dbcc0e602ac3 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 125 | `kai-pm/CODE_AUDIT_BATCH_TELEGRAM_PERCEPTION_BRIDGE.md` | 0860ecc9cbf4a583 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation and duplicate reconciliation | DEC×0 |
+    | 126 | `kai-pm/CODE_AUDIT_BATCH_TEST_HARNESSES_MARKET_CACHE.md` | 6be73e2af91d6e7f | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 127 | `kai-pm/CODE_AUDIT_BATCH_TEST_STUBS_EXTERNAL_MODEL_OCR_FUZZ.md` | 1b76b8f6d07514a9 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 128 | `kai-pm/CODE_AUDIT_BATCH_TOOL_GATE_EXTENSION.md` | 6945ef0dbb14cfb0 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 129 | `kai-pm/CODE_AUDIT_BATCH_TRUST_GOVERNANCE_AUTHORITY.md` | 95ed403bc24db05a | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 130 | `kai-pm/CODE_AUDIT_BATCH_TRUST_LEDGER_EXTENSION.md` | 2d1aa191d0396398 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 131 | `kai-pm/CODE_AUDIT_BATCH_TTS_SERVICE.md` | f4d7090617dc7f0d | 2026-07-26 → 2026-07-26 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 132 | `kai-pm/CODE_AUDIT_BATCH_TTS_SERVICE_EXTENSION.md` | 6cf1b0d5eda40933 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 133 | `kai-pm/CODE_AUDIT_BATCH_VAULT_BRIDGE_EXTENSION.md` | 2545363e3854768f | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 134 | `kai-pm/CODE_AUDIT_BATCH_VAULT_SYNC.md` | 84b5d6d84c9fc0f8 | 2026-07-26 → 2026-07-27 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 135 | `kai-pm/CODE_AUDIT_BATCH_VERIFIER.md` | 12f78434bd649f3c | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 136 | `kai-pm/CODE_AUDIT_BATCH_VISION_SERVICE.md` | e317d520507b91d4 | 2026-07-26 → 2026-07-26 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 137 | `kai-pm/CODE_AUDIT_BATCH_VISION_SERVICE_DEPLOYMENT_EXTENSION.md` | 00388e1bdc6155fa | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 138 | `kai-pm/CODE_AUDIT_BATCH_VISION_SERVICE_EXTENSION.md` | 00de51677b5dea51 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 139 | `kai-pm/CODE_AUDIT_BATCH_WAKE_SERVICE.md` | 5be052e28ae9cf0a | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 140 | `kai-pm/CODE_AUDIT_BATCH_WATCHDOG_RECOVERY.md` | bdabe451259a2b84 | 2026-07-26 → 2026-07-26 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 141 | `kai-pm/CODE_AUDIT_BATCH_WEATHER_SERVICE.md` | 3b04bc7837fba30e | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    | 142 | `kai-pm/CODE_AUDIT_BATCH_WEB_SCOUT.md` | 0d483d035c1bed9b | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending final consolidation | DEC×0 |
+    | 143 | `kai-pm/CODE_AUDIT_BATCH_WORLD_ANCHOR.md` | 3bcd3a533d3cb3c9 | 2026-07-27 → 2026-07-27 | L4: Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md` | DEC×0 |
+    
+    ## G. Beyond the 306-file universe: 40 Markdown files (Orion proposals)
+    
+    | # | Path | SHA-256 (first 16) | First → last commit | Evidence passage | Class (by) | Role · scope | Owner ruling / banking | Conflicts | Fully read | Checked by | Residual uncertainty |
+    |---|---|---|---|---|---|---|---|---|---|---|---|
+    | 1 | `.claude/skills/kai-handoff/SKILL.md` | 5f0b5d7881eb69a2 | 2026-09-30 → 2026-10-04 | L9: state, grants no permission, admits nothing and closes nothing. Authority | **derived** (Orion proposal) | none · process tooling | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 2 | `.github/PULL_REQUEST_TEMPLATE.md` | 97c13f47ec62fb00 | 2026-04-21 → 2026-04-21 | L8: - [ ] `kai-pm/STATUS.md` updated (or N/A with reason) | **derived** (Orion proposal) | none · process template | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 3 | `.github/copilot-instructions.md` | 20cfcac7485050c1 | 2026-02-23 → 2026-08-05 | L7: - `orchestrator/` — final risk authority before execution | **derived** (Orion proposal) | cross-check · agent instructions describing the system (from 2026-02-23) | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 4 | `data/AGENTS.md` | 2034af0467350acf | 2026-03-22 → 2026-06-02 | L9: \| Agent \| Domain \| Trigger \| Endpoint \| Status \| | **derived** (Orion proposal) | intake · runtime registry; own line: 'Defines Kai's capabilities - what Kai can do and how' | DEC×10 | none found in header | no | Orion (mech.) | body unread |
+    | 5 | `data/SOUL.md` | git blob d62a137a2b492ec3 | 2026-03-22 → 2026-07-25 | not opened (instruction) | **UNCLASSIFIED** (Orion proposal) | inaccessible · not opened: standing instruction 'do not touch data/SOUL.md'; likely identity material; Kai/Dainius to rule | not opened | none found in header | not opened | Orion (mech.) | body unread |
+    | 6 | `data/self-emp/Accounting/README.md` | c7ef0e11e47a704f | 2026-02-21 → 2026-02-21 | L1: - GnuCash portable | **derived** (Orion proposal) | cross-check · runtime data folder note; self-employment domain lead | DEC×64 | none found in header | no | Orion (mech.) | body unread |
+    | 7 | `data/self-emp/Coding/README.md` | 90a8e81546b6024e | 2026-02-21 → 2026-02-21 | L1: - VS Code portable | **derived** (Orion proposal) | cross-check · runtime data folder note; self-employment domain lead | DEC×64 | none found in header | no | Orion (mech.) | body unread |
+    | 8 | `data/self-emp/Engineering/README.md` | 1a293ca5a8ab771d | 2026-02-21 → 2026-02-21 | L1: - LibreCAD / FreeCAD / QGIS assets | **derived** (Orion proposal) | cross-check · runtime data folder note; self-employment domain lead | DEC×64 | none found in header | no | Orion (mech.) | body unread |
+    | 9 | `data/self-emp/Legal/README.md` | dbb60c3ddaa8744c | 2026-02-21 → 2026-02-21 | L1: - GOV.UK SA100/SA103F references | **derived** (Orion proposal) | cross-check · runtime data folder note; self-employment domain lead | DEC×64 | none found in header | no | Orion (mech.) | body unread |
+    | 10 | `data/self-emp/Social/README.md` | 8d429820a3b55767 | 2026-02-21 → 2026-02-21 | L1: - TikTok script templates | **derived** (Orion proposal) | cross-check · runtime data folder note; self-employment domain lead | DEC×64 | none found in header | no | Orion (mech.) | body unread |
+    | 11 | `data/skills/daily_brief.md` | 76bcbcbb3bf40ccf | 2026-03-22 → 2026-03-22 | title: # Skill: Daily Brief | **derived** (Orion proposal) | intake · runtime skill definition; capability lead | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 12 | `data/skills/invoice.md` | 9a32fe254959506c | 2026-03-22 → 2026-03-22 | L18: - Status: Draft — review and confirm | **derived** (Orion proposal) | intake · runtime skill definition; capability lead | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 13 | `data/teammates/auditor.md` | 40e4151cb8fd6c03 | 2026-07-25 → 2026-07-25 | title: # Auditor | **derived** (Orion proposal) | intake · runtime specialist persona; capability lead | DEC×4 | none found in header | no | Orion (mech.) | body unread |
+    | 14 | `data/teammates/doctor.md` | 749995ab2b432ec7 | 2026-07-24 → 2026-07-25 | title: # Doctor | **derived** (Orion proposal) | intake · runtime specialist persona; capability lead | DEC×2 | none found in header | no | Orion (mech.) | body unread |
+    | 15 | `data/teammates/oracle.md` | debc10dd7d0bd3ce | 2026-07-24 → 2026-07-25 | title: # Oracle | **derived** (Orion proposal) | intake · runtime specialist persona; capability lead | DEC×2 | none found in header | no | Orion (mech.) | body unread |
+    | 16 | `data/teammates/sage.md` | 4acba3e6003e654a | 2026-07-24 → 2026-07-24 | title: # Sage | **derived** (Orion proposal) | intake · runtime specialist persona; capability lead | DEC×1 | none found in header | no | Orion (mech.) | body unread |
+    | 17 | `data/teammates/scout.md` | 2907de31dfba04bc | 2026-07-24 → 2026-07-25 | title: # Scout | **derived** (Orion proposal) | intake · runtime specialist persona; capability lead | DEC×3 | none found in header | no | Orion (mech.) | body unread |
+    | 18 | `docs/operator-journal/_template.md` | 65119afb975719b0 | 2026-07-21 → 2026-07-21 | title: # Operator Journal — Week of YYYY-MM-DD | **derived** (Orion proposal) | cross-check · weekly operator journal template; feedback-loop lead | DEC×5 | none found in header | no | Orion (mech.) | body unread |
+    | 19 | `kai-pm/PLAYBOOKS/dispatch_jewel.md` | ec03f0b8b8fcabd4 | 2026-04-21 → 2026-04-21 | L13: ## 2) Draft the problem statement | **derived** (Orion proposal) | none · process playbook | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 20 | `kai-pm/PLAYBOOKS/parallel_dispatch.md` | a7e14045430a932a | 2026-04-21 → 2026-04-21 | L14: 3. Approve fan-out in `STATUS.md` notes. | **derived** (Orion proposal) | none · process playbook | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 21 | `kai-pm/PLAYBOOKS/post_merge_checklist.md` | 7411c2e0041c7f66 | 2026-04-21 → 2026-04-21 | L6: 2. Refresh `kai-pm/STATUS.md` (in-flight PRs, current focus, last-updated date). | **derived** (Orion proposal) | none · process playbook | DEC×2 | none found in header | no | Orion (mech.) | body unread |
+    | 22 | `kai-pm/PLAYBOOKS/resume_session.md` | a953a3e29ef82c0a | 2026-04-21 → 2026-04-21 | L6: 2. Read `kai-pm/STATUS.md` (live state and next actions) | **derived** (Orion proposal) | none · process playbook | DEC×2 | none found in header | no | Orion (mech.) | body unread |
+    | 23 | `kai-pm/PLAYBOOKS/tech_evaluation.md` | 2bda897fc0a0a907 | 2026-04-21 → 2026-04-21 | title: # Playbook: Tech Evaluation (Model / Library / Tool) | **derived** (Orion proposal) | none · process playbook | DEC×0 | none found in header | no | Orion (mech.) | body unread |
+    | 24 | `kai-pm/census_v11_claim_sensitivity/PRECOMMIT.md` | a89bb9cc2f6aa9bf | 2026-08-26 → 2026-08-26 | title: # CLAIM-SENSITIVITY MUTATIONS — PRECOMMITTED BEFORE EXECUTION | **derived** (Orion proposal) | none · H2 instrument record | DEC×3 | none found in header | no | Orion (mech.) | body unread |
+    | 25 | `kai-pm/house_in_order_census_v11/README.md` | 11452e9506d18989 | 2026-08-23 → 2026-08-26 | title: # HOUSE-IN-ORDER-CENSUS-INSTRUMENT v1.1 | **derived** (Orion proposal) | none · H2 instrument record | DEC×64 | none found in header | no | Orion (mech.) | body unread |
+    | 26 | `kai-pm/house_in_order_h2/HOLDOUT_RULE.md` | 89150d466fcfbdfc | 2026-08-23 → 2026-08-23 | title: # H2 independent holdout — SELECTION RULE, COMMITTED BEFORE SELECTION | **derived** (Orion proposal) | none · H2 instrument record | DEC×1 | none found in header | no | Orion (mech.) | body unread |
+    | 27 | `kai-pm/house_in_order_h2/RUN.md` | 4611293f7ec77f72 | 2026-08-23 → 2026-08-23 | title: # HOUSE-IN-ORDER-H2-CLASSIFIER v1.0 — execution record | **derived** (Orion proposal) | none · H2 instrument record | DEC×4 | none found in header | no | Orion (mech.) | body unread |
+    | 28 | `kai-pm/house_in_order_h2_v11/PRECOMMIT.md` | fa1069103a721cf5 | 2026-08-27 → 2026-08-27 | title: # HOUSE_H2 v1.1 — ACCEPTANCE CONTRACT, PRECOMMITTED | **derived** (Orion proposal) | none · H2 instrument record | DEC×3 | none found in header | no | Orion (mech.) | body unread |
+    | 29 | `kai-pm/house_in_order_h2_v11/RUN.md` | 037db6e22c99a8c1 | 2026-08-27 → 2026-08-27 | L7: > **STATUS: CANDIDATE. NOT FROZEN. NOT ADMITTED TO HOUSE_H3.** | **derived** (Orion proposal) | none · H2 instrument record | DEC×4 | none found in header | no | Orion (mech.) | body unread |
+    | 30 | `kai-pm/house_in_order_h2_v12/RUN.md` | 53bf6e309e45dfb6 | 2026-08-27 → 2026-08-27 | L9: > **STATUS: CANDIDATE. NOT FROZEN. NOT ADMITTED TO HOUSE_H3.** | **derived** (Orion proposal) | none · H2 instrument record | DEC×4 | none found in header | no | Orion (mech.) | body unread |
+    | 31 | `kai-pm/house_in_order_instrument/AUTHORITY_ONTOLOGY.md` | 2ad79be051ebf852 | 2026-08-23 → 2026-08-23 | L6: One label was made to carry lifecycle, function, authority, generation, | **derived** (Orion proposal) | none · H2 instrument scratch spec | DEC×10 | none found in header | no | Orion (mech.) | body unread |
+    | 32 | `kai-pm/house_in_order_instrument/README.md` | c6514a23c734d492 | 2026-08-23 → 2026-08-23 | L3: **Not production code. Not a gate. Not programme authority.** | **derived** (Orion proposal) | none · H2 instrument frozen artefacts note | DEC×64 | none found in header | no | Orion (mech.) | body unread |
+    | 33 | `skills/_template.md` | a168ea21359553b3 | 2026-07-21 → 2026-07-21 | title: # Skill: [Skill Name] | **derived** (Orion proposal) | cross-check · skill file template; says Kai loads skills at startup | DEC×5 | none found in header | no | Orion (mech.) | body unread |
+    | 34 | `skills/cis-deductions.md` | 14872e3a78e7a0da | 2026-07-21 → 2026-07-21 | L14: - **Gross payment status**: 0% deduction; HMRC grants this once your compliance record is strong | **derived** (Orion proposal) | intake · runtime domain skill (UK CIS); capability lead; see gap K-CIS | DEC×2 | none found in header | no | Orion (mech.) | body unread |
+    | 35 | `skills/ladder-safety.md` | 5e8822471d5adfd3 | 2026-07-21 → 2026-07-21 | title: # Skill: Ladder and Working at Height Safety (UK) | **derived** (Orion proposal) | intake · runtime domain skill (working at height); capability lead | DEC×2 | none found in header | no | Orion (mech.) | body unread |
+    | 36 | `skills/mtd-vat.md` | 940c3c509f23e3fc | 2026-07-21 → 2026-07-21 | title: # Skill: MTD and VAT (UK Self-Employed) | **derived** (Orion proposal) | intake · runtime domain skill (MTD / VAT); capability lead | DEC×2 | none found in header | no | Orion (mech.) | body unread |
+    | 37 | `vault-sync/templates/daily-note.md` | 53beb4b4ec4ea3e9 | 2026-07-24 → 2026-07-24 | title: # {{ date }} | **derived** (Orion proposal) | intake · vault-sync note template; capability lead | DEC×1 | none found in header | no | Orion (mech.) | body unread |
+    | 38 | `vault-sync/templates/kai-inbox.md` | 5209e8d8e30d6914 | 2026-07-24 → 2026-07-24 | L5: status: unreviewed | **derived** (Orion proposal) | intake · vault-sync note template; capability lead | DEC×1 | none found in header | no | Orion (mech.) | body unread |
+    | 39 | `vault-sync/templates/lesson-learned.md` | caec8ca34b106090 | 2026-07-24 → 2026-07-24 | title: # {{ title }} | **derived** (Orion proposal) | intake · vault-sync note template; capability lead | DEC×1 | none found in header | no | Orion (mech.) | body unread |
+    | 40 | `vault-sync/templates/soul-mirror.md` | 0dd740c16cb0ef9e | 2026-07-24 → 2026-07-24 | title: # Soul Mirror — {{ date }} | **derived** (Orion proposal) | intake · vault-sync note template; capability lead | DEC×1 | none found in header | no | Orion (mech.) | body unread |
+    
+    ## H. Named exclusions (not documents, or out of this register's scope)
+    
+    Counted from the pinned tree (1,255 files):
+    
+    - 646 `.py`, 30 `.sh`, 4 `.js`, 1 `.css` and the remaining configuration files: **code and configuration**. They are evidence of *what exists* (KAI TODAY), not of intent. Out of scope for the source register; they belong to the Wave 0 code census.
+    - 50 `requirements*.txt`: dependency lists. Out of scope.
+    - 4 `dashboard/static/*.html`: user-interface code. Wave 0 code census; capability leads for the dashboard.
+    - 18 `.txt` files under `kai-pm/` (H2 build evidence, holdout extraction and selection): instrument evidence, no feature content expected.
+    - `security/trusted_tokens.txt`: security configuration. **Not opened** by this register.
+    - **Other branches.** All 11 remote branches were compared with the pin by Markdown path. Only two hold Markdown files the pin lacks: `claude/cai-v1-bootstrap` (6 change-control files: process and assurance, not features; KAI_CHANGE_AUTHORITY_INTERLOCK says "IMPLEMENTATION LEG 1 — NOT ACTIVE") and `claude/d379-retained-interpreter-…` (1 vendored Python test README). Proposed: outside the source register.
+    - `data/SOUL.md` (row G5): **not opened**, standing instruction "do not touch data/SOUL.md". It may hold identity intent. Kai and Dainius to decide whether and how it is read.
+    
+    ## I. How this was produced and checked
+    
+    - `gather.py` read every path at the pin through `git` (bytes, SHA-256, first and last commit date on this branch's history up to the pin, title, the first status-like line in lines 1–20).
+    - `members.py` derived each population from the banked texts: Kai's 69 parsed from comments 28939a90 and 2f76278b (equal to Orion's 75 minus the 6 listed sources: checked), Kai's 6 from d2d4301d, Orion's 16 from the entry 258 list, the audit class by name `kai-pm/CODE_AUDIT_BATCH*`.
+    - Orion's proposals are in `orion_classes.py` (119 paths: 11 of the 16, the 68, the 40).
+    - `check_register_v2.py` (read-only) proves: every universe path exactly once; every SHA-256 prefix matches the pinned bytes; Kai's classes equal the banked comments; no empty cell; every evidence passage is at the line it names (or the title is in lines 1–40); every quoted conflict line is at that line at the pin. Calibrated with deliberate faults (results in the handoff entry).
+    
+    ## J. Conflicts and refinements for Kai (each quote checked against the pinned file)
+    
+    **K1 · CONTRADICTION · CODE_AUDIT_P0..P4 plans (Kai #8-#12).** Kai: lineage, risk/test cross-check; d2d4301d: 'defect/negative-test crosswalk, not distinct features'.
+    
+    - `kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:16` — "first-class existing maturity/design inputs; do not rediscover them under new names"
+    - `kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:89` — "should be **recovered/integrated rather than reinvented**"
+    
+    The authority index (2026-08-24, after D353) treats P1-P4 as first-class maturity/design inputs, and D353's research says best-practice requirements already live in P1-P4. Treating them only as a defect crosswalk could drop maturity obligations from the census. The index names P1-P4, not P0. **Proposed:** P1-P4: lineage, INTAKE for maturity and assurance obligations (not new user-facing features) plus defect crosswalk. P0: keep Kai's cross-check.
+    
+    **K2 · CONTRADICTION · kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md (Kai #69).** Kai: draft, unreleased work plan.
+    
+    - `kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md:3` — "**Status:** complete. All five steps done; the debt is **0** and ratcheted."
+    
+    The file says it is complete, not unreleased. **Proposed:** derived: a completion record; its completion claim is unverified at runtime (KAI-project is not running).
+    
+    **K3 · REFINEMENT · seven DECISIONS_CANONICAL_APPEND_QUEUE files (Kai #30-#36).** Kai: derived, duplicate append queue.
+    
+    - `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D348.md:5` — "This supersedes `DECISIONS_CANONICAL_APPEND_QUEUE_D344_D347.md` as the current pending-append queue."
+    - `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D353.md:5` — "Supersedes D344–D352 as the current pending-append surface."
+    
+    They are cumulative, not byte duplicates: each later queue supersedes the one before and lists earlier entries as one-line summaries. The longest text for D344-D347 is in the D347 queue (193 lines) and the standalone D-files. **Proposed:** Agree derived, no new owner rulings. Mark D344_D353 as the current pending-append surface and the six earlier queues as history; read D-entry detail from the standalone D-files.
+    
+    **K4 · SELF-CLAIM · kai-pm/UH_PROGRESS_TRACKER.md (Kai d2d4301d: derived status check).** Kai: derived status check.
+    
+    - `kai-pm/UH_PROGRESS_TRACKER.md:4` — "If this file and any other doc disagree, **this file wins** for UH status."
+    - `kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:15` — "foundational existing migration architecture/current UH workstream evidence"
+    
+    The file claims to win on UH status; the index calls it current UH workstream evidence. Neither makes it a feature authority, and status claims are unverified while KAI is not running. **Proposed:** Agree with Kai: derived. Record the self-claim; status claims are leads for verification.
+    
+    **K5 · SELF-CLAIM · kai-pm/STRATEGIC_PLAN.md (Kai #65) and kai-pm/SEQUENCE.md.** Kai: lineage, April historical lead only.
+    
+    - `kai-pm/STRATEGIC_PLAN.md:3` — "Canonical 5-phase roadmap for Kai."
+    - `kai-pm/SEQUENCE.md:3` — "This sequence follows the canonical roadmap in [STRATEGIC_PLAN.md](STRATEGIC_PLAN.md)."
+    
+    Both call STRATEGIC_PLAN canonical. Kai's step 0.1 classification (2026-10-14) is later. **Proposed:** Agree with Kai: lineage. SEQUENCE.md proposed lineage with it.
+    
+    **K6 · SELF-CLAIM · kai-pm/KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md (Kai #42).** Kai: lineage, target design intake.
+    
+    - `kai-pm/KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md:5` — "Status: **AUTHORITATIVE TARGET-ARCHITECTURE ADDENDUM — PLANNING ONLY**"
+    
+    Self-labelled authoritative (2026-07-27). The authority index line 15 calls it foundational existing migration architecture. **Proposed:** Agree with Kai: lineage, intake. Record the self-label.
+    
+    **K7 · SETTLED · README.md.** Kai: d2d4301d: canonical for intended features under v3.2.3, not for runtime facts.
+    
+    - `kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:14` — "stale factually, but mandatory organism/capability/presentation lineage input"
+    
+    Raised in the first proposal; Kai has ruled. **Proposed:** None. Kai's later classification governs; listed so the earlier index wording is not lost.
+    
+    **K8 · WORDING · standing doctrines classed canonical* (Kai #38, #52, #56, #58, #63).** Kai: canonical*, standing operator intent / assurance intent, not executable authority.
+    
+    - `kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:20` — "Standing mission/proactivity/resilience/contingency/continuity/operator doctrines and older architecture as historical/design inputs only."
+    
+    The index calls these doctrines design inputs only. Compatible with canonical* if canonical* means intent only. **Proposed:** Kai to confirm canonical* = authoritative for intent, never for implementation or runtime fact.
+    
+    **K9 · GAP · two removed v0.4 governance files.** Kai: not classified.
+    
+    - `kai-pm/D352_WITHDRAW_REJECTED_V0_4_ARCHITECTURE_PACKAGE.md:19` — "`kai-pm/KINGSMAN_EXISTING_KAI_MASTER_ARCHITECTURE_PLAN_V0_4.md`"
+    - `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D350.md:60` — "`KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_V0_4.md`"
+    
+    KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_V0_4.md and KINGSMAN_CANON_SYNCHRONISATION_REGISTER_V0_4.md existed and were removed on 2026-08-24 (commits 3d51fca, 4563b8a, 'remove obsolete'). D352 lists three withdrawn files, not these two. **Proposed:** Record both as superseded and removed; no capability content expected; not sources.
+    
+    **K10 · NAMED GAP · docs/CIS_FINANCE_DESIGN.md.** Kai: not classified.
+    
+    - `kai-pm/PHASE_0_5_BACKLOG.md:42` — "`docs/CIS_FINANCE_DESIGN.md` — design doc for CIS-aware P29"
+    
+    Named as a design document. No file of that name is in the pinned tree, and no commit reachable from the pin touches that path. Related material exists: skills/cis-deductions.md. **Proposed:** Add as a named gap beside the April vision; the census uses skills/cis-deductions.md and the backlog item as leads.
+    
+    **K11 · SELF-CLAIM · completion claims (PHASE_0_5_BACKLOG #64, STATUS.md, docs/gpu_integration_phase0.md).** Kai: #64 derived, task cross-check.
+    
+    - `kai-pm/PHASE_0_5_BACKLOG.md:6` — "**Status:** ✅ COMPLETE — all items shipped (2026-07-21)"
+    - `kai-pm/STATUS.md:4` — "Phase 0 — COMPLETE. Awaiting GPU hardware (RTX 5080) to enter Phase 1."
+    - `docs/gpu_integration_phase0.md:5` — "**Status:** ✅ Complete — Phase 0 hardening tasks implemented"
+    
+    Written completion claims. Owner: nothing is running (handoff entry 217). **Proposed:** Agree derived. The census treats every completion claim as a claim to verify, never a fact.
+    
+    **K12 · CONFLICT CARRIED · HMAC signing in docs/next_level_roadmap.md and docs/hmac_rotation_runbook.md.** Kai: roadmap: lineage; runbook: not classified.
+    
+    - `docs/next_level_roadmap.md:12` — "**Chosen now:** HMAC-SHA256 with primary+previous secret (rotation window)."
+    - `kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:102` — "current Ed25519 direction remains retained"
+    
+    Raised in the first proposal; the runbook is a second source for the HMAC choice. **Proposed:** Keep the promise and the conflict for the census; neither file settles it.
+    
+    **K13 · NAMED GAP · the Phase 0.5 plan file yes-brother-i-agree-eager-dewdrop.md.** Kai: not classified.
+    
+    - `kai-pm/DECISIONS.md:667` — "the Phase 0.5 plan (`yes-brother-i-agree-eager-dewdrop.md`) explicitly deferred"
+    
+    DECISIONS.md cites a Phase 0.5 plan by this file name. No file of that name is in the pinned tree or on any of the 11 remote branches. The name looks like a coding-session plan file kept outside the repository. **Proposed:** Named gap. kai-pm/PHASE_0_5_BACKLOG.md (Kai #64) is the in-repository record of that phase; the census uses it and DECISIONS.md, and does not assume the plan's contents.
+    
+    
+    ## K. Referenced names that match no file at the pin
+    
+    Scan: every `NAME.md` token in the 345 opened Markdown files (data/SOUL.md not opened), compared with every file name in the pinned tree (1255 files). 261 distinct names; 24 are referenced outside the handoff log; 237 only inside it. Of those 237, 124 carry a banked verbatim block of the same file name in the handoff log at the current head (an `- EVIDENCE NAME file:` line) and 113 do not; by name the 113 are mostly external project files (SLSA, SPIFFE, llama.cpp and other READMEs) and scratch names. Eight look like programme documents; five of them exist on branch `claude/cai-v1-bootstrap` under `kai-pm/change-control/` (BOOTSTRAP_PLAN, CONSUMER_INVENTORY, KAI_CHANGE_AUTHORITY_INTERLOCK, THREAT_MODEL, PINNING_RESEARCH: the change-control system, process not features); KAI_COMMUNICATION_PROTOCOL.md, AUDIT_PLAN_C.md and NEL_PURPOSE.md are on none of the 11 remote branches. Every one of the 237 is listed in annex M with that status. The 24 referenced outside the log:
+    
+    | Name | Referenced from | Disposition (Orion proposal) |
+    |---|---|---|
+    | `AGENTIC_APP_MAP.md` | `SESSION_BACKLOG.md`, `kai-pm/CLEANUP_TODO.md` | planned deliverable never produced (CLEANUP_TODO says the plan did not execute); not a source |
+    | `BASELINE_RESPONSES_7B.md` | `kai-pm/GPU_ARRIVAL_RUNBOOK.md` | future artefact for GPU day; not a source |
+    | `CIS_FINANCE_DESIGN.md` | `kai-pm/PHASE_0_5_BACKLOG.md` | **named gap** (K10) |
+    | `CURIOSITY.md` | `CHANGELOG.md`, `README.md`, `kai-pm/DECISIONS.md`, `kai-pm/HANDOFF_LOG.md`, `kai-pm/SESSION_BOOTSTRAP.md`, `kai-pm/STATUS.md` | runtime output file written by a feature (`/data/CURIOSITY.md`); feature lead, not a source |
+    | `KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_V0_4.md` | `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D350.md`, `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D351.md` | removed 2026-08-24 (K9) |
+    | `KINGSMAN_CANON_SYNCHRONISATION_REGISTER_V0_4.md` | `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D350.md`, `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D351.md` | removed 2026-08-24 (K9) |
+    | `KINGSMAN_CURRENT_TO_TARGET_MIGRATION_MATRIX_V0_4.md` | `kai-pm/D350_MASTER_ARCHITECTURE_PLAN_AND_DRAWING_SET_V0_4.md`, `kai-pm/D352_WITHDRAW_REJECTED_V0_4_ARCHITECTURE_PACKAGE.md`, `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D350.md`, `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D352.md`, `kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md` | withdrawn by D352; absent as required |
+    | `KINGSMAN_ENGINEERING_ARCHITECTURE_DRAWING_SET_V0_4.md` | `kai-pm/D350_MASTER_ARCHITECTURE_PLAN_AND_DRAWING_SET_V0_4.md`, `kai-pm/D352_WITHDRAW_REJECTED_V0_4_ARCHITECTURE_PACKAGE.md`, `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D350.md`, `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D352.md`, `kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md` | withdrawn by D352; absent as required |
+    | `KINGSMAN_EXISTING_KAI_MASTER_ARCHITECTURE_PLAN_V0_4.md` | `kai-pm/D350_MASTER_ARCHITECTURE_PLAN_AND_DRAWING_SET_V0_4.md`, `kai-pm/D351_EVOLUTION_NOT_REDESIGN_AND_PRESENTATION_BAR_CORRECTION.md`, `kai-pm/D352_WITHDRAW_REJECTED_V0_4_ARCHITECTURE_PACKAGE.md`, `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D350.md`, `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D352.md`, `kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md` | withdrawn by D352; absent as required |
+    | `RITUALS.md` | `CHANGELOG.md`, `README.md`, `kai-pm/DECISIONS.md`, `kai-pm/HANDOFF_LOG.md`, `kai-pm/SESSION_BOOTSTRAP.md`, `kai-pm/STATUS.md` | runtime output file written by a feature (`/data/RITUALS.md`); feature lead, not a source |
+    | `SECURITY.md` | `kai-pm/ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md`, `kai-pm/DECISIONS.md` | confirmed absent repository policy file (DECISIONS.md); professionalisation gap, not a feature source |
+    | `YYYY-MM-DD.md` | `docs/operator-journal/_template.md` | file-name pattern for journal entries (template line 44) |
+    | `discovery.md` | `docs/sovereign_ai_spec.md` | example file layout inside docs/sovereign_ai_spec.md (lines 782-880); not a missing source |
+    | `f.md` | `kai-pm/DECISIONS.md` | example path in a test description (DECISIONS.md:27191) |
+    | `file.md` | `kai-pm/DECISIONS.md`, `kai-pm/HANDOFF_LOG.md` | example path in a classifier description (DECISIONS.md:36624) |
+    | `guide.md` | `kai-pm/DECISIONS.md` | example path in a link-check description (DECISIONS.md:26959) |
+    | `non-.md` | `README.md` | the phrase 'non-.md files' (README.md:412) |
+    | `plan.md` | `docs/sovereign_ai_spec.md` | same as discovery.md |
+    | `progress.md` | `docs/sovereign_ai_spec.md` | same as discovery.md |
+    | `real.md` | `kai-pm/DECISIONS.md` | example path in a filter description (DECISIONS.md:29240) |
+    | `research.md` | `docs/sovereign_ai_spec.md` | same as discovery.md |
+    | `tREADME.md` | `kai-pm/DECISIONS.md` | tab-escaped `README.md` in a git output row (DECISIONS.md:24861) |
+    | `x.md` | `kai-pm/DECISIONS.md`, `kai-pm/house_in_order_census_v11/README.md` | example URL `https://x.md` in a test description (DECISIONS.md:29140) |
+    | `yes-brother-i-agree-eager-dewdrop.md` | `kai-pm/DECISIONS.md` | **named gap** (K13): the Phase 0.5 plan, cited at DECISIONS.md:667 |
+    
+    ## L. Limits (what this register does not show)
+    
+    - **Not read.** Classes for the 68, the 11 and the 40 come from titles and lines 1–20. Kai's classes were checked only against each file's own status line. A body may contradict its header.
+    - **Commit dates** are this branch's history up to the pin, not authoring dates written inside the files.
+    - **The "beyond" scan** covers Markdown files outside the four folders. It does not read code, comments or docstrings for capability promises; that is the Wave 0 code census.
+    - **Owner-ruling column**: a name count in `DECISIONS.md` shows a mention, not a banking.
+    - **Unlocated names**: a token scan for `NAME.md` only. A source referred to without a `.md` name (for example "the v2.1 architecture") is not found by it.
+    - Orion cannot certify his own work. Kai-GPT adjudicates.
+    
+    ## M. Annex: the 237 names referenced only inside the handoff log
+    
+    **Banked** (a verbatim block of that file name exists in the log), 124: `27a461b0_2026-10-10T104452.632Z.md`, `31139212_2026-10-09T105933.897Z.md`, `331aecbc_2026-10-08T121051.645Z.md`, `379e92cc_2026-10-08T101544.738Z.md`, `379e92cc_2026-10-08T121054.048Z.md`, `3cb64961_2026-10-10T092937.809Z.md`, `5d3c3607_2026-10-10T100036.496Z.md`, `6f33dadf_2026-10-08T123509.692Z.md`, `6f33dadf_2026-10-09T065441.108Z.md`, `7d7b7127_2026-10-10T100234.294Z.md`, `9dd4474f_2026-10-09T183149.643Z.md`, `CHECKLIST_1.md`, `D359_mirror.md`, `D390_mirror.md`, `DAI6_DESIGN.md`, `DEEPSEEK_PACKET_AW01_CLOSURE.md`, `DEEPSEEK_PACKET_AW01_CLOSURE_V2.md`, `DEEPSEEK_PACKET_AW01_v1.md`, `DEEPSEEK_PACKET_AW01_v2.md`, `DEEPSEEK_PACKET_DAI6_V1.md`, `DEEPSEEK_PACKET_SB01_v1.md`, `DEEPSEEK_PACKET_TWO_FACT.md`, `DEEPSEEK_PACKET_TWO_FACT_v2.md`, `DEEPSEEK_PACKET_TWO_FACT_v3.md`, `DEEPSEEK_PACKET_TWO_FACT_v4.md`, `ERRATUM_E2.md`, `ERRATUM_E3_AND_CHECK.md`, `KAI_FEATURE_LIST.md`, `KAI_GPT_START_HERE.md`, `KAI_GPT_START_HERE_V2.md`, `KAI_GPT_START_HERE_V3.md`, `KAI_GPT_START_HERE_V4.md`, `KAI_MASTER_PLAN_v1_1_UNIFIED_DRAFT.md`, `KAI_RESEARCH_PROCEDURE_FINAL_CANDIDATE.md`, `KAI_RESEARCH_PROCEDURE_V3_2_1.md`, `KAI_RESEARCH_PROCEDURE_V3_2_2.md`, `KAI_RESEARCH_PROCEDURE_V3_2_3.md`, `KAI_RESEARCH_PROPOSAL.md`, `KAI_RESEARCH_PROPOSAL_V2.md`, `KAI_RESEARCH_PROPOSAL_V3.md`, `KAI_RESEARCH_PROPOSAL_V3_1.md`, `KAI_VISION_BRIEF_FOR_GPT.md`, `KINGSMAN_MASTER_PLAN_ORION_CANDIDATE_v0_1.md`, `ORION_BANKED_OWNER_INTENT_ACK.md`, `ORION_CHECK_KAI_VERDICT.md`, `ORION_CHECK_TRANCHE1.md`, `ORION_ITEM13_R21_RESEARCH_GATE.md`, `ORION_KAI_COLD_START_BRIEF.md`, `ORION_KAI_RECONCILIATION_MATRIX_v0_1.md`, `ORION_PRE_RAMS_READINESS_REPORT.md`, `ORION_PROTOCOL_FC_VERIFY.md`, `ORION_PROTOCOL_V0_1_REVIEW.md`, `ORION_PROTOCOL_V0_2_VERIFY.md`, `ORION_PROTOCOL_V0_3_VERIFY.md`, `ORION_PROTOCOL_V0_4_VERIFY.md`, `ORION_R21_PROPOSAL.md`, `ORION_RESEARCH_REVIEW_1.md`, `ORION_REVIEW_KINGSMAN_BASELINE.md`, `ORION_TO_KAI_A2_ALIGN.md`, `ORION_TO_KAI_ASSURANCE_NOTE.md`, `ORION_TO_KAI_UPDATE_2026-10-07.md`, `PASS2_PACKET.md`, `V3_1_AMENDMENT_A1.md`, `ack.md`, `agent_census.md`, `agent_doctrine.md`, `agent_external.md`, `bff57ebd_2026-10-09T185817.676Z.md`, `cd786753_2026-10-09T065437.315Z.md`, `comment_07812fda.md`, `comment_09b5a624.md`, `comment_1b93e797.md`, `comment_2111cf85.md`, `comment_257c9d33.md`, `comment_28104661.md`, `comment_2ac14cd8.md`, `comment_316cd9b5.md`, `comment_326c9d8f.md`, `comment_3a54b56d.md`, `comment_552eefd1.md`, `comment_6e92fbc3.md`, `comment_738492e1.md`, `comment_7fb82822.md`, `comment_827ed34b.md`, `comment_8dff603e.md`, `comment_935e1c19.md`, `comment_9779f798.md`, `comment_9aab89ea.md`, `comment_9ed32b77.md`, `comment_a73972c5.md`, `comment_ab81c4ca.md`, `comment_b14ae903.md`, `comment_be2ddfbf.md`, `comment_cb67c42a.md`, `comment_ce66b607.md`, `comment_d7db3d55.md`, `comment_e1db3a89.md`, `comment_e4b00569.md`, `comment_f53657c5.md`, `comment_fa338587.md`, `d4_reco.md`, `d5_reco.md`, `dai10_gold_review_post.md`, `dai10_reminder_post.md`, `dai10_rereview_post.md`, `gold_review_summary.md`, `kai_155caf7d.md`, `kai_49e8229e.md`, `kai_8c755e33.md`, `kai_answers_post.md`, `kai_c22679b4.md`, `kai_note.md`, `kai_update_1.md`, `main.md`, `new_thread_start.md`, `orion_attacks.md`, `orion_scope_reply.md`, `part_i_iii.md`, `pointer.md`, `report_48c39815.md`, `review2_register.md`, `s01_plan.md`, `source_check.md`, `v04_section19.md`
+    
+    **Not banked by that name**, 113: `AUDIT_PLAN_C.md`, `BOOTSTRAP_PLAN.md`, `CONSUMER_INVENTORY.md`, `CRLF.md`, `CR_SAC.md`, `DAI6_PACKET_V1_BODY.md`, `DOC.md`, `KAI_CHANGE_AUTHORITY_INTERLOCK.md`, `KAI_COMMUNICATION_PROTOCOL.md`, `LICENSE.md`, `LINK.md`, `LONECR.md`, `LS_HEAD.md`, `MISC_D.md`, `NEL_PURPOSE.md`, `NEW.md`, `NOTES.md`, `NOTES_B.md`, `OTHER.md`, `PHASEN_READINESS.md`, `PHASE_N_N_BACKLOG.md`, `PINNING_RESEARCH.md`, `PLAN_A.md`, `POSTMORTEM_N-N-N_RUNNER_STARVATION.md`, `REISSUE.md`, `REPO_HEALTH_AUDIT_N-N-N.md`, `SELF.md`, `SPIFFE_Workload_API.md`, `SYNTH.md`, `SYNTH_0.md`, `SYNTH_1.md`, `SYNTH_2.md`, `THREAT_MODEL.md`, `UHN_INTAKE_REDESIGN.md`, `UHN_SENSOR_INGRESS_PLAN.md`, `WN_DASHBOARD_REMEDIATION_PLAN.md`, `WN_GLOBAL_HYGIENE_SUBPLAN.md`, `X.md`, `XREADME.md`, `autogen_README.md`, `build-provenance.md`, `census.md`, `compose_config.md`, `d390_final.md`, `d390_template.md`, `dockerdocs_config.md`, `e18.md`, `e23.md`, `e28.md`, `e7agit_v2.md`, `extending-openapi.md`, `fastapi_metadata.md`, `fastapi_openapi_extend.md`, `ggml_gguf.md`, `gguf.md`, `graphiti_README.md`, `hooks.md`, `index.md`, `kafka_README.md`, `lancedb_README.md`, `langgraph_README.md`, `langgraph_checkpoint_README.md`, `lemonade_README.md`, `letta_README.md`, `letta_archive_README.md`, `lettacode_README.md`, `llamacpp_README.md`, `llamacpp_build.md`, `llamacpprocm_README.md`, `maf_README.md`, `mem0_README.md`, `nDECISIONS.md`, `ollama_README.md`, `otel_CHANGELOG.md`, `otel_overview.md`, `outside.md`, `outside_target.md`, `overview.md`, `packet22.md`, `pelt.md`, `pgvector_CHANGELOG.md`, `pgvector_README.md`, `plan_v11_entry106.md`, `qdrant_README.md`, `readme.md`, `slsa12_spec_about.md`, `slsa12_spec_build-provenance.md`, `slsa12_spec_build-track-basics.md`, `slsa12_spec_index.md`, `slsa12_spec_provenance.md`, `slsa12_spec_terminology.md`, `slsa_README.md`, `slsa_docs_spec_v1.0_about.md`, `slsa_docs_spec_v1.0_index.md`, `slsa_docs_spec_v1.0_provenance.md`, `slsa_docs_spec_v1.1_about.md`, `slsa_docs_spec_v1.1_index.md`, `slsa_docs_spec_v1.1_provenance.md`, `slsa_docs_spec_v1.2_about.md`, `slsa_docs_spec_v1.2_index.md`, `slsa_docs_spec_v1.2_provenance.md`, `spiffe_README.md`, `spiffe_SPIFFE.md`, `spiffe_X509SVID.md`, `spiffe_wlapi.md`, `spire_README.md`, `spire_server.md`, `temporal_LICENSE.md`, `temporal_README.md`, `v321_base.md`, `v322_base.md`, `v32_base.md`, `vllm_README.md`
+    
+    Full 64-character SHA-256 values are not printed; `gather.py` (banked with this register) recomputes them from the pin.
+    END-VERBATIM ORION-SOURCE-REGISTER-V2
+- EVIDENCE RV2-GATHER-SCRIPT gather.py: 2024 bytes, sha256 f6dbc5feed4614b849cdac0fa349ae755b252c20c1bbf218fd74b714f4f13473, final LF True (added by Orion)  [CMD `sha256sum gather.py` → f6dbc5feed4614b8…]
+    BEGIN-VERBATIM RV2-GATHER-SCRIPT
+    # Read-only: per-path facts at the pin for the 306-file universe and the 40 Markdown files beyond it.
+    import hashlib, json, re, subprocess, sys
+    REPO, PIN, OUT = sys.argv[1], "dd153c1f4ab7c52f34620e07238554453a8912d9", sys.argv[2]
+    def git(*a): return subprocess.run(["git", *a], cwd=REPO, capture_output=True, check=True).stdout
+    tree = git("ls-tree", "-r", "--name-only", PIN).decode().split("\n")[:-1]
+    md = [p for p in tree if p.endswith(".md")]
+    u306 = [p for p in md if "/" not in p or re.match(r"^(kai-pm|docs|bootstrap)/[^/]+$", p)]
+    beyond = [p for p in md if p not in set(u306)]
+    NOOPEN = {"data/SOUL.md"}  # standing instruction: do not touch; recorded by git object id only
+    STAT = re.compile(r"(?i)\bstatus\b|NOT IMPLEMENTATION|SUPERSEDED|WITHDRAWN|\bDRAFT\b|\bCANONICAL\b|\bAUTHORITY\b")
+    rows = []
+    for p in u306 + beyond:
+        oid = git("rev-parse", f"{PIN}:{p}").decode().strip()
+        dates = git("log", PIN, "--format=%cs", "--", p).decode().split()
+        r = {"path": p, "set": "U306" if p in u306 else "BEYOND", "blob": oid, "first": dates[-1] if dates else "", "last": dates[0] if dates else "", "commits": len(dates)}
+        if p in NOOPEN:
+            r.update(sha256="not computed (data/SOUL.md: do-not-touch instruction; git blob id only)", lines=None, title="", status="", status_line=None)
+        else:
+            b = git("cat-file", "blob", oid); t = b.decode("utf-8", "replace").split("\n")
+            r["sha256"], r["bytes"], r["lines"] = hashlib.sha256(b).hexdigest(), len(b), b.count(b"\n")
+            r["title"] = next((l.strip() for l in t[:40] if l.startswith("#")), "")
+            hit = next(((i + 1, l.strip()) for i, l in enumerate(t[:20]) if STAT.search(l) and not l.startswith("# ")), None)
+            r["status_line"], r["status"] = (hit if hit else (None, ""))
+        rows.append(r)
+    json.dump({"pin": PIN, "tree_files": len(tree), "md": len(md), "u306": len(u306), "beyond": len(beyond), "rows": rows}, open(OUT, "w"), indent=1)
+    print(f"tree={len(tree)} md={len(md)} u306={len(u306)} beyond={len(beyond)} rows={len(rows)}")
+    END-VERBATIM RV2-GATHER-SCRIPT
+- EVIDENCE RV2-MEMBERS-SCRIPT members.py: 2746 bytes, sha256 ac75d8e4c09d6e471687e259b27d306f139a39b8fa341284f8614e40c4252fd9, final LF True (added by Orion)  [CMD `sha256sum members.py` → ac75d8e4c09d6e47…]
+    BEGIN-VERBATIM RV2-MEMBERS-SCRIPT
+    # Membership of each U306 path in the populations named so far; derived from the banked texts, not retyped.
+    import json, re, sys
+    S = "/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad"
+    facts = json.load(open(f"{S}/rv2/facts.json")); U = [r["path"] for r in facts["rows"] if r["set"] == "U306"]; Uset = set(U)
+    kai69 = {}
+    for f in ("comment_28939a90.md", "comment_2f76278b.md"):
+        for m in re.finditer(r"^(\d+)\. `([^`]+)` — \*\*([a-z]+)(\*?)\*\*,? ?(.*)$", open(f"{S}/proto/own/{f}").read(), re.M):
+            kai69[m.group(2)] = {"n": int(m.group(1)), "class": m.group(3) + m.group(4), "use": m.group(5).strip()}
+    d2 = open(f"{S}/proto/own/comment_d2d4301d.md").read()
+    extra_txt = d2.split("Add sources entirely omitted by the filename filter:")[1].split("\n")[0]
+    kai6 = {}
+    for m in re.finditer(r"([A-Z0-9_\-\.]+\.md) \(([^)]+)\)", extra_txt):
+        hits = [p for p in U if p.rsplit("/", 1)[-1] == m.group(1)]
+        kai6[hits[0] if len(hits) == 1 else m.group(1)] = {"class_text": m.group(2), "resolved": len(hits)}
+    om = json.load(open(f"{S}/s01/omitted_final.json")); o16 = om["register_referenced"] + om["arrow_check_cited"]
+    orig = {"README.md": 1, "kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md": 2, "kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md": 3,
+            "kai-pm/KINGSMAN_FINAL_VISION_MASTER_CANON_PLAN.md": 4, "bootstrap/master_plan.md": 5, "docs/next_level_roadmap.md": 6, "kai-pm/DECISIONS.md": 8,
+            "kai-pm/HANDOFF_LOG.md": 9, "kai-pm/SHOPPING_LIST_PLAN.md": 10}
+    cand75 = open(f"{S}/s01/cand_all.txt").read().split()
+    audit = [p for p in U if p.startswith("kai-pm/CODE_AUDIT_BATCH")]
+    rem70 = json.load(open(f"{S}/s01/remaining.json"))
+    pops = {"orig12_paths": set(orig), "cand75": set(cand75), "kai69": set(kai69), "kai6": set(kai6), "orion16": set(o16), "audit144": set(audit), "prev_remaining70": set(rem70)}
+    for k, v in pops.items(): print(f"{k:18} n={len(v):3}  not-in-U306={sorted(v - Uset)}")
+    print("kai69 == cand75 - orig12 :", pops["kai69"] == pops["cand75"] - pops["orig12_paths"], " cand75&orig12 =", len(pops["cand75"] & pops["orig12_paths"]))
+    print("kai6 - orion16:", sorted(pops["kai6"] - pops["orion16"]), " orion16 & audit:", sorted(pops["orion16"] & pops["audit144"]))
+    covered = pops["orig12_paths"] | pops["cand75"] | pops["kai6"] | pops["orion16"] | pops["audit144"]
+    R = sorted(Uset - covered)
+    print("covered", len(covered), "remaining", len(R))
+    print("in prev 70 but now covered:", sorted(pops["prev_remaining70"] - set(R)), " in R not in prev 70:", sorted(set(R) - pops["prev_remaining70"]))
+    json.dump({"kai69": kai69, "kai6": kai6, "orion16": o16, "orig": orig, "audit": audit, "R": R, "cand75": cand75}, open(f"{S}/rv2/members.json", "w"), indent=1)
+    END-VERBATIM RV2-MEMBERS-SCRIPT
+- EVIDENCE RV2-ORION-CLASSES orion_classes.py: 12236 bytes, sha256 aaba094068467a896205db979e0ef1684b695acab1d4edc893096a47c5f4d018, final LF True (added by Orion)  [CMD `sha256sum orion_classes.py` → aaba094068467a89…]
+    BEGIN-VERBATIM RV2-ORION-CLASSES
+    # Orion's PROPOSED classes (for Kai's adjudication) for paths Kai has not classified. (class, role, scope note)
+    I, X, C, N = "intake", "cross-check", "control", "none"
+    P = {
+    # --- Orion's 16 not classified by Kai's d2d4301d
+    "docs/personality_and_proactive.md": ("lineage", I, "personality modes and proactive behaviour design; feature-bearing"),
+    "kai-pm/ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md": ("external", X, "snapshot-bound research evidence (own status line); assurance obligations only"),
+    "kai-pm/CODE_AUDIT_BATCH_MEMU_PERSONALITY_AUTONOMY.md": ("derived", X, "audit batch; deduplicated into the 144 audit class (defect / negative-test evidence)"),
+    "kai-pm/DAINIUS_KINGSMAN_ENGINEERING_STANDARD.md": ("canonical*", C, "standing operator engineering principle (own status line); intent and assurance only"),
+    "kai-pm/KAI_KINGSMAN_COLD_START_MASTER.md": ("derived", C, "cold-start recovery and navigation document; no new feature authority"),
+    "kai-pm/KAI_KINGSMAN_PUZZLE_MAP_AND_RECONCILIATION.md": ("derived", X, "master synthesis / planning input (own status line); completeness cross-check"),
+    "kai-pm/KAI_ORION_CONTINUITY.md": ("derived", C, "recovery protocol; own status line: not a source of programme truth"),
+    "kai-pm/KINGSMAN_CONTINGENCY_AND_FAILSAFE_LIBRARY_DESIGN.md": ("lineage", I, "contingency / failsafe library design input; feature-bearing"),
+    "kai-pm/KINGSMAN_LONG_HORIZON_STEWARDSHIP_AND_SUCCESSION.md": ("lineage", I, "future architecture obligation (stewardship, succession); feature-bearing, no implementation authority"),
+    "kai-pm/MEMORY_GRAPH_DESIGN.md": ("lineage", I, "memu-graph graph-memory design; feature-bearing"),
+    "kai-pm/PHASE2_DOCUMENT_SYNC_AND_DRIFT_CONTROL.md": ("lineage", X, "control-design finding (document drift); assurance obligation"),
+    # --- the 68 not considered before
+    "CHANGELOG.md": ("derived", X, "claimed shipped changes; feature leads only, runtime unverified"),
+    "PROJECT_STATUS.md": ("derived", N, "one-line redirect to kai-pm/STATUS.md; no content"),
+    "bootstrap/README.md": ("lineage", I, "early bootstrap plan and principles"),
+    "docs/DEMO.md": ("derived", X, "demo walkthrough of claimed features"),
+    "docs/ERROR_LOG.md": ("derived", X, "defect log (2026-03-22 test counts); defect evidence"),
+    "docs/PHONE_SETUP.md": ("derived", X, "user guide; PWA install capability is a feature lead"),
+    "docs/ara_review_status.md": ("derived", X, "implementation status record"),
+    "docs/design_system.md": ("lineage", I, "UI / presentation design intent"),
+    "docs/gaps_and_hardening.md": ("lineage", I, "gap and hardening checklist; open items are leads"),
+    "docs/gpu_integration_phase0.md": ("derived", X, "implementation record claiming completion; runtime unverified"),
+    "docs/hmac_rotation_runbook.md": ("derived", X, "operating procedure for HMAC rotation; see conflict K-HMAC"),
+    "docs/known_issues.md": ("derived", X, "known issues; defect evidence"),
+    "docs/phase1_patch_set.md": ("lineage", I, "early concrete patch plan"),
+    "docs/unfair_advantages.md": ("lineage", I, "strategic capability document, 680 lines; feature-bearing; missed by the name filter"),
+    "docs/wake_intent_j2.md": ("lineage", I, "J2 wake-word and intent feature specification"),
+    "kai-pm/BASELINE_RESPONSES_0.5B.md": ("derived", C, "test capture template, capture still pending"),
+    "kai-pm/CLEANUP_TODO.md": ("superseded", N, "own note: the plan did not execute as written"),
+    "kai-pm/CODE_AUDIT_CONTINUATION_LOG.md": ("derived", X, "audit record; same disposition as the audit class"),
+    "kai-pm/CODE_AUDIT_FINAL_REPORT.md": ("derived", X, "audit report; same disposition as the audit class"),
+    "kai-pm/CODE_AUDIT_IMPLEMENTATION_SEQUENCE_AND_CLOSURE_MATRIX.md": ("derived", X, "audit closure matrix; planning control"),
+    "kai-pm/CODE_AUDIT_MASTER.md": ("derived", X, "audit master register; 'single source of truth' for audit findings, not features"),
+    "kai-pm/CODE_AUDIT_REGISTER.md": ("derived", X, "audit register; same disposition as the audit class"),
+    "kai-pm/CODE_AUDIT_REGISTER_CONTINUED.md": ("derived", X, "audit register; same disposition as the audit class"),
+    "kai-pm/CODE_AUDIT_REGISTER_CONTINUED_2.md": ("derived", X, "audit register; same disposition as the audit class"),
+    "kai-pm/COMPOSE_DRIFT.md": ("derived", X, "compose drift analysis (2026-07-21)"),
+    "kai-pm/CONVICTION_SCENARIOS.md": ("derived", C, "test scenarios; the conviction pipeline is a feature lead"),
+    "kai-pm/CROSS_AXIS_SEMANTIC_AUDIT.md": ("derived", N, "D365 evidence for the H2 instrument; no feature content expected"),
+    "kai-pm/DECISIONS_DRAFT_UNBANKED.md": ("draft", X, "own status: banks nothing; owner-intent cross-check for entries 1-5"),
+    "kai-pm/DEEPSEEK_BRIEF_2026-08-07_EMBEDDINGS.md": ("external", X, "brief to DeepSeek behind D167"),
+    "kai-pm/DEEPSEEK_BRIEF_2026-08-07_METHOD.md": ("external", N, "method brief"),
+    "kai-pm/DEEPSEEK_BRIEF_2026-08-07_TOPOLOGY.md": ("external", X, "network topology decision brief"),
+    "kai-pm/DEEPSEEK_REVIEW_PACKET_EXISTING_KAI_EVOLUTION_V0_3.md": ("derived", X, "review wrapper for v0.3 (like Kai's #37)"),
+    "kai-pm/DEEPSEEK_REVIEW_PACKET_KINGSMAN_MASTER_CANDIDATE_V0_2.md": ("derived", X, "review wrapper for v0.2"),
+    "kai-pm/DEEPSEEK_REVIEW_PACKET_SUPPLEMENT_D346_ENGINEERING_DRAWINGS.md": ("derived", X, "review supplement for D346"),
+    "kai-pm/EMBEDDING_BACKEND_STATE.md": ("derived", X, "measured embedding backend state (2026-08-12)"),
+    "kai-pm/EQ_BASELINE_SAMPLES.md": ("derived", C, "test samples; EQ detection is a feature lead"),
+    "kai-pm/FAILURE_PATTERN_LEDGER.md": ("canonical*", N, "authoritative append-only process ledger; no feature content"),
+    "kai-pm/GPU_ARRIVAL_RUNBOOK.md": ("draft", X, "future operating plan for GPU arrival"),
+    "kai-pm/H2_REPAIR_CONTRACT_D367.md": ("canonical*", N, "frozen H2 repair contract (D367) only; assurance instrument, no feature content"),
+    "kai-pm/KAI_ORION_CONTINUITY_CURRENT_MASTER_POINTER.md": ("derived", C, "recovery pointer while D344-D353 append is open"),
+    "kai-pm/KAI_PRIMARY_MISSION_RECOVERY_POINTER.md": ("derived", C, "recovery pointer; own status: not authority"),
+    "kai-pm/MAKEFILE_AUDIT.md": ("derived", X, "Makefile audit (123 targets)"),
+    "kai-pm/MAKEFILE_TARGETS.md": ("derived", X, "Makefile target catalogue"),
+    "kai-pm/METRICS.md": ("derived", N, "PM metrics note"),
+    "kai-pm/NAVIGATION.md": ("derived", C, "navigation index"),
+    "kai-pm/ORION_FIELD_NOTES.md": ("derived", N, "non-authoritative working memory"),
+    "kai-pm/PHASE1_READINESS.md": ("draft", I, "Phase 1 readiness plan"),
+    "kai-pm/POSTMORTEM_2026-08-06_RUNNER_STARVATION.md": ("derived", N, "CI incident record"),
+    "kai-pm/REALITY_CHECK_2026-05-10.md": ("derived", X, "dated reality reconciliation"),
+    "kai-pm/REALITY_CHECK_2026-06-18.md": ("derived", X, "dated reality reconciliation"),
+    "kai-pm/REPO_HEALTH_AUDIT_2026-05-10.md": ("derived", X, "dated repository health audit"),
+    "kai-pm/RISKS.md": ("derived", X, "risk register (last reviewed 2026-07-21)"),
+    "kai-pm/RUNTIME_TOPOLOGY_CENSUS.md": ("derived", X, "measured runtime topology census (2026-08-12)"),
+    "kai-pm/SEQUENCE.md": ("lineage", I, "5-phase delivery sequence; follows STRATEGIC_PLAN.md"),
+    "kai-pm/SERVICE_IDENTITY_MEASUREMENT.md": ("derived", X, "evidence for review; no implementation"),
+    "kai-pm/SERVICE_IDENTITY_STATE.md": ("derived", X, "service identity engineering state (2026-08-08)"),
+    "kai-pm/SERVICE_IDENTITY_TRUST_BOUNDARIES.md": ("derived", X, "trust-boundary analysis"),
+    "kai-pm/SESSION_BOOTSTRAP.md": ("derived", X, "summary of the system (to 2026-07-25); claims are leads"),
+    "kai-pm/STATUS.md": ("derived", X, "status dashboard; 'Phase 0 COMPLETE' is a claim, not fact"),
+    "kai-pm/STUBS_AND_PLACEHOLDERS.md": ("derived", I, "each stub names an intended real implementation; feature leads"),
+    "kai-pm/TECH_DEBT_E402.md": ("derived", N, "lint debt note"),
+    "kai-pm/TECH_WATCH.md": ("lineage", X, "technology candidates; choices re-earned under D3"),
+    "kai-pm/TEST_WRITING_REVIEW.md": ("derived", N, "process review"),
+    "kai-pm/UH0_EVIDENCE_MANIFEST.md": ("derived", X, "module inventory baseline at 7adab8d; KAI TODAY cross-check"),
+    "kai-pm/UH2_INTAKE_REBUILD_ANALYSIS.md": ("draft", X, "analysis for review; no code written"),
+    "kai-pm/UH2_INTAKE_REDESIGN.md": ("draft", I, "intake architecture redesign; no implementation"),
+    "kai-pm/VALIDITY_BINDING_AUDIT.md": ("derived", N, "D364 evidence for the H2 instrument"),
+    "kai-pm/WAYPOINTS.md": ("derived", N, "known-good commit record"),
+    # --- 40 Markdown files beyond the four folders
+    ".claude/skills/kai-handoff/SKILL.md": ("derived", N, "process tooling"),
+    ".github/PULL_REQUEST_TEMPLATE.md": ("derived", N, "process template"),
+    ".github/copilot-instructions.md": ("derived", X, "agent instructions describing the system (from 2026-02-23)"),
+    "data/AGENTS.md": ("derived", I, "runtime registry; own line: 'Defines Kai's capabilities - what Kai can do and how'"),
+    "data/SOUL.md": ("UNCLASSIFIED", "inaccessible", "not opened: standing instruction 'do not touch data/SOUL.md'; likely identity material; Kai/Dainius to rule"),
+    "data/self-emp/Accounting/README.md": ("derived", X, "runtime data folder note; self-employment domain lead"),
+    "data/self-emp/Coding/README.md": ("derived", X, "runtime data folder note; self-employment domain lead"),
+    "data/self-emp/Engineering/README.md": ("derived", X, "runtime data folder note; self-employment domain lead"),
+    "data/self-emp/Legal/README.md": ("derived", X, "runtime data folder note; self-employment domain lead"),
+    "data/self-emp/Social/README.md": ("derived", X, "runtime data folder note; self-employment domain lead"),
+    "data/skills/daily_brief.md": ("derived", I, "runtime skill definition; capability lead"),
+    "data/skills/invoice.md": ("derived", I, "runtime skill definition; capability lead"),
+    "data/teammates/auditor.md": ("derived", I, "runtime specialist persona; capability lead"),
+    "data/teammates/doctor.md": ("derived", I, "runtime specialist persona; capability lead"),
+    "data/teammates/oracle.md": ("derived", I, "runtime specialist persona; capability lead"),
+    "data/teammates/sage.md": ("derived", I, "runtime specialist persona; capability lead"),
+    "data/teammates/scout.md": ("derived", I, "runtime specialist persona; capability lead"),
+    "docs/operator-journal/_template.md": ("derived", X, "weekly operator journal template; feedback-loop lead"),
+    "kai-pm/PLAYBOOKS/dispatch_jewel.md": ("derived", N, "process playbook"),
+    "kai-pm/PLAYBOOKS/parallel_dispatch.md": ("derived", N, "process playbook"),
+    "kai-pm/PLAYBOOKS/post_merge_checklist.md": ("derived", N, "process playbook"),
+    "kai-pm/PLAYBOOKS/resume_session.md": ("derived", N, "process playbook"),
+    "kai-pm/PLAYBOOKS/tech_evaluation.md": ("derived", N, "process playbook"),
+    "kai-pm/census_v11_claim_sensitivity/PRECOMMIT.md": ("derived", N, "H2 instrument record"),
+    "kai-pm/house_in_order_census_v11/README.md": ("derived", N, "H2 instrument record"),
+    "kai-pm/house_in_order_h2/HOLDOUT_RULE.md": ("derived", N, "H2 instrument record"),
+    "kai-pm/house_in_order_h2/RUN.md": ("derived", N, "H2 instrument record"),
+    "kai-pm/house_in_order_h2_v11/PRECOMMIT.md": ("derived", N, "H2 instrument record"),
+    "kai-pm/house_in_order_h2_v11/RUN.md": ("derived", N, "H2 instrument record"),
+    "kai-pm/house_in_order_h2_v12/RUN.md": ("derived", N, "H2 instrument record"),
+    "kai-pm/house_in_order_instrument/AUTHORITY_ONTOLOGY.md": ("derived", N, "H2 instrument scratch spec"),
+    "kai-pm/house_in_order_instrument/README.md": ("derived", N, "H2 instrument frozen artefacts note"),
+    "skills/_template.md": ("derived", X, "skill file template; says Kai loads skills at startup"),
+    "skills/cis-deductions.md": ("derived", I, "runtime domain skill (UK CIS); capability lead; see gap K-CIS"),
+    "skills/ladder-safety.md": ("derived", I, "runtime domain skill (working at height); capability lead"),
+    "skills/mtd-vat.md": ("derived", I, "runtime domain skill (MTD / VAT); capability lead"),
+    "vault-sync/templates/daily-note.md": ("derived", I, "vault-sync note template; capability lead"),
+    "vault-sync/templates/kai-inbox.md": ("derived", I, "vault-sync note template; capability lead"),
+    "vault-sync/templates/lesson-learned.md": ("derived", I, "vault-sync note template; capability lead"),
+    "vault-sync/templates/soul-mirror.md": ("derived", I, "vault-sync note template; capability lead"),
+    }
+    END-VERBATIM RV2-ORION-CLASSES
+- EVIDENCE RV2-CONFLICTS conflicts.py: 8809 bytes, sha256 3425e9ebca35f6daf6248d8eaf0c7639af58b99c8ccb889c1bbc634686f81f41, final LF True (added by Orion)  [CMD `sha256sum conflicts.py` → 3425e9ebca35f6da…]
+    BEGIN-VERBATIM RV2-CONFLICTS
+    # Conflicts and refinements for Kai. Each cite is (path, line, exact substring at that line at the pin); the checker verifies every one.
+    K = [
+     {"id": "K1", "kind": "CONTRADICTION", "subject": "CODE_AUDIT_P0..P4 plans (Kai #8-#12)",
+      "kai": "lineage, risk/test cross-check; d2d4301d: 'defect/negative-test crosswalk, not distinct features'",
+      "cites": [("kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md", 16, "first-class existing maturity/design inputs; do not rediscover them under new names"),
+                ("kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md", 89, "should be **recovered/integrated rather than reinvented**")],
+      "issue": "The authority index (2026-08-24, after D353) treats P1-P4 as first-class maturity/design inputs, and D353's research says best-practice requirements already live in P1-P4. Treating them only as a defect crosswalk could drop maturity obligations from the census. The index names P1-P4, not P0.",
+      "proposal": "P1-P4: lineage, INTAKE for maturity and assurance obligations (not new user-facing features) plus defect crosswalk. P0: keep Kai's cross-check."},
+     {"id": "K2", "kind": "CONTRADICTION", "subject": "kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md (Kai #69)",
+      "kai": "draft, unreleased work plan",
+      "cites": [("kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md", 3, "**Status:** complete. All five steps done; the debt is **0** and ratcheted.")],
+      "issue": "The file says it is complete, not unreleased.",
+      "proposal": "derived: a completion record; its completion claim is unverified at runtime (KAI-project is not running)."},
+     {"id": "K3", "kind": "REFINEMENT", "subject": "seven DECISIONS_CANONICAL_APPEND_QUEUE files (Kai #30-#36)",
+      "kai": "derived, duplicate append queue",
+      "cites": [("kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D348.md", 5, "This supersedes `DECISIONS_CANONICAL_APPEND_QUEUE_D344_D347.md` as the current pending-append queue."),
+                ("kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D353.md", 5, "Supersedes D344–D352 as the current pending-append surface.")],
+      "issue": "They are cumulative, not byte duplicates: each later queue supersedes the one before and lists earlier entries as one-line summaries. The longest text for D344-D347 is in the D347 queue (193 lines) and the standalone D-files.",
+      "proposal": "Agree derived, no new owner rulings. Mark D344_D353 as the current pending-append surface and the six earlier queues as history; read D-entry detail from the standalone D-files."},
+     {"id": "K4", "kind": "SELF-CLAIM", "subject": "kai-pm/UH_PROGRESS_TRACKER.md (Kai d2d4301d: derived status check)",
+      "kai": "derived status check",
+      "cites": [("kai-pm/UH_PROGRESS_TRACKER.md", 4, "If this file and any other doc disagree, **this file wins** for UH status."),
+                ("kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md", 15, "foundational existing migration architecture/current UH workstream evidence")],
+      "issue": "The file claims to win on UH status; the index calls it current UH workstream evidence. Neither makes it a feature authority, and status claims are unverified while KAI is not running.",
+      "proposal": "Agree with Kai: derived. Record the self-claim; status claims are leads for verification."},
+     {"id": "K5", "kind": "SELF-CLAIM", "subject": "kai-pm/STRATEGIC_PLAN.md (Kai #65) and kai-pm/SEQUENCE.md",
+      "kai": "lineage, April historical lead only",
+      "cites": [("kai-pm/STRATEGIC_PLAN.md", 3, "Canonical 5-phase roadmap for Kai."),
+                ("kai-pm/SEQUENCE.md", 3, "This sequence follows the canonical roadmap in [STRATEGIC_PLAN.md](STRATEGIC_PLAN.md).")],
+      "issue": "Both call STRATEGIC_PLAN canonical. Kai's step 0.1 classification (2026-10-14) is later.",
+      "proposal": "Agree with Kai: lineage. SEQUENCE.md proposed lineage with it."},
+     {"id": "K6", "kind": "SELF-CLAIM", "subject": "kai-pm/KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md (Kai #42)",
+      "kai": "lineage, target design intake",
+      "cites": [("kai-pm/KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md", 5, "Status: **AUTHORITATIVE TARGET-ARCHITECTURE ADDENDUM — PLANNING ONLY**")],
+      "issue": "Self-labelled authoritative (2026-07-27). The authority index line 15 calls it foundational existing migration architecture.",
+      "proposal": "Agree with Kai: lineage, intake. Record the self-label."},
+     {"id": "K7", "kind": "SETTLED", "subject": "README.md",
+      "kai": "d2d4301d: canonical for intended features under v3.2.3, not for runtime facts",
+      "cites": [("kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md", 14, "stale factually, but mandatory organism/capability/presentation lineage input")],
+      "issue": "Raised in the first proposal; Kai has ruled.",
+      "proposal": "None. Kai's later classification governs; listed so the earlier index wording is not lost."},
+     {"id": "K8", "kind": "WORDING", "subject": "standing doctrines classed canonical* (Kai #38, #52, #56, #58, #63)",
+      "kai": "canonical*, standing operator intent / assurance intent, not executable authority",
+      "cites": [("kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md", 20, "Standing mission/proactivity/resilience/contingency/continuity/operator doctrines and older architecture as historical/design inputs only.")],
+      "issue": "The index calls these doctrines design inputs only. Compatible with canonical* if canonical* means intent only.",
+      "proposal": "Kai to confirm canonical* = authoritative for intent, never for implementation or runtime fact."},
+     {"id": "K9", "kind": "GAP", "subject": "two removed v0.4 governance files",
+      "kai": "not classified",
+      "cites": [("kai-pm/D352_WITHDRAW_REJECTED_V0_4_ARCHITECTURE_PACKAGE.md", 19, "`kai-pm/KINGSMAN_EXISTING_KAI_MASTER_ARCHITECTURE_PLAN_V0_4.md`"),
+                ("kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D350.md", 60, "`KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_V0_4.md`")],
+      "issue": "KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_V0_4.md and KINGSMAN_CANON_SYNCHRONISATION_REGISTER_V0_4.md existed and were removed on 2026-08-24 (commits 3d51fca, 4563b8a, 'remove obsolete'). D352 lists three withdrawn files, not these two.",
+      "proposal": "Record both as superseded and removed; no capability content expected; not sources."},
+     {"id": "K10", "kind": "NAMED GAP", "subject": "docs/CIS_FINANCE_DESIGN.md",
+      "kai": "not classified",
+      "cites": [("kai-pm/PHASE_0_5_BACKLOG.md", 42, "`docs/CIS_FINANCE_DESIGN.md` — design doc for CIS-aware P29")],
+      "issue": "Named as a design document. No file of that name is in the pinned tree, and no commit reachable from the pin touches that path. Related material exists: skills/cis-deductions.md.",
+      "proposal": "Add as a named gap beside the April vision; the census uses skills/cis-deductions.md and the backlog item as leads."},
+     {"id": "K11", "kind": "SELF-CLAIM", "subject": "completion claims (PHASE_0_5_BACKLOG #64, STATUS.md, docs/gpu_integration_phase0.md)",
+      "kai": "#64 derived, task cross-check",
+      "cites": [("kai-pm/PHASE_0_5_BACKLOG.md", 6, "**Status:** ✅ COMPLETE — all items shipped (2026-07-21)"),
+                ("kai-pm/STATUS.md", 4, "Phase 0 — COMPLETE. Awaiting GPU hardware (RTX 5080) to enter Phase 1."),
+                ("docs/gpu_integration_phase0.md", 5, "**Status:** ✅ Complete — Phase 0 hardening tasks implemented")],
+      "issue": "Written completion claims. Owner: nothing is running (handoff entry 217).",
+      "proposal": "Agree derived. The census treats every completion claim as a claim to verify, never a fact."},
+     {"id": "K12", "kind": "CONFLICT CARRIED", "subject": "HMAC signing in docs/next_level_roadmap.md and docs/hmac_rotation_runbook.md",
+      "kai": "roadmap: lineage; runbook: not classified",
+      "cites": [("docs/next_level_roadmap.md", 12, "**Chosen now:** HMAC-SHA256 with primary+previous secret (rotation window)."),
+                ("kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md", 102, "current Ed25519 direction remains retained")],
+      "issue": "Raised in the first proposal; the runbook is a second source for the HMAC choice.",
+      "proposal": "Keep the promise and the conflict for the census; neither file settles it."},
+     {"id": "K13", "kind": "NAMED GAP", "subject": "the Phase 0.5 plan file yes-brother-i-agree-eager-dewdrop.md",
+      "kai": "not classified",
+      "cites": [("kai-pm/DECISIONS.md", 667, "the Phase 0.5 plan (`yes-brother-i-agree-eager-dewdrop.md`) explicitly deferred")],
+      "issue": "DECISIONS.md cites a Phase 0.5 plan by this file name. No file of that name is in the pinned tree or on any of the 11 remote branches. The name looks like a coding-session plan file kept outside the repository.",
+      "proposal": "Named gap. kai-pm/PHASE_0_5_BACKLOG.md (Kai #64) is the in-repository record of that phase; the census uses it and DECISIONS.md, and does not assume the plan's contents."},
+    ]
+    END-VERBATIM RV2-CONFLICTS
+- EVIDENCE RV2-UNLOCATED-SCRIPT unlocated.py: 1168 bytes, sha256 2a1cef4c9d5e5b1d6659885f9e114baa6dcc166395a6583ef07edeb623a12698, final LF True (added by Orion)  [CMD `sha256sum unlocated.py` → 2a1cef4c9d5e5b1d…]
+    BEGIN-VERBATIM RV2-UNLOCATED-SCRIPT
+    # Read-only: Markdown file names referenced inside the 346 Markdown files at the pin that match no file name anywhere in the pinned tree.
+    import json, re, subprocess, collections, sys
+    REPO, S = sys.argv[1], "/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad"
+    F = json.load(open(f"{S}/rv2/facts.json"))
+    names = set(l.rsplit("/", 1)[-1] for l in open(f"{S}/s01/tree_pin.txt").read().split())
+    TOK = re.compile(r"[A-Za-z0-9_][A-Za-z0-9_.\-]*\.md\b")
+    refs = collections.defaultdict(set); scanned = 0
+    for r in F["rows"]:
+        if r["path"] == "data/SOUL.md": continue
+        t = subprocess.run(["git", "cat-file", "blob", r["blob"]], cwd=REPO, capture_output=True, check=True).stdout.decode("utf-8", "replace"); scanned += 1
+        for m in TOK.finditer(t):
+            n = m.group(0)
+            if n not in names: refs[n].add(r["path"])
+    print(f"scanned={scanned} files; distinct unlocated names={len(refs)}")
+    for n, ps in sorted(refs.items(), key=lambda x: (-len(x[1]), x[0])): print(f"{len(ps):3} {n} <- {sorted(ps)[:3]}{' …' if len(ps) > 3 else ''}")
+    json.dump({n: sorted(p) for n, p in refs.items()}, open(f"{S}/rv2/unlocated.json", "w"), indent=1)
+    END-VERBATIM RV2-UNLOCATED-SCRIPT
+- EVIDENCE RV2-BUILD-SCRIPT build_register.py: 14551 bytes, sha256 3415514ae5a0ad0f5fd57edc72cdb42a981198fc4c2e2fffcbdeafaa27f82d27, final LF True (added by Orion)  [CMD `sha256sum build_register.py` → 3415514ae5a0ad0f…]
+    BEGIN-VERBATIM RV2-BUILD-SCRIPT
+    # Build source register v2 (Markdown + JSON) from facts.json, members.json, the banked Kai comments and Orion's proposals.
+    import json, re, subprocess, sys
+    S = "/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad"; REPO = "/home/user/kai-system"
+    sys.path.insert(0, f"{S}/rv2"); from orion_classes import P; from conflicts import K
+    facts = json.load(open(f"{S}/rv2/facts.json")); F = {r["path"]: r for r in facts["rows"]}; M = json.load(open(f"{S}/rv2/members.json"))
+    PIN = facts["pin"]
+    dec = subprocess.run(["git", "show", f"{PIN}:kai-pm/DECISIONS.md"], cwd=REPO, capture_output=True, check=True).stdout.decode()
+    dheads = set(re.findall(r"^## (D\d+A?)\b", dec, re.M))
+    FULLY = {"kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md"}  # read 112 of 112 lines in this stint
+    KAI6 = {"CLAUDE.md": ("canonical*", "control"), "kai-pm/KINGSMAN_EXISTING_KAI_MATURATION_IMPLEMENTATION_RESEARCH_REISSUE_2026-08-24.md": ("lineage", "intake"),
+            "kai-pm/HOUSE_IN_ORDER_PHASE2_PROFESSIONALISATION.md": ("lineage", "intake"), "kai-pm/A4_SELF_DIAGNOSIS_EVOLUTION.md": ("lineage", "intake"),
+            "kai-pm/UH_PROGRESS_TRACKER.md": ("derived", "cross-check"), "kai-pm/KAI_RECONCILIATION_DEEPSEEK_EXISTING_KAI_EVOLUTION_V0_3.md": ("derived", "cross-check")}
+    ORIG = {"README.md": ("canonical*", "intake", "intended features under v3.2.3; never runtime fact"),
+     "kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md": ("canonical*", "intake", "owner-affirmed design invariant; not implementation permission or frozen constitution"),
+     "kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md": ("lineage", "intake", "final-product planning document: lineage/draft"),
+     "kai-pm/KINGSMAN_FINAL_VISION_MASTER_CANON_PLAN.md": ("lineage", "intake", "master-canon planning document: lineage/draft"),
+     "bootstrap/master_plan.md": ("lineage", "intake", "older roadmap / original vision: lineage"),
+     "docs/next_level_roadmap.md": ("lineage", "intake", "older roadmap: lineage; HMAC conflict carried (K12)"),
+     "kai-pm/DECISIONS.md": ("canonical", "intake", "actually banked owner rulings only"),
+     "kai-pm/HANDOFF_LOG.md": ("canonical*", "intake", "verbatim owner intent only, each carrying ⚠ UNBANKED pending-ledger status; never a ledger entry"),
+     "kai-pm/SHOPPING_LIST_PLAN.md": ("lineage", "cross-check", "Orion proposal (Kai's d2d4301d does not name it); D13 itself is in DECISIONS.md")}
+    DFILE = re.compile(r"^kai-pm/(D3(4[4-9]|5[0-3])A?)_")
+    def cell(s): return str(s).replace("|", "\\|").replace("\n", " ")
+    def evid(r):
+        if r["path"] == "data/SOUL.md": return "not opened (instruction)"
+        if r["status"]: return f"L{r['status_line']}: {r['status'][:110]}"
+        if r["title"]: return f"title: {r['title'][:100]}"
+        t = subprocess.run(["git", "cat-file", "blob", r["blob"]], cwd=REPO, capture_output=True, check=True).stdout.decode().split("\n")
+        i = next(k for k, l in enumerate(t) if l.strip())
+        return f"L{i + 1}: {t[i].strip()[:110]}"
+    def owner(p):
+        m = DFILE.match(p)
+        if m: return f"{m.group(1)}: pending append; no `## {m.group(1)}` heading in DECISIONS.md" if m.group(1) not in dheads else f"{m.group(1)} heading present in DECISIONS.md"
+        if p == "kai-pm/DECISIONS.md": return f"the ledger ({len(dheads)} distinct D headings)"
+        if p == "kai-pm/HANDOFF_LOG.md": return "rulings marked ⚠ UNBANKED until banked"
+        if p == "data/SOUL.md": return "not opened"
+        return f"DEC×{dec.count(p.rsplit('/', 1)[-1])}"
+    conf = {}
+    for k in K:
+        for c in k["cites"]: conf.setdefault(c[0], set())
+    for k in K:
+        subj = k["subject"]
+        for p in F:
+            if p in subj or (k["id"] == "K1" and re.match(r"kai-pm/CODE_AUDIT_P[0-4]_", p)) or (k["id"] == "K3" and "APPEND_QUEUE" in p) \
+               or (k["id"] == "K8" and p in ("kai-pm/ENGINEERING_DOCTRINE.md", "kai-pm/KINGSMAN_ENGINEERING_ARCHITECTURE_VISUAL_STANDARD.md", "kai-pm/KINGSMAN_ORGANIC_RESILIENCE_ARCHITECTURE_DOCTRINE.md", "kai-pm/KINGSMAN_PROACTIVE_ORGANISM_DOCTRINE.md", "kai-pm/OPERATOR_VISIBILITY_ENGINEERING_DOCTRINE.md")) \
+               or (k["id"] == "K11" and p in ("kai-pm/PHASE_0_5_BACKLOG.md", "kai-pm/STATUS.md", "docs/gpu_integration_phase0.md")) \
+               or (k["id"] == "K12" and p in ("docs/next_level_roadmap.md", "docs/hmac_rotation_runbook.md")) or (k["id"] == "K5" and p in ("kai-pm/STRATEGIC_PLAN.md", "kai-pm/SEQUENCE.md")):
+                conf.setdefault(p, set()).add(k["id"])
+    rows = []
+    def add(section, p, cls, by, role, scope):
+        r = F[p]
+        rows.append({"section": section, "path": p, "sha256": r["sha256"], "blob": r["blob"], "lines": r["lines"], "first": r["first"], "last": r["last"],
+                     "evidence": evid(r), "class": cls, "class_by": by, "role": role, "scope": scope, "owner": owner(p),
+                     "conflicts": ",".join(sorted(conf.get(p, []))) or "none found in header",
+                     "fully_read": "yes" if p in FULLY else ("not opened" if p == "data/SOUL.md" else "no"),
+                     "checked_by": "Orion (mech.)",
+                     "uncertainty": "body unread" if p not in FULLY else "later rulings only"})
+    for p, (c, ro, sc) in ORIG.items(): add("B", p, c, "Kai d2d4301d" if p != "kai-pm/SHOPPING_LIST_PLAN.md" else "Orion proposal", ro, sc)
+    for p, k in sorted(M["kai69"].items(), key=lambda x: x[1]["n"]):
+        add("C", p, k["class"], f"Kai {'28939a90' if k['n'] <= 35 else '2f76278b'} #{k['n']}", "intake" if k["use"].startswith("intake") else ("cross-check" if "cross-check" in k["use"] else "scoped"), k["use"])
+    seen = set(r["path"] for r in rows)
+    for p in sorted(set(M["kai6"]) | set(M["orion16"])):
+        if p in KAI6: add("D", p, KAI6[p][0], "Kai d2d4301d", KAI6[p][1], M["kai6"][p]["class_text"] + ("; also Orion 16" if p in M["orion16"] else ""))
+        else: c, ro, sc = P[p]; add("D", p, c, "Orion proposal (Orion 16)", ro, sc)
+    for p in M["R"]: c, ro, sc = P[p]; add("E", p, c, "Orion proposal", ro, sc)
+    for p in M["audit"]:
+        if p in set(M["orion16"]): continue
+        add("F", p, "derived", "Kai 5e94c4d3 (class)", "cross-check", "audit class: defect / negative-test evidence; may reveal undocumented intended behaviour")
+    for r in facts["rows"]:
+        if r["set"] == "BEYOND": c, ro, sc = P[r["path"]]; add("G", r["path"], c, "Orion proposal", ro, sc)
+    _u = json.load(open(f"{S}/rv2/unlocated.json")); _ev = set(re.findall(r"^- EVIDENCE \S+ (\S+): \d+ bytes", open(f"{REPO}/kai-pm/HANDOFF_LOG.md", encoding="utf-8").read(), re.M))
+    json.dump({"pin": PIN, "rows": rows, "conflicts": K, "unlocated": {n: {"referenced_from": p, "banked_block_same_name_in_log": n in _ev} for n, p in _u.items()}}, open(f"{S}/rv2/register_v2.json", "w"), indent=1)
+    # ---------- Markdown
+    H = "| # | Path | SHA-256 (first 16) | First → last commit | Evidence passage | Class (by) | Role · scope | Owner ruling / banking | Conflicts | Fully read | Checked by | Residual uncertainty |\n|---|---|---|---|---|---|---|---|---|---|---|---|\n"
+    def table(sec):
+        out, i = H, 0
+        for r in rows:
+            if r["section"] != sec: continue
+            i += 1; sha = r["sha256"][:16] if len(r["sha256"]) == 64 else "git blob " + r["blob"][:16]
+            out += "| " + " | ".join(cell(x) for x in [i, f"`{r['path']}`", sha, f"{r['first']} → {r['last']}", r["evidence"], f"**{r['class']}** ({r['class_by']})", f"{r['role']} · {r['scope']}", r["owner"], r["conflicts"], r["fully_read"], r["checked_by"], r["uncertainty"]]) + " |\n"
+        return out
+    cnt = {s: sum(1 for r in rows if r["section"] == s) for s in "BCDEFG"}
+    md = open(f"{S}/rv2/register_head.md").read().format(**{f"n{s}": v for s, v in cnt.items()}, PIN=PIN, ndec=len(dheads))
+    md += "\n## B. The listed sources: nine files\n\n" + table("B")
+    md += "\n**Two listed sources are handoff-log entries, not files**, and one is a gap:\n\n| # | Entry | Class (by) | Role · scope | Owner ruling | Fully read |\n|---|---|---|---|---|---|\n| 10 | v1.1 unified draft, handoff entry 106, block KAI-MASTER-PLAN-V1-1-UNIFIED-DRAFT | **draft** (Kai d2d4301d: lineage/draft) | intake · unadjudicated draft | none | no |\n| 11 | 104-item register, handoff entry 167, block KAI-FEATURE-LIST | **derived** (Kai d2d4301d) | cross-check · guides deduplication; does not establish source completeness | none | no |\n| 12 | \"Old April vision\" | **named gap** (Kai d2d4301d) | — · STRATEGIC_PLAN.md is historical lineage, not its replacement | — | — |\n"
+    md += "\n## C. Kai's 69 candidates (classes as Kai posted them; provisional until verified)\n\n" + table("C")
+    md += "\n## D. Kai's six added sources and Orion's 16 omitted sources (17 distinct paths)\n\n" + table("D")
+    md += "\n## E. The 68 paths not considered before (Orion proposals)\n\n" + table("E")
+    md += "\n## F. The audit class (143 rows; the 144th, CODE_AUDIT_BATCH_MEMU_PERSONALITY_AUTONOMY, is in section D)\n\nEvery row in this section has the same values in the other columns: **Class** derived (Kai 5e94c4d3, as a class) · **Role** cross-check: defect / negative-test evidence that may reveal undocumented intended behaviour, to be traced to an owner source · **Owner ruling** none (DEC×0 for all but the counts shown) · **Conflicts** none found in header · **Fully read** no · **Checked by** Orion (mech.) · **Uncertainty** body unread.\n\n| # | Path | SHA-256 (first 16) | First → last commit | Evidence passage | DEC |\n|---|---|---|---|---|---|\n" + "".join(f"| {i} | `{r['path']}` | {r['sha256'][:16]} | {r['first']} → {r['last']} | {cell(r['evidence'])} | {r['owner']} |\n" for i, r in enumerate([r for r in rows if r['section'] == 'F'], 1))
+    md += "\n## G. Beyond the 306-file universe: 40 Markdown files (Orion proposals)\n\n" + table("G")
+    md += open(f"{S}/rv2/register_tail.md").read()
+    md += "\n## J. Conflicts and refinements for Kai (each quote checked against the pinned file)\n\n"
+    for k in K:
+        md += f"**{k['id']} · {k['kind']} · {k['subject']}.** Kai: {k['kai']}.\n\n"
+        for (p, ln, q) in k["cites"]: md += f"- `{p}:{ln}` — \"{q}\"\n"
+        md += f"\n{k['issue']} **Proposed:** {k['proposal']}\n\n"
+    u = json.load(open(f"{S}/rv2/unlocated.json")); logtxt = open(f"{REPO}/kai-pm/HANDOFF_LOG.md", encoding="utf-8").read()
+    evn = set(re.findall(r"^- EVIDENCE \S+ (\S+): \d+ bytes", logtxt, re.M)); nbank = sum(1 for n, p in u.items() if all(x == "kai-pm/HANDOFF_LOG.md" for x in p) and n in evn)
+    outside = {n: p for n, p in u.items() if any(x != "kai-pm/HANDOFF_LOG.md" for x in p)}
+    md += f"\n## K. Referenced names that match no file at the pin\n\nScan: every `NAME.md` token in the 345 opened Markdown files (data/SOUL.md not opened), compared with every file name in the pinned tree ({facts['tree_files']} files). {len(u)} distinct names; {len(outside)} are referenced outside the handoff log; {len(u) - len(outside)} only inside it. Of those {len(u) - len(outside)}, {nbank} carry a banked verbatim block of the same file name in the handoff log at the current head (an `- EVIDENCE NAME file:` line) and {len(u) - len(outside) - nbank} do not; by name the {len(u) - len(outside) - nbank} are mostly external project files (SLSA, SPIFFE, llama.cpp and other READMEs) and scratch names. Eight look like programme documents; five of them exist on branch `claude/cai-v1-bootstrap` under `kai-pm/change-control/` (BOOTSTRAP_PLAN, CONSUMER_INVENTORY, KAI_CHANGE_AUTHORITY_INTERLOCK, THREAT_MODEL, PINNING_RESEARCH: the change-control system, process not features); KAI_COMMUNICATION_PROTOCOL.md, AUDIT_PLAN_C.md and NEL_PURPOSE.md are on none of the 11 remote branches. Every one of the {len(u) - len(outside)} is listed in annex M with that status. The {len(outside)} referenced outside the log:\n\n| Name | Referenced from | Disposition (Orion proposal) |\n|---|---|---|\n"
+    DISP = {"CURIOSITY.md": "runtime output file written by a feature (`/data/CURIOSITY.md`); feature lead, not a source", "RITUALS.md": "runtime output file written by a feature (`/data/RITUALS.md`); feature lead, not a source",
+     "CIS_FINANCE_DESIGN.md": "**named gap** (K10)", "AGENTIC_APP_MAP.md": "planned deliverable never produced (CLEANUP_TODO says the plan did not execute); not a source",
+     "BASELINE_RESPONSES_7B.md": "future artefact for GPU day; not a source", "SECURITY.md": "confirmed absent repository policy file (DECISIONS.md); professionalisation gap, not a feature source",
+     "KINGSMAN_EXISTING_KAI_MASTER_ARCHITECTURE_PLAN_V0_4.md": "withdrawn by D352; absent as required", "KINGSMAN_ENGINEERING_ARCHITECTURE_DRAWING_SET_V0_4.md": "withdrawn by D352; absent as required",
+     "KINGSMAN_CURRENT_TO_TARGET_MIGRATION_MATRIX_V0_4.md": "withdrawn by D352; absent as required", "KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_V0_4.md": "removed 2026-08-24 (K9)", "KINGSMAN_CANON_SYNCHRONISATION_REGISTER_V0_4.md": "removed 2026-08-24 (K9)",
+     "yes-brother-i-agree-eager-dewdrop.md": "**named gap** (K13): the Phase 0.5 plan, cited at DECISIONS.md:667",
+     "f.md": "example path in a test description (DECISIONS.md:27191)", "file.md": "example path in a classifier description (DECISIONS.md:36624)", "guide.md": "example path in a link-check description (DECISIONS.md:26959)",
+     "real.md": "example path in a filter description (DECISIONS.md:29240)", "x.md": "example URL `https://x.md` in a test description (DECISIONS.md:29140)", "tREADME.md": "tab-escaped `README.md` in a git output row (DECISIONS.md:24861)",
+     "non-.md": "the phrase 'non-.md files' (README.md:412)", "YYYY-MM-DD.md": "file-name pattern for journal entries (template line 44)",
+     "discovery.md": "example file layout inside docs/sovereign_ai_spec.md (lines 782-880); not a missing source", "research.md": "same as discovery.md", "plan.md": "same as discovery.md", "progress.md": "same as discovery.md"}
+    for n, ps in sorted(outside.items()): md += f"| `{n}` | {', '.join('`'+x+'`' for x in ps)} | {DISP.get(n, 'text fragment or placeholder, not a document name')} |\n"
+    md += open(f"{S}/rv2/register_limits.md").read()
+    only = sorted(n for n, p in u.items() if all(x == "kai-pm/HANDOFF_LOG.md" for x in p))
+    md += f"\n## M. Annex: the {len(only)} names referenced only inside the handoff log\n\n**Banked** (a verbatim block of that file name exists in the log), {sum(1 for n in only if n in evn)}: " + ", ".join(f"`{n}`" for n in only if n in evn) + f"\n\n**Not banked by that name**, {sum(1 for n in only if n not in evn)}: " + ", ".join(f"`{n}`" for n in only if n not in evn) + "\n\nFull 64-character SHA-256 values are not printed; `gather.py` (banked with this register) recomputes them from the pin.\n"
+    open(f"{S}/rv2/SOURCE_REGISTER_V2.md", "w").write(md)
+    print("rows", len(rows), cnt, "bytes", len(md.encode()))
+    END-VERBATIM RV2-BUILD-SCRIPT
+- EVIDENCE RV2-TEXT-HEAD register_head.md: 4091 bytes, sha256 e65a9f2a441b8dce2c9e5a576b069e94d928d81b89c9818152bbabbaf69499c3, final LF True (added by Orion)  [CMD `sha256sum register_head.md` → e65a9f2a441b8dce…]
+    BEGIN-VERBATIM RV2-TEXT-HEAD
+    # Step 0.1 — Source register v2 (DRAFT for Kai-GPT's adjudication)
+    
+    Prepared by Orion on 2026-10-14 under Kai-GPT's DAI-10 instruction 5e94c4d3 (option b), banked in handoff entry 261. **This is a proposal. It closes nothing.** Kai-GPT adjudicates it; only then can step 0.1 pass and Wave 0 start. No code, runtime, Miro, Gold Tier, PRE-RAMS or PR #122 change. KAI-project is not running (owner, handoff entry 217).
+    
+    ## In plain words
+    
+    Think of this as the drawing register before the survey starts. Every document in the repository folders we agreed is listed once, with its fingerprint (SHA-256), its dates, the line that says what it is, and a proposed status. **"Listed" is not "read".** Almost every row says "fully read: no": the status was judged from the first 20 lines and the title. Reading the bodies is the census itself (Wave 0).
+    
+    What changed since the first proposal:
+    
+    1. Kai's classifications for the original 12 and the 69 are carried in exactly as Kai posted them (the checker compares them with the banked comments).
+    2. The 17 extra sources (Kai's 6 and Orion's 16, overlapping by 5) are integrated.
+    3. The 70 "not yet considered" files are now 68 rows, each with a proposed status. Two left that pile: `CLAUDE.md` (Kai added it) and `kai-pm/HANDOFF_LOG.md` (**Orion's counting error**: it is listed source 9 and should never have been in the 70).
+    4. 40 Markdown files outside the four folders are listed. Several carry capabilities: `data/AGENTS.md` ("Defines Kai's capabilities"), five specialist personas in `data/teammates/`, skills in `data/skills/` and `skills/`, and vault-sync templates.
+    5. Thirteen conflicts, refinements or gaps for Kai, each with the exact quoted line (section J). The most important: **K1**, the P1–P4 audit plans; **K10** and **K13**, two documents the records cite that are not in the repository.
+    
+    ## A. Rulings this register preserves
+    
+    - **D351** — evolution, not reinvention; the governing architecture posture (authority index line 11). Not implementation permission.
+    - **D352** — the rejected v0.4 package is withdrawn. Checked: the three files D352 lists (lines 19–27) are absent at the pin.
+    - **KAI-project is not running** — owner confirmation, handoff entry 217 (⚠ UNBANKED). Every runtime or completion claim in any source is a claim to verify, never a fact.
+    - **A file named D… is not automatically canonical.** D344–D353 have no heading in `DECISIONS.md` ({ndec} distinct D headings, checked); each is scoped to its operative passage (Kai d2d4301d).
+    - **Kai's classifications are provisional** until path, quote and chronology are verified (5e94c4d3). "canonical*" means only the scoped operative passage or doctrine is canonical, for intent, never for implementation.
+    
+    ## Pin, universe and counts
+    
+    - Pin: `{PIN}`.
+    - Universe: the 306 Markdown files directly in the repository root, `kai-pm/`, `docs/` and `bootstrap/` at the pin, derived from `git ls-tree`, not from a list.
+    - Rows: B {nB} listed files (plus 2 log entries and 1 gap) · C {nC} Kai candidates · D {nD} added sources · E {nE} not considered before · F {nF} audit class · G {nG} beyond the universe.
+    - Reconciliation: 9 + 69 + 17 + 68 + 143 = 306 (the 144th audit file is in D). Every path appears exactly once; the checker proves it.
+    
+    **Columns.** *Class*: canonical / canonical* / lineage / draft / superseded / external / derived; named gaps are separate. *By*: who classified it. *Role*: intake (may carry owner-intended capability promises) · cross-check (corroboration or defect evidence) · control (navigation, recovery, process) · none. *Owner ruling / banking*: for D344–D353 whether a heading exists in `DECISIONS.md`; for other files `DEC×n` = how many times the file name appears in `DECISIONS.md`, a pointer, not proof of banking. *Fully read*: "no" means only lines 1–20 and the title were read. *Checked by*: "Orion (mech.)" = Orion checked bytes, SHA-256, commit dates and the status line by script; **Kai's check is pending for every row**. *Residual uncertainty*: "body unread" = the class rests on the header alone.
+    END-VERBATIM RV2-TEXT-HEAD
+- EVIDENCE RV2-TEXT-TAIL register_tail.md: 2341 bytes, sha256 be0e2d0ea745798b41ae6e5b57c95e8c582763c2375bac0eebf4bc76d2233b26, final LF True (added by Orion)  [CMD `sha256sum register_tail.md` → be0e2d0ea745798b…]
+    BEGIN-VERBATIM RV2-TEXT-TAIL
+    
+    ## H. Named exclusions (not documents, or out of this register's scope)
+    
+    Counted from the pinned tree (1,255 files):
+    
+    - 646 `.py`, 30 `.sh`, 4 `.js`, 1 `.css` and the remaining configuration files: **code and configuration**. They are evidence of *what exists* (KAI TODAY), not of intent. Out of scope for the source register; they belong to the Wave 0 code census.
+    - 50 `requirements*.txt`: dependency lists. Out of scope.
+    - 4 `dashboard/static/*.html`: user-interface code. Wave 0 code census; capability leads for the dashboard.
+    - 18 `.txt` files under `kai-pm/` (H2 build evidence, holdout extraction and selection): instrument evidence, no feature content expected.
+    - `security/trusted_tokens.txt`: security configuration. **Not opened** by this register.
+    - **Other branches.** All 11 remote branches were compared with the pin by Markdown path. Only two hold Markdown files the pin lacks: `claude/cai-v1-bootstrap` (6 change-control files: process and assurance, not features; KAI_CHANGE_AUTHORITY_INTERLOCK says "IMPLEMENTATION LEG 1 — NOT ACTIVE") and `claude/d379-retained-interpreter-…` (1 vendored Python test README). Proposed: outside the source register.
+    - `data/SOUL.md` (row G5): **not opened**, standing instruction "do not touch data/SOUL.md". It may hold identity intent. Kai and Dainius to decide whether and how it is read.
+    
+    ## I. How this was produced and checked
+    
+    - `gather.py` read every path at the pin through `git` (bytes, SHA-256, first and last commit date on this branch's history up to the pin, title, the first status-like line in lines 1–20).
+    - `members.py` derived each population from the banked texts: Kai's 69 parsed from comments 28939a90 and 2f76278b (equal to Orion's 75 minus the 6 listed sources: checked), Kai's 6 from d2d4301d, Orion's 16 from the entry 258 list, the audit class by name `kai-pm/CODE_AUDIT_BATCH*`.
+    - Orion's proposals are in `orion_classes.py` (119 paths: 11 of the 16, the 68, the 40).
+    - `check_register_v2.py` (read-only) proves: every universe path exactly once; every SHA-256 prefix matches the pinned bytes; Kai's classes equal the banked comments; no empty cell; every evidence passage is at the line it names (or the title is in lines 1–40); every quoted conflict line is at that line at the pin. Calibrated with deliberate faults (results in the handoff entry).
+    END-VERBATIM RV2-TEXT-TAIL
+- EVIDENCE RV2-TEXT-LIMITS register_limits.md: 827 bytes, sha256 90f2dcccc170ce8572e4dcf46a2d72447e41122092731523d3244e010f7035d3, final LF True (added by Orion)  [CMD `sha256sum register_limits.md` → 90f2dcccc170ce85…]
+    BEGIN-VERBATIM RV2-TEXT-LIMITS
+    
+    ## L. Limits (what this register does not show)
+    
+    - **Not read.** Classes for the 68, the 11 and the 40 come from titles and lines 1–20. Kai's classes were checked only against each file's own status line. A body may contradict its header.
+    - **Commit dates** are this branch's history up to the pin, not authoring dates written inside the files.
+    - **The "beyond" scan** covers Markdown files outside the four folders. It does not read code, comments or docstrings for capability promises; that is the Wave 0 code census.
+    - **Owner-ruling column**: a name count in `DECISIONS.md` shows a mention, not a banking.
+    - **Unlocated names**: a token scan for `NAME.md` only. A source referred to without a `.md` name (for example "the v2.1 architecture") is not found by it.
+    - Orion cannot certify his own work. Kai-GPT adjudicates.
+    END-VERBATIM RV2-TEXT-LIMITS
+- EVIDENCE RV2-CHECK-SCRIPT check_register_v2.py: 3288 bytes, sha256 ca641c3fb0e197352ce84c3a7d2b536a2b49d6a6c81db417cc27cee13dfeab17, final LF True (added by Orion)  [CMD `sha256sum check_register_v2.py` → ca641c3fb0e19735…]
+    BEGIN-VERBATIM RV2-CHECK-SCRIPT
+    # Read-only check of source register v2 against the pinned tree and the banked Kai comments. argv: register.md repo kai_part1.md kai_part2.md
+    import hashlib, re, subprocess, sys
+    md, REPO, k1, k2 = sys.argv[1:5]; PIN = "dd153c1f4ab7c52f34620e07238554453a8912d9"
+    doc = open(md, encoding="utf-8").read()
+    def git(*a): return subprocess.run(["git", *a], cwd=REPO, capture_output=True, check=True).stdout
+    tree = git("ls-tree", "-r", "--name-only", PIN).decode().split("\n")[:-1]
+    md_all = [p for p in tree if p.endswith(".md")]
+    U = [p for p in md_all if "/" not in p or re.match(r"^(kai-pm|docs|bootstrap)/[^/]+$", p)]
+    B = [p for p in md_all if p not in set(U)]
+    bad = []
+    secs = re.split(r"^## ", doc, flags=re.M)
+    rowsec = {}
+    for s in secs:
+        name = s.split("\n", 1)[0][:2]
+        for l in s.split("\n"):
+            m = re.match(r"^\| (\d+) \| `([^`]+)` \| ([0-9a-f]{16}|git blob [0-9a-f]{16}) \|", l)
+            if m: rowsec.setdefault(m.group(2), []).append((name, l))
+    for p in U + B:
+        n = len(rowsec.get(p, []))
+        if n != 1: bad.append(f"{p}: {n} rows")
+    extra = sorted(set(rowsec) - set(U + B))
+    if extra: bad.append(f"rows for paths not in the pinned tree: {extra}")
+    shachk = 0; evchk = 0
+    for p, lst in rowsec.items():
+        if p not in set(U + B): continue
+        l = lst[0][1]; cells = [c.strip() for c in re.split(r"(?<!\\)\|", l.strip().strip("|"))]
+        if any(c == "" for c in cells): bad.append(f"{p}: empty cell")
+        h = cells[2]
+        if h.startswith("git blob"):
+            if not git("rev-parse", f"{PIN}:{p}").decode().startswith(h.split()[-1]): bad.append(f"{p}: blob id mismatch")
+        elif not hashlib.sha256(git("show", f"{PIN}:{p}")).hexdigest().startswith(h): bad.append(f"{p}: sha256 mismatch")
+        shachk += 1
+        ev = cells[4].replace("\\|", "|")
+        if p != "data/SOUL.md":
+            tl = git("show", f"{PIN}:{p}").decode("utf-8", "replace").split("\n")
+            m2 = re.match(r"^L(\d+): (.*)$", ev)
+            if m2:
+                if not tl[int(m2.group(1)) - 1].strip().startswith(m2.group(2)): bad.append(f"{p}: evidence passage not at line {m2.group(1)}")
+            elif ev.startswith("title: "):
+                if not any(l.strip().startswith(ev[7:]) for l in tl[:40]): bad.append(f"{p}: title not in lines 1-40")
+            else: bad.append(f"{p}: evidence cell has no line reference")
+            evchk += 1
+    kai = {}
+    for f in (k1, k2):
+        for m in re.finditer(r"^(\d+)\. `([^`]+)` — \*\*([a-z]+\*?)\*\*", open(f).read(), re.M): kai[m.group(2)] = (int(m.group(1)), m.group(3))
+    kchk = 0
+    for p, (n, c) in kai.items():
+        l = rowsec.get(p, [("", "")])[0][1]
+        want = f"**{c}** (Kai {'28939a90' if n <= 35 else '2f76278b'} #{n})"
+        if want not in l: bad.append(f"Kai class drift for {p}: expected {want}")
+        kchk += 1
+    qchk = 0
+    for m in re.finditer(r"^- `([^`]+):(\d+)` — \"(.*)\"$", doc, re.M):
+        p, ln, q = m.group(1), int(m.group(2)), m.group(3)
+        lines = git("show", f"{PIN}:{p}").decode().split("\n")
+        if ln > len(lines) or q not in lines[ln - 1]: bad.append(f"quote not at {p}:{ln}: {q[:60]}")
+        qchk += 1
+    print(f"universe={len(U)} beyond={len(B)} rows={sum(len(v) for v in rowsec.values())} sha_checked={shachk} kai_classes_checked={kchk} quotes_checked={qchk} evidence_checked={evchk} problems={len(bad)}")
+    for b in bad[:40]: print("  PROBLEM", b)
+    sys.exit(1 if bad else 0)
+    END-VERBATIM RV2-CHECK-SCRIPT
+- EVIDENCE RV2-CHECK-CALIBRATION calibration.txt: 1934 bytes, sha256 2fc662954810a99ed25deacf683ad56586c5b9acef92541906265465f79e1aac, final LF True (added by Orion)  [CMD `sha256sum calibration.txt` → 2fc662954810a99e…]
+    BEGIN-VERBATIM RV2-CHECK-CALIBRATION
+    == REAL
+    universe=306 beyond=40 rows=346 sha_checked=346 kai_classes_checked=69 quotes_checked=21 evidence_checked=345 problems=0
+    exit=0
+    == f1_sha
+    universe=306 beyond=40 rows=346 sha_checked=346 kai_classes_checked=69 quotes_checked=21 evidence_checked=345 problems=1
+      PROBLEM SESSION_BACKLOG.md: sha256 mismatch
+    exit=1
+    == f2_drop
+    universe=306 beyond=40 rows=345 sha_checked=345 kai_classes_checked=69 quotes_checked=21 evidence_checked=344 problems=2
+      PROBLEM SESSION_BACKLOG.md: 0 rows
+      PROBLEM Kai class drift for SESSION_BACKLOG.md: expected **derived** (Kai 28939a90 #1)
+    exit=1
+    == f3_dup
+    universe=306 beyond=40 rows=347 sha_checked=346 kai_classes_checked=69 quotes_checked=21 evidence_checked=345 problems=1
+      PROBLEM SESSION_BACKLOG.md: 2 rows
+    exit=1
+    == f4_class
+    universe=306 beyond=40 rows=346 sha_checked=346 kai_classes_checked=69 quotes_checked=21 evidence_checked=345 problems=1
+      PROBLEM Kai class drift for SESSION_BACKLOG.md: expected **derived** (Kai 28939a90 #1)
+    exit=1
+    == f5_quote
+    universe=306 beyond=40 rows=346 sha_checked=346 kai_classes_checked=69 quotes_checked=21 evidence_checked=345 problems=1
+      PROBLEM quote not at kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md:3: **Status:** done. All five steps done; the debt is **0** and
+    exit=1
+    == f6_empty
+    universe=306 beyond=40 rows=346 sha_checked=346 kai_classes_checked=69 quotes_checked=21 evidence_checked=345 problems=2
+      PROBLEM SESSION_BACKLOG.md: empty cell
+      PROBLEM SESSION_BACKLOG.md: evidence cell has no line reference
+    exit=1
+    == f7_extra
+    universe=306 beyond=40 rows=347 sha_checked=346 kai_classes_checked=69 quotes_checked=21 evidence_checked=345 problems=1
+      PROBLEM rows for paths not in the pinned tree: ['SESSION_BACKLOG_X.md']
+    exit=1
+    == f8_evidence
+    universe=306 beyond=40 rows=346 sha_checked=346 kai_classes_checked=69 quotes_checked=21 evidence_checked=345 problems=1
+      PROBLEM kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md: evidence passage not at line 4
+    exit=1
+    END-VERBATIM RV2-CHECK-CALIBRATION
+
+### 6. Next authorised step
+
+- Post the register to Kai on DAI-10 (summary comment plus the full register), verify posted equals banked, update the start-here page, report to Dainius in plain words  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 5e94c4d3, "post back its entry/commit and the draft v2"]
+
+### 7. What I am unsure of
+
+- Classes for 119 paths rest on titles and lines 1–20 only; a body may contradict its header. Kai's 69 were checked only against each file's own status line  [CMD `check_register_v2.py` → evidence_checked=345]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
