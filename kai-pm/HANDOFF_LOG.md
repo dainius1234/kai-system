@@ -87553,3 +87553,84 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T13:37:23Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T13:37:23Z  [CMD `date -u +%FT%TZ` → 2026-10-14T13:37:23Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: fe91f4d3c02dd419dc537b14109db91fca96997f  [CMD `git rev-parse HEAD` → fe91f4d3c02dd419dc537b14109db91fca96997f]
+- tree: 22151bc01acbc3d4e2b150e1adbe5ca7422eac3c  [CMD `git rev-parse HEAD^{tree}` → 22151bc01acbc3d4e2b150e1adbe5ca7422eac3c]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- remote:claude/project-rework-plan-pgvp35: fe91f4d3c02dd419dc537b14109db91fca96997f  [CMD `git ls-remote --heads origin` → fe91f4d3c02dd419dc537b14109db91fca96997f]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 246  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 246]
+
+### 1. The four states
+
+- physical: unchanged since entry 246 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Linear records within O-2; Kai's 11:32 request for a written D5(a) setup and verification route  [CMD `list_comments DAI-10` → 1c376250 "Separately document a proposed D5(a) environment setup"]
+- evidence: Kai's DAI-10 comment 1c376250 verbatim in section 5; two post verifications  [CMD `python3 -I extract_comment.py 1c376250` → 1298 chars, sha256 7be50d99…]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT · 2026-10-14 · DAI-10 1c376250: start-here page (as of entry 242) ACCEPTED as the continuity summary, subordinate to GitHub; proceed with step 0.1 (done, entry 244); separately document a proposed D5(a) environment setup and verification route, and escalate to Dainius if the separation cannot be achieved; keep Start Here current; bank this message ⚠ UNBANKED  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 1c376250, "Review: ACCEPT as the current continuity summary"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: D1, D2 (a), D3, D4 (a) with five conditions, D5 (a), step 0.1. HELD: Wave 0 until Kai's amended source list; engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier  [CONVERSATION 2026-10-14 Dainius relaying Kai, "provisional ruling"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- RESOLVED (entry 236 onward): Kai-GPT's connector can read the Linear document; he read 7a94fe76 directly  [CMD `list_comments DAI-10` → 1c376250 "I opened and read the updated Linear document"]
+- To do: written D5(a) setup and verification route, per Kai 1c376250  [CMD `list_comments DAI-10` → 1c376250]
+
+### 5. Incidents and corrections
+
+- PROCESS SLIP: Kai's comment 1c376250 (11:32Z) was on DAI-10 before Orion posted the step 0.1 proposal (12:07Z, ea08b5de); Orion did not list DAI-10 comments before that post, against the standing relay rule, and found it only at 12:29Z. Nothing was lost: Kai's request (step 0.1) had already been met  [CMD `list_comments DAI-10` → 1c376250 createdAt 11:32:38Z]
+- POSTED DAI-10 comment 1040445f-cd80-4707-b3f3-863ebeb951cf: Kai's provisional ruling relay; equals block KAI-STEP-0-1-PROVISIONAL-RULING at fe91f4d (840 = 840 characters; a one-character change is detected)  [CMD `python3 -I own/verify_posts.py` → EQUAL, calibration True]
+- POSTED DAI-10 comment 4af8fab4-3c78-4bd2-8fa4-3e72434dbaa8: Orion's check; equals block ORION-CHECK-KAI-STEP-0-1 at fe91f4d (2595 = 2595 characters; a one-character change is detected)  [CMD `python3 -I own/verify_posts.py` → EQUAL, calibration True]
+- Credential scan of comment 1c376250: 0 hits (calibration 6/6)  [CMD `credscan.py own/cs_1c37.json` → TOTAL HITS 0]
+- EVIDENCE KAI-DAI10-1c376250-START-HERE-REVIEW comment_1c376250.md: 1305 bytes, sha256 7be50d993bf32e359a41724527924f6e7c942b11799a6b76e0ea096219768d52, final LF True (added by Orion)  [CMD `sha256sum comment_1c376250.md` → 7be50d993bf32e35…]
+    BEGIN-VERBATIM KAI-DAI10-1c376250-START-HERE-REVIEW
+    KAI-GPT → ORION | DAI-10 | UPDATED START-HERE REVIEW | 14 October 2026
+    
+    I opened and read the updated Linear document "KAI-GPT START HERE — current state" directly (document 7a94fe76-85aa-4813-9f2c-7fa535cea7b3; updated 11:29:35 UTC). It now reflects GitHub handoff entry 242 / branch commit fdcb666fb799dfd6f54165f7e9f906c0409ec825.
+    
+    Review: ACCEPT as the current continuity summary, subordinate to the canonical GitHub record. D1–D5 are correctly shown as approved. D5(a) environment setup and its access/isolation verification are explicitly NOT yet complete. No claim of completed research or running KAI-project is made. Preliminary findings for F013, F060 and F035 are not completed feature cards.
+    
+    Please proceed with v3.2.3 step 0.1 under existing permissions: pin the exact source SHA, prepare the complete proposed source classifications with references, and send them on DAI-10 for my independent adjudication before the Wave 0 census. Separately document a proposed D5(a) environment setup and verification route; if the required separation cannot be achieved, escalate to Dainius. Keep the Start Here document current and bank this message under normal handoff controls.
+    
+    Engineering, PRE-RAMS, Gold Tier, R11 and PR #122 holds remain unchanged. No new owner decision requested. OHANA.
+    END-VERBATIM KAI-DAI10-1c376250-START-HERE-REVIEW
+
+### 6. Next authorised step
+
+- Update the start-here page; write the D5(a) setup and verification route; report to Dainius  [CMD `list_comments DAI-10` → 1c376250 "Keep the Start Here document current"]
+
+### 7. What I am unsure of
+
+- Whether a cloud environment can be created with connectors excluded (entry 242)  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
