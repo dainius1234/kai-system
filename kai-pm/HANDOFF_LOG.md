@@ -86650,3 +86650,210 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T11:30:00Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T11:30:00Z  [CMD `date -u +%FT%TZ` → 2026-10-14T11:30:00Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: c4d2226cde1a6228f54354a3bda38cfc326d6460  [CMD `git rev-parse HEAD` → c4d2226cde1a6228f54354a3bda38cfc326d6460]
+- tree: 2532545d3c44da21ffaf2fe4a16f474d6c675b08  [CMD `git rev-parse HEAD^{tree}` → 2532545d3c44da21ffaf2fe4a16f474d6c675b08]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/project-rework-plan-pgvp35: c4d2226cde1a6228f54354a3bda38cfc326d6460  [CMD `git ls-remote --heads origin` → c4d2226cde1a6228f54354a3bda38cfc326d6460]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 241  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 241]
+
+### 1. The four states
+
+- physical: unchanged since entry 241 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Linear records within O-2, by the owner's direction  [CONVERSATION 2026-10-14 Dainius, "please make sure you log all in linear"]
+- evidence: two DAI-10 comments and start-here page version 4, below  [CMD `save_comment issue DAI-10` → e0343725, ad79464b]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None; this entry records the Linear posts for the D5 ruling banked in entry 241  [CONVERSATION 2026-10-14 Dainius, "Ruling a ok to go ahead"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: D1, D2 (a), D3, D4 (a) with five conditions, D5 (a). HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier  [CONVERSATION 2026-10-14 Dainius, "Ruling a ok to go ahead"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- D5 research environment: in the four session-documentation pages Orion read (index, environment.network, connectors.tool_off, github.access), connectors are managed at claude.ai/customize/connectors for the whole account, and network access per environment; no per-environment connector switch was found in those pages. NOT_FOUND_IN_INSPECTED_RANGE, not a proof that none exists. Under the D5 ruling Orion returns to Dainius with a tested route before any use  [CMD `read_documentation index; environment.network; connectors.tool_off; github.access` → no per-environment connector setting named]
+
+### 5. Incidents and corrections
+
+- POSTED DAI-10 comment e0343725-2a7d-40be-a83e-8a66a681f358 at 2026-10-14T10:29:37Z: D5 ruling record; body after header equals block DAINIUS-D5-RULING at c4d2226 (23 = 23 characters; a one-character change is detected)  [CMD `python3 -I own/verify_posts.py` → EQUAL, calibration True]
+- POSTED DAI-10 comment ad79464b-7613-4803-9da3-4b53cd1a1e85 at 2026-10-14T10:30:32Z: the D5 message; body after header equals block ORION-D5-RECOMMENDATION at c4d2226 (3051 = 3051 characters; a one-character change is detected)  [CMD `python3 -I own/verify_posts.py` → EQUAL, calibration True]
+- UPDATED Linear document 7a94fe76 to version 4 by five patch edits (last-updated line; D5 row approved; checklist item 3 done; next steps; new §8b on the research environment); read back at 2026-10-14T11:29:35Z: all five edits present  [CMD `save_document patch; get_document 7a94fe76` → 5 edits present]
+- Credential scan of version 4: 0 hits (calibration 6/6)  [CMD `credscan.py KAI_GPT_START_HERE_V4.md.cs.json` → TOTAL HITS 0]
+- EVIDENCE ORION-KAI-GPT-START-HERE-V4 KAI_GPT_START_HERE_V4.md: 8313 bytes, sha256 23d78edbea4f67037b3835631f3f046d797182a6c7f46f45bffce40d96d9efc3, final LF True (added by Orion)  [CMD `sha256sum KAI_GPT_START_HERE_V4.md` → 23d78edbea4f6703…]
+    BEGIN-VERBATIM ORION-KAI-GPT-START-HERE-V4
+    # KAI-GPT START HERE — current state of the KAI programme
+    
+    > **Read this first in every new thread.** Kept by Orion and updated after every step, because Kai-GPT has no restart hook or carried memory (Dainius's direction, handoff entry 235).
+    > **Authority:** GitHub `dainius1234/kai-system`, branch `claude/project-rework-plan-pgvp35`, file `kai-pm/HANDOFF_LOG.md`, is the canonical record. This page is a mirror and summary. Where they differ, GitHub wins; tell Orion.
+    > **Last updated:** 2026-10-14, after handoff entry 242.
+    
+    ## 1. Who is who
+    
+    | Name | Role |
+    |---|---|
+    | **Dainius** | Owner. A construction engineer: plain words, one decision at a time. Makes every consequential decision |
+    | **Kai (Kai-GPT)** | Principal technical reviewer and planner. Reviews and adjudicates all evidence from Orion and DeepSeek against primary sources. Researches and writes the research cards |
+    | **Orion (Claude)** | Executor, verifier and record-keeper. Checks Kai's work independently, banks everything word for word in GitHub, posts to DAI-10 |
+    | **DeepSeek** | Adversarial reviewer, at Dainius's or Orion's request |
+    | **KAI (KAI-project)** | The software being researched. **Not running anywhere** (owner-confirmed, entry 217). Its runtime is NOT_OBSERVED |
+    
+    ## 2. Standing holds (unchanged)
+    
+    - Engineering paused (entry 99).
+    - PRE-RAMS hold.
+    - Gold Tier hold.
+    - R11.
+    - PR #122 DO NOT MERGE.
+    - No code changes, no runtime tests, no deployment.
+    - The comprehensive Master Plan, RAMS, ITPs, ITCs and LTQR wait until full-feature research is complete (Dainius's S-1 ruling, entry 191).
+    
+    ## 3. The governing principle (Gold Tier)
+    
+    Preserve Dainius's intended KAI, not weak code that happens to carry the right name.
+    - A README tick, service name, flag or test is never proof that a feature works.
+    - Every feature card separates four things:
+      - **intended behaviour;**
+      - **what the code really does:** GENUINE, PARTIAL, SIMULATED, NAME_ONLY, ABSENT or UNKNOWN;
+      - **runtime:** NOT_OBSERVED, OBSERVED or QUALIFIED;
+      - **the gap,** with a credible, evidenced solution route.
+    - Rebuilds are allowed when evidence meets a D351 condition (entries 206, 191, 203).
+    
+    ## 4. The research procedure (approved)
+    
+    **v3.2.3** = v3.2 + errata E1, E2, E3. Approved by Dainius (entries 230–231).
+    
+    Full text: handoff entry 225, block `ORION-RESEARCH-PROCEDURE-V3-2-3`. On DAI-10, the text is spread across three comments:
+    - v3.2.1 in full: comment 7eb32a5c;
+    - the E2 changes: comment 37bc558f;
+    - the E3 changes: comment bb9ad38e.
+    
+    Known cosmetic typo: a comma is missing in the v3.2.3 header line (entry 226).
+    
+    Key rules:
+    - one pinned 40-character SHA per census;
+    - standard-library Python scripts, banked in the handoff log;
+    - cards in `kai-pm/research/`, JSON and Markdown only;
+    - machine check with calibration;
+    - full independent review of critical, Wave 1 and change-recommending cards;
+    - an EVALUATED outside offer may have no blank fit or licence field;
+    - an EVIDENCED route may cite only EVALUATED offers;
+    - a CONTINGENT route lists every open condition for Dainius.
+    
+    ## 5. Owner decisions
+    
+    | Item | Status | Where |
+    |---|---|---|
+    | S-1: full research before the final RAMS/ITPs | **Decided** | entry 191 |
+    | Procedure v3.2.3 | **Approved** | entries 230–231 |
+    | D1: read-only census scripts | **Approved** | entry 231 |
+    | D2: research cards in `kai-pm/research/` (JSON + Markdown only) | **Approved, option (a)** | entry 233 |
+    | D3: borrowing rules (v3.2.3 §4) | **Approved** | entry 235; DAI-10 comment 35b75a22 |
+    | D4: when preliminary hazard and test drafts may start | **Approved, option (a) with five Gold Tier conditions** (see §8a) | entry 238; DAI-10 comments b1d9b5bf, 4bc53c3e |
+    | D5: research reading access | **Approved, option (a)** (see §8b) | entry 241; DAI-10 comments e0343725, ad79464b |
+    
+    Owner facts:
+    - KAI is never sold (use model for licences).
+    - Nothing is running.
+    - The "April" vision document cannot be found; it is a named gap.
+    - DeepSeek does the adversarial reviews (entry 208).
+    - Research may proceed, with Linear and Miro used for transparency (entries 228, 230).
+    
+    ## 6. Research so far (baseline evidence, not DONE cards)
+    
+    Pilot features, adjudicated by Kai and checked by Orion (entries 227, 229, 231), pinned at 421478a; product code is unchanged since 05ffd4c:
+    
+    - **#13 MARS memory decay — PARTIAL.**
+      - Real decay and consolidation. Retention uses age, stability and retrieval count.
+      - The call path runs across three services: heartbeat/app.py:166 → /memory/decay (memu-core/introspect_app.py:88); memory-compressor/app.py:98 → /memory/consolidate.
+      - Defect: `half_life_days` is accepted but never used (memu-core/app.py:3579, :3630).
+      - The source paper is arXiv:2503.19271, "MARS: Memory-Enhanced Agents with Reflective Self-improvement". KAI's backlog gives the wrong title, and KAI does not implement the paper's full framework.
+    - **#60 Struggle detection — PARTIAL.**
+      - Real scoring from four message signals (memu-core/app.py:4869).
+      - Defect: one module-wide 30-minute cooldown (`_last_struggle_alert`, :4884) silences offers for every session and person.
+    - **#35 Causal world model — PARTIAL overall, with major stubs.**
+      - The edge store works; simulation and surprise detection are gated off ("All can_*() methods return False", agentic/causal_world_model.py:11).
+      - Defect: co-occurrence is stored as cause (agentic/app.py:1922; audit KAI-COGFOUND-010).
+    - **Earlier repository findings to carry into cards** (entry 202):
+      - the fingerprint feature is ON by default and writes chat samples to plain JSONL (common/feature_flags.py:87); its inference is a stub;
+      - an unknown mode falls back to PUB;
+      - the anti-annoyance filter is bypassed when it fails;
+      - confession can be triggered by any caller.
+    
+    ## 7. Checklist (ORION-CHECKLIST-1, entry 209)
+    
+    1. ✅ Kai's verdict on the plan.
+    2. ✅ Research plan final and approved.
+    3. ✅ Owner decisions: D1 ✅, D2 ✅, D3 ✅, D4 ✅, D5 ✅. All owner decisions made.
+    4. ⏳ Fingerprint feature: fix or switch off before KAI first runs on Dainius's laptop (needs engineering authorisation).
+    5. ⏳ Miro: Kai makes the 8 approved cosmetic edits; Orion checks; Orion re-reviews Kai's third pass (110 connections).
+    6. ⏳ Open items F7 and F12.
+    
+    ## 8. What happens next
+    
+    1. ✅ D1–D5 decided.
+    2. **Step 0.1:**
+       - Orion pins one SHA;
+       - Orion proposes a status for every source (canonical, lineage, draft, superseded, external, derived);
+       - Kai adjudicates.
+    3. **Wave 0 census:**
+       - Orion runs the calibrated read-only scripts;
+       - seeded omission tests;
+       - human sample.
+    4. **Pilot:** formal cards for #13, #60, #35, timed.
+    5. **Waves 1a → 1b → 2 → 3.**
+    
+    ## 8a. Preliminary hazard and test drafts (D4)
+    
+    May start alongside Wave 1a. Conditions: every page stamped "PRELIMINARY — NOT A BASELINE" and never cited as approval; every hazard traced to a card or file:line, or marked unverified; the test strategy is built from the cards' own test lists, not a second list; Kai reviews and DeepSeek challenges before it counts, and nothing enters the final RAMS without being re-earned; drafts are Markdown in `kai-pm/research/`. Not allowed: final RAMS, test baseline, code change, test run.
+    
+    ## 8b. Research environment for outside sources (D5)
+    
+    Outside reading (papers, standards, borrowed tools) happens only in a research environment set up for the job: wide read access, no repository write, no connectors, its capability list written down and checked by Orion before first use. Status: not yet set up. Open question: the documentation Orion read shows connectors managed for the whole account, with no per-environment switch found; Orion returns to Dainius with a tested route before any use. Not needed for step 0.1 or Wave 0 (repository only).
+    
+    ## 9. How to work with this record
+    
+    - Post findings to DAI-10 if your connector allows. If it is blocked, Dainius relays them, and Orion banks them word for word and posts them for you.
+    - Pin every claim to a commit, path and line. Mark anything you have not checked as unverified.
+    - Orion checks your work, and you check Orion's. Nothing is admitted because another assistant said it.
+    - This page is replaced, not appended to, after each step; the history lives in GitHub.
+    - The DAI-10 comment pointing here is ac8d3984 (entry 236).
+    END-VERBATIM ORION-KAI-GPT-START-HERE-V4
+
+### 6. Next authorised step
+
+- Report to Dainius: all five decisions made; the connector question is open and not urgent; step 0.1 (source classification, repository only) is next under v3.2.3 §6  [CONVERSATION 2026-10-13 Dainius, "one thing at a time"]
+
+### 7. What I am unsure of
+
+- Whether Kai-GPT's Linear connector can read documents as well as comments (it could read DAI-10 comments, entry 227)  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
