@@ -85375,3 +85375,107 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T09:53:09Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T09:53:09Z  [CMD `date -u +%FT%TZ` → 2026-10-14T09:53:09Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: c16c80a6489721e977b3f6b52fc4e3222eedadbe  [CMD `git rev-parse HEAD` → c16c80a6489721e977b3f6b52fc4e3222eedadbe]
+- tree: 1b414643df83fbcf5f2cb9cab65add01f6344372  [CMD `git rev-parse HEAD^{tree}` → 1b414643df83fbcf5f2cb9cab65add01f6344372]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/project-rework-plan-pgvp35: c16c80a6489721e977b3f6b52fc4e3222eedadbe  [CMD `git ls-remote --heads origin` → c16c80a6489721e977b3f6b52fc4e3222eedadbe]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 230  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 230]
+
+### 1. The four states
+
+- physical: unchanged since entry 230 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: D1 granted by the owner; read-only census scripts are permitted under v3.2.3 §1a. Step 0.1 still also needs D2  [CONVERSATION 2026-10-14 Dainius, "Ruling/yes I aprove"]
+- evidence: Dainius's ruling with Kai's adjudication, verbatim in section 5  [CMD `cat .git/kai-ruling-capture/1892834e030114b7.json` → flagged long(2474), keyword(ruling)]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-14 · D1 APPROVED: read-only feature-census scripts with the safeguards of v3.2.3 (standard-library Python, pinned SHA, run as in §1a, banked word for word with checksums, calibrated before use). Authorises source counting and verification only; not engineering, deployment or changes to KAI-project ⚠ UNBANKED  [CONVERSATION 2026-10-14 Dainius, "Ruling/yes I aprove"]
+- Kai's adjudication (relayed in the same message): the v3.2.3 acceptance (entry 230) is recorded as approval of the research procedure ⚠ UNBANKED  [CONVERSATION 2026-10-14 Kai, "Your acceptance of v3.2.3 is recorded as approval of the research procedure."]
+- Kai's adjudication of the pilot evidence: #13 PARTIAL, #60 PARTIAL, #35 PARTIAL overall with major stubs; Orion's three principal findings accepted; arXiv:2503.19271 is "MARS: Memory-Enhanced Agents with Reflective Self-improvement" (KAI's backlog title is wrong; the card must not claim KAI implements the full framework); new issue: half_life_days unused; pilot cards stay open pending the census. Kai's Linear write was blocked ⚠ UNBANKED  [CONVERSATION 2026-10-14 Kai, "My adjudication: accept Orion’s three principal findings, incorporate these corrections, and keep the three pilot cards open pending the formal census and verification."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED (D1): read-only census scripts, as v3.2.3 §1a. HELD: their first run waits for D2 (where cards live) per §6 step 0.1; engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier  [CONVERSATION 2026-10-14 Dainius, "Ruling/yes I aprove"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Next: D2 (where the research cards live), one decision per message  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 5. Incidents and corrections
+
+- Kai's half_life_days finding confirmed: the parameter is declared at memu-core/app.py:3579 and appears again only in the response at :3630 (function body 3578–3633 at c16c80a); `_recency_weight` (:1222) takes no half-life argument. heartbeat/app.py:166 passes half_life_days=14 to no effect  [CMD `git show c16c80a:memu-core/app.py | awk 'NR>=3578 && NR<=3633 && /half_life_days/'` → lines 3579, 3630]
+- Kai's MARS paper title not checked by Orion (arxiv.org blocked here); single-producer evidence  [FILE kai-pm/HANDOFF_LOG.md:1]
+- Credential scan of the ruling: calibration 6/6, TOTAL HITS 0  [CMD `credscan.py own/cs_d1.json` → TOTAL HITS 0]
+- EVIDENCE DAINIUS-D1-RULING-AND-KAI-ADJUDICATION d1_ruling.txt: 2509 bytes, sha256 eb221eaef98e881c6e4c6113db8a4cf854e473722fd5c954a4e3cc7e64473926, final LF True (added by Orion)  [CMD `sha256sum d1_ruling.txt` → eb221eaef98e881c…]
+    BEGIN-VERBATIM DAINIUS-D1-RULING-AND-KAI-ADJUDICATION
+    Ruling/yes I aprove : Brother, I’ve checked Orion’s first research review against the actual repository code.
+    
+    The main findings are confirmed, but two details need correcting before the research cards are accepted.
+    
+    Feature	My assessment
+    #13 Memory decay	PARTIAL. Real decay and consolidation code exists. It considers memory age, stability and retrieval history—not simply age. Orion correctly identified the three-service execution path.
+    #60 Struggle detection	PARTIAL. Real scoring logic exists. Orion correctly found that one global 30-minute cooldown can suppress help offers across different sessions.
+    #35 Causal world model	PARTIAL overall, with major stubs. The edge store exists, but causal reasoning, simulation and surprise detection are not operational. Correlations can be stored as causal relationships without proper validation.
+    
+    The research is producing useful, source-confirmed findings. That does not mean the formal pilot or feature census is complete.
+    
+    Your acceptance of v3.2.3 is recorded as approval of the research procedure. D1 remains a separate decision: permission for Orion to run read-only census scripts has not yet been explicitly granted.
+    
+    Additional finding: MARS source verified
+    
+    I checked the original research reference. arXiv:2503.19271 is MARS: Memory-Enhanced Agents with Reflective Self-improvement⁠￼ (2025), which includes reflective learning and forgetting-curve memory optimisation.
+    
+    KAI’s source code cites the correct paper number, but its project backlog gives the paper an incorrect expanded title. The research card should correct that citation and must not claim KAI implements the paper’s complete framework.
+    
+    I also identified another memory-decay issue for testing: the endpoint accepts a half_life_days parameter, but the visible retention calculation does not use it.
+    
+    My adjudication: accept Orion’s three principal findings, incorporate these corrections, and keep the three pilot cards open pending the formal census and verification.
+    
+    I attempted to post my review directly to Linear, but the connector blocked the write. I cannot claim that this latest adjudication has been banked. Orion’s existing review remains available as comment c5e015ce.
+    
+    One decision remains
+    
+    D1 — Do you approve read-only feature-census scripts, with the safeguards specified in v3.2.3?
+    
+    My recommendation is YES. This authorises source counting and verification only, not engineering, deployment or changes to KAI-project.
+    
+    You retain the decision.
+    END-VERBATIM DAINIUS-D1-RULING-AND-KAI-ADJUDICATION
+
+### 6. Next authorised step
+
+- Post the ruling and Kai's adjudication to DAI-10 on Kai's behalf (his write was blocked), with posted == banked; then put D2 to Dainius on its own  [CONVERSATION 2026-10-14 Dainius, "obviously use miro and linear to keep all transparent and on record"]
+
+### 7. What I am unsure of
+
+- Nothing new  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
