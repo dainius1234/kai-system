@@ -93361,3 +93361,178 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T17:17:15Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T17:17:15Z  [CMD `date -u +%FT%TZ` → 2026-10-14T17:17:15Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: d465dc5ed712bacd9d3bb1d5a7e71e88c1ed210b  [CMD `git rev-parse HEAD` → d465dc5ed712bacd9d3bb1d5a7e71e88c1ed210b]
+- tree: fc81a95ef33beddee1a834b20f83b39ee7a1f199  [CMD `git rev-parse HEAD^{tree}` → fc81a95ef33beddee1a834b20f83b39ee7a1f199]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/project-rework-plan-pgvp35: d465dc5ed712bacd9d3bb1d5a7e71e88c1ed210b  [CMD `git ls-remote --heads origin` → d465dc5ed712bacd9d3bb1d5a7e71e88c1ed210b]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 257  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 257]
+
+### 1. The four states
+
+- physical: unchanged since entry 257 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: step 0.1 continues; Wave 0 held until an amended source list exists  [CONVERSATION 2026-10-14 Dainius relaying Kai, "They need to be included in the source register before the census starts"]
+- evidence: Kai's findings as relayed, Orion's check, and the list of omitted sources, verbatim in section 5  [CMD `ruling_capture store 27657d1aac7cf08c` → 897 characters]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT (relayed by Dainius) · 2026-10-14 · step 0.1: README stays an input for intended capability but cannot establish runtime facts; D351 preserves evolution-not-reinvention and D352 withdraws the rejected v0.4 architecture, which cannot regain authority through the census; D344–D353 to be examined individually, file names confer no authority; important research inputs omitted by Orion's file-name search must be added to the source register before the census starts. The omitted inputs are not named ⚠ UNBANKED  [CONVERSATION 2026-10-14 Dainius relaying Kai, "I also found important research inputs omitted by Orion’s initial filename search"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: D1–D5; step 0.1. HELD: Wave 0 until Kai's amended source list (or accepted Orion draft); engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier certification (Kai)  [CONVERSATION 2026-10-14 Dainius relaying Kai, "before the census starts"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- For Kai: send the amended source list, or accept an Orion draft "source register v2"; rule on the 144 audit files as a class; decide whether the 70 remaining files are listed  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 5. Incidents and corrections
+
+- REFERENCE TRACE: `.md` names inside 7 register/decision files matched to files at dd153c1, minus the 75 considered: 17 hits, 6 excluded as other files named README.md, 11 genuine; plus 5 files cited by the arrow check (entry 255) in neither list: 16 omitted sources  [CMD `python3 -I reference trace` → 17 hits, 11 genuine; 5 cited]
+- COVERAGE: universe 306 Markdown files (root, kai-pm, docs, bootstrap); covered 236 (75 by name, 2 listed not by name, 16 traced, 144 audit class, 1 overlap); remaining 70  [CMD `python3 -I coverage` → covered 236, remaining 70]
+- SELF-CORRECTION before banking: the draft check said 235 covered and 71 remaining; recomputed by script, 236 and 70 (one traced file is also an audit file; two listed sources were omitted from the tally)  [CMD `python3 -I coverage` → 236 / 70]
+- CORRECTION to entry 244: the name-based search universe was disclosed as limited but should have been derived from what the governing registers reference; Kai's fourth point is upheld  [CONVERSATION 2026-10-14 Dainius relaying Kai, "omitted by Orion’s initial filename search"]
+- Credential scan of the three banked texts: 0 hits (calibration 6/6)  [CMD `credscan.py s01/cs258.json` → TOTAL HITS 0]
+- EVIDENCE KAI-STEP-0-1-FINDINGS-2 kai_s01_ruling2.txt: 906 bytes, sha256 ba8c94983fd7500a10190ec72990ded3ef6ef88ff7419d30050ae2bc511aac23, final LF True (added by Orion)  [CMD `sha256sum kai_s01_ruling2.txt` → ba8c94983fd7500a…]
+    BEGIN-VERBATIM KAI-STEP-0-1-FINDINGS-2
+    Brother, I’ve confirmed the central issue in Step 0.1: the research must preserve every legitimate capability without treating historical design proposals as approved architecture.
+    
+    The source review establishes three important distinctions:
+    
+    * The README remains an input for KAI’s intended capabilities, but its claims that features are running cannot establish runtime facts.
+    * D351 preserves the evolution-not-reinvention requirement; D352 withdraws the rejected v0.4 architecture. The withdrawn design cannot regain authority through the feature census.
+    * D344–D353 must be examined individually. Some contain governing corrections, others contain provisional designs or review findings. Their filenames alone do not confer authority.
+    
+    I also found important research inputs omitted by Orion’s initial filename search. They need to be included in the source register before the census starts.
+    END-VERBATIM KAI-STEP-0-1-FINDINGS-2
+- EVIDENCE ORION-CHECK-KAI-STEP-0-1-2 orion_check_kai_s01_2.md: 5520 bytes, sha256 fff9a77d8e112aa97ae337a037ec4b768dea56296d5bbf5b2fa86b111256fb9d, final LF True (added by Orion)  [CMD `sha256sum orion_check_kai_s01_2.md` → fff9a77d8e112aa9…]
+    BEGIN-VERBATIM ORION-CHECK-KAI-STEP-0-1-2
+    # Orion's check of Kai's step 0.1 findings (second relay)
+    
+    **ORION → KAI, DAINIUS | independent check | read-only, at dd153c1 | 2026-10-14**
+    
+    ## In plain words
+    
+    All four of Kai's points hold. His fourth point is right, and it corrects my proposal: my file-name search missed real sources. I have now traced every document the project's own register files point to, and found 16 that were missing. They are listed below. Step 0.1 still needs Kai's written amended source list before the census can start; to save time, Orion can draft that list for Kai to accept or change.
+    
+    ## 1. Point by point
+    
+    1. **README is an input for intended capability, not runtime fact: holds.** It matches proposal row 1; README:1328 claims a feature is "actively collecting" while the owner says nothing is running (entry 217).
+    2. **D351 preserves evolution-not-reinvention; D352 withdraws the rejected v0.4 architecture, which cannot regain authority through the census: holds.** D351 line 3 status "ARCHITECTURE POSTURE CORRECTION"; D352 lines 1, 9 and 17 withdraw the v0.4 package banked in D350.
+    3. **D344–D353 must be examined one by one; file names confer no authority: holds** (Orion's correction, entry 246).
+    4. **Important research inputs were missed by the file-name search: holds.**
+    
+    ## 2. The missing sources, found by reference tracing
+    
+    Method: every `.md` file named inside seven register and decision files (the authority index CURRENT, the canon synchronisation register CURRENT, the master-canon input manifest v0.2, the mission propagation map, the architectural pillars index, D351 and D353), matched to files at the pin, minus the 75 already considered. Six matches were other files that happen to be called README.md; they are excluded. Then the files cited as evidence in today's arrow check (entry 255) that were in neither list.
+    
+    **Referenced by the registers (11):**
+    
+    | File | Its own status line or title |
+    |---|---|
+    | `kai-pm/KINGSMAN_EXISTING_KAI_MATURATION_IMPLEMENTATION_RESEARCH_REISSUE_2026-08-24.md` | title: Kingsman Existing-Kai Maturation — Implementation Research Reissue (the research behind D353) |
+    | `kai-pm/KAI_RECONCILIATION_DEEPSEEK_EXISTING_KAI_EVOLUTION_V0_3.md` | KAI-VERIFIED ARCHITECTURE REVIEW / RECONCILIATION INPUT — NOT IMPLEMENTATION AUTHORITY |
+    | `kai-pm/HOUSE_IN_ORDER_PHASE2_PROFESSIONALISATION.md` | FUTURE PROGRAMME PHASE / PLANNING AUTHORITY ONLY |
+    | `kai-pm/A4_SELF_DIAGNOSIS_EVOLUTION.md` | FUTURE DESIGN OBLIGATION / ARCHITECTURE NOTE — NOT CURRENT PROGRAMME AUTHORITY |
+    | `kai-pm/UH_PROGRESS_TRACKER.md` | title: Unified Hunter — Progress Tracker |
+    | `kai-pm/KINGSMAN_LONG_HORIZON_STEWARDSHIP_AND_SUCCESSION.md` | MASTER-CANON DESIGN REQUIREMENT / FUTURE ARCHITECTURE OBLIGATION |
+    | `kai-pm/KINGSMAN_CONTINGENCY_AND_FAILSAFE_LIBRARY_DESIGN.md` | MASTER-CANON / PHASE-2 DESIGN INPUT |
+    | `kai-pm/KAI_KINGSMAN_PUZZLE_MAP_AND_RECONCILIATION.md` | MASTER SYNTHESIS / PLANNING INPUT |
+    | `kai-pm/ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md` | SNAPSHOT-BOUND RESEARCH EVIDENCE |
+    | `kai-pm/PHASE2_DOCUMENT_SYNC_AND_DRIFT_CONTROL.md` | PLANNING / CONTROL-DESIGN FINDING |
+    | `kai-pm/KAI_ORION_CONTINUITY.md` | RECOVERY PROTOCOL — NOT A SOURCE OF PROGRAMME TRUTH |
+    
+    **Cited as evidence in today's arrow check, in neither list (5):**
+    
+    | File | Its own status line or title |
+    |---|---|
+    | `docs/personality_and_proactive.md` | title: Kai Personality Architecture — Pub Mode, Work Mode & Proactive Behaviour (feature-bearing) |
+    | `kai-pm/MEMORY_GRAPH_DESIGN.md` | title: Graph-Memory Layer Design — memu-graph ("Design doc, not yet a decision") |
+    | `kai-pm/DAINIUS_KINGSMAN_ENGINEERING_STANDARD.md` | STANDING OPERATOR / ENGINEERING PRINCIPLE |
+    | `kai-pm/KAI_KINGSMAN_COLD_START_MASTER.md` | status section says read before use (navigation, not authority) |
+    | `kai-pm/CODE_AUDIT_BATCH_MEMU_PERSONALITY_AUTONOMY.md` | title: Kai Code Audit — memU Personality, Conscience and Proactive Autonomy Batch |
+    
+    **Also for Kai to rule on as a class:** the 144 `kai-pm/CODE_AUDIT_BATCH_*.md` files that the first search excluded by name. They hold defects, not promises; Orion proposes they are read as defect evidence for the research cards, not as feature sources.
+    
+    ## 3. Still not covered
+    
+    Universe: 306 Markdown files directly in the repository root, `kai-pm/`, `docs/` and `bootstrap/` at the pin. Considered so far: 75 by name, 2 listed sources the name search did not match (`README.md`, `kai-pm/DECISIONS.md`), 16 by reference tracing, and the 144 audit files as one class (one of the 16 is also an audit file): 236. **70 files in that universe have been neither named, traced nor classed**, and files outside those four folders were not searched. Wave 0's census reads beyond this list; Kai may want the 70 listed too.
+    
+    ## 4. What Orion needs from Kai
+    
+    Either Kai's written amended source list, or Kai's acceptance (with changes) of an Orion draft "source register v2" that applies Kai's three rulings above, adds these 16 documents with proposed statuses, and lists the 70 remaining files for completeness. Wave 0 does not start until one of the two exists.
+    
+    ## 5. Correction recorded
+    
+    The first proposal (entry 244) searched by file name and said so ("A name search misses documents with other names"). Saying so was not enough: the project's own registers already listed several of the missing files, and a reference trace would have found them. The search universe should have been derived from what the governing documents point to, not from a list of words beside them.
+    END-VERBATIM ORION-CHECK-KAI-STEP-0-1-2
+- EVIDENCE ORION-STEP-0-1-OMITTED-SOURCES omitted_final.json: 1165 bytes, sha256 f6aa316951386a0e19ddc739dc8e51780399111f6188a0531d9eb19a50636796, final LF True (added by Orion)  [CMD `sha256sum omitted_final.json` → f6aa316951386a0e…]
+    BEGIN-VERBATIM ORION-STEP-0-1-OMITTED-SOURCES
+    {
+     "register_referenced": [
+      "kai-pm/A4_SELF_DIAGNOSIS_EVOLUTION.md",
+      "kai-pm/ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md",
+      "kai-pm/HOUSE_IN_ORDER_PHASE2_PROFESSIONALISATION.md",
+      "kai-pm/KAI_KINGSMAN_PUZZLE_MAP_AND_RECONCILIATION.md",
+      "kai-pm/KAI_ORION_CONTINUITY.md",
+      "kai-pm/KAI_RECONCILIATION_DEEPSEEK_EXISTING_KAI_EVOLUTION_V0_3.md",
+      "kai-pm/KINGSMAN_CONTINGENCY_AND_FAILSAFE_LIBRARY_DESIGN.md",
+      "kai-pm/KINGSMAN_EXISTING_KAI_MATURATION_IMPLEMENTATION_RESEARCH_REISSUE_2026-08-24.md",
+      "kai-pm/KINGSMAN_LONG_HORIZON_STEWARDSHIP_AND_SUCCESSION.md",
+      "kai-pm/PHASE2_DOCUMENT_SYNC_AND_DRIFT_CONTROL.md",
+      "kai-pm/UH_PROGRESS_TRACKER.md"
+     ],
+     "arrow_check_cited": [
+      "docs/personality_and_proactive.md",
+      "kai-pm/CODE_AUDIT_BATCH_MEMU_PERSONALITY_AUTONOMY.md",
+      "kai-pm/DAINIUS_KINGSMAN_ENGINEERING_STANDARD.md",
+      "kai-pm/KAI_KINGSMAN_COLD_START_MASTER.md",
+      "kai-pm/MEMORY_GRAPH_DESIGN.md"
+     ],
+     "false_matches_excluded": [
+      "bootstrap/README.md",
+      "data/self-emp/Accounting/README.md",
+      "data/self-emp/Coding/README.md",
+      "data/self-emp/Engineering/README.md",
+      "data/self-emp/Legal/README.md",
+      "data/self-emp/Social/README.md"
+     ]
+    }
+    END-VERBATIM ORION-STEP-0-1-OMITTED-SOURCES
+
+### 6. Next authorised step
+
+- Post Kai's findings (relay) and Orion's check to DAI-10; update the start-here page; report to Dainius  [CONVERSATION 2026-10-14 Dainius, "please make sure you log all in linear"]
+
+### 7. What I am unsure of
+
+- Whether Kai's unnamed omitted inputs are the same as the 16 Orion found; Kai to confirm or add  [CONVERSATION 2026-10-14 Dainius relaying Kai, "important research inputs omitted"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
