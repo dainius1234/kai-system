@@ -86857,3 +86857,91 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T11:33:01Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T11:33:01Z  [CMD `date -u +%FT%TZ` → 2026-10-14T11:33:01Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: fdcb666fb799dfd6f54165f7e9f906c0409ec825  [CMD `git rev-parse HEAD` → fdcb666fb799dfd6f54165f7e9f906c0409ec825]
+- tree: df0a7a28a8c5566a0445733ee8393bb84670cd67  [CMD `git rev-parse HEAD^{tree}` → df0a7a28a8c5566a0445733ee8393bb84670cd67]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- remote:claude/project-rework-plan-pgvp35: fdcb666fb799dfd6f54165f7e9f906c0409ec825  [CMD `git ls-remote --heads origin` → fdcb666fb799dfd6f54165f7e9f906c0409ec825]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 242  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 242]
+
+### 1. The four states
+
+- physical: unchanged since entry 242 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: step 0.1 source classification, read-only, by owner ruling below under v3.2.3 §6 (procedure approved; D1, D2 decided)  [CONVERSATION 2026-10-14 Dainius, "Ruling go"]
+- evidence: the ruling and Orion's done/scope plan, verbatim in section 5  [CMD `ruling_capture store 40fbfba65d5b0cf0` → "Ruling go"]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-14 · GO for step 0.1 (source classification), answering Orion's "Say go and I'll start step 0.1": Orion pins one SHA and proposes a status for every source; Kai adjudicates. Read-only; no code change, nothing run, no item reading ⚠ UNBANKED  [CONVERSATION 2026-10-14 Dainius, "Ruling go"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: D1, D2 (a), D3, D4 (a) with five conditions, D5 (a), step 0.1. HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier  [CONVERSATION 2026-10-14 Dainius, "Ruling go"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- D5 research environment: connector isolation route still to be found and tested before any use (entry 242)  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 5. Incidents and corrections
+
+- Credential scan of ruling and plan: 0 hits (calibration 6/6)  [CMD `credscan.py own/cs_go.json` → TOTAL HITS 0]
+- EVIDENCE DAINIUS-STEP-0-1-GO go_ruling.txt: 10 bytes, sha256 691b251b39dc808c0f40678119abef6266f4021bbdbd187fc5059f432ad2ecf8, final LF True (added by Orion)  [CMD `sha256sum go_ruling.txt` → 691b251b39dc808c…]
+    BEGIN-VERBATIM DAINIUS-STEP-0-1-GO
+    Ruling go
+    END-VERBATIM DAINIUS-STEP-0-1-GO
+- EVIDENCE ORION-STEP-0-1-PLAN s01_plan.md: 1574 bytes, sha256 d67ac89e3f7d941df7039daf2f6ba4da8bacdb0dc43ce4eb9869ca181f5c6b19, final LF True (added by Orion)  [CMD `sha256sum s01_plan.md` → d67ac89e3f7d941d…]
+    BEGIN-VERBATIM ORION-STEP-0-1-PLAN
+    # Step 0.1 — source classification: done, scope, simplest form (R21)
+    
+    **Done** when all of these are true and checked:
+    1. One full 40-character commit SHA is pinned for step 0.1 and recorded once.
+    2. Every source in v3.2.3 Annex A's table (12 rows) has: whether it exists at the pinned SHA; size and SHA-256 if it does; its dates (last commit touching it, and any date it states itself, with file:line); a proposed status from the one vocabulary (canonical, lineage, draft, superseded, external, derived); and the reason, citing file:line.
+    3. A chronology of those sources, oldest to newest, is recorded.
+    4. Other documents that may describe KAI features are found by a bounded, stated search and listed separately as candidate additions, each with a proposed status. They are not read for items.
+    5. The proposal is banked word for word in the handoff log, posted to DAI-10, checked posted == banked, and the start-here page is updated.
+    
+    Check: a standard-library script confirms all 12 rows are present with no empty field, and recomputes every SHA-256 from the pinned commit.
+    
+    Step 0.1 is **finished** only when Kai adjudicates (v3.2.3 §6). Orion's part ends at a delivered proposal.
+    
+    **Scope:** read-only over the pinned commit (`git show`, `git log`, `git ls-tree`). No file is written to the repository except the handoff log. Nothing is read for feature items (that is Wave 0). `kai-pm/research/` is not created until Kai has adjudicated.
+    
+    **Simplest form:** one Markdown proposal with one table per section, plus the check script banked beside it. No new tooling.
+    END-VERBATIM ORION-STEP-0-1-PLAN
+
+### 6. Next authorised step
+
+- Pin the SHA and build the step 0.1 proposal per block ORION-STEP-0-1-PLAN  [CONVERSATION 2026-10-14 Dainius, "Ruling go"]
+
+### 7. What I am unsure of
+
+- Whether Kai-GPT's Linear connector can read documents as well as comments (it could read DAI-10 comments, entry 227)  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
