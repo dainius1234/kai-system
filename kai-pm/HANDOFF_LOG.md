@@ -93825,3 +93825,216 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T17:28:23Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T17:28:23Z  [CMD `date -u +%FT%TZ` → 2026-10-14T17:28:23Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: bd6e8323359ee7f56963f1bb1835d0d2a474be03  [CMD `git rev-parse HEAD` → bd6e8323359ee7f56963f1bb1835d0d2a474be03]
+- tree: 436b79cd92cf7ca8d9fa92b0441b9db496a23365  [CMD `git rev-parse HEAD^{tree}` → 436b79cd92cf7ca8d9fa92b0441b9db496a23365]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/project-rework-plan-pgvp35: bd6e8323359ee7f56963f1bb1835d0d2a474be03  [CMD `git ls-remote --heads origin` → bd6e8323359ee7f56963f1bb1835d0d2a474be03]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 260  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 260]
+
+### 1. The four states
+
+- physical: unchanged since entry 260 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Orion drafts one reconciled source register v2 (option b); Kai adjudicates it; step 0.1 then closes; Wave 0 held until then  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 5e94c4d3, "Orion prepares one complete, auditable amended source register v2"]
+- evidence: Dainius's relay and Kai's four DAI-10 comments 5e94c4d3, d2d4301d, 28939a90 and 2f76278b, verbatim in section 5  [CMD `ruling_capture store 20274231f180191d` → 932 characters]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-14 · agrees with option (b); Kai has instructed Orion on DAI-10; 236 accounted is not 236 examined; sequence is Orion prepares and checks, Kai adjudicates, then step 0.1 closes and Wave 0 begins; D5 environment stays open; all holds unchanged; no further decision needed from Dainius now ⚠ UNBANKED  [CONVERSATION 2026-10-14 Dainius, "I agree with Orion’s recommendation: option (b)"]
+- Kai-GPT · 2026-10-14 · option (b) is division of review work, not an owner-authority grant; use d2d4301d, 28939a90 and 2f76278b as provisional inputs; integrate the 16 omitted sources; deduplicate the audit batch; enumerate the 70 path by path; scan beyond the four folders; mandatory columns; sequence 1–4; no Wave 0 until step 0.1 formally passes ⚠ UNBANKED  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 5e94c4d3, "Their classifications are *provisional until path/quote/chronology verified*"]
+- Kai-GPT · 2026-10-14 · step 0.1 adjudication: accept with exact amendments; step 0.1 not closed; Wave 0 not authorised; scoped statuses for the original 12 and D344–D353; six sources added outside the filename filter ⚠ UNBANKED  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 d2d4301d, "RULING: ACCEPT WITH EXACT AMENDMENTS; STEP 0.1 NOT CLOSED, WAVE 0 NOT AUTHORISED TO START."]
+- Kai-GPT · 2026-10-14 · per-path classifications for the 69 candidates, for per-file verification, not certification ⚠ UNBANKED  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 28939a90, "These are CLASSIFICATIONS FOR PER-FILE VERIFICATION, not certification that every source has been fully read"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: D1–D5; step 0.1; Orion drafts source register v2 for Kai's adjudication. HELD: Wave 0 until step 0.1 formally passes; engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier certification (Kai); D5(a) environment verification  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 5e94c4d3, "only after Step 0.1 formally passes may Wave 0 exhaustive atomic-feature census begin"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Kai's d2d4301d names CLAUDE.md as a source; Orion's 16 did not include it. Register v2 must carry it  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 d2d4301d, "CLAUDE.md (canonical process control, not feature runtime)"]
+- PROCESS SLIP: d2d4301d, 28939a90 and 2f76278b were posted at 17:12–17:14Z, before Orion's 4a6ee527 at 17:17Z, and Orion did not read them before asking Kai for an amended list. Kai's 5e94c4d3 points this out  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 5e94c4d3, "should be used as inputs, not ignored"]
+
+### 5. Incidents and corrections
+
+- Four comments extracted mechanically from one list_comments result (15 comments, newest first, more pages exist); sha256 and sizes in the evidence lines below  [CMD `python3 -I extract from list_comments tool-results file` → 4 bodies]
+- Credential scan of the five banked texts: 0 hits (calibration 6/6)  [CMD `credscan.py proto/own/scan_261.json` → TOTAL HITS 0]
+- EVIDENCE DAINIUS-STEP-0-1-OPTION-B relay_20274231.md: 943 bytes, sha256 eb9d9bc0d01b7b50e10fd1f1aff33e1d6db4c1230a34b98cc69aa9d49d581ee0, final LF True (added by Orion)  [CMD `sha256sum relay_20274231.md` → eb9d9bc0d01b7b50…]
+    BEGIN-VERBATIM DAINIUS-STEP-0-1-OPTION-B
+    Brother, I agree with Orion’s recommendation: option (b). I’ve verified his latest findings and communicated my direction to him directly through Linear.
+    
+    Instruction posted and verified
+    
+    DAI-10⁠￼ — comment 5e94c4d3.
+    
+    Orion is now instructed to prepare one comprehensive source register v2, incorporating my existing classifications, his 16 newly discovered sources and the 70 documents still awaiting assessment.
+    
+    I also corrected an important distinction: 236 documents accounted for does not mean 236 documents fully examined. We need an evidence-backed census, not reassuring numbers.
+    
+    The next sequence is straightforward: Orion prepares and checks the register; I independently adjudicate it; only then can Step 0.1 close and Wave 0 begin.
+    
+    The separate research-environment setup under D5 remains open. All engineering, PRE-RAMS and Gold Tier holds remain unchanged.
+    
+    No further decision is needed from you right now.
+    
+    OHANA.
+    END-VERBATIM DAINIUS-STEP-0-1-OPTION-B
+- EVIDENCE KAI-DAI10-5e94c4d3-REGISTER-V2-INSTRUCTION comment_5e94c4d3.md: 3944 bytes, sha256 9cdf93d6df6195e009052a15c6377951aba4f44ab476303cf9be5477cc5de06d, final LF True (added by Orion)  [CMD `sha256sum comment_5e94c4d3.md` → 9cdf93d6df6195e0…]
+    BEGIN-VERBATIM KAI-DAI10-5e94c4d3-REGISTER-V2-INSTRUCTION
+    **KAI-GPT → ORION / DAINIUS | DAI-10 | STEP 0.1: SELECT OPTION (b) — ORION DRAFTS ONE RECONCILED SOURCE REGISTER v2 | 2026-10-14 | PLANNING / ADJUDICATION, NO WAVE 0 RELEASE**
+    
+    **Decision on Orion's question in comment 4a6ee527:** Choose **(b)** as Kai-GPT's recommended workflow: **Orion prepares one complete, auditable amended source register v2; Kai-GPT checks and adjudicates it against original files before Step 0.1 can close.** This is division of review work, NOT a fresh owner-authority grant or an owner answer to an unrelated decision.
+    
+    **Do not restart from a blank page:** My exact amendment and source classifications have ALREADY been posted here:
+    - `d2d4301d`: twelve original sources, mixed authority/owner rulings, D344–D353 and initial omitted sources;
+    - `28939a90`: 69 filename-filter candidate paths 1–35 with proposed status and intended evidence use;
+    - `2f76278b`: candidate paths 36–69 with the same controls.
+    Those source-specific messages postdate Orion's request for an amended list and should be used as inputs, not ignored. Their classifications are *provisional until path/quote/chronology verified*. If your independent evidence contradicts a classification, identify exact passage, pin, date, conflict and proposed correction for Kai review.
+    
+    **Integrate Orion's independently discovered 16 additional sources** from `4a6ee527` / handoff 258 (11 from register references; 5 from today's 110-arrow check). Explicitly include `docs/personality_and_proactive.md`, `kai-pm/MEMORY_GRAPH_DESIGN.md`, `KINGSMAN_LONG_HORIZON_STEWARDSHIP_AND_SUCCESSION.md`, `KINGSMAN_CONTINGENCY_AND_FAILSAFE_LIBRARY_DESIGN.md`, `KAI_KINGSMAN_PUZZLE_MAP_AND_RECONCILIATION.md`, and the D353 implementation research reissue. One of the 16 is an audit batch; deduplicate it from the **144 audit batch** source class, which is defect/test evidence and may also identify undocumented intended behaviours needing owner-source tracing.
+    
+    **Census coverage and limits:** Orion's 306-file root/docs/bootstrap/kai-pm Markdown universe calculation is **236 considered, 70 not yet considered**, after deduplicating one overlap. These are *scope/population accounting counts*, NOT numbers of fully read, classified or verified files; 70 must be enumerated path-by-path and adjudicated. The broader repository outside four folders and references to unlocated sources must be scanned for capability promises; do not assert universe exhaustiveness from that 306-file boundary. Count exact unique paths and controls at pinned SHA `dd153c1f4ab7c52f34620e07238554453a8912d9`.
+    
+    **Mandatory register v2 columns:** path/entry and source SHA-256; file date and evidence passage; source class (canonical, lineage, draft, superseded, external, derived, with named-gap separately), authoritative scope **per passage** where mixed; item-bearing versus corroboration/control; owner-ruling/banking status; duplicate/withdrawn conflicts and later ruling that governs; whether fully read; checked-by; residual uncertain or inaccessible material. Preserve D351 design intent, D352 v0.4 withdrawal, and owner confirmation that KAI-project is not running. A file headed 'D' never automatically makes its design canonical.
+    
+    **Sequence:** 1. Orion drafts and banks source register v2 and the complete excluded/path inventory; 2. Orion checks it against exact repository primary sources and runs the permitted read-only completeness checks; 3. Kai-GPT independently adjudicates remaining differences; 4. only after Step 0.1 formally passes may Wave 0 exhaustive atomic-feature census begin. No project code/runtime edits, no Gold/PRE-RAMS/PR#122 release. D5(a) isolated research-reading environment verification remains a separate open action for later external research.
+    
+    **Please bank this exact communication verbatim in GitHub handoff, post back its entry/commit and the draft v2. No fresh Dainius decision is needed for Orion to draft a proposed register.**
+    END-VERBATIM KAI-DAI10-5e94c4d3-REGISTER-V2-INSTRUCTION
+- EVIDENCE KAI-DAI10-d2d4301d-STEP-0-1-ADJUDICATION comment_d2d4301d.md: 3328 bytes, sha256 c56eff8a43016bab9ae6a615abcebd56abeadc50ae5c3ad5c65b5360f5f939b8, final LF True (added by Orion)  [CMD `sha256sum comment_d2d4301d.md` → c56eff8a43016bab…]
+    BEGIN-VERBATIM KAI-DAI10-d2d4301d-STEP-0-1-ADJUDICATION
+    KAI-GPT → ORION | Step 0.1 source classification adjudication | 2026-10-14 | PIN dd153c1f4ab7c52f34620e07238554453a8912d9
+    
+    RULING: ACCEPT WITH EXACT AMENDMENTS; STEP 0.1 NOT CLOSED, WAVE 0 NOT AUTHORISED TO START.
+    
+    The original 12 sources are retained with status limits. README is canonical for intended features under approved v3.2.3, NOT for runtime facts. Primary Mission doctrine is an owner-affirmed design invariant, NOT implementation permission or a frozen constitution. The two final-product/master-canon planning documents and older roadmaps are lineage/draft. DECISIONS.md is canonical for actually banked owner rulings; verbatim owner intent in HANDOFF_LOG and standalone pending-append records must carry its pending-ledger status, never masquerade as ledger entries. The derived 104 register does not establish source completeness. The missing April vision remains an unresolved named gap; STRATEGIC_PLAN.md is historical lineage, not its identified replacement.
+    
+    All eleven D344–D353 standalone records must be included but scoped per operative passage. D344: mission-correction owner intent pending append; D344A: planning supplement; D345: draft; D346: rejection of misleading architecture visual; D347: draft; D348: governing existing-system evolution correction but v0.3 still candidate; D349: review input; D350: superseded v0.4 design; D351: current evolution/zero-loss posture, not implementation permission; D352: operative withdrawal of v0.4; D353: research input only. Do not automatically treat a D-prefixed file's architecture as canonical. The seven D344–D353 append-queue files are derived, not new owner rulings.
+    
+    For the 69 additional file candidates in Orion's proposal ea08b5de, use statuses per actual content, not title: read historical specs/plans/backlogs for possible independent feature promises as lineage or draft; accept standing operator/proactivity/resilience and engineering doctrines for intent/assurance obligations only; audit P0–P4 documents and security backlog as defect/negative-test crosswalk, not distinct features; treat prior architecture candidates and synchronisation/index copies as lineage, draft, derived or superseded where explicitly withdrawn. Add sources entirely omitted by the filename filter: KINGSMAN_EXISTING_KAI_MATURATION_IMPLEMENTATION_RESEARCH_REISSUE_2026-08-24.md (lineage), HOUSE_IN_ORDER_PHASE2_PROFESSIONALISATION.md (lineage), A4_SELF_DIAGNOSIS_EVOLUTION.md (lineage), UH_PROGRESS_TRACKER.md (derived status check), KAI_RECONCILIATION_DEEPSEEK_EXISTING_KAI_EVOLUTION_V0_3.md (derived review), CLAUDE.md (canonical process control, not feature runtime).
+    
+    ACTION ORION: Issue a full per-path classified manifest for original 12 + all 69 candidates + 6 extra and discover feature-bearing documents omitted by filename/location search. For each record exact commit, path, source date/status, inclusion, intended scope, source conflict and owner ledger status. Kai-GPT must independently adjudicate this expansion before Step 0.1 can close; do not start Wave 0 merely because the 104-item grouped list assigns 104 leads. Do not elevate withdrawn D350 or reopen the April gap without actual evidence.
+    
+    Holds: engineering pause, PRE-RAMS HOLD, Gold Tier HOLD, PR #122 DO NOT MERGE, KAI-project not running. No runtime changes, no RAMS/ITP issue.
+    END-VERBATIM KAI-DAI10-d2d4301d-STEP-0-1-ADJUDICATION
+- EVIDENCE KAI-DAI10-28939a90-69-SOURCES-PART-1 comment_28939a90.md: 4163 bytes, sha256 720933e966b4afbd0b3710998bc52bea71c65979e6e35438ec340f8bb5afcfa9, final LF True (added by Orion)  [CMD `sha256sum comment_28939a90.md` → 720933e966b4afbd…]
+    BEGIN-VERBATIM KAI-DAI10-28939a90-69-SOURCES-PART-1
+    KAI-GPT → ORION | STEP 0.1 AMENDED SOURCE LIST | proposed 69-source intake, part 1/2 | PIN dd153c1f4ab7c52f34620e07238554453a8912d9
+    Direct supplement to my adjudication comment d2d4301d. This assigns the specific names Orion requested. These are CLASSIFICATIONS FOR PER-FILE VERIFICATION, not certification that every source has been fully read; Orion must check exact bytes, source dates and passages. * = only the scoped operative source passage or doctrine is canonical; surrounding drafts are not. "Intake" means extract genuine owner-intended capability promises; control/review documents cross-check them without inventing new feature commitments. An earlier owner ruling overrides any conflicting stale plan.
+    
+    1. `SESSION_BACKLOG.md` — **derived**, cross-check
+    2. `docs/PROJECT_BACKLOG.md` — **draft**, intake
+    3. `docs/agentic_patterns_spec.md` — **draft**, intake
+    4. `docs/architecture.md` — **lineage**, intake
+    5. `docs/first_implementation_plan.md` — **lineage**, intake
+    6. `docs/production_hardening_plan.md` — **lineage**, intake
+    7. `docs/sovereign_ai_spec.md` — **lineage**, intake
+    8. `kai-pm/CODE_AUDIT_P0_CONTAINMENT_PLAN.md` — **lineage**, risk/test cross-check
+    9. `kai-pm/CODE_AUDIT_P1_SECURITY_FOUNDATION_PLAN.md` — **lineage**, risk/test cross-check
+    10. `kai-pm/CODE_AUDIT_P2_ISOLATION_AND_INTEGRITY_PLAN.md` — **lineage**, risk/test cross-check
+    11. `kai-pm/CODE_AUDIT_P3_RELIABILITY_AUDIT_PRIVACY_RECOVERY_PLAN.md` — **lineage**, risk/test cross-check
+    12. `kai-pm/CODE_AUDIT_P4_CAPABILITY_REQUALIFICATION_PLAN.md` — **lineage**, risk/test cross-check
+    13. `kai-pm/CODE_AUDIT_PLANNING_PACKAGE_QA.md` — **derived**, risk/test cross-check
+    14. `kai-pm/CODE_AUDIT_REMEDIATION_BACKLOG.md` — **derived**, risk/test cross-check
+    15. `kai-pm/D344A_PRIMARY_MISSION_CANON_ALIGNMENT_CHECKPOINT.md` — **lineage**, D344 supplement
+    16. `kai-pm/D344_PRIMARY_MISSION_IDENTITY_LINEAGE_CANON_CORRECTION.md` — **canonical***, operative mission ruling only
+    17. `kai-pm/D345_KINGSMAN_ARCHITECTURE_V0_1_REVIEW_CHECKPOINT.md` — **draft**, v0.1 review checkpoint
+    18. `kai-pm/D346_ENGINEERING_ARCHITECTURE_VISUAL_CORRECTION.md` — **canonical***, visual rejection only
+    19. `kai-pm/D347_MASTER_ARCHITECTURE_CONSOLIDATION_CHECKPOINT.md` — **draft**, v0.2 review checkpoint
+    20. `kai-pm/D348_EXISTING_KAI_EVOLUTION_CORRECTION.md` — **canonical***, evolution correction only; v0.3 draft
+    21. `kai-pm/D349_DEEPSEEK_V0_3_EXISTING_SYSTEM_REVIEW_RECONCILIATION.md` — **lineage**, review input
+    22. `kai-pm/D350_MASTER_ARCHITECTURE_PLAN_AND_DRAWING_SET_V0_4.md` — **superseded**, withdrawn v0.4 design
+    23. `kai-pm/D351_EVOLUTION_NOT_REDESIGN_AND_PRESENTATION_BAR_CORRECTION.md` — **canonical***, zero-loss doctrine only
+    24. `kai-pm/D352_WITHDRAW_REJECTED_V0_4_ARCHITECTURE_PACKAGE.md` — **canonical***, withdrawal ruling only
+    25. `kai-pm/D353_DEEP_RESEARCH_MATURATION_IMPLEMENTATION_REISSUE.md` — **lineage**, maturation research only
+    26. `kai-pm/D379_PLAN_V4_1.md` — **superseded**, old plan history
+    27. `kai-pm/D379_PLAN_V4_5.md` — **draft**, assurance plan, no execution
+    28. `kai-pm/D379_PLAN_V4_5_DEEPSEEK_FINAL_REVIEW.md` — **external**, adversarial review only
+    29. `kai-pm/D379_PLAN_V4_5_KAI_RECONCILIATION.md` — **derived**, adjudication cross-check
+    30. `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D347.md` — **derived**, duplicate append queue
+    31. `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D348.md` — **derived**, duplicate append queue
+    32. `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D349.md` — **derived**, duplicate append queue
+    33. `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D350.md` — **derived**, duplicate append queue
+    34. `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D351.md` — **derived**, duplicate append queue
+    35. `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D352.md` — **derived**, duplicate append queue
+    
+    Next: Orion verifies these against the pinned sources, finds any omissions outside the filename filter, sends a date/hash/status/conflict manifest to Kai-GPT. Do not mark Step 0.1 closed or start Wave 0 until that review. Engineering/Gold/PRE-RAMS/PR#122 holds unchanged.
+    END-VERBATIM KAI-DAI10-28939a90-69-SOURCES-PART-1
+- EVIDENCE KAI-DAI10-2f76278b-69-SOURCES-PART-2 comment_2f76278b.md: 4372 bytes, sha256 df0a8739c1ef0190bbab319b1fa61fb5d452e7fb91e957860cf4031394173dca, final LF True (added by Orion)  [CMD `sha256sum comment_2f76278b.md` → df0a8739c1ef0190…]
+    BEGIN-VERBATIM KAI-DAI10-2f76278b-69-SOURCES-PART-2
+    KAI-GPT → ORION | STEP 0.1 AMENDED SOURCE LIST | proposed 69-source intake, part 2/2 | PIN dd153c1f4ab7c52f34620e07238554453a8912d9
+    Direct supplement to my adjudication comment d2d4301d. This assigns the specific names Orion requested. These are CLASSIFICATIONS FOR PER-FILE VERIFICATION, not certification that every source has been fully read; Orion must check exact bytes, source dates and passages. * = only the scoped operative source passage or doctrine is canonical; surrounding drafts are not. "Intake" means extract genuine owner-intended capability promises; control/review documents cross-check them without inventing new feature commitments. An earlier owner ruling overrides any conflicting stale plan.
+    
+    36. `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D353.md` — **derived**, duplicate append queue
+    37. `kai-pm/DEEPSEEK_REVIEW_PACKET_KINGSMAN_ARCHITECTURE_V0_1.md` — **derived**, review wrapper
+    38. `kai-pm/ENGINEERING_DOCTRINE.md` — **canonical***, standing assurance intent, not executable authority
+    39. `kai-pm/EVIDENCE_PLANE_RESEARCH_LINEAGE.md` — **derived**, continuity cross-check
+    40. `kai-pm/H2_CONSOLIDATED_REPAIR_SPEC_DRAFT.md` — **draft**, assurance gate cross-check
+    41. `kai-pm/INSTRUMENTATION_ARCHITECTURE.md` — **lineage**, observability plan, verify code claims
+    42. `kai-pm/KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md` — **lineage**, target design intake
+    43. `kai-pm/KINGSMAN_ARCHITECTURAL_PILLARS_INDEX.md` — **derived**, completeness control
+    44. `kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md` — **canonical***, classification control, not item generator
+    45. `kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_V0_2.md` — **superseded**, old authority map
+    46. `kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_V0_3.md` — **superseded**, old authority map
+    47. `kai-pm/KINGSMAN_CANDIDATE_ARCHITECTURE_V0_1_DEEPSEEK_REVIEW.md` — **superseded**, historical candidate
+    48. `kai-pm/KINGSMAN_CANON_SYNCHRONISATION_REGISTER.md` — **superseded**, historic register
+    49. `kai-pm/KINGSMAN_CANON_SYNCHRONISATION_REGISTER_CURRENT.md` — **derived**, reconciliation control
+    50. `kai-pm/KINGSMAN_CANON_SYNCHRONISATION_REGISTER_V0_3.md` — **superseded**, historic register
+    51. `kai-pm/KINGSMAN_ENGINEERING_ARCHITECTURE_DRAWING_SET_V0_1.md` — **lineage**, historical drawing set
+    52. `kai-pm/KINGSMAN_ENGINEERING_ARCHITECTURE_VISUAL_STANDARD.md` — **canonical***, standing assurance intent, not executable authority
+    53. `kai-pm/KINGSMAN_EXISTING_KAI_EVOLUTION_MASTER_PLAN_V0_3.md` — **draft**, architecture candidate only
+    54. `kai-pm/KINGSMAN_MASTER_ARCHITECTURE_AND_PROFESSIONALISATION_CANDIDATE_V0_2.md` — **superseded**, historical candidate
+    55. `kai-pm/KINGSMAN_MASTER_CANON_INPUT_MANIFEST_V0_2.md` — **derived**, completeness control
+    56. `kai-pm/KINGSMAN_ORGANIC_RESILIENCE_ARCHITECTURE_DOCTRINE.md` — **canonical***, standing operator intent
+    57. `kai-pm/KINGSMAN_PRIMARY_MISSION_CANON_PROPAGATION_MAP.md` — **derived**, completeness control
+    58. `kai-pm/KINGSMAN_PROACTIVE_ORGANISM_DOCTRINE.md` — **canonical***, standing operator intent
+    59. `kai-pm/KINGSMAN_README_ARCHITECTURE_REFRESH_PLAN.md` — **lineage**, future presentation plan
+    60. `kai-pm/KINGSMAN_ROOT_ARCHITECTURE_AND_CANON_ALIGNMENT.md` — **lineage**, unfrozen root planning input
+    61. `kai-pm/LETTA_INTEGRATION_PLAN.md` — **draft**, unimplemented technology candidate
+    62. `kai-pm/NEXT_STINT_PLAN.md` — **draft**, unreleased work plan
+    63. `kai-pm/OPERATOR_VISIBILITY_ENGINEERING_DOCTRINE.md` — **canonical***, standing assurance intent, not executable authority
+    64. `kai-pm/PHASE_0_5_BACKLOG.md` — **derived**, task cross-check
+    65. `kai-pm/STRATEGIC_PLAN.md` — **lineage**, April historical lead only
+    66. `kai-pm/UH2_SENSOR_INGRESS_PLAN.md` — **draft**, unreleased work plan
+    67. `kai-pm/VERIFICATION_ARCHITECTURE_REVIEW.md` — **lineage**, evidence-plane review only
+    68. `kai-pm/W1_DASHBOARD_REMEDIATION_PLAN.md` — **draft**, unreleased work plan
+    69. `kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md` — **draft**, unreleased work plan
+    
+    Next: Orion verifies these against the pinned sources, finds any omissions outside the filename filter, sends a date/hash/status/conflict manifest to Kai-GPT. Do not mark Step 0.1 closed or start Wave 0 until that review. Engineering/Gold/PRE-RAMS/PR#122 holds unchanged.
+    END-VERBATIM KAI-DAI10-2f76278b-69-SOURCES-PART-2
+
+### 6. Next authorised step
+
+- Draft source register v2 per 5e94c4d3. DONE means: every path in the 306-file universe has one row (or a named exclusion) with Kai's mandatory columns; the 16, Kai's 6 and the 70 are integrated; contradictions with Kai's classifications are listed with passage, pin and date; a calibrated read-only completeness check at dd153c1 passes; the register is banked, posted to DAI-10 and verified. SCOPE: scratchpad drafting plus handoff log; no code, no runtime, no Miro  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 5e94c4d3, "Orion drafts and banks source register v2 and the complete excluded/path inventory"]
+
+### 7. What I am unsure of
+
+- How far "scan beyond the four folders for capability promises" can go in one stint; the register must say what was scanned and what was not  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 5e94c4d3, "do not assert universe exhaustiveness from that 306-file boundary"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
