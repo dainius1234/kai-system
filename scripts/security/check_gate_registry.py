@@ -58,13 +58,29 @@ from typing import Dict, List, Optional, Tuple
 REPO = Path(__file__).resolve().parent.parent.parent
 SECURITY = REPO / "scripts" / "security"
 
-# Invocation means *running* the script. A bare path match counted a
-# comment explaining a gate, and an `echo` naming it in a log message, as
-# though they configured it — so this file reported a gate as invoked by
-# two workflows that only talked about it. A gate is invoked when a
-# python interpreter is pointed at it, and not otherwise.
-_INVOCATION = re.compile(
-    r"python3?\s+(?:-\S+\s+)*scripts/(?:security/)?([a-z0-9_/]+)\.py")
+# ── THE SHARED EXECUTION SURFACE ─────────────────────────────────────
+# One definition of what actually runs, extracted under D376 §3 (as
+# corrected by D377) and shared with check_operational_portability.py.
+# The code was MOVED, not reimplemented, and these names are re-exported
+# so every existing caller — including scripts/test_gate_registry.py,
+# which reaches them as attributes of this module — resolves unchanged.
+#
+# The helper holds no authority of its own, deliberately: this file
+# AUDITS the portability gate, so that gate must not import this one.
+# An auditor that is a dependency of the audited is the circular shape
+# this registry exists to find.
+sys.path.insert(0, str(REPO))
+from scripts.security.execution_surface import (  # noqa: E402
+    _INVOCATION,
+    _MAKE_TARGET,
+    _makefile_scripts,
+    _swallows,
+    discover_policy_check,
+    discover_workflows,
+    enforcing_elsewhere,
+    workflow_files,
+)
+
 
 #: Modules named without a path live in `scripts/security/`; anything
 #: else carries its directory. Both forms resolve here, so the registry
@@ -110,44 +126,6 @@ def ambiguous_modules() -> List[str]:
         if (SECURITY / p.name).exists() and not p.stem.startswith("_"))
 
 
-def _swallows(line: str, step: dict, run: str) -> bool:
-    """Does this invocation's exit code get discarded?
-
-    A script whose exit code cannot fail the build is not enforcing, and
-    holding it to a gate's invariants would report a defect in code
-    behaving exactly as designed — the inverse error, and the worse one.
-
-    Three shapes, because the third was found the hard way. The first
-    draft knew `|| true` and `continue-on-error`, and classified
-    `behavioral_scoreboard` as enforcing. It is not, twice over: its step
-    is
-
-        set +e
-        out=$(python scripts/behavioral_scoreboard.py 2>&1)
-        ...
-        exit 0
-
-    and the script itself ends `asyncio.run(run()); sys.exit(0)`, so the
-    score it computes is deliberately advisory. The step even says so in
-    its name. Writing the test for it is what surfaced that — which is
-    what I-3 is for, aimed at my own detector.
-
-    **This is a lower bound and says so.** A step could `set +e` and then
-    `exit 1` on a condition, and deciding that needs shell semantics
-    rather than a regex. Under-reporting is the safe direction here for
-    the same reason the boundary-blindness scan under-reports: a survey
-    with false positives invites people to fix working code.
-    """
-    if (step or {}).get("continue-on-error") is True:
-        return True
-    if re.search(r"\|\|\s*(true|echo)", line):
-        return True
-    # The step manages its own exit code, so the script's is not the
-    # build's.
-    if re.search(r"^\s*set\s+\+e\b", run, re.M):
-        return True
-    return bool(re.search(r"^\s*exit\s+0\s*$", run, re.M))
-
 # Mirrored from the registry so `cross_check` stays a pure function that
 # the suite can call without importing the real registry.
 GATE_KIND = "gate"
@@ -190,179 +168,7 @@ def discover_modules() -> List[str]:
     return sorted(set(in_security) | set(enforcing_elsewhere()))
 
 
-def enforcing_elsewhere() -> List[str]:
-    """Scripts outside `scripts/security/` that can fail the build.
-
-    The denominator was `scripts/security/*.py` — a *directory*, which is
-    where the checks happened to be put, not what makes something an
-    instrument. What makes it one is that CI runs it and a non-zero exit
-    stops the build.
-
-    Measured on 2026-08-06: 30 modules in that directory, and **eight**
-    outside it that can fail the build —
-
-        scripts/behavioral_scoreboard      scripts/ci/kill_isolation
-        scripts/ci/assert_clean_bringup    scripts/ci/live_smoke
-        scripts/ci/compose_probe           scripts/ci/make_dev_secrets
-        scripts/sync_docs                  scripts/test_restart_persistence
-
-    none of them registered, none held to I-1 through I-7, and the
-    meta-check printing `GATE PASSED: I-1 … I-7 hold` over all of it.
-    The seventeenth venue of this programme's one finding, and this time
-    in the file whose entire job is to catch it: **a check whose scope
-    was smaller than its name implied.**
-
-    `assert_clean_bringup` made it concrete. It was written this morning
-    to enforce in CI, it is the guard that decides whether a bring-up
-    succeeded — and because it lives in `scripts/ci/`, the registry could
-    not see it, could not find it unregistered, and reported the
-    instrumentation sound.
-
-    An invocation whose exit code is swallowed is excluded: it cannot
-    fail the build, so holding it to a gate's invariants would report a
-    defect in code doing exactly what it was written to do.
-    """
-    import yaml
-
-    found: Dict[str, bool] = {}
-    make_targets: set = set()
-    for path in workflow_files():
-        try:
-            doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
-        except Exception:
-            continue        # `cross_check` owns the unparseable-workflow finding
-        for job in (doc.get("jobs") or {}).values():
-            for step in (job or {}).get("steps") or []:
-                run = str((step or {}).get("run") or "")
-                # Join shell continuations first: a `|| true` after a
-                # trailing `\` belongs to the same command, and reading
-                # it per physical line got that wrong the first time.
-                joined = re.sub(r"\\\s*\n\s*", " ", run)
-                swallowed_step = _swallows("", step, run)
-                for line in joined.splitlines():
-                    for module in _INVOCATION.findall(line):
-                        if (SECURITY / f"{module}.py").exists():
-                            continue        # already in the directory scan
-                        enforcing = not _swallows(line, step, run)
-                        found[module] = found.get(module, False) or enforcing
-                if not swallowed_step:
-                    make_targets |= set(_MAKE_TARGET.findall(joined))
-
-    # A script can also enforce *through* a make target — `check-docs`
-    # runs `sync_docs.py --check`, and reading only workflow `run:` lines
-    # missed it. Measured before it was added, because widening a scope
-    # past the evidence is the worse defect: the 36 targets CI invokes
-    # run exactly **two** scripts directly, so this is a small, bounded
-    # extension rather than a floodgate.
-    #
-    # Recipe lines only, not prerequisites. `test-uh` is a target whose
-    # prerequisites are forty suites, and those are watched by
-    # `check_assertion_floors` and `check_suite_floor` — a different
-    # instrument, verified to cover them, not an assumption made here.
-    for module in _makefile_scripts(make_targets):
-        if not (SECURITY / f"{module}.py").exists():
-            found[module] = True
-    return sorted(m for m, enforcing in found.items() if enforcing)
-
-
-_MAKE_TARGET = re.compile(r"^\s*make\s+(?:--\S+\s+)*([a-z0-9][a-z0-9_-]*)",
-                          re.M)
-
-
-def _makefile_scripts(targets: set) -> List[str]:
-    """Scripts run directly by the recipe of any of `targets`."""
-    if not targets:
-        return []
-    lines = (REPO / "Makefile").read_text(encoding="utf-8").splitlines()
-    out: List[str] = []
-    for i, line in enumerate(lines):
-        match = re.match(r"^([a-z0-9][a-z0-9_-]*):", line)
-        if not match or match.group(1) not in targets:
-            continue
-        for j in range(i + 1, len(lines)):
-            if lines[j] and not lines[j].startswith(("\t", " ")):
-                break
-            if lines[j].lstrip().startswith("#"):
-                continue
-            out.extend(_INVOCATION.findall(lines[j]))
-    return sorted(set(out))
-
-
 # ── Source 2: what actually runs ─────────────────────────────────────
-
-def discover_policy_check() -> List[str]:
-    """Modules named inside the Makefile's `policy-check` target."""
-    makefile = (REPO / "Makefile").read_text(encoding="utf-8")
-    block: List[str] = []
-    inside = False
-    for line in makefile.splitlines():
-        if line.startswith("policy-check:"):
-            inside = True
-            continue
-        if inside:
-            if line and not line.startswith(("\t", " ")):
-                break
-            block.append(line)
-    # Comments mention scripts; they do not run them. Without this, a
-    # line explaining *why* a gate is configured a certain way counts as
-    # configuring it — which is how this file first reported a gate as
-    # invoked by two workflows that only named it in a comment.
-    body = "\n".join(l for l in block if not l.lstrip().startswith("#"))
-    return sorted(set(_INVOCATION.findall(body)))
-
-
-def workflow_files() -> List[Path]:
-    """Every workflow, both extensions. GitHub accepts `.yaml` too."""
-    root = REPO / ".github" / "workflows"
-    return sorted(p for p in root.glob("*.y*ml") if p.is_file())
-
-
-def discover_workflows() -> Dict[str, List[str]]:
-    """Map module -> the workflow files that actually invoke it.
-
-    **Parsed, not grepped.** This read the raw text and matched any line
-    that looked like an invocation, which is not the same question as
-    "does this step run". `policy-checks.yml` had:
-
-        - name: Every compose bring-up supplies the variables it needs
-          run: python scripts/security/check_compose_env.py
-
-          run: python scripts/security/check_test_wiring.py
-
-    — a step that lost its `- name:`, so its `run:` became a *second*
-    `run:` key on the step above. YAML keeps the last one. The job
-    displayed the compose-env name, executed the test-wiring gate, and
-    went green; `check_compose_env.py` never ran in CI at all.
-
-    The text said both were wired. Only the parse knows which one runs,
-    and I-4's whole job is to make the registry agree with reality.
-    """
-    import yaml
-
-    found: Dict[str, List[str]] = {}
-    for path in workflow_files():
-        # I-1: an unparseable workflow is a finding, not a file to skip.
-        # `main()` surfaces it as a phantom/wiring disagreement rather
-        # than silently shrinking the survey.
-        doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
-        for job in (doc.get("jobs") or {}).values():
-            for step in (job or {}).get("steps") or []:
-                run = str((step or {}).get("run") or "")
-                for module in _INVOCATION.findall(run):
-                    found.setdefault(module, []).append(path.name)
-                # A workflow that runs `make check-docs` runs
-                # `sync_docs.py` just as surely as one naming it
-                # directly. Without this, a make-invoked gate could
-                # never have a declaration that matches reality: it
-                # would be discovered as enforcing by
-                # `enforcing_elsewhere` and as invoked by nobody here,
-                # so every possible `in_workflows` value was wrong. The
-                # two discoveries have to share one idea of "invoked",
-                # or the cross-check is comparing different questions.
-                for module in _makefile_scripts(
-                        set(_MAKE_TARGET.findall(run))):
-                    found.setdefault(module, []).append(path.name)
-    return {m: sorted(set(v)) for m, v in found.items()}
 
 
 # ── I-1: boundary blindness, detected in the source ──────────────────
