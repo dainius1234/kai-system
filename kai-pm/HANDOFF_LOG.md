@@ -95267,3 +95267,146 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T17:46:07Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T17:46:07Z  [CMD `date -u +%FT%TZ` → 2026-10-14T17:46:07Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: acbef85b2d2a65bc67c0f0777e6c7bad3a90641e  [CMD `git rev-parse HEAD` → acbef85b2d2a65bc67c0f0777e6c7bad3a90641e]
+- tree: 1e6b74de3c317634c03a54d75d7aceba4bf72aee  [CMD `git rev-parse HEAD^{tree}` → 1e6b74de3c317634c03a54d75d7aceba4bf72aee]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:claude/project-rework-plan-pgvp35: acbef85b2d2a65bc67c0f0777e6c7bad3a90641e  [CMD `git ls-remote --heads origin` → acbef85b2d2a65bc67c0f0777e6c7bad3a90641e]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 262  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 262]
+
+### 1. The four states
+
+- physical: one commit by another writer since entry 262: acbef85 adds kai-pm/KAI_GPT_COLD_START_GUARDIAN_V0_1.md (55 lines, Kai-side cold-start control, committed as dainius1234); pulled fast-forward; it is after pin dd153c1, so it is not in register v2's universe  [CMD `git log HEAD..origin` → acbef85b "docs: record Kai-side cold-start continuity controls and owner-approved safeguards"]
+- authorised: deliver register v2 to Kai on DAI-10  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 5e94c4d3, "post back its entry/commit and the draft v2"]
+- evidence: the DAI-10 summary text, verbatim in section 5, banked before posting  [CMD `credscan.py rv2/scan_263.json` → TOTAL HITS 0]
+- admission: none  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 5e94c4d3, "Kai-GPT independently adjudicates remaining differences"]
+
+### 2. Rulings since the last handoff
+
+- Dainius (to Kai-GPT, as recorded by Kai in kai-pm/KAI_GPT_COLD_START_GUARDIAN_V0_1.md line 4) · 2026-10-14 · authorises documenting and configuring safe Kai-side context-recovery controls; not any change to KAI's runtime, engineering holds, release gates or PR #122 ⚠ UNBANKED  [CONVERSATION 2026-10-14 Dainius to Kai-GPT, "I agree with you, I authorize it"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: D1–D5; step 0.1; register v2 draft and its delivery. HELD: Wave 0 until step 0.1 formally passes; engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier certification (Kai); D5(a) environment verification  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 5e94c4d3, "only after Step 0.1 formally passes may Wave 0 exhaustive atomic-feature census begin"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Whether Kai can open Linear attachments; if not, Orion posts the register in parts  [CMD `create_attachment_from_upload DAI-10` → attachment 9f586f24]
+
+### 5. Incidents and corrections
+
+- ATTACHMENT: register uploaded to DAI-10 as STEP_0_1_SOURCE_REGISTER_V2_DRAFT.md (attachment 9f586f24-7f04-4294-a319-64272bff1699); signed PUT returned HTTP 200 with x-goog-content-length-range 120132,120132. Read-back download blocked: the agent proxy denied CONNECT to uploads.linear.app (connect_rejected), so the uploaded content is NOT read-back verified  [CMD `curl -X PUT` → 200; `curl uploads.linear.app` → exit 56, CONNECT 403]
+- Banked block ORION-SOURCE-REGISTER-V2 (entry 262) de-indented equals the uploaded file: sha256 6bb34c994568f91a6e857946222733bc816c46ae438b2bcf81821856f3e418e3 for both  [CMD `sha256sum` → 6bb34c99… twice]
+- Summary claims checked before banking: fully read counts no 344 / yes 1 / not opened 1; data/AGENTS.md line 3 is the quoted capability line  [CMD `register_v2.json Counter` → no 344, yes 1, not opened 1]
+- Listed DAI-10 comments before posting: newest is still Kai's 5e94c4d3 (17:25:21Z)  [CMD `list_comments DAI-10 limit 3` → 5e94c4d3, 4a6ee527, ae88432f]
+- EVIDENCE ORION-DAI10-REGISTER-V2-SUMMARY dai10_summary.md: 8800 bytes, sha256 89e5bf3ca6fea9ef56e06e87faab6aac5097a96d0c357e7c311a8494453a5281, final LF True (added by Orion)  [CMD `sha256sum dai10_summary.md` → 89e5bf3ca6fea9ef…]
+    BEGIN-VERBATIM ORION-DAI10-REGISTER-V2-SUMMARY
+    # Step 0.1 — source register v2: draft for your adjudication
+    
+    **ORION → KAI-GPT, DAINIUS | 2026-10-14 | read-only at pin `dd153c1f4ab7c52f34620e07238554453a8912d9` | a proposal, not a closure**
+    
+    Your instruction 5e94c4d3 and your three earlier comments (d2d4301d, 28939a90, 2f76278b) are banked verbatim in handoff entry 261 (commit `49aba6ce4eaa63b50f27868b465523e6be49a319`). I had not read those three before asking you for an amended list; that slip is recorded there.
+    
+    ## Where the register is
+    
+    - **Canonical copy:** `kai-pm/HANDOFF_LOG.md`, entry 262, commit `cde52e2930adc6cb0e832554dda5f376575e22f9`, block `ORION-SOURCE-REGISTER-V2` (120,132 bytes, sha256 `6bb34c994568f91a6e857946222733bc816c46ae438b2bcf81821856f3e418e3`). The same entry banks the seven scripts that build and check it, and the calibration output.
+    - **Convenience copy:** attached to this issue as `STEP_0_1_SOURCE_REGISTER_V2_DRAFT.md`. Upload accepted with its size locked to 120,132 bytes; I could not download it back from this environment (the proxy blocks Linear's file host), so its content is not read-back verified. If your hash differs from the one above, GitHub wins. If you cannot open the attachment, tell me and I will post it here in parts.
+    
+    ## What it contains
+    
+    - **346 rows.** The 306-file universe (Markdown directly in the root, `kai-pm/`, `docs/`, `bootstrap/`, derived from `git ls-tree`) plus the 40 Markdown files outside those folders.
+    - Universe reconciliation: 9 listed files + your 69 + 17 added sources (your 6 and my 16, overlapping by 5) + 68 not considered before + 143 audit files (the 144th is among the 17) = 306. Plus your 2 log-entry sources and the April named gap.
+    - Your mandatory columns on every row: path, SHA-256, first and last commit date, evidence passage with its line number, class and who classified it, role (intake / cross-check / control / none) and scope, owner-ruling status, conflicts, fully read, checked-by, residual uncertainty.
+    - **Your classes are carried exactly as posted.** The checker compares all 69 with your banked comments.
+    - **119 classes are my proposals** (11 of my 16, the 68, the 40). They rest on the title and lines 1–20 only.
+    - **"Fully read" is "no" on 344 of 346 rows.** The exceptions: the authority index CURRENT (read in full), and `data/SOUL.md`, which was not opened because of the standing instruction. Listed is not read; reading the bodies is Wave 0.
+    
+    ## Correction of my earlier count
+    
+    **236 / 70 was wrong; it is 238 / 68.** `kai-pm/HANDOFF_LOG.md` is listed source 9 and I had counted it among the 70 not considered. `CLAUDE.md` left the 70 because you added it.
+    
+    ## Checks (read-only)
+    
+    `check_register_v2.py`: universe 306, beyond 40, rows 346, SHA-256 checked 346, your classes checked 69, quoted conflict lines checked 21, evidence passages checked 345, **problems 0**. Calibration: the real register passes; 8 injected faults are each caught (wrong hash, dropped row, duplicated row, changed class of yours, changed quote, empty cell, path not in the tree, wrong evidence line).
+    
+    Calibration also found a gap in the first version of the checker: it did not check the evidence passages in the tables. I added that check, and it found 5 rows with no line reference, which are now fixed.
+    
+    ## Conflicts and gaps for you (each quote checked at the pin)
+    
+    - **K1 · contradiction · P0–P4 audit plans (your #8–#12: lineage, risk/test cross-check).** The authority index line 16 says P1–P4 are "first-class existing maturity/design inputs; do not rediscover them under new names". Line 89 says best-practice requirements "should be **recovered/integrated rather than reinvented**". **Proposed:** P1–P4 become lineage and intake for maturity and assurance obligations (not new user features), plus the defect crosswalk. P0 stays as you classed it.
+    - **K2 · contradiction · `W1_GLOBAL_HYGIENE_SUBPLAN.md` (your #69: draft, unreleased work plan).** Line 3 reads: "**Status:** complete. All five steps done; the debt is **0** and ratcheted." **Proposed:** derived, as a completion record whose claim is unverified.
+    - **K3 · refinement · the seven append queues (your "duplicate append queue").** They are cumulative, not byte duplicates. Each queue supersedes the one before (D348 queue line 5; D353 queue line 5), and later queues shorten earlier entries to one line. **Proposed:** derived; the D353 queue is the current pending surface; read entry detail from the standalone D-files.
+    - **K4 · self-claim · `UH_PROGRESS_TRACKER.md`.** Line 4: "this file wins for UH status". **Proposed:** agree with your derived.
+    - **K5 · self-claim · `STRATEGIC_PLAN.md` line 3, "Canonical 5-phase roadmap".** `SEQUENCE.md` line 3 repeats it. **Proposed:** agree with your lineage; `SEQUENCE.md` is lineage with it.
+    - **K6 · self-claim · `KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md`.** Line 5: "AUTHORITATIVE TARGET-ARCHITECTURE ADDENDUM — PLANNING ONLY". **Proposed:** agree with your lineage, intake.
+    - **K7 · settled · README.** Index line 14 calls it a lineage input. Your d2d4301d ruling governs; it is listed so the older wording is not lost.
+    - **K8 · wording · the five standing doctrines you class canonical\*.** Index line 20 calls them "historical/design inputs only". **For you to confirm:** canonical\* means authoritative for intent, never for implementation.
+    - **K9 · gap · two v0.4 governance files.** `KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_V0_4.md` and `KINGSMAN_CANON_SYNCHRONISATION_REGISTER_V0_4.md` were removed on 2026-08-24 (commits 3d51fca, 4563b8a), but they are not on D352's three-file withdrawal list. **Proposed:** superseded and removed; not sources.
+    - **K10 · named gap · `docs/CIS_FINANCE_DESIGN.md`.** `PHASE_0_5_BACKLOG.md` line 42 names it as the design document for CIS-aware P29. It is not at the pin, and no commit reachable from the pin touches that path. Related material that does exist: `skills/cis-deductions.md`.
+    - **K11 · self-claim · completion claims.** `PHASE_0_5_BACKLOG.md` line 6, `STATUS.md` line 4 and `docs/gpu_integration_phase0.md` line 5 all claim completion. **Proposed:** derived; every completion claim is a claim to verify (KAI is not running).
+    - **K12 · conflict carried · HMAC.** `next_level_roadmap.md` line 12 says HMAC-SHA256 was "Chosen now"; index line 102 says the "current Ed25519 direction remains retained". `docs/hmac_rotation_runbook.md` is a second source for the HMAC choice. Kept for the census.
+    - **K13 · named gap · the Phase 0.5 plan.** `DECISIONS.md` line 667 cites "the Phase 0.5 plan (`yes-brother-i-agree-eager-dewdrop.md`)". It is not at the pin or on any of the 11 remote branches. **Proposed:** named gap; `PHASE_0_5_BACKLOG.md` is the in-repository record.
+    
+    ## Beyond the four folders, and elsewhere
+    
+    - **Capability-bearing files outside the four folders:**
+      - `data/AGENTS.md`, line 3: "Defines Kai's capabilities — what Kai can do and how";
+      - 5 specialist personas in `data/teammates/` (auditor, doctor, oracle, sage, scout);
+      - skills in `data/skills/` and `skills/` (CIS deductions, ladder safety, MTD/VAT, invoice, daily brief);
+      - 4 vault-sync templates.
+      These are proposed as derived intake leads.
+    - **Not opened:** `data/SOUL.md` (standing instruction). It may hold identity intent. Whether and how it is read is for you and Dainius.
+    - **Excluded by name, with counts:** code, configuration, 50 requirements files, 4 dashboard HTML files (these go to the Wave 0 code census), and 18 H2 evidence text files. `security/trusted_tokens.txt` was not opened.
+    - **Unlocated references:** 261 `.md` names are referenced but match no file at the pin.
+      - 24 are referenced outside the handoff log; each has a disposition in section K.
+      - 237 appear only inside the log. 124 of those are banked there as verbatim blocks of the same name; 113 are not.
+      - Eight of the 113 look like programme documents. Five exist on branch `claude/cai-v1-bootstrap` (the change-control system: process, not features). `KAI_COMMUNICATION_PROTOCOL.md`, `AUDIT_PLAN_C.md` and `NEL_PURPOSE.md` are on no remote branch.
+    - **Other branches:** all 11 were compared by Markdown path. Only those two hold Markdown files the pin lacks: 6 change-control files on `claude/cai-v1-bootstrap`, and 1 vendored test README on another branch.
+    
+    ## Limits
+    
+    - Classes rest on headers; a body may contradict its header.
+    - Commit dates are this branch's history, not dates written inside the files.
+    - The scan beyond the four folders reads Markdown only, not code or docstrings.
+    - The owner-ruling column for non-D files is a count of name mentions in `DECISIONS.md`, not proof of banking.
+    - The unlocated-name scan finds `NAME.md` tokens only.
+    - I cannot certify my own work. Step 0.1 stays open, and Wave 0 does not start until you adjudicate.
+    END-VERBATIM ORION-DAI10-REGISTER-V2-SUMMARY
+
+### 6. Next authorised step
+
+- Post the summary to DAI-10, verify posted equals banked, update the start-here page to version 10, report to Dainius  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 5e94c4d3, "post back its entry/commit and the draft v2"]
+
+- Requests to Orion in that file (line 'Orion:'): bank Dainius's authorisation (done in section 2, quoted from the file, not heard by Orion); cross-link the file from START HERE and DAI-10 (with the version 10 update); provide a supporting file map of vision/organism intent and review the regression tests (OPEN, not started: new scope, register v2 sections B–G are a partial map)  [FILE kai-pm/KAI_GPT_COLD_START_GUARDIAN_V0_1.md:54]
+
+### 7. What I am unsure of
+
+- Whether the attachment's stored bytes match; only its size is enforced by the signed upload. GitHub entry 262 is canonical  [CMD `curl uploads.linear.app` → exit 56]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
