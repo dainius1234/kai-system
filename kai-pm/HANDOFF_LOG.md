@@ -86945,3 +86945,298 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T11:38:25Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T11:38:25Z  [CMD `date -u +%FT%TZ` → 2026-10-14T11:38:25Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: dd153c1f4ab7c52f34620e07238554453a8912d9  [CMD `git rev-parse HEAD` → dd153c1f4ab7c52f34620e07238554453a8912d9]
+- tree: 7a1e5442aa30d392486c9bc9a3976894dfc3450e  [CMD `git rev-parse HEAD^{tree}` → 7a1e5442aa30d392486c9bc9a3976894dfc3450e]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- remote:claude/project-rework-plan-pgvp35: dd153c1f4ab7c52f34620e07238554453a8912d9  [CMD `git ls-remote --heads origin` → dd153c1f4ab7c52f34620e07238554453a8912d9]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 243  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 243]
+
+### 1. The four states
+
+- physical: unchanged since entry 243 apart from this entry; local `.git` deepened to full branch history (read-only fetch, no tracked file changed)  [CMD `git fetch --unshallow origin claude/project-rework-plan-pgvp35` → 1491 commits, shallow false]
+- authorised: step 0.1 proposal, read-only, by owner GO (entry 243)  [CONVERSATION 2026-10-14 Dainius, "Ruling go"]
+- evidence: the proposal, its check script and the check runs, verbatim in section 5  [CMD `python3 -I check_s01.py` → rows=12 sha256_compared=8 problems=0]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- None; this entry banks Orion's step 0.1 proposal for Kai's adjudication  [CONVERSATION 2026-10-14 Dainius, "Ruling go"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: D1, D2 (a), D3, D4 (a) with five conditions, D5 (a), step 0.1. HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier  [CONVERSATION 2026-10-14 Dainius, "Ruling go"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- For Kai (proposal §6): pinned branch; twelve statuses incl. README and doctrine conflicts; adding D344–D353 standalone files; use of the authority index; §3c candidates; the April lead  [FILE kai-pm/HANDOFF_LOG.md:1]
+- For Dainius: is `kai-pm/STRATEGIC_PLAN.md` (first added 2026-04-21) the "April" document?  [CMD `git log --since=2026-04-01 --until=2026-05-01 --diff-filter=A` → STRATEGIC_PLAN.md only plan added]
+
+### 5. Incidents and corrections
+
+- Pinned commit for step 0.1: dd153c1f4ab7c52f34620e07238554453a8912d9 (entry 243); product code unchanged since 421478a  [CMD `git diff --stat 421478a..dd153c1` → only kai-pm/HANDOFF_LOG.md]
+- FINDING: D344–D353 have no heading in kai-pm/DECISIONS.md at the pin (D351: 0 mentions); they exist as 11 standalone kai-pm/D3xx files  [CMD `git show dd153c1:kai-pm/DECISIONS.md | grep -c` → D351 0]
+- CHECKER DEFECT CAUGHT BY CALIBRATION: first version of check_s01.py required a 20-hex sha prefix, so README's 16-hex prefix was silently skipped while the count said 8 checked; planted wrong sha passed. Fixed to accept 16–64 hex, count real comparisons, and fail on any skipped sha; rerun: real file passes, 4 of 4 planted faults fail  [CMD `python3 -I check_s01.py kp1..kp4` → exit 1 ×4]
+- Dates in the first measurement used a shallow clone (history from 2026-08-05) and were wrong for older files; all dates in the proposal were re-measured after the full fetch  [CMD `git rev-parse --is-shallow-repository` → true, then false]
+- Credential scan of proposal, script and runs: 0 hits (calibration 6/6)  [CMD `credscan.py s01/cs.json` → TOTAL HITS 0]
+- EVIDENCE ORION-STEP-0-1-PROPOSAL STEP_0_1_SOURCE_CLASSIFICATION_PROPOSAL.md: 25169 bytes, sha256 9c995976c7998c921e4458110c07e43bc4410dc2d7ee82ce04faa68ef8115a2e, final LF True (added by Orion)  [CMD `sha256sum STEP_0_1_SOURCE_CLASSIFICATION_PROPOSAL.md` → 9c995976c7998c92…]
+    BEGIN-VERBATIM ORION-STEP-0-1-PROPOSAL
+    # Step 0.1 — Source classification proposal (for Kai to adjudicate)
+    
+    **ORION → KAI, DAINIUS | v3.2.3 §6 step 0.1 and Annex A | PROPOSAL | read-only | 2026-10-14**
+    
+    ## In plain words
+    
+    Before anyone counts KAI's features, every document that promises features gets a label saying how much it counts: current authority, older version, draft, replaced, outside source, or derived. This is Orion's proposed labelling. Kai decides. Three things stand out:
+    1. **Decisions D344 to D353 are not in `DECISIONS.md`.** They are in 11 separate files, including D351, the "evolve, don't redesign" rule the procedure relies on. The list as written would miss them. Proposal: add those files.
+    2. **A lead on the missing "April" document:** `kai-pm/STRATEGIC_PLAN.md` was first added on 21 April 2026 and calls itself the "Canonical 5-phase roadmap for Kai". It is the only plan document first added that month. Not proof; Dainius or Kai to confirm.
+    3. **Two labels in the approved list conflict with the repository's own authority index,** for `README.md` and the mission doctrine. Both readings are set out below for Kai.
+    
+    ## 1. Pinned commit
+    
+    - **`dd153c1f4ab7c52f34620e07238554453a8912d9`** on `claude/project-rework-plan-pgvp35` (handoff entry 243, which banks Dainius's go). Recorded once; every fact below is at this commit.
+    - Product code is unchanged since the pilot pin 421478a: `git diff --stat 421478a..dd153c1` changes only `kai-pm/HANDOFF_LOG.md`.
+    - **For Kai to adjudicate:** this branch is not `main`. `git diff --name-only origin/main dd153c1` lists 414 paths, 169 of them outside `kai-pm/` and `.claude/`. Orion proposes this branch as the research subject because all programme work and the pilot evidence are on it.
+    - History: the local clone was shallow (from 2026-08-05). Orion fetched the full branch history (read-only; local `.git` only): 1491 commits from 2025-06-18. Every date below uses the full history.
+    
+    ## 2. The twelve listed sources (Annex A table)
+    
+    Dates are commit dates on this branch (first added, last changed); "self" is a date the document states itself. Vocabulary: canonical · lineage · draft · superseded · external · derived.
+    
+    | # | Source | Exists at pin | Dates | Proposed status | Reason and evidence |
+    |---|---|---|---|---|---|
+    | 1 | `README.md` | yes · 1841 lines · sha256 796c1f01d40d41fd… | first 2025-06-18, last 2026-09-17 (279 commits) | **canonical for feature intent; never runtime or current fact** (as Annex A) | Annex A, approved by Dainius 2026-10-14. **Conflict for Kai:** `KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:14` (2026-08-24, after D353) calls it "stale factually, but mandatory organism/capability/presentation lineage input; never current fact authority without verification". Both agree it is not fact authority; they differ on canonical versus lineage for intent. README:1328 makes runtime claims (fingerprint "actively collecting"); owner: nothing is running (entry 217) |
+    | 2 | `kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md` | yes · 449 lines · sha256 349d7b13fe51eabac5cf… | first and last 2026-08-23 | **canonical for mission intent; not implementation authority** | Its own status (line 3): "MASTER-CANON ROOT DESIGN INVARIANT / HISTORICAL INTENT CONSOLIDATION — NOT IMPLEMENTATION AUTHORITY AND NOT PROGRAMME EXECUTION AUTHORITY". **Correction for Kai:** Annex A cites "frozen protocol O-3". O-3 (handoff entries 120 and 131) is a naming recommendation: "until freeze, the Primary Mission/Identity/Lineage doctrine plus locked master-plan candidates are inputs, not final constitution". It does not freeze the doctrine |
+    | 3 | `kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md` | yes · 1760 lines · sha256 a3b3c5b5a2b45ceb22ce… | first and last 2026-07-27; self "Prepared: 27 July 2026" (line 5) | **lineage (target design)** (as Annex A) | Its own status (line 4): "TARGET PRODUCT DESIGN — PLANNING ONLY"; "Current release decision: NO_GO" (line 8) |
+    | 4 | `kai-pm/KINGSMAN_FINAL_VISION_MASTER_CANON_PLAN.md` | yes · 463 lines · sha256 d23db5728d4b0a51070c… | first 2026-08-23, last 2026-08-23 | **lineage** | Its own status (line 3): "MASTER-DESIGN PLANNING OBLIGATION — FINAL CANON NOT YET FROZEN BY THIS FILE". The authority index (line 24): "no current file is accepted as the professional Kingsman master architecture blueprint". It quotes two operator statements (lines 5, 7) about programme order (Item 8 before A4); those are owner rulings, read as such, but they add no feature |
+    | 5 | `bootstrap/master_plan.md` | yes · 88 lines · sha256 a2f0a38739f8ff8b671e… | first and last 2026-06-02 (commit e7b256c "Document Kai's unique vision and refined development principles") | **lineage (the original vision)** (as Annex A) | Vision statement (memory, dreams, diary, Memu Core / Executor, swarm of models). Note: at this path it dates from June 2026, not the project start; `README.md` is older (2025-06-18) |
+    | 6 | `docs/next_level_roadmap.md` | yes · 66 lines · sha256 fbd9bc6d36b9648e278b… | first 2026-02-22, last 2026-06-02 (5 commits) | **lineage, with two choices flagged as possibly superseded** | Reliability hardening notes. It records "Chosen now: HMAC-SHA256" request signing and `/tmp` safety-state persistence. The authority index (line 102) says the "current Ed25519 direction remains retained". No explicit removal found in the inspected range, so under Annex A the promises are kept and the conflict is recorded for Kai |
+    | 7 | v1.1 unified draft (handoff entry 106, block KAI-MASTER-PLAN-V1-1-UNIFIED-DRAFT) | yes (entry 106, 2026-10-07) | 2026-10-07 | **draft** (as Annex A) | Unadjudicated draft; counted and flagged |
+    | 8 | D-numbered decisions in `kai-pm/DECISIONS.md` | yes · 39453 lines · sha256 d89343f83a1788cd6c15… | first 2026-04-21, last 2026-10-02 (374 commits) | **canonical where they add, remove or hold a capability** (as Annex A) | **Finding:** 373 distinct `## D<n>` headings, highest D390. **D344–D353 have no heading in `DECISIONS.md`** (D351: 0 mentions; D344: 49 and D353: 48 mentions, no heading). They live as standalone files (§3a) and in append-queue files. Proposal: add the standalone files as sources on the same terms |
+    | 9 | Owner rulings banked in the handoff log | yes · `kai-pm/HANDOFF_LOG.md` 86947 lines | first 2026-09-30 | **canonical owner intent where they add, remove or hold a capability; flagged UNBANKED** | `handoff.py check` at entry 243 counts 170 ruling lines (unit: §2 ruling lines; most are not about capabilities). **For Kai:** `CLAUDE.md` calls the log non-authoritative working memory, and a ruling is "⚠ UNBANKED" until it is in `DECISIONS.md`. Proposal: use the verbatim owner words as intent, and list each capability ruling used as UNBANKED |
+    | 10 | `kai-pm/SHOPPING_LIST_PLAN.md` / D13 "v2.1" | yes · 297 lines · sha256 8f49cd4dc83b2664545f… | first and last 2026-06-21; D13 dated 2026-06-18 (`DECISIONS.md:213`) | **SHOPPING_LIST_PLAN: lineage. D13: canonical (D-number). The original "v2.1 architecture" document: external, and a named gap** | The plan scopes tools from the 2026-06-18 evaluation pass (lines 3–7). The "v2.1" document it describes was external. A search of every file name in the branch history finds no v2.1 document; only `SHOPPING_LIST_PLAN.md` and `DECISIONS.md` mention it. Tool choices are re-earned under v3.2.3 §4 (D3) |
+    | 11 | 104-item register (handoff entry 167, block KAI-FEATURE-LIST) | yes (entry 167, 2026-10-11) | 2026-10-11 | **derived** (as Annex A) | Built from README by script; guides deduplication; never outranks a source |
+    | 12 | "Old April vision" | **not found** | — | **named gap** (as Annex A), **with one lead** | Bounded search in §4 |
+    
+    ## 3. Candidate additions (not on the list)
+    
+    ### 3a. Standalone decision files — proposed: add
+    
+    15 files match `kai-pm/D<number>…md`. Eleven hold D344–D353: D344, D344A, D345, D346, D347, D348, D349, D350, D351, D352, D353. Proposal: **canonical where they add, remove or hold a capability**, as for `DECISIONS.md`, because those numbers are not in `DECISIONS.md`. D351 is cited by the procedure itself (rebuild conditions). The seven `DECISIONS_CANONICAL_APPEND_QUEUE_D344_D3xx.md` files: proposed **derived** (queued copies; the standalone file wins). The other four D-files (D379 plans and reviews) are listed in §3c.
+    
+    ### 3b. Authority and register documents — proposed: use as classification evidence, not item sources
+    
+    - `kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md` (2026-08-24): an existing authority order after D353. Proposed **canonical for document authority as of 2026-08-24**, later owner rulings prevail. Its order and the Annex A list should be reconciled by Kai.
+    - `kai-pm/KINGSMAN_CANON_SYNCHRONISATION_REGISTER_CURRENT.md` and `kai-pm/KINGSMAN_MASTER_CANON_INPUT_MANIFEST_V0_2.md` (2026-08-24): earlier disposition registers ("There is no disposition called forgotten"). Proposed **derived**; the census should cross-check them so no earlier disposition is lost.
+    - `kai-pm/STRATEGIC_PLAN.md` (first 2026-04-21, last 2026-07-21; line 3: "Canonical 5-phase roadmap for Kai"): proposed **lineage**, and the lead for the April gap (§4).
+    
+    ### 3c. All other candidates found by the bounded search
+    
+    Search universe: Markdown files directly in the repository root, `kai-pm/`, `docs/` and `bootstrap/` at the pin (306 files), whose names contain vision, plan, architect, roadmap, backlog, feature, spec, canon, doctrine or strateg (71 names; `CODE_AUDIT_BATCH*` excluded by name), plus the 15 D-files: 75 unique. Of these, 6 are already in §2 and 69 are listed below with their self-declared status, unclassified. A name search misses documents with other names; Wave 0's census reads beyond this list. Kai decides which join the source list.
+    
+    | Path | Lines | First / last | Self-declared status (first 15 lines) or title |
+    |---|---|---|---|
+    | `SESSION_BACKLOG.md` | 283 | 2026-03-22 / 2026-07-23 | title: # Kai System — Session Backlog |
+    | `docs/PROJECT_BACKLOG.md` | 1433 | 2026-02-25 / 2026-09-17 | title: # Kai System — Project Backlog |
+    | `docs/agentic_patterns_spec.md` | 303 | 2026-03-02 / 2026-06-02 | title: # Agentic Patterns Spec — kai-system Phase 2 |
+    | `docs/architecture.md` | 209 | 2026-03-22 / 2026-06-02 | title: # Kai System — Architecture |
+    | `docs/first_implementation_plan.md` | 172 | 2026-02-21 / 2026-06-02 | title: # First Implementation Plan (Core Sovereign Stack) |
+    | `docs/production_hardening_plan.md` | 118 | 2026-02-21 / 2026-02-21 | title: # Production Hardening Plan (Post Core-Stability) |
+    | `docs/sovereign_ai_spec.md` | 1273 | 2026-02-07 / 2026-06-02 | title: # Sovereign AI (Local-Only) — Consolidated Technical Specification |
+    | `kai-pm/CODE_AUDIT_P0_CONTAINMENT_PLAN.md` | 538 | 2026-07-27 / 2026-07-27 | title: # Kai System — Phase 0 Source-Specific Containment Plan |
+    | `kai-pm/CODE_AUDIT_P1_SECURITY_FOUNDATION_PLAN.md` | 1163 | 2026-07-27 / 2026-07-27 | title: # Kai System — Phase 1 Security Foundation Plan |
+    | `kai-pm/CODE_AUDIT_P2_ISOLATION_AND_INTEGRITY_PLAN.md` | 1382 | 2026-07-27 / 2026-07-27 | title: # Kai System — Phase 2 Isolation and Integrity Plan |
+    | `kai-pm/CODE_AUDIT_P3_RELIABILITY_AUDIT_PRIVACY_RECOVERY_PLAN.md` | 1376 | 2026-07-27 / 2026-07-27 | title: # Kai System — Phase 3 Reliability, Audit, Privacy and Recovery Plan |
+    | `kai-pm/CODE_AUDIT_P4_CAPABILITY_REQUALIFICATION_PLAN.md` | 1352 | 2026-07-27 / 2026-07-27 | title: # Kai System — Phase 4 Capability Requalification Plan |
+    | `kai-pm/CODE_AUDIT_PLANNING_PACKAGE_QA.md` | 122 | 2026-07-27 / 2026-07-27 | title: # Kai System — Planning Package Continuity and Integrity Review |
+    | `kai-pm/CODE_AUDIT_REMEDIATION_BACKLOG.md` | 679 | 2026-07-27 / 2026-07-27 | title: # Kai System — Prioritised Remediation Backlog |
+    | `kai-pm/D344A_PRIMARY_MISSION_CANON_ALIGNMENT_CHECKPOINT.md` | 222 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: D344 SUPPLEMENT / GOVERNANCE CHECKPOINT — DURABLE PLANNING ALIGNMENT, NOT A SUBSTITUTE FOR SAFE APPEND TO `DECISIONS.md`, NOT EXECUTION AUTHORITY.** |
+    | `kai-pm/D344_PRIMARY_MISSION_IDENTITY_LINEAGE_CANON_CORRECTION.md` | 244 | 2026-08-23 / 2026-08-23 | L3: > **STATUS: GOVERNANCE / CANON CORRECTION RECOVERY ARTIFACT — PENDING SAFE APPEND TO `kai-pm/DECISIONS.md`.** |
+    | `kai-pm/D345_KINGSMAN_ARCHITECTURE_V0_1_REVIEW_CHECKPOINT.md` | 271 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: GOVERNANCE / DESIGN CHECKPOINT — CANDIDATE RETURNED FOR EXTERNAL ADVERSARIAL REVIEW. NOT FINAL CANON. NOT IMPLEMENTATION AUTHORITY.** |
+    | `kai-pm/D346_ENGINEERING_ARCHITECTURE_VISUAL_CORRECTION.md` | 175 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: GOVERNANCE / DESIGN CORRECTION — NO RUNTIME OR PROGRAMME EXECUTION AUTHORISED.** |
+    | `kai-pm/D347_MASTER_ARCHITECTURE_CONSOLIDATION_CHECKPOINT.md` | 239 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: GOVERNANCE / DESIGN CHECKPOINT — CONSOLIDATED MASTER CANDIDATE BANKED; NOT FINAL CANON, NOT IMPLEMENTATION AUTHORITY, NOT PROGRAMME EXECUTION AUTHORITY.** |
+    | `kai-pm/D348_EXISTING_KAI_EVOLUTION_CORRECTION.md` | 279 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: GOVERNANCE / ARCHITECTURE CORRECTION — v0.3 BECOMES PRIMARY REVIEW SUBJECT. NOT IMPLEMENTATION AUTHORITY. NOT PROGRAMME EXECUTION AUTHORITY.** |
+    | `kai-pm/D349_DEEPSEEK_V0_3_EXISTING_SYSTEM_REVIEW_RECONCILIATION.md` | 128 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: GOVERNANCE / ARCHITECTURE REVIEW CHECKPOINT — NOT IMPLEMENTATION AUTHORITY, NOT PROGRAMME EXECUTION AUTHORITY, NOT FINAL CANON.** |
+    | `kai-pm/D350_MASTER_ARCHITECTURE_PLAN_AND_DRAWING_SET_V0_4.md` | 152 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: GOVERNANCE / ARCHITECTURE CHECKPOINT — v0.4 MASTER PLAN + DRAWINGS + MIGRATION MATRIX BANKED. NOT FINAL CANON. NOT IMPLEMENTATION AUTHORITY. NOT PROGRAMME EXECUTION AUTHORITY.** |
+    | `kai-pm/D351_EVOLUTION_NOT_REDESIGN_AND_PRESENTATION_BAR_CORRECTION.md` | 320 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: GOVERNANCE / ARCHITECTURE POSTURE CORRECTION. NOT IMPLEMENTATION AUTHORITY. NOT PROGRAMME EXECUTION AUTHORITY.** |
+    | `kai-pm/D352_WITHDRAW_REJECTED_V0_4_ARCHITECTURE_PACKAGE.md` | 81 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: GOVERNANCE / ARCHITECTURE CLEANUP. NOT IMPLEMENTATION AUTHORITY. NOT PROGRAMME EXECUTION AUTHORITY.** |
+    | `kai-pm/D353_DEEP_RESEARCH_MATURATION_IMPLEMENTATION_REISSUE.md` | 169 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: GOVERNANCE / RESEARCH CHECKPOINT — NOT ARCHITECTURE AUTHORITY, NOT IMPLEMENTATION AUTHORITY, NOT PROGRAMME EXECUTION AUTHORITY.** |
+    | `kai-pm/D379_PLAN_V4_1.md` | 598 | 2026-09-30 / 2026-09-30 | title: # D379 PLAN v4.1 — PRESERVED TEXT (non-authoritative record) |
+    | `kai-pm/D379_PLAN_V4_5.md` | 1936 | 2026-09-30 / 2026-09-30 | title: (no title) |
+    | `kai-pm/D379_PLAN_V4_5_DEEPSEEK_FINAL_REVIEW.md` | 226 | 2026-09-30 / 2026-09-30 | title: (no title) |
+    | `kai-pm/D379_PLAN_V4_5_KAI_RECONCILIATION.md` | 595 | 2026-09-30 / 2026-09-30 | title: (no title) |
+    | `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D347.md` | 193 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: ZERO-LOSS GOVERNANCE QUEUE — NOT A SUBSTITUTE FOR `kai-pm/DECISIONS.md`.** |
+    | `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D348.md` | 115 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: ZERO-LOSS GOVERNANCE QUEUE — NOT A SUBSTITUTE FOR `kai-pm/DECISIONS.md`.** |
+    | `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D349.md` | 75 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: ZERO-LOSS GOVERNANCE QUEUE — NOT A SUBSTITUTE FOR `kai-pm/DECISIONS.md`.** |
+    | `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D350.md` | 104 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: ZERO-LOSS GOVERNANCE QUEUE — NOT A SUBSTITUTE FOR CANONICAL `kai-pm/DECISIONS.md`.** |
+    | `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D351.md` | 73 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: ZERO-LOSS GOVERNANCE QUEUE — NOT A SUBSTITUTE FOR CANONICAL `kai-pm/DECISIONS.md`.** |
+    | `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D352.md` | 69 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: ZERO-LOSS GOVERNANCE QUEUE — NOT A SUBSTITUTE FOR CANONICAL `kai-pm/DECISIONS.md`.** |
+    | `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D353.md` | 93 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: ZERO-LOSS GOVERNANCE QUEUE — NOT A SUBSTITUTE FOR CANONICAL `kai-pm/DECISIONS.md`.** |
+    | `kai-pm/DEEPSEEK_REVIEW_PACKET_KINGSMAN_ARCHITECTURE_V0_1.md` | 185 | 2026-08-24 / 2026-08-24 | title: # DeepSeek Review Packet — Kai Kingsman Candidate Architecture v0.1 |
+    | `kai-pm/ENGINEERING_DOCTRINE.md` | 1021 | 2026-08-15 / 2026-09-10 | title: # Engineering doctrine |
+    | `kai-pm/EVIDENCE_PLANE_RESEARCH_LINEAGE.md` | 175 | 2026-08-20 / 2026-08-20 | title: # KAI Evidence Plane — Research Lineage and Continuity Note |
+    | `kai-pm/H2_CONSOLIDATED_REPAIR_SPEC_DRAFT.md` | 1246 | 2026-08-29 / 2026-08-29 | L4: **STATUS: DRAFT FOR REVIEW. NOT AUTHORISED. NO IMPLEMENTATION.** |
+    | `kai-pm/INSTRUMENTATION_ARCHITECTURE.md` | 477 | 2026-08-03 / 2026-08-05 | title: # Sub-plan — The Instrumentation Layer |
+    | `kai-pm/KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md` | 1189 | 2026-07-27 / 2026-07-27 | title: # Kai Unified Hunter Architecture and Migration Roadmap |
+    | `kai-pm/KINGSMAN_ARCHITECTURAL_PILLARS_INDEX.md` | 284 | 2026-08-23 / 2026-08-23 | L3: > **STATUS: MASTER-CANON NAVIGATION / SYNTHESIS INDEX — NOT IMPLEMENTATION AUTHORITY.** |
+    | `kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md` | 112 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: CURRENT ARCHITECTURE/DOCUMENT AUTHORITY MAP AFTER D353 — PLANNING/GOVERNANCE ONLY.** |
+    | `kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_V0_2.md` | 221 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: ARCHITECTURE-DOCUMENT AUTHORITY MAP — PLANNING/GOVERNANCE ONLY, NOT IMPLEMENTATION OR PROGRAMME EXECUTION AUTHORITY.** |
+    | `kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_V0_3.md` | 116 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: CURRENT ARCHITECTURE/DOCUMENT AUTHORITY MAP AFTER D348 — PLANNING/GOVERNANCE ONLY.** |
+    | `kai-pm/KINGSMAN_CANDIDATE_ARCHITECTURE_V0_1_DEEPSEEK_REVIEW.md` | 1918 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: CANDIDATE FOR DAINIUS + KAI + DEEPSEEK ADVERSARIAL REVIEW — NOT FROZEN, NOT IMPLEMENTATION AUTHORITY, NOT A PROGRAMME-SEQUENCE CHANGE.** |
+    | `kai-pm/KINGSMAN_CANON_SYNCHRONISATION_REGISTER.md` | 272 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: OPERATOR / PROGRAMME CONTROL REGISTER — PLANNING STATE ONLY, NOT IMPLEMENTATION AUTHORITY.** |
+    | `kai-pm/KINGSMAN_CANON_SYNCHRONISATION_REGISTER_CURRENT.md` | 103 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: CURRENT ARCHITECTURE / PROGRAMME CONTROL REGISTER AFTER D353 — NOT IMPLEMENTATION AUTHORITY.** |
+    | `kai-pm/KINGSMAN_CANON_SYNCHRONISATION_REGISTER_V0_3.md` | 112 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: CURRENT ARCHITECTURE/PROGRAMME CONTROL REGISTER AFTER D348 — NOT IMPLEMENTATION AUTHORITY.** |
+    | `kai-pm/KINGSMAN_ENGINEERING_ARCHITECTURE_DRAWING_SET_V0_1.md` | 555 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: CANDIDATE ENGINEERING DRAWING SET FOR DAINIUS / KAI / DEEPSEEK REVIEW — NOT FINAL CANON, NOT IMPLEMENTATION AUTHORITY.** |
+    | `kai-pm/KINGSMAN_ENGINEERING_ARCHITECTURE_VISUAL_STANDARD.md` | 229 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: STANDING DESIGN / OPERATOR-VISIBILITY EXTENSION — NOT IMPLEMENTATION AUTHORITY.** |
+    | `kai-pm/KINGSMAN_EXISTING_KAI_EVOLUTION_MASTER_PLAN_V0_3.md` | 1092 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: PRIMARY ARCHITECTURE EVOLUTION CANDIDATE FOR DAINIUS + KAI + DEEPSEEK + ORION REVIEW — NOT FROZEN, NOT IMPLEMENTATION AUTHORITY, NOT PROGRAMME EXECUTION AUTHORITY.** |
+    | `kai-pm/KINGSMAN_MASTER_ARCHITECTURE_AND_PROFESSIONALISATION_CANDIDATE_V0_2.md` | 1522 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: WHOLE-SYSTEM MASTER-CANON CANDIDATE FOR DAINIUS + KAI + DEEPSEEK + ORION REVIEW — NOT FROZEN, NOT IMPLEMENTATION AUTHORITY, NOT PROGRAMME EXECUTION AUTHORITY.** |
+    | `kai-pm/KINGSMAN_MASTER_CANON_INPUT_MANIFEST_V0_2.md` | 222 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: CONTROL / TRACEABILITY MANIFEST FOR `KINGSMAN_MASTER_ARCHITECTURE_AND_PROFESSIONALISATION_CANDIDATE_V0_2.md` — NOT IMPLEMENTATION AUTHORITY.** |
+    | `kai-pm/KINGSMAN_ORGANIC_RESILIENCE_ARCHITECTURE_DOCTRINE.md` | 442 | 2026-08-23 / 2026-08-23 | L3: > **STATUS: MASTER-CANON DESIGN INPUT / STANDING ARCHITECTURAL INVARIANT — NOT IMPLEMENTATION AUTHORITY.** |
+    | `kai-pm/KINGSMAN_PRIMARY_MISSION_CANON_PROPAGATION_MAP.md` | 329 | 2026-08-23 / 2026-08-23 | L3: > **STATUS: CROSS-DOCUMENT RECONCILIATION / AMENDMENT MAP — NOT IMPLEMENTATION AUTHORITY.** |
+    | `kai-pm/KINGSMAN_PROACTIVE_ORGANISM_DOCTRINE.md` | 308 | 2026-08-23 / 2026-08-23 | L3: > **STATUS: MASTER-CANON DESIGN INPUT / STANDING ARCHITECTURAL INVARIANT — NOT IMPLEMENTATION AUTHORITY.** |
+    | `kai-pm/KINGSMAN_README_ARCHITECTURE_REFRESH_PLAN.md` | 427 | 2026-08-23 / 2026-08-23 | L3: > **STATUS: PLANNING / FUTURE EXECUTION OBLIGATION — NO README REWRITE AUTHORISED BY THIS FILE.** |
+    | `kai-pm/KINGSMAN_ROOT_ARCHITECTURE_AND_CANON_ALIGNMENT.md` | 506 | 2026-08-24 / 2026-08-24 | L3: > **STATUS: MASTER-CANON ROOT PLANNING ALIGNMENT — NOT IMPLEMENTATION AUTHORITY, NOT EXPERIMENT AUTHORITY, FINAL CANON NOT YET FROZEN.** |
+    | `kai-pm/LETTA_INTEGRATION_PLAN.md` | 162 | 2026-07-21 / 2026-07-21 | title: # Letta Integration Plan |
+    | `kai-pm/NEXT_STINT_PLAN.md` | 431 | 2026-08-07 / 2026-08-12 | title: # Next stint — plan of work |
+    | `kai-pm/OPERATOR_VISIBILITY_ENGINEERING_DOCTRINE.md` | 235 | 2026-08-23 / 2026-08-23 | L3: > **STATUS: STANDING ENGINEERING DOCTRINE EXTENSION.** |
+    | `kai-pm/PHASE_0_5_BACKLOG.md` | 109 | 2026-05-10 / 2026-07-21 | title: # Phase 0.5 Backlog — CPU-Safe Work Before GPU Lands |
+    | `kai-pm/STRATEGIC_PLAN.md` | 121 | 2026-04-21 / 2026-07-21 | title: # Sovereign AI Strategic Plan |
+    | `kai-pm/UH2_SENSOR_INGRESS_PLAN.md` | 337 | 2026-08-07 / 2026-08-07 | title: # UH-2 sensor ingress — implementation plan (rev 2) |
+    | `kai-pm/VERIFICATION_ARCHITECTURE_REVIEW.md` | 245 | 2026-08-12 / 2026-08-12 | title: # Verification-architecture gap review |
+    | `kai-pm/W1_DASHBOARD_REMEDIATION_PLAN.md` | 322 | 2026-08-02 / 2026-08-03 | title: # Wave 1 — Dashboard Privileged Gateway Remediation Plan |
+    | `kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md` | 279 | 2026-08-03 / 2026-08-04 | title: # Sub-plan — Repository-wide HTTP and Time Hygiene |
+    
+    ## 4. The "April" gap: bounded search
+    
+    - **Owner:** searched and not found (entry 208).
+    - **File names, whole branch history (1491 commits from 2025-06-18):** no file whose name contains "april" has ever existed. No file whose name contains vision, roadmap, master_plan, strateg or spec has ever been deleted. The only file ever named "vision" that is a plan is `KINGSMAN_FINAL_VISION_MASTER_CANON_PLAN.md` (2026-08-23).
+    - **Text at the pin** ("april vision", "april 2026", "april plan", case-insensitive, handoff log excluded): 5 files, all unrelated (tax dates, a document-date table, evidence JSON).
+    - **Documents first added in April 2026 (36 commits that month):** 16 Markdown files, outside `.github/`. The only one named as a plan or roadmap is `kai-pm/STRATEGIC_PLAN.md`, first added 2026-04-21 in commit f2051b9 ("fix ci E999 and replace fabricated PM artifacts"); the same day, commit 37f07d7 added the `kai-pm` project-management folder and changed `README.md`.
+    - **Lead, not proof:** `STRATEGIC_PLAN.md` may be the "April vision". Dainius or Kai to confirm. If not, the gap stays open with this search record (Annex A).
+    - **Not searched:** other branches, and anything outside this repository.
+    
+    ## 5. Chronology (oldest first, by first appearance on this branch)
+    
+    | Date | Source |
+    |---|---|
+    | 2025-06-18 | `README.md` (project start) |
+    | 2026-02-22 | `docs/next_level_roadmap.md` |
+    | 2026-04-21 | `kai-pm/DECISIONS.md`; `kai-pm/STRATEGIC_PLAN.md` (April lead) |
+    | 2026-06-02 | `bootstrap/master_plan.md` |
+    | 2026-06-18 / 06-21 | D13 / `kai-pm/SHOPPING_LIST_PLAN.md` |
+    | 2026-07-27 | `kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md` |
+    | 2026-08-23 | mission doctrine; final-vision master-canon plan |
+    | 2026-08-24 | authority index CURRENT; canon synchronisation register CURRENT (after D353) |
+    | 2026-09-30 → | handoff log (owner rulings) |
+    | 2026-10-07 | v1.1 unified draft (entry 106) |
+    | 2026-10-11 | 104-item register (entry 167) |
+    | 2026-10-14 | procedure v3.2.3 approved; D1–D5 decided (entries 230–241) |
+    
+    Where two canonical sources conflict, the later owner ruling or D-number governs, and both are recorded (Annex A).
+    
+    ## 6. What Kai is asked to adjudicate
+    
+    1. The pinned commit and branch (§1).
+    2. The twelve statuses (§2), including the README and doctrine conflicts.
+    3. Adding the D344–D353 standalone files (§3a).
+    4. How the authority index and registers are used (§3b).
+    5. Which §3c candidates join the source list.
+    6. The April lead (§4).
+    
+    ## 7. Limits
+    
+    - Dates are commit dates on this one branch; they are not authorship dates.
+    - Statuses in §3c are what each document says about itself; Orion has not classified them.
+    - Nothing was read for feature items. That is Wave 0, after Kai adjudicates.
+    - No file in the repository was changed, apart from the handoff log.
+    END-VERBATIM ORION-STEP-0-1-PROPOSAL
+- EVIDENCE ORION-STEP-0-1-CHECK-SCRIPT check_s01.py: 1595 bytes, sha256 82db82494efb013b0ccdddffdac8555c4c2a5b658bb01d65093a3bbe762e2ba5, final LF True (added by Orion)  [CMD `sha256sum check_s01.py` → 82db82494efb013b…]
+    BEGIN-VERBATIM ORION-STEP-0-1-CHECK-SCRIPT
+    """Step 0.1 proposal check: 12 source rows, no empty cell, sha256 prefixes match the pinned commit."""
+    import hashlib, re, subprocess, sys
+    PIN = "dd153c1f4ab7c52f34620e07238554453a8912d9"
+    doc, repo = open(sys.argv[1], encoding="utf-8").read(), sys.argv[2]
+    sec = doc.split("## 2. The twelve listed sources")[1].split("## 3.")[0]
+    rows = [l for l in sec.splitlines() if re.match(r"^\| \d+ \|", l)]
+    bad = []
+    compared = 0
+    if [int(l.split("|")[1]) for l in rows] != list(range(1, 13)):
+        bad.append(f"row numbers {[l.split('|')[1].strip() for l in rows]}")
+    for l in rows:
+        cells = [c.strip() for c in l.strip().strip("|").split("|")]
+        if len(cells) != 6 or any(not c for c in cells):
+            bad.append(f"row {cells[0]}: {len(cells)} cells or an empty cell")
+        m = re.search(r"`([^`]+\.md)`", cells[1]); h = re.search(r"sha256 ([0-9a-f]{16,64})", cells[2])
+        if "sha256" in cells[2] and not h:
+            bad.append(f"row {cells[0]}: sha256 text present but no hex prefix of 16+ characters")
+        if h:
+            compared += 1
+            blob = subprocess.run(["git", "show", f"{PIN}:{m.group(1)}"], cwd=repo, capture_output=True, check=True).stdout
+            if not hashlib.sha256(blob).hexdigest().startswith(h.group(1)):
+                bad.append(f"row {cells[0]}: sha256 mismatch for {m.group(1)}")
+    n_sha = sum(1 for l in rows if "sha256" in l)
+    if compared != n_sha:
+        bad.append(f"compared {compared} of {n_sha} rows carrying sha256")
+    print(f"rows={len(rows)} rows_with_sha256={n_sha} sha256_compared={compared} problems={len(bad)}")
+    for b in bad: print("  PROBLEM", b)
+    sys.exit(1 if bad else 0)
+    END-VERBATIM ORION-STEP-0-1-CHECK-SCRIPT
+- EVIDENCE ORION-STEP-0-1-CHECK-RUNS check_runs.txt: 681 bytes, sha256 d5dcdeb4fa87a42bd5132a8c054dd12658d8b0be2b678e606d2ccde8479cea89, final LF True (added by Orion)  [CMD `sha256sum check_runs.txt` → d5dcdeb4fa87a42b…]
+    BEGIN-VERBATIM ORION-STEP-0-1-CHECK-RUNS
+    --- STEP_0_1_SOURCE_CLASSIFICATION_PROPOSAL
+    rows=12 rows_with_sha256=8 sha256_compared=8 problems=0
+    exit 0
+    --- kp1
+    rows=12 rows_with_sha256=8 sha256_compared=8 problems=1
+      PROBLEM row 3: 6 cells or an empty cell
+    exit 1
+    --- kp2
+    rows=12 rows_with_sha256=8 sha256_compared=8 problems=1
+      PROBLEM row 1: sha256 mismatch for README.md
+    exit 1
+    --- kp3
+    rows=11 rows_with_sha256=8 sha256_compared=8 problems=1
+      PROBLEM row numbers ['1', '2', '3', '4', '5', '6', '8', '9', '10', '11', '12']
+    exit 1
+    --- kp4
+    rows=12 rows_with_sha256=8 sha256_compared=7 problems=2
+      PROBLEM row 5: sha256 text present but no hex prefix of 16+ characters
+      PROBLEM compared 7 of 8 rows carrying sha256
+    exit 1
+    END-VERBATIM ORION-STEP-0-1-CHECK-RUNS
+
+### 6. Next authorised step
+
+- Post the proposal to DAI-10 (posted == banked); update the start-here page; report to Dainius  [CONVERSATION 2026-10-14 Dainius, "please make sure you log all in linear"]
+
+### 7. What I am unsure of
+
+- Whether Kai-GPT's Linear connector can read documents as well as comments (it could read DAI-10 comments, entry 227)  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
