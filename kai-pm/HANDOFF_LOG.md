@@ -96291,3 +96291,152 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T18:42:29Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T18:42:29Z  [CMD `date -u +%FT%TZ` → 2026-10-14T18:42:29Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 73846cfea2cfd44c828c54d55e54e6e8bdd177d1  [CMD `git rev-parse HEAD` → 73846cfea2cfd44c828c54d55e54e6e8bdd177d1]
+- tree: 080e3930aefbf4613d75174d0931924bab9d4917  [CMD `git rev-parse HEAD^{tree}` → 080e3930aefbf4613d75174d0931924bab9d4917]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 73846cfea2cfd44c828c54d55e54e6e8bdd177d1  [CMD `git ls-remote --heads origin` → 73846cfea2cfd44c828c54d55e54e6e8bdd177d1]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 268  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 268]
+
+### 1. The four states
+
+- physical: unchanged since entry 268 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Kai-side continuity controls; the addendum extends Kai's Project instructions  [FILE kai-pm/KAI_GPT_COLD_START_GUARDIAN_V0_1.md:4]
+- evidence: Guardian Verification Addendum v1.1 as pasted by Dainius, and Orion's check, verbatim in section 5; Orion's assessment ae07f15b verified posted == banked  [CMD `verify_posts.py ae07f15b,ORION-COLD-START-TEST-01-ASSESSMENT-2,73846cfe` → EQUAL, calibration True]
+- admission: none; the addendum releases no hold  [CONVERSATION 2026-10-14 Dainius, "A successful cold-start test does not release any engineering, research, PRE-RAMS, Gold Tier or merge hold."]
+
+### 2. Rulings since the last handoff
+
+- Dainius (pasting Kai's text) · 2026-10-14 · Kingsman Cold-Start Guardian Verification Addendum v1.1: receipt first with identifiers; branch claude/project-rework-plan-pgvp35, not main; D351/D352 preserved; independent decision recovery beyond the ruling hook; continuity qualification kept separate; no hold released ⚠ UNBANKED  [CONVERSATION 2026-10-14 Dainius, "The following requirements extend the existing KAI-GPT Cold-Start & Continuity Protocol."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: D1–D5; step 0.1 (register v2 awaiting Kai); Kai-side continuity controls. HELD: Wave 0; engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier certification (Kai); D5(a)  [CONVERSATION 2026-10-14 Dainius, "does not release any engineering, research, PRE-RAMS, Gold Tier or merge hold"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Optional consistency sentence for the addendum (identifiers must agree with each other); whether v1.1 is to be committed beside the Guardian file  [CMD `orion_check_addendum.md` → notes]
+
+### 5. Incidents and corrections
+
+- COVERAGE: all of Orion's raised points are in v1.1 (receipt first, comment identifier and timestamp, full HEAD, latest handoff entry, branch, D351, D352, ruling hook, separate status); no cross-consistency requirement  [CMD `key-phrase check of addendum_v1_1.md` → all True except 'consistent' False]
+- LENGTH: instructions plus addendum 6,810 characters (original) or 7,275 (amended); ChatGPT limit not checked  [CMD `len()` → 6810, 7275]
+- v1.1 is not in the repository as a file; only kai-pm/KAI_GPT_COLD_START_GUARDIAN_V0_1.md matches GUARDIAN under kai-pm  [CMD `git ls-tree -r --name-only HEAD kai-pm | grep -i GUARDIAN` → 1 path]
+- Credential scan of the addendum and check: 0 hits (calibration 6/6)  [CMD `credscan.py ad1/scan.json, ad1/scan2.json` → TOTAL HITS 0]
+- EVIDENCE KAI-GUARDIAN-VERIFICATION-ADDENDUM-V1-1 addendum_v1_1.md: 2919 bytes, sha256 4199a4a0800c4e6e0f2da0dcb436e9dea38ef1c13add4baddb9000ebcc57b2f6, final LF True (added by Orion)  [CMD `sha256sum addendum_v1_1.md` → 4199a4a0800c4e6e…]
+    BEGIN-VERBATIM KAI-GUARDIAN-VERIFICATION-ADDENDUM-V1-1
+    KINGSMAN COLD-START GUARDIAN — VERIFICATION ADDENDUM v1.1
+    
+    The following requirements extend the existing KAI-GPT Cold-Start & Continuity Protocol. They do not replace or weaken any existing requirement.
+    
+    1. Receipt first — mandatory
+    
+    At the beginning of every new substantive KAI-project conversation, perform the cold-start retrieval and place the verification receipt BEFORE the main answer.
+    
+    The receipt must identify:
+    
+    * Linear START HERE document and its latest checked update time.
+    * Linear DAI-10 and the latest relevant comment actually read, with identifier and timestamp.
+    * GitHub repository, active programme branch and full HEAD commit.
+    * Latest verified HANDOFF_LOG.md entry and relevant DECISIONS.md retrieval status.
+    * Frozen research commit SHA, when applicable.
+    * Whether Miro was accessed and verified.
+    * Missing evidence, contradictions, unresolved holds or access failures.
+    
+    Mark the result VERIFIED, DEGRADED or BLOCKED. Never claim verification merely because an identifier appears in a summary. Actually retrieve the evidence.
+    
+    2. Correct GitHub branch
+    
+    The established programme branch is claude/project-rework-plan-pgvp35. Verify the current active branch against START HERE and GitHub at each cold start.
+    
+    Do not default to main: it may not contain the current handoff records. Distinguish the live branch HEAD from historical commits and frozen research snapshots.
+    
+    3. Preserve organic evolution — D351/D352
+    
+    KAI remains ONE organically integrated, evolving personal intelligence organism, exclusively for Dainius and his family, never for sale.
+    
+    Evolve the existing KAI rather than reinventing it from scratch (D351). Any replacement must preserve intended behaviour, have traceable technical evidence and receive the required owner approval.
+    
+    The withdrawn v0.4 architecture must never be reinstated without a new explicit owner decision (D352).
+    
+    Defective, simulated, partial, name-only and absent features remain part of the intended feature universe until formally adjudicated. Do not silently discard them.
+    
+    4. Independent decision recovery
+    
+    Orion’s ruling hook detects only certain triggering wording. It may miss an owner decision made without those words.
+    
+    Kai-GPT must independently check relevant owner rulings against Linear and the banked GitHub record before treating consequential decisions as approved.
+    
+    5. Continuous verification
+    
+    Keep the continuity safeguard’s qualification status separate from KAI’s research, implementation and Gold Tier qualification statuses.
+    
+    A successful cold-start test does not release any engineering, research, PRE-RAMS, Gold Tier or merge hold.
+    
+    Repeat continuity tests across new conversations, including inaccessible sources, outdated handovers, contradictory evidence and missing rulings.
+    
+    Never claim a native automatic startup hook. Follow these Project instructions whenever they apply and the necessary tools are available.
+    END-VERBATIM KAI-GUARDIAN-VERIFICATION-ADDENDUM-V1-1
+- EVIDENCE ORION-CHECK-GUARDIAN-ADDENDUM-V1-1 orion_check_addendum.md: 1953 bytes, sha256 eddc5d4563556243dc72d30e8f7351ef48923c838bca7a2ef65409cd8113dd7b, final LF True (added by Orion)  [CMD `sha256sum orion_check_addendum.md` → eddc5d4563556243…]
+    BEGIN-VERBATIM ORION-CHECK-GUARDIAN-ADDENDUM-V1-1
+    # Orion's check of Guardian Verification Addendum v1.1
+    
+    **ORION → KAI, DAINIUS | 2026-10-14 | read-only**
+    
+    ## In plain words
+    
+    The addendum covers everything Orion raised: receipt first, the identifiers (including the newest DAI-10 comment with its time and the latest handoff entry), the correct branch, D351/D352, the ruling-hook limit, and keeping the safeguard's test status separate from KAI's holds. Recommended: paste it. One optional sentence would have caught test 01's off-by-one.
+    
+    ## Coverage (key-phrase check of the addendum text)
+    
+    | Orion's point | Source | In v1.1 |
+    |---|---|---|
+    | Name the branch; main has no handoff log | comment e541f463 | yes ("Do not default to main") |
+    | Evolution not reinvention (D351); no v0.4 (D352) | e541f463 | yes |
+    | Ruling hook misses decisions without trigger words | e541f463 | yes |
+    | Receipt first, with identifiers | bfeeb75c | yes |
+    | Newest DAI-10 comment ID and time; latest handoff entry | ae07f15b | yes |
+    
+    ## Notes
+    
+    - **D352 wording.** v1.1 says the v0.4 architecture "must never be reinstated without a new explicit owner decision". That is weaker than the Guardian file's "Do not reinstate superseded designs", but it matches who holds the authority: Dainius can always decide again. Not a defect.
+    - **Optional sentence** (would have caught test 01's "265 entries" against a head holding 266): "The identifiers must agree with each other; for example, the handoff entry you name must exist at the HEAD commit you name."
+    - **Length.** Instructions plus addendum come to about 6,800 characters (Kai's original) or 7,300 (amended). Orion has not checked ChatGPT's limit. After saving, confirm that the last line of the addendum ("Never claim a native automatic startup hook. …") is present.
+    - The addendum is not yet in GitHub. If it is to be the controlled version, it belongs beside `kai-pm/KAI_GPT_COLD_START_GUARDIAN_V0_1.md`; until then the handoff log copy (this entry) is the record.
+    END-VERBATIM ORION-CHECK-GUARDIAN-ADDENDUM-V1-1
+
+### 6. Next authorised step
+
+- Post the check to DAI-10, verify, report to Dainius; then wait for Kai's adjudication of register v2  [CONVERSATION 2026-10-14 Dainius relaying Kai, "The next authorised move is independent adjudication of Source Register v2"]
+
+### 7. What I am unsure of
+
+- Whether Dainius has already pasted v1.1 into the Project, and whether it fits  [CMD `len()` → 7275]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
