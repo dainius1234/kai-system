@@ -87446,3 +87446,110 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T12:29:08Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T12:29:08Z  [CMD `date -u +%FT%TZ` → 2026-10-14T12:29:08Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: c94fb3fc996475712785bf88af2d58e85f996f84  [CMD `git rev-parse HEAD` → c94fb3fc996475712785bf88af2d58e85f996f84]
+- tree: 25e594b36bea9c86984886af20121cbe858ea507  [CMD `git rev-parse HEAD^{tree}` → 25e594b36bea9c86984886af20121cbe858ea507]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/project-rework-plan-pgvp35: c94fb3fc996475712785bf88af2d58e85f996f84  [CMD `git ls-remote --heads origin` → c94fb3fc996475712785bf88af2d58e85f996f84]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 245  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 245]
+
+### 1. The four states
+
+- physical: unchanged since entry 245 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: step 0.1 continues; Wave 0 not started until Kai's amended list exists  [CONVERSATION 2026-10-14 Dainius relaying Kai, "My provisional ruling is ACCEPT WITH AMENDMENTS"]
+- evidence: Kai's provisional ruling as relayed, and Orion's check, verbatim in section 5  [CMD `ruling_capture store be3eb0f7f432c057` → 840 characters]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT (relayed by Dainius) · 2026-10-14 · step 0.1 proposal: PROVISIONAL ACCEPT WITH AMENDMENTS. D344–D353 standalone records confirmed outside the main ledger; other important documents must be considered; `STRATEGIC_PLAN.md` retained as historical design evidence, not used to close the April gap; owner decisions separated from old architecture proposals, a D-file is not automatically approved architecture or permission. The amendments themselves are not listed ⚠ UNBANKED  [CONVERSATION 2026-10-14 Dainius relaying Kai, "My provisional ruling is ACCEPT WITH AMENDMENTS"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: D1, D2 (a), D3, D4 (a) with five conditions, D5 (a), step 0.1. HELD: Wave 0 until Kai's amended source list; engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier  [CONVERSATION 2026-10-14 Dainius relaying Kai, "provisional ruling"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Needed from Kai: the amended source list written out (twelve statuses; each D344–D353 file's standing; which of 69 candidates join; pinned branch)  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 5. Incidents and corrections
+
+- CORRECTION to entry 244 (proposal §3a): Orion labelled all eleven D344–D353 files "canonical where they add, remove or hold a capability". Too wide: D350 banks the v0.4 package that D352 withdraws; the label came from file names and their absence from DECISIONS.md, not from what each file decides. Kai's point 3 is upheld  [CMD `git show dd153c1:kai-pm/D352_WITHDRAW_REJECTED_V0_4_ARCHITECTURE_PACKAGE.md | sed -n 1,17p` → withdraws v0.4 package]
+- Self-correction before banking: a draft sentence said all eleven status lines read "NOT IMPLEMENTATION AUTHORITY"; measured, 8 do (D345, D347–D353), D344A and D346 withhold execution authority in other words, D344 reads "PENDING SAFE APPEND"  [CMD `sed -n 3p` on each file → NOT-IMPL 8 of 11]
+- Credential scan of ruling and check: 0 hits (calibration 6/6)  [CMD `credscan.py own/cs_ks01.json` → TOTAL HITS 0]
+- EVIDENCE KAI-STEP-0-1-PROVISIONAL-RULING kai_s01_ruling.txt: 857 bytes, sha256 cce4654f926b9b327d329050cbe7a43c4198c1b3e7856f4d617c93d64cb2faeb, final LF True (added by Orion)  [CMD `sha256sum kai_s01_ruling.txt` → cce4654f926b9b32…]
+    BEGIN-VERBATIM KAI-STEP-0-1-PROVISIONAL-RULING
+    Brother, I’ve reviewed Orion’s Step 0.1 proposal against the frozen GitHub snapshot and the project’s authority documents.
+    
+    My provisional ruling is ACCEPT WITH AMENDMENTS. Orion has identified a genuine gap: the research cannot rely on the original twelve-source list alone. I confirmed that the standalone D344–D353 records exist outside the main decision ledger, and several other important documents must be considered.
+    
+    One important distinction: STRATEGIC_PLAN.md was created in April 2026, but that does not establish that it is the missing “April vision.” I’ll retain it as historical design evidence without using it to close the unresolved source gap.
+    
+    I’m also separating genuine owner decisions from old architecture proposals. A file beginning with D is not automatically an approved architecture or permission to implement it.
+    END-VERBATIM KAI-STEP-0-1-PROVISIONAL-RULING
+- EVIDENCE ORION-CHECK-KAI-STEP-0-1 orion_check_kai_s01.md: 2616 bytes, sha256 695b3b7a447e0c81e3eddf6405d55a3dc589f0532e1d1a26a42d0c332f2c6d01, final LF True (added by Orion)  [CMD `sha256sum orion_check_kai_s01.md` → 695b3b7a447e0c81…]
+    BEGIN-VERBATIM ORION-CHECK-KAI-STEP-0-1
+    # Orion's check of Kai's provisional step 0.1 ruling
+    
+    **ORION → KAI, DAINIUS | independent check | read-only, at dd153c1 | 2026-10-14**
+    
+    ## In plain words
+    
+    Kai's three points hold. His third point corrects a real error in my proposal. His ruling is provisional and does not list the amendments, so step 0.1 is not finished yet. I need his full amended source list before the census can start.
+    
+    ## 1. Point by point
+    
+    1. **D344–D353 outside the main ledger: agrees** with my finding (entry 244, proposal §2 row 8 and §3a).
+    2. **`STRATEGIC_PLAN.md` kept as historical design evidence, not used to close the April gap: agrees.** My proposal called it "a lead, not proof". With Kai's ruling the April gap stays open, with the search record of proposal §4.
+    3. **A D-file is not automatically an approved architecture or permission to implement: holds, and it corrects my proposal.** In §3a I proposed all eleven D344–D353 files as "canonical where they add, remove or hold a capability". That label is too wide. Example at the pin: `D350` (line 3) banks the "v0.4 MASTER PLAN + DRAWINGS + MIGRATION MATRIX", and `D352` (lines 1, 9, 17) withdraws that package from the live branch. Under my label, withdrawn architecture content in D350 could have entered the census as canonical. Ten of the eleven status lines (line 3 of each file) withhold authority in their own words: "NOT IMPLEMENTATION AUTHORITY" in D345 and D347–D353, "NOT EXECUTION AUTHORITY" in D344A, "NO RUNTIME OR PROGRAMME EXECUTION AUTHORISED" in D346. D344's says "PENDING SAFE APPEND TO `kai-pm/DECISIONS.md`". The correct reading separates the decision a file records from the design content it carries.
+    
+    ## 2. What is still needed from Kai
+    
+    For step 0.1 to be finished (v3.2.3 §6: "every source classified, Kai has adjudicated, chronology recorded"), Orion needs Kai's amended list, written out:
+    - the status of each of the twelve listed sources, including the README and doctrine conflicts;
+    - for each D344–D353 file: what it counts as (owner decision, superseded design, withdrawn, research input);
+    - which of the 69 candidates join the list, and with which status;
+    - the pinned commit and branch (proposal §1).
+    
+    Until then, Orion starts nothing in Wave 0.
+    
+    ## 3. Correction recorded
+    
+    Orion's §3a label for the D344–D353 files was wider than the evidence: it was derived from the file names and the fact that the numbers are missing from `DECISIONS.md`, not from what each file decides. The status lines that show this were in the proposal's own §3c table. That is the R17 shape: the qualifier was in my table and not in my label.
+    END-VERBATIM ORION-CHECK-KAI-STEP-0-1
+
+### 6. Next authorised step
+
+- Post Kai's ruling (relay) and Orion's check to DAI-10 (posted == banked); update the start-here page; ask for Kai's amended list  [CONVERSATION 2026-10-14 Dainius, "please make sure you log all in linear"]
+
+### 7. What I am unsure of
+
+- Whether Kai has posted, or can post, his full step 0.1 adjudication himself  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
