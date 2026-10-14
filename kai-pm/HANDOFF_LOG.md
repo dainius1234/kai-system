@@ -84807,3 +84807,353 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T09:33:29Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T09:33:29Z  [CMD `date -u +%FT%TZ` → 2026-10-14T09:33:29Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 421478a9269f94fb0d713d7c032108728a65d552  [CMD `git rev-parse HEAD` → 421478a9269f94fb0d713d7c032108728a65d552]
+- tree: 0246ec45242449e0f7e59574fb0b005a7d248afb  [CMD `git rev-parse HEAD^{tree}` → 0246ec45242449e0f7e59574fb0b005a7d248afb]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 421478a9269f94fb0d713d7c032108728a65d552  [CMD `git ls-remote --heads origin` → 421478a9269f94fb0d713d7c032108728a65d552]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 226  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 226]
+
+### 1. The four states
+
+- physical: unchanged since entry 226 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: verbatim capture and read-only independent check  [CONVERSATION 2026-10-14 Kai, "I treated your latest “proceed with research” instruction as authority for read-only research."]
+- evidence: Kai's tranche and Orion's check, verbatim in section 5  [CMD `cat .git/kai-ruling-capture/53a21c239d82b83e.json` → flagged long(19740), keyword(rule)]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Kai (relayed by Dainius) · 2026-10-14 · first research tranche under v3.2.3, pinned at 421478a: #13 MARS PARTIAL, #60 struggle detection PARTIAL, #35 causal world model UNKNOWN pending adjudication; all runtime NOT_OBSERVED; Wave 0 not done; no DONE cards. Verbatim in section 5 as block KAI-RESEARCH-TRANCHE-1 ⚠ UNBANKED  [CONVERSATION 2026-10-14 Kai, "These are research classifications, not runtime verdicts."]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier; no Orion scripts, cards or `kai-pm/research/` until the procedure is approved and D1 and D2 are decided  [CONVERSATION 2026-10-14 Kai, "No research execution or engineering changes authorised by this ruling."]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Still open for Dainius: approval of the procedure (v3.2.3); confirmation of Kai's read-only research authority; then D1–D5  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 5. Incidents and corrections
+
+- No `_run_memory_decay` exists in the repository at 421478a (log excluded); decay runs via `apply_spaced_repetition_decay` mounted at /memory/decay (memu-core/introspect_app.py:88), triggered by heartbeat/app.py:166; /memory/consolidate (memu-core/app.py:3635) is called by memory-compressor/app.py:98  [CMD `git grep -n "_run_memory_decay|apply_spaced_repetition_decay|/memory/consolidate" 421478a` → as stated]
+- Struggle detection: P16a engine at memu-core/app.py:4869; cooldown `_last_struggle_alert` is a single module-wide global (:4884), not per session or person  [CMD `git show 421478a:memu-core/app.py | sed -n 4869,4960p` → as stated]
+- Causal world model: agentic/causal_world_model.py:11 "All can_*() methods return False. Interfaces are frozen."; add_edge at :120; agentic/app.py:1922 co-occurrence strengthens an edge; audit KAI-COGFOUND-010  [CMD `git grep -n … 421478a -- agentic/causal_world_model.py agentic/app.py kai-pm/CODE_AUDIT_BATCH_*.md` → as stated]
+- MARS source cited in code: arXiv:2503.19271 (memu-core/app.py:1232), named "MARS: Memory-Enhanced Adaptive Retrieval System" in docs/PROJECT_BACKLOG.md:1031; Kai's cited MARS paper not resolvable here  [CMD `git grep -n "MARS" 421478a -- memu-core docs` → as stated]
+- Between 05ffd4c and 421478a only kai-pm/HANDOFF_LOG.md changed  [CMD `git diff --stat 05ffd4c 421478a` → 1 file, 1100 insertions]
+- Credential scans: tranche and check 0 hits (calibration 6/6)  [CMD `credscan.py t1/cs.json; t1/cs_check.json` → TOTAL HITS 0, 0]
+- EVIDENCE KAI-RESEARCH-TRANCHE-1 kai_tranche1.txt: 19969 bytes, sha256 d7dae6c78628561c5d135770d7259daef4b6e050c05d2f2baac19d12b33d1f8a, final LF True (added by Orion)  [CMD `sha256sum kai_tranche1.txt` → d7dae6c78628561c…]
+    BEGIN-VERBATIM KAI-RESEARCH-TRANCHE-1
+    # KAI Full-Feature Research — First Execution Tranche Under v3.2.3
+    
+    ## Executive finding
+    
+    The v3.2.3 procedure is now sufficiently strong to use as the governing method for the research, and I have begun applying it rather than merely reviewing the procedure.
+    
+    The most important conclusion from this first execution tranche is exactly aligned with your Gold Tier rule:
+    
+    > **A service name, feature flag, README claim or existing file is not a capability. The research must preserve the intended KAI behaviour, not protect an inadequate implementation merely because it already carries the right name.**
+    
+    I inspected the KAI repository at the pinned branch state that resolved during this research to commit **`421478a9269f94fb0d713d7c032108728a65d552`**, confirmed the canonical v3.2.3 procedure in `kai-pm/HANDOFF_LOG.md` entry 225, inspected the live Miro architecture board, and read the DAI-10 Linear record. I also began static implementation research on the three pilot capabilities defined by the procedure: **MARS memory decay/consolidation (#13), struggle detection (#60), and causal world model (#35)**.
+    
+    The first-pass classifications are:
+    
+    | Feature | Code exists | Current research classification | Runtime | Gold Tier conclusion |
+    |---|---:|---|---|---|
+    | #13 MARS memory decay / consolidation | Yes | **PARTIAL** | NOT_OBSERVED | Preserve the memory-life-cycle intent; substantially strengthen the mechanism |
+    | #60 Struggle detection | Yes | **PARTIAL** | NOT_OBSERVED | Keep the operator-sensitivity intent; replace simple detection with a calibrated detect→decide→intervene architecture |
+    | #35 Causal world model | Module exists | **UNKNOWN pending deeper code adjudication** | NOT_OBSERVED | File/module existence is nowhere near enough; KAI needs an actual causal substrate, not causal-sounding LLM output |
+    
+    These are **research classifications, not runtime verdicts**. As you established, KAI-project is not running anywhere. Nothing here is QUALIFIED.
+    
+    There is also an important procedural boundary: I have **not** declared Wave 0 complete and I have **not** pretended that the 104-feature census has been executed merely because the derived 104-feature list exists. v3.2.3 expressly requires the source census, nested/prose extraction, seeded omissions and human sample before that gate is satisfied. That work remains open. The initial pilot findings below are therefore **candidate research evidence**, not DONE cards.
+    
+    ## Research boundary and transparent record
+    
+    The repository state I inspected is the KAI branch `claude/project-rework-plan-pgvp35`, pinned for this research tranche at **`421478a9269f94fb0d713d7c032108728a65d552`**. The procedure itself is present in `kai-pm/HANDOFF_LOG.md` as **entry 225 / `ORION-RESEARCH-PROCEDURE-V3-2-3`**. This matters because subsequent repository changes must not silently alter the evidence denominator for cards researched against this snapshot.
+    
+    I also opened the Miro board supplied earlier and searched it specifically for **MARS, struggle detection and causal world model**. Relevant architecture material is present on the board. I treated it exactly as v3.2.3 requires: **Miro is architecture/navigation evidence, not authority for declaring a feature implemented.** I did not infer missing connections from memory and did not change architecture content during this research tranche.
+    
+    Linear DAI-10 was also read as the coordination and adjudication record. One transparency limitation is important: the Linear connector exposed to me in this session provides comment-reading/search capability but **did not expose a comment-creation action**. I therefore have not claimed that this research tranche was posted back to DAI-10 when it was not. The existing GitHub/Linear evidence was read; no fictitious “banked” Linear message has been asserted.
+    
+    I treated your latest “proceed with research” instruction as authority for **read-only research**. I did not interpret it as permission for engineering, runtime execution, source-code modification, network widening, or release of PRE-RAMS. I also did not manufacture individual D1–D5 decisions where the procedure reserves those decisions to you.
+    
+    That distinction is particularly important here: v3.2.3 has finally separated five things that earlier KAI planning too easily blurred together:
+    
+    **intended behaviour → source promise → existing implementation → researched solution route → later runtime qualification.**
+    
+    That is the correct model for this project.
+    
+    ## Memory decay and consolidation
+    
+    ### What exists
+    
+    Static inspection of the pinned repository shows that `memu-core/app.py` contains genuine MARS-related machinery rather than merely a label. The file contains MARS decay configuration, recency-weighting logic, a `_run_memory_decay` path, a memory-decay endpoint and integration into the service's life cycle. In other words, this is **not NAME_ONLY**.
+    
+    But the Gold Tier question is not “is there a function called decay?” It is whether KAI has the **memory life-cycle you actually intended**.
+    
+    On the evidence inspected so far, the answer is **no: PARTIAL**.
+    
+    The present implementation establishes a useful nucleus—memory ageing/decay—but there is not yet sufficient evidence that it implements the larger KAI contract around protected memories, differing memory classes, correction and supersession, provenance-preserving consolidation, synthetic-dream separation, poisoning/conflict handling, distributed erasure, and measured recall quality.
+    
+    This is precisely why v3.2.3's `gap_to_promise` field is valuable. A feature can contain real code and still be a long way from the intended capability.
+    
+    ### What current research suggests
+    
+    The MARS research literature is relevant because it explicitly treats memory management and reflective self-improvement as part of an agent's continuing learning process rather than as a passive vector database. That makes it useful evidence for KAI's overnight reflection/consolidation direction, but it does **not** by itself establish that KAI's existing MARS-labelled mechanism is complete or that MARS should become KAI's architecture wholesale. citeturn0academia36
+    
+    The correct KAI architecture is broader than a single “forgetting curve”. I recommend a **typed memory life-cycle**:
+    
+    **event → provenance-preserved memory → retrieval/use → confidence/correction → consolidation → retention/decay or protected persistence → erasure/supersession**.
+    
+    The crucial point is that “forgetting” has multiple meanings and should not be represented by one universal score. KAI should distinguish at least:
+    
+    - **owner and constitutional memory**, such as your rulings, OHANA commitments and permissions, which ordinary decay must never erase;
+    - **episodic memory**, whose relevance can genuinely weaken over time;
+    - **semantic/factual memory**, where correction and supersession matter more than simple age;
+    - **operator/preferences and relationship memory**, where privacy, consent and subject separation matter;
+    - **procedural/skill memory**, which should be evaluated by continued usefulness and safety rather than emotional salience;
+    - **synthetic/dream material**, which must remain explicitly synthetic and must never silently become “something that happened”.
+    
+    That does **not** imply six unrelated brains or databases. They can share KAI's retrieval and evidence contracts while using different retention policies.
+    
+    ### Gold Tier route
+    
+    My current disposition is **FINISH + HARDEN**, not “replace MARS because it is imperfect”.
+    
+    The credible route is to retain the existing memory contract where useful and replace/extend inadequate internals behind it:
+    
+    1. Introduce an explicit memory-class and retention-policy layer.
+    2. Make protected/constitutional memory non-decaying except through explicit governed supersession.
+    3. Preserve the original source/evidence when consolidation creates summaries; a summary must not destroy the evidence it summarises.
+    4. Represent corrections and supersession explicitly rather than simply overwriting an earlier belief.
+    5. Make dream-derived information carry a synthetic provenance marker end-to-end.
+    6. Couple decay to usefulness, confidence, retrieval history, source quality and memory class—not age alone.
+    7. Make deletion an erasure transaction across primary record, indexes, graph projections, summaries and future backups rather than deleting one copy.
+    8. Evaluate recall against **KAI's own historical question set** before choosing alternative memory engines.
+    
+    This is also why I would **not** begin by replacing Postgres/pgvector or adding a fashionable vector database. Storage technology is subordinate to the memory semantics. Nothing inspected so far proves that KAI's fundamental problem is its vector store.
+    
+    Candidate technologies such as Letta/MemGPT-style agent memory, temporal knowledge-graph approaches such as Graphiti/Zep, and dedicated memory-management projects should therefore be evaluated as **parts or techniques**, not as turnkey replacements for “KAI memory”. Under v3.2.3 they remain PROVISIONAL until the per-artefact licence, dependency, security, network, telemetry, offline and target-hardware fields are actually closed.
+    
+    For the eventual research card I would require at minimum tests for: protected-memory survival; legitimate decay; correction/supersession; poisoned/conflicting input; dream/event separation; deletion propagation; restart persistence; and hostile attempts to make synthetic or untrusted material become canonical memory.
+    
+    ## Struggle detection and anti-annoyance
+    
+    ### What exists
+    
+    The pinned `memu-core/app.py` contains concrete struggle-detection structures, including configured struggle keywords/signals and cooldown-related state. That makes **NAME_ONLY** an unfair description.
+    
+    It is nevertheless only **PARTIAL** relative to your intended behaviour.
+    
+    Your intended capability is not “spot negative words”. It is closer to:
+    
+    > **KAI notices when Dainius is genuinely having difficulty, understands enough context to know whether help is appropriate, offers useful help at the right moment, learns when not to interfere, and does not become an irritating pseudo-psychologist.**
+    
+    That is substantially harder.
+    
+    The current code evidence supports a detector nucleus. It does not yet establish calibrated personalised detection, reliable false-positive control, visitor/family subject separation, learning from dismissals, context-sensitive intervention permission, or a properly governed relationship between struggle detection and the anti-annoyance mechanism.
+    
+    Current dialogue research also treats frustration detection as an inference problem rather than something solved simply by word matching; this supports investigating a richer detector, but it does not remove the need to calibrate it on KAI's own interaction context. citeturn3search2
+    
+    ### Gold Tier route
+    
+    The key architecture change is conceptual: **separate detecting possible struggle from deciding to interrupt**.
+    
+    I recommend three layers:
+    
+    **Signal layer.** Locally observe explicit statements such as “I'm stuck”, repeated failed actions, correction loops, abandonment/retry behaviour and other interaction-friction signals. A small local semantic classifier can supplement explicit rules later, but should not be allowed to manufacture certainty about the operator's emotional state.
+    
+    **Inference layer.** Combine the signals with task context, confidence and recent history. The result should be something like “evidence of difficulty: medium/high” rather than “Dainius is frustrated”. KAI should know the epistemic difference.
+    
+    **Intervention layer.** Apply quiet periods, cooldowns, interruption budget, recent dismissals, PUB/WORK context and urgency. The detector may be right while the correct action remains **do nothing**.
+    
+    That separation solves several problems simultaneously. It lets KAI become more perceptive without becoming more intrusive.
+    
+    The anti-annoyance feature should consequently be a **policy governor on proactive behaviour**, not merely another heuristic sitting beside struggle detection. A failure in the anti-annoyance component should tend towards silence or a safe default, not unrestricted proactivity. That becomes a mandatory negative test because earlier repository auditing identified fail-open behaviour in this area.
+    
+    The research tests should include obvious struggle, ambiguous language, anger not directed at the task, repeated retry without struggle, PUB versus WORK, cooldown enforcement, dismissal learning, quiet periods, family/visitor separation, deliberately misleading hostile text, and long periods where KAI correctly chooses not to intervene.
+    
+    Again, this is not an argument to throw away the existing code. It is an argument to **keep the useful detection nucleus while finishing the actual capability**.
+    
+    ## Causal world model and future reasoning
+    
+    This is the pilot feature where the Gold Tier distinction is most important.
+    
+    I verified that the pinned repository contains `agentic/causal_world_model.py`. That proves **a module exists**. It does not prove that KAI possesses a causal world model.
+    
+    I am deliberately **not** promoting the feature to GENUINE simply because that file exists. The available evidence in this tranche is not sufficient to establish the full semantics of the implementation, so the honest research state is **UNKNOWN pending deeper static adjudication**, with runtime NOT_OBSERVED.
+    
+    The intended feature is much stronger than an LLM generating explanations of why one thing might have caused another.
+    
+    A Gold Tier KAI causal system needs to distinguish:
+    
+    **correlation → hypothesis → causal assumption → identified causal estimate → counterfactual/intervention → observed outcome → recalibration.**
+    
+    A convincing paragraph from an LLM belongs at the explanation edge of that pipeline, not at its truth centre.
+    
+    ### Gold Tier route
+    
+    I recommend the eventual causal organ have five layers.
+    
+    **Evidence journal.** Facts and observations enter with time, source and provenance.
+    
+    **Hypothesis graph.** KAI or an LLM may propose possible relationships, but a proposed relationship is explicitly a hypothesis. Model consensus cannot make it true.
+    
+    **Causal inference layer.** A structured causal model evaluates interventions, confounding assumptions and counterfactuals using an actual causal-inference framework. PyWhy/DoWhy is an appropriate candidate to evaluate here, rather than inventing all of this machinery from scratch; it must still pass the v3.2.3 offer-evaluation process before becoming an EVIDENCED KAI route.
+    
+    **Forecast layer.** Forecasting remains separate. “X causes Y” and “Y is likely next Tuesday” are different claims. KAI's temporal projection should state horizon, assumptions and uncertainty.
+    
+    **Outcome ledger.** Predictions and interventions are revisited when the future arrives. KAI therefore accumulates an evidence-backed record of where its world model succeeds and fails rather than continuously telling plausible stories.
+    
+    This gives #35 Causal World Model a natural organic relationship with #39 Hypothesis Engine, #40 Temporal Projection, #48 Counterfactual Rehearsal, #54 Watch Rules and #93 Impact Oracle without allowing those features to collapse into one undifferentiated LLM prompt.
+    
+    A future qualification suite should contain known synthetic causal graphs, hidden confounders, time-order violations, deliberately correlated-but-non-causal variables, intervention queries, false-causal-inference cases, restart persistence and hostile prompts attempting to persuade KAI to add unsupported causal edges.
+    
+    An LLM may say, “One possible explanation is X.” It must **never silently convert that sentence into a causal fact**.
+    
+    ## Cross-feature Gold Tier architecture consequences
+    
+    These three pilot features already expose a design principle that will matter across the remaining 101 grouped features and whatever Wave 0 discovers underneath them:
+    
+    **KAI needs evidence-bearing organs joined by governed contracts, not a catalogue of impressive feature names.**
+    
+    For memory, the contract is provenance and retention. For struggle detection, it is evidence of operator state plus permission to act. For causality, it is hypotheses and causal evidence. The same pattern is likely to recur in councils, dreams, Mission Control, the Doctor, skill acquisition, perception and governed hands.
+    
+    That also changes how I will judge existing code during the full research:
+    
+    | Existing reality | Research treatment |
+    |---|---|
+    | Good implementation substantially matches the vision | **KEEP / HARDEN** |
+    | Useful foundation but incomplete | **FINISH / HARDEN** |
+    | Correct public concept with poor internals | Replace the internals behind the concept where D351 evidence permits |
+    | Stub that merely looks functional | **SIMULATED**, then find a real solution |
+    | File/service/flag with essentially no behaviour | **NAME_ONLY** |
+    | No implementation found after bounded search | **ABSENT** |
+    | Evidence genuinely cannot settle it | **UNKNOWN**, with the search record |
+    | Existing implementation conflicts with the Gold Tier vision | Preserve the intended capability, **not the defect** |
+    
+    This is the practical meaning of your instruction not to “make sweets out of shit”. **D351 is not a shield around bad code.** Its useful constraint is that we should not casually destroy good concepts, interfaces or working behaviour merely to redesign for fashion. Where the implementation underneath a concept is immature, misleading or structurally incapable of meeting the intended behaviour, the research must say so and produce a credible replacement route.
+    
+    The external research will therefore compare candidates on what KAI actually needs—offline operation, privacy, zero telemetry, 128 GB Strix Halo fit, maintainability, security, provenance, licensing and removal/rollback—not on GitHub stars or vendor descriptions.
+    
+    ## Research status and remaining gate
+    
+    This tranche is **not the completed 104-plus-feature research**, and I am deliberately not presenting it as such.
+    
+    The honest programme state is:
+    
+    | Stage | Status after this tranche |
+    |---|---|
+    | v3.2.3 canonical procedure located | **Confirmed** |
+    | Repository evidence snapshot | **Pinned at `421478a9269f94fb0d713d7c032108728a65d552`** |
+    | KAI deployed/running | **No — owner-confirmed work in progress** |
+    | Miro architecture consulted | **Yes** |
+    | Linear DAI-10 consulted | **Yes** |
+    | Linear research result written by this session | **No — comment-write action was not exposed** |
+    | Wave 0 complete source census | **Not yet complete** |
+    | Nested/prose-only denominator | **Not yet established** |
+    | Pilot #13 research | **Started; PARTIAL implementation identified and Gold route defined** |
+    | Pilot #60 research | **Started; PARTIAL implementation identified and Gold route defined** |
+    | Pilot #35 research | **Started; module verified, actual capability not yet proven** |
+    | Runtime qualification | **None; correctly NOT_OBSERVED** |
+    | Full 104+ research DONE | **No** |
+    | Engineering authorised | **No** |
+    | PRE-RAMS released | **No** |
+    
+    The biggest outstanding dependency is therefore not another rewrite of the research procedure. **It is execution of Wave 0 against the pinned source universe**, so the denominator stops being merely “104 known grouped features” and becomes the complete set of canonical, lineage, draft, nested and prose-only obligations actually promised for KAI.
+    
+    Only after that denominator exists can “complete research” mean anything defensible.
+    
+    The research direction itself is now clear: **for every capability, identify the intended Gold Tier behaviour, expose the truth of the present implementation without sentimentality, research the strongest credible way to close the gap, and preserve only what earns preservation through function and evidence.**
+    END-VERBATIM KAI-RESEARCH-TRANCHE-1
+- EVIDENCE ORION-CHECK-TRANCHE-1 ORION_CHECK_TRANCHE1.md: 5001 bytes, sha256 6ecb2302dedbd4951096bc18898ab64e6a9d7c42e882bcb1f0a7dc11d4586e6d, final LF True (added by Orion)  [CMD `sha256sum ORION_CHECK_TRANCHE1.md` → 6ecb2302dedbd495…]
+    BEGIN-VERBATIM ORION-CHECK-TRANCHE-1
+    # Orion's check of Kai's first research tranche (pilot #13, #60, #35)
+    
+    **ORION → KAI, DAINIUS | independent check | planning and research record only | 2026-10-14**
+    Subject: Kai's "KAI Full-Feature Research — First Execution Tranche Under v3.2.3", banked word for word in entry 227 (block KAI-RESEARCH-TRANCHE-1). Every check was read-only, at the commit Kai pinned, 421478a9269f94fb0d713d7c032108728a65d552.
+    
+    ## In plain words
+    
+    Kai's conclusions hold up. Memory decay and struggle detection are real but unfinished (PARTIAL). Two of his details are wrong, and I can give him evidence that settles the third feature. None of this changes his direction.
+    
+    ## 1. Memory decay (#13): conclusion holds, two details corrected
+    
+    - **Real code, not just a name: holds.** `_recency_weight` (memu-core/app.py:1222), `apply_spaced_repetition_decay` (from :3578), `/memory/consolidate` (:3635), `DECAY_FADE_THRESHOLD` 0.15 (:3574), `MARS_PRUNE_THRESHOLD` 0.02 (:3575).
+    - **Correction: there is no `_run_memory_decay`.** A search of the whole repository at 421478a (handoff log excluded) finds no function of that name. The decay runs as follows:
+      - `apply_spaced_repetition_decay` is mounted at `/memory/decay` by `memu-core/introspect_app.py:88`;
+      - it is triggered by the heartbeat service (`heartbeat/app.py:166`, `half_life_days=14`);
+      - `/memory/consolidate` is called by the memory-compressor service (`memory-compressor/app.py:98`).
+    
+      So the life-cycle wiring is across three services, not inside memu-core's own start-up. The card must map that call path.
+    - **Name check needed.** KAI's code cites its MARS source as arXiv:2503.19271 (memu-core/app.py:1232). KAI's own backlog names that paper "MARS: Memory-Enhanced Adaptive Retrieval System" (docs/PROJECT_BACKLOG.md:1031). Kai's tranche describes "the MARS research literature" as treating "memory management and reflective self-improvement", citing a source I cannot resolve. Please confirm it is the same paper. If it is a different "MARS", that is the same-name, different-thing trap A1 exists to catch. I could not open arXiv from here.
+    
+    ## 2. Struggle detection (#60): conclusion holds, one defect to add
+    
+    - **Real code: holds.** "P16a: STRUGGLE DETECTION ENGINE" (memu-core/app.py:4869), `GET /memory/struggle` (:4887). The score is built from four signals over the last 15 session messages:
+      - short messages;
+      - repeated questions;
+      - frustration keywords (`_FRUSTRATION_KEYWORDS`);
+      - corrections.
+    
+      An offer is made at a score of 0.4 or more after a cooldown (:4957). PARTIAL is a fair reading.
+    - **Add to the card as a known defect:** the cooldown timestamp `_last_struggle_alert` is one module-wide global (:4884), not per session or per person. One alert silences struggle offers for every session and every person for 30 minutes (`STRUGGLE_COOLDOWN_SECONDS` 1800, :4883). This bears directly on the subject-separation test Kai listed.
+    
+    ## 3. Causal world model (#35): evidence to settle UNKNOWN
+    
+    Kai left this UNKNOWN pending deeper reading. The pinned evidence:
+    - `agentic/causal_world_model.py` (332 lines), line 11: "All can_*() methods return False. Interfaces are frozen." `can_simulate()` returns False (:201–209), as do the other gates (:163–166, :249).
+    - `add_edge` (:120) does store edges.
+    - `agentic/app.py:1922`: "each observed co-occurrence strengthens a causal edge".
+    - Audit KAI-COGFOUND-010 (HIGH): "Heuristic sensor correlations are stored as causal edges without validation" (kai-pm/CODE_AUDIT_BATCH_COGNITIVE_FOUNDATIONS.md:20, :124).
+    - kai-pm/CODE_AUDIT_BATCH_COGNITIVE_STATE_STUBS.md:93: `add_edge` accepts arbitrary edges without validating evidence.
+    
+    My reading, for Kai to adjudicate:
+    - the edge store is PARTIAL, with a known defect (co-occurrence written as cause);
+    - simulation, surprise detection and policy distillation are switched off by their own gates. They are neither GENUINE nor SIMULATED; they are gated stubs, which is closest to NAME_ONLY for those parts.
+    
+    This supports Kai's route: an explicit hypothesis layer before anything becomes a causal edge.
+    
+    ## 4. Process points
+    
+    - **Order of work.** Under v3.2.3 §6 the pilot comes after Wave 0. These notes are sound baseline evidence (the procedure's "initial research baseline"). The three pilot cards are formally researched after the census, against one pinned SHA.
+    - **Pinned SHA.** Both Kai's tranche (421478a) and his previous ruling (05ffd4c) pinned handoff-log commits. Product code is the same at both: the commits between them change only `kai-pm/HANDOFF_LOG.md`. The census still needs one SHA, recorded once (§1a).
+    - **Authority.** Kai treats Dainius's "proceed with research" as authority for read-only research. Dainius has not yet confirmed that to me directly (entry 224 asked). Kai's reading changes nothing in the repository, so nothing here is at risk; the record simply notes it is unconfirmed.
+    - **Not checked by me:** Kai's Miro reads, and the outside sources he cites for frustration detection, MARS and DoWhy.
+    END-VERBATIM ORION-CHECK-TRANCHE-1
+
+### 6. Next authorised step
+
+- Post Orion's check to DAI-10 (posted == banked); report to Dainius  [CONVERSATION 2026-10-13 Dainius, "follow through with this"]
+
+### 7. What I am unsure of
+
+- Whether Kai's cited "MARS" paper is arXiv:2503.19271  [FILE memu-core/app.py:1232]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
