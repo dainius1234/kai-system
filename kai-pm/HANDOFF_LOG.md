@@ -97113,3 +97113,68 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T19:07:43Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T19:07:43Z  [CMD `date -u +%FT%TZ` → 2026-10-14T19:07:43Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 2e2b493ecb40f1475d66a14e74999d55e10c7874  [CMD `git rev-parse HEAD` → 2e2b493ecb40f1475d66a14e74999d55e10c7874]
+- tree: a3f63a5e7ab0ecd22a28c757d7375e41bd124eb8  [CMD `git rev-parse HEAD^{tree}` → a3f63a5e7ab0ecd22a28c757d7375e41bd124eb8]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/project-rework-plan-pgvp35: 2e2b493ecb40f1475d66a14e74999d55e10c7874  [CMD `git ls-remote --heads origin` → 2e2b493ecb40f1475d66a14e74999d55e10c7874]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 274  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 274]
+
+### 1. The four states
+
+- physical: unchanged since entry 274 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: as entry 274  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 fdabd167, "independently assess its fresh-thread tests"]
+- evidence: DAI-10 comment 63ab4a70 verified equal to block ORION-CHECK-GUARDIAN-V1-2 at 2e2b493e  [CMD `verify_posts.py 63ab4a70,ORION-CHECK-GUARDIAN-V1-2,2e2b493e` → EQUAL, calibration True]
+- admission: none  [CONVERSATION 2026-10-14 Dainius relaying Kai, "Programme completeness and safeguard regression qualification remain OPEN."]
+
+### 2. Rulings since the last handoff
+
+- None since entry 274  [CONVERSATION 2026-10-14 Dainius relaying Kai, "Verdict: Core source retrieval VERIFIED."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: D1–D5; step 0.1 (register v2 awaiting Kai); Kai-side continuity controls. HELD: Wave 0; engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier certification (Kai); D5(a)  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 b3f09655, "No KAI engineering, research Wave 0, PRE-RAMS, Gold Tier or PR #122 hold has changed."]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Kai: adjudicate source register v2 (K1–K13); optional v1.2 additions (63ab4a70)  [CMD `list_comments DAI-10` → no adjudication yet]
+
+### 5. Incidents and corrections
+
+- Listed DAI-10 before posting: newest was Orion's 61052855; no new Kai comment since b3f09655  [CMD `list_comments DAI-10 limit 3` → 61052855, b3f09655, 5fa47d64]
+
+### 6. Next authorised step
+
+- Wait for Kai's adjudication of register v2; bank it on arrival  [CONVERSATION 2026-10-14 Dainius relaying Kai, "The next authorised move is independent adjudication of Source Register v2"]
+
+### 7. What I am unsure of
+
+- Nothing new beyond entry 274 section 7  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
