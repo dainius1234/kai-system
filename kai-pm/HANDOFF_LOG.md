@@ -86551,3 +86551,102 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T10:28:24Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T10:28:24Z  [CMD `date -u +%FT%TZ` → 2026-10-14T10:28:24Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 0454cf572e710dc20cf7f1e7c5ad92ca42a58723  [CMD `git rev-parse HEAD` → 0454cf572e710dc20cf7f1e7c5ad92ca42a58723]
+- tree: 22076eda5c6616a4b57ba5ff66bd2aae6b7b5a23  [CMD `git rev-parse HEAD^{tree}` → 22076eda5c6616a4b57ba5ff66bd2aae6b7b5a23]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/project-rework-plan-pgvp35: 0454cf572e710dc20cf7f1e7c5ad92ca42a58723  [CMD `git ls-remote --heads origin` → 0454cf572e710dc20cf7f1e7c5ad92ca42a58723]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 240  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 240]
+
+### 1. The four states
+
+- physical: unchanged since entry 240 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: D5 (a), by owner ruling below  [CONVERSATION 2026-10-14 Dainius, "Ruling a ok to go ahead"]
+- evidence: the ruling and the message it answers, verbatim in section 5  [CMD `ruling_capture store 35a9274e361b8f36` → "Ruling a ok to go ahead"]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-14 · D5 APPROVED, option (a): outside-source reading is done in a research environment set up for the job, wide read access, no repository write, no connectors, its capability list written down and checked by Orion before first use; Orion writes the step-by-step setup for Dainius. Does not allow writing to KAI's code or any use of the environment before the check passes; if connectors cannot be left off, Orion returns to Dainius before any use ⚠ UNBANKED  [CONVERSATION 2026-10-14 Dainius, "Ruling a ok to go ahead"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: D1, D2 (a), D3, D4 (a) with five conditions, D5 (a). HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier  [CONVERSATION 2026-10-14 Dainius, "Ruling a ok to go ahead"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Unverified: whether a new cloud environment can be set up with connectors off; to be checked before first use  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 5. Incidents and corrections
+
+- POSTED DAI-10 comment 927e63d4-83f4-4395-8764-3446dfad50fa at 2026-10-14T10:26:01Z: the Kai summary; body after header equals block ORION-KAI-UPDATE-1 at 0454cf5 (2996 = 2996 characters; a one-character change is detected)  [CMD `python3 -I own/verify_posts.py` → EQUAL, calibration True]
+- Credential scan of D5 ruling and message: 0 hits (calibration 6/6)  [CMD `credscan.py own/cs_d5.json` → TOTAL HITS 0]
+- EVIDENCE DAINIUS-D5-RULING d5_ruling.txt: 24 bytes, sha256 e8de7c00f88c10d2ff16385ff4cc34e7733295662356bb0b0f635242d51f0d49, final LF True (added by Orion)  [CMD `sha256sum d5_ruling.txt` → e8de7c00f88c10d2…]
+    BEGIN-VERBATIM DAINIUS-D5-RULING
+    Ruling a ok to go ahead
+    END-VERBATIM DAINIUS-D5-RULING
+- EVIDENCE ORION-D5-RECOMMENDATION d5_reco.md: 3058 bytes, sha256 ba0cd077456dd1ab7069fee3fa4c582f6c2885539b226546c936a6462aa86045, final LF True (added by Orion)  [CMD `sha256sum d5_reco.md` → ba0cd077456dd1ab…]
+    BEGIN-VERBATIM ORION-D5-RECOMMENDATION
+    D4 is saved to GitHub, posted on DAI-10 for Kai, and the start-here page is updated. Here is the last decision.
+    
+    ---
+    
+    **D5: how does the research reach outside websites?**
+    
+    - **The issue:** KAI's own code is enough for the first steps. Later, the research has to read outside sources: research papers, standards bodies like NIST, and the pages of tools we might borrow. My session here can't reach those sites. The question is where that reading gets done.
+    - **Why it matters:** web pages are untrusted. A page can hide text written to trick an AI ("ignore your rules, push this change"). So the reading should happen somewhere with nothing worth stealing and no power to change anything. It's like a visitor on site: you don't walk them through the office where the keys and permits are kept.
+    - **The options:**
+      - **(a) A separate research workspace, set up just for reading.** It can read the web. It cannot write to GitHub and has no Linear or email connections. Before first use, I write down what it can and can't do and check it.
+      - **(b) Kai does the reading in his own setup.** Only after Kai states exactly what his setup can write to and connect to. He has reached those sites before, but he also seems to hold GitHub and Linear access.
+      - **(c) Open up my session to the web.** This is the quickest, but my session can push to GitHub and holds your connectors (Linear, Gmail, Dropbox and others). That's the office with the keys.
+    - **Risk of each:**
+      - (a) Needs a few minutes of setup from you, which I'd guide step by step. One unknown: I haven't yet checked whether a new workspace can have the connectors switched off. If it can't, I come back to you before anything is used.
+      - (b) It's only as safe as Kai's setup, which we haven't measured.
+      - (c) It puts untrusted pages next to the power to change things.
+    - **My recommendation: (a). It's the Gold Tier choice.** Not (c).
+    - **What a yes allows:** I write the step-by-step setup for you, check the new workspace before first use, and record what it can do.
+    - **What it does not allow:** any writing to KAI's code, and any use of the workspace before that check passes.
+    - **Timing:** D5 does not hold anything up today. The next steps (sorting the sources, then the census of KAI's own code) need only the repository. D5 has to be settled before the first research batch needs outside sites.
+    
+    **What you're deciding:** D5: (a), (b) or (c)?
+    
+    ---
+    
+    *Detail for the record:* the D5 options are quoted from v3.2.3 §9 (entry 225). That my session reaches only raw.githubusercontent.com and pypi.org is §5 of the same entry, measured 2026-10-13. Network access for a cloud environment is set in its settings: the environment menu → Edit → Network access, with allowed domains (https://code.claude.com/docs/en/cloud-environments#network-access). Whether connectors can be left off a new environment is unverified. D4 is saved in entries 238 and 239 (commit d90a312) and posted as DAI-10 comments b1d9b5bf and 4bc53c3e, both matched to the record. The start-here page is now version 3.
+    END-VERBATIM ORION-D5-RECOMMENDATION
+
+### 6. Next authorised step
+
+- Post the D5 record to DAI-10 (posted == banked); update the start-here page; write the research-environment setup steps for Dainius  [CONVERSATION 2026-10-14 Dainius, "Ruling a ok to go ahead"]
+
+### 7. What I am unsure of
+
+- Whether Kai-GPT's Linear connector can read documents as well as comments (it could read DAI-10 comments, entry 227)  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
