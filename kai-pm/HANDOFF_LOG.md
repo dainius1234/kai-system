@@ -82850,3 +82850,84 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-14T08:26:19Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-14T08:26:19Z  [CMD `date -u +%FT%TZ` → 2026-10-14T08:26:19Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: d7d8a08f4fa5a395af90171c23d02f22d3cb1d61  [CMD `git rev-parse HEAD` → d7d8a08f4fa5a395af90171c23d02f22d3cb1d61]
+- tree: 034804c32c025a2df20c20f39b3cd43c709e208a  [CMD `git rev-parse HEAD^{tree}` → 034804c32c025a2df20c20f39b3cd43c709e208a]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/project-rework-plan-pgvp35: d7d8a08f4fa5a395af90171c23d02f22d3cb1d61  [CMD `git ls-remote --heads origin` → d7d8a08f4fa5a395af90171c23d02f22d3cb1d61]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 219  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 219]
+
+### 1. The four states
+
+- physical: unchanged since entry 219 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: verbatim capture (O-2 record authority)  [CONVERSATION 2026-10-14 Dainius, "Bring up to do check list please"]
+- evidence: Kai's DAI-10 comment c22679b4 (a reply under 8c755e33), verbatim in section 5  [CMD `list_comments DAI-10 limit 1` → c22679b4]
+- admission: none  [FILE kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:24]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-14 (quoted by Kai in DAI-10 c22679b4): Kai-GPT reviews all evidence given by Orion or DeepSeek; do not confuse Kai-project (the software, not running) with Kai-GPT (the reviewer). Kai asks for a bounded wording correction to v3.2.1 before readiness. Verbatim in section 5 ⚠ UNBANKED  [CONVERSATION 2026-10-14 Dainius, "Correction 1 . You are Kai so all evidence given to you by Orion or deep seek will be and are to be reviewed by you ! Do not confuse Kai-project and , kai-GPT"]
+
+### 3. Authorised / Held / Forbidden
+
+- HELD: engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier; no research execution, scripts, cards or `kai-pm/research/`; D1–D5 undecided  [CONVERSATION 2026-10-14 Kai, "No research execution or engineering changes authorised by this ruling."]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Next on checklist item 2: fold c22679b4's bounded wording correction into v3.2.1 (naming Kai-GPT as reviewer of all Orion and DeepSeek evidence; KAI-project as the software), then Kai's READY / NOT READY  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 5. Incidents and corrections
+
+- Relay-turn listing: one DAI-10 comment newer than Orion's 7eb32a5c: Kai's c22679b4 at 2026-10-14T06:40:39.317Z (threaded under 8c755e33), banked here. No READY / NOT READY ruling on v3.2.1 yet  [CMD `list_comments DAI-10 limit 1` → c22679b4]
+- Credential scan of the comment: calibration 6/6, TOTAL HITS 0  [CMD `credscan.py e2/cs.json` → TOTAL HITS 0]
+- EVIDENCE KAI-DAI10-c22679b4-OWNER-CORRECTION kai_c22679b4.md: 2334 bytes, sha256 18c349d727b135a150e3588355ee30655ab5a7e6ece6a8d78079c52a075b7d12, final LF True (added by Orion)  [CMD `sha256sum kai_c22679b4.md` → 18c349d727b135a1…]
+    BEGIN-VERBATIM KAI-DAI10-c22679b4-OWNER-CORRECTION
+    **OWNER CORRECTION TO KAI-FC32-01 — KAI-GPT REVIEW AUTHORITY VS KAI-PROJECT RUNTIME EVIDENCE**
+    
+    Dainius's exact words (2026-10-14):
+    > Correction 1 . You are Kai so all evidence given to you by Orion or deep seek will be and are to be reviewed by you ! Do not confuse Kai-project and , kai-GPT
+    
+    **Kai-GPT's corrected interpretation:** There are TWO DISTINCT REFERENTS:
+    1. **Kai-GPT (this assistant):** the owner's principal technical reviewer/adjudicator of ALL evidence and proposals supplied by Orion and DeepSeek. None of their claims is admitted merely because another assistant asserted it. I review against original primary sources, check provenance, distinguish inference from fact, challenge weaknesses, record residual uncertainty, and send consequential owner decisions to Dainius. Independent Orion checks of Kai-GPT's output continue; DeepSeek's adversarial role continues. Do not conflate source-review governance with runtime certification.
+    2. **KAI-project:** the developing software/AI organism, **not running or deployed**, which cannot provide live runtime qualification. It may later qualify its own behavior under separately authorised, objective tests. A future KAI-project runtime test is NOT a prerequisite for Kai-GPT to review the validity of external technical evidence and research candidates today.
+    
+    **Narrow erratum to previous KAI-FC32-01:** Preserve the distinction between external research evidence and eventual runtime qualification, but expressly say that **ALL Orion/DeepSeek evidence is subject to Kai-GPT independent review/adjudication**. The phrase 'Only a KAI test is evidence' cannot erase the standing responsibility of Kai-GPT to review external primary sources, code, standards, reproducible research and other producers' evidence. Never imply Kai-GPT and KAI-project are the same entity or that KAI-project is acting as an autonomous current checker. Do not modify or supersede the owner's wording. Ask Orion to bank this correction verbatim in GitHub handoff and incorporate it only as a bounded wording correction before procedure readiness; no engineering change or hold release.
+    
+    **Owner authority:** Dainius makes all consequential final decisions. **Programme unchanged:** planning/research governance only; PRE-RAMS / Gold Tier / engineering hold and PR #122 DO NOT MERGE remain.
+    END-VERBATIM KAI-DAI10-c22679b4-OWNER-CORRECTION
+
+### 6. Next authorised step
+
+- Show Dainius the checklist with current status; then, one at a time, the bounded wording correction  [CONVERSATION 2026-10-14 Dainius, "Bring up to do check list please"]
+
+### 7. What I am unsure of
+
+- Nothing new  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
