@@ -98205,3 +98205,72 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-26T18:47:42Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-26T18:47:42Z  [CMD `date -u +%FT%TZ` → 2026-10-26T18:47:42Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 6525480ed18d09cdf06d5680baf8c26267b5b727  [CMD `git rev-parse HEAD` → 6525480ed18d09cdf06d5680baf8c26267b5b727]
+- tree: bbbfb30b7b797c3db42eec8e0e9a8a38a4ea0638  [CMD `git rev-parse HEAD^{tree}` → bbbfb30b7b797c3db42eec8e0e9a8a38a4ea0638]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 6525480ed18d09cdf06d5680baf8c26267b5b727  [CMD `git ls-remote --heads origin` → 6525480ed18d09cdf06d5680baf8c26267b5b727]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 284  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 284]
+
+### 1. The four states
+
+- physical: unchanged since entry 284 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: research stage with testing and verification, read as: Kai researches, Orion tests and verifies research and records read-only; no KAI runtime tests or code changes without an explicit go  [CONVERSATION 2026-10-26 Dainius, "We now in research stage and testing and verification"]
+- evidence: Dainius's message verbatim in section 5  [CMD `credscan.py roles/scan5.json` → TOTAL HITS 0]
+- admission: none  [CONVERSATION 2026-10-26 Dainius, "We now in research stage and testing and verification"]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-26 · programme stage: research, testing and verification ⚠ UNBANKED  [CONVERSATION 2026-10-26 Dainius, "We now in research stage and testing and verification"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: research (Kai), read-only verification (Orion). HELD: engineering pause (entry 99); KAI runtime tests (START HERE §2 "No code changes, no runtime tests, no deployment") unless Dainius says so explicitly; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE  [CONVERSATION 2026-10-26 Dainius, "testing and verification"]
+
+### 4. Open questions
+
+- Bounded assumption stated to Dainius: "testing" means verifying research and records, not running KAI's own tests; running KAI's tests needs his explicit go  [CONVERSATION 2026-10-26 Dainius, "testing and verification"]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- HOOK: not flagged (no trigger word); banked by hand  [CMD `ruling_capture.py status` → flagged=2 banked=2]
+- EVIDENCE DAINIUS-STAGE-RESEARCH-TEST-VERIFY dainius_stage.md: 54 bytes, sha256 f8bccdc80cdd6f328ab9d061008de58aaff8ad247196fbb0868ab0b84f45d599, final LF True (added by Orion)  [CMD `sha256sum dainius_stage.md` → f8bccdc80cdd6f32…]
+    BEGIN-VERBATIM DAINIUS-STAGE-RESEARCH-TEST-VERIFY
+    We now in research stage and testing and verification
+    END-VERBATIM DAINIUS-STAGE-RESEARCH-TEST-VERIFY
+
+### 6. Next authorised step
+
+- Wait for Kai's register adjudication and research; verify each output on arrival  [CONVERSATION 2026-10-26 Dainius, "We now in research stage and testing and verification"]
+
+### 7. What I am unsure of
+
+- Whether Dainius means KAI runtime tests; asked through the stated assumption  [CONVERSATION 2026-10-26 Dainius, "testing and verification"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
