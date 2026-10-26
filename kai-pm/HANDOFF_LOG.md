@@ -97178,3 +97178,129 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-26T17:59:27Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-26T17:59:27Z  [CMD `date -u +%FT%TZ` → 2026-10-26T17:59:27Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: fbb852ee4443d9e88541c92965349c08031af132  [CMD `git rev-parse HEAD` → fbb852ee4443d9e88541c92965349c08031af132]
+- tree: c4a7470b666c7f716109679248377e364b748a32  [CMD `git rev-parse HEAD^{tree}` → c4a7470b666c7f716109679248377e364b748a32]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- remote:claude/project-rework-plan-pgvp35: fbb852ee4443d9e88541c92965349c08031af132  [CMD `git ls-remote --heads origin` → fbb852ee4443d9e88541c92965349c08031af132]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 275  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 275]
+
+### 1. The four states
+
+- physical: unchanged since entry 275 apart from this entry; after fetch, local HEAD equals origin fbb852e; main 194db0a; no commit by any writer since entry 275; 0 uncommitted paths  [CMD `git fetch origin && git log HEAD..origin/claude/project-rework-plan-pgvp35` → 0 commits]
+- authorised: unchanged since entry 275: step 0.1 register v2 awaits Kai's adjudication  [CONVERSATION 2026-10-26 Dainius, "Let’s resume , make sure your hook fires and you are up to date"]
+- evidence: resume checks in section 5; the two helper scripts rewritten this session, verbatim  [CMD `handoff.py verify` → compared=22 match=19 differs=3 unmeasured=0]
+- admission: none  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 b3f09655, "No KAI engineering, research Wave 0, PRE-RAMS, Gold Tier or PR #122 hold has changed."]
+
+### 2. Rulings since the last handoff
+
+- None. Dainius's resume instruction is a direction to check, not a ruling  [CONVERSATION 2026-10-26 Dainius, "Let’s resume , make sure your hook fires and you are up to date"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: D1–D5; step 0.1 (register v2 awaiting Kai); Kai-side continuity controls. HELD: Wave 0; engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier certification (Kai); D5(a)  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 b3f09655, "No KAI engineering, research Wave 0, PRE-RAMS, Gold Tier or PR #122 hold has changed."]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Kai has not adjudicated source register v2 in the 12 days since entry 262; no Kai comment on DAI-10 since b3f09655 (2026-10-14T18:54:03Z)  [CMD `list_comments DAI-10 limit 25` → newest 63ab4a70 (Orion), reached last-seen]
+- Still owed by Orion: D5(a) setup and verification route (Kai 1c376250); vision file map and review of Guardian tests 3–8 when run  [FILE kai-pm/KAI_GPT_COLD_START_GUARDIAN_V0_1.md:54]
+
+### 5. Incidents and corrections
+
+- HOOKS: SessionStart (session-start.sh, ruling_capture report), UserPromptSubmit (ruling_capture prompt), PreToolUse Bash (handoff gate), Stop (handoff-hook stop, ruling_capture stop), PreCompact all registered; both SessionStart hooks fired on this resume  [CMD `.claude/settings.json hooks` → 7 commands]
+- SELFTESTS: ruling_capture 41/41 passed; handoff 74 passed, 0 failed  [CMD `ruling_capture.py selftest; handoff.py selftest` → 41/41; 74/74]
+- FRESH CONTAINER: the clone-local ruling-capture store is empty (flagged=0); captures from 14 October that were banked are in this log; the scratchpad was empty  [CMD `ruling_capture.py status` → flagged=0 OUTSTANDING=0]
+- VERIFY DIFFERS (3): head, remote branch and tree moved 2e2b493 → fbb852e, which is Orion's own entry 275 commit; the 11 other remote refs match  [CMD `handoff.py verify` → differs=3]
+- LINEAR: no new or edited DAI-10 comments after 2026-10-14T19:07:20Z; no issue or document updated after 19:08Z / 19:04Z. Filter calibrated: the same queries from 2026-10-14T00:00Z return DAI-10 (updated 19:07:20Z) and START HERE (19:03:23Z)  [CMD `list_issues updatedAt>2026-10-14T19:08Z; list_documents updatedAt>19:04Z` → 0 and 0; from 00:00Z → 1 and 1]
+- TOOLS RESTORED: credscan.py and extract_comment.py extracted from banked blocks RESCUE-CREDSCAN-INSTRUMENT and ORION-EXTRACT-COMMENT-PY, sha256 equal to the banked values; gen_entry.py and verify_posts.py rewritten from their source as printed earlier in this session and banked below. verify_posts: matching pair EQUAL exit 0; mismatched pair DIFFER exit 1  [CMD `sha256 of restored blocks` → True, True; `verify_posts.py` → exit 0 / exit 1]
+- EVIDENCE ORION-GEN-ENTRY-PY gen_entry.py: 1192 bytes, sha256 873ebd841aea6fc89ca42f880e7536267af4916b10ffac52984321d4e49ff24b, final LF True (added by Orion)  [CMD `sha256sum gen_entry.py` → 873ebd841aea6fc8…]
+    BEGIN-VERBATIM ORION-GEN-ENTRY-PY
+    # Append one handoff entry. argv: sections-file  NAME=path ...   (evidence blocks go at the end of section 5 via the {EVIDENCE} marker)
+    import sys, hashlib, re
+    S="/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad"
+    tmpl=open(sys.argv[1]).read()
+    blks=""
+    for arg in sys.argv[2:]:
+        name,path=arg.split("=",1)
+        b=open(path,"rb").read()
+        if not b.endswith(b"\n"): b+=b"\n"
+        t=b.decode(); lines=t.split("\n")[:-1]
+        assert not any(re.match(r"^\s*(BEGIN|END)-VERBATIM\b",l) or l.startswith("## HANDOFF") for l in lines), name
+        sha=hashlib.sha256(b).hexdigest(); fn=path.rsplit("/",1)[-1]
+        blks+=f"- EVIDENCE {name} {fn}: {len(b)} bytes, sha256 {sha}, final LF True (added by Orion)  [CMD `sha256sum {fn}` → {sha[:16]}…]\n    BEGIN-VERBATIM {name}\n"+"\n".join("    "+l for l in lines)+f"\n    END-VERBATIM {name}\n"
+    measure=open(sys.argv[1]+".measure").read().rstrip("\n")
+    utc=[l for l in measure.splitlines() if l.startswith("- utc:")][0].split()[2]
+    E=tmpl.replace("{UTC}",utc).replace("{MEASURE}",measure).replace("{EVIDENCE}",blks)
+    open("/home/user/kai-system/kai-pm/HANDOFF_LOG.md","a").write(E)
+    print("appended",len(E.encode()),"bytes")
+    END-VERBATIM ORION-GEN-ENTRY-PY
+- EVIDENCE ORION-VERIFY-POSTS-PY verify_posts.py: 1537 bytes, sha256 cad8325c8c5339a1b0b083b9d1dcab284ca75cc8a3379497392ef2b808ff81b2, final LF True (added by Orion)  [CMD `sha256sum verify_posts.py` → cad8325c8c5339a1…]
+    BEGIN-VERBATIM ORION-VERIFY-POSTS-PY
+    import json, sys, subprocess
+    T = "/root/.claude/projects/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c.jsonl"
+    def posted(cid):
+        found = None
+        for line in open(T, encoding="utf-8"):
+            if cid not in line: continue
+            rec = json.loads(line)
+            c = rec.get("message", {}).get("content")
+            if not isinstance(c, list): continue
+            for part in c:
+                if part.get("type") != "tool_result": continue
+                cc = part.get("content")
+                texts = [x.get("text","") for x in cc] if isinstance(cc, list) else [cc]
+                for t in texts:
+                    try: d = json.loads(t)
+                    except Exception: continue
+                    if isinstance(d, dict) and d.get("id") == cid: found = d["body"]
+        return found
+    def banked(name, sha):
+        log = subprocess.run(["git","show",f"{sha}:kai-pm/HANDOFF_LOG.md"],capture_output=True,text=True,check=True,cwd="/home/user/kai-system").stdout.split("\n")
+        i = log.index(f"    BEGIN-VERBATIM {name}"); j = log.index(f"    END-VERBATIM {name}", i)
+        return "\n".join(l[4:] for l in log[i+1:j])
+    ok = True
+    for cid, name, sha in [tuple(x.split(',')) for x in sys.argv[1:]]:
+        p = posted(cid); b = banked(name, sha)
+        body = p.partition("\n\n")[2]
+        eq = body == b
+        cal = (body[:-1] + ("X" if body[-1] != "X" else "Y")) != b
+        print(cid[:8], name, "posted_chars", len(body), "banked_chars", len(b), "EQUAL" if eq else "DIFFER", "calibration(1-char change detected)", cal)
+        ok = ok and eq and cal
+    sys.exit(0 if ok else 1)
+    END-VERBATIM ORION-VERIFY-POSTS-PY
+
+### 6. Next authorised step
+
+- Wait for Kai's adjudication of register v2; bank it on arrival. Offer Dainius a gentle prompt to Kai on DAI-10 if he wants one  [CONVERSATION 2026-10-14 Dainius relaying Kai, "The next authorised move is independent adjudication of Source Register v2"]
+
+### 7. What I am unsure of
+
+- Whether Kai has worked on the register outside Linear and GitHub (for example in ChatGPT only); nothing of it is in either record  [CMD `list_comments DAI-10; git log` → nothing new]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
