@@ -1,0 +1,483 @@
+STEP 3 / M1 — ROOT-CAUSE INVESTIGATION. MEASUREMENT ONLY, NO REPAIR.
+PRODUCED BY ORION. ZERO ADJUDICATION WEIGHT. NOT AN ANSWER KEY.
+subject      d8aac4d49e6ba997e3eb38062c0917186ee3f197
+subject tree 3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+admission contract  self_approval=NONE status=CANDIDATE. NOT FROZEN. NOT ADMITTED.
+
+1. THE PROMOTION PATH, exactly
+   classify.py  validity(row, contradiction)  L139-142
+       w = _binding_witness(row, "DATE")
+       if w is not None:
+           return E.claim(w, "TIME_BOUND", scope="WHOLE_FILE",
+                          rationale="document-level date binding")
+   classify.py  _binding_witness(row, *kinds)  L98-104 — the FIRST
+   witness of the named kind whose applicability_scope is already
+   WHOLE_FILE, in Pass A emission order (source order).
+
+2. WHAT ENTERS THE PATH
+   passa.scan L509-518 emits every DATE token starting inside the
+   head window as witness_type=DATE_STAMP. The PREDICATE that
+   earned document scope is NOT in witness_type -- every date is
+   DATE_STAMP -- but it IS carried verbatim in `local_context`,
+   which since the F5 repair holds the complete logical source
+   line. The evidence needed to tell a review event from a state
+   binding is therefore ALREADY PRESENT and simply never read.
+
+3. VALIDITY AS MEASURED UNDER THE ACCEPTED LINEAGE
+   population rows 272   VALIDITY {'UNKNOWN': 83, 'TIME_BOUND': 184, 'EXACT_SNAPSHOT': 5}
+
+4. DETERMINING-WITNESS BUCKET over the TIME_BOUND rows
+     A_DOCUMENT_STATE          5
+     B_REVIEW_EVENT          146
+     C_ORIGIN_EVENT           17
+     D_NON_PREDICATE          12
+     E_BARE_DATE_LABEL         4
+
+5. DETERMINING ROUTE + SOURCE PREDICATE, every combination
+     INTRINSIC_LABEL     'reviewed'              144
+     H1_LINE             ''                        6
+     INTRINSIC_LABEL     'created'                 5
+     INTRINSIC_LABEL     'date'                    4
+     ROOT_LIFECYCLE      ''                        4
+     BARE_DATELINE       ''                        4
+     INTRINSIC_LABEL     'updated'                 2
+     INTRINSIC_LABEL     'last updated'            2
+     INTRINSIC_LABEL     'started'                 2
+     INTRINSIC_LABEL     'generated'               2
+     INTRINSIC_LABEL     'version'                 1
+     SELF_SUBJECT        ''                        1
+     INTRINSIC_LABEL     'log started'             1
+     INTRINSIC_LABEL     'review date'             1
+     INTRINSIC_LABEL     'prepared'                1
+     INTRINSIC_LABEL     'planning date'           1
+     CONTEXTUAL_STATUS   'status'                  1
+     INTRINSIC_LABEL     'last reviewed'           1
+     INTRINSIC_LABEL     'opened'                  1
+
+6. THE AFFECTED POPULATION
+     review event determines TIME_BOUND            146
+     of those, NO independent document-state binding 146   <- AFFECTED
+     of those, an independent A-class binding exists 0   <- would still promote under Kai's invariant
+     affected rows carrying NO OTHER document-scoped DATE witness of any bucket: 146 of 146
+
+7. LITERAL vs MECHANISM — the D368 / R13 trap, shown not asserted
+     documents carrying a root review-class PREDICATE : 146
+     documents matching the LITERAL 'Reviewed: 27 July 2026' : 120
+     distinct review predicates observed: ['last reviewed', 'review date', 'reviewed']
+     Counting the literal would report the wrong population. The
+     affected figure above is a predicate count, not a string count.
+
+8. PROTECTED POSITIVES, RE-MEASURED. HISTORICAL 10 NOT ASSUMED.
+     strict A only                          5
+     A + E (bare 'Date:' label)             9
+     everything not B                       38
+     The boundary between these three is KAI'S RULING, not mine.
+
+9. EVERY NON-B DETERMINING ROW — the candidate protected set
+     A_DOCUMENT_STATE    INTRINSIC_LABEL   'updated'       docs/ERROR_LOG.md  L5
+       **Updated:** 2026-03-22 | **Test suite:** 1,513 passed, 5 skipped, 0 failed
+     A_DOCUMENT_STATE    INTRINSIC_LABEL   'version'       docs/agentic_patterns_spec.md  L3
+       > Version: 1.0 — 2 Mar 2026
+     A_DOCUMENT_STATE    INTRINSIC_LABEL   'updated'       docs/gaps_and_hardening.md  L6
+       > Updated: 5 March 2026
+     E_BARE_DATE_LABEL   INTRINSIC_LABEL   'date'          docs/gpu_integration_phase0.md  L3
+       **Date:** 2026-04-21
+     D_NON_PREDICATE     H1_LINE           ''              kai-pm/ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md  L1
+       # Assurance counterpart research — 2026-08-23
+     D_NON_PREDICATE     SELF_SUBJECT      ''              kai-pm/CLEANUP_TODO.md  L3
+       > ⚠️ **2026-06-18: this tracker describes a plan that did not execute as written.**
+     C_ORIGIN_EVENT      INTRINSIC_LABEL   'log started'   kai-pm/CODE_AUDIT_CONTINUATION_LOG.md  L4
+       Log started: 27 July 2026  
+     A_DOCUMENT_STATE    INTRINSIC_LABEL   'last updated'  kai-pm/CODE_AUDIT_REGISTER.md  L6
+       Last updated: 26 July 2026
+     C_ORIGIN_EVENT      INTRINSIC_LABEL   'started'       kai-pm/CODE_AUDIT_REGISTER_CONTINUED.md  L6
+       Started: 26 July 2026
+     C_ORIGIN_EVENT      INTRINSIC_LABEL   'started'       kai-pm/CODE_AUDIT_REGISTER_CONTINUED_2.md  L6
+       Started: 26 July 2026
+     C_ORIGIN_EVENT      INTRINSIC_LABEL   'generated'     kai-pm/COMPOSE_DRIFT.md  L3
+       **Generated:** 2026-07-21
+     C_ORIGIN_EVENT      INTRINSIC_LABEL   'created'       kai-pm/CONVICTION_SCENARIOS.md  L3
+       **Created:** 2026-07-23  
+     C_ORIGIN_EVENT      ROOT_LIFECYCLE    ''              kai-pm/DEEPSEEK_BRIEF_2026-08-07_EMBEDDINGS.md  L3
+       Sent 2026-08-07. Their answer drove D167; recorded here so the question
+     C_ORIGIN_EVENT      ROOT_LIFECYCLE    ''              kai-pm/DEEPSEEK_BRIEF_2026-08-07_METHOD.md  L3
+       Sent 2026-08-07. Kept because the answer is worth reading against the
+     D_NON_PREDICATE     BARE_DATELINE     ''              kai-pm/DEEPSEEK_BRIEF_2026-08-07_TOPOLOGY.md  L3
+       2026-08-07. A decision I have deliberately not taken alone: it changes
+     C_ORIGIN_EVENT      ROOT_LIFECYCLE    ''              kai-pm/EMBEDDING_BACKEND_STATE.md  L3
+       **#47 MEASUREMENT: COMPLETE.** Closed 2026-08-12 by operator decision.
+     C_ORIGIN_EVENT      INTRINSIC_LABEL   'created'       kai-pm/EQ_BASELINE_SAMPLES.md  L3
+       **Created:** 2026-07-23  
+     C_ORIGIN_EVENT      INTRINSIC_LABEL   'created'       kai-pm/GPU_ARRIVAL_RUNBOOK.md  L3
+       **Created:** 2026-07-23  
+     C_ORIGIN_EVENT      INTRINSIC_LABEL   'prepared'      kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md  L5
+       Prepared: 27 July 2026  
+     C_ORIGIN_EVENT      INTRINSIC_LABEL   'planning date' kai-pm/KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md  L4
+       Planning date: 27 July 2026  
+     C_ORIGIN_EVENT      INTRINSIC_LABEL   'generated'     kai-pm/MAKEFILE_TARGETS.md  L3
+       **Generated:** 2026-07-22
+     A_DOCUMENT_STATE    INTRINSIC_LABEL   'last updated'  kai-pm/NAVIGATION.md  L6
+       **Last updated:** 2026-08-01
+     C_ORIGIN_EVENT      ROOT_LIFECYCLE    ''              kai-pm/NEXT_STINT_PLAN.md  L3
+       Written 2026-08-07, after `core-tests.yml` reached 67 of 67 green across
+     C_ORIGIN_EVENT      INTRINSIC_LABEL   'created'       kai-pm/PHASE1_READINESS.md  L3
+       **Created:** 2026-07-23  
+     D_NON_PREDICATE     CONTEXTUAL_STATUS 'status'        kai-pm/PHASE_0_5_BACKLOG.md  L6
+       **Status:** ✅ COMPLETE — all items shipped (2026-07-21)
+     D_NON_PREDICATE     H1_LINE           ''              kai-pm/POSTMORTEM_2026-08-06_RUNNER_STARVATION.md  L1
+       # Post-mortem — GitHub Actions degradation, 2026-08-06
+     D_NON_PREDICATE     H1_LINE           ''              kai-pm/REALITY_CHECK_2026-05-10.md  L1
+       # Reality Check — 2026-05-10 UTC
+     D_NON_PREDICATE     H1_LINE           ''              kai-pm/REALITY_CHECK_2026-06-18.md  L1
+       # Reality Check — 2026-06-18 UTC
+     D_NON_PREDICATE     H1_LINE           ''              kai-pm/REPO_HEALTH_AUDIT_2026-05-10.md  L1
+       # Repo Health Audit — 2026-05-10
+     D_NON_PREDICATE     H1_LINE           ''              kai-pm/RUNTIME_TOPOLOGY_CENSUS.md  L1
+       # #41 runtime-topology census — measured 2026-08-12
+     E_BARE_DATE_LABEL   INTRINSIC_LABEL   'date'          kai-pm/SERVICE_IDENTITY_MEASUREMENT.md  L3
+       **Date:** 2026-08-07 · **Status:** evidence, for review. No implementation.
+     E_BARE_DATE_LABEL   INTRINSIC_LABEL   'date'          kai-pm/SERVICE_IDENTITY_TRUST_BOUNDARIES.md  L3
+       **Date:** 2026-08-08 · **Status:** analysis, no new mechanism proposed.
+     C_ORIGIN_EVENT      INTRINSIC_LABEL   'opened'        kai-pm/TECH_DEBT_E402.md  L5
+       **Opened:** 2026-08-06, during the lint sweep.
+     D_NON_PREDICATE     BARE_DATELINE     ''              kai-pm/UH2_INTAKE_REBUILD_ANALYSIS.md  L3
+       2026-08-07. **No code written. No trust-boundary change made.**
+     D_NON_PREDICATE     BARE_DATELINE     ''              kai-pm/UH2_INTAKE_REDESIGN.md  L3
+       2026-08-07. **No implementation. No trust-boundary change.** For
+     D_NON_PREDICATE     BARE_DATELINE     ''              kai-pm/UH2_SENSOR_INGRESS_PLAN.md  L3
+       2026-08-07. **No code written. No trust-boundary change made.** Written
+     E_BARE_DATE_LABEL   INTRINSIC_LABEL   'date'          kai-pm/VERIFICATION_ARCHITECTURE_REVIEW.md  L3
+       **Date:** 2026-08-12 · **Scope:** the proof system, not Kai
+     C_ORIGIN_EVENT      INTRINSIC_LABEL   'created'       kai-pm/W1_DASHBOARD_REMEDIATION_PLAN.md  L4
+       **Created:** 2026-08-02
+
+10. EVERY AFFECTED ROW (146), with its raw source line
+     kai-pm/CODE_AUDIT_BATCH_AGENTIC_API.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_AGENTIC_INTROSPECTION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_AIRQUALITY_SERVICE.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_ANALOGY_STUB.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_ARCHITECTURE_INTERACTION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_AUDIO_PERCEPTION.md	L5	reviewed
+       Reviewed: 26 July 2026
+     kai-pm/CODE_AUDIT_BATCH_AUDIO_PERCEPTION_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_AUTONOMOUS_STATE.md	L5	reviewed
+       Reviewed: 26 July 2026
+     kai-pm/CODE_AUDIT_BATCH_AVATAR_SERVICE.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_AVATAR_SERVICE_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_BACKUP_SERVICE.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_BACKUP_SERVICE_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_BEHAVIOURAL_FEEDBACK_TOOLS.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_BOOTSTRAP_CLOSURE_SMOKE.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_BROKER_BRIDGE.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_BROKER_BRIDGE_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_BROWSER_AGENT.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_BROWSER_AGENT_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_BUSINESS_SAFETY_ADVISORS.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_CALENDAR_SERVICE.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_CALENDAR_SYNC_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_CAMERA_SERVICE.md	L5	reviewed
+       Reviewed: 26 July 2026
+     kai-pm/CODE_AUDIT_BATCH_CAMERA_SERVICE_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_CHAOS_GONOGO_TEST_BOOTSTRAP.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_CI_BACKUP.md	L5	reviewed
+       Reviewed: 26 July 2026
+     kai-pm/CODE_AUDIT_BATCH_CI_WORKFLOWS.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_CI_WORKFLOW_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_CLIPBOARD_SERVICE.md	L5	reviewed
+       Reviewed: 26 July 2026
+     kai-pm/CODE_AUDIT_BATCH_CLIPBOARD_SERVICE_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_COGNITIVE_FOUNDATIONS.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_COGNITIVE_GOVERNANCE_FOUNDATIONS.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_COGNITIVE_STATE_STUBS.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_COMMON_AUTH.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_COMMON_CONTROL_PLANE.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_COMMON_MODEL_RUNTIME.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_COMMON_RESILIENCE.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_COMMON_RUNTIME.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_CONVICTION_PLANNING_FORECASTING.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_CORTEX.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_CROSS_SERVICE_ATTACK_CHAINS.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_DASHBOARD_FRONTEND.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_DASHBOARD_GATEWAY.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_DOCKER_WATCHER.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_DOCUMENT_PARSER.md	L5	reviewed
+       Reviewed: 26 July 2026
+     kai-pm/CODE_AUDIT_BATCH_DOCUMENT_PARSER_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_DREAM_EVOLVER_CHECKPOINTS.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_EMAIL_READER.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_EMAIL_READER_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_ENVIRONMENTAL_SENSORS.md	L5	reviewed
+       Reviewed: 26 July 2026
+     kai-pm/CODE_AUDIT_BATCH_ENVIRONMENTAL_SENSORS_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_EXECUTOR.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_FEATURE_FLAGS_EPISODES.md	L5	reviewed
+       Reviewed: 26 July 2026
+     kai-pm/CODE_AUDIT_BATCH_FILES_SERVICE.md	L5	reviewed
+       Reviewed: 26 July 2026
+     kai-pm/CODE_AUDIT_BATCH_FILES_SERVICE_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_FINANCIAL_AUTONOMY_MARKET_INTELLIGENCE.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_FINANCIAL_AWARENESS.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_FINANCIAL_AWARENESS_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_FUSION_ENGINE.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_FUSION_ENGINE_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_GIT_WATCHER.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_GPU_FOUNDATION_STUBS.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_GPU_UTILITIES.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_HEARTBEAT.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_HEARTBEAT_SELF_MODEL.md	L5	reviewed
+       Reviewed: 26 July 2026
+     kai-pm/CODE_AUDIT_BATCH_HMAC_ROTATION_DRILL.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_HOST_SETUP_HARDENING_SHELL.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_HOST_WATCHERS.md	L5	reviewed
+       Reviewed: 26 July 2026
+     kai-pm/CODE_AUDIT_BATCH_HOST_WATCHERS_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_HOUSE_DOCTOR.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_INTROSPECTION_IDENTITY.md	L5	reviewed
+       Reviewed: 26 July 2026
+     kai-pm/CODE_AUDIT_BATCH_KAI_ADVISOR.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_KAI_ADVISOR_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_KEY_ROTATION.md	L5	reviewed
+       Reviewed: 26 July 2026
+     kai-pm/CODE_AUDIT_BATCH_KEY_ROTATION_MIGRATION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_LEDGER_WORKER.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_LEDGER_WORKER_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_LETTA_AGENT.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_LETTA_AGENT_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_LIVE_SUPERVISOR.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_MEMORY_COMPRESSOR.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_MEMORY_COMPRESSOR_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_MEMORY_GRAPH.md	L5	reviewed
+       Reviewed: 26 July 2026
+     kai-pm/CODE_AUDIT_BATCH_MEMORY_GRAPH_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_MEMU_CORE_HOT_PATH.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_MEMU_INTROSPECTION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_MEMU_PERSONALITY_AUTONOMY.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_METRICS_GATEWAY.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_METRICS_GATEWAY_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_MODEL_DECISION_CONTROLS.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_MONITOR_SERVICE.md	L5	reviewed
+       Reviewed: 26 July 2026
+     kai-pm/CODE_AUDIT_BATCH_MONITOR_SERVICE_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_NEWS_FEED.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_NEWS_FEED_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_NEWS_FEED_INTEGRATION_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_NOTIFY_SERVICE.md	L5	reviewed
+       Reviewed: 26 July 2026
+     kai-pm/CODE_AUDIT_BATCH_NOTIFY_SERVICE_BUILD_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_NOTIFY_SERVICE_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_OPERATIONAL_ASSURANCE_SCRIPTS.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_OPERATIONAL_STATE_EPISODE_RECOVERY.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_OPERATOR_CONTROL_DRILLS.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_ORCHESTRATION_ARCHITECTURE.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_ORCHESTRATION_STUBS.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_PERSISTENCE_1.md	L5	reviewed
+       Reviewed: 26 July 2026
+     kai-pm/CODE_AUDIT_BATCH_QUESTIONER_TEAMMATES_WATCHDOG.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_RECOVERY_OPERATIONAL_SCRIPTS.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_RELEASE_BOOTSTRAP_TOOLING.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_REPOSITORY_QUALITY_DOCS.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_ROUTING_LLM_DISPATCH.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_SCREEN_CAPTURE.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_SCREEN_CAPTURE_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_SCREEN_WATCHER.md	L5	reviewed
+       Reviewed: 26 July 2026
+     kai-pm/CODE_AUDIT_BATCH_SCREEN_WATCHER_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_SELF_AUDIT_SUPERVISOR.md	L5	reviewed
+       Reviewed: 26 July 2026
+     kai-pm/CODE_AUDIT_BATCH_SHARED_RUNTIME_CONTROLS.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_SHELL_HEALTH_ROTATION_WRAPPERS.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_SHELL_SANDBOX.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_SHELL_SANDBOX_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_SKILL_HUNTER.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_SWARM_ORCHESTRATION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_SYSMETRICS.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_SYSMETRICS_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_SYSMETRICS_WORLD_ANCHOR.md	L5	reviewed
+       Reviewed: 26 July 2026
+     kai-pm/CODE_AUDIT_BATCH_TEAMMATES_FSM_POLICY_MEMORY.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_TELEGRAM_BOT.md	L5	reviewed
+       Reviewed: 26 July 2026
+     kai-pm/CODE_AUDIT_BATCH_TELEGRAM_BOT_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_TELEGRAM_PERCEPTION_BRIDGE.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_TEST_HARNESSES_MARKET_CACHE.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_TEST_STUBS_EXTERNAL_MODEL_OCR_FUZZ.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_TOOL_GATE_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_TRUST_GOVERNANCE_AUTHORITY.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_TRUST_LEDGER_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_TTS_SERVICE.md	L5	reviewed
+       Reviewed: 26 July 2026
+     kai-pm/CODE_AUDIT_BATCH_TTS_SERVICE_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_VAULT_BRIDGE_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_VAULT_SYNC.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_VERIFIER.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_VISION_SERVICE.md	L5	reviewed
+       Reviewed: 26 July 2026
+     kai-pm/CODE_AUDIT_BATCH_VISION_SERVICE_DEPLOYMENT_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_VISION_SERVICE_EXTENSION.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_WAKE_SERVICE.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_WATCHDOG_RECOVERY.md	L5	reviewed
+       Reviewed: 26 July 2026
+     kai-pm/CODE_AUDIT_BATCH_WEATHER_SERVICE.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_WEB_SCOUT.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_BATCH_WORLD_ANCHOR.md	L5	reviewed
+       Reviewed: 27 July 2026
+     kai-pm/CODE_AUDIT_PLANNING_PACKAGE_QA.md	L4	review date
+       Review date: 27 July 2026  
+     kai-pm/RISKS.md	L3	last reviewed
+       Last reviewed: 2026-07-21
+
+11. DOCUMENTS WHERE AN A-CLASS BINDING IS NOT THE DETERMINING ONE
+    (determining-witness selection is source order, not semantics)
+     kai-pm/PHASE1_READINESS.md  determining=C_ORIGIN_EVENT/'created' L3  also A: [('last updated', 'L4')]
+     kai-pm/PHASE_0_5_BACKLOG.md  determining=D_NON_PREDICATE/'status' L6  also A: [('last updated', 'L7')]
+     count: 2
+
+12. SCOPE COLLATERAL — the SAME helper feeds a different axis
+     SCOPE=WHOLE_FILE rows                         194
+     of those, affected AND with no other binding  146
+     scope() consumes _binding_witness too. A repair placed in the
+     SHARED helper would move these SCOPE verdicts as well. A root
+     'Reviewed:' date IS document-scoped, so SCOPE=WHOLE_FILE looks
+     CORRECT and must not move. This constrains where a repair may
+     be placed. Reported as a constraint, not acted on.
+
+13. REPRODUCTION — the run artefacts are NOT banked, deliberately
+    Banking the candidate's full verdict aggregate in the repository
+    would place a self-referential input where a later Stage A
+    precommit could read it. Kai's architecture forbids a
+    self-referential aggregate, so only this derived report and the
+    instrument are banked. The inputs are HASH-PINNED and
+    deterministically regenerable -- two independent runs produced
+    byte-identical output.
+      sha256(passA          ) 24fb1f555560277fd4555087f22ed06ef4a72efee845a339bbc87b925730f51c
+      sha256(classification ) e34d7f2cce2bf0cfca72dd83c409190e3fc8a191a7104ae8a60b602c703ce391
+      python3 passa.py --subject-repo <SUBJECT> \
+          --history-repo <SUBJECT> --subject d8aac4d49e6ba997e3eb38062c0917186ee3f197 \
+          --census-package kai-pm/house_in_order_census_v11 --out passA.json
+      python3 run_h2_v12.py --subject-repo <SUBJECT> --passa passA.json \
+          --out classification.json
+      python3 build_evidence/m1_investigation.py --subject-repo <SUBJECT> \
+          --tree 3abc9e9d8ca11966a6f996d5f0af68072ee5b117 \
+          --passa passA.json --classification classification.json --out F
+
+14. UNCLASSIFIED — everything the partition did not cover
+     0

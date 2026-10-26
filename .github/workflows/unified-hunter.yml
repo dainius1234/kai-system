@@ -19,12 +19,47 @@ on:
 jobs:
   unified-hunter:
     runs-on: ubuntu-latest
+    # GitHub's default job timeout is 360 minutes; a hung job burns six
+    # hours and reads as "still running". Run 697 of core-tests sat at
+    # 133.9 minutes and finished with no conclusion at all. 60 is over
+    # twice the longest successful run of any workflow here, so it
+    # cannot cut short work that is progressing. All nine jobs were
+    # unbounded — the bound is applied to the whole set, not to the one
+    # workflow whose change prompted it.
+    timeout-minutes: 60
     env:
       MEMU_ALLOW_FAKE_EMBEDDINGS: "true"
       HMAC_ALLOW_DEV_SECRET: "true"
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          # fetch-depth 0 — the FULL history, not a fixed number.
+          #
+          # Depth 2 was set because scripts/test_item8_verdicts.py resolves
+          # HEAD~1 to build an authority envelope for a parent that is not
+          # the approved commit. `git rev-parse` echoes its argument back
+          # on stdout when a revision is missing, so at depth 1 that
+          # scenario silently measured a malformed envelope instead of the
+          # property it names -- red here since cf84ac1 while passing
+          # locally on a full clone. (R11, I-8)
+          #
+          # That fixed ONE instrument's history requirement and left the
+          # class open (R6). scripts/test_bind_mount_portability.py
+          # calibrates against a known answer read from the tree at
+          # f50715b -- 398 commits back -- with `git show`. At depth 2 all
+          # three of its reads return 128, the suite emits its explicit
+          # "could not read f50715b … (rebase or shallow clone?)" failure,
+          # and `make test-uh` halts there. Measured: depth 2 gives
+          # 25 passed / 1 failed, a full clone gives 29 / 0. The 25 is the
+          # exact count CI recorded.
+          #
+          # A depth number is a promise about how far back every present
+          # and future calibration may look, kept in a file none of them
+          # can see. Depth 0 removes the guess. The instruments are NOT
+          # changed to need less history: an instrument that cannot read
+          # its known answer must fail, and it still does. (D375 / RC-6)
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -59,10 +94,43 @@ jobs:
             pip install -r "$req" || true
           done
 
+      # The log alone is not evidence. `check_assertion_floors.py --from-log`
+      # binds `status = 0` to a literal, so the branch that refuses to judge
+      # an incomplete run has never executed on the path CI uses: on
+      # 1009f31 the aggregate exited 2, `make` halted at prerequisite 61 of
+      # 78, and the gate reported the five suites that never started as
+      # `missing` — a run that stopped, rendered as a surface that eroded.
+      # The evidence unit is LOG + AUTHORITATIVE PROCESS STATUS, so this
+      # step records both. Nothing reads the status yet; the consumer is
+      # W2.2. (WF-2)
+      #
+      # Every line below is load-bearing, and each was measured rather
+      # than assumed. The shell is `/usr/bin/bash -e {0}` — errexit is on.
+      #
+      #   `status=0` before the pipeline: the green path must reach the
+      #   printf with the variable defined.
+      #
+      #   `set -o pipefail`: `tee` exits 0. Without pipefail the recorded
+      #   status is tee's, and a failing suite would be banked as a zero —
+      #   the same fabrication this step exists to remove, moved one level
+      #   upstream. Measured: 2 becomes 0.
+      #
+      #   `|| status=$?`: under errexit a failing pipeline ends the step
+      #   at that line. Measured: without this, nothing after it runs and
+      #   the status file is never written — on the only path that matters.
+      #   It protects the aggregate pipeline and nothing else; a second
+      #   `||` anywhere here would suppress a failure we need to see.
+      #
+      #   `exit "$status"`: recording evidence must not turn a red suite
+      #   green. The step concludes with the aggregate's own code — 2 on
+      #   1009f31 — exactly as it did before this change.
       - name: Unified Hunter suites
         run: |
           set -o pipefail
-          make test-uh 2>&1 | tee /tmp/test-uh.log
+          status=0
+          make test-uh 2>&1 | tee /tmp/test-uh.log || status=$?
+          printf '%s\n' "$status" > /tmp/test-uh.log.status
+          exit "$status"
 
       # A test run must leave the tree exactly as it found it. Until
       # 2026-08-05 it did not: `make test-uh` appended two signed,

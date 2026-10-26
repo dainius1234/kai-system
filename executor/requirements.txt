@@ -9,3 +9,4 @@ httpx==0.27.2
 # policy loads empty, and every permission drops to its most
 # restrictive default. Proven in CI on 2026-08-06 (tool-gate).
 pyyaml>=6.0
+cryptography==43.0.1

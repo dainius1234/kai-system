@@ -1,0 +1,74 @@
+STEP 2 / M3 — CYCLE 6 RESULT
+IMPLEMENTATION 002e0ab banked before this run. BASELINE 0f3da09.
+PREDECESSOR c3c7731, loaded from the git object and executed.
+PRODUCED BY ORION. NOT A REFERENCE KEY. ZERO ADJUDICATION WEIGHT.
+
+  baseline   WHOLE_FILE 168  SPAN 324  total 492
+  cycle 5    WHOLE_FILE 200  SPAN 292  total 492
+  cycle 6    WHOLE_FILE 201  SPAN 291  total 492
+  vs baseline  promotions 35   demotions 2   unchanged 455
+  vs cycle 5   CHANGED IDENTITIES 1   unchanged 491
+  D14-B 76dbba4 kai-pm/UH_PROGRESS_TRACKER.md L76 -> SPAN
+
+  CONSERVATION
+    records in 492 · records out 492 · identity set unchanged: True
+    documents carrying at least one record: 210
+    same-span detector pairs 6 · splits 0
+
+  PAIR REPORT — every duplicate physical span
+  path                                         start   end  detA        scopeA  detB  scopeB
+  kai-pm/EMBEDDING_BACKEND_STATE.md              621   632  DECIMAL_RUN SPAN    HEX   SPAN
+  kai-pm/ORION_FIELD_NOTES.md                    642   653  DECIMAL_RUN SPAN    HEX   SPAN
+  kai-pm/ORION_FIELD_NOTES.md                    973   984  DECIMAL_RUN SPAN    HEX   SPAN
+  kai-pm/ORION_FIELD_NOTES.md                   1239  1250  DECIMAL_RUN SPAN    HEX   SPAN
+  kai-pm/ORION_FIELD_NOTES.md                   1641  1652  DECIMAL_RUN SPAN    HEX   SPAN
+  kai-pm/RUNTIME_TOPOLOGY_CENSUS.md              551   562  DECIMAL_RUN SPAN    HEX   SPAN
+
+  CHANGED FROM CYCLE 5 (1) — every one, with its raw source
+    kai-pm/PHASE_0_5_BACKLOG.md	273	283	DATE	L6	SPAN -> WHOLE_FILE
+      raw line   : **Status:** ✅ COMPLETE — all items shipped (2026-07-21)
+      matched    : 2026-07-21
+
+  DEMOTIONS vs baseline (2)
+    kai-pm/CODE_AUDIT_PLANNING_PACKAGE_QA.md	793	833	HEX	L20
+    kai-pm/ORION_FIELD_NOTES.md	254	264	DATE	L9
+
+  PROMOTIONS vs baseline (35)
+    docs/ERROR_LOG.md	109	119	DATE	L5
+    docs/gaps_and_hardening.md	170	182	DATE	L6
+    kai-pm/ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md	35	45	DATE	L1
+    kai-pm/CLEANUP_TODO.md	69	79	DATE	L3
+    kai-pm/CODE_AUDIT_CONTINUATION_LOG.md	91	103	DATE	L4
+    kai-pm/CODE_AUDIT_FINAL_REPORT.md	232	244	DATE	L5
+    kai-pm/CODE_AUDIT_MASTER.md	137	149	DATE	L5
+    kai-pm/CODE_AUDIT_PLANNING_PACKAGE_QA.md	117	129	DATE	L4
+    kai-pm/CODE_AUDIT_REGISTER_CONTINUED.md	177	189	DATE	L6
+    kai-pm/CODE_AUDIT_REGISTER_CONTINUED_2.md	223	235	DATE	L6
+    kai-pm/COMPOSE_DRIFT.md	41	51	DATE	L3
+    kai-pm/CONVICTION_SCENARIOS.md	50	60	DATE	L3
+    kai-pm/DEEPSEEK_BRIEF_2026-08-07_EMBEDDINGS.md	76	86	DATE	L3
+    kai-pm/DEEPSEEK_BRIEF_2026-08-07_METHOD.md	51	61	DATE	L3
+    kai-pm/DEEPSEEK_BRIEF_2026-08-07_TOPOLOGY.md	70	80	DATE	L3
+    kai-pm/EMBEDDING_BACKEND_STATE.md	77	87	DATE	L3
+    kai-pm/EQ_BASELINE_SAMPLES.md	74	84	DATE	L3
+    kai-pm/GPU_ARRIVAL_RUNBOOK.md	36	46	DATE	L3
+    kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md	162	174	DATE	L5
+    kai-pm/MAKEFILE_TARGETS.md	44	54	DATE	L3
+    kai-pm/NEXT_STINT_PLAN.md	37	47	DATE	L3
+    kai-pm/NEXT_STINT_PLAN.md	195	205	DATE	L6
+    kai-pm/PHASE1_READINESS.md	39	49	DATE	L3
+    kai-pm/PHASE_0_5_BACKLOG.md	273	283	DATE	L6
+    kai-pm/POSTMORTEM_2026-08-06_RUNNER_STARVATION.md	44	54	DATE	L1
+    kai-pm/REALITY_CHECK_2026-05-10.md	18	28	DATE	L1
+    kai-pm/REALITY_CHECK_2026-06-18.md	18	28	DATE	L1
+    kai-pm/REPO_HEALTH_AUDIT_2026-05-10.md	22	32	DATE	L1
+    kai-pm/RUNTIME_TOPOLOGY_CENSUS.md	41	51	DATE	L1
+    kai-pm/STATUS.md	53	63	DATE	L3
+    kai-pm/TECH_DEBT_E402.md	173	183	DATE	L5
+    kai-pm/UH2_INTAKE_REBUILD_ANALYSIS.md	64	74	DATE	L3
+    kai-pm/UH2_INTAKE_REDESIGN.md	39	49	DATE	L3
+    kai-pm/UH2_SENSOR_INGRESS_PLAN.md	53	63	DATE	L3
+    kai-pm/W1_DASHBOARD_REMEDIATION_PLAN.md	119	129	DATE	L4
+
+  HISTORICAL RECONCILIATION ONLY — ZERO DESIGN AUTHORITY
+    historical 214 WHOLE_FILE / 278 SPAN, 47 up / 1 down

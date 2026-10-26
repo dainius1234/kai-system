@@ -32,7 +32,7 @@ from __future__ import annotations
 import hmac
 import logging
 import os
-from typing import Callable, Optional
+from typing import Callable, Dict, Optional, Tuple
 
 logger = logging.getLogger("kai.service_auth")
 
@@ -101,7 +101,12 @@ def check_token(
 
 
 def require_service_auth(operation: str) -> Callable:
-    """FastAPI dependency enforcing service authentication.
+    """FastAPI dependency enforcing service *membership*.
+
+    Correct for the six class-A endpoints — read-only, no attribution,
+    identical response for any authorised caller. For the twenty-six
+    class-B endpoints, where the caller's identity changes what should be
+    recorded or permitted, use ``require_service_identity`` instead.
 
     ``operation`` names the protected action and appears in logs and in
     the 503 body, so a misconfiguration says which endpoint refused.
@@ -113,4 +118,254 @@ def require_service_auth(operation: str) -> Callable:
         if not ok:
             raise HTTPException(status_code=status, detail=detail)
 
+    return _dependency
+
+
+# ── identity: who called, not merely that someone did ───────────────────
+#
+# The measurement that produced this (2026-08-07): 26 of 32 protected
+# endpoints need the caller's identity, and the shared token cannot
+# supply it. `common/service_identity` derives the principal from the key
+# that signed the request. Nothing below reads a name from a header.
+
+REQUIRE_IDENTITY_ENV = "KAI_REQUIRE_SERVICE_IDENTITY"
+
+_keymap = None
+_nonce_cache = None
+_keymap_error = ""
+_WARNED_TRANSITION: set = set()
+
+#: (operation, outcome) -> count. Chronic refusal must be VISIBLE.
+#:
+#: The reason this exists is a measured one: `/observe_turn`'s only
+#: caller sent no credentials at all, every call was 401'd, and
+#: `record_degradation` swallowed it — so an integration that had never
+#: worked looked exactly like an integration nobody was using. A counter
+#: is not a fix for that, but it is the difference between a silence and
+#: a number somebody can read.
+#:
+#: Deliberately NOT a health probe that exercises the endpoint. A live
+#: monitor that posts turns to prove authentication works would make the
+#: monitor a perception source, and Cortex would learn from its own
+#: watchdog.
+_auth_events: Dict[Tuple[str, str], int] = {}
+
+
+def _record(operation: str, outcome: str) -> None:
+    key = (operation, outcome)
+    _auth_events[key] = _auth_events.get(key, 0) + 1
+
+
+def auth_telemetry() -> Dict[str, Dict[str, int]]:
+    """Counts keyed by operation and error class, for a /health payload.
+
+    Read-only and side-effect free: reporting it changes nothing, which
+    is what lets a service expose it without the report itself becoming
+    an event.
+    """
+    out: Dict[str, Dict[str, int]] = {}
+    for (operation, outcome), count in sorted(_auth_events.items()):
+        out.setdefault(operation, {})[outcome] = count
+    return out
+
+
+def reset_auth_telemetry() -> None:
+    _auth_events.clear()
+
+
+def identity_required() -> bool:
+    """Whether an unsigned caller is refused outright.
+
+    False during the migration window, when a class-B endpoint still
+    accepts the shared token but records the caller as **unverified** —
+    which never reaches a provenance record, because
+    ``ServicePrincipal.usable_for_provenance`` is False for it.
+
+    This defaults to False so the migration does not break every caller
+    on the commit that lands it. That is a deliberate, temporary widening
+    and it is loud: the first such request per operation logs, every one
+    is counted in `auth_telemetry()`, and
+    `scripts/security/report_service_identity.py` prints how many class-B
+    endpoints are still on the shared token.
+
+    It does NOT apply to grant-gated endpoints. A grant is a decision
+    about *who*, so an endpoint requiring one always requires a verified
+    identity — see `check_identity`.
+    """
+    return os.getenv(REQUIRE_IDENTITY_ENV, "false").lower() in {
+        "1", "true", "yes"}
+
+
+def _identity_context():
+    """Load the key map and replay cache once, not per request."""
+    global _keymap, _nonce_cache, _keymap_error
+    if _keymap is not None or _keymap_error:
+        return _keymap, _nonce_cache
+    try:
+        from common.service_identity import KeyMap, NonceCache
+        _keymap = KeyMap.load()
+        _nonce_cache = NonceCache()
+    except Exception as exc:
+        # Recorded, not raised. Whether an absent key map is fatal
+        # depends on identity_required(), which is decided per request.
+        _keymap_error = f"{type(exc).__name__}: {exc}"
+        logger.warning("service identity unavailable: %s", _keymap_error)
+    return _keymap, _nonce_cache
+
+
+def reset_identity_context() -> None:
+    """Drop the cached key map. For tests and for key rotation."""
+    global _keymap, _nonce_cache, _keymap_error
+    _keymap = _nonce_cache = None
+    _keymap_error = ""
+
+
+def check_identity(
+    headers, operation: str, *, destination: str, method: str, path: str,
+    body: bytes, require_grant: bool = False,
+):
+    """Validate a request and return ``(principal, status, detail)``.
+
+    Order matters. A **valid signature always wins**, in both directions:
+    it is tried first so a signed caller is identified even during the
+    transition window, and a *bad* signature is refused outright rather
+    than falling back to the shared token. Without that second half, an
+    attacker could strip a signature and downgrade to anonymous
+    membership, which would make the whole mechanism optional.
+    """
+    from common.service_identity import (unverified_principal,
+                                         verify_request, SIGNATURE_HEADER)
+
+    lower = {str(k).lower(): v for k, v in dict(headers).items()}
+    keymap, cache = _identity_context()
+
+    if lower.get(SIGNATURE_HEADER):
+        if keymap is None:
+            logger.error(
+                "SECURITY: '%s' received a signed request but has no usable "
+                "key map (%s) — refusing rather than downgrading",
+                operation, _keymap_error)
+            _record(operation, "keymap_unavailable")
+            return None, 503, (
+                f"{operation} cannot verify caller identity: "
+                f"the service key map is unavailable")
+        try:
+            principal, status, detail = verify_request(
+                lower, destination=destination, method=method, path=path,
+                body=body, keymap=keymap, cache=cache)
+        except Exception as exc:
+            # Reached when the key map loads but the Ed25519 backend does
+            # not — a missing `cryptography` in the image. Without this,
+            # an absent dependency surfaced as a 500 from somewhere deep,
+            # which is the least useful shape a configuration error can
+            # take. It is still a refusal: no fallback.
+            logger.error("SECURITY: '%s' could not evaluate a signature "
+                         "(%s: %s)", operation, type(exc).__name__, exc)
+            _record(operation, "backend_unavailable")
+            return None, 503, (
+                f"{operation} cannot verify caller identity: "
+                f"the signing backend is unavailable")
+        # No fallback on failure. See docstring.
+        if principal is None:
+            _record(operation, "signature_rejected")
+            return principal, status, detail
+        if not require_grant:
+            _record(operation, f"verified:{principal.identity}")
+            return principal, status, detail
+        # Proving WHO called is not deciding they MAY. 403, not 401: the
+        # caller is authenticated and simply not authorised, and telling
+        # them apart is what makes the log readable.
+        if not keymap.granted(operation, principal.identity):
+            logger.warning(
+                "SECURITY: '%s' verified as '%s' but that identity holds no "
+                "grant for this operation (granted: %s)",
+                operation, principal.identity,
+                ", ".join(keymap.grants_for(operation)) or "nobody")
+            _record(operation, f"no_grant:{principal.identity}")
+            return None, 403, (
+                f"{principal.identity} is not granted {operation}")
+        _record(operation, f"verified:{principal.identity}")
+        return principal, status, detail
+
+    if require_grant:
+        # An endpoint that gates on a grant CANNOT be satisfied by an
+        # unsigned caller: a grant is a decision about *who*, and there
+        # is no who. The transition window deliberately does not apply
+        # here.
+        #
+        # This is not how it was first written. The check was
+        # `require_grant and identity_required()`, so with the flag off —
+        # the default — a caller could skip the signature entirely and
+        # sail past the grant table. The scope check was bypassable by
+        # not attempting it, which is the same shape as the signature
+        # downgrade closed above: a control that can be declined is not a
+        # control. Found by the slice test, not by reading this code.
+        #
+        # The cost is intended: turning on require_grant for an endpoint
+        # makes signing mandatory *for that endpoint that day*. That is
+        # the per-endpoint migration switch, and it is why the population
+        # is migrated one slice at a time.
+        logger.warning("SECURITY: '%s' refused an unsigned caller — this "
+                       "operation is grant-gated and requires an identity",
+                       operation)
+        _record(operation, "unsigned_but_grant_gated")
+        return None, 401, (
+            f"{operation} requires a signed request: this endpoint's "
+            f"authorisation depends on which service called")
+
+    if identity_required():
+        logger.warning("SECURITY: '%s' refused an unsigned caller", operation)
+        _record(operation, "unsigned_identity_required")
+        return None, 401, (
+            f"{operation} requires a signed request: this endpoint's "
+            f"behaviour depends on which service called")
+
+    ok, status, detail = check_token(lower.get("authorization"), operation)
+    if not ok:
+        _record(operation, f"token_rejected_{status}")
+        return None, status, detail
+    if operation not in _WARNED_TRANSITION:
+        _WARNED_TRANSITION.add(operation)
+        logger.warning(
+            "SECURITY: '%s' accepted a shared-token caller. Identity is "
+            "UNVERIFIED and will not appear in any provenance record. Set "
+            "%s=true once every caller signs.", operation,
+            REQUIRE_IDENTITY_ENV)
+    _record(operation, "shared_token_unverified")
+    return unverified_principal(), 200, "membership only (unverified)"
+
+
+def require_service_identity(operation: str,
+                             require_grant: bool = False) -> Callable:
+    """FastAPI dependency yielding a ``ServicePrincipal``.
+
+    For the class-B endpoints. The handler receives the principal and
+    must check ``usable_for_provenance`` before attributing anything to
+    it — during the transition window it may legitimately be anonymous,
+    and recording an anonymous caller by name is exactly the defect this
+    replaces.
+    """
+    from fastapi import HTTPException, Request
+
+    async def _dependency(request):
+        principal, status, detail = check_identity(
+            request.headers, operation,
+            destination=os.getenv("KAI_SERVICE_NAME", ""),
+            method=request.method,
+            path=request.url.path,
+            body=await request.body(),
+            require_grant=require_grant,
+        )
+        if principal is None:
+            raise HTTPException(status_code=status, detail=detail)
+        return principal
+
+    # Bound to the real class, not the name. This module uses
+    # `from __future__ import annotations`, so a written annotation would
+    # be the *string* "Request", and FastAPI resolves hints against
+    # module globals where `Request` is not imported — it is local to
+    # this function. Assigning the class sidesteps the resolution
+    # entirely, and the failure it avoids is a startup crash in
+    # pydantic, not a subtle one.
+    _dependency.__annotations__["request"] = Request
     return _dependency

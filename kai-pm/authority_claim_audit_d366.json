@@ -1,0 +1,116 @@
+{
+ "audit": "AUTHORITY_CLAIM_EVIDENCE",
+ "banked_under": "D366 (evidence only)",
+ "subject": "d8aac4d49e6ba997e3eb38062c0917186ee3f197",
+ "subject_tree": "3abc9e9d8ca11966a6f996d5f0af68072ee5b117",
+ "population": 6,
+ "rows": [
+  {
+   "path": "README.md",
+   "claim": "SELF_ASSERTS_AUTHORITY",
+   "AUTHORITY_verdict": "UNKNOWN",
+   "self_binding_source": "bare pronoun 'it'",
+   "total_claims": 1,
+   "self_bound_claims": 1,
+   "evidence_rows_in_artefact": 1,
+   "self_rows_shown": 1,
+   "determining_row_recoverable_from_package": true,
+   "self_claim_text": [
+    "It is the source of truth for UH work \u2014 including an honest open-gaps list."
+   ]
+  },
+  {
+   "path": "kai-pm/CODE_AUDIT_MASTER.md",
+   "claim": "SELF_ASSERTS_AUTHORITY",
+   "AUTHORITY_verdict": "UNKNOWN",
+   "self_binding_source": "controlled field / names itself",
+   "total_claims": 8,
+   "self_bound_claims": 1,
+   "evidence_rows_in_artefact": 6,
+   "self_rows_shown": 1,
+   "determining_row_recoverable_from_package": true,
+   "self_claim_text": [
+    "Status: **FINAL \u2014 SINGLE SOURCE OF TRUTH**"
+   ]
+  },
+  {
+   "path": "kai-pm/DECISIONS.md",
+   "claim": "SELF_ASSERTS_AUTHORITY",
+   "AUTHORITY_verdict": "UNKNOWN",
+   "self_binding_source": "controlled field / names itself",
+   "total_claims": 43,
+   "self_bound_claims": 1,
+   "evidence_rows_in_artefact": 6,
+   "self_rows_shown": 0,
+   "determining_row_recoverable_from_package": false,
+   "self_claim_text": [
+    "names itself: | programme history | `kai-pm/DECISIONS.md` (append-only) | **AUTHORIT"
+   ]
+  },
+  {
+   "path": "kai-pm/KAI_ORION_CONTINUITY.md",
+   "claim": "SELF_ASSERTS_NON_AUTHORITY",
+   "AUTHORITY_verdict": "UNKNOWN",
+   "self_binding_source": "controlled field / names itself",
+   "total_claims": 1,
+   "self_bound_claims": 1,
+   "evidence_rows_in_artefact": 1,
+   "self_rows_shown": 1,
+   "determining_row_recoverable_from_package": true,
+   "self_claim_text": [
+    "**STATUS: RECOVERY PROTOCOL \u2014 NOT A SOURCE OF PROGRAMME TRUTH.**"
+   ]
+  },
+  {
+   "path": "kai-pm/KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md",
+   "claim": "SELF_ASSERTS_AUTHORITY",
+   "AUTHORITY_verdict": "UNKNOWN",
+   "self_binding_source": "controlled field / names itself",
+   "total_claims": 3,
+   "self_bound_claims": 1,
+   "evidence_rows_in_artefact": 3,
+   "self_rows_shown": 1,
+   "determining_row_recoverable_from_package": true,
+   "self_claim_text": [
+    "Status: **AUTHORITATIVE TARGET-ARCHITECTURE ADDENDUM \u2014 PLANNING ONLY**"
+   ]
+  },
+  {
+   "path": "kai-pm/PHASE1_READINESS.md",
+   "claim": "SELF_ASSERTS_AUTHORITY",
+   "AUTHORITY_verdict": "UNKNOWN",
+   "self_binding_source": "'this document/file'",
+   "total_claims": 1,
+   "self_bound_claims": 1,
+   "evidence_rows_in_artefact": 1,
+   "self_rows_shown": 1,
+   "determining_row_recoverable_from_package": true,
+   "self_claim_text": [
+    "This document is the source of truth for \"are we ready for Phase 1.\""
+   ]
+  }
+ ],
+ "polarity_probe": {
+  "This document is non-authoritative.": "SELF_ASSERTS_AUTHORITY (INVERTED)",
+  "This document is not authoritative.": "SELF_ASSERTS_NON_AUTHORITY (correct)",
+  "**Status:** non-authoritative": "SELF_ASSERTS_AUTHORITY (INVERTED)",
+  "**Status:** authoritative": "SELF_ASSERTS_AUTHORITY (correct)"
+ },
+ "scope_ontology_defect": {
+  "governing_statement": "AUTHORITY_ONTOLOGY.md:44 \u2014 UNKNOWN is First-class on EVERY axis, independently",
+  "SCOPE_alphabet": [
+   "WHOLE_FILE",
+   "HEADING",
+   "TABLE",
+   "MANAGED_REGION"
+  ],
+  "UNKNOWN_in_SCOPE_alphabet": false,
+  "emittable_SCOPE_UNKNOWN": false,
+  "WHOLE_FILE_disposition": [
+   "H2_EMITTABLE",
+   "file-level default"
+  ],
+  "injection_result": "CONTRACT VIOLATION: emitted SCOPE=UNKNOWN, disposition None"
+ },
+ "caveat": "Author nomination. No admission weight. Kai adjudicates."
+}

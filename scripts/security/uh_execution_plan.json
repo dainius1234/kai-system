@@ -1,0 +1,318 @@
+{
+  "schema": "kai.uh-plan/v1",
+  "note": "The ordered execution plan for Unified Hunter. THIS FILE CAUSES EXECUTION: the runner traverses it, so it is not a list kept beside the measured thing. Population membership is defined here and nowhere else -- not by stdout text, not by a filesystem glob, not by parsing the Make database. Each entry's result_label is matched LITERALLY and anchored; stdout may report counts but may never create or remove a population member. (WF-3 v3.3)",
+  "targets": [
+    {
+      "make_target": "test-contracts",
+      "result_label": "UH-1 Contract Tests"
+    },
+    {
+      "make_target": "test-perception-spine",
+      "result_label": "UH-2 Perception Spine Tests"
+    },
+    {
+      "make_target": "test-world-state",
+      "result_label": "UH-3 World State Tests"
+    },
+    {
+      "make_target": "test-proposal-workspace",
+      "result_label": "UH-4 Proposal Workspace Tests"
+    },
+    {
+      "make_target": "test-policy-bridge",
+      "result_label": "UH-5 Policy Bridge Tests"
+    },
+    {
+      "make_target": "test-vertical-slice",
+      "result_label": "UH-6 Vertical Slice Tests"
+    },
+    {
+      "make_target": "test-actuator-registry",
+      "result_label": "UH-7 Actuator Registry Tests"
+    },
+    {
+      "make_target": "test-autonomy",
+      "result_label": "UH-8 Autonomy Tests"
+    },
+    {
+      "make_target": "test-payload-bounds",
+      "result_label": "Payload Bounds Tests"
+    },
+    {
+      "make_target": "test-assessment",
+      "result_label": "Constraint Assessment Tests"
+    },
+    {
+      "make_target": "test-invariant-guards",
+      "result_label": "Invariant Guard Tests"
+    },
+    {
+      "make_target": "test-concurrency-clock",
+      "result_label": "Concurrency & Clock Tests"
+    },
+    {
+      "make_target": "test-service-auth",
+      "result_label": "Service Auth Tests"
+    },
+    {
+      "make_target": "test-erasure",
+      "result_label": "Erasure Tests"
+    },
+    {
+      "make_target": "test-legacy-bridge",
+      "result_label": "Legacy Bridge Tests"
+    },
+    {
+      "make_target": "test-migration",
+      "result_label": "Migration & Active Mode Tests"
+    },
+    {
+      "make_target": "test-full-migration",
+      "result_label": "Full Migration Tests"
+    },
+    {
+      "make_target": "test-flags-enabled",
+      "result_label": "Flags-Enabled Integration Tests"
+    },
+    {
+      "make_target": "test-preflight",
+      "result_label": "Deployment Preflight Tests"
+    },
+    {
+      "make_target": "test-architecture-rules",
+      "result_label": "Architecture Rule Tests"
+    },
+    {
+      "make_target": "test-dashboard-findings",
+      "result_label": "Dashboard Finding Tracker Tests"
+    },
+    {
+      "make_target": "test-dashboard-auth",
+      "result_label": "Dashboard Auth Tests"
+    },
+    {
+      "make_target": "test-dashboard-ui-auth",
+      "result_label": "Dashboard UI Auth Tests"
+    },
+    {
+      "make_target": "test-degraded",
+      "result_label": "Degraded State Tests"
+    },
+    {
+      "make_target": "test-hygiene-gate",
+      "result_label": "Hygiene Gate Tests"
+    },
+    {
+      "make_target": "test-assertion-floors",
+      "result_label": "Assertion Floor Tests"
+    },
+    {
+      "make_target": "test-gate-registry",
+      "result_label": "Gate Registry Tests"
+    },
+    {
+      "make_target": "test-compose-drift",
+      "result_label": "Compose Drift Tests"
+    },
+    {
+      "make_target": "test-secret-gates",
+      "result_label": "Secret & Restart Gate Tests"
+    },
+    {
+      "make_target": "test-compose-gates",
+      "result_label": "Compose Gate Tests"
+    },
+    {
+      "make_target": "test-ci-tolerations",
+      "result_label": "CI Toleration Tests"
+    },
+    {
+      "make_target": "test-test-wiring",
+      "result_label": "Test Wiring Tests"
+    },
+    {
+      "make_target": "test-test-isolation",
+      "result_label": "Test Isolation Tests"
+    },
+    {
+      "make_target": "test-live-smoke",
+      "result_label": "Live Smoke Tests"
+    },
+    {
+      "make_target": "test-compose-probe",
+      "result_label": "Compose Probe Tests"
+    },
+    {
+      "make_target": "test-workflow-filters",
+      "result_label": "Workflow Filter Tests"
+    },
+    {
+      "make_target": "test-workflow-outputs",
+      "result_label": "Workflow Output Tests"
+    },
+    {
+      "make_target": "test-dockerfile-flags",
+      "result_label": "Dockerfile Flag Tests"
+    },
+    {
+      "make_target": "test-dockerfile-coverage",
+      "result_label": "Dockerfile Coverage Tests"
+    },
+    {
+      "make_target": "test-dockerfile-context",
+      "result_label": "Dockerfile Context Tests"
+    },
+    {
+      "make_target": "test-service-tokens",
+      "result_label": "Service Token Tests"
+    },
+    {
+      "make_target": "test-compose-env",
+      "result_label": "Compose Env Tests"
+    },
+    {
+      "make_target": "test-compose-interpolation",
+      "result_label": "Compose Interpolation Tests"
+    },
+    {
+      "make_target": "test-unreachable-bindings",
+      "result_label": "Unreachable Binding Tests"
+    },
+    {
+      "make_target": "test-implicit-deps",
+      "result_label": "Implicit Dependency Tests"
+    },
+    {
+      "make_target": "test-image-modules",
+      "result_label": "Image Module Tests"
+    },
+    {
+      "make_target": "test-test-identity",
+      "result_label": "Test Identity Tests"
+    },
+    {
+      "make_target": "test-execution-coverage",
+      "result_label": "Execution Coverage Tests"
+    },
+    {
+      "make_target": "test-bringup-guards",
+      "result_label": "Bring-up Guard Tests"
+    },
+    {
+      "make_target": "test-ci-scripts",
+      "result_label": "CI Script Tests"
+    },
+    {
+      "make_target": "test-post-mortem",
+      "result_label": "Post-mortem tests"
+    },
+    {
+      "make_target": "test-summarise-runs",
+      "result_label": "CI summariser tests"
+    },
+    {
+      "make_target": "test-bind-mount-portability",
+      "result_label": "Bind-mount portability tests"
+    },
+    {
+      "make_target": "test-service-reachability",
+      "result_label": "Service reachability tests"
+    },
+    {
+      "make_target": "test-perception-intake",
+      "result_label": "Perception intake tests"
+    },
+    {
+      "make_target": "test-phase0-reducers",
+      "result_label": "Phase 0 reducer tests"
+    },
+    {
+      "make_target": "test-service-identity",
+      "result_label": "Service identity audit tests"
+    },
+    {
+      "make_target": "test-service-identity-auth",
+      "result_label": "Service identity (ed25519) tests"
+    },
+    {
+      "make_target": "test-observe-turn-identity",
+      "result_label": "/observe_turn identity slice"
+    },
+    {
+      "make_target": "test-service-identity-wiring",
+      "result_label": "Identity wiring gate tests"
+    },
+    {
+      "make_target": "test-container-proof-harness",
+      "result_label": "Container proof harness tests"
+    },
+    {
+      "make_target": "test-embedding-backends",
+      "result_label": "Embedding backend tests"
+    },
+    {
+      "make_target": "test-runtime-topology",
+      "result_label": "Runtime Topology Tests"
+    },
+    {
+      "make_target": "test-degradation-tolerance",
+      "result_label": "Degradation Tolerance Tests"
+    },
+    {
+      "make_target": "test-model-load-denominator",
+      "result_label": "Model-Load Denominator Calibration"
+    },
+    {
+      "make_target": "test-model-startup-classifier",
+      "result_label": "Model Startup Classifier Calibration"
+    },
+    {
+      "make_target": "test-asset-contract",
+      "result_label": "Asset Contract Summariser Calibration"
+    },
+    {
+      "make_target": "test-memu-graph-acceptance",
+      "result_label": "memu-graph Acceptance Calibration"
+    },
+    {
+      "make_target": "test-graph-stall",
+      "result_label": "Graph Stall Analyser Calibration"
+    },
+    {
+      "make_target": "test-ingest-contract",
+      "result_label": "Ingest Contract Analyser Calibration"
+    },
+    {
+      "make_target": "test-cognify-result",
+      "result_label": "Cognify Result Predicate Calibration"
+    },
+    {
+      "make_target": "test-llm-contract",
+      "result_label": "LLM Response Contract Calibration"
+    },
+    {
+      "make_target": "test-gated-commit",
+      "result_label": "Drift guard tests"
+    },
+    {
+      "make_target": "test-shipped-package-deps",
+      "result_label": "Shipped Package Deps Tests"
+    },
+    {
+      "make_target": "test-policy-loader",
+      "result_label": "Policy Loader Tests"
+    },
+    {
+      "make_target": "test-healthcheck-runnable",
+      "result_label": "Healthcheck Runnable Tests"
+    },
+    {
+      "make_target": "test-depends-on-readiness",
+      "result_label": "Depends-On Readiness Tests"
+    },
+    {
+      "make_target": "test-suite-floor",
+      "result_label": "Suite Floor Tests"
+    }
+  ]
+}

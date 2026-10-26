@@ -53,9 +53,12 @@ from typing import Any, Deque, Dict, List, Optional, Tuple
 import httpx
 
 from common.http_hygiene import pooled_client
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from pydantic import BaseModel
 from common.degraded import record_degradation
+from common.service_auth import (auth_telemetry,
+                                require_service_auth,
+                                require_service_identity)
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger("cortex")
@@ -100,6 +103,10 @@ class CortexState:
     tacit_rules: List[str]
     sensor_credibility: Dict[str, float]
     refresh_count: int
+    #: Which service supplied the last turn, derived from the key that
+    #: signed it. None when the caller authenticated with the shared
+    #: token during the transition window — an honest gap, not a guess.
+    last_turn_source: Optional[str] = None
 
 
 # ── Module state ──────────────────────────────────────────────────────────────
@@ -115,6 +122,7 @@ _state: CortexState = CortexState(
     tacit_rules=[],
     sensor_credibility={},
     refresh_count=0,
+    last_turn_source=None,
 )
 
 # Signal credibility: last 5 raw values per sensor label
@@ -507,7 +515,12 @@ class TurnObservation(BaseModel):
 
 # ── Endpoints ─────────────────────────────────────────────────────────────────
 
-@app.get("/state")
+# Cortex's state includes its Level-2/Level-3 interpretations and intent
+# hypotheses. Reading it is not a public act, and until now any caller
+# that could reach Cortex could read it. Authenticated, failing closed —
+# an unconfigured token returns 503, never 200.
+@app.get("/state",
+         dependencies=[Depends(require_service_auth("cortex_state_read"))])
 async def get_state() -> Dict[str, Any]:
     """Return the current CortexState for agentic context assembly."""
     s = _state
@@ -528,9 +541,48 @@ async def get_state() -> Dict[str, Any]:
     }
 
 
+# THIS ENDPOINT MUTATES STATE — _topic_history, bridge_active,
+# bridge_note, _tacit_msg_lengths and _tacit_hourly_counts — and it did
+# so for any caller that could reach the port.
+#
+# Authentication closes that door. It does NOT complete the R3
+# governance requirement: the turn must become a typed, bounded event
+# accepted through the canonical path BEFORE Cortex derives anything
+# from it, with provenance derived from the caller's identity. That
+# work is blocked on a prerequisite that does not exist — see the note
+# on identity below — so this endpoint remains a known blocker to Cortex
+# promotion, now closed to strangers rather than open to them.
+#
+# The turn's provenance IS the caller, so this endpoint takes a verified
+# ServicePrincipal rather than a shared token. `require_grant=True` means
+# the key map must also *authorise* that identity for this operation —
+# proving who called is not deciding they may.
+#
+# What changed, and why it was the blocker: KAI_SERVICE_TOKEN is a shared
+# secret. It proved a caller held the token, never WHICH caller, so any
+# token-holder could submit turns as any other service and provenance
+# could not be derived from identity at all. It now is — from the key
+# that signed the request, never from a header or a body field.
 @app.post("/observe_turn")
-async def observe_turn(obs: TurnObservation) -> Dict[str, Any]:
-    """Receive a conversation turn for Context Bridge and Tacit Knowledge accumulation."""
+async def observe_turn(
+    obs: TurnObservation,
+    principal=Depends(require_service_identity("cortex_observe_turn",
+                                               require_grant=True)),
+) -> Dict[str, Any]:
+    """Receive a conversation turn for Context Bridge and Tacit Knowledge accumulation.
+
+    Nothing is mutated before the dependency has accepted the request:
+    FastAPI resolves dependencies first, so a refused call reaches no
+    line of this body. `scripts/test_observe_turn_identity.py` asserts
+    that directly by checking the accumulators are untouched after each
+    refusal, rather than trusting the framework's ordering.
+    """
+    # `unverified` during the transition window, when the caller
+    # authenticated with the shared token. Recording that name as the
+    # source would be a lie wearing a signature's confidence, so the
+    # source is recorded as absent instead.
+    source = principal.identity if principal.usable_for_provenance else None
+
     keywords = _extract_topic_keywords(obs.user_message)
     bridge_active, bridge_note = _detect_bridge(keywords)
     _topic_history.append(keywords)
@@ -538,12 +590,14 @@ async def observe_turn(obs: TurnObservation) -> Dict[str, Any]:
     # No `global` needed: _state is mutated, never rebound.
     _state.bridge_active = bridge_active
     _state.bridge_note = bridge_note
+    _state.last_turn_source = source
 
     _tacit_msg_lengths.append(len(obs.user_message))
     hour = datetime.now(timezone.utc).hour
     _tacit_hourly_counts[hour] = _tacit_hourly_counts.get(hour, 0) + 1
 
-    return {"bridge_active": bridge_active, "bridge_note": bridge_note}
+    return {"bridge_active": bridge_active, "bridge_note": bridge_note,
+            "turn_source": source}
 
 
 @app.get("/health")
@@ -555,4 +609,12 @@ async def health() -> Dict[str, Any]:
         "refresh_count": _state.refresh_count,
         "last_refresh": _state.timestamp,
         "level2": _state.level2_summary,
+        # Chronic refusal must be visible. /observe_turn's only caller
+        # sent no credentials at all and every call was swallowed as a
+        # degradation, so an integration that had NEVER worked looked
+        # like one nobody used. Counts only — reading this changes
+        # nothing, and no probe posts a turn to prove auth works, which
+        # would make the watchdog a perception source.
+        "auth": auth_telemetry(),
+        "last_turn_source": _state.last_turn_source,
     }
