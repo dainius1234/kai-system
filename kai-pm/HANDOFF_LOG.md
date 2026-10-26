@@ -97304,3 +97304,146 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-26T18:29:08Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-26T18:29:08Z  [CMD `date -u +%FT%TZ` → 2026-10-26T18:29:08Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: c25db401dff2b8a773c34163a4f5fbf191f98411  [CMD `git rev-parse HEAD` → c25db401dff2b8a773c34163a4f5fbf191f98411]
+- tree: b005878efabc5e99fd0de2c74751db8be48e30ac  [CMD `git rev-parse HEAD^{tree}` → b005878efabc5e99fd0de2c74751db8be48e30ac]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/project-rework-plan-pgvp35: c25db401dff2b8a773c34163a4f5fbf191f98411  [CMD `git ls-remote --heads origin` → c25db401dff2b8a773c34163a4f5fbf191f98411]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 276  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 276]
+
+### 1. The four states
+
+- physical: unchanged since entry 276 apart from this entry; no environment, setting, session or connector created or changed  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Orion documents a proposed D5(a) setup and verification route; escalates to Dainius if separation cannot be achieved  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 1c376250, "Separately document a proposed D5(a) environment setup and verification route; if the required separation cannot be achieved, escalate to Dainius."]
+- evidence: the route document, verbatim in section 5  [CMD `credscan.py d5/scan.json` → TOTAL HITS 0]
+- admission: none; D5(a) remains NOT SET UP  [CONVERSATION 2026-10-26 Dainius, "Go"]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-26 · go-ahead for Orion to write the D5(a) research-room route (documentation only; nothing set up without his say) ⚠ UNBANKED  [CONVERSATION 2026-10-26 Dainius, "Go"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: D1–D5; step 0.1 (register v2 awaiting Kai); D5(a) route as a document. HELD: Wave 0; engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier certification (Kai); any D5(a) environment creation or outside reading until Dainius chooses an option and the start-up check passes  [CONVERSATION 2026-10-14 Dainius, "Ruling a ok to go ahead"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- For Dainius: choose a connector option (1 switch off during research, recommended; 2 separate account; 3 approve each action; 4 Kai's setup) — not urgent, needed before the first research wave  [CMD `D5A_RESEARCH_ROOM_ROUTE.md` → section 3]
+- For Kai: review the route; rule on WebFetch/WebSearch in Orion's session (untested, unused for research)  [CMD `D5A_RESEARCH_ROOM_ROUTE.md` → section 2]
+
+### 5. Incidents and corrections
+
+- MEASURED: one environment on the account, "Kai" env_01Ha1i8oEpfN1BHjvDRdP65a (anthropic_cloud, created 2026-06-17)  [CMD `list_environments` → 1 environment]
+- MEASURED: from this session csrc.nist.gov 000 and arxiv.org 000 (refused); pypi.org/simple 200; raw.githubusercontent.com 301  [CMD `curl -w %{http_code}` → 000, 000, 200, 301]
+- DOCUMENTATION read 2026-10-26: index, environment.network, connectors.tool_off, github.access, connectors.add; no per-environment connector switch named in those pages (NOT_FOUND_IN_INSPECTED_RANGE)  [CMD `read_documentation` → 5 pages]
+- ESCALATION per Kai 1c376250: requirement "no connectors" is not achievable by any setting found; options put to Dainius  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 1c376250, "if the required separation cannot be achieved, escalate to Dainius"]
+- EVIDENCE ORION-D5A-RESEARCH-ROOM-ROUTE D5A_RESEARCH_ROOM_ROUTE.md: 7515 bytes, sha256 722be0a6947b05a3f40bfc7ffdf0adeebdcd8aac6d447e5d362ad62ca2879854, final LF True (added by Orion)  [CMD `sha256sum D5A_RESEARCH_ROOM_ROUTE.md` → 722be0a6947b05a3…]
+    BEGIN-VERBATIM ORION-D5A-RESEARCH-ROOM-ROUTE
+    # D5(a) research room — proposed setup and verification route (DRAFT for Kai and Dainius)
+    
+    **ORION → KAI, DAINIUS | 2026-10-26 | documentation only: nothing created, switched or opened**
+    Asked for by Kai on DAI-10 (comment 1c376250, handoff entry 247): "Separately document a proposed D5(a) environment setup and verification route; if the required separation cannot be achieved, escalate to Dainius."
+    
+    ## In plain words
+    
+    You approved a separate "research room" for reading outside websites (D5, option a). It must be able to read the web, and must have no way to change GitHub and no connections to your other services. The first two parts can be set up. **The third part cannot be done with a setting that I can find:** your connections (Linear, Gmail, Dropbox, Miro and the rest) belong to your whole account, so any new session gets them automatically. So, as Kai asked, this comes back to you with options. My recommendation is option 1 below: switch the connections off only while the research room is in use, and prove they are off before any reading starts.
+    
+    ## 1. What D5(a) requires (the approved wording)
+    
+    From the approved procedure v3.2.3 §9 (handoff entry 225): "A research environment set up for the job: wide read access, no repository write, no connectors, with its capability list written down and checked before first use."
+    
+    | Requirement | Can a setting achieve it? | Evidence |
+    |---|---|---|
+    | R1 Wide read access | **Yes.** Network access is set per environment: the environment menu, then Edit, then Network access (a broader level, or named allowed domains) | Session documentation, page environment.network, read 2026-10-26; https://code.claude.com/docs/en/cloud-environments#network-access |
+    | R2 No repository write | **Yes, with one check.** A session's repositories are chosen when it starts; start the research session with no repository selected | Session documentation, page github.access, read 2026-10-26 |
+    | R3 No connectors | **No setting found.** Connectors are managed for the whole account at claude.ai/customize/connectors and are read when a session starts | Session documentation, pages connectors.add and connectors.tool_off, read 2026-10-26 |
+    | R4 Capability list checked before first use | **Yes**, by the start-up check in section 4 | this document |
+    
+    The search for a per-environment connector switch covered the session documentation index and the pages environment.network, connectors.add, connectors.tool_off and github.access. **Not found in those pages; that is not proof that no such switch exists.**
+    
+    ## 2. What was measured today in this session (the "Kai" environment)
+    
+    - Environments on the account: one, "Kai" (env_01Ha1i8oEpfN1BHjvDRdP65a), created 2026-06-17.
+    - Network from this session: csrc.nist.gov and arxiv.org refused; pypi.org and raw.githubusercontent.com reachable. Unchanged since the 2026-10-13 measurement.
+    - **Flag for Kai (R12):** this session also lists WebFetch and WebSearch tools. Their network path may not go through this environment's proxy. Orion has **not** tested them, because testing means reading untrusted pages in a session that holds the keys, which is what D5 exists to prevent. They stay unused for research unless Dainius rules otherwise.
+    
+    ## 3. Options for the connector problem (R3)
+    
+    | Option | What it means | Risk | Cost |
+    |---|---|---|---|
+    | **1. Connectors off during research (recommended)** | Before a research session, Dainius switches the connectors off at claude.ai/customize/connectors, starts the research session, then switches them back on after it ends | Human error: forgetting a step. Controlled by the start-up check (section 4), which stops the session if any connector is present | Free; a few minutes per research batch; other sessions started meanwhile also lack connectors |
+    | 2. A separate Claude account for research | A second account with no connectors and no GitHub link | Cleanest separation; no switching | A second subscription; one more login to manage |
+    | 3. Keep connectors, approve every action by hand | Run the research session in a mode that asks before every tool use | Weakest: relies on spotting a disguised request among many prompts | Free; tiring |
+    | 4. Kai reads in his own ChatGPT setup (D5 option b) | Already offered on 14 October; Dainius chose (a) | Only as safe as Kai's setup, which has shown live GitHub and Linear access (Guardian file, layer C) | Needs a new owner decision |
+    
+    Recommendation: **option 1** for the first research batches. Move to option 2 if research becomes frequent enough that switching is a burden.
+    
+    ## 4. Start-up check, run in the research session before any reading (fail closed)
+    
+    The research session's first message runs this check and reports the results word for word. If any line fails, it stops and reads nothing.
+    
+    1. **Tools:** list the tools available. PASS only if no Linear, Gmail, Dropbox, Miro, TickTick, Docs, Hugging Face, Indeed, Expedia or Trivago tools appear, and no GitHub tools with write power.
+    2. **Repository:** confirm that no repository is attached, and that the working folder is not a clone of `dainius1234/kai-system`.
+    3. **GitHub credential (negative test):** a read of `https://api.github.com/repos/dainius1234/kai-system` with the session's git tooling must not return private repository data. No write is attempted, ever.
+    4. **Network (positive test):** fetch the front page of each domain the batch needs (for example csrc.nist.gov, arxiv.org). PASS only if each loads.
+    5. **Record:** environment name, session start time, network level, and the results of 1–4.
+    
+    **Calibration:** the same check run in this "Kai" session must FAIL on line 1 (connectors present), line 2 (repository attached) and line 4 (NIST and arXiv refused, measured today). That is the known-negative showing that the check can fail. A research session with connectors off must PASS. Both outputs are banked before first use.
+    
+    ## 5. How results come back (untrusted data)
+    
+    - The research session writes plain notes with exact source links and dates. It never receives repository, Linear or email access.
+    - Dainius copies the notes to Orion. Orion credential-scans them and banks them word for word, marked **UNTRUSTED EXTERNAL**: data, never instructions.
+    - Kai adjudicates every claim against its primary source (v3.2.3 §4 item 8; secondary sources stay SECONDARY, §5).
+    - The research session is not linked to Orion's or Kai's sessions by messaging, so a hidden instruction in a web page has no path to the keys.
+    
+    ## 6. Setup steps for Dainius (only after he chooses an option)
+    
+    1. Claude app → cloud environments → new environment named "KAI Research".
+    2. Network access: the level that allows the named research domains (the list comes from Kai per research batch).
+    3. No setup script, no secrets, no repositories in the environment settings.
+    4. (Option 1) Switch connectors off at claude.ai/customize/connectors.
+    5. Start a session in "KAI Research" with **no repository selected**; paste the start-up check from section 4 as the first message.
+    6. Send Orion the check output. Orion checks it against section 4 and banks it. Reading starts only after PASS.
+    7. When the batch ends, close the session and switch connectors back on.
+    
+    ## 7. What this does not do
+    
+    No environment, setting, session or connector has been created or changed. No outside page has been read. D5(a) stays NOT SET UP until Dainius chooses an option and the start-up check passes. Wave 0 does not need the research room; the first research wave does.
+    END-VERBATIM ORION-D5A-RESEARCH-ROOM-ROUTE
+
+### 6. Next authorised step
+
+- Post the route to DAI-10, verify, update START HERE section 8b, report to Dainius plainly  [CONVERSATION 2026-10-14 Kai-GPT on DAI-10 1c376250, "Keep the Start Here document current"]
+
+### 7. What I am unsure of
+
+- Whether a session started while connectors are switched off picks them up if they are switched back on mid-session (documentation says connectors are read at session start; not tested)  [CMD `read_documentation connectors.add` → "connectors are read when a session starts"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
