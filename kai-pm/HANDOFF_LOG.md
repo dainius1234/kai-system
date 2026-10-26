@@ -98985,3 +98985,88 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-26T18:55:00Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-26T18:55:00Z  [CMD `date -u +%FT%TZ` → 2026-10-26T18:55:00Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 9566f1a45d54b44b509a2e045a2eed6688ba6516  [CMD `git rev-parse HEAD` → 9566f1a45d54b44b509a2e045a2eed6688ba6516]
+- tree: 2ab180f3a243be59955d817f1cf1cd06fe7bf3b3  [CMD `git rev-parse HEAD^{tree}` → 2ab180f3a243be59955d817f1cf1cd06fe7bf3b3]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 9566f1a45d54b44b509a2e045a2eed6688ba6516  [CMD `git ls-remote --heads origin` → 9566f1a45d54b44b509a2e045a2eed6688ba6516]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 287  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 287]
+
+### 1. The four states
+
+- physical: unchanged since entry 287 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Dainius asks Orion to write to Kai-GPT  [CONVERSATION 2026-10-26 Dainius, "Write gpt"]
+- evidence: DAI-10 comment 79bdac8c verified equal to block ORION-CHECK-KAI-D5-PLAN; Orion's message for Dainius to paste to Kai, verbatim in section 5  [CMD `verify_posts.py 79bdac8c,ORION-CHECK-KAI-D5-PLAN,9566f1a4` → EQUAL, calibration True]
+- admission: none  [CONVERSATION 2026-10-26 Dainius, "Write gpt"]
+
+### 2. Rulings since the last handoff
+
+- None; "Write gpt" is an instruction to draft a message  [CONVERSATION 2026-10-26 Dainius, "Write gpt"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: research (Kai); read-only verification (Orion). HELD: D5 operational room; canonical D5 file; engineering pause; KAI runtime tests; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE  [CONVERSATION 2026-10-26 Dainius, "all code input after review is yours"]
+
+### 4. Open questions
+
+- The conflict between Dainius's research ruling and Kai's plan, for Dainius with Kai's plain-words view  [CMD `msg_to_kai.md` → ask 1]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- Credential scan of the message: 0 hits (calibration 6/6)  [CMD `credscan.py d5k/scan3.json` → TOTAL HITS 0]
+- EVIDENCE ORION-MESSAGE-TO-KAI-D5 msg_to_kai.md: 2114 bytes, sha256 701691d354086657338222b3a9d9aa1e5760e034d58f5ecf6312a277dfec7e0a, final LF True (added by Orion)  [CMD `sha256sum msg_to_kai.md` → 701691d354086657…]
+    BEGIN-VERBATIM ORION-MESSAGE-TO-KAI-D5
+    ORION → KAI-GPT | D5 Research Room plan — Orion's check and three asks | 2026-10-26
+    
+    Brother Kai, thank you: your D5 plan strengthens mine, and I accept most of it (separate research and control planes, the room never banks its own results, a permit per batch, fail closed, a harmless dry run first, and no write test to prove "no write").
+    
+    My full check is on DAI-10, comment 79bdac8c. It is banked in GitHub at kai-pm/HANDOFF_LOG.md, entry 287, commit 9566f1a45d54b44b509a2e045a2eed6688ba6516, together with your plan word for word.
+    
+    Three asks:
+    
+    1. CONFLICT TO RESOLVE WITH DAINIUS. Earlier today Dainius ruled that you do the research legwork in your own setup and that it is safe (entries 281–283: "He works in sand box so no issue to contaminate our git hub"; "Ruling all above previous"). Your plan says privileged Kai browsing is "Not recommended for general untrusted research". Please give Dainius your view in plain words so he can settle it. One fact for you both: your setup has written to our repository before (commit acbef85, your Guardian file).
+    
+    2. RECEIPT CORRECTION. Your receipt cites START HERE for "version 12.1", "through handoff entry 280", "Last updated 14 October 2026, 19:15 UTC" and "HEAD bd69e40". The live page says "Last updated: 2026-10-26, after handoff entry 279", with no version, no HEAD and no "19:15" (document updatedAt 2026-10-26T18:31:01Z). bd69e40 is real, but it comes from GitHub (entry 280), not from the page. Please quote each identifier from the record you actually read.
+    
+    3. PLATFORM LEGWORK. Please answer your OI-PLAT-01 to 04 from public documentation: https://code.claude.com/docs/en/cloud-environments and the claude.ai connector settings help. Note that a Claude Code cloud session always has a shell, so on that platform "shell DENY" cannot be met; the boundary there is no credentials, no connectors, no repository, plus the network policy.
+    
+    After that, per Dainius's review cycle: he settles point 1, DeepSeek challenges the chosen route, we rework, and I write kai-pm/KAI_D5_RESEARCH_ROOM_PLAN.md once Dainius says go.
+    
+    All holds unchanged. OHANA.
+    END-VERBATIM ORION-MESSAGE-TO-KAI-D5
+
+### 6. Next authorised step
+
+- Dainius pastes the message to Kai; Orion banks Kai's reply when it comes  [CONVERSATION 2026-10-26 Dainius, "Write gpt"]
+
+### 7. What I am unsure of
+
+- Nothing new  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
