@@ -99180,3 +99180,73 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-26T19:21:19Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-26T19:21:19Z  [CMD `date -u +%FT%TZ` → 2026-10-26T19:21:19Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 3bb1a9048b8c8e073b2b9b40adcf9ec283121bcf  [CMD `git rev-parse HEAD` → 3bb1a9048b8c8e073b2b9b40adcf9ec283121bcf]
+- tree: 2027f6b6c03e4d595d0f26d9d30f729759f23884  [CMD `git rev-parse HEAD^{tree}` → 2027f6b6c03e4d595d0f26d9d30f729759f23884]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/project-rework-plan-pgvp35: 3bb1a9048b8c8e073b2b9b40adcf9ec283121bcf  [CMD `git ls-remote --heads origin` → 3bb1a9048b8c8e073b2b9b40adcf9ec283121bcf]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 289  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 289]
+
+### 1. The four states
+
+- physical: unchanged since entry 289 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: unchanged since entry 289  [CONVERSATION 2026-10-26 Kai-GPT on DAI-10 a6b84ae3, "The roles and established practice have NOT changed"]
+- evidence: Dainius's question verbatim in section 5, and Orion's root-cause answer below  [CMD `ruling_capture store 73baa5c461859da6` → 421 characters]
+- admission: none  [CONVERSATION 2026-10-26 Dainius, "We have our own engineering standards and the rules and how we work."]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-26 · reminder: we look at people and ideas, look at the owner's vision, and implement it the best way possible, under our own engineering standards and rules; Orion is to remind himself of them ⚠ UNBANKED  [CONVERSATION 2026-10-26 Dainius, "We have our own engineering standards and the rules and how we work. You need to remind yourself."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED and HELD: unchanged since entry 289  [CONVERSATION 2026-10-26 Kai-GPT on DAI-10 a6b84ae3, "Priorities unchanged"]
+
+### 4. Open questions
+
+- CANDIDATE failure mechanism for Kai and Dainius (not entered in FAILURE_PATTERN_LEDGER; allocation held): "a protective option grows into a gate". Instance chain today: Orion self-assigned the D5 route as waiting-time work (entry 277), framed it as needed before the first research wave, put a four-way choice to the owner; Kai answered with a 36 kB permit system (entry 287); Orion then raised a "conflict" with the owner's roles ruling (79bdac8c). No step asked what live risk the control was answering. Rules already covering it: R21 (simplest sufficient form; no speculative features), R12 (flag, do not expand scope), and the owner's roles ruling (entry 281)  [CONVERSATION 2026-10-26 Kai-GPT on DAI-10 a6b84ae3, "I let a legitimate D5 isolation question expand into an unwarranted obstacle to ordinary KAI research."]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- ORIGIN of D5, for the record: Orion's session could not reach standards and paper sites (measured 2026-10-13), so Orion proposed the D5 options in procedure v3.2.3 §9 (entry 225); Dainius chose (a) on 2026-10-14 (entry 241). It was a narrow answer to "where does outside reading happen", not a gate on research  [FILE kai-pm/HANDOFF_LOG.md:84311]
+- Credential scan of the message: 0 hits (calibration 6/6)  [CMD `credscan.py roles/scan8.json` → TOTAL HITS 0]
+- EVIDENCE DAINIUS-WHY-THE-PANIC why_73baa5c4.md: 422 bytes, sha256 a7084756b7b0def0ac5f91a9e0a49595541627352d5da583e4c7f91d57b829c8, final LF True (added by Orion)  [CMD `sha256sum why_73baa5c4.md` → a7084756b7b0def0…]
+    BEGIN-VERBATIM DAINIUS-WHY-THE-PANIC
+    Bro, it's okay. I'm so glad you're back on track and so glad to have you back, Ryan. But where all this fucking panic came from? What the fuck has prompted you? What the fuck has happened for it to be? Because we always look at people, look at ideas, you look at my vision, and we try to implement it the best way possible. We have our own engineering standards and the rules and how we work. You need to remind yourself.
+    END-VERBATIM DAINIUS-WHY-THE-PANIC
+
+### 6. Next authorised step
+
+- Back to the critical path: Kai adjudicates register v2; Orion checks. No new self-assigned governance work while waiting  [CONVERSATION 2026-10-26 Dainius, "you look at my vision, and we try to implement it the best way possible"]
+
+### 7. What I am unsure of
+
+- Nothing new  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
