@@ -97926,3 +97926,74 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-10-26T18:42:10Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-10-26T18:42:10Z  [CMD `date -u +%FT%TZ` → 2026-10-26T18:42:10Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: bd69e40f95c2edbc970771401b2f602f978845d3  [CMD `git rev-parse HEAD` → bd69e40f95c2edbc970771401b2f602f978845d3]
+- tree: 1a553fc93223e624f7d2aef82f9f2a8cfc5cf256  [CMD `git rev-parse HEAD^{tree}` → 1a553fc93223e624f7d2aef82f9f2a8cfc5cf256]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/project-rework-plan-pgvp35: bd69e40f95c2edbc970771401b2f602f978845d3  [CMD `git ls-remote --heads origin` → bd69e40f95c2edbc970771401b2f602f978845d3]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 280  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 280]
+
+### 1. The four states
+
+- physical: unchanged since entry 280 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: owner direction on roles: Kai does legwork and research; Orion codes  [CONVERSATION 2026-10-26 Dainius, "we gonna use Kai to do leg work and research , you code"]
+- evidence: Dainius's message verbatim in section 5  [CMD `credscan.py roles/scan.json` → TOTAL HITS 0]
+- admission: none  [CONVERSATION 2026-10-26 Dainius, "We have roles !"]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-10-26 · roles: Kai-GPT does the legwork and research (tokens not limited); Orion codes (tokens limited); use each to advantage; Orion is not a one-man army; Dainius has already instructed Kai ⚠ UNBANKED  [CONVERSATION 2026-10-26 Dainius, "Orion we gonna use Kai to do leg work and research , you code and your tokens limited ! GPT not !"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: D1–D5; step 0.1 (register v2 awaiting Kai); research legwork by Kai. HELD: Wave 0; engineering per entry 99; PRE-RAMS; R11; PR #122 DO NOT MERGE; Gold Tier certification (Kai)  [CONVERSATION 2026-10-26 Dainius, "you code"]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+- Reading of the direction (Orion's, for Kai to confirm): outside research is done by Kai in his own setup, which is D5 option (b) / route option 4; the D5(a) route (entry 277) becomes a fallback. "You code" does not lift the engineering pause (entry 99); coding still needs its own authorisation  [CONVERSATION 2026-10-26 Dainius, "So we use all to our advantage!"]
+- Dainius's instruction to Kai is not yet on DAI-10 (newest comment efc368f4, Orion's)  [CMD `list_comments DAI-10 limit 3` → efc368f4, 63ab4a70, 61052855]
+
+### 5. Incidents and corrections
+
+- HOOK MISS: the ruling hook did not flag this owner direction (store flagged=0 after the message); it has none of the trigger words. This is the known limit named in Guardian v1.2 and the Guardian file line 14; banked by hand  [CMD `ruling_capture.py status` → flagged=0]
+- TOKEN USE: list_comments returns full comment bodies; Orion will list with small limits and stop at the last comment already seen  [CMD `list_comments DAI-10 limit 3` → 3 full bodies]
+- EVIDENCE DAINIUS-ROLES-DIRECTION dainius_roles.md: 209 bytes, sha256 b555c1a6f05690260747e9e4d3c15e6cc9c79c0c011c6bb77a70b8de2b00d05f, final LF True (added by Orion)  [CMD `sha256sum dainius_roles.md` → b555c1a6f0569026…]
+    BEGIN-VERBATIM DAINIUS-ROLES-DIRECTION
+    Orion we gonna use Kai to do leg work and research , you code and your tokens limited ! GPT not ! We have roles ! So we use all to our advantage! You aren’t one man army ! Brother. I already instructed GPT!
+    END-VERBATIM DAINIUS-ROLES-DIRECTION
+
+### 6. Next authorised step
+
+- Wait for Kai: register v2 adjudication and research legwork; Orion verifies and records, and codes only when engineering is authorised  [CONVERSATION 2026-10-26 Dainius, "I already instructed GPT!"]
+
+### 7. What I am unsure of
+
+- The exact words Dainius gave Kai; Orion will bank them when they appear on DAI-10 or are relayed  [CONVERSATION 2026-10-26 Dainius, "I already instructed GPT!"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
