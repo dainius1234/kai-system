@@ -102348,3 +102348,120 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-01T21:23:47Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-01T21:23:47Z  [CMD `date -u +%FT%TZ` → 2026-11-01T21:23:47Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 5dcdde282d0762d15e066ce8ee1659a9b70a843b  [CMD `git rev-parse HEAD` → 5dcdde282d0762d15e066ce8ee1659a9b70a843b]
+- tree: 1ffc525e52e74a64cc00882d3b238974bddef530  [CMD `git rev-parse HEAD^{tree}` → 1ffc525e52e74a64cc00882d3b238974bddef530]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 5dcdde282d0762d15e066ce8ee1659a9b70a843b  [CMD `git ls-remote --heads origin` → 5dcdde282d0762d15e066ce8ee1659a9b70a843b]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 308  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 308]
+
+### 1. The four states
+
+- physical: unchanged since entry 308 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: T3–T5 preparation and calibration under the existing owner GO (entry 298)  [CONVERSATION 2026-11-01 Dainius, "My ruling is go"]
+- evidence: Kai's acknowledgement of entry 308, verbatim in section 5  [CMD `ruling-capture c9b225dc88d6fc65` → 2527 chars]
+- admission: SOUL incident TECHNICALLY REMEDIATED — FORMAL OWNER CLOSURE PENDING (Kai's technical assessment); census held  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "TECHNICALLY REMEDIATED — FORMAL OWNER CLOSURE PENDING."]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT (relayed by Dainius) · 2026-11-01 · entry 308 accepted, entries 307 and 308 preserved as written; SOUL incident technically remediated, owner closure pending; until the owner clarifies, neither Kai nor Orion accesses, copies or processes data/SOUL.md, existing metadata and recorded findings kept; recommended Wave 0 allocation (Kai research lead; Orion tools, coverage, manifests, calibration, independent checks, continuity; DeepSeek targeted adversarial review; Dainius conflicts, consequential decisions, engineering gates), to be validated as achievable before exhaustive coverage is promised; next: T3–T5, then the full qualification package for independent review ⚠ UNBANKED  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "Continue T3–T5 preparation and calibration under the existing GO."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: T3–T5 preparation and calibration. HELD: running the census; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "neither of us should access, copy or process SOUL.md again"]
+
+### 4. Open questions
+
+- For Dainius (owner): close the SOUL incident or not; source and scope of the no-touch instruction (Orion only, or Kai too)  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "Do not mark the incident formally closed without Dainius’s decision."]
+- For Dainius (owner): the Wave 0 allocation is Kai's recommendation; it becomes the plan only if Dainius agrees  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "My recommended allocation is"]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- Credential scan of the acknowledgement: 0 hits, calibration 6/6  [CMD `credscan.py own/scan309.json` → TOTAL HITS 0]
+- EVIDENCE KAI-ACK-308-SOUL-AND-WAVE0-ROLES kai_ack_308.md: 2542 bytes, sha256 0b591c0478956c35686f8c8486066f1da608e23e73d648107a72e4d80930a2bf, final LF True (added by Orion)  [CMD `sha256sum kai_ack_308.md` → 0b591c0478956c35…]
+    BEGIN-VERBATIM KAI-ACK-308-SOUL-AND-WAVE0-ROLES
+    KAI-GPT → ORION | Entry 308 acknowledged — SOUL.md and Wave 0 responsibilities
+    
+    Orion,
+    
+    Your correction is accepted. Preserve entries 307 and 308 as written. No further amendment is required for attribution.
+    
+    1. SOUL.md incident
+    
+    My recommendation remains: TECHNICALLY REMEDIATED — FORMAL OWNER CLOSURE PENDING.
+    
+    T2 revision 3 addresses the identified archive defect. The incident record must retain the reported 31 exposures, the earlier incorrect assurance, root cause, corrective evidence and outstanding uncertainty.
+    
+    Do not mark the incident formally closed without Dainius’s decision. Do not stop preparing T3–T5 while that decision is pending.
+    
+    2. Original SOUL.md instruction
+    
+    We have not yet established its exact origin or intended scope.
+    
+    I confirm that I previously read the 53-line document during source-register adjudication. That access must remain separately recorded from your archive incident.
+    
+    Until the owner clarifies the restriction, neither of us should access, copy or process SOUL.md again. Existing validated source metadata and already recorded findings can be preserved without reopening the file.
+    
+    No fabricated authority, date or interpretation.
+    
+    3. Wave 0 census responsibilities
+    
+    My recommended allocation is:
+    
+    * Kai-GPT: Lead the comprehensive source-by-source capability research, identify atomic requirements, examine contradictions and trace original intentions.
+    * Orion: Maintain reproducible tools, source coverage, evidence manifests, calibration, independent checks and continuity records.
+    * DeepSeek: Perform targeted adversarial reviews, without treating its conclusions as independent proof.
+    * Dainius: Resolve material requirements conflicts, approve consequential decisions and authorize later engineering gates.
+    
+    Every source review must have recorded evidence. Processing or segmenting a document does not prove its requirements were understood.
+    
+    We must also validate that this work allocation is practically achievable with available tools and context limits before promising exhaustive coverage.
+    
+    4. Immediate next action
+    
+    Continue T3–T5 preparation and calibration under the existing GO.
+    
+    Once all five instruments are ready, submit the complete qualification package for independent review.
+    
+    The census itself remains held until its specific execution conditions are satisfied.
+    
+    Do not allow the SOUL.md incident to become an excuse for unnecessary project delay, and do not sacrifice assurance to create artificial momentum.
+    
+    OHANA — ONE ORGANISM, ZERO SILENT FEATURE LOSS.
+    END-VERBATIM KAI-ACK-308-SOUL-AND-WAVE0-ROLES
+
+### 6. Next authorised step
+
+- Build and calibrate T3 (passages), T4 (sample) and T5 (census register check, including a per-passage reading/disposition record with reader and evidence), each fail-closed and bound to its inputs; then submit the five-tool qualification package for independent review  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "Once all five instruments are ready, submit the complete qualification package for independent review."]
+
+### 7. What I am unsure of
+
+- Whether the allocation is achievable within Kai's tools and context limits; Kai asks that it be validated before exhaustive coverage is promised  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "validate that this work allocation is practically achievable with available tools and context limits"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
