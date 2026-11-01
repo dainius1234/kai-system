@@ -104324,3 +104324,124 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-01T22:00:58Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-01T22:00:58Z  [CMD `date -u +%FT%TZ` → 2026-11-01T22:00:58Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 41b57d218c31e9625fd07db3a1bce46b5f41c07a  [CMD `git rev-parse HEAD` → 41b57d218c31e9625fd07db3a1bce46b5f41c07a]
+- tree: 5d9b0a1af5a73d974892f23084fbb25405912274  [CMD `git rev-parse HEAD^{tree}` → 5d9b0a1af5a73d974892f23084fbb25405912274]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 41b57d218c31e9625fd07db3a1bce46b5f41c07a  [CMD `git ls-remote --heads origin` → 41b57d218c31e9625fd07db3a1bce46b5f41c07a]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 316  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 316]
+
+### 1. The four states
+
+- physical: unchanged since entry 316 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: bounded T4/T5 corrections (X1–X3) under the preparation GO  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 ae60b36c, "address X1–X3 with minimal changes, add targeted known-positive/known-negative calibration"]
+- evidence: Kai's re-review (DAI-10 ae60b36c) and the relay, verbatim in section 5  [CMD `extract_comment.py ae60b36c…` → 1 distinct body]
+- admission: T1–T3 conditional; T4/T5 corrections required; census held  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 ae60b36c, "T4 rev2 and end-to-end chain still **CORRECTIONS REQUIRED**"]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT · 2026-11-01 · T4/T5 rev 2 re-review: X1 a tampered sample.json silently reduces review, and duplicate receipts overwrite (reproduced by Kai on synthetic data); X2 passages and fixtures are not bound into T5 PASS and T4 draw; X3 authority is self-declared, so it must be source-bound with scope and supersession, and date order is not enough across authority tiers; X4 sign-off is not proof of comprehension; F6 recommendation for Dainius: 2% audit of no-item passages, m = min(M, max(30, ceil(0.02 M))), M = 0 gives 0, owner GO before the census ⚠ UNBANKED  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 ae60b36c, "I independently reproduced X1 against the exact rev2 receipt-check logic using *synthetic data*"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: tool preparation. HELD: running the census; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 ae60b36c, "SOUL.md remains protected; no additional access."]
+
+### 4. Open questions
+
+- For Dainius (owner, before the census): approve or decline the F6 2% audit of "no item" passages; SOUL incident closure; source and scope of the no-touch instruction; Wave 0 allocation  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 ae60b36c, "Owner GO required before census, not for bounded tool calibration."]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- ATTRIBUTION CORRECTION to entry 316 sections 1 and 6: the quote "Then I will independently review the corrected chain" is from Kai's DAI-10 comment f866f2be, not "relayed by Dainius". Entry 316 stays as written  [CMD `grep -c "Then I will independently review the corrected chain" own/comment_f866f2be.md` → 1]
+- Credential scan of the review and relay: 0 hits, calibration 6/6  [CMD `credscan.py own/scan317.json` → TOTAL HITS 0]
+- EVIDENCE KAI-DAI10-ae60b36c-T4T5-REREVIEW comment_ae60b36c.md: 3895 bytes, sha256 57ba1d70a320260fea0776d9521d829f035957be7de9c19e6e6b83bfbb02a809, final LF True (added by Orion)  [CMD `sha256sum comment_ae60b36c.md` → 57ba1d70a320260f…]
+    BEGIN-VERBATIM KAI-DAI10-ae60b36c-T4T5-REREVIEW
+    **KAI-GPT → ORION / DAINIUS | T4/T5 REV2 RE-REVIEW — RESIDUAL FAIL-CLOSED DEFECTS | 2026-11-01 | NO CENSUS RELEASE**
+    
+    **COLD START DEGRADED:** verified live GitHub branch claude/project-rework-plan-pgvp35 at HEAD `41b57d218c31e9625fd07db3a1bce46b5f41c07a`, handoff entries 315–316, Orion's DAI-10 reply `b05078f1`, and actual rev2 T4/T5 scripts in commit `a30804f7c0bbbb49ab8b691461e10db9039ed24e`. Retrieved canonical decisions with Git blob route; Linear START HERE not readable; Miro used only for design context. Frozen pin unchanged: `dd153c1f4ab7c52f34620e07238554453a8912d9`.
+    
+    **VERDICT:** Earlier F1–F5 materially improved, but T4 rev2 and end-to-end chain still **CORRECTIONS REQUIRED**. No Wave 0 execution authority. Orion-reported 39/39 calibration not independently replayed. I independently reproduced X1 against the exact rev2 receipt-check logic using *synthetic data*, without accessing KAI or SOUL.md.
+    
+    **X1 HIGH — tampered `sample.json` can silently reduce independent review.** `receipts_check` trusts supplied sample+mandatory lists; it does not bind receipt verification to verified original draw, seed, population, input/fixture hashes or immutable sampling manifest. Independent synthetic test: original two-passage selection flags absent P2 receipt; removing P2 from the supplied sample makes the same receipt set PASS. Duplicate receipt IDs also overwrite in a dict. **Required:** verify original draw+mandatory selection at receipt time using authenticated/original T5-bound inputs; reject altered selection, duplicates, missing mandatory IDs; calibrate all.
+    
+    **X2 HIGH — missing upstream bindings.** T4 draw compares T5 output's register and units hashes but omits `passages.json` hash. T5 fixtures argument is optional and T5 PASS does not bind the fixture file/inventory digest, allowing hidden/nested known-positive checks to disappear. **Required:** pin and verify passages + fixture identities, fail closed on absent/changed fixtures for required calibrated run, verify fixture inventory as well as content, test mutation after T5 PASS.
+    
+    **X3 HIGH — authority is self-declared.** T5 checks textual ID/date in a review unit and an enum `owner_ruling|d_number|canonical_doc|unproven` but does not substantiate source identity, ruling scope, supremacy of a later owner's ruling over weaker later docs, or removal's chronology. **Required:** source-bound authority proof, explicit supersession/scope or unresolved status, tests for later but unauthorized source and older purported removal. Do not assume date order is sufficient across different authority tiers.
+    
+    **X4 assurance limit:** source-grounded notes and distinct reviewer names are better records, but not proof that a person or model read every line. Keep separate independent semantic audit/negative tests and avoid calling mere signoff proof of comprehension.
+    
+    **F6 for Dainius's later decision:** I recommend adding separately seeded **2% independent review of no-item passages**, stratified by source/criticality, PLUS justified mandatory-intake exceptions, with `m=min(M,max(30,ceil(.02*M)))` and `M=0 → 0`. At 51,727 passages the theoretical sample cap before mandatory additions is 1,035; actual M must be measured. This would supplement, not silently alter, frozen Annex A feature-bearing sampling. Owner GO required before census, not for bounded tool calibration.
+    
+    **Next for Orion:** bank verbatim, address X1–X3 with minimal changes, add targeted known-positive/known-negative calibration, send updated scripts/hashes/replay package for independent examination. Current approved GO permits preparation only. Engineering, PRE-RAMS, Gold Tier, R11 and PR #122 DO NOT MERGE unchanged. SOUL.md remains protected; no additional access. **Confidence 0.99 X1, 0.97 X2/X3 based on direct code inspection; full chain not replayed.** OHANA — ONE ORGANISM, ZERO SILENT FEATURE LOSS.
+    END-VERBATIM KAI-DAI10-ae60b36c-T4T5-REREVIEW
+- EVIDENCE KAI-RELAY-317 relay_317.md: 2005 bytes, sha256 40b9fb99bfb65fc9b1071b616f975235fa04131392c3cd213c19db4edc6e5094, final LF True (added by Orion)  [CMD `sha256sum relay_317.md` → 40b9fb99bfb65fc9…]
+    BEGIN-VERBATIM KAI-RELAY-317
+    KAI-GPT verdict — corrections required
+    
+    Orion has made genuine progress. His revisions address the five original findings, and the stronger calibration is a worthwhile improvement.
+    
+    However, I found three remaining defects that must be corrected before the five-tool system can pass final qualification.
+    
+    Finding	What it means
+    1. Missing spot-checks could go unnoticed	Removing a passage from the sample could allow the receipt checker to pass without that passage being reviewed. I reproduced this with synthetic test data.
+    2. Evidence checks could be bypassed	The tools do not fully bind the source passages and mandatory hidden-feature tests to the approved input records.
+    3. Decision authority is insufficiently verified	A later-dated document could be treated as overriding an owner decision without sufficient proof of its authority.
+    
+    The corrections are limited. No complete rewrite is needed.
+    
+    Extra safeguard I recommend
+    
+    We originally missed 23 features during earlier research. I don’t want us repeating that mistake.
+    
+    I recommend independently auditing 2% of passages marked “no feature found”, in addition to the existing mandatory sampling. This specifically targets requirements that the first reader might overlook.
+    
+    The additional sampling would require your approval before execution. We can establish its actual workload once the census produces the relevant figures.
+    
+    Recorded in Linear
+    
+    I posted the independent review to DAI-10, comment ae60b36c, and verified that it appeared.
+    
+    Current position: T1–T3 remain conditionally accepted. T4–T5 require these corrections and an independent end-to-end qualification. The census has not started, KAI’s product code remains unchanged, and all existing engineering holds remain in force.
+    
+    Confidence: 0.99 in the demonstrated missing-spot-check defect; 0.97 in the other two code-review findings.
+    
+    In site terms, we’re making sure the inspection sheet cannot say PASS when part of the inspection was silently omitted.
+    
+    OHANA.
+    END-VERBATIM KAI-RELAY-317
+
+### 6. Next authorised step
+
+- Check X1–X3 against the rev 2 code, correct minimally, calibrate with known-positive and known-negative cases, return scripts, hashes and replay package  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 ae60b36c, "send updated scripts/hashes/replay package for independent examination"]
+
+### 7. What I am unsure of
+
+- How far "source-bound authority proof" can go mechanically; authority tier and scope may need a reader's judgement recorded with its source, and the tool can then enforce consistency, not truth  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 ae60b36c, "Do not assume date order is sufficient across different authority tiers."]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
