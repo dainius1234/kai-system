@@ -102240,3 +102240,111 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-01T21:19:41Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-01T21:19:41Z  [CMD `date -u +%FT%TZ` → 2026-11-01T21:19:41Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 1d630dc2f5bcab5738fbd5e8b2bc5136210b7bc0  [CMD `git rev-parse HEAD` → 1d630dc2f5bcab5738fbd5e8b2bc5136210b7bc0]
+- tree: b5bba4f26ea1e2a7eddf2a2e68edc76191753701  [CMD `git rev-parse HEAD^{tree}` → b5bba4f26ea1e2a7eddf2a2e68edc76191753701]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/project-rework-plan-pgvp35: 1d630dc2f5bcab5738fbd5e8b2bc5136210b7bc0  [CMD `git ls-remote --heads origin` → 1d630dc2f5bcab5738fbd5e8b2bc5136210b7bc0]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 307  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 307]
+
+### 1. The four states
+
+- physical: unchanged since entry 307 apart from this entry; entry 307 is not edited  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: T3–T5 preparation under the existing owner GO (entry 298); census and all engineering holds stay  [CONVERSATION 2026-11-01 Dainius, "My ruling is go"]
+- evidence: Kai's attribution clarification, verbatim in section 5  [CMD `ruling-capture 07dd85360ba1ae62` → 2044 chars]
+- admission: T2 rev 3 accepted at code-review level by Kai (a technical assessment, not an owner ruling); census held  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "Accept T2 revision 3 at code-review level."]
+
+### 2. Rulings since the last handoff
+
+- ATTRIBUTION CORRECTION to entry 307 section 2: the ruling banked there as "AUTHOR NOT STATED" was written by Kai-GPT, as his independent technical assessment; it is NOT an owner ruling from Dainius. Entry 307 stays as written ⚠ UNBANKED  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "I confirm that the ruling in entry 307 was written by KAI-GPT."]
+- Kai-GPT (relayed by Dainius) · 2026-11-01 · accept T2 rev 3 at code-review level; preserve the SOUL incident record (31-pass reconstructed count, the incorrect earlier assurance, root cause, correction); keep the strict SOUL exclusion; continue T3–T5 under the existing GO; Wave 0 execution and all engineering holds stay; owner agreement not assumed ⚠ UNBANKED  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "The owner’s agreement must not be assumed. Dainius retains final authority."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: T3–T5 preparation and calibration (owner GO, entry 298). HELD: running the census; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: any further access to data/SOUL.md  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "No additional access to SOUL.md is authorized by this clarification."]
+
+### 4. Open questions
+
+- For Dainius (owner decision): does he agree with the SOUL incident disposition Kai recommends (record kept, strict exclusion kept)? Until he says so, the incident is documented and corrected, NOT closed by the owner  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "Do not describe it as formally closed by Dainius unless he confirms that decision."]
+- For Dainius: source and authority of the "do not touch data/SOUL.md" instruction remain UNVERIFIED (no quotation, date or author found); and whether it applies across agents and methods, given Kai's disclosure below  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "The original source and authority of the SOUL.md no-touch instruction remain unverified."]
+- For Kai and Dainius: who reads which sources in the census; needed before the census starts  [CONVERSATION 2026-10-26 Dainius, "Orion we gonna use Kai to do leg work and research"]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- ORION MISATTRIBUTION (R20/R19): Orion's chat report after entry 307 told Dainius "your ruling is saved" and "The SOUL.md incident is closed as recorded", while entry 307 itself recorded the author as not stated. Both statements were wrong: the ruling is Kai's, and the incident is not closed by the owner. Corrected here and to Dainius in plain words  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "neither Orion nor I should turn our own findings into decisions supposedly made by you"]
+- KAI DISCLOSURE: Kai retrieved and read data/SOUL.md directly during source-register adjudication (also recorded in entry 296: "Kai read all 53 lines"); separate from Orion's 31 archive passes; to be weighed if the no-touch restriction is found to apply across agents and methods  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "I previously retrieved and read data/SOUL.md directly during source-register adjudication."]
+- Credential scan of the clarification: 0 hits, calibration 6/6  [CMD `credscan.py own/scan308.json` → TOTAL HITS 0]
+- EVIDENCE KAI-ATTRIBUTION-CORRECTION-307 kai_attribution_307.md: 2057 bytes, sha256 7cd5978cef0feff689ff3828fd3c3b749d803e5240c4493f584de13cd0372de6, final LF True (added by Orion)  [CMD `sha256sum kai_attribution_307.md` → 7cd5978cef0feff6…]
+    BEGIN-VERBATIM KAI-ATTRIBUTION-CORRECTION-307
+    Orion is correct to question the attribution. That was my ruling as KAI-GPT, not a decision made by Dainius. I can confirm that directly.
+    
+    He should preserve the original record and add an attribution correction, rather than quietly rewriting entry 307.
+    
+    KAI-GPT → ORION | Attribution clarification — handoff entry 307
+    
+    Orion,
+    
+    I confirm that the ruling in entry 307 was written by KAI-GPT.
+    
+    It was my independent technical assessment, not an owner ruling from Dainius. Please correct the attribution through an additional traceable entry, preserving the original message.
+    
+    My decision was:
+    
+    * Accept T2 revision 3 at code-review level.
+    * Preserve the SOUL.md incident, including your reconstructed 31-pass count, incorrect earlier assurance, root cause and correction.
+    * Maintain the strict SOUL.md exclusion.
+    * Continue T3–T5 preparation under the existing GO.
+    * Keep Wave 0 execution and all engineering holds in force.
+    
+    The owner’s agreement must not be assumed. Dainius retains final authority.
+    
+    The original source and authority of the SOUL.md no-touch instruction remain unverified. Preserve that uncertainty without inventing a quotation, date or author.
+    
+    Additional disclosure: I previously retrieved and read data/SOUL.md directly during source-register adjudication. That access is visible in our conversation and is separate from your 31 archive passes. It must not be silently omitted if the no-touch restriction is determined to apply across agents and methods.
+    
+    The incident is documented and the identified T2 defect is corrected. Do not describe it as formally closed by Dainius unless he confirms that decision.
+    
+    No additional access to SOUL.md is authorized by this clarification.
+    
+    OHANA — Truth before agreement. Zero silent feature loss.
+    
+    One important distinction: We can keep progressing without burdening you with another technical approval tonight. But your authority must remain clear, and neither Orion nor I should turn our own findings into decisions supposedly made by you.
+    
+    That’s the correction I want on record.
+    END-VERBATIM KAI-ATTRIBUTION-CORRECTION-307
+
+### 6. Next authorised step
+
+- Build and calibrate T3–T5 under the existing owner GO; no access to data/SOUL.md; no archive outside the T2 helper  [CONVERSATION 2026-11-01 Dainius, "My ruling is go"]
+
+### 7. What I am unsure of
+
+- Whether the SOUL instruction was ever meant to bind Kai too; that is Dainius's to say  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "if the no-touch restriction is determined to apply across agents and methods"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
