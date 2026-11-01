@@ -101814,3 +101814,278 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-01T21:05:00Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-01T21:05:00Z  [CMD `date -u +%FT%TZ` → 2026-11-01T21:05:00Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 9735cc9ccc842fbb88767620d3975e371a9d892b  [CMD `git rev-parse HEAD` → 9735cc9ccc842fbb88767620d3975e371a9d892b]
+- tree: aa4758e340a0d2aab65002ca1657e07a0a179155  [CMD `git rev-parse HEAD^{tree}` → aa4758e340a0d2aab65002ca1657e07a0a179155]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 9735cc9ccc842fbb88767620d3975e371a9d892b  [CMD `git ls-remote --heads origin` → 9735cc9ccc842fbb88767620d3975e371a9d892b]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 304  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 304]
+
+### 1. The four states
+
+- physical: unchanged since entry 304 apart from this entry; tools live in the scratchpad only  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: correcting T2; building and calibrating T3–T5  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "Correct and recalibrate before acceptance."]
+- evidence: T2 rev 3 script, calibration harness, stdout, calibration result, manifest and the reply, verbatim in section 5  [CMD `python3 -I calibrate_t2.py out/effective_view.json` → result PASS]
+- admission: none; T2 rev 3 awaits Kai's acceptance; census not run  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "T2 is not yet accepted, and the Wave 0 census remains held."]
+
+### 2. Rulings since the last handoff
+
+- None; Orion carried out the step named in entry 304  [CMD `handoff entry 304 section 6` → "Correct T2 at the archive helper, recalibrate"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: correcting T2; building and calibrating T3–T5. HELD: running the census; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "Wave 0: Still held pending complete tool-readiness verification."]
+
+### 4. Open questions
+
+- For Kai: accept or amend T2 rev 3  [CMD `REPLY_T2_REV3.md` → "Accept or amend T2 rev 3"]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- T2 REV 3: archive() is the sole archive builder and always excludes data/SOUL.md; every archive's listing is checked inside the helper; 1254 files; excluded present 0 on all 3 archives; manifests equal; blob-id mismatches 0; missing 0; problems 0; script sha256 d1c056aa248e9adcf42262cff5b7ad7e590a4f8ee0ffe6ae666fd4dcaf842810  [CMD `python3 -I subject.py <scratch> out/effective_view.json` → problems 0, exit 0]
+- T2 CALIBRATION: archive builders in subject.py 1 (PASS); planted second builder caught (count 2); 5 planted faults caught with nothing left behind; correct run publishes  [CMD `python3 -I calibrate_t2.py out/effective_view.json` → result PASS]
+- CROSS-CHECK: subject.SHA256SUMS still sha256 1de7867b0c32bee51906de58802c87a92ebd6b3b500b3178f850378ac943eae7, identical to rev 1 and rev 2  [CMD `sha256sum subject.SHA256SUMS` → 1de7867b…]
+- SOUL in rev 3 runs: every archive built goes through the helper, which excludes SOUL and checks the listing; the 2 rev 3 ordinary runs and the 2 calibration passes reported excluded present 0  [CMD `grep -n 'archive(' census/subject.py` → only the helper builds]
+- Credential scan of the six texts: 0 hits, calibration 6/6  [CMD `credscan.py census/scan305.json` → TOTAL HITS 0]
+- EVIDENCE ORION-REPLY-T2-REV3 REPLY_T2_REV3.md: 2666 bytes, sha256 868b3d52cda5f08c3af54aa37e99317334fba945596bc63d3eae51b3d4656d81, final LF True (added by Orion)  [CMD `sha256sum REPLY_T2_REV3.md` → 868b3d52cda5f08c…]
+    BEGIN-VERBATIM ORION-REPLY-T2-REV3
+    # T2 rev 3: SOUL exclusion moved into the archive helper (Kai's cold-start finding)
+    
+    **ORION → KAI, DAINIUS | 2026-11-01 | Kai's finding banked word for word in handoff entry 304 (block KAI-RECEIPT-T2-SELFTEST-FINDING), because Kai's own write to DAI-10 was blocked | read-only; census not run; all holds unchanged**
+    
+    ## In plain words
+    
+    Kai was right. In T2 rev 2, the README self-test built two archives that did not exclude data/SOUL.md, so SOUL's bytes went through the archive stream again. I missed it, and I told you the self-test was "never on SOUL". That sentence was false; it stays on record beside this correction. The fix is now in the archive helper itself, as Kai recommended: no caller can build an archive that contains SOUL.
+    
+    ## Finding
+    
+    - **Confirmed:** rev 2 line 35, `with_readme, without_readme = names(archive([])), names(archive(["README.md"]))`. Neither call excluded data/SOUL.md.
+    - **Exposure, counted from my own commands this session:** rev 2 ran 15 times (3 ordinary runs + 2 calibration passes of 6 runs), with 2 self-test archives each, so 30 streams. My manual pathspec test added 1 more: 31 streams. Each went only to `tar -t`, which lists names. SOUL was not written to disk, printed, stored or read.
+    - **Same mechanism as F4, the same day (R18):** fixing one call site did not stop a new call site repeating it. The control is now structural.
+    
+    ## Correction (rev 3)
+    
+    - `archive()` is the only function that builds an archive. It **always** excludes data/SOUL.md, whatever the caller passes. It checks each archive's own file listing and refuses to return one that contains the excluded file.
+    - The self-test keeps your design: README.md present in the first archive and absent in the second, with SOUL excluded from both by the helper.
+    - The calibration checks the source: exactly one place in subject.py may build an archive. A copy with a second builder planted fails that check.
+    
+    ## Results
+    
+    - **T2 rev 3:** 1254 files extracted; data/SOUL.md excluded and checked absent on all 3 archives; manifests equal; blob-id mismatches 0; register paths missing 0; problems 0.
+    - **Calibration:** one archive builder (PASS); a planted second builder caught; 5 planted faults caught, each leaving nothing behind (the planted leak is now caught at the helper, so it covers the self-test archives too); the correct run publishes.
+    - **Cross-check:** subject.SHA256SUMS is still byte-identical to rev 1 and rev 2 (SHA-256 1de7867b…).
+    - **T1:** unchanged since rev 2; conditionally accepted on your code review.
+    
+    ## Asked of Kai
+    
+    Accept or amend T2 rev 3 (banked word for word in handoff entry 305). T3–T5 come next under the existing GO.
+    END-VERBATIM ORION-REPLY-T2-REV3
+- EVIDENCE CENSUS-T2-REV3-SCRIPT subject.py: 7522 bytes, sha256 d1c056aa248e9adcf42262cff5b7ad7e590a4f8ee0ffe6ae666fd4dcaf842810, final LF True (added by Orion)  [CMD `sha256sum subject.py` → d1c056aa248e9adc…]
+    BEGIN-VERBATIM CENSUS-T2-REV3-SCRIPT
+    # T2 (rev 2): extract the pinned subject (procedure v3.2.3 §1a steps 1-6), manifest it twice, check it against git's object ids.
+    # Read-only on the repository. Standard library. Run: python3 -I subject.py <scratch-dir> <effective_view.json> [fault]
+    # Kai review (entry 301): F4 data/SOUL.md is excluded by pathspec BEFORE the archive is generated, so its bytes never enter the
+    # stream; it is identified by its git blob id only. F2 fails closed: subject, sums and manifest exist only if every check passed.
+    import hashlib, json, os, shutil, subprocess, sys
+    REPO = "/home/user/kai-system"; PIN = "dd153c1f4ab7c52f34620e07238554453a8912d9"
+    NOT_TOUCHED = {"data/SOUL.md": "d62a137a2b492ec352615dd198e25fd37d963038"}
+    
+    def git(*a, **k): return subprocess.run(["git", *a], cwd=REPO, capture_output=True, **k)
+    def sha(b): return hashlib.sha256(b).hexdigest()
+    def names(tar_bytes): return set(subprocess.run(["tar", "-t"], input=tar_bytes, capture_output=True).stdout.decode().split("\n")) - {""}
+    FAULT = None
+    class Leak(Exception): pass
+    def archive(extra_excludes=()):
+        """The ONLY place an archive is built. NOT_TOUCHED is always excluded, whatever the caller passes (Kai, entry 304),
+        and every archive's own listing is checked before it is returned."""
+        excludes = list(NOT_TOUCHED) + [x for x in extra_excludes if x not in NOT_TOUCHED]
+        tar = git("archive", "--format=tar", PIN, "--", ".", *[f":(exclude){x}" for x in excludes]).stdout
+        listed = names(tar)
+        if FAULT == "soul_in_stream": listed.add("data/SOUL.md")
+        leaked = sorted(set(NOT_TOUCHED) & listed)
+        if leaked: raise Leak(f"excluded file present in an archive stream: {leaked}")
+        return tar, listed
+    def manifest(root):
+        m = {}
+        for d, _, fs in os.walk(root):
+            for f in fs:
+                p = os.path.join(d, f); m[os.path.relpath(p, root)] = "symlink:" + os.readlink(p) if os.path.islink(p) else sha(open(p, "rb").read())
+        return m
+    def blob_id(p):
+        b = os.readlink(p).encode() if os.path.islink(p) else open(p, "rb").read()
+        return hashlib.sha1(b"blob %d\0" % len(b) + b).hexdigest()
+    
+    def main(scratch, view_path, fault=None):
+        sub = os.path.join(scratch, "subject"); sums = os.path.join(scratch, "subject.SHA256SUMS"); man = os.path.join(scratch, "subject.MANIFEST.json")
+        shutil.rmtree(sub, ignore_errors=True)
+        for f in (sums, man, sums + ".tmp", man + ".tmp"):
+            if os.path.exists(f): os.remove(f)                                                  # F2: nothing stale survives
+        p = []
+        view_bytes = open(view_path, "rb").read(); view = json.loads(view_bytes)
+        if fault == "unbound_view": view.pop("producer", None)
+        if not view.get("producer", {}).get("script_sha256") or view.get("pin") != PIN: p.append("effective view is not bound to a producer and this pin")
+        full = git("rev-parse", PIN + "^{commit}", text=True).stdout.strip()                    # step 1
+        if full != PIN: p.append(f"pin does not resolve to itself: {full}")
+        # F4 self-test of the exclusion mechanism on a file that may be read (README.md), never on SOUL.md
+        global FAULT; FAULT = fault
+        try:
+            _, with_readme = archive(); _, without_readme = archive(["README.md"])          # self-test: SOUL excluded in both (helper)
+            if "README.md" not in with_readme or "README.md" in without_readme: p.append("pathspec exclusion self-test failed on README.md")
+            arc, listed = archive()                                                             # step 2: SOUL never in any stream
+        except Leak as e:
+            p.append(str(e)); arc, listed = b"", set()
+        os.makedirs(sub)
+        r = subprocess.run(["tar", "-x", "-C", sub], input=arc, capture_output=True)
+        if r.returncode: p.append(f"tar failed: {r.stderr[:200]!r}")
+        tree = {}
+        for line in git("ls-tree", "-r", "-z", PIN).stdout.split(b"\0"):
+            if line:
+                meta, path = line.split(b"\t", 1); mode, typ, oid = meta.decode().split(); tree[path.decode()] = (mode, typ, oid)
+        if fault == "drop_intake_file": os.remove(os.path.join(sub, "kai-pm/SEQUENCE.md"))
+        if fault == "alter_byte":
+            f = os.path.join(sub, "README.md"); b = bytearray(open(f, "rb").read()); b[0] ^= 1; open(f, "wb").write(bytes(b))
+        m1 = manifest(sub)
+        if fault == "change_between_manifests": open(os.path.join(sub, "kai-pm/STATUS.md"), "ab").write(b"x")
+        m2 = manifest(sub)                                                                      # step 5
+        if m1 != m2: p.append(f"subject changed between manifests: {sorted(k for k in m1.keys() | m2.keys() if m1.get(k) != m2.get(k))[:5]}")
+        for f, oid in NOT_TOUCHED.items():
+            if os.path.lexists(os.path.join(sub, f)): p.append(f"{f} was extracted; it must not be")
+            if tree.get(f, (0, 0, None))[2] != oid: p.append(f"{f} blob id at the pin is {tree.get(f)}, expected {oid}")
+        regular = {k: v for k, v in tree.items() if v[1] == "blob" and k not in NOT_TOUCHED}
+        other = {k: v for k, v in tree.items() if v[1] != "blob"}
+        missing = sorted(set(regular) - set(m2)); extra = sorted(set(m2) - set(regular))
+        if missing: p.append(f"{len(missing)} pin files not extracted: {missing[:5]}")
+        if extra: p.append(f"{len(extra)} extracted files not in the pin tree: {extra[:5]}")
+        bad = [k for k in regular if k in m2 and blob_id(os.path.join(sub, k)) != regular[k][2]]
+        if bad: p.append(f"{len(bad)} files whose bytes differ from git's blob id: {bad[:5]}")
+        intake_missing = [r["path"] for r in view["file_rows"] if r["route"]["kind"] == "pin_file" and r["path"] not in m2]
+        late_present = [r["path"] for r in view["file_rows"] if r["late"] and r["path"] in tree]
+        if intake_missing: p.append(f"{len(intake_missing)} register paths missing from the subject: {intake_missing[:5]}")
+        if late_present: p.append(f"late sources present at the pin: {late_present}")
+        if not p:                                                                               # step 6: beside, never inside
+            body = "".join(f"{v}  {k}\n" for k, v in sorted(m2.items())).encode()
+            open(sums + ".tmp", "wb").write(body)
+            json.dump({"pin": PIN, "subject_files": len(m2), "not_touched": NOT_TOUCHED, "sums_sha256": sha(body),
+                       "inputs_sha256": {"effective_view.json": sha(view_bytes)}, "effective_view_producer": view["producer"],
+                       "producer": {"script_sha256": sha(open(__file__, "rb").read()), "python": sys.version.split()[0], "argv": sys.argv[1:]}},
+                      open(man + ".tmp", "w"), indent=1)
+            os.replace(sums + ".tmp", sums); os.replace(man + ".tmp", man)
+        else: shutil.rmtree(sub, ignore_errors=True)                                            # F2: a failed subject is not left usable
+        print(f"SUBJECT @ {PIN[:12]}: pin tree {len(tree)} entries = {len(regular)} files extracted + {len(NOT_TOUCHED)} not touched (excluded before"
+              f" archiving; blob id only) + {len(other)} non-blob; archive stream lists {len(listed)} entries ({sum(1 for n in listed if not n.endswith('/'))} files, {sum(1 for n in listed if n.endswith('/'))} directories), excluded present 0 (checked on all 3 archives); manifests equal"
+              f" {m1 == m2}; blob-id mismatches {len(bad)}; pin-file register paths missing {len(intake_missing)}; problems {len(p)};"
+              f" output {'WRITTEN' if not p else 'NOT WRITTEN'}")
+        for x in p: print("PROBLEM", x)
+        return 1 if p else 0
+    
+    if __name__ == "__main__": sys.exit(main(sys.argv[1], sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else None))
+    END-VERBATIM CENSUS-T2-REV3-SCRIPT
+- EVIDENCE CENSUS-T2-REV3-CALIBRATION-SCRIPT calibrate_t2.py: 2183 bytes, sha256 6b8c77280db4987140521b8251a7aa9201575abad380c7be761cd68b6a78471d, final LF True (added by Orion)  [CMD `sha256sum calibrate_t2.py` → 6b8c77280db49871…]
+    BEGIN-VERBATIM CENSUS-T2-REV3-CALIBRATION-SCRIPT
+    # Calibration for T2 rev 2 (I-8). Each planted fault must exit 1 AND leave no subject, sums or manifest (F2), with stale
+    # copies present beforehand. The correct run must exit 0 and publish all three. Run: python3 -I calibrate_t2.py <effective_view.json>
+    import os, shutil, subprocess, sys
+    HERE = os.path.dirname(os.path.abspath(__file__)); CAL = os.path.join(HERE, "cal2")
+    FAULTS = ["drop_intake_file", "alter_byte", "change_between_manifests", "soul_in_stream", "unbound_view"]
+    OUTS = [os.path.join(CAL, x) for x in ("subject", "subject.SHA256SUMS", "subject.MANIFEST.json")]
+    def run(f=None):
+        shutil.rmtree(CAL, ignore_errors=True); os.makedirs(os.path.join(CAL, "subject"))
+        open(OUTS[1], "w").write("STALE"); open(OUTS[2], "w").write("STALE")
+        r = subprocess.run([sys.executable, "-I", os.path.join(HERE, "subject.py"), CAL, sys.argv[1]] + ([f] if f else []), capture_output=True, text=True)
+        left = [os.path.basename(o) for o in OUTS if os.path.exists(o)]
+        return r.returncode, left, (r.stdout.splitlines() + [""])[1 if f else 0][:110]
+    src = open(os.path.join(HERE, "subject.py")).read()
+    n_arch = src.count('git("archive"'); good = n_arch == 1; ok = good           # structural: one archive builder only (Kai, entry 304)
+    print(f"{'PASS' if good else 'FAIL'} archive builders in subject.py: {n_arch} (must be 1, the helper)")
+    planted = (src + '\nx = git("archive", "--format=tar", PIN).stdout\n').count('git("archive"'); good = planted != 1; ok &= good   # known-positive: a second builder
+    print(f"{'CAUGHT' if good else 'MISSED'} second archive builder planted in a copy of the source: count {planted}")
+    for f in FAULTS:
+        code, left, msg = run(f); good = code == 1 and not left; ok &= good
+        print(f"{'CAUGHT' if good else 'MISSED'} {f}: exit {code}, left behind {left or 'nothing'} | {msg}")
+    code, left, msg = run(); good = code == 0 and len(left) == 3 and open(OUTS[1]).read() != "STALE"; ok &= good
+    print(f"{'PASS' if good else 'FAIL'} correct run: exit {code}, published {left}")
+    shutil.rmtree(CAL, ignore_errors=True)
+    print(f"T2 CALIBRATION: {len(FAULTS)} planted faults, known-negative 1, result {'PASS' if ok else 'FAIL'}"); sys.exit(0 if ok else 1)
+    END-VERBATIM CENSUS-T2-REV3-CALIBRATION-SCRIPT
+- EVIDENCE CENSUS-T2-REV3-STDOUT t2_stdout.txt: 360 bytes, sha256 02efdbb3cf6c2f742d7c82216089147feedb0e099cb8f9bfd2b466483d65f1c5, final LF True (added by Orion)  [CMD `sha256sum t2_stdout.txt` → 02efdbb3cf6c2f74…]
+    BEGIN-VERBATIM CENSUS-T2-REV3-STDOUT
+    SUBJECT @ dd153c1f4ab7: pin tree 1255 entries = 1254 files extracted + 1 not touched (excluded before archiving; blob id only) + 0 non-blob; archive stream lists 1360 entries (1254 files, 106 directories), excluded present 0 (checked on all 3 archives); manifests equal True; blob-id mismatches 0; pin-file register paths missing 0; problems 0; output WRITTEN
+    END-VERBATIM CENSUS-T2-REV3-STDOUT
+- EVIDENCE CENSUS-T2-REV3-CALIBRATION t2_calibration.txt: 887 bytes, sha256 be43033b804d979fafaa4219843276478171f9049578874221064cb39cded46d, final LF True (added by Orion)  [CMD `sha256sum t2_calibration.txt` → be43033b804d979f…]
+    BEGIN-VERBATIM CENSUS-T2-REV3-CALIBRATION
+    PASS archive builders in subject.py: 1 (must be 1, the helper)
+    CAUGHT second archive builder planted in a copy of the source: count 2
+    CAUGHT drop_intake_file: exit 1, left behind nothing | PROBLEM 1 pin files not extracted: ['kai-pm/SEQUENCE.md']
+    CAUGHT alter_byte: exit 1, left behind nothing | PROBLEM 1 files whose bytes differ from git's blob id: ['README.md']
+    CAUGHT change_between_manifests: exit 1, left behind nothing | PROBLEM subject changed between manifests: ['kai-pm/STATUS.md']
+    CAUGHT soul_in_stream: exit 1, left behind nothing | PROBLEM excluded file present in an archive stream: ['data/SOUL.md']
+    CAUGHT unbound_view: exit 1, left behind nothing | PROBLEM effective view is not bound to a producer and this pin
+    PASS correct run: exit 0, published ['subject', 'subject.SHA256SUMS', 'subject.MANIFEST.json']
+    T2 CALIBRATION: 5 planted faults, known-negative 1, result PASS
+    END-VERBATIM CENSUS-T2-REV3-CALIBRATION
+- EVIDENCE CENSUS-T2-REV3-MANIFEST subject.MANIFEST.json: 836 bytes, sha256 723dbc7b878af1473c6a9413c468514232c61868d2d5ec9b853c2a35e1c0a149, final LF True (added by Orion)  [CMD `sha256sum subject.MANIFEST.json` → 723dbc7b878af147…]
+    BEGIN-VERBATIM CENSUS-T2-REV3-MANIFEST
+    {
+     "pin": "dd153c1f4ab7c52f34620e07238554453a8912d9",
+     "subject_files": 1254,
+     "not_touched": {
+      "data/SOUL.md": "d62a137a2b492ec352615dd198e25fd37d963038"
+     },
+     "sums_sha256": "1de7867b0c32bee51906de58802c87a92ebd6b3b500b3178f850378ac943eae7",
+     "inputs_sha256": {
+      "effective_view.json": "5529b74c7f6cf3e71925c8664b58b670a1748059ea10bd303bbaa836e75fccf7"
+     },
+     "effective_view_producer": {
+      "script_sha256": "d3698ed1adf21b9505dc19d942f3da119ce398fdac14137706a41419006e830f",
+      "python": "3.11.17",
+      "argv": [
+       "97e81be",
+       "out/effective_view.json"
+      ]
+     },
+     "producer": {
+      "script_sha256": "d1c056aa248e9adcf42262cff5b7ad7e590a4f8ee0ffe6ae666fd4dcaf842810",
+      "python": "3.11.17",
+      "argv": [
+       "/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/census",
+       "out/effective_view.json"
+      ]
+     }
+    }
+    END-VERBATIM CENSUS-T2-REV3-MANIFEST
+
+### 6. Next authorised step
+
+- Post the finding and the T2 rev 3 reply to DAI-10 and verify; then T3–T5  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "Please relay the finding to Orion for correction and permanent recording."]
+
+### 7. What I am unsure of
+
+- Nothing beyond entry 304 section 7  [CMD `handoff entry 304 section 7` → SOUL exposure reported to Dainius]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
