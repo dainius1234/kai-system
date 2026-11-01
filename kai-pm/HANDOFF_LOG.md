@@ -101692,3 +101692,125 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-01T21:03:36Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-01T21:03:36Z  [CMD `date -u +%FT%TZ` → 2026-11-01T21:03:36Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: afdf26b81d81c686b2c368fb4ab5257ca37cf8e2  [CMD `git rev-parse HEAD` → afdf26b81d81c686b2c368fb4ab5257ca37cf8e2]
+- tree: c7c934022cd7f9a71e6077ab46b19634ef58d5e1  [CMD `git rev-parse HEAD^{tree}` → c7c934022cd7f9a71e6077ab46b19634ef58d5e1]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:claude/project-rework-plan-pgvp35: afdf26b81d81c686b2c368fb4ab5257ca37cf8e2  [CMD `git ls-remote --heads origin` → afdf26b81d81c686b2c368fb4ab5257ca37cf8e2]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 303  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 303]
+
+### 1. The four states
+
+- physical: unchanged since entry 303 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: correct T2 and recalibrate; continue T3–T5 under the existing GO  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "T2: One HIGH defect remains in the self-test. Correct and recalibrate before acceptance."]
+- evidence: Kai's cold-start receipt and T2 finding, verbatim in section 5  [CMD `ruling-capture cf70f29440793548` → 2911 chars]
+- admission: T1 conditionally accepted on code review; T2 NOT accepted; Wave 0 census held  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "T1 is substantially improved. T2 is not yet accepted, and the Wave 0 census remains held."]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT (relayed by Dainius) · 2026-11-01 · T1 conditional acceptance on code review (16/16 producer-reported); T2 one HIGH defect: the README self-test generates two archives without the SOUL exclusion; fix at the archive helper so no caller can generate an archive containing the excluded file; T3–T5 may continue; Wave 0 held ⚠ UNBANKED  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "fix this at the archive helper itself, so no future caller can accidentally generate an archive containing the excluded file"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: correcting T2; building and calibrating T3–T5. HELD: running the census; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "Wave 0: Still held pending complete tool-readiness verification."]
+
+### 4. Open questions
+
+- None new; Kai's T1/T2 acceptance follows the T2 correction  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "Correct and recalibrate before acceptance."]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- FINDING CONFIRMED: subject.py rev 2 line 35 builds `archive([])` and `archive(["README.md"])`, neither excluding data/SOUL.md  [CMD `grep -n "archive(" census/subject.py` → 35: with_readme, without_readme = names(archive([])), names(archive(["README.md"]))]
+- SOUL BOUNDARY, SECOND OCCURRENCE (R18, same mechanism as F4: an archive generated without the exclusion). Count, from this session's commands: subject.py rev 2 ran 15 times (3 ordinary runs + 2 calibration passes of 6 runs) × 2 self-test archives = 30 streams, plus 1 manual pathspec test (`git archive <pin> -- . ':(exclude)README.md' | tar -t`) = 31 archive streams carrying SOUL bytes. Every one went only to `tar -t` (names listed); none written to disk, printed, stored or read. Kai's receipt was the detector, not Orion  [CMD `grep -n "archive(" census/subject.py` → line 35]
+- FALSE CLAIM, now corrected (R1): DAI-10 comment 4c31818a and block ORION-REPLY-F1-F4 say the self-test runs "on README.md … never on SOUL". The test target was README, but SOUL's bytes were in both test archives. The sentence stays as posted, beside this correction  [CMD `grep -c "never on SOUL" kai-pm/HANDOFF_LOG.md` → present in entry 302]
+- CONTROL (R18): fixing the call site in rev 2 did not stop a new call site repeating the mechanism. The archive helper itself will always exclude NOT_TOUCHED, so no caller can build an archive with it, as Kai recommends. FAILURE_PATTERN_LEDGER not written (allocation held)  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "That is stronger than correcting just the two current calls."]
+- Kai could not write to DAI-10 (blocked); the finding exists on Linear only once Orion posts it  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "I attempted to save this finding directly to Linear DAI-10, but the operation was blocked."]
+- Credential scan of the receipt: 0 hits, calibration 6/6  [CMD `credscan.py own/scan304.json` → TOTAL HITS 0]
+- EVIDENCE KAI-RECEIPT-T2-SELFTEST-FINDING kai_receipt_t2.md: 2936 bytes, sha256 421112995d8c523193c98b3ef101dfe3a651fc0b3dff7e1075c473b5c54e49fe, final LF True (added by Orion)  [CMD `sha256sum kai_receipt_t2.md` → 421112995d8c5231…]
+    BEGIN-VERBATIM KAI-RECEIPT-T2-SELFTEST-FINDING
+    COLD-START RECEIPT — DEGRADED
+    
+    I verified Orion’s latest work against the live KAI sources.
+    
+    * GitHub branch: claude/project-rework-plan-pgvp35
+    * Live HEAD: afdf26b81d81c686b2c368fb4ab5257ca37cf8e2
+    * Latest handoff: entry 303, 1 November 2026, 20:58 UTC
+    * T1/T2 corrections: handoff entry 302, commit 588bb1ba4c74ffdfc714b9e2946c679a6fef1724
+    * Linear: DAI-10 comment 4c31818a confirms Orion’s response is posted.
+    * Research pin: dd153c1f4ab7c52f34620e07238554453a8912d9
+    * Gaps: Linear START HERE returned no content. The ordinary GitHub reader still cannot return the large decisions ledger. Miro’s architecture references are accessible.
+    
+    The four original defects have been acknowledged and addressed in Orion’s revised design. I’m checking the actual revised scripts before accepting them, particularly whether the corrected source labels truly control downstream processing and whether the tools fail safely.
+    
+    Review finding — T2 still needs one correction
+    
+    I found a remaining problem in the revised T2 code.
+    
+    Orion correctly changed the main extraction to exclude data/SOUL.md before generating the archive. But the new self-test generates two separate archives that do not exclude SOUL.
+    
+    The relevant line is:
+    
+    with_readme, without_readme = names(archive([])), names(archive(["README.md"]))
+    
+    Both test archives still contain SOUL’s bytes. This recreates the original boundary problem, even though the final extracted folder is correct.
+    
+    Required correction: Exclude SOUL from both self-test archives as well:
+    
+    with_readme = names(archive(["data/SOUL.md"]))
+    without_readme = names(archive(["data/SOUL.md", "README.md"]))
+    
+    Then verify that README.md is present in the first archive, absent in the second, and SOUL absent in both.
+    
+    Disposition: T1 is substantially improved. T2 is not yet accepted, and the Wave 0 census remains held.
+    
+    My recommendation is to fix this at the archive helper itself, so no future caller can accidentally generate an archive containing the excluded file. That is stronger than correcting just the two current calls.
+    
+    The remaining assessment is:
+    
+    * T1: Conditional acceptance based on code review. Its revised structure addresses my original F1–F3 findings. Orion’s 16/16 tests remain producer-reported.
+    * T2: One HIGH defect remains in the self-test. Correct and recalibrate before acceptance.
+    * T3–T5: Orion may continue preparing these under your existing GO.
+    * Wave 0: Still held pending complete tool-readiness verification.
+    
+    I attempted to save this finding directly to Linear DAI-10, but the operation was blocked. It has not been banked. Please relay the finding to Orion for correction and permanent recording.
+    
+    This is precisely why we independently review the instruments, not just their green test results. We’re preventing a demonstrable failure before the census begins.
+    
+    Confidence: 0.99 on the T2 finding, based on direct inspection of the actual revised code.
+    END-VERBATIM KAI-RECEIPT-T2-SELFTEST-FINDING
+
+### 6. Next authorised step
+
+- Correct T2 at the archive helper, recalibrate, bank, and post the finding and the correction to DAI-10  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "Please relay the finding to Orion for correction and permanent recording."]
+
+### 7. What I am unsure of
+
+- Whether Dainius wants the SOUL stream exposure handled beyond this record; it is reported to him in plain words  [CMD `grep -n -i "touch data/SOUL" kai-pm/HANDOFF_LOG.md` → earliest at line 56562, a table cell "data/SOUL.md (do not touch)"; no owner quotation found in the log by this search]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
