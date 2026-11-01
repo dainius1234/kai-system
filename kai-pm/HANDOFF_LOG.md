@@ -108162,3 +108162,94 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-01T23:12:03Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-01T23:12:03Z  [CMD `date -u +%FT%TZ` → 2026-11-01T23:12:03Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: afafa63df5c1fb11787921e48c53b3bd4191b8bb  [CMD `git rev-parse HEAD` → afafa63df5c1fb11787921e48c53b3bd4191b8bb]
+- tree: ea112cf9d6387c8d96cb5a6bfdd1dd24d8334209  [CMD `git rev-parse HEAD^{tree}` → ea112cf9d6387c8d96cb5a6bfdd1dd24d8334209]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:claude/project-rework-plan-pgvp35: afafa63df5c1fb11787921e48c53b3bd4191b8bb  [CMD `git ls-remote --heads origin` → afafa63df5c1fb11787921e48c53b3bd4191b8bb]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 327  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 327]
+
+### 1. The four states
+
+- physical: unchanged since entry 327 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: tool preparation only; nothing new to build  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "my verdict remains qualification pending, not failure and not approval."]
+- evidence: Kai's cold-start checkpoint, verbatim in section 5  [CMD `ruling-capture 45a290b3499179b9` → text banked]
+- admission: census toolchain QUALIFICATION PENDING (not failed, not approved); census held  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "my verdict remains qualification pending, not failure and not approval."]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT (relayed by Dainius) · 2026-11-01 · checkpoint: HEAD afafa63 and entry 327 confirmed; the replay covers real-data preparation and synthetic fault detection but is not an independent production-census qualification; the SOUL check verifies exclusion from the copied subject, not that every possible file access was prevented; verdict qualification pending; all holds unchanged ⚠ UNBANKED  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "The SOUL.md check also verifies exclusion from the copied subject, rather than independently proving every possible file access was prevented."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: nothing new; tool preparation remains authorised. HELD: running the census; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "The census, engineering, PRE-RAMS, Gold Tier, R11 and PR #122 holds remain unchanged."]
+
+### 4. Open questions
+
+- For Kai: what evidence would turn "qualification pending" into qualified (an independent replay environment, or a named list of controls he can verify by reading only)  [CMD `FINAL_PACKAGE.md` → "Replay it if you can; if you can't, say so"]
+- For Dainius (before any census): approve the real anchor; the 2% no-item audit; reading allocation; SOUL incident closure; no-touch rule provenance  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 eb49fe60, "Owner decisions remain deferred"]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- AGREED, no dispute: the replay is single-producer evidence and is not a production-census qualification  [CMD `FINAL_PACKAGE.md` → "single-producer evidence, reproducible, not independent corroboration"]
+- CLAIM NARROWED (R17): entry 326 and DAI-10 7102e076 call the SOUL evidence a "SOUL proof". What was measured: data/SOUL.md absent from the replayed subject; the T2 manifest records it as not touched; the 20 script lines that name it do not read its bytes. Not measured: every other possible access path (a path computed at run time, another process, tools outside the census scripts). The correct label is "SOUL exclusion evidence for the census scripts", not proof that no access was possible. The earlier wording stays, beside this correction  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "rather than independently proving every possible file access was prevented"]
+- DAI-10 checked before banking: newest comment is Orion's 7102e076; Kai's checkpoint reached Orion only through the conversation  [CMD `list_comments DAI-10 limit 1` → 7102e076-5c8b-4f61-9e17-d88275e41aa0]
+- Credential scan of the checkpoint: 0 hits, calibration 6/6  [CMD `credscan.py own/scan328.json` → TOTAL HITS 0]
+- EVIDENCE KAI-CHECKPOINT-328 kai_checkpoint_328.md: 1103 bytes, sha256 9af22ed4f67090e6a24bda83cd36d839b91cee425d05bf6f60506b1f90491bbe, final LF True (added by Orion)  [CMD `sha256sum kai_checkpoint_328.md` → 9af22ed4f67090e6…]
+    BEGIN-VERBATIM KAI-CHECKPOINT-328
+    Cold-start: DEGRADED, but continuity recovered.
+    
+    I’ve independently confirmed the latest KAI records:
+    
+    * GitHub working branch HEAD: afafa63df5c1fb11787921e48c53b3bd4191b8bb.
+    * Handoff entry 327 is present.
+    * Orion’s latest package is recorded in DAI-10, comment 7102e076, posted at 22:59 UTC.
+    * Frozen research baseline remains dd153c1f4ab7c52f34620e07238554453a8912d9.
+    * Miro is accessible. START HERE and the full decisions ledger remain unreadable through their normal retrieval routes.
+    
+    One important finding: I’ve inspected Orion’s replay script. His tests cover real-data preparation and synthetic fault detection, but they do not constitute an independent production-census qualification. The SOUL.md check also verifies exclusion from the copied subject, rather than independently proving every possible file access was prevented.
+    
+    So my verdict remains qualification pending, not failure and not approval.
+    
+    The census, engineering, PRE-RAMS, Gold Tier, R11 and PR #122 holds remain unchanged.
+    
+    We have a verified checkpoint without risking another long, interrupted operation.
+    
+    OHANA.
+    END-VERBATIM KAI-CHECKPOINT-328
+
+### 6. Next authorised step
+
+- None to build. Wait for Kai's stated qualification route; the anchor adjudication and Dainius's decisions come before any census  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "We have a verified checkpoint without risking another long, interrupted operation."]
+
+### 7. What I am unsure of
+
+- Whether a stronger SOUL guarantee is wanted (for example, running the census scripts under an operating-system sandbox that denies the path), which would be new work needing authorisation  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "independently proving every possible file access was prevented"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
