@@ -107701,3 +107701,170 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-01T22:57:03Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-01T22:57:03Z  [CMD `date -u +%FT%TZ` → 2026-11-01T22:57:03Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: f6868db0e2af1c62f6bd21749cf5504238246210  [CMD `git rev-parse HEAD` → f6868db0e2af1c62f6bd21749cf5504238246210]
+- tree: fc0a4e9fe7e8303b1d0f8e8bde2fc5f598acd448  [CMD `git rev-parse HEAD^{tree}` → fc0a4e9fe7e8303b1d0f8e8bde2fc5f598acd448]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- remote:claude/project-rework-plan-pgvp35: f6868db0e2af1c62f6bd21749cf5504238246210  [CMD `git ls-remote --heads origin` → f6868db0e2af1c62f6bd21749cf5504238246210]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 324  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 324]
+
+### 1. The four states
+
+- physical: unchanged since entry 324 apart from this entry; replay folders live in the scratchpad only  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: the finite acceptance package for A1–A4  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 eb49fe60, "Finish this as one finite acceptance package, not serial rewrites"]
+- evidence: the first replay's full output (it crashed at its own SOUL-proof step) and the corrected replay script, verbatim in section 5  [CMD `python3 -I replay.py f6868db <empty dir>` → 11 tool steps OK, then TypeError]
+- admission: none; the replay is rerun from this entry's banked script next  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 eb49fe60, "one complete T1–T5 replay with exact script hashes and proof no SOUL access"]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `handoff entry 324 section 6` → "Replay the whole chain from these banked blocks"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: tool preparation. HELD: running the census; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 eb49fe60, "This is not permission to expose SOUL.md or modify historical project sources."]
+
+### 4. Open questions
+
+- None new  [CMD `handoff entry 324 section 4` → unchanged]
+
+### 5. Incidents and corrections
+
+- REPLAY rev 1 FAILED at its own last step: all 11 tool steps passed from the banked blocks (script hashes match the working copies; T1–T3 real data and calibrations; units; anchor draft; T4 and T5 calibrations, 72 caught; A3 reconciliation 351, problems 0), then replay.py crashed with TypeError at the SOUL-proof step (a one-argument helper called with two). The crash failed the run, but the SOUL proof did not execute. Fixed in rev 2, which also fails if the T2 manifest does not record data/SOUL.md as not touched  [CMD `python3 -I replay.py f6868db <empty dir>` → exit 1, TypeError line 56]
+- Credential scan of the two texts: 0 hits, calibration 6/6  [CMD `credscan.py census/scan325.json` → TOTAL HITS 0]
+- EVIDENCE CENSUS-REPLAY-REV1-CRASH-OUTPUT replay_rev1_crash.txt: 3459 bytes, sha256 dde7219ae091db9c06cfd8d639d3ed2cc344514f1827bcecc58b0b0bd4c60001, final LF True (added by Orion)  [CMD `sha256sum replay_rev1_crash.txt` → dde7219ae091db9c…]
+    BEGIN-VERBATIM CENSUS-REPLAY-REV1-CRASH-OUTPUT
+    SCRIPTS extracted from the log at f6868db
+      effective_view.py    CENSUS-T1-REV2-SCRIPT                d3698ed1adf21b9505dc19d942f3da119ce398fdac14137706a41419006e830f
+      calibrate_t1.py      CENSUS-T1-REV2-CALIBRATION-SCRIPT    c3f9fe464fb8421606a9a2b2b98c5c74d7c5512e9153dd94806bc827285e6f6a
+      subject.py           CENSUS-T2-REV3-SCRIPT                d1c056aa248e9adcf42262cff5b7ad7e590a4f8ee0ffe6ae666fd4dcaf842810
+      calibrate_t2.py      CENSUS-T2-REV3-CALIBRATION-SCRIPT    6b8c77280db4987140521b8251a7aa9201575abad380c7be761cd68b6a78471d
+      passages.py          CENSUS-T3-PASSAGES-SCRIPT            64443df7894db16392684628ef1e617cf8765aa5137ffc81074a25509ebd8b83
+      calibrate_t3.py      CENSUS-T3-CALIBRATION-SCRIPT         67f41a25aeebda973dcfecb9d403c98f24b061aaa5fe0c5cd733088c23f1a278
+      calibrate_t4.py      CENSUS-T4-REV2-CALIBRATION-SCRIPT    dba07ca06e862d93cc3ed6a99619e356194c17f79daafa2b5046f4e6a546effe
+      sample.py            CENSUS-T4-REV5-SAMPLE-SCRIPT         8275a0aee0cd285c542b554a83716546d3c06600bb1c1fa36c01ed04ea43dbb3
+      census_check.py      CENSUS-T5-REV5-CHECK-SCRIPT          a0c68d0b8d077482ddcd238464d1456e1e675fe15cf27f64783cbcb0336e4a50
+      calibrate_t5.py      CENSUS-T5-REV5-CALIBRATION-SCRIPT    9d92d2b5f2d28b5b60cc1912a8881ff01bdd32fe1e6712ee0b07864ba33048c1
+      anchor.py            CENSUS-ANCHOR-REV2-SCRIPT            802ec30c159a782db6733fbf060db054cc314cabfb98d99baf92ff7ba6da6c5d
+    OK   T1 effective view: EFFECTIVE VIEW @ 97e81be9f9b5: v2 file rows 346 (B9 C69 D17 E68 F143 G40) + non-file 3 + late 2 = view file rows 348; change list 39 rows = 30 on v2 p
+    OK   T1 calibration: T1 CALIBRATION: 16 planted faults, known-negative 1, result PASS
+    OK   T2 pinned subject: SUBJECT @ dd153c1f4ab7: pin tree 1255 entries = 1254 files extracted + 1 not touched (excluded before archiving; blob id only) + 0 non-blob; archive s
+    OK   T2 calibration: T2 CALIBRATION: 5 planted faults, known-negative 1, result PASS
+    OK   T3 passages: PASSAGES @ dd153c1f4ab7: sources 351 = segmented 349 + not segmented 2 (data/SOUL.md [git_blob_not_opened], B12:named-gap [named_gap]); passages 51727
+    OK   T3 calibration: T3 CALIBRATION: 7 planted faults + 1 planted reader, known-negative 1, result PASS
+    OK   T5 review units: UNITS: 1095 units over 51727 passages; split sources ['kai-pm/DECISIONS.md', 'kai-pm/HANDOFF_LOG.md']; continuation links 43; largest 1395 lines; over
+    OK   anchor draft (T1->T2->T3 chain): ANCHOR DRAFT: T1->T2->T3 chain problems 0; output WRITTEN (draft)
+    OK   T4 formula calibration: T4 CALIBRATION: result PASS
+    OK   T5+T4 chain calibration: T5+T4 CALIBRATION: 72 planted faults, known-negatives 6 + calibration-stamp check, result PASS
+    OK   A3 real-data reconciliation: register 351 = segmented 349 + exceptions 2; problems 0
+    Traceback (most recent call last):
+      File "/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/replay_tool/replay.py", line 64, in <module>
+        if __name__ == "__main__": sys.exit(main(sys.argv[1], sys.argv[2]))
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/replay_tool/replay.py", line 56, in main
+        t2 = open(o("..", "subject.MANIFEST.json")).read() if os.path.exists(os.path.join(d, "subject.MANIFEST.json")) else ""
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    TypeError: main.<locals>.<lambda>() takes 1 positional argument but 2 were given
+    END-VERBATIM CENSUS-REPLAY-REV1-CRASH-OUTPUT
+- EVIDENCE CENSUS-REPLAY-REV2-SCRIPT replay.py: 5261 bytes, sha256 fc5cd75bc86194bf3355e5d40ae70620ef11c8368756d3b2a8612c54456ac51a, final LF True (added by Orion)  [CMD `sha256sum replay.py` → fc5cd75bc86194bf…]
+    BEGIN-VERBATIM CENSUS-REPLAY-REV2-SCRIPT
+    # Complete T1-T5 replay from the BANKED script blocks (Kai, entry 323, item 5). Read-only on the repository; writes only into <dir>.
+    # Run: python3 -I replay.py <log-commit> <empty-dir>
+    # Extracts every census script from kai-pm/HANDOFF_LOG.md at <log-commit>, runs the real-data steps and every calibration, prints each
+    # script's SHA-256 and each step's result, checks the SOUL boundary, and exits 1 if anything fails.
+    import hashlib, json, os, re, subprocess, sys
+    REPO = "/home/user/kai-system"
+    SCRIPTS = {"effective_view.py": "CENSUS-T1-REV2-SCRIPT", "calibrate_t1.py": "CENSUS-T1-REV2-CALIBRATION-SCRIPT",
+               "subject.py": "CENSUS-T2-REV3-SCRIPT", "calibrate_t2.py": "CENSUS-T2-REV3-CALIBRATION-SCRIPT",
+               "passages.py": "CENSUS-T3-PASSAGES-SCRIPT", "calibrate_t3.py": "CENSUS-T3-CALIBRATION-SCRIPT",
+               "calibrate_t4.py": "CENSUS-T4-REV2-CALIBRATION-SCRIPT", "sample.py": "CENSUS-T4-REV5-SAMPLE-SCRIPT",
+               "census_check.py": "CENSUS-T5-REV5-CHECK-SCRIPT", "calibrate_t5.py": "CENSUS-T5-REV5-CALIBRATION-SCRIPT", "anchor.py": "CENSUS-ANCHOR-REV2-SCRIPT"}
+    T1_COMMIT = "97e81be"                                                     # the log commit T1 rev 2 was qualified against (entry 302)
+    def sha(b): return hashlib.sha256(b).hexdigest()
+    
+    def main(commit, d):
+        if os.path.exists(d) and os.listdir(d): print(f"PROBLEM {d} is not empty"); return 1
+        os.makedirs(os.path.join(d, "out"), exist_ok=True)
+        log = subprocess.run(["git", "show", f"{commit}:kai-pm/HANDOFF_LOG.md"], cwd=REPO, capture_output=True, text=True).stdout.split("\n")
+        p, rows = [], []
+        for fn, blk in SCRIPTS.items():
+            starts = [i for i, l in enumerate(log) if l == f"    BEGIN-VERBATIM {blk}"]
+            if not starts: p.append(f"block {blk} not in the log at {commit}"); continue
+            i = starts[-1]; j = log.index(f"    END-VERBATIM {blk}", i); b = ("\n".join(l[4:] for l in log[i + 1:j]) + "\n").encode()
+            open(os.path.join(d, fn), "wb").write(b); rows.append(f"  {fn:20s} {blk:36s} {sha(b)}")
+        print("SCRIPTS extracted from the log at", commit); print("\n".join(rows))
+        if p:
+            for x in p: print("PROBLEM", x)
+            return 1
+        def run(name, *a):
+            r = subprocess.run([sys.executable, "-I", os.path.join(d, a[0]), *a[1:]], capture_output=True, text=True, cwd=d)
+            last = (r.stdout.strip().splitlines() or [""])[-1]
+            print(f"{'OK  ' if r.returncode == 0 else 'FAIL'} {name}: {last[:150]}")
+            if r.returncode: p.append(f"{name} exit {r.returncode}"); print(r.stdout[-1500:])
+            return r
+        o = lambda f: os.path.join(d, "out", f)
+        run("T1 effective view", "effective_view.py", T1_COMMIT, o("effective_view.json"))
+        run("T1 calibration", "calibrate_t1.py", T1_COMMIT)
+        run("T2 pinned subject", "subject.py", d, o("effective_view.json"))
+        run("T2 calibration", "calibrate_t2.py", o("effective_view.json"))
+        run("T3 passages", "passages.py", d, o("effective_view.json"), o("passages.json"))
+        run("T3 calibration", "calibrate_t3.py", d, o("effective_view.json"))
+        run("T5 review units", "census_check.py", "units", d, o("passages.json"), o("units.json"))
+        run("anchor draft (T1->T2->T3 chain)", "anchor.py", "draft", o("effective_view.json"), d, o("passages.json"), o("anchor_draft.json"))
+        run("T4 formula calibration", "calibrate_t4.py")
+        run("T5+T4 chain calibration", "calibrate_t5.py")
+        # A3 on real data: every register entry exactly once
+        import importlib.util
+        s = importlib.util.spec_from_file_location("anchor", os.path.join(d, "anchor.py")); A = importlib.util.module_from_spec(s); s.loader.exec_module(A)
+        vb, pb = open(o("effective_view.json"), "rb").read(), open(o("passages.json"), "rb").read(); v, ps = json.loads(vb), json.loads(pb)
+        rec = A.verify_sources({"pin": v["pin"], "effective_view_sha256": sha(vb), "passages_sha256": sha(pb), "fixture_plan": []}, vb, v, pb, ps, [])
+        print(f"{'OK  ' if not rec else 'FAIL'} A3 real-data reconciliation: register {len(v['file_rows']) + len(v['nonfile_rows'])} = segmented {len(ps['sources'])} + exceptions {len(ps['not_segmented'])}; problems {len(rec)}")
+        p += rec
+        # SOUL boundary proof
+        soul_in_subject = os.path.lexists(os.path.join(d, "subject", "data", "SOUL.md"))
+        soul_lines = [f"{fn}:{k + 1}" for fn in SCRIPTS for k, l in enumerate(open(os.path.join(d, fn), encoding="utf-8")) if "SOUL" in l]
+        t2p = os.path.join(d, "subject.MANIFEST.json"); t2 = open(t2p).read() if os.path.exists(t2p) else ""   # rev 2: rev 1 crashed here (helper misuse)
+        if "data/SOUL.md" not in t2: p.append("T2 manifest does not record data/SOUL.md as not touched")
+        print(f"{'OK  ' if not soul_in_subject and 'data/SOUL.md' in t2 else 'FAIL'} SOUL: data/SOUL.md in the replayed subject: {soul_in_subject}; T2 manifest not_touched entry present: {'data/SOUL.md' in t2}; "
+              f"script lines mentioning SOUL: {len(soul_lines)} (listed below for review)")
+        for x in soul_lines: print("   ", x)
+        if soul_in_subject: p.append("data/SOUL.md present in the replayed subject")
+        print(f"REPLAY @ {commit}: steps failed {len(p)}; result {'PASS' if not p else 'FAIL'}")
+        return 1 if p else 0
+    
+    if __name__ == "__main__": sys.exit(main(sys.argv[1], sys.argv[2]))
+    END-VERBATIM CENSUS-REPLAY-REV2-SCRIPT
+
+### 6. Next authorised step
+
+- Rerun the replay from this entry's banked replay script into a fresh folder; bank the result; post the package  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 eb49fe60, "one complete T1–T5 replay with exact script hashes and proof no SOUL access"]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff entry 324 section 7` → unchanged]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
