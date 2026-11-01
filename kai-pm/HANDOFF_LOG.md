@@ -108096,3 +108096,69 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-01T22:59:56Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-01T22:59:56Z  [CMD `date -u +%FT%TZ` → 2026-11-01T22:59:56Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 01a65413a19cea0986eb3ff38f718f4ca3227bbc  [CMD `git rev-parse HEAD` → 01a65413a19cea0986eb3ff38f718f4ca3227bbc]
+- tree: f75064074d768e15e41e2855ca4e9ed0dbf49cb7  [CMD `git rev-parse HEAD^{tree}` → f75064074d768e15e41e2855ca4e9ed0dbf49cb7]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/project-rework-plan-pgvp35: 01a65413a19cea0986eb3ff38f718f4ca3227bbc  [CMD `git ls-remote --heads origin` → 01a65413a19cea0986eb3ff38f718f4ca3227bbc]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 326  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 326]
+
+### 1. The four states
+
+- physical: unchanged since entry 326 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: tool preparation; the final package is with Kai  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 eb49fe60, "I will then independently review evidence and state what I can/cannot execute."]
+- evidence: final package posted to DAI-10 as comment 7102e076-5c8b-4f61-9e17-d88275e41aa0; posted body equals banked block ORION-CENSUS-FINAL-PACKAGE at 01a6541  [CMD `verify_posts.py 7102e076…,ORION-CENSUS-FINAL-PACKAGE,01a6541` → EQUAL, calibration True]
+- admission: none; awaiting Kai's review; census held  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 eb49fe60, "TRUST-ANCHOR DESIGN ACCEPTED IN PRINCIPLE, NOT YET QUALIFIED FOR PRODUCTION CENSUS."]
+
+### 2. Rulings since the last handoff
+
+- None; Orion carried out the posting step named in entry 326  [CMD `handoff entry 326 section 6` → "Post the final package to DAI-10 and verify"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: tool preparation. HELD: running the census; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 eb49fe60, "This is not permission to expose SOUL.md or modify historical project sources."]
+
+### 4. Open questions
+
+- For Kai: review the final package; replay if possible  [CMD `FINAL_PACKAGE.md` → "Asked of Kai"]
+- For Dainius (before any census): approve the real anchor; the 2% no-item audit; reading allocation; SOUL incident closure; no-touch rule provenance  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 eb49fe60, "Owner decisions remain deferred"]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- BEFORE POSTING: DAI-10 newest comment was eb49fe60 (Kai); nothing new since entry 323  [CMD `list_comments DAI-10 limit 1` → eb49fe60-ef3b-4927-ba79-fc398a29cf9f]
+
+### 6. Next authorised step
+
+- Wait for Kai's review of the final package; correct whatever he finds; build nothing new meanwhile  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 eb49fe60, "I will then independently review evidence and state what I can/cannot execute."]
+
+### 7. What I am unsure of
+
+- Nothing new  [CMD `handoff entry 324 section 7` → approval message format for Dainius]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
