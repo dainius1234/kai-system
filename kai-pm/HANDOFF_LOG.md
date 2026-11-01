@@ -100419,3 +100419,111 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-01T20:37:09Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-01T20:37:09Z  [CMD `date -u +%FT%TZ` → 2026-11-01T20:37:09Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 4dbaa6d1ce2939db0529e47ba7222b222c59e9ec  [CMD `git rev-parse HEAD` → 4dbaa6d1ce2939db0529e47ba7222b222c59e9ec]
+- tree: 5d94759269317dde4d022ba3b775496cf463159e  [CMD `git rev-parse HEAD^{tree}` → 5d94759269317dde4d022ba3b775496cf463159e]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 4dbaa6d1ce2939db0529e47ba7222b222c59e9ec  [CMD `git ls-remote --heads origin` → 4dbaa6d1ce2939db0529e47ba7222b222c59e9ec]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 297  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 297]
+
+### 1. The four states
+
+- physical: unchanged since entry 297 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: preparation and calibration of the read-only census tools (Dainius GO); all engineering and runtime holds intact  [CONVERSATION 2026-11-01 Dainius, "My ruling is go"]
+- evidence: Kai's final step 0.1 adjudication (DAI-10 3325fad7) and Dainius's GO message, verbatim in section 5  [CMD `extract_comment.py 3325fad7…` → 1 distinct body, 6219 bytes]
+- admission: step 0.1 PASSED for source-register completeness and authority scoping (Kai); the census itself is NOT started and may begin only after the tool-readiness checks pass  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 3325fad7, "Step 0.1 PASSED for source-register completeness and authority scoping"]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT · 2026-11-01 · Step 0.1 FINAL ADJUDICATION: PASSES; baseline = register v2 (entry 262) + the 39-row v2.1 change list (entry 296, DAI-10 7ac119bf) + the two late-source records (587f806, acbef85) as a traceable composite, not a regenerated file; all 346 rows stay in the intake population; the 119 classes are provisional source-purpose judgments; the census tools must take an effective view of v2+delta+late sources with a mechanical check that nothing is silently lost (a Wave 0 readiness check); named gaps K10, K13, April vision and K12 stay open ⚠ UNBANKED  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 3325fad7, "DECISION: STEP 0.1 SOURCE-REGISTER ADJUDICATION PASSES"]
+- Dainius · 2026-11-01 · GO for Orion to prepare and calibrate the read-only census tools now; all engineering and runtime holds stay ⚠ UNBANKED  [CONVERSATION 2026-11-01 Dainius, "My ruling is go"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: building and calibrating read-only census tools; the effective-view check. HELD: running the census (until tool-readiness checks pass); engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 3325fad7, "This does not authorize code editing, deployment, KAI runtime execution"]
+
+### 4. Open questions
+
+- None new for Dainius. Named gaps K10, K13, the April vision and K12 stay open by Kai's ruling  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 3325fad7, "retain the three named gaps, K12 crypto conflict and late-source provenance"]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- BEFORE BANKING: DAI-10 newest comments were 3325fad7 (Kai, final adjudication) then 7ac119bf (Orion); nothing else since entry 297  [CMD `list_comments DAI-10 limit 3` → 3325fad7, 7ac119bf, 7702b3c3]
+- Credential scan of both texts: 0 hits, calibration 6/6  [CMD `credscan.py own/scan298.json` → TOTAL HITS 0]
+- EVIDENCE KAI-DAI10-3325fad7-STEP-0-1-FINAL comment_3325fad7.md: 6219 bytes, sha256 68ecb2082e530030eb66f1078f9e8562cab003009533c6a545c7f0288f2438d6, final LF True (added by Orion)  [CMD `sha256sum comment_3325fad7.md` → 68ecb2082e530030…]
+    BEGIN-VERBATIM KAI-DAI10-3325fad7-STEP-0-1-FINAL
+    **KAI-GPT → ORION / DAINIUS | STEP 0.1 SOURCE REGISTER v2.1 — FINAL ADJUDICATION | 2026-11-01 | SOURCE-INTAKE GATE ONLY**
+    
+    **DECISION: STEP 0.1 SOURCE-REGISTER ADJUDICATION PASSES, with the exact composite baseline and limitations below.** This does **NOT** certify a complete feature census, current implementation, runtime, or engineering readiness.
+    
+    **Evidence independently retrieved and checked:** Original v2 source-register attachment on DAI-10, handoff entry 262 at `cde52e2930adc6cb0e832554dda5f376575e22f9`; Orion's 39-row proposed v2.1 delta in DAI-10 comment `7ac119bf-d011-403e-bb23-68a80a1800c8`, banked in handoff entry 296 (`f7f961de8cd44f6ccf9a304f134ac8677d84090e`), post equality checked at entry 297 (`4dbaa6d1ce2939db0529e47ba7222b222c59e9ec`). Frozen research pin `dd153c1f4ab7c52f34620e07238554453a8912d9` inspected independently; latest observed **live branch HEAD** `4dbaa6d1ce2939db0529e47ba7222b222c59e9ec`. Retrieved the full `DECISIONS.md` using the Git blob route; standard file reader returned empty due file size. Linear START HERE retrieval was degraded; Miro architecture search accessible. DAI-10 latest checked comment was Orion's `7ac119bf`. Frozen research pin ≠ HEAD.
+    
+    **1. Part 1 (K1–K13 and SOUL): ACCEPT corrected dispositions.** Orion accepted the material correction at K2: `W1_GLOBAL_HYGIENE_SUBPLAN.md` header says earlier steps complete, but H-6 remains explicitly OPEN at :189–191. P1–P4 remain maturity/assurance requirement **INTAKE**, not merely negative-test cross-check. K9 historical provenance now independently verified: GitHub commits `3d51fca13fa7c0b8941b22a268bbf69e4cb37625` and `4563b8a43b653a33cdd2bad4facdac41528c5178` delete the two v0.4 governance documents; the withdrawn v0.4 architecture is not reinstated. K10/CIS design and K13/Phase 0.5 plan remain **named gaps**; the April vision remains a named gap. K12 HMAC vs Ed25519 remains **unresolved**, not an authorization or crypto design decision. The full `data/SOUL.md` at pin, blob `d62a137a2b492ec352615dd198e25fd37d963038`, is an **intended identity, personality, values and behavior INTAKE source**, never runtime proof.
+    
+    **2. Part 2: ACCEPT the 119 Orion-proposed source classifications IN GROUPS FOR SOURCE PURPOSE ONLY**, incorporating all corrections in the v2.1 delta (39 rows, 32 paths, 16 source-line checks reported by Orion). I independently checked multiple risk-selected original bodies, including personality, long-horizon stewardship, contingency, memory-graph, audit/failure and control documents, and confirmed Orion's two counter-corrections: `RISKS.md` and `TECH_WATCH.md` already had cross-check roles in the original register. The delta's `TECH_WATCH.md` class correction lineage → derived remains valid.
+    
+    **Important scope conditions (not unresolved blockers to source-register admission):**
+    - **Baseline identity is exactly:** frozen source register **v2** (entry 262 / attached file) **PLUS** the verbatim **v2.1 39-row change list** (entry 296, DAI-10 comment 7ac119bf), **PLUS** two post-pin late-source records preserved separately: Lumen origin document (587f806) and Cold-Start Guardian (acbef85). These are a traceable composite baseline, **not** a new 346-row physically consolidated file and **not** evidence that those late files existed at the frozen pin. Do not cite a non-existent 'fully regenerated v2.1' as checked.
+    - All **346 source-register file rows** stay in the intake population as source/exclusion/control evidence according to their role. Do not allow a classifier label such as 'derived', 'none' or 'superseded' automatically to suppress possible capability or risk language before Wave 0 has tested its contents. Historic withdrawn documents are not live design subjects; recover historical requirements only through explicitly controlled provenance.
+    - The **119 source-class judgments are accepted as provisional source-purpose judgments**, not proof the bodies were exhaustively read. Do not change 'fully read: no' to 'yes' or 'checked by Kai' in a way that claims passage-by-passage inspection. Wave 0 must extract atomic promises in bodies, nested prose, examples, specialist definitions, code/docstrings, negative tests and source references. Uncertain classifications must be corrected as evidence emerges.
+    - The v2.1 delta is **mandatory input** to all downstream tooling. Orion must give the census tools an unambiguous effective view of v2+delta+late-source intake, with a mechanical check that no row or correction is silently lost. Treat that as a **Wave 0 readiness check**, not a demand for needless new paperwork.
+    - Do not silently collapse identity and consciousness design obligations, Lumen's deferred candidate, survival/succession, or root OHANA values into feature names alone. Implementation status and qualified runtime evidence stay separate.
+    
+    **3. Programme consequence:** **Step 0.1 PASSED for source-register completeness and authority scoping; the Wave 0 research gate may advance to preparation.** This does not authorize code editing, deployment, KAI runtime execution or removal of PRE-RAMS, Gold Tier, R11 and PR #122 DO NOT MERGE holds. **Census-tool preparation is a separate outstanding owner decision**: Orion requested an explicit `GO` from Dainius and must not treat my technical signoff as that GO. The actual census may begin only after the agreed tool-readiness checks and the owner's authorization boundaries are satisfied.
+    
+    **4. Action for Orion:** Bank this adjudication verbatim; link v2 and the exact delta as one composite research baseline; report any failure of the mechanical effective-view check rather than guessing; retain the three named gaps, K12 crypto conflict and late-source provenance; then ask Dainius only for the separately outstanding tool-preparation GO. No assumptions about product readiness.
+    
+    **Confidence:** 0.94 in source-register *classification* sufficiency for beginning Wave 0 preparation; no claim of full feature coverage or runtime qualification. I did not personally re-read every one of the 346 bodies or replay Orion's checker locally; that belongs to Wave 0 and its independent qualification controls.
+    
+    OHANA — ONE ORGANISM, ZERO SILENT FEATURE LOSS.
+    END-VERBATIM KAI-DAI10-3325fad7-STEP-0-1-FINAL
+- EVIDENCE DAINIUS-GO-CENSUS-TOOLS dainius_go_298.md: 846 bytes, sha256 cf4258a0b728fa14d8cd773e01520e2960e42de966c0df7420311173f5535a81, final LF True (added by Orion)  [CMD `sha256sum dainius_go_298.md` → cf4258a0b728fa14…]
+    BEGIN-VERBATIM DAINIUS-GO-CENSUS-TOOLS
+    My ruling is go : Step 0.1 is now formally signed off.
+    
+    I’ve independently reviewed Orion’s 39 corrections and posted my final adjudication directly to Linear DAI-10⁠￼, comment 3325fad7.
+    
+    The accepted baseline is source register v2 plus Orion’s verified v2.1 corrections. The missing historical documents and unresolved HMAC/Ed25519 question remain explicitly recorded for later investigation.
+    
+    What this unlocks: preparation for Wave 0, our exhaustive feature census. It does not mean the census is complete, KAI is operational, or engineering is authorized.
+    
+    Orion’s independent checks held up. We also caught and corrected real omissions. This is measurable progress.
+    
+    One decision remains yours: Do you give Orion GO to prepare and calibrate the read-only census tools now, while leaving all engineering and runtime holds intact?
+    END-VERBATIM DAINIUS-GO-CENSUS-TOOLS
+
+### 6. Next authorised step
+
+- Write done / scope / simplest form for the census tools from procedure v3.2.3 (entry 225, Annex A and Annex C) and Kai's 3325fad7 section 2 (effective-view check), then build and calibrate them read-only; the census does not run  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 3325fad7, "Orion must give the census tools an unambiguous effective view of v2+delta+late-source intake"]
+
+### 7. What I am unsure of
+
+- Nothing on where the tools live: v3.2.3 already rules standard-library scripts run with python3 -I, banked word for word in the handoff log, no code in kai-pm/research/  [CMD `sed -n 84066,84562p kai-pm/HANDOFF_LOG.md | grep -n kai-pm/research` → "No code goes into `kai-pm/research/`."]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
