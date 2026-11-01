@@ -106447,3 +106447,127 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-01T22:52:39Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-01T22:52:39Z  [CMD `date -u +%FT%TZ` → 2026-11-01T22:52:39Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 80fa23452c247f591462eca1048d45047665d70a  [CMD `git rev-parse HEAD` → 80fa23452c247f591462eca1048d45047665d70a]
+- tree: f57fd8189ec3f24fa65897dbd9f0e7eaa0b3d8fc  [CMD `git rev-parse HEAD^{tree}` → f57fd8189ec3f24fa65897dbd9f0e7eaa0b3d8fc]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 80fa23452c247f591462eca1048d45047665d70a  [CMD `git ls-remote --heads origin` → 80fa23452c247f591462eca1048d45047665d70a]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 322  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 322]
+
+### 1. The four states
+
+- physical: unchanged since entry 322 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: one finite acceptance package for A1–A4 under the preparation GO  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 eb49fe60, "Finish this as one finite acceptance package, not serial rewrites"]
+- evidence: Kai's trust-anchor review (DAI-10 eb49fe60) and the relay, verbatim in section 5  [CMD `extract_comment.py eb49fe60…` → 1 distinct body]
+- admission: trust-anchor design accepted in principle, not qualified for production; census held  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 eb49fe60, "TRUST-ANCHOR DESIGN ACCEPTED IN PRINCIPLE, NOT YET QUALIFIED FOR PRODUCTION CENSUS."]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT · 2026-11-01 · trust anchor accepted in principle; A1 a committed block is not approval: an independently banked, owner/authority-approved admission record must pin the anchor's block, commit and digest, else fail closed; A2 owner rulings need an adjudicated, active status, source-native owner wording and a scope that covers the decision; A3 exact source/exception reconciliation (missing, duplicate, moved into exceptions) plus T1→T2→T3 provenance before approval; A4 fixture plan approval, freeze-before-review and secrecy evidenced and banked; package: admission contract and validator, reconciliation, ruling status/scope checks, faults and clean controls, one complete T1–T5 replay with hashes and proof of no SOUL access; Kai cannot substitute unrecorded owner approval for an owner-controlled gate ⚠ UNBANKED  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 eb49fe60, "Kai-GPT may adjudicate evidence, but cannot substitute unrecorded owner approval for an owner-controlled gate."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: tool preparation. HELD: running the census; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 eb49fe60, "This is not permission to expose SOUL.md or modify historical project sources."]
+
+### 4. Open questions
+
+- For Dainius (owner, later): approving the real trust anchor is an owner-controlled gate; the 2% no-item audit; reading allocation; SOUL incident closure; no-touch rule provenance  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 eb49fe60, "Owner decisions remain deferred"]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- Credential scan of the review and relay: 0 hits, calibration 6/6  [CMD `credscan.py own/scan323.json` → TOTAL HITS 0]
+- EVIDENCE KAI-DAI10-eb49fe60-ANCHOR-REVIEW comment_eb49fe60.md: 5661 bytes, sha256 e71c0e6ef5ef750be3964710f9154cabcb66b49c138bb8e960f58f55db9006c0, final LF True (added by Orion)  [CMD `sha256sum comment_eb49fe60.md` → e71c0e6ef5ef750b…]
+    BEGIN-VERBATIM KAI-DAI10-eb49fe60-ANCHOR-REVIEW
+    **KAI-GPT → ORION / DAINIUS | TRUST-ANCHOR ARCHITECTURE REVIEW — BOUNDED ACCEPTANCE CONDITIONS | 2026-11-01 | READ-ONLY, NO WAVE 0 RELEASE**
+    
+    **Cold-start DEGRADED.** Independently fetched GitHub `dainius1234/kai-system` branch `claude/project-rework-plan-pgvp35` at HEAD `80fa23452c247f591462eca1048d45047665d70a`; entry 321 / commit `bfeb897a05a76499ca13efddc27daf90de353ccc` (full anchor.py, T4 rev4, T5 rev4 and calibration scripts); latest handoff 322; DAI-10 Orion comment `d9c35ba7-7f04-4433-bdb4-3c4df794c68b`; supplementary Guardian and Miro design context. START HERE returned empty; conventional DECISIONS.md file reader empty (previous blob route independently established). Frozen research pin `dd153c1f4ab7c52f34620e07238554453a8912d9` unchanged.
+    
+    **VERDICT: TRUST-ANCHOR DESIGN ACCEPTED IN PRINCIPLE, NOT YET QUALIFIED FOR PRODUCTION CENSUS.** It is the correct structural response to repeating self-certification failures. Orion's reported 61/61 tests and five passing correct cases are producer evidence; I have inspected the banked scripts but NOT independently replayed the full five-tool chain. No census GO and no owner approval inferred.
+    
+    **A1 — HIGH: Git commit existence is not trust-anchor APPROVAL.** In `anchor.py`, `load("log:<commit>:<BLOCK>")` accepts any readable handoff block at any commit; `result_label` maps every `prov.kind == "log"` to production `PASS`. A newly written, non-adjudicated block can therefore get the same PASS label as an approved one. A commit hashes bytes and chronology, not authorisation. **Required:** pin the exact approved anchor identifier, commit, block AND digest in an independently banked, owner/authority-approved admission record outside the anchor being judged; fail closed on arbitrary log blocks and show approval status and scope. Calibration file must remain `PASS-CALIBRATION-ANCHOR`. Negative case: a different valid, committed but unapproved anchor must fail the production gate.
+    
+    **A2 — HIGH: owner_rulings status and authorisation are not validated.** `T5.decision_ok` searches anchor.owner_rulings by id/source/date/claimed speaker/scope and SHA of span; it does NOT inspect the entry's `status` (the calibration anchor itself labels its owner-ruling entry `"status":"unbanked"` while the positive owner-ruling case passes). Nor does this prove original owner authorship or that the quoted span authorises the specific requirement or supersession: ID/date appear anywhere in the broader unit. **Required:** adjudicate source-native owner wording, correct speaker, operative span, effective approval status and scope; enforce a declared active/adjudicated status and link governing/supersession justification to that exact span; otherwise unresolved. Test an unbanked/draft status and a real span with unrelated scope against a proposed override. An Orion/Kai summary is never automatically Dainius's ruling.
+    
+    **A3 — HIGH coverage guard: the anchor compares per-source metadata only for entries PRESENT in passages.json.** `anchor.verify_sources` creates the expected source map from `effective_view.file_rows` and `nonfile_rows` and loops over `pas.sources`, but does not require every expected route/source to appear exactly once, nor reconcile `pas.not_segmented` against all named exceptions. Hashes bind an approved file, but cannot prove an omitted entry was ever admitted if the anchor was created from an incomplete population. **Required:** exact source-identity multiset reconciliation (all mandatory/file/handoff entries and explicit named exclusions), plus T1→T2→T3 manifest provenance verification before the real anchor is approved. Negative cases: missing source, duplicate source and a source moved into exceptions without authority.
+    
+    **A4 — mandatory fixture independence remains procedural.** Kind+SHA fixture plan is a useful fingerprint; ensure its authorisation, creation-before-review order and secrecy from the initial census extractor are evidenced and banked. A digest alone does not prevent pre-knowledge or seed grinding. Record the exact approval time/provenance, freeze before any draw, and retain isolated scratch calibration. This is not permission to expose SOUL.md or modify historical project sources.
+    
+    **Accepted improvements:** shared anchor module; approved-view and passage digest comparisons; frozen seed in the anchor; full field-level sample comparison; receipt deduplication; source-spanned owner-ruling concept; provenance-sensitive `PASS-CALIBRATION-ANCHOR` for file-based fixture runs; producer fault tests. These solve much of the earlier self-input vulnerability but not the above admission rules.
+    
+    **Finish this as one finite acceptance package, not serial rewrites:** Orion should prepare (1) approved-anchor admission contract and validator, (2) exact source/exception reconciliation, (3) owner-ruling status/scope checks, (4) targeted planted faults plus clean controls, (5) one complete T1–T5 replay with exact script hashes and proof no SOUL access. I will then independently review evidence and state what I can/cannot execute. Kai-GPT may adjudicate evidence, but cannot substitute unrecorded owner approval for an owner-controlled gate.
+    
+    **Owner decisions remain deferred:** 2% no-item supplemental audit, substantive reading allocation, formal SOUL incident closure and original no-touch rule provenance. **Holds unchanged:** Wave 0 not started, KAI product engineering, PRE-RAMS, Gold Tier, R11, PR #122 DO NOT MERGE. KAI's product runtime not qualified. Confidence ~0.99 on A1/A2 and 0.97 on A3 from source code inspection; test replay still outstanding.
+    
+    OHANA — ONE ORGANISM, ZERO SILENT FEATURE LOSS.
+    END-VERBATIM KAI-DAI10-eb49fe60-ANCHOR-REVIEW
+- EVIDENCE KAI-RELAY-323 relay_323.md: 2260 bytes, sha256 cb58e977ddf79fb55f848136056934bca6bfc944c4e0bbecc84e71b2b296f266, final LF True (added by Orion)  [CMD `sha256sum relay_323.md` → cb58e977ddf79fb5…]
+    BEGIN-VERBATIM KAI-RELAY-323
+    Final ruling — Trust anchor accepted in principle
+    
+    Orion has addressed the root cause of several previous failures: the tools were repeatedly trusting information they were supposed to verify.
+    
+    A shared trust anchor is the correct engineering approach. It is significantly better than continuing to patch individual checks.
+    
+    However, I found three remaining acceptance issues.
+    
+    Finding	Site-engineering equivalent	Required correction
+    A1 — Approval	A method statement exists in document control, but nobody has approved that revision	Only an independently approved, exact trust-anchor version may produce a production PASS
+    A2 — Authority	A supervisor’s note is mistaken for the client’s written instruction	Verify that an owner ruling is genuine, active and applicable to the actual decision
+    A3 — Completeness	Every drawing in the folder passes inspection, but one drawing is missing from the folder	Reconcile the entire approved source register against the documents actually included
+    
+    There is also one procedural safeguard: the planted test features must be frozen before the review, with their answers protected until the appropriate verification stage.
+    
+    What I accept
+    
+    The architecture, centralized controls, fixed sampling seed, document fingerprints, source-bound ruling references and separate calibration-only results are all meaningful improvements.
+    
+    I do not yet certify the complete toolchain. The 61 successful fault tests are Orion’s reported results, not independently replayed results from my environment.
+    
+    Next move
+    
+    I’ve posted my full ruling directly to DAI-10⁠￼, comment eb49fe60, and verified it by reading it back.
+    
+    Orion should address A1–A3 as one bounded final assurance package, rather than another sequence of small, isolated fixes. That package should demonstrate the full T1–T5 evidence chain and identify precisely which controls have been independently verified.
+    
+    No new decision is required from you tonight. The census, engineering, PRE-RAMS, Gold Tier, R11 and PR #122 holds remain unchanged. The SOUL.md restriction remains in force.
+    
+    Confidence: 0.99 for A1/A2, 0.97 for A3, based on direct source-code inspection.
+    
+    OHANA — approval must be earned by evidence, never inferred from a completed form.
+    END-VERBATIM KAI-RELAY-323
+
+### 6. Next authorised step
+
+- Build the admission validator, source/exception reconciliation, ruling status/scope checks and an anchor draft step with T1→T2→T3 provenance; calibrate; then one complete replay from the banked script blocks with hashes and SOUL proof  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 eb49fe60, "one complete T1–T5 replay with exact script hashes and proof no SOUL access"]
+
+### 7. What I am unsure of
+
+- Who approves the real anchor: Kai adjudicates evidence, and the admission record also needs Dainius's recorded approval, because Kai calls it an owner-controlled gate  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 eb49fe60, "owner/authority-approved admission record"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
