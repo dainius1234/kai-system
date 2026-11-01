@@ -102705,3 +102705,108 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-01T21:29:38Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-01T21:29:38Z  [CMD `date -u +%FT%TZ` → 2026-11-01T21:29:38Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 5b581ead760115291cbe00cb72f31bc8f9ec174c  [CMD `git rev-parse HEAD` → 5b581ead760115291cbe00cb72f31bc8f9ec174c]
+- tree: 937f33cf71737ad79e79d5f37104d56bf6483a76  [CMD `git rev-parse HEAD^{tree}` → 937f33cf71737ad79e79d5f37104d56bf6483a76]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 5b581ead760115291cbe00cb72f31bc8f9ec174c  [CMD `git ls-remote --heads origin` → 5b581ead760115291cbe00cb72f31bc8f9ec174c]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 310  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 310]
+
+### 1. The four states
+
+- physical: unchanged since entry 310 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: T4–T5 preparation under the existing owner GO  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "Proceed with T4–T5 preparation under the existing GO."]
+- evidence: Kai's T3 code review, verbatim in section 5  [CMD `ruling-capture c684d145ae7a7ea1` → text banked]
+- admission: T3 conditionally acceptable at code-review level, pending end-to-end qualification (Kai, not replayed); census reading method not certified; census held  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "T3 verdict: conditionally acceptable at code-review level, pending end-to-end qualification."]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT (relayed by Dainius) · 2026-11-01 · T3 conditionally acceptable at code review; review the handoff log and decisions log by complete entry and complete decision while keeping every passage id, line range and checksum, splitting oversized units with explicit continuation and coverage checks; T5 must not count generated, indexed or assigned passages as reviewed (evidence-backed disposition only); SOUL and the April vision stay visible exceptions, with the earlier SOUL findings kept separately ⚠ UNBANKED  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "I recommend reviewing those logs by complete handoff entry and complete decision, while retaining every underlying passage ID, source line range and checksum."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: T4–T5 preparation and calibration. HELD: running the census; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "all engineering and Wave 0 execution holds remain unchanged"]
+
+### 4. Open questions
+
+- For Dainius (owner, none needed for tool preparation): SOUL incident closure; source and scope of the no-touch instruction; Wave 0 allocation  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "No further owner decision is needed for tool preparation."]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- Credential scan of the review: 0 hits, calibration 6/6  [CMD `credscan.py own/scan311.json` → TOTAL HITS 0]
+- EVIDENCE KAI-REVIEW-T3 kai_t3_review.md: 2908 bytes, sha256 66e69559899a072784d8ff664c09db1d4932192f18a3a7fc1fee46f167e11bdf, final LF True (added by Orion)  [CMD `sha256sum kai_t3_review.md` → 66e69559899a0727…]
+    BEGIN-VERBATIM KAI-REVIEW-T3
+    COLD-START — DEGRADED
+    
+    I’ve verified the live KAI project branch at 5b581ead760115291cbe00cb72f31bc8f9ec174c, including Orion’s handoff entries 309–310. DAI-10 and Miro are accessible. START HERE returned no content, and the normal GitHub reader still could not return the large decisions ledger. The frozen research pin remains dd153c1f4ab7c52f34620e07238554453a8912d9.
+    
+    T3 is genuine progress. I’ve inspected the actual banked passage-splitting code, not just Orion’s summary. It has a central source reader, checks input bindings, records source locations and passage hashes, and separates document segmentation from evidence that someone has actually reviewed the material.
+    
+    The reported result is substantial:
+    
+    Measure	Orion’s reported result
+    Total source records	351
+    Sources segmented	349
+    Passages generated	51,727
+    Source lines accounted for	226,943
+    Non-segmented records	2
+    
+    The two non-segmented records are data/SOUL.md, under its existing restriction, and the missing April vision document.
+    
+    I have not independently replayed Orion’s 7/7 calibration tests. T3 therefore remains subject to final toolchain qualification.
+    
+    My recommendation for T4 and T5
+    
+    Proceed with T4–T5 preparation under the existing GO. The main problem now is not generating more passages; it’s making their review accurate and achievable.
+    
+    Orion is right to flag the scale. The handoff and decisions logs account for approximately 53% of the generated passages. Reading those as isolated fragments would be inefficient and could destroy context.
+    
+    I recommend reviewing those logs by complete handoff entry and complete decision, while retaining every underlying passage ID, source line range and checksum. This allows the review to follow the meaning of each decision without losing traceability. Any entry too large for a review window must be split with explicit continuation and coverage checks.
+    
+    Two additional controls should be built into the remaining tools:
+    
+    * No false completion: A passage being generated, indexed or assigned to a reader must never count as substantively reviewed. T5 needs a separate evidence-backed review disposition.
+    * No hidden exclusions: SOUL.md’s no-touch status and the missing April vision must remain visible exceptions, with the earlier verified SOUL findings preserved separately—not quietly treated as inspected by T3.
+    
+    T3 verdict: conditionally acceptable at code-review level, pending end-to-end qualification. I have not yet identified a reason to stop T4–T5 preparation. I will not certify the census reading method until the final package demonstrates it can manage this workload without missing requirements.
+    
+    No further owner decision is needed for tool preparation. The SOUL incident remains technically remediated but formally open, and all engineering and Wave 0 execution holds remain unchanged.
+    
+    OHANA — one organism, zero silent feature loss.
+    END-VERBATIM KAI-REVIEW-T3
+
+### 6. Next authorised step
+
+- Build and calibrate T4 (frozen human sample) and T5 (review units for the two logs; evidence-backed dispositions; census register check with Annex C census known-positives and visible exceptions); then the five-tool qualification package  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "A passage being generated, indexed or assigned to a reader must never count as substantively reviewed."]
+
+### 7. What I am unsure of
+
+- Nothing new  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "I have not yet identified a reason to stop T4–T5 preparation."]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
