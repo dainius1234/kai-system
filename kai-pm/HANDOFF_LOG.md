@@ -101088,3 +101088,541 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-01T20:56:54Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-01T20:56:54Z  [CMD `date -u +%FT%TZ` → 2026-11-01T20:56:54Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 97e81be9f9b5106d4ae6bc51a51af372f9c8782e  [CMD `git rev-parse HEAD` → 97e81be9f9b5106d4ae6bc51a51af372f9c8782e]
+- tree: 9d8d89d5318a30ff032c97f0ff06c5c02807197a  [CMD `git rev-parse HEAD^{tree}` → 9d8d89d5318a30ff032c97f0ff06c5c02807197a]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 97e81be9f9b5106d4ae6bc51a51af372f9c8782e  [CMD `git ls-remote --heads origin` → 97e81be9f9b5106d4ae6bc51a51af372f9c8782e]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 301  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 301]
+
+### 1. The four states
+
+- physical: unchanged since entry 301 apart from this entry; tools, outputs and the extracted subject live in the scratchpad only  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: correcting T1/T2; building and calibrating T3–T5  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "Proceed with T3–T5 preparation and calibration under the existing owner GO. Correct T1 and T2 before their final acceptance."]
+- evidence: T1 rev 2 and T2 rev 2 with calibration harnesses, outputs, T2 manifest and the reply to Kai, verbatim in section 5  [CMD `calibrate_t1.py 97e81be; calibrate_t2.py out/effective_view.json` → PASS, PASS]
+- admission: none; T1 and T2 rev 2 await Kai's acceptance; the census does not start until the complete tool chain passes independent readiness review  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "Do not commence the feature census until the complete tool chain has passed independent readiness review."]
+
+### 2. Rulings since the last handoff
+
+- None; Orion carried out the step named in entry 301  [CMD `handoff entry 301 section 6` → "Check F1–F4 against the banked scripts, correct T1 and T2 minimally"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: correcting T1/T2; building and calibrating T3–T5. HELD: running the census; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "No engineering or runtime hold is lifted."]
+
+### 4. Open questions
+
+- For Kai: accept or amend T1 rev 2 and T2 rev 2  [CMD `REPLY_F1_F4.md` → "ready for your acceptance check"]
+- For Kai and Dainius: who reads which sources in the census; needed before the census starts  [CONVERSATION 2026-10-26 Dainius, "Orion we gonna use Kai to do leg work and research"]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- F1–F4 CONFIRMED against the banked rev 1 scripts (entry 299 and entry 300 blocks): F1 free-text v21 only; F2 `if not fault:` publishes despite problems; F3 non-file rows counted only and late sources checked at HEAD; F4 full `git archive` before `tar --exclude`; none disputed  [CMD `Read census/effective_view.py rev 1` → line 108 "if not fault:"]
+- SOUL BOUNDARY (F4, stated plainly): in the entry 300 T2 run, data/SOUL.md bytes passed through the archive pipe in memory; not written to disk, printed, stored or read by Orion; superseded by rev 2, which excludes it before the archive is generated. FAILURE_PATTERN_LEDGER not written (allocation held)  [CMD `git archive <pin> -- . ':(exclude)data/SOUL.md' | tar -t` → excluded present 0]
+- T1 REV 2 @ 97e81be: 346 + 3 non-file + 2 late = 348; 39 change rows = 30 + 2 late + 7 group notes; effective fields on 32 rows; MANDATORY 7; 'was' differs from v2 on 3; problems 0; effective classes derived 258, lineage 41, canonical* 18, draft 16, superseded 9, external 5, canonical 1, UNCLASSIFIED 0; output sha256 5529b74c7f6cf3e71925c8664b58b670a1748059ea10bd303bbaa836e75fccf7  [CMD `python3 -I effective_view.py 97e81be out/effective_view.json` → problems 0, exit 0]
+- T1 CALIBRATION: 16 planted faults caught, each exit 1 with no output despite a stale file beforehand; the correct set publishes  [CMD `python3 -I calibrate_t1.py 97e81be` → result PASS]
+- T2 REV 2: 1254 files + SOUL excluded before archiving; stream 1360 entries (1254 files, 106 directories); manifests equal; blob-id mismatches 0; missing 0; problems 0; manifest sha256 a6c94ab633e0ec26c5f0bbb6988971d59b4dce93664e9de9808ced1ef771e5ca  [CMD `python3 -I subject.py <scratch> out/effective_view.json` → problems 0, exit 0]
+- T2 CALIBRATION: 5 planted faults caught, each leaving no subject, sums or manifest; the correct run publishes all three  [CMD `python3 -I calibrate_t2.py out/effective_view.json` → result PASS]
+- CROSS-CHECK: the rev 2 subject.SHA256SUMS is byte-identical to rev 1 (sha256 1de7867b0c32bee51906de58802c87a92ebd6b3b500b3178f850378ac943eae7)  [CMD `sha256sum subject.SHA256SUMS` → 1de7867b…]
+- CAUGHT BEFORE BANKING (R15/R1): (a) my first rev 2 checker had a wrong canonical* pattern and read lower-case "may hold mandatory" as the MANDATORY flag; it failed closed (7 problems, no output); fixed. (b) T2 printed "1360 files" for 1360 entries; fixed. (c) my reply said 51 "scoped" rows; the effective view has 50 (K6 moved to intake); fixed  [CMD `Counter(section) for scoped eff_roles` → C 50; v2 C 51]
+- FOUND: the entry 296 change list's "was" column differs from v2 on 3 rows (K6, K2, SOUL); descriptions only; no corrected value depends on them  [CMD `effective_view.json change_list_was_differs_from_v2` → 3 rows]
+- Credential scan of the ten texts: 0 hits, calibration 6/6  [CMD `credscan.py census/scan302.json` → TOTAL HITS 0]
+- EVIDENCE ORION-REPLY-F1-F4 REPLY_F1_F4.md: 5693 bytes, sha256 27c6e351a0573f6981c240359d52e7f2bec42d68a6000487acd8b8f82d103691, final LF True (added by Orion)  [CMD `sha256sum REPLY_F1_F4.md` → 27c6e351a0573f69…]
+    BEGIN-VERBATIM ORION-REPLY-F1-F4
+    # T1/T2 corrections for Kai's review F1–F4
+    
+    **ORION → KAI, DAINIUS | 2026-11-01 | your review banked word for word in handoff entry 301 (block KAI-REVIEW-CENSUS-TOOLS-T1-T5) | read-only tool preparation; census not run; all holds unchanged**
+    
+    ## In plain words
+    
+    All four findings were right. I checked each against the banked scripts before changing anything, and I dispute none. Both tools are corrected. Each one now publishes nothing unless every check passes, and each catches every fault I planted. T1 and T2 rev 2 are ready for your acceptance check.
+    
+    ## Findings
+    
+    | # | Your finding | Checked against | Verdict | Correction | New calibration |
+    |---|---|---|---|---|---|
+    | F1 | corrected classes not machine-applied | rev 1 stored only free text `v21`; `data/SOUL.md` read UNCLASSIFIED/inaccessible | **CONFIRMED** | every row now carries `eff_class`, `eff_roles`, `eff_mandatory`, `eff_scope` and `eff_basis`; the v2 values are kept for provenance. Each written value is checked against its own change text: the class must appear in the text (or follow "unchanged" / "as K1 above"), every role must appear, and MANDATORY must match. A role the text is silent on carries forward from v2 and says so. A read-back of the published file checks that SOUL, FAILURE_PATTERN_LEDGER and TECH_WATCH arrived corrected | wrong class, missing row, extra row, MANDATORY dropped, and v2 values published in place of the corrections: each caught |
+    | F2 | output written despite failed checks | rev 1 T1 line 108 `if not fault:`; rev 1 T2 the same for the checksum file | **CONFIRMED** | stale outputs are deleted at start; results are written to a temporary file and published only if every check (including the read-back) passed; T2 removes the extracted subject on failure | every fault run starts with a stale output in place; all 21 left nothing behind |
+    | F3 | non-file and late sources need content routes and immutable ids | rev 1 counted the two log blocks; late sources were checked at moving HEAD | **CONFIRMED** | each source now has a `route`. The v1.1 draft and the 104-item register: log commit, block name, start line, line count and SHA-256. Late sources: the commit that added each file (checked to be the adding commit), its blob id and its size, plus a check that the blob is unchanged at the log commit. SOUL: blob id only, marked not opened. April vision: named gap | wrong late commit and missing block: each caught |
+    | F4 | SOUL bytes entered the archive stream | rev 1 ran `git archive <pin>` in full, then `tar --exclude` | **CONFIRMED** | SOUL is excluded by pathspec before the archive is generated (`git archive <pin> -- . ':(exclude)data/SOUL.md'`); the stream's own listing is checked; the exclusion mechanism is self-tested each run on README.md (present without the exclusion, absent with it), never on SOUL | SOUL present in the stream listing: caught |
+    | All | bind output to inputs, pin, script, execution | rev 1 recorded none | agreed | T1 output records the pin, the full log commit, the SHA-256 of both input blocks, its own script SHA-256, the Python version and arguments. T2's manifest records the same, plus the SHA-256 of the effective view it read and that view's producer; T2 refuses a view without one | an unbound view is refused: caught |
+    
+    ## Results
+    
+    - **T1 rev 2 @ 97e81be:** 346 v2 file rows (B9 C69 D17 E68 F143 G40) + 3 non-file + 2 late = 348; 39 change rows = 30 on v2 paths + 2 late + 7 group notes; effective fields from the change list on 32 rows; MANDATORY on 7; problems 0. Effective classes: derived 258, lineage 41, canonical* 18, draft 16, superseded 9, external 5, canonical 1; UNCLASSIFIED 0.
+    - **T1 calibration:** 16 planted faults caught, each with no output; the correct set publishes.
+    - **T2 rev 2:** 1254 files extracted + data/SOUL.md excluded before archiving; the stream lists 1360 entries (1254 files, 106 directories), excluded present 0; manifests equal; blob-id mismatches 0; register paths missing 0; problems 0.
+    - **T2 calibration:** 5 planted faults caught, each leaving nothing behind; the correct run publishes subject, sums and manifest.
+    - **Cross-check:** the rev 2 checksum file is byte-identical to rev 1's (SHA-256 1de7867b…). The changed exclusion method extracted exactly the same 1254 files.
+    
+    ## Found while correcting (R15)
+    
+    1. **The change list's "was" column differs from register v2 on 3 rows.** K6 "lineage / intake" (v2: lineage / scoped). K2 "draft (Kai) / Orion proposed derived completion record" (v2: draft / scoped). SOUL "UNCLASSIFIED / not opened" (v2: UNCLASSIFIED / inaccessible). These are descriptions of the old value in my entry 296 list; no corrected value depends on them. T1 now reports such differences instead of hiding them.
+    2. **My first T1 rev 2 checker had two faults of its own.** Its canonical* pattern was wrong, and it read "may hold mandatory assurance failure modes" (four rows) as a MANDATORY flag. It failed closed and published nothing. Both are fixed: whole-token class match, and MANDATORY matched in capitals as the change list writes it.
+    3. **SOUL in rev 1 (F4), stated plainly.** In the rev 1 run, SOUL's bytes passed through the archive pipe in memory. They were not written to disk, printed, stored or read by me, but they did enter the stream, which the boundary did not allow. That run is superseded by rev 2.
+    
+    ## Open for you
+    
+    - 50 rows carry your own role label "scoped" in the effective view, all in section C. v2 had 51; K6 moved from scoped to intake. T1 keeps "scoped" as an allowed role. Under 3325fad7 §2, no label suppresses reading, so the census reads them all either way.
+    - T3–T5 next, under the existing GO, to your requirements in entry 301.
+    END-VERBATIM ORION-REPLY-F1-F4
+- EVIDENCE CENSUS-T1-REV2-SCRIPT effective_view.py: 16912 bytes, sha256 d3698ed1adf21b9505dc19d942f3da119ce398fdac14137706a41419006e830f, final LF True (added by Orion)  [CMD `sha256sum effective_view.py` → d3698ed1adf21b95…]
+    BEGIN-VERBATIM CENSUS-T1-REV2-SCRIPT
+    # T1 (rev 2): effective view of source register v2 + v2.1 change list + late sources, with a no-loss check.
+    # Read-only. Standard library. Run: python3 -I effective_view.py <log-commit> <out.json> [fault]
+    # Inputs come from banked bytes in kai-pm/HANDOFF_LOG.md at <log-commit>. Fails closed: output exists only if every check passed.
+    # Kai review (entry 301): F1 explicit effective fields; F2 fail closed; F3 content routes and immutable ids; output bound to inputs.
+    import ast, hashlib, json, os, re, subprocess, sys
+    REPO = "/home/user/kai-system"; PIN = "dd153c1f4ab7c52f34620e07238554453a8912d9"
+    SECTIONS = {"B": 9, "C": 69, "D": 17, "E": 68, "F": 143, "G": 40}   # file rows per section, as register v2 states them
+    B_NONFILE = 3                                                        # v2 section B: 2 log blocks + 1 named gap
+    F_CLASS, F_ROLE = "derived", "cross-check"                           # v2 section F: one value for every row (its preamble)
+    CLASSES = {"canonical", "canonical*", "lineage", "draft", "superseded", "external", "derived", "UNCLASSIFIED"}
+    ROLES = {"intake", "cross-check", "control", "none", "scoped", "inaccessible"}
+    OPEN_ITEMS = {"K10", "K12", "K13"}
+    # F1: the change list's free-text v2.1 values, written as fields. Each is checked against its own text below (consistent()).
+    # (class, roles, mandatory); roles None = the change text is silent on role, so the v2 role carries forward.
+    EFF = {
+     "kai-pm/CODE_AUDIT_P1_SECURITY_FOUNDATION_PLAN.md": ("lineage", ["intake", "cross-check"], False),
+     "kai-pm/CODE_AUDIT_P2_ISOLATION_AND_INTEGRITY_PLAN.md": ("lineage", ["intake", "cross-check"], False),
+     "kai-pm/CODE_AUDIT_P3_RELIABILITY_AUDIT_PRIVACY_RECOVERY_PLAN.md": ("lineage", ["intake", "cross-check"], False),
+     "kai-pm/CODE_AUDIT_P4_CAPABILITY_REQUALIFICATION_PLAN.md": ("lineage", ["intake", "cross-check"], False),
+     "kai-pm/CODE_AUDIT_P0_CONTAINMENT_PLAN.md": ("lineage", ["cross-check"], False),
+     "kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md": ("derived", None, False),
+     "kai-pm/UH_PROGRESS_TRACKER.md": ("derived", None, False),
+     "kai-pm/SEQUENCE.md": ("lineage", None, False),
+     "kai-pm/KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md": ("lineage", ["intake"], False),
+     "README.md": ("canonical*", None, False),
+     "data/SOUL.md": ("lineage", ["intake"], False),
+     "docs/personality_and_proactive.md": ("lineage", ["intake"], True),
+     "kai-pm/KINGSMAN_CONTINGENCY_AND_FAILSAFE_LIBRARY_DESIGN.md": ("lineage", ["intake"], True),
+     "kai-pm/KINGSMAN_LONG_HORIZON_STEWARDSHIP_AND_SUCCESSION.md": ("lineage", ["intake"], True),
+     "kai-pm/MEMORY_GRAPH_DESIGN.md": ("lineage", ["intake"], True),
+     "kai-pm/PHASE2_DOCUMENT_SYNC_AND_DRIFT_CONTROL.md": ("lineage", ["intake", "control"], True),
+     "kai-pm/DAINIUS_KINGSMAN_ENGINEERING_STANDARD.md": ("canonical*", None, False),
+     "kai-pm/KAI_KINGSMAN_PUZZLE_MAP_AND_RECONCILIATION.md": ("derived", ["cross-check"], False),
+     "kai-pm/STUBS_AND_PLACEHOLDERS.md": ("derived", ["intake"], True),
+     "kai-pm/FAILURE_PATTERN_LEDGER.md": ("canonical*", ["cross-check"], False),
+     "kai-pm/H2_REPAIR_CONTRACT_D367.md": ("canonical*", ["cross-check"], False),
+     "kai-pm/TECH_WATCH.md": ("derived", None, False),
+     "kai-pm/CONVICTION_SCENARIOS.md": ("derived", ["cross-check"], False),
+     "kai-pm/CROSS_AXIS_SEMANTIC_AUDIT.md": ("derived", ["cross-check"], False),
+     "kai-pm/VALIDITY_BINDING_AUDIT.md": ("derived", ["cross-check"], False),
+     "kai-pm/POSTMORTEM_2026-08-06_RUNNER_STARVATION.md": ("derived", ["cross-check"], False),
+     "kai-pm/TEST_WRITING_REVIEW.md": ("derived", ["cross-check"], False),
+     "kai-pm/GPU_ARRIVAL_RUNBOOK.md": ("draft", None, False),
+     "data/AGENTS.md": ("derived", ["intake"], True),
+     "vault-sync/templates/soul-mirror.md": ("derived", ["intake"], False),
+     "kai-pm/KAI_LUMEN_OHANA_BRIDGE_ORIGIN_CONTINUITY_RECORD_2026-10-26.md": ("lineage", ["intake"], False),
+     "kai-pm/KAI_GPT_COLD_START_GUARDIAN_V0_1.md": ("derived", ["control"], False),
+    }
+    KNOWN = {"data/SOUL.md": ("lineage", ["intake"]), "kai-pm/FAILURE_PATTERN_LEDGER.md": ("canonical*", ["cross-check"]),
+             "kai-pm/TECH_WATCH.md": ("derived", ["cross-check"])}   # downstream propagation probes, from Kai 052b5be0 / 7702b3c3
+    
+    def git(*a): return subprocess.run(["git", *a], cwd=REPO, capture_output=True, text=True)
+    def sha(b): return hashlib.sha256(b if isinstance(b, bytes) else b.encode()).hexdigest()
+    def block_at(log, name):
+        i = log.index(f"    BEGIN-VERBATIM {name}"); j = log.index(f"    END-VERBATIM {name}", i)
+        return i, [l[4:] for l in log[i + 1:j]]
+    
+    def load_delta(lines):
+        env = {}
+        def ev(n):
+            if isinstance(n, ast.Constant): return n.value
+            if isinstance(n, ast.Name): return env[n.id]
+            if isinstance(n, (ast.Tuple, ast.List)): return [ev(e) for e in n.elts]
+            raise ValueError(f"non-literal in delta: {ast.dump(n)[:60]}")
+        for node in ast.parse("\n".join(lines)).body:          # literal assignments only, evaluated without exec
+            assert isinstance(node, ast.Assign), "delta block holds a non-assignment"
+            t = node.targets[0]
+            if isinstance(t, ast.Tuple):
+                for a, v in zip(t.elts, node.value.elts): env[a.id] = ev(v)
+            else: env[t.id] = ev(node.value)
+        return env["D"]
+    
+    def parse_v2(lines):
+        rows, nonfile, sec = [], [], None
+        for l in lines:
+            m = re.match(r"^## ([A-M])\. ", l)
+            if m: sec = m.group(1); continue
+            if sec not in SECTIONS or not re.match(r"^\| \d+ \|", l): continue
+            c = [x.strip() for x in re.split(r"(?<!\\)\|", l.strip().strip("|"))]   # a cell may hold an escaped \|
+            if not c[1].startswith("`"):
+                nonfile.append({"section": sec, "n": int(c[0]), "name": c[1]}); continue
+            if sec == "F": cls, role = F_CLASS, F_ROLE
+            else: cls, role = re.match(r"^\*\*(.+?)\*\*(?!\*)", c[5]).group(1), c[6].split("·")[0].strip()
+            rows.append({"path": c[1].strip("`"), "section": sec, "v2_class": cls, "v2_role": role})
+        return rows, nonfile
+    
+    def consistent(text, base, cls, roles, mand, v2cls):
+        """The written fields must be readable from the change text itself (or, for 'unchanged' / 'as K1 above', from what it points to)."""
+        t = text.lower(); out = []
+        if t.startswith("unchanged"):
+            if cls != v2cls: out.append(f"'unchanged' but class {cls} != v2 {v2cls}")
+        elif not re.search(r"(?<![\w*])" + re.escape(cls.lower()) + r"(?![\w*])", t):     # whole token; canonical* never matches canonical
+            if not (base and cls == base[0]): out.append(f"class {cls} not in its change text")
+        for r in roles or []:
+            if r not in t and not (base and r in (base[1] or [])): out.append(f"role {r} not in its change text")
+        if mand != ("MANDATORY" in text): out.append(f"mandatory={mand} disagrees with its change text")   # the list writes the flag in capitals; "may hold mandatory failure modes" is not it
+        return out
+    
+    def build(log, commit, fault=None):
+        vi, v2 = block_at(log, "ORION-SOURCE-REGISTER-V2"); di, dl = block_at(log, "RV21-DELTA")
+        rows, nonfile = parse_v2(v2); delta = load_delta(dl); eff = {k: list(v) for k, v in EFF.items()}
+        inputs = {"ORION-SOURCE-REGISTER-V2": sha("\n".join(v2) + "\n"), "RV21-DELTA": sha("\n".join(dl) + "\n")}
+        if fault == "drop_v2_row": rows.pop(10)
+        if fault == "dup_v2_row": rows.append(dict(rows[5]))
+        if fault == "drop_delta_row": delta.pop(20)
+        if fault == "delta_path_not_in_v2": delta[0] = ["K1", "kai-pm/NO_SUCH_FILE.md"] + list(delta[0][2:])
+        if fault == "late_in_v2": rows.append({"path": [d for d in delta if d[0] == "LATE"][0][1], "section": "G", "v2_class": "derived", "v2_role": "none"})
+        if fault == "drop_open_item": delta = [d for d in delta if d[0] != "K12"]
+        if fault == "drop_nonfile": nonfile.pop()
+        if fault == "bad_class": rows[3]["v2_class"] = "Agent \\"
+        if fault == "bad_role": rows[7]["v2_role"] = "Status \\"
+        if fault == "eff_wrong_class": eff["data/SOUL.md"][0] = "derived"
+        if fault == "eff_missing": del eff["kai-pm/MEMORY_GRAPH_DESIGN.md"]
+        if fault == "eff_extra": eff["kai-pm/RISKS.md"] = ["derived", ["cross-check"], False]
+        if fault == "eff_mandatory_lost": eff["data/AGENTS.md"][2] = False
+        if fault == "late_wrong_commit": delta = [list(d) if d[0] != "LATE" else [d[0], d[1], d[2], d[3].replace("587f806", "f32bfb6"), d[4], d[5]] for d in delta]
+        if fault == "block_missing": nonfile[0]["name"] = nonfile[0]["name"].replace("KAI-FEATURE-LIST", "KAI-NO-SUCH").replace("KAI-MASTER-PLAN-V1-1-UNIFIED-DRAFT", "KAI-NO-SUCH")
+        view = {r["path"]: dict(r, v21=None, delta_rows=[], late=False) for r in rows}
+        groups, p = [], []
+        for k, (rid, path, was, now, src, cites) in enumerate(delta):
+            tag = f"{k + 1}:{rid}"
+            if rid == "LATE":
+                if path in view: p.append(f"{tag} late source already in v2: {path}")
+                view[path] = {"path": path, "section": "LATE", "v2_class": None, "v2_role": None, "v21": now, "delta_rows": [tag], "late": True}
+            elif path is None: groups.append({"row": tag, "item": rid, "v21": now, "source": src})
+            elif path not in view: p.append(f"{tag} path not in v2: {path}")
+            else: view[path]["v21"] = now; view[path]["delta_rows"].append(tag); view[path]["delta_was"] = was
+        base = eff.get("kai-pm/CODE_AUDIT_P1_SECURITY_FOUNDATION_PLAN.md")
+        for v in view.values():                                              # F1: effective fields for every row
+            if v["delta_rows"]:
+                if v["path"] not in eff: p.append(f"changed row has no effective fields: {v['path']}"); continue
+                cls, roles, mand = eff[v["path"]]
+                for x in consistent(v["v21"], base if v["v21"].startswith("as K1") else None, cls, roles, mand, v["v2_class"]): p.append(f"{v['path']}: {x}")
+                v.update(eff_class=cls, eff_roles=roles if roles is not None else [v["v2_role"]], eff_mandatory=mand,
+                         eff_scope=v["v21"], eff_basis=f"change list row {v['delta_rows'][0]}" + ("" if roles is not None else "; role from v2 (change text silent)"))
+            else:
+                v.update(eff_class=v["v2_class"], eff_roles=[v["v2_role"]], eff_mandatory=False, eff_scope=None, eff_basis="register v2 (no change)")
+        for k in eff:
+            if k not in view or not view[k]["delta_rows"]: p.append(f"effective fields for a row the change list does not change: {k}")
+        for v in view.values():                                              # F3: immutable identities for late sources
+            if v["late"]:
+                m = re.search(r"\(([0-9a-f]{7,40}),", v["v21"]); c = git("rev-parse", (m.group(1) if m else "x") + "^{commit}").stdout.strip()
+                added = git("log", "--format=%H", "--diff-filter=A", "--", v["path"]).stdout.split()
+                if not m or c not in added: p.append(f"late source {v['path']}: stated commit {m and m.group(1)} is not the commit that added it {added}")
+                blob = git("rev-parse", f"{c}:{v['path']}").stdout.strip(); now = git("rev-parse", f"{commit}:{v['path']}").stdout.strip()
+                if git("cat-file", "-e", f"{PIN}:{v['path']}").returncode == 0: p.append(f"late source exists at the pin: {v['path']}")
+                if not blob or blob != now: p.append(f"late source {v['path']} changed after {c[:12]} (blob {blob[:12]} vs {now[:12]} at {commit[:12]})")
+                v["route"] = {"kind": "git_blob", "commit": c, "path": v["path"], "blob": blob, "bytes": int(git("cat-file", "-s", blob).stdout or 0)}
+            elif v["path"] == "data/SOUL.md":
+                v["route"] = {"kind": "git_blob_not_opened", "commit": PIN, "path": v["path"], "blob": git("rev-parse", f"{PIN}:{v['path']}").stdout.strip()}
+            else: v["route"] = {"kind": "pin_file", "commit": PIN, "path": v["path"]}
+        for n in nonfile:                                                    # F3: content routes for the non-file sources
+            m = re.search(r"block ([A-Z0-9-]+)", n["name"])
+            if not m: n["route"] = {"kind": "named_gap"}; continue
+            try: i, b = block_at(log, m.group(1))
+            except ValueError: p.append(f"non-file source block not found: {m.group(1)}"); continue
+            n["route"] = {"kind": "handoff_block", "log_commit": commit, "block": m.group(1), "log_line": i + 1, "lines": len(b), "sha256": sha("\n".join(b) + "\n")}
+        if sum(1 for n in nonfile if n.get("route", {}).get("kind") == "named_gap") != 1: p.append("expected exactly one named-gap non-file row (April vision)")
+        return rows, nonfile, delta, view, groups, p, inputs
+    
+    def check(rows, nonfile, delta, view, groups, p):
+        from collections import Counter
+        dup = [x for x, n in Counter(r["path"] for r in rows).items() if n > 1]
+        if dup: p.append(f"duplicate v2 paths: {dup}")
+        per = Counter(r["section"] for r in rows)
+        for s, n in SECTIONS.items():
+            if per[s] != n: p.append(f"section {s}: {per[s]} file rows, register states {n}")
+        bad = [(r["path"], r["v2_class"], r["v2_role"]) for r in rows if r["v2_class"] not in CLASSES or r["v2_role"] not in ROLES]
+        if bad: p.append(f"{len(bad)} rows outside the class/role vocabulary: {bad[:3]}")
+        badeff = [v["path"] for v in view.values() if v.get("eff_class") not in CLASSES or any(r not in ROLES for r in v.get("eff_roles") or [None])]
+        if badeff: p.append(f"{len(badeff)} rows with effective fields outside the vocabulary: {badeff[:3]}")
+        if len(nonfile) != B_NONFILE: p.append(f"section B non-file rows {len(nonfile)}, expected {B_NONFILE}")
+        if len(delta) != 39: p.append(f"change list rows {len(delta)}, expected 39")
+        used = {t for v in view.values() for t in v["delta_rows"]} | {g["row"] for g in groups}
+        if len(used) != len(delta): p.append(f"change-list rows accounted {len(used)} of {len(delta)}")
+        missing = OPEN_ITEMS - {g["item"] for g in groups}
+        if missing: p.append(f"open items not carried: {sorted(missing)}")
+        expect = sum(SECTIONS.values()) + sum(1 for d in delta if d[0] == "LATE")
+        if len(view) != expect: p.append(f"view file rows {len(view)}, expected {expect}")
+        return p
+    
+    def verify_written(path):
+        """Downstream probe: re-read the published file and check corrected values arrived (F1 propagation)."""
+        d = json.load(open(path)); rows = {r["path"]: r for r in d["file_rows"]}; out = []
+        for k, (c, r) in KNOWN.items():
+            if (rows[k]["eff_class"], rows[k]["eff_roles"]) != (c, r): out.append(f"published {k} is {rows[k]['eff_class']}/{rows[k]['eff_roles']}, expected {c}/{r}")
+        return out
+    
+    if __name__ == "__main__":
+        commit, out = sys.argv[1], sys.argv[2]; fault = sys.argv[3] if len(sys.argv) > 3 else None
+        for f in (out, out + ".tmp"):                                        # F2: no stale output survives a run
+            if os.path.exists(f): os.remove(f)
+        full = git("rev-parse", commit + "^{commit}").stdout.strip()
+        log = git("show", f"{full}:kai-pm/HANDOFF_LOG.md").stdout.split("\n")
+        rows, nonfile, delta, view, groups, p, inputs = build(log, full, fault)
+        p = check(rows, nonfile, delta, view, groups, p)
+        was_diff = [(v["path"], v["delta_was"], f"{v['v2_class']} / {v['v2_role']}") for v in view.values() if v.get("delta_was") and
+                    not (v["delta_was"].split(" / ")[0].split(" (")[0] == v["v2_class"] and (" / " not in v["delta_was"] or v["delta_was"].split(" / ")[1] == v["v2_role"]))]
+        doc = {"pin": PIN, "log_commit": full, "inputs_sha256": inputs,
+               "producer": {"script_sha256": sha(open(__file__, "rb").read()), "python": sys.version.split()[0], "argv": sys.argv[1:]},
+               "file_rows": sorted(view.values(), key=lambda v: v["path"]), "nonfile_rows": nonfile, "group_notes": groups,
+               "open_items": sorted(OPEN_ITEMS) + ["April vision (B non-file row)"], "change_list_was_differs_from_v2": was_diff}
+        if fault == "stale_downstream":
+            for r in doc["file_rows"]:
+                if r["path"] in KNOWN: r["eff_class"], r["eff_roles"] = r["v2_class"], [r["v2_role"]]
+        if not p:
+            json.dump(doc, open(out + ".tmp", "w"), indent=1, ensure_ascii=False)
+            p += verify_written(out + ".tmp")
+            if p: os.remove(out + ".tmp")
+            else: os.replace(out + ".tmp", out)
+        eff = [v for v in view.values()]
+        print(f"EFFECTIVE VIEW @ {full[:12]}: v2 file rows {len(rows)} (" + " ".join(f"{s}{sum(r['section'] == s for r in rows)}" for s in SECTIONS) +
+              f") + non-file {len(nonfile)} + late {sum(v['late'] for v in eff)} = view file rows {len(view)}; change list {len(delta)} rows = "
+              f"{sum(len(v['delta_rows']) for v in eff if not v['late'])} on v2 paths + {sum(v['late'] for v in eff)} late + {len(groups)} group notes; "
+              f"effective fields from change list {sum(1 for v in eff if v['delta_rows'])}; mandatory {sum(1 for v in eff if v.get('eff_mandatory'))}; "
+              f"'was' column differs from v2 on {len(was_diff)}; problems {len(p)}; output {'WRITTEN ' + out if not p else 'NOT WRITTEN'}")
+        for x in p: print("PROBLEM", x)
+        sys.exit(1 if p else 0)
+    END-VERBATIM CENSUS-T1-REV2-SCRIPT
+- EVIDENCE CENSUS-T1-REV2-CALIBRATION-SCRIPT calibrate_t1.py: 1623 bytes, sha256 c3f9fe464fb8421606a9a2b2b98c5c74d7c5512e9153dd94806bc827285e6f6a, final LF True (added by Orion)  [CMD `sha256sum calibrate_t1.py` → c3f9fe464fb84216…]
+    BEGIN-VERBATIM CENSUS-T1-REV2-CALIBRATION-SCRIPT
+    # Calibration for T1 rev 2 (I-8). Every planted fault must exit 1 AND leave no output, even with a stale file present beforehand (F2).
+    # The correct run must exit 0 and publish. Run: python3 -I calibrate_t1.py <log-commit>
+    import os, subprocess, sys
+    HERE = os.path.dirname(os.path.abspath(__file__)); OUT = os.path.join(HERE, "cal_out.json")
+    FAULTS = ["drop_v2_row", "dup_v2_row", "drop_delta_row", "delta_path_not_in_v2", "late_in_v2", "drop_open_item", "drop_nonfile",
+              "bad_class", "bad_role", "eff_wrong_class", "eff_missing", "eff_extra", "eff_mandatory_lost", "late_wrong_commit",
+              "block_missing", "stale_downstream"]
+    def run(f=None):
+        open(OUT, "w").write("STALE")                                     # a stale file from an earlier run
+        r = subprocess.run([sys.executable, "-I", os.path.join(HERE, "effective_view.py"), sys.argv[1], OUT] + ([f] if f else []), capture_output=True, text=True)
+        return r.returncode, os.path.exists(OUT), (r.stdout.splitlines() + [""])[1 if f else 0][:110]
+    ok = True
+    for f in FAULTS:
+        code, exists, msg = run(f); good = code == 1 and not exists; ok &= good
+        print(f"{'CAUGHT' if good else 'MISSED'} {f}: exit {code}, output {'PRESENT' if exists else 'absent'} | {msg}")
+    code, exists, msg = run(); good = code == 0 and exists and open(OUT).read() != "STALE"; ok &= good
+    print(f"{'PASS' if good else 'FAIL'} correct set: exit {code}, output {'published' if exists else 'absent'}")
+    os.path.exists(OUT) and os.remove(OUT)
+    print(f"T1 CALIBRATION: {len(FAULTS)} planted faults, known-negative 1, result {'PASS' if ok else 'FAIL'}"); sys.exit(0 if ok else 1)
+    END-VERBATIM CENSUS-T1-REV2-CALIBRATION-SCRIPT
+- EVIDENCE CENSUS-T1-REV2-STDOUT t1_stdout.txt: 318 bytes, sha256 eabac78baf1038733fd152f62fbb247230d02e6902e2ac05f526a34185f5f411, final LF True (added by Orion)  [CMD `sha256sum t1_stdout.txt` → eabac78baf103873…]
+    BEGIN-VERBATIM CENSUS-T1-REV2-STDOUT
+    EFFECTIVE VIEW @ 97e81be9f9b5: v2 file rows 346 (B9 C69 D17 E68 F143 G40) + non-file 3 + late 2 = view file rows 348; change list 39 rows = 30 on v2 paths + 2 late + 7 group notes; effective fields from change list 32; mandatory 7; 'was' column differs from v2 on 3; problems 0; output WRITTEN out/effective_view.json
+    END-VERBATIM CENSUS-T1-REV2-STDOUT
+- EVIDENCE CENSUS-T1-REV2-CALIBRATION t1_calibration.txt: 2098 bytes, sha256 daa41d0dab95189a1568bc9837b96dc0c30fcdb38eaf6bfbbc96a18b2e61d527, final LF True (added by Orion)  [CMD `sha256sum t1_calibration.txt` → daa41d0dab95189a…]
+    BEGIN-VERBATIM CENSUS-T1-REV2-CALIBRATION
+    CAUGHT drop_v2_row: exit 1, output absent | PROBLEM section C: 68 file rows, register states 69
+    CAUGHT dup_v2_row: exit 1, output absent | PROBLEM duplicate v2 paths: ['docs/next_level_roadmap.md']
+    CAUGHT drop_delta_row: exit 1, output absent | PROBLEM effective fields for a row the change list does not change: kai-pm/KINGSMAN_LONG_HORIZON_STEWARDSHIP_A
+    CAUGHT delta_path_not_in_v2: exit 1, output absent | PROBLEM 1:K1 path not in v2: kai-pm/NO_SUCH_FILE.md
+    CAUGHT late_in_v2: exit 1, output absent | PROBLEM 38:LATE late source already in v2: kai-pm/KAI_LUMEN_OHANA_BRIDGE_ORIGIN_CONTINUITY_RECORD_2026-10-26.m
+    CAUGHT drop_open_item: exit 1, output absent | PROBLEM change list rows 38, expected 39
+    CAUGHT drop_nonfile: exit 1, output absent | PROBLEM expected exactly one named-gap non-file row (April vision)
+    CAUGHT bad_class: exit 1, output absent | PROBLEM 1 rows outside the class/role vocabulary: [('kai-pm/KINGSMAN_FINAL_VISION_MASTER_CANON_PLAN.md', 'Agen
+    CAUGHT bad_role: exit 1, output absent | PROBLEM 1 rows outside the class/role vocabulary: [('kai-pm/HANDOFF_LOG.md', 'canonical*', 'Status \\')]
+    CAUGHT eff_wrong_class: exit 1, output absent | PROBLEM data/SOUL.md: class derived not in its change text
+    CAUGHT eff_missing: exit 1, output absent | PROBLEM changed row has no effective fields: kai-pm/MEMORY_GRAPH_DESIGN.md
+    CAUGHT eff_extra: exit 1, output absent | PROBLEM effective fields for a row the change list does not change: kai-pm/RISKS.md
+    CAUGHT eff_mandatory_lost: exit 1, output absent | PROBLEM data/AGENTS.md: mandatory=False disagrees with its change text
+    CAUGHT late_wrong_commit: exit 1, output absent | PROBLEM late source kai-pm/KAI_LUMEN_OHANA_BRIDGE_ORIGIN_CONTINUITY_RECORD_2026-10-26.md: stated commit f32bfb
+    CAUGHT block_missing: exit 1, output absent | PROBLEM non-file source block not found: KAI-NO-SUCH
+    CAUGHT stale_downstream: exit 1, output absent | PROBLEM published data/SOUL.md is UNCLASSIFIED/['inaccessible'], expected lineage/['intake']
+    PASS correct set: exit 0, output published
+    T1 CALIBRATION: 16 planted faults, known-negative 1, result PASS
+    END-VERBATIM CENSUS-T1-REV2-CALIBRATION
+- EVIDENCE CENSUS-T2-REV2-SCRIPT subject.py: 6983 bytes, sha256 85a0c1605441af04a2f8a66992ed729ccacd908406cc23bd5695e99966c545fe, final LF True (added by Orion)  [CMD `sha256sum subject.py` → 85a0c1605441af04…]
+    BEGIN-VERBATIM CENSUS-T2-REV2-SCRIPT
+    # T2 (rev 2): extract the pinned subject (procedure v3.2.3 §1a steps 1-6), manifest it twice, check it against git's object ids.
+    # Read-only on the repository. Standard library. Run: python3 -I subject.py <scratch-dir> <effective_view.json> [fault]
+    # Kai review (entry 301): F4 data/SOUL.md is excluded by pathspec BEFORE the archive is generated, so its bytes never enter the
+    # stream; it is identified by its git blob id only. F2 fails closed: subject, sums and manifest exist only if every check passed.
+    import hashlib, json, os, shutil, subprocess, sys
+    REPO = "/home/user/kai-system"; PIN = "dd153c1f4ab7c52f34620e07238554453a8912d9"
+    NOT_TOUCHED = {"data/SOUL.md": "d62a137a2b492ec352615dd198e25fd37d963038"}
+    
+    def git(*a, **k): return subprocess.run(["git", *a], cwd=REPO, capture_output=True, **k)
+    def sha(b): return hashlib.sha256(b).hexdigest()
+    def archive(excludes): return git("archive", "--format=tar", PIN, "--", ".", *[f":(exclude){x}" for x in excludes]).stdout
+    def names(tar_bytes): return set(subprocess.run(["tar", "-t"], input=tar_bytes, capture_output=True).stdout.decode().split("\n")) - {""}
+    def manifest(root):
+        m = {}
+        for d, _, fs in os.walk(root):
+            for f in fs:
+                p = os.path.join(d, f); m[os.path.relpath(p, root)] = "symlink:" + os.readlink(p) if os.path.islink(p) else sha(open(p, "rb").read())
+        return m
+    def blob_id(p):
+        b = os.readlink(p).encode() if os.path.islink(p) else open(p, "rb").read()
+        return hashlib.sha1(b"blob %d\0" % len(b) + b).hexdigest()
+    
+    def main(scratch, view_path, fault=None):
+        sub = os.path.join(scratch, "subject"); sums = os.path.join(scratch, "subject.SHA256SUMS"); man = os.path.join(scratch, "subject.MANIFEST.json")
+        shutil.rmtree(sub, ignore_errors=True)
+        for f in (sums, man, sums + ".tmp", man + ".tmp"):
+            if os.path.exists(f): os.remove(f)                                                  # F2: nothing stale survives
+        p = []
+        view_bytes = open(view_path, "rb").read(); view = json.loads(view_bytes)
+        if fault == "unbound_view": view.pop("producer", None)
+        if not view.get("producer", {}).get("script_sha256") or view.get("pin") != PIN: p.append("effective view is not bound to a producer and this pin")
+        full = git("rev-parse", PIN + "^{commit}", text=True).stdout.strip()                    # step 1
+        if full != PIN: p.append(f"pin does not resolve to itself: {full}")
+        # F4 self-test of the exclusion mechanism on a file that may be read (README.md), never on SOUL.md
+        with_readme, without_readme = names(archive([])), names(archive(["README.md"]))
+        if "README.md" not in with_readme or "README.md" in without_readme: p.append("pathspec exclusion self-test failed on README.md")
+        arc = archive(list(NOT_TOUCHED))                                                        # step 2: SOUL never in the stream
+        listed = names(arc)
+        if fault == "soul_in_stream": listed.add("data/SOUL.md")
+        leaked = sorted(set(NOT_TOUCHED) & listed)
+        if leaked: p.append(f"excluded file present in the archive stream: {leaked}")
+        os.makedirs(sub)
+        r = subprocess.run(["tar", "-x", "-C", sub], input=arc, capture_output=True)
+        if r.returncode: p.append(f"tar failed: {r.stderr[:200]!r}")
+        tree = {}
+        for line in git("ls-tree", "-r", "-z", PIN).stdout.split(b"\0"):
+            if line:
+                meta, path = line.split(b"\t", 1); mode, typ, oid = meta.decode().split(); tree[path.decode()] = (mode, typ, oid)
+        if fault == "drop_intake_file": os.remove(os.path.join(sub, "kai-pm/SEQUENCE.md"))
+        if fault == "alter_byte":
+            f = os.path.join(sub, "README.md"); b = bytearray(open(f, "rb").read()); b[0] ^= 1; open(f, "wb").write(bytes(b))
+        m1 = manifest(sub)
+        if fault == "change_between_manifests": open(os.path.join(sub, "kai-pm/STATUS.md"), "ab").write(b"x")
+        m2 = manifest(sub)                                                                      # step 5
+        if m1 != m2: p.append(f"subject changed between manifests: {sorted(k for k in m1.keys() | m2.keys() if m1.get(k) != m2.get(k))[:5]}")
+        for f, oid in NOT_TOUCHED.items():
+            if os.path.lexists(os.path.join(sub, f)): p.append(f"{f} was extracted; it must not be")
+            if tree.get(f, (0, 0, None))[2] != oid: p.append(f"{f} blob id at the pin is {tree.get(f)}, expected {oid}")
+        regular = {k: v for k, v in tree.items() if v[1] == "blob" and k not in NOT_TOUCHED}
+        other = {k: v for k, v in tree.items() if v[1] != "blob"}
+        missing = sorted(set(regular) - set(m2)); extra = sorted(set(m2) - set(regular))
+        if missing: p.append(f"{len(missing)} pin files not extracted: {missing[:5]}")
+        if extra: p.append(f"{len(extra)} extracted files not in the pin tree: {extra[:5]}")
+        bad = [k for k in regular if k in m2 and blob_id(os.path.join(sub, k)) != regular[k][2]]
+        if bad: p.append(f"{len(bad)} files whose bytes differ from git's blob id: {bad[:5]}")
+        intake_missing = [r["path"] for r in view["file_rows"] if r["route"]["kind"] == "pin_file" and r["path"] not in m2]
+        late_present = [r["path"] for r in view["file_rows"] if r["late"] and r["path"] in tree]
+        if intake_missing: p.append(f"{len(intake_missing)} register paths missing from the subject: {intake_missing[:5]}")
+        if late_present: p.append(f"late sources present at the pin: {late_present}")
+        if not p:                                                                               # step 6: beside, never inside
+            body = "".join(f"{v}  {k}\n" for k, v in sorted(m2.items())).encode()
+            open(sums + ".tmp", "wb").write(body)
+            json.dump({"pin": PIN, "subject_files": len(m2), "not_touched": NOT_TOUCHED, "sums_sha256": sha(body),
+                       "inputs_sha256": {"effective_view.json": sha(view_bytes)}, "effective_view_producer": view["producer"],
+                       "producer": {"script_sha256": sha(open(__file__, "rb").read()), "python": sys.version.split()[0], "argv": sys.argv[1:]}},
+                      open(man + ".tmp", "w"), indent=1)
+            os.replace(sums + ".tmp", sums); os.replace(man + ".tmp", man)
+        else: shutil.rmtree(sub, ignore_errors=True)                                            # F2: a failed subject is not left usable
+        print(f"SUBJECT @ {PIN[:12]}: pin tree {len(tree)} entries = {len(regular)} files extracted + {len(NOT_TOUCHED)} not touched (excluded before"
+              f" archiving; blob id only) + {len(other)} non-blob; archive stream lists {len(listed)} entries ({sum(1 for n in listed if not n.endswith('/'))} files, {sum(1 for n in listed if n.endswith('/'))} directories), excluded present {len(leaked)}; manifests equal"
+              f" {m1 == m2}; blob-id mismatches {len(bad)}; pin-file register paths missing {len(intake_missing)}; problems {len(p)};"
+              f" output {'WRITTEN' if not p else 'NOT WRITTEN'}")
+        for x in p: print("PROBLEM", x)
+        return 1 if p else 0
+    
+    if __name__ == "__main__": sys.exit(main(sys.argv[1], sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else None))
+    END-VERBATIM CENSUS-T2-REV2-SCRIPT
+- EVIDENCE CENSUS-T2-REV2-CALIBRATION-SCRIPT calibrate_t2.py: 1625 bytes, sha256 5c62fb7c6da216d01a24e483e2816c35b28e8dcc032da8bd8ba2a36d130f1d68, final LF True (added by Orion)  [CMD `sha256sum calibrate_t2.py` → 5c62fb7c6da216d0…]
+    BEGIN-VERBATIM CENSUS-T2-REV2-CALIBRATION-SCRIPT
+    # Calibration for T2 rev 2 (I-8). Each planted fault must exit 1 AND leave no subject, sums or manifest (F2), with stale
+    # copies present beforehand. The correct run must exit 0 and publish all three. Run: python3 -I calibrate_t2.py <effective_view.json>
+    import os, shutil, subprocess, sys
+    HERE = os.path.dirname(os.path.abspath(__file__)); CAL = os.path.join(HERE, "cal2")
+    FAULTS = ["drop_intake_file", "alter_byte", "change_between_manifests", "soul_in_stream", "unbound_view"]
+    OUTS = [os.path.join(CAL, x) for x in ("subject", "subject.SHA256SUMS", "subject.MANIFEST.json")]
+    def run(f=None):
+        shutil.rmtree(CAL, ignore_errors=True); os.makedirs(os.path.join(CAL, "subject"))
+        open(OUTS[1], "w").write("STALE"); open(OUTS[2], "w").write("STALE")
+        r = subprocess.run([sys.executable, "-I", os.path.join(HERE, "subject.py"), CAL, sys.argv[1]] + ([f] if f else []), capture_output=True, text=True)
+        left = [os.path.basename(o) for o in OUTS if os.path.exists(o)]
+        return r.returncode, left, (r.stdout.splitlines() + [""])[1 if f else 0][:110]
+    ok = True
+    for f in FAULTS:
+        code, left, msg = run(f); good = code == 1 and not left; ok &= good
+        print(f"{'CAUGHT' if good else 'MISSED'} {f}: exit {code}, left behind {left or 'nothing'} | {msg}")
+    code, left, msg = run(); good = code == 0 and len(left) == 3 and open(OUTS[1]).read() != "STALE"; ok &= good
+    print(f"{'PASS' if good else 'FAIL'} correct run: exit {code}, published {left}")
+    shutil.rmtree(CAL, ignore_errors=True)
+    print(f"T2 CALIBRATION: {len(FAULTS)} planted faults, known-negative 1, result {'PASS' if ok else 'FAIL'}"); sys.exit(0 if ok else 1)
+    END-VERBATIM CENSUS-T2-REV2-CALIBRATION-SCRIPT
+- EVIDENCE CENSUS-T2-REV2-STDOUT t2_stdout.txt: 332 bytes, sha256 e96456f2bdf90aba5c06b498b35d7c0b3db26ba39972c8c1237db9e33eaf0fc1, final LF True (added by Orion)  [CMD `sha256sum t2_stdout.txt` → e96456f2bdf90aba…]
+    BEGIN-VERBATIM CENSUS-T2-REV2-STDOUT
+    SUBJECT @ dd153c1f4ab7: pin tree 1255 entries = 1254 files extracted + 1 not touched (excluded before archiving; blob id only) + 0 non-blob; archive stream lists 1360 entries (1254 files, 106 directories), excluded present 0; manifests equal True; blob-id mismatches 0; pin-file register paths missing 0; problems 0; output WRITTEN
+    END-VERBATIM CENSUS-T2-REV2-STDOUT
+- EVIDENCE CENSUS-T2-REV2-CALIBRATION t2_calibration.txt: 754 bytes, sha256 8d8d02c10af776ff38e7f93f9729ffb442fb5a5636eac16535981cb5220f5899, final LF True (added by Orion)  [CMD `sha256sum t2_calibration.txt` → 8d8d02c10af776ff…]
+    BEGIN-VERBATIM CENSUS-T2-REV2-CALIBRATION
+    CAUGHT drop_intake_file: exit 1, left behind nothing | PROBLEM 1 pin files not extracted: ['kai-pm/SEQUENCE.md']
+    CAUGHT alter_byte: exit 1, left behind nothing | PROBLEM 1 files whose bytes differ from git's blob id: ['README.md']
+    CAUGHT change_between_manifests: exit 1, left behind nothing | PROBLEM subject changed between manifests: ['kai-pm/STATUS.md']
+    CAUGHT soul_in_stream: exit 1, left behind nothing | PROBLEM excluded file present in the archive stream: ['data/SOUL.md']
+    CAUGHT unbound_view: exit 1, left behind nothing | PROBLEM effective view is not bound to a producer and this pin
+    PASS correct run: exit 0, published ['subject', 'subject.SHA256SUMS', 'subject.MANIFEST.json']
+    T2 CALIBRATION: 5 planted faults, known-negative 1, result PASS
+    END-VERBATIM CENSUS-T2-REV2-CALIBRATION
+- EVIDENCE CENSUS-T2-REV2-MANIFEST subject.MANIFEST.json: 836 bytes, sha256 37a79ad25a233f28812a42887f2720c35db1d0633f11f413c370f2291bc44494, final LF True (added by Orion)  [CMD `sha256sum subject.MANIFEST.json` → 37a79ad25a233f28…]
+    BEGIN-VERBATIM CENSUS-T2-REV2-MANIFEST
+    {
+     "pin": "dd153c1f4ab7c52f34620e07238554453a8912d9",
+     "subject_files": 1254,
+     "not_touched": {
+      "data/SOUL.md": "d62a137a2b492ec352615dd198e25fd37d963038"
+     },
+     "sums_sha256": "1de7867b0c32bee51906de58802c87a92ebd6b3b500b3178f850378ac943eae7",
+     "inputs_sha256": {
+      "effective_view.json": "5529b74c7f6cf3e71925c8664b58b670a1748059ea10bd303bbaa836e75fccf7"
+     },
+     "effective_view_producer": {
+      "script_sha256": "d3698ed1adf21b9505dc19d942f3da119ce398fdac14137706a41419006e830f",
+      "python": "3.11.17",
+      "argv": [
+       "97e81be",
+       "out/effective_view.json"
+      ]
+     },
+     "producer": {
+      "script_sha256": "85a0c1605441af04a2f8a66992ed729ccacd908406cc23bd5695e99966c545fe",
+      "python": "3.11.17",
+      "argv": [
+       "/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/census",
+       "out/effective_view.json"
+      ]
+     }
+    }
+    END-VERBATIM CENSUS-T2-REV2-MANIFEST
+
+### 6. Next authorised step
+
+- Post the reply to DAI-10 and verify; then build T3–T5 to Kai's entry 301 requirements  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "return the minimal corrections and their new calibration results"]
+
+### 7. What I am unsure of
+
+- Whether Kai wants the 50 "scoped" rows mapped onto intake/cross-check/control; T1 keeps his label as given  [CMD `REPLY_F1_F4.md` → "Open for you"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
