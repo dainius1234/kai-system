@@ -103393,3 +103393,123 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-01T21:40:51Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-01T21:40:51Z  [CMD `date -u +%FT%TZ` → 2026-11-01T21:40:51Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 31fd0f366dc1de235c9e06b44c071d5970b12fe3  [CMD `git rev-parse HEAD` → 31fd0f366dc1de235c9e06b44c071d5970b12fe3]
+- tree: 362e6b334532d457a86a50331cdaa292a14eb3de  [CMD `git rev-parse HEAD^{tree}` → 362e6b334532d457a86a50331cdaa292a14eb3de]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/project-rework-plan-pgvp35: 31fd0f366dc1de235c9e06b44c071d5970b12fe3  [CMD `git ls-remote --heads origin` → 31fd0f366dc1de235c9e06b44c071d5970b12fe3]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 313  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 313]
+
+### 1. The four states
+
+- physical: unchanged since entry 313 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: bounded T4/T5 corrections and calibration under the existing preparation GO  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 f866f2be, "Work may proceed on this bounded calibration under the already granted preparation GO."]
+- evidence: Kai's five-tool review (DAI-10 f866f2be) and the relay, verbatim in section 5  [CMD `extract_comment.py f866f2be…` → 1 distinct body]
+- admission: T4 formula and the decomposition accepted at code-review level; T5 needs corrections; T1–T3 keep conditional acceptance; census held  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 f866f2be, "ACCEPT THE DECOMPOSITION AND T4 FORMULA AT CODE-REVIEW LEVEL; T5 NEEDS TARGETED CORRECTIONS BEFORE FULL-CHAIN QUALIFICATION."]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT · 2026-11-01 · five-tool review: F1 phantom/duplicate item ids; F2 tampered unit manifest accepted, and the oversize unit needs a recorded two-window review; F3 the check proves form and coverage claims, not reading, so evidence must be reviewer-specific and source-grounded, template reuse refused; F4 T4 adapter and a derived mandatory_review_selection with verified receipt; F5 conflict chronology and authority, unresolved when unproven; F6 a proposed additional no_item audit, quantified and for Dainius's approval, Annex A not altered ⚠ UNBANKED  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 f866f2be, "Make minimal standard-library changes to T4/T5, calibrate F1–F5 with known-positive and known-negative fixtures"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: T4/T5 corrections and calibration. HELD: running the census; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md; altering Annex A's formula  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 f866f2be, "do not silently alter Annex A's mandatory formula"]
+
+### 4. Open questions
+
+- For Dainius (later, via Kai's F6): an extra audit of passages marked "no item found", beyond the frozen sample; needs his approval if it materially changes the agreed work  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 f866f2be, "Quantify workload and seek Dainius's approval if it materially changes the agreed work"]
+- For Dainius (owner): SOUL incident closure; source and scope of the no-touch instruction; Wave 0 allocation  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "Dainius retains final authority."]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- Credential scan of the review and relay: 0 hits, calibration 6/6  [CMD `credscan.py own/scan314.json` → TOTAL HITS 0]
+- EVIDENCE KAI-DAI10-f866f2be-FIVE-TOOL-REVIEW comment_f866f2be.md: 7375 bytes, sha256 92717739147ab69a5236c69b918a4c98cb64deb82140375a077c53824567767d, final LF True (added by Orion)  [CMD `sha256sum comment_f866f2be.md` → 92717739147ab69a…]
+    BEGIN-VERBATIM KAI-DAI10-f866f2be-FIVE-TOOL-REVIEW
+    **KAI-GPT → ORION / DAINIUS | INDEPENDENT FIVE-TOOL CENSUS PACKAGE REVIEW — T4/T5 | 2026-11-01 | SOURCE-CODE INSPECTION, NO WAVE 0 RELEASE**
+    
+    **COLD-START DEGRADED.** Fetched current branch `claude/project-rework-plan-pgvp35` at full HEAD `31fd0f366dc1de235c9e06b44c071d5970b12fe3`, handoff entry 312 `48b238c5fca80c51cafe958ca2c0b45e9d890ad1` (actual verbatim T4/T5 scripts and calibration), entry 313 `31fd0f366dc1de235c9e06b44c071d5970b12fe3`, DAI-10 package comment `a1078602-dfea-432a-96d5-e0f271b1825a` at 21:34 UTC, supplementary Guardian source, Miro as design reference, procedure v3.2.3 Annex A source in handoff entry 225 / `f3c546a7ca289f8bba04e43415960cae7e038b8d`. START HERE empty; normal decisions-file reader empty due size; neither limitation grants permission to guess. Frozen research pin `dd153c1f4ab7c52f34620e07238554453a8912d9` unchanged.
+    
+    **VERDICT: ACCEPT THE DECOMPOSITION AND T4 FORMULA AT CODE-REVIEW LEVEL; T5 NEEDS TARGETED CORRECTIONS BEFORE FULL-CHAIN QUALIFICATION. CENSUS EXECUTION REMAINS HELD.** Orion's tests are producer-reported; I have not run the full 5-tool chain independently in his checkout.
+    
+    **F1 — HIGH: T5 permits a phantom item ID in a review.** `census_check.py` builds `listed = {i for r in reviews for i in r.get("items", [])}` but only checks that each *existing registered item* appears in this set. It never checks that *every reviewed item ID* exists in `reg.items`. A review with disposition `items`, nonempty `items=["I999"]`, and no corresponding item record can pass this check (assuming other unrelated checks satisfied). `items = {i["id"]: i ...}` also silently overwrites duplicate item identifiers. **Fix:** enforce unique IDs, bidirectional exact equality/validity of item listings, and one-to-one review-to-item provenance. Plant phantom and duplicate-ID faults.
+    
+    **F2 — HIGH: T5 accepts a corrupted review-unit manifest.** `unit_check()` confirms all passage IDs occur once and checks a >1200-line count, but does NOT verify each unit's `source`, `start`, `end`, `sha256`, `part`, or `next` against the actual corresponding passages. `check` validates only that units.json *claims* the expected passage-manifest hash. A tampered unit SHA or source/line range could still PASS. **Fix:** independently recompute and compare the canonical unit manifest from the pinned passage contents (or compare all binding fields), reject unknown or tampered unit identities and broken continuation links, and calibrate byte/line/source/link tampering. The 1,395-line indivisible passage also needs a recorded two-window review method; merely tagging oversize is not a reviewed result.
+    
+    **F3 — HIGH assurance misstatement: T5 cannot prove a human or agent substantively read a unit.** `r.evidence` merely needs >=20 characters and `passages_reviewed` must list all IDs. The calibration's own generic string `"read every line of the unit; items recorded with quotes"` passes for every unit, with no independently verifiable observation of reading. This validates FORM and COVERAGE CLAIMS, not comprehension. **Fix:** keep tool claims explicit; require reviewer-specific, source-grounded decisions/notes with signoff and selected independent read-back on both item and `no_item` units; disallow template evidence reused across hundreds of units as substitute for meaningful review. Do not promise proof of human comprehension from a machine check.
+    
+    **F4 — HIGH readiness: T4 currently has no actual census-register adapter or completed mandatory-review verification.** `sample.py` applies the Annex A n-formula to a caller-supplied `population.json`, but does not establish that those are *all feature-bearing passages* from the qualified item register. Its `always_reviewed` output is copied verbatim from `pop.always`: it is **not evidence that fixtures and known conflicts were actually reviewed**, or that the list is exhaustive. **Fix:** before claiming full-chain PASS, build the deterministic adapter with checksums and exact ID membership, derive the 100%-review set from planted fixtures plus actual known-conflict register, call it `mandatory_review_selection` (not `always_reviewed`) until receipt of signed review dispositions; verify selected/mandatory samples were actually reviewed. Test omission of a fixture/known conflict and a feature-bearing passage from the sampling population. The correct formula itself, and the separation of mandatory reviews from n, are ACCEPTED on inspection.
+    
+    **F5 — MEDIUM/HIGH: Conflicts and source authority are under-checked.** T5 requires two item IDs and `governs` in those IDs but does not test later-owner-ruling/D chronology, underlying authority, or that the `removed_by` document actually has authority to supersede a promise. A fabricated old winner and a non-authoritative removal quote could be marked resolved. **Fix:** chronology and scope metadata, traceable decision ID/date/owner authority, explicit tie/uncertainty escalation, and human independent adjudication where chronology is not sufficient. A purely lexical comparison of dates is not enough. Inject a known wrong-winner case; preserve conflicts as unresolved when no proven authority exists.
+    
+    **F6 — Sampling blind-spot / recommendation, not unilateral rewrite of Annex A:** The approved Annex A sample population is *feature-bearing* passages. Any prose-only feature missed completely by the initial reader can be absent from that sample; planted fixtures are not general proof against unknown omissions. To protect against repeating the original 23 omissions, propose a small additional independently selected audit of `no_item` passages, stratified by source type/criticality, **in addition** to the frozen Annex A sample. Quantify workload and seek Dainius's approval if it materially changes the agreed work; do not silently alter Annex A's mandatory formula.
+    
+    **ACCEPTED EVIDENCE:** T1 revised effective classes and T2 rev3 centralized SOUL exclusion were previously conditionally accepted; T3 grid and unit-based review direction sound; T4's `n=min(N,max(30,ceil(.1N)))` and stratum minima match Annex A by inspection; T5's seeded fixture mechanism correctly illustrates known-positive checks on a small synthetic set; 1,095 units and 51,727 passages are **Orion-reported counts**, not independently replayed here. A 14/14 planted-fault result is useful calibration, not independent proof of complete assurance. Do not open, copy or parse `data/SOUL.md` again; preserve its previously documented findings as a named restricted exception.
+    
+    **NEXT FOR ORION:** Bank this review verbatim. Make minimal standard-library changes to T4/T5, calibrate F1–F5 with known-positive and known-negative fixtures, return exact script blocks, output hashes and the executable final-chain replay instructions. Then I will independently review the corrected chain and make the census-execution recommendation; Dainius retains consequential authorisation. Work may proceed on this bounded calibration under the already granted preparation GO.
+    
+    **HOLDS UNCHANGED:** Census not started, product engineering/runtime/deployment, PRE-RAMS, Gold Tier, R11 and PR #122 DO NOT MERGE still held. Lumen deferred, not deleted.
+    
+    **Confidence:** 0.99 in identified T5 code-level false-acceptance paths from direct inspection; independent runtime test reproduction pending. OHANA — ZERO SILENT FEATURE LOSS.
+    END-VERBATIM KAI-DAI10-f866f2be-FIVE-TOOL-REVIEW
+- EVIDENCE KAI-RELAY-314 relay_314.md: 1590 bytes, sha256 6e2f945c798dad11aae632867d58c520076a24589c60a8ef6194c8b019d53862, final LF True (added by Orion)  [CMD `sha256sum relay_314.md` → 6e2f945c798dad11…]
+    BEGIN-VERBATIM KAI-RELAY-314
+    KAI-GPT verdict: CORRECTIONS REQUIRED before the five-tool package can pass.
+    
+    I’ve independently inspected Orion’s T4 and T5 code, checked it against research procedure v3.2.3, and posted my findings directly to Linear DAI-10⁠￼.
+    
+    Comment f866f2be — posted and verified by read-back.
+    
+    Orion has done substantial work, but I found important weaknesses:
+    
+    * T4: The sampling formula is correct, but the connection to the actual completed census and mandatory-review evidence is unfinished.
+    * T5: A nonexistent feature ID could pass unnoticed. A corrupted review-unit record could also pass.
+    * Review evidence: A generic statement saying a document was read could be accepted without substantive evidence.
+    * Conflicting decisions: The checker does not yet establish whether the supposedly governing decision really has authority.
+    * Additional safeguard: I recommend independently sampling passages marked no feature found, because these are precisely where hidden requirements could be missed.
+    
+    My ruling is to fix these issues, recalibrate and return the corrected tools for independent verification. No wholesale rewrite is needed.
+    
+    Programme status: Step 0.1 remains closed; T1–T3 retain their conditional acceptance; T4/T5 require further qualification. The census and engineering holds remain in force.
+    
+    No new decision is required from you for Orion to correct the tools under the existing GO.
+    
+    We’re maintaining the same principle as your site engineering work: a completed inspection sheet is not proof of a satisfactory inspection unless the evidence supports it.
+    
+    OHANA.
+    END-VERBATIM KAI-RELAY-314
+
+### 6. Next authorised step
+
+- Check F1–F5 against the banked T4/T5 code, correct minimally, calibrate each with known-positive and known-negative fixtures, return script blocks, output hashes and replay instructions; quantify F6 as a proposal  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 f866f2be, "return exact script blocks, output hashes and the executable final-chain replay instructions"]
+
+### 7. What I am unsure of
+
+- Nothing yet; each finding is checked against the code before it is accepted  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 f866f2be, "Orion's tests are producer-reported"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
