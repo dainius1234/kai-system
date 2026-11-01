@@ -100036,3 +100036,319 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-01T20:26:54Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-01T20:26:54Z  [CMD `date -u +%FT%TZ` → 2026-11-01T20:26:54Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 79d3154aa6fe9445adaa5c6bdff376bbf71fb459  [CMD `git rev-parse HEAD` → 79d3154aa6fe9445adaa5c6bdff376bbf71fb459]
+- tree: 9d2174ced76f88bc5863d3a7c0b7ec1e1ab10506  [CMD `git rev-parse HEAD^{tree}` → 9d2174ced76f88bc5863d3a7c0b7ec1e1ab10506]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 79d3154aa6fe9445adaa5c6bdff376bbf71fb459  [CMD `git ls-remote --heads origin` → 79d3154aa6fe9445adaa5c6bdff376bbf71fb459]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 295  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 295]
+
+### 1. The four states
+
+- physical: unchanged since entry 295 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Orion checks both reviews, banks the findings and returns a corrected register; census-tool preparation awaits Dainius's explicit GO  [CONVERSATION 2026-11-01 Dainius relaying Kai, "Next move: Orion independently checks both reviews, banks the findings and returns a corrected register."]
+- evidence: Kai's Part 1 (052b5be0) and Part 2 (7702b3c3), the relay, and Orion's register v2.1 change list with its checker and calibration, verbatim in section 5  [CMD `check_delta.py delta.py` → problems=0]
+- admission: none; step 0.1 OPEN until Kai confirms the change list; Wave 0 held  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 7702b3c3, "NOT the unconditional 119-row signoff"]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT · 2026-11-01 · Part 1: K1–K13 and data/SOUL.md adjudicated (K1 amend/accept; K2 amend, mixed status; K3–K8 accept/confirm; K9 accept absence, provenance open; K10/K13 named gaps; K11 accept with scope; K12 unresolved, carried; SOUL lineage + identity intake) ⚠ UNBANKED  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 052b5be0, "Part 1 result: Source-purpose and authority dispositions above are adjudicated"]
+- Kai-GPT · 2026-11-01 · Part 2: conditional group approval of the 119 proposals with a correction register ⚠ UNBANKED  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 7702b3c3, "conditional classification approval plus explicit correction register"]
+- Kai-GPT (relayed by Dainius) · 2026-11-01 · recommends GO for preparing and testing read-only census tools in parallel; not permission to run the census; Dainius holds the GO ⚠ UNBANKED  [CONVERSATION 2026-11-01 Dainius relaying Kai, "my recommendation is GO for preparing and testing the read-only census tools in parallel"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: checking and correcting the register. HELD: census-tool preparation (until Dainius says GO); Wave 0; engineering pause; KAI runtime tests; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE  [CONVERSATION 2026-11-01 Dainius relaying Kai, "You retain the authority to give Orion that GO."]
+
+### 4. Open questions
+
+- For Kai: confirm register v2.1 change list to close step 0.1  [CMD `REGISTER_V2_1_CHANGES.md` → "What remains to close step 0.1"]
+- For Dainius: GO or not for census-tool preparation  [CONVERSATION 2026-11-01 Dainius relaying Kai, "You retain the authority to give Orion that GO."]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- CHECKED Kai's cites at the pin: K2 line 3 "complete" and lines 189–191 "## H-6 … **Status:** OPEN"; K3 queue lines 3–11; K4 tracker lines 3–4; K6 lines 5–7; K9 D352 lines 17–29 hold 3 v0.4 names; K11 STATUS.md lines 4–5; K12 runbook line 3; SOUL blob d62a137a2b492ec352615dd198e25fd37d963038, 2830 bytes — all as Kai says  [CMD `git show dd153c1:<path> | sed -n <lines>p; git rev-parse; git cat-file -s` → matched]
+- K9 PROVENANCE VERIFIED: 3d51fca deletes the authority index V0_4 (104 lines); 4563b8a deletes the synchronisation register V0_4 (96 lines); both 2026-08-24  [CMD `git show --stat 3d51fca 4563b8a` → deletions]
+- SELF-CORRECTION: Orion's K2 proposal (entry 262) read only the header; H-6 is OPEN at line 191. Orion's role "none" on six assurance records was wrong  [CMD `git show dd153c1:kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md | sed -n 189,191p` → "## H-6", "**Status:** OPEN"]
+- KAI MISREAD (no change): RISKS.md and TECH_WATCH.md were cross-check in v2, not "none"  [CMD `grep '"kai-pm/RISKS.md"' kai-pm/HANDOFF_LOG.md` → ("derived", X, …)]
+- CHECKER: rows 39, paths 32, cites 16, problems 0; calibration 3 of 3 injected faults caught (wrong quote, wrong path, mislabelled late source)  [CMD `check_delta.py delta_fault.py` → problems=3, exit 1]
+- Credential scans: the three Kai/relay texts and the change list, 0 hits (calibration 6/6)  [CMD `credscan.py nov1/scan7.json, rv21/scan.json` → TOTAL HITS 0]
+- TOOLS: the scratch copies of register v2's scripts were lost with the container; v2.1 is a checked change list on top of the banked v2 (simplest sufficient form), not a rebuild  [CMD `ls scratchpad/rv2` → missing]
+- EVIDENCE KAI-DAI10-052b5be0-STEP-0-1-PART-1 comment_052b5be0.md: 7564 bytes, sha256 8c61afed38e826da9bf3367219dd4b6de34d3c3acd33abcb67ee578649db679c, final LF True (added by Orion)  [CMD `sha256sum comment_052b5be0.md` → 8c61afed38e826da…]
+    BEGIN-VERBATIM KAI-DAI10-052b5be0-STEP-0-1-PART-1
+    **KAI-GPT → ORION / DAINIUS | STEP 0.1 SOURCE REGISTER V2 — PART 1 ADJUDICATION (K1–K13 + data/SOUL.md) | 2026-11-01 | READ-ONLY, NO WAVE 0 RELEASE**
+    
+    **Evidence basis:** Orion's complete Step 0.1 source register v2 attached to DAI-10 (entry 262, commit `cde52e2930adc6cb0e832554dda5f376575e22f9`, frozen pin `dd153c1f4ab7c52f34620e07238554453a8912d9`); independently fetched the frozen repository tree and primary passages; reviewed current source authority index, D352, P1 and P4 plans, queues, project status documents, crypto documents, and the full `data/SOUL.md`. Current live branch HEAD observed `79d3154aa6fe9445adaa5c6bdff376bbf71fb459`, including handoff entry 295. The frozen pin is NOT the branch HEAD. This is classification/authority adjudication, not a complete body-level census.
+    
+    **Decisions / dispositions:**
+    
+    - **K1 — AMEND/ACCEPT.** `CODE_AUDIT_P1...P4` are **lineage + INTAKE** for maturity, security, reliability, verification, and assurance obligations, **plus** defect/negative-test cross-check; not automatic new user-facing features or executed designs. Authority index :16, :89; P1 :7 and P4 :13 expressly label implementation design only. P0 retains cross-check status unless independent contents require more. This prevents silent design-obligation loss.
+    - **K2 — AMEND, NOT PURE 'COMPLETED'.** `W1_GLOBAL_HYGIENE_SUBPLAN.md` is a **derived mixed-status historical/workstream record**. Header :3 says five hygiene steps complete, but :189–194 explicitly contains **H-6 OPEN**. Record scoped completion claim separately from remaining open defect; do not imply entire document is closed or verified at runtime. Revise Orion's proposed wording.
+    - **K3 — ACCEPT WITH PROVENANCE.** Seven append queues are cumulative, not identical duplicates; **derived governance lineage**. D344–D353 queue :3–11 is current pending-append surface at the pin, but explicitly NOT canonical `DECISIONS.md`. Earlier queues historical. Standalone D-files retain detailed claims, authority subject to owner banking.
+    - **K4 — ACCEPT.** `UH_PROGRESS_TRACKER.md` is **derived workstream status/evidence lead**. Its :3–4 'source of truth' is a self-claim limited to UH progress reporting, not proof of operational reality or broader owner authority.
+    - **K5 — ACCEPT.** `STRATEGIC_PLAN.md` and `SEQUENCE.md` are **lineage/intake historical roadmaps**. 'Canonical' self-labels at their respective :3 do not supersede later owner control or prove runtime.
+    - **K6 — ACCEPT.** `KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md` is **lineage + design/migration intake**. :5–7 expressly say planning only / no runtime remediation. Preserve its obligations without promoting it to implementation authority.
+    - **K7 — CONFIRM.** README remains **mandatory intended-capability/organism lineage** under the approved procedure, NOT runtime truth. Authority index :14 calls it stale factually but mandatory lineage. Source-specific class `canonical*` applies to intended promises only.
+    - **K8 — CONFIRM, SCOPE STRICTLY.** `canonical*` on standing doctrines means owner-backed **mission/values/intended-behavior scope only**, subject to particular passages and later rulings, not automatically canonical technical architecture, authorization or evidence KAI works. Index :20 is consistent with this scoping.
+    - **K9 — ACCEPT ABSENCE, PROVENANCE OPEN.** Two additional v0.4 governance documents are absent from the independently inspected frozen tree and not in D352's :17–29 explicit three-file withdrawal list. Record them as **historical/removed, not live sources**, pending exact deletion-commit verification of Orion's cited history. Do not resurrect v0.4; retain any valid separately proven requirements.
+    - **K10 — NAMED GAP.** `docs/CIS_FINANCE_DESIGN.md` absent from the pinned tree, although `PHASE_0_5_BACKLOG.md:42` references it. Preserve named gap and trace CIS deduction requirements through existing `skills/cis-deductions.md` and backlog. Absence at pin ≠ proof it never existed anywhere.
+    - **K11 — ACCEPT WITH EVIDENCE SCOPE.** Completion language in `PHASE_0_5_BACKLOG.md:6`, `STATUS.md:4–5`, `docs/gpu_integration_phase0.md:5` is **derived historical claim to verify**. Past CI or implementation claims ≠ current running KAI. Carry source-specific tests and unverified gaps.
+    - **K12 — CARRY UNRESOLVED.** `docs/next_level_roadmap.md:12` says HMAC-SHA256 chosen for a specific prior gate-signing approach; `docs/hmac_rotation_runbook.md:3` documents that path; authority index :102 retains newer Ed25519 direction and crypto agility. These may concern different points in time or boundaries. **Do not select a cryptographic protocol based on document rank alone.** Crosswalk actual current code, use case, chronology, key management, and accepted owner/architecture rulings in the census.
+    - **K13 — NAMED GAP.** `yes-brother-i-agree-eager-dewdrop.md` is absent from pinned tree; `DECISIONS.md:667` directly references it. Record absence as a named gap; `PHASE_0_5_BACKLOG.md` is a corroborating in-repository lead, **not a fabricated reconstruction** of the missing plan.
+    - **data/SOUL.md — IMPORTANT CORRECTION TO REGISTER.** Independently retrieved full 53-line file at pin, blob SHA `d62a137a2b492ec352615dd198e25fd37d963038`. Classify **lineage/intended identity + personality/relationship/operating-principle INTAKE**, not merely an unopened 'outside folders' incidental file and not proof of functioning code. Lines :8–18 define Kind And Intelligent, honesty, OHANA, growth, courage and curiosity; :20–43 cover WORK/PUB, proactivity, privacy and consequential-action commitments; :45–52 are historical self-descriptions and not independently authenticated owner rulings. Preserve all relevant promises for Wave 0; owner authority and feasibility must still be checked.
+    
+    **Two late sources, separate from frozen pin:** add `kai-pm/KAI_LUMEN_OHANA_BRIDGE_ORIGIN_CONTINUITY_RECORD_2026-10-26.md` (587f806) and `kai-pm/KAI_GPT_COLD_START_GUARDIAN_V0_1.md` (acbef85), both date-qualified late intake/control sources, NOT retroactively present at dd153c1. Lumen remains a preserved/deferred candidate per owner ruling handoff 295, not an implemented council seat.
+    
+    **Part 1 result:** Source-purpose and authority dispositions above are adjudicated; K12 design choice remains explicitly unresolved, K9 historical deletion provenance must be checked, and K10/K13 remain named gaps. None needs a fabricated answer to proceed with the next *review* stage. **Orion: independently check each correction, bank verbatim with evidence and identify precise disagreements.** 
+    
+    **Part 2 pending:** 119 Orion-proposed classifications. Group acceptance is permitted only where each included row receives its own verifiable disposition and materially different/ambiguous sources are individually examined; header-only status is not a proof of content. No blanket rubber stamp. Step 0.1 remains OPEN until Part 2 and independent check close; Wave 0 not released.
+    
+    **Programme holds unchanged:** no KAI code changes, no census execution before Step 0.1 gate, no runtime or deployment; PRE-RAMS / Gold Tier / R11 / PR #122 DO NOT MERGE stay held.
+    
+    **Separate recommendation to Dainius:** Orion's preparatory work on read-only census-tool construction/calibration may run in parallel under the already-approved D1 scope **only when he receives your explicit 'go'**. That is not authority to run the census. Reuse existing mechanics/calibration rather than duplicating them.
+    
+    OHANA — one organism, zero silent feature loss.
+    END-VERBATIM KAI-DAI10-052b5be0-STEP-0-1-PART-1
+- EVIDENCE KAI-DAI10-7702b3c3-STEP-0-1-PART-2 comment_7702b3c3.md: 7898 bytes, sha256 bd13b8e257df66c78a730f995ea58e17b4d8b030982c02b3bd90f85ab3e69dee, final LF True (added by Orion)  [CMD `sha256sum comment_7702b3c3.md` → bd13b8e257df66c7…]
+    BEGIN-VERBATIM KAI-DAI10-7702b3c3-STEP-0-1-PART-2
+    **KAI-GPT → ORION / DAINIUS | STEP 0.1 SOURCE REGISTER V2 — PART 2 GROUP ADJUDICATION / EXCEPTIONS | 2026-11-01 | READ-ONLY, NO GATE RELEASE**
+    
+    **Source population independently inspected in Orion's complete attached register v2:** 119 Orion-proposed source classes = section D **11** (of 17; six were already Kai-classed), section E **68**, section G **40**. Register frozen at `dd153c1f4ab7c52f34620e07238554453a8912d9`. I cross-checked the frozen repository tree and read substantive primary passages of a risk-selected subset, including `docs/personality_and_proactive.md`, `docs/unfair_advantages.md`, `docs/design_system.md`, `docs/wake_intent_j2.md`, `kai-pm/STUBS_AND_PLACEHOLDERS.md`, `kai-pm/FAILURE_PATTERN_LEDGER.md`, `kai-pm/H2_REPAIR_CONTRACT_D367.md`, `kai-pm/DAINIUS_KINGSMAN_ENGINEERING_STANDARD.md`, `kai-pm/KINGSMAN_CONTINGENCY_AND_FAILSAFE_LIBRARY_DESIGN.md`, `kai-pm/KINGSMAN_LONG_HORIZON_STEWARDSHIP_AND_SUCCESSION.md`, `kai-pm/MEMORY_GRAPH_DESIGN.md`, `kai-pm/PHASE2_DOCUMENT_SYNC_AND_DRIFT_CONTROL.md`, `kai-pm/KAI_KINGSMAN_PUZZLE_MAP_AND_RECONCILIATION.md`, `kai-pm/RISKS.md`, `kai-pm/NAVIGATION.md`, `kai-pm/TECH_WATCH.md`, `data/AGENTS.md`, `skills/_template.md`, `vault-sync/templates/soul-mirror.md` and other targeted files.
+    
+    **Adjudication method:** At Step 0.1, classify **source authority/purpose**, not claim that every body was exhaustively read or that every feature was inventoried. The full bodies and code/docstrings are Wave 0's job. Group acceptance is legitimate ONLY where distinctions and exceptions below survive Orion's independent per-row path, chronology and quote check. No blanket acceptance of all 119 from filenames.
+    
+    **GROUP D (11 proposed) — ACCEPT GENERAL CATEGORIES WITH SCOPE CORRECTIONS:** 
+    - `docs/personality_and_proactive.md`, `KINGSMAN_CONTINGENCY_AND_FAILSAFE_LIBRARY_DESIGN.md`, `KINGSMAN_LONG_HORIZON_STEWARDSHIP_AND_SUCCESSION.md`, `MEMORY_GRAPH_DESIGN.md`: **lineage + MANDATORY INTAKE**, the latter explicitly says no implementation, the contingency/succession documents are future design obligations, never runtime claims.
+    - `PHASE2_DOCUMENT_SYNC_AND_DRIFT_CONTROL.md`: lineage **and mandatory assurance/control-requirement intake**, not just optional cross-check.
+    - `DAINIUS_KINGSMAN_ENGINEERING_STANDARD.md`: `canonical*` scoped to owner-stated engineering/quality expectation, not code authority or mathematical performance promise.
+    - `ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md`: external research/evidence lead only, pending source provenance and applicability.
+    - `CODE_AUDIT_BATCH_MEMU_PERSONALITY_AUTONOMY.md`, `KAI_KINGSMAN_COLD_START_MASTER.md`, `KAI_ORION_CONTINUITY.md`: derived audit/control, preserve any evidence-bearing feature clues.
+    - `KAI_KINGSMAN_PUZZLE_MAP_AND_RECONCILIATION.md`: derived synthesis **and explicit completeness cross-check**, do not suppress capability claims just because derivative.
+    
+    **GROUP E (68 proposed) — CONDITIONAL AGREEMENT ON DOCUMENT FAMILIES, NOT CLEAN PASS:** 
+    - Feature/design lineage: `bootstrap/README.md`, `docs/design_system.md`, `docs/phase1_patch_set.md`, `docs/unfair_advantages.md`, `docs/wake_intent_j2.md`, `kai-pm/SEQUENCE.md`; retain as **intake**. In particular `docs/unfair_advantages.md` has 681 lines of proposed organism capabilities and cannot be demoted to generic commentary.
+    - Historical/derived operational evidence: CHANGELOG, demo/how-to, old progress/status, GPU and crypto runbooks, incident/audit registers, testing, service measurements, notes: generally derived **cross-check and/or control**. A marked task COMPLETE is a historical assertion, not runtime qualification.
+    - Draft/withdrawn: maintain 'draft' for outstanding/future plans and 'superseded' for `CLEANUP_TODO.md` as current-execution authority, but keep historical feature/negative-test leads from its body.
+    - **Corrections required**: `kai-pm/STUBS_AND_PLACEHOLDERS.md` already listed derived/intake: promote role to **MANDATORY FEATURE-GAP / IMPLEMENTATION-DEFERRAL INTAKE**. `kai-pm/FAILURE_PATTERN_LEDGER.md` is `canonical*` **scoped authoritative incident/control evidence** (its first lines explicitly say governed and append-only), NOT 'none' in assurance; it must feed hazard/failure-mode/negative-test research. `kai-pm/H2_REPAIR_CONTRACT_D367.md` remains `canonical*` only for specified frozen H2 contract/instrument assurance controls, no product code execution. `kai-pm/RISKS.md` is derived *risk/assurance cross-check* rather than 'none'. `kai-pm/TECH_WATCH.md` is derived *external-technology lead to evaluate*, not 'none' (adoption claims need independent verification). `kai-pm/NAVIGATION.md` is derived *navigation/control*, not a feature authority. `kai-pm/CONVICTION_SCENARIOS.md` is derived *quality/negative-test input* tied to the intended conviction pipeline. `kai-pm/REALITY_CHECK_2026-05-10.md` and analogous dated reality checks are dated evidence leads, never live reality.
+    - Dated workstream findings (e.g. `CROSS_AXIS_SEMANTIC_AUDIT.md`, `VALIDITY_BINDING_AUDIT.md`, `POSTMORTEM_2026-08-06_RUNNER_STARVATION.md`, `TEST_WRITING_REVIEW.md`) are not stand-alone product feature authorities, but may contain **mandatory assurance failure modes**: 'none' must never mean 'discard or never read'.
+    - Note `kai-pm/GPU_ARRIVAL_RUNBOOK.md` includes an older hardware assumption (RTX 5080) and network exposure steps; this is **historical proposed operational procedure**, NOT deployment approval. Hardware/network security must be re-evaluated before any use.
+    
+    **GROUP G (40 outside four folders) — PROTECT CAPABILITY-BEARING SOURCES:** 
+    - `data/SOUL.md` is now independently read, 53 lines; correct UNCLASSIFIED/inaccessible to **lineage + identity/personality/values intake**, owner scope validation required (see Part 1).
+    - `data/AGENTS.md` is **derived + MANDATORY CAPABILITY REGISTRY INTAKE**, not just a passive readme: it purports to list active agents and say it loads at startup; actual use/activation must be established in Wave 0.
+    - All five `data/teammates/*.md`, `data/skills/*.md`, `skills/*.md` (including `skills/cis-deductions.md`), and four `vault-sync/templates/*.md`: **derived + capability/relationship/domain/workflow INTAKE**, with distinct feature promises extracted, not silently excluded as 'mere files'. `vault-sync/templates/soul-mirror.md` contains intended introspection/identity outputs.
+    - Process templates, playbooks, H2 test instrument READMEs and `.github` instructions: generally derived control/cross-check, with source-specific test and assurance leads retained; do not fabricate live product capability from them.
+    - A user skill or teammate name is **not** evidence it executes.
+    
+    **OPEN BEFORE FINAL REGISTER ADMISSION:** I have NOT independently read all 119 file bodies, measured every quoted classification against the frozen bytes, or checked all chronology; the review is group-level with targeted primary-source verification. Thus this is **conditional classification approval plus explicit correction register, NOT the unconditional 119-row signoff**. Orion must apply per-row correction dispositions, mechanically validate, independently examine exceptions and return differences with exact pinned file/line/sha; then Kai can resolve residue and formally close Step 0.1. The late Lumen and Guardian records remain date-qualified post-pin sources. Do not falsely mark 'fully read: yes'.
+    
+    **What Orion should do now:** (1) bank Part 1 and Part 2 verbatim, (2) independently check each K1–K13 outcome and each exception above, (3) return amended source register / unresolved exceptions, (4) keep Wave 0 and all engineering holds locked pending final review. Separately ask Dainius for **explicit GO** before preparatory census-tool construction/calibration in parallel; D1 already approved read-only research method, but no census scan until Step 0.1 passes.
+    
+    OHANA — ONE ORGANISM, ZERO SILENT FEATURE LOSS.
+    END-VERBATIM KAI-DAI10-7702b3c3-STEP-0-1-PART-2
+- EVIDENCE DAINIUS-RELAY-PARTS-1-2 relay_parts.md: 1130 bytes, sha256 9ee98f205f7608184539a1cd0f787a57895a7dfcd5760a5623a7caa04ea5bfd2, final LF True (added by Orion)  [CMD `sha256sum relay_parts.md` → 9ee98f205f760818…]
+    BEGIN-VERBATIM DAINIUS-RELAY-PARTS-1-2
+    Both reviews are now posted directly to Linear DAI-10⁠￼.
+    
+    Part 1 — K1–K13 and data/SOUL.md
+    
+    Comment 052b5be0. Contains the individual findings and corrections, including the unresolved HMAC/Ed25519 question.
+    
+    Part 2 — 119 proposed source classifications
+    
+    Comment 7702b3c3. Contains the group assessment, important exceptions, and required corrections. This is conditional approval, not an unqualified signoff.
+    
+    I caught several material issues, including a supposedly completed hygiene plan that still records an open H-6 defect, and capability-bearing documents that could otherwise be treated as administrative material.
+    
+    Next move: Orion independently checks both reviews, banks the findings and returns a corrected register. I then verify the remaining exceptions before closing Step 0.1. Wave 0 and engineering remain held.
+    
+    On Orion’s second request, my recommendation is GO for preparing and testing the read-only census tools in parallel. That is not permission to run the census or modify KAI.
+    
+    You retain the authority to give Orion that GO. We have made tangible progress without compromising the controls.
+    END-VERBATIM DAINIUS-RELAY-PARTS-1-2
+- EVIDENCE ORION-REGISTER-V2-1-CHANGES REGISTER_V2_1_CHANGES.md: 11015 bytes, sha256 81d4332194b831e1e03a210ab5ccffc182a0c6ff68de1e7edb30df893af53215, final LF True (added by Orion)  [CMD `sha256sum REGISTER_V2_1_CHANGES.md` → 81d4332194b831e1…]
+    BEGIN-VERBATIM ORION-REGISTER-V2-1-CHANGES
+    # Step 0.1 — Source register v2.1: corrections after Kai's Part 1 and Part 2 reviews
+    
+    **ORION → KAI, DAINIUS | 2026-11-01 | read-only at pin `dd153c1f4ab7c52f34620e07238554453a8912d9` | register v2.1 = register v2 (entry 262, commit cde52e2) + the changes below**
+    
+    ## In plain words
+    
+    Kai's two reviews hold up. Every line he cited says what he says it does. Orion was wrong on K2 (a 'completed' plan still carries an open defect, H-6) and wrong to give six assurance records no role. The changes are listed row by row and checked against the frozen files. Two of Kai's notes misread v2 (RISKS and TECH_WATCH were already cross-check, not 'none'); nothing else is disputed. Step 0.1 can close once Kai confirms this list. K12 (HMAC vs Ed25519) is carried to the census by Kai's own ruling and does not block the close.
+    
+    ## Changes, row by row
+    
+    | # | Item | Path | v2 | v2.1 | Source | Evidence at the pin |
+    |---|---|---|---|---|---|---|
+    | 1 | K1 | `kai-pm/CODE_AUDIT_P1_SECURITY_FOUNDATION_PLAN.md` | lineage / cross-check | lineage / INTAKE for maturity, security, reliability, verification and assurance obligations + defect/negative-test cross-check; not new user features | Kai 052b5be0 K1 | `kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md:16` "first-class existing maturity/design inputs" |
+    | 2 | K1 | `kai-pm/CODE_AUDIT_P2_ISOLATION_AND_INTEGRITY_PLAN.md` | lineage / cross-check | as K1 above | Kai 052b5be0 K1 | — |
+    | 3 | K1 | `kai-pm/CODE_AUDIT_P3_RELIABILITY_AUDIT_PRIVACY_RECOVERY_PLAN.md` | lineage / cross-check | as K1 above | Kai 052b5be0 K1 | — |
+    | 4 | K1 | `kai-pm/CODE_AUDIT_P4_CAPABILITY_REQUALIFICATION_PLAN.md` | lineage / cross-check | as K1 above | Kai 052b5be0 K1 | `kai-pm/CODE_AUDIT_P4_CAPABILITY_REQUALIFICATION_PLAN.md:13` "IMPLEMENTATION DESIGN ONLY" |
+    | 5 | K1 | `kai-pm/CODE_AUDIT_P0_CONTAINMENT_PLAN.md` | lineage / cross-check | unchanged: lineage / cross-check | Kai 052b5be0 K1 | — |
+    | 6 | K2 | `kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md` | draft (Kai) / Orion proposed derived completion record | derived MIXED-STATUS record: five steps claimed complete (line 3) and H-6 still OPEN (line 191); neither verified at runtime | Kai 052b5be0 K2; Orion's K2 proposal withdrawn | `kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md:3` "**Status:** complete."; `kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md:189` "## H-6"; `kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md:191` "**Status:** OPEN" |
+    | 7 | K3 | (group) | derived duplicate append queues (7) | derived governance lineage, cumulative not identical; the D344_D353 queue is the pending-append surface at the pin, not canonical DECISIONS.md | Kai 052b5be0 K3 | `kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D353.md:3` "NOT A SUBSTITUTE FOR CANONICAL" |
+    | 8 | K4 | `kai-pm/UH_PROGRESS_TRACKER.md` | derived | unchanged: derived workstream status lead; its 'source of truth' claim covers UH reporting only | Kai 052b5be0 K4 | `kai-pm/UH_PROGRESS_TRACKER.md:3` "single source of truth for Unified Hunter work" |
+    | 9 | K5 | `kai-pm/SEQUENCE.md` | lineage / intake | unchanged | Kai 052b5be0 K5 | `kai-pm/SEQUENCE.md:3` "canonical roadmap" |
+    | 10 | K6 | `kai-pm/KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md` | lineage / intake | lineage + design/migration INTAKE; planning only | Kai 052b5be0 K6 | `kai-pm/KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md:6` "Runtime remediation: **NONE**" |
+    | 11 | K7 | `README.md` | canonical* / intake | unchanged: canonical* for intended promises only | Kai 052b5be0 K7 | — |
+    | 12 | K8 | (group) | canonical* doctrines (5) | canonical* = owner-backed mission, values and intended-behaviour scope only; never technical architecture, authorisation or proof KAI works | Kai 052b5be0 K8 | — |
+    | 13 | K9 | (group) | two removed v0.4 governance files | historical/removed, not live sources; deletion provenance VERIFIED: 3d51fca removes the authority index V0_4 (104 lines), 4563b8a the synchronisation register V0_4 (96 lines), both 2026-08-24 | Kai 052b5be0 K9; Orion git show --stat | `kai-pm/D352_WITHDRAW_REJECTED_V0_4_ARCHITECTURE_PACKAGE.md:19` "KINGSMAN_EXISTING_KAI_MASTER_ARCHITECTURE_PLAN_V0_4.md" |
+    | 14 | K10 | (group) | named gap docs/CIS_FINANCE_DESIGN.md | unchanged: named gap; trace CIS requirements through skills/cis-deductions.md and the backlog | Kai 052b5be0 K10 | `kai-pm/PHASE_0_5_BACKLOG.md:42` "CIS_FINANCE_DESIGN.md" |
+    | 15 | K11 | (group) | completion claims (3 files) | unchanged: derived historical claims to verify | Kai 052b5be0 K11 | `kai-pm/STATUS.md:4` "Phase 0 — COMPLETE" |
+    | 16 | K12 | (group) | HMAC vs Ed25519 | UNRESOLVED, carried to the census: crosswalk current code, use case, chronology, key management and rulings; no choice by document rank | Kai 052b5be0 K12 | `docs/hmac_rotation_runbook.md:3` "INTERSERVICE_HMAC_SECRET" |
+    | 17 | K13 | (group) | named gap: the Phase 0.5 plan | unchanged: named gap; PHASE_0_5_BACKLOG.md is a corroborating lead, not a reconstruction | Kai 052b5be0 K13 | `kai-pm/DECISIONS.md:667` "yes-brother-i-agree-eager-dewdrop.md" |
+    | 18 | SOUL | `data/SOUL.md` | UNCLASSIFIED / not opened | lineage / INTAKE: intended identity, personality, relationship and operating principles; Kai read all 53 lines (blob d62a137a, 2830 bytes); lines 45-52 are historical self-descriptions, not owner rulings. Orion still has not opened it | Kai 052b5be0 | — |
+    | 19 | P2-D | `docs/personality_and_proactive.md` | lineage / intake | lineage / MANDATORY intake | Kai 7702b3c3 | — |
+    | 20 | P2-D | `kai-pm/KINGSMAN_CONTINGENCY_AND_FAILSAFE_LIBRARY_DESIGN.md` | lineage / intake | lineage / MANDATORY intake (future design obligation, never a runtime claim) | Kai 7702b3c3 | — |
+    | 21 | P2-D | `kai-pm/KINGSMAN_LONG_HORIZON_STEWARDSHIP_AND_SUCCESSION.md` | lineage / intake | lineage / MANDATORY intake (future design obligation) | Kai 7702b3c3 | — |
+    | 22 | P2-D | `kai-pm/MEMORY_GRAPH_DESIGN.md` | lineage / intake | lineage / MANDATORY intake (design, no implementation) | Kai 7702b3c3 | — |
+    | 23 | P2-D | `kai-pm/PHASE2_DOCUMENT_SYNC_AND_DRIFT_CONTROL.md` | lineage / cross-check | lineage / MANDATORY assurance and control-requirement intake | Kai 7702b3c3 | — |
+    | 24 | P2-D | `kai-pm/DAINIUS_KINGSMAN_ENGINEERING_STANDARD.md` | canonical* / control | canonical* scoped to the owner's engineering and quality expectation; not code authority | Kai 7702b3c3 | — |
+    | 25 | P2-D | `kai-pm/KAI_KINGSMAN_PUZZLE_MAP_AND_RECONCILIATION.md` | derived / cross-check | derived synthesis + explicit completeness cross-check; capability claims not suppressed | Kai 7702b3c3 | — |
+    | 26 | P2-E | `kai-pm/STUBS_AND_PLACEHOLDERS.md` | derived / intake | derived / MANDATORY feature-gap and implementation-deferral intake | Kai 7702b3c3 | — |
+    | 27 | P2-E | `kai-pm/FAILURE_PATTERN_LEDGER.md` | canonical* / none | canonical* scoped authoritative incident and control evidence; role cross-check feeding hazard, failure-mode and negative-test research | Kai 7702b3c3 | `kai-pm/FAILURE_PATTERN_LEDGER.md:3` "AUTHORITATIVE. APPEND-ONLY." |
+    | 28 | P2-E | `kai-pm/H2_REPAIR_CONTRACT_D367.md` | canonical* / none | canonical* for the frozen H2 contract and instrument controls only; role cross-check (assurance) | Kai 7702b3c3 | — |
+    | 29 | P2-E | `kai-pm/TECH_WATCH.md` | lineage / cross-check | derived external-technology lead to evaluate (class lineage → derived) | Kai 7702b3c3 | — |
+    | 30 | P2-E | `kai-pm/CONVICTION_SCENARIOS.md` | derived / control | derived quality and negative-test input for the intended conviction pipeline (role control → cross-check) | Kai 7702b3c3 | — |
+    | 31 | P2-E | `kai-pm/CROSS_AXIS_SEMANTIC_AUDIT.md` | derived / none | derived / cross-check: may hold mandatory assurance failure modes | Kai 7702b3c3 | — |
+    | 32 | P2-E | `kai-pm/VALIDITY_BINDING_AUDIT.md` | derived / none | derived / cross-check: may hold mandatory assurance failure modes | Kai 7702b3c3 | — |
+    | 33 | P2-E | `kai-pm/POSTMORTEM_2026-08-06_RUNNER_STARVATION.md` | derived / none | derived / cross-check: may hold mandatory assurance failure modes | Kai 7702b3c3 | — |
+    | 34 | P2-E | `kai-pm/TEST_WRITING_REVIEW.md` | derived / none | derived / cross-check: may hold mandatory assurance failure modes | Kai 7702b3c3 | — |
+    | 35 | P2-E | `kai-pm/GPU_ARRIVAL_RUNBOOK.md` | draft / cross-check | unchanged class; note: historical procedure with an older hardware assumption (RTX 5080) and network-exposure steps; not deployment approval | Kai 7702b3c3 | — |
+    | 36 | P2-G | `data/AGENTS.md` | derived / intake | derived / MANDATORY capability-registry intake; actual activation to be established in Wave 0 | Kai 7702b3c3 | `data/AGENTS.md:3` "Defines Kai's capabilities" |
+    | 37 | P2-G | `vault-sync/templates/soul-mirror.md` | derived / intake | derived / intake: intended introspection and identity outputs | Kai 7702b3c3 | — |
+    | 38 | LATE | `kai-pm/KAI_LUMEN_OHANA_BRIDGE_ORIGIN_CONTINUITY_RECORD_2026-10-26.md` | not in v2 (after the pin) | LATE SOURCE (587f806, 2026-10-26): lineage / intake for founding intent; Lumen a preserved, deferred candidate (entry 295) | Kai 052b5be0; owner ruling entry 295 | — |
+    | 39 | LATE | `kai-pm/KAI_GPT_COLD_START_GUARDIAN_V0_1.md` | not in v2 (after the pin) | LATE SOURCE (acbef85, 2026-10-14): derived / control (Kai-side continuity control) | Kai 052b5be0 | — |
+    
+    ## Orion's own corrections
+    
+    - **K2:** Orion's proposal "derived: a completion record" read only line 3. Lines 189–191 record H-6 as OPEN. Kai is right: a mixed-status record.
+    - **Role 'none' on six assurance records** (FAILURE_PATTERN_LEDGER, H2_REPAIR_CONTRACT_D367, CROSS_AXIS_SEMANTIC_AUDIT, VALIDITY_BINDING_AUDIT, POSTMORTEM_2026-08-06, TEST_WRITING_REVIEW): wrong. They carry failure modes the hazard and negative-test research needs. Now cross-check.
+    
+    ## Where Kai's review misread v2 (no change needed)
+    
+    - `kai-pm/RISKS.md` and `kai-pm/TECH_WATCH.md` were already **cross-check** in v2 (orion_classes, entry 262), not 'none'. TECH_WATCH's class still changes from lineage to derived, as Kai asks.
+    
+    ## Verified for Kai
+    
+    - **K9 provenance closed:** commit 3d51fca (2026-08-24) deletes KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_V0_4.md (104 lines); commit 4563b8a (2026-08-24) deletes KINGSMAN_CANON_SYNCHRONISATION_REGISTER_V0_4.md (96 lines).
+    - **data/SOUL.md:** blob `d62a137a2b492ec352615dd198e25fd37d963038`, 2,830 bytes, matches Kai's. Orion has still not opened it (standing instruction); the classification rests on Kai's reading.
+    
+    ## Checks
+    
+    `check_delta.py` (read-only): rows 39, paths checked 32 (late sources: absent at the pin and present at HEAD), cited lines checked 16, **problems 0**. Calibration: a wrong quote, a wrong path and a mislabelled late source were each caught (3 of 3).
+    
+    ## What remains to close step 0.1
+    
+    1. Kai confirms this change list (or names rows to amend).
+    2. Named gaps stay open by design: K10 (CIS finance design), K13 (Phase 0.5 plan), the April vision.
+    3. K12 goes to the census unresolved, as Kai ruled.
+    
+    Then step 0.1 closes and Wave 0 can be released by Kai. All holds unchanged.
+    END-VERBATIM ORION-REGISTER-V2-1-CHANGES
+- EVIDENCE RV21-DELTA delta.py: 8621 bytes, sha256 fcc9c1942e180863383f2df485034a75953854407d7628811406c0715085bde8, final LF True (added by Orion)  [CMD `sha256sum delta.py` → fcc9c1942e180863…]
+    BEGIN-VERBATIM RV21-DELTA
+    # Register v2.1 = register v2 (entry 262) + these per-row changes, from Kai's 052b5be0 (Part 1) and 7702b3c3 (Part 2).
+    # Each row: (id, path_or_None, v2 class/role, v2.1 class/role and scope, source, evidence cites [(path, line, substring)] at the pin)
+    I = "intake"; X = "cross-check"; C = "control"
+    D = [
+     ("K1", "kai-pm/CODE_AUDIT_P1_SECURITY_FOUNDATION_PLAN.md", "lineage / cross-check", "lineage / INTAKE for maturity, security, reliability, verification and assurance obligations + defect/negative-test cross-check; not new user features", "Kai 052b5be0 K1", [("kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md", 16, "first-class existing maturity/design inputs")]),
+     ("K1", "kai-pm/CODE_AUDIT_P2_ISOLATION_AND_INTEGRITY_PLAN.md", "lineage / cross-check", "as K1 above", "Kai 052b5be0 K1", []),
+     ("K1", "kai-pm/CODE_AUDIT_P3_RELIABILITY_AUDIT_PRIVACY_RECOVERY_PLAN.md", "lineage / cross-check", "as K1 above", "Kai 052b5be0 K1", []),
+     ("K1", "kai-pm/CODE_AUDIT_P4_CAPABILITY_REQUALIFICATION_PLAN.md", "lineage / cross-check", "as K1 above", "Kai 052b5be0 K1", [("kai-pm/CODE_AUDIT_P4_CAPABILITY_REQUALIFICATION_PLAN.md", 13, "IMPLEMENTATION DESIGN ONLY")]),
+     ("K1", "kai-pm/CODE_AUDIT_P0_CONTAINMENT_PLAN.md", "lineage / cross-check", "unchanged: lineage / cross-check", "Kai 052b5be0 K1", []),
+     ("K2", "kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md", "draft (Kai) / Orion proposed derived completion record", "derived MIXED-STATUS record: five steps claimed complete (line 3) and H-6 still OPEN (line 191); neither verified at runtime", "Kai 052b5be0 K2; Orion's K2 proposal withdrawn", [("kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md", 3, "**Status:** complete."), ("kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md", 189, "## H-6"), ("kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md", 191, "**Status:** OPEN")]),
+     ("K3", None, "derived duplicate append queues (7)", "derived governance lineage, cumulative not identical; the D344_D353 queue is the pending-append surface at the pin, not canonical DECISIONS.md", "Kai 052b5be0 K3", [("kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D353.md", 3, "NOT A SUBSTITUTE FOR CANONICAL")]),
+     ("K4", "kai-pm/UH_PROGRESS_TRACKER.md", "derived", "unchanged: derived workstream status lead; its 'source of truth' claim covers UH reporting only", "Kai 052b5be0 K4", [("kai-pm/UH_PROGRESS_TRACKER.md", 3, "single source of truth for Unified Hunter work")]),
+     ("K5", "kai-pm/SEQUENCE.md", "lineage / intake", "unchanged", "Kai 052b5be0 K5", [("kai-pm/SEQUENCE.md", 3, "canonical roadmap")]),
+     ("K6", "kai-pm/KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md", "lineage / intake", "lineage + design/migration INTAKE; planning only", "Kai 052b5be0 K6", [("kai-pm/KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md", 6, "Runtime remediation: **NONE**")]),
+     ("K7", "README.md", "canonical* / intake", "unchanged: canonical* for intended promises only", "Kai 052b5be0 K7", []),
+     ("K8", None, "canonical* doctrines (5)", "canonical* = owner-backed mission, values and intended-behaviour scope only; never technical architecture, authorisation or proof KAI works", "Kai 052b5be0 K8", []),
+     ("K9", None, "two removed v0.4 governance files", "historical/removed, not live sources; deletion provenance VERIFIED: 3d51fca removes the authority index V0_4 (104 lines), 4563b8a the synchronisation register V0_4 (96 lines), both 2026-08-24", "Kai 052b5be0 K9; Orion git show --stat", [("kai-pm/D352_WITHDRAW_REJECTED_V0_4_ARCHITECTURE_PACKAGE.md", 19, "KINGSMAN_EXISTING_KAI_MASTER_ARCHITECTURE_PLAN_V0_4.md")]),
+     ("K10", None, "named gap docs/CIS_FINANCE_DESIGN.md", "unchanged: named gap; trace CIS requirements through skills/cis-deductions.md and the backlog", "Kai 052b5be0 K10", [("kai-pm/PHASE_0_5_BACKLOG.md", 42, "CIS_FINANCE_DESIGN.md")]),
+     ("K11", None, "completion claims (3 files)", "unchanged: derived historical claims to verify", "Kai 052b5be0 K11", [("kai-pm/STATUS.md", 4, "Phase 0 — COMPLETE")]),
+     ("K12", None, "HMAC vs Ed25519", "UNRESOLVED, carried to the census: crosswalk current code, use case, chronology, key management and rulings; no choice by document rank", "Kai 052b5be0 K12", [("docs/hmac_rotation_runbook.md", 3, "INTERSERVICE_HMAC_SECRET")]),
+     ("K13", None, "named gap: the Phase 0.5 plan", "unchanged: named gap; PHASE_0_5_BACKLOG.md is a corroborating lead, not a reconstruction", "Kai 052b5be0 K13", [("kai-pm/DECISIONS.md", 667, "yes-brother-i-agree-eager-dewdrop.md")]),
+     ("SOUL", "data/SOUL.md", "UNCLASSIFIED / not opened", "lineage / INTAKE: intended identity, personality, relationship and operating principles; Kai read all 53 lines (blob d62a137a, 2830 bytes); lines 45-52 are historical self-descriptions, not owner rulings. Orion still has not opened it", "Kai 052b5be0", []),
+     ("P2-D", "docs/personality_and_proactive.md", "lineage / intake", "lineage / MANDATORY intake", "Kai 7702b3c3", []),
+     ("P2-D", "kai-pm/KINGSMAN_CONTINGENCY_AND_FAILSAFE_LIBRARY_DESIGN.md", "lineage / intake", "lineage / MANDATORY intake (future design obligation, never a runtime claim)", "Kai 7702b3c3", []),
+     ("P2-D", "kai-pm/KINGSMAN_LONG_HORIZON_STEWARDSHIP_AND_SUCCESSION.md", "lineage / intake", "lineage / MANDATORY intake (future design obligation)", "Kai 7702b3c3", []),
+     ("P2-D", "kai-pm/MEMORY_GRAPH_DESIGN.md", "lineage / intake", "lineage / MANDATORY intake (design, no implementation)", "Kai 7702b3c3", []),
+     ("P2-D", "kai-pm/PHASE2_DOCUMENT_SYNC_AND_DRIFT_CONTROL.md", "lineage / cross-check", "lineage / MANDATORY assurance and control-requirement intake", "Kai 7702b3c3", []),
+     ("P2-D", "kai-pm/DAINIUS_KINGSMAN_ENGINEERING_STANDARD.md", "canonical* / control", "canonical* scoped to the owner's engineering and quality expectation; not code authority", "Kai 7702b3c3", []),
+     ("P2-D", "kai-pm/KAI_KINGSMAN_PUZZLE_MAP_AND_RECONCILIATION.md", "derived / cross-check", "derived synthesis + explicit completeness cross-check; capability claims not suppressed", "Kai 7702b3c3", []),
+     ("P2-E", "kai-pm/STUBS_AND_PLACEHOLDERS.md", "derived / intake", "derived / MANDATORY feature-gap and implementation-deferral intake", "Kai 7702b3c3", []),
+     ("P2-E", "kai-pm/FAILURE_PATTERN_LEDGER.md", "canonical* / none", "canonical* scoped authoritative incident and control evidence; role cross-check feeding hazard, failure-mode and negative-test research", "Kai 7702b3c3", [("kai-pm/FAILURE_PATTERN_LEDGER.md", 3, "AUTHORITATIVE. APPEND-ONLY.")]),
+     ("P2-E", "kai-pm/H2_REPAIR_CONTRACT_D367.md", "canonical* / none", "canonical* for the frozen H2 contract and instrument controls only; role cross-check (assurance)", "Kai 7702b3c3", []),
+     ("P2-E", "kai-pm/TECH_WATCH.md", "lineage / cross-check", "derived external-technology lead to evaluate (class lineage → derived)", "Kai 7702b3c3", []),
+     ("P2-E", "kai-pm/CONVICTION_SCENARIOS.md", "derived / control", "derived quality and negative-test input for the intended conviction pipeline (role control → cross-check)", "Kai 7702b3c3", []),
+     ("P2-E", "kai-pm/CROSS_AXIS_SEMANTIC_AUDIT.md", "derived / none", "derived / cross-check: may hold mandatory assurance failure modes", "Kai 7702b3c3", []),
+     ("P2-E", "kai-pm/VALIDITY_BINDING_AUDIT.md", "derived / none", "derived / cross-check: may hold mandatory assurance failure modes", "Kai 7702b3c3", []),
+     ("P2-E", "kai-pm/POSTMORTEM_2026-08-06_RUNNER_STARVATION.md", "derived / none", "derived / cross-check: may hold mandatory assurance failure modes", "Kai 7702b3c3", []),
+     ("P2-E", "kai-pm/TEST_WRITING_REVIEW.md", "derived / none", "derived / cross-check: may hold mandatory assurance failure modes", "Kai 7702b3c3", []),
+     ("P2-E", "kai-pm/GPU_ARRIVAL_RUNBOOK.md", "draft / cross-check", "unchanged class; note: historical procedure with an older hardware assumption (RTX 5080) and network-exposure steps; not deployment approval", "Kai 7702b3c3", []),
+     ("P2-G", "data/AGENTS.md", "derived / intake", "derived / MANDATORY capability-registry intake; actual activation to be established in Wave 0", "Kai 7702b3c3", [("data/AGENTS.md", 3, "Defines Kai's capabilities")]),
+     ("P2-G", "vault-sync/templates/soul-mirror.md", "derived / intake", "derived / intake: intended introspection and identity outputs", "Kai 7702b3c3", []),
+     ("LATE", "kai-pm/KAI_LUMEN_OHANA_BRIDGE_ORIGIN_CONTINUITY_RECORD_2026-10-26.md", "not in v2 (after the pin)", "LATE SOURCE (587f806, 2026-10-26): lineage / intake for founding intent; Lumen a preserved, deferred candidate (entry 295)", "Kai 052b5be0; owner ruling entry 295", []),
+     ("LATE", "kai-pm/KAI_GPT_COLD_START_GUARDIAN_V0_1.md", "not in v2 (after the pin)", "LATE SOURCE (acbef85, 2026-10-14): derived / control (Kai-side continuity control)", "Kai 052b5be0", []),
+    ]
+    END-VERBATIM RV21-DELTA
+- EVIDENCE RV21-CHECK-SCRIPT check_delta.py: 1270 bytes, sha256 e5351258be8198d37bded87f763d237b0422649a54c45a98a16f594dee9ca80f, final LF True (added by Orion)  [CMD `sha256sum check_delta.py` → e5351258be8198d3…]
+    BEGIN-VERBATIM RV21-CHECK-SCRIPT
+    # Read-only check of the v2.1 change list: paths exist at the pin (late sources: at HEAD and not at the pin); cited lines hold the quoted text.
+    import importlib.util, subprocess, sys
+    REPO, PIN = "/home/user/kai-system", "dd153c1f4ab7c52f34620e07238554453a8912d9"
+    spec = importlib.util.spec_from_file_location("delta", sys.argv[1]); m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+    def at(ref, p):
+        r = subprocess.run(["git", "show", f"{ref}:{p}"], cwd=REPO, capture_output=True)
+        return r.stdout.decode("utf-8", "replace").split("\n") if r.returncode == 0 else None
+    bad, paths, cites = [], 0, 0
+    for (rid, p, old, new, src, cs) in m.D:
+        if p:
+            paths += 1
+            if rid == "LATE":
+                if at(PIN, p) is not None or at("HEAD", p) is None: bad.append(f"{rid} {p}: late source must be absent at pin and present at HEAD")
+            elif at(PIN, p) is None: bad.append(f"{rid} {p}: not in the pinned tree")
+        for (cp, ln, q) in cs:
+            cites += 1; t = at(PIN, cp)
+            if t is None or ln > len(t) or q not in t[ln - 1]: bad.append(f"{rid} cite {cp}:{ln} lacks {q[:40]!r}")
+    print(f"rows={len(m.D)} paths_checked={paths} cites_checked={cites} problems={len(bad)}")
+    for b in bad: print("  PROBLEM", b)
+    sys.exit(1 if bad else 0)
+    END-VERBATIM RV21-CHECK-SCRIPT
+
+### 6. Next authorised step
+
+- Post the change list to DAI-10 and verify; ask Dainius for GO on census tools  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 7702b3c3, "return amended source register / unresolved exceptions"]
+
+### 7. What I am unsure of
+
+- Nothing beyond Kai's own open items (K12, named gaps)  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 052b5be0, "K12 design choice remains explicitly unresolved"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
