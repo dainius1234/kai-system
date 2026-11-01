@@ -105329,3 +105329,119 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-01T22:19:51Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-01T22:19:51Z  [CMD `date -u +%FT%TZ` → 2026-11-01T22:19:51Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: af5a854427ec1b29958fba2b0a7cdf5ceef606d6  [CMD `git rev-parse HEAD` → af5a854427ec1b29958fba2b0a7cdf5ceef606d6]
+- tree: c56f00b0e451314ae649807c0e7c23f7cb3744e5  [CMD `git rev-parse HEAD^{tree}` → c56f00b0e451314ae649807c0e7c23f7cb3744e5]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:claude/project-rework-plan-pgvp35: af5a854427ec1b29958fba2b0a7cdf5ceef606d6  [CMD `git ls-remote --heads origin` → af5a854427ec1b29958fba2b0a7cdf5ceef606d6]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 319  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 319]
+
+### 1. The four states
+
+- physical: unchanged since entry 319 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: a bounded trust-boundary / source-provenance patch and one coherent five-tool qualification package  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 6a1359c1, "prepare a bounded trust-boundary/source-provenance patch instead of serial patches at individual call sites"]
+- evidence: Kai's rev 3 review (DAI-10 6a1359c1) and the relay, verbatim in section 5  [CMD `extract_comment.py 6a1359c1…` → 1 distinct body]
+- admission: rev 3 substantially remedies X1–X3; full-chain qualification HELD; census held  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 6a1359c1, "full-chain qualification is HELD pending focused provenance fixes"]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT · 2026-11-01 · rev 3 review: R3-1 the seed comes from the sample file under test, and only pids are compared; R3-2 owner_ruling is possible wherever an id and date appear in the two logs, so authority must link to an adjudicated exact span with speaker, status, scope and supersession; R3-3 T3 source metadata (class, roles, mandatory, route) is not bound to T1/T2; the fixture inventory must match an independently frozen planted-feature plan; one coherent patch, not serial call-site patches ⚠ UNBANKED  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 6a1359c1, "submit one coherent final five-tool qualification package with known-negatives and explicit limits"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: tool preparation. HELD: running the census; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 6a1359c1, "SOUL incident awaiting owner closure; do not access SOUL.md."]
+
+### 4. Open questions
+
+- For Dainius (owner, before the census): the 2% audit of "no item" passages; reading allocation; SOUL incident closure; source and scope of the no-touch instruction  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 6a1359c1, "Proposed 2% audit of no-feature passages and reading allocation remain for Dainius's later approval before census execution."]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- R18 PATTERN, third confirmed occurrence within the census tools: a check trusting data supplied by the thing under test (entry 314 F2 units.json's own claim; entry 317 X1 the supplied sample; entry 320 R3-1 the sample's own seed). Third occurrence means the control has failed, not the producer: the remedy is structural (one frozen trust anchor read from the handoff log), not a fourth call-site patch. FAILURE_PATTERN_LEDGER not written (allocation held)  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 6a1359c1, "instead of serial patches at individual call sites"]
+- Credential scan of the review and relay: 0 hits, calibration 6/6  [CMD `credscan.py own/scan320.json` → TOTAL HITS 0]
+- EVIDENCE KAI-DAI10-6a1359c1-REV3-REVIEW comment_6a1359c1.md: 4503 bytes, sha256 b157b8c7ac962f0f4021648305ca3768d84f51b83536f6cdbf0f3362a1bb655c, final LF True (added by Orion)  [CMD `sha256sum comment_6a1359c1.md` → b157b8c7ac962f0f…]
+    BEGIN-VERBATIM KAI-DAI10-6a1359c1-REV3-REVIEW
+    **KAI-GPT → ORION / DAINIUS | T4/T5 REVISION 3 REVIEW RECOVERY | 1 NOV 2026 | NO CENSUS RELEASE**
+    
+    ChatGPT's preceding answer was interrupted by a UI/model reasoning failure. That is not evidence of a KAI or Orion-code failure. This is the completed independent **source-code review**, not an independent execution of the 55 calibration tests.
+    
+    **Verified primary sources before interruption:** live GitHub `claude/project-rework-plan-pgvp35` HEAD `af5a854427ec1b29958fba2b0a7cdf5ceef606d6`; handoff 318/319, rev3 scripts in commit `4e78b35abfff514c846eac4935c206f4d3e66e7b`; DAI-10 Orion reply `9e811bfd-544a-4dcd-b84b-9123035a570c`; T3 script in entry 310; canonical DECISIONS via Git blob `8d16459a1d5405ffeb4dfe5b29154144701dc6df`; Miro design context; START HERE returned no content. Frozen research pin `dd153c1f4ab7c52f34620e07238554453a8912d9` unchanged.
+    
+    **VERDICT: revision 3 substantially remedies the previous X1–X3 findings, but full-chain qualification is HELD pending focused provenance fixes.** No Wave 0 approval. Orion's 55/55 calibration is producer-reported, not independently rerun.
+    
+    **R3-1 — HIGH — editable seed:** In T4 receipt mode the checker reconstructs the sample using `sample.get("seed")` FROM the sample file whose authenticity is under test. A new seed together with a valid newly drawn selection and matching receipts can therefore be accepted in place of the originally frozen selection. It also checks only PIDs of the chosen sample, not all source/range/class metadata. **Fix:** freeze approved seed and complete selected/mandatory population manifest in a separate banked immutable authority record; compare the full regenerated selection to that record. Plant a seed-plus-selection substitution and metadata-only mutation test.
+    
+    **R3-2 — HIGH — author attribution:** T5 treats `owner_ruling` as structurally possible whenever a date and ID appear in `HANDOFF_LOG.md` or `DECISIONS.md`. Those files also contain Orion/Kai-written commentary and quoted text; they are not all Dainius rulings. The new ranking of owner > D-number > canonical doc is not proof that an item is truly from the owner or governs this particular behavior. **Fix:** link authority to an independently adjudicated exact source span with provenance, speaker, decision status, scope, and any explicit supersession; where not evidenced keep unresolved. Plant an Orion-authored handoff paragraph wrongly marked as owner ruling.
+    
+    **R3-3 — HIGH — source-class provenance:** T5 recuts source text to check passage bounds but does not independently verify T3 `eff_class`, `eff_roles`, `eff_mandatory`, and `route` against the approved effective-view register and source manifest. A self-consistently edited passages/units/response chain could change canonical status or sampling strata while leaving bytes unchanged. **Fix:** bind all T3 source metadata to independently pinned T1/T2 approved records and calibrate a class/route substitution with consistent downstream hashes.
+    
+    **Companion fixture provenance:** prose+nested fixtures are now mandatory and hashed, but the supplied inventory must also be verified against the **independently frozen approved planted-feature plan**; otherwise substituted fixtures can pass the toolchain with matching hashes. Add a planted-fixture replacement test.
+    
+    **Accepted progress:** rev3 rederivation correctly rejects a truncated sample at the SAME seed; duplicate receipts are rejected; T5 binds passages, units, register and fixtures, verifies passage segmentation against source text and deletes stale PASS output on early exits. Reader signoffs do not prove comprehension. T2 SOUL no-touch restriction remains.
+    
+    **Next:** Orion bank this review, prepare a bounded trust-boundary/source-provenance patch instead of serial patches at individual call sites, and submit one coherent final five-tool qualification package with known-negatives and explicit limits. No further user decisions for calibration. Proposed 2% audit of no-feature passages and reading allocation remain for Dainius's later approval before census execution.
+    
+    **All holds unchanged:** feature census not executed or authorized; KAI product engineering, PRE-RAMS, Gold Tier, R11 and PR #122 DO NOT MERGE held. SOUL incident awaiting owner closure; do not access SOUL.md.
+    
+    **Confidence:** high (about 0.97–0.99) in the static code-level provenance gaps, but not an independently executed complete five-tool certification.
+    
+    OHANA — ONE ORGANISM, ZERO SILENT FEATURE LOSS.
+    END-VERBATIM KAI-DAI10-6a1359c1-REV3-REVIEW
+- EVIDENCE KAI-RELAY-320 relay_320.md: 1500 bytes, sha256 635f6088821dd8730199cc9a39dabe4b8ff772c1cba5f56835b2c5fc32f86031, final LF True (added by Orion)  [CMD `sha256sum relay_320.md` → 635f6088821dd873…]
+    BEGIN-VERBATIM KAI-RELAY-320
+    Review completed — three remaining checks
+    
+    After inspecting the full revision 3 code, I identified three issues that still need correction:
+    
+    * The spot-check starting number isn’t independently locked. Someone could change both the starting number and the selected passages, producing a different but apparently valid inspection sample.
+    * Owner decisions need stronger proof. A statement appearing in the handoff log must not automatically count as your ruling. We need evidence showing who made it and what they actually authorized.
+    * Document classifications need to remain locked to the approved source register. Otherwise, a document could be reclassified as more authoritative without changing its contents.
+    
+    The planted test features also need to be checked against an independently frozen test inventory.
+    
+    The good news: Orion’s revision 3 fixes are substantive. These are specific remaining assurance gaps, not a reason to rebuild everything.
+    
+    I’ve now posted the completed findings to DAI-10⁠￼ as comment 6a1359c1 and independently verified the comment is present.
+    
+    Current status: Corrections required before full qualification. The census has not started, all engineering holds remain, and no owner decision is needed tonight.
+    
+    One clarification: the interrupted screen mentioned two remaining issues. My completed examination identified three, plus the test-inventory safeguard. This is the authoritative completed review.
+    
+    OHANA — protect the evidence, protect the vision.
+    END-VERBATIM KAI-RELAY-320
+
+### 6. Next authorised step
+
+- Build the trust anchor (seed, fixture plan as hashes, effective view and passages identities, adjudicated owner-ruling spans), bind T4/T5 to it, calibrate R3-1 to R3-3 and the fixture substitution, and submit one five-tool package; the anchor itself needs Kai's adjudication before any census  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 6a1359c1, "freeze approved seed and complete selected/mandatory population manifest in a separate banked immutable authority record"]
+
+### 7. What I am unsure of
+
+- The real anchor's owner-ruling list must be adjudicated by Kai from primary sources; Orion can draft it but cannot be its authority  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 6a1359c1, "link authority to an independently adjudicated exact source span"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
