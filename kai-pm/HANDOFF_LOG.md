@@ -100803,3 +100803,152 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-01T20:43:11Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-01T20:43:11Z  [CMD `date -u +%FT%TZ` → 2026-11-01T20:43:11Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 4434180033fc6f53f2752e71e9a51d75406bfb7f  [CMD `git rev-parse HEAD` → 4434180033fc6f53f2752e71e9a51d75406bfb7f]
+- tree: 9817dbd5d1da153ddc6a748771878e5c2cdf30b0  [CMD `git rev-parse HEAD^{tree}` → 9817dbd5d1da153ddc6a748771878e5c2cdf30b0]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 4434180033fc6f53f2752e71e9a51d75406bfb7f  [CMD `git ls-remote --heads origin` → 4434180033fc6f53f2752e71e9a51d75406bfb7f]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 299  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 299]
+
+### 1. The four states
+
+- physical: unchanged since entry 299 apart from this entry; the extracted subject lives in the scratchpad only  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: preparation and calibration of read-only census tools  [CONVERSATION 2026-11-01 Dainius, "My ruling is go"]
+- evidence: plan and T1 posted to DAI-10 as 7e96f5b9-9a62-4f19-a167-c4ea28e1d1fa, posted equals banked; T2 subject.py, stdout and calibration verbatim in section 5  [CMD `verify_posts.py 7e96f5b9…,ORION-POST-CENSUS-T1,4434180` → posted_chars 4174 banked_chars 4174 EQUAL calibration True]
+- admission: none; the census is not run; T1 and the plan await Kai's check  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 3325fad7, "The actual census may begin only after the agreed tool-readiness checks"]
+
+### 2. Rulings since the last handoff
+
+- None; Orion carried out the step named in entry 299  [CMD `handoff entry 299 section 6` → "then build T2 (pinned subject extraction) while Kai checks"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: building and calibrating read-only census tools. HELD: running the census; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 3325fad7, "This does not authorize code editing, deployment, KAI runtime execution"]
+
+### 4. Open questions
+
+- For Kai: check the census-tool plan T1–T5 and the T1 result (DAI-10 7e96f5b9)  [CMD `POST_T1.md` → "What I need from Kai"]
+- For Kai and Dainius: who reads which sources in the census; needed before the census starts, not for the tool build  [CONVERSATION 2026-10-26 Dainius, "Orion we gonna use Kai to do leg work and research"]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- BEFORE POSTING: DAI-10 newest comment was 3325fad7; nothing new since entry 298  [CMD `list_comments DAI-10 limit 2` → 3325fad7, 7ac119bf]
+- T2 RESULT: pin tree 1255 entries = 1254 files extracted + 1 not touched (data/SOUL.md, blob id only) + 0 non-blob; manifests equal; blob-id mismatches 0 (bytes checked against git's own object ids); register paths 348 (late 2), missing 0; problems 0. subject.SHA256SUMS 1254 lines, sha256 1de7867b0c32bee51906de58802c87a92ebd6b3b500b3178f850378ac943eae7, written beside the subject; Python 3.11.17  [CMD `python3 -I subject.py <scratch> out/effective_view.json` → problems 0, exit 0]
+- T2 CALIBRATION: 3 of 3 planted faults caught (a deleted intake file, one altered byte, a change between the two manifests); the correct run passes  [CMD `subject.py <scratch>/cal … <fault>` → 3 × exit=1]
+- LIMIT (I-8, stated not hidden): the check "data/SOUL.md was extracted" has no planted positive, because planting it means extracting SOUL.md, which the standing instruction forbids. Its negative (not extracted) is observed: `ls subject/data/SOUL.md` → no such file  [CMD `ls subject/data/SOUL.md` → "No such file or directory"]
+- Credential scan of the three texts: 0 hits, calibration 6/6  [CMD `credscan.py census/scan300.json` → TOTAL HITS 0]
+- EVIDENCE CENSUS-T2-SUBJECT-SCRIPT subject.py: 4770 bytes, sha256 0a049b60409effca236c06ac712671df24f0a19c50d9134d95be6b050654ac7d, final LF True (added by Orion)  [CMD `sha256sum subject.py` → 0a049b60409effca…]
+    BEGIN-VERBATIM CENSUS-T2-SUBJECT-SCRIPT
+    # T2: extract the pinned subject (procedure v3.2.3 §1a steps 1-6), manifest it twice, check it against git's own object ids.
+    # Read-only on the repository. Standard library. Run: python3 -I subject.py <scratch-dir> <effective_view.json> [fault]
+    # data/SOUL.md is never extracted or read (standing instruction); it is identified by its git blob id only.
+    import hashlib, json, os, shutil, subprocess, sys
+    REPO = "/home/user/kai-system"; PIN = "dd153c1f4ab7c52f34620e07238554453a8912d9"
+    NOT_TOUCHED = {"data/SOUL.md": "d62a137a2b492ec352615dd198e25fd37d963038"}
+    
+    def git(*a, **k): return subprocess.run(["git", *a], cwd=REPO, capture_output=True, **k)
+    def manifest(root):
+        m = {}
+        for d, _, fs in os.walk(root):
+            for f in fs:
+                p = os.path.join(d, f); rel = os.path.relpath(p, root)
+                m[rel] = "symlink:" + os.readlink(p) if os.path.islink(p) else hashlib.sha256(open(p, "rb").read()).hexdigest()
+        return m
+    def blob_id(p):
+        b = os.readlink(p).encode() if os.path.islink(p) else open(p, "rb").read()
+        return hashlib.sha1(b"blob %d\0" % len(b) + b).hexdigest()
+    
+    def main(scratch, view_path, fault=None):
+        p = []
+        sha = git("rev-parse", PIN + "^{commit}", text=True).stdout.strip()                       # step 1
+        if sha != PIN: p.append(f"pin does not resolve to itself: {sha}")
+        sub = os.path.join(scratch, "subject"); shutil.rmtree(sub, ignore_errors=True); os.makedirs(sub)
+        arc = git("archive", "--format=tar", PIN).stdout                                           # step 2
+        excl = [x for f in NOT_TOUCHED for x in ("--exclude", f)]
+        r = subprocess.run(["tar", "-x", "-C", sub, *excl], input=arc, capture_output=True)
+        if r.returncode: p.append(f"tar failed: {r.stderr[:200]!r}")
+        tree = {}
+        for line in git("ls-tree", "-r", "-z", PIN).stdout.split(b"\0"):
+            if not line: continue
+            meta, path = line.split(b"\t", 1); mode, typ, oid = meta.decode().split()
+            tree[path.decode()] = (mode, typ, oid.lower())
+        if fault == "drop_intake_file": os.remove(os.path.join(sub, "kai-pm/SEQUENCE.md"))
+        if fault == "alter_byte":
+            f = os.path.join(sub, "README.md"); b = bytearray(open(f, "rb").read()); b[0] ^= 1; open(f, "wb").write(bytes(b))
+        m1 = manifest(sub)
+        if fault == "change_between_manifests": open(os.path.join(sub, "kai-pm/STATUS.md"), "ab").write(b"x")
+        m2 = manifest(sub)                                                                          # step 5
+        if m1 != m2: p.append(f"subject changed between manifests: {sorted(k for k in m1.keys() | m2.keys() if m1.get(k) != m2.get(k))[:5]}")
+        for f, oid in NOT_TOUCHED.items():
+            if os.path.lexists(os.path.join(sub, f)): p.append(f"{f} was extracted; it must not be")
+            if tree.get(f, (None, None, None))[2] != oid: p.append(f"{f} blob id at the pin is {tree.get(f)}, expected {oid}")
+        regular = {k: v for k, v in tree.items() if v[1] == "blob" and k not in NOT_TOUCHED}
+        other = {k: v for k, v in tree.items() if v[1] != "blob"}
+        missing = sorted(set(regular) - set(m2)); extra = sorted(set(m2) - set(regular))
+        if missing: p.append(f"{len(missing)} pin files not extracted: {missing[:5]}")
+        if extra: p.append(f"{len(extra)} extracted files not in the pin tree: {extra[:5]}")
+        bad = [k for k in regular if k in m2 and blob_id(os.path.join(sub, k)) != regular[k][2]]
+        if bad: p.append(f"{len(bad)} files whose bytes differ from git's blob id: {bad[:5]}")
+        view = json.load(open(view_path)); intake_missing, late_present = [], []
+        for row in view["file_rows"]:
+            here = row["path"] in m2 or row["path"] in NOT_TOUCHED
+            if row["late"] and here: late_present.append(row["path"])
+            if not row["late"] and not here: intake_missing.append(row["path"])
+        if intake_missing: p.append(f"{len(intake_missing)} register paths missing from the subject: {intake_missing[:5]}")
+        if late_present: p.append(f"late sources present at the pin: {late_present}")
+        sums = os.path.join(scratch, "subject.SHA256SUMS")                                          # step 6: beside, never inside
+        if not fault: open(sums, "w").write("".join(f"{v}  {k}\n" for k, v in sorted(m2.items())))
+        print(f"SUBJECT @ {PIN[:12]}: pin tree {len(tree)} entries = {len(regular)} files extracted + {len(NOT_TOUCHED)} not touched (blob id only)"
+              f" + {len(other)} non-blob; manifests equal {m1 == m2}; blob-id mismatches {len(bad)}; register paths {len(view['file_rows'])}"
+              f" (late {sum(r['late'] for r in view['file_rows'])}) missing {len(intake_missing)}; problems {len(p)}")
+        for x in p: print("PROBLEM", x)
+        return 1 if p else 0
+    
+    if __name__ == "__main__": sys.exit(main(sys.argv[1], sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else None))
+    END-VERBATIM CENSUS-T2-SUBJECT-SCRIPT
+- EVIDENCE CENSUS-T2-STDOUT t2_stdout.txt: 208 bytes, sha256 94cdc648976299abe8597ae3375d85c0759c84b565fd2c503471a2e5e0369720, final LF True (added by Orion)  [CMD `sha256sum t2_stdout.txt` → 94cdc648976299ab…]
+    BEGIN-VERBATIM CENSUS-T2-STDOUT
+    SUBJECT @ dd153c1f4ab7: pin tree 1255 entries = 1254 files extracted + 1 not touched (blob id only) + 0 non-blob; manifests equal True; blob-id mismatches 0; register paths 348 (late 2) missing 0; problems 0
+    END-VERBATIM CENSUS-T2-STDOUT
+- EVIDENCE CENSUS-T2-CALIBRATION t2_calibration.txt: 418 bytes, sha256 eaedd3c9c69938919a6cc5312618697db8a93dd2b9b947add58d839d60c61157, final LF True (added by Orion)  [CMD `sha256sum t2_calibration.txt` → eaedd3c9c6993891…]
+    BEGIN-VERBATIM CENSUS-T2-CALIBRATION
+    drop_intake_file exit=1 PROBLEM 1 pin files not extracted: ['kai-pm/SEQUENCE.md'];PROBLEM 1 register paths missing from the subject: ['kai-pm/SEQUENCE.md'];
+    alter_byte exit=1 PROBLEM 1 files whose bytes differ from git's blob id: ['README.md'];
+    change_between_manifests exit=1 PROBLEM subject changed between manifests: ['kai-pm/STATUS.md'];PROBLEM 1 files whose bytes differ from git's blob id: ['kai-pm/STATUS.md'];
+    END-VERBATIM CENSUS-T2-CALIBRATION
+
+### 6. Next authorised step
+
+- Build T3 (passage splitter) and T4 (human sample) while Kai checks the plan; if Kai amends the plan, the amendment comes first  [CONVERSATION 2026-11-01 Dainius, "My ruling is go"]
+
+### 7. What I am unsure of
+
+- Nothing new beyond entry 299 section 7 (T1's section counts come from the register's own statement)  [CMD `effective_view.py SECTIONS` → from v2 "Pin, universe and counts"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
