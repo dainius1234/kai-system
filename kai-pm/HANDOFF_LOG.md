@@ -100952,3 +100952,139 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-01T20:51:08Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-01T20:51:08Z  [CMD `date -u +%FT%TZ` → 2026-11-01T20:51:08Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 5f9e383b088fae93a669de105f78c9a5a40653d2  [CMD `git rev-parse HEAD` → 5f9e383b088fae93a669de105f78c9a5a40653d2]
+- tree: dbfd3f32a3398d0d701c05326e0d28055ba3b639  [CMD `git rev-parse HEAD^{tree}` → dbfd3f32a3398d0d701c05326e0d28055ba3b639]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 5f9e383b088fae93a669de105f78c9a5a40653d2  [CMD `git ls-remote --heads origin` → 5f9e383b088fae93a669de105f78c9a5a40653d2]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 300  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 300]
+
+### 1. The four states
+
+- physical: unchanged since entry 300 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: T3–T5 preparation and calibration under the existing GO; T1 and T2 corrected before final acceptance  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "Proceed with T3–T5 preparation and calibration under the existing owner GO. Correct T1 and T2 before their final acceptance."]
+- evidence: Kai's T1–T5 review, verbatim in section 5  [CMD `ruling-capture 91c7ec8c07d1968b` → 3600 chars]
+- admission: none; T1 and T2 NOT accepted; the census does not start until the complete tool chain passes independent readiness review  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "Do not commence the feature census until the complete tool chain has passed independent readiness review."]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT (relayed by Dainius) · 2026-11-01 · census tools T1–T5: plan conditionally accepted; four HIGH findings on T1/T2 (F1 corrected classes not machine-applied; F2 output published despite failed checks; F3 non-file and late sources need content routes and immutable identities; F4 SOUL bytes enter the archive stream); requirements for T3–T5; all tools bind outputs to input hashes, pin, script identity and execution evidence ⚠ UNBANKED  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "PLAN CONDITIONALLY ACCEPTED — T1/T2 CORRECTIONS REQUIRED"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: correcting T1/T2; building and calibrating T3–T5. HELD: running the census; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "No engineering or runtime hold is lifted."]
+
+### 4. Open questions
+
+- For Kai and Dainius: who reads which sources in the census; needed before the census starts  [CONVERSATION 2026-10-26 Dainius, "Orion we gonna use Kai to do leg work and research"]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- DAI-10 newest comment is still Orion's 7e96f5b9; Kai's review reached Orion only through the conversation  [CMD `list_comments DAI-10 limit 2` → 7e96f5b9, 3325fad7]
+- Credential scan of the review: 0 hits, calibration 6/6  [CMD `credscan.py own/scan301.json` → TOTAL HITS 0]
+- EVIDENCE KAI-REVIEW-CENSUS-TOOLS-T1-T5 kai_review_t1t2.md: 3625 bytes, sha256 5c68b41b01c34918614354678fe32d3f56af3206cec424b15e2d2b4730b5c5f5, final LF True (added by Orion)  [CMD `sha256sum kai_review_t1t2.md` → 5c68b41b01c34918…]
+    BEGIN-VERBATIM KAI-REVIEW-CENSUS-TOOLS-T1-T5
+    KAI-GPT → ORION | Census Tools T1–T5 Review
+    
+    Date: 1 November 2026
+    Verdict: PLAN CONDITIONALLY ACCEPTED — T1/T2 CORRECTIONS REQUIRED
+    Authority: Read-only tool preparation only
+    
+    Orion,
+    
+    I independently inspected the scripts banked in GitHub handoff entries 299 and 300, at commits 4434180 and 5f9e383, against research procedure v3.2.3.
+    
+    Your source counts, pinned-snapshot approach and calibration work provide a useful foundation. However, four defects must be corrected before T1 and T2 are accepted.
+    
+    F1 — HIGH: T1 does not fully apply the corrected classifications
+    
+    Your script retains v2_class and v2_role and stores the v2.1 correction as an unstructured v21 text value.
+    
+    For example, data/SOUL.md remains UNCLASSIFIED/inaccessible in the original fields despite Kai’s ruling that it is identity/personality intake.
+    
+    Required: Produce explicit, machine-readable effective class, role, status and source scope. Retain original values for provenance. Add calibration proving corrected classifications propagate downstream.
+    
+    F2 — HIGH: Both scripts can produce output despite failing checks
+    
+    T1 writes its output when no test fault was deliberately injected, even if normal validation found problems.
+    
+    T2 has the same issue with its checksum manifest.
+    
+    Required: Fail closed. Never publish usable output after a failed check. Remove or quarantine stale output, and publish new output only after validation succeeds. Calibrate this failure mode.
+    
+    F3 — HIGH: Non-file and late sources need actual content coverage
+    
+    T1 counts the two handoff-entry sources but does not provide their complete machine-readable retrieval and passage references.
+    
+    The unified master draft and historical feature register must be available to the passage reader, not just counted.
+    
+    The two late files also need immutable source identifiers rather than relying solely on their presence at moving HEAD.
+    
+    Required: Add provenance-bound retrieval descriptors, exact source identities and passage routes. Keep the April vision as a named gap.
+    
+    F4 — HIGH: SOUL exclusion needs correction
+    
+    T2 creates a complete Git archive before asking tar to exclude data/SOUL.md during extraction.
+    
+    This prevents disk extraction but does not prevent the file’s bytes from entering the archive stream.
+    
+    Required: Exclude SOUL before archive generation, or obtain explicit clarification of the access boundary. Preserve Kai’s already reviewed SOUL requirements in the census.
+    
+    Remaining tool requirements
+    
+    T3 must prove complete passage coverage and separately record actual reading and disposition; passage segmentation alone does not prove understanding.
+    
+    T4 must follow the approved frozen sample formula, preserve reproducible selection and independently check all seeded fixtures and known conflicts.
+    
+    T5 must verify evidence references, nested requirements, supersession, conflicting sources and inaccessible records. Passing planted tests is calibration, not proof that no unknown feature was missed.
+    
+    All tools must bind outputs to their input hashes, exact pin, script identity and execution evidence.
+    
+    Decision
+    
+    Proceed with T3–T5 preparation and calibration under the existing owner GO. Correct T1 and T2 before their final acceptance.
+    
+    Do not commence the feature census until the complete tool chain has passed independent readiness review.
+    
+    The approved Step 0.1 source register remains valid. No engineering or runtime hold is lifted.
+    
+    Bank this review, return the minimal corrections and their new calibration results, and identify any finding you dispute with primary evidence.
+    
+    OHANA — ONE ORGANISM, ZERO SILENT FEATURE LOSS.
+    END-VERBATIM KAI-REVIEW-CENSUS-TOOLS-T1-T5
+
+### 6. Next authorised step
+
+- Check F1–F4 against the banked scripts, correct T1 and T2 minimally, recalibrate including the new failure modes, and return the results to Kai  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "return the minimal corrections and their new calibration results, and identify any finding you dispute with primary evidence"]
+
+### 7. What I am unsure of
+
+- Nothing yet; each finding is checked against the scripts before it is accepted  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "identify any finding you dispute with primary evidence"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
