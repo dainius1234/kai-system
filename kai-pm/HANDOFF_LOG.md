@@ -102465,3 +102465,243 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-01T21:25:47Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-01T21:25:47Z  [CMD `date -u +%FT%TZ` → 2026-11-01T21:25:47Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: cea798a1355c96e9e4d3f94e4ec4644775f608a6  [CMD `git rev-parse HEAD` → cea798a1355c96e9e4d3f94e4ec4644775f608a6]
+- tree: 11402be0e19dd987070e7c96a647c93ac411cfdd  [CMD `git rev-parse HEAD^{tree}` → 11402be0e19dd987070e7c96a647c93ac411cfdd]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/project-rework-plan-pgvp35: cea798a1355c96e9e4d3f94e4ec4644775f608a6  [CMD `git ls-remote --heads origin` → cea798a1355c96e9e4d3f94e4ec4644775f608a6]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 309  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 309]
+
+### 1. The four states
+
+- physical: unchanged since entry 309 apart from this entry; tools and outputs live in the scratchpad only  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: T3–T5 preparation and calibration under the existing owner GO  [CONVERSATION 2026-11-01 Dainius, "My ruling is go"]
+- evidence: T3 passages.py, its calibration harness, stdout and calibration result, verbatim in section 5  [CMD `python3 -I calibrate_t3.py <scratch> out/effective_view.json` → result PASS]
+- admission: none; T3 is not yet reviewed; it goes to Kai in the five-tool qualification package; census held  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "Once all five instruments are ready, submit the complete qualification package for independent review."]
+
+### 2. Rulings since the last handoff
+
+- None; Orion carried out the step named in entry 309  [CMD `handoff entry 309 section 6` → "Build and calibrate T3 (passages)"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: T3–T5 preparation and calibration. HELD: running the census; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "neither of us should access, copy or process SOUL.md again"]
+
+### 4. Open questions
+
+- For Dainius (owner): close the SOUL incident or not; source and scope of the no-touch instruction; whether Kai's recommended Wave 0 allocation is the plan  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "Dainius retains final authority."]
+- For Kai and Dainius: achievability. T3 measures the census reading grid at 51727 passages over 226943 lines in 349 sources; kai-pm/HANDOFF_LOG.md at the pin is 18265 passages and kai-pm/DECISIONS.md 9153 (together 53%)  [CMD `passages.json Counter / top sources` → HANDOFF_LOG 18265, DECISIONS 9153]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- T3 RESULT: sources 351 = segmented 349 (pin files 345, late git blobs 2, handoff blocks 2) + not segmented 2 (data/SOUL.md not opened; April vision named gap); passages 51727 (text 34777, heading 9609, section 5533, code 911, table 897); lines 226943; every non-blank line in exactly one passage; problems 0; output sha256 88c6c95278a383d47ce45f1c46a71ea26e820df587d7f1206f89d6d7321d0317  [CMD `python3 -I passages.py <scratch> out/effective_view.json out/passages.json` → problems 0, exit 0]
+- T3 BINDING: checks the chain subject file → subject.SHA256SUMS → T2 manifest → effective view; late blobs re-hashed to their git blob ids; handoff blocks re-hashed to the effective view's sha256  [CMD `calibrate_t3.py` → unbound_chain, tamper_subject_byte, block_sha_mismatch, late_blob_mismatch caught]
+- T3 CALIBRATION: one source reader (PASS); planted second reader caught; 7 planted faults caught, each with no output despite a stale file; correct run publishes. data/SOUL.md refused inside read_source() before any open  [CMD `python3 -I calibrate_t3.py <scratch> out/effective_view.json` → result PASS]
+- CAUGHT BY THE SELF-TEST: the code joined a heading to the lines directly under it while the written rule kept headings alone; the joined form was kept as the rule (the reader sees the heading with its text), labelled "section", and the self-test expectation updated to it  [CMD `passages.py first run` → "segmentation self-test FAIL", output NOT WRITTEN]
+- Credential scan of the four texts: 0 hits, calibration 6/6  [CMD `credscan.py census/scan310.json` → TOTAL HITS 0]
+- EVIDENCE CENSUS-T3-PASSAGES-SCRIPT passages.py: 8440 bytes, sha256 64443df7894db16392684628ef1e617cf8765aa5137ffc81074a25509ebd8b83, final LF True (added by Orion)  [CMD `sha256sum passages.py` → 64443df7894db163…]
+    BEGIN-VERBATIM CENSUS-T3-PASSAGES-SCRIPT
+    # T3: cut every intake source into numbered passages that cover every non-blank line exactly once.
+    # Read-only. Standard library. Run: python3 -I passages.py <scratch-dir> <effective_view.json> <out.json> [fault]
+    # Passages are a reading grid, NOT evidence of reading: the reading/disposition record is separate (T5) (Kai, entry 301).
+    # data/SOUL.md is refused inside read_source(), the only function that reads a source (Kai, entries 304, 309).
+    import hashlib, json, os, re, subprocess, sys
+    REPO = "/home/user/kai-system"; PIN = "dd153c1f4ab7c52f34620e07238554453a8912d9"
+    NOT_TOUCHED = {"data/SOUL.md"}
+    FENCE = re.compile(r"^\s{0,3}(```|~~~)"); HEAD = re.compile(r"^\s{0,3}#{1,6}\s")
+    
+    def sha(b): return hashlib.sha256(b if isinstance(b, bytes) else b.encode()).hexdigest()
+    def git(*a): return subprocess.run(["git", *a], cwd=REPO, capture_output=True)
+    class Refused(Exception): pass
+    
+    def read_source(route, sub, sums, log):
+        """The ONLY reader of source bytes. Refuses NOT_TOUCHED before anything is opened, whatever the route says."""
+        if route.get("path") in NOT_TOUCHED: raise Refused(f"refused to read {route['path']}")
+        k = route["kind"]
+        if k == "pin_file":
+            b = open(os.path.join(sub, route["path"]), "rb").read()
+            if sums.get(route["path"]) != sha(b): raise Refused(f"{route['path']} bytes differ from subject.SHA256SUMS")
+            return b
+        if k == "git_blob":
+            b = git("show", f"{route['commit']}:{route['path']}").stdout
+            if hashlib.sha1(b"blob %d\0" % len(b) + b).hexdigest() != route["blob"]: raise Refused(f"{route['path']} blob id mismatch")
+            return b
+        if k == "handoff_block":
+            i = log.index(f"    BEGIN-VERBATIM {route['block']}"); j = log.index(f"    END-VERBATIM {route['block']}", i)
+            t = "\n".join(l[4:] for l in log[i + 1:j]) + "\n"
+            if sha(t) != route["sha256"]: raise Refused(f"block {route['block']} sha256 differs from the effective view")
+            return t.encode()
+        raise Refused(f"no reader for route kind {k}")
+    
+    def segment(lines):
+        """Blank lines separate passages; a heading or a fence starts a new one, and a heading keeps the lines directly under it ("section");
+        a fenced block is one passage, blank lines included."""
+        out, i, n = [], 0, len(lines)
+        while i < n:
+            if not lines[i].strip(): i += 1; continue
+            s = i
+            if FENCE.match(lines[i]):
+                m = FENCE.match(lines[i]).group(1); i += 1
+                while i < n and not lines[i].lstrip().startswith(m): i += 1
+                i = min(i + 1, n); kind = "code"
+            else:
+                i += 1
+                while i < n and lines[i].strip() and not HEAD.match(lines[i]) and not FENCE.match(lines[i]): i += 1
+                kind = ("heading" if i - s == 1 else "section") if HEAD.match(lines[s]) else ("table" if lines[s].lstrip().startswith("|") else "text")
+            out.append([s + 1, i, kind])                                     # 1-based, inclusive
+        return out
+    
+    def coverage(lines, ps):
+        own = [0] * len(lines)
+        for s, e, _ in ps:
+            for k in range(s - 1, e): own[k] += 1
+        gaps = [k + 1 for k, l in enumerate(lines) if l.strip() and own[k] == 0]
+        over = [k + 1 for k in range(len(lines)) if own[k] > 1]
+        return gaps, over, sum(1 for k, l in enumerate(lines) if not l.strip() and own[k] == 0)
+    
+    def selftest():
+        """Known answers for the segmentation rule, independent of the corpus."""
+        t = ["# H", "para 1", "para 2", "", "```", "code", "", "more code", "```", "", "| a | b |", "|---|---|", "", "## H2", "", "tail"]
+        want = [[1, 3, "section"], [5, 9, "code"], [11, 12, "table"], [14, 14, "heading"], [16, 16, "text"]]
+        got = segment(t); return [] if got == want else [f"segmentation self-test: got {got}, want {want}"]
+    
+    def main(scratch, view_path, out, fault=None):
+        for f in (out, out + ".tmp"):
+            if os.path.exists(f): os.remove(f)
+        p = selftest()
+        sub = os.path.join(scratch, "subject"); sums_path = os.path.join(scratch, "subject.SHA256SUMS"); man_path = os.path.join(scratch, "subject.MANIFEST.json")
+        view_b = open(view_path, "rb").read(); view = json.loads(view_b); man = json.load(open(man_path)); sums_b = open(sums_path, "rb").read()
+        if fault == "unbound_chain": view_b += b" "
+        if man["inputs_sha256"]["effective_view.json"] != sha(view_b): p.append("T2 manifest was not made from this effective view")
+        if man["sums_sha256"] != sha(sums_b): p.append("subject.SHA256SUMS differs from the T2 manifest")
+        if view["pin"] != PIN or man["pin"] != PIN: p.append("pin mismatch")
+        sums = {l.split("  ", 1)[1]: l.split("  ", 1)[0] for l in sums_b.decode().splitlines()}
+        log = git("show", f"{view['log_commit']}:kai-pm/HANDOFF_LOG.md").stdout.decode().split("\n")
+        rows = [dict(r) for r in view["file_rows"]] + [dict(n, path=None) for n in view["nonfile_rows"]]
+        if fault == "soul_as_pin_file":
+            for r in rows:
+                if r.get("path") == "data/SOUL.md": r["route"] = {"kind": "pin_file", "commit": PIN, "path": "data/SOUL.md"}
+        if fault == "tamper_subject_byte": sums["README.md"] = "0" * 64
+        if fault == "block_sha_mismatch":
+            for r in rows:
+                if r["route"].get("kind") == "handoff_block": r["route"] = dict(r["route"], sha256="0" * 64); break
+        if fault == "late_blob_mismatch":
+            for r in rows:
+                if r["route"].get("kind") == "git_blob": r["route"] = dict(r["route"], blob="0" * 40); break
+        sources, skipped = [], []
+        for r in rows:
+            route = r["route"]; rid = r["path"] or f"B{r['n']}:{route.get('block', 'named-gap')}"
+            if route["kind"] in ("named_gap", "git_blob_not_opened"):
+                skipped.append({"source": rid, "route": route["kind"], "reason": "named gap" if route["kind"] == "named_gap" else "not opened (standing restriction); Kai's recorded findings only"}); continue
+            try: b = read_source(route, sub, sums, log)
+            except Refused as e: p.append(str(e)); continue
+            try: lines = b.decode("utf-8").split("\n")
+            except UnicodeDecodeError: p.append(f"{rid}: not UTF-8"); continue
+            if lines and lines[-1] == "": lines = lines[:-1]
+            ps = segment(lines)
+            if fault == "drop_passage" and rid == "README.md": ps.pop(3)
+            if fault == "overlap_passage" and rid == "README.md": ps.append(list(ps[2]))
+            gaps, over, blank = coverage(lines, ps)
+            if gaps: p.append(f"{rid}: {len(gaps)} non-blank lines in no passage, first {gaps[:3]}")
+            if over: p.append(f"{rid}: {len(over)} lines in more than one passage, first {over[:3]}")
+            sources.append({"source": rid, "route": route, "eff_class": r.get("eff_class") or "nonfile", "eff_roles": r.get("eff_roles") or [],
+                            "eff_mandatory": r.get("eff_mandatory", False), "lines": len(lines), "blank_uncovered": blank,
+                            "passages": [{"pid": f"{rid}#P{k + 1}", "start": s, "end": e, "kind": kd, "sha256": sha("\n".join(lines[s - 1:e]))}
+                                         for k, (s, e, kd) in enumerate(ps)]})
+        expect = len(rows) - len(skipped)
+        if len(sources) != expect: p.append(f"segmented {len(sources)} sources, expected {expect}")
+        npas = sum(len(s["passages"]) for s in sources)
+        if not p:
+            json.dump({"pin": PIN, "inputs_sha256": {"effective_view.json": sha(view_b), "subject.MANIFEST.json": sha(open(man_path, "rb").read())},
+                       "producer": {"script_sha256": sha(open(__file__, "rb").read()), "python": sys.version.split()[0], "argv": sys.argv[1:]},
+                       "rule": "blank lines separate; heading or fence starts a passage; a heading keeps the lines directly under it; fenced block whole", "note": "passages are a reading grid, not evidence of reading",
+                       "sources": sources, "not_segmented": skipped}, open(out + ".tmp", "w"), ensure_ascii=False)
+            os.replace(out + ".tmp", out)
+        print(f"PASSAGES @ {PIN[:12]}: sources {len(rows)} = segmented {len(sources)} + not segmented {len(skipped)} "
+              f"({', '.join(s['source'] + ' [' + s['route'] + ']' for s in skipped)}); passages {npas}; lines {sum(s['lines'] for s in sources)}; "
+              f"segmentation self-test {'PASS' if not selftest() else 'FAIL'}; problems {len(p)}; output {'WRITTEN' if not p else 'NOT WRITTEN'}")
+        for x in p: print("PROBLEM", x)
+        return 1 if p else 0
+    
+    if __name__ == "__main__": sys.exit(main(*sys.argv[1:4], sys.argv[4] if len(sys.argv) > 4 else None))
+    END-VERBATIM CENSUS-T3-PASSAGES-SCRIPT
+- EVIDENCE CENSUS-T3-CALIBRATION-SCRIPT calibrate_t3.py: 1993 bytes, sha256 67f41a25aeebda973dcfecb9d403c98f24b061aaa5fe0c5cd733088c23f1a278, final LF True (added by Orion)  [CMD `sha256sum calibrate_t3.py` → 67f41a25aeebda97…]
+    BEGIN-VERBATIM CENSUS-T3-CALIBRATION-SCRIPT
+    # Calibration for T3 (I-8). Each planted fault must exit 1 AND leave no output (stale file present beforehand).
+    # The correct run must exit 0 and publish. Structural: only read_source() may open subject files; a planted second reader is caught.
+    # Run: python3 -I calibrate_t3.py <scratch-dir> <effective_view.json>
+    import os, subprocess, sys
+    HERE = os.path.dirname(os.path.abspath(__file__)); OUT = os.path.join(HERE, "cal3_out.json")
+    FAULTS = ["drop_passage", "overlap_passage", "tamper_subject_byte", "unbound_chain", "soul_as_pin_file", "block_sha_mismatch", "late_blob_mismatch"]
+    ok = True
+    src = open(os.path.join(HERE, "passages.py")).read(); READER = "open(os.path.join(sub"
+    n = src.count(READER); good = n == 1; ok &= good
+    print(f"{'PASS' if good else 'FAIL'} source readers in passages.py: {n} (must be 1, read_source)")
+    planted = (src + "\nb = open(os.path.join(sub, 'data/SOUL.md'), 'rb').read()\n").count(READER); good = planted != 1; ok &= good
+    print(f"{'CAUGHT' if good else 'MISSED'} second reader planted in a copy of the source: count {planted}")
+    def run(f=None):
+        open(OUT, "w").write("STALE")
+        r = subprocess.run([sys.executable, "-I", os.path.join(HERE, "passages.py"), sys.argv[1], sys.argv[2], OUT] + ([f] if f else []), capture_output=True, text=True)
+        return r.returncode, os.path.exists(OUT), (r.stdout.splitlines() + ["", ""])[1 if f else 0][:110]
+    for f in FAULTS:
+        code, exists, msg = run(f); good = code == 1 and not exists; ok &= good
+        print(f"{'CAUGHT' if good else 'MISSED'} {f}: exit {code}, output {'PRESENT' if exists else 'absent'} | {msg}")
+    code, exists, msg = run(); good = code == 0 and exists and open(OUT).read(5) != "STALE"; ok &= good
+    print(f"{'PASS' if good else 'FAIL'} correct run: exit {code}, output {'published' if exists else 'absent'}")
+    os.path.exists(OUT) and os.remove(OUT)
+    print(f"T3 CALIBRATION: {len(FAULTS)} planted faults + 1 planted reader, known-negative 1, result {'PASS' if ok else 'FAIL'}"); sys.exit(0 if ok else 1)
+    END-VERBATIM CENSUS-T3-CALIBRATION-SCRIPT
+- EVIDENCE CENSUS-T3-STDOUT t3_stdout.txt: 222 bytes, sha256 65beaec8b67d2ecec8ee6029ee7cf3d943969cefe0887e174024440e92ca1d1f, final LF True (added by Orion)  [CMD `sha256sum t3_stdout.txt` → 65beaec8b67d2ece…]
+    BEGIN-VERBATIM CENSUS-T3-STDOUT
+    PASSAGES @ dd153c1f4ab7: sources 351 = segmented 349 + not segmented 2 (data/SOUL.md [git_blob_not_opened], B12:named-gap [named_gap]); passages 51727; lines 226943; segmentation self-test PASS; problems 0; output WRITTEN
+    END-VERBATIM CENSUS-T3-STDOUT
+- EVIDENCE CENSUS-T3-CALIBRATION t3_calibration.txt: 1043 bytes, sha256 106c273f8d25e178e2eea8835784d91229ff677c5993c230c0b52da3e0aad356, final LF True (added by Orion)  [CMD `sha256sum t3_calibration.txt` → 106c273f8d25e178…]
+    BEGIN-VERBATIM CENSUS-T3-CALIBRATION
+    PASS source readers in passages.py: 1 (must be 1, read_source)
+    CAUGHT second reader planted in a copy of the source: count 2
+    CAUGHT drop_passage: exit 1, output absent | PROBLEM README.md: 8 non-blank lines in no passage, first [21, 22, 23]
+    CAUGHT overlap_passage: exit 1, output absent | PROBLEM README.md: 10 lines in more than one passage, first [10, 11, 12]
+    CAUGHT tamper_subject_byte: exit 1, output absent | PROBLEM README.md bytes differ from subject.SHA256SUMS
+    CAUGHT unbound_chain: exit 1, output absent | PROBLEM T2 manifest was not made from this effective view
+    CAUGHT soul_as_pin_file: exit 1, output absent | PROBLEM refused to read data/SOUL.md
+    CAUGHT block_sha_mismatch: exit 1, output absent | PROBLEM block KAI-MASTER-PLAN-V1-1-UNIFIED-DRAFT sha256 differs from the effective view
+    CAUGHT late_blob_mismatch: exit 1, output absent | PROBLEM kai-pm/KAI_GPT_COLD_START_GUARDIAN_V0_1.md blob id mismatch
+    PASS correct run: exit 0, output published
+    T3 CALIBRATION: 7 planted faults + 1 planted reader, known-negative 1, result PASS
+    END-VERBATIM CENSUS-T3-CALIBRATION
+
+### 6. Next authorised step
+
+- Build and calibrate T4 (frozen human sample) and T5 (census register and reading/disposition check); then submit the five-tool qualification package to Kai  [CONVERSATION 2026-11-01 Kai-GPT relayed by Dainius, "Continue T3–T5 preparation and calibration under the existing GO."]
+
+### 7. What I am unsure of
+
+- Whether the handoff log and DECISIONS.md should be read passage by passage or by entry and D-number; that is a census-method question for Kai, raised with the achievability numbers  [CMD `passages.json top sources` → 18265 and 9153 passages]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
