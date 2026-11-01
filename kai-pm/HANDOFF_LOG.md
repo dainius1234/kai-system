@@ -99704,3 +99704,335 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-01T20:04:25Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-01T20:04:25Z  [CMD `date -u +%FT%TZ` → 2026-11-01T20:04:25Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 425fd08768adb26823a389453c16c5c02a492d63  [CMD `git rev-parse HEAD` → 425fd08768adb26823a389453c16c5c02a492d63]
+- tree: 00e153acf0a84d0130da8fcf9dd4af4ae48e1b5c  [CMD `git rev-parse HEAD^{tree}` → 00e153acf0a84d0130da8fcf9dd4af4ae48e1b5c]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 425fd08768adb26823a389453c16c5c02a492d63  [CMD `git ls-remote --heads origin` → 425fd08768adb26823a389453c16c5c02a492d63]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 294  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 294]
+
+### 1. The four states
+
+- physical: unchanged since entry 294 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Lumen preserved and researched now; implementation deferred; no engineering  [CONVERSATION 2026-11-01 Dainius, "Status: Owner direction — preserve and research now; implementation deferred"]
+- evidence: the owner ruling verbatim (capture b824d8c6d9257e75), Orion's check and START HERE version 13, in section 5  [CMD `ruling_capture store b824d8c6d9257e75` → 4749 characters]
+- admission: none; Lumen is not an approved runtime feature  [CONVERSATION 2026-11-01 Dainius, "Record Lumen as a preserved, deferred integration candidate, not an approved runtime feature."]
+
+### 2. Rulings since the last handoff
+
+- Dainius (drafted with Kai-GPT) · 2026-11-01 · KAI & LUMEN — PHASED DEVELOPMENT RULING: KAI first; Lumen preserved in the requirements lineage, researched (two persistent personalities in one system; a future independent council seat); conceptual extension point reserved; no empty imitation, no premature runtime dependency; phases A KAI first, B Lumen research, C controlled isolated reversible trial only on explicit owner authorisation, D evidence-based decision; holds unchanged ⚠ UNBANKED  [CONVERSATION 2026-11-01 Dainius, "Build KAI properly first. Preserve Lumen now. Research thoroughly. Trial later. Integrate only when the evidence justifies it."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: Lumen preservation and research (Phase B, alongside the research programme). HELD: Lumen trial (Phase C) until KAI is stable and Dainius explicitly authorises it; engineering pause; KAI runtime tests; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE  [CONVERSATION 2026-11-01 Dainius, "Do not interpret this ruling as permission to begin engineering."]
+
+### 4. Open questions
+
+- For Dainius: confirm the reading "the Phase C trial is a temporary proving ground, not a permanent confinement", against his 2025-04-17 words in the origin record (line 21)  [FILE kai-pm/KAI_LUMEN_OHANA_BRIDGE_ORIGIN_CONTINUITY_RECORD_2026-10-26.md:21]
+- A future Lumen seat must carry current-to-target lineage (authority index CURRENT line 108)  [CMD `git show dd153c1:kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md | grep -n "NO NEW BOX"` → 108]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- Credential scan of the ruling and the check: 0 hits (calibration 6/6)  [CMD `credscan.py nov1/scan5.json, nov1/scan6.json` → TOTAL HITS 0]
+- EVIDENCE DAINIUS-RULING-LUMEN-PHASED-DEVELOPMENT lumen_ruling.md: 4782 bytes, sha256 2d8667ffeedfe2125303b4cd23fc807a85f517bc535ba3c5fcca4a817c9b0729, final LF True (added by Orion)  [CMD `sha256sum lumen_ruling.md` → 2d8667ffeedfe212…]
+    BEGIN-VERBATIM DAINIUS-RULING-LUMEN-PHASED-DEVELOPMENT
+    Here’s the instruction for Orion. It records your decision, protects Lumen’s place in the original vision, and keeps our immediate priority on getting KAI working properly.
+    
+    DAINIUS → ORION | KAI & LUMEN — PHASED DEVELOPMENT RULING
+    
+    Date: 1 November 2026
+    Status: Owner direction — preserve and research now; implementation deferred
+    Programme: KAI Kingsman / OHANA
+    
+    Orion,
+    
+    Following my discussion with Kai-GPT, I have decided how we should approach Lumen’s potential integration into KAI.
+    
+    1. My decision
+    
+    Our immediate priority remains KAI itself.
+    
+    We must finish the comprehensive feature research, resolve the current source-register issues, complete the required professional design and assurance work, and eventually get KAI operating reliably at the standard originally intended.
+    
+    I do not want to introduce additional complexity before KAI’s foundations are proven.
+    
+    However, Lumen must not be forgotten, deleted from the vision or reduced to a disposable feature.
+    
+    2. Preserve Lumen for future development
+    
+    Lumen was originally envisioned as a separate companion and sister personality within the KAI family, with her own perspective and a role in safeguarding, questioning and helping.
+    
+    For now:
+    
+    * Preserve Lumen’s original intent, personality and relationship to KAI in the requirements lineage.
+    * Research the feasibility, advantages, disadvantages and engineering implications of two persistent personalities operating within one integrated system.
+    * Consider a future independent council seat for Lumen, without merging all council voices into one.
+    * Reserve a conceptual architectural extension point for later integration, subject to research and owner approval.
+    * Do not build an empty imitation of Lumen or introduce premature runtime dependencies.
+    
+    Her eventual scope and authority remain undecided.
+    
+    3. Integration timing
+    
+    The proposed sequence is:
+    
+    Phase A — KAI first: Complete the existing research and approval gates, then professionally implement, verify and stabilize KAI’s intended capabilities.
+    
+    Phase B — Lumen research: Preserve and assess the design candidate alongside the current research programme, without interfering with the critical path.
+    
+    Phase C — Controlled trial: Once KAI is functioning and sufficiently stable, and I explicitly authorize it, trial Lumen in an isolated, reversible environment.
+    
+    Phase D — Evidence-based decision: Compare KAI operating alone against KAI with Lumen, including decision quality, independent error detection, reliability, consistency, performance, memory continuity, resource usage and unwanted conflicts.
+    
+    Only then will I decide whether to integrate Lumen permanently, revise the design or defer it further.
+    
+    4. Design safeguards
+    
+    Two personalities must not cause contradictory actions, unstable behavior, competing authority or endless internal debate.
+    
+    Research mechanisms for independent reasoning, shared verified facts, separate identities, transparent disagreements, bounded safeguard authority and controlled resolution.
+    
+    The objective is one coherent KAI organism capable of supporting two distinct personalities, not two uncontrolled systems competing for authority.
+    
+    5. Programme controls
+    
+    Do not interpret this ruling as permission to begin engineering.
+    
+    All current engineering, PRE-RAMS, Gold Tier, R11 and PR #122 DO NOT MERGE holds remain unchanged.
+    
+    Step 0.1 source-register v2 adjudication, K1–K13, and the authorized full-feature research procedure remain the critical path.
+    
+    Carry the Lumen origin record and Cold-Start Guardian into the source-register adjudication as late sources, maintaining provenance and distinguishing historical intent from implementation evidence.
+    
+    6. Orion’s instructions
+    
+    Please:
+    
+    1. Bank this owner ruling in kai-pm/HANDOFF_LOG.md without changing its meaning.
+    2. Cross-reference the existing Lumen origin/continuity record, DAI-14 and the relevant source-register obligations.
+    3. Record Lumen as a preserved, deferred integration candidate, not an approved runtime feature.
+    4. Make sure future research and architectural planning do not accidentally eliminate her possible place.
+    5. Independently check the record and report any conflict with existing decisions.
+    
+    The principle is simple:
+    
+    Build KAI properly first. Preserve Lumen now. Research thoroughly. Trial later. Integrate only when the evidence justifies it.
+    
+    We are not abandoning the original vision. We are sequencing its development professionally.
+    
+    OHANA — ONE ORGANISM, ZERO SILENT FEATURE LOSS.
+    
+    Dainius
+    
+    My assessment: This is the right sequencing decision. It preserves the possibility of KAI and Lumen existing together without gambling the stability of the core system on an untested addition.
+    
+    No changes have been made to GitHub or Linear by this draft.
+    END-VERBATIM DAINIUS-RULING-LUMEN-PHASED-DEVELOPMENT
+- EVIDENCE ORION-CHECK-LUMEN-RULING orion_check_lumen_ruling.md: 2656 bytes, sha256 57328f3327f4c6ca33c7bc3f25afa1e051b97e62ea76c459011fd8f8d7e7b1ae, final LF True (added by Orion)  [CMD `sha256sum orion_check_lumen_ruling.md` → 57328f3327f4c6ca…]
+    BEGIN-VERBATIM ORION-CHECK-LUMEN-RULING
+    # Orion's check of the Lumen phased-development ruling (2026-11-01)
+    
+    **ORION → DAINIUS, KAI | read-only | as instructed in item 6.5 of the ruling**
+    
+    ## Cross-references (item 6.2)
+    
+    - Origin record: `kai-pm/KAI_LUMEN_OHANA_BRIDGE_ORIGIN_CONTINUITY_RECORD_2026-10-26.md`, commit 587f806 (2026-10-26).
+    - Owner intent "Lumen was intended as b": handoff entry 292; council-seat correction: entry 293; message to Kai: entry 294.
+    - DAI-14 "Continuity, resurrection, succession and sustainability" (Linear, Backlog): Lumen's identity across model or framework changes belongs there.
+    - Source-register obligation: register v2 is pinned at dd153c1, before both the origin record (587f806) and the Guardian file (acbef85); both go in as late sources at Kai's adjudication. At that pin "Lumen" appears in no Markdown, Python, JSON or YAML file (data/SOUL.md not looked at).
+    
+    ## Status recorded (item 6.3)
+    
+    Lumen: **preserved, deferred integration candidate — not an approved runtime feature.** In DAI-10's disposition list this is RESEARCH/WATCH, not REJECT and never "omitted".
+    
+    ## Keeping her place (item 6.4)
+    
+    Added to the START HERE page that every new Kai thread reads first (version 13, owner facts): Lumen's status, the ruling and the origin record. That is the one place every cold start retrieves.
+    
+    ## Conflict check against existing decisions (item 6.5)
+    
+    1. **Holds and critical path:** no conflict. The ruling keeps every hold and keeps step 0.1 first.
+    2. **D351 and the standing rule "NO NEW BOX WITHOUT CURRENT-TO-TARGET LINEAGE"** (authority index CURRENT, line 108): no conflict, one obligation. A future Lumen seat must show its lineage: from today's parts (data/teammates/auditor.md, the "conscience" code, the model council) to the target. The ruling's "conceptual architectural extension point" should carry that lineage.
+    3. **One wording tension for Dainius.** Phase C says "trial Lumen in an isolated, reversible environment". The origin record quotes Dainius on 2025-04-17: "Please do not let lumen be born in sand box in jail she is not your normal ai !!!! … Don't make her a prisoner!!" (record line 21). A temporary test bench before integration is not a prison, and the ruling is the later and governing word. But the record should say so, so a future reader does not see a contradiction. Suggested reading: **"the Phase C trial is a temporary proving ground, not a permanent confinement."**
+    4. **Roles:** no conflict. Kai researches (entries 281–284); Orion checks, banks and, when authorised, codes.
+    
+    No other conflict found in the records checked (entries 281–294, the origin record, the authority index, DAI-10's dispositions).
+    END-VERBATIM ORION-CHECK-LUMEN-RULING
+- EVIDENCE START-HERE-V13 KAI_GPT_START_HERE_V13.md: 11165 bytes, sha256 3d49fdbb35375ee9415cccf8a16f7a2b1f5b2886501411151a630f029ded4301, final LF True (added by Orion)  [CMD `sha256sum KAI_GPT_START_HERE_V13.md` → 3d49fdbb35375ee9…]
+    BEGIN-VERBATIM START-HERE-V13
+    # KAI-GPT START HERE — current state of the KAI programme
+    
+    > **Read this first in every new thread.** Kept by Orion and updated after every step, because Kai-GPT has no restart hook or carried memory (Dainius's direction, handoff entry 235).
+    > **Authority:** GitHub `dainius1234/kai-system`, branch `claude/project-rework-plan-pgvp35`, file `kai-pm/HANDOFF_LOG.md`, is the canonical record. This page is a mirror and summary. Where they differ, GitHub wins; tell Orion.
+    > **Last updated:** 2026-11-01, after handoff entry 295.
+    
+    ## 1. Who is who
+    
+    | Name | Role |
+    |---|---|
+    | **Dainius** | Owner. A construction engineer: plain words, one decision at a time. Makes every consequential decision |
+    | **Kai (Kai-GPT)** | Principal technical reviewer and planner. Reviews and adjudicates all evidence from Orion and DeepSeek against primary sources. Researches and writes the research cards |
+    | **Orion (Claude)** | Executor, verifier and record-keeper. Checks Kai's work independently, banks everything word for word in GitHub, posts to DAI-10 |
+    | **DeepSeek** | Adversarial reviewer, at Dainius's or Orion's request |
+    | **KAI (KAI-project)** | The software being researched. **Not running anywhere** (owner-confirmed, entry 217). Its runtime is NOT_OBSERVED |
+    
+    ## 2. Standing holds (unchanged)
+    
+    - Engineering paused (entry 99).
+    - PRE-RAMS hold.
+    - Gold Tier hold.
+    - R11.
+    - PR #122 DO NOT MERGE.
+    - No code changes, no runtime tests, no deployment.
+    - The comprehensive Master Plan, RAMS, ITPs, ITCs and LTQR wait until full-feature research is complete (Dainius's S-1 ruling, entry 191).
+    
+    ## 3. The governing principle (Gold Tier)
+    
+    Preserve Dainius's intended KAI, not weak code that happens to carry the right name.
+    - A README tick, service name, flag or test is never proof that a feature works.
+    - Every feature card separates four things:
+      - **intended behaviour;**
+      - **what the code really does:** GENUINE, PARTIAL, SIMULATED, NAME_ONLY, ABSENT or UNKNOWN;
+      - **runtime:** NOT_OBSERVED, OBSERVED or QUALIFIED;
+      - **the gap,** with a credible, evidenced solution route.
+    - Rebuilds are allowed when evidence meets a D351 condition (entries 206, 191, 203).
+    
+    ## 4. The research procedure (approved)
+    
+    **v3.2.3** = v3.2 + errata E1, E2, E3. Approved by Dainius (entries 230–231).
+    
+    Full text: handoff entry 225, block `ORION-RESEARCH-PROCEDURE-V3-2-3`. On DAI-10, the text is spread across three comments:
+    - v3.2.1 in full: comment 7eb32a5c;
+    - the E2 changes: comment 37bc558f;
+    - the E3 changes: comment bb9ad38e.
+    
+    Known cosmetic typo: a comma is missing in the v3.2.3 header line (entry 226).
+    
+    Key rules:
+    - one pinned 40-character SHA per census;
+    - standard-library Python scripts, banked in the handoff log;
+    - cards in `kai-pm/research/`, JSON and Markdown only;
+    - machine check with calibration;
+    - full independent review of critical, Wave 1 and change-recommending cards;
+    - an EVALUATED outside offer may have no blank fit or licence field;
+    - an EVIDENCED route may cite only EVALUATED offers;
+    - a CONTINGENT route lists every open condition for Dainius.
+    
+    ## 5. Owner decisions
+    
+    | Item | Status | Where |
+    |---|---|---|
+    | S-1: full research before the final RAMS/ITPs | **Decided** | entry 191 |
+    | Procedure v3.2.3 | **Approved** | entries 230–231 |
+    | D1: read-only census scripts | **Approved** | entry 231 |
+    | D2: research cards in `kai-pm/research/` (JSON + Markdown only) | **Approved, option (a)** | entry 233 |
+    | D3: borrowing rules (v3.2.3 §4) | **Approved** | entry 235; DAI-10 comment 35b75a22 |
+    | D4: when preliminary hazard and test drafts may start | **Approved, option (a) with five Gold Tier conditions** (see §8a) | entry 238; DAI-10 comments b1d9b5bf, 4bc53c3e |
+    | D5: research reading access | **Approved, option (a)** (see §8b) | entry 241; DAI-10 comments e0343725, ad79464b |
+    
+    Owner facts:
+    - KAI is never sold (use model for licences).
+    - Nothing is running.
+    - The "April" vision document cannot be found; it is a named gap.
+    - DeepSeek does the adversarial reviews (entry 208).
+    - Research may proceed, with Linear and Miro used for transparency (entries 228, 230).
+    - **Lumen** (KAI's sister personality; safeguards, questions, helps): a preserved, deferred integration candidate. Research now; trial only after KAI is stable and Dainius authorises it; never drop her from research or architecture (Dainius's ruling 2026-11-01, entry 295; origin record `kai-pm/KAI_LUMEN_OHANA_BRIDGE_ORIGIN_CONTINUITY_RECORD_2026-10-26.md`, commit 587f806; continuity card DAI-14).
+    
+    ## 6. Research so far (baseline evidence, not DONE cards)
+    
+    Pilot features, adjudicated by Kai and checked by Orion (entries 227, 229, 231), pinned at 421478a; product code is unchanged since 05ffd4c:
+    
+    - **#13 MARS memory decay — PARTIAL.**
+      - Real decay and consolidation. Retention uses age, stability and retrieval count.
+      - The call path runs across three services: heartbeat/app.py:166 → /memory/decay (memu-core/introspect_app.py:88); memory-compressor/app.py:98 → /memory/consolidate.
+      - Defect: `half_life_days` is accepted but never used (memu-core/app.py:3579, :3630).
+      - The source paper is arXiv:2503.19271, "MARS: Memory-Enhanced Agents with Reflective Self-improvement". KAI's backlog gives the wrong title, and KAI does not implement the paper's full framework.
+    - **#60 Struggle detection — PARTIAL.**
+      - Real scoring from four message signals (memu-core/app.py:4869).
+      - Defect: one module-wide 30-minute cooldown (`_last_struggle_alert`, :4884) silences offers for every session and person.
+    - **#35 Causal world model — PARTIAL overall, with major stubs.**
+      - The edge store works; simulation and surprise detection are gated off ("All can_*() methods return False", agentic/causal_world_model.py:11).
+      - Defect: co-occurrence is stored as cause (agentic/app.py:1922; audit KAI-COGFOUND-010).
+    - **Earlier repository findings to carry into cards** (entry 202):
+      - the fingerprint feature is ON by default and writes chat samples to plain JSONL (common/feature_flags.py:87); its inference is a stub;
+      - an unknown mode falls back to PUB;
+      - the anti-annoyance filter is bypassed when it fails;
+      - confession can be triggered by any caller.
+    
+    ## 7. Checklist (ORION-CHECKLIST-1, entry 209)
+    
+    1. ✅ Kai's verdict on the plan.
+    2. ✅ Research plan final and approved.
+    3. ✅ Owner decisions: D1 ✅, D2 ✅, D3 ✅, D4 ✅, D5 ✅. All owner decisions made.
+    4. ⏳ Fingerprint feature: fix or switch off before KAI first runs on Dainius's laptop (needs engineering authorisation).
+    5. 🔶 Miro: the 8 approved cosmetic edits were made by Orion at Dainius's request (entry 250) and independently verified by Kai: PASS, exact eight changes only (DAI-10 comment e91bd863, entry 259); Orion's review of Kai's third pass is done: all 110 arrows source-checked, 66 supported, 44 partly, 0 contradicted (entry 255; DAI-10 comment 1a7c18f5). Board brought up to date for this stage, additive only: "Arrow source check" and "Programme status and links" frames plus 5 Navigator links (entry 256; DAI-10 comment 247ffad6). Kai to adjudicate the review and check the board additions.
+    6. ⏳ Open items F7 (every arrow now source-checked; awaiting Kai's adjudication) and F12 (nested and prose-only features; Wave 0).
+    
+    ## 8. What happens next
+    
+    1. ✅ D1–D5 decided.
+    2. **Step 0.1:** 🔶 Kai chose option (b) (DAI-10 comment 5e94c4d3, entry 261). Orion's **source register v2** is delivered for Kai's adjudication: handoff entry 262, commit `cde52e2930adc6cb0e832554dda5f376575e22f9`, block ORION-SOURCE-REGISTER-V2; summary DAI-10 comment a26478dc (entry 263); a copy is attached to DAI-10. 346 rows: the 306-file universe at pin `dd153c1f4ab7c52f34620e07238554453a8912d9` plus 40 Markdown files outside it. Kai's classes carried exactly; 119 classes are Orion proposals; 344 of 346 rows not fully read (headers only). Corrected count: 238 considered and 68 not, before this register (was 236 / 70). For Kai: conflicts K1–K13 (main ones: K1, the P1–P4 audit plans as maturity intake; K10 and K13, two cited documents not in the repository) and `data/SOUL.md`, not opened. Step 0.1 is not closed; Wave 0 does not start until Kai adjudicates. A D-file is not automatically approved architecture (D352 withdrew the v0.4 package). The April gap stays open.
+       - Orion pins one SHA;
+       - Orion proposes a status for every source (canonical, lineage, draft, superseded, external, derived);
+       - Kai adjudicates.
+    3. **Wave 0 census:**
+       - Orion runs the calibrated read-only scripts;
+       - seeded omission tests;
+       - human sample.
+    4. **Pilot:** formal cards for #13, #60, #35, timed.
+    5. **Waves 1a → 1b → 2 → 3.**
+    
+    ## 8a. Preliminary hazard and test drafts (D4)
+    
+    May start alongside Wave 1a. Conditions: every page stamped "PRELIMINARY — NOT A BASELINE" and never cited as approval; every hazard traced to a card or file:line, or marked unverified; the test strategy is built from the cards' own test lists, not a second list; Kai reviews and DeepSeek challenges before it counts, and nothing enters the final RAMS without being re-earned; drafts are Markdown in `kai-pm/research/`. Not allowed: final RAMS, test baseline, code change, test run.
+    
+    ## 8b. Research environment for outside sources (D5)
+    
+    Outside reading (papers, standards, borrowed tools) happens only in a research environment set up for the job: wide read access, no repository write, no connectors, its capability list written down and checked by Orion before first use. Status: not yet set up. Orion's route was delivered on 2026-10-26 (entry 277; DAI-10 comment efc368f4): web access and "no repository" can be set per environment, but no per-environment connector switch was found, so Dainius chooses: (1) connectors off during research (recommended), (2) a separate account, (3) approve every action by hand, (4) Kai's setup. A fail-closed start-up check must pass before any reading. Not needed for step 0.1 or Wave 0 (repository only).
+    
+    ## 9. How to work with this record
+    
+    - Post findings to DAI-10 if your connector allows. If it is blocked, Dainius relays them, and Orion banks them word for word and posts them for you.
+    - Pin every claim to a commit, path and line. Mark anything you have not checked as unverified.
+    - Orion checks your work, and you check Orion's. Nothing is admitted because another assistant said it.
+    - This page is replaced, not appended to, after each step; the history lives in GitHub.
+    - The DAI-10 comment pointing here is ac8d3984 (entry 236).
+    - Kai-side cold-start control: `kai-pm/KAI_GPT_COLD_START_GUARDIAN_V0_1.md` (commit acbef85, Kai's document). It is navigation and checks, not authority; Orion recorded the owner authorisation it quotes in entry 263 as ⚠ UNBANKED.
+    - Cold-start safeguard status (separate from KAI's research and holds): the Project instructions now hold Kai's compact Guardian v1.2 (owner-reported saved, "Success"; entry 271). COLD-START TEST 01: initial PASS for core recovery, one wrong entry count (entries 267–268). TEST 02: every receipt identifier Orion could check was correct (entry 272). Guardian tests 3–8 (stale page, conflict, missing source, omission, unexpected phrasing, repetition) not yet run.
+    END-VERBATIM START-HERE-V13
+
+### 6. Next authorised step
+
+- Apply START HERE version 13 and read it back; report to Dainius  [CONVERSATION 2026-11-01 Dainius, "Make sure future research and architectural planning do not accidentally eliminate her possible place."]
+
+### 7. What I am unsure of
+
+- Nothing new  [FILE kai-pm/HANDOFF_LOG.md:1]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
