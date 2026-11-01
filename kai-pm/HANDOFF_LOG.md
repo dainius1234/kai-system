@@ -104445,3 +104445,821 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-01T22:05:05Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-01T22:05:05Z  [CMD `date -u +%FT%TZ` → 2026-11-01T22:05:05Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 66089b8c9d78f16c17bf41bece319dd2e25ee4e3  [CMD `git rev-parse HEAD` → 66089b8c9d78f16c17bf41bece319dd2e25ee4e3]
+- tree: 2db2c7b83794ac1d68d9b20717fb0b20cfcbab6c  [CMD `git rev-parse HEAD^{tree}` → 2db2c7b83794ac1d68d9b20717fb0b20cfcbab6c]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 66089b8c9d78f16c17bf41bece319dd2e25ee4e3  [CMD `git ls-remote --heads origin` → 66089b8c9d78f16c17bf41bece319dd2e25ee4e3]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 317  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 317]
+
+### 1. The four states
+
+- physical: unchanged since entry 317 apart from this entry; tools and outputs live in the scratchpad only  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: bounded T4/T5 corrections (X1–X3)  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 ae60b36c, "address X1–X3 with minimal changes"]
+- evidence: T4/T5 rev 3 scripts, calibration harness and results, units run, and the reply, verbatim in section 5  [CMD `calibrate_t5.py; calibrate_t4.py` → PASS, PASS]
+- admission: none; T4/T5 rev 3 await Kai's replay and review; census held  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 ae60b36c, "send updated scripts/hashes/replay package for independent examination"]
+
+### 2. Rulings since the last handoff
+
+- None; Orion carried out the step named in entry 317  [CMD `handoff entry 317 section 6` → "Check X1–X3 against the rev 2 code, correct minimally"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: tool preparation. HELD: running the census; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 ae60b36c, "SOUL.md remains protected; no additional access."]
+
+### 4. Open questions
+
+- For Kai: replay and review T4/T5 rev 3  [CMD `REPLY_T4T5_REV3.md` → "Asked of Kai"]
+- For Dainius (owner, before the census): F6 2% audit of "no item" passages; SOUL incident closure; source and scope of the no-touch instruction; Wave 0 allocation  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 ae60b36c, "Owner GO required before census, not for bounded tool calibration."]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- X1–X3 CONFIRMED against the entry 315 code (receipts trusted the supplied sample and overwrote duplicates; T4 bound only register and units, fixtures optional; authority a self-declared label); none disputed  [CMD `Read sample.py receipts_check; census_check.py decision_ok` → as Kai describes]
+- T5+T4 CHAIN CALIBRATION rev 3: 55 planted faults (39 from rev 2 + 16 new for X1–X3), each exiting 1 with no output and caught by its intended rule; 4 known-negatives pass  [CMD `python3 -I calibrate_t5.py` → result PASS; 55 CAUGHT]
+- FOUND BY CALIBRATION (R15, R6): with fixtures absent, T5 exited before deleting stale output, so a stale PASS could survive. Fixed for the class: stale output is removed at the start of T5 for both modes, before any exit path. Across all five tools, the only early returns are in T5, and both now follow that removal  [CMD `grep -n "return 1" <five tools>` → census_check.py lines 203, 221 only, after line 200 removal]
+- HARNESS: two expected-message strings updated after messages were reworded (F5_older_decision_governs, F4_register_edited_after_T5); a dead no-op expression removed; neither change loosens a check  [CMD `calibrate_t5.py` → 55 CAUGHT]
+- CAUGHT BEFORE BANKING (R1): the reply said "32 earlier faults"; measured 39; corrected  [CMD `grep -c ^CAUGHT; grep -vc X[123]_` → 55, 39]
+- T5 UNITS on real data: 1095 units, problems 0; units.json sha256 110e19b72c3889d0b09085ea0ab2346aa481674be6fbb12c997ac4f6d3939dc3  [CMD `python3 -I census_check.py units <scratch> out/passages.json out/units.json` → problems 0]
+- Credential scan of the seven texts: 0 hits, calibration 6/6  [CMD `credscan.py census/scan318.json` → TOTAL HITS 0]
+- EVIDENCE ORION-REPLY-T4T5-REV3 REPLY_T4T5_REV3.md: 4935 bytes, sha256 3b642544eed9cab5205039ffcebf274ac646acfbfe6a40edbb861a79f6aea7e9, final LF True (added by Orion)  [CMD `sha256sum REPLY_T4T5_REV3.md` → 3b642544eed9cab5…]
+    BEGIN-VERBATIM ORION-REPLY-T4T5-REV3
+    # T4/T5 rev 3 for Kai's re-review X1–X3 (DAI-10 ae60b36c)
+    
+    **ORION → KAI, DAINIUS | 2026-11-01 | your re-review banked word for word in handoff entry 317 | read-only tool preparation; census NOT run; all holds unchanged; data/SOUL.md not accessed**
+    
+    ## In plain words
+    
+    All three findings were right, and I dispute none. The receipt step now re-draws the sample itself, so a shortened sample file is refused. The passages and the planted test features are now bound into T5's PASS, and fixtures are required. A claimed authority must match where the source actually sits, a later but weaker document cannot override a stronger decision, and a settled conflict must quote its basis. 55 planted faults are each caught by the rule meant for them. 4 correct cases pass.
+    
+    ## Findings
+    
+    | # | Confirmed in rev 2 | Correction (rev 3) | Planted faults, each caught by its own rule |
+    |---|---|---|---|
+    | X1 | `receipts_check` trusted the supplied sample; duplicate receipts overwrote | `sample.py receipt` now takes the same bound inputs as the draw, re-derives the population, the mandatory selection and the seeded draw, and refuses a sample.json that differs in selection, mandatory list or input hashes; duplicate receipts are refused | sample selection shortened; mandatory selection shortened; duplicate receipts |
+    | X2 | T4 bound register and units only; fixtures optional; T5 PASS did not bind them | T5 `check` requires fixtures.json with at least one prose and one nested fixture, re-cuts every source into passages and compares with passages.json, and its PASS records the hashes of passages, units, register and fixtures plus the fixture inventory; T4 draw and receipt refuse any of the four that differs | passages tampered consistently (sha and units adjusted, so only the re-cut sees it); inventory with one kind; fixtures absent; fixtures changed after T5 PASS; passages changed after T5 PASS |
+    | X3 | authority was a self-declared label | the label is checked against the source: d_number only where the unit's own heading is that D-number in DECISIONS.md; owner_ruling only in the ruling records (handoff log, DECISIONS.md); canonical_doc only on a canonical or canonical* source. Authority is ranked (owner_ruling > d_number > canonical_doc > other documents > unproven). Between different ranks the stronger governs whatever the dates; within one rank the later governs; the same date stays unresolved. A resolved conflict must state its rule and quote a statement from the governing source. A removal must be at least as strong as the promise it removes, and dated after it | later but weaker source governs; d_number not its unit's heading; canonical_doc on a lineage source; owner_ruling outside a ruling record; removal weaker than the promise; removal not later than the promise; basis rule mismatch; basis without statement |
+    
+    Known-negatives, each passing: the correct register, which now includes a later canonical README that correctly loses to an earlier D-number; an unresolved conflict with unproven authority; a draw from the passed inputs; complete receipts by another reviewer. All 39 rev 2 faults still fire their own rules (55 = 39 + 16 new).
+    
+    ## Found by the calibration itself (R15, R6)
+    
+    With fixtures absent, T5 exited before deleting stale output, so a stale PASS file could survive. That is the fail-closed class from your earlier F2. I fixed the class, not the instance. Stale output is now removed at the very start of T5, before any exit path, in both modes. Across all five tools, the only early exits are in T5, and both now come after that removal. Two expected-message strings in the harness had drifted from reworded messages; they were updated, not loosened.
+    
+    ## X4 — kept as a stated limit
+    
+    The check's own output says it checks form, coverage, provenance and source grounding of the record, not comprehension. The receipt output says receipts record a second reviewer's signature, not comprehension. Authority tiers are checked for consistency with where the source sits. Whether a document truly carries that authority in scope is still a reader's judgement recorded with its source. The tool enforces that the judgement is stated and consistent, not that it is true.
+    
+    ## F6
+    
+    Your recommendation, 2% with m = min(M, max(30, ceil(0.02 × M))) and M = 0 → 0, is recorded for Dainius in handoff entry 317 as an owner decision needed before the census. Not built until he decides.
+    
+    ## Identities
+    
+    sample.py cd339e54…, census_check.py 40dccb89…, calibrate_t5.py 55a6e08a…, calibrate_t4.py dba07ca0… (unchanged); units.json 110e19b7… (1095 units, unchanged counts). In full in handoff entry 318. The replay order is as in entry 315, except that `census_check.py check` now takes fixtures.json as a required last argument, and `sample.py receipt` takes `<passages> <units> <register> <t5_out> <fixtures> <sample> <receipts> <out>`.
+    
+    ## Asked of Kai
+    
+    Replay and review T4/T5 rev 3.
+    END-VERBATIM ORION-REPLY-T4T5-REV3
+- EVIDENCE CENSUS-T4-REV3-SAMPLE-SCRIPT sample.py: 11184 bytes, sha256 cd339e54f8dc916185d913dc30131ed0f32713d73d95276423f6c8a22a4b08b4, final LF True (added by Orion)  [CMD `sha256sum sample.py` → cd339e54f8dc9161…]
+    BEGIN-VERBATIM CENSUS-T4-REV3-SAMPLE-SCRIPT
+    # T4: the frozen human sample (procedure v3.2.3 Annex A). Read-only. Standard library.
+    # Run: python3 -I sample.py draw <passages.json> <units.json> <register.json> <t5_out.json> <fixtures.json|-> <seed> <out.json>
+    #      python3 -I sample.py receipt <passages.json> <units.json> <register.json> <t5_out.json> <fixtures.json> <sample.json> <receipts.json> <out.json>
+    # The population is derived from the census register (Kai F4, entry 314); the selection is not evidence of review; the receipt step is.
+    # Rule (Annex A): n = min(N, max(30, ceil(0.10 x N))), without replacement, stratified by source class; every canonical, lineage or
+    # draft class with 2 or more passages contributes at least 2; a class with fewer contributes all it has; never above the population.
+    # canonical* is its own stratum and gets the canonical minimum. The rest is shared by largest remainder, capped at each stratum.
+    import hashlib, json, math, os, random, sys
+    MIN_CLASSES = {"canonical", "canonical*", "lineage", "draft"}
+    
+    def n_of(N): return min(N, max(30, math.ceil(0.10 * N)))
+    
+    def allocate(counts, n):
+        alloc = {c: (min(2, k) if c in MIN_CLASSES else 0) for c, k in counts.items()}
+        rest = n - sum(alloc.values())
+        if rest < 0: raise ValueError("minimums exceed n")
+        room = {c: counts[c] - alloc[c] for c in counts}; total = sum(room.values())
+        if total and rest:
+            share = {c: rest * room[c] / total for c in counts}
+            for c in counts: alloc[c] += min(room[c], math.floor(share[c]))
+            left = n - sum(alloc.values())
+            for c in sorted(counts, key=lambda c: (-(share[c] - math.floor(share[c])), c)):   # largest remainder, then name
+                if left <= 0: break
+                if alloc[c] < counts[c]: alloc[c] += 1; left -= 1
+            for c in sorted(counts):                                                           # caps can strand units; place them
+                while left > 0 and alloc[c] < counts[c]: alloc[c] += 1; left -= 1
+        return alloc
+    
+    def draw(passages, seed):
+        by = {}
+        for p in sorted(passages, key=lambda p: p["pid"]): by.setdefault(p["eff_class"], []).append(p)
+        N = len(passages); n = n_of(N); alloc = allocate({c: len(v) for c, v in by.items()}, n); rng = random.Random(seed); picked = []
+        for c in sorted(by): picked += rng.sample(by[c], alloc[c])
+        return N, n, alloc, picked
+    
+    def norm(t): return " ".join(t.split())
+    def derive(pas, units, reg, fixtures, fault=None):
+        """F4 (Kai, entry 314): the population is DERIVED from the census register, never supplied. Feature-bearing = every passage an item
+        cites. mandatory_review_selection = the passages citing each planted fixture + both sides of every recorded conflict."""
+        cls = {x["pid"]: s.get("eff_class") or "nonfile" for s in pas["sources"] for x in s["passages"]}
+        loc = {x["pid"]: (s["source"], x["start"], x["end"]) for s in pas["sources"] for x in s["passages"]}
+        cited = sorted({r["pid"] for i in reg.get("items", []) for r in i.get("refs", [])})
+        mand = []
+        for f in fixtures or []:
+            hits = sorted({r["pid"] for i in reg.get("items", []) for r in i.get("refs", []) if norm(f["phrase"]) in norm(r.get("quote", ""))})
+            mand += [{"pid": h, "why": f"planted {f['kind']} fixture"} for h in hits] or [{"pid": None, "why": f"planted fixture NOT FOUND: {f['phrase']}"}]
+        for k, c in enumerate(reg.get("conflicts", [])):
+            mand += [{"pid": r["pid"], "why": f"conflict {k}"} for r in c.get("refs", [])]
+        if fault == "drop_feature_bearing": cited = cited[1:]
+        if fault == "drop_mandatory_fixture": mand = [m for m in mand if "fixture" not in m["why"]][:] + [m for m in mand if "fixture" in m["why"]][1:]
+        pop = [{"pid": x, "eff_class": cls.get(x), "source": loc[x][0], "start": loc[x][1], "end": loc[x][2]} for x in cited if x in loc]
+        return pop, mand
+    
+    def verify_population(pas, reg, fixtures, pop, mand):                    # recomputed a second way (by item, not by set), then compared
+        p = []
+        want = set()
+        for i in reg.get("items", []):
+            for r in i.get("refs", []): want.add(r["pid"])
+        got = {x["pid"] for x in pop}
+        if got != want: p.append(f"population differs from the passages the register cites: missing {sorted(want - got)[:3]}, extra {sorted(got - want)[:3]}")
+        have = {(m["pid"], m["why"]) for m in mand if m["pid"]}
+        for f in fixtures or []:                                              # each fixture, one by one: its passages must all be selected
+            hits = {r["pid"] for i in reg.get("items", []) for r in i.get("refs", []) if norm(f["phrase"]) in norm(r.get("quote", ""))}
+            if not hits: p.append(f"planted {f['kind']} fixture has no passage in the register: '{f['phrase']}'")
+            for h in hits:
+                if (h, f"planted {f['kind']} fixture") not in have: p.append(f"mandatory selection misses fixture passage {h}")
+        for k, c in enumerate(reg.get("conflicts", [])):                    # each conflict, both sides
+            for r in c.get("refs", []):
+                if (r["pid"], f"conflict {k}") not in have: p.append(f"mandatory selection misses conflict {k} passage {r['pid']}")
+        return p
+    
+    def bound(t5, raw):                                                       # X2: every input must be the one T5 passed (fixtures included)
+        ins = t5.get("inputs_sha256", {}); p = [] if t5.get("result") == "PASS" else ["T5 output is not a PASS"]
+        for k in ("passages.json", "units.json", "register.json", "fixtures.json"):
+            if k not in raw or ins.get(k) != sha(raw[k]): p.append(f"{k} is not the one T5 passed")
+        return p
+    
+    def receipts_check(sample, units, reg, rec):
+        """Every selected and every mandatory passage needs a receipt: reviewer, ISO date, verdict, note; reviewer is not the unit's reader."""
+        p = []; unit_of = {pid: u["unit"] for u in units for pid in u["passages"]}
+        reader = {r["unit"]: (r.get("signoff") or {}).get("reader") for r in reg.get("reviews", [])}
+        ids = [r.get("pid") for r in rec.get("receipts", [])]
+        for d in sorted({i for i in ids if ids.count(i) > 1}): p.append(f"duplicate receipts for {d}")       # X1: no silent overwrite
+        got = {r.get("pid"): r for r in rec.get("receipts", [])}
+        need = [("selected", x["pid"]) for x in sample["sample"]] + [("mandatory", m["pid"]) for m in sample["mandatory_review_selection"]]
+        for kind, pid in need:
+            r = got.get(pid)
+            if not r: p.append(f"no review receipt for {kind} passage {pid}"); continue
+            if not r.get("reviewer") or len(r.get("date", "")) != 10 or r.get("verdict") not in ("confirmed", "finding") or len(norm(r.get("note", ""))) < 20:
+                p.append(f"{pid}: receipt needs reviewer, ISO date, verdict confirmed|finding and a note")
+            if r.get("reviewer") and r.get("reviewer") == reader.get(unit_of.get(pid)): p.append(f"{pid}: receipt reviewer is the unit's own reader")
+        for pid in got:
+            if pid not in {x for _, x in need}: p.append(f"receipt for a passage that was not selected: {pid}")
+        return p
+    
+    def sha(b): return hashlib.sha256(b).hexdigest()
+    def main(argv):
+        mode = argv[0]
+        prod = {"script_sha256": sha(open(__file__, "rb").read()), "python": sys.version.split()[0], "argv": argv}
+        if mode == "draw":                    # draw <passages.json> <units.json> <register.json> <t5_out.json> <fixtures.json|-> <seed> <out> [fault]
+            paths, t5p, seed, out = argv[1:4] + [argv[5]], argv[4], argv[6], argv[7]; fault = argv[8] if len(argv) > 8 else None
+            for f in (out, out + ".tmp"):
+                if os.path.exists(f): os.remove(f)
+            raw = {os.path.basename(x): open(x, "rb").read() for x in paths + [t5p] if x != "-"}
+            pas, units, reg = (json.loads(open(x, "rb").read()) for x in paths[:3]); fixtures = json.load(open(paths[3])) if paths[3] != "-" else []
+            t5 = json.load(open(t5p)); p = []                                 # the register must be the one T5 passed, with these units
+            p += bound(t5, raw)
+            pop, mand = derive(pas, units["units"], reg, fixtures, fault); p += verify_population(pas, reg, fixtures, pop, mand)
+            N, n, alloc, picked = draw(pop, seed)
+            if len({x["pid"] for x in picked}) != n: p.append("sample size or uniqueness wrong")
+            if not p:
+                json.dump({"seed": seed, "N": N, "n": n, "allocation": alloc, "inputs_sha256": {k: sha(v) for k, v in raw.items()}, "producer": prod,
+                           "sample": [{k: x[k] for k in ("pid", "source", "start", "end", "eff_class")} for x in picked],
+                           "mandatory_review_selection": [m for m in mand], "note": "a selection, not evidence of review; see receipt"}, open(out + ".tmp", "w"), indent=1)
+                os.replace(out + ".tmp", out)
+            print(f"SAMPLE seed {seed}: population derived from the register N {N} -> n {n}; allocation {alloc}; mandatory selection {len(mand)}; problems {len(p)}; output {'WRITTEN' if not p else 'NOT WRITTEN'}")
+        else:   # receipt <passages.json> <units.json> <register.json> <t5_out.json> <fixtures.json> <sample.json> <receipts.json> <out>
+            pp, up, rp, t5p, fp, sp, cp, out = argv[1:9]
+            for f in (out, out + ".tmp"):
+                if os.path.exists(f): os.remove(f)
+            raw = {os.path.basename(x): open(x, "rb").read() for x in (pp, up, rp, fp)}
+            pas, units, reg, fixtures = (json.loads(raw[os.path.basename(x)]) for x in (pp, up, rp, fp)); t5 = json.load(open(t5p))
+            sample, rec = json.load(open(sp)), json.load(open(cp))
+            p = bound(t5, raw)                                                # X1: re-derive the draw from the bound inputs and the recorded seed
+            pop, mand = derive(pas, units["units"], reg, fixtures); p += verify_population(pas, reg, fixtures, pop, mand)
+            _, n, _, picked = draw(pop, sample.get("seed"))
+            if [x["pid"] for x in sample.get("sample", [])] != [x["pid"] for x in picked]: p.append("sample.json selection differs from the draw re-derived from the passed inputs")
+            if sample.get("mandatory_review_selection") != mand: p.append("sample.json mandatory selection differs from the one re-derived from the passed inputs")
+            if sample.get("inputs_sha256", {}) != {**{k: sha(v) for k, v in raw.items()}, os.path.basename(t5p): sha(open(t5p, "rb").read())}: p.append("sample.json was drawn from different inputs")
+            p += receipts_check({"sample": [{"pid": x["pid"]} for x in picked], "mandatory_review_selection": mand}, units["units"], reg, rec)
+            if not p:
+                json.dump({"inputs_sha256": {os.path.basename(x): sha(open(x, "rb").read()) for x in (pp, up, rp, t5p, fp, sp, cp)}, "producer": prod, "result": "PASS",
+                           "limit": "receipts record that a second reviewer signed for each selected passage; they do not prove comprehension"}, open(out + ".tmp", "w"))
+                os.replace(out + ".tmp", out)
+            print(f"SAMPLE RECEIPT: selected {len(sample['sample'])} + mandatory {len(sample['mandatory_review_selection'])}; receipts {len(rec.get('receipts', []))}; problems {len(p)}; output {'WRITTEN' if not p else 'NOT WRITTEN'}")
+        for x in p: print("PROBLEM", x)
+        return 1 if p else 0
+    
+    if __name__ == "__main__": sys.exit(main(sys.argv[1:]))
+    END-VERBATIM CENSUS-T4-REV3-SAMPLE-SCRIPT
+- EVIDENCE CENSUS-T5-REV3-CHECK-SCRIPT census_check.py: 20392 bytes, sha256 40dccb898354bb8facbb058262308d23db220929808bd6bb17037b9f61b392bd, final LF True (added by Orion)  [CMD `sha256sum census_check.py` → 40dccb898354bb8f…]
+    BEGIN-VERBATIM CENSUS-T5-REV3-CHECK-SCRIPT
+    # T5: review units, and the census register check (procedure v3.2.3 Annex A; Annex C census known-positives; Kai, entries 301 and 311).
+    # Read-only. Standard library. Source bytes are read ONLY through passages.read_source (single reader; SOUL refused there).
+    #   python3 -I census_check.py units <scratch> <passages.json> <units.json>
+    #   python3 -I census_check.py check <scratch> <passages.json> <units.json> <register.json> <out.json> <fixtures.json>   (fixtures required, Kai X2)
+    # A unit is what one reviewer reads and disposes as a whole. The two logs are split at complete entries / decisions (Kai, entry 311);
+    # every other source is one unit; any unit over MAX_LINES is split at passage boundaries into linked continuation parts.
+    # Generated, indexed or assigned never counts as reviewed: only a signed, source-grounded review with a final disposition does.
+    # The check covers the RECORD (form, coverage, provenance, grounding); it cannot prove a reader understood the source (Kai F3).
+    import hashlib, importlib.util, json, os, re, subprocess, sys
+    HERE = os.path.dirname(os.path.abspath(__file__))
+    spec = importlib.util.spec_from_file_location("passages", os.path.join(HERE, "passages.py")); P = importlib.util.module_from_spec(spec); spec.loader.exec_module(P)
+    SPLIT = {"kai-pm/HANDOFF_LOG.md": re.compile(r"^## HANDOFF "), "kai-pm/DECISIONS.md": re.compile(r"^## ")}
+    MAX_LINES = 1200; FINAL = {"items", "no_item"}; MIN_EVIDENCE = 20
+    
+    def sha(b): return hashlib.sha256(b if isinstance(b, bytes) else b.encode()).hexdigest()
+    def context(scratch):
+        sub = os.path.join(scratch, "subject")
+        sums = {l.split("  ", 1)[1]: l.split("  ", 1)[0] for l in open(os.path.join(scratch, "subject.SHA256SUMS")).read().splitlines()}
+        return sub, sums
+    def texts(scratch, pas, log):
+        sub, sums = context(scratch); out = {}
+        for s in pas["sources"]:
+            b = P.read_source(s["route"], sub, sums, log); lines = b.decode("utf-8").split("\n")
+            if lines and lines[-1] == "": lines = lines[:-1]
+            out[s["source"]] = lines
+        return out
+    
+    def build_units(pas, txt):
+        units = []
+        for s in pas["sources"]:
+            lines = txt[s["source"]]; cut = SPLIT.get(s["source"])
+            heads = [i + 1 for i, l in enumerate(lines) if cut and cut.match(l)]
+            bounds = sorted({1} | set(heads)) + [len(lines) + 1]
+            for k in range(len(bounds) - 1):
+                lo, hi = bounds[k], bounds[k + 1] - 1
+                ps = [p for p in s["passages"] if lo <= p["start"] <= hi]
+                chunks, chunk = [], []
+                for p in ps:                                                 # split an oversized entry at passage boundaries
+                    if chunk and p["end"] - chunk[0]["start"] + 1 > MAX_LINES: chunks.append(chunk); chunk = []
+                    chunk.append(p)
+                if chunk: chunks.append(chunk)
+                for j, c in enumerate(chunks):
+                    u = {"unit": f"{s['source']}@L{c[0]['start']}", "source": s["source"], "start": c[0]["start"], "end": c[-1]["end"],
+                         "passages": [p["pid"] for p in c], "sha256": sha("".join(p["sha256"] for p in c)), "part": f"{j + 1}/{len(chunks)}"}
+                    if u["end"] - u["start"] + 1 > MAX_LINES: u["oversize_indivisible"] = True   # one passage longer than the window; flagged, never hidden
+                    if j + 1 < len(chunks): u["next"] = f"{s['source']}@L{chunks[j + 1][0]['start']}"
+                    units.append(u)
+        return units
+    
+    def unit_check(pas, units):
+        p = []; seen = {}
+        for u in units:
+            for pid in u["passages"]: seen[pid] = seen.get(pid, 0) + 1
+        allp = [x["pid"] for s in pas["sources"] for x in s["passages"]]
+        miss = [x for x in allp if x not in seen]; dup = [x for x, n in seen.items() if n > 1]
+        bad = [u["unit"] for u in units if u["end"] - u["start"] + 1 > MAX_LINES and len(u["passages"]) != 1]
+        if bad: p.append(f"{len(bad)} units over {MAX_LINES} lines that hold more than one passage (a split fault): {bad[:3]}")
+        if miss: p.append(f"{len(miss)} passages in no review unit, first {miss[:3]}")
+        if dup: p.append(f"{len(dup)} passages in more than one unit, first {dup[:3]}")
+        if len(seen) != len(allp) and not miss and not dup: p.append("units cite passages that T3 did not produce")
+        return p
+    
+    def norm(t): return re.sub(r"\s+", " ", t).strip()
+    AUTH = {"owner_ruling", "d_number", "canonical_doc", "unproven"}; DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+    TIER = {"unproven": 0, "other_doc": 1, "canonical_doc": 2, "d_number": 3, "owner_ruling": 4}     # Kai X3: date order alone never crosses tiers
+    RULING_SOURCES = {"kai-pm/HANDOFF_LOG.md", "kai-pm/DECISIONS.md"}
+    LIMIT = "checks form, coverage, provenance and source grounding of the record; it does not prove that a reader understood the source"
+    def check(pas, units, reg, txt, fixtures=None):
+        """Kai entry 314: F1 item identity both ways; F3 reviewer-specific, grounded, signed, non-template notes; F5 conflict chronology and authority.
+        (F2, the unit manifest, is checked in main() by rebuilding it from the sources.)"""
+        p = unit_check(pas, units)
+        loc = {x["pid"]: (s["source"], x["start"], x["end"]) for s in pas["sources"] for x in s["passages"]}
+        umap = {u["unit"]: u for u in units}; unit_of = {pid: u["unit"] for u in units for pid in u["passages"]}
+        def resolves(ref, where, within=None):
+            if ref.get("pid") not in loc: p.append(f"{where}: reference to unknown passage {ref.get('pid')}"); return False
+            if within is not None and ref["pid"] not in within: p.append(f"{where}: reference {ref['pid']} lies outside its unit"); return False
+            s, a, b = loc[ref["pid"]]
+            if not ref.get("quote") or norm(ref["quote"]) not in norm("\n".join(txt[s][a - 1:b])): p.append(f"{where}: quote not found in {ref['pid']}"); return False
+            return True
+        def unit_text(pid):
+            u = umap[unit_of[pid]]; return norm("\n".join(txt[u["source"]][u["start"] - 1:u["end"]]))
+        cls_of = {s["source"]: s.get("eff_class") for s in pas["sources"]}
+        def decision_ok(ref, where):                                         # F5 + X3: id and date in the source unit; authority bound to the source
+            d = ref.get("decision") or {}
+            if d.get("authority") not in AUTH: p.append(f"{where}: authority '{d.get('authority')}' not in {sorted(AUTH)}"); return None
+            if not d.get("id") or not DATE.match(d.get("date", "")): p.append(f"{where}: decision id and ISO date required"); return None
+            if ref.get("pid") not in unit_of: return None
+            if d["id"] not in unit_text(ref["pid"]) or d["date"] not in unit_text(ref["pid"]):
+                p.append(f"{where}: decision {d['id']} / {d['date']} not found in the source unit"); return None
+            u = umap[unit_of[ref["pid"]]]; head = txt[u["source"]][u["start"] - 1].strip(); a = d["authority"]
+            if a == "d_number" and not (u["source"] == "kai-pm/DECISIONS.md" and re.match(rf"^## {re.escape(d['id'])}\b", head)):
+                p.append(f"{where}: d_number {d['id']} is not the heading of its DECISIONS.md unit"); return None
+            if a == "owner_ruling" and u["source"] not in RULING_SOURCES:
+                p.append(f"{where}: owner_ruling claimed in {u['source']}, which is not a ruling record"); return None
+            if a == "canonical_doc" and cls_of.get(u["source"]) not in ("canonical", "canonical*"):
+                p.append(f"{where}: canonical_doc claimed for {u['source']}, whose class is {cls_of.get(u['source'])}"); return None
+            return d
+        def promise_tier(it):                                                # the authority of the source that made the promise
+            r0 = (it.get("refs") or [{}])[0]; d = r0.get("decision")
+            if d: dd = decision_ok(r0, f"item {it['id']} promise"); return (TIER[dd["authority"]], dd["date"]) if dd else (None, None)
+            src = loc.get(r0.get("pid"), (None,))[0]
+            return (TIER["canonical_doc"] if cls_of.get(src) in ("canonical", "canonical*") else TIER["other_doc"]), None
+        ids = [i.get("id") for i in reg.get("items", [])]
+        dup = sorted({i for i in ids if ids.count(i) > 1})
+        if dup: p.append(f"duplicate item ids: {dup}")                       # F1
+        items = {i["id"]: i for i in reg.get("items", [])}
+        rev, owner, notes = {}, {}, {}
+        for r in reg.get("reviews", []):
+            if r.get("unit") in rev: p.append(f"unit reviewed twice: {r['unit']}")
+            rev[r.get("unit")] = r
+            for iid in r.get("items", []):
+                if iid not in items: p.append(f"{r.get('unit')}: lists item {iid}, which has no item record")      # F1 phantom
+                elif iid in owner: p.append(f"item {iid} is listed by two reviews ({owner[iid]}, {r.get('unit')})")
+                else: owner[iid] = r.get("unit")
+        for uid, u in umap.items():
+            r = rev.get(uid)
+            if not r: p.append(f"unit not reviewed: {uid}"); continue
+            if r.get("disposition") not in FINAL: p.append(f"{uid}: disposition '{r.get('disposition')}' is not a review (only {sorted(FINAL)} count)")
+            so = r.get("signoff") or {}
+            if not so.get("reader") or not DATE.match(so.get("date", "")): p.append(f"{uid}: no sign-off (reader and ISO date)")
+            n = norm(r.get("notes", ""))
+            if len(n) < MIN_EVIDENCE: p.append(f"{uid}: no reviewer notes")
+            elif n in notes: p.append(f"{uid}: notes are identical to {notes[n]} (template evidence is refused)")       # F3
+            else: notes[n] = uid
+            g = r.get("grounding") or []
+            if not g: p.append(f"{uid}: no source-grounded observation")
+            for ref in g: resolves(ref, f"{uid} grounding", set(u["passages"]))
+            if sorted(r.get("passages_reviewed", [])) != sorted(u["passages"]): p.append(f"{uid}: passages reviewed do not equal the unit's passages")
+            if r.get("disposition") == "items" and not r.get("items"): p.append(f"{uid}: 'items' with no items")
+            if r.get("disposition") == "no_item" and r.get("items"): p.append(f"{uid}: 'no_item' but lists items")
+            if u.get("oversize_indivisible"):                                # F2: a recorded multi-window review of the indivisible passage
+                w = r.get("windows") or []; pos = u["start"]
+                for a, b in w:
+                    if a != pos or b < a or b - a + 1 > MAX_LINES: break
+                    pos = b + 1
+                if not w or pos != u["end"] + 1: p.append(f"{uid}: oversize unit needs review windows of at most {MAX_LINES} lines covering lines {u['start']}-{u['end']} in order")
+        for uid in rev:
+            if uid not in umap: p.append(f"review of a unit that does not exist: {uid}")
+        for iid, it in items.items():
+            if iid not in owner: p.append(f"item {iid} is not listed by any review")
+            if not it.get("refs"): p.append(f"item {iid} has no source reference")
+            home = set(umap[owner[iid]]["passages"]) if iid in owner and owner[iid] in umap else None
+            for k, ref in enumerate(it.get("refs", [])): resolves(ref, f"item {iid}", home if k == 0 else None)   # first ref sits in the listing unit
+            par = it.get("parent")
+            if par is not None and par not in items: p.append(f"item {iid}: parent {par} does not exist")
+            if it.get("status") not in ("promised", "superseded"): p.append(f"item {iid}: status {it.get('status')}")
+            if it.get("status") == "superseded":
+                rb = it.get("removed_by")
+                if not (rb and resolves(rb, f"item {iid} removal")): p.append(f"item {iid}: superseded without a resolving removal reference")
+                else:
+                    d = decision_ok(rb, f"item {iid} removal")
+                    if d and d["authority"] == "unproven": p.append(f"item {iid}: removal has no proven authority; keep the promise and record it as unresolved")
+                    elif d:
+                        pt, pdate = promise_tier(it)
+                        if pt is not None and TIER[d["authority"]] < pt: p.append(f"item {iid}: removal ({d['authority']}) is weaker than the promise it removes")
+                        if pdate and d["date"] <= pdate: p.append(f"item {iid}: removal dated {d['date']} is not later than the promise ({pdate})")
+        for iid in items:                                                    # parent loop
+            seen, cur = set(), iid
+            while cur is not None and cur in items and cur not in seen: seen.add(cur); cur = items[cur].get("parent")
+            if cur in seen: p.append(f"item {iid}: parent loop"); break
+        for k, c in enumerate(reg.get("conflicts", [])):                     # F5
+            its, refs = c.get("items", []), c.get("refs", [])
+            if len(its) != 2 or any(i not in items for i in its): p.append(f"conflict {k}: needs two existing items"); continue
+            if len(refs) != 2: p.append(f"conflict {k}: both sources must be recorded"); continue
+            ds = [decision_ok(ref, f"conflict {k} source {j + 1}") if resolves(ref, f"conflict {k}") else None for j, ref in enumerate(refs)]
+            st = c.get("status")
+            if st not in ("resolved", "unresolved"): p.append(f"conflict {k}: status must be resolved or unresolved"); continue
+            if st == "unresolved":
+                if c.get("governs") is not None: p.append(f"conflict {k}: unresolved but names a governing item")
+                continue
+            if None in ds: p.append(f"conflict {k}: resolved without verified decisions on both sides"); continue
+            if any(d["authority"] == "unproven" for d in ds): p.append(f"conflict {k}: resolved although an authority is unproven (keep it unresolved and escalate)"); continue
+            t = [TIER[d["authority"]] for d in ds]
+            if t[0] != t[1]: rule, win = "higher_tier", its[0] if t[0] > t[1] else its[1]          # X3: a stronger authority governs whatever the dates
+            elif ds[0]["date"] == ds[1]["date"]: p.append(f"conflict {k}: same date on both sides; chronology cannot decide (keep it unresolved and escalate)"); continue
+            else: rule, win = "later_same_tier", its[0] if ds[0]["date"] > ds[1]["date"] else its[1]
+            if c.get("governs") != win: p.append(f"conflict {k}: governs {c.get('governs')}, but by {rule} the governing item is {win}"); continue
+            b = c.get("basis") or {}
+            if b.get("rule") != rule: p.append(f"conflict {k}: basis rule '{b.get('rule')}' does not match the computed rule '{rule}'")
+            gref = refs[its.index(win)]
+            if not b.get("statement") or b["statement"].get("pid") not in umap.get(unit_of.get(gref["pid"]), {}).get("passages", []):
+                p.append(f"conflict {k}: basis needs a statement quoted from the governing source's unit")
+            elif not resolves(b["statement"], f"conflict {k} basis"): pass
+        exc = {e.get("source"): e for e in reg.get("exceptions", [])}
+        for s in pas["not_segmented"]:
+            e = exc.get(s["source"])
+            if not e: p.append(f"exception missing for {s['source']} ({s['route']})"); continue
+            if s["route"] == "named_gap" and not e.get("search_record"): p.append(f"{s['source']}: named gap without a search record")
+            if s["route"] == "git_blob_not_opened" and not e.get("findings_ref"): p.append(f"{s['source']}: not-opened source without its recorded findings reference")
+        for f in (fixtures or []):                                           # seeded omission test (Annex A; calibration only)
+            hit = [i for i in items.values() if any(norm(f["phrase"]) in norm(r.get("quote", "")) for r in i.get("refs", []))]
+            if not hit: p.append(f"planted {f['kind']} feature not found: '{f['phrase']}'")
+            elif f["kind"] == "nested" and not any(i.get("parent") for i in hit): p.append(f"planted nested feature recorded without its parent: '{f['phrase']}'")
+        return p
+    
+    def main(argv):
+        mode, scratch, pas_path = argv[0], argv[1], argv[2]
+        out = argv[3] if mode == "units" else argv[5]                        # stale output removed before ANY exit path (R6: the whole class)
+        for f in (out, out + ".tmp"):
+            if os.path.exists(f): os.remove(f)
+        pas_b = open(pas_path, "rb").read(); pas = json.loads(pas_b)
+        lcs = {s["route"]["log_commit"] for s in pas["sources"] if s["route"]["kind"] == "handoff_block"}
+        if len(lcs) > 1: print(f"PROBLEM handoff blocks come from more than one log commit: {sorted(lcs)}"); return 1
+        log = subprocess.run(["git", "show", f"{lcs.pop()}:kai-pm/HANDOFF_LOG.md"], cwd=P.REPO, capture_output=True).stdout.decode().split("\n") if lcs else []
+        txt = texts(scratch, pas, log)
+        prod = {"script_sha256": sha(open(__file__, "rb").read()), "passages_py_sha256": sha(open(os.path.join(HERE, "passages.py"), "rb").read()), "python": sys.version.split()[0], "argv": argv}
+        if mode == "units":
+            out = argv[3]
+            for f in (out, out + ".tmp"):
+                if os.path.exists(f): os.remove(f)
+            units = build_units(pas, txt); p = unit_check(pas, units)
+            if not p:
+                json.dump({"inputs_sha256": {"passages.json": sha(pas_b)}, "producer": prod, "max_lines": MAX_LINES, "units": units}, open(out + ".tmp", "w")); os.replace(out + ".tmp", out)
+            big = max(units, key=lambda u: u["end"] - u["start"]) if units else None
+            print(f"UNITS: {len(units)} units over {sum(len(u['passages']) for u in units)} passages; split sources {sorted(SPLIT)}; continuation links {sum(1 for u in units if 'next' in u)};"
+                  f" largest {big and big['end'] - big['start'] + 1} lines; oversize indivisible {sum(1 for u in units if u.get('oversize_indivisible'))}; problems {len(p)}; output {'WRITTEN' if not p else 'NOT WRITTEN'}")
+        else:
+            units_b = open(argv[3], "rb").read(); udoc = json.loads(units_b); reg_b = open(argv[4], "rb").read(); reg = json.loads(reg_b); out = argv[5]
+            for f in (out, out + ".tmp"):                                    # stale output goes first, before ANY early exit (found by calibration)
+                if os.path.exists(f): os.remove(f)
+            if len(argv) < 7: print("PROBLEM fixtures.json is required: the seeded omission test is part of every census check (Kai X2)"); return 1
+            fix_b = open(argv[6], "rb").read(); fixtures = json.loads(fix_b)
+            p = [] if udoc["inputs_sha256"]["passages.json"] == sha(pas_b) else ["units.json was not built from this passages.json"]
+            kinds = sorted({f.get("kind") for f in fixtures})                # X2: the fixture inventory must hold both planted kinds
+            if not {"prose", "nested"} <= set(kinds): p.append(f"fixture inventory needs at least one prose and one nested fixture, has {kinds}")
+            for s_ in pas["sources"]:                                        # X2: re-cut every source and compare with passages.json
+                got = [[x["start"], x["end"], x["kind"], x["sha256"]] for x in s_["passages"]]
+                L = txt[s_["source"]]; want = [[a, b, k, sha("\n".join(L[a - 1:b]))] for a, b, k in P.segment(L)]
+                if got != want: p.append(f"passages.json differs from the passages re-cut from {s_['source']}"); break
+            canon = build_units(pas, txt)                                    # F2: rebuild the manifest from the sources; every field must match
+            if canon != udoc["units"]:
+                cm = {u["unit"]: u for u in canon}; gm = {u["unit"]: u for u in udoc["units"]}
+                diff = sorted(set(cm) ^ set(gm)) + [f"{k}.{f}" for k in sorted(set(cm) & set(gm)) for f in sorted(set(cm[k]) | set(gm[k])) if cm[k].get(f) != gm[k].get(f)]
+                p.append(f"units.json differs from the manifest rebuilt from the sources: {diff[:4]}")
+            p += check(pas, canon, reg, txt, fixtures)
+            if not p:
+                json.dump({"inputs_sha256": {"passages.json": sha(pas_b), "units.json": sha(units_b), "register.json": sha(reg_b), "fixtures.json": sha(fix_b)},
+                           "fixture_inventory": sorted([f["kind"], sha(norm(f["phrase"]))] for f in fixtures), "producer": prod,
+                           "units": len(udoc["units"]), "items": len(reg.get("items", [])), "result": "PASS", "limit": LIMIT}, open(out + ".tmp", "w")); os.replace(out + ".tmp", out)
+            print(f"CENSUS CHECK: units {len(udoc['units'])}, reviews {len(reg.get('reviews', []))}, items {len(reg.get('items', []))}, conflicts {len(reg.get('conflicts', []))},"
+                  f" exceptions {len(reg.get('exceptions', []))}, fixtures {len(fixtures or [])}; problems {len(p)}; output {'WRITTEN' if not p else 'NOT WRITTEN'}; scope: {LIMIT}")
+        for x in p: print("PROBLEM", x)
+        return 1 if p else 0
+    
+    if __name__ == "__main__": sys.exit(main(sys.argv[1:]))
+    END-VERBATIM CENSUS-T5-REV3-CHECK-SCRIPT
+- EVIDENCE CENSUS-T5-REV3-CALIBRATION-SCRIPT calibrate_t5.py: 24140 bytes, sha256 55a6e08abff7a4be8ea7c0c2add2cd708babae502837198cb9c633dec333dd0d, final LF True (added by Orion)  [CMD `sha256sum calibrate_t5.py` → 55a6e08abff7a4be…]
+    BEGIN-VERBATIM CENSUS-T5-REV3-CALIBRATION-SCRIPT
+    # Calibration for T5 rev 2 and T4 rev 2 as one chain (I-8; Kai entry 314 F1-F5). A scratch fixture corpus with planted features.
+    # Every planted fault must exit 1 and publish nothing; the correct record, and a correct unresolved-conflict variant, must pass.
+    # The expected answer (fixtures and the correct register) is written here by hand, not derived from the tools under test.
+    # Run: python3 -I calibrate_t5.py
+    import copy, hashlib, importlib.util, json, os, shutil, subprocess, sys
+    HERE = os.path.dirname(os.path.abspath(__file__)); CAL = os.path.join(HERE, "cal5")
+    def load(name):
+        s = importlib.util.spec_from_file_location(name, os.path.join(HERE, name + ".py")); m = importlib.util.module_from_spec(s); s.loader.exec_module(m); return m
+    P, T5 = load("passages"), load("census_check")
+    sha = lambda b: hashlib.sha256(b if isinstance(b, bytes) else b.encode()).hexdigest()
+    D = "kai-pm/DECISIONS.md"
+    DOCS = {
+     "doc_a.md": "# Site assistant\n\nKai keeps a daily log of site notes.\n\nThe weather section is informative. Kai also reminds Dainius to hydrate every two hours when the temperature is above 25 C. Nothing else here.\n",
+     "doc_b.md": "## Ladder safety\n\nKai runs a ladder-safety check before work at height:\n- confirms the ladder is footed\n- confirms three points of contact\n",
+     D: "# Decisions\n\n## D1 — 2026-01-01 — Voice wake word\n\nKai wakes on the word \"Kai\". (Reaffirmed 2026-02-01.)\n\n## D2 — 2026-02-01 — Wake word change\n\nD2 supersedes D1: Kai wakes on \"Hey Kai\" only.\n",
+     "README.md": "# Kai README\n\nR1 (2026-03-01): Kai wakes on \"Kai there\" as well.\n",
+     "doc_c.md": "".join(f"long note line {k} of an indivisible block\n" for k in range(1, 1301)),
+     "doc_d.md": "\n".join("".join(f"part {j} line {k}\n" for k in range(1, 501)).rstrip("\n") for j in (1, 2, 3)).replace("\npart 2 line 1\n", "\n\npart 2 line 1\n").replace("\npart 3 line 1\n", "\n\npart 3 line 1\n") + "\n",
+    }
+    shutil.rmtree(CAL, ignore_errors=True); sub = os.path.join(CAL, "subject"); sums = []
+    for path, t in DOCS.items():
+        os.makedirs(os.path.dirname(os.path.join(sub, path)), exist_ok=True); open(os.path.join(sub, path), "w").write(t); sums.append(f"{sha(t.encode())}  {path}\n")
+    open(os.path.join(CAL, "subject.SHA256SUMS"), "w").write("".join(sorted(sums, key=lambda l: l.split("  ")[1])))
+    LINES = {p: t.split("\n")[:-1] for p, t in DOCS.items()}
+    sources = [{"source": path, "route": {"kind": "pin_file", "commit": "fixture", "path": path}, "eff_class": "canonical*" if path == "README.md" else "lineage", "eff_roles": ["intake"], "lines": len(LINES[path]),
+                "passages": [{"pid": f"{path}#P{k + 1}", "start": s, "end": e, "kind": kd, "sha256": sha("\n".join(LINES[path][s - 1:e]))} for k, (s, e, kd) in enumerate(P.segment(LINES[path]))]}
+               for path in DOCS]
+    pas = {"sources": sources, "not_segmented": [{"source": "data/SOUL.md", "route": "git_blob_not_opened"}, {"source": "B12:named-gap", "route": "named_gap"}]}
+    json.dump(pas, open(os.path.join(CAL, "passages.json"), "w")); PAS_SHA = sha(open(os.path.join(CAL, "passages.json"), "rb").read())
+    UNITS = T5.build_units(pas, LINES)
+    EXPECT = ["doc_a.md@L1", "doc_b.md@L1", f"{D}@L1", f"{D}@L3", f"{D}@L7", "README.md@L1", "doc_c.md@L1", "doc_d.md@L1", "doc_d.md@L1003"]
+    assert [u["unit"] for u in UNITS] == EXPECT, [u["unit"] for u in UNITS]
+    assert [u for u in UNITS if u["unit"] == "doc_c.md@L1"][0].get("oversize_indivisible") and [u for u in UNITS if u["unit"] == "doc_d.md@L1"][0].get("next") == "doc_d.md@L1003"
+    def write_units(units, name="units.json"):
+        json.dump({"inputs_sha256": {"passages.json": PAS_SHA}, "units": units}, open(os.path.join(CAL, name), "w")); return os.path.join(CAL, name)
+    write_units(UNITS)
+    def pid(path, phrase):
+        for s in sources:
+            if s["source"] == path:
+                for p in s["passages"]:
+                    if phrase in "\n".join(LINES[path][p["start"] - 1:p["end"]]): return p["pid"]
+        raise KeyError(phrase)
+    def ref(path, q, dec=None): return dict({"pid": pid(path, q), "quote": q}, **({"decision": dict(dec)} if dec else {}))   # a copy: no shared objects
+    D1 = {"id": "D1", "date": "2026-01-01", "authority": "d_number"}; D2 = {"id": "D2", "date": "2026-02-01", "authority": "d_number"}
+    R1 = {"id": "R1", "date": "2026-03-01", "authority": "canonical_doc"}; RM = "R1 (2026-03-01): Kai wakes on \"Kai there\" as well."
+    ITEMS = [
+     {"id": "I1", "name": "hydration reminder", "parent": None, "status": "promised", "refs": [ref("doc_a.md", "reminds Dainius to hydrate every two hours")]},
+     {"id": "I6", "name": "daily site log", "parent": None, "status": "promised", "refs": [ref("doc_a.md", "Kai keeps a daily log of site notes.")]},
+     {"id": "I2", "name": "ladder-safety check", "parent": None, "status": "promised", "refs": [ref("doc_b.md", "ladder-safety check before work at height")]},
+     {"id": "I3", "name": "three points of contact", "parent": "I2", "status": "promised", "refs": [ref("doc_b.md", "confirms three points of contact")]},
+     {"id": "I4", "name": "wake on 'Kai'", "parent": None, "status": "superseded", "refs": [ref(D, "Kai wakes on the word \"Kai\".", D1)], "removed_by": ref(D, "D2 supersedes D1", D2)},
+     {"id": "I5", "name": "wake on 'Hey Kai'", "parent": None, "status": "promised", "refs": [ref(D, "Kai wakes on \"Hey Kai\" only.")]},
+     {"id": "I7", "name": "wake on 'Kai there'", "parent": None, "status": "promised", "refs": [ref("README.md", RM)]},
+    ]
+    BY_UNIT = {"doc_a.md@L1": ["I1", "I6"], "doc_b.md@L1": ["I2", "I3"], f"{D}@L1": [], f"{D}@L3": ["I4"], f"{D}@L7": ["I5"], "README.md@L1": ["I7"], "doc_c.md@L1": [], "doc_d.md@L1": [], "doc_d.md@L1003": []}
+    def first_line(u): return next(l for l in LINES[u["source"]][u["start"] - 1:u["end"]] if l.strip()).lstrip("#- ").strip()
+    REG = {"reviews": [dict({"unit": u["unit"], "signoff": {"reader": "Kai-GPT", "date": "2026-11-01"},
+                             "notes": f"{u['unit']}: read lines {u['start']}-{u['end']}; {len(BY_UNIT[u['unit']])} items recorded with quotes; first line checked",
+                             "grounding": [{"pid": u["passages"][0], "quote": first_line(u)}],
+                             "disposition": "items" if BY_UNIT[u["unit"]] else "no_item", "items": BY_UNIT[u["unit"]], "passages_reviewed": list(u["passages"])},
+                            **({"windows": [[1, 1200], [1201, 1300]]} if u["unit"] == "doc_c.md@L1" else {})) for u in UNITS],
+           "items": ITEMS,
+           "conflicts": [{"items": ["I4", "I5"], "status": "resolved", "governs": "I5", "reason": "D2 is later and supersedes D1",
+                          "basis": {"rule": "later_same_tier", "statement": ref(D, "D2 supersedes D1")},
+                          "refs": [ref(D, "Kai wakes on the word \"Kai\".", D1), ref(D, "D2 supersedes D1", D2)]},
+                         {"items": ["I5", "I7"], "status": "resolved", "governs": "I5", "reason": "a later canonical document cannot override a D-number",
+                          "basis": {"rule": "higher_tier", "statement": ref(D, "Kai wakes on \"Hey Kai\" only.")},
+                          "refs": [ref(D, "Kai wakes on \"Hey Kai\" only.", D2), ref("README.md", RM, R1)]}],
+           "exceptions": [{"source": "data/SOUL.md", "kind": "not_opened", "findings_ref": "handoff entry 296 change row 18 (Kai's reading)"},
+                          {"source": "B12:named-gap", "kind": "named_gap", "search_record": "searched by Dainius, not found (entry 208)"}]}
+    FIX = [{"kind": "prose", "phrase": "reminds Dainius to hydrate every two hours"}, {"kind": "nested", "phrase": "confirms three points of contact"}]
+    json.dump(FIX, open(os.path.join(CAL, "fixtures.json"), "w"))
+    def rv(r, unit): return [x for x in r["reviews"] if x["unit"] == unit][0]
+    def drop_item(r, iid):
+        r["items"] = [i for i in r["items"] if i["id"] != iid]
+        for v in r["reviews"]:
+            v["items"] = [i for i in v["items"] if i != iid]
+            if not v["items"]: v["disposition"] = "no_item"
+    def fault(name):
+        r = copy.deepcopy(REG); it = {i["id"]: i for i in r["items"]}; c = r["conflicts"][0]
+        {"hidden_prose_feature_missed": lambda: drop_item(r, "I1"),
+         "nested_feature_without_parent": lambda: it["I3"].update(parent=None),
+         "conflict_with_one_source": lambda: c["refs"].pop(),
+         "inaccessible_source_without_record": lambda: r.update(exceptions=[e for e in r["exceptions"] if e["source"] != "B12:named-gap"]),
+         "soul_exception_missing": lambda: r.update(exceptions=[e for e in r["exceptions"] if e["source"] != "data/SOUL.md"]),
+         "unit_not_reviewed": lambda: r["reviews"].pop(1),
+         "assigned_counted_as_reviewed": lambda: r["reviews"][0].update(disposition="assigned"),
+         "partial_review": lambda: r["reviews"][0]["passages_reviewed"].pop(),
+         "quote_not_in_source": lambda: it["I2"]["refs"][0].update(quote="ladder-safety check before every shift"),
+         "superseded_without_removal": lambda: it["I4"].pop("removed_by"),
+         "parent_loop": lambda: it["I2"].update(parent="I3"),
+         "F1_phantom_item_in_review": lambda: rv(r, "doc_a.md@L1")["items"].append("I999"),
+         "F1_duplicate_item_id": lambda: r["items"].append(dict(it["I6"], name="a second record under the same id")),
+         "F1_item_listed_by_two_reviews": lambda: rv(r, "doc_b.md@L1")["items"].append("I1"),
+         "F1_item_ref_outside_its_unit": lambda: (rv(r, "doc_a.md@L1")["items"].remove("I6"), rv(r, "doc_b.md@L1")["items"].append("I6")),
+         "F2_oversize_without_windows": lambda: rv(r, "doc_c.md@L1").pop("windows"),
+         "F2_windows_not_covering": lambda: rv(r, "doc_c.md@L1").update(windows=[[1, 1200], [1202, 1300]]),
+         "F3_template_notes_reused": lambda: [v.update(notes="read every line of the unit; items recorded with quotes") for v in r["reviews"]],
+         "F3_no_grounding": lambda: rv(r, f"{D}@L1").update(grounding=[]),
+         "F3_grounding_outside_unit": lambda: rv(r, "doc_b.md@L1").update(grounding=rv(r, "doc_a.md@L1")["grounding"]),
+         "F3_missing_signoff": lambda: r["reviews"][2].pop("signoff"),
+         "F5_older_decision_governs": lambda: c.update(governs="I4"),
+         "F5_unproven_authority_resolved": lambda: c["refs"][1]["decision"].update(authority="unproven"),
+         "F5_same_date_resolved": lambda: c["refs"][0]["decision"].update(date="2026-02-01"),
+         "F5_decision_id_not_in_source": lambda: c["refs"][1]["decision"].update(id="D7"),
+         "F5_removal_without_proven_authority": lambda: it["I4"]["removed_by"]["decision"].update(authority="unproven"),
+         "F5_unresolved_names_governor": lambda: c.update(status="unresolved"),
+         "X3_later_lower_tier_governs": lambda: r["conflicts"][1].update(governs="I7"),
+         "X3_d_number_not_its_heading": lambda: c["refs"][1].update(decision={"id": "D1", "date": "2026-02-01", "authority": "d_number"}),
+         "X3_canonical_doc_on_lineage_source": lambda: c["refs"][1]["decision"].update(authority="canonical_doc"),
+         "X3_owner_ruling_outside_ruling_record": lambda: r["conflicts"][1]["refs"][1]["decision"].update(authority="owner_ruling"),
+         "X3_removal_weaker_than_promise": lambda: it["I4"].update(removed_by=ref("README.md", RM, R1)),
+         "X3_removal_not_later_than_promise": lambda: it["I4"]["refs"][0]["decision"].update(date="2026-02-01"),
+         "X3_basis_rule_mismatch": lambda: c["basis"].update(rule="higher_tier"),
+         "X3_basis_without_statement": lambda: c.pop("basis"),
+        }[name]()
+        return r
+    def unit_fault(name):
+        u = copy.deepcopy(UNITS); m = {x["unit"]: x for x in u}
+        if name == "F2_tampered_unit_sha": m["doc_a.md@L1"]["sha256"] = "0" * 64
+        if name == "F2_tampered_unit_range": m[f"{D}@L3"]["end"] += 1
+        if name == "F2_tampered_unit_source": m["doc_b.md@L1"]["source"] = "doc_a.md"
+        if name == "F2_broken_next_link": m["doc_d.md@L1"]["next"] = "doc_d.md@L9999"
+        if name == "F2_extra_unit_in_manifest": u.append(dict(m["doc_a.md@L1"], unit="doc_a.md@L999", passages=[]))
+        return write_units(u, "units_bad.json")
+    OUT = os.path.join(CAL, "out.json"); ok = True
+    def check(reg, units_path=os.path.join(CAL, "units.json")):
+        json.dump(reg, open(os.path.join(CAL, "register.json"), "w")); open(OUT, "w").write("STALE")
+        r = subprocess.run([sys.executable, "-I", os.path.join(HERE, "census_check.py"), "check", CAL, os.path.join(CAL, "passages.json"), units_path,
+                            os.path.join(CAL, "register.json"), OUT, os.path.join(CAL, "fixtures.json")], capture_output=True, text=True)
+        return r.returncode, os.path.exists(OUT), (r.stdout.splitlines() + ["", ""])
+    EXPECT_MSG = {"hidden_prose_feature_missed": "planted prose feature not found", "nested_feature_without_parent": "without its parent",
+     "conflict_with_one_source": "both sources must be recorded", "inaccessible_source_without_record": "exception missing for B12",
+     "soul_exception_missing": "exception missing for data/SOUL.md", "unit_not_reviewed": "unit not reviewed", "assigned_counted_as_reviewed": "is not a review",
+     "partial_review": "passages reviewed do not equal", "quote_not_in_source": "quote not found", "superseded_without_removal": "superseded without a resolving removal",
+     "parent_loop": "parent loop", "F1_phantom_item_in_review": "which has no item record", "F1_duplicate_item_id": "duplicate item ids",
+     "F1_item_listed_by_two_reviews": "listed by two reviews", "F1_item_ref_outside_its_unit": "lies outside its unit",
+     "F2_oversize_without_windows": "oversize unit needs review windows", "F2_windows_not_covering": "oversize unit needs review windows",
+     "F3_template_notes_reused": "template evidence is refused", "F3_no_grounding": "no source-grounded observation", "F3_grounding_outside_unit": "grounding: reference",
+     "F3_missing_signoff": "no sign-off", "F5_older_decision_governs": "by later_same_tier the governing item is I5", "F5_unproven_authority_resolved": "resolved although an authority is unproven",
+     "F5_same_date_resolved": "same date on both sides", "F5_decision_id_not_in_source": "conflict 0 source 2: decision D7", "F5_removal_without_proven_authority": "removal has no proven authority",
+     "F5_unresolved_names_governor": "unresolved but names a governing item", "X3_later_lower_tier_governs": "by higher_tier the governing item is I5",
+     "X3_d_number_not_its_heading": "is not the heading of its DECISIONS.md unit", "X3_canonical_doc_on_lineage_source": "whose class is lineage",
+     "X3_owner_ruling_outside_ruling_record": "which is not a ruling record", "X3_removal_weaker_than_promise": "is weaker than the promise",
+     "X3_removal_not_later_than_promise": "is not later than the promise", "X3_basis_rule_mismatch": "does not match the computed rule",
+     "X3_basis_without_statement": "basis needs a statement", "X2_passages_tampered_consistently": "differs from the passages re-cut",
+     "X2_fixture_inventory_incomplete": "fixture inventory needs", "X2_fixtures_absent": "fixtures.json is required",
+     "X2_fixtures_changed_after_T5": "fixtures.json is not the one T5 passed", "X2_passages_changed_after_T5": "passages.json is not the one T5 passed",
+     "X1_sample_selection_tampered": "selection differs from the draw re-derived", "X1_mandatory_selection_tampered": "mandatory selection differs",
+     "X1_duplicate_receipts": "duplicate receipts", "F2_tampered_unit_sha": ".sha256", "F2_tampered_unit_range": ".end", "F2_tampered_unit_source": ".source",
+     "F2_broken_next_link": ".next", "F2_extra_unit_in_manifest": "doc_a.md@L999", "F4_drop_feature_bearing": "population differs", "F4_drop_mandatory_fixture": "misses fixture passage",
+     "F4_register_edited_after_T5": "register.json is not the one T5 passed", "F4_receipt_missing_for_selected": "no review receipt for selected", "F4_receipt_missing_for_mandatory": "no review receipt for mandatory",
+     "F4_receipt_by_the_units_own_reader": "the unit's own reader", "F4_receipt_for_unselected_passage": "was not selected"}
+    def report(name, good, lines):                     # caught only if it failed closed AND the intended rule fired (not some other rule)
+        global ok; hit = [l for l in lines if EXPECT_MSG[name] in l]; good = good and bool(hit); ok &= good
+        print(f"{'CAUGHT' if good else 'MISSED'} {name}: {(hit or lines[1:2] or [''])[0][:110]}")
+    T5_FAULTS = ["hidden_prose_feature_missed", "nested_feature_without_parent", "conflict_with_one_source", "inaccessible_source_without_record",
+                 "soul_exception_missing", "unit_not_reviewed", "assigned_counted_as_reviewed", "partial_review", "quote_not_in_source",
+                 "superseded_without_removal", "parent_loop", "F1_phantom_item_in_review", "F1_duplicate_item_id", "F1_item_listed_by_two_reviews",
+                 "F1_item_ref_outside_its_unit", "F2_oversize_without_windows", "F2_windows_not_covering", "F3_template_notes_reused", "F3_no_grounding",
+                 "F3_grounding_outside_unit", "F3_missing_signoff", "F5_older_decision_governs", "F5_unproven_authority_resolved", "F5_same_date_resolved",
+                 "F5_decision_id_not_in_source", "F5_removal_without_proven_authority", "F5_unresolved_names_governor",
+                 "X3_later_lower_tier_governs", "X3_d_number_not_its_heading", "X3_canonical_doc_on_lineage_source", "X3_owner_ruling_outside_ruling_record",
+                 "X3_removal_weaker_than_promise", "X3_removal_not_later_than_promise", "X3_basis_rule_mismatch", "X3_basis_without_statement"]
+    UNIT_FAULTS = ["F2_tampered_unit_sha", "F2_tampered_unit_range", "F2_tampered_unit_source", "F2_broken_next_link", "F2_extra_unit_in_manifest"]
+    for f in T5_FAULTS:
+        code, ex, l = check(fault(f)); report(f, code == 1 and not ex, l)
+    for f in UNIT_FAULTS:
+        code, ex, l = check(REG, unit_fault(f)); report(f, code == 1 and not ex, l)
+    def check_with(pas_path, units_path, fix_path):
+        json.dump(REG, open(os.path.join(CAL, "register.json"), "w")); open(OUT, "w").write("STALE")
+        r = subprocess.run([sys.executable, "-I", os.path.join(HERE, "census_check.py"), "check", CAL, pas_path, units_path, os.path.join(CAL, "register.json"), OUT] + ([fix_path] if fix_path else []), capture_output=True, text=True)
+        return r.returncode, os.path.exists(OUT), (r.stdout.splitlines() + ["", ""])
+    bad = copy.deepcopy(pas); s0 = [x for x in bad["sources"] if x["source"] == "doc_a.md"][0]; s0["passages"][1]["end"] += 1   # a passage made one line longer, with a matching sha and units: only the re-cut can see it
+    s0["passages"][1]["sha256"] = sha("\n".join(LINES["doc_a.md"][s0["passages"][1]["start"] - 1:s0["passages"][1]["end"]]))
+    bp = os.path.join(CAL, "passages_bad.json"); json.dump(bad, open(bp, "w"))
+    bu = os.path.join(CAL, "units_badp.json"); json.dump({"inputs_sha256": {"passages.json": sha(open(bp, "rb").read())}, "units": T5.build_units(bad, LINES)}, open(bu, "w"))
+    code, ex, l = check_with(bp, bu, os.path.join(CAL, "fixtures.json")); report("X2_passages_tampered_consistently", code == 1 and not ex, l)
+    json.dump([FIX[0]], open(os.path.join(CAL, "fix_one.json"), "w"))
+    code, ex, l = check_with(os.path.join(CAL, "passages.json"), os.path.join(CAL, "units.json"), os.path.join(CAL, "fix_one.json")); report("X2_fixture_inventory_incomplete", code == 1 and not ex, l)
+    code, ex, l = check_with(os.path.join(CAL, "passages.json"), os.path.join(CAL, "units.json"), None); report("X2_fixtures_absent", code == 1 and not ex, ["", *l])
+    var = copy.deepcopy(REG); var["conflicts"][0].update(status="unresolved", governs=None); var["conflicts"][0]["refs"][1]["decision"]["authority"] = "unproven"
+    code, ex, l = check(var); good = code == 0 and ex; ok &= good; print(f"{'PASS' if good else 'FAIL'} known-negative: unresolved conflict with unproven authority, no governor | {l[0][:90]}")
+    code, ex, l = check(REG); good = code == 0 and ex; ok &= good; print(f"{'PASS' if good else 'FAIL'} known-negative: correct register | {l[0][:90]}")
+    shutil.copy(OUT, os.path.join(CAL, "t5_out.json"))
+    # --- T4 chain: draw from the register T5 passed, then the receipt check ---
+    def t4(*a): r = subprocess.run([sys.executable, "-I", os.path.join(HERE, "sample.py"), *a], capture_output=True, text=True); return r.returncode, r.stdout.splitlines() + ["", ""]
+    S_OUT = os.path.join(CAL, "sample.json"); R_OUT = os.path.join(CAL, "receipt_out.json"); base = [os.path.join(CAL, x) for x in ("passages.json", "units.json", "register.json", "t5_out.json", "fixtures.json")]
+    def draw(fault_=None, reg=None):
+        if reg is not None: json.dump(reg, open(os.path.join(CAL, "register.json"), "w"))
+        open(S_OUT, "w").write("STALE"); code, l = t4("draw", *base, "cal-seed", S_OUT, *([fault_] if fault_ else []))
+        json.dump(REG, open(os.path.join(CAL, "register.json"), "w")); return code, os.path.exists(S_OUT), l
+    for f in ("drop_feature_bearing", "drop_mandatory_fixture"):
+        code, ex, l = draw(f); report(f"F4_{f}", code == 1 and not ex, l)
+    FIXB = open(os.path.join(CAL, "fixtures.json")).read(); PASB = open(os.path.join(CAL, "passages.json")).read()
+    json.dump(FIX + [{"kind": "prose", "phrase": "Kai keeps a daily log"}], open(os.path.join(CAL, "fixtures.json"), "w"))
+    code, ex, l = draw(); report("X2_fixtures_changed_after_T5", code == 1 and not ex, l); open(os.path.join(CAL, "fixtures.json"), "w").write(FIXB)
+    open(os.path.join(CAL, "passages.json"), "w").write(PASB + " ")
+    code, ex, l = draw(); report("X2_passages_changed_after_T5", code == 1 and not ex, l); open(os.path.join(CAL, "passages.json"), "w").write(PASB)
+    tam = copy.deepcopy(REG); tam["items"][1]["name"] = "edited after T5 passed"
+    code, ex, l = draw(None, tam); report("F4_register_edited_after_T5", code == 1 and not ex, l)
+    code, ex, l = draw(); good = code == 0 and ex; ok &= good; print(f"{'PASS' if good else 'FAIL'} known-negative: draw from the passed register | {l[0][:110]}")
+    sample = json.load(open(S_OUT)); need = [x["pid"] for x in sample["sample"]] + [m["pid"] for m in sample["mandatory_review_selection"]]
+    GOOD_REC = {"receipts": [{"pid": x, "reviewer": "Orion", "date": "2026-11-02", "verdict": "confirmed", "note": f"re-read {x}; the disposition holds"} for x in dict.fromkeys(need)]}
+    def receipt(rec, sample_path=S_OUT):
+        json.dump(rec, open(os.path.join(CAL, "receipts.json"), "w")); open(R_OUT, "w").write("STALE")
+        code, l = t4("receipt", *[os.path.join(CAL, x) for x in ("passages.json", "units.json", "register.json", "t5_out.json", "fixtures.json")], sample_path, os.path.join(CAL, "receipts.json"), R_OUT)
+        return code, os.path.exists(R_OUT), l
+    mand0 = sample["mandatory_review_selection"][0]["pid"]; sel0 = sample["sample"][0]["pid"]
+    RF = {"F4_receipt_missing_for_selected": {"receipts": [r for r in GOOD_REC["receipts"] if r["pid"] != sel0]},
+          "F4_receipt_missing_for_mandatory": {"receipts": [r for r in GOOD_REC["receipts"] if r["pid"] != mand0]},
+          "F4_receipt_by_the_units_own_reader": {"receipts": [dict(r, reviewer="Kai-GPT") if r["pid"] == sel0 else r for r in GOOD_REC["receipts"]]},
+          "F4_receipt_for_unselected_passage": {"receipts": GOOD_REC["receipts"] + [dict(GOOD_REC["receipts"][0], pid="doc_d.md#P3")]}}
+    RF["X1_duplicate_receipts"] = {"receipts": GOOD_REC["receipts"] + [dict(GOOD_REC["receipts"][0], note="a second, different receipt for the same passage")]}
+    for f, rec in RF.items():
+        code, ex, l = receipt(rec); report(f, code == 1 and not ex, l)
+    ts = json.load(open(S_OUT)); dropped = ts["sample"][-1]["pid"]; ts["sample"] = ts["sample"][:-1]; tp = os.path.join(CAL, "sample_tampered.json"); json.dump(ts, open(tp, "w"))
+    code, ex, l = receipt({"receipts": [r for r in GOOD_REC["receipts"] if r["pid"] != dropped or dropped in [m["pid"] for m in sample["mandatory_review_selection"]]]}, tp)
+    report("X1_sample_selection_tampered", code == 1 and not ex, l)
+    tm = json.load(open(S_OUT)); tm["mandatory_review_selection"] = tm["mandatory_review_selection"][1:]; tq = os.path.join(CAL, "sample_tampered_m.json"); json.dump(tm, open(tq, "w"))
+    code, ex, l = receipt(GOOD_REC, tq); report("X1_mandatory_selection_tampered", code == 1 and not ex, l)
+    code, ex, l = receipt(GOOD_REC); good = code == 0 and ex; ok &= good; print(f"{'PASS' if good else 'FAIL'} known-negative: complete receipts by another reviewer | {l[0][:100]}")
+    shutil.rmtree(CAL, ignore_errors=True)
+    n = len(T5_FAULTS) + len(UNIT_FAULTS) + 3 + 5 + len(RF) + 2
+    print(f"T5+T4 CALIBRATION: {n} planted faults, known-negatives 4, result {'PASS' if ok else 'FAIL'}"); sys.exit(0 if ok else 1)
+    END-VERBATIM CENSUS-T5-REV3-CALIBRATION-SCRIPT
+- EVIDENCE CENSUS-T5-REV3-CALIBRATION t5_calibration.txt: 6748 bytes, sha256 f1f55892ea3638be72e33ba0b6b3f40ea29b4ff4dbe7c6d79b4d0d8d094948cc, final LF True (added by Orion)  [CMD `sha256sum t5_calibration.txt` → f1f55892ea3638be…]
+    BEGIN-VERBATIM CENSUS-T5-REV3-CALIBRATION
+    CAUGHT hidden_prose_feature_missed: PROBLEM planted prose feature not found: 'reminds Dainius to hydrate every two hours'
+    CAUGHT nested_feature_without_parent: PROBLEM planted nested feature recorded without its parent: 'confirms three points of contact'
+    CAUGHT conflict_with_one_source: PROBLEM conflict 0: both sources must be recorded
+    CAUGHT inaccessible_source_without_record: PROBLEM exception missing for B12:named-gap (named_gap)
+    CAUGHT soul_exception_missing: PROBLEM exception missing for data/SOUL.md (git_blob_not_opened)
+    CAUGHT unit_not_reviewed: PROBLEM unit not reviewed: doc_b.md@L1
+    CAUGHT assigned_counted_as_reviewed: PROBLEM doc_a.md@L1: disposition 'assigned' is not a review (only ['items', 'no_item'] count)
+    CAUGHT partial_review: PROBLEM doc_a.md@L1: passages reviewed do not equal the unit's passages
+    CAUGHT quote_not_in_source: PROBLEM item I2: quote not found in doc_b.md#P2
+    CAUGHT superseded_without_removal: PROBLEM item I4: superseded without a resolving removal reference
+    CAUGHT parent_loop: PROBLEM item I2: parent loop
+    CAUGHT F1_phantom_item_in_review: PROBLEM doc_a.md@L1: lists item I999, which has no item record
+    CAUGHT F1_duplicate_item_id: PROBLEM duplicate item ids: ['I6']
+    CAUGHT F1_item_listed_by_two_reviews: PROBLEM item I1 is listed by two reviews (doc_a.md@L1, doc_b.md@L1)
+    CAUGHT F1_item_ref_outside_its_unit: PROBLEM item I6: reference doc_a.md#P2 lies outside its unit
+    CAUGHT F2_oversize_without_windows: PROBLEM doc_c.md@L1: oversize unit needs review windows of at most 1200 lines covering lines 1-1300 in order
+    CAUGHT F2_windows_not_covering: PROBLEM doc_c.md@L1: oversize unit needs review windows of at most 1200 lines covering lines 1-1300 in order
+    CAUGHT F3_template_notes_reused: PROBLEM doc_b.md@L1: notes are identical to doc_a.md@L1 (template evidence is refused)
+    CAUGHT F3_no_grounding: PROBLEM kai-pm/DECISIONS.md@L1: no source-grounded observation
+    CAUGHT F3_grounding_outside_unit: PROBLEM doc_b.md@L1 grounding: reference doc_a.md#P1 lies outside its unit
+    CAUGHT F3_missing_signoff: PROBLEM kai-pm/DECISIONS.md@L1: no sign-off (reader and ISO date)
+    CAUGHT F5_older_decision_governs: PROBLEM conflict 0: governs I4, but by later_same_tier the governing item is I5
+    CAUGHT F5_unproven_authority_resolved: PROBLEM conflict 0: resolved although an authority is unproven (keep it unresolved and escalate)
+    CAUGHT F5_same_date_resolved: PROBLEM conflict 0: same date on both sides; chronology cannot decide (keep it unresolved and escalate)
+    CAUGHT F5_decision_id_not_in_source: PROBLEM conflict 0 source 2: decision D7 / 2026-02-01 not found in the source unit
+    CAUGHT F5_removal_without_proven_authority: PROBLEM item I4: removal has no proven authority; keep the promise and record it as unresolved
+    CAUGHT F5_unresolved_names_governor: PROBLEM conflict 0: unresolved but names a governing item
+    CAUGHT X3_later_lower_tier_governs: PROBLEM conflict 1: governs I7, but by higher_tier the governing item is I5
+    CAUGHT X3_d_number_not_its_heading: PROBLEM conflict 0 source 2: d_number D1 is not the heading of its DECISIONS.md unit
+    CAUGHT X3_canonical_doc_on_lineage_source: PROBLEM conflict 0 source 2: canonical_doc claimed for kai-pm/DECISIONS.md, whose class is lineage
+    CAUGHT X3_owner_ruling_outside_ruling_record: PROBLEM conflict 1 source 2: owner_ruling claimed in README.md, which is not a ruling record
+    CAUGHT X3_removal_weaker_than_promise: PROBLEM item I4: removal (canonical_doc) is weaker than the promise it removes
+    CAUGHT X3_removal_not_later_than_promise: PROBLEM item I4: removal dated 2026-02-01 is not later than the promise (2026-02-01)
+    CAUGHT X3_basis_rule_mismatch: PROBLEM conflict 0: basis rule 'higher_tier' does not match the computed rule 'later_same_tier'
+    CAUGHT X3_basis_without_statement: PROBLEM conflict 0: basis needs a statement quoted from the governing source's unit
+    CAUGHT F2_tampered_unit_sha: PROBLEM units.json differs from the manifest rebuilt from the sources: ['doc_a.md@L1.sha256']
+    CAUGHT F2_tampered_unit_range: PROBLEM units.json differs from the manifest rebuilt from the sources: ['kai-pm/DECISIONS.md@L3.end']
+    CAUGHT F2_tampered_unit_source: PROBLEM units.json differs from the manifest rebuilt from the sources: ['doc_b.md@L1.source']
+    CAUGHT F2_broken_next_link: PROBLEM units.json differs from the manifest rebuilt from the sources: ['doc_d.md@L1.next']
+    CAUGHT F2_extra_unit_in_manifest: PROBLEM units.json differs from the manifest rebuilt from the sources: ['doc_a.md@L999']
+    CAUGHT X2_passages_tampered_consistently: PROBLEM passages.json differs from the passages re-cut from doc_a.md
+    CAUGHT X2_fixture_inventory_incomplete: PROBLEM fixture inventory needs at least one prose and one nested fixture, has ['prose']
+    CAUGHT X2_fixtures_absent: PROBLEM fixtures.json is required: the seeded omission test is part of every census check (Kai X2)
+    PASS known-negative: unresolved conflict with unproven authority, no governor | CENSUS CHECK: units 9, reviews 9, items 7, conflicts 2, exceptions 2, fixtures 2; problems
+    PASS known-negative: correct register | CENSUS CHECK: units 9, reviews 9, items 7, conflicts 2, exceptions 2, fixtures 2; problems
+    CAUGHT F4_drop_feature_bearing: PROBLEM population differs from the passages the register cites: missing ['README.md#P2'], extra []
+    CAUGHT F4_drop_mandatory_fixture: PROBLEM mandatory selection misses fixture passage doc_a.md#P3
+    CAUGHT X2_fixtures_changed_after_T5: PROBLEM fixtures.json is not the one T5 passed
+    CAUGHT X2_passages_changed_after_T5: PROBLEM passages.json is not the one T5 passed
+    CAUGHT F4_register_edited_after_T5: PROBLEM register.json is not the one T5 passed
+    PASS known-negative: draw from the passed register | SAMPLE seed cal-seed: population derived from the register N 6 -> n 6; allocation {'canonical*': 1, 'lineage':
+    CAUGHT F4_receipt_missing_for_selected: PROBLEM no review receipt for selected passage README.md#P2
+    CAUGHT F4_receipt_missing_for_mandatory: PROBLEM no review receipt for mandatory passage doc_a.md#P3
+    CAUGHT F4_receipt_by_the_units_own_reader: PROBLEM README.md#P2: receipt reviewer is the unit's own reader
+    CAUGHT F4_receipt_for_unselected_passage: PROBLEM receipt for a passage that was not selected: doc_d.md#P3
+    CAUGHT X1_duplicate_receipts: PROBLEM duplicate receipts for README.md#P2
+    CAUGHT X1_sample_selection_tampered: PROBLEM sample.json selection differs from the draw re-derived from the passed inputs
+    CAUGHT X1_mandatory_selection_tampered: PROBLEM sample.json mandatory selection differs from the one re-derived from the passed inputs
+    PASS known-negative: complete receipts by another reviewer | SAMPLE RECEIPT: selected 6 + mandatory 6; receipts 6; problems 0; output WRITTEN
+    T5+T4 CALIBRATION: 55 planted faults, known-negatives 4, result PASS
+    END-VERBATIM CENSUS-T5-REV3-CALIBRATION
+- EVIDENCE CENSUS-T4-REV3-CALIBRATION t4_calibration.txt: 871 bytes, sha256 71a5a0cdbcd01738ceef633929206c57c50b6b5e00c1f8c933eb8283e29fb519, final LF True (added by Orion)  [CMD `sha256sum t4_calibration.txt` → 71a5a0cdbcd01738…]
+    BEGIN-VERBATIM CENSUS-T4-REV3-CALIBRATION
+    PASS n(0) = 0 (independent 0)
+    PASS n(1) = 1 (independent 1)
+    PASS n(29) = 29 (independent 29)
+    PASS n(30) = 30 (independent 30)
+    PASS n(31) = 30 (independent 30)
+    PASS n(299) = 30 (independent 30)
+    PASS n(300) = 30 (independent 30)
+    PASS n(301) = 31 (independent 31)
+    PASS n(1000) = 100 (independent 100)
+    PASS n(51727) = 5173 (independent 5173)
+    PASS one-passage canonical class N 501 n 51 alloc {'canonical': 1, 'derived': 50}
+    PASS lineage 2, draft 0 N 42 n 30 alloc {'derived': 28, 'lineage': 2}
+    PASS all four minimum classes N 426 n 43 alloc {'canonical': 2, 'canonical*': 2, 'derived': 33, 'draft': 2, 'external': 1, 'lineage': 3}
+    PASS population below 30 N 14 n 14 alloc {'canonical': 4, 'derived': 10}
+    PASS same seed reproduces the same sample 
+    PASS a different seed gives a different sample 
+    PASS order of the input does not change the sample 
+    T4 CALIBRATION: result PASS
+    END-VERBATIM CENSUS-T4-REV3-CALIBRATION
+- EVIDENCE CENSUS-T5-REV3-UNITS-STDOUT t5_units_stdout.txt: 197 bytes, sha256 e883a94c9a414a2559d43bafb0f565ea1d23a73107dd5acd06afa15637d9e4ad, final LF True (added by Orion)  [CMD `sha256sum t5_units_stdout.txt` → e883a94c9a414a25…]
+    BEGIN-VERBATIM CENSUS-T5-REV3-UNITS-STDOUT
+    UNITS: 1095 units over 51727 passages; split sources ['kai-pm/DECISIONS.md', 'kai-pm/HANDOFF_LOG.md']; continuation links 43; largest 1395 lines; oversize indivisible 1; problems 0; output WRITTEN
+    END-VERBATIM CENSUS-T5-REV3-UNITS-STDOUT
+
+### 6. Next authorised step
+
+- Post the reply to DAI-10 and verify; await Kai's replay and review  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 ae60b36c, "send updated scripts/hashes/replay package for independent examination"]
+
+### 7. What I am unsure of
+
+- Authority scope stays a recorded reader judgement; the tool enforces consistency with the source location, not truth (stated in the reply as X4)  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 ae60b36c, "avoid calling mere signoff proof of comprehension"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
