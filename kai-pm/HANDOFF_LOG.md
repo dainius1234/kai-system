@@ -100527,3 +100527,279 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-01T20:41:25Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-01T20:41:25Z  [CMD `date -u +%FT%TZ` → 2026-11-01T20:41:25Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: f32bfb6ea68d155ba032a2aecb107b20ee449ce3  [CMD `git rev-parse HEAD` → f32bfb6ea68d155ba032a2aecb107b20ee449ce3]
+- tree: 3fda2df95bdc0a23c1028bdafc6bae12618ddac5  [CMD `git rev-parse HEAD^{tree}` → 3fda2df95bdc0a23c1028bdafc6bae12618ddac5]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- remote:claude/project-rework-plan-pgvp35: f32bfb6ea68d155ba032a2aecb107b20ee449ce3  [CMD `git ls-remote --heads origin` → f32bfb6ea68d155ba032a2aecb107b20ee449ce3]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 298  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 298]
+
+### 1. The four states
+
+- physical: unchanged since entry 298 apart from this entry; tools live in the scratchpad only  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: preparation and calibration of read-only census tools  [CONVERSATION 2026-11-01 Dainius, "My ruling is go"]
+- evidence: census-tool plan (T1–T5), T1 effective_view.py, its stdout, its calibration and the post to Kai, verbatim in section 5  [CMD `python3 -I effective_view.py f32bfb6 out/effective_view.json` → problems 0, exit 0]
+- admission: none; the census is not run; T1 awaits Kai's check  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 3325fad7, "The actual census may begin only after the agreed tool-readiness checks"]
+
+### 2. Rulings since the last handoff
+
+- None; Orion carried out the step named in entry 298  [CMD `handoff entry 298 section 6` → "Write done / scope / simplest form for the census tools"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: building and calibrating read-only census tools. HELD: running the census; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE  [CONVERSATION 2026-11-01 Kai-GPT on DAI-10 3325fad7, "This does not authorize code editing, deployment, KAI runtime execution"]
+
+### 4. Open questions
+
+- For Kai: check the census-tool plan T1–T5 and the T1 result  [CMD `POST_T1.md` → "What I need from Kai"]
+- For Kai and Dainius: who reads which sources in the census (Orion's tokens are limited; Kai does legwork); needed before the census starts, not for the tool build  [CONVERSATION 2026-10-26 Dainius, "Orion we gonna use Kai to do leg work and research"]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- T1 RESULT: v2 file rows 346 (B9 C69 D17 E68 F143 G40) + non-file 3 + late 2 = 348; change list 39 = 30 on 30 v2 paths + 2 late + 7 group notes; problems 0. Output effective_view.json sha256 9f0da56183188678d4f3858ea1e245bd5fa1a6d0dbe0c225205bf5d093546bbe, regenerable from the banked script and log commit f32bfb6; Python 3.11.17  [CMD `sha256sum out/effective_view.json` → 9f0da561…]
+- T1 CALIBRATION: 9 of 9 planted faults caught (exit 1 each); the correct set passes (exit 0)  [CMD `effective_view.py f32bfb6 /dev/null <fault>` → 9 × exit=1]
+- CROSS-METHOD (same producer, different artefact; not independent corroboration): 119 of 119 Orion-proposed class/role values parsed from the rendered table equal block RV2-ORION-CLASSES; 0 differ  [CMD `python3 -I ast-parse RV2-ORION-CLASSES vs out/effective_view.json` → differ 0]
+- CAUGHT BEFORE BANKING (R15): the first T1 run passed its seven loss checks while 7 rows carried nonsense classes; escaped `\|` in evidence cells split columns, and the parser dropped the `*` of canonical*. Fixed; vocabulary check added with two planted faults. A pass on counts alone was not sufficient  [CMD `Counter(v2_class)` → 'Agent \\', 'ID \\' … before; 0 outside vocabulary after]
+- Credential scan of the five texts: 0 hits, calibration 6/6  [CMD `credscan.py census/scan299.json` → TOTAL HITS 0]
+- EVIDENCE ORION-CENSUS-TOOLS-PLAN PLAN.md: 3476 bytes, sha256 ebd736269936207c34903b0db30be1348efbdb49a5e633970430160370177238, final LF True (added by Orion)  [CMD `sha256sum PLAN.md` → ebd736269936207c…]
+    BEGIN-VERBATIM ORION-CENSUS-TOOLS-PLAN
+    # Census tools — done, scope, simplest form (R21)
+    
+    **ORION | 2026-11-01 | authorised by Dainius's GO (entry 298); governed by procedure v3.2.3 (entry 225) §1a, §6, §7, Annex A, Annex C, and Kai's step 0.1 adjudication (DAI-10 3325fad7) §2**
+    
+    ## Scope
+    
+    Build and calibrate read-only, standard-library Python tools, run with `python3 -I`, kept in the scratchpad and banked word for word in the handoff log (v3.2.3 §0 row 06: "No code goes into `kai-pm/research/`"). They read the repository and the handoff log only. They write only to the scratchpad. **The census itself does not run.** No KAI code change, no runtime, no deployment; every hold stays.
+    
+    ## The tools, in order
+    
+    | # | Tool | Required by | Done when |
+    |---|---|---|---|
+    | T1 | `effective_view.py`: one machine-readable view of register v2 + the 39-row v2.1 change list + the two late sources, with a no-loss check | Kai 3325fad7 §2 ("an unambiguous effective view of v2+delta+late-source intake, with a mechanical check that no row or correction is silently lost") | every v2 row appears exactly once; every change-list row is applied to one row or carried as a group note; late sources absent at the pin and present at HEAD; counts reconcile; calibration: each injected loss is caught and the correct set passes |
+    | T2 | `subject.py`: extract the pinned subject with `git archive`, take per-file SHA-256 manifests before and after, and record the manifest | v3.2.3 §1a steps 1–6 | the two manifests are equal; every intake path in T1 is in the subject (or recorded as late, removed or a named gap) |
+    | T3 | `passages.py`: split every intake source into numbered passages that cover every line exactly once | Annex A "every classified source read to the end"; the human sample needs N passages | line coverage is 100% with no overlap, for every intake file |
+    | T4 | `sample.py`: the frozen human sample, n = min(N, max(30, ceil(0.10 × N))), stratified by class, at least 2 from each class with 2 or more, seeded, without replacement | Annex A "Human sample (frozen)" | the formula holds on edge cases (N below 30, a class with 1 passage, N = 0); the seed and line ranges are printed for banking |
+    | T5 | `census_check.py`: checks a census register against T3: every passage has a disposition; every item cites a real passage; every child has a parent; a superseded promise cites its removal; a conflict records both sources and which governs; a missing source has a search record | Annex A; Annex C "Census known-positives" | known-positives each caught (hidden prose-only feature, nested feature, two conflicting canonical decisions, an inaccessible source); a correct set passes |
+    
+    The research-card machine check (Annex C card rules) is **not** in scope: no cards exist until the pilot.
+    
+    ## Simplest sufficient form
+    
+    One small script per tool and no shared framework. Each tool prints its own denominator and exits non-zero on failure. Each has a calibration file that injects the faults named above. Nothing is configurable beyond the pin and the input paths.
+    
+    ## For Kai and Dainius to note (R12)
+    
+    The census means reading every intake source to the end: hundreds of files, many of them long. Under the 26 October roles, Kai does the legwork and Orion's tokens are limited. The tools above are built so that **whoever reads**, the check of completeness stays mechanical. Who reads which sources is a decision for Kai and Dainius before the census starts. It is not needed for building the tools.
+    END-VERBATIM ORION-CENSUS-TOOLS-PLAN
+- EVIDENCE CENSUS-T1-EFFECTIVE-VIEW-SCRIPT effective_view.py: 7650 bytes, sha256 e87f46c5debae00241680225375c4a5639b0daa3972148f24242e94bc7420f63, final LF True (added by Orion)  [CMD `sha256sum effective_view.py` → e87f46c5debae002…]
+    BEGIN-VERBATIM CENSUS-T1-EFFECTIVE-VIEW-SCRIPT
+    # T1: effective view of source register v2 + v2.1 change list + late sources, with a no-loss check.
+    # Read-only. Standard library. Run: python3 -I effective_view.py <log-commit> <out.json> [fault]
+    # Inputs are taken from the banked bytes in kai-pm/HANDOFF_LOG.md at <log-commit>, never from scratch copies.
+    import ast, json, re, subprocess, sys
+    REPO = "/home/user/kai-system"; PIN = "dd153c1f4ab7c52f34620e07238554453a8912d9"
+    SECTIONS = {"B": 9, "C": 69, "D": 17, "E": 68, "F": 143, "G": 40}   # file rows per section, as register v2 states them
+    B_NONFILE = 3                                                        # v2 section B: 2 log blocks + 1 named gap
+    F_CLASS, F_ROLE = "derived", "cross-check"                           # v2 section F: one value for every row (its preamble)
+    CLASSES = {"canonical", "canonical*", "lineage", "draft", "superseded", "external", "derived", "UNCLASSIFIED"}   # v2 Columns note + SOUL row
+    ROLES = {"intake", "cross-check", "control", "none", "scoped", "inaccessible"}                                       # v2 Columns note + Kai C rows + SOUL row
+    OPEN_ITEMS = {"K10", "K12", "K13"}                                   # carried open by Kai 3325fad7 (plus the April vision, a B row)
+    
+    def git(*a): return subprocess.run(["git", *a], cwd=REPO, capture_output=True, text=True)
+    def block(log, name):
+        i = log.index(f"    BEGIN-VERBATIM {name}"); j = log.index(f"    END-VERBATIM {name}", i)
+        return [l[4:] for l in log[i + 1:j]]
+    
+    def load_delta(lines):
+        env = {}
+        for node in ast.parse("\n".join(lines)).body:          # only literal assignments, evaluated without exec
+            assert isinstance(node, ast.Assign), "delta block holds a non-assignment"
+            def ev(n):
+                if isinstance(n, ast.Constant): return n.value
+                if isinstance(n, ast.Name): return env[n.id]
+                if isinstance(n, (ast.Tuple, ast.List)): return [ev(e) for e in n.elts]
+                raise ValueError(f"non-literal in delta: {ast.dump(n)[:60]}")
+            vals = ev(node.value) if not isinstance(node.targets[0], ast.Tuple) else None
+            if isinstance(node.targets[0], ast.Tuple):
+                for t, v in zip(node.targets[0].elts, node.value.elts): env[t.id] = ev(v)
+            else: env[node.targets[0].id] = vals
+        return env["D"]
+    
+    def parse_v2(lines):
+        rows, nonfile, sec = [], [], None
+        for l in lines:
+            m = re.match(r"^## ([A-M])\. ", l)
+            if m: sec = m.group(1); continue
+            if sec not in SECTIONS or not re.match(r"^\| \d+ \|", l): continue
+            c = [x.strip() for x in re.split(r"(?<!\\)\|", l.strip().strip("|"))]   # a cell may hold an escaped \|
+            if not c[1].startswith("`"):
+                nonfile.append({"section": sec, "n": int(c[0]), "name": c[1]}); continue
+            path = c[1].strip("`")
+            if sec == "F": cls, role = F_CLASS, F_ROLE
+            else:
+                cls = re.match(r"^\*\*(.+?)\*\*(?!\*)", c[5]).group(1)          # keeps the * of canonical*
+                role = c[6].split("·")[0].strip()
+            rows.append({"path": path, "section": sec, "v2_class": cls, "v2_role": role})
+        return rows, nonfile
+    
+    def build(log, fault=None):
+        v2 = block(log, "ORION-SOURCE-REGISTER-V2"); dl = block(log, "RV21-DELTA")
+        rows, nonfile = parse_v2(v2); delta = load_delta(dl)
+        if fault == "drop_v2_row": rows.pop(10)
+        if fault == "dup_v2_row": rows.append(dict(rows[5]))
+        if fault == "drop_delta_row": delta.pop(20)
+        if fault == "delta_path_not_in_v2": delta[0] = ["K1", "kai-pm/NO_SUCH_FILE.md"] + list(delta[0][2:])
+        if fault == "late_in_v2": rows.append({"path": [d for d in delta if d[0] == "LATE"][0][1], "section": "G", "v2_class": "derived", "v2_role": "none"})
+        if fault == "drop_open_item": delta = [d for d in delta if d[0] != "K12"]
+        if fault == "drop_nonfile": nonfile.pop()
+        if fault == "bad_class": rows[3]["v2_class"] = "Agent \\"
+        if fault == "bad_role": rows[7]["v2_role"] = "Status \\"
+        view = {r["path"]: dict(r, v21=None, delta_rows=[], late=False) for r in rows}
+        groups, problems = [], []
+        for k, (rid, path, was, now, src, cites) in enumerate(delta):
+            tag = f"{k + 1}:{rid}"
+            if rid == "LATE":
+                if path in view: problems.append(f"{tag} late source already in v2: {path}")
+                view[path] = {"path": path, "section": "LATE", "v2_class": None, "v2_role": None, "v21": now, "delta_rows": [tag], "late": True}
+            elif path is None: groups.append({"row": tag, "item": rid, "v21": now, "source": src})
+            elif path not in view: problems.append(f"{tag} path not in v2: {path}")
+            else: view[path]["v21"] = now; view[path]["delta_rows"].append(tag)
+        return rows, nonfile, delta, view, groups, problems
+    
+    def check(rows, nonfile, delta, view, groups, problems):
+        p = list(problems)
+        from collections import Counter
+        dup = [x for x, n in Counter(r["path"] for r in rows).items() if n > 1]
+        if dup: p.append(f"duplicate v2 paths: {dup}")
+        per = Counter(r["section"] for r in rows)
+        for s, n in SECTIONS.items():
+            if per[s] != n: p.append(f"section {s}: {per[s]} file rows, register states {n}")
+        bad = [(r["path"], r["v2_class"], r["v2_role"]) for r in rows if r["v2_class"] not in CLASSES or r["v2_role"] not in ROLES]
+        if bad: p.append(f"{len(bad)} rows outside the class/role vocabulary: {bad[:3]}")
+        if len(nonfile) != B_NONFILE: p.append(f"section B non-file rows {len(nonfile)}, expected {B_NONFILE}")
+        if len(delta) != 39: p.append(f"change list rows {len(delta)}, expected 39")
+        used = sorted({t for v in view.values() for t in v["delta_rows"]} | {g["row"] for g in groups}, key=lambda t: int(t.split(":")[0]))
+        if len(used) != len(delta): p.append(f"change-list rows accounted {len(used)} of {len(delta)}")
+        for v in view.values():
+            if v["late"]:
+                if git("cat-file", "-e", f"{PIN}:{v['path']}").returncode == 0: p.append(f"late source exists at the pin: {v['path']}")
+                if git("cat-file", "-e", f"HEAD:{v['path']}").returncode != 0: p.append(f"late source absent at HEAD: {v['path']}")
+        missing = OPEN_ITEMS - {g["item"] for g in groups}
+        if missing: p.append(f"open items not carried: {sorted(missing)}")
+        expect = sum(SECTIONS.values()) + sum(1 for d in delta if d[0] == "LATE")
+        if len(view) != expect: p.append(f"view file rows {len(view)}, expected {expect}")
+        return p
+    
+    if __name__ == "__main__":
+        commit, out = sys.argv[1], sys.argv[2]; fault = sys.argv[3] if len(sys.argv) > 3 else None
+        log = git("show", f"{commit}:kai-pm/HANDOFF_LOG.md").stdout.split("\n")
+        rows, nonfile, delta, view, groups, problems = build(log, fault)
+        p = check(rows, nonfile, delta, view, groups, problems)
+        changed = sum(1 for v in view.values() if v["delta_rows"] and not v["late"])
+        print(f"EFFECTIVE VIEW @ {commit[:12]}: v2 file rows {len(rows)} (" + " ".join(f"{s}{sum(r['section']==s for r in rows)}" for s in SECTIONS) +
+              f") + non-file {len(nonfile)} + late {sum(v['late'] for v in view.values())} = view file rows {len(view)}; change list {len(delta)} rows = "
+              f"{sum(len(v['delta_rows']) for v in view.values() if not v['late'])} on {changed} v2 paths + {sum(v['late'] for v in view.values())} late + {len(groups)} group notes; problems {len(p)}")
+        for x in p: print("PROBLEM", x)
+        if not fault:
+            json.dump({"pin": PIN, "log_commit": commit, "file_rows": sorted(view.values(), key=lambda v: v["path"]), "nonfile_rows": nonfile,
+                       "group_notes": groups, "open_items": sorted(OPEN_ITEMS) + ["April vision (B non-file row)"]}, open(out, "w"), indent=1, ensure_ascii=False)
+        sys.exit(1 if p else 0)
+    END-VERBATIM CENSUS-T1-EFFECTIVE-VIEW-SCRIPT
+- EVIDENCE CENSUS-T1-STDOUT t1_stdout.txt: 190 bytes, sha256 d81b37462eb16de3ec7f5c5b2d4668ef335c01af647f58fb93d66e5b4b7db071, final LF True (added by Orion)  [CMD `sha256sum t1_stdout.txt` → d81b37462eb16de3…]
+    BEGIN-VERBATIM CENSUS-T1-STDOUT
+    EFFECTIVE VIEW @ f32bfb6: v2 file rows 346 (B9 C69 D17 E68 F143 G40) + non-file 3 + late 2 = view file rows 348; change list 39 rows = 30 on 30 v2 paths + 2 late + 7 group notes; problems 0
+    END-VERBATIM CENSUS-T1-STDOUT
+- EVIDENCE CENSUS-T1-CALIBRATION t1_calibration.txt: 774 bytes, sha256 5658677e7dc9b0c3bd64cb8bf0cae203d84fa974fe9cdd7905d5f1552b1c9884, final LF True (added by Orion)  [CMD `sha256sum t1_calibration.txt` → 5658677e7dc9b0c3…]
+    BEGIN-VERBATIM CENSUS-T1-CALIBRATION
+    drop_v2_row exit=1 PROBLEM section C: 68 file rows, register states 69
+    dup_v2_row exit=1 PROBLEM duplicate v2 paths: ['docs/next_level_roadmap.md']
+    drop_delta_row exit=1 PROBLEM change list rows 38, expected 39
+    delta_path_not_in_v2 exit=1 PROBLEM 1:K1 path not in v2: kai-pm/NO_SUCH_FILE.md
+    late_in_v2 exit=1 PROBLEM 38:LATE late source already in v2: kai-pm/KAI_LUMEN_OHANA_BRIDGE_ORIGIN_CONTINUITY_RECORD_20
+    drop_open_item exit=1 PROBLEM change list rows 38, expected 39
+    drop_nonfile exit=1 PROBLEM section B non-file rows 2, expected 3
+    bad_class exit=1 PROBLEM 1 rows outside the class/role vocabulary: [('kai-pm/KINGSMAN_FINAL_VISION_MASTER_CANON_PLAN.
+    bad_role exit=1 PROBLEM 1 rows outside the class/role vocabulary: [('kai-pm/HANDOFF_LOG.md', 'canonical*', 'Status \
+    END-VERBATIM CENSUS-T1-CALIBRATION
+- EVIDENCE ORION-POST-CENSUS-T1 POST_T1.md: 4198 bytes, sha256 6a94dcbba599c068e4360d737f8fbca4dbf1dbfad53da8d8ae8ab24a8ec8483e, final LF True (added by Orion)  [CMD `sha256sum POST_T1.md` → 6a94dcbba599c068…]
+    BEGIN-VERBATIM ORION-POST-CENSUS-T1
+    # Census tools: plan (T1–T5) and T1 effective view — for Kai's check
+    
+    **ORION → KAI, DAINIUS | 2026-11-01 | Dainius GO for read-only census-tool preparation (entry 298) | census NOT run; all holds unchanged**
+    
+    ## In plain words
+    
+    Dainius gave GO. Before building I wrote down what each tool must prove (the plan below). The first tool, T1, is the one you asked for in 3325fad7 §2: one machine-readable view of register v2 + the 39-row change list + the two late sources, which fails if anything is lost. It passes, and it catches every loss I planted. Please check the plan before I build T2–T5.
+    
+    ## The plan
+    
+    | # | Tool | Done when |
+    |---|---|---|
+    | T1 | effective view + no-loss check (your 3325fad7 §2) | every v2 row once; every change-list row applied or carried; late sources absent at the pin and present at HEAD; counts reconcile; planted losses caught |
+    | T2 | pinned subject extraction (v3.2.3 §1a): `git archive` of the pin, SHA-256 manifest before and after | manifests equal; every intake path found in the subject, or recorded as late, removed or a named gap |
+    | T3 | passage splitter: every intake source cut into numbered passages | every line of every intake file in exactly one passage |
+    | T4 | human sample (Annex A, frozen formula), seeded and stratified by class | formula holds on edge cases; seed and line ranges printed for banking |
+    | T5 | census register check (Annex A; Annex C census known-positives) | catches a hidden prose-only feature, a nested feature, two conflicting canonical decisions and an inaccessible source; a correct set passes |
+    
+    Rules for all five: standard library, `python3 -I`, scratchpad only, banked word for word in the handoff log (v3.2.3 §0 row 06). The research-card machine check is not in scope; no cards exist before the pilot.
+    
+    ## T1 result
+    
+    `EFFECTIVE VIEW @ f32bfb6: v2 file rows 346 (B9 C69 D17 E68 F143 G40) + non-file 3 + late 2 = view file rows 348; change list 39 rows = 30 on 30 v2 paths + 2 late + 7 group notes; problems 0`
+    
+    - **Inputs** are read from the banked bytes in the handoff log at commit f32bfb6 (blocks ORION-SOURCE-REGISTER-V2 and RV21-DELTA), not from scratch copies.
+    - **Non-file rows (3)**, carried so they are not lost: the v1.1 unified draft (entry 106), the 104-item register (entry 167), and the "Old April vision" named gap.
+    - **Group notes (7):** K3, K8, K9, K10, K11, K12, K13. Open items carried: K10, K12, K13 and the April vision.
+    - **Classes after parsing (346 v2 file rows):** derived 255 · lineage 40 · canonical* 18 · draft 17 · superseded 9 · external 5 · canonical 1 (DECISIONS.md) · UNCLASSIFIED 1 (data/SOUL.md, as in v2; v2.1 row 18 carries Kai's reclassification).
+    - **Calibration, 9 of 9 planted faults caught:** a dropped v2 row, a duplicated row, a dropped change-list row, a change row pointing at a file not in v2, a late source placed inside v2, a dropped open item (K12), a dropped non-file row, a class outside the vocabulary, and a role outside the vocabulary. The correct set passes.
+    - **Cross-method check (same producer, different artefact; not independent corroboration):** the class and role of each of the 119 Orion-proposed rows, as parsed from the rendered table, equal the builder's input data (block RV2-ORION-CLASSES): 119 of 119, 0 differ.
+    
+    ## Corrected before banking (R15)
+    
+    The first run passed all seven of its loss checks while seven rows carried nonsense classes ("Agent \", "ID \"…). Two causes: evidence cells containing an escaped `\|` split the table columns, and the parser dropped the `*` from "canonical*". Both are fixed, and a vocabulary check was added with two planted faults. A pass on counts alone was not enough.
+    
+    ## For Kai and Dainius (R12)
+    
+    The census reads every intake source to the end: hundreds of files. Under the 26 October roles, Kai does the legwork and Orion's tokens are limited. The tools keep the completeness check mechanical whoever does the reading. Who reads what should be settled before the census starts; it does not block the tool build.
+    
+    ## What I need from Kai
+    
+    1. Check the plan (T1–T5): anything missing or unnecessary?
+    2. Check T1: the script and its output are banked word for word in handoff entry 299.
+    END-VERBATIM ORION-POST-CENSUS-T1
+
+### 6. Next authorised step
+
+- Post the plan and T1 to DAI-10 for Kai's check and verify the post; then build T2 (pinned subject extraction) while Kai checks  [CONVERSATION 2026-11-01 Dainius, "My ruling is go"]
+
+### 7. What I am unsure of
+
+- Whether T1's section counts should come from somewhere other than the register's own stated counts; today they are the register's statement checked against its own table, plus the cross-method check above  [CMD `effective_view.py SECTIONS` → B9 C69 D17 E68 F143 G40 from v2 "Pin, universe and counts"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
