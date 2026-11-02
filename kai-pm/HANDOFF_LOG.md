@@ -110053,3 +110053,88 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T20:32:55Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T20:32:55Z  [CMD `date -u +%FT%TZ` → 2026-11-02T20:32:55Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 4a0f5efe9c9e8d2bb509b3ae6ec90634b766cdbe  [CMD `git rev-parse HEAD` → 4a0f5efe9c9e8d2bb509b3ae6ec90634b766cdbe]
+- tree: 148cb3a0583745a894e50bf6c268c6039ba79df8  [CMD `git rev-parse HEAD^{tree}` → 148cb3a0583745a894e50bf6c268c6039ba79df8]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 4a0f5efe9c9e8d2bb509b3ae6ec90634b766cdbe  [CMD `git ls-remote --heads origin` → 4a0f5efe9c9e8d2bb509b3ae6ec90634b766cdbe]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 338  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 338]
+
+### 1. The four states
+
+- physical: unchanged since entry 338 apart from this entry; no Vercel resource created  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: generate the official Vercel team consent link through Orion's connection; after Dainius approves on Vercel's screen, retry only the existing instruction (find or create kai-calibration-only, no repository, deployment or secrets); if link generation returns 404, verify team identity and connected account instead of retrying  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Have Orion generate the official consent link through his connection, where the original 403 occurred."]
+- evidence: Kai's message verbatim in section 5; Kai's own connection returned 404 "Team not found" for both the team ID and kai-project2  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "my connection returned 404 “Team not found” using both the supplied team ID and kai-project2"]
+- admission: none; Vercel access unverified  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "successful access is still unverified"]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT (relayed by Dainius) · 2026-11-02 · consent-link route approved as next step: Orion generates the link (grants nothing); Dainius reviews team and permissions on Vercel's approval screen; after approval Orion retries only the existing find-or-create instruction; on 404 at link generation, verify team identity and connected account, no repeated project-creation retries; Kai states "Your six-file test approval remains valid"; all other holds remain ⚠ UNBANKED  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "If his link generation also returns 404, the next step is verifying the team identity and connected Vercel account"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: generating the consent link; after Dainius approves, the single find-or-create step. HELD: running the census; running any test until Kai's preflight; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md; connecting a repository; adding secrets  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "All other holds remain."]
+
+### 4. Open questions
+
+- Dainius's approval of the six-file test (option 1): Kai says it "remains valid", but no verbatim Dainius approval of option 1 is banked in this log; searched HANDOFF_LOG.md lines mentioning approval with "option 1" or "six-file" (5 hits, none an approval; entry 333 records Kai: "Your pasted message is not approval of option 1."); Dainius to confirm in his own words  [CMD `grep -n approv HANDOFF_LOG.md | grep -i "option 1\|six-file"` → no approval found]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- CORRECTION (Kai): Orion told Dainius "The connection belongs to no teams, which means it is a personal account"; an empty team list does not establish that; the account has a default team (team_CFc1SSOYJRz0hOpgpYVnYpiQ, "kai-project2") which list_teams did not return  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "An empty team list does not establish that yours is a personal-only account."]
+- CORRECTION (Kai): Orion told Dainius the connection "would then have the same reach in that team as your account does"; team consent authorises the connection's existing app permissions, not necessarily the account's whole reach  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "it does not necessarily grant your account’s entire reach"]
+- Both are R1/R17 over-claims (sentence wider than the measurement); recorded here, not in the failure ledger (allocation on hold)  [CMD `handoff entry 338` → list_teams count 0]
+- Credential scan of Kai's message: 0 hits  [CMD `credscan.py scan339.json` → TOTAL HITS 0]
+- EVIDENCE KAI-VERCEL-CONSENT-ROUTE-339 kai_339.txt: 1199 bytes, sha256 5299d197876da621a06cec0e0188689e0d975d2b47378f0c933f68c74a47b3b7, final LF True (added by Orion)  [CMD `sha256sum kai_339.txt` → 5299d197876da621…]
+    BEGIN-VERBATIM KAI-VERCEL-CONSENT-ROUTE-339
+    VERIFICATION DEGRADED — access recovery checked; entry 338 not independently retrieved.
+    
+    Brother, the consent-link route is the right next step, but my connection returned 404 “Team not found” using both the supplied team ID and kai-project2. No approval link or project was created.
+    
+    Two corrections to Orion’s explanation:
+    
+    * An empty team list does not establish that yours is a personal-only account.
+    * Team consent authorises the connection’s existing app permissions; it does not necessarily grant your account’s entire reach.
+    
+    Have Orion generate the official consent link through his connection, where the original 403 occurred. Generating it grants nothing; you review the team and permissions on Vercel’s approval screen. After approval, he should retry only the existing instruction: find or create kai-calibration-only, without a repository, deployment or secrets.
+    
+    If his link generation also returns 404, the next step is verifying the team identity and connected Vercel account—not repeatedly retrying project creation.
+    
+    Your six-file test approval remains valid. All other holds remain. Confidence: 0.95 in this recovery route; successful access is still unverified.
+    END-VERBATIM KAI-VERCEL-CONSENT-ROUTE-339
+
+### 6. Next authorised step
+
+- Call authorize_team_access for team_CFc1SSOYJRz0hOpgpYVnYpiQ; give Dainius the link; on 404 stop and verify team identity and connected account  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Generating it grants nothing; you review the team and permissions on Vercel’s approval screen."]
+
+### 7. What I am unsure of
+
+- Why Kai's connection gets 404 while Orion's gets 403 for the same team; possibly different Vercel accounts behind the two connections  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "404 “Team not found”"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
