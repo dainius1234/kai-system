@@ -110138,3 +110138,69 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T20:33:27Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T20:33:27Z  [CMD `date -u +%FT%TZ` → 2026-11-02T20:33:27Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 212d16ea5d2d2811dcd8fc73500345a967793f44  [CMD `git rev-parse HEAD` → 212d16ea5d2d2811dcd8fc73500345a967793f44]
+- tree: b31a0b006bf5efb4cb77529bb7ca349d123cee83  [CMD `git rev-parse HEAD^{tree}` → b31a0b006bf5efb4cb77529bb7ca349d123cee83]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/project-rework-plan-pgvp35: 212d16ea5d2d2811dcd8fc73500345a967793f44  [CMD `git ls-remote --heads origin` → 212d16ea5d2d2811dcd8fc73500345a967793f44]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 339  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 339]
+
+### 1. The four states
+
+- physical: unchanged since entry 339 apart from this entry; no Vercel project created  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: consent link generation; retry of find-or-create only after Dainius approves  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "After approval, he should retry only the existing instruction"]
+- evidence: authorize_team_access for team_CFc1SSOYJRz0hOpgpYVnYpiQ returned status requires_user_action with a single-use link expiring 2026-11-02T20:43:05Z (generated about 20:33Z); not a 404; the link URL is not banked here because it is a one-time access request  [CMD `Vercel authorize_team_access` → "requires_user_action"]
+- admission: none; access pending Dainius's approval on Vercel's screen  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "you review the team and permissions on Vercel’s approval screen"]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `handoff entry 339 section 6` → "Call authorize_team_access"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: after Dainius approves, retry only find-or-create kai-calibration-only, no repository, deployment or secrets. HELD: running the census; running any test until Kai's preflight; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "All other holds remain."]
+
+### 4. Open questions
+
+- Dainius: approve (or not) on Vercel's screen within 10 minutes; if it expires, Orion generates a fresh link on request  [CMD `Vercel authorize_team_access expiresAt` → 2026-11-02T20:43:05Z]
+- Dainius's own-words approval of the six-file test (option 1) still not banked  [CMD `handoff entry 339 section 4` → no approval found]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- None  [CMD `git status --porcelain` → 0 lines]
+
+### 6. Next authorised step
+
+- When Dainius says he approved: retry list_projects for the team, then find or create kai-calibration-only with no repository; confirm no link and no deployments; report team ID and project ID  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "find or create kai-calibration-only, without a repository, deployment or secrets"]
+
+### 7. What I am unsure of
+
+- What permissions Vercel's approval screen will list; Dainius sees them, Orion does not  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Team consent authorises the connection’s existing app permissions"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
