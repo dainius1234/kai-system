@@ -112166,3 +112166,89 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T22:01:16Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T22:01:16Z  [CMD `date -u +%FT%TZ` → 2026-11-02T22:01:16Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 90a339f82d2c380a38226cdfcbb2c1e7b0e067e9  [CMD `git rev-parse HEAD` → 90a339f82d2c380a38226cdfcbb2c1e7b0e067e9]
+- tree: ef826fc568e2c59cd084e23886b4c9e8bbfbb4df  [CMD `git rev-parse HEAD^{tree}` → ef826fc568e2c59cd084e23886b4c9e8bbfbb4df]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 90a339f82d2c380a38226cdfcbb2c1e7b0e067e9  [CMD `git ls-remote --heads origin` → 90a339f82d2c380a38226cdfcbb2c1e7b0e067e9]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 356  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 356]
+
+### 1. The four states
+
+- physical: unchanged since entry 356 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: anchor-package preparation, not census execution; the reader safeguards Kai lists  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Proceed with preparation of the exact anchor package, not census execution."]
+- evidence: Kai's review verbatim in section 5; checks made: v3.2.3 Annex A (block ORION-RESEARCH-PROCEDURE-V3-2-3, Annex A at log line 84325) states the item rule for canonical, lineage or draft sources and "Superseded promises: recorded unless a D-number, owner ruling or canonical document explicitly removed them"; the seven DECISIONS_CANONICAL_APPEND_QUEUE_D344_D347…D353 files are census sources of class derived; .claude/settings.json has no permissions block  [CMD `awk Annex A in v3.2.3 block; passages.json; settings.json keys` → as stated]
+- admission: none; seed, sealed fixtures and owner-ruling references not issued; pilot needs Dainius's separate anchor approval  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Do not invent or substitute them."]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT (relayed by Dainius) · 2026-11-02 · reader definition provisionally acceptable with safeguards: keep the source-class rules subject to the original v3.2.3 Annex A; quote capability promises found in excluded historical or superseded sources into notes or flags for zero-loss reconciliation; process records are not features unless they specify an intended KAI capability, behaviour or obligation; keep reader access physically restricted to prepared units (instruction-only is not filesystem isolation); keep the D344–D353 pending-append records within reconciliation; seed, fixtures and owner-ruling references not yet issued and must not be invented; prepare the anchor package, not execution ⚠ UNBANKED  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Keep reader access physically restricted to prepared census units."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: reader safeguards and anchor-package preparation. HELD: census execution including the pilot; engineering; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md; inventing seed, fixtures or owner-ruling references  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "All engineering and SOUL restrictions remain unchanged."]
+
+### 4. Open questions
+
+- Physical restriction: Claude Code docs (sub-agents, permissions, sandboxing pages, read by a claude-code-guide helper) give no documented zero-tool subagent; permissions.deny Read rules are enforced by Claude Code for the Read tool (Grep and Glob best effort; Bash cat not covered); application to custom subagents is not stated in the docs  [CMD `claude-code-guide report` → "Docs do not state an empty tools: value, a "none" keyword, or any zero-tool option"]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- CORRECTION: entry 356 and the reader definition cited "procedure v3.2.3, Annex A", but Orion had read the item rule from the copy inside ORION-RESEARCH-PROPOSAL-V3-1 (log line 79448); the v3.2.3 text has been read now and carries the same item rule and source-class scope  [CMD `awk 'NR<79448 && /BEGIN-VERBATIM/'` → ORION-RESEARCH-PROPOSAL-V3-1]
+- Credential scan of Kai's review: 0 hits  [CMD `credscan.py scan357.json` → TOTAL HITS 0]
+- EVIDENCE KAI-READER-REVIEW-357 kai_357.txt: 1374 bytes, sha256 0685f64e07d023c17d521abfc00a3c3491d6fd76407d496fa31c1928cad9cc9b, final LF True (added by Orion)  [CMD `sha256sum kai_357.txt` → 0685f64e07d023c1…]
+    BEGIN-VERBATIM KAI-READER-REVIEW-357
+    KAI → ORION | Wave 0 reader review
+    
+    Verified branch HEAD 90a339f82d2c380a38226cdfcbb2c1e7b0e067e9, the reader definition, handoff entry 356 via commit evidence, DAI-10 and Miro.
+    
+    Provisional verdict: reader definition acceptable, with one preservation safeguard.
+    
+    1. Keep the approved active-feature source-class rules, subject to checking the original v3.2.3 Annex A.
+    2. Where excluded historical or superseded sources contain KAI capability promises, record the relevant exact quotations in review notes/flags for zero-loss reconciliation. Do not silently classify such evidence as irrelevant.
+    3. Process records are not themselves KAI features, unless they specify an intended KAI capability, behavior or obligation.
+    4. Keep reader access physically restricted to prepared census units. Instruction-only restrictions are not equivalent to filesystem isolation.
+    5. Ensure the D344–D353 pending-append governance records remain within the approved evidence and ruling reconciliation.
+    
+    The sampling seed, sealed fixtures and exact owner-ruling references are not yet issued. They require proper custody and source verification. Do not invent or substitute them.
+    
+    Proceed with preparation of the exact anchor package, not census execution. The 30-chunk pilot requires Dainius’s separate approval of that anchor.
+    
+    All engineering and SOUL restrictions remain unchanged.
+    END-VERBATIM KAI-READER-REVIEW-357
+
+### 6. Next authorised step
+
+- Edit the reader: excluded-class capability quotes kept for reconciliation, the D344–D353 queue files named, unit text given inline; add project deny rules for reading data/SOUL.md (and later the fixture custody file); confirm in the pilot, with a harmless decoy, that a denied read fails for the reader  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Instruction-only restrictions are not equivalent to filesystem isolation."]
+
+### 7. What I am unsure of
+
+- Whether the permissions deny rule binds custom subagents; the docs imply but do not state it; to be shown with a decoy file, not assumed  [CMD `claude-code-guide report` → "They do not explicitly say this for custom subagents and Read rules."]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
