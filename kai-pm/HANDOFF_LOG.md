@@ -109970,3 +109970,86 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T20:30:01Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T20:30:01Z  [CMD `date -u +%FT%TZ` → 2026-11-02T20:30:01Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 433ffcec849fe9e1c59d6ce232b56b6cf14fda7a  [CMD `git rev-parse HEAD` → 433ffcec849fe9e1c59d6ce232b56b6cf14fda7a]
+- tree: 75880798cad04a9c59fa7d668dee59091933c107  [CMD `git rev-parse HEAD^{tree}` → 75880798cad04a9c59fa7d668dee59091933c107]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 433ffcec849fe9e1c59d6ce232b56b6cf14fda7a  [CMD `git ls-remote --heads origin` → 433ffcec849fe9e1c59d6ce232b56b6cf14fda7a]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 337  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 337]
+
+### 1. The four states
+
+- physical: unchanged since entry 337 apart from this entry; no Vercel resource created  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: the single Vercel empty-project step, stopping on permission denial  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "If permission is denied, report the exact error and stop."]
+- evidence: the connection sees no teams; its default team team_CFc1SSOYJRz0hOpgpYVnYpiQ (scope "kai-project2") refused GET /v10/projects with 403 forbidden; exact responses verbatim in section 5  [CMD `Vercel list_projects teamId=team_CFc1SSOYJRz0hOpgpYVnYpiQ` → "403: forbidden … scope \"kai-project2\""]
+- admission: none; nothing created; Kai's preflight not reached  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "creating the project alone does not prove the isolation we need"]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `handoff entry 337 section 6` → "List Vercel teams and projects; create or reuse"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: nothing further on Vercel; the step stopped at permission denial. HELD: running the census; running any test; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md; calling authorize_team_access or retrying without a new instruction  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "report the exact error and stop"]
+
+### 4. Open questions
+
+- For Dainius and Kai: whether to grant this connection access to team "kai-project2" (Vercel's own remedy: a one-time consent link from authorize_team_access, approved by the account owner), then retry the same single step; or to drop the Vercel route  [CMD `Vercel error recovery field` → "Call authorize_team_access … show the user the returned link"]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- A project search without a team scope returned 0 projects; no project was created there, because the intended team is evidently the default team "kai-project2", which refused access  [CMD `Vercel list_projects search=kai-calibration-only` → count 0]
+- Credential scan of the result record: 0 hits  [CMD `credscan.py scan338.json` → TOTAL HITS 0]
+- EVIDENCE VERCEL-STEP-RESULT-338 vercel_result_338.txt: 1626 bytes, sha256 4e046842b6f07e0ef8a3442fd0656b61544d4a5b33b1914721a470fd5b85ee40, final LF True (added by Orion)  [CMD `sha256sum vercel_result_338.txt` → 4e046842b6f07e0e…]
+    BEGIN-VERBATIM VERCEL-STEP-RESULT-338
+    VERCEL STEP RESULT (Orion, 2026-11-02) — exact responses, nothing created
+    
+    1. list_teams (limit 20) -> {"teams": [], "pagination": {"count": 0}}
+    2. list_projects (no team scope, search "kai-calibration-only") -> {"projects": [], "pagination": {"count": 0}}
+    3. get_auth_user -> user id mHbfLbCtzQ8IAApQbCb1xQu3, username dkhgpm85tp-2091, defaultTeamId team_CFc1SSOYJRz0hOpgpYVnYpiQ, version northstar, plan hobby, createdAt 1793650660048 (email omitted here)
+    4. list_projects (teamId team_CFc1SSOYJRz0hOpgpYVnYpiQ, limit 50) -> ERROR, exact fields:
+       "message": "Vercel API request failed (403: forbidden). Not authorized: Trying to access resource under scope \"kai-project2\". You must re-authenticate to this scope or use a token with access to this scope."
+       "status": 403, "code": "forbidden", "operation": "GET /v10/projects", "saml": false, "ssoEnforced": false,
+       "scope": "kai-project2", "teamId": "team_CFc1SSOYJRz0hOpgpYVnYpiQ", "requestId": "iad1:iad1:iad1:sfo1::bcpc7-1793651372560-ace93bce31fd"
+       "recovery": "Call authorize_team_access (or authorize_team_sso if that is the available tool) with this teamId and show the user the returned link. After they approve team access and complete SSO if required, retry the same request with this connection. Do not ask them to reconnect."
+    
+    STOPPED at step 4 per the instruction "If permission is denied, report the exact error and stop."
+    Not done: create_project; authorize_team_access (not called: it would be a further step beyond the instruction).
+    No project was created in any scope. No repository connected, nothing deployed, no secrets added, KAI unchanged.
+    END-VERBATIM VERCEL-STEP-RESULT-338
+
+### 6. Next authorised step
+
+- Report the exact error to Dainius for Kai and stop; wait for a decision on team access  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "If permission is denied, report the exact error and stop."]
+
+### 7. What I am unsure of
+
+- Whether "kai-project2" is the team Kai intended; it is the only team this connection points to (as its default) and the only one named in the refusal  [CMD `Vercel get_auth_user` → defaultTeamId team_CFc1SSOYJRz0hOpgpYVnYpiQ]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
