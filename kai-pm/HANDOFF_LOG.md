@@ -109604,3 +109604,234 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T19:13:45Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T19:13:45Z  [CMD `date -u +%FT%TZ` → 2026-11-02T19:13:45Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 67d23f3463c1ad17669f1662db5304c3242ec124  [CMD `git rev-parse HEAD` → 67d23f3463c1ad17669f1662db5304c3242ec124]
+- tree: 6ebf9ca3ed204e0a5cd8394e77bd272ccab1c7bb  [CMD `git rev-parse HEAD^{tree}` → 6ebf9ca3ed204e0a5cd8394e77bd272ccab1c7bb]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 67d23f3463c1ad17669f1662db5304c3242ec124  [CMD `git ls-remote --heads origin` → 67d23f3463c1ad17669f1662db5304c3242ec124]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 334  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 334]
+
+### 1. The four states
+
+- physical: unchanged since entry 334 apart from this entry; tools live in the scratchpad only  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: bank Kai's scoped review and present the execution options to Dainius  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Orion can bank this scoped review and present the execution options to you."]
+- evidence: Kai's receipt verbatim in section 5; the six-file synthetic calibration set (anchor rev 3, calibrate_t5 rev 6) run in a fresh scratch folder, and again with the project path pointed at a missing folder: both PASS, outputs byte-identical  [CMD `python3 -I calibrate_t5.py` in six_rev6 and six_rev6-norepo → "78 planted faults … result PASS"; `cmp` → identical]
+- admission: none; A1 denial-as-approval defect closed by Kai's reading review; overall qualification pending; independent execution not verified  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "A1’s denial-as-approval defect is closed by reading review; overall qualification remains pending."]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT (relayed by Dainius) · 2026-11-02 · receipt: bundle 5 and the three script hashes and byte counts match; no script executed; A1 rev 3 VERIFIED BY READING within the stated scope, closing his previous finding (not authorship, independent execution or production readiness); the "rev 2" header is cosmetic, no separate revision needed; a negative disposition in any block is acceptable as a conservative STOP for this bounded qualification, never described as Dainius personally refusing; load() reads only the selected commit, so before any authorised census run the reviewer must check the current authoritative log for later withdrawal or supersession and record that check separately from the frozen research pin (procedural, not automated by rev 3); A4: all seven steps go in the census method, cross-referenced from admission, and the initial admission record must separate completed prerequisites (with evidence) from future obligations (with responsible person and required evidence); no further rewrite required before the execution decision; independent execution, if chosen, is limited to the six-file synthetic calibration set; real-anchor approval and all other open decisions and holds unchanged ⚠ UNBANKED  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "No further rewrite is required by this review before that decision."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: presenting the execution options to Dainius. HELD: running the census; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md; Kai executing scripts (until Dainius decides)  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "The real-anchor approval and all other open decisions and holds remain unchanged."]
+
+### 4. Open questions
+
+- For Dainius NOW: who, if anyone, runs the six-file synthetic test kit (options 1/2/3; Orion recommends 1); note verbatim in section 5  [CMD `EXEC_OPTIONS_DAINIUS.md` → "What you are deciding: only who, if anyone, runs the six-file test kit."]
+- For Dainius, later: the real anchor's approval; the 2% audit; reading allocation; SOUL incident closure; no-touch provenance  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "The real-anchor approval and all other open decisions and holds remain unchanged."]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- R1 re-check before recommending option 1: the six-file "fresh folder" test cited in comment 7e1968c2 was on anchor rev 2 / calibrate_t5 rev 5; rerun today on rev 3 / rev 6 from the hash-checked bundles (bundle 5 overriding 1 and 2): calibrate_t4 PASS, calibrate_t5 78 faults PASS, exit 0  [CMD `python3 -I calibrate_t5.py` in scratchpad/six_rev6 → "result PASS"]
+- I-8 known-negative for "the calibrations never use the project path": REPO in anchor.py and passages.py (the only two project-path strings among the six files) replaced with /nonexistent/kai-system in a copy; calibrate_t4 PASS and calibrate_t5 PASS, output byte-identical (10338 bytes, sha256 fd4003b8a4bdbc5b…); this is a diagnostic copy, not a shipped revision  [CMD `grep -n "kai-system\|/home/user" six_rev6/*.py` → 2 lines; `cmp six_rev6.txt six_rev6_norepo.txt` → identical]
+- Credential scan of Kai's receipt, the options note and the run output: 0 hits  [CMD `credscan.py scan335.json; scan335b.json` → TOTAL HITS 0]
+- EVIDENCE KAI-RECEIPT-335-A1-CLOSED kai_receipt_335.txt: 3095 bytes, sha256 3f8b01f74ce0d18555c7e9ff06005acd61a48a85c7ab8f8b10b33faec5b83261, final LF True (added by Orion)  [CMD `sha256sum kai_receipt_335.txt` → 3f8b01f74ce0d185…]
+    BEGIN-VERBATIM KAI-RECEIPT-335-A1-CLOSED
+    VERIFICATION RECEIPT — A1’s denial-as-approval defect is closed by reading review; overall qualification remains pending.
+    
+    * Working branch HEAD: 67d23f3463c1ad17669f1662db5304c3242ec124; entry 334 confirmed.
+    * DAI-10 comment 0f92fe24-1cfd-4539-80e1-9b4430d3a430 retrieved, 2 November, 18:54:58 UTC.
+    * Bundle 5: 56,381 bytes, SHA-256 57716f8182616e6be79167ab3b3e7bd2b23be92d0e2cb8a0ab65368abae235aa—matches.
+    * All three script hashes and byte counts match the banked values in entry 333.
+    * No supplied scripts executed. Orion’s 78-case PASS remains producer evidence.
+    
+    Brother, the specific fix holds. Here are my answers to Orion’s three questions.
+    
+    1. A1 rev 3: VERIFIED BY READING, within the stated scope.
+    
+    The code now requires explicit ADJUDICATED and APPROVED dispositions matching the anchor identifier, full digest and admission scope. Refusal prose alone cannot satisfy approval. The six new calibration cases cover the reported additions, including approval followed by withdrawal.
+    
+    This closes my previous finding. It does not prove authorship, independent execution or production readiness. The stale “rev 2” header is cosmetic; no separate revision is needed just for that.
+    
+    2. A negative disposition in any block: acceptable as a conservative STOP, not proof of an owner ruling.
+    
+    Keep it for this bounded qualification. An exact negative line from any block should stop admission for review; it must not be described as establishing that Dainius personally refused the anchor. Examples or copied records could also trigger that stop.
+    
+    One important limit: “anywhere in the log” means anywhere in the selected commit’s log. load() reads the supplied commit. A withdrawal added later will not appear when somebody selects an older commit.
+    
+    Therefore, before any authorised census run, the reviewer must check the current authoritative log for later withdrawal or supersession and record that check separately from the frozen research pin. This is a required procedural safeguard; rev 3 does not automate it.
+    
+    3. A4 placement: agreed, with a timing correction.
+    
+    Put all seven steps in the census method and cross-reference them from admission. But the initial admission record must distinguish:
+    
+    * Completed prerequisites, with evidence references.
+    * Future obligations, with their responsible person and required evidence.
+    
+    Freezing the completed census register, recording draws and revealing fixture answers happen later. They cannot truthfully be marked completed before the census starts. Their evidence should be appended when those stages occur.
+    
+    Next move: Orion can bank this scoped review and present the execution options to you. No further rewrite is required by this review before that decision. If you choose independent execution, it remains limited to the six-file synthetic calibration set—not the full repository replay or census.
+    
+    The real-anchor approval and all other open decisions and holds remain unchanged.
+    
+    Confidence: 0.99 in the hash checks and closure of the specific A1 defect by reading. Independent execution remains unverified.
+    END-VERBATIM KAI-RECEIPT-335-A1-CLOSED
+- EVIDENCE CENSUS-SIX-FILE-REV6-RUN six_rev6.txt: 10338 bytes, sha256 fd4003b8a4bdbc5be93ccd36781915b6d01e88b0daaafb7869be87a8531ab5fa, final LF True (added by Orion)  [CMD `sha256sum six_rev6.txt` → fd4003b8a4bdbc5b…]
+    BEGIN-VERBATIM CENSUS-SIX-FILE-REV6-RUN
+    CAUGHT hidden_prose_feature_missed: PROBLEM planted prose feature not found: 'reminds Dainius to hydrate every two hours'
+    CAUGHT nested_feature_without_parent: PROBLEM planted nested feature recorded without its parent: 'confirms three points of contact'
+    CAUGHT conflict_with_one_source: PROBLEM conflict 0: both sources must be recorded
+    CAUGHT inaccessible_source_without_record: PROBLEM exception missing for B12:named-gap (named_gap)
+    CAUGHT soul_exception_missing: PROBLEM exception missing for data/SOUL.md (git_blob_not_opened)
+    CAUGHT unit_not_reviewed: PROBLEM unit not reviewed: doc_b.md@L1
+    CAUGHT assigned_counted_as_reviewed: PROBLEM doc_a.md@L1: disposition 'assigned' is not a review (only ['items', 'no_item'] count)
+    CAUGHT partial_review: PROBLEM doc_a.md@L1: passages reviewed do not equal the unit's passages
+    CAUGHT quote_not_in_source: PROBLEM item I2: quote not found in doc_b.md#P2
+    CAUGHT superseded_without_removal: PROBLEM item I4: superseded without a resolving removal reference
+    CAUGHT parent_loop: PROBLEM item I2: parent loop
+    CAUGHT F1_phantom_item_in_review: PROBLEM doc_a.md@L1: lists item I999, which has no item record
+    CAUGHT F1_duplicate_item_id: PROBLEM duplicate item ids: ['I6']
+    CAUGHT F1_item_listed_by_two_reviews: PROBLEM item I1 is listed by two reviews (doc_a.md@L1, doc_b.md@L1)
+    CAUGHT F1_item_ref_outside_its_unit: PROBLEM item I6: reference doc_a.md#P2 lies outside its unit
+    CAUGHT F2_oversize_without_windows: PROBLEM doc_c.md@L1: oversize unit needs review windows of at most 1200 lines covering lines 1-1300 in order
+    CAUGHT F2_windows_not_covering: PROBLEM doc_c.md@L1: oversize unit needs review windows of at most 1200 lines covering lines 1-1300 in order
+    CAUGHT F3_template_notes_reused: PROBLEM doc_b.md@L1: notes are identical to doc_a.md@L1 (template evidence is refused)
+    CAUGHT F3_no_grounding: PROBLEM kai-pm/DECISIONS.md@L1: no source-grounded observation
+    CAUGHT F3_grounding_outside_unit: PROBLEM doc_b.md@L1 grounding: reference doc_a.md#P1 lies outside its unit
+    CAUGHT F3_missing_signoff: PROBLEM kai-pm/DECISIONS.md@L1: no sign-off (reader and ISO date)
+    CAUGHT F5_older_decision_governs: PROBLEM conflict 0: governs I4, but by later_same_tier the governing item is I5
+    CAUGHT F5_unproven_authority_resolved: PROBLEM conflict 0: resolved although an authority is unproven (keep it unresolved and escalate)
+    CAUGHT F5_same_date_resolved: PROBLEM conflict 0: same date on both sides; chronology cannot decide (keep it unresolved and escalate)
+    CAUGHT F5_decision_id_not_in_source: PROBLEM conflict 0 source 2: decision D7 / 2026-02-01 not found in the source unit
+    CAUGHT F5_removal_without_proven_authority: PROBLEM item I4: removal has no proven authority; keep the promise and record it as unresolved
+    CAUGHT F5_unresolved_names_governor: PROBLEM conflict 0: unresolved but names a governing item
+    CAUGHT X3_later_lower_tier_governs: PROBLEM conflict 1: governs I7, but by higher_tier the governing item is I5
+    CAUGHT X3_d_number_not_its_heading: PROBLEM conflict 0 source 2: d_number D1 is not the heading of its DECISIONS.md unit
+    CAUGHT X3_canonical_doc_on_lineage_source: PROBLEM conflict 0 source 2: canonical_doc claimed for kai-pm/DECISIONS.md, whose class is lineage
+    CAUGHT X3_owner_ruling_outside_ruling_record: PROBLEM conflict 1 source 2: owner_ruling claimed in README.md, which is not a ruling record
+    CAUGHT X3_removal_weaker_than_promise: PROBLEM item I4: removal (canonical_doc) is weaker than the promise it removes
+    CAUGHT X3_removal_not_later_than_promise: PROBLEM item I4: removal dated 2026-02-01 is not later than the promise (2026-02-01)
+    CAUGHT X3_basis_rule_mismatch: PROBLEM conflict 0: basis rule 'higher_tier' does not match the computed rule 'later_same_tier'
+    CAUGHT X3_basis_without_statement: PROBLEM conflict 0: basis needs a statement quoted from the governing source's unit
+    CAUGHT F2_tampered_unit_sha: PROBLEM units.json differs from the manifest rebuilt from the sources: ['doc_a.md@L1.sha256']
+    CAUGHT F2_tampered_unit_range: PROBLEM units.json differs from the manifest rebuilt from the sources: ['kai-pm/DECISIONS.md@L3.end']
+    CAUGHT F2_tampered_unit_source: PROBLEM units.json differs from the manifest rebuilt from the sources: ['doc_b.md@L1.source']
+    CAUGHT F2_broken_next_link: PROBLEM units.json differs from the manifest rebuilt from the sources: ['doc_d.md@L1.next']
+    CAUGHT F2_extra_unit_in_manifest: PROBLEM units.json differs from the manifest rebuilt from the sources: ['doc_a.md@L999']
+    CAUGHT X2_passages_tampered_consistently: PROBLEM passages.json differs from the passages re-cut from doc_a.md
+    CAUGHT X2_fixture_inventory_incomplete: PROBLEM fixture inventory needs at least one prose and one nested fixture, has ['prose']
+    CAUGHT X2_fixtures_absent: PROBLEM fixtures.json is required: the seeded omission test is part of every census check (Kai X2)
+    CAUGHT R3_2_orion_note_marked_owner_ruling: PROBLEM conflict 1 source 2: OR2 is not an adjudicated owner ruling in the trust anchor (speaker, span, date a
+    CAUGHT A2_ruling_status_draft: PROBLEM conflict 1 source 2: owner ruling OR1 is not active and adjudicated (status draft, active True, supers
+    CAUGHT A2_ruling_superseded: PROBLEM conflict 1 source 2: owner ruling OR1 is not active and adjudicated (status adjudicated, active True, 
+    CAUGHT A2_ruling_scope_does_not_cover_item: PROBLEM conflict 1 source 2: owner ruling OR1 does not apply to item I7 (applies_to ['I5'])
+    CAUGHT A2_paraphrase_outside_owner_block: PROBLEM conflict 1 source 2: owner ruling OR1 is not inside a banked DAINIUS verbatim block (a summary is neve
+    PASS known-negative: an adjudicated owner ruling outranks a D-number | CENSUS CHECK: units 10, reviews 10, items 7, conflicts 2, exceptions 2, fixtures 2; proble
+    CAUGHT R3_3_class_substituted_consistently: PROBLEM source metadata for doc_b.md differs from the effective view (class, roles, mandatory or route)
+    CAUGHT R3_3_effective_view_edited: PROBLEM effective_view.json is not the one in the trust anchor
+    CAUGHT FIXTURE_plan_substituted: PROBLEM fixtures differ from the trust anchor's planted-feature plan
+    CAUGHT A3_source_missing: PROBLEM register entry doc_b.md is missing from passages.json (neither segmented nor an exception)
+    CAUGHT A3_source_duplicated: PROBLEM register entry doc_a.md appears 2 times in passages.json
+    CAUGHT A3_source_moved_into_exceptions: PROBLEM doc_b.md was moved into exceptions without authority in the register
+    CAUGHT A1_no_admission_record: PROBLEM trust anchor ANCHOR-A is not admitted: no ANCHOR-ADMISSION record names this anchor
+    CAUGHT A1_admission_names_other_digest: PROBLEM trust anchor ANCHOR-B is not admitted: ANCHOR-ADMISSION-B: names another anchor or digest (this block'
+    CAUGHT A1_approval_not_by_owner: PROBLEM trust anchor ANCHOR-C is not admitted: ANCHOR-ADMISSION-C: approval block 'ORION-APPROVE' is not a ban
+    CAUGHT A1_adjudication_lacks_digest: PROBLEM trust anchor ANCHOR-D is not admitted: ANCHOR-ADMISSION-D: KAI-ADJ-NODIGEST has no single ADJUDICATED 
+    CAUGHT A1_denial_wording_as_approval: PROBLEM trust anchor ANCHOR-F is not admitted: ANCHOR-ADMISSION-F: DAINIUS-DENY-F has no single APPROVED dispo
+    CAUGHT A1_refused_disposition: PROBLEM trust anchor ANCHOR-G is not admitted: ANCHOR-ADMISSION-G: DAINIUS-REFUSE-G has no single APPROVED dis
+    CAUGHT A1_deferred_disposition: PROBLEM trust anchor ANCHOR-H is not admitted: ANCHOR-ADMISSION-H: DAINIUS-DEFER-H has no single APPROVED disp
+    CAUGHT A1_approval_later_withdrawn: PROBLEM trust anchor ANCHOR-I is not admitted: ANCHOR-ADMISSION-I: a WITHDRAWN disposition for this anchor exi
+    CAUGHT A1_digest_prefix_only: PROBLEM trust anchor ANCHOR-J is not admitted: ANCHOR-ADMISSION-J: DAINIUS-SHORT-J has no single APPROVED disp
+    CAUGHT A1_scope_mismatch: PROBLEM trust anchor ANCHOR-K is not admitted: ANCHOR-ADMISSION-K: DAINIUS-SCOPE-K has no single APPROVED disp
+    PASS known-negative: an admitted anchor passes, and from a calibration repository it is still stamped 'PASS-CALIBRATION-ANCHOR' | CENSUS CHECK: units 10, reviews 10, items 7, conflicts 2, exceptions 2
+    PASS known-negative: unresolved conflict with unproven authority, no governor | CENSUS CHECK: units 10, reviews 10, items 7, conflicts 2, exceptions 2, fixtures 2; proble
+    PASS known-negative: correct register | CENSUS CHECK: units 10, reviews 10, items 7, conflicts 2, exceptions 2, fixtures 2; proble
+    PASS a file anchor is stamped calibration-only: result 'PASS-CALIBRATION-ANCHOR'
+    CAUGHT F4_drop_feature_bearing: PROBLEM population differs from the passages the register cites: missing ['README.md#P2'], extra []
+    CAUGHT F4_drop_mandatory_fixture: PROBLEM mandatory selection misses fixture passage doc_a.md#P3
+    CAUGHT X2_fixtures_changed_after_T5: PROBLEM fixtures.json is not the one T5 passed
+    CAUGHT X2_passages_changed_after_T5: PROBLEM passages.json is not the one T5 passed
+    CAUGHT F4_register_edited_after_T5: PROBLEM register.json is not the one T5 passed
+    PASS known-negative: draw from the passed register | SAMPLE seed anchor-seed-1: population derived from the register N 6 -> n 6; allocation {'canonical*': 1, 'line
+    CAUGHT F4_receipt_missing_for_selected: PROBLEM no review receipt for selected passage README.md#P2
+    CAUGHT F4_receipt_missing_for_mandatory: PROBLEM no review receipt for mandatory passage doc_a.md#P3
+    CAUGHT F4_receipt_by_the_units_own_reader: PROBLEM README.md#P2: receipt reviewer is the unit's own reader
+    CAUGHT F4_receipt_for_unselected_passage: PROBLEM receipt for a passage that was not selected: doc_d.md#P3
+    CAUGHT X1_duplicate_receipts: PROBLEM duplicate receipts for README.md#P2
+    CAUGHT X1_sample_selection_tampered: PROBLEM sample.json selection differs from the draw re-derived from the passed inputs (pid, source, range or c
+    CAUGHT X1_mandatory_selection_tampered: PROBLEM sample.json mandatory selection differs from the one re-derived from the passed inputs
+    CAUGHT R3_1_seed_and_selection_substituted: PROBLEM sample.json seed differs from the trust anchor's frozen seed
+    CAUGHT R3_1_metadata_only_mutation: PROBLEM sample.json selection differs from the draw re-derived from the passed inputs (pid, source, range or c
+    PASS known-negative: complete receipts by another reviewer | SAMPLE RECEIPT: selected 6 + mandatory 6; receipts 6; problems 0; output WRITTEN
+    T5+T4 CALIBRATION: 78 planted faults, known-negatives 6 + calibration-stamp check, result PASS
+    END-VERBATIM CENSUS-SIX-FILE-REV6-RUN
+- EVIDENCE ORION-EXEC-OPTIONS-FOR-DAINIUS EXEC_OPTIONS_DAINIUS.md: 3006 bytes, sha256 a43becb7ac0f521fbb6269d9c1701b270a6ab20f92ee4e2796af1105116dbc21, final LF True (added by Orion)  [CMD `sha256sum EXEC_OPTIONS_DAINIUS.md` → a43becb7ac0f521f…]
+    BEGIN-VERBATIM ORION-EXEC-OPTIONS-FOR-DAINIUS
+    DECISION FOR DAINIUS: who runs the test kit a second time (Orion, 2026-11-02, after Kai's receipt banked in entry 335)
+    
+    Where we are: the census tools are built. Kai has checked them by reading and says the approval gate is now fixed. I have run the test kit and it passed. What is missing is a second pair of hands running the tests. At the moment the only person who has run them is me, the person who built the tools. That is like a contractor signing off his own pressure test.
+    
+    What "the test kit" is: six small files. They contain deliberately planted faults (78) and correct cases (6). Each test checks that a fault is caught and a correct case passes. They use made-up data only: no KAI data, no SOUL.md, no internet. They need Python 3 and git. I ran exactly these six files again today, from the copies Kai has already hash-checked, in a fresh folder. I ran them a second time with the project folder pointed at a place that does not exist. Both times: 78 faults caught, result PASS.
+    
+    The options:
+    
+    1. Allow Kai to run the six-file test kit in his own sandbox (a sealed test area on his side).
+       - What it allows: Kai runs those six files and reports the result. Nothing else.
+       - What it does not allow: running the census, using KAI data, running the full repository replay, touching SOUL.md, changing any code. All holds stay.
+       - Risk: low. It is an exception to Kai's own read-only practice (26 October), so it needs your word. His sandbox may not have git; if so, he reports that and nothing is lost.
+       - What it buys: a genuine second test by someone who did not write the code.
+    
+    2. Ask DeepSeek to run the same six files under the same limits.
+       - Same allowances and limits as option 1.
+       - Risk: DeepSeek is our adversarial reviewer, so this mixes two roles. It also adds a relay step through you.
+    
+    3. Do not rerun. Record the qualification level as "builder's test plus Kai's reading review", written exactly like that.
+       - Risk: nobody independent has run the tests. If a test is wrong in a way reading cannot see, we find out later and at higher cost.
+    
+    My recommendation: option 1. It is the smallest step that gives a real second test, and Kai has already confirmed the exact files.
+    
+    What you are deciding: only who, if anyone, runs the six-file test kit. You are NOT approving the census, the real anchor, or any change to KAI.
+    
+    Two safeguards Kai added, which will go into the census method whatever you choose:
+    - Before any real census run, the reviewer checks the latest log for a later withdrawal or replacement of the anchor, and records that check. The tool only reads the log at the commit it is given, so it cannot see later changes on its own.
+    - The anchor's approval record splits steps already done (with evidence) from steps still to come (with who does them and what evidence they must produce).
+    
+    Still open for you, unchanged: approval of the real anchor; the 2% no-item audit; reading allocation; closing the SOUL incident; where the no-touch rule came from.
+    END-VERBATIM ORION-EXEC-OPTIONS-FOR-DAINIUS
+
+### 6. Next authorised step
+
+- Put the execution options to Dainius in plain words and wait for his decision; bank it verbatim before acting; record Kai's two procedural safeguards in the census method when it is written  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Orion can bank this scoped review and present the execution options to you."]
+
+### 7. What I am unsure of
+
+- Whether Kai's sandbox has git; calibrate_t5's A1 cases build a throwaway git repository  [CMD `calibrate_t5.py CENSUS_CAL_REPO` → throwaway git repo]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
