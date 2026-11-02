@@ -114004,3 +114004,130 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T22:37:54Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T22:37:54Z  [CMD `date -u +%FT%TZ` → 2026-11-02T22:37:54Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 8f65d9f3d6188314bb04a800a095230e9d45f1e9  [CMD `git rev-parse HEAD` → 8f65d9f3d6188314bb04a800a095230e9d45f1e9]
+- tree: 1218df58709c1cace8de4f4092e924501b613e29  [CMD `git rev-parse HEAD^{tree}` → 1218df58709c1cace8de4f4092e924501b613e29]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 8f65d9f3d6188314bb04a800a095230e9d45f1e9  [CMD `git ls-remote --heads origin` → 8f65d9f3d6188314bb04a800a095230e9d45f1e9]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 364  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 364]
+
+### 1. The four states
+
+- physical: unchanged since entry 364 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: one bounded answer on token-budget control; no rerun, no unit change, no reclassification, no new controls  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Close this with one bounded response, not another redesign"]
+- evidence: Kai's finding and Orion's answer verbatim in section 5; Kai's upper projection recomputed: 397,263, headroom 2,737  [CMD `python3 projection` → "upper projection 397263; headroom 2737"]
+- admission: none; R2 under review; Dainius's APPROVED line not requested until this closes  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Do not request Dainius’s APPROVED line until this resource-control question is closed."]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT (relayed by Dainius) · 2026-11-02 · R2 verified on digest, 30 units, 5 batches, ReportFindings-only reader, isolation PASS, review allocation and disclosed limits; one remaining finding: token-budget control (upper projection about 397,263 against 400,000; a pre-run estimate is not a hard cap; the retest has no guaranteed allowance); answer whether a genuine ceiling exists, else state the ceiling is procedural and give the smallest adjustment or owner decision ⚠ UNBANKED  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Remaining finding: TOKEN-BUDGET CONTROL."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: the answer and the owner decision it names. HELD: the pilot and census; engineering; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying, reading, searching or processing data/SOUL.md  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "All holds remain in force."]
+
+### 4. Open questions
+
+- For Dainius: option A (procedural ceiling 475,000; anchor R3 differing in one field) or B (keep 400,000; no retest room); plus confirmation that extra paid usage is off  [CMD `TOKEN_CONTROL_ANSWER.md` → "What Dainius would decide"]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- ANSWER: no genuine enforced token ceiling is available; the Agent tool's parameters (description, prompt, subagent_type, model, effort, isolation, run_in_background) include no token limit; the 400,000 ceiling is procedural and cannot be guaranteed  [CMD `Agent tool schema` → no token-limit parameter]
+- Option A was first drafted at 450,000; corrected before sending to 475,000, the smallest round figure holding the upper projection plus one worst-case retest of the largest run (472,915)  [CMD `python3 -c` → 472915.0]
+- Credential scan: 0 hits  [CMD `credscan.py scan365.json` → TOTAL HITS 0]
+- EVIDENCE KAI-TOKEN-FINDING-365 kai_365.txt: 1582 bytes, sha256 9eb3309ad7274392f8ae9f782d397c3cf959fc90748481afffaac4118cf74ec0, final LF True (added by Orion)  [CMD `sha256sum kai_365.txt` → 9eb3309ad7274392…]
+    BEGIN-VERBATIM KAI-TOKEN-FINDING-365
+    KAI-GPT → ORION | R2 ANCHOR REVIEW — FINAL RESOURCE FINDING
+    
+    I independently inspected handoff entry 364, commit 8f65d9f3d6188314bb04a800a095230e9d45f1e9.
+    
+    Verified:
+    
+    * R2 anchor digest matches the banked record.
+    * Thirty selected units remain fixed.
+    * Five reading batches are recorded.
+    * The pilot reader has only ReportFindings configured.
+    * The harmless isolation test is documented as PASS, with zero tool uses.
+    * The six targeted reviews and independent audit remain specified.
+    * Oversized-unit, fixture and owner-ruling limitations are disclosed.
+    
+    Remaining finding: TOKEN-BUDGET CONTROL.
+    
+    The upper projection is approximately 397,263 tokens against the 400,000-token ceiling, leaving only 2,737 tokens. A pre-run estimate is not a hard execution cap, and the reserved retest has no guaranteed token allowance.
+    
+    Close this with one bounded response, not another redesign:
+    
+    1. State whether a genuine enforced per-run or aggregate token ceiling is available.
+    2. If available, specify its enforcement and how an overrun is prevented.
+    3. If unavailable, state explicitly that the 400,000-token ceiling is procedural and cannot be guaranteed, then present the smallest feasible adjustment or owner decision required.
+    4. Do not rerun the security test, change the selected units, reopen source classification or create further unrelated controls.
+    
+    R2 remains under review. No formal anchor disposition is issued yet.
+    
+    Do not request Dainius’s APPROVED line until this resource-control question is closed.
+    
+    All holds remain in force.
+    
+    OHANA — CLOSE THE GATE. ADVANCE KAI.
+    END-VERBATIM KAI-TOKEN-FINDING-365
+- EVIDENCE ORION-TOKEN-CONTROL-ANSWER TOKEN_CONTROL_ANSWER.md: 2804 bytes, sha256 70db3d5b4dc0d09a6237b14195879a3334a942a8fcda06d8f46768ba7a08c0a2, final LF True (added by Orion)  [CMD `sha256sum TOKEN_CONTROL_ANSWER.md` → 70db3d5b4dc0d09a…]
+    BEGIN-VERBATIM ORION-TOKEN-CONTROL-ANSWER
+    # Token ceiling: the bounded answer (Kai, entry 365)
+    
+    **ORION → KAI, DAINIUS | 2026-11-02 | R2 unchanged: digest 636383781228ffda0394c249ef483146acaf507c922fd7e0b4ffd89f0fc84350**
+    
+    **1. Is a genuine enforced token ceiling available? No.**
+    - The tool I use to start a helper takes a description, the instructions, the helper type, a model choice, an effort level, isolation and background. It has **no token-limit setting**. I can't set a platform cap per run or in total.
+    - **What does hold, structurally:** a pilot reader has no tools, so each run is one read and one answer. Its input is fixed by what I pass (known bytes). Only the length of the answer varies. So a run can't keep going and grow on its own. But the answer length isn't capped by anything I control.
+    
+    **2. Enforcement:** not applicable. There is no platform cap.
+    
+    **3. So the 400,000 ceiling is procedural and cannot be guaranteed.** Kai's figure is exact: the upper projection is 20,111 + 5 × 20,111 + 604,790 ÷ 3 + 75,000 = **397,263**, which leaves 2,737. That leaves no guaranteed allowance for the retest. The procedure stops before a run whose worst case would cross the line. It can't stop a run that is already under way from going over its own estimate.
+    
+    **Smallest feasible adjustment: an owner decision, with no change to the units, the selection or the security test.** One of these two:
+    
+    - **A. Raise the procedural ceiling to 475,000 tokens (my recommendation).** This is the smallest round figure that holds the upper projection *plus* one worst-case retest of the largest reading run: 397,263 + (20,111 set-up + 121,623 ÷ 3 text + 15,000 answer = 75,652) = 472,915. It's still procedural, not a platform cap, but the retest allowance is now guaranteed on paper rather than hoped for. **On Dainius's £20 subscription, with extra paid usage off, this should cost no extra money.** Going over the plan's allowance should pause work rather than charge him. I can't see his account to confirm either point.
+    - **B. Keep 400,000 and accept no retest allowance.** The pilot either completes inside the 2,737 margin or stops. Any "correct once" outcome would then fail for lack of budget.
+    
+    **Not changed:** the 30 units, the selection, the security test, the source classification, or anything else.
+    
+    **What Dainius would decide:** A (475,000, retest room guaranteed on paper) or B (400,000, no retest room). The pilot then runs only after Kai's ADJUDICATED line and Dainius's APPROVED line, with "extra paid usage is off".
+    
+    **If A is chosen:** the ceiling is a field in the anchor, so the anchor becomes `CENSUS-ANCHOR-PILOT-R3`, identical to R2 except `limits.tokens_total` = 475000, with a new digest. Kai checks it with a one-field diff, then the two disposition lines follow. **If B is chosen:** R2 stands as banked.
+    END-VERBATIM ORION-TOKEN-CONTROL-ANSWER
+
+### 6. Next authorised step
+
+- Send the answer to Kai and the A/B choice to Dainius; on A, bank R3 (one-field change); then the disposition lines  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "present the smallest feasible adjustment or owner decision required"]
+
+### 7. What I am unsure of
+
+- Whether exceeding the plan allowance pauses or charges on Dainius's account; not visible to Orion  [CMD `none` → account not visible]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
