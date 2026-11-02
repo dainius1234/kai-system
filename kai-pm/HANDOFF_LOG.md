@@ -111739,3 +111739,146 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T21:36:32Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T21:36:32Z  [CMD `date -u +%FT%TZ` → 2026-11-02T21:36:32Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: ec346efa3748e8bf8b6532b10d6d13561a478514  [CMD `git rev-parse HEAD` → ec346efa3748e8bf8b6532b10d6d13561a478514]
+- tree: d65e0b1b9fd5a51f92cd451902ec100f258e5756  [CMD `git rev-parse HEAD^{tree}` → d65e0b1b9fd5a51f92cd451902ec100f258e5756]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- remote:claude/project-rework-plan-pgvp35: ec346efa3748e8bf8b6532b10d6d13561a478514  [CMD `git ls-remote --heads origin` → ec346efa3748e8bf8b6532b10d6d13561a478514]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 352  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 352]
+
+### 1. The four states
+
+- physical: unchanged since entry 352 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Orion establishes a realistic reviewer allocation and a proposed spending limit, then prepares the exact anchor for Dainius's approval; Kai prepares seed, planted test features and owner-ruling references  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Orion: Establish a realistic reviewer allocation and proposed spending limit, then prepare the exact anchor for your approval."]
+- evidence: Kai's message verbatim and Orion's allocation and spending proposal verbatim in section 5; sample bounds computed from passages.json: N 51,727; 10% max 5,173; 2% max 1,035; 274 bytes per passage on average  [CMD `passages.json` → as stated]
+- admission: none; census execution not released; exact anchor needs separate owner approval  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Census execution	Not yet released"]
+
+### 2. Rulings since the last handoff
+
+- Dainius (as reported by Kai-GPT; Dainius's own words not seen by Orion) · 2026-11-02 · Wave 0 census method approved: parallel helper agents, 10% feature-bearing sample, 2% no-item audit; required: feasible independent review allocation and a defined spending allowance; exact anchor needs separate owner approval; census execution not yet released; holds unchanged; no further qualification of the census tools unless a material defect emerges ⚠ UNBANKED  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Wave 0 census method: APPROVED, subject to the conditions you specified."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: the allocation and spending proposal; preparing the exact anchor once Kai's parameters arrive; adding the approved 2% audit to the sampling tool with one quick test. HELD: census execution (including the pilot) until the anchor is approved and admitted; engineering; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "data/SOUL.md must not be accessed."]
+
+### 4. Open questions
+
+- Dainius's own words of approval are not in Orion's conversation; Kai reports them as explicit; a one-line confirmation from Dainius in Orion's conversation would let it be banked first-hand  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Your exact approval is available in this conversation."]
+- For Kai: seed, planted test features (custodian only), owner-ruling references; review of the allocation and spending proposal  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Kai-GPT: Prepare the proposed anchor parameters"]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- The spending limit is in tokens and helper runs, not money: Orion cannot see Dainius's billing and does not state prices from memory  [CMD `ALLOCATION_SPEND_PROPOSAL.md §2` → "the limit is in tokens and helper runs"]
+- Credential scan of both texts: 0 hits  [CMD `credscan.py scan353.json` → TOTAL HITS 0]
+- EVIDENCE KAI-METHOD-APPROVAL-REPORT-353 kai_353.txt: 1289 bytes, sha256 76953d434daf827c1caf0ca3954ccfa68ce483a404e6b5500f8d2f477092a7f1, final LF True (added by Orion)  [CMD `sha256sum kai_353.txt` → 76953d434daf827c…]
+    BEGIN-VERBATIM KAI-METHOD-APPROVAL-REPORT-353
+    KINGSMAN — OWNER APPROVAL RECEIVED
+    
+    Your approval is explicit and unambiguous.
+    
+    Wave 0 census method: APPROVED, subject to the conditions you specified.
+    
+    Component	Authority
+    Parallel helper agents	Approved
+    10% feature-bearing sample	Approved
+    2% no-item audit	Approved
+    Feasible independent review allocation	Required
+    Defined spending allowance	Required
+    Exact trust anchor	Separate owner approval required
+    Census execution	Not yet released
+    
+    Next move
+    
+    Kai-GPT: Prepare the proposed anchor parameters, including the seed, planted test features and applicable owner-ruling references.
+    
+    Orion: Establish a realistic reviewer allocation and proposed spending limit, then prepare the exact anchor for your approval.
+    
+    Dainius: No further action until we present that specific approval request.
+    
+    All existing engineering, PRE-RAMS, Gold Tier, R11 and PR #122 holds remain unchanged. data/SOUL.md must not be accessed.
+    
+    Your exact approval is available in this conversation. I have not yet independently confirmed it has been banked in GitHub.
+    
+    No further qualification of the already accepted census tools is necessary unless a material defect emerges.
+    
+    Mission remains: complete the feature inventory, preserve every intended capability, then advance toward building the integrated KAI.
+    
+    OHANA.
+    END-VERBATIM KAI-METHOD-APPROVAL-REPORT-353
+- EVIDENCE ORION-ALLOCATION-SPEND-353 ALLOCATION_SPEND_PROPOSAL.md: 2919 bytes, sha256 7da10af4bb0fefd57770cd08a475debb097bcb846f7728206f8c025ff4b5c278, final LF True (added by Orion)  [CMD `sha256sum ALLOCATION_SPEND_PROPOSAL.md` → 7da10af4bb0fefd5…]
+    BEGIN-VERBATIM ORION-ALLOCATION-SPEND-353
+    # Census: reviewer allocation and spending limit (proposal)
+    
+    **ORION → KAI and DAINIUS | 2026-11-02 | method approved per Kai's report (entry 353) | census not released**
+    
+    ## 1. Reviewer allocation
+    
+    **The review load depends on what the readers find, so it can't be fixed exactly in advance.** The bounds below are measured:
+    
+    | Check | Formula (approved) | Smallest | Largest possible |
+    |---|---|---|---|
+    | 10% sample of feature passages (F) | max(30, ceil(0.10 × F)) | 30 | 5,173 (if all 51,727 carry a feature) |
+    | 2% second look at no-item passages (M) | min(M, max(30, ceil(0.02 × M))) | 0 | 1,035 |
+    | Planted tests and known conflicts | 100% | a handful | a handful |
+    
+    A passage averages about 274 bytes, about 4 lines. The worst case for Kai is therefore about 6,200 passages, roughly 1.7 MB, or about 46 text bundles of the size he already reads (37 KB). The realistic case is much smaller, because most of the handoff log is process record rather than features. That is a guess until we measure it.
+    
+    **Proposal:**
+    - **Kai reviews.** Samples go to Kai in text bundles of about 35 KB, each passage with its source line and the reader's answer. For each one Kai records "agree", "missed feature" or "wrong feature".
+    - **Measure first.** The first slice of the census (the pilot, below) gives the real share of feature-bearing passages, and from that the real review size.
+    - **Capacity limit.** If the projected review is more than Kai can do (say more than 20 bundles), I stop and bring Kai and Dainius one decision. I don't shrink the sample on my own.
+    - **DeepSeek** does targeted spot-checks only. Those are labelled as adversarial review, not independent proof.
+    
+    ## 2. Spending limit
+    
+    I can't see Dainius's billing or plan, and I won't guess a price in pounds or dollars. So the limit is in **tokens and helper runs**, with hard stops:
+    
+    | Stage | Limit | Stop rule |
+    |---|---|---|
+    | Pilot: the first 30 of 1,095 chunks, chosen by the seed across all source classes | 400,000 tokens, at most 10 helper runs | stop and report the measured tokens per chunk and the share of feature-bearing passages |
+    | Full run, only if the pilot projects within the limit | 8,000,000 tokens in total, at most 120 helper runs | at 80% used, pause and report; never exceed |
+    
+    Basis: about 3.5 million tokens of text (bytes ÷ 4, an estimate). On top of that come the instructions for each helper and the written answers. The pilot replaces this estimate with a measured figure, before most of the money is spent.
+    
+    The pilot's answers are real census work and count towards the final result. It is the first slice of the census, not another tool test. It runs only after the anchor is approved.
+    
+    ## 3. Then the anchor
+    
+    When Kai sends the seed, the planted test features (to the custodian, not the readers) and the list of owner-ruling references, I build the exact anchor and give Dainius one approval line quoting its digest.
+    END-VERBATIM ORION-ALLOCATION-SPEND-353
+
+### 6. Next authorised step
+
+- Send the proposal to Kai via Dainius; add the 2% audit to sample.py with one quick test; on receiving Kai's parameters, build the exact anchor and the one-line approval for Dainius  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "then prepare the exact anchor for your approval"]
+
+### 7. What I am unsure of
+
+- The real share of feature-bearing passages, and so the real review size and token cost; the pilot measures both  [CMD `ALLOCATION_SPEND_PROPOSAL.md §1` → "Measure first"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
