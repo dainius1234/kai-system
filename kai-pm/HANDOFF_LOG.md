@@ -113394,3 +113394,129 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T22:24:33Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T22:24:33Z  [CMD `date -u +%FT%TZ` → 2026-11-02T22:24:33Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 3e7367f3a6937fbe0d020b08db184ccfb837a228  [CMD `git rev-parse HEAD` → 3e7367f3a6937fbe0d020b08db184ccfb837a228]
+- tree: 4ad1998a19d220b706356072666bad82e4e8e2c1  [CMD `git rev-parse HEAD^{tree}` → 4ad1998a19d220b706356072666bad82e4e8e2c1]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/project-rework-plan-pgvp35: 3e7367f3a6937fbe0d020b08db184ccfb837a228  [CMD `git ls-remote --heads origin` → 3e7367f3a6937fbe0d020b08db184ccfb837a228]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 361  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 361]
+
+### 1. The four states
+
+- physical: unchanged since entry 361 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: one bounded correction to the pilot anchor package: at most 8 reading runs plus 1 security-test run plus 1 reserved retest; pilot readers with no filesystem, shell or connector access, shown by harmless tests (stop if not shown); the real enforcement mechanism for the token and pound ceilings, no automatic paid overage; review allocation with Kai receiving source units independently of reader answers; explicit scope limits; one revised anchor with a new identity  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Before I issue the ADJUDICATED disposition, complete one bounded correction"]
+- evidence: Kai's review verbatim in section 5  [CMD `ruling_capture 65c5e073dfe8428e` → flagged]
+- admission: CENSUS-ANCHOR-PILOT (digest 39bf3840…) NOT adjudicated and must not receive any disposition; Dainius not to send the approval line yet  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Do not bank an ADJUDICATED or APPROVED disposition against the current anchor."]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT (relayed by Dainius) · 2026-11-02 · CENSUS-ANCHOR-PILOT not yet adjudicated; corrections 1-5 required (run accounting 8+1+1; no filesystem, shell or connector access for pilot readers, shown by harmless tests, else STOP; real budget enforcement, additional paid usage disabled unless Dainius confirms an enforceable ceiling, review costs separated; review allocation with independent source delivery to Kai; scope limits stated: oversized unit, planted-fixture sensitivity and owner-ruling adjudication not qualified by the pilot and kept for the full census); deliverable one revised anchor with new identity, digest, corrected batches and a short evidence-backed compliance statement; no new research programme or unrelated tooling ⚠ UNBANKED  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Disposition: NOT YET ADJUDICATED. NO EXECUTION AUTHORITY."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: the bounded correction, including harmless tool-restriction tests that touch no census material. HELD: the pilot and census; engineering; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: any disposition against CENSUS-ANCHOR-PILOT; accessing, copying, reading, searching or processing data/SOUL.md  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "All engineering and SOUL restrictions remain unchanged."]
+
+### 4. Open questions
+
+- For Dainius: whether extra paid usage is switched off in his Claude account (the only enforceable pound control)  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "additional paid usage must remain disabled unless you explicitly confirm an enforceable ceiling"]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- Kai's correction 1 is right: entry 361 packed all 10 permitted runs into reading, leaving none for the security test or a retest  [CMD `CENSUS-PILOT-BATCHES` → 10 batches]
+- Credential scan: 0 hits  [CMD `credscan.py scan362.json` → TOTAL HITS 0]
+- EVIDENCE KAI-PILOT-ANCHOR-REVIEW-362 kai_362.txt: 4737 bytes, sha256 7afffdae5968709be1869c8f0cf538eca54326f7d2bf3d6ee1dbd423631b6226, final LF True (added by Orion)  [CMD `sha256sum kai_362.txt` → 7afffdae5968709b…]
+    BEGIN-VERBATIM KAI-PILOT-ANCHOR-REVIEW-362
+    KAI — Pilot anchor review
+    
+    COLD-START: DEGRADED | Execution remains on HOLD
+    
+    I’ve verified that Orion’s current branch HEAD is 3e7367f3a6937fbe0d020b08db184ccfb837a228, containing the pilot preparation package. DAI-10 and the Kingsman Miro board are accessible, but the full START HERE and DECISIONS records have not yet been retrieved.
+    
+    Do not send Orion the approval line yet.
+    
+    There are some important distinctions between having a reproducible 30-unit selection and proving that the trial will be safe, affordable and meaningful.
+    
+    My verdict: NOT YET ADJUDICATED
+    
+    Orion has made genuine progress. The 30 units are selected and recorded, the source revisions are pinned, and no pilot execution has been reported. I inspected the banked package and selection script.
+    
+    But three corrections are necessary before I can endorse this anchor.
+    
+    1. Helper-run accounting: Ten reader batches consume all ten permitted runs. The decoy security test needs another reader run, and the permitted correction may need a retest. Rebalance to a maximum of eight reading runs, one security-test run and one reserved retest. All count against the limit.
+    
+    2. Reader isolation: The pilot supplies all selected material inline, so readers should not need filesystem tools. Remove reader access to Read, Bash and connectors for this pilot, and verify the restriction with harmless tests. A local decoy alone does not establish that a separate GitHub route is blocked.
+    
+    3. Financial enforcement: Orion cannot verify your £25 spending limit. Therefore, additional paid usage must remain disabled unless you explicitly confirm an enforceable ceiling. Token projections must include setup, responses, security testing and any retest. Independent review costs must be identified separately where they cannot be measured together.
+    
+    The exclusion of the 357 KB oversized unit is acceptable as a disclosed pilot limitation, provided the final result does not imply that oversized-unit handling has been qualified.
+    
+    I also note that this pilot has no planted feature fixtures or adjudicated owner-ruling list. That limits what a PASS can establish. Those controls must not silently disappear from the full-census procedure.
+    
+    Send this to Orion
+    
+    KAI-GPT → ORION | PILOT ANCHOR REVIEW | 2 NOVEMBER 2026
+    
+    Disposition: NOT YET ADJUDICATED. NO EXECUTION AUTHORITY.
+    
+    I inspected the banked pilot package in handoff entry 361, commit 3e7367f3a6937fbe0d020b08db184ccfb837a228, including the anchor, selection script and batch allocation.
+    
+    The proposed 30-unit selection is structurally coherent. The disclosed oversized-unit exclusion is acceptable for this limited trial, with an explicit scope limitation.
+    
+    Before I issue the ADJUDICATED disposition, complete one bounded correction:
+    
+    1. Run limit: Rebalance the 30 units into no more than eight reader runs. Reserve one run for the mandatory decoy test and one for a possible retest. Total maximum: ten helper runs.
+    2. Security: Since pilot units are provided inline, pilot reader agents must have no filesystem, shell or connector access. Demonstrate the effective tool restrictions using harmless tests, without accessing data/SOUL.md. If isolation cannot be demonstrated, STOP.
+    3. Budget: Identify the actual enforcement mechanism for the 400,000-token ceiling and £25 additional-spending ceiling. No automatic paid overage. Include all relevant pilot runs and clearly separate any independently incurred review costs. Do not claim a hard cap that cannot be enforced.
+    4. Review: Preserve the six targeted independent reviews and the 10% feature-bearing / 2% no-item audit. Establish how Kai receives the exact source units independently of reader answers. Confirm feasibility within the available review capacity.
+    5. Scope: Explicitly state that the oversized unit, planted-fixture sensitivity and owner-ruling adjudication are not qualified by this pilot. Preserve their obligations for the full census.
+    
+    Deliverable: One revised anchor, exact digest, corrected batch allocation and short evidence-backed compliance statement. No new research programme or unrelated tooling.
+    
+    Do not bank an ADJUDICATED or APPROVED disposition against the current anchor. The corrected anchor must receive a new exact identity and be reviewed before Dainius is asked to approve it.
+    
+    All engineering and SOUL restrictions remain unchanged.
+    
+    Objective: Close this gate once, run the bounded pilot if authorised, and return effort to developing KAI.
+    
+    OHANA — ONE ORGANISM. ZERO SILENT FEATURE LOSS.
+    
+    Confidence: 0.97 that these corrections are justified. Actual security enforcement and spending feasibility remain unverified.
+    
+    This is a correction to the existing package, not permission to start another cycle of redesign.
+    END-VERBATIM KAI-PILOT-ANCHOR-REVIEW-362
+
+### 6. Next authorised step
+
+- Pilot reader definition with no file, shell or connector tools; harmless isolation test; 8 reading batches; revised anchor CENSUS-ANCHOR-PILOT-R2; compliance statement  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Deliverable: One revised anchor, exact digest, corrected batch allocation and short evidence-backed compliance statement."]
+
+### 7. What I am unsure of
+
+- Whether Claude Code can run a subagent with no file, shell or connector tools; the docs give no zero-tool option; the harmless test decides, and failure means STOP  [CMD `handoff entry 357 section 4` → "no documented zero-tool subagent"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
