@@ -110489,3 +110489,72 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T20:43:22Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T20:43:22Z  [CMD `date -u +%FT%TZ` → 2026-11-02T20:43:22Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: a4e689af634b511a173706d612905ba43f71164c  [CMD `git rev-parse HEAD` → a4e689af634b511a173706d612905ba43f71164c]
+- tree: 5befde988c8bb123c45cefc40f09fe63e12be129  [CMD `git rev-parse HEAD^{tree}` → 5befde988c8bb123c45cefc40f09fe63e12be129]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: a4e689af634b511a173706d612905ba43f71164c  [CMD `git ls-remote --heads origin` → a4e689af634b511a173706d612905ba43f71164c]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 344  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 344]
+
+### 1. The four states
+
+- physical: unchanged since entry 344 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Orion runs the six-file test kit and returns outcome data for review, because Kai cannot  [CONVERSATION 2026-11-02 Dainius, "I did send but he can’t , can you run the tests and return outcome data for review?"]
+- evidence: plan in section 6; not yet run  [CONVERSATION 2026-11-02 Dainius, "can you run the tests and return outcome data for review?"]
+- admission: none; a run by Orion is producer evidence on a fresh machine, NOT independent execution  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Orion’s 78-case PASS remains producer evidence."]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-11-02 · Kai could not run the six-file kit; Orion is asked to run the tests and return outcome data for review; read as: in the kai-calibration-only Vercel project (the route Dainius approved as "the only way for our team to run those test"), limited to the six files ⚠ UNBANKED  [CONVERSATION 2026-11-02 Dainius, "I did send but he can’t , can you run the tests and return outcome data for review?"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: one sandbox in kai-calibration-only, outbound network deny-all, not persistent, no environment variables, no ports, no repository source, 10-minute timeout; upload only the six files; run version and hash checks, a network known-negative probe, calibrate_t4.py and calibrate_t5.py; return full output; stop the sandbox. HELD: running the census; full repository replay; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md; secrets; repository connection  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "it remains limited to the six-file synthetic calibration set—not the full repository replay or census"]
+
+### 4. Open questions
+
+- Kai's preflight was to come before any test; he could not run it; the preflight checks Orion applies (deny-all network, no env, no repository, ephemeral) are stated and recorded for Kai's review rather than presented as his  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "I’ll check access and preflight before any test"]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- Request not flagged by the ruling-capture hook; banked by hand under R19  [CMD `ruling_capture.py status` → OUTSTANDING=0]
+- EVIDENCE DAINIUS-RUN-REQUEST-345 dainius_345.txt: 86 bytes, sha256 80a487571ebed4f2229ad474b7730f8b3eb81dda36888e4872532e71ee824f69, final LF True (added by Orion)  [CMD `sha256sum dainius_345.txt` → 80a487571ebed4f2…]
+    BEGIN-VERBATIM DAINIUS-RUN-REQUEST-345
+    I did send but he can’t , can you run the tests and return outcome data for review?
+    END-VERBATIM DAINIUS-RUN-REQUEST-345
+
+### 6. Next authorised step
+
+- Create the sandbox as in section 3; upload the six files from the hash-checked bundles; run; collect full logs; stop the sandbox; bank the outcome; report  [CONVERSATION 2026-11-02 Dainius, "return outcome data for review"]
+
+### 7. What I am unsure of
+
+- Whether the default sandbox image has python3 and git; if not, report as is, no workaround that widens network access  [CMD `none yet` → unmeasured]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
