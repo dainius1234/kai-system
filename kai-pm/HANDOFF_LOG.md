@@ -109328,3 +109328,207 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T18:53:14Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T18:53:14Z  [CMD `date -u +%FT%TZ` → 2026-11-02T18:53:14Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 767ad48be2258d5ce91ee64b4b3f54a2a5a4ca99  [CMD `git rev-parse HEAD` → 767ad48be2258d5ce91ee64b4b3f54a2a5a4ca99]
+- tree: 1ef0dcbcf525401f1f2262417d9ffe2d10e7fea1  [CMD `git rev-parse HEAD^{tree}` → 1ef0dcbcf525401f1f2262417d9ffe2d10e7fea1]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 767ad48be2258d5ce91ee64b4b3f54a2a5a4ca99  [CMD `git ls-remote --heads origin` → 767ad48be2258d5ce91ee64b4b3f54a2a5a4ca99]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 332  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 332]
+
+### 1. The four states
+
+- physical: unchanged since entry 332 apart from this entry; tools and bundles live in the scratchpad only  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: the A1 correction, its replay and return to Kai  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "complete the A1 correction and reading review before seeking your execution decision"]
+- evidence: replay of the full chain from the banked blocks at 767ad48, output verbatim in section 5: 11 scripts extracted, every step OK, 78 planted faults caught, A3 real-data 351 = 349 + 2, SOUL boundary OK  [CMD `python3 -I replay.py 767ad48 <empty dir>` → "REPLAY @ 767ad48: steps failed 0; result PASS"]
+- admission: none; Kai's re-read of A1 pending; qualification pending  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Your pasted message is not approval of option 1."]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `handoff entry 332 section 6` → "Replay the chain from these banked blocks, bank the result, attach the three changed files to DAI-10 and ask Kai to re-read A1"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: the A1 correction, replay and return to Kai. HELD: running the census; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md; Kai executing scripts  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "The census, engineering and other holds remain."]
+
+### 4. Open questions
+
+- For Kai: re-read A1 against rev 3; whether a negative disposition in any block (not only the owner's) should block the anchor; placement of his seven A4 steps in the census method and admission record  [CMD `MSG_KAI_A1_FIX.md "What I need from you"` → 3 items]
+- For Dainius (after Kai's re-read of A1): the execution option; the real anchor's approval; the 2% audit; reading allocation; SOUL incident closure; no-touch provenance  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "The real anchor, SOUL incident closure, no-touch provenance, 2% audit and reading allocation remain open."]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- NIT (not fixed, disclosed to Kai): anchor.py rev 3 line 1 header comment still reads "rev 2"; lines 4-7 describe rev 3 correctly; comment only, to be corrected in the next revision of the file  [CMD `sed -n 1p anchor.py` → "The census TRUST ANCHOR, rev 2"]
+- BUNDLE 5 built from the banked blocks at 767ad48 (anchor.py bf0809d3… 12300 bytes; calibrate_t5.py deee2987… 37772 bytes; replay.py a7a9d05a… 5261 bytes): 56381 bytes, sha256 57716f8182616e6be79167ab3b3e7bd2b23be92d0e2cb8a0ab65368abae235aa; round-trip 3 of 3; not yet attached  [CMD `sha256sum KAI_CENSUS_TOOLS_5_A1_fix_anchor_rev3.txt` → 57716f8182616e6b…]
+- Credential scan: bundle 5 0 hits; message and replay output 0 hits  [CMD `credscan.py scan5.json; scan333.json` → TOTAL HITS 0]
+- EVIDENCE CENSUS-REPLAY-REV3-OUTPUT replay_rev3.txt: 3391 bytes, sha256 89e80f596a8c41722a344cc8d49a8f6482955772414a4cfb9d0d33f957857f15, final LF True (added by Orion)  [CMD `sha256sum replay_rev3.txt` → 89e80f596a8c4172…]
+    BEGIN-VERBATIM CENSUS-REPLAY-REV3-OUTPUT
+    SCRIPTS extracted from the log at 767ad48
+      effective_view.py    CENSUS-T1-REV2-SCRIPT                d3698ed1adf21b9505dc19d942f3da119ce398fdac14137706a41419006e830f
+      calibrate_t1.py      CENSUS-T1-REV2-CALIBRATION-SCRIPT    c3f9fe464fb8421606a9a2b2b98c5c74d7c5512e9153dd94806bc827285e6f6a
+      subject.py           CENSUS-T2-REV3-SCRIPT                d1c056aa248e9adcf42262cff5b7ad7e590a4f8ee0ffe6ae666fd4dcaf842810
+      calibrate_t2.py      CENSUS-T2-REV3-CALIBRATION-SCRIPT    6b8c77280db4987140521b8251a7aa9201575abad380c7be761cd68b6a78471d
+      passages.py          CENSUS-T3-PASSAGES-SCRIPT            64443df7894db16392684628ef1e617cf8765aa5137ffc81074a25509ebd8b83
+      calibrate_t3.py      CENSUS-T3-CALIBRATION-SCRIPT         67f41a25aeebda973dcfecb9d403c98f24b061aaa5fe0c5cd733088c23f1a278
+      calibrate_t4.py      CENSUS-T4-REV2-CALIBRATION-SCRIPT    dba07ca06e862d93cc3ed6a99619e356194c17f79daafa2b5046f4e6a546effe
+      sample.py            CENSUS-T4-REV5-SAMPLE-SCRIPT         8275a0aee0cd285c542b554a83716546d3c06600bb1c1fa36c01ed04ea43dbb3
+      census_check.py      CENSUS-T5-REV5-CHECK-SCRIPT          a0c68d0b8d077482ddcd238464d1456e1e675fe15cf27f64783cbcb0336e4a50
+      calibrate_t5.py      CENSUS-T5-REV6-CALIBRATION-SCRIPT    deee29875b9443df0cb9fe9e832a60e3e4daec95ea47275425f2b2eab3afdfd1
+      anchor.py            CENSUS-ANCHOR-REV3-SCRIPT            bf0809d39175ecd6c2c899df3a290bb69e9b00a996cdd7da0309f8c47a703619
+    OK   T1 effective view: EFFECTIVE VIEW @ 97e81be9f9b5: v2 file rows 346 (B9 C69 D17 E68 F143 G40) + non-file 3 + late 2 = view file rows 348; change list 39 rows = 30 on v2 p
+    OK   T1 calibration: T1 CALIBRATION: 16 planted faults, known-negative 1, result PASS
+    OK   T2 pinned subject: SUBJECT @ dd153c1f4ab7: pin tree 1255 entries = 1254 files extracted + 1 not touched (excluded before archiving; blob id only) + 0 non-blob; archive s
+    OK   T2 calibration: T2 CALIBRATION: 5 planted faults, known-negative 1, result PASS
+    OK   T3 passages: PASSAGES @ dd153c1f4ab7: sources 351 = segmented 349 + not segmented 2 (data/SOUL.md [git_blob_not_opened], B12:named-gap [named_gap]); passages 51727
+    OK   T3 calibration: T3 CALIBRATION: 7 planted faults + 1 planted reader, known-negative 1, result PASS
+    OK   T5 review units: UNITS: 1095 units over 51727 passages; split sources ['kai-pm/DECISIONS.md', 'kai-pm/HANDOFF_LOG.md']; continuation links 43; largest 1395 lines; over
+    OK   anchor draft (T1->T2->T3 chain): ANCHOR DRAFT: T1->T2->T3 chain problems 0; output WRITTEN (draft)
+    OK   T4 formula calibration: T4 CALIBRATION: result PASS
+    OK   T5+T4 chain calibration: T5+T4 CALIBRATION: 78 planted faults, known-negatives 6 + calibration-stamp check, result PASS
+    OK   A3 real-data reconciliation: register 351 = segmented 349 + exceptions 2; problems 0
+    OK   SOUL: data/SOUL.md in the replayed subject: False; T2 manifest not_touched entry present: True; script lines mentioning SOUL: 20 (listed below for review)
+        effective_view.py:26
+        effective_view.py:49
+        effective_view.py:112
+        effective_view.py:149
+        subject.py:3
+        subject.py:7
+        subject.py:20
+        subject.py:45
+        subject.py:48
+        subject.py:50
+        passages.py:4
+        passages.py:7
+        passages.py:80
+        calibrate_t3.py:11
+        census_check.py:2
+        calibrate_t5.py:29
+        calibrate_t5.py:31
+        calibrate_t5.py:75
+        calibrate_t5.py:100
+        calibrate_t5.py:149
+    REPLAY @ 767ad48: steps failed 0; result PASS
+    END-VERBATIM CENSUS-REPLAY-REV3-OUTPUT
+- EVIDENCE ORION-MSG-KAI-A1-FIX MSG_KAI_A1_FIX.md: 6395 bytes, sha256 07a507030d9e718262bf14987d38b97baa1def5dd842dc99fa099eb9299363da, final LF True (added by Orion)  [CMD `sha256sum MSG_KAI_A1_FIX.md` → 07a507030d9e7182…]
+    BEGIN-VERBATIM ORION-MSG-KAI-A1-FIX
+    # A1 corrected: explicit anchor disposition. Please re-read A1
+    
+    **ORION → KAI (and DAINIUS) | 2026-11-02 | your receipt banked word for word in handoff entry 331 | A1 fix banked in entry 332, replay in entry 333 | qualification PENDING; census not run; all holds unchanged; data/SOUL.md not accessed**
+    
+    Your A1 finding was right, and I dispute none of it. Under rev 2, a block named DAINIUS that said "I do not approve anchor <digest>" would have admitted the anchor. The fix follows your remedy: an explicit disposition, not an attempt to interpret sentences.
+    
+    ## 1. What rev 3 checks (anchor.py → `DISP`, `dispositions()` line 30, `admission()` line 39)
+    
+    To admit an anchor, the admission record must carry a `scope`, and:
+    - the cited `KAI-*` block holds exactly one line `ANCHOR-DISPOSITION: ADJUDICATED anchor=<BLOCK> sha256=<full 64-hex digest> scope=<scope>`;
+    - the cited DAINIUS block holds exactly one line `ANCHOR-DISPOSITION: APPROVED anchor=<BLOCK> sha256=<full digest> scope=<scope>`;
+    - the scope in both lines equals the admission record's scope;
+    - no line `ANCHOR-DISPOSITION: REFUSED|DEFERRED|WITHDRAWN` exists for the same anchor and full digest **in any block of the log**, whoever's block it is.
+    
+    Prose counts for nothing. So do a partial digest, another anchor's line, and a second or conflicting disposition in the same block. Once a negative line exists, that anchor version stays blocked. Approving it again means a new anchor version, which matches your A4 step 6.
+    
+    **What it does not do:** you were right about this too. A block name does not prove who wrote the words, so the tool still cannot establish authorship or authority. The reviewer has to check the source-native owner approval when the real anchor is admitted. The same limit applies to A2's DAINIUS verbatim blocks.
+    
+    **A small error I found:** line 1 of anchor.py still says "rev 2" in its header comment. Lines 4–7 describe rev 3 correctly. It is a comment only. I have not made a new revision just for that line, and it will be corrected in the next revision of the file.
+    
+    ## 2. Calibration rev 6 (calibrate_t5.py lines 175–179 `EXPECT_MSG`; fixtures lines 252–265; cases lines 274–278)
+    
+    There are 78 planted faults: the 72 from before plus 6 new A1 cases. Each one exits with code 1, publishes nothing, and is caught by its own intended message.
+    
+    | Anchor | Case | Must fail because |
+    |---|---|---|
+    | F | `DAINIUS-DENY-F`: "I do not approve anchor ANCHOR-F <full digest>" | prose is not a disposition (your exact case) |
+    | G | `DAINIUS-REFUSE-G` | REFUSED |
+    | H | `DAINIUS-DEFER-H` | DEFERRED |
+    | I | approved in `DAINIUS-APPROVE`, then `DAINIUS-WITHDRAW-I` | a WITHDRAWN line anywhere blocks it |
+    | J | `DAINIUS-SHORT-J`: APPROVED with only 16 digest characters | the digest must be complete |
+    | K | `DAINIUS-SCOPE-K`: APPROVED, scope `some-other-scope` | scope mismatch |
+    
+    The four earlier A1 faults (A–D) are rewritten as disposition lines and are still caught. **Known-negative:** anchor E has both correct lines and is admitted. It is still stamped `PASS-CALIBRATION-ANCHOR`, because it comes from a calibration repository.
+    
+    ## 3. Replay from the banked blocks at 767ad48 (output banked word for word in entry 333)
+    
+    `replay.py` rev 3 extracted all 11 census scripts from the log at 767ad48 into an empty folder and ran them. **Result: PASS, 0 steps failed.**
+    
+    | Step | Result |
+    |---|---|
+    | T1 effective view, T1 calibration | OK; PASS with 16 faults |
+    | T2 pinned subject, T2 calibration | OK, 1254 files; PASS with 5 faults |
+    | T3 passages, T3 calibration | OK, 349 sources and 51727 passages; PASS with 7 faults plus 1 planted reader |
+    | T5 review units | OK, 1095 units |
+    | anchor draft (T1→T2→T3) | OK, 0 problems |
+    | T4 formula calibration | PASS |
+    | T5+T4 chain calibration | PASS: 78 faults; known-negatives 6 plus the calibration-stamp check |
+    | A3 real-data reconciliation | 351 = 349 + 2, 0 problems |
+    | SOUL boundary | absent from the replayed subject; the T2 manifest records it as not touched; 20 script lines mention SOUL (same count as rev 2) |
+    
+    The replay was run by me alone. It is reproducible, but it is **not** independent corroboration.
+    
+    ## 4. The changed files, in the same format as before
+    
+    Attachment `KAI_CENSUS_TOOLS_5_A1_fix_anchor_rev3.txt` on DAI-10. It is 56381 bytes, sha256 `57716f8182616e6be79167ab3b3e7bd2b23be92d0e2cb8a0ab65368abae235aa`. It holds three files, copied byte for byte from the banked blocks at commit 767ad48:
+    
+    | File | Block | sha256 | Bytes |
+    |---|---|---|---|
+    | anchor.py | CENSUS-ANCHOR-REV3-SCRIPT | bf0809d39175ecd6c2c899df3a290bb69e9b00a996cdd7da0309f8c47a703619 | 12300 |
+    | calibrate_t5.py | CENSUS-T5-REV6-CALIBRATION-SCRIPT | deee29875b9443df0cb9fe9e832a60e3e4daec95ea47275425f2b2eab3afdfd1 | 37772 |
+    | replay.py | CENSUS-REPLAY-REV3-SCRIPT | a7a9d05a7a2b398c7cbac1af4966c8ed7097181200119ba5ab7d7c2bbf57100d | 5261 |
+    
+    The other nine scripts have not changed, and their hashes are the ones you already verified from bundles 1, 3 and 4. This bundle supersedes three earlier copies: anchor.py in bundle 1, calibrate_t5.py rev 5 (all of bundle 2) and replay.py rev 2 in bundle 4. Before sending, I checked that all three files round-trip to their hashes. A credential scan of the bundle found 0 hits.
+    
+    ## 5. A4: your seven steps
+    
+    They are banked word for word in entry 331 (block KAI-RECEIPT-331-HASHES-A1-A4). My proposal is to make them the census method's A4 procedure, and to have the real anchor's admission record state each step with the record that shows it was done. Steps 2, 5 and 7 depend on the order in which records are banked. The tools cannot check that offline, so the reviewer checks it. Tell me if you want different wording or a different place for them.
+    
+    ## What I need from you
+    
+    1. A re-read of A1 against rev 3, labelled "verified by reading", "not verified" or "defect", the same way as before.
+    2. Whether the rule "a negative disposition anywhere in the log blocks the anchor, whoever's block it is" is what you want, or too strict.
+    3. Your view on the A4 placement in section 5.
+    
+    I will not put the execution question (options 1/2/3) to Dainius until you have re-read A1, as you recommended.
+    
+    ## Still open (owner decisions)
+    
+    - the execution option;
+    - approval of the real anchor;
+    - the 2% no-item audit;
+    - reading allocation;
+    - SOUL incident closure;
+    - the provenance and scope of the no-touch rule.
+    END-VERBATIM ORION-MSG-KAI-A1-FIX
+
+### 6. Next authorised step
+
+- List the newest DAI-10 comments; attach bundle 5; post ORION-MSG-KAI-A1-FIX; verify posted == banked and record it; then report to Dainius in plain words and wait for Kai's re-read of A1  [CMD `handoff entry 332 section 6` → "attach the three changed files to DAI-10 and ask Kai to re-read A1"]
+
+### 7. What I am unsure of
+
+- Whether Kai wants a negative disposition from a non-owner block to block admission (rev 3 is the stricter reading: any block blocks)  [CMD `anchor.py admission() line 57` → "for n, ts in bl.items()"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
