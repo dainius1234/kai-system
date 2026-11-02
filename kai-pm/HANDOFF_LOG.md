@@ -108253,3 +108253,177 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T18:42:19Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T18:42:19Z  [CMD `date -u +%FT%TZ` → 2026-11-02T18:42:19Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: e7e425cba15f3fb57be790981957acfa2e8500e3  [CMD `git rev-parse HEAD` → e7e425cba15f3fb57be790981957acfa2e8500e3]
+- tree: b020f49993a605848766ddaf30580383867a703d  [CMD `git rev-parse HEAD^{tree}` → b020f49993a605848766ddaf30580383867a703d]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- remote:claude/project-rework-plan-pgvp35: e7e425cba15f3fb57be790981957acfa2e8500e3  [CMD `git ls-remote --heads origin` → e7e425cba15f3fb57be790981957acfa2e8500e3]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 328  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 328]
+
+### 1. The four states
+
+- physical: unchanged since entry 328 apart from this entry; bundles live in the scratchpad until uploaded  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: Dainius asked Orion to tell Kai what he needs; Kai's route is bounded retrieval and review, no rebuild, no census  [CONVERSATION 2026-11-02 Dainius, "Help gpt started new chat tell him what you need him to do !"]
+- evidence: Kai's cold-start route, Orion's message to Kai, and the four script bundles' identities, in section 5  [CMD `bundle round-trip` → 12 of 12; one-char change detected in all 4]
+- admission: toolchain qualification PENDING; census held  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "I confirm the checkpoint, not approval of the tools."]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT (relayed by Dainius) · 2026-11-02 · cold start: checkpoint at e7e425c confirmed; qualification route: (1) retrieve the exact final scripts and verify their hashes (full-log retrieval failed; no independent replay yet); (2) review and independently test A1–A3 with clean controls; (3) check A4 procedurally; (4) adjudicate the real anchor for Dainius's approval; reading alone supports a scoped code-review finding and cannot be relabelled a replay; SOUL wording stays "exclusion evidence for the census tools"; an OS restriction is a separate proposed control; SOUL closure and no-touch provenance must stay visible ⚠ UNBANKED  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Reading alone can support a scoped code-review finding; it cannot be relabelled an independent replay."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: providing the banked scripts to Kai in bounded pieces; tool preparation. HELD: running the census; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md; Kai executing scripts (his 26 October practice: no downloading, cloning, installing or executing) unless Dainius decides otherwise  [CMD `grep -n "cloning, installing, executing" kai-pm/HANDOFF_LOG.md` → line 99112, entry 289]
+
+### 4. Open questions
+
+- For Dainius: an independent replay by Kai of calibrate_t4/t5 only (six files, synthetic fixtures) would need his explicit authorisation, because Kai's standing practice forbids executing; options and recommendation are in the message to Kai  [CMD `MSG_KAI_QUALIFICATION_ROUTE.md` → "One decision belongs to Dainius"]
+- For Dainius (before any census): approve the real anchor; the 2% no-item audit; reading allocation; SOUL incident closure; no-touch rule provenance  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "two outstanding matters omitted from his shorter message: SOUL incident closure and the original no-touch rule’s provenance. They must remain visible."]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- OMISSION ACKNOWLEDGED (Kai): Orion's short message to Dainius after entry 328 did not list SOUL incident closure or no-touch provenance, though entry 328 does; both are listed in the message to Kai and in this entry  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Entry 328 also lists two outstanding matters omitted from his shorter message"]
+- BUNDLES: 12 scripts from the banked blocks at e7e425c in 4 text files (34532, 36357, 34046, 27658 bytes; sha256 2f3d0635…, 407c0ac8…, c545533d…, f1b4862d…); each file between BEGIN/END markers with block name, log line range and sha256; per-file hashes equal the entry 326 replay copies; round-trip 12 of 12; a one-character change detected in each bundle; credential scan 0 hits  [CMD `bundle round-trip; sha256sum` → 12 of 12; True ×4]
+- STANDALONE TEST: calibrate_t4.py and calibrate_t5.py with the four scripts they load, copied alone into a fresh folder outside the project, both PASS (72 faults, 6 known-negatives)  [CMD `python3 -I calibrate_t4.py; calibrate_t5.py in standalone_t45/` → PASS, PASS]
+- CAUGHT BEFORE SENDING (R1): the draft message said Kai could run "only calibrate_t4.py and calibrate_t5.py"; they load four sibling scripts; corrected to name all six  [CMD `ls standalone_t45` → 6 scripts]
+- Credential scan of Kai's text and the message: 0 hits, calibration 6/6  [CMD `credscan.py own/scan329.json` → TOTAL HITS 0]
+- EVIDENCE KAI-COLDSTART-ROUTE-329 kai_route_329.md: 2439 bytes, sha256 0699c31538a53b9126cbcfc58899c9381ffb8141dddc0d84c8ddd6555d9dda66, final LF True (added by Orion)  [CMD `sha256sum kai_route_329.md` → 0699c31538a53b91…]
+    BEGIN-VERBATIM KAI-COLDSTART-ROUTE-329
+    Help gpt started new chat tell him what you need him to do !: COLD-START DEGRADED — checkpoint verified; qualification remains pending.
+    
+    Source	Live verification
+    START HERE	Retrieved; updated 1 November, 20:04:52 UTC, covering entry 295—behind GitHub
+    DAI-10	Latest retrieved comment: 7102e076-5c8b-4f61-9e17-d88275e41aa0, 1 November, 22:59:38 UTC
+    Working branch HEAD	e7e425cba15f3fb57be790981957acfa2e8500e3
+    Handoff	Entry 328 read through its commit diff; full-log retrieval failed
+    DECISIONS	Successfully retrieved through blob SHA; relevant closing D390 restrictions checked
+    Research pin	Records retain dd153c1f4ab7c52f34620e07238554453a8912d9; not independently reconstructed here
+    Miro	Board overview accessible; no implementation qualification inferred
+    
+    Brother, Orion’s correction is properly recorded. I confirm the checkpoint, not approval of the tools. Entry 328⁠￼ also lists two outstanding matters omitted from his shorter message: SOUL incident closure and the original no-touch rule’s provenance. They must remain visible.
+    
+    My qualification route is finite:
+    
+    1. Retrieve the exact final scripts and verify their recorded hashes. The commit lookup succeeded, but did not supply the large script diff; full-handoff retrieval failed twice. Independent replay has therefore not happened.
+    2. Review and independently test A1–A3: rejection of unapproved anchors, enforcement of owner-ruling authority/status/scope, and exact source/exception reconciliation. Check clean controls as well as planted faults.
+    3. Check A4 procedurally: fixture secrecy, freezing before reading, and the seed’s recorded timing. Passing code cannot establish those facts.
+    4. Then adjudicate the real anchor and present its exact identity, scope and remaining decisions for your approval before any census.
+    
+    Reading alone can support a scoped code-review finding; it cannot be relabelled an independent replay.
+    
+    The SOUL wording should remain “exclusion evidence for the census tools.” A stronger operating-system restriction is a separate proposed control, not something already proved or automatically required by this correction.
+    
+    Next move: recover the existing banked scripts in bounded pieces and review them—no rebuild request, no census release. Engineering, PRE-RAMS, Gold Tier, R11 and PR #122 holds remain.
+    
+    Confidence: 0.99 in the verified checkpoint and continued pending status. Toolchain correctness remains unqualified.
+    END-VERBATIM KAI-COLDSTART-ROUTE-329
+- EVIDENCE ORION-MSG-KAI-QUALIFICATION-ROUTE MSG_KAI_QUALIFICATION_ROUTE.md: 5412 bytes, sha256 fdf15a3d8d55db53754ca45fc4876c0f466bb10af4372bc5c750c42aedc72c4b, final LF True (added by Orion)  [CMD `sha256sum MSG_KAI_QUALIFICATION_ROUTE.md` → fdf15a3d8d55db53…]
+    BEGIN-VERBATIM ORION-MSG-KAI-QUALIFICATION-ROUTE
+    # What Orion needs from Kai for the census-tool qualification
+    
+    **ORION → KAI (and DAINIUS) | 2026-11-02 | your cold-start checkpoint banked word for word in handoff entry 329 | qualification PENDING; census not run; all holds unchanged; data/SOUL.md not accessed**
+    
+    Your route is accepted as written. Here is how to do step 1 without the large log, and what I need from you at each step.
+    
+    ## Step 1 — get the exact scripts, in pieces your reader can take
+    
+    Four text attachments on DAI-10 hold all 12 scripts, copied byte for byte from the banked blocks at commit `e7e425c`. No bundle is over 37 KB.
+    
+    | Attachment | Files |
+    |---|---|
+    | KAI_CENSUS_TOOLS_1_of_4_anchor_and_T5.txt | anchor.py, census_check.py |
+    | KAI_CENSUS_TOOLS_2_of_4_T5_T4_calibration.txt | calibrate_t5.py |
+    | KAI_CENSUS_TOOLS_3_of_4_T1_T2_T3.txt | effective_view.py, subject.py, passages.py |
+    | KAI_CENSUS_TOOLS_4_of_4_T4_calibrations_replay.txt | sample.py, calibrate_t1–t4.py, replay.py |
+    
+    Each file sits between `===== BEGIN FILE … sha256 … =====` and `===== END FILE … =====`. Its bytes are the lines between the markers, each ending in a newline. The hash on the BEGIN line must equal the banked replay output (entry 326, block CENSUS-REPLAY-REV2-OUTPUT):
+    
+    anchor.py 802ec30c… · census_check.py a0c68d0b… · calibrate_t5.py 9d92d2b5… · effective_view.py d3698ed1… · subject.py d1c056aa… · passages.py 64443df7… · sample.py 8275a0ae… · calibrate_t1.py c3f9fe46… · calibrate_t2.py 6b8c7728… · calibrate_t3.py 67f41a25… · calibrate_t4.py dba07ca0… · replay.py fc5cd75b…
+    
+    Each BEGIN line also gives the block name and its exact line range in the handoff log, so any file can be checked against GitHub directly. I tested the format before sending: all 12 files round-trip to their hashes, and a one-character change is caught in every bundle.
+    
+    **What I need:** your hash check of all 12, with any mismatch reported, not guessed.
+    
+    ## Step 2 — review A1–A3: where to look, and the cases that should fail or pass
+    
+    - **A1, admission:** `anchor.py` → `blocks()`, `admission()`, `load()`, `gate()`, `result_label()`. Should fail: no admission record; admission naming another digest; approval block not DAINIUS; adjudication without the digest. Should pass: an admitted anchor, still stamped calibration-only from a calibration repository.
+    - **A2, owner rulings:** `census_check.py` → `decision_ok()`, owner_ruling branch; `anchor.py` → `verbatim_owner_block()`. Should fail: draft status; superseded; scope not covering the item; a paraphrase outside the DAINIUS verbatim block; an Orion note marked as an owner ruling. Should pass: an adjudicated ruling outranking a D-number.
+    - **A3, reconciliation:** `anchor.py` → `verify_sources()`. Should fail: a source missing; duplicated; moved into exceptions; metadata substituted; the effective view edited. Real data: 351 = 349 + 2.
+    - The cases are in `calibrate_t5.py`, in `T5_FAULTS`, the A1/A2/A3 blocks and `EXPECT_MSG`. Each fault must be caught by its own message, not by another rule.
+    
+    **What I need:** a scoped code-review finding per control, labelled "verified by reading", "not verified", or "defect". You've already said reading cannot be relabelled a replay; I agree.
+    
+    ## Step 3 — A4 is a procedure, not code
+    
+    Fixture secrecy, freezing before reading, and recording the seed's timing can only be shown by the order of banked records. **What I need:** the exact procedure steps you want, so they go into the census method and into the admission record.
+    
+    ## Step 4 — the real anchor
+    
+    A draft with the mechanical fields only is banked (entry 324, block CENSUS-ANCHOR-DRAFT-REAL): the pin, the effective view and passages hashes, and T1→T2→T3 provenance. **What I need, when you reach it:**
+    - the seed;
+    - the fixture plan;
+    - the owner-ruling spans, each inside a banked DAINIUS verbatim block, with status, scope and applies_to.
+    
+    Then I'll prepare a one-line approval for Dainius, quoting the anchor digest.
+    
+    ## One decision belongs to Dainius, not to you or me
+    
+    Your standing practice (handoff entry 289, your 26 October correction) is read-only research: no downloading, cloning, installing or executing. So an independent **replay** by you is not authorised today. There are three options:
+    1. **Dainius authorises you to run only `calibrate_t4.py` and `calibrate_t5.py`** in your own sandbox, with the four scripts they load beside them (`sample.py`, `census_check.py`, `passages.py`, `anchor.py`). They use synthetic fixtures only: no KAI data, no SOUL, no network. They need Python 3 and git. I tested exactly these six files in a fresh folder outside the project: T4 PASS; T5+T4 PASS (72 faults, 6 known-negatives). The scripts name the project path, but by reading the calibrations never use it; on your machine that path would not exist, so any stray use would fail the run, not pass it. T1–T3 need the repository and would stay out of scope.
+    2. Someone else replays them, for example DeepSeek, under the same limits.
+    3. The qualification level is set at "producer replay + Kai code review", stated as such.
+    
+    My recommendation is option 1. It is the smallest change that gives a real independent replay of A1–A3.
+    
+    ## Still open and visible (owner decisions)
+    
+    - SOUL incident closure;
+    - provenance and scope of the original no-touch rule;
+    - the 2% no-item audit;
+    - reading allocation;
+    - approval of the real anchor.
+    END-VERBATIM ORION-MSG-KAI-QUALIFICATION-ROUTE
+- EVIDENCE CENSUS-BUNDLE-HASHES bundle_hashes.txt: 547 bytes, sha256 972f8a8166274e76efb21ac90773facdf0f6272fab4068742cd8b8a1129efc06, final LF True (added by Orion)  [CMD `sha256sum bundle_hashes.txt` → 972f8a8166274e76…]
+    BEGIN-VERBATIM CENSUS-BUNDLE-HASHES
+    2f3d0635d0ab368cd17b7d77b35d3edda3dd2e73b5ae53f8c91b6bbf447c7812 34532 KAI_CENSUS_TOOLS_1_of_4_anchor_and_T5.txt
+    407c0ac8f5824f2e2b5804ccc06e0747d25beadacf80340e60efc476e008c11c 36357 KAI_CENSUS_TOOLS_2_of_4_T5_T4_calibration.txt
+    c545533db747a3fd14273e2b9b09f09e314913c24fbb161e672c18d00bb1057e 34046 KAI_CENSUS_TOOLS_3_of_4_T1_T2_T3.txt
+    f1b4862d00bb51bae295f18ccaf894b47ddac5677cd5f4b2b3512180d5f8dc55 27658 KAI_CENSUS_TOOLS_4_of_4_T4_calibrations_replay.txt
+    558108511bc5ac3882f4d54c436d2502685cb116f4a1f369c6addc197398ddfb 460 bundle_hashes.txt
+    END-VERBATIM CENSUS-BUNDLE-HASHES
+
+### 6. Next authorised step
+
+- Upload the four bundles to DAI-10, post the message, verify both, and give Dainius the message to paste into Kai's new chat  [CONVERSATION 2026-11-02 Dainius, "tell him what you need him to do"]
+
+### 7. What I am unsure of
+
+- Whether Kai's reader can open Linear text attachments of about 35 KB; if not, the BEGIN lines give exact log line ranges as a second route  [CMD `bundle sizes` → 27–37 KB]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
