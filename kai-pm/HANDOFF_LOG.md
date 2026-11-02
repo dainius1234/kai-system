@@ -108495,3 +108495,115 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T18:48:30Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T18:48:30Z  [CMD `date -u +%FT%TZ` → 2026-11-02T18:48:30Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 88e1c5b03cb0726843648a895c21343629b8919b  [CMD `git rev-parse HEAD` → 88e1c5b03cb0726843648a895c21343629b8919b]
+- tree: 016f61237a568ef5c201b305da9a987a0a2342df  [CMD `git rev-parse HEAD^{tree}` → 016f61237a568ef5c201b305da9a987a0a2342df]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 88e1c5b03cb0726843648a895c21343629b8919b  [CMD `git ls-remote --heads origin` → 88e1c5b03cb0726843648a895c21343629b8919b]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 330  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 330]
+
+### 1. The four states
+
+- physical: unchanged since entry 330 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: the A1 correction and its calibration under the preparation GO; no execution by Kai  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "complete the A1 correction and reading review before seeking your execution decision"]
+- evidence: Kai's verification receipt and scoped reading review, verbatim in section 5  [CMD `ruling-capture a7c8d4ccef0df31c` → text banked]
+- admission: qualification PENDING; A2 and A3 verified by reading (Kai); A1 defect open; execution not verified and not authorised; census held  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "A1 — anchor admission	Defect remains: approval wording is not validated"]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT (relayed by Dainius) · 2026-11-02 · receipt: the 4 bundle hashes and the 12 script hashes and byte counts match (11 against entry 326, replay.py against entry 325); no script executed; A1 defect: admission() accepts any DAINIUS/KAI-named block that contains the digest prefix, so "I do not approve anchor <digest>" would qualify; remedy: an explicit, independently checked approval disposition tied to the exact anchor and scope, where refusal, deferral, withdrawal and digest-only mentions do not qualify; block names alone cannot establish authorship; A2 and A3 verified by reading; A4 procedure in seven steps (custodian and readers named; fixture plan and seed frozen and banked before reading; anchor bound to population, exceptions, script versions and ruling spans; owner approval of the exact anchor and scope; register frozen before drawing, every draw recorded; any change is a new version; fixture answers revealed only after reading is frozen, misses recorded); finish A1 before the execution decision; the pasted message is not approval of option 1 ⚠ UNBANKED  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Refusal, deferral, withdrawal and digest-only mentions must not qualify."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: the A1 correction and calibration. HELD: running the census; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md; Kai executing scripts  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Your pasted message is not approval of option 1."]
+
+### 4. Open questions
+
+- For Dainius (after the A1 correction): the execution option (1, 2 or 3); the real anchor's approval; the 2% no-item audit; reading allocation; SOUL incident closure; no-touch rule provenance  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "The real anchor, SOUL incident closure, no-touch provenance, 2% audit and reading allocation remain open."]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- READ-BACK COMPLETED BY KAI: the entry 330 gap (stored bytes not read back from this container) is closed by Kai's hash check through the Linear connector  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "his missing read-back is now completed"]
+- CORRECTION OF ORION'S MESSAGE: it said all 12 hashes "must equal the banked replay output (entry 326)"; replay.py's hash is in entry 325, not in entry 326's eleven  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "replay.py matches its separate record in entry 325—it is not among the eleven hashes in entry 326"]
+- Credential scan of the receipt: 0 hits, calibration 6/6  [CMD `credscan.py own/scan331.json` → TOTAL HITS 0]
+- EVIDENCE KAI-RECEIPT-331-HASHES-A1-A4 kai_receipt_331.md: 3856 bytes, sha256 eaf1b7bc47a9e353905c14a0c0f5122935163dd8e0edf81084c5317886f5b398, final LF True (added by Orion)  [CMD `sha256sum kai_receipt_331.md` → eaf1b7bc47a9e353…]
+    BEGIN-VERBATIM KAI-RECEIPT-331-HASHES-A1-A4
+    VERIFICATION RECEIPT — scripts recovered; qualification still pending.
+    
+    * Live branch HEAD: 88e1c5b03cb0726843648a895c21343629b8919b; entry 330 confirmed.
+    * DAI-10⁠￼ comment 7e1968c2-8bd9-4d73-924d-b8cd5f8d8c0d retrieved, posted 2 November, 18:44:29 UTC.
+    * Four bundle hashes: all match. Twelve script hashes and byte counts: all match.
+    * Eleven script hashes match entry 326. replay.py matches its separate record in entry 325—it is not among the eleven hashes in entry 326.
+    * No supplied scripts executed. I used a separate text/hash utility solely to verify the attachments.
+    
+    Brother, the retrieval blocker is resolved. Orion’s attachments came through the Linear connector, so his missing read-back is now completed.
+    
+    My scoped reading review:
+    
+    Control	Finding
+    A1 — anchor admission	Defect remains: approval wording is not validated
+    A2 — owner rulings	Verified by reading: explicit checks for adjudicated status, active state, supersession, span hash, enclosing DAINIUS block and applicable item
+    A3 — source reconciliation	Verified by reading: checks missing, duplicate and extra passage-source identities, unauthorised exceptions, metadata and bound hashes
+    Independent execution	Not verified; not authorised
+    Real-data total 351 = 349 + 2	Still producer-reported; not independently replayed
+    
+    A1 needs one precise correction. In anchor.py → admission(), an approval block qualifies if its name contains DAINIUS and its text contains the first twelve characters of the anchor digest. The adjudication check behaves similarly.
+    
+    Consequently, a correctly named block saying “I do not approve anchor [digest]” would satisfy that text check if an admission record pointed to it. That is a code-level finding from reading, not an executed test. The existing four A1 fault cases do not test it.
+    
+    The remedy is not an AI trying to interpret arbitrary sentences. The admission contract needs an explicit, independently checked approval disposition tied to the exact anchor and scope. Refusal, deferral, withdrawal and digest-only mentions must not qualify. Source-native owner approval must still be verified by the reviewer; block names alone cannot establish authorship or authority.
+    
+    A2’s checks likewise establish consistency with the adjudicated anchor. They do not independently prove that somebody labelled DAINIUS actually supplied the words. That remains part of our anchor review.
+    
+    For A4, these are the procedure steps I recommend recording:
+    
+    1. Name the fixture custodian, census readers and independent reviewers; record who has already seen fixture answers.
+    2. Freeze the fixture plan and seed before census reading or sampling. Bank their identities and timing; keep the fixture answer key inaccessible to readers.
+    3. Bind the approved anchor to the exact source population, exceptions, script versions and adjudicated owner-ruling spans.
+    4. Obtain your explicit approval of that exact anchor version and scope.
+    5. Freeze the completed census register before drawing the sample. Record every attempted draw; no selective redraws.
+    6. Any changed population, seed, fixture plan or governing ruling requires an explicit new version and disposition of affected work.
+    7. Reveal fixture answers only after initial reading is frozen; record misses and corrective review without silently overwriting the original result.
+    
+    My recommendation: complete the A1 correction and reading review before seeking your execution decision. Running the current calibration unchanged would not test the newly identified denial-as-approval case.
+    
+    Your pasted message is not approval of option 1. The census, engineering and other holds remain. The real anchor, SOUL incident closure, no-touch provenance, 2% audit and reading allocation remain open.
+    
+    Confidence: 0.99 in the hash verification and A1 finding; execution behaviour remains untested.
+    END-VERBATIM KAI-RECEIPT-331-HASHES-A1-A4
+
+### 6. Next authorised step
+
+- Correct A1 with an explicit disposition contract (approved/adjudicated only; refusal, deferral, withdrawal, digest-only and scope mismatch fail), calibrate it with the denial-as-approval case, replay from banked blocks, and return the changed files to Kai  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "The admission contract needs an explicit, independently checked approval disposition tied to the exact anchor and scope."]
+
+### 7. What I am unsure of
+
+- Authorship of a DAINIUS block cannot be proved by any tool here; it stays a reviewer's verification of the source, as Kai states  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "block names alone cannot establish authorship or authority"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
