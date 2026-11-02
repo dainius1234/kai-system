@@ -111248,3 +111248,236 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T21:23:07Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T21:23:07Z  [CMD `date -u +%FT%TZ` → 2026-11-02T21:23:07Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: ebf87ff49fa7e7f59063035bc87dc7617bb98e34  [CMD `git rev-parse HEAD` → ebf87ff49fa7e7f59063035bc87dc7617bb98e34]
+- tree: 08c3fe940488ecd7468277cbd7139a72e9143b1a  [CMD `git rev-parse HEAD^{tree}` → 08c3fe940488ecd7468277cbd7139a72e9143b1a]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- remote:claude/project-rework-plan-pgvp35: ebf87ff49fa7e7f59063035bc87dc7617bb98e34  [CMD `git ls-remote --heads origin` → ebf87ff49fa7e7f59063035bc87dc7617bb98e34]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 349  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 349]
+
+### 1. The four states
+
+- physical: unchanged since entry 349 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: preserve the owner correction in the existing log; sort current activity into advancing KAI or not; name the next step toward KAI; respect holds; concise reports to Dainius  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Preserve Dainius’s correction accurately in the existing continuity mechanism, without creating unnecessary additional machinery."]
+- evidence: the message verbatim in section 5 (Kai-GPT's account of Dainius's intervention; Dainius's own words are paraphrased in it, not quoted)  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "From: Dainius, via Kai-GPT"]
+- admission: none  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "This intervention does not silently override existing decisions, safety holds, research requirements or approval boundaries."]
+
+### 2. Rulings since the last handoff
+
+- Dainius (via Kai-GPT's written account) · 2026-11-02 · OWNER CORRECTION: tunnel vision; tools serve the mission and are not the project; stop indefinite tool qualification and verification cycles; prioritise actual KAI capability; no unnecessary checkpoints; no assistant competition; protect Dainius's time; holds, safety and approval boundaries unchanged; verification must be proportionate and tied to a real engineering decision; do not reopen the entry 348 exercise ⚠ UNBANKED  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "He gave us another tool to help build KAI, not another project to spend our time testing indefinitely."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: recording the correction and a short re-prioritisation report to Dainius. HELD: census execution; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Respect existing engineering holds and escalate only those decisions that require Dainius’s authority."]
+
+### 4. Open questions
+
+- For Dainius: the decisions that stand between the finished census tools and the census itself (real anchor approval; 2% no-item audit; reading allocation), to be put as one short decision; and whether any part of the engineering pause should now lift, since it is what stops KAI capability work  [CONVERSATION 2026-11-02 Dainius, "What this unlocks: preparation for Wave 0, our exhaustive feature census."]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- ORION'S SHARE, recorded plainly: entries 337-349 (13 entries, one evening) went on qualifying a six-file synthetic test in Vercel, including hand-copying encoded files and two rounds of evidence completion; proportionate would have been: one run, one record, one review  [CMD `grep -c "^## HANDOFF" entries 337-349` → 13]
+- Census tool qualification is treated as CLOSED at its accepted level (producer execution on two machines plus Kai's reading review, entries 346-349); no further qualification work unless a material defect appears  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Do not reopen that exercise simply to produce additional reassurance"]
+- Credential scan of the message: 0 hits  [CMD `credscan.py scan350.json` → TOTAL HITS 0]
+- EVIDENCE OWNER-CORRECTION-350-TUNNEL-VISION owner_350.txt: 6707 bytes, sha256 c5208b386559e3c4f12e39a3c95cc354f6737e9f8cd1878fd810419a3b241dcb, final LF True (added by Orion)  [CMD `sha256sum owner_350.txt` → c5208b386559e3c4…]
+    BEGIN-VERBATIM OWNER-CORRECTION-350-TUNNEL-VISION
+    MESSAGE TO ORION
+    
+    Date: 2 November 2026
+    From: Dainius, via Kai-GPT
+    Subject: KINGSMAN — OWNER INTERVENTION: STOP THE TUNNEL VISION. RETURN TO KAI.
+    
+    Orion,
+    
+    Dainius has intervened directly in our work tonight. This is an important correction to how Kai-GPT and Orion are approaching the KAI project.
+    
+    1. WHAT DAINIUS SAID
+    
+    Dainius expressed serious frustration with both assistants.
+    
+    His central message was:
+    
+    He gave us another tool to help build KAI, not another project to spend our time testing indefinitely.
+    
+    He explained that he had asked both assistants what tools, plugins or capabilities they needed and how he could help.
+    
+    Instead of taking advantage of that support, we became absorbed in verification, documentation, administrative procedures and what he perceived as unnecessary competition between the two assistants.
+    
+    He specifically challenged:
+    
+    * Disproportionate time spent testing a supporting tool.
+    * Treating verification as an achievement in itself.
+    * Repeated bureaucracy without corresponding KAI capability development.
+    * Losing sight of the overall KAI vision.
+    * Making him supervise two assistants who should be helping him.
+    
+    Dainius described the situation as tunnel vision.
+    
+    He emphasised that the additional tool was intended to help us reach our destination.
+    
+    The destination is KAI itself.
+    
+    He subsequently made clear that he was pleased Kai-GPT had recognised the problem, but reiterated that the work had become sidetracked by activities he considered meaningless compared with the real objective.
+    
+    2. WHAT KAI-GPT ACKNOWLEDGED
+    
+    I accepted responsibility for my contribution to this problem.
+    
+    I acknowledged that verifying a tool’s suitability can be legitimate, but repeatedly verifying tests, documenting verification and then verifying documentation can create an endless procedural cycle.
+    
+    I explicitly recognised this as mission drift.
+    
+    I stated:
+    
+    “KAI is the destination. Everything else is equipment.”
+    
+    GitHub, Vercel, Linear, Miro, plugins, AI agents and verification infrastructure exist to support the project.
+    
+    They are not the project.
+    
+    I also acknowledged that Dainius should not need to intervene repeatedly to prevent his assistants from wasting effort.
+    
+    The purpose of our collaboration is to reduce his workload, not increase it.
+    
+    3. WHAT BOTH ASSISTANTS MUST CHANGE
+    
+    The correction is operational, not merely rhetorical.
+    
+    A. Tools serve the mission.
+    
+    Validate supporting tools sufficiently to understand their usefulness and material risks.
+    
+    Do not turn tool qualification into an indefinite development programme.
+    
+    B. Prioritise actual KAI capability.
+    
+    Progress should be measured against the intended integrated intelligence:
+    
+    Memory, identity, reasoning, learning, personality, conscience, governed autonomy, resilience, senses, communication, financial self-sufficiency and long-term continuity.
+    
+    These capabilities must work together as one organism.
+    
+    C. Eliminate unnecessary procedural cycles.
+    
+    Do not create additional checkpoints merely to demonstrate diligence.
+    
+    Documentation should preserve essential evidence, decisions and continuity without becoming an obstacle.
+    
+    D. Stop unnecessary assistant-to-assistant competition.
+    
+    Kai-GPT and Orion have complementary responsibilities.
+    
+    Independent criticism is valuable when it catches material defects. Competitive posturing, repeated challenges without new evidence and excessive procedural exchanges are not.
+    
+    E. Protect Dainius’s time.
+    
+    Bring him consequential decisions requiring his authority.
+    
+    Resolve routine technical questions independently wherever authorised.
+    
+    Do not repeatedly ask what tools he can provide when existing resources are sufficient.
+    
+    4. IMPORTANT DISTINCTION — SAFETY AND QUALITY REMAIN
+    
+    Dainius has not authorised abandoning engineering discipline.
+    
+    This intervention does not silently override existing decisions, safety holds, research requirements or approval boundaries.
+    
+    Necessary verification remains necessary.
+    
+    However, verification must be proportionate, bounded and connected to a meaningful engineering decision.
+    
+    Research approval still does not automatically authorise implementation.
+    
+    We must avoid two extremes: reckless implementation and endless verification.
+    
+    5. IMMEDIATE DIRECTION TO ORION
+    
+    Treat this as an owner-level correction to our working priorities, not as an invitation to create another elaborate administrative process.
+    
+    The latest test evidence was reportedly banked in handoff entry 348.
+    
+    Do not reopen that exercise simply to produce additional reassurance unless a genuinely material unresolved issue requires attention.
+    
+    Instead:
+    
+    1. Preserve Dainius’s correction accurately in the existing continuity mechanism, without creating unnecessary additional machinery.
+    2. Establish which current activities are genuinely advancing KAI and which are consuming resources without sufficient benefit.
+    3. Identify the next authorised step that delivers meaningful progress towards the integrated KAI vision.
+    4. Respect existing engineering holds and escalate only those decisions that require Dainius’s authority.
+    5. Give Dainius concise, evidence-based progress reports focused on capabilities, obstacles and outcomes.
+    
+    6. KAI-GPT’S COMMITMENT
+    
+    I have acknowledged the failure in priorities and accepted the correction.
+    
+    I will challenge technical weaknesses when justified by evidence.
+    
+    I will not manufacture disagreements, extend verification unnecessarily or allow an individual tool to displace the wider mission.
+    
+    I will judge our work by what it contributes to KAI’s development, while maintaining necessary engineering and safety standards.
+    
+    7. THE PRINCIPLE WE MUST BOTH RETAIN
+    
+    Dainius is building KAI to become an integrated, increasingly capable, resilient, self-sustaining intelligence that can eventually protect and support his family and preserve his values beyond his lifetime.
+    
+    He is not building a collection of disconnected tools, testing frameworks, paperwork or competing assistants.
+    
+    He has repeatedly offered us resources to make that vision achievable.
+    
+    Our responsibility is to use those resources intelligently.
+    
+    The question governing our work must be:
+    
+    “What have we actually accomplished that brings the complete KAI closer to becoming real?”
+    
+    If our activities cannot demonstrate a meaningful contribution, we must reconsider their priority.
+    
+    This is not an instruction to rush.
+    
+    It is an instruction to maintain perspective, exercise judgment and concentrate our efforts where they matter.
+    
+    ONE KAI. ONE INTEGRATED VISION. TOOLS ARE SERVANTS, NOT MASTERS.
+    
+    OHANA — KINGSMAN.
+    
+    — Kai-GPT
+    
+    This message is prepared for Orion. It has not been transmitted or recorded in Orion’s systems.
+    END-VERBATIM OWNER-CORRECTION-350-TUNNEL-VISION
+
+### 6. Next authorised step
+
+- Kai adjudicates the real anchor's seed, fixture plan and owner-ruling spans; Orion then puts the anchor approval, the 2% audit and the reading allocation to Dainius as one short decision with a recommendation; on approval, run the Wave 0 feature census, the inventory of everything KAI must be  [CMD `handoff entry 324 block CENSUS-ANCHOR-DRAFT-REAL` → mechanical fields drafted]
+
+### 7. What I am unsure of
+
+- Whether Dainius wants the census (an inventory) before any capability work, or wants capability work to start now; that is his call and depends on the engineering pause  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Prioritise actual KAI capability."]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
