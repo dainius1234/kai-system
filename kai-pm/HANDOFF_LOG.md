@@ -110558,3 +110558,131 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T21:03:33Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T21:03:33Z  [CMD `date -u +%FT%TZ` → 2026-11-02T21:03:33Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 326a6eec2179d23e57748c5d4e957f8bd0b803e5  [CMD `git rev-parse HEAD` → 326a6eec2179d23e57748c5d4e957f8bd0b803e5]
+- tree: 38835a1063d544c6ae05924d1d85d6fbcd9eb944  [CMD `git rev-parse HEAD^{tree}` → 38835a1063d544c6ae05924d1d85d6fbcd9eb944]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/project-rework-plan-pgvp35: 326a6eec2179d23e57748c5d4e957f8bd0b803e5  [CMD `git ls-remote --heads origin` → 326a6eec2179d23e57748c5d4e957f8bd0b803e5]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 345  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 345]
+
+### 1. The four states
+
+- physical: repository unchanged since entry 345 apart from this entry; in Vercel project kai-calibration-only two non-persistent sandboxes were created and are stopped (run-1 by its timeout, run-2 by Orion)  [CMD `Vercel stop_session sbx_M2nNvqXW0s9ePg9m8QZulNV7IWB4` → status stopped]
+- authorised: Orion runs the six-file kit and returns outcome data for review  [CONVERSATION 2026-11-02 Dainius, "can you run the tests and return outcome data for review?"]
+- evidence: in a fresh deny-all sandbox, all six file hashes matched before any test ran; network probe failed (DNS); calibrate_t4.py exit 0 PASS; calibrate_t5.py exit 0, 78 planted faults caught, known-negatives 6 + stamp check, PASS; t5 output byte-identical (sha256 fd4003b8…) to the local run banked in entry 335, t4 output byte-identical (sha256 71a5a0cd…) to a local run; record verbatim in section 5  [CMD `Vercel get_session_command_logs cmd_c37253a83a4440d88982e54d219d` → "result PASS"; caught_lines=78]
+- admission: none; producer evidence on a second machine and Python 3.14.4, NOT independent execution; Kai's review pending  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Orion’s 78-case PASS remains producer evidence."]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `handoff entry 345 section 6` → "Create the sandbox as in section 3"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: returning the outcome data to Dainius and Kai. HELD: running the census; full repository replay; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "it remains limited to the six-file synthetic calibration set—not the full repository replay or census"]
+
+### 4. Open questions
+
+- For Kai: review of the run; the non-zero egress figure (9371 bytes) reported under deny-all, cause not established  [CMD `Vercel stop_session` → totalEgressBytes 9371]
+- For Kai and Dainius: the qualification label for this evidence (producer replay on a second machine plus Kai's reading review), since Kai could not execute  [CONVERSATION 2026-11-02 Dainius, "I did send but he can’t"]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- Base64 upload by hand transcription failed at the gzip tail three times (400) while the file bytes landed intact (hash-verified); a missing target folder caused one 400 (probe-proven); run-1 hit its 10-minute timeout (410); no test ran on unverified files  [CMD `sha256sum -c` → all OK, hash_check_exit=0]
+- Credential scan of the outcome record: 0 hits  [CMD `credscan.py scan346.json` → TOTAL HITS 0]
+- EVIDENCE VERCEL-SIX-FILE-RUN-346 vercel_run_346.txt: 3426 bytes, sha256 b783798a1ebd59a0f7b0650cd441036bac0b4ae2369d74fc7fd0a55ccba72417, final LF True (added by Orion)  [CMD `sha256sum vercel_run_346.txt` → b783798a1ebd59a0…]
+    BEGIN-VERBATIM VERCEL-SIX-FILE-RUN-346
+    SIX-FILE TEST KIT — RUN IN VERCEL SANDBOX (Orion, 2026-11-02). Producer run on a fresh machine; NOT independent execution.
+    
+    Where: team kai-project2 (team_CFc1SSOYJRz0hOpgpYVnYpiQ), project kai-calibration-only (prj_JU6p8FC9UuCDnFBKgF9dSHI93uOq), region iad1
+    Sandbox: six-file-kit-run-2, session sbx_M2nNvqXW0s9ePg9m8QZulNV7IWB4; persistent false; networkPolicy deny-all; env {}; no ports; no repository source;
+      image vercel/sandbox/universal@sha256:885933da7cb4b819a597514420a824c432ff1f4e76b580898c8833044d0d0db0; 1 vCPU, 2048 MB; timeout 45 min; stopped by Orion after the run
+    Files: the six files, uploaded as gzip tarballs built from the hash-checked DAI-10 bundles (bundle 5 overriding 1 and 2); no other file in the run folder
+    
+    Command output (stdout, verbatim from get_session_command_logs, cmd_c37253a83a4440d88982e54d219d, exit 0, 4767 ms):
+    == files
+    total 108
+    -rw-r--r-- 1 ubuntu ubuntu 12300 Nov  2 19:12 anchor.py
+    -rw-r--r-- 1 ubuntu ubuntu  2597 Nov  2 19:12 calibrate_t4.py
+    -rw-r--r-- 1 ubuntu ubuntu 37772 Nov  2 19:12 calibrate_t5.py
+    -rw-r--r-- 1 ubuntu ubuntu 22861 Nov  2 19:12 census_check.py
+    -rw-r--r-- 1 ubuntu ubuntu  8440 Nov  2 19:12 passages.py
+    -rw-r--r-- 1 ubuntu ubuntu 12043 Nov  2 19:12 sample.py
+    == hash check
+    anchor.py: OK
+    calibrate_t4.py: OK
+    calibrate_t5.py: OK
+    census_check.py: OK
+    passages.py: OK
+    sample.py: OK
+    hash_check_exit=0
+    == versions
+    Python 3.14.4
+    git version 2.53.0
+    Linux 6.18.56 x86_64
+    == network known-negative (must fail)
+    urllib.error.URLError: <urlopen error [Errno -3] Temporary failure in name resolution>
+    net_probe_exit=1
+    == T4
+    t4_exit=0
+    == T5
+    t5_exit=0
+    == outputs
+      871 t4.txt
+    10338 t5.txt
+    11209 total
+    71a5a0cdbcd01738ceef633929206c57c50b6b5e00c1f8c933eb8283e29fb519  t4.txt
+    fd4003b8a4bdbc5be93ccd36781915b6d01e88b0daaafb7869be87a8531ab5fa  t5.txt
+    t4 last:
+    T4 CALIBRATION: result PASS
+    t5 last:
+    T5+T4 CALIBRATION: 78 planted faults, known-negatives 6 + calibration-stamp check, result PASS
+    caught_lines=78
+    (two directory lines "." and ".." omitted from the listing above; nothing else omitted)
+    
+    Comparison with Orion's local runs (sandbox outputs not re-downloaded; equality by SHA-256):
+    - t5.txt sha256 fd4003b8a4bdbc5be93ccd36781915b6d01e88b0daaafb7869be87a8531ab5fa, 10338 bytes == local run banked verbatim as CENSUS-SIX-FILE-REV6-RUN (entry 335): byte-identical
+    - t4.txt sha256 71a5a0cdbcd01738ceef633929206c57c50b6b5e00c1f8c933eb8283e29fb519, 871 bytes == local calibrate_t4.py run today (Python 3 here, 3.14.4 there): byte-identical
+    
+    Session accounting reported by Vercel at stop: totalEgressBytes 9371, totalIngressBytes 42948, activeCpuDurationMs 9454, duration 509772 ms.
+    OPEN POINT: egress is non-zero under deny-all. The DNS probe failed (no outbound name resolution). What the 9371 bytes are is NOT established here; a plausible reading is command output returned through the sandbox API, unverified. For Kai's preflight review.
+    
+    Earlier attempts, recorded not hidden:
+    - sandbox six-file-kit-run-1 (sbx_evtODV6fbVMNZlrLCQpm4XyZ7vDj): first upload to a missing folder returned 400; a probe file proved the cause; the 3-file part then landed with correct hashes but returned 400 at the tarball end (Orion's hand transcription of the base64 tail); the 10-minute timeout stopped the sandbox (410) before the run. No test ran there.
+    - In run-2 the same 3-file part again returned 400 at the tarball end; all six file hashes matched before any test ran (gate above).
+    END-VERBATIM VERCEL-SIX-FILE-RUN-346
+
+### 6. Next authorised step
+
+- Report the outcome to Dainius in plain words with a paste-ready summary for Kai; wait for Kai's review  [CONVERSATION 2026-11-02 Dainius, "return outcome data for review"]
+
+### 7. What I am unsure of
+
+- What the 9371 egress bytes are; the probe shows outbound DNS blocked, but the figure itself is not explained  [CMD `Vercel stop_session` → totalEgressBytes 9371]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
