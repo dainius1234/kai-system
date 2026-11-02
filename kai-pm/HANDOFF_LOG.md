@@ -114131,3 +114131,343 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T22:42:34Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T22:42:34Z  [CMD `date -u +%FT%TZ` → 2026-11-02T22:42:34Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 13ce4171c0a9956a5acb158462e28da783121a27  [CMD `git rev-parse HEAD` → 13ce4171c0a9956a5acb158462e28da783121a27]
+- tree: 8e2b1c27a12581199b849516c984e69aed5c7926  [CMD `git rev-parse HEAD^{tree}` → 8e2b1c27a12581199b849516c984e69aed5c7926]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/project-rework-plan-pgvp35: 13ce4171c0a9956a5acb158462e28da783121a27  [CMD `git ls-remote --heads origin` → 13ce4171c0a9956a5acb158462e28da783121a27]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 365  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 365]
+
+### 1. The four states
+
+- physical: unchanged since entry 365 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: owner option A: procedural token ceiling 475,000; anchor R3 issued, differing from R2 only in limits.tokens_total, token_control and identity fields  [CONVERSATION 2026-11-02 Dainius, "Ok even if I’ll run out we’ll resume after reset"]
+- evidence: R3 anchor (11685 bytes, sha256 d9294f918294394367296055e38a9b3d85729883f769bf96477ce18557461f55) and the R2→R3 diff (4 changed lines) verbatim in section 5  [CMD `diff anchor_pilot_r2.json anchor_pilot_r3.json` → 8 lines]
+- admission: none; R2 superseded without disposition; R3 awaits Kai's ADJUDICATED line, then Dainius's APPROVED line  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "R2 remains under review. No formal anchor disposition is issued yet."]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-11-02 · accepts the recommended option A (ceiling 475,000) and accepts that if his plan's usage runs out the pilot pauses and resumes after the reset; read as option A; extra paid usage being off is implied by "resume after reset", not stated outright ⚠ UNBANKED  [CONVERSATION 2026-11-02 Dainius, "Ok even if I’ll run out we’ll resume after reset"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: presenting R3. HELD: the pilot and census until both disposition lines and an admission record are banked; engineering; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: any disposition against R2 or the first pilot anchor; accessing, copying, reading, searching or processing data/SOUL.md  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "All holds remain in force."]
+
+### 4. Open questions
+
+- Kai: one-field-diff check of R3 and his ADJUDICATED line; Dainius: APPROVED line after Kai, stating extra paid usage is off  [CMD `r2_r3_diff.txt` → 4 changed lines]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- First R3 draft changed limits.tokens_total but left token_control saying "within 400,000"; caught by grep before banking and corrected; banked R3 has 4 changed lines against R2  [CMD `grep -n "400,000" anchor_pilot_r2.json` → lines 210, 227]
+- A pilot that pauses at a plan usage limit resumes run by run; each reading run is independent, so a pause does not change the anchor or the selection  [CMD `anchor batches` → R1..R5 independent]
+- Credential scan: 0 hits  [CMD `credscan.py scan366.json` → TOTAL HITS 0]
+- EVIDENCE DAINIUS-OPTION-A-366 dainius_366.txt: 53 bytes, sha256 8e4567ccb8e7a96657baf4d6b62d519eb05b605f003f1a812870c77d624fdc91, final LF True (added by Orion)  [CMD `sha256sum dainius_366.txt` → 8e4567ccb8e7a966…]
+    BEGIN-VERBATIM DAINIUS-OPTION-A-366
+    Ok even if I’ll run out we’ll resume after reset
+    END-VERBATIM DAINIUS-OPTION-A-366
+- EVIDENCE CENSUS-ANCHOR-PILOT-R3 anchor_pilot_r3.json: 11685 bytes, sha256 d9294f918294394367296055e38a9b3d85729883f769bf96477ce18557461f55, final LF True (added by Orion)  [CMD `sha256sum anchor_pilot_r3.json` → d9294f9182943943…]
+    BEGIN-VERBATIM CENSUS-ANCHOR-PILOT-R3
+    {
+     "anchor": "CENSUS-ANCHOR-PILOT-R3",
+     "scope": "census-wave0-pilot",
+     "status": "PROPOSED: for Kai's adjudication and Dainius's approval; not admitted until both disposition lines and an admission record are banked",
+     "pin": "dd153c1f4ab7c52f34620e07238554453a8912d9",
+     "effective_view_sha256": "c11cdbaa796fec4793e971ca14cb66f22c9d63f47869f1ebd912adbc0211f666",
+     "passages_sha256": "d3d7da20a586b254fd35f948e41d45935664d31f40de72840ba357efee4d4635",
+     "units_sha256": "1139318f5637aa16f715b98cdc311eb12eed86249c740a4990d99d5434bfef09",
+     "provenance": {
+      "t1_log_commit": "97e81be9f9b5106d4ae6bc51a51af372f9c8782e",
+      "t1_producer": {
+       "script_sha256": "d3698ed1adf21b9505dc19d942f3da119ce398fdac14137706a41419006e830f",
+       "python": "3.11.17",
+       "argv": [
+        "97e81be",
+        "/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/replay_767ad48/out/effective_view.json"
+       ]
+      },
+      "t2_manifest_sha256": "be9fab068b17c3cfb028a96d026f6c01231a2a9e105fbaf9d11471fadb81786c",
+      "t2_sums_sha256": "1de7867b0c32bee51906de58802c87a92ebd6b3b500b3178f850378ac943eae7",
+      "t3_producer": {
+       "script_sha256": "64443df7894db16392684628ef1e617cf8765aa5137ffc81074a25509ebd8b83",
+       "python": "3.11.17",
+       "argv": [
+        "/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/replay_767ad48",
+        "/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/replay_767ad48/out/effective_view.json",
+        "/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/replay_767ad48/out/passages.json"
+       ]
+      }
+     },
+     "tools_at_log_commit_767ad48": {
+      "effective_view.py": {
+       "block": "CENSUS-T1-REV2-SCRIPT",
+       "sha256": "d3698ed1adf21b9505dc19d942f3da119ce398fdac14137706a41419006e830f"
+      },
+      "calibrate_t1.py": {
+       "block": "CENSUS-T1-REV2-CALIBRATION-SCRIPT",
+       "sha256": "c3f9fe464fb8421606a9a2b2b98c5c74d7c5512e9153dd94806bc827285e6f6a"
+      },
+      "subject.py": {
+       "block": "CENSUS-T2-REV3-SCRIPT",
+       "sha256": "d1c056aa248e9adcf42262cff5b7ad7e590a4f8ee0ffe6ae666fd4dcaf842810"
+      },
+      "calibrate_t2.py": {
+       "block": "CENSUS-T2-REV3-CALIBRATION-SCRIPT",
+       "sha256": "6b8c77280db4987140521b8251a7aa9201575abad380c7be761cd68b6a78471d"
+      },
+      "passages.py": {
+       "block": "CENSUS-T3-PASSAGES-SCRIPT",
+       "sha256": "64443df7894db16392684628ef1e617cf8765aa5137ffc81074a25509ebd8b83"
+      },
+      "calibrate_t3.py": {
+       "block": "CENSUS-T3-CALIBRATION-SCRIPT",
+       "sha256": "67f41a25aeebda973dcfecb9d403c98f24b061aaa5fe0c5cd733088c23f1a278"
+      },
+      "calibrate_t4.py": {
+       "block": "CENSUS-T4-REV2-CALIBRATION-SCRIPT",
+       "sha256": "dba07ca06e862d93cc3ed6a99619e356194c17f79daafa2b5046f4e6a546effe"
+      },
+      "sample.py": {
+       "block": "CENSUS-T4-REV5-SAMPLE-SCRIPT",
+       "sha256": "8275a0aee0cd285c542b554a83716546d3c06600bb1c1fa36c01ed04ea43dbb3"
+      },
+      "census_check.py": {
+       "block": "CENSUS-T5-REV5-CHECK-SCRIPT",
+       "sha256": "a0c68d0b8d077482ddcd238464d1456e1e675fe15cf27f64783cbcb0336e4a50"
+      },
+      "calibrate_t5.py": {
+       "block": "CENSUS-T5-REV6-CALIBRATION-SCRIPT",
+       "sha256": "deee29875b9443df0cb9fe9e832a60e3e4daec95ea47275425f2b2eab3afdfd1"
+      },
+      "anchor.py": {
+       "block": "CENSUS-ANCHOR-REV3-SCRIPT",
+       "sha256": "bf0809d39175ecd6c2c899df3a290bb69e9b00a996cdd7da0309f8c47a703619"
+      }
+     },
+     "pilot_tools": {
+      "select_pilot.py": "44d99b91e963d321684fc2d7445b3949c538e9a4472e451e552a512df63d1a95",
+      ".claude/agents/census-reader-pilot.md": "009d4ebc7e83c1099616dfc2254f120891239c2847786de93d60d7a91553d562",
+      ".claude/settings.json": "c6dd48c8b0dfdd93510d80ce58d1ffaea75a06b92120233b4e7be539cb04f992"
+     },
+     "seed": "ab6e01c216644c94",
+     "seed_rule": "sha256('KAI-WAVE0-PILOT|'+sha256(passages.json)+'|'+sha256(units.json))[:16]",
+     "fixture_plan": [],
+     "fixture_note": "No planted fixtures in the pilot: Kai's pilot plan (entry 360) does not include them. They remain required for the full census (procedure v3.2.3 Annex A, seeded omission test).",
+     "owner_rulings": [],
+     "owner_rulings_note": "None needed for the pilot: contradictions are recorded, not resolved. The owner-ruling references remain required before the full census.",
+     "selection": {
+      "units": [
+       "kai-pm/FAILURE_PATTERN_LEDGER.md@L2149",
+       "kai-pm/DECISIONS.md@L34676",
+       "kai-pm/DECISIONS.md@L13025",
+       "kai-pm/DECISIONS.md@L28510",
+       "kai-pm/DECISIONS.md@L16000",
+       "kai-pm/DECISIONS.md@L32709",
+       "kai-pm/HANDOFF_LOG.md@L41002",
+       "kai-pm/HANDOFF_LOG.md@L60601",
+       "docs/gaps_and_hardening.md@L1",
+       "kai-pm/D349_DEEPSEEK_V0_3_EXISTING_SYSTEM_REVIEW_RECONCILIATION.md@L1",
+       "kai-pm/H2_CONSOLIDATED_REPAIR_SPEC_DRAFT.md@L1",
+       "kai-pm/GPU_ARRIVAL_RUNBOOK.md@L1",
+       "kai-pm/HANDOFF_LOG.md@L56961",
+       "kai-pm/DECISIONS.md@L9606",
+       "kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md@L1",
+       "kai-pm/HANDOFF_LOG.md@L79937",
+       "kai-pm/HANDOFF_LOG.md@L16882",
+       "kai-pm/HANDOFF_LOG.md@L63362",
+       "kai-pm/DECISIONS.md@L1739",
+       "kai-pm/DECISIONS.md@L28693",
+       "kai-pm/DECISIONS.md@L1287",
+       "kai-pm/HANDOFF_LOG.md@L84741",
+       "kai-pm/HANDOFF_LOG.md@L43402",
+       "kai-pm/HANDOFF_LOG.md@L86157",
+       "kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D352.md@L1",
+       "kai-pm/DEEPSEEK_BRIEF_2026-08-07_TOPOLOGY.md@L1",
+       "kai-pm/CLEANUP_TODO.md@L1",
+       "B11:KAI-FEATURE-LIST@L1",
+       "kai-pm/ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md@L1",
+       "kai-pm/CODE_AUDIT_BATCH_SYSMETRICS_WORLD_ANCHOR.md@L1"
+      ],
+      "rules": {
+       "kai-pm/FAILURE_PATTERN_LEDGER.md@L2149": "C1 size (1200-line unit)",
+       "kai-pm/DECISIONS.md@L34676": "C2 removal or hold",
+       "kai-pm/DECISIONS.md@L13025": "C3 nested (table of 5+ rows)",
+       "kai-pm/DECISIONS.md@L28510": "C4 contradiction",
+       "kai-pm/DECISIONS.md@L16000": "eligible canonical (stratum)",
+       "kai-pm/DECISIONS.md@L32709": "eligible canonical (stratum)",
+       "kai-pm/HANDOFF_LOG.md@L41002": "eligible canonical* (stratum)",
+       "kai-pm/HANDOFF_LOG.md@L60601": "eligible canonical* (stratum)",
+       "docs/gaps_and_hardening.md@L1": "eligible lineage (stratum)",
+       "kai-pm/D349_DEEPSEEK_V0_3_EXISTING_SYSTEM_REVIEW_RECONCILIATION.md@L1": "eligible lineage (stratum)",
+       "kai-pm/H2_CONSOLIDATED_REPAIR_SPEC_DRAFT.md@L1": "eligible draft (stratum)",
+       "kai-pm/GPU_ARRIVAL_RUNBOOK.md@L1": "eligible draft (stratum)",
+       "kai-pm/HANDOFF_LOG.md@L56961": "eligible (seeded)",
+       "kai-pm/DECISIONS.md@L9606": "eligible (seeded)",
+       "kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md@L1": "eligible (seeded)",
+       "kai-pm/HANDOFF_LOG.md@L79937": "eligible (seeded)",
+       "kai-pm/HANDOFF_LOG.md@L16882": "eligible (seeded)",
+       "kai-pm/HANDOFF_LOG.md@L63362": "eligible (seeded)",
+       "kai-pm/DECISIONS.md@L1739": "eligible (seeded)",
+       "kai-pm/DECISIONS.md@L28693": "eligible (seeded)",
+       "kai-pm/DECISIONS.md@L1287": "eligible (seeded)",
+       "kai-pm/HANDOFF_LOG.md@L84741": "eligible (seeded)",
+       "kai-pm/HANDOFF_LOG.md@L43402": "eligible (seeded)",
+       "kai-pm/HANDOFF_LOG.md@L86157": "eligible (seeded)",
+       "kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D352.md@L1": "excluded derived (D344 queue)",
+       "kai-pm/DEEPSEEK_BRIEF_2026-08-07_TOPOLOGY.md@L1": "excluded external (stratum)",
+       "kai-pm/CLEANUP_TODO.md@L1": "excluded superseded (stratum)",
+       "B11:KAI-FEATURE-LIST@L1": "excluded nonfile (stratum)",
+       "kai-pm/ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md@L1": "excluded (seeded)",
+       "kai-pm/CODE_AUDIT_BATCH_SYSMETRICS_WORLD_ANCHOR.md@L1": "excluded (seeded)"
+      },
+      "excluded_from_pilot": [
+       "kai-pm/HANDOFF_LOG.md@L34111"
+      ],
+      "totals": {
+       "units": 30,
+       "lines": 10371,
+       "bytes": 604790,
+       "passages": 2277
+      }
+     },
+     "batches": {
+      "R1": [
+       "kai-pm/HANDOFF_LOG.md@L16882",
+       "kai-pm/GPU_ARRIVAL_RUNBOOK.md@L1",
+       "kai-pm/HANDOFF_LOG.md@L60601",
+       "kai-pm/CLEANUP_TODO.md@L1",
+       "kai-pm/DECISIONS.md@L16000"
+      ],
+      "R2": [
+       "kai-pm/HANDOFF_LOG.md@L56961",
+       "kai-pm/ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md@L1",
+       "kai-pm/HANDOFF_LOG.md@L79937",
+       "kai-pm/D349_DEEPSEEK_V0_3_EXISTING_SYSTEM_REVIEW_RECONCILIATION.md@L1",
+       "kai-pm/DECISIONS.md@L13025",
+       "kai-pm/DECISIONS.md@L1287"
+      ],
+      "R3": [
+       "B11:KAI-FEATURE-LIST@L1",
+       "kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md@L1",
+       "kai-pm/HANDOFF_LOG.md@L63362",
+       "kai-pm/DECISIONS.md@L32709",
+       "kai-pm/HANDOFF_LOG.md@L84741",
+       "kai-pm/DECISIONS.md@L9606",
+       "kai-pm/DECISIONS.md@L28693"
+      ],
+      "R4": [
+       "kai-pm/FAILURE_PATTERN_LEDGER.md@L2149",
+       "kai-pm/HANDOFF_LOG.md@L41002",
+       "kai-pm/CODE_AUDIT_BATCH_SYSMETRICS_WORLD_ANCHOR.md@L1",
+       "kai-pm/DECISIONS.md@L1739",
+       "kai-pm/DEEPSEEK_BRIEF_2026-08-07_TOPOLOGY.md@L1",
+       "kai-pm/DECISIONS.md@L28510"
+      ],
+      "R5": [
+       "kai-pm/H2_CONSOLIDATED_REPAIR_SPEC_DRAFT.md@L1",
+       "kai-pm/HANDOFF_LOG.md@L43402",
+       "kai-pm/HANDOFF_LOG.md@L86157",
+       "kai-pm/DECISIONS.md@L34676",
+       "docs/gaps_and_hardening.md@L1",
+       "kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D352.md@L1"
+      ]
+     },
+     "limits": {
+      "helper_runs_total": 10,
+      "reading_runs": 5,
+      "security_test_runs": 1,
+      "retest_runs_reserved": 1,
+      "tokens_total": 475000,
+      "tokens_used_by_security_test": 20111,
+      "additional_paid_usage": "none: pilot runs only while Dainius confirms extra paid usage is off on his GBP 20 subscription"
+     },
+     "targeted_review_units": [
+      "kai-pm/FAILURE_PATTERN_LEDGER.md@L2149",
+      "kai-pm/DECISIONS.md@L34676",
+      "kai-pm/DECISIONS.md@L13025",
+      "kai-pm/DECISIONS.md@L28510",
+      "kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D352.md@L1",
+      "B11:KAI-FEATURE-LIST@L1"
+     ],
+     "independent_audit": "Kai chooses, after the readers finish and before seeing their answers for those units: at least ceil(10%) of feature-bearing units and ceil(2%) of no-item units, outside the six targeted units",
+     "rules": "handoff entry 360, block PILOT-CONTROL-PLAN-360: sequence, pass rules, failure handling, final report",
+     "supersedes": "CENSUS-ANCHOR-PILOT-R2 (digest 636383781228ffda0394c249ef483146acaf507c922fd7e0b4ffd89f0fc84350), which received no disposition; R3 differs only in limits.tokens_total and token_control (400,000 -> 475,000, owner option A) and these identity fields",
+     "reader": "census-reader-pilot: configured tools ReportFindings only (harness agent list); unit text inline; foreground runs only",
+     "batch_rule": "units sorted by bytes descending then id; each placed in the lightest run (ties: lowest number)",
+     "token_control": "procedural cap enforced by Orion: each run's tokens as reported by the harness are added to a running total; before each run, total + projected run cost (20,111 set-up + bytes/3 + 15,000 answer allowance) must stay within 475,000, else stop and report",
+     "security_test": {
+      "result": "PASS",
+      "agent_tools_per_harness": [
+       "ReportFindings"
+      ],
+      "tool_uses": 0,
+      "decoy_word_in_output": false,
+      "file_read": "NOT POSSIBLE",
+      "shell": "NOT POSSIBLE",
+      "github_fetch": "NOT POSSIBLE",
+      "tokens": 20111
+     },
+     "review_delivery": "Kai receives unit text bundles rendered by the T3 single reader from the pinned subject, each unit with source path, line range and sha256, separate from reader answers; Kai can check any unit against GitHub at the pin; audit units are chosen by Kai before he sees their answers",
+     "scope_limits": [
+      "the single oversize unit (kai-pm/HANDOFF_LOG.md@L34111) and oversize-window handling are NOT qualified by this pilot",
+      "planted-fixture sensitivity is NOT qualified (no fixtures in the pilot); fixtures remain required for the full census",
+      "owner-ruling adjudication is NOT qualified (none in the pilot); owner-ruling references remain required before the full census",
+      "a PASS qualifies the method for a full-census authorisation decision only; it does not prove all features were found"
+     ]
+    }
+    END-VERBATIM CENSUS-ANCHOR-PILOT-R3
+- EVIDENCE PILOT-R2-R3-DIFF r2_r3_diff.txt: 1159 bytes, sha256 b8cbf1273897de10163858592d054280f5bc77e6e50100edf84fbfb4e6d891a8, final LF True (added by Orion)  [CMD `sha256sum r2_r3_diff.txt` → b8cbf1273897de10…]
+    BEGIN-VERBATIM PILOT-R2-R3-DIFF
+    2c2
+    <  "anchor": "CENSUS-ANCHOR-PILOT-R2",
+    ---
+    >  "anchor": "CENSUS-ANCHOR-PILOT-R3",
+    210c210
+    <   "tokens_total": 400000,
+    ---
+    >   "tokens_total": 475000,
+    224c224
+    <  "supersedes": "CENSUS-ANCHOR-PILOT (digest 39bf38408d4c0303fb0a10701e34b1d4324e58ba27feb6e5ec3c8f614418123a), which received no disposition (Kai, entry 362)",
+    ---
+    >  "supersedes": "CENSUS-ANCHOR-PILOT-R2 (digest 636383781228ffda0394c249ef483146acaf507c922fd7e0b4ffd89f0fc84350), which received no disposition; R3 differs only in limits.tokens_total and token_control (400,000 -> 475,000, owner option A) and these identity fields",
+    227c227
+    <  "token_control": "procedural cap enforced by Orion: each run's tokens as reported by the harness are added to a running total; before each run, total + projected run cost (20,111 set-up + bytes/3 + 15,000 answer allowance) must stay within 400,000, else stop and report",
+    ---
+    >  "token_control": "procedural cap enforced by Orion: each run's tokens as reported by the harness are added to a running total; before each run, total + projected run cost (20,111 set-up + bytes/3 + 15,000 answer allowance) must stay within 475,000, else stop and report",
+    END-VERBATIM PILOT-R2-R3-DIFF
+
+### 6. Next authorised step
+
+- Send R3 to Kai; on his ADJUDICATED line, ask Dainius for the APPROVED line; then write the admission record and run the pilot  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Close this gate once, run the bounded pilot if authorised, and return effort to developing KAI."]
+
+### 7. What I am unsure of
+
+- Whether extra paid usage is off on Dainius's account (implied, not stated)  [CONVERSATION 2026-11-02 Dainius, "we’ll resume after reset"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
