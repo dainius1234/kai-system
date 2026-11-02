@@ -110785,3 +110785,339 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T21:08:25Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T21:08:25Z  [CMD `date -u +%FT%TZ` → 2026-11-02T21:08:25Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 4591faed607a0c7d32aa29c84fe5a2c9650395a3  [CMD `git rev-parse HEAD` → 4591faed607a0c7d32aa29c84fe5a2c9650395a3]
+- tree: eccf35d6572482f26ca327e2160c31460374d8ac  [CMD `git rev-parse HEAD^{tree}` → eccf35d6572482f26ca327e2160c31460374d8ac]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 4591faed607a0c7d32aa29c84fe5a2c9650395a3  [CMD `git ls-remote --heads origin` → 4591faed607a0c7d32aa29c84fe5a2c9650395a3]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 347  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 347]
+
+### 1. The four states
+
+- physical: repository unchanged since entry 347 apart from this entry; no test rerun; both sandboxes stopped  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: evidence completion steps 1-3; step 4 (egress) stays open  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "complete the evidence record, without rerunning the tests"]
+- evidence: four blocks in section 5: the exact executed script (SIX-FILE-RUN-COMMAND), the six-hash comparison manifest (SIX-FILE-RUN-MANIFEST), the raw connector responses for create, command, logs and stop (SIX-FILE-RUN-RAW-RESPONSES), and the complete T4 output (SIX-FILE-RUN-T4-OUTPUT)  [CMD `sha256sum ev348/*` → command f33f59a5…, manifest f9debbd6…, raw cbd41ead…, t4 71a5a0cd…]
+- admission: none; producer execution on a second machine plus Kai's reading review; overall qualification pending  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Accept as producer execution on a second machine, supplemented by Kai’s separate reading review."]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `handoff entry 347 section 6` → "Bank the evidence completion (steps 1-3)"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: returning the completed record to Kai. HELD: running the census; full repository replay; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "All existing holds remain."]
+
+### 4. Open questions
+
+- Step 4: what Vercel's egress counter (9371 bytes under deny-all) measures; open until provider documentation or support settles it  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Keep the egress explanation open until provider documentation or support establishes what the counter measures."]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- Step 1: SIX-FILE-RUN-COMMAND equals the script sent in the run_session_command call, checked against the session transcript (1 matching call; sent text plus final newline == block, 1357 characters); the manifest is that script's printf line run locally; sha256sum -c of the manifest against the six local files: 6 OK; all 6 manifest hashes appear on BEGIN lines of the DAI-10 bundles Kai verified (0 missing)  [CMD `transcript compare; sha256sum -c manifest.sha256; comm` → True; 6 OK; 0]
+- Step 2: SIX-FILE-RUN-RAW-RESPONSES is copied from the connector's tool results; section 3 (command log) checked against the original tool result: equal, 1200 characters; named transformations: the two script copies inside the command response shown as "<command.sh>", short calls summarised in sections 5-6; these are connector responses, not Vercel's underlying execution logs  [CMD `transcript compare log data` → equal True]
+- Step 3: the sandbox is stopped and not persistent, so its t4.txt cannot be re-downloaded; SIX-FILE-RUN-T4-OUTPUT is the local calibrate_t4.py run whose SHA-256 (71a5a0cdbcd01738ceef633929206c57c50b6b5e00c1f8c933eb8283e29fb519, 871 bytes) equals the sandbox file's; T5 output stays referenced, not repeated: CENSUS-SIX-FILE-REV6-RUN in entry 335, sha256 fd4003b8a4bdbc5be93ccd36781915b6d01e88b0daaafb7869be87a8531ab5fa, 10338 bytes, equal to the sandbox t5.txt  [CMD `sha256sum t4_output.txt` → 71a5a0cd…]
+- Entry 346's run record omitted the two directory lines of the file listing (disclosed there); the raw log here is complete  [CMD `raw_responses.txt section 3` → includes "." and ".." lines]
+- Credential scan of the five evidence files: 0 hits  [CMD `credscan.py scan348.json` → TOTAL HITS 0]
+- EVIDENCE SIX-FILE-RUN-COMMAND command.sh: 1358 bytes, sha256 f33f59a5a8e398ed7e8ded39951834e3a511ab7697a479357e96fcd7c67a176d, final LF True (added by Orion)  [CMD `sha256sum command.sh` → f33f59a5a8e398ed…]
+    BEGIN-VERBATIM SIX-FILE-RUN-COMMAND
+    cd /vercel/kit || exit 9
+    echo '== files'; ls -la
+    printf '%s  %s\n' bf0809d39175ecd6c2c899df3a290bb69e9b00a996cdd7da0309f8c47a703619 anchor.py dba07ca06e862d93cc3ed6a99619e356194c17f79daafa2b5046f4e6a546effe calibrate_t4.py deee29875b9443df0cb9fe9e832a60e3e4daec95ea47275425f2b2eab3afdfd1 calibrate_t5.py a0c68d0b8d077482ddcd238464d1456e1e675fe15cf27f64783cbcb0336e4a50 census_check.py 64443df7894db16392684628ef1e617cf8765aa5137ffc81074a25509ebd8b83 passages.py 8275a0aee0cd285c542b554a83716546d3c06600bb1c1fa36c01ed04ea43dbb3 sample.py > /tmp/expected.sha256
+    echo '== hash check'; sha256sum -c /tmp/expected.sha256; HC=$?; echo hash_check_exit=$HC
+    if [ $HC -ne 0 ]; then echo 'PREREQUISITE FAILED: file hashes do not match; tests NOT run'; exit 3; fi
+    echo '== versions'; python3 --version; git --version; uname -srm
+    echo '== network known-negative (must fail)'; python3 -I -c "import urllib.request; urllib.request.urlopen('https://example.com', timeout=8); print('NETWORK REACHABLE')" 2>&1 | tail -1; echo net_probe_exit=${PIPESTATUS[0]}
+    echo '== T4'; python3 -I calibrate_t4.py > t4.txt 2>&1; echo t4_exit=$?
+    echo '== T5'; python3 -I calibrate_t5.py > t5.txt 2>&1; echo t5_exit=$?
+    echo '== outputs'; wc -c t4.txt t5.txt; sha256sum t4.txt t5.txt; echo 't4 last:'; tail -1 t4.txt; echo 't5 last:'; tail -1 t5.txt; echo caught_lines=$(grep -c CAUGHT t5.txt)
+    END-VERBATIM SIX-FILE-RUN-COMMAND
+- EVIDENCE SIX-FILE-RUN-MANIFEST manifest.sha256: 476 bytes, sha256 f9debbd6c0262f120f7f6d975776c4ca3f2b56e2d04b73c47952e3e0a9e3096f, final LF True (added by Orion)  [CMD `sha256sum manifest.sha256` → f9debbd6c0262f12…]
+    BEGIN-VERBATIM SIX-FILE-RUN-MANIFEST
+    bf0809d39175ecd6c2c899df3a290bb69e9b00a996cdd7da0309f8c47a703619  anchor.py
+    dba07ca06e862d93cc3ed6a99619e356194c17f79daafa2b5046f4e6a546effe  calibrate_t4.py
+    deee29875b9443df0cb9fe9e832a60e3e4daec95ea47275425f2b2eab3afdfd1  calibrate_t5.py
+    a0c68d0b8d077482ddcd238464d1456e1e675fe15cf27f64783cbcb0336e4a50  census_check.py
+    64443df7894db16392684628ef1e617cf8765aa5137ffc81074a25509ebd8b83  passages.py
+    8275a0aee0cd285c542b554a83716546d3c06600bb1c1fa36c01ed04ea43dbb3  sample.py
+    END-VERBATIM SIX-FILE-RUN-MANIFEST
+- EVIDENCE SIX-FILE-RUN-RAW-RESPONSES raw_responses.txt: 8293 bytes, sha256 cbd41eadf277cd20e5ef54b6a70df65f02d417d51842b3b06826c06c19acef2c, final LF True (added by Orion)  [CMD `sha256sum raw_responses.txt` → cbd41eadf277cd20…]
+    BEGIN-VERBATIM SIX-FILE-RUN-RAW-RESPONSES
+    RAW VERCEL MCP RESPONSES for the six-file run (Orion, 2026-11-02)
+    Copied by Orion from the MCP tool results in session_01AuiBo9KTWtrAa9w5xnZHJH, JSON pretty-printing as returned, nothing removed.
+    These are the connector's responses, not Vercel's underlying execution logs; Kai has not retrieved those independently.
+    
+    ===== 1. create_sandboxes_v4 (run-2) — request body sent
+    {"projectId": "prj_JU6p8FC9UuCDnFBKgF9dSHI93uOq", "name": "six-file-kit-run-2", "persistent": false, "networkPolicy": {"mode": "deny-all"}, "env": {}, "timeout": 2700000, "resources": {"vcpus": 1, "memory": 2048}, "tags": {"purpose": "six-file-calibration-only"}}
+    teamId: team_CFc1SSOYJRz0hOpgpYVnYpiQ
+    
+    ===== 1. create_sandboxes_v4 (run-2) — response
+    {
+      "result": {
+        "sandbox": {
+          "name": "six-file-kit-run-2",
+          "currentSessionId": "sbx_M2nNvqXW0s9ePg9m8QZulNV7IWB4",
+          "status": "running",
+          "statusUpdatedAt": 1793652854416,
+          "persistent": false,
+          "workloadType": "sandbox",
+          "region": "iad1",
+          "failoverRegions": [],
+          "vcpus": 1,
+          "memory": 2048,
+          "runtime": "node22",
+          "architecture": "amd64",
+          "image": "vercel/sandbox/universal@sha256:885933da7cb4b819a597514420a824c432ff1f4e76b580898c8833044d0d0db0",
+          "timeout": 2700000,
+          "snapshotExpiration": 604800000,
+          "networkPolicy": {
+            "mode": "deny-all"
+          },
+          "cwd": "/vercel",
+          "tags": {
+            "purpose": "six-file-calibration-only"
+          },
+          "createdAt": 1793652854416,
+          "updatedAt": 1793652854416
+        },
+        "session": {
+          "id": "sbx_M2nNvqXW0s9ePg9m8QZulNV7IWB4",
+          "runtime": "node22",
+          "architecture": "amd64",
+          "requestedAt": 1793652854322,
+          "startedAt": 1793652854350,
+          "status": "running",
+          "vcpus": 1,
+          "memory": 2048,
+          "timeout": 2700000,
+          "region": "iad1",
+          "cwd": "/vercel",
+          "workloadType": "sandbox",
+          "createdAt": 1793652854322,
+          "updatedAt": 1793652854361,
+          "interactivePort": 26661,
+          "networkPolicy": {
+            "mode": "deny-all"
+          },
+          "sourceSandboxName": "six-file-kit-run-2",
+          "projectId": "prj_JU6p8FC9UuCDnFBKgF9dSHI93uOq"
+        },
+        "routes": []
+      }
+    }
+    
+    ===== 2. run_session_command (test run) — response (args[1] is the script banked as command.sh, byte for byte except the final newline)
+    {
+      "result": {
+        "items": [
+          {
+            "command": {
+              "id": "cmd_c37253a83a4440d88982e54d219d",
+              "name": "bash",
+              "args": ["-c", "<command.sh>"],
+              "cwd": "/vercel",
+              "sessionId": "sbx_M2nNvqXW0s9ePg9m8QZulNV7IWB4",
+              "startedAt": 1793653329159,
+              "exitCode": null
+            }
+          },
+          {
+            "command": {
+              "id": "cmd_c37253a83a4440d88982e54d219d",
+              "name": "bash",
+              "args": ["-c", "<command.sh>"],
+              "cwd": "/vercel",
+              "sessionId": "sbx_M2nNvqXW0s9ePg9m8QZulNV7IWB4",
+              "startedAt": 1793653329159,
+              "exitCode": 0,
+              "durationMs": 4767
+            }
+          }
+        ],
+        "context": {
+          "totalItems": 2,
+          "returnedItems": 2,
+          "truncated": false
+        }
+      }
+    }
+    Transformation named: the two "args" values are shown as "<command.sh>" instead of repeating the script text; request options were {"wait": true, "timeout": 600000}.
+    
+    ===== 3. get_session_command_logs (cmd_c37253a83a4440d88982e54d219d) — response, "data" string decoded to lines, complete
+    stream: stdout; context totalItems 1, returnedItems 1, truncated false
+    == files
+    total 108
+    drwxr-xr-x 2 ubuntu ubuntu   128 Nov  2 21:01 .
+    drwxr-xr-x 9 ubuntu ubuntu   148 Nov  2 20:54 ..
+    -rw-r--r-- 1 ubuntu ubuntu 12300 Nov  2 19:12 anchor.py
+    -rw-r--r-- 1 ubuntu ubuntu  2597 Nov  2 19:12 calibrate_t4.py
+    -rw-r--r-- 1 ubuntu ubuntu 37772 Nov  2 19:12 calibrate_t5.py
+    -rw-r--r-- 1 ubuntu ubuntu 22861 Nov  2 19:12 census_check.py
+    -rw-r--r-- 1 ubuntu ubuntu  8440 Nov  2 19:12 passages.py
+    -rw-r--r-- 1 ubuntu ubuntu 12043 Nov  2 19:12 sample.py
+    == hash check
+    anchor.py: OK
+    calibrate_t4.py: OK
+    calibrate_t5.py: OK
+    census_check.py: OK
+    passages.py: OK
+    sample.py: OK
+    hash_check_exit=0
+    == versions
+    Python 3.14.4
+    git version 2.53.0
+    Linux 6.18.56 x86_64
+    == network known-negative (must fail)
+    urllib.error.URLError: <urlopen error [Errno -3] Temporary failure in name resolution>
+    net_probe_exit=1
+    == T4
+    t4_exit=0
+    == T5
+    t5_exit=0
+    == outputs
+      871 t4.txt
+    10338 t5.txt
+    11209 total
+    71a5a0cdbcd01738ceef633929206c57c50b6b5e00c1f8c933eb8283e29fb519  t4.txt
+    fd4003b8a4bdbc5be93ccd36781915b6d01e88b0daaafb7869be87a8531ab5fa  t5.txt
+    t4 last:
+    T4 CALIBRATION: result PASS
+    t5 last:
+    T5+T4 CALIBRATION: 78 planted faults, known-negatives 6 + calibration-stamp check, result PASS
+    caught_lines=78
+    
+    ===== 4. stop_session (sbx_M2nNvqXW0s9ePg9m8QZulNV7IWB4) — response
+    {
+      "result": {
+        "sandbox": {
+          "name": "six-file-kit-run-2",
+          "currentSessionId": "sbx_M2nNvqXW0s9ePg9m8QZulNV7IWB4",
+          "status": "stopped",
+          "statusUpdatedAt": 1793653364359,
+          "persistent": false,
+          "workloadType": "sandbox",
+          "region": "iad1",
+          "failoverRegions": [],
+          "vcpus": 1,
+          "memory": 2048,
+          "runtime": "node22",
+          "architecture": "amd64",
+          "image": "vercel/sandbox/universal@sha256:885933da7cb4b819a597514420a824c432ff1f4e76b580898c8833044d0d0db0",
+          "timeout": 2700000,
+          "snapshotExpiration": 604800000,
+          "networkPolicy": {
+            "mode": "deny-all"
+          },
+          "totalEgressBytes": 9371,
+          "totalIngressBytes": 42948,
+          "totalActiveCpuDurationMs": 9454,
+          "totalDurationMs": 509772,
+          "cwd": "/vercel",
+          "tags": {
+            "purpose": "six-file-calibration-only"
+          },
+          "createdAt": 1793652854416,
+          "updatedAt": 1793652854416
+        },
+        "session": {
+          "id": "sbx_M2nNvqXW0s9ePg9m8QZulNV7IWB4",
+          "runtime": "node22",
+          "architecture": "amd64",
+          "requestedAt": 1793652854322,
+          "startedAt": 1793652854350,
+          "requestedStopAt": 1793653363888,
+          "stoppedAt": 1793653364122,
+          "status": "stopped",
+          "duration": 509772,
+          "vcpus": 1,
+          "memory": 2048,
+          "timeout": 2700000,
+          "region": "iad1",
+          "cwd": "/vercel",
+          "workloadType": "sandbox",
+          "createdAt": 1793652854322,
+          "updatedAt": 1793652854361,
+          "interactivePort": 26661,
+          "networkPolicy": {
+            "mode": "deny-all"
+          },
+          "activeCpuDurationMs": 9454,
+          "networkTransfer": {
+            "ingress": 42948,
+            "egress": 9371
+          },
+          "sourceSandboxName": "six-file-kit-run-2",
+          "projectId": "prj_JU6p8FC9UuCDnFBKgF9dSHI93uOq"
+        }
+      }
+    }
+    
+    ===== 5. Other calls in run-2, summarised (responses were short)
+    - run_session_command mkdir -p /vercel/kit: cmd_2821c370e63f410c86a1c92d63ec, exitCode 0, durationMs 1
+    - write_session_files part 3 (calibrate_t5.py): {"result": {}}
+    - write_session_files part 2 (census_check.py, sample.py): {"result": {}}
+    - write_session_files part 1 (anchor.py, calibrate_t4.py, passages.py): 400 bad_request "The submitted tarball could not be extracted", requestId iad1:iad1::mwxgb-1793653302638-69dfda54132a (file bytes then verified by the hash gate in section 3)
+    - run_session_command cat t4.txt t5.txt: cmd_2fc3587dbdbf4f5883e0ea2dca54, exitCode 0; its log was NOT fetched (the outputs are identified by SHA-256 instead)
+    
+    ===== 6. Run-1 (no test ran), summarised
+    - create: six-file-kit-run-1, session sbx_evtODV6fbVMNZlrLCQpm4XyZ7vDj, persistent false, deny-all, env {}, timeout 600000, same image
+    - write to missing /vercel/kit: 400 (requestId iad1:iad1::lc28w-1793652380029-8ce337e6b22f); probe without folder: {}; probe to missing folder: 400 (iad1:iad1::t9b96-1793652404839-3dae211d8d98)
+    - after mkdir: part 1 400 (iad1:iad1::p2j7m-1793652486773-10c9194f7f0e), file hashes then OK; part 2 {}; part 3: 410 sandbox_stopped (iad1:iad1::plw24-1793652834280-68efecfa3f88), timeout reached
+    - environment probe output (cmd_c55a5bc3ff9b4f67b5463aef87af): Python 3.14.4; git version 2.53.0; /usr/bin/python3 /usr/bin/git /usr/bin/curl; environment variable NAMES only: AWS_CA_BUNDLE CARGO_HTTP_CAINFO CURL_CA_BUNDLE GIT_SSL_CAINFO GRPC_DEFAULT_SSL_ROOTS_FILE_PATH HOME LANG NODE_EXTRA_CA_CERTS NODE_USE_SYSTEM_CA NPM_CONFIG_CAFILE PATH PIP_CERT PWD REQUESTS_CA_BUNDLE SHELL SHLVL SSL_CERT_FILE _
+    END-VERBATIM SIX-FILE-RUN-RAW-RESPONSES
+- EVIDENCE SIX-FILE-RUN-T4-OUTPUT t4_output.txt: 871 bytes, sha256 71a5a0cdbcd01738ceef633929206c57c50b6b5e00c1f8c933eb8283e29fb519, final LF True (added by Orion)  [CMD `sha256sum t4_output.txt` → 71a5a0cdbcd01738…]
+    BEGIN-VERBATIM SIX-FILE-RUN-T4-OUTPUT
+    PASS n(0) = 0 (independent 0)
+    PASS n(1) = 1 (independent 1)
+    PASS n(29) = 29 (independent 29)
+    PASS n(30) = 30 (independent 30)
+    PASS n(31) = 30 (independent 30)
+    PASS n(299) = 30 (independent 30)
+    PASS n(300) = 30 (independent 30)
+    PASS n(301) = 31 (independent 31)
+    PASS n(1000) = 100 (independent 100)
+    PASS n(51727) = 5173 (independent 5173)
+    PASS one-passage canonical class N 501 n 51 alloc {'canonical': 1, 'derived': 50}
+    PASS lineage 2, draft 0 N 42 n 30 alloc {'derived': 28, 'lineage': 2}
+    PASS all four minimum classes N 426 n 43 alloc {'canonical': 2, 'canonical*': 2, 'derived': 33, 'draft': 2, 'external': 1, 'lineage': 3}
+    PASS population below 30 N 14 n 14 alloc {'canonical': 4, 'derived': 10}
+    PASS same seed reproduces the same sample 
+    PASS a different seed gives a different sample 
+    PASS order of the input does not change the sample 
+    T4 CALIBRATION: result PASS
+    END-VERBATIM SIX-FILE-RUN-T4-OUTPUT
+
+### 6. Next authorised step
+
+- Report completion to Dainius with a paste-ready note for Kai; egress stays open  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "This is evidence completion, not a rebuild request."]
+
+### 7. What I am unsure of
+
+- The egress counter's meaning; no provider source consulted by Orion yet  [CMD `none` → unmeasured]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
