@@ -109901,3 +109901,72 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T20:28:48Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T20:28:48Z  [CMD `date -u +%FT%TZ` → 2026-11-02T20:28:48Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 5b96ee8d51ff047ba4447585548377e81a95019b  [CMD `git rev-parse HEAD` → 5b96ee8d51ff047ba4447585548377e81a95019b]
+- tree: abcaf2c204fa49e9cb31b25ddc70fb0f4f7bb611  [CMD `git rev-parse HEAD^{tree}` → abcaf2c204fa49e9cb31b25ddc70fb0f4f7bb611]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 5b96ee8d51ff047ba4447585548377e81a95019b  [CMD `git ls-remote --heads origin` → 5b96ee8d51ff047ba4447585548377e81a95019b]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 336  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 336]
+
+### 1. The four states
+
+- physical: unchanged since entry 336 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: create one empty Vercel project "kai-calibration-only" (or reuse it if it exists), with no repository, deployment, secrets or KAI change; return team ID and project ID; stop on permission error  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Give him this exact instruction: create one empty Vercel project named “kai-calibration-only” in your intended team."]
+- evidence: instruction verbatim in section 5; not yet acted on  [CMD `ruling_capture 79d9dcd185b32379` → flagged]
+- admission: none; Kai will check access and preflight before any test; creating the project proves no isolation  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "creating the project alone does not prove the isolation we need"]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT (relayed by Dainius; authorship inferred from the text, which addresses Dainius about Orion) · 2026-11-02 · Orion may try, with Dainius's permission, to create one empty Vercel project "kai-calibration-only" in the intended team; no repository connected, nothing deployed, no secrets, no KAI change; reuse it if it exists; return team ID and project ID and confirm no repository or deployment attached; on permission denial report the exact error and stop; Kai then checks access and preflight before any test ⚠ UNBANKED  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Do not connect a repository, deploy anything, add secrets, or change KAI."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: the single Vercel project step above, nothing more. HELD: running the census; running any test in Vercel until Kai's preflight; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md; connecting a repository; adding secrets  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "If permission is denied, report the exact error and stop."]
+
+### 4. Open questions
+
+- Which Vercel team is "intended": to be resolved from the connection's team list; ask Dainius if more than one team qualifies  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "in your intended team"]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- Instruction captured by the ruling-capture hook and banked before acting; credential scan 0 hits  [CMD `credscan.py scan337.json` → TOTAL HITS 0]
+- EVIDENCE KAI-VERCEL-PROJECT-INSTRUCTION-337 vercel_instr_337.txt: 741 bytes, sha256 6da9f89886f48901ea05dbf98f9941dd0a186151368b6f06503e50290dcf5bd6, final LF True (added by Orion)  [CMD `sha256sum vercel_instr_337.txt` → 6da9f89886f48901…]
+    BEGIN-VERBATIM KAI-VERCEL-PROJECT-INSTRUCTION-337
+    I’ll check what Orion can do through that connection. Yes —he can try with your permission. His Vercel connection may have different rights from mine, so it might still fail. Give him this exact instruction: create one empty Vercel project named “kai-calibration-only” in your intended team. Do not connect a repository, deploy anything, add secrets, or change KAI. If that project already exists, use it rather than creating another. Return the team ID and project ID, and confirm that no repository or deployment is attached. If permission is denied, report the exact error and stop. After he reports back, I’ll check access and preflight before any test, because creating the project alone does not prove the isolation we need.
+    END-VERBATIM KAI-VERCEL-PROJECT-INSTRUCTION-337
+
+### 6. Next authorised step
+
+- List Vercel teams and projects; create or reuse "kai-calibration-only" with no repository; confirm no link and no deployments; record IDs in the next entry; report to Dainius for Kai  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Return the team ID and project ID, and confirm that no repository or deployment is attached."]
+
+### 7. What I am unsure of
+
+- Whether the paste itself is Dainius's permission; read as such because he relayed the instruction to Orion in answer to the yes/no question  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Yes —he can try with your permission."]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
