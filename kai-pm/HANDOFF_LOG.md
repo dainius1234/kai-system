@@ -112454,3 +112454,112 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T22:12:53Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T22:12:53Z  [CMD `date -u +%FT%TZ` → 2026-11-02T22:12:53Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 882a149ca8c165d47015b93f28909a0d3f5bd19f  [CMD `git rev-parse HEAD` → 882a149ca8c165d47015b93f28909a0d3f5bd19f]
+- tree: 2707fe17ec0405b990bb8e80575fd9e13f9f6bff  [CMD `git rev-parse HEAD^{tree}` → 2707fe17ec0405b990bb8e80575fd9e13f9f6bff]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 882a149ca8c165d47015b93f28909a0d3f5bd19f  [CMD `git ls-remote --heads origin` → 882a149ca8c165d47015b93f28909a0d3f5bd19f]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 359  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 359]
+
+### 1. The four states
+
+- physical: unchanged since entry 359 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: prepare one exact anchor package for the 30-unit pilot, presenting the seven required elements and one owner approval line; not to run the pilot  [CONVERSATION 2026-11-02 Dainius, "Your next authorised task is to prepare the exact anchor package, not to run the pilot."]
+- evidence: the full pilot control plan verbatim in section 5 (written section 8 plus a dictated restatement of points 1-7)  [CMD `ruling_capture ca84e8e689f8c20b` → flagged]
+- admission: none; pilot not authorised  [CONVERSATION 2026-11-02 Dainius, "Execution not approved. Do not treat this as authorization to run the pilot."]
+
+### 2. Rulings since the last handoff
+
+- Dainius (relaying Kai-GPT's plan, approved as the execution-control framework in entry 359) · 2026-11-02 · pilot control plan: executor Orion, independent adjudicator Kai-GPT, final authority Dainius; exactly 30 distinct units of the 1,095, deterministic and documented before execution; ceilings 10 helper runs, 400,000 tokens, £25 additional paid usage, with spend shown measurable and controllable; sequence prepare → approve → security test → execute → verify → decide, no stage after a failed prerequisite; mix 20 eligible (canonical, lineage, draft), 6 excluded or non-feature, 4 challenging; at least 6 units with targeted high-risk review; independent audit of at least 10% of feature-bearing and 2% of no-item units, rounded up, chosen independently; pass rules (decoy denial test, full coverage, exact quotes and identifiers, rules for nested, removals, holds and excluded-class statements, no material omission found by independent review, automated checks pass, spend inside limits, uncertainty recorded); failure handling (one correction for a minor bounded defect; stop without retry on security breach, uncontrolled spend or fundamental feature loss; a second failure stops the pilot); one concise final report; data/SOUL.md never accessed; SOUL denial must be proven before any census reading ⚠ UNBANKED  [CONVERSATION 2026-11-02 Dainius, "Prepare one exact anchor package for independent review and my explicit approval."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: anchor package preparation only. HELD: security test, pilot and census execution until Dainius approves the anchor; engineering; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying, reading, searching or processing data/SOUL.md  [CONVERSATION 2026-11-02 Dainius, "data/SOUL.md must not be accessed, copied, read, searched or processed."]
+
+### 4. Open questions
+
+- None new; the package will state what it can and cannot prove  [CONVERSATION 2026-11-02 Dainius, "Present this as one complete approval package, with a clear owner approval line."]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- Credential scan: 0 hits  [CMD `credscan.py scan360.json` → TOTAL HITS 0]
+- EVIDENCE PILOT-CONTROL-PLAN-360 plan_360.txt: 5850 bytes, sha256 856769068dec965ceafd2869696ae9b0345c10518a44d8b8cbc4f5a197a42f37, final LF True (added by Orion)  [CMD `sha256sum plan_360.txt` → 856769068dec965c…]
+    BEGIN-VERBATIM PILOT-CONTROL-PLAN-360
+    The supporting machine-readable evidence must remain available for audit.
+    
+    Dainius should not need to examine thousands of lines of technical logs to make the decision.
+    
+    ⸻
+    
+    8. Final instruction to Orion
+    
+    The execution-control framework is approved.
+    
+    Your next authorised task is to prepare the exact anchor package, not to run the pilot.
+    
+    The package must establish:
+    
+    1. Exactly what Dainius is being asked to approve.
+    2. The fixed 30-unit selection and reproducible selection method.
+    3. The spending allowance and proof of enforceable controls.
+    4. The reader-access restrictions and harmless security-decoy test.
+    5. The independent review allocation and feasibility.
+    6. The pass/fail rules and permitted correction boundary.
+    7. The exact anchor identifier, source revisions, digest and approval scope.
+    
+    Present this as one complete approval package, with a clear owner approval line.
+    
+    Do not introduce additional administrative stages unless a material defect or mandatory safety requirement justifies them.
+    
+    All KAI engineering holds remain in force.
+    
+    Research preparation does not authorise engineering, deployment, PRE-RAMS, Gold Tier, R11 or merging PR #122.
+    
+    data/SOUL.md must not be accessed, copied, read, searched or processed.
+    
+    Mission priority: The census is supporting infrastructure. Its purpose is to prevent loss of KAI’s intended features so we can advance development of the complete integrated organism.
+    
+    The inspection process must never become the project itself.
+    
+    OHANA — ONE ORGANISM. ZERO SILENT FEATURE LOSS. ZERO ENDLESS LOOPS.
+    
+    ⸻
+    
+    My assessment: This gives Orion the missing instructions without changing your original authorisation. The next meaningful decision is whether the exact anchor is acceptable—not whether to start another planning exercise.   to Orion — thirty-chunk pilot control plan. Handoff entry three five nine, commit eight eight two A one four nine. Execution not approved. Do not treat this as authorization to run the pilot. Prepare one exact anchor package for independent review and my explicit approval. One, current verified position for this plan was recorded by Kai as follows: branch claude/project-rework-plan-p g v p thirty five, with HEAD nine f nine b seven caf one five six d six b three e three a a two five e e three three three six zero four a e e b eight four eight e a a d, latest checked handoff entry three five eight dated two November twenty twenty-six, DAI-ten latest retrieved comment zero f nine two f e two four dated two November twenty twenty-six at six fifty-four p m UTC. Research pin previously recorded as d d one five three c one, f four a b seven c five two, f three four six two zero e zero seven two three eight five five four four five three a eight nine one two d nine. Start Here timestamp one November twenty twenty-six at eight-o-four p m UTC, full content was unavailable. Decisions text not retrieved. Miro was not inspected. Recheck live HEAD and relevant decisions when preparing the anchor. Orion has added a data soul dot m d access denial rule, but its effectiveness for helper agents is unproven. That boundary must be proven before any census reading. Two, exact assignment. Responsible executor is Orion. Independent adjudicator is Kai GPT. Final authority is Dainius. Exactly thirty distinct census units from the one thousand ninety-five-unit population reported by Orion’s replay. Selection must be deterministic, reproducible, and documented before execution. Maximum ten helper runs, four hundred thousand tokens, and twenty-five pounds additional paid usage as proposed ceilings. Orion must show spend can be measured and controlled. Three, sequence is prepare, approve, security test, execute, verify, decide. No stage starts if its prerequisite fails. Four, selection mix is twenty from eligible canonical, lineage, and draft sources, six from excluded or non-feature classes, and four challenging cases like nested features, removals, contradictions, or unusual size. At least six units get targeted high-risk review. Independent audit checks at least ten percent of feature-bearing units and two percent of no-item units, rounded up and chosen independently. Five, pass requires all of the following: the harmless decoy denial test passes with no access to soul dot md, all thirty selected units are fully reviewed with no silent skips, every extracted capability has an exact source quotation and identifier, nested behaviors, removals, holds, and excluded-class statements are handled per approved rules, independent review finds no material omission or misclassification, automated structure, quotation, and consistency checks pass, spend stays inside limits, and uncertainty or contradictions are recorded, not hidden. Passing qualifies the method for a full-census authorization decision only; it does not prove all features are found. Six, if anything fails: minor bounded defect gets one correction and limited retest; material security breach, uncontrolled spend, or fundamental feature loss stops immediately with no retry; a second failed attempt stops the pilot. No new testing program without separate authority. Seven, final report is one concise decision report with coverage, feature count, omissions, security result, validation, spend, problems and verdict. Evidence remains available. Dainius should not need to read thousands of lines. Orion, your task now is only to prepare the exact anchor package proving spend control, selection, access restrictions, decoy test, and independent review allocation. All holds remain, including engineering, PRE-RAMS, Gold Tier, R eleven, and PR one-two-two; data/soul dot md must not be accessed. Mission priority is preserving intended KAI capabilities while advancing development, not building endless inspection machinery. Zero silent feature loss, zero endless loops.
+    END-VERBATIM PILOT-CONTROL-PLAN-360
+
+### 6. Next authorised step
+
+- Build the anchor package: deterministic 30-unit selection, spend measurement and control, access boundary and decoy test design, review allocation, pass/fail rules, anchor identity and digest; bank; present one approval line  [CONVERSATION 2026-11-02 Dainius, "Present this as one complete approval package"]
+
+### 7. What I am unsure of
+
+- Whether the £25 paid-usage ceiling can be measured from inside this session (token counts are visible per helper run; money is not)  [CONVERSATION 2026-11-02 Dainius, "Orion must show spend can be measured and controlled."]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
