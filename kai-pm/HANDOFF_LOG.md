@@ -110338,3 +110338,85 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T20:38:27Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T20:38:27Z  [CMD `date -u +%FT%TZ` → 2026-11-02T20:38:27Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 4487637b2b2d24a91c9051ab9d4cc5638f81406c  [CMD `git rev-parse HEAD` → 4487637b2b2d24a91c9051ab9d4cc5638f81406c]
+- tree: dfef040a2dfe45c043c794f2ef9cbba5f9fbc6f2  [CMD `git rev-parse HEAD^{tree}` → dfef040a2dfe45c043c794f2ef9cbba5f9fbc6f2]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 4487637b2b2d24a91c9051ab9d4cc5638f81406c  [CMD `git ls-remote --heads origin` → 4487637b2b2d24a91c9051ab9d4cc5638f81406c]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 342  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 342]
+
+### 1. The four states
+
+- physical: repository unchanged since entry 342 apart from this entry; one Vercel project created outside the repository: kai-calibration-only (prj_JU6p8FC9UuCDnFBKgF9dSHI93uOq) in team kai-project2 (team_CFc1SSOYJRz0hOpgpYVnYpiQ)  [CMD `Vercel create_project` → id prj_JU6p8FC9UuCDnFBKgF9dSHI93uOq]
+- authorised: the single find-or-create step  [CONVERSATION 2026-11-02 Dainius, "Approved, go ahead and create the project"]
+- evidence: team access worked after Dainius approved on Vercel's screen; 0 projects existed; project created with name only; 0 deployments; 0 environment variables; no repository link in the returned fields; exact responses in section 5  [CMD `Vercel list_deployments; filter_project_envs` → count 0; envs []]
+- admission: none; isolation not established; Kai's access check and preflight next  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "creating the project alone does not prove the isolation we need"]
+
+### 2. Rulings since the last handoff
+
+- None; Dainius reported completing the Vercel approval  [CONVERSATION 2026-11-02 Dainius, "Done"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: reporting the IDs to Kai via Dainius; nothing further on Vercel. HELD: running any test in the project until Kai's preflight; running the census; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md; connecting a repository; adding secrets  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Do not connect a repository, deploy anything, add secrets, or change KAI."]
+
+### 4. Open questions
+
+- For Kai: access check and preflight of kai-calibration-only before any test  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "After he reports back, I’ll check access and preflight before any test"]
+- For Dainius: own-words confirmation that he approves Kai running the six-file test kit (option 1)  [CMD `handoff entry 341 section 4` → to be confirmed]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- "No repository attached" is bounded: the create request had no gitRepository and get_project's returned fields show no link; the tool may not return every field  [CMD `Vercel get_project` → no link field in output]
+- Credential scan of the result record: 0 hits  [CMD `credscan.py scan343.json` → TOTAL HITS 0]
+- EVIDENCE VERCEL-PROJECT-RESULT-343 vercel_project_343.txt: 1588 bytes, sha256 3d4c4df7c46fdd663b05f8be4a0ea7a6397c255057c474bb8112e92b4b183cb5, final LF True (added by Orion)  [CMD `sha256sum vercel_project_343.txt` → 3d4c4df7c46fdd66…]
+    BEGIN-VERBATIM VERCEL-PROJECT-RESULT-343
+    VERCEL PROJECT RESULT (Orion, 2026-11-02, after Dainius approved team consent on Vercel's screen and said "Done")
+    
+    1. list_projects (teamId team_CFc1SSOYJRz0hOpgpYVnYpiQ, limit 50) -> {"projects": [], "pagination": {"count": 0}}   (access now works; no existing kai-calibration-only to reuse)
+    2. create_project (teamId team_CFc1SSOYJRz0hOpgpYVnYpiQ, requestBody {"name": "kai-calibration-only"}; nothing else sent: no gitRepository, no environmentVariables, no framework)
+       -> id prj_JU6p8FC9UuCDnFBKgF9dSHI93uOq, name kai-calibration-only, accountId team_CFc1SSOYJRz0hOpgpYVnYpiQ, createdAt 1793651861341,
+          nodeVersion 26.x, live false, latestDeployment null, domains [], passwordProtection disabled, ssoProtection enabled (all_except_custom_domains), trustedIps disabled
+    3. get_project prj_JU6p8FC9UuCDnFBKgF9dSHI93uOq -> same fields; updatedAt 1793651861549; live false; latestDeployment null; domains []; the returned fields contain no repository link field
+    4. list_deployments (projectId prj_JU6p8FC9UuCDnFBKgF9dSHI93uOq, limit 20) -> {"deployments": [], "pagination": {"count": 0}}
+    5. filter_project_envs prj_JU6p8FC9UuCDnFBKgF9dSHI93uOq -> {"envs": [], "hiddenProductionEnvCount": 0}
+    6. list_projects (team, limit 50) -> count 1: prj_JU6p8FC9UuCDnFBKgF9dSHI93uOq kai-calibration-only
+    
+    Limits: "no repository" rests on (a) the create request carrying no gitRepository and (b) get_project's returned fields showing no link; the MCP may not return every project field. Isolation for testing is NOT established by this; Kai's access check and preflight come next. KAI unchanged.
+    END-VERBATIM VERCEL-PROJECT-RESULT-343
+
+### 6. Next authorised step
+
+- Report team ID and project ID to Dainius for Kai; wait for Kai's access check and preflight  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Return the team ID and project ID, and confirm that no repository or deployment is attached."]
+
+### 7. What I am unsure of
+
+- Whether Kai's Vercel connection can see this team; it returned 404 earlier  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "my connection returned 404 “Team not found”"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
