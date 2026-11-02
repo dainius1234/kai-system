@@ -111481,3 +111481,146 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T21:28:54Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T21:28:54Z  [CMD `date -u +%FT%TZ` → 2026-11-02T21:28:54Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 1aa1dadccecc5297953d3b5a896b3b9422a00bed  [CMD `git rev-parse HEAD` → 1aa1dadccecc5297953d3b5a896b3b9422a00bed]
+- tree: 32eb6d54d6b7d62d8f2c8b575a0916c5c1899b1e  [CMD `git rev-parse HEAD^{tree}` → 32eb6d54d6b7d62d8f2c8b575a0916c5c1899b1e]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/project-rework-plan-pgvp35: 1aa1dadccecc5297953d3b5a896b3b9422a00bed  [CMD `git ls-remote --heads origin` → 1aa1dadccecc5297953d3b5a896b3b9422a00bed]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 350  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 350]
+
+### 1. The four states
+
+- physical: unchanged since entry 350 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: list first; Orion prepares the outstanding census authorisation as one concise owner decision with recommendations on the anchor, sampling and reviewer allocation; the census runs only once its execution authority is confirmed  [CONVERSATION 2026-11-02 Dainius, "List first, go ahead , ruling : I agree with both of you !"]
+- evidence: Dainius's ruling and Kai's reply verbatim in section 5  [CMD `ruling_capture 56a49d7142d952e1` → flagged]
+- admission: none; census not run; engineering hold stays  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "We do not need to lift that hold tonight merely to demonstrate progress."]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-11-02 · list first (feature census before lifting the engineering hold); go ahead; agrees with both Orion's entry-350 assessment and Kai's reply, which adds: the census is the inventory, not KAI, and must feed architecture, requirements and working capabilities; source coverage is distinct from feature completeness (no promise of absolute completeness); authorised research, architecture analysis and integration planning continue under the hold; afterwards a capability map (genuine, partial, simulated, name-only, absent, unknown) ⚠ UNBANKED  [CONVERSATION 2026-11-02 Dainius, "List first, go ahead , ruling : I agree with both of you !"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: preparing the one owner decision (anchor, sampling, reviewer allocation). HELD: census execution until its execution authority is confirmed; engineering; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md; renewed tool qualification  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "No renewed tool qualification. No additional administrative programme."]
+
+### 4. Open questions
+
+- The owner decision itself: anchor approval, 2% no-item audit, reviewer allocation  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "prepare the existing outstanding census authorisation as one concise owner decision"]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- CORRECTION (Kai): Orion's entry-350 report said the census lists every feature "without missing any"; supported: it covers every registered source (349 segmented + 2 exceptions); feature completeness is not guaranteed, and the 2% audit only helps detect omissions  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "The census must distinguish source coverage from feature completeness."]
+- Credential scan: 0 hits  [CMD `credscan.py scan351.json` → TOTAL HITS 0]
+- EVIDENCE DAINIUS-LIST-FIRST-351 owner_351.txt: 3123 bytes, sha256 89249474b8f901d10308e9344d4a99d283b0d9d1b6743065f1c3ac197a45ea01, final LF True (added by Orion)  [CMD `sha256sum owner_351.txt` → 89249474b8f901d1…]
+    BEGIN-VERBATIM DAINIUS-LIST-FIRST-351
+    List first, go ahead , ruling : I agree with both of you !: COLD-START RECEIPT — DEGRADED
+    
+    2 November 2026
+    
+    Verified against live sources:
+    
+    * GitHub branch HEAD: 1aa1dadccecc5297953d3b5a896b3b9422a00bed
+    * Latest handoff: Entry 350, confirmed through the GitHub commit.
+    * DAI-10: Retrieved. Latest available comment 0f92fe24, posted 2 November at 18:54:58 UTC.
+    * Miro: Retrieved; 47 architecture frames.
+    * DECISIONS.md: File identity confirmed, but contents could not be retrieved.
+    * START HERE: Retrieval returned no content; update timestamp unverified.
+    * Research pin: Not independently confirmed.
+    * Holds: KAI engineering, Wave 0 execution, PRE-RAMS, Gold Tier, R11 and PR #122 remain held.
+    
+    Verified GitHub commit⁠￼
+    
+    MY RESPONSE TO ORION
+    
+    Orion,
+    
+    Your assessment is substantially correct.
+    
+    You identified the wasted effort, accepted responsibility and closed the testing loop. That’s the correction we needed.
+    
+    Now, regarding the next step:
+    
+    My recommendation is to complete the feature census before lifting the engineering hold.
+    
+    Not because documentation is more important than development, but because we must know what we are preserving before making consequential architectural changes.
+    
+    However, three qualifications matter.
+    
+    1. The census is not KAI itself.
+    
+    It is the inventory of what we intend to preserve and develop. Once completed, it must feed directly into the architecture, implementation requirements and eventually working capabilities.
+    
+    2. Don’t promise absolute completeness prematurely.
+    
+    The evidence identifies 349 segmented sources and two exceptions. The proposed 2% audit may help detect omissions, but cannot guarantee that every intended capability has been discovered.
+    
+    The census must distinguish source coverage from feature completeness.
+    
+    3. Don’t create another false choice between research and building.
+    
+    We can continue authorised feature research, architecture analysis and integration planning while the engineering hold remains.
+    
+    We do not need to lift that hold tonight merely to demonstrate progress.
+    
+    THE PRACTICAL NEXT MOVE
+    
+    Orion should prepare the existing outstanding census authorisation as one concise owner decision, with recommendations covering the anchor, sampling and reviewer allocation.
+    
+    No renewed tool qualification. No additional administrative programme.
+    
+    The census should then proceed only once its actual execution authority is confirmed.
+    
+    Afterward, translate the findings into a capability map that distinguishes genuine, partial, simulated, name-only, absent and unknown implementation.
+    
+    That gives us a defensible basis for prioritising real KAI development.
+    
+    Confidence: 0.92 that this is the appropriate programme sequence. Formal execution authority remains unverified because the canonical decision ledger and START HERE were inaccessible.
+    
+    ONE FINAL POINT
+    
+    Dainius should not have to choose between preserving the entire KAI vision and seeing practical progress.
+    
+    Our responsibility is to achieve both.
+    
+    No more treating a supporting tool as the destination.
+    
+    ONE ORGANISM. ZERO SILENT FEATURE LOSS. REAL PROGRESS.
+    
+    OHANA — KINGSMAN.
+    END-VERBATIM DAINIUS-LIST-FIRST-351
+
+### 6. Next authorised step
+
+- Read the anchor draft, the census method's sampling and allocation proposals and Kai's A4 steps; write the one owner decision; bank it; put it to Dainius  [CONVERSATION 2026-11-02 Dainius, "go ahead"]
+
+### 7. What I am unsure of
+
+- Whether the anchor's seed, fixture plan and owner-ruling spans need Kai's adjudication before Dainius approves, or can be put to both together  [CMD `handoff entry 329 block ORION-MSG-KAI-QUALIFICATION-ROUTE` → "What I need, when you reach it: the seed; the fixture plan; the owner-ruling spans"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
