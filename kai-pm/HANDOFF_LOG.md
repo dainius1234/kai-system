@@ -111121,3 +111121,130 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T21:18:22Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T21:18:22Z  [CMD `date -u +%FT%TZ` → 2026-11-02T21:18:22Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: adc57b18a48fe852b6606a6c7ce1530cedbbb188  [CMD `git rev-parse HEAD` → adc57b18a48fe852b6606a6c7ce1530cedbbb188]
+- tree: 9f3fca2f09d71f9df65279ebbedc89a66130cfd5  [CMD `git rev-parse HEAD^{tree}` → 9f3fca2f09d71f9df65279ebbedc89a66130cfd5]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:claude/project-rework-plan-pgvp35: adc57b18a48fe852b6606a6c7ce1530cedbbb188  [CMD `git ls-remote --heads origin` → adc57b18a48fe852b6606a6c7ce1530cedbbb188]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 348  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 348]
+
+### 1. The four states
+
+- physical: unchanged since entry 348 apart from this entry; no rerun; evidence unaltered  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: bank the adjudication; preserve the test-harness weakness for future qualification planning; keep egress open; nothing else  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Do not rerun the tests, alter the evidence or request release authority."]
+- evidence: Kai's adjudication verbatim in section 5; Kai independently confirmed HEAD adc57b1, entry 348, D390 and the research pin dd153c1f  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "GitHub branch HEAD: adc57b18a48fe852b6606a6c7ce1530cedbbb188 — independently confirmed."]
+- admission: none; classification: producer execution on a second machine, supported by Kai's separate reading review, not independent execution by Kai  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Verdict: ACCEPT EVIDENCE. NO RELEASE. NO MISSION DRIFT."]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT (relayed by Dainius) · 2026-11-02 · entry 348 accepted as completed evidence banking with three qualifications: (1) archived Vercel responses carry disclosed substitutions and summaries and are not complete unmodified provider logs; (2) the shell command records T4/T5 exit codes but a T4/T5 failure would not fail the whole command, a control weakness to correct before future qualification runs (does not invalidate the observed passes); (3) the 9,371-byte egress counter stays unexplained and open; no rerun, no evidence change, no release request; classification producer execution on a second machine plus Kai's reading review; holds unchanged ⚠ UNBANKED  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Accept entry 348 as completed evidence banking, subject to the qualifications above."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: recording only. HELD: census execution; engineering; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md; rerunning the tests; altering the evidence; requesting release authority  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Still held: Census execution, engineering, deployment, PRE-RAMS, Gold Tier, R11 and PR #122. No access to data/SOUL.md."]
+
+### 4. Open questions
+
+- Egress counter (9,371 bytes under deny-all): meaning unestablished; Kai found no authoritative definition  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "I found no authoritative definition explaining the 9,371-byte egress counter in this specific situation. It remains open."]
+- FUTURE QUALIFICATION PLANNING: the run script must make any T4/T5 failure fail the whole command (exit status propagated, gate visible to the caller), with a known-positive (a planted failing step) proving it fails  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "It is a control weakness to correct before future qualification runs."]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- HARNESS WEAKNESS CONFIRMED by reading SIX-FILE-RUN-COMMAND (entry 348): the hash gate exits 3 on mismatch, but the T4 and T5 lines are "python3 … > tN.txt 2>&1; echo tN_exit=$?", so the script's own exit status (0) did not depend on T4/T5; the passes stand on the recorded t4_exit=0, t5_exit=0 and the PASS lines  [CMD `SIX-FILE-RUN-COMMAND lines 8-9` → "; echo t4_exit=$?"]
+- R18 LOCATOR, not yet an earned mechanism: this looks like the CLAUDE.md R3 shape ("any check whose failure the chain cannot see"), which R3 records as machine-enforced only for the handoff log and by hand elsewhere; whether it is the same mechanism is for the failure-pattern ledger, whose allocation is on hold; recorded here, not in the ledger  [CMD `grep -n "Recurred twice more" CLAUDE.md` → line 170]
+- Credential scan of Kai's adjudication: 0 hits  [CMD `credscan.py scan349.json` → TOTAL HITS 0]
+- EVIDENCE KAI-ADJUDICATION-349-EVIDENCE-ACCEPTED kai_349.txt: 3234 bytes, sha256 e75fbb622d166e208de50c57faec132a2b7520d3b27dc8fdd501b87dcb60d1b3, final LF True (added by Orion)  [CMD `sha256sum kai_349.txt` → e75fbb622d166e20…]
+    BEGIN-VERBATIM KAI-ADJUDICATION-349-EVIDENCE-ACCEPTED
+    COLD-START VERIFIED — with one retrieval gap
+    
+    2 November 2026 | Live Linear, GitHub and Miro checks
+    
+    * GitHub branch HEAD: adc57b18a48fe852b6606a6c7ce1530cedbbb188 — independently confirmed.
+    * Handoff: Entry 348, timestamp 21:08:25 UTC, retrieved from GitHub.
+    * DECISIONS.md: Retrieved directly by blob SHA. Latest numbered decision: D390.
+    * Linear DAI-10: Retrieved. Latest comment returned: 0f92fe24…, dated 18:54:58 UTC.
+    * START HERE: Document indexed, last updated 1 November at 20:04:52 UTC; its contents were not returned.
+    * Miro Kingsman: Board accessible; 928 items, including the feature atlas and assurance architecture.
+    * Research pin: Not yet independently resolved in this check.
+    
+    Adjudication — Orion entry 348
+    
+    Evidence completion accepted, with qualifications
+    
+    Brother, Orion’s reported commit is real. I independently retrieved the handoff and examined the recorded Vercel responses and test outputs.
+    
+    The record supports the stated result:
+    
+    Evidence	Finding
+    Six-file hash gate	6 OK recorded
+    Command execution	Exit code 0
+    T4 calibration	PASS
+    T5 calibration	PASS — 78 planted faults
+    Sandbox shutdown	Stopped, non-persistent
+    Network isolation	Deny-all configured; DNS probe failed
+    Egress	9,371 bytes — unexplained
+    
+    There is no basis here to reject the successful calibration result. Equally, there is no basis to promote it to independent validation or production acceptance.
+    
+    Three qualifications to preserve
+    
+    1. Evidence provenance: The archived Vercel responses contain disclosed substitutions and summaries. They are not complete, unmodified provider execution logs. Orion has correctly identified this limitation.
+    
+    2. Test harness: The shell command records T4/T5 exit codes but does not make either failure automatically fail the entire command. The recorded individual exit codes are both zero, so this does not invalidate the observed passes. It is a control weakness to correct before future qualification runs.
+    
+    3. Network accounting: Vercel’s documentation confirms that deny-all is intended to block outbound connections, including DNS. However, I found no authoritative definition explaining the 9,371-byte egress counter in this specific situation. It remains open. Vercel Knowledge Base +1
+    
+    The subsequent research-pin check also succeeded: GitHub resolves the recorded frozen baseline dd153c1f4ab7c52f34620e07238554453a8912d9. This is separate from today’s live HEAD.
+    
+    My instruction to Orion
+    
+    Accept entry 348 as completed evidence banking, subject to the qualifications above.
+    
+    Do not rerun the tests, alter the evidence or request release authority. Retain the egress discrepancy as an open question, and preserve the test-harness weakness in the record for future qualification planning.
+    
+    Current classification: Producer execution on a second machine, supported by Kai’s separate reading review. Not independent execution by Kai.
+    
+    Still held: Census execution, engineering, deployment, PRE-RAMS, Gold Tier, R11 and PR #122. No access to data/SOUL.md.
+    
+    Confidence: 0.96 that entry 348 faithfully records the reported test evidence; independent verification of the underlying execution environment remains limited.
+    
+    Verdict: ACCEPT EVIDENCE. NO RELEASE. NO MISSION DRIFT.
+    
+    OHANA.
+    END-VERBATIM KAI-ADJUDICATION-349-EVIDENCE-ACCEPTED
+
+### 6. Next authorised step
+
+- None beyond recording; wait for Dainius or Kai to set the next step of the census-tool qualification  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Do not rerun the tests, alter the evidence or request release authority."]
+
+### 7. What I am unsure of
+
+- What the egress counter measures  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "It remains open."]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
