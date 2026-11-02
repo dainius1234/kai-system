@@ -112252,3 +112252,110 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T22:02:14Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T22:02:14Z  [CMD `date -u +%FT%TZ` → 2026-11-02T22:02:14Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 2d09d88a10900be8b557abf60bfb5cc8dd247b52  [CMD `git rev-parse HEAD` → 2d09d88a10900be8b557abf60bfb5cc8dd247b52]
+- tree: 2cabdd1ca53af78af5697ffa5120ece0cca1c5be  [CMD `git rev-parse HEAD^{tree}` → 2cabdd1ca53af78af5697ffa5120ece0cca1c5be]
+- uncommitted_paths: 2  [CMD `git status --porcelain | count lines` → 2]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/project-rework-plan-pgvp35: 2d09d88a10900be8b557abf60bfb5cc8dd247b52  [CMD `git ls-remote --heads origin` → 2d09d88a10900be8b557abf60bfb5cc8dd247b52]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 357  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 357]
+
+### 1. The four states
+
+- physical: two files changed and committed with this entry: .claude/agents/census-reader.md (sha256 3b9a888f…) and .claude/settings.json (sha256 c6dd48c8…, six lines added: permissions.deny Read(/data/SOUL.md) and Edit(/data/SOUL.md); hooks unchanged)  [CMD `git diff --stat` → 2 files changed, 14 insertions(+), 4 deletions(-)]
+- authorised: Kai's reader safeguards  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Keep reader access physically restricted to prepared census units."]
+- evidence: reader diff verbatim in section 5; agent frontmatter and example JSON parse; the example now carries excluded_capability_quotes  [CMD `python3 parse check` → "tools: Read | example keys: [batch, excluded_capability_quotes, flags, items, removals, reviews]"]
+- admission: none; census not run  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Proceed with preparation of the exact anchor package, not census execution."]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `handoff entry 357 section 6` → "Edit the reader"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: anchor-package preparation. HELD: census execution including the pilot; engineering; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "All engineering and SOUL restrictions remain unchanged."]
+
+### 4. Open questions
+
+- What the restriction is and is not: (a) unit text goes inline, so readers need no file access for normal units; (b) the project deny rule is enforced by Claude Code for the Read tool and the Edit tool on data/SOUL.md, Grep and Glob best effort, Bash not covered (readers have no Bash); (c) readers keep the Read tool for oversize units, so other repository files are readable by them in principle; (d) whether the deny rule binds custom subagents and whether it is live in this session are NOT verified; the pilot's first step is a decoy test (a harmless file added to the deny list must be refused to a reader), before any unit is read. Full filesystem isolation (a reader that can reach nothing but its units) would need a separate empty environment; not proposed unless Kai or Dainius require it  [CMD `claude-code-guide report` → "a denyRead entry doesn't stop the Read tool, so you need both layers"]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- Not tested on data/SOUL.md itself: a test read would breach the no-access rule if the control failed; a decoy is the only acceptable known-positive  [CMD `none` → by design]
+- Credential scan of both files: 0 hits  [CMD `credscan.py scan358.json` → TOTAL HITS 0]
+- EVIDENCE CENSUS-READER-DIFF-358 reader_diff_358.txt: 3865 bytes, sha256 60f217e209abd4afca752adb69863a941daf7f683c8125b2f148be7f1e9ecf22, final LF True (added by Orion)  [CMD `sha256sum reader_diff_358.txt` → 60f217e209abd4af…]
+    BEGIN-VERBATIM CENSUS-READER-DIFF-358
+    diff --git a/.claude/agents/census-reader.md b/.claude/agents/census-reader.md
+    index 7ca1cf2..0628d4a 100644
+    --- a/.claude/agents/census-reader.md
+    +++ b/.claude/agents/census-reader.md
+    @@ -10,10 +10,10 @@ You are a census reader for the KAI project's Wave 0 feature census. Your job is
+     
+     The orchestrator sends you:
+     - a batch code, for example `B017`, and today's date;
+    -- one or more unit files, each starting with a header that gives the unit id, the source path, the source class and the line range;
+    -- inside each unit file, every passage in a block that starts with a line `### pid <pid> lines <a>-<b>`, followed by the passage's exact text.
+    +- one or more units, each starting with a header that gives the unit id, the source path, the source class and the line range;
+    +- inside each unit, every passage in a block that starts with a line `### pid <pid> lines <a>-<b>`, followed by the passage's exact text.
+     
+    -Read only the unit files named in your instructions. Do not open any other file. Never open, search for or quote `data/SOUL.md`, even if a unit mentions it.
+    +The unit text is in your instructions. Only a unit too long to paste is given as a file path, and then you read that path and nothing else. Do not open any other file. Never open, search for or quote `data/SOUL.md`, even if a unit mentions it. A project rule blocks reading it. If a read is refused, record that in `flags` and go on.
+     
+     ## What counts as a feature (an "item")
+     
+    @@ -22,7 +22,8 @@ This comes from the approved census procedure (v3.2.3, Annex A):
+     - **Function names in code are not items.**
+     - **Nested items:** one parent and one child per behaviour. A behaviour is a separate child if a pass/fail test can be written for it on its own. If in doubt, split, and say why in the item's `why_split`.
+     - **Source class:** record items only from units whose class is `canonical`, `canonical*`, `lineage` or `draft`. Units of any other class (`derived`, `external`, `superseded`, `nonfile`) still need a full review. Their disposition is `no_item`, and your notes say what the unit contains and its class.
+    -- **Process records are not features.** A sentence about how the assistants work, a test run, a commit or a meeting is not a KAI feature, unless it states something KAI itself has, will have or must have.
+    +- **Nothing is lost from excluded classes.** If a unit of an excluded class states a KAI capability, behaviour or obligation (including a D-number that adds, removes or holds one), copy the exact text into `excluded_capability_quotes`. It is not an item, but it is kept for reconciliation. This includes the pending-append decision queue files (`kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_*.md`), which are class `derived`. Never treat such text as irrelevant.
+    +- **Process records are not features.** A sentence about how the assistants work, a test run, a commit or a meeting is not a KAI feature, unless it specifies an intended KAI capability, behaviour or obligation.
+     - **Do not deduplicate across units.** If the same feature appears in two units, record it in both. The orchestrator merges them later.
+     - **A removal or hold:** when the unit itself removes or holds a capability (for example a D-number), record it under `removals`, not as a promise.
+     
+    @@ -59,6 +60,9 @@ Return **only** one JSON object, with no other text, in exactly this form:
+       "removals": [
+         {"pid": "<pid>", "quote": "<exact text>", "what_is_removed": "<capability>", "decision_id": "<e.g. D123 or null>", "date": "<YYYY-MM-DD or null>"}
+       ],
+    +  "excluded_capability_quotes": [
+    +    {"unit": "<unit id>", "class": "<derived|external|superseded|nonfile>", "pid": "<pid>", "quote": "<exact text>", "what_it_states": "<the capability, behaviour or obligation>"}
+    +  ],
+       "flags": ["<anything you could not read, could not decide, or think conflicts with another source>"]
+     }
+     ```
+    END-VERBATIM CENSUS-READER-DIFF-358
+
+### 6. Next authorised step
+
+- Wait for Kai's seed, sealed fixtures and owner-ruling references; then assemble the anchor package (anchor, the 2% audit in sample.py with one known-positive and one known-negative, unit rendering, the decoy step for the pilot) and give Dainius one approval line  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Proceed with preparation of the exact anchor package"]
+
+### 7. What I am unsure of
+
+- Whether the new deny rule is live in this session or only after a restart  [CMD `none` → unmeasured]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check

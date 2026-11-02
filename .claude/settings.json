@@ -68,5 +68,11 @@
         ]
       }
     ]
+  },
+  "permissions": {
+    "deny": [
+      "Read(/data/SOUL.md)",
+      "Edit(/data/SOUL.md)"
+    ]
   }
 }
