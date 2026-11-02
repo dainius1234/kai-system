@@ -112359,3 +112359,98 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T22:06:18Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T22:06:18Z  [CMD `date -u +%FT%TZ` → 2026-11-02T22:06:18Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 9f9b7caf156d6b3e3aa25ee333604aeeb848eaad  [CMD `git rev-parse HEAD` → 9f9b7caf156d6b3e3aa25ee333604aeeb848eaad]
+- tree: 23512bcf77ef8fb91e90ee649ffeca4efad42c5f  [CMD `git rev-parse HEAD^{tree}` → 23512bcf77ef8fb91e90ee649ffeca4efad42c5f]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 9f9b7caf156d6b3e3aa25ee333604aeeb848eaad  [CMD `git ls-remote --heads origin` → 9f9b7caf156d6b3e3aa25ee333604aeeb848eaad]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 358  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 358]
+
+### 1. The four states
+
+- physical: unchanged since entry 358 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: as received: approve Kai's proposed execution-control framework, not permission to run the pilot; Orion prepares one exact anchor package implementing "these parameters"  [CONVERSATION 2026-11-02 Dainius, "Approve this as the proposed execution-control framework, not as permission to run the pilot."]
+- evidence: the message verbatim in section 5; it begins mid-way ("…The supporting machine-readable evidence remains available for audit") and contains only the end of point 7, point 8 and the recommendation; points 1-7, which hold the parameters, did not arrive in Orion's conversation  [CMD `head -c 200 owner_359.txt` → begins "Ruling : The supporting machine-readable evidence"]
+- admission: none; pilot not authorised; census not run  [CONVERSATION 2026-11-02 Dainius, "not as permission to run the pilot"]
+
+### 2. Rulings since the last handoff
+
+- Dainius (prefixing Kai-GPT's text with "Ruling :") · 2026-11-02 · approves Kai's proposed execution-control framework for the pilot, not permission to run it; after the trial: PASS recommends the full census subject to full-census spending and execution authorisation; CORRECT ONCE permits only the identified correction and a limited retest; FAIL preserves evidence, stops and names the blocker; no outcome releases KAI engineering, PRE-RAMS, Gold Tier, R11 or PR #122; Dainius need not review thousands of lines of logs; no separate rounds of administrative redesign unless a material defect is shown ⚠ UNBANKED  [CONVERSATION 2026-11-02 Dainius, "Ruling : The supporting machine-readable evidence remains available for audit."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: preparing the anchor package once the parameters are in hand. HELD: the pilot; census execution; engineering; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md; inventing missing parameters  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Do not invent or substitute them."]
+
+### 4. Open questions
+
+- MISSING INPUT: points 1-7 of the framework (the parameters the anchor must implement) were not received; Dainius or Kai to paste them  [CMD `owner_359.txt` → starts mid point 7]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- Credential scan: 0 hits  [CMD `credscan.py scan359.json` → TOTAL HITS 0]
+- EVIDENCE OWNER-RULING-359-FRAMEWORK-PARTIAL owner_359.txt: 1407 bytes, sha256 f5b5324567b6c262c3f9434f115064c05f98aca2955e2b1d951e63d5d1bb2fb2, final LF True (added by Orion)  [CMD `sha256sum owner_359.txt` → f5b5324567b6c262…]
+    BEGIN-VERBATIM OWNER-RULING-359-FRAMEWORK-PARTIAL
+    Ruling : The supporting machine-readable evidence remains available for audit. Dainius does not need to review thousands of lines of technical logs to make the decision.
+    
+    8. The decision after the trial
+    
+    PASS: Recommend proceeding to the full feature census, subject to the required full-census spending and execution authorisation.
+    
+    CORRECT ONCE: Permit only the identified correction and limited retest.
+    
+    FAIL: Preserve the evidence, stop execution and identify the fundamental blocker.
+    
+    None of these outcomes releases KAI engineering, PRE-RAMS, Gold Tier, R11 or PR #122.
+    
+    ⸻
+    
+    My recommendation
+    
+    Approve this as the proposed execution-control framework, not as permission to run the pilot.
+    
+    Orion’s next task is specific: prepare one exact anchor package that implements these parameters and presents its identity, cost feasibility, security boundary and independent-review allocation for adjudication.
+    
+    There should be no separate rounds of administrative redesign unless a material defect is demonstrated.
+    
+    Confidence in this bounded approach: 0.96. Confidence in the actual reader’s reliability remains undetermined until the pilot produces evidence.
+    
+    The target is not a perfect testing system. The target is reliable preservation of KAI’s intended capabilities so we can progress towards building the complete organism.
+    
+    OHANA — ONE ORGANISM. ZERO SILENT FEATURE LOSS. ZERO ENDLESS LOOPS.
+    END-VERBATIM OWNER-RULING-359-FRAMEWORK-PARTIAL
+
+### 6. Next authorised step
+
+- On receiving points 1-7: bank them verbatim, then build the one anchor package (identity, cost feasibility, security boundary, independent-review allocation)  [CONVERSATION 2026-11-02 Dainius, "prepare one exact anchor package that implements these parameters"]
+
+### 7. What I am unsure of
+
+- What points 1-7 contain; nothing assumed  [CMD `owner_359.txt` → points 1-7 absent]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
