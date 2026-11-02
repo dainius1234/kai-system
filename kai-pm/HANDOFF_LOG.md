@@ -109835,3 +109835,69 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T19:24:46Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T19:24:46Z  [CMD `date -u +%FT%TZ` → 2026-11-02T19:24:46Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: b2a8487cf3b6590900f6eee6adb0954d1db49d68  [CMD `git rev-parse HEAD` → b2a8487cf3b6590900f6eee6adb0954d1db49d68]
+- tree: 9bfe54cdab51347c712d8774236e6ebe60c7882c  [CMD `git rev-parse HEAD^{tree}` → 9bfe54cdab51347c712d8774236e6ebe60c7882c]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:claude/project-rework-plan-pgvp35: b2a8487cf3b6590900f6eee6adb0954d1db49d68  [CMD `git ls-remote --heads origin` → b2a8487cf3b6590900f6eee6adb0954d1db49d68]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 335  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 335]
+
+### 1. The four states
+
+- physical: unchanged since entry 335 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: presenting the execution options to Dainius  [CMD `handoff entry 335 section 6` → "Put the execution options to Dainius in plain words and wait for his decision"]
+- evidence: Dainius states a constraint on DeepSeek that removes option 2 as a test run  [CONVERSATION 2026-11-02 Dainius, "deep seek can’t get to my repo can’t see only work on info and questions you supply"]
+- admission: none; qualification pending; no execution decision yet  [CONVERSATION 2026-11-02 Dainius, "Ok but there’s one issue"]
+
+### 2. Rulings since the last handoff
+
+- None; a stated fact, not a decision: DeepSeek cannot reach the repository and works only on the information and questions Orion supplies, so option 2 (DeepSeek runs the six-file kit) is withdrawn as a test-run route; DeepSeek's adversarial review stays possible on supplied material  [CONVERSATION 2026-11-02 Dainius, "deep seek can’t get to my repo can’t see only work on info and questions you supply"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: presenting the remaining options. HELD: running the census; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md; Kai executing scripts (until Dainius decides)  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "The real-anchor approval and all other open decisions and holds remain unchanged."]
+
+### 4. Open questions
+
+- For Dainius NOW: option 1 (Kai runs the six-file kit) or option 3 (no rerun, level written as builder's test plus Kai's reading review); Orion recommends 1  [CMD `handoff entry 335 block ORION-EXEC-OPTIONS-FOR-DAINIUS` → "My recommendation: option 1."]
+- Whether Kai's sandbox can run Python with git: unknown; Kai to report if option 1 is chosen  [CMD `handoff entry 335 section 7` → "Whether Kai's sandbox has git"]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- CORRECTION to entry 335's options note: option 2 assumed DeepSeek could receive and run files; per Dainius it works only on what Orion supplies, and there is no evidence here that it can execute code; the note stays as banked, this entry supersedes its option 2  [CONVERSATION 2026-11-02 Dainius, "only work on info and questions you supply"]
+
+### 6. Next authorised step
+
+- Wait for Dainius's choice between option 1 and option 3; bank it verbatim before acting  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Orion can bank this scoped review and present the execution options to you."]
+
+### 7. What I am unsure of
+
+- Whether Kai's sandbox has Python with git; not checked from here  [CMD `handoff entry 335 section 7` → unknown]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
