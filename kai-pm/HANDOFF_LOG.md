@@ -111624,3 +111624,118 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T21:30:47Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T21:30:47Z  [CMD `date -u +%FT%TZ` → 2026-11-02T21:30:47Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 579a4d9cc376243adaa121dd3d9024e398839b8f  [CMD `git rev-parse HEAD` → 579a4d9cc376243adaa121dd3d9024e398839b8f]
+- tree: 08944d26fb6893d09be894eae43e122ffc465528  [CMD `git rev-parse HEAD^{tree}` → 08944d26fb6893d09be894eae43e122ffc465528]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 579a4d9cc376243adaa121dd3d9024e398839b8f  [CMD `git ls-remote --heads origin` → 579a4d9cc376243adaa121dd3d9024e398839b8f]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 351  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 351]
+
+### 1. The four states
+
+- physical: unchanged since entry 351 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: preparing the one owner decision for the census  [CONVERSATION 2026-11-02 Dainius, "List first, go ahead"]
+- evidence: the decision text verbatim in section 5; census volume measured from the replay outputs at 767ad48: 349 sources, 226,943 lines, 51,727 passages, 1,095 units, 14,162,850 bytes in the 345 pin-file sources, of which HANDOFF_LOG.md + DECISIONS.md 9,072,316 bytes  [CMD `passages.json, units.json, git cat-file -s` → as stated]
+- admission: none; census not run  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "The census should then proceed only once its actual execution authority is confirmed."]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `handoff entry 351 section 6` → "write the one owner decision; bank it; put it to Dainius"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: putting the decision to Dainius. HELD: census execution until Dainius approves and the anchor is admitted; engineering; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "No renewed tool qualification. No additional administrative programme."]
+
+### 4. Open questions
+
+- Dainius: yes or no to the three-part census plan  [CMD `OWNER_DECISION_CENSUS.md` → "Yes or no to parts 1–3 as written."]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- The recommended reader allocation (Orion extracts with helper agents; Kai samples 10% plus fixtures and conflicts) follows procedure v3.2.3 Annex A ("Kai reads 10% of the feature-bearing source passages … The sample tests the extractor") and differs from Kai's entry-308 allocation ("Kai-GPT: Lead the comprehensive source-by-source capability research"), which Kai himself made conditional on feasibility; the measured 14 MB volume is the reason  [CMD `grep -n "Human sample (frozen)" HANDOFF_LOG.md` → Annex A text]
+- The token figure (about 3.5 million) is bytes/4, an estimate, not a measurement; the time figure is an unmeasured estimate  [CMD `bytes // 4` → 3540712]
+- Credential scan of the decision text: 0 hits  [CMD `credscan.py scan352.json` → TOTAL HITS 0]
+- EVIDENCE ORION-OWNER-DECISION-CENSUS-352 OWNER_DECISION_CENSUS.md: 3324 bytes, sha256 e5c474cc3cf969db6b7256d4c2440624b4047e2dc3c7f4e4ca648b4c45f440ec, final LF True (added by Orion)  [CMD `sha256sum OWNER_DECISION_CENSUS.md` → e5c474cc3cf969db…]
+    BEGIN-VERBATIM ORION-OWNER-DECISION-CENSUS-352
+    # One decision for Dainius: how the feature census runs
+    
+    **ORION → DAINIUS (and KAI) | 2026-11-02 | your ruling "List first, go ahead" (entry 351) | nothing runs until you approve**
+    
+    ## What the census is
+    
+    We read every registered KAI document and write down every feature KAI is meant to have, each with the exact line it came from. The result is KAI's build list. It feeds the capability map Kai described: genuine, partial, simulated, name-only, absent, or unknown.
+    
+    **What it can and cannot promise:** every registered document gets read to the end: 349 documents plus 2 named exceptions. That is source coverage. It cannot promise that no feature hides somewhere we never registered, or that a reader never misses one. The checks below are there to catch misses. They don't guarantee zero.
+    
+    ## How big it is (measured)
+    
+    - 349 documents, about 227,000 lines, about 14 MB of text, cut into 1,095 reading chunks.
+    - Two files make up about two-thirds of it: the handoff log and the decisions file.
+    
+    ## My recommendation, in three parts
+    
+    **1. Who reads.** I read everything, using parallel helper agents. Each helper reads a set of chunks and records every feature with its source line, or records "nothing here" for each passage. The checking tool then confirms, mechanically, that every passage has an answer and every feature points to a real line.
+    - Kai does what the plan already gives him: he reads a random 10% of the feature passages, plus every planted test and every known conflict. That is how we find out whether the readers miss things.
+    - DeepSeek gets a few targeted spot-checks. You settle any real conflict between documents.
+    - *Why not Kai reading everything?* About 14 MB is too much to pull through a chat connector. His sampling role is also more valuable, because it checks the readers.
+    
+    **2. The 2% second look.** Kai re-reads a random 2% (at least 30) of the passages where the readers found nothing. This catches features hidden in plain prose. **I recommend yes.** It costs Kai up to about 1,000 short passages (2% of at most 51,727; passages average about 4 lines). Adding it to the sampling tool is a small change, and it gets one quick test, not another qualification round.
+    
+    **3. The fixed starting point (the "anchor").** Before anyone reads, Kai fixes:
+    - the random seed;
+    - a few planted test features (fake features hidden in a copy, to prove the readers find them, kept away from the readers);
+    - the list of your own rulings that override older decisions.
+    
+    Then I give you one line to copy back. That line is your approval of that exact version. Nothing else is needed from you before the run.
+    
+    ## What you are deciding now
+    
+    Yes or no to parts 1–3 as written.
+    
+    **Yes means:** Kai prepares the anchor; you send one approval line; I run the census with helper agents and bring you the feature list and the capability map.
+    
+    **It does not mean:** any KAI code change, testing KAI itself, or deployment. The engineering hold stays, and data/SOUL.md stays untouched.
+    
+    **Risks:**
+    - **Cost.** Reading roughly 3.5 million tokens (estimated from 14 MB) with helpers is a large, one-off cost.
+    - **Time.** My estimate is days, not hours. I have not measured it.
+    - **Missed features.** Readers can still miss a feature, which is why Kai's samples are there.
+    
+    **My recommendation:** yes to all three.
+    END-VERBATIM ORION-OWNER-DECISION-CENSUS-352
+
+### 6. Next authorised step
+
+- On Dainius's yes: Kai fixes seed, planted fixtures and owner-ruling spans; Orion adds the 2% audit to the sampling tool with one quick test; Orion builds the anchor and gives Dainius one approval line; then the census runs with helper agents  [CMD `OWNER_DECISION_CENSUS.md` → "Yes means"]
+
+### 7. What I am unsure of
+
+- Running parallel helper agents at this scale needs Dainius's explicit go for multi-agent orchestration; his yes to part 1 is read as that go only if he says so  [CMD `OWNER_DECISION_CENSUS.md part 1` → "using parallel helper agents"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
