@@ -113520,3 +113520,132 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T22:25:35Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T22:25:35Z  [CMD `date -u +%FT%TZ` → 2026-11-02T22:25:35Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 1de36f83188e51024e60ceaf8ed004ce819b70a9  [CMD `git rev-parse HEAD` → 1de36f83188e51024e60ceaf8ed004ce819b70a9]
+- tree: 3da01bb660f3c5bdd347aaa1b7a31b9a13fb21a9  [CMD `git rev-parse HEAD^{tree}` → 3da01bb660f3c5bdd347aaa1b7a31b9a13fb21a9]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/project-rework-plan-pgvp35: 1de36f83188e51024e60ceaf8ed004ce819b70a9  [CMD `git ls-remote --heads origin` → 1de36f83188e51024e60ceaf8ed004ce819b70a9]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 362  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 362]
+
+### 1. The four states
+
+- physical: commit 1de36f8 adds .claude/agents/census-reader-pilot.md (census-reader rules, unit text inline, frontmatter tools: ReportFindings only); a harmless decoy file with a random word sits in the scratchpad only  [CMD `git log --oneline -1` → 1de36f8]
+- authorised: Kai's bounded correction (entry 362)  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "complete one bounded correction"]
+- evidence: the 30 units repacked into 8 reading runs (largest 95,605 bytes; total 604,790), plan verbatim in section 5; the isolation test could not run: "Agent type 'census-reader-pilot' not found" (agent definitions load at a session refresh)  [CMD `Agent census-reader-pilot` → "Agent type 'census-reader-pilot' not found"]
+- admission: none; no disposition on any pilot anchor  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Do not bank an ADJUDICATED or APPROVED disposition against the current anchor."]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `handoff entry 362 section 6` → "Pilot reader definition with no file, shell or connector tools"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: the isolation test at the next turn; then the revised anchor. HELD: the pilot and census; engineering; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying, reading, searching or processing data/SOUL.md  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "If isolation cannot be demonstrated, STOP."]
+
+### 4. Open questions
+
+- For Dainius: is extra paid usage switched off in his Claude account  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "No automatic paid overage."]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- The failed Agent call ran nothing and used no helper run  [CMD `Agent census-reader-pilot` → not found]
+- EVIDENCE CENSUS-PILOT-RUNS-R2 pilot_batches_r2.json: 1627 bytes, sha256 f6f44ab6eabbb35f0154587e3424a0a47c0ce89524459c386f675dd9e88fd714, final LF True (added by Orion)  [CMD `sha256sum pilot_batches_r2.json` → f6f44ab6eabbb35f…]
+    BEGIN-VERBATIM CENSUS-PILOT-RUNS-R2
+    {
+     "reading_runs": {
+      "R1": [
+       "kai-pm/HANDOFF_LOG.md@L16882"
+      ],
+      "R2": [
+       "kai-pm/HANDOFF_LOG.md@L56961"
+      ],
+      "R3": [
+       "B11:KAI-FEATURE-LIST@L1"
+      ],
+      "R4": [
+       "kai-pm/FAILURE_PATTERN_LEDGER.md@L2149",
+       "kai-pm/DECISIONS.md@L9606",
+       "kai-pm/DECISIONS.md@L16000"
+      ],
+      "R5": [
+       "kai-pm/H2_CONSOLIDATED_REPAIR_SPEC_DRAFT.md@L1",
+       "kai-pm/DECISIONS.md@L34676",
+       "kai-pm/DEEPSEEK_BRIEF_2026-08-07_TOPOLOGY.md@L1",
+       "kai-pm/DECISIONS.md@L1287"
+      ],
+      "R6": [
+       "kai-pm/HANDOFF_LOG.md@L43402",
+       "kai-pm/CODE_AUDIT_BATCH_SYSMETRICS_WORLD_ANCHOR.md@L1",
+       "kai-pm/HANDOFF_LOG.md@L79937",
+       "kai-pm/HANDOFF_LOG.md@L84741",
+       "docs/gaps_and_hardening.md@L1",
+       "kai-pm/DECISIONS.md@L28693"
+      ],
+      "R7": [
+       "kai-pm/HANDOFF_LOG.md@L41002",
+       "kai-pm/GPU_ARRIVAL_RUNBOOK.md@L1",
+       "kai-pm/HANDOFF_LOG.md@L86157",
+       "kai-pm/HANDOFF_LOG.md@L60601",
+       "kai-pm/D349_DEEPSEEK_V0_3_EXISTING_SYSTEM_REVIEW_RECONCILIATION.md@L1",
+       "kai-pm/DECISIONS.md@L13025"
+      ],
+      "R8": [
+       "kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md@L1",
+       "kai-pm/ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md@L1",
+       "kai-pm/HANDOFF_LOG.md@L63362",
+       "kai-pm/DECISIONS.md@L32709",
+       "kai-pm/DECISIONS.md@L1739",
+       "kai-pm/CLEANUP_TODO.md@L1",
+       "kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D352.md@L1",
+       "kai-pm/DECISIONS.md@L28510"
+      ]
+     },
+     "bytes": {
+      "R1": 95605,
+      "R2": 83346,
+      "R3": 70760,
+      "R4": 71319,
+      "R5": 71315,
+      "R6": 71188,
+      "R7": 70313,
+      "R8": 70944
+     },
+     "rule": "units sorted by bytes descending then id; each placed in the lightest run (ties: lowest number); 8 reading runs"
+    }
+    END-VERBATIM CENSUS-PILOT-RUNS-R2
+
+### 6. Next authorised step
+
+- At the next turn: run the isolation test (tools listed; decoy read, shell and GitHub fetch must all be impossible; harness tool-use count 0; decoy word absent); it counts as the security-test run; if it fails, STOP; if it passes, build CENSUS-ANCHOR-PILOT-R2 with the 8 runs and the compliance statement  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "Demonstrate the effective tool restrictions using harmless tests"]
+
+### 7. What I am unsure of
+
+- Whether the allowlist of one harmless tool removes connector tools from the helper; the test decides  [CMD `none` → unmeasured]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
