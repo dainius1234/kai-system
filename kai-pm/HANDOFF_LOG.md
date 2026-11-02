@@ -109532,3 +109532,75 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T18:55:46Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T18:55:46Z  [CMD `date -u +%FT%TZ` → 2026-11-02T18:55:46Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: ceac47cdb7adc8f2e88e908d0b7c5b2acd79671f  [CMD `git rev-parse HEAD` → ceac47cdb7adc8f2e88e908d0b7c5b2acd79671f]
+- tree: ca549bb755b0413191fbbc09e53715d616bf7947  [CMD `git rev-parse HEAD^{tree}` → ca549bb755b0413191fbbc09e53715d616bf7947]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/project-rework-plan-pgvp35: ceac47cdb7adc8f2e88e908d0b7c5b2acd79671f  [CMD `git ls-remote --heads origin` → ceac47cdb7adc8f2e88e908d0b7c5b2acd79671f]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 333  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 333]
+
+### 1. The four states
+
+- physical: unchanged since entry 333 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: returning the A1 fix to Kai  [CMD `handoff entry 333 section 6` → "attach bundle 5; post ORION-MSG-KAI-A1-FIX; verify posted == banked and record it"]
+- evidence: bundle 5 attached to DAI-10; message posted as comment 0f92fe24 and verified equal to the banked block; verifier output verbatim in section 5  [CMD `verify_posts.py 0f92fe24…,ORION-MSG-KAI-A1-FIX,ceac47c` → EQUAL, exit 0]
+- admission: none; waiting for Kai's re-read of A1; qualification pending  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "complete the A1 correction and reading review before seeking your execution decision"]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `list_comments DAI-10 newest 3 before posting` → newest was Orion's 7e1968c2; no new Kai or Dainius comment]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: waiting for Kai's re-read of A1. HELD: running the census; engineering pause; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying or processing data/SOUL.md; Kai executing scripts  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "The census, engineering and other holds remain."]
+
+### 4. Open questions
+
+- For Kai: the three items in comment 0f92fe24 (A1 re-read; whether any-block negative dispositions block; A4 placement)  [CMD `verify_0f92fe24.txt` → EQUAL]
+- For Dainius (after Kai's re-read of A1): the execution option; the real anchor's approval; the 2% audit; reading allocation; SOUL incident closure; no-touch provenance  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "The real anchor, SOUL incident closure, no-touch provenance, 2% audit and reading allocation remain open."]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- BUNDLE 5 attached to DAI-10 as attachment 4b4ac761 (KAI_CENSUS_TOOLS_5_A1_fix_anchor_rev3.txt, 56381 bytes, sha256 57716f8182616e6b…): signed PUT returned 200 with content-length range fixed at 56381,56381; READ-BACK NOT DONE: the proxy refused uploads.linear.app (CONNECT 403), as for bundles 1-4; Kai's hash check is the read-back  [CMD `curl PUT; curl GET uploads.linear.app` → 200; "CONNECT tunnel failed, response 403"]
+- POST: ORION-MSG-KAI-A1-FIX posted as DAI-10 comment 0f92fe24-1cfd-4539-80e1-9b4430d3a430 at 2026-11-02T18:54:58Z; posted body after the header line equals the banked block at ceac47c, 6376 characters each, one-character-change calibration detected  [CMD `verify_posts.py` → EQUAL, exit 0]
+- SLIP: the first attempt to write this entry used a wrong scratchpad path; the chain stopped at the missing file before any append (tree 0 lines); a stray measure file outside the scratchpad was deleted  [CMD `git status --porcelain` → 0 lines]
+- EVIDENCE POST-VERIFY-0F92FE24 verify_0f92fe24.txt: 113 bytes, sha256 0fe283f430238c67b9285d589102619eb78246f2752f0fbe2f31b94847f9c417, final LF True (added by Orion)  [CMD `sha256sum verify_0f92fe24.txt` → 0fe283f430238c67…]
+    BEGIN-VERBATIM POST-VERIFY-0F92FE24
+    0f92fe24 ORION-MSG-KAI-A1-FIX posted_chars 6376 banked_chars 6376 EQUAL calibration(1-char change detected) True
+    END-VERBATIM POST-VERIFY-0F92FE24
+
+### 6. Next authorised step
+
+- Wait for Kai's re-read of A1 and answers to the three questions; bank them verbatim on arrival; only after that put the execution option to Dainius in plain words  [CONVERSATION 2026-11-02 Kai-GPT relayed by Dainius, "complete the A1 correction and reading review before seeking your execution decision"]
+
+### 7. What I am unsure of
+
+- Whether the uploaded attachment bytes equal the local bundle: not read back here (proxy 403); only the upload size was enforced  [CMD `curl GET uploads.linear.app` → 403]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
