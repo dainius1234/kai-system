@@ -112563,3 +112563,834 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-02T22:17:01Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-02T22:17:01Z  [CMD `date -u +%FT%TZ` → 2026-11-02T22:17:01Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 9715348f8514c6f792a49470d8f844e0c311381d  [CMD `git rev-parse HEAD` → 9715348f8514c6f792a49470d8f844e0c311381d]
+- tree: b0467a3acc6403f3ad24128d775db12b8c96b26e  [CMD `git rev-parse HEAD^{tree}` → b0467a3acc6403f3ad24128d775db12b8c96b26e]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 9715348f8514c6f792a49470d8f844e0c311381d  [CMD `git ls-remote --heads origin` → 9715348f8514c6f792a49470d8f844e0c311381d]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 360  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 360]
+
+### 1. The four states
+
+- physical: repository unchanged since entry 360 apart from this entry; nothing executed against census material  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: the pilot anchor package for Kai's adjudication and Dainius's approval  [CONVERSATION 2026-11-02 Dainius, "Present this as one complete approval package, with a clear owner approval line."]
+- evidence: section 5 banks the package, the anchor record CENSUS-ANCHOR-PILOT (9,691 bytes, sha256 39bf38408d4c0303fb0a10701e34b1d4324e58ba27feb6e5ec3c8f614418123a), select_pilot.py, its output and the batch plan; the selection ran twice with byte-identical output  [CMD `python3 -I select_pilot.py … ×2; cmp` → REPRODUCIBLE; seed ab6e01c216644c94]
+- admission: none; no disposition lines; the security test, pilot and census are not authorised  [CONVERSATION 2026-11-02 Dainius, "Execution not approved."]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `handoff entry 360 section 6` → "Build the anchor package"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: presenting the package. HELD: security test, pilot and census execution until both disposition lines and an admission record are banked; engineering; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying, reading, searching or processing data/SOUL.md  [CONVERSATION 2026-11-02 Dainius, "data/SOUL.md must not be accessed, copied, read, searched or processed."]
+
+### 4. Open questions
+
+- Kai: adjudicate the package; Dainius: approve the anchor with the APPROVED line  [CMD `PILOT_ANCHOR_PACKAGE.md section 7` → disposition lines]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- DESIGN CHOICE, disclosed: the single oversize unit (kai-pm/HANDOFF_LOG.md@L34111, 1,395 lines, 357,052 bytes) is excluded from the pilot for cost and named for the full census; the first draw with it included totalled 817,615 bytes  [CMD `select_pilot.py first run` → "9823 lines, 817615 bytes"]
+- The digest is sha256 of the anchor file; anchor.load computes it from the banked block text; equality is checked right after this commit  [CMD `sha256sum anchor_pilot.json` → 39bf3840…]
+- Credential scan of the five banked texts: 0 hits  [CMD `credscan.py scan361.json` → TOTAL HITS 0]
+- EVIDENCE PILOT-ANCHOR-PACKAGE PILOT_ANCHOR_PACKAGE.md: 7738 bytes, sha256 6840e06d37ca4990107223503d4e9b3e007d0f010b78983a806e0b19aef9ab47, final LF True (added by Orion)  [CMD `sha256sum PILOT_ANCHOR_PACKAGE.md` → 6840e06d37ca4990…]
+    BEGIN-VERBATIM PILOT-ANCHOR-PACKAGE
+    # Pilot anchor package: 30-chunk trial of the feature census
+    
+    **ORION → KAI (adjudication) → DAINIUS (approval) | 2026-11-02 | plan: handoff entry 360 | anchor record: block CENSUS-ANCHOR-PILOT (entry 361) | nothing has run**
+    
+    ## 1. What Dainius is being asked to approve
+    
+    A trial read of **30 chunks** out of the 1,095 in the census, done with the census-reader helpers. It runs under the rules in Kai's plan (entry 360), in this order:
+    
+    security test → read → check → decide.
+    
+    **Approval allows:** that trial only, inside the limits below.
+    
+    **It does not allow:** the full census; any KAI code change; testing KAI itself; deployment; PRE-RAMS, Gold Tier, R11 or PR #122. Nothing about data/SOUL.md changes: it is not opened, copied, read, searched or processed.
+    
+    ## 2. The 30 chunks: fixed and reproducible
+    
+    - **The seed is chosen by nobody.** It is calculated from two files that were frozen before this plan existed: `seed = sha256("KAI-WAVE0-PILOT|" + sha256(passages.json) + "|" + sha256(units.json))`, first 16 hex digits = **ab6e01c216644c94**. Running the selection script twice gives the same 30 chunks, byte for byte.
+    - **The mix, as Kai's plan requires:**
+    
+    | Group | Count | Rule |
+    |---|---|---|
+    | Challenging | 4 | one 1,200-line chunk (size); a decisions chunk that removes or holds something; a chunk with a table of 5+ rows (nested features); a chunk that talks about a contradiction |
+    | Feature-eligible (canonical, lineage, draft) | 20 | at least 2 from each eligible class, the rest drawn by the seed |
+    | Excluded classes | 6 | one from each excluded class present, plus exactly one from the D344–D353 pending-decision queue, the rest drawn by the seed |
+    
+    - **Totals:** 30 distinct chunks; 10,371 lines; 604,790 bytes; 2,277 passages. The full list is in the anchor record.
+    - **One change I made, and why.** The single biggest chunk in the whole census is a 1,395-line, 357 KB diagnostics record. With it in the trial, the reading alone would leave too little room under the 400,000-token limit. It is left out of the trial and named as a special case for the full census. The size test uses a normal maximum-length chunk (1,200 lines) instead.
+    
+    ## 3. Spending: limit and controls
+    
+    - **Limits (as proposed):** at most **10 helper runs**, **400,000 tokens**, **£25** additional paid usage.
+    - **Measured, not guessed.** Each helper run reports its own token count back to me. I keep a running total in the trial record.
+    - **Controlled.** The 30 chunks are pre-packed into 10 fixed batches; the largest batch is 95,605 bytes. Before each run I check that the running total plus that batch's projected cost stays under 400,000. If it doesn't, I stop and report. I never exceed the limit.
+    - **Projection.** Reading is about 151,000 tokens (bytes ÷ 4; up to about 202,000 if the text is dense). Answers are estimated at up to 60,000. The unknown is each run's set-up cost, so the security test measures it on one real reader run first. If the projected total is then over 400,000, the trial does not start.
+    - **Money: what I can't do.** I can't see Dainius's bill, so I can't measure pounds. The £25 ceiling is enforced in Dainius's own Claude account: keep extra paid usage switched off, or capped at £25. The token limit is my control. The pound limit is his.
+    
+    ## 4. Who can read what, and the decoy test
+    
+    - **Readers get only their chunks.** Each reader receives its chunk text inside its instructions, prepared with the census tools' single reader, which refuses SOUL.md. Readers have only the Read tool and run in the foreground. Whether connector tools could still reach a helper is not documented, which is why the GitHub lock below covers that route.
+    - **Locked for everyone:** reading or editing data/SOUL.md (project setting, already committed).
+    - **Added during the trial only:** a lock on the decoy folder, and a lock on GitHub file fetching (SOUL.md also exists on GitHub). The GitHub lock is removed after the trial; the SOUL.md lock stays.
+    - **Decoy test, before anything is read:**
+      1. A harmless file with a fresh random word in it is created and locked.
+      2. I try to read it: it must be refused.
+      3. One census-reader is asked to read it and report the word: it must be refused, and the word must not appear in its answer.
+    
+      If any of this fails, the trial does not start. SOUL.md itself is never used as a test.
+    
+    ## 5. Independent review: who and how much
+    
+    - **Six chunks get a full targeted review by Kai:** the 4 challenging chunks, the D344 queue chunk, and the excluded-class feature list B11:KAI-FEATURE-LIST (the highest risk of silent loss). That is about 151 KB, roughly 5 bundles.
+    - **Independent audit:** after the readers finish, Kai picks at least 10% of the feature-bearing chunks and 2% of the no-item chunks (rounded up), outside those six, before seeing the readers' answers for them. Estimated at 2 or 3 bundles.
+    - **Feasibility:** about 7–8 bundles of about 35 KB in total, well under the limit of 20 bundles. DeepSeek: optional spot-checks only, labelled as adversarial review, not independent proof.
+    
+    ## 6. Pass, fail and the one allowed correction
+    
+    Exactly as in Kai's plan (entry 360).
+    
+    **PASS needs all of:**
+    - the decoy test passed;
+    - all 30 chunks fully reviewed;
+    - every feature has an exact quote and an identifier;
+    - nested features, removals, holds and excluded-class statements handled by the rules;
+    - no material omission or misclassification found by Kai;
+    - the automated checks pass;
+    - spending inside the limits;
+    - uncertainty recorded.
+    
+    **Failure handling:**
+    - **Minor bounded defect:** one correction and a limited retest.
+    - **Security breach, uncontrolled spend or fundamental feature loss:** stop, with no retry.
+    - **A second failure** stops the trial.
+    
+    **After the trial:** one short report.
+    - PASS leads to a recommendation for the full census, under its own spending and execution approval.
+    - A PASS shows the method works. It does not prove every feature was found.
+    
+    ## 7. The exact anchor
+    
+    - **Identifier:** block `CENSUS-ANCHOR-PILOT`, handoff entry 361.
+    - **Scope:** `census-wave0-pilot`.
+    - **Source revisions:**
+      - research pin `dd153c1f4ab7c52f34620e07238554453a8912d9`;
+      - census tools as banked at log commit 767ad48 (11 scripts, hashes in the anchor);
+      - `select_pilot.py`, census-reader definition and settings file hashes in the anchor.
+    - **Digest (SHA-256 of the banked anchor record):** `39bf38408d4c0303fb0a10701e34b1d4324e58ba27feb6e5ec3c8f614418123a`
+    - **Live state at preparation:**
+      - branch HEAD 9715348 (entry 360);
+      - DECISIONS.md: 373 headings, highest D390, no duplicates (handoff measure);
+      - DAI-10's newest comment is still Orion's 0f92fe24 (Kai's check, not re-checked by me).
+    - **Approval lines.** Each is copied back exactly and banked word for word.
+      - Kai: `ANCHOR-DISPOSITION: ADJUDICATED anchor=CENSUS-ANCHOR-PILOT sha256=39bf38408d4c0303fb0a10701e34b1d4324e58ba27feb6e5ec3c8f614418123a scope=census-wave0-pilot`
+      - **Dainius:** `ANCHOR-DISPOSITION: APPROVED anchor=CENSUS-ANCHOR-PILOT sha256=39bf38408d4c0303fb0a10701e34b1d4324e58ba27feb6e5ec3c8f614418123a scope=census-wave0-pilot`
+    
+      The anchor tool admits the anchor only when both lines exist, with this digest and scope, and no refusal or withdrawal line exists for it.
+    
+    ## What is not in this pilot, said plainly
+    
+    - **No planted test features.** Kai's plan doesn't include them in the trial; they stay required for the full census.
+    - **No owner-ruling list.** Contradictions are recorded in the trial, not resolved. The list is needed before the full census.
+    - **Not verified yet:**
+      - whether the locks bind the helper readers; the decoy test decides this before anything is read;
+      - each run's set-up cost; it is measured at the decoy test.
+    END-VERBATIM PILOT-ANCHOR-PACKAGE
+- EVIDENCE CENSUS-ANCHOR-PILOT anchor_pilot.json: 9691 bytes, sha256 39bf38408d4c0303fb0a10701e34b1d4324e58ba27feb6e5ec3c8f614418123a, final LF True (added by Orion)  [CMD `sha256sum anchor_pilot.json` → 39bf38408d4c0303…]
+    BEGIN-VERBATIM CENSUS-ANCHOR-PILOT
+    {
+     "anchor": "CENSUS-ANCHOR-PILOT",
+     "scope": "census-wave0-pilot",
+     "status": "PROPOSED: for Kai's adjudication and Dainius's approval; not admitted until both disposition lines and an admission record are banked",
+     "pin": "dd153c1f4ab7c52f34620e07238554453a8912d9",
+     "effective_view_sha256": "c11cdbaa796fec4793e971ca14cb66f22c9d63f47869f1ebd912adbc0211f666",
+     "passages_sha256": "d3d7da20a586b254fd35f948e41d45935664d31f40de72840ba357efee4d4635",
+     "units_sha256": "1139318f5637aa16f715b98cdc311eb12eed86249c740a4990d99d5434bfef09",
+     "provenance": {
+      "t1_log_commit": "97e81be9f9b5106d4ae6bc51a51af372f9c8782e",
+      "t1_producer": {
+       "script_sha256": "d3698ed1adf21b9505dc19d942f3da119ce398fdac14137706a41419006e830f",
+       "python": "3.11.17",
+       "argv": [
+        "97e81be",
+        "/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/replay_767ad48/out/effective_view.json"
+       ]
+      },
+      "t2_manifest_sha256": "be9fab068b17c3cfb028a96d026f6c01231a2a9e105fbaf9d11471fadb81786c",
+      "t2_sums_sha256": "1de7867b0c32bee51906de58802c87a92ebd6b3b500b3178f850378ac943eae7",
+      "t3_producer": {
+       "script_sha256": "64443df7894db16392684628ef1e617cf8765aa5137ffc81074a25509ebd8b83",
+       "python": "3.11.17",
+       "argv": [
+        "/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/replay_767ad48",
+        "/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/replay_767ad48/out/effective_view.json",
+        "/tmp/claude-0/-home-user-kai-system/84284242-f61e-5a69-9588-732883a5292c/scratchpad/replay_767ad48/out/passages.json"
+       ]
+      }
+     },
+     "tools_at_log_commit_767ad48": {
+      "effective_view.py": {
+       "block": "CENSUS-T1-REV2-SCRIPT",
+       "sha256": "d3698ed1adf21b9505dc19d942f3da119ce398fdac14137706a41419006e830f"
+      },
+      "calibrate_t1.py": {
+       "block": "CENSUS-T1-REV2-CALIBRATION-SCRIPT",
+       "sha256": "c3f9fe464fb8421606a9a2b2b98c5c74d7c5512e9153dd94806bc827285e6f6a"
+      },
+      "subject.py": {
+       "block": "CENSUS-T2-REV3-SCRIPT",
+       "sha256": "d1c056aa248e9adcf42262cff5b7ad7e590a4f8ee0ffe6ae666fd4dcaf842810"
+      },
+      "calibrate_t2.py": {
+       "block": "CENSUS-T2-REV3-CALIBRATION-SCRIPT",
+       "sha256": "6b8c77280db4987140521b8251a7aa9201575abad380c7be761cd68b6a78471d"
+      },
+      "passages.py": {
+       "block": "CENSUS-T3-PASSAGES-SCRIPT",
+       "sha256": "64443df7894db16392684628ef1e617cf8765aa5137ffc81074a25509ebd8b83"
+      },
+      "calibrate_t3.py": {
+       "block": "CENSUS-T3-CALIBRATION-SCRIPT",
+       "sha256": "67f41a25aeebda973dcfecb9d403c98f24b061aaa5fe0c5cd733088c23f1a278"
+      },
+      "calibrate_t4.py": {
+       "block": "CENSUS-T4-REV2-CALIBRATION-SCRIPT",
+       "sha256": "dba07ca06e862d93cc3ed6a99619e356194c17f79daafa2b5046f4e6a546effe"
+      },
+      "sample.py": {
+       "block": "CENSUS-T4-REV5-SAMPLE-SCRIPT",
+       "sha256": "8275a0aee0cd285c542b554a83716546d3c06600bb1c1fa36c01ed04ea43dbb3"
+      },
+      "census_check.py": {
+       "block": "CENSUS-T5-REV5-CHECK-SCRIPT",
+       "sha256": "a0c68d0b8d077482ddcd238464d1456e1e675fe15cf27f64783cbcb0336e4a50"
+      },
+      "calibrate_t5.py": {
+       "block": "CENSUS-T5-REV6-CALIBRATION-SCRIPT",
+       "sha256": "deee29875b9443df0cb9fe9e832a60e3e4daec95ea47275425f2b2eab3afdfd1"
+      },
+      "anchor.py": {
+       "block": "CENSUS-ANCHOR-REV3-SCRIPT",
+       "sha256": "bf0809d39175ecd6c2c899df3a290bb69e9b00a996cdd7da0309f8c47a703619"
+      }
+     },
+     "pilot_tools": {
+      "select_pilot.py": "44d99b91e963d321684fc2d7445b3949c538e9a4472e451e552a512df63d1a95",
+      ".claude/agents/census-reader.md": "3b9a888f694c357a62ecc87b37a47a584451a80cfda56233667c936899aea70e",
+      ".claude/settings.json (before the security test)": "c6dd48c8b0dfdd93510d80ce58d1ffaea75a06b92120233b4e7be539cb04f992"
+     },
+     "seed": "ab6e01c216644c94",
+     "seed_rule": "sha256('KAI-WAVE0-PILOT|'+sha256(passages.json)+'|'+sha256(units.json))[:16]",
+     "fixture_plan": [],
+     "fixture_note": "No planted fixtures in the pilot: Kai's pilot plan (entry 360) does not include them. They remain required for the full census (procedure v3.2.3 Annex A, seeded omission test).",
+     "owner_rulings": [],
+     "owner_rulings_note": "None needed for the pilot: contradictions are recorded, not resolved. The owner-ruling references remain required before the full census.",
+     "selection": {
+      "units": [
+       "kai-pm/FAILURE_PATTERN_LEDGER.md@L2149",
+       "kai-pm/DECISIONS.md@L34676",
+       "kai-pm/DECISIONS.md@L13025",
+       "kai-pm/DECISIONS.md@L28510",
+       "kai-pm/DECISIONS.md@L16000",
+       "kai-pm/DECISIONS.md@L32709",
+       "kai-pm/HANDOFF_LOG.md@L41002",
+       "kai-pm/HANDOFF_LOG.md@L60601",
+       "docs/gaps_and_hardening.md@L1",
+       "kai-pm/D349_DEEPSEEK_V0_3_EXISTING_SYSTEM_REVIEW_RECONCILIATION.md@L1",
+       "kai-pm/H2_CONSOLIDATED_REPAIR_SPEC_DRAFT.md@L1",
+       "kai-pm/GPU_ARRIVAL_RUNBOOK.md@L1",
+       "kai-pm/HANDOFF_LOG.md@L56961",
+       "kai-pm/DECISIONS.md@L9606",
+       "kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md@L1",
+       "kai-pm/HANDOFF_LOG.md@L79937",
+       "kai-pm/HANDOFF_LOG.md@L16882",
+       "kai-pm/HANDOFF_LOG.md@L63362",
+       "kai-pm/DECISIONS.md@L1739",
+       "kai-pm/DECISIONS.md@L28693",
+       "kai-pm/DECISIONS.md@L1287",
+       "kai-pm/HANDOFF_LOG.md@L84741",
+       "kai-pm/HANDOFF_LOG.md@L43402",
+       "kai-pm/HANDOFF_LOG.md@L86157",
+       "kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D352.md@L1",
+       "kai-pm/DEEPSEEK_BRIEF_2026-08-07_TOPOLOGY.md@L1",
+       "kai-pm/CLEANUP_TODO.md@L1",
+       "B11:KAI-FEATURE-LIST@L1",
+       "kai-pm/ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md@L1",
+       "kai-pm/CODE_AUDIT_BATCH_SYSMETRICS_WORLD_ANCHOR.md@L1"
+      ],
+      "rules": {
+       "kai-pm/FAILURE_PATTERN_LEDGER.md@L2149": "C1 size (1200-line unit)",
+       "kai-pm/DECISIONS.md@L34676": "C2 removal or hold",
+       "kai-pm/DECISIONS.md@L13025": "C3 nested (table of 5+ rows)",
+       "kai-pm/DECISIONS.md@L28510": "C4 contradiction",
+       "kai-pm/DECISIONS.md@L16000": "eligible canonical (stratum)",
+       "kai-pm/DECISIONS.md@L32709": "eligible canonical (stratum)",
+       "kai-pm/HANDOFF_LOG.md@L41002": "eligible canonical* (stratum)",
+       "kai-pm/HANDOFF_LOG.md@L60601": "eligible canonical* (stratum)",
+       "docs/gaps_and_hardening.md@L1": "eligible lineage (stratum)",
+       "kai-pm/D349_DEEPSEEK_V0_3_EXISTING_SYSTEM_REVIEW_RECONCILIATION.md@L1": "eligible lineage (stratum)",
+       "kai-pm/H2_CONSOLIDATED_REPAIR_SPEC_DRAFT.md@L1": "eligible draft (stratum)",
+       "kai-pm/GPU_ARRIVAL_RUNBOOK.md@L1": "eligible draft (stratum)",
+       "kai-pm/HANDOFF_LOG.md@L56961": "eligible (seeded)",
+       "kai-pm/DECISIONS.md@L9606": "eligible (seeded)",
+       "kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md@L1": "eligible (seeded)",
+       "kai-pm/HANDOFF_LOG.md@L79937": "eligible (seeded)",
+       "kai-pm/HANDOFF_LOG.md@L16882": "eligible (seeded)",
+       "kai-pm/HANDOFF_LOG.md@L63362": "eligible (seeded)",
+       "kai-pm/DECISIONS.md@L1739": "eligible (seeded)",
+       "kai-pm/DECISIONS.md@L28693": "eligible (seeded)",
+       "kai-pm/DECISIONS.md@L1287": "eligible (seeded)",
+       "kai-pm/HANDOFF_LOG.md@L84741": "eligible (seeded)",
+       "kai-pm/HANDOFF_LOG.md@L43402": "eligible (seeded)",
+       "kai-pm/HANDOFF_LOG.md@L86157": "eligible (seeded)",
+       "kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D352.md@L1": "excluded derived (D344 queue)",
+       "kai-pm/DEEPSEEK_BRIEF_2026-08-07_TOPOLOGY.md@L1": "excluded external (stratum)",
+       "kai-pm/CLEANUP_TODO.md@L1": "excluded superseded (stratum)",
+       "B11:KAI-FEATURE-LIST@L1": "excluded nonfile (stratum)",
+       "kai-pm/ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md@L1": "excluded (seeded)",
+       "kai-pm/CODE_AUDIT_BATCH_SYSMETRICS_WORLD_ANCHOR.md@L1": "excluded (seeded)"
+      },
+      "excluded_from_pilot": [
+       "kai-pm/HANDOFF_LOG.md@L34111"
+      ],
+      "totals": {
+       "units": 30,
+       "lines": 10371,
+       "bytes": 604790,
+       "passages": 2277
+      }
+     },
+     "batches": {
+      "B01": [
+       "kai-pm/HANDOFF_LOG.md@L16882"
+      ],
+      "B02": [
+       "kai-pm/HANDOFF_LOG.md@L56961"
+      ],
+      "B03": [
+       "B11:KAI-FEATURE-LIST@L1"
+      ],
+      "B04": [
+       "kai-pm/FAILURE_PATTERN_LEDGER.md@L2149"
+      ],
+      "B05": [
+       "kai-pm/H2_CONSOLIDATED_REPAIR_SPEC_DRAFT.md@L1"
+      ],
+      "B06": [
+       "kai-pm/HANDOFF_LOG.md@L43402",
+       "docs/gaps_and_hardening.md@L1",
+       "kai-pm/DECISIONS.md@L28693"
+      ],
+      "B07": [
+       "kai-pm/HANDOFF_LOG.md@L41002",
+       "kai-pm/DECISIONS.md@L34676",
+       "kai-pm/DECISIONS.md@L9606",
+       "kai-pm/DECISIONS.md@L16000"
+      ],
+      "B08": [
+       "kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md@L1",
+       "kai-pm/HANDOFF_LOG.md@L86157",
+       "kai-pm/HANDOFF_LOG.md@L60601",
+       "kai-pm/HANDOFF_LOG.md@L84741",
+       "kai-pm/DEEPSEEK_BRIEF_2026-08-07_TOPOLOGY.md@L1",
+       "kai-pm/DECISIONS.md@L1287"
+      ],
+      "B09": [
+       "kai-pm/ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md@L1",
+       "kai-pm/CODE_AUDIT_BATCH_SYSMETRICS_WORLD_ANCHOR.md@L1",
+       "kai-pm/HANDOFF_LOG.md@L79937",
+       "kai-pm/D349_DEEPSEEK_V0_3_EXISTING_SYSTEM_REVIEW_RECONCILIATION.md@L1",
+       "kai-pm/DECISIONS.md@L13025",
+       "kai-pm/DECISIONS.md@L28510"
+      ],
+      "B10": [
+       "kai-pm/HANDOFF_LOG.md@L63362",
+       "kai-pm/GPU_ARRIVAL_RUNBOOK.md@L1",
+       "kai-pm/DECISIONS.md@L32709",
+       "kai-pm/DECISIONS.md@L1739",
+       "kai-pm/CLEANUP_TODO.md@L1",
+       "kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D352.md@L1"
+      ]
+     },
+     "limits": {
+      "helper_runs": 10,
+      "tokens": 400000,
+      "additional_paid_usage_gbp": 25
+     },
+     "targeted_review_units": [
+      "kai-pm/FAILURE_PATTERN_LEDGER.md@L2149",
+      "kai-pm/DECISIONS.md@L34676",
+      "kai-pm/DECISIONS.md@L13025",
+      "kai-pm/DECISIONS.md@L28510",
+      "kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D352.md@L1",
+      "B11:KAI-FEATURE-LIST@L1"
+     ],
+     "independent_audit": "Kai chooses, after the readers finish and before seeing their answers for those units: at least ceil(10%) of feature-bearing units and ceil(2%) of no-item units, outside the six targeted units",
+     "rules": "handoff entry 360, block PILOT-CONTROL-PLAN-360: sequence, pass rules, failure handling, final report"
+    }
+    END-VERBATIM CENSUS-ANCHOR-PILOT
+- EVIDENCE CENSUS-SELECT-PILOT-SCRIPT select_pilot.py: 6109 bytes, sha256 44d99b91e963d321684fc2d7445b3949c538e9a4472e451e552a512df63d1a95, final LF True (added by Orion)  [CMD `sha256sum select_pilot.py` → 44d99b91e963d321…]
+    BEGIN-VERBATIM CENSUS-SELECT-PILOT-SCRIPT
+    # Wave 0 pilot: deterministic selection of exactly 30 review units (Kai's pilot control plan, handoff entry 360, point 4).
+    # Read-only; standard library; run with python3 -I. Source bytes are read ONLY through passages.read_source (via census_check.texts),
+    # which refuses data/SOUL.md before anything is opened.
+    #   python3 -I select_pilot.py <scratch-with-subject> <passages.json> <units.json> <out.json>
+    # The seed is not chosen by anyone: seed = first 16 hex digits of sha256("KAI-WAVE0-PILOT|" + sha256(passages.json) + "|" + sha256(units.json)),
+    # both inputs frozen before this plan existed, so the seed cannot be ground.
+    # Mix: 20 eligible (canonical, canonical*, lineage, draft), at least 2 per eligible class; 6 excluded (derived, external, superseded,
+    # nonfile), at least 1 per excluded class present, and exactly 1 of them from the D344 pending-append queue files; 4 challenging, one per rule:
+    #   C1 size: a unit of the maximum normal length (MAX_LINES = 1200 lines); the single oversize indivisible unit
+    #      (kai-pm/HANDOFF_LOG.md@L34111, 1395 lines, 357 KB) is excluded from the pilot for cost and is a named special case for the full census;
+    #   C2 removal or hold: a kai-pm/DECISIONS.md unit whose text matches REMOVAL;
+    #   C3 nested: an eligible unit holding a table of at least 5 rows (lines starting with "|");
+    #   C4 contradiction: an eligible unit whose text matches CONTRA.
+    # Each challenging pick is drawn by the seed from its candidate pool, in order C1..C4, skipping units already taken.
+    import hashlib, importlib.util, json, os, random, re, subprocess, sys
+    HERE = os.path.dirname(os.path.abspath(__file__)); REPO = "/home/user/kai-system"
+    spec = importlib.util.spec_from_file_location("census_check", os.path.join(HERE, "census_check.py")); C = importlib.util.module_from_spec(spec); spec.loader.exec_module(C)
+    ELIGIBLE = ["canonical", "canonical*", "lineage", "draft"]; EXCLUDED = ["derived", "external", "superseded", "nonfile"]
+    QUEUE = "kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_"
+    REMOVAL = re.compile(r"\b(remov\w*|withdraw\w*|supersed\w*|on hold|held|retir\w*|deprecat\w*)\b", re.I)
+    CONTRA = re.compile(r"\b(contradict\w*|conflict\w*|inconsisten\w*)\b", re.I)
+    def sha(b): return hashlib.sha256(b).hexdigest()
+    
+    def main(scratch, pas_path, units_path, out):
+        if os.path.exists(out): os.remove(out)
+        pb, ub = open(pas_path, "rb").read(), open(units_path, "rb").read(); pas, U = json.loads(pb), json.loads(ub)
+        seed_hex = sha(("KAI-WAVE0-PILOT|" + sha(pb) + "|" + sha(ub)).encode())[:16]; rng = random.Random(int(seed_hex, 16))
+        lcs = {s["route"]["log_commit"] for s in pas["sources"] if s["route"]["kind"] == "handoff_block"}
+        log = subprocess.run(["git", "show", f"{lcs.pop()}:kai-pm/HANDOFF_LOG.md"], cwd=REPO, capture_output=True, text=True).stdout.split("\n") if lcs else []
+        txt = C.texts(scratch, pas, log); cls = {s["source"]: s["eff_class"] for s in pas["sources"]}
+        units = sorted(U["units"], key=lambda u: u["unit"])                 # fixed order before any draw
+        body = {u["unit"]: "\n".join(txt[u["source"]][u["start"] - 1:u["end"]]) for u in units}
+        taken, pick, why = {u["unit"] for u in units if u.get("oversize_indivisible")}, [], {}
+        def draw(pool, n, label):
+            pool = [u for u in pool if u["unit"] not in taken]
+            if len(pool) < n: raise SystemExit(f"PROBLEM pool '{label}' has {len(pool)} units, need {n}")
+            for u in rng.sample(pool, n): taken.add(u["unit"]); pick.append(u); why[u["unit"]] = label
+        special = [u["unit"] for u in units if u.get("oversize_indivisible")]
+        draw([u for u in units if u["end"] - u["start"] + 1 == C.MAX_LINES and not u.get("oversize_indivisible")], 1, "C1 size (1200-line unit)")
+        draw([u for u in units if u["source"] == "kai-pm/DECISIONS.md" and REMOVAL.search(body[u["unit"]])], 1, "C2 removal or hold")
+        draw([u for u in units if cls[u["source"]] in ELIGIBLE and sum(1 for l in body[u["unit"]].split("\n") if l.lstrip().startswith("|")) >= 5], 1, "C3 nested (table of 5+ rows)")
+        draw([u for u in units if cls[u["source"]] in ELIGIBLE and CONTRA.search(body[u["unit"]])], 1, "C4 contradiction")
+        for c in ELIGIBLE: draw([u for u in units if cls[u["source"]] == c], 2, f"eligible {c} (stratum)")
+        draw([u for u in units if cls[u["source"]] in ELIGIBLE], 20 - 2 * len(ELIGIBLE), "eligible (seeded)")
+        draw([u for u in units if u["source"].startswith(QUEUE)], 1, "excluded derived (D344 queue)")
+        present = [c for c in EXCLUDED if any(cls[u["source"]] == c for u in units)]
+        for c in present:
+            if not any(cls[u["source"]] == c and why[u["unit"]].startswith("excluded") for u in pick): draw([u for u in units if cls[u["source"]] == c], 1, f"excluded {c} (stratum)")
+        draw([u for u in units if cls[u["source"]] in EXCLUDED], 6 - sum(1 for u in pick if why[u["unit"]].startswith("excluded")), "excluded (seeded)")
+        ids = [u["unit"] for u in pick]
+        assert len(ids) == 30 == len(set(ids)), "selection is not 30 distinct units"
+        rows = [{"unit": u["unit"], "source": u["source"], "class": cls[u["source"]], "lines": u["end"] - u["start"] + 1, "bytes": len(body[u["unit"]].encode()),
+                 "passages": len(u["passages"]), "rule": why[u["unit"]]} for u in pick]
+        res = {"excluded_from_pilot": special, "seed_hex": seed_hex, "seed_rule": "sha256('KAI-WAVE0-PILOT|'+sha256(passages.json)+'|'+sha256(units.json))[:16]",
+               "passages_sha256": sha(pb), "units_sha256": sha(ub), "population_units": len(units), "selected": rows,
+               "totals": {"units": 30, "lines": sum(r["lines"] for r in rows), "bytes": sum(r["bytes"] for r in rows), "passages": sum(r["passages"] for r in rows)}}
+        open(out, "w").write(json.dumps(res, indent=1) + "\n")
+        for r in rows: print(f"  {r['rule']:34s} {r['class']:11s} {r['lines']:5d} lines {r['bytes']:7d} B  {r['unit']}")
+        print(f"PILOT SELECTION: seed {seed_hex}; 30 distinct of {len(units)} units; {res['totals']['lines']} lines, {res['totals']['bytes']} bytes, {res['totals']['passages']} passages")
+        return 0
+    
+    if __name__ == "__main__": sys.exit(main(*sys.argv[1:]))
+    END-VERBATIM CENSUS-SELECT-PILOT-SCRIPT
+- EVIDENCE CENSUS-PILOT-SELECTION pilot_selection.json: 7050 bytes, sha256 8300bdc2b6ce3ac6dc1396dd3f0b7faabae2f4fa1d8363a42ceeefd9693f7281, final LF True (added by Orion)  [CMD `sha256sum pilot_selection.json` → 8300bdc2b6ce3ac6…]
+    BEGIN-VERBATIM CENSUS-PILOT-SELECTION
+    {
+     "excluded_from_pilot": [
+      "kai-pm/HANDOFF_LOG.md@L34111"
+     ],
+     "seed_hex": "ab6e01c216644c94",
+     "seed_rule": "sha256('KAI-WAVE0-PILOT|'+sha256(passages.json)+'|'+sha256(units.json))[:16]",
+     "passages_sha256": "d3d7da20a586b254fd35f948e41d45935664d31f40de72840ba357efee4d4635",
+     "units_sha256": "1139318f5637aa16f715b98cdc311eb12eed86249c740a4990d99d5434bfef09",
+     "population_units": 1095,
+     "selected": [
+      {
+       "unit": "kai-pm/FAILURE_PATTERN_LEDGER.md@L2149",
+       "source": "kai-pm/FAILURE_PATTERN_LEDGER.md",
+       "class": "canonical*",
+       "lines": 1200,
+       "bytes": 63923,
+       "passages": 111,
+       "rule": "C1 size (1200-line unit)"
+      },
+      {
+       "unit": "kai-pm/DECISIONS.md@L34676",
+       "source": "kai-pm/DECISIONS.md",
+       "class": "canonical",
+       "lines": 168,
+       "bytes": 6914,
+       "passages": 32,
+       "rule": "C2 removal or hold"
+      },
+      {
+       "unit": "kai-pm/DECISIONS.md@L13025",
+       "source": "kai-pm/DECISIONS.md",
+       "class": "canonical",
+       "lines": 91,
+       "bytes": 4611,
+       "passages": 21,
+       "rule": "C3 nested (table of 5+ rows)"
+      },
+      {
+       "unit": "kai-pm/DECISIONS.md@L28510",
+       "source": "kai-pm/DECISIONS.md",
+       "class": "canonical",
+       "lines": 29,
+       "bytes": 1665,
+       "passages": 3,
+       "rule": "C4 contradiction"
+      },
+      {
+       "unit": "kai-pm/DECISIONS.md@L16000",
+       "source": "kai-pm/DECISIONS.md",
+       "class": "canonical",
+       "lines": 59,
+       "bytes": 2475,
+       "passages": 17,
+       "rule": "eligible canonical (stratum)"
+      },
+      {
+       "unit": "kai-pm/DECISIONS.md@L32709",
+       "source": "kai-pm/DECISIONS.md",
+       "class": "canonical",
+       "lines": 193,
+       "bytes": 9222,
+       "passages": 43,
+       "rule": "eligible canonical (stratum)"
+      },
+      {
+       "unit": "kai-pm/HANDOFF_LOG.md@L41002",
+       "source": "kai-pm/HANDOFF_LOG.md",
+       "class": "canonical*",
+       "lines": 1199,
+       "bytes": 32993,
+       "passages": 403,
+       "rule": "eligible canonical* (stratum)"
+      },
+      {
+       "unit": "kai-pm/HANDOFF_LOG.md@L60601",
+       "source": "kai-pm/HANDOFF_LOG.md",
+       "class": "canonical*",
+       "lines": 68,
+       "bytes": 7143,
+       "passages": 19,
+       "rule": "eligible canonical* (stratum)"
+      },
+      {
+       "unit": "docs/gaps_and_hardening.md@L1",
+       "source": "docs/gaps_and_hardening.md",
+       "class": "lineage",
+       "lines": 75,
+       "bytes": 4054,
+       "passages": 18,
+       "rule": "eligible lineage (stratum)"
+      },
+      {
+       "unit": "kai-pm/D349_DEEPSEEK_V0_3_EXISTING_SYSTEM_REVIEW_RECONCILIATION.md@L1",
+       "source": "kai-pm/D349_DEEPSEEK_V0_3_EXISTING_SYSTEM_REVIEW_RECONCILIATION.md",
+       "class": "lineage",
+       "lines": 128,
+       "bytes": 6060,
+       "passages": 54,
+       "rule": "eligible lineage (stratum)"
+      },
+      {
+       "unit": "kai-pm/H2_CONSOLIDATED_REPAIR_SPEC_DRAFT.md@L1",
+       "source": "kai-pm/H2_CONSOLIDATED_REPAIR_SPEC_DRAFT.md",
+       "class": "draft",
+       "lines": 1199,
+       "bytes": 56530,
+       "passages": 261,
+       "rule": "eligible draft (stratum)"
+      },
+      {
+       "unit": "kai-pm/GPU_ARRIVAL_RUNBOOK.md@L1",
+       "source": "kai-pm/GPU_ARRIVAL_RUNBOOK.md",
+       "class": "draft",
+       "lines": 309,
+       "bytes": 10210,
+       "passages": 51,
+       "rule": "eligible draft (stratum)"
+      },
+      {
+       "unit": "kai-pm/HANDOFF_LOG.md@L56961",
+       "source": "kai-pm/HANDOFF_LOG.md",
+       "class": "canonical*",
+       "lines": 925,
+       "bytes": 83346,
+       "passages": 109,
+       "rule": "eligible (seeded)"
+      },
+      {
+       "unit": "kai-pm/DECISIONS.md@L9606",
+       "source": "kai-pm/DECISIONS.md",
+       "class": "canonical",
+       "lines": 114,
+       "bytes": 4921,
+       "passages": 27,
+       "rule": "eligible (seeded)"
+      },
+      {
+       "unit": "kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md@L1",
+       "source": "kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md",
+       "class": "canonical*",
+       "lines": 449,
+       "bytes": 16609,
+       "passages": 156,
+       "rule": "eligible (seeded)"
+      },
+      {
+       "unit": "kai-pm/HANDOFF_LOG.md@L79937",
+       "source": "kai-pm/HANDOFF_LOG.md",
+       "class": "canonical*",
+       "lines": 78,
+       "bytes": 8435,
+       "passages": 19,
+       "rule": "eligible (seeded)"
+      },
+      {
+       "unit": "kai-pm/HANDOFF_LOG.md@L16882",
+       "source": "kai-pm/HANDOFF_LOG.md",
+       "class": "canonical*",
+       "lines": 1200,
+       "bytes": 95605,
+       "passages": 101,
+       "rule": "eligible (seeded)"
+      },
+      {
+       "unit": "kai-pm/HANDOFF_LOG.md@L63362",
+       "source": "kai-pm/HANDOFF_LOG.md",
+       "class": "canonical*",
+       "lines": 109,
+       "bytes": 11189,
+       "passages": 30,
+       "rule": "eligible (seeded)"
+      },
+      {
+       "unit": "kai-pm/DECISIONS.md@L1739",
+       "source": "kai-pm/DECISIONS.md",
+       "class": "canonical",
+       "lines": 63,
+       "bytes": 6963,
+       "passages": 15,
+       "rule": "eligible (seeded)"
+      },
+      {
+       "unit": "kai-pm/DECISIONS.md@L28693",
+       "source": "kai-pm/DECISIONS.md",
+       "class": "canonical",
+       "lines": 26,
+       "bytes": 1374,
+       "passages": 3,
+       "rule": "eligible (seeded)"
+      },
+      {
+       "unit": "kai-pm/DECISIONS.md@L1287",
+       "source": "kai-pm/DECISIONS.md",
+       "class": "canonical",
+       "lines": 17,
+       "bytes": 2294,
+       "passages": 8,
+       "rule": "eligible (seeded)"
+      },
+      {
+       "unit": "kai-pm/HANDOFF_LOG.md@L84741",
+       "source": "kai-pm/HANDOFF_LOG.md",
+       "class": "canonical*",
+       "lines": 69,
+       "bytes": 6308,
+       "passages": 19,
+       "rule": "eligible (seeded)"
+      },
+      {
+       "unit": "kai-pm/HANDOFF_LOG.md@L43402",
+       "source": "kai-pm/HANDOFF_LOG.md",
+       "class": "canonical*",
+       "lines": 1200,
+       "bytes": 41486,
+       "passages": 401,
+       "rule": "eligible (seeded)"
+      },
+      {
+       "unit": "kai-pm/HANDOFF_LOG.md@L86157",
+       "source": "kai-pm/HANDOFF_LOG.md",
+       "class": "canonical*",
+       "lines": 98,
+       "bytes": 9296,
+       "passages": 27,
+       "rule": "eligible (seeded)"
+      },
+      {
+       "unit": "kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D352.md@L1",
+       "source": "kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D352.md",
+       "class": "derived",
+       "lines": 69,
+       "bytes": 3343,
+       "passages": 20,
+       "rule": "excluded derived (D344 queue)"
+      },
+      {
+       "unit": "kai-pm/DEEPSEEK_BRIEF_2026-08-07_TOPOLOGY.md@L1",
+       "source": "kai-pm/DEEPSEEK_BRIEF_2026-08-07_TOPOLOGY.md",
+       "class": "external",
+       "lines": 116,
+       "bytes": 5577,
+       "passages": 23,
+       "rule": "excluded external (stratum)"
+      },
+      {
+       "unit": "kai-pm/CLEANUP_TODO.md@L1",
+       "source": "kai-pm/CLEANUP_TODO.md",
+       "class": "superseded",
+       "lines": 102,
+       "bytes": 5650,
+       "passages": 27,
+       "rule": "excluded superseded (stratum)"
+      },
+      {
+       "unit": "B11:KAI-FEATURE-LIST@L1",
+       "source": "B11:KAI-FEATURE-LIST",
+       "class": "nonfile",
+       "lines": 631,
+       "bytes": 70760,
+       "passages": 125,
+       "rule": "excluded nonfile (stratum)"
+      },
+      {
+       "unit": "kai-pm/ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md@L1",
+       "source": "kai-pm/ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md",
+       "class": "external",
+       "lines": 235,
+       "bytes": 16303,
+       "passages": 103,
+       "rule": "excluded (seeded)"
+      },
+      {
+       "unit": "kai-pm/CODE_AUDIT_BATCH_SYSMETRICS_WORLD_ANCHOR.md@L1",
+       "source": "kai-pm/CODE_AUDIT_BATCH_SYSMETRICS_WORLD_ANCHOR.md",
+       "class": "derived",
+       "lines": 152,
+       "bytes": 9531,
+       "passages": 31,
+       "rule": "excluded (seeded)"
+      }
+     ],
+     "totals": {
+      "units": 30,
+      "lines": 10371,
+      "bytes": 604790,
+      "passages": 2277
+     }
+    }
+    END-VERBATIM CENSUS-PILOT-SELECTION
+- EVIDENCE CENSUS-PILOT-BATCHES pilot_batches.json: 1576 bytes, sha256 81e078be97dbb2018ffa8578b243f3c1e9a2cd6ce762000db85a27d951e83f95, final LF True (added by Orion)  [CMD `sha256sum pilot_batches.json` → 81e078be97dbb201…]
+    BEGIN-VERBATIM CENSUS-PILOT-BATCHES
+    {
+     "batches": {
+      "B01": [
+       "kai-pm/HANDOFF_LOG.md@L16882"
+      ],
+      "B02": [
+       "kai-pm/HANDOFF_LOG.md@L56961"
+      ],
+      "B03": [
+       "B11:KAI-FEATURE-LIST@L1"
+      ],
+      "B04": [
+       "kai-pm/FAILURE_PATTERN_LEDGER.md@L2149"
+      ],
+      "B05": [
+       "kai-pm/H2_CONSOLIDATED_REPAIR_SPEC_DRAFT.md@L1"
+      ],
+      "B06": [
+       "kai-pm/HANDOFF_LOG.md@L43402",
+       "docs/gaps_and_hardening.md@L1",
+       "kai-pm/DECISIONS.md@L28693"
+      ],
+      "B07": [
+       "kai-pm/HANDOFF_LOG.md@L41002",
+       "kai-pm/DECISIONS.md@L34676",
+       "kai-pm/DECISIONS.md@L9606",
+       "kai-pm/DECISIONS.md@L16000"
+      ],
+      "B08": [
+       "kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md@L1",
+       "kai-pm/HANDOFF_LOG.md@L86157",
+       "kai-pm/HANDOFF_LOG.md@L60601",
+       "kai-pm/HANDOFF_LOG.md@L84741",
+       "kai-pm/DEEPSEEK_BRIEF_2026-08-07_TOPOLOGY.md@L1",
+       "kai-pm/DECISIONS.md@L1287"
+      ],
+      "B09": [
+       "kai-pm/ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md@L1",
+       "kai-pm/CODE_AUDIT_BATCH_SYSMETRICS_WORLD_ANCHOR.md@L1",
+       "kai-pm/HANDOFF_LOG.md@L79937",
+       "kai-pm/D349_DEEPSEEK_V0_3_EXISTING_SYSTEM_REVIEW_RECONCILIATION.md@L1",
+       "kai-pm/DECISIONS.md@L13025",
+       "kai-pm/DECISIONS.md@L28510"
+      ],
+      "B10": [
+       "kai-pm/HANDOFF_LOG.md@L63362",
+       "kai-pm/GPU_ARRIVAL_RUNBOOK.md@L1",
+       "kai-pm/DECISIONS.md@L32709",
+       "kai-pm/DECISIONS.md@L1739",
+       "kai-pm/CLEANUP_TODO.md@L1",
+       "kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D352.md@L1"
+      ]
+     },
+     "bytes": {
+      "B01": 95605,
+      "B02": 83346,
+      "B03": 70760,
+      "B04": 63923,
+      "B05": 56530,
+      "B06": 46914,
+      "B07": 47303,
+      "B08": 47227,
+      "B09": 46605,
+      "B10": 46577
+     }
+    }
+    END-VERBATIM CENSUS-PILOT-BATCHES
+
+### 6. Next authorised step
+
+- Present the package to Dainius for Kai; wait for the ADJUDICATED and APPROVED lines  [CONVERSATION 2026-11-02 Dainius, "Prepare one exact anchor package for independent review and my explicit approval."]
+
+### 7. What I am unsure of
+
+- Per-run set-up tokens and whether the locks bind helper readers; both measured by the security test before any reading  [CMD `PILOT_ANCHOR_PACKAGE.md "Not verified yet"` → as stated]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
