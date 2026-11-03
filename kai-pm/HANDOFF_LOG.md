@@ -114871,3 +114871,107 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-03T07:39:13Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-03T07:39:13Z  [CMD `date -u +%FT%TZ` → 2026-11-03T07:39:13Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 4f6b357b248ca43f5a5b49f5e78c0d337409c26a  [CMD `git rev-parse HEAD` → 4f6b357b248ca43f5a5b49f5e78c0d337409c26a]
+- tree: cda635ae8ce3e87bc62a44561bcb7aefc43d1d4a  [CMD `git rev-parse HEAD^{tree}` → cda635ae8ce3e87bc62a44561bcb7aefc43d1d4a]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 4f6b357b248ca43f5a5b49f5e78c0d337409c26a  [CMD `git ls-remote --heads origin` → 4f6b357b248ca43f5a5b49f5e78c0d337409c26a]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 370  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 370]
+
+### 1. The four states
+
+- physical: repository unchanged since entry 370 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: the capability map (entry 370)  [CONVERSATION 2026-11-03 Kai-GPT relayed by Dainius, "Map every entry to the actual repository implementation"]
+- evidence: eight read-only helper agents launched in parallel with the brief verbatim in section 5: G1 O1–O2 (19), G2 O3–O4 (14), G3 O5 (19), G4 O6–O7 (17), G5 O8–O9 (16), G6 O10, O11, ENG (19), G7 K1–K20 (20), and one to read the 21 other Kingsman documents for missing features; 19+14+19+17+16+19 = 104 README features  [CMD `split script` → per-group feature counts]
+- admission: none; results pending; nothing changed in KAI  [CONVERSATION 2026-11-03 Kai-GPT relayed by Dainius, "All active engineering, PRE-RAMS, Gold Tier, R11 and PR #122 holds remain."]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `handoff entry 370 section 6` → "Start the capability map"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: reading code and documents. HELD: engineering; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying, reading, searching or processing data/SOUL.md  [CONVERSATION 2026-11-03 Kai-GPT relayed by Dainius, "Do not access data/SOUL.md."]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- Helpers are general-purpose agents with file tools; the brief forbids touching data/SOUL.md and any search over the repository root or data/, and the SOUL Read/Edit deny rule applies; Bash is not technically blocked, so this is instruction plus the deny rule, not isolation  [CMD `BRIEF.md rule 1` → as stated]
+- EVIDENCE CAPMAP-BRIEF BRIEF.md: 2868 bytes, sha256 9c8f4503535f658a29c8612f6a9c9d4aa32c212b89de0f5a98d9f78d998b65a3, final LF True (added by Orion)  [CMD `sha256sum BRIEF.md` → 9c8f4503535f658a…]
+    BEGIN-VERBATIM CAPMAP-BRIEF
+    # Capability map brief (read this fully first)
+    
+    You are mapping KAI's intended features to the real code in the repository at `/home/user/kai-system`. The output feeds one factual "KAI today vs KAI intended" capability map for the owner, Dainius.
+    
+    ## Hard rules (breaking any of these ruins the work)
+    
+    1. **Never touch `data/SOUL.md`.** Do not open, read, list, grep, search or process it, and never run any search over the whole repository or over `data/`. With Grep or Glob, always set a path to a specific code directory, or add the glob `!data/**`. With Bash, never run `grep -r`, `find`, `git grep` or `cat` over the repository root or `data/`. If you think you need `data/`, stop and say so in your notes.
+    2. **Read-only.** Do not edit, write, create or delete files. Do not run git commands that change anything. Do not run the code, tests, docker, pip or anything over the network.
+    3. **Evidence, not belief.** Never mark a feature as working because the README says so, a test file exists, a feature flag exists or a service is named after it. Look at what the code actually does.
+    4. **Bounded negatives.** For ABSENT or NAME_ONLY, say exactly where you looked (directories, search terms). "Not found in X" is fine; "nowhere" is not.
+    
+    ## Classification (pick one per feature)
+    
+    | Class | Meaning |
+    |---|---|
+    | GENUINE | Real implementation of the stated behaviour, wired to an endpoint or caller, with no stub as the main path |
+    | PARTIAL | Real code for part of the behaviour, or real but not wired in, or only works with a missing backend |
+    | SIMULATED | Code runs but returns canned, hashed, random or heuristic output standing in for the real behaviour |
+    | NAME_ONLY | Only a name: flag, docstring, route, UI label, config entry or empty function |
+    | ABSENT | Nothing found in the stated search |
+    | UNKNOWN | Could not decide; say why |
+    
+    **Runtime** is a separate column. Write `NOT RUN` for every feature: runtime testing is on hold. Only if you find an existing recorded runtime result (a log or report in the repository) cite its path, and still say it was not re-run.
+    
+    ## Leads (verify against the code; they may be stale)
+    
+    - `kai-pm/STUBS_AND_PLACEHOLDERS.md`: known stubs and placeholders.
+    - `kai-pm/CODE_AUDIT_BATCH_<SERVICE>.md`: per-service code audits (mostly security). Cite one if you used it.
+    - README lines and feature flags (FF_*) in your feature file show the names to search for.
+    
+    ## Output
+    
+    Return **only** a Markdown table, one row per feature in your file, in this form:
+    
+    | # | Feature | Code location (file:line, at most 3) | Class | What the code actually does (one line) | Runtime | Gap and next action (retain / finish / integrate / replace) |
+    
+    Then at most 10 short notes, for anything cross-cutting: shared stubs, wiring gaps, features that are really one mechanism, and any place you could not look. Keep rows short and factual.
+    END-VERBATIM CAPMAP-BRIEF
+
+### 6. Next authorised step
+
+- Collect the eight results, check them, assemble one capability map and a prioritised gap report  [CONVERSATION 2026-11-03 Kai-GPT relayed by Dainius, "Deliver one actionable capability map and a prioritised engineering gap report"]
+
+### 7. What I am unsure of
+
+- Helper accuracy; spot-checks of their code references follow when results arrive  [CMD `none` → pending]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
