@@ -114665,3 +114665,74 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-03T07:14:14Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-03T07:14:14Z  [CMD `date -u +%FT%TZ` → 2026-11-03T07:14:14Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 299b34d7439edc3a1a49952b7856b7025f6dd104  [CMD `git rev-parse HEAD` → 299b34d7439edc3a1a49952b7856b7025f6dd104]
+- tree: dd9e1022ca8cb096fa949537f3ad62bed00471cc  [CMD `git rev-parse HEAD^{tree}` → dd9e1022ca8cb096fa949537f3ad62bed00471cc]
+- uncommitted_paths: 1  [CMD `git status --porcelain | count lines` → 1]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/project-rework-plan-pgvp35: 299b34d7439edc3a1a49952b7856b7025f6dd104  [CMD `git ls-remote --heads origin` → 299b34d7439edc3a1a49952b7856b7025f6dd104]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 368  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 368]
+
+### 1. The four states
+
+- physical: new file kai-pm/KAI_FEATURE_LIST_README_PLUS_KINGSMAN.md committed with this entry  [CMD `git status --porcelain` → 1 new file]
+- authorised: build the feature list from the README plus the Kingsman plan, as Dainius directed  [CONVERSATION 2026-11-03 Dainius, "Well the rest is writen in kingsman tier plan"]
+- evidence: README's 104 features (block KAI-FEATURE-LIST) plus 20 additions with source lines from KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md and KINGSMAN_FINAL_VISION_MASTER_CANON_PLAN.md, both read in full for the cited sections; 12 additions extend README features, 8 are new; total 124  [CMD `grep -c '^| K[0-9]'; grep -c Extends` → 20; 12]
+- admission: the pilot and full census are superseded in practice by this list, pending Dainius's word and Kai being told; no disposition was banked on any pilot anchor  [CONVERSATION 2026-11-03 Dainius, "you both with gpt taking 100 hours just for that ???? That’s so inefficient!"]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-11-03 · the features beyond the README are in the Kingsman plan; the census exercise was inefficient and focused on execution and tools rather than results ⚠ UNBANKED  [CONVERSATION 2026-11-03 Dainius, "As you concentrate again more on execution than actual results and the toys again !"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: the merged feature list. HELD: engineering; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying, reading, searching or processing data/SOUL.md; whole-project searches that do not exclude it  [CONVERSATION 2026-11-02 Dainius, "data/SOUL.md must not be accessed, copied, read, searched or processed."]
+
+### 4. Open questions
+
+- Dainius: confirm the census pilot is cancelled and the 124-feature list is the build list; next step is the capability map (what works today)  [CMD `KAI_FEATURE_LIST_README_PLUS_KINGSMAN.md` → "What this list does not say"]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- Orion's admission: the README list existed since 2026-10-07 and was designated by Dainius as the preservation universe; the census planning of entries 298-367 should have started from it plus the Kingsman documents  [CMD `grep -n "preservation universe" HANDOFF_LOG.md` → line 67168]
+- First draft said 14 of 20 additions extend README features; counted 12 and corrected before commit  [CMD `grep -c Extends` → 12]
+- Credential scan: 0 hits  [CMD `credscan.py scan369.json` → TOTAL HITS 0]
+- EVIDENCE DAINIUS-KINGSMAN-DIRECTION-369 dainius_369.txt: 265 bytes, sha256 887fcfb8430ba4a90daff19f1035fb78ef5cfb3137d27565cba72f1341dffb7a, final LF True (added by Orion)  [CMD `sha256sum dainius_369.txt` → 887fcfb8430ba4a9…]
+    BEGIN-VERBATIM DAINIUS-KINGSMAN-DIRECTION-369
+    Well the rest is writen in kingsman tier plan , I’m not ai but I’ve done it in like 5 seconds and you both with gpt taking 100 hours just for that ???? That’s so inefficient! As you concentrate again more on execution than actual results and the toys again !
+    END-VERBATIM DAINIUS-KINGSMAN-DIRECTION-369
+
+### 6. Next authorised step
+
+- Give Dainius the list; on his word, tell Kai the pilot is cancelled; propose the capability map as the next result  [CONVERSATION 2026-11-03 Dainius, "concentrate again more on execution than actual results"]
+
+### 7. What I am unsure of
+
+- Whether other Kingsman documents (resilience, proactive organism, stewardship and succession, contingency library) add features beyond the 20; only the two documents above were read  [CMD `ls kai-pm/KINGSMAN*` → 23 files]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
