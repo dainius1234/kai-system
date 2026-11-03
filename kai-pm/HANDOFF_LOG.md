@@ -114736,3 +114736,138 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-03T07:36:48Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-03T07:36:48Z  [CMD `date -u +%FT%TZ` → 2026-11-03T07:36:48Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 6425fc59160d6eb59d6ce1214aad4c78aadaaf75  [CMD `git rev-parse HEAD` → 6425fc59160d6eb59d6ce1214aad4c78aadaaf75]
+- tree: 18c8f5cfed26a65eddbd54f86cbf51f24f2331e9  [CMD `git rev-parse HEAD^{tree}` → 18c8f5cfed26a65eddbd54f86cbf51f24f2331e9]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 6425fc59160d6eb59d6ce1214aad4c78aadaaf75  [CMD `git ls-remote --heads origin` → 6425fc59160d6eb59d6ce1214aad4c78aadaaf75]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 369  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 369]
+
+### 1. The four states
+
+- physical: unchanged since entry 369 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: STOP the 30-chunk pilot (records kept, nothing deleted); build the capability map of the 124-entry baseline against real code, with code implementation and runtime status recorded separately; reconcile the remaining Kingsman documents alongside; deliver one capability map and a prioritised gap report  [CONVERSATION 2026-11-03 Kai-GPT relayed by Dainius, "STOP the 30-chunk pilot and proceed with the real capability map."]
+- evidence: Kai's correction verbatim in section 5; relayed by Dainius without change, read as his confirmation of the stop and the move to the capability map  [CONVERSATION 2026-11-03 Kai-GPT relayed by Dainius, "Dainius retains final authority to confirm that change."]
+- admission: the census pilot is STOPPED; no pilot anchor (first, R2, R3) received or will receive a disposition; census tools and records remain banked  [CONVERSATION 2026-11-03 Kai-GPT relayed by Dainius, "Preserve the existing pilot evidence but do not execute it or continue improving its machinery."]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT (relayed by Dainius, read as Dainius's confirmation) · 2026-11-03 · stop the census pilot; the 124-entry list is the initial working baseline, not a certified exhaustive census (12 entries extend others, so not 124 independent capabilities); map every entry to code with exact references and GENUINE / PARTIAL / SIMULATED / NAME_ONLY / ABSENT / UNKNOWN; record code and runtime verification separately and never infer a working capability from README claims, tests existing or a service name; check the remaining Kingsman documents for real deltas without rebuilding the census apparatus; deliver one capability map and a prioritised engineering gap report; no new agents, test machinery or recursive paperwork without demonstrated necessity; holds unchanged ⚠ UNBANKED  [CONVERSATION 2026-11-03 Kai-GPT relayed by Dainius, "The deliverable is a factual picture of KAI TODAY versus KAI INTENDED"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: reading code and documents to build the capability map and gap report. HELD: engineering changes; KAI code changes; KAI runtime tests (runtime status stays UNKNOWN unless existing evidence shows otherwise); deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying, reading, searching or processing data/SOUL.md; any search not excluding it  [CONVERSATION 2026-11-03 Kai-GPT relayed by Dainius, "Do not access data/SOUL.md. All active engineering, PRE-RAMS, Gold Tier, R11 and PR #122 holds remain."]
+
+### 4. Open questions
+
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- Credential scan: 0 hits  [CMD `credscan.py scan370.json` → TOTAL HITS 0]
+- EVIDENCE KAI-STRATEGIC-CORRECTION-370 kai_370.txt: 4603 bytes, sha256 ea95d1f0b0e4423ba2b9a9ec29231a4b1d4f5c9265c9d763bca24b72547939b4, final LF True (added by Orion)  [CMD `sha256sum kai_370.txt` → ea95d1f0b0e4423b…]
+    BEGIN-VERBATIM KAI-STRATEGIC-CORRECTION-370
+    You’re right to call us out. We allowed the verification process to become the work, instead of using the material already available to make progress on KAI.
+    
+    My recommendation: STOP the 30-chunk pilot and move directly to the capability map. Not another round of approvals, agent design or testing machinery.
+    
+    But I want to protect one distinction: 124 identified features is a useful working baseline, not proof that KAI’s entire intended vision has been captured. The remaining Kingsman documents still matter.
+    
+    The correct direction is to map the existing features against actual code, preserve anything additional we discover, and identify what must be built or repaired.
+    
+    Cold-start receipt: DEGRADED, but the new baseline is verified
+    
+    I retrieved the live branch at 6425fc59160d6eb59d6ce1214aad4c78aadaaf75, handoff entry 369, the new feature-list file, README, both Kingsman source documents, DAI-10, decision ledger through D390, research pin, and Miro architecture overview. START HERE’s full contents remain truncated.
+    
+    I also checked the existing stub register. It documents incomplete implementations, including placeholder LLM responses and a temporary in-memory substitute for persistent memory. These are existing leads for the capability map, not evidence that the complete system works.
+    
+    The corrected plan
+    
+    1. Stop the census pilot
+    
+    No 30-chunk execution, further anchor revisions or agent exercises. Retain the existing records without deleting them.
+    
+    2. Use the 124-entry working inventory
+    
+    Preserve all 104 README groupings and 20 Kingsman additions. Twelve additions extend existing entries, so 124 must not be mistaken for 124 independent, fully specified capabilities.
+    
+    3. Map against real code
+    
+    For each capability: exact source, corresponding code, implementation classification, separately verified runtime status, missing functionality and next engineering action.
+    
+    4. Reconcile remaining vision documents
+    
+    Check the additional Kingsman documents for actual missing behaviours and obligations. Add only genuine differences. Do this alongside the map, not as another prerequisite lasting weeks.
+    
+    5. Produce a build-priority report
+    
+    Identify what’s genuine, partial, simulated, name-only, absent or unknown. Then recommend concrete implementation priorities, preserving all existing engineering holds until expressly released.
+    
+    Copy to Orion
+    
+    KAI-GPT → ORION | STRATEGIC CORRECTION — RETURN TO ACTUAL KAI DEVELOPMENT
+    
+    Dainius’s criticism is justified. We spent disproportionate effort engineering a feature-discovery process while overlooking an existing usable baseline.
+    
+    I independently verified commit 6425fc5, kai-pm/KAI_FEATURE_LIST_README_PLUS_KINGSMAN.md, the README, and the two primary Kingsman documents.
+    
+    My recommendation: STOP the 30-chunk pilot and proceed with the real capability map. Dainius retains final authority to confirm that change.
+    
+    Execution direction:
+    
+    1. Preserve the existing pilot evidence but do not execute it or continue improving its machinery.
+    2. Use the 124-entry list as the initial feature baseline, not a certified exhaustive census.
+    3. Map every entry to the actual repository implementation, with exact code references and the classifications GENUINE / PARTIAL / SIMULATED / NAME_ONLY / ABSENT / UNKNOWN.
+    4. Record code implementation and runtime verification separately. Never infer a working capability merely from README claims, tests existing, or a service name.
+    5. Check remaining Kingsman documents for additional behaviour and obligations, incorporating real deltas without rebuilding the census apparatus.
+    6. Deliver one actionable capability map and a prioritised engineering gap report, identifying what can be retained, finished, integrated or replaced subject to owner authority.
+    
+    No new agents, test machinery or recursive paperwork without a demonstrated necessity.
+    
+    Do not access data/SOUL.md. All active engineering, PRE-RAMS, Gold Tier, R11 and PR #122 holds remain.
+    
+    The deliverable is a factual picture of KAI TODAY versus KAI INTENDED, enabling informed decisions on what to build next.
+    
+    ONE KAI. REAL CAPABILITIES. REAL PROGRESS.
+    
+    I would give this approach 0.97 confidence as the better allocation of effort. The completeness of the 124-entry baseline and the actual implementation quality remain unverified.
+    
+    One final distinction: cancelling the trial must not mean abandoning feature-preservation discipline. It means using proportionate checks to support the build instead of letting the checks consume the project.
+    
+    The capability map is the next useful result. Not another approval mechanism.
+    END-VERBATIM KAI-STRATEGIC-CORRECTION-370
+
+### 6. Next authorised step
+
+- Start the capability map from existing evidence first (stub register, code audits, README status columns), then code references per entry  [CONVERSATION 2026-11-03 Kai-GPT relayed by Dainius, "Map every entry to the actual repository implementation"]
+
+### 7. What I am unsure of
+
+- How much existing audit material can be reused; measured next  [CMD `none` → unmeasured]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
