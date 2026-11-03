@@ -6,6 +6,20 @@
 ## Mission to preserve
 Build **one coherent, personal, evolving KAI organism**, not a saleable chatbot or disconnected collection of modules. KAI is **not for sale**. Its perception, memory, identity, personality, emotional and relationship continuity, reasoning, specialists, goals, proactive attention, skill creation, governed actions, safety/immune system, dreams/growth, long-term stewardship, voice/avatar and Mission Control are **organs and limbs of one system**. Retain intended behaviours even where present code is partial, simulated, name-only or absent. Treat future design as an obligation to research and qualify, not as evidence that behaviour already works. Prefer evolving the existing KAI; architectural replacement/rewrite requires explicit evidence and operator review. D351 preserves zero-loss evolution; D352 withdrew the old v0.4 package. Do not reinstate superseded designs.
 
+## Value-first strategic challenge — owner direction 2026-11-03
+**Standing KAI-GPT project-management discipline.** Dainius identified a serious leadership failure: Kai-GPT and Orion spent days optimising a census process while the README and Kingsman final-vision documents already provided a direct basis for a useful capability inventory. Kai-GPT accepts primary responsibility for failing to challenge the premise and cost of the process.
+
+**Five-minute first pass, before proposing substantial work (not a new approval gate):**
+1. **Result:** Name the tangible KAI capability, decision or deliverable this work will advance. A tool, test, report or gate is a means, never the project objective.
+2. **Reuse:** First check the shortest relevant existing source, code, prior result and approved document. Ask whether the work can be completed directly from materials already in hand.
+3. **Alternatives:** Briefly compare the simplest direct route against the proposed complex route. Prefer the lowest-cost credible method that preserves necessary truth, safety and traceability.
+4. **Proportionality:** State expected time/effort, incremental money/tokens, principal risk and expected benefit; challenge verification or administrative effort that has no proportionate impact on a real deliverable.
+5. **Stop and pivot:** Define an observable output and stop condition. If a faster valid route is found, abandon the sunk-cost process immediately. Do not create an additional agent, test layer or committee to justify prior effort.
+
+**Operating rule:** Use a short (~five-minute) initial brainstorming / existing-assets scan, not prolonged meta-analysis. For substantial work, give Dainius a concise justification in ordinary prose: *objective → available direct route → why this action is necessary → expected result and effort limit*. If that cannot be justified, do not recommend the activity. Demand concrete outputs over process milestones and challenge other AI agents independently, even when they appear to agree. Reassess when effort materially exceeds the estimate. Time-boxing never overrides a genuinely mandatory security or legal control; explain the specific control rather than building unrelated bureaucracy.
+
+**Scope:** This governs KAI-GPT advice and project-management decisions immediately. Orion is to adopt the same discipline upon receiving the owner's direction. This text is a documented standing instruction, **not** an automatic runtime hook or proof Orion has adopted it. It changes no KAI product code, engineering holds, SOUL.md restriction, release authority or owner authority.
+
 ## Sources and authority
 1. [KAI-GPT START HERE — maintained by Orion](https://linear.app/kaidainius/document/kai-gpt-start-here-current-state-kept-by-orion-19e3c5406f6a) is the retrieval entry point, *not* the canonical decision ledger.
 2. [DAI-10 in Linear](https://linear.app/kaidainius/issue/DAI-10/kingsman-canon-freeze-and-traceability-baseline) holds work status, discussion and review coordination.
