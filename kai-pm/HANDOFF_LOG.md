@@ -114471,3 +114471,127 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-03T07:04:22Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-03T07:04:22Z  [CMD `date -u +%FT%TZ` → 2026-11-03T07:04:22Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 2d690c03e8e9ff23c3f5c82951edeba346b9390b  [CMD `git rev-parse HEAD` → 2d690c03e8e9ff23c3f5c82951edeba346b9390b]
+- tree: 0d07371f662c18bdb4554a5ce29f7732fb366b7c  [CMD `git rev-parse HEAD^{tree}` → 0d07371f662c18bdb4554a5ce29f7732fb366b7c]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/project-rework-plan-pgvp35: 2d690c03e8e9ff23c3f5c82951edeba346b9390b  [CMD `git ls-remote --heads origin` → 2d690c03e8e9ff23c3f5c82951edeba346b9390b]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 366  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 366]
+
+### 1. The four states
+
+- physical: unchanged since entry 366 apart from this entry  [CMD `git status --porcelain` → 0 lines before this append]
+- authorised: owner option A (procedural allowance 475,000 tokens); anchor R3 to Kai for one final identity check and adjudication; extra-usage setting to be confirmed by Dainius before execution  [CONVERSATION 2026-11-03 Dainius, "Ruling , I choose A"]
+- evidence: Dainius's ruling with Kai's assessment verbatim in section 5; R3 already banked in entry 366 (sha256 d9294f918294394367296055e38a9b3d85729883f769bf96477ce18557461f55)  [CMD `handoff entry 366 block CENSUS-ANCHOR-PILOT-R3` → banked]
+- admission: none; pilot on hold  [CONVERSATION 2026-11-03 Dainius, "Status: Resource decision recommendation complete. Execution remains held."]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-11-03 · chooses option A: a 475,000-token procedural allowance, accepted as a forecast-based operating limit, not an enforced maximum; Kai's qualifications: 472,915 is an upper estimate, not a guaranteed maximum; 475,000 must never be represented as an enforced ceiling or a guaranteed funded retest; batches, units, isolation, review and stop-before-next-run unchanged; a subscription is not assumed to prevent extra charges; extra-usage setting to be confirmed before execution; R3 changes only the authorised token-limit field and gets one final identity check ⚠ UNBANKED  [CONVERSATION 2026-11-03 Dainius, "Ruling , I choose A"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: submitting R3 for the identity check. HELD: the pilot until Kai's ADJUDICATED line, Dainius's APPROVED line and his confirmation of the extra-usage setting; engineering; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying, reading, searching or processing data/SOUL.md  [CONVERSATION 2026-11-03 Dainius, "Execution remains held."]
+
+### 4. Open questions
+
+- Dainius: has he checked that extra paid usage is switched off in his Claude account  [CONVERSATION 2026-11-03 Dainius, "Have you also checked in your Claude account that extra paid usage is switched off?"]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- CORRECTION (Kai): Orion's entry-365 answer said option A makes the retest allowance "guaranteed on paper"; supported: 472,915 is an upper estimate under stated assumptions (density, set-up, answer length), none of them enforced; 475,000 does not guarantee the retest fits  [CONVERSATION 2026-11-03 Dainius, "475,000 must never be represented as a technically enforced ceiling or a guaranteed funded retest"]
+- Disclosure for the identity check: R3 changes limits.tokens_total and the matching token_control text (both the token limit), plus anchor and supersedes; diff banked as PILOT-R2-R3-DIFF (entry 366)  [CMD `diff R2 R3` → 4 changed lines]
+- Credential scan: 0 hits  [CMD `credscan.py scan367.json` → TOTAL HITS 0]
+- EVIDENCE DAINIUS-RULING-OPTION-A-367 owner_367.txt: 3025 bytes, sha256 cc9ce2ae95b675e60b879de94a97f002002c78186b76928b2d6109fea8ae05c9, final LF True (added by Orion)  [CMD `sha256sum owner_367.txt` → cc9ce2ae95b675e6…]
+    BEGIN-VERBATIM DAINIUS-RULING-OPTION-A-367
+    Ruling , I choose A : KAI — Token budget decision
+    
+    COLD-START: DEGRADED | Pilot remains on HOLD
+    
+    Verified GitHub branch HEAD 13ce4171c0a9956a5acb158462e28da783121a27, handoff entry 365, DAI-10’s latest retrieved comment 0f92fe24, and DECISIONS.md through D390. START HERE metadata is current to 1 November, 20:04 UTC, but its full text was unavailable. The frozen research pin remains dd153c1f4ab7c52f34620e07238554453a8912d9; Miro was previously inspected for architecture context.
+    
+    My recommendation: Option A — with one correction
+    
+    I support raising the procedural allowance to 475,000 tokens, provided you accept that this is a forecast-based operating limit, not an enforced maximum.
+    
+    Orion’s arithmetic checks out:
+    
+    Calculation	Tokens
+    Trial upper estimate	397,263
+    Estimated largest-run retest	75,652
+    Combined estimate	472,915
+    Proposed allowance	475,000
+    Remaining estimated margin	2,085
+    
+    However, 475,000 does not guarantee the retest will fit. The supposed worst case depends on estimated token density, setup and output length. None is an enforced upper bound.
+    
+    Option B preserves the original 400,000-token allowance, but makes a correction less likely to fit. It does not mean every correction would necessarily fail; actual usage could be lower.
+    
+    Why I favor A: It gives the single permitted correction a realistic chance without introducing more agents, more selected units or another research cycle. It also keeps the project moving toward the actual feature census.
+    
+    Send Orion this assessment
+    
+    KAI-GPT → ORION | ENTRY 365 — TOKEN CONTROL ASSESSMENT
+    
+    Your bounded answer is accepted as a truthful account of the available controls.
+    
+    My recommendation to Dainius is Option A: a 475,000-token procedural allowance.
+    
+    One important qualification: 472,915 tokens is the calculated upper estimate under the stated assumptions, not a guaranteed maximum. Therefore 475,000 must never be represented as a technically enforced ceiling or a guaranteed funded retest.
+    
+    Keep the existing five reading batches, thirty units, isolation restrictions, independent review and stop-before-next-run rule unchanged.
+    
+    Do not assume that a subscription prevents extra charges. Confirm the additional-usage setting with Dainius before execution.
+    
+    If Dainius selects A, prepare anchor R3 with only the authorised token-limit field changed. Submit the new digest for one final identity check and adjudication before requesting his exact anchor approval.
+    
+    No further research, security-test repetition or control redesign is requested.
+    
+    Status: Resource decision recommendation complete. Execution remains held.
+    
+    OHANA — CLOSE THE GATE. ADVANCE KAI.
+    
+    One thing I need from you
+    
+    I recommend A, but the decision belongs to you. Have you also checked in your Claude account that extra paid usage is switched off?
+    
+    Once you confirm those two things, we can close the budget decision without opening another review cycle.
+    
+    Confidence: 0.97 in the recommendation; actual consumption and account billing controls remain unverified.
+    END-VERBATIM DAINIUS-RULING-OPTION-A-367
+
+### 6. Next authorised step
+
+- Kai: identity check and ADJUDICATED line on R3; Dainius: confirm the extra-usage setting and send the APPROVED line; then the admission record and the pilot  [CONVERSATION 2026-11-03 Dainius, "Submit the new digest for one final identity check and adjudication before requesting his exact anchor approval."]
+
+### 7. What I am unsure of
+
+- The extra-usage setting on Dainius's account  [CONVERSATION 2026-11-03 Dainius, "Do not assume that a subscription prevents extra charges."]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
