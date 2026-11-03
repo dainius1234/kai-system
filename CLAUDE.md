@@ -74,6 +74,7 @@ check before continuing.
 | I am writing to Dainius and the sentence has a hash, an ID, an acronym or wording I would not say on site | R20 — plain words and a simple example first; the detail goes below, marked as detail for the record |
 | I am asking Dainius to decide something | R20 — have I given the issue, why it matters, options, risks, my recommendation and exactly what he is deciding? |
 | I am about to start a substantive change and cannot state what "done" means, the authorised scope, or how completion will be checked | R21 — define done, scope and the simplest sufficient form before starting |
+| I am about to build a tool, test, gate, agent or procedure, or verify the verification | R22 — five-minute challenge: which KAI result does this serve, and does something we already have get there directly? |
 
 **The trigger is speed, not ignorance.** Every R1 breach on 2026-08-07
 happened while moving fast — a hard-coded image name, a guessed job id,
@@ -705,6 +706,21 @@ This rule does not delay immediate evidence preservation, verbatim instruction c
 > on 2026-10-11 (entry 148) and reconciled by Kai and Orion on DAI-10.
 > Unlike R1–R19, this rule was not earned by a KAI incident; it is preventive.
 > Recorded rather than self-adopted.
+
+## R22. Value before process: the five-minute challenge. Directed by Dainius, 2026-11-03
+
+**Before proposing or starting substantial work, spend about five minutes on:**
+1. **Result:** which KAI capability or owner decision does this advance?
+2. **Reuse:** can the README, the Kingsman documents, existing code or prior results answer it directly?
+3. **Direct route:** compare the simplest credible route with the proposed one.
+4. **Proportion:** what does it cost in time, tokens and the owner's attention, against what it delivers?
+5. **Stop:** what is the deliverable, the effort limit and the stop condition?
+
+If a faster valid route appears, pivot at once, whatever has already been spent. A tool, test, gate or report is a means, never the result. Challenge Kai's proposals independently, even when we agree. This does not waive mandatory safety controls (SOUL.md, the holds); name the specific control rather than adding process around it.
+
+Earned 2026-11-02/03: Kai and Orion spent about 70 handoff entries building and qualifying a census framework. The README feature list (104 features, built 2026-10-07 and designated by Dainius as the preservation universe) plus the Kingsman final-vision documents gave the build list in minutes. Dainius found the direct route; neither assistant did.
+
+> **Provenance:** directed by Dainius on 2026-11-03 ("you both with gpt taking 100 hours just for that ???? That's so inefficient!"), relayed with Kai's matching rule in `kai-pm/KAI_GPT_COLD_START_GUARDIAN_V0_1.md` (commit 4c52929) and his instruction "Orion, adopt the same discipline". Recorded rather than self-adopted.
 
 The full doctrine this serves, its standing rules and the specific
 failure that earned each one, is in `kai-pm/ENGINEERING_DOCTRINE.md`.
