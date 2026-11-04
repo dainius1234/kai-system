@@ -115327,3 +115327,246 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-04T22:05:43Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-04T22:05:43Z  [CMD `date -u +%FT%TZ` → 2026-11-04T22:05:43Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 78179a0b8442ef0146758f470d647bd656a4bc0a  [CMD `git rev-parse HEAD` → 78179a0b8442ef0146758f470d647bd656a4bc0a]
+- tree: 4f0410ce20a2c332e0622976c3e3e4893ea2846e  [CMD `git rev-parse HEAD^{tree}` → 4f0410ce20a2c332e0622976c3e3e4893ea2846e]
+- uncommitted_paths: 25  [CMD `git status --porcelain | count lines` → 25]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 78179a0b8442ef0146758f470d647bd656a4bc0a  [CMD `git ls-remote --heads origin` → 78179a0b8442ef0146758f470d647bd656a4bc0a]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 375  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 375]
+
+### 1. The four states
+
+- physical: 24 files changed (275+/81-): KAI code fixes for P1.1, P1.2, P1.4, P1.5, P1.6, P1.7, P1.11, plus the P1.10 crash only; 7 new or extended tests; README.md and docs/PROJECT_BACKLOG.md metric lines via make sync-docs; capability map update section  [CMD `git diff --stat` → 24 files changed, 275 insertions(+), 81 deletions(-)]
+- authorised: 8 wiring fixes on the branch; offline unit tests  [CONVERSATION 2026-11-04 Dainius, "8 wiring fixes (Recommended)"]
+- evidence: tests on old vs new code, network off, SOUL-free tree; policy gates per command on both; port comparison after fix — blocks below  [CMD `runtests.sh basetree/testtree; gates per command` → see evidence blocks]
+- admission: none; nothing deployed, nothing to main, no live runtime test  [CONVERSATION 2026-11-04 Dainius, "Yes, offline only (Recommended)"]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `ruling_capture.py status` → OUTSTANDING=0]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED (used): the 8 wiring fixes; offline unit tests. HELD: P1.3 trust level; P1.8 values recording; P1.9 dashboard service token; P1.10 hunted-skill loading (probation); P1.12 flags; route/contract mismatches; VAT default; live runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE; push to main. NOT AUTHORISED: accessing, copying, reading, searching or processing data/SOUL.md  [CONVERSATION 2026-11-04 Dainius, "8 wiring fixes (Recommended)"]
+
+### 4. Open questions
+
+- For Dainius: P1.10 — may self-hunted (probationary) skills load into live chat, and under what approval? Held as a permission question (K19), not wiring  [CMD `Read skill-hunter/app.py:157-175; agentic/router.py:609-684` → hunter writes probationary: true; loader never reads it]
+- For Dainius: P1.3 trust level for proactive observation (unchanged)  [CMD `Read agentic/trust_core.py:195-197` → unknown capability defaults to GUARDIAN]
+- For Kai: candidate failure mechanism — tests written against the consumer's assumed shape, not the producer's output (5 instances this session); proposed for FAILURE_PATTERN_LEDGER.md, not written there  [CMD `new tests fail on basetree` → 9 failures in 6 files on old code]
+
+### 5. Incidents and corrections
+
+- Population counts changed scope twice: P1.1 3 readers (not 1); P1.4 7 of 14 memorize sites wrong; P1.11 19 port mismatches (not 6), all 5 helper-found ports among them  [CMD `ports.py` → before 19 mismatches; after 0 of 203 literals]
+- SOUL hazard found: importing agentic/app.py reads Path("data/SOUL.md") relative to the working folder (agentic/app.py:1436); tests were therefore run only in git-archive copies excluding data/SOUL.md, with SOUL_PATH=/nonexistent/SOUL.md; SOUL.md absent checked before each run  [CMD `test ! -e testtree/data/SOUL.md` → SOUL.md ABSENT from test tree]
+- Disclosure: test dependencies were installed from PyPI into a scratch venv (network used for install only); every test and gate ran inside `unshare -rn` (no network)  [CMD `uv pip install -r <service>/requirements.txt` → 10 ok]
+- Known-positive / known-negative: every new test fails on the old code and passes on the new; the tax-year test fails on old code only because the helper is absent (date bug confirmed by reading)  [CMD `pytest on basetree vs testtree` → base 2+3+1+1 failed + adversary AttributeError + tax-year; fixed all pass]
+- Pre-existing failures, identical before and after: test_cognitive_mechanisms 34 errors, test_d89_cognitive_depth 7 failed (pydantic undefined-annotation 'List' in this sandbox); house-doctor fix therefore not test-verified  [CMD `diff failing sets base vs fix` → same failing set (34), same failing set (7)]
+- Policy gates: 45 commands run separately on both trees, identical; test_item8_verdicts and test_item8_preflight fail on both; check-docs and sync_docs --check failed on both, then pass after make sync-docs (README.md, docs/PROJECT_BACKLOG.md metric lines only)  [CMD `diff gates_gatebase.txt gates_testtree.txt` → IDENTICAL gate results]
+- README and backlog still state "0 failures"; not measured by me, and false in this sandbox for the two files above; recorded, not changed  [CMD `git diff README.md` → only stamp, test count and LOC lines changed]
+- Repository changes equal the tested files byte for byte (24 of 24) and compile  [CMD `cmp each changed file with testtree; py_compile` → differing-from-tested=0, compile-ok]
+- Credential scan of the full diff: 0 hits  [CMD `credscan.py scan_fix.json` → TOTAL HITS 0]
+- EVIDENCE TESTS-BASE ev_tests_base.txt: 1574 bytes, sha256 d9008f88a5aeb421ab107351143c14bf2ad252c9dc5700ad92117934691b35dd, final LF True (added by Orion)  [CMD `sha256sum ev_tests_base.txt` → d9008f88a5aeb421…]
+    BEGIN-VERBATIM TESTS-BASE
+    test_llm_contract rc=0 20 passed, 4 warnings in 1.75s
+    test_ab_log rc=0 6 passed, 4 warnings in 0.11s
+    test_d90_swarm rc=0 38 passed, 4 warnings in 0.18s
+    test_adversary rc=5 4 warnings in 0.11s
+    test_v7_verifier rc=0 28 passed, 4 warnings in 0.29s
+    test_agentic_routes rc=0 176 passed, 9 warnings in 27.01s
+    test_planner rc=5 4 warnings in 0.05s
+    test_planner_preferences rc=0 8 passed, 4 warnings in 0.08s
+    test_gem_preferences rc=0 13 passed, 4 warnings in 0.06s
+    test_router rc=5 4 warnings in 0.06s
+    test_financial_awareness rc=0 18 passed, 4 warnings in 0.24s
+    test_sysmetrics rc=0 14 passed, 4 warnings in 0.26s
+    test_actuator_registry rc=0 33 passed, 4 warnings in 0.17s
+    test_screen_watcher rc=0 17 passed, 4 warnings in 0.30s
+    test_cognitive_mechanisms rc=1 10 passed, 38 warnings, 34 errors in 16.48s
+    test_d89_cognitive_depth rc=1 7 failed, 40 passed, 4 warnings in 2.20s
+    test_p21_proactive_agent rc=0 93 passed, 4 warnings in 0.13s
+    test_architecture_rules rc=0 27 passed, 4 warnings in 2.33s
+    test_invariant_guards rc=0 14 passed, 4 warnings in 0.58s
+    test_migration rc=0 44 passed, 4 warnings in 0.47s
+    test_full_migration rc=0 28 passed, 4 warnings in 1.25s
+    test_camera_proactive_gate rc=0 2 passed, 4 warnings in 0.08s
+    test_camera_service rc=0 2 passed, 4 warnings in 0.08s
+    test_dashboard rc=0 28 passed, 8 warnings in 2.30s
+    test_dashboard_auth rc=0 33 passed, 4 warnings in 0.11s
+    test_dashboard_findings rc=0 64 passed, 4 warnings in 7.79s
+    test_dashboard_ui rc=0 1 passed, 8 warnings in 0.41s
+    test_dashboard_ui_auth.js rc=4 
+    test_heartbeat rc=0 3 passed, 4 warnings in 0.14s
+    END-VERBATIM TESTS-BASE
+- EVIDENCE TESTS-FIXED ev_tests_fixed.txt: 1740 bytes, sha256 1b2373df8b90ea8bc0616090b253d7e0796f26336e223a93d103da38291800e8, final LF True (added by Orion)  [CMD `sha256sum ev_tests_fixed.txt` → 1b2373df8b90ea8b…]
+    BEGIN-VERBATIM TESTS-FIXED
+    test_llm_contract rc=0 20 passed, 4 warnings in 1.22s
+    test_ab_log rc=0 6 passed, 4 warnings in 0.08s
+    test_d90_swarm rc=0 41 passed, 4 warnings in 3.17s
+    test_adversary rc=5 4 warnings in 0.08s
+    test_v7_verifier rc=0 28 passed, 4 warnings in 0.16s
+    test_agentic_routes rc=0 178 passed, 9 warnings in 26.42s
+    test_planner rc=5 4 warnings in 0.04s
+    test_planner_preferences rc=0 9 passed, 4 warnings in 0.08s
+    test_gem_preferences rc=0 13 passed, 4 warnings in 0.05s
+    test_router rc=5 4 warnings in 0.05s
+    test_financial_awareness rc=0 19 passed, 4 warnings in 0.21s
+    test_sysmetrics rc=0 14 passed, 4 warnings in 0.19s
+    test_actuator_registry rc=0 33 passed, 4 warnings in 0.16s
+    test_screen_watcher rc=0 17 passed, 4 warnings in 0.25s
+    test_cognitive_mechanisms rc=1 10 passed, 38 warnings, 34 errors in 16.45s
+    test_d89_cognitive_depth rc=1 7 failed, 40 passed, 4 warnings in 2.03s
+    test_p21_proactive_agent rc=0 93 passed, 4 warnings in 0.11s
+    test_architecture_rules rc=0 27 passed, 4 warnings in 2.14s
+    test_invariant_guards rc=0 14 passed, 4 warnings in 0.47s
+    test_migration rc=0 44 passed, 4 warnings in 0.41s
+    test_full_migration rc=0 28 passed, 4 warnings in 1.20s
+    test_camera_proactive_gate rc=0 2 passed, 4 warnings in 0.08s
+    test_camera_service rc=0 2 passed, 4 warnings in 0.08s
+    test_dashboard rc=0 28 passed, 8 warnings in 2.30s
+    test_dashboard_auth rc=0 33 passed, 4 warnings in 0.06s
+    test_dashboard_findings rc=0 64 passed, 4 warnings in 8.53s
+    test_dashboard_ui rc=0 1 passed, 8 warnings in 0.40s
+    test_dashboard_ui_auth.js rc=4 
+    test_heartbeat rc=0 3 passed, 4 warnings in 0.10s
+    test_adversary(script) rc=0 All adversary tests passed
+    test_planner(script) rc=0 All planner tests passed
+    test_router(script) rc=0 router classification tests passed
+    END-VERBATIM TESTS-FIXED
+- EVIDENCE GATES-BASE ev_gates_base.txt: 2793 bytes, sha256 9e88b0f72d788783c965f9398ca35e5b44621fb3491a19a231de6f0193e7d57d, final LF True (added by Orion)  [CMD `sha256sum ev_gates_base.txt` → 9e88b0f72d788783…]
+    BEGIN-VERBATIM GATES-BASE
+    1 rc=0 :: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics    --exclude=.venv,_arc
+    2 rc=0 :: python3 scripts/security/check_port_bindings.py
+    3 rc=0 :: python3 scripts/security/check_default_profiles.py
+    4 rc=0 :: python3 scripts/security/check_secret_fallbacks.py
+    5 rc=0 :: python3 scripts/security/check_service_tokens.py
+    6 rc=0 :: python3 scripts/security/check_network_zones.py
+    7 rc=0 :: python3 scripts/security/check_turbovec_writers.py
+    8 rc=0 :: python3 scripts/security/check_restart_recovery.py
+    9 rc=0 :: python3 scripts/security/check_image_tags.py
+    10 rc=0 :: python3 scripts/security/check_compose_drift.py
+    11 rc=0 :: python3 scripts/security/check_architecture_rules.py
+    12 rc=0 :: python3 scripts/security/check_operational_portability.py
+    13 rc=0 :: python3 scripts/security/check_evidence_package_integrity.py
+    14 rc=0 :: python3 scripts/security/hygiene_survey.py --gate
+    15 rc=0 :: python3 scripts/security/check_ci_tolerations.py
+    16 rc=0 :: python3 scripts/security/check_preflight_reachability.py    --expect-reachable scripts/tes
+    17 rc=0 :: python3 scripts/test_capture_trigger_paths.py
+    18 rc=0 :: python3 scripts/test_declared_prerequisites.py
+    19 rc=0 :: python3 scripts/security/check_doctrine_integrity.py
+    20 rc=0 :: python3 scripts/test_doctrine_integrity.py
+    21 rc=0 :: python3 scripts/test_image_identity.py
+    22 rc=0 :: python3 scripts/security/check_item8_design.py
+    23 rc=0 :: python3 scripts/test_item8_instruments.py
+    24 rc=1 :: python3 scripts/test_item8_verdicts.py
+    25 rc=1 :: python3 scripts/test_item8_preflight.py
+    26 rc=0 :: python3 scripts/security/check_workflow_filters.py
+    27 rc=0 :: python3 scripts/security/check_workflow_outputs.py
+    28 rc=0 :: python3 scripts/security/check_dockerfile_flags.py
+    29 rc=0 :: python3 scripts/security/check_dockerfile_coverage.py
+    30 rc=0 :: python3 scripts/security/check_dockerfile_context.py
+    31 rc=0 :: python3 scripts/security/check_compose_env.py
+    32 rc=0 :: python3 scripts/security/check_compose_interpolation.py
+    33 rc=0 :: python3 scripts/security/check_unreachable_bindings.py
+    34 rc=0 :: python3 scripts/security/check_implicit_deps.py
+    35 rc=0 :: python3 scripts/security/check_image_modules.py
+    36 rc=0 :: python3 scripts/security/check_shipped_package_deps.py
+    37 rc=0 :: python3 scripts/security/check_healthcheck_runnable.py
+    38 rc=0 :: python3 scripts/security/check_service_identity_wiring.py
+    39 rc=0 :: python3 scripts/security/check_bind_mount_portability.py
+    40 rc=0 :: python3 scripts/security/check_depends_on_readiness.py
+    41 rc=0 :: python3 scripts/security/check_test_identity.py
+    42 rc=0 :: python3 scripts/security/check_test_wiring.py
+    43 rc=0 :: python3 scripts/security/check_gate_registry.py --gate
+    44 rc=2 :: make --no-print-directory check-docs
+    45 rc=1 :: python3 scripts/sync_docs.py --check
+    END-VERBATIM GATES-BASE
+- EVIDENCE GATES-FIXED ev_gates_fixed.txt: 2793 bytes, sha256 9e88b0f72d788783c965f9398ca35e5b44621fb3491a19a231de6f0193e7d57d, final LF True (added by Orion)  [CMD `sha256sum ev_gates_fixed.txt` → 9e88b0f72d788783…]
+    BEGIN-VERBATIM GATES-FIXED
+    1 rc=0 :: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics    --exclude=.venv,_arc
+    2 rc=0 :: python3 scripts/security/check_port_bindings.py
+    3 rc=0 :: python3 scripts/security/check_default_profiles.py
+    4 rc=0 :: python3 scripts/security/check_secret_fallbacks.py
+    5 rc=0 :: python3 scripts/security/check_service_tokens.py
+    6 rc=0 :: python3 scripts/security/check_network_zones.py
+    7 rc=0 :: python3 scripts/security/check_turbovec_writers.py
+    8 rc=0 :: python3 scripts/security/check_restart_recovery.py
+    9 rc=0 :: python3 scripts/security/check_image_tags.py
+    10 rc=0 :: python3 scripts/security/check_compose_drift.py
+    11 rc=0 :: python3 scripts/security/check_architecture_rules.py
+    12 rc=0 :: python3 scripts/security/check_operational_portability.py
+    13 rc=0 :: python3 scripts/security/check_evidence_package_integrity.py
+    14 rc=0 :: python3 scripts/security/hygiene_survey.py --gate
+    15 rc=0 :: python3 scripts/security/check_ci_tolerations.py
+    16 rc=0 :: python3 scripts/security/check_preflight_reachability.py    --expect-reachable scripts/tes
+    17 rc=0 :: python3 scripts/test_capture_trigger_paths.py
+    18 rc=0 :: python3 scripts/test_declared_prerequisites.py
+    19 rc=0 :: python3 scripts/security/check_doctrine_integrity.py
+    20 rc=0 :: python3 scripts/test_doctrine_integrity.py
+    21 rc=0 :: python3 scripts/test_image_identity.py
+    22 rc=0 :: python3 scripts/security/check_item8_design.py
+    23 rc=0 :: python3 scripts/test_item8_instruments.py
+    24 rc=1 :: python3 scripts/test_item8_verdicts.py
+    25 rc=1 :: python3 scripts/test_item8_preflight.py
+    26 rc=0 :: python3 scripts/security/check_workflow_filters.py
+    27 rc=0 :: python3 scripts/security/check_workflow_outputs.py
+    28 rc=0 :: python3 scripts/security/check_dockerfile_flags.py
+    29 rc=0 :: python3 scripts/security/check_dockerfile_coverage.py
+    30 rc=0 :: python3 scripts/security/check_dockerfile_context.py
+    31 rc=0 :: python3 scripts/security/check_compose_env.py
+    32 rc=0 :: python3 scripts/security/check_compose_interpolation.py
+    33 rc=0 :: python3 scripts/security/check_unreachable_bindings.py
+    34 rc=0 :: python3 scripts/security/check_implicit_deps.py
+    35 rc=0 :: python3 scripts/security/check_image_modules.py
+    36 rc=0 :: python3 scripts/security/check_shipped_package_deps.py
+    37 rc=0 :: python3 scripts/security/check_healthcheck_runnable.py
+    38 rc=0 :: python3 scripts/security/check_service_identity_wiring.py
+    39 rc=0 :: python3 scripts/security/check_bind_mount_portability.py
+    40 rc=0 :: python3 scripts/security/check_depends_on_readiness.py
+    41 rc=0 :: python3 scripts/security/check_test_identity.py
+    42 rc=0 :: python3 scripts/security/check_test_wiring.py
+    43 rc=0 :: python3 scripts/security/check_gate_registry.py --gate
+    44 rc=2 :: make --no-print-directory check-docs
+    45 rc=1 :: python3 scripts/sync_docs.py --check
+    END-VERBATIM GATES-FIXED
+- EVIDENCE PORTS-AFTER ev_ports_after.txt: 252 bytes, sha256 4a522892755182725fac6deb0a5826014a979cf3c581729515b20c48555f1f8d, final LF True (added by Orion)  [CMD `sha256sum ev_ports_after.txt` → 4a52289275518272…]
+    BEGIN-VERBATIM PORTS-AFTER
+    URL literals with host:port 203 | host matched & port ok 188 | mismatches 0 | hosts not a compose service 8
+    UNKNOWN HOSTS ['ollama', 'parakeet-server', 'perception-audio', 'perception-telegram', 'shell-sandbox', 'telegram-bridge', 'tts', 'vault-sync']
+    END-VERBATIM PORTS-AFTER
+
+### 6. Next authorised step
+
+- Report to Dainius; Kai review of the fixes and the held items  [CONVERSATION 2026-11-04 Dainius, "prioritise, analize  , evaluate, fix , log , confirm, improve all above"]
+
+### 7. What I am unsure of
+
+- Whether the fixes behave correctly with live services: not run; runtime testing held  [CMD `none` → no live test]
+- Whether the 8 non-compose host names in default URLs are correct  [CMD `ports.py` → UNKNOWN HOSTS 8, not checked]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check

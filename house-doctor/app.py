@@ -197,7 +197,8 @@ async def _write_medical_report(
         try:
             await client.post(
                 f"{MEMU_URL}/memory/memorize",
-                json={"content": summary, "metadata": report, "category": "medical_report", "user_id": "keeper"},
+                json={"timestamp": datetime.now(timezone.utc).isoformat(), "event_type": "medical_report",
+                      "result_raw": summary, "metrics": report, "category": "medical_report", "user_id": "keeper"},
             )
         except Exception as exc:
             logger.warning("Could not write medical report to memu-core: %s", exc)

@@ -403,7 +403,7 @@ def _save_assessment(current: Dict[str, Any]) -> None:
 
 WORLD_ANCHOR_DIR = Path(os.getenv("WORLD_ANCHOR_DIR", "/tmp/world-anchor"))
 WORLD_ANCHOR_DIR.mkdir(parents=True, exist_ok=True)
-CALENDAR_SYNC_URL = os.getenv("CALENDAR_SYNC_URL", "http://calendar-sync:8030")
+CALENDAR_SYNC_URL = os.getenv("CALENDAR_SYNC_URL", "http://calendar-sync:8055")
 _last_world_fetch: float = 0.0
 WORLD_FETCH_INTERVAL = int(os.getenv("WORLD_FETCH_INTERVAL", "86400"))  # once/day
 

@@ -251,8 +251,10 @@ async def hunt(req: HuntRequest) -> Dict[str, Any]:
                 await client.post(
                     f"{MEMU_URL}/memory/memorize",
                     json={
-                        "content": f"Acquired new skill '{name}' using package '{found}' to address gap: {gap}",
-                        "metadata": meta,
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
+                        "event_type": "skill_acquisition",
+                        "result_raw": f"Acquired new skill '{name}' using package '{found}' to address gap: {gap}",
+                        "metrics": meta,
                         "category": "skill_acquisition",
                         "user_id": "keeper",
                     },

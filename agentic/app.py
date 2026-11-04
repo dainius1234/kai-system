@@ -754,7 +754,8 @@ async def introspect_capabilities() -> Dict[str, Any]:
         "sensory_services": list(pings),
         "reachable_count": sum(1 for p in pings if p["reachable"]),
         "unreachable_count": sum(1 for p in pings if not p["reachable"]),
-        "skills": [{"name": s.name} for s in skills],
+        # list_skills() returns dicts (router.py), not Skill objects
+        "skills": [{"name": s["name"]} for s in skills],
         "skill_count": len(skills),
         "feature_flags": {f["flag"]: f["enabled"] for f in get_all_flags()},
         "baselines_tracked": list(_sensor_baselines.keys()),
@@ -1560,9 +1561,13 @@ async def _recall_memories(query: str, top_k: int = 5) -> List[str]:
     memories = []
     for r in records:
         content = r.get("content", {})
-        text = content.get("text", "") or content.get("query", "")
+        if not isinstance(content, dict):
+            content = {"result": str(content)}
+        # memu-core stores the memory text under "result" (memu-core/app.py
+        # memorize); "text"/"query" are kept for older writers.
+        text = content.get("result", "") or content.get("text", "") or content.get("query", "")
         if text:
-            memories.append(text)
+            memories.append(str(text))
     return memories
 
 
@@ -1599,7 +1604,8 @@ async def _sync_letta_memories() -> None:
             for mem in export.json().get("memories", [])[:50]:
                 await client.post(
                     f"{MEMU_URL}/memory/memorize",
-                    json={"content": mem, "category": "letta_archival"},
+                    json={"timestamp": datetime.now(timezone.utc).isoformat(), "event_type": "letta_archival",
+                          "result_raw": str(mem), "category": "letta_archival"},
                 )
     except Exception as _exc:
         record_degradation("letta", "sync_letta_memories", _exc)
@@ -2177,7 +2183,9 @@ async def _proactive_observer() -> None:
                             await client.post(
                                 f"{MEMU_URL}/memory/memorize",
                                 json={
-                                    "content": sched_text,
+                                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                                    "event_type": "proactive_schedule",
+                                    "result_raw": sched_text,
                                     "category": "proactive_schedule",
                                     "user_id": "keeper",
                                 },
@@ -2194,7 +2202,9 @@ async def _proactive_observer() -> None:
                         await client.post(
                             f"{MEMU_URL}/memory/memorize",
                             json={
-                                "content": obs_text,
+                                "timestamp": datetime.now(timezone.utc).isoformat(),
+                                "event_type": "proactive_observation",
+                                "result_raw": obs_text,
                                 "category": "proactive_observation",
                                 "user_id": "keeper",
                             },
@@ -2213,7 +2223,9 @@ async def _proactive_observer() -> None:
                         await client.post(
                             f"{MEMU_URL}/memory/memorize",
                             json={
-                                "content": pattern_text,
+                                "timestamp": datetime.now(timezone.utc).isoformat(),
+                                "event_type": "sensor_pattern",
+                                "result_raw": pattern_text,
                                 "category": "sensor_pattern",
                                 "user_id": "keeper",
                             },
@@ -2251,7 +2263,9 @@ async def _proactive_observer() -> None:
                         await client.post(
                             f"{MEMU_URL}/memory/memorize",
                             json={
-                                "content": json.dumps(world_model),
+                                "timestamp": datetime.now(timezone.utc).isoformat(),
+                                "event_type": "world_state",
+                                "result_raw": json.dumps(world_model),
                                 "category": "world_state",
                                 "user_id": "keeper",
                             },
@@ -2717,27 +2731,30 @@ async def chat_stream(req: ChatRequest):
     # feel the financial ground truth — CIS/VAT/tax, keyword-triggered
     if financial_context:
         fin_parts = []
-        cis = financial_context.get("cis_summary", {})
+        # Keys as returned by financial-awareness /finance/summary
+        # ({"cis", "vat", "tax"}); see financial-awareness/app.py.
+        cis = financial_context.get("cis", {})
         if cis:
             fin_parts.append(
-                f"CIS YTD: gross £{cis.get('total_gross', 0):.2f}, "
-                f"deductions £{cis.get('total_deductions', 0):.2f}, "
-                f"net £{cis.get('total_net', 0):.2f} "
+                f"CIS YTD: gross £{cis.get('gross_income_ytd', 0):.2f}, "
+                f"deductions £{cis.get('cis_deducted_ytd', 0):.2f}, "
+                f"net £{cis.get('net_received_ytd', 0):.2f} "
                 f"({cis.get('record_count', 0)} records)"
             )
-        vat = financial_context.get("vat_position", {})
+        vat = financial_context.get("vat", {})
         if vat:
             fin_parts.append(
-                f"VAT: rolling 12-month £{vat.get('rolling_12m_turnover', 0):.2f} "
-                f"(threshold £{vat.get('threshold', 85000):.0f}, "
-                f"must register: {vat.get('must_register', False)})"
+                f"VAT: rolling 12-month £{vat.get('rolling_12m_income', 0):.2f} "
+                f"(threshold £{vat.get('vat_threshold', 0):.0f}, "
+                f"must register: {not vat.get('below_threshold', True)})"
             )
-        tax = financial_context.get("tax_estimate", {})
+        tax = financial_context.get("tax", {})
         if tax:
             fin_parts.append(
-                f"Tax estimate: income tax £{tax.get('income_tax', 0):.2f}, "
-                f"Class 4 NI £{tax.get('class4_ni', 0):.2f}, "
-                f"total £{tax.get('total_liability', 0):.2f}"
+                f"Tax estimate: income tax £{tax.get('income_tax_estimate', 0):.2f}, "
+                f"Class 4 NI £{tax.get('class4_ni_estimate', 0):.2f}, "
+                f"total £{tax.get('total_tax_ni_estimate', 0):.2f}, "
+                f"balance after CIS £{tax.get('estimated_balance_due', 0):.2f}"
             )
         if fin_parts:
             messages.append({

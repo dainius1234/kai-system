@@ -44,7 +44,7 @@ except ImportError:
     budget = ErrorBudget()
 
 PORT = int(os.getenv("PORT", "8036"))
-SCREEN_CAPTURE_URL = os.getenv("SCREEN_CAPTURE_URL", "http://screen-capture:8020")
+SCREEN_CAPTURE_URL = os.getenv("SCREEN_CAPTURE_URL", "http://screen-capture:8059")
 NOTIFY_URL = os.getenv("NOTIFY_SERVICE_URL", "http://notify-service:8031")
 TTS_URL = os.getenv("TTS_SERVICE_URL", "http://tts-service:8030")
 DEFAULT_INTERVAL = int(os.getenv("WATCH_INTERVAL_SECONDS", "10"))

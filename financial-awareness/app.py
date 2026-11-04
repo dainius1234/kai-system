@@ -75,10 +75,16 @@ def _class4_ni(profit: float) -> float:
     return round(band1 * 0.06 + band2 * 0.02, 2)
 
 
+def _tax_year_start(today: date) -> date:
+    """UK tax year starts on 6 April: this year's if today is on/after it, else last year's."""
+    start = date(today.year, 4, 6)
+    return start if today >= start else date(today.year - 1, 4, 6)
+
+
 def _ytd_income_from_records(records: List[Dict[str, Any]]) -> float:
     """Gross income YTD from CIS records (current tax year: April 6 → April 5)."""
     today = date.today()
-    tax_year_start = date(today.year if today.month >= 4 and today.day >= 6 else today.year - 1, 4, 6)
+    tax_year_start = _tax_year_start(today)
     total = 0.0
     for r in records:
         try:
@@ -92,7 +98,7 @@ def _ytd_income_from_records(records: List[Dict[str, Any]]) -> float:
 
 def _ytd_deductions_from_records(records: List[Dict[str, Any]]) -> float:
     today = date.today()
-    tax_year_start = date(today.year if today.month >= 4 and today.day >= 6 else today.year - 1, 4, 6)
+    tax_year_start = _tax_year_start(today)
     total = 0.0
     for r in records:
         try:
@@ -209,7 +215,7 @@ async def cis_summary() -> Dict[str, Any]:
     """YTD CIS deductions breakdown and reclaim guidance."""
     records = _load_records()
     today = date.today()
-    tax_year_start = date(today.year if today.month >= 4 and today.day >= 6 else today.year - 1, 4, 6)
+    tax_year_start = _tax_year_start(today)
 
     ytd_records = [
         r for r in records

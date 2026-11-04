@@ -1355,7 +1355,8 @@ async def api_memory_graph_data(
         mem_id = f"mem:{r.get('id', str(id(r)))}"
         content = r.get("content") or {}
         if isinstance(content, dict):
-            snippet = content.get("text", content.get("result_raw", r.get("event_type", "")))
+            snippet = (content.get("result") or content.get("text")
+                       or content.get("result_raw") or r.get("event_type", ""))
         else:
             snippet = str(content)
 
@@ -1391,9 +1392,9 @@ async def api_finance_summary():
     """Proxy CIS/VAT/tax financial summary from the financial-awareness service (P29)."""
     return await _proxy_get(f"{FINANCIAL_URL}/finance/summary", fallback={
         "status": "unavailable",
-        "cis_summary": {},
-        "vat_position": {},
-        "tax_estimate": {},
+        "cis": {},
+        "vat": {},
+        "tax": {},
         "invoices": [],
     })
 

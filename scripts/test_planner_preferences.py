@@ -69,6 +69,16 @@ class TestBuildEnrichedPlanWithPreferences(unittest.TestCase):
         decision = build_enriched_plan(ctx, "general")
         self.assertEqual(decision.plan["preferences_applied"], 2)
 
+    def test_preferences_in_memu_core_shape_are_injected(self):
+        """memu-core /memory/preferences returns {"preference": ...} items
+        (memu-core/app.py get_preferences). These must reach the plan."""
+        prefs = [{"id": "p1", "preference": "keeper prefers metric units",
+                  "context": "", "timestamp": "2026-11-04T00:00:00Z", "importance": 0.95}]
+        ctx = PlanContext(user_input="estimate timber", session_id="s1", preferences=prefs)
+        decision = build_enriched_plan(ctx, "general")
+        pref_steps = [s for s in decision.plan["steps"] if s.get("action") == "apply_preference"]
+        self.assertEqual([s["preference"] for s in pref_steps], ["keeper prefers metric units"])
+
     def test_max_five_preferences_injected(self):
         """At most 5 preferences should be injected."""
         prefs = [{"content": {"text": f"pref {i}"}} for i in range(10)]

@@ -960,6 +960,26 @@ class TestAsyncHelpers:
         assert "VAT filing query" in result
         assert len(result) == 2
 
+    def test_get_relevant_memories_reads_memu_core_result_field(self):
+        # memu-core /memory/memorize stores the text under content["result"]
+        # (memu-core/app.py memorize_event); recall must read it.
+        records = [{"content": {"result": "site meeting moved to Friday", "user_id": "keeper"}}]
+        mc, _ = _make_http_mock(200, records)
+        with patch("httpx.AsyncClient", return_value=mc):
+            result = _asyncio.run(ag._recall_memories("site meeting"))
+        assert result == ["site meeting moved to Friday"]
+
+    def test_introspect_capabilities_with_loaded_skill(self):
+        # router.list_skills() returns dicts; the endpoint used s.name and
+        # crashed as soon as one skill was loaded (masked here by the [] stub).
+        skill = {"name": "cis-deductions", "triggers": ["cis"], "action": "", "source": "x.md"}
+        mc, _ = _make_http_mock(200, {})
+        with patch.object(ag, "list_skills", return_value=[skill]), \
+             patch("httpx.AsyncClient", return_value=mc):
+            r = client.get("/introspect/capabilities")
+        assert r.status_code == 200
+        assert r.json()["skills"] == [{"name": "cis-deductions"}]
+
     def test_get_relevant_memories_empty_on_non_200(self):
         mc, _ = _make_http_mock(404, {})
         with patch("httpx.AsyncClient", return_value=mc):
@@ -997,12 +1017,13 @@ class TestAsyncHelpers:
         assert result == {}
 
     def test_read_financial_context_fetches_on_vat_keyword(self):
-        fin = {"cis_summary": {"total_gross": 10000, "total_deductions": 200,
-                               "total_net": 9800, "record_count": 5}}
+        # Shape returned by financial-awareness /finance/summary
+        fin = {"cis": {"gross_income_ytd": 10000, "cis_deducted_ytd": 200,
+                       "net_received_ytd": 9800, "record_count": 5}}
         mc, _ = _make_http_mock(200, fin)
         with patch("httpx.AsyncClient", return_value=mc):
             result = _asyncio.run(ag._read_financial_context("my VAT invoice this quarter"))
-        assert result.get("cis_summary") is not None
+        assert result.get("cis") is not None
 
     def test_read_financial_context_empty_on_non_200(self):
         mc, _ = _make_http_mock(503, {})
@@ -1367,12 +1388,13 @@ class TestChatContextInjection:
 
     def test_financial_context_block_executes(self):
         fin = {
-            "cis_summary": {"total_gross": 50000.0, "total_deductions": 1000.0,
-                            "total_net": 49000.0, "record_count": 12},
-            "vat_position": {"rolling_12m_turnover": 80000.0, "threshold": 85000.0,
-                             "must_register": False},
-            "tax_estimate": {"income_tax": 8500.0, "class4_ni": 1800.0,
-                             "total_liability": 10300.0},
+            # Shape returned by financial-awareness /finance/summary
+            "cis": {"gross_income_ytd": 50000.0, "cis_deducted_ytd": 1000.0,
+                    "net_received_ytd": 49000.0, "record_count": 12},
+            "vat": {"rolling_12m_income": 80000.0, "vat_threshold": 85000.0,
+                    "below_threshold": True},
+            "tax": {"income_tax_estimate": 8500.0, "class4_ni_estimate": 1800.0,
+                    "total_tax_ni_estimate": 10300.0, "estimated_balance_due": 9300.0},
         }
         with patch.object(ag, "_read_financial_context", AsyncMock(return_value=fin)):
             r = client.post("/chat", json={"message": "give me my VAT and CIS summary"})

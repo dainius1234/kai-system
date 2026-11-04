@@ -443,7 +443,7 @@ async def dispatch_tax_advisory(query: str) -> str:
 async def dispatch_fact_check(claim: str) -> str:
     """Dispatch to Verifier /verify — zero LLM cost."""
     import os
-    verifier_url = os.getenv("VERIFIER_URL", "http://verifier:8003")
+    verifier_url = os.getenv("VERIFIER_URL", "http://verifier:8052")
     try:
         async with pooled_client(timeout=8.0) as client:
             resp = await client.post(

@@ -582,3 +582,40 @@ class TestSwarmFlag:
         result = is_enabled("SWARM")
         os.environ.pop("FF_SWARM", None)
         assert result is False
+
+
+class TestLLMRouterChatContract:
+    """The swarm, teammates and reasoning modules are written against
+    LLMChatFn = Callable[[List[Dict[str, str]]], Awaitable[str]] and agentic
+    passes ``_llm.chat`` (agentic/app.py /chat/swarm, /chat/teammate). The
+    real LLMRouter must provide it; a mocked router would hide its absence."""
+
+    def _router(self):
+        if str(_ROOT) not in sys.path:
+            sys.path.insert(0, str(_ROOT))
+        from common.llm import LLMRouter
+        return LLMRouter(backends={})  # no backends: deterministic stub
+
+    def test_router_has_chat(self):
+        assert callable(getattr(self._router(), "chat", None))
+
+    def test_chat_returns_text(self):
+        out = asyncio.run(self._router().chat([
+            {"role": "system", "content": "You are Scout."},
+            {"role": "user", "content": "check the site"},
+        ]))
+        assert isinstance(out, str) and out
+
+    def test_chat_passes_system_prompt(self):
+        r = self._router()
+        seen = {}
+
+        async def fake_query(specialist, prompt, **kw):
+            seen.update(specialist=specialist, prompt=prompt, system=kw.get("system"))
+            from common.llm import LLMResponse
+            return LLMResponse(specialist=specialist, text="ok", latency_ms=0.0, source="stub")
+
+        r.query = fake_query
+        assert asyncio.run(r.chat([{"role": "system", "content": "SYS"},
+                                   {"role": "user", "content": "Q"}])) == "ok"
+        assert seen == {"specialist": "Ollama", "prompt": "Q", "system": "SYS"}

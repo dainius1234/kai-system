@@ -260,6 +260,35 @@ class LLMRouter:
         tasks = [self.query(name, prompt, **kwargs) for name in specialists]
         return list(await asyncio.gather(*tasks))
 
+    async def chat(
+        self,
+        messages: List[Dict[str, str]],
+        *,
+        specialist: Optional[str] = None,
+        **kwargs: Any,
+    ) -> str:
+        """Answer an OpenAI-style message list and return the reply text.
+
+        This is the ``LLMChatFn`` contract the swarm stages, teammates and
+        reasoning modules are written against
+        (``Callable[[List[Dict[str, str]]], Awaitable[str]]``). System
+        messages become the system prompt; the rest are joined in order.
+        The specialist defaults to Ollama when configured, otherwise the
+        first configured backend, otherwise the stub.
+        """
+        system = "\n\n".join(m.get("content", "") for m in messages if m.get("role") == "system")
+        turns = [m for m in messages if m.get("role") != "system"]
+        if len(turns) == 1:
+            prompt = turns[0].get("content", "")
+        else:
+            prompt = "\n\n".join(f"{m.get('role', 'user')}: {m.get('content', '')}" for m in turns)
+        if specialist is None:
+            specialist = "Ollama" if "Ollama" in self.backends else (self.available[0] if self.available else "Ollama")
+        if system:
+            kwargs.setdefault("system", system)
+        resp = await self.query(specialist, prompt, **kwargs)
+        return resp.text
+
     # ── internals ────────────────────────────────────────────────────
 
     async def _live_query(

@@ -11,6 +11,58 @@ This map reports and recommends. It changes nothing in KAI: KAI code changes are
 
 ---
 
+## Update 2026-11-04: Priority 1 wiring fixes applied (handoff entries 375–376)
+
+**Authority.** Dainius released the hold for the 8 wiring fixes only, on this branch, plus offline unit tests. The authority is in entry 375 and is word for word.
+
+**What happened to each item:**
+
+| Item | Result | Population counted first (R4/R6) | Test evidence |
+|---|---|---|---|
+| P1.1 memory label | **FIXED** | 3 readers of the wrong field: agentic/app.py `_recall_memories`, agentic/planner.py preferences, dashboard/app.py Memory Map | new tests fail on the old code, pass on the new |
+| P1.2 missing chat function | **FIXED**: `LLMRouter.chat()` added in common/llm.py, matching the `LLMChatFn` contract | 2 call sites (agentic/app.py:827, :864) | 3 new tests fail on the old code, pass on the new |
+| P1.4 memory-write format | **FIXED** | 14 memorize call sites, **7** wrong: 5 in agentic, skill-hunter, house-doctor | by reading only; house-doctor tests fail in this sandbox **before and after** (pydantic/typing load error), so not test-verified |
+| P1.5 CPU reads 0 | **FIXED** at the producer: sysmetrics also returns top-level `cpu_percent` | 4 consumers (agentic ×2, cortex, perception spine) all expected it | new assert fails on the old code, passes on the new |
+| P1.6 finance | **FIXED**: one correct `_tax_year_start()` for all 3 places; chat context and Finance view read the keys the service returns | 3 tax-year lines; 2 consumers | new boundary test passes (on the old code it fails because the helper is absent; the date bug itself was confirmed by reading) |
+| P1.7 verifier score | **FIXED**: the adversary passes memu-core's real `rank_score`, `relevance` and `importance`; chunks with no score stay at 0.5 | 1 site | new test fails on the old code, passes on the new; shows a strong record can now reach 0.60 |
+| P1.10 skill loading | **HELD, needs a decision.** Only the hidden crash was fixed (agentic/app.py `s["name"]`). Hunted skills are marked `probationary: true`, and the loader ignores that mark. Making them load would put self-acquired skills into live chat without approval. That is a permission question (K19 earned autonomy), not wiring. The 4 repository skills are knowledge notes with no trigger section, so they need writing, not wiring | — | crash: new test fails on the old code, passes on the new |
+| P1.11 wrong ports | **FIXED: 19, not the 6 first listed.** Every hard-coded `http://host:port` default (203 literals, outside data/, kai-pm/, docs/, tests and scripts) compared with the port each compose service really listens on | 188 now match, 0 mismatch; 8 hosts are not compose service names, so they were not checked | calibration: the 5 helper-found ports all appeared in the 19 |
+
+**Not touched (still held):**
+- P1.3 trust level;
+- P1.8 values recording;
+- P1.9 dashboard service token;
+- P1.12 flags;
+- address problems that are routes, not ports: screen-watcher `/screenshot`, calendar `/summary` fields, the audio host name;
+- VAT default £85,000.
+
+**Test run.**
+- **Setup:**
+  - Python 3.11 in a scratch virtual environment. Installing it needed the network, to PyPI.
+  - Tests ran with the **network switched off** (`unshare -n`).
+  - Tests ran in a copy of the code made with `git archive` **with `data/SOUL.md` left out**, because importing agentic reads `data/SOUL.md` from the working folder (agentic/app.py:1436).
+- **Comparison:** 32 test files, each run on the old code and on the new.
+  - 28 unchanged.
+  - 4 changed only by the new passing tests.
+  - The two files that fail before and after (`test_cognitive_mechanisms`: 34 errors; `test_d89_cognitive_depth`: 7 failed) fail identically, from a pydantic load error in this sandbox.
+- **`make policy-check`:** each of its 45 commands run separately on both copies gives identical results, apart from the docs-sync count below.
+  - The two Item-8 calibration scripts fail identically on both.
+  - `check-docs` and `sync_docs --check` failed on both (README code size was already stale), and the new tests added a stale test count. After `make sync-docs`, which changed only README.md and docs/PROJECT_BACKLOG.md metric lines, both pass.
+- **Not run:** any live service, docker or runtime test. Runtime testing stays on hold.
+
+**A pattern worth recording (proposed for Kai, not yet in the failure ledger).** Several tests "passed" while the feature was dead, because each test was written against the consumer's own wrong idea of the data rather than the producer's real output:
+- the finance fixtures used `cis_summary`;
+- the recall fixture used `content.text`;
+- the planner fixtures used `content.text`;
+- the test stub returned `list_skills() == []`;
+- a mocked `LLMRouter` hid the missing `chat`.
+
+That is 5 instances of one mechanism: a test built beside the code instead of from the producer (CLAUDE.md I-8). Each new test above takes its expected shape from the producer's code.
+
+**The counts in §1 and §3 are unchanged.** They describe the code at `e32488a`, before these fixes. No feature is re-classified as GENUINE on the strength of a fix that has not been run live.
+
+---
+
 ## 1. The answer in plain words
 
 Think of KAI as a building at second fix. Most rooms are framed and have cable pulled, but many circuits were never connected at the board. A few are connected to the wrong breaker. Some rooms are only a name on the drawing.
