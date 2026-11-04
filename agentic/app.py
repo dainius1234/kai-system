@@ -2946,20 +2946,17 @@ async def chat_stream(req: ChatRequest):
             ("emotion", "/memory/emotion/record", {"session_id": session, "text": u_msg}),
             ("autobiography", "/memory/autobiography/record", {"text": u_msg, "context": "chat"}),
             ("thought", "/memory/imagine/thought", {"thought": thought, "context": "chat_reflection"}),
-            ("values", "/memory/values/learn", {"experience": u_msg[:300], "outcome": "positive", "context": "chat"}),
         ]:
             try:
                 await _memu_post(path, body, timeout=3.0)
             except Exception as e:
                 failed.append(f"{label}: {e}")
-        # D109: record decision so OhanaCore can learn the operator's situational stances
-        try:
-            get_ohana_core().record_decision(
-                situation={"query": u_msg[:200], "mode": mode, "session_id": session},
-                decision=response[:300],
-            )
-        except Exception as e:
-            failed.append(f"ohana: {e}")
+        # P1.8 (Dainius, 2026-11-04, handoff entry 378): the chat path no
+        # longer (a) learns every operator message as a "positive" value, or
+        # (b) records Kai's own reply as the operator's decision in OhanaCore.
+        # Assistant text must never become operator truth (Kingsman K17).
+        # Value learning and decision recording from chat stay off until an
+        # operator-confirmed design exists; nothing else replaces them here.
         # Cortex observe_turn — feeds context bridge and tacit knowledge
         # accumulator. SIGNED: /observe_turn derives the turn's provenance
         # from the key that signs this request, so `json=` would be wrong

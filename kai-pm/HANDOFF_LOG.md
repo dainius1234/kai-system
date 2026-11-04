@@ -115806,3 +115806,119 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-04T22:37:20Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-04T22:37:20Z  [CMD `date -u +%FT%TZ` → 2026-11-04T22:37:20Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 3968f76587eb17301fa4c9b6e6b05abde4f874cc  [CMD `git rev-parse HEAD` → 3968f76587eb17301fa4c9b6e6b05abde4f874cc]
+- tree: 5060e0fe2c608355a08727d47f88f55c23e2842e  [CMD `git rev-parse HEAD^{tree}` → 5060e0fe2c608355a08727d47f88f55c23e2842e]
+- uncommitted_paths: 15  [CMD `git status --porcelain | count lines` → 15]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/project-rework-plan-pgvp35: 3968f76587eb17301fa4c9b6e6b05abde4f874cc  [CMD `git ls-remote --heads origin` → 3968f76587eb17301fa4c9b6e6b05abde4f874cc]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 378  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 378]
+
+### 1. The four states
+
+- physical: 15 files changed (110+/29-): P1.8 parts 1–3 (agentic chat path; memu-core values/learn), VAT £90,000 in 8 places, tests, README/backlog metric lines, capability map update  [CMD `git diff --stat` → 15 files changed, 110 insertions(+), 29 deletions(-)]
+- authorised: P1.8 parts 1–3 and VAT in 8 places; branch only; offline tests, no network  [CONVERSATION 2026-11-04 Dainius, "Approve all 4 (Recommended)"]
+- evidence: tests before/after and gate diff in blocks below; no network used (existing scratch venv, unshare -rn); SOUL-free git-archive copies  [CMD `runtests on base2/fix2; gates per command on gb2/fix2` → see evidence blocks]
+- admission: none; not live-qualified, not deployed, not merged  [CONVERSATION 2026-11-04 Kai-GPT relayed by Dainius, "Retain the corrections. Do not classify them as live-qualified or deploy them."]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `ruling_capture.py status` → OUTSTANDING=0]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED (used): the approved integrity fix. HELD: cleanup of already-learned data; P1.3; P1.9; P1.10 skill promotion; P1.12; network-dependent setup; live runtime; deployment; merge; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying, reading, searching or processing data/SOUL.md  [CONVERSATION 2026-11-04 Dainius, "Approve all 4 (Recommended)"]
+
+### 4. Open questions
+
+- For Dainius: whether and how to clean up values and stances already learned wrongly (stored under data/, if KAI has run live)  [CMD `Read agentic/moral_core.py:182-196` → record_decision saves the fingerprint to disk]
+- For Dainius and Kai: P1.10, P1.3, P1.9 design decisions (unchanged)  [CONVERSATION 2026-11-04 Kai-GPT relayed by Dainius, "Everything else remains held."]
+
+### 5. Incidents and corrections
+
+- Population: chat path was the only non-test caller of record_decision and of /memory/values/learn besides an operator dashboard proxy that no UI calls  [CMD `Grep "record_decision\(|values/learn"` → agentic/app.py 2 sites; dashboard/app.py proxy; dashboard/static 0]
+- Existing p20 tests encoded the defect: 7 taught values with no outcome and expected learning; they now send "outcome": "positive" (explicit teaching)  [CMD `test_p20 edit` → updated 7]
+- Known-positive / known-negative: 4 new tests fail on the old code (chat integrity 1, memu no-outcome 2, VAT default 1) and pass on the new; the chat test also asserts the rest of the learning step still runs  [CMD `pytest base2 vs fix2` → before 4 failed; after 0 failed]
+- test_phase_b_memu_core fails identically before and after (sentence_transformers not installed; installing would need network, not authorised)  [CMD `python scripts/test_phase_b_memu_core.py` → RuntimeError: Embedding backend unavailable, both trees]
+- Gates: 45 commands identical before/after except check-docs and sync_docs --check (test count 4,872 → 4,876); after make sync-docs both pass; item8 verdicts/preflight fail on both as before  [CMD `diff g2_gb2.txt g2_fix2.txt` → only lines 44, 45]
+- Kai's VAT scope corrected by count: two compose files override the code default, so fixing only financial-awareness/app.py would not change deployed behaviour  [CMD `Grep "85[,_]?000"` → docker-compose.sovereign.yml:412 hard-coded, docker-compose.full.yml:555 default]
+- Repository changes equal tested files (all non-kai-pm files); credential scan 0 hits  [CMD `cmp each; credscan.py scan379.json` → differing-from-tested=0; TOTAL HITS 0]
+- EVIDENCE TESTS-BEFORE ev379_tests_before.txt: 1608 bytes, sha256 c2eff017b432b674fe9a608dc7cc7e4979efeade6fea03a6dbdc1173d7fb3720, final LF True (added by Orion)  [CMD `sha256sum ev379_tests_before.txt` → c2eff017b432b674…]
+    BEGIN-VERBATIM TESTS-BEFORE
+    test_agentic_routes rc=1 1 failed, 178 passed, 9 warnings
+        FAILED scripts/test_agentic_routes.py::TestChatLearningIntegrity::test_chat_does_not_learn_values_or_record_reply_as_decision
+    test_p20_conscience_values rc=1 2 failed, 71 passed, 13 warnings
+        FAILED scripts/test_p20_conscience_values.py::TestValueFormation::test_no_outcome_learns_nothing
+        FAILED scripts/test_p20_conscience_values.py::TestValueFormation::test_neutral_or_unknown_outcome_learns_nothing
+    test_memu_routes rc=0 236 passed, 4 warnings
+    test_financial_awareness rc=1 1 failed, 19 passed, 4 warnings
+        FAILED scripts/test_financial_awareness.py::TestVatThresholdDefault::test_default_is_current_hmrc_threshold
+    test_d109_ohana_core rc=0 27 passed, 4 warnings
+    test_wisdom_ingestion rc=0 29 passed, 4 warnings
+    test_invoice rc=0 3 passed, 4 warnings
+    test_self_emp_advisor rc=0(script) self-employment advisor tests passed
+    test_memu_retrieval rc=0(script) memu retrieval tests passed
+    test_phase_b_memu_core rc=1(script) RuntimeError: Embedding backend unavailable after 0.0s (model='all-MiniLM-L6-v2'): No module named 'sentence_transformers'. the sentence-transformers library is not importable at all, so this is a dependency problem rather than a model problem — check memu-core/requirements.txt reached the image. Refusing to silently degrade to fake hash-based embeddings — memory retrieval would keep returning results while being semantically meaningless. Set MEMU_ALLOW_FAKE_EMBEDDINGS=true to explicitly opt into the deterministic hash fallback for lightweight/offline tests that don't depend on real embedding quality.
+    END-VERBATIM TESTS-BEFORE
+- EVIDENCE TESTS-AFTER ev379_tests_after.txt: 1118 bytes, sha256 69b22e6ffdd504dae161e3948d764aea76419ef41151279b547de56d1b71ec71, final LF True (added by Orion)  [CMD `sha256sum ev379_tests_after.txt` → 69b22e6ffdd504da…]
+    BEGIN-VERBATIM TESTS-AFTER
+    test_agentic_routes rc=0 179 passed, 9 warnings
+    test_p20_conscience_values rc=0 73 passed, 13 warnings
+    test_memu_routes rc=0 236 passed, 4 warnings
+    test_financial_awareness rc=0 20 passed, 4 warnings
+    test_d109_ohana_core rc=0 27 passed, 4 warnings
+    test_wisdom_ingestion rc=0 29 passed, 4 warnings
+    test_invoice rc=0 3 passed, 4 warnings
+    test_self_emp_advisor rc=0(script) self-employment advisor tests passed
+    test_memu_retrieval rc=0(script) memu retrieval tests passed
+    test_phase_b_memu_core rc=1(script) RuntimeError: Embedding backend unavailable after 0.0s (model='all-MiniLM-L6-v2'): No module named 'sentence_transformers'. the sentence-transformers library is not importable at all, so this is a dependency problem rather than a model problem — check memu-core/requirements.txt reached the image. Refusing to silently degrade to fake hash-based embeddings — memory retrieval would keep returning results while being semantically meaningless. Set MEMU_ALLOW_FAKE_EMBEDDINGS=true to explicitly opt into the deterministic hash fallback for lightweight/offline tests that don't depend on real embedding quality.
+    END-VERBATIM TESTS-AFTER
+- EVIDENCE GATES-DIFF ev379_gates_diff.txt: 435 bytes, sha256 95d67bb16420f443191e41ca165faee01364d986e80361cf11130d1c705e0793, final LF True (added by Orion)  [CMD `sha256sum ev379_gates_diff.txt` → 95d67bb16420f443…]
+    BEGIN-VERBATIM GATES-DIFF
+    44,45c44,45
+    < 44 rc=0 :: make --no-print-directory check-docs
+    < 45 rc=0 :: python3 scripts/sync_docs.py --check
+    ---
+    > 44 rc=2 :: make --no-print-directory check-docs
+    > 45 rc=1 :: python3 scripts/sync_docs.py --check
+    24 rc=1 :: python3 scripts/test_item8_verdicts.py
+    25 rc=1 :: python3 scripts/test_item8_preflight.py
+    44 rc=2 :: make --no-print-directory check-docs
+    45 rc=1 :: python3 scripts/sync_docs.py --check
+    
+    [exited with code 0]
+    END-VERBATIM GATES-DIFF
+
+### 6. Next authorised step
+
+- Report to Dainius and Kai; remaining items held  [CONVERSATION 2026-11-04 Kai-GPT relayed by Dainius, "Everything else remains held."]
+
+### 7. What I am unsure of
+
+- Live behaviour of the changed chat path: not run  [CMD `none` → no live test]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check

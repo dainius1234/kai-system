@@ -59,6 +59,22 @@ This map reports and recommends. It changes nothing in KAI: KAI code changes are
 
 That is 5 instances of one mechanism: a test built beside the code instead of from the producer (CLAUDE.md I-8). Each new test above takes its expected shape from the producer's code.
 
+### Update 2026-11-04 (later): values integrity and VAT (handoff entries 377–379)
+
+Kai reviewed commit `6aaf36f` (entry 377). Dainius then approved a narrow integrity fix (entry 378), with branch-only work and offline tests, no network:
+
+| Item | Result | Test evidence |
+|---|---|---|
+| P1.8 (1): Kai's reply recorded as Dainius's decision | **FIXED**: the chat path no longer calls `record_decision` | new test fails on the old code, passes on the new |
+| P1.8 (2): every chat message learned as a "positive" value | **FIXED**: the chat path no longer posts to `/memory/values/learn`. KAI learns no values from chat until an operator-confirmed design exists | same test |
+| P1.8 (3): memu-core treated a missing or unknown outcome as "positive" | **FIXED**: only an explicit `positive` or `negative` teaches a value; anything else returns `not_learned`. The 7 existing tests that taught values without an outcome now send `"outcome": "positive"`, because they represent explicit teaching | 2 new tests fail on the old code, pass on the new |
+| VAT threshold £85,000 → **£90,000** | **FIXED in all 8 counted places:** financial-awareness, self_emp_advisor and invoice.py defaults; docker-compose.full.yml and docker-compose.sovereign.yml, which override the code default; .env.example; skills/mtd-vat.md (3 lines) | new default test fails on the old code, passes on the new |
+
+**Not included:**
+- cleaning up anything already wrongly learned (it lives under `data/`; a separate decision);
+- the "review again near £80,000" guidance text in financial-awareness;
+- test fixtures and a classifier example phrase that mention 85,000 as arbitrary numbers.
+
 **The counts in §1 and §3 are unchanged.** They describe the code at `e32488a`, before these fixes. No feature is re-classified as GENUINE on the strength of a fix that has not been run live.
 
 ---

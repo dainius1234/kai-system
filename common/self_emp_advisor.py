@@ -23,7 +23,7 @@ def _to_float(value: object) -> float:
 def thresholds() -> Dict[str, float]:
     return {
         "mtd_start": _to_float(os.getenv("MTD_START", "50000")),
-        "vat_threshold": _to_float(os.getenv("VAT_THRESHOLD", "85000")),
+        "vat_threshold": _to_float(os.getenv("VAT_THRESHOLD", "90000")),
         "mileage_rate": _to_float(os.getenv("MILEAGE_RATE", "0.45")),
     }
 

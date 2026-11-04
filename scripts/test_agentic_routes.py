@@ -1293,6 +1293,33 @@ class TestAsyncHelpers:
 # Patch _get_* helpers to return rich data so the injection blocks run
 # ═════════════════════════════════════════════════════════════════════
 
+class TestChatLearningIntegrity:
+    """P1.8 (handoff entry 378): a chat turn must not teach a value from the
+    operator's message, and must not record Kai's reply as the operator's
+    decision. The rest of the learning step must still run."""
+
+    def test_chat_does_not_learn_values_or_record_reply_as_decision(self):
+        captured = []
+        memu = AsyncMock(return_value={})
+        ohana = MagicMock()
+        ohana.inject_into_prompt.side_effect = lambda prompt, **_: prompt
+        with patch.object(ag._cleanup_mgr, "submit", side_effect=captured.append), \
+             patch.object(ag, "_memu_post", memu), \
+             patch.object(ag, "get_ohana_core", return_value=ohana), \
+             patch.object(ag, "_append_session_turn", AsyncMock()), \
+             patch.object(ag, "_auto_memorize", AsyncMock()):
+            r = client.post("/chat", json={"message": "I always pay subbies on time"})
+            assert r.status_code == 200
+            assert captured, "the end-of-turn learning step was not scheduled"
+            for coro in captured:
+                _asyncio.run(coro)
+        paths = [c.args[0] for c in memu.await_args_list]
+        assert "/memory/values/learn" not in paths
+        ohana.record_decision.assert_not_called()
+        # known-negative: the learning step itself still ran
+        assert "/memory/emotion/record" in paths
+
+
 class TestChatContextInjection:
     """These tests patch the async _get_* helper functions to return
     non-empty data so that the context-injection if-blocks in

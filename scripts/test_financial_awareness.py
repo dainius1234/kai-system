@@ -267,6 +267,14 @@ class TestFinanceSummary(unittest.TestCase):
         self.assertIn("tax", data)
 
 
+class TestVatThresholdDefault(unittest.TestCase):
+    def test_default_is_current_hmrc_threshold(self):
+        # HMRC VAT registration threshold is £90,000 (checked 2026-11-04).
+        if "VAT_THRESHOLD" in os.environ:
+            self.skipTest("VAT_THRESHOLD set in the environment")
+        self.assertEqual(_app_module.VAT_THRESHOLD, 90000.0)
+
+
 class TestTaxYearStart(unittest.TestCase):
     """UK tax year starts 6 April. Expected dates come from that rule, not the code."""
 

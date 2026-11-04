@@ -33,7 +33,7 @@ PERSONAL_ALLOWANCE = float(os.getenv("UK_PERSONAL_ALLOWANCE", "12570"))
 BASIC_RATE_LIMIT = float(os.getenv("UK_BASIC_RATE_LIMIT", "50270"))
 HIGHER_RATE_LIMIT = float(os.getenv("UK_HIGHER_RATE_LIMIT", "125140"))
 MTD_THRESHOLD = float(os.getenv("MTD_START", "50000"))
-VAT_THRESHOLD = float(os.getenv("VAT_THRESHOLD", "85000"))
+VAT_THRESHOLD = float(os.getenv("VAT_THRESHOLD", "90000"))  # HMRC registration threshold
 MILEAGE_RATE = float(os.getenv("MILEAGE_RATE", "0.45"))
 
 # CIS deduction rates

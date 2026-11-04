@@ -409,7 +409,7 @@ services:
       TOOL_GATE_URL: "http://tool-gate:8000"
       AUDIT_REDIS_URL: "redis://redis:6379"
       MTD_START: "50000"
-      VAT_THRESHOLD: "85000"
+      VAT_THRESHOLD: "90000"
       MILEAGE_RATE: "0.45"
       SELF_EMP_ROOT: "/data/self-emp"
       INCOME_CSV: "/data/self-emp/Accounting/income.csv"

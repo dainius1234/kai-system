@@ -6777,9 +6777,21 @@ async def learn_value(request: Request):
 
     exp_lower = experience.lower()
 
+    # P1.8 (Dainius, 2026-11-04, handoff entry 378): only an explicit
+    # "positive" or "negative" outcome teaches a value. A missing, neutral
+    # or unknown outcome used to be silently treated as "positive", so
+    # anything sent here became an endorsed value. Nothing is learned now.
+    if outcome not in ("positive", "negative"):
+        return {
+            "status": "not_learned",
+            "reason": "outcome must be 'positive' or 'negative'; nothing was learned",
+            "values_learned": [],
+            "total_values": len(_p20_all_values()),
+        }
+
     # detect value category from experience text
     detected_values = []
-    signal_type = outcome if outcome in ("positive", "negative") else "positive"
+    signal_type = outcome
     for category, keywords in _VALUE_SIGNALS.get(signal_type, {}).items():
         if any(k in exp_lower for k in keywords):
             detected_values.append(category)
