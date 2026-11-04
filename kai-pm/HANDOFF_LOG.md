@@ -115108,3 +115108,80 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-04T21:21:10Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-04T21:21:10Z  [CMD `date -u +%FT%TZ` → 2026-11-04T21:21:10Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: e32488a46f7e391ad4689d1933eaf942340df26d  [CMD `git rev-parse HEAD` → e32488a46f7e391ad4689d1933eaf942340df26d]
+- tree: f5093a69286b91f74eee381be9bacf8e6d7525d7  [CMD `git rev-parse HEAD^{tree}` → f5093a69286b91f74eee381be9bacf8e6d7525d7]
+- uncommitted_paths: 1  [CMD `git status --porcelain | count lines` → 1]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- remote:claude/project-rework-plan-pgvp35: e32488a46f7e391ad4689d1933eaf942340df26d  [CMD `git ls-remote --heads origin` → e32488a46f7e391ad4689d1933eaf942340df26d]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 372  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 372]
+
+### 1. The four states
+
+- physical: kai-pm/KAI_CAPABILITY_MAP.md added (124 features mapped to code; gap report; K21–K46 proposed; helper outputs verbatim in Appendix A), committed with this entry  [CMD `python3 -I assemble.py; ls -l kai-pm/KAI_CAPABILITY_MAP.md` → written, 146623 bytes]
+- authorised: the code-backed capability map and prioritised gap report  [CONVERSATION 2026-11-03 Kai-GPT relayed by Dainius, "The next substantive deliverable should be the code-backed KAI capability map, not another procedure."]
+- evidence: read only; nothing run; every Runtime cell NOT RUN (119 plain, 5 also cite output/health_scorecard.json liveness)  [CMD `parse.py results rows.json` → 124 rows, missing [] extra [], Runtime Counter 119 NOT RUN + 5 annotated]
+- admission: none; the map reports and recommends, it changes no KAI code  [CONVERSATION 2026-11-03 Kai-GPT relayed by Dainius, "This does not waive essential safety controls or existing engineering holds."]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `ruling-capture SessionStart` → flagged=42 banked=42 OUTSTANDING=0]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: the capability map. HELD: engineering; KAI code changes; KAI runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying, reading, searching or processing data/SOUL.md  [CONVERSATION 2026-11-03 Kai-GPT relayed by Dainius, "This does not waive essential safety controls or existing engineering holds."]
+
+### 4. Open questions
+
+- For Dainius: P1.3 (proactive observer trust gate) needs a ruling on which trust level proactive observation requires before any fix; it is an autonomy decision, not a typo  [CMD `Read agentic/trust_core.py:71-98,195-197; agentic/app.py:2064-2070` → proactive_observation absent from CAPABILITY_GATES; unknown capability defaults to GUARDIAN]
+- For Kai and Dainius: whether to add any of the 26 proposed K21–K46 (7 NEW, 19 extend) to the baseline  [CMD `grep K-rows RECON.md, column 4` → NEW K21 K29 K30 K36 K37 K38 K40; 19 Extends]
+- For Dainius: release of the code-change hold for Priority 1 fixes (map §2)  [CONVERSATION 2026-11-03 Kai-GPT relayed by Dainius, "This does not waive essential safety controls or existing engineering holds."]
+- STANDING REMINDER for Dainius — current-state index. Trigger: when the research and architecture reconciliation is complete (or earlier if Kai's blob route stops working, or a cold start is blocked again), Orion reminds Dainius and asks for his explicit decision  [CONVERSATION 2026-10-11 Dainius, "please remind me when to implement"]
+
+### 5. Incidents and corrections
+
+- Counts after overrides: GENUINE 15, PARTIAL 86, SIMULATED 8, NAME_ONLY 11, ABSENT 4 = 124 (helpers' own: 18/83/8/11/4)  [CMD `assemble.py` → {'PARTIAL': 86, 'GENUINE': 15, 'SIMULATED': 8, 'ABSENT': 4, 'NAME_ONLY': 11}]
+- Orion override: 37, 47, 51 GENUINE→PARTIAL; LLMRouter has no chat method, /chat/swarm builds with _llm.chat (agentic/app.py:864) before CognitiveFSM (:871), /chat/teammate calls it at :827; no other non-test CognitiveFSM caller in agentic/  [CMD `Grep "^class |def " common/llm.py; Grep "CognitiveFSM\(" agentic/ !**/test*` → no chat/__getattr__; only app.py:871]
+- Spot check: 12 helper claims read by Orion; 11 confirm (several narrower, stated per row in map §6); 1 is Orion's override finding. Sample chosen to drive Priority 1, not random  [CMD `cat capmap/SPOTCHECK.md` → 12 rows]
+- Orion correction before commit: tax-year bug first drafted as "wrong for most of April–December"; the condition month>=4 and day>=6 is wrong only on days 1–5 of May–December (about 40 days a year); corrected in the map  [CMD `Read financial-awareness/app.py:81` → `today.year if today.month >= 4 and today.day >= 6 else today.year - 1`]
+- RECON count discrepancy: its prose says "10 are new and 16 extend"; its table marks 7 NEW and 19 extend; the map uses the table  [CMD `assemble.py assert nk=={'NEW':7,'EXT':19}` → passed]
+- Helper search-rule disclosure, G5: two searches from the repository root reached data/ (`grep -rln … --include=*.py .`; Grep glob **/*.py without !data/**), .py files only; helper reports SOUL.md not opened and no data/ result used. Self-report only; Orion has no independent record of helper tool calls  [CMD `grep -niE 'root|data/|SOUL' G5.md` → note 1 as stated]
+- Helper disclosures, others: G3 one whole-repo search with !data/** (recorded entry 372); G4 root-path searches with exclusion globs including data/**; G1 grep -r over named top-level dirs excluding data/; G7 two single-file root greps; G2 three named compose files; G6 none  [CMD `grep notes in G1..G7.md` → as stated]
+- Orion's brief (CAPMAP-BRIEF) rule 1 was internally inconsistent ("never run any search over the whole repository" vs root Grep allowed "with the glob !data/**"); the defect is in the brief, not only the helpers  [CMD `Read capmap/BRIEF.md:7` → both sentences present]
+- Appendix A of the map is byte-identical to the saved helper outputs, 8 of 8, each with SHA-256  [CMD `python3 -I verbatim check` → verbatim 8 /8]
+- Credential scan of the map: 0 hits, calibration pass  [CMD `credscan.py scan_in.json` → CALIBRATION PASS 6/6, TOTAL HITS 0]
+
+### 6. Next authorised step
+
+- Report the map to Dainius in plain words and to Kai for review; no KAI code change until Dainius releases the hold  [CONVERSATION 2026-11-03 Kai-GPT relayed by Dainius, "Deliver one actionable capability map and a prioritised engineering gap report"]
+
+### 7. What I am unsure of
+
+- Whether the proactive observer actually runs today: the stored trust level is in data/, not inspected  [CMD `none` → data/ not opened by rule]
+- Helper-reading rows not spot-checked by Orion remain single-reader evidence, not independent corroboration  [CMD `cat capmap/SPOTCHECK.md` → 12 of 124+ claims checked]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
