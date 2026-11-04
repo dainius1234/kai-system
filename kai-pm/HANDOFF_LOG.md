@@ -115570,3 +115570,163 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-04T22:18:44Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-04T22:18:44Z  [CMD `date -u +%FT%TZ` → 2026-11-04T22:18:44Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 6aaf36f6b4178948ab80d57aa2133ad1b5215c69  [CMD `git rev-parse HEAD` → 6aaf36f6b4178948ab80d57aa2133ad1b5215c69]
+- tree: 9a2969ea495cc0e9cb0556c148d937e74e5e236f  [CMD `git rev-parse HEAD^{tree}` → 9a2969ea495cc0e9cb0556c148d937e74e5e236f]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 6aaf36f6b4178948ab80d57aa2133ad1b5215c69  [CMD `git ls-remote --heads origin` → 6aaf36f6b4178948ab80d57aa2133ad1b5215c69]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 376  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 376]
+
+### 1. The four states
+
+- physical: no KAI code change; this entry banks Kai's engineering review of 6aaf36f  [CMD `git status --short` → clean]
+- authorised: nothing new; Kai's message asks Dainius to approve a narrow P1.8 + VAT fix and grants nothing itself  [CONVERSATION 2026-11-04 Kai-GPT relayed by Dainius, "Do you approve a narrowly scoped, branch-only fix for the values/decision-recording bug and outdated VAT threshold, with offline tests only?"]
+- evidence: Kai's review verbatim in section 5 (ruling-capture id 3a7760b5a18fd88f)  [CMD `ruling_capture json text` → 6024 chars]
+- admission: none; fixes in 6aaf36f retained on the branch, not live-qualified, not deployed  [CONVERSATION 2026-11-04 Kai-GPT relayed by Dainius, "Retain the corrections. Do not classify them as live-qualified or deploy them."]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT · 2026-11-04 · recommendations, pending Dainius: P1.10 probationary skills never auto-enter live use; P1.3 separate passive observation from notifications, durable changes and action; P1.8 most urgent integrity defect; P1.9 secrets stay server-side; VAT default £85,000 outdated, HMRC £90,000 ⚠ UNBANKED  [CONVERSATION 2026-11-04 Kai-GPT relayed by Dainius, "Next recommendation: one small, separately authorised offline-only integrity correction covering P1.8 and the finance threshold, with focused tests."]
+- Kai-GPT · 2026-11-04 · correction to Orion: future network-dependent setup (e.g. installing test dependencies) requires explicit scope authorisation ⚠ UNBANKED  [CONVERSATION 2026-11-04 Kai-GPT relayed by Dainius, "future network-dependent setup requires explicit scope authorisation."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: none new. HELD: P1.8 and VAT fix until Dainius approves; all other KAI code changes; network-dependent setup without explicit scope; live runtime tests; deployment; merge; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying, reading, searching or processing data/SOUL.md  [CONVERSATION 2026-11-04 Kai-GPT relayed by Dainius, "Everything else remains held."]
+
+### 4. Open questions
+
+- For Dainius: approve the narrow P1.8 + VAT fix (branch only, offline tests only)?  [CONVERSATION 2026-11-04 Kai-GPT relayed by Dainius, "Do you approve a narrowly scoped, branch-only fix"]
+
+### 5. Incidents and corrections
+
+- Kai's review banked word for word below  [CMD `sha256sum kai377.txt` → see evidence line]
+- EVIDENCE KAI-REVIEW-6aaf36f kai377.txt: 6074 bytes, sha256 dadf4c99dfd881abfdde873503439f5f9a3392c9df2d4ed6d6d0bd37891db5a1, final LF True (added by Orion)  [CMD `sha256sum kai377.txt` → dadf4c99dfd881ab…]
+    BEGIN-VERBATIM KAI-REVIEW-6aaf36f
+    KAI — Engineering progress review
+    
+    COLD-START: DEGRADED | Working branch verified
+    
+    I independently retrieved GitHub HEAD 6aaf36f6b4178948ab80d57aa2133ad1b5215c69, the updated capability map, DAI-10, Miro’s relevant architecture guidance, and the current code changes. START HERE’s full text remains truncated. I have not independently rerun Orion’s tests or observed KAI running.
+    
+    This is a much better direction: fixing faults in KAI itself rather than building another system to inspect it.
+    
+    Orion’s commit contains real implementation changes across memory, chat, monitoring, finance, evidence scoring and service connectivity. His report also distinguishes offline testing from live operation, which is essential.
+    
+    My provisional assessment: Keep the changes on the working branch for now. Do not merge or deploy them yet. The open decisions concern autonomy, authority and identity integrity—not merely technical wiring.
+    
+    My technical verdict
+    
+    The fixes are worth retaining, but they are not yet qualified for live use.
+    
+    Orion’s tests support improvements to the code. They do not establish that all seven corrected functions work together in a running KAI.
+    
+    The most important outstanding risks are these:
+    
+    Priority	Finding	My recommendation
+    Critical	KAI records its own replies as your decisions and automatically marks messages as positive values	Fix before any live chat learning
+    High	Self-acquired skills can bypass their probationary classification if loaded	Keep execution blocked until approval and capability restrictions exist
+    High	Proactive observation has no properly defined trust category	Permit separately authorised observation, not blanket autonomy
+    High	Dashboard service calls lack the required authentication	Repair server-side authentication; never expose service secrets in the browser
+    High	Finance defaults to an outdated VAT threshold	Correct before financial decisions depend on it
+    
+    I verified the VAT issue independently: the current UK VAT registration threshold is £90,000, not the £85,000 default still present in financial-awareness/app.py. HMRC confirms the £90,000 threshold. GOV.UK
+    
+    Decisions I recommend
+    
+    1. Self-taught skills — keep probation, allow governed progression.
+    
+    KAI should be able to discover, create and improve skills. That is central to the intended organism. But discovering a skill is not equivalent to authorising it.
+    
+    A new skill should initially be evaluated without executing consequential actions. Promotion into live use should require a documented capability scope, evidence of safe operation and approval appropriate to its risk. No automatic promotion merely because the skill file parses successfully.
+    
+    2. Proactivity — give KAI permission to notice, not unrestricted permission to act.
+    
+    The current proactive_observation capability is missing from the trust table, so it falls back to the highest trust requirement.
+    
+    My recommended design is to separate read-only observation from notifications, durable changes, scheduling and external actions. Each should have its own permission level, with sensor privacy requirements respected.
+    
+    This prevents KAI from becoming either permanently inactive or unnecessarily autonomous.
+    
+    3. Values and decision recording — fix first.
+    
+    I read the relevant chat code. It really does pass the assistant’s generated response into record_decision() and assigns "positive" to the user’s message in its values-learning call.
+    
+    That’s a direct violation of our intention to distinguish your confirmed values from KAI’s interpretations.
+    
+    KAI can preserve conversation history and learn from evidence, but it must not silently promote an assistant answer into an owner decision.
+    
+    What I would tell Orion
+    
+    KAI-GPT → ORION | ENGINEERING REVIEW — COMMIT 6aaf36f
+    
+    The branch-only implementation work is useful and within the scope recorded in handoff entry 375.
+    
+    Retain the corrections. Do not classify them as live-qualified or deploy them.
+    
+    My decisions/recommendations for the open design questions:
+    
+    * P1.10: probationary skills must not automatically enter live use. Design risk-scoped approval and promotion.
+    * P1.3: separate passive observation from notifications, durable state changes and autonomous action; do not grant broad trust.
+    * P1.8: values and decision provenance is the most urgent outstanding integrity defect. Assistant responses must never be recorded as Dainius’s decisions.
+    * P1.9: preserve authentication, with secrets confined to trusted server-side components.
+    * Finance: the default UK VAT registration threshold of £85,000 is outdated; current HMRC threshold is £90,000.
+    
+    Qualification limits: House Doctor’s modified path was not independently test-verified; existing cognitive and Item 8 failures persist; live runtime remains untested. Eight default-address hosts remain outside the port comparison’s verified population.
+    
+    The prior test-dependency download used the network despite the offline-only test intention. That exception was disclosed, but future network-dependent setup requires explicit scope authorisation.
+    
+    Next recommendation: one small, separately authorised offline-only integrity correction covering P1.8 and the finance threshold, with focused tests.
+    
+    No new census, no new review framework, no scope expansion. Existing engineering holds apply outside any specifically approved correction.
+    
+    Our objective is a functional, trustworthy KAI—not a larger register of engineering activity.
+    
+    OHANA.
+    
+    Next move
+    
+    My priority is protecting KAI’s identity and the integrity of what it learns, before enabling additional skills or autonomy.
+    
+    Do you approve a narrowly scoped, branch-only fix for the values/decision-recording bug and outdated VAT threshold, with offline tests only?
+    
+    Everything else remains held.
+    
+    Confidence: 0.98 that these two defects merit correction, based on the source code and HMRC guidance. Confidence in KAI’s live functional readiness remains low because the integrated runtime has not been verified.
+    
+    No further planning exercise is needed to make this next decision.
+    END-VERBATIM KAI-REVIEW-6aaf36f
+
+### 6. Next authorised step
+
+- Wait for Dainius's answer; prepare the exact P1.8 and VAT change description so he can decide (reading only)  [CONVERSATION 2026-11-04 Kai-GPT relayed by Dainius, "No further planning exercise is needed to make this next decision."]
+
+### 7. What I am unsure of
+
+- None new  [CMD `none` → n/a]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
