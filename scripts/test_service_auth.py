@@ -19,6 +19,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from common.service_auth import (
     ALLOW_UNAUTH_ENV,
+    DASHBOARD_TOKEN_ENV,
     TOKEN_ENV,
     check_token,
     unauthenticated_allowed,
@@ -175,6 +176,38 @@ def test_prefix_token_rejected():
             check(f"prefix_{attempt[:12]}_denied", not ok)
 
 
+def test_dashboard_key_rejected_where_not_configured():
+    """Known-negative for privilege spread: a service holding only the
+    shared token (e.g. the executor) must reject the dashboard's key."""
+    with _Env(**{TOKEN_ENV: "shared-AAA", DASHBOARD_TOKEN_ENV: None, ALLOW_UNAUTH_ENV: None}):
+        ok, status, _ = check_token("Bearer dash-BBB", "executor_run")
+        check("dashboard_key_denied_at_unkeyed_service", not ok and status == 403, status)
+
+
+def test_dashboard_key_accepted_where_configured():
+    """Known-positive: browser-agent/monitor/notify accept the dashboard key
+    and still accept the shared token; anything else is refused."""
+    with _Env(**{TOKEN_ENV: "shared-AAA", DASHBOARD_TOKEN_ENV: "dash-BBB", ALLOW_UNAUTH_ENV: None}):
+        ok_d, _, _ = check_token("Bearer dash-BBB", "monitor_rules")
+        ok_s, _, _ = check_token("Bearer shared-AAA", "monitor_rules")
+        ok_x, status_x, _ = check_token("Bearer dash-BB", "monitor_rules")
+        check("dashboard_key_accepted", ok_d)
+        check("shared_token_still_accepted", ok_s)
+        check("near_miss_rejected", not ok_x and status_x == 403, status_x)
+
+
+def test_dashboard_key_alone_keeps_fail_closed_semantics():
+    """With no token of either kind and no dev bypass, still 503."""
+    with _Env(**{TOKEN_ENV: None, DASHBOARD_TOKEN_ENV: None, ALLOW_UNAUTH_ENV: None}):
+        ok, status, _ = check_token("Bearer anything", "op")
+        check("no_tokens_fail_closed", not ok and status == 503, status)
+    with _Env(**{TOKEN_ENV: None, DASHBOARD_TOKEN_ENV: "dash-BBB", ALLOW_UNAUTH_ENV: None}):
+        ok, _, _ = check_token("Bearer dash-BBB", "op")
+        ok2, status2, _ = check_token(None, "op")
+        check("dashboard_only_service_accepts_key", ok)
+        check("dashboard_only_service_requires_header", not ok2 and status2 == 401, status2)
+
+
 # ═══════════════════════════════════════════════════════════════════
 # 3. Coverage — every audited endpoint is actually protected
 # ═══════════════════════════════════════════════════════════════════
@@ -313,6 +346,9 @@ if __name__ == "__main__":
     test_bearer_scheme_case_insensitive()
     test_token_whitespace_tolerated()
     test_prefix_token_rejected()
+    test_dashboard_key_rejected_where_not_configured()
+    test_dashboard_key_accepted_where_configured()
+    test_dashboard_key_alone_keeps_fail_closed_semantics()
     test_every_audited_endpoint_protected()
     test_protection_count()
     test_services_import_helper()

@@ -38,6 +38,12 @@ logger = logging.getLogger("kai.service_auth")
 
 TOKEN_ENV = "KAI_SERVICE_TOKEN"
 ALLOW_UNAUTH_ENV = "KAI_ALLOW_UNAUTHENTICATED"
+# The dashboard's own key (Dainius, 2026-11-04, handoff entries 381-382).
+# A service accepts it only if this variable is set FOR THAT SERVICE.
+# Compose sets it for browser-agent, monitor-service and notify-service
+# only, so a compromised dashboard cannot reach the executor or any other
+# service that holds the shared KAI_SERVICE_TOKEN.
+DASHBOARD_TOKEN_ENV = "KAI_DASHBOARD_SERVICE_TOKEN"
 
 _WARNED_UNAUTH: set[str] = set()
 
@@ -49,6 +55,15 @@ def _load_token() -> str:
         return load_secret(TOKEN_ENV, "")
     except Exception:
         return os.getenv(TOKEN_ENV, "")
+
+
+def _load_dashboard_token() -> str:
+    """The dashboard key, if THIS service has been configured to accept it."""
+    try:
+        from common.auth import load_secret
+        return load_secret(DASHBOARD_TOKEN_ENV, "")
+    except Exception:
+        return os.getenv(DASHBOARD_TOKEN_ENV, "")
 
 
 def unauthenticated_allowed() -> bool:
@@ -65,8 +80,9 @@ def check_token(
     can be unit-tested without spinning up a server.
     """
     expected = _load_token()
+    dashboard = _load_dashboard_token()
 
-    if not expected:
+    if not expected and not dashboard:
         if unauthenticated_allowed():
             if operation not in _WARNED_UNAUTH:
                 _WARNED_UNAUTH.add(operation)
@@ -93,7 +109,12 @@ def check_token(
     if scheme.lower() != "bearer" or not credential:
         return False, 401, "expected 'Authorization: Bearer <token>'"
 
-    if not hmac.compare_digest(credential.strip(), expected):
+    supplied = credential.strip()
+    # Compare against both configured tokens every time (constant work);
+    # an unconfigured token never matches.
+    ok_shared = bool(expected) and hmac.compare_digest(supplied, expected)
+    ok_dashboard = bool(dashboard) and hmac.compare_digest(supplied, dashboard)
+    if not (ok_shared or ok_dashboard):
         logger.warning("SECURITY: rejected bad token for '%s'", operation)
         return False, 403, "invalid service token"
 

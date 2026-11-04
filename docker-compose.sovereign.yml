@@ -363,6 +363,7 @@ services:
     ports:
       - "127.0.0.1:8080:8080"
     environment:
+      KAI_DASHBOARD_SERVICE_TOKEN: "${KAI_DASHBOARD_SERVICE_TOKEN:-}"
       TOOL_GATE_URL: "http://tool-gate:8000"
       LEDGER_URL: "postgresql://keeper:${DB_PASSWORD}@postgres:5432/sovereign"
       MEMU_URL: "http://memu-core:8001"

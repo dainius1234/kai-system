@@ -224,6 +224,7 @@ services:
       dockerfile: dashboard/Dockerfile
     <<: *defaults
     environment:
+      KAI_DASHBOARD_SERVICE_TOKEN: "${KAI_DASHBOARD_SERVICE_TOKEN:-}"
       TOOL_GATE_URL: http://tool-gate:8000
       MEMU_URL: http://memu-core:8001
       MEMU_INTROSPECT_URL: http://memu-core-introspect:8009

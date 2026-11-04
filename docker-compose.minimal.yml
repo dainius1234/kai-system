@@ -273,6 +273,7 @@ services:
     container_name: sovereign-dashboard-minimal
     <<: *defaults
     environment:
+      KAI_DASHBOARD_SERVICE_TOKEN: "${KAI_DASHBOARD_SERVICE_TOKEN:-}"
       TOOL_GATE_URL: http://tool-gate:8000
       # Inbound gateway credentials (Wave 1 Track A). The dashboard
       # fails closed: without these it answers 503 on every route.
@@ -385,6 +386,7 @@ services:
     container_name: sovereign-browser-agent
     <<: *defaults
     environment:
+      KAI_DASHBOARD_SERVICE_TOKEN: "${KAI_DASHBOARD_SERVICE_TOKEN:-}"
       KAI_SERVICE_TOKEN: "${KAI_SERVICE_TOKEN:-}"
       BROWSER_HEADLESS: "true"
       NAV_TIMEOUT_MS: "${NAV_TIMEOUT_MS:-20000}"
@@ -465,6 +467,7 @@ services:
     container_name: sovereign-notify-service
     <<: *defaults
     environment:
+      KAI_DASHBOARD_SERVICE_TOKEN: "${KAI_DASHBOARD_SERVICE_TOKEN:-}"
       KAI_SERVICE_TOKEN: "${KAI_SERVICE_TOKEN:-}"
       NOTIFY_MAX_PENDING: "${NOTIFY_MAX_PENDING:-100}"
     healthcheck:
@@ -499,6 +502,7 @@ services:
     container_name: sovereign-monitor-service
     <<: *defaults
     environment:
+      KAI_DASHBOARD_SERVICE_TOKEN: "${KAI_DASHBOARD_SERVICE_TOKEN:-}"
       KAI_SERVICE_TOKEN: "${KAI_SERVICE_TOKEN:-}"
       BROWSER_AGENT_URL: http://browser-agent:8040
       NOTIFY_SERVICE_URL: http://notify-service:8031

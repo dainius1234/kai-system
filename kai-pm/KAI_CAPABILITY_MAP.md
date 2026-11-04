@@ -84,6 +84,33 @@ A small accuracy point: an unknown outcome returns HTTP 200 with `status: not_le
 - the "review again near £80,000" guidance text in financial-awareness;
 - test fixtures and a classifier example phrase that mention 85,000 as arbitrary numbers.
 
+### Update 2026-11-04 (later still): dashboard service key, P1.9 (entries 380–383)
+
+Dainius approved the dashboard's **own** key in entry 381, rather than the shared master token. Entry 382 corrected the scope by count.
+
+**Who needs the key.** The dashboard has 164 proxy call strings. 15 of them hit token-guarded routes:
+- browser-agent: 5;
+- monitor-service: 7;
+- notify-service: 3;
+- agentic: 0.
+
+The counter matches route decorators only. A check inside a function body would be missed.
+
+**Changes:**
+- `common/service_auth.py` accepts `KAI_DASHBOARD_SERVICE_TOKEN` only on a service that has that variable set.
+- The dashboard sends it only to browser-agent, monitor-service and notify-service, and never sends the shared token.
+- `common/resilience.resilient_call` gains an optional `headers`. It is backward compatible.
+- Compose gives the variable to the dashboard (all 3 files) and to the 3 services (minimal file). It is **not** given to the executor or agentic.
+- `.env.example` documents the variable as a separate value.
+
+**Tests**, offline and SOUL-free:
+- the dashboard and auth checks fail on the old code where they should (acceptance), and pass on the new;
+- "executor rejects the dashboard key" passes on both, so nothing was widened;
+- the token is not echoed to the browser on the tested route;
+- the browser-agent, monitor and notify test files fail to load in this sandbox both before and after (a pydantic `Optional` annotation error), so the receiving services are covered only through the shared `check_token` tests.
+
+**Docs.** `docs/PROJECT_BACKLOG.md` no longer says "0 failures". It now says the figure is a count of defined tests, not a pass result (Kai, entry 380). The README's "Failures 0" row is a fixed string owned by `sync_docs.py`, already caveated in the README, and was left alone.
+
 **The counts in §1 and §3 are unchanged.** They describe the code at `e32488a`, before these fixes. No feature is re-classified as GENUINE on the strength of a fix that has not been run live.
 
 ---
