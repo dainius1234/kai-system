@@ -116103,3 +116103,74 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-04T22:53:13Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-04T22:53:13Z  [CMD `date -u +%FT%TZ` → 2026-11-04T22:53:13Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 33bad602b0ad35165ec66dc2cdb24e66d6e63003  [CMD `git rev-parse HEAD` → 33bad602b0ad35165ec66dc2cdb24e66d6e63003]
+- tree: bc38692a390edf9905791dd94e2c5cfef52e23c4  [CMD `git rev-parse HEAD^{tree}` → bc38692a390edf9905791dd94e2c5cfef52e23c4]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/project-rework-plan-pgvp35: 33bad602b0ad35165ec66dc2cdb24e66d6e63003  [CMD `git ls-remote --heads origin` → 33bad602b0ad35165ec66dc2cdb24e66d6e63003]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 380  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 380]
+
+### 1. The four states
+
+- physical: no KAI code change yet; this entry banks Dainius's approval before acting  [CMD `git status --short` → clean]
+- authorised: a separate dashboard service token accepted only by the services the dashboard must reach (stated as monitor-service, browser-agent, agentic), never the executor; server-side only, never sent to the browser; branch only; offline tests, no network  [CONVERSATION 2026-11-04 Dainius, "Dashboard's own key (Recommended)"]
+- evidence: question and answer verbatim in section 5  [CONVERSATION 2026-11-04 Dainius, "Dashboard's own key (Recommended)"]
+- admission: none  [CONVERSATION 2026-11-04 Dainius, "Dashboard's own key (Recommended)"]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-11-04 · approves the dashboard's own key: a separate pass accepted only by the services the dashboard proxies to that require a token, never the executor; kept server-side; branch only; offline tests, no network ⚠ UNBANKED  [CONVERSATION 2026-11-04 Dainius, "Dashboard's own key (Recommended)"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: the dashboard-token change and offline tests (existing scratch venv, unshare -rn). HELD: shared-master-key option; skill promotion; proactive autonomy; historical data inspection or cleanup; network-dependent setup; live runtime; deployment; merge; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying, reading, searching or processing data/SOUL.md; giving the dashboard any Binance key  [CONVERSATION 2026-11-04 Dainius, "Dashboard's own key (Recommended)"]
+
+### 4. Open questions
+
+- None new  [CMD `none` → n/a]
+
+### 5. Incidents and corrections
+
+- Found before asking: one shared KAI_SERVICE_TOKEN (common/service_auth.py:39) is accepted by agentic, browser-agent, cortex, executor, monitor-service and telegram-bot; giving the dashboard that token would let a compromised dashboard reach the executor  [CMD `Grep require_service_auth in service dirs` → agentic, browser-agent, cortex, executor, monitor-service, telegram-bot]
+- Approval banked word for word below  [CMD `sha256sum ruling381.txt` → see evidence line]
+- EVIDENCE DASHBOARD-KEY-APPROVAL ruling381.txt: 936 bytes, sha256 6067e709bc6cc0c4fdfa7dc909a1aff7b19957a6d8793807d134c73de91b92be, final LF True (added by Orion)  [CMD `sha256sum ruling381.txt` → 6067e709bc6cc0c4…]
+    BEGIN-VERBATIM DASHBOARD-KEY-APPROVAL
+    Q (Orion): Kai recommends the dashboard login fix next. Today, three services refuse the dashboard's requests because it brings no pass: the watch rules, the browser helper and the chat engine. The catch is that all KAI services share ONE pass, like a master key, and the code-running service (executor) opens to that same key. If the dashboard, the part facing your web browser, held the master key and was ever broken into, an attacker could run commands. Which way do you want it fixed? Branch only, offline tests, no network. Binance keys are untouched and stay in broker-bridge.
+    A (Dainius): Dashboard's own key (Recommended)
+    Option text shown: Give the dashboard its own separate pass that only those 3 services accept, never the executor. The pass stays on the server and is never sent to the browser. A small change to the shared login code plus the settings files. Risk: low; a broken-into dashboard still cannot run commands.
+    END-VERBATIM DASHBOARD-KEY-APPROVAL
+
+### 6. Next authorised step
+
+- Count which dashboard proxy calls hit token-protected endpoints; implement; test offline; log  [CONVERSATION 2026-11-04 Dainius, "Dashboard's own key (Recommended)"]
+
+### 7. What I am unsure of
+
+- Whether the population is exactly the three services named in the question; counting it is the first step  [CMD `none` → not yet counted]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
