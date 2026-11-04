@@ -115185,3 +115185,71 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-04T21:26:37Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-04T21:26:37Z  [CMD `date -u +%FT%TZ` → 2026-11-04T21:26:37Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: ca2a1df0ab0c38b8db4435d09dc2ea072debf710  [CMD `git rev-parse HEAD` → ca2a1df0ab0c38b8db4435d09dc2ea072debf710]
+- tree: 839cedff89b621052786201c938d914ca44e572e  [CMD `git rev-parse HEAD^{tree}` → 839cedff89b621052786201c938d914ca44e572e]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/project-rework-plan-pgvp35: ca2a1df0ab0c38b8db4435d09dc2ea072debf710  [CMD `git ls-remote --heads origin` → ca2a1df0ab0c38b8db4435d09dc2ea072debf710]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 373  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 373]
+
+### 1. The four states
+
+- physical: no change to KAI code; this entry banks Dainius's direction before acting  [CMD `git status --short` → clean before this entry]
+- authorised: prioritise, analyse, evaluate, log, confirm and improve the capability map; "fix" read as needing clarification of scope before any KAI code change, because KAI code changes are held  [CONVERSATION 2026-11-04 Dainius, "prioritise, analize  , evaluate, fix , log , confirm, improve all above"]
+- evidence: Dainius's message verbatim in section 5 (ruling-capture id c44f0eb25f2eb018)  [CMD `ruling_capture.json text` → as stated]
+- admission: none  [CONVERSATION 2026-11-04 Dainius, "prioritise, analize  , evaluate, fix , log , confirm, improve all above"]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-11-04 · direction on the capability map: "prioritise, analize, evaluate, fix, log, confirm, improve all above"; whether "fix" releases the KAI code-change hold, and for which items, is being asked before acting (R14, R20, R21) ⚠ UNBANKED  [CONVERSATION 2026-11-04 Dainius, "prioritise, analize  , evaluate, fix , log , confirm, improve all above"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: map analysis and improvement; logging. HELD until Dainius states scope: KAI code changes; KAI runtime tests. HELD: engineering; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying, reading, searching or processing data/SOUL.md  [CONVERSATION 2026-11-03 Kai-GPT relayed by Dainius, "This does not waive essential safety controls or existing engineering holds."]
+
+### 4. Open questions
+
+- For Dainius: does "fix" release the code-change hold, for which Priority 1 items, and may offline unit tests be run to confirm the fixes  [CONVERSATION 2026-11-04 Dainius, "fix , log , confirm"]
+
+### 5. Incidents and corrections
+
+- Dainius's message banked word for word below  [CMD `sha256sum ruling374.txt` → see evidence line]
+- EVIDENCE DAINIUS-2026-11-04 ruling374.txt: 89 bytes, sha256 ffd6d2fe05280a038a00cb9505caa267f68e284fc392d83e34f4c9134abc4ce2, final LF True (added by Orion)  [CMD `sha256sum ruling374.txt` → ffd6d2fe05280a03…]
+    BEGIN-VERBATIM DAINIUS-2026-11-04
+    / advisor opus : prioritise, analize  , evaluate, fix , log , confirm, improve all above
+    END-VERBATIM DAINIUS-2026-11-04
+
+### 6. Next authorised step
+
+- Ask Dainius the scope question; meanwhile analyse and improve the map (no KAI code change)  [CONVERSATION 2026-11-04 Dainius, "prioritise, analize  , evaluate, fix , log , confirm, improve all above"]
+
+### 7. What I am unsure of
+
+- Whether "fix" was meant as a hold release; asked rather than assumed  [CONVERSATION 2026-11-04 Dainius, "fix"]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
