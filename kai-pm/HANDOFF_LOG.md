@@ -116174,3 +116174,95 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-04T22:55:30Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-04T22:55:30Z  [CMD `date -u +%FT%TZ` → 2026-11-04T22:55:30Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 7b05b1e58d5c99022e54b2d75c491ac723846e9d  [CMD `git rev-parse HEAD` → 7b05b1e58d5c99022e54b2d75c491ac723846e9d]
+- tree: d66e73095abb5994dad6a06fa55446de124beba3  [CMD `git rev-parse HEAD^{tree}` → d66e73095abb5994dad6a06fa55446de124beba3]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 7b05b1e58d5c99022e54b2d75c491ac723846e9d  [CMD `git ls-remote --heads origin` → 7b05b1e58d5c99022e54b2d75c491ac723846e9d]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 381  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 381]
+
+### 1. The four states
+
+- physical: no KAI code change yet; banks the corrected scope before acting  [CMD `git status --short` → clean]
+- authorised: dashboard's own key accepted by browser-agent, monitor-service and notify-service only; not agentic, not executor; server-side only; branch only; offline tests, no network  [CONVERSATION 2026-11-04 Dainius, "Yes, these 3 (Recommended)"]
+- evidence: population count and Dainius's confirmation in section 5  [CMD `python3 dashauth.py` → 15 protected call sites in 3 services]
+- admission: none  [CONVERSATION 2026-11-04 Dainius, "Yes, these 3 (Recommended)"]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-11-04 · corrected scope: the dashboard key goes to browser-agent, monitor-service and notify-service; agentic and executor do not accept it ⚠ UNBANKED  [CONVERSATION 2026-11-04 Dainius, "Yes, these 3 (Recommended)"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: the dashboard-key change for those 3 services; offline tests. HELD: everything else as in entry 381. NOT AUTHORISED: accessing, copying, reading, searching or processing data/SOUL.md; giving the dashboard any Binance key or the shared service token  [CONVERSATION 2026-11-04 Dainius, "Yes, these 3 (Recommended)"]
+
+### 4. Open questions
+
+- None new  [CMD `none` → n/a]
+
+### 5. Incidents and corrections
+
+- Orion error: entry 381's question named "the chat engine" (agentic) as the third service from recognition, not from a count (R5 tell: a name recognised, not looked up). Counting the dashboard's 164 proxy call strings against routes guarded by require_service_auth/identity found browser-agent 5, monitor-service 7, notify-service 3, agentic 0. Caught before any code change and put back to Dainius  [CMD `python3 dashauth.py` → PROTECTED rows below; dashboard→agentic calls are /soul and /agents-registry, unguarded]
+- Counting instrument limits: matches decorator-level dependencies and a FastAPI-level dependency only; a check inside a function body would be missed; the first run matched nothing (wrong URL-definition pattern) and was fixed before use  [CMD `python3 dashauth.py (first run)` → mapped to a service dir: 0]
+- Dainius's confirmation banked word for word below  [CMD `sha256sum ruling382.txt` → see evidence line]
+- EVIDENCE DASHBOARD-KEY-SCOPE ruling382.txt: 863 bytes, sha256 871a5dfba5e0e920eff9c30b1c37dce45c8993c0409266b15df95fc04e59f37e, final LF True (added by Orion)  [CMD `sha256sum ruling382.txt` → 871a5dfba5e0e920…]
+    BEGIN-VERBATIM DASHBOARD-KEY-SCOPE
+    Q (Orion): Correction to my last question: I named the wrong third service. Counting every dashboard call shows the 3 services that refuse the dashboard are the browser helper (5 calls), the watch rules (7 calls) and the NOTIFICATIONS service (3 calls: send, dismiss one, dismiss all). The chat engine is not one of them. No dashboard call to it needs a pass, so it should NOT get the dashboard's key. Everything else stays as you approved: the dashboard's own key, never the executor, server-side only. OK to give the dashboard key to these three: browser helper, watch rules, notifications?
+    A (Dainius): Yes, these 3 (Recommended)
+    Option text shown: Browser helper, watch rules and notifications accept the dashboard's key; the chat engine and the executor do not. This is narrower and safer than my wrong version, which would have given it to the chat engine.
+    END-VERBATIM DASHBOARD-KEY-SCOPE
+- EVIDENCE POPULATION ev382_population.txt: 1678 bytes, sha256 2a97f5792ad23f06bc97c400d9ff84519d410b230940c43ee7f9774d68694b79, final LF True (added by Orion)  [CMD `sha256sum ev382_population.txt` → 2a97f5792ad23f06…]
+    BEGIN-VERBATIM POPULATION
+    dashboard proxy call strings: 164 | mapped to a service dir: 164
+    PROTECTED ('BROWSER_AGENT_URL', 'browser-agent', 'browser-agent', '/navigate', 'post', '/navigate')
+    PROTECTED ('BROWSER_AGENT_URL', 'browser-agent', 'browser-agent', '/run', 'post', '/run')
+    PROTECTED ('BROWSER_AGENT_URL', 'browser-agent', 'browser-agent', '/scrape', 'post', '/scrape')
+    PROTECTED ('BROWSER_AGENT_URL', 'browser-agent', 'browser-agent', '/screenshot', 'post', '/screenshot')
+    PROTECTED ('BROWSER_AGENT_URL', 'browser-agent', 'browser-agent', '/search', 'post', '/search')
+    PROTECTED ('MONITOR_URL', 'monitor-service', 'monitor-service', '/alerts', 'delete', '/alerts')
+    PROTECTED ('MONITOR_URL', 'monitor-service', 'monitor-service', '/rules', 'post', '/rules')
+    PROTECTED ('MONITOR_URL', 'monitor-service', 'monitor-service', '/rules/{rule_id}', 'put', '/rules/{rule_id}')
+    PROTECTED ('MONITOR_URL', 'monitor-service', 'monitor-service', '/rules/{rule_id}', 'delete', '/rules/{rule_id}')
+    PROTECTED ('MONITOR_URL', 'monitor-service', 'monitor-service', '/rules/{rule_id}/check', 'post', '/rules/{rule_id}/check')
+    PROTECTED ('MONITOR_URL', 'monitor-service', 'monitor-service', '/rules/{rule_id}/disable', 'post', '/rules/{rule_id}/disable')
+    PROTECTED ('MONITOR_URL', 'monitor-service', 'monitor-service', '/rules/{rule_id}/enable', 'post', '/rules/{rule_id}/enable')
+    PROTECTED ('NOTIFY_URL', 'notify-service', 'output/notify', '/notify', 'post', '/notify')
+    PROTECTED ('NOTIFY_URL', 'notify-service', 'output/notify', '/pending', 'delete', '/pending')
+    PROTECTED ('NOTIFY_URL', 'notify-service', 'output/notify', '/pending/{notification_id}', 'delete', '/pending/{notification_id}')
+    UNMAPPED URL vars: []
+    END-VERBATIM POPULATION
+
+### 6. Next authorised step
+
+- Implement; tests offline; log  [CONVERSATION 2026-11-04 Dainius, "Yes, these 3 (Recommended)"]
+
+### 7. What I am unsure of
+
+- None new  [CMD `none` → n/a]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
