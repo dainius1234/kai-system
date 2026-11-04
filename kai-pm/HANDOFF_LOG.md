@@ -115253,3 +115253,77 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-04T21:28:01Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-04T21:28:01Z  [CMD `date -u +%FT%TZ` → 2026-11-04T21:28:01Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 93f81bc6b7f340f11185d606b29afc70003436c6  [CMD `git rev-parse HEAD` → 93f81bc6b7f340f11185d606b29afc70003436c6]
+- tree: 30123e78848dfde1e7d96757d5b862e72cc1ffe2  [CMD `git rev-parse HEAD^{tree}` → 30123e78848dfde1e7d96757d5b862e72cc1ffe2]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 93f81bc6b7f340f11185d606b29afc70003436c6  [CMD `git ls-remote --heads origin` → 93f81bc6b7f340f11185d606b29afc70003436c6]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 374  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 374]
+
+### 1. The four states
+
+- physical: no KAI code change yet; this entry banks the scope ruling before acting  [CMD `git status --short` → clean]
+- authorised: 8 wiring fixes on the branch (memory label, missing chat function, memory-write format, CPU reading, finance dates and field names, verifier score, skill loading, wrong port numbers); offline unit tests touching changed files  [CONVERSATION 2026-11-04 Dainius, "8 wiring fixes (Recommended)"]
+- evidence: question and answers verbatim in section 5  [CONVERSATION 2026-11-04 Dainius, "Yes, offline only (Recommended)"]
+- admission: none  [CONVERSATION 2026-11-04 Dainius, "8 wiring fixes (Recommended)"]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-11-04 · partial release of the KAI code-change hold: the 8 Priority 1 wiring fixes only, on claude/project-rework-plan-pgvp35, nothing to main, nothing deployed; excluded: observer trust level, values-recording fault, dashboard service token ⚠ UNBANKED  [CONVERSATION 2026-11-04 Dainius, "8 wiring fixes (Recommended)"]
+- Dainius · 2026-11-04 · partial release of the runtime-test hold: existing offline Python unit tests touching the changed files only; no services, docker, network or data/ ⚠ UNBANKED  [CONVERSATION 2026-11-04 Dainius, "Yes, offline only (Recommended)"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: the 8 wiring fixes; offline unit tests for them. HELD: all other KAI code changes (incl. P1.3 trust level, P1.8 values, P1.9 service token); live runtime tests; deployment; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE; push to main. NOT AUTHORISED: accessing, copying, reading, searching or processing data/SOUL.md  [CONVERSATION 2026-11-04 Dainius, "8 wiring fixes (Recommended)"]
+
+### 4. Open questions
+
+- None new  [CMD `none` → n/a]
+
+### 5. Incidents and corrections
+
+- Scope question and answers banked word for word below  [CMD `sha256sum ruling375.txt` → see evidence line]
+- EVIDENCE SCOPE-RULING-2026-11-04 ruling375.txt: 1419 bytes, sha256 45ed0a01403193e13176fbf1fc6f17a1d97a0f68238ab8b22768ee8e9cba0e91, final LF True (added by Orion)  [CMD `sha256sum ruling375.txt` → 45ed0a01403193e1…]
+    BEGIN-VERBATIM SCOPE-RULING-2026-11-04
+    Q1 (Orion): You said "fix". KAI code changes are on hold right now, so I need to know what you are releasing. My recommendation is to fix only the faults that are pure wiring and need no decision about values or permissions. That covers 8 items: the memory label, the missing chat function, the memory-write format, the CPU reading, the finance dates and field names, the verifier score, skill loading, and the wrong port numbers. Every fix stays on our working branch: nothing goes to main and nothing is deployed. Which scope do you want?
+    A1 (Dainius): 8 wiring fixes (Recommended)
+    Option text shown: Fix only the 8 pure wiring faults on the branch. This leaves out the trust level for the observer (your decision), the values-recording fault (it needs a short design: what to record instead) and the dashboard service token (security, so Kai reviews first). Risk: low. Each fix is a few lines and can be reverted.
+    Q2 (Orion): To confirm a fix works, I can run KAI's existing offline unit tests. These are plain Python tests on this machine: no services started, no docker, no network, no data/ folder. Live runtime testing stays on hold either way. Is running these offline tests allowed?
+    A2 (Dainius): Yes, offline only (Recommended)
+    Option text shown: Run only the existing Python unit tests that touch the changed files, offline. Without this, "confirm" can only mean "I read it again", which is weaker evidence.
+    END-VERBATIM SCOPE-RULING-2026-11-04
+
+### 6. Next authorised step
+
+- Define done for each fix, count each fault's population, fix, run the offline tests, log  [CONVERSATION 2026-11-04 Dainius, "8 wiring fixes (Recommended)"]
+
+### 7. What I am unsure of
+
+- None new  [CMD `none` → n/a]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
