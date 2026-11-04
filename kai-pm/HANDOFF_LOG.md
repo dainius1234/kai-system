@@ -115730,3 +115730,79 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-04T22:20:33Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-04T22:20:33Z  [CMD `date -u +%FT%TZ` → 2026-11-04T22:20:33Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 3526c9e96c5b8a297ee0fbfda208e124371119a9  [CMD `git rev-parse HEAD` → 3526c9e96c5b8a297ee0fbfda208e124371119a9]
+- tree: d5e0231bb7661b210b3423e9d269e97b8e5b5d1f  [CMD `git rev-parse HEAD^{tree}` → d5e0231bb7661b210b3423e9d269e97b8e5b5d1f]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/project-rework-plan-pgvp35: 3526c9e96c5b8a297ee0fbfda208e124371119a9  [CMD `git ls-remote --heads origin` → 3526c9e96c5b8a297ee0fbfda208e124371119a9]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 377  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 377]
+
+### 1. The four states
+
+- physical: no KAI code change yet; this entry banks Dainius's approval before acting  [CMD `git status --short` → clean]
+- authorised: P1.8 parts 1–3 (stop recording Kai's reply as Dainius's decision; stop learning every chat message as positive; memu-core stops defaulting unclear outcomes to positive) and VAT £90,000 in 8 places; branch only; offline tests, no network  [CONVERSATION 2026-11-04 Dainius, "Approve all 4 (Recommended)"]
+- evidence: question and answer verbatim in section 5  [CONVERSATION 2026-11-04 Dainius, "Approve all 4 (Recommended)"]
+- admission: none  [CONVERSATION 2026-11-04 Dainius, "Approve all 4 (Recommended)"]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-11-04 · approves the narrow integrity fix: P1.8 parts 1–3 and VAT £90,000 in the 8 counted places; branch only; offline tests with no network; cleanup of already-learned data excluded (separate decision) ⚠ UNBANKED  [CONVERSATION 2026-11-04 Dainius, "Approve all 4 (Recommended)"]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: the 4 approved parts; offline tests using the existing scratch venv with network off. HELD: cleanup of learned data; P1.3; P1.9; P1.10 skill promotion; P1.12; any network-dependent setup; live runtime; deployment; merge; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying, reading, searching or processing data/SOUL.md  [CONVERSATION 2026-11-04 Dainius, "Approve all 4 (Recommended)"]
+
+### 4. Open questions
+
+- None new  [CMD `none` → n/a]
+
+### 5. Incidents and corrections
+
+- Population counted before asking: memu-core/app.py:6782 maps any outcome other than positive/negative to positive; VAT 85000 in financial-awareness/app.py:36, common/self_emp_advisor.py:26, scripts/invoice.py:30, docker-compose.sovereign.yml:412, docker-compose.full.yml:555, .env.example:41, skills/mtd-vat.md (3 lines)  [CMD `Grep "85[,_]?000" excluding data, kai-pm, output, runtime-logs` → as listed, plus test fixtures and a classifier example phrase not counted]
+- Approval banked word for word below  [CMD `sha256sum ruling378.txt` → see evidence line]
+- EVIDENCE INTEGRITY-FIX-APPROVAL ruling378.txt: 1058 bytes, sha256 f680d3413e36a5693c1ab41c34b13dbcaa06ae8b4c5cdc16dd351ece1917bcad, final LF True (added by Orion)  [CMD `sha256sum ruling378.txt` → f680d3413e36a569…]
+    BEGIN-VERBATIM INTEGRITY-FIX-APPROVAL
+    Q (Orion): Kai asks you to approve a small branch-only fix, tested offline using the tools I've already installed, so no network this time. Approving means:
+    (1) KAI stops recording its own replies as YOUR decisions.
+    (2) KAI stops learning every message you send as a 'positive' value.
+    (3) The memory service stops turning unclear signals into 'positive' by itself.
+    (4) VAT is corrected to £90,000 in all 8 places: 3 code defaults, 2 Docker settings files, the example settings file, and KAI's own VAT knowledge note.
+    The catch: until a proper design exists, KAI learns NO values from chat at all, because the old learning was wrong. Anything wrongly learned if KAI has ever run live stays stored; cleaning that up is a separate decision. Nothing goes to main or live. Do you approve?
+    A (Dainius): Approve all 4 (Recommended)
+    Option text shown: Fix the values and decision recording (parts 1–3) and the VAT threshold in all 8 places, branch only, offline tests with no network. Risk: low; KAI pauses value-learning from chat until it is designed properly.
+    END-VERBATIM INTEGRITY-FIX-APPROVAL
+
+### 6. Next authorised step
+
+- Implement the 4 parts with focused tests; run offline (unshare -rn) in a SOUL-free copy; log  [CONVERSATION 2026-11-04 Dainius, "Approve all 4 (Recommended)"]
+
+### 7. What I am unsure of
+
+- None new  [CMD `none` → n/a]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
