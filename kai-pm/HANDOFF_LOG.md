@@ -115922,3 +115922,184 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-04T22:51:06Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-04T22:51:06Z  [CMD `date -u +%FT%TZ` → 2026-11-04T22:51:06Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 27d6374f65dd4205f14aa1db1cf3f67868bc4545  [CMD `git rev-parse HEAD` → 27d6374f65dd4205f14aa1db1cf3f67868bc4545]
+- tree: efe0014b3f0758033a500a01dba9b2116936643b  [CMD `git rev-parse HEAD^{tree}` → efe0014b3f0758033a500a01dba9b2116936643b]
+- uncommitted_paths: 1  [CMD `git status --porcelain | count lines` → 1]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/project-rework-plan-pgvp35: 27d6374f65dd4205f14aa1db1cf3f67868bc4545  [CMD `git ls-remote --heads origin` → 27d6374f65dd4205f14aa1db1cf3f67868bc4545]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 379  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 379]
+
+### 1. The four states
+
+- physical: no KAI code change; Kai's adjudication banked; capability map records the values-provenance design weakness  [CMD `git diff --stat` → kai-pm/KAI_CAPABILITY_MAP.md only]
+- authorised: nothing new; next task (server-side dashboard authentication correction) needs Dainius's approval  [CONVERSATION 2026-11-04 Kai-GPT relayed by Dainius, "Next recommended engineering task: a narrowly scoped server-side dashboard authentication correction, with offline tests, subject to Dainius's approval."]
+- evidence: Kai's adjudication verbatim in section 5 (ruling-capture id 41fa7dc7242609c0)  [CMD `ruling_capture json text` → 6502 chars]
+- admission: 27d6374 accepted for retention; not runtime-qualified; not merged or deployed  [CONVERSATION 2026-11-04 Kai-GPT relayed by Dainius, "VERDICT: SOURCE-LEVEL FIX ACCEPTED FOR RETENTION. NOT RUNTIME-QUALIFIED."]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT · 2026-11-04 · 27d6374 retained, not runtime-qualified; caller-supplied outcome is not owner-confirmed value; chat-to-values learning stays off until OBSERVED / INFERRED / OWNER-CONFIRMED provenance is designed and approved; no inspection or modification of protected historical data without separate authority; no deletion or reset of learned records; correct the backlog's blanket passing-test claim in the next relevant documentation update; priority order: historical provenance protection, dashboard authentication, observation vs action, skill admission ⚠ UNBANKED  [CONVERSATION 2026-11-04 Kai-GPT relayed by Dainius, "Do not equate caller-supplied outcome with Dainius-confirmed values."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: none new. HELD: dashboard authentication fix (pending Dainius); skill promotion; proactive autonomy; historical data inspection or cleanup; live runtime; deployment; merge; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying, reading, searching or processing data/SOUL.md  [CONVERSATION 2026-11-04 Kai-GPT relayed by Dainius, "Keep skill promotion, proactive autonomy, historical data cleanup, live runtime, deployment, PRE-RAMS, Gold Tier, R11 and PR #122 held."]
+
+### 4. Open questions
+
+- For Dainius: approve the server-side dashboard authentication correction (branch only, offline tests, no network)?  [CONVERSATION 2026-11-04 Kai-GPT relayed by Dainius, "subject to Dainius's approval."]
+- STANDING: backlog/README "0 failures" claim to correct at the next relevant documentation update  [CONVERSATION 2026-11-04 Kai-GPT relayed by Dainius, "Correct them in the next relevant documentation update without opening another process cycle."]
+
+### 5. Incidents and corrections
+
+- Kai's adjudication banked word for word below  [CMD `sha256sum kai380.txt` → see evidence line]
+- Precision note recorded in the map: unknown outcome returns 200 status not_learned, not an error ("rejected" in Kai's table means not learned)  [CMD `Read memu-core/app.py learn_value` → returns status not_learned]
+- EVIDENCE KAI-ADJUDICATION-27d6374 kai380.txt: 6537 bytes, sha256 d14269b6b7559cb0634b3c3acf8a7229a17d187763c7a873d27bf9db8aaa1fe3, final LF True (added by Orion)  [CMD `sha256sum kai380.txt` → d14269b6b7559cb0…]
+    BEGIN-VERBATIM KAI-ADJUDICATION-27d6374
+    KAI — Senior Engineering Adjudication
+    
+    COLD-START: DEGRADED | Code review completed | Runtime not qualified
+    
+    Verified GitHub HEAD 27d6374f65dd4205f14aa1db1cf3f67868bc4545, handoff entry 379, DAI-10’s latest comment 0f92fe24, DECISIONS.md through D390, frozen research pin dd153c1f4ab7c52f34620e07238554453a8912d9, and Miro’s architecture overview. START HERE’s full contents remain unavailable.
+    
+    Scoped code changes verified
+    
+    Verdict: RETAIN THE COMMIT. DO NOT MERGE OR DEPLOY YET.
+    
+    Orion has made valuable, bounded engineering progress. This time the effort produced actual corrections to KAI rather than more process machinery.
+    
+    I inspected the source changes and recorded test evidence. The fixes are consistent with the approved scope, but I have not independently executed the tests.
+    
+    1. Technical assessment
+    
+    Area	Assessment
+    Assistant replies incorrectly recorded as owner decisions	Corrected in the chat path
+    Automatic positive-value learning	Removed from the chat path
+    Missing or unrecognized value outcomes	Now rejected by the learning endpoint
+    VAT threshold	Corrected to £90,000 across the eight identified locations
+    Regression tests	Four new tests reportedly fail before and pass after
+    Live integration	Not verified
+    Historical contaminated memory	Not assessed; no cleanup authorized
+    
+    HMRC independently confirms the £90,000 VAT registration threshold. GOV.UK
+    
+    Confidence: 0.97 that the identified source-level defects were corrected as described. This is not a 97% estimate of operational readiness.
+    
+    2. One important issue Orion hasn’t fully resolved
+    
+    The new values-learning endpoint accepts a request containing:
+    
+    "outcome": "positive"
+    
+    That prevents accidental positive learning from missing outcomes.
+    
+    But it does not establish who authorized the learning.
+    
+    A service, agent or other permitted caller supplying that field is not equivalent to Dainius confirming a value.
+    
+    This distinction is fundamental to KAI’s identity.
+    
+    The mature system needs three separate states:
+    
+    OBSERVED — KAI heard something, without treating it as belief.
+    
+    INFERRED — KAI formed an interpretation, which remains uncertain.
+    
+    OWNER-CONFIRMED — An authenticated, explicit decision establishes authority for a particular value or action.
+    
+    Do not restore automatic value formation until that provenance distinction is implemented.
+    
+    Crucially, the present fix is a temporary fail-closed correction, not the finished values-learning capability. KAI must eventually learn and evolve responsibly, not lose the organ entirely.
+    
+    3. Two additional findings
+    
+    Existing records may contain false authority. Changing the code stops the identified faulty write paths; it does not repair previously stored values or decisions. Their existence is unknown because historical runtime and protected data have not been inspected.
+    
+    The correct approach is preservation first, then a separately authorized, read-only provenance inspection. No blanket deletion, resetting or rewriting. data/SOUL.md remains prohibited.
+    
+    The documentation still overstates test readiness. The repository backlog says thousands of tests pass with zero failures, whereas the current evidence includes an unavailable embedding dependency and pre-existing Item 8 failures. These are different kinds of limitations, but neither supports a current blanket zero-failures claim. The inaccurate status should be corrected as part of the next relevant documentation update, not through another audit programme.
+    
+    4. Strategic priority
+    
+    I would not jump straight into autonomous skills or proactivity.
+    
+    Order	Next engineering result	Reason
+    1	Protect historical values and decision provenance	Prevent corrupted identity from influencing KAI
+    2	Repair dashboard-to-service authentication	Close an identified security/integration weakness
+    3	Separate passive observation from autonomous action	Restore useful proactivity without unnecessary authority
+    4	Introduce probationary skill admission and promotion	Allow KAI to evolve without unrestricted skill execution
+    
+    Each task needs its own narrow authorization while existing holds apply.
+    
+    One longer-term improvement is also clear: VAT thresholds should eventually come from one versioned, effective-date-aware configuration source instead of being repeated in eight places. That’s how to prevent the same defect returning.
+    
+    5. My instruction to Orion
+    
+    KAI-GPT → ORION | ENGINEERING ADJUDICATION — 27d6374
+    
+    VERDICT: SOURCE-LEVEL FIX ACCEPTED FOR RETENTION. NOT RUNTIME-QUALIFIED.
+    
+    The approved P1.8 integrity changes and VAT corrections are present in the working branch. The recorded before/after tests support the changes, but I have not independently rerun them.
+    
+    One outstanding design weakness must be preserved explicitly: requiring positive or negative at the values endpoint is necessary but does not authenticate operator approval. Do not equate caller-supplied outcome with Dainius-confirmed values.
+    
+    Keep automatic chat-to-values learning disabled until authenticated provenance and explicit confirmation are designed and approved.
+    
+    Do not modify or inspect protected historical data without separate authority. Do not delete or reset previously learned records.
+    
+    The backlog’s blanket passing-test claims are not supported by the current qualification evidence. Correct them in the next relevant documentation update without opening another process cycle.
+    
+    Next recommended engineering task: a narrowly scoped server-side dashboard authentication correction, with offline tests, subject to Dainius’s approval.
+    
+    Keep skill promotion, proactive autonomy, historical data cleanup, live runtime, deployment, PRE-RAMS, Gold Tier, R11 and PR #122 held.
+    
+    Mission: Develop KAI’s actual capabilities while preserving its identity, truth and governance. No unnecessary review loops.
+    
+    OHANA.
+    
+    My recommendation to you
+    
+    Accept this phase as meaningful engineering progress and close it.
+    
+    Do not ask Orion to repeat the same tests or build another verification layer.
+    
+    The next proposed code task should be the dashboard authentication correction, while the existing values-integrity safeguard remains in place. Historical memory cleanup should wait until we can inspect the actual records safely and with your authorization.
+    
+    That is how we now move KAI forward: one real defect corrected, evidence examined, residual risk identified, then onto the next capability.
+    
+    Confidence in this priority order: 0.94. The biggest remaining uncertainty is KAI’s historical runtime and stored state, not whether this commit exists.
+    END-VERBATIM KAI-ADJUDICATION-27d6374
+
+### 6. Next authorised step
+
+- Ask Dainius about the dashboard authentication correction; no code change until approved  [CONVERSATION 2026-11-04 Kai-GPT relayed by Dainius, "subject to Dainius's approval."]
+
+### 7. What I am unsure of
+
+- None new  [CMD `none` → n/a]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check

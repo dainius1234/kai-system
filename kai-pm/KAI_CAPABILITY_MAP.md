@@ -70,6 +70,15 @@ Kai reviewed commit `6aaf36f` (entry 377). Dainius then approved a narrow integr
 | P1.8 (3): memu-core treated a missing or unknown outcome as "positive" | **FIXED**: only an explicit `positive` or `negative` teaches a value; anything else returns `not_learned`. The 7 existing tests that taught values without an outcome now send `"outcome": "positive"`, because they represent explicit teaching | 2 new tests fail on the old code, pass on the new |
 | VAT threshold £85,000 → **£90,000** | **FIXED in all 8 counted places:** financial-awareness, self_emp_advisor and invoice.py defaults; docker-compose.full.yml and docker-compose.sovereign.yml, which override the code default; .env.example; skills/mtd-vat.md (3 lines) | new default test fails on the old code, passes on the new |
 
+**Open design weakness (Kai, entry 380): this is a fail-closed stopgap, not the finished values organ.** `/memory/values/learn` now requires an explicit `positive` or `negative`. But any permitted caller can supply that field, so it does not prove that Dainius confirmed the value. A caller-supplied outcome is not an owner-confirmed value.
+
+Chat-to-values learning stays off until an approved design separates three states:
+- **OBSERVED:** KAI heard it;
+- **INFERRED:** KAI's interpretation, still uncertain;
+- **OWNER-CONFIRMED:** an authenticated, explicit decision by Dainius.
+
+A small accuracy point: an unknown outcome returns HTTP 200 with `status: not_learned`, not an error.
+
 **Not included:**
 - cleaning up anything already wrongly learned (it lives under `data/`; a separate decision);
 - the "review again near £80,000" guidance text in financial-awareness;
