@@ -116933,3 +116933,89 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-05T14:19:31Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-05T14:19:31Z  [CMD `date -u +%FT%TZ` → 2026-11-05T14:19:31Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 7512371c0a993d21e8c3ae648e3cb0700ec770e2  [CMD `git rev-parse HEAD` → 7512371c0a993d21e8c3ae648e3cb0700ec770e2]
+- tree: a01389a6b606acbb6be390de6a5081ab94ca6f83  [CMD `git rev-parse HEAD^{tree}` → a01389a6b606acbb6be390de6a5081ab94ca6f83]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/project-rework-plan-pgvp35: 7512371c0a993d21e8c3ae648e3cb0700ec770e2  [CMD `git ls-remote --heads origin` → 7512371c0a993d21e8c3ae648e3cb0700ec770e2]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 386  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 386]
+
+### 1. The four states
+
+- physical: no KAI code change yet; banks Dainius's task approval before acting  [CMD `git status --short` → clean]
+- authorised: one bounded, branch-only, offline task repairing the existing proactive observer: separate safe observation/analysis from governed memory writes, notifications and actions; only explicitly scoped read-only observation in the shadow path; fail closed when its authority is unavailable; synthetic inputs and focused offline tests; preserve existing capabilities for later governed integration  [CONVERSATION 2026-11-05 Dainius, "I approve one bounded, branch-only, offline engineering task to repair KAI's existing proactive observer."]
+- evidence: message verbatim in section 5 (ruling-capture id b75561adca8143a1)  [CMD `ruling_capture json text` → as stated]
+- admission: none  [CONVERSATION 2026-11-05 Dainius, "Stop when this bounded result is delivered."]
+
+### 2. Rulings since the last handoff
+
+- Dainius · 2026-11-05 · approves the proactive-observer repair: no replacement; separate observation from side effects; shadow path read-only and explicitly scoped; fail closed without authority; synthetic offline tests; do not silently remove capabilities; no live runtime, network, protected data, deployment, merge or unrelated engineering; all holds remain ⚠ UNBANKED  [CONVERSATION 2026-11-05 Dainius, "Separate safe observation/analysis from governed memory writes, notifications and actions."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: the observer repair and its offline tests. HELD: everything else, including live runtime, deployment, merge, skill promotion, historical data, PRE-RAMS, Gold Tier, R11, PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying, reading, searching or processing data/SOUL.md; network use  [CONVERSATION 2026-11-05 Dainius, "All existing holds remain."]
+
+### 4. Open questions
+
+- None new  [CMD `none` → n/a]
+
+### 5. Incidents and corrections
+
+- Dainius's instruction banked word for word below  [CMD `sha256sum d387.txt` → see evidence line]
+- EVIDENCE OBSERVER-TASK-APPROVAL d387.txt: 1137 bytes, sha256 5d58eb776b3d814d9f07a425dae11d34f622a4f32de1ab810c417574380b2d61, final LF True (added by Orion)  [CMD `sha256sum d387.txt` → 5d58eb776b3d814d…]
+    BEGIN-VERBATIM OBSERVER-TASK-APPROVAL
+    DAINIUS → ORION | NEXT KAI ENGINEERING TASK — PROACTIVE OBSERVATION
+    
+    I approve one bounded, branch-only, offline engineering task to repair KAI’s existing proactive observer.
+    
+    Do not build a replacement.
+    
+    Kai independently inspected agentic/app.py, trust_core.py and trust_integration.py. The existing observer combines passive sensing with memory writes, House Doctor notifications, ritual proposals, watchdog events and other side effects.
+    
+    Required result: Separate safe observation/analysis from governed memory writes, notifications and actions. Permit only explicitly scoped read-only observation in the shadow path. Fail closed when its required authority is unavailable.
+    
+    Use synthetic inputs and focused offline tests. Preserve the existing capabilities for later governed integration; do not silently remove them.
+    
+    No live runtime, external network, protected data access, deployment, merge or unrelated engineering.
+    
+    Report the actual working change, tests and remaining limitations. Stop when this bounded result is delivered.
+    
+    All existing holds remain.
+    
+    OHANA — EVOLVE THE EXISTING KAI. PROTECT THE WHOLE ORGANISM.
+    END-VERBATIM OBSERVER-TASK-APPROVAL
+
+### 6. Next authorised step
+
+- Read the observer in full; define done/scope; implement; test offline; log; stop  [CONVERSATION 2026-11-05 Dainius, "Report the actual working change, tests and remaining limitations."]
+
+### 7. What I am unsure of
+
+- None new  [CMD `none` → n/a]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
