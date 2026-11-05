@@ -110,7 +110,7 @@ class TestValueFormation:
     def test_detects_honesty_value(self):
         resp = memu_client.post(
             "/memory/values/learn",
-            json={"experience": "I believe in being honest and transparent always"},
+            json={"experience": "I believe in being honest and transparent always", "outcome": "positive"},
         )
         data = resp.json()
         assert data["status"] == "ok"
@@ -120,7 +120,7 @@ class TestValueFormation:
     def test_detects_loyalty_value(self):
         resp = memu_client.post(
             "/memory/values/learn",
-            json={"experience": "Brother, ohana means family — we stick together"},
+            json={"experience": "Brother, ohana means family — we stick together", "outcome": "positive"},
         )
         vals = [v["value"] for v in resp.json()["values_learned"]]
         assert "loyalty" in vals
@@ -128,7 +128,7 @@ class TestValueFormation:
     def test_detects_persistence_value(self):
         resp = memu_client.post(
             "/memory/values/learn",
-            json={"experience": "Never give up, keep going, grind until it works"},
+            json={"experience": "Never give up, keep going, grind until it works", "outcome": "positive"},
         )
         vals = [v["value"] for v in resp.json()["values_learned"]]
         assert "persistence" in vals
@@ -136,7 +136,7 @@ class TestValueFormation:
     def test_detects_growth_value(self):
         resp = memu_client.post(
             "/memory/values/learn",
-            json={"experience": "I want to learn and improve and grow every day"},
+            json={"experience": "I want to learn and improve and grow every day", "outcome": "positive"},
         )
         vals = [v["value"] for v in resp.json()["values_learned"]]
         assert "growth" in vals
@@ -145,16 +145,37 @@ class TestValueFormation:
         # Learn the same value twice
         memu_client.post(
             "/memory/values/learn",
-            json={"experience": "Courage to be brave and bold"},
+            json={"experience": "Courage to be brave and bold", "outcome": "positive"},
         )
         resp = memu_client.post(
             "/memory/values/learn",
-            json={"experience": "Being courageous and bold is essential"},
+            json={"experience": "Being courageous and bold is essential", "outcome": "positive"},
         )
         for v in resp.json()["values_learned"]:
             if v["value"] == "courage":
                 assert v["reinforcements"] >= 2
                 assert v["strength"] > 0.3
+
+    def test_no_outcome_learns_nothing(self):
+        # P1.8: a missing outcome used to be learned as "positive".
+        before = memu_client.get("/memory/values").json()["count"]
+        resp = memu_client.post(
+            "/memory/values/learn",
+            json={"experience": "Integrity and reliability above everything"},
+        )
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["status"] == "not_learned"
+        assert data["values_learned"] == []
+        assert memu_client.get("/memory/values").json()["count"] == before
+
+    def test_neutral_or_unknown_outcome_learns_nothing(self):
+        for outcome in ("neutral", "", "unsure", "POSITIVE?"):
+            resp = memu_client.post(
+                "/memory/values/learn",
+                json={"experience": "Respect for the client always", "outcome": outcome},
+            )
+            assert resp.json()["status"] == "not_learned", outcome
 
     def test_requires_experience(self):
         resp = memu_client.post(
@@ -202,7 +223,7 @@ class TestConscienceCheck:
         # First ensure we have honesty value
         memu_client.post(
             "/memory/values/learn",
-            json={"experience": "honesty and truth are sacred"},
+            json={"experience": "honesty and truth are sacred", "outcome": "positive"},
         )
         resp = memu_client.post(
             "/memory/conscience/check",

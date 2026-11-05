@@ -3,9 +3,11 @@
   "floors": {
     "Architecture Rule Tests": 68,
     "Assertion Floor Tests": 40,
+    "Bind-mount portability tests": 29,
     "Bring-up Guard Tests": 23,
     "CI Script Tests": 23,
     "CI Toleration Tests": 26,
+    "CI summariser tests": 14,
     "Compose Drift Tests": 33,
     "Compose Env Tests": 24,
     "Compose Gate Tests": 54,
@@ -17,6 +19,7 @@
     "Dashboard Finding Tracker Tests": 217,
     "Dashboard UI Auth Tests": 42,
     "Degraded State Tests": 71,
+    "Depends-On Readiness Tests": 24,
     "Deployment Preflight Tests": 57,
     "Dockerfile Context Tests": 24,
     "Dockerfile Coverage Tests": 26,
@@ -35,10 +38,14 @@
     "Live Smoke Tests": 36,
     "Migration & Active Mode Tests": 136,
     "Payload Bounds Tests": 24,
+    "Perception intake tests": 23,
+    "Phase 0 reducer tests": 46,
     "Policy Loader Tests": 16,
+    "Post-mortem tests": 23,
     "Secret & Restart Gate Tests": 28,
     "Service Auth Tests": 59,
     "Service Token Tests": 24,
+    "Service reachability tests": 37,
     "Shipped Package Deps Tests": 13,
     "Suite Floor Tests": 18,
     "Test Identity Tests": 31,
@@ -56,5 +63,5 @@
     "Workflow Filter Tests": 22,
     "Workflow Output Tests": 29
   },
-  "total": 2852
+  "total": 3048
 }

@@ -1,0 +1,5717 @@
+{
+ "documents": 330,
+ "edges": 1389,
+ "denominator_reconciliation": {
+  "raw_candidate_matches": 1482,
+  "rejected_non_operations": {
+   "NOT_SHELL_CONTEXT": 26,
+   "COMMENT_CONTEXT": 38,
+   "EXTRACTION_ARTEFACT": 117,
+   "QUOTED_STRING_CONTENT": 87,
+   "ARROW_OPERATOR": 4
+  },
+  "rejected_total": 272,
+  "admitted_candidate_operations": 1210,
+  "sum_dispositions": 1210,
+  "reconciles": true
+ },
+ "disposition_tally": {
+  "UNRESOLVED_RELEVANCE": 727,
+  "RESOLVED_NON_DOCUMENT_TARGET": 433,
+  "UNRESOLVED_TARGET": 37,
+  "RESOLVED_READ": 8,
+  "RESOLVED_WRITE": 5
+ },
+ "edge_kind_tally": {
+  "EXPLICIT_PATH_REFERENCE": 705,
+  "BASENAME_UNIQUE": 629,
+  "MARKDOWN_LINK": 55
+ },
+ "edge_context_tally": {
+  "INLINE_CODE": 835,
+  "PROSE_PATH": 89,
+  "TABLE": 268,
+  "MARKDOWN_LINK": 55,
+  "QUOTE": 39,
+  "FENCED_CODE": 103
+ },
+ "claim_tally": {
+  "NO_PROVEN_WRITER": 325,
+  "PROVEN_WRITE_RELATION": 5
+ },
+ "claims": {
+  ".github/PULL_REQUEST_TEMPLATE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  ".github/copilot-instructions.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "CHANGELOG.md": {
+   "claim": "PROVEN_WRITE_RELATION",
+   "sources": [
+    "scripts/auto_changelog.py"
+   ],
+   "buckets": {
+    "REACHES_T": 1,
+    "EXCLUDED_FROM_T": 433,
+    "COULD_REACH_T": 182
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 403,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "CLAUDE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 434,
+    "COULD_REACH_T": 182
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 404,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "PROJECT_STATUS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 434,
+    "COULD_REACH_T": 182
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 404,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "README.md": {
+   "claim": "PROVEN_WRITE_RELATION",
+   "sources": [
+    "scripts/sync_docs.py"
+   ],
+   "buckets": {
+    "REACHES_T": 1,
+    "EXCLUDED_FROM_T": 433,
+    "COULD_REACH_T": 182
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 403,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "SESSION_BACKLOG.md": {
+   "claim": "PROVEN_WRITE_RELATION",
+   "sources": [
+    "scripts/auto_session_log.py"
+   ],
+   "buckets": {
+    "REACHES_T": 1,
+    "EXCLUDED_FROM_T": 433,
+    "COULD_REACH_T": 182
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 403,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "bootstrap/README.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 435,
+    "COULD_REACH_T": 181
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 368,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "bootstrap/master_plan.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "data/AGENTS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "data/SOUL.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "data/self-emp/Accounting/README.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 435,
+    "COULD_REACH_T": 181
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 368,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "data/self-emp/Coding/README.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 435,
+    "COULD_REACH_T": 181
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 368,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "data/self-emp/Engineering/README.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 435,
+    "COULD_REACH_T": 181
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 368,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "data/self-emp/Legal/README.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 435,
+    "COULD_REACH_T": 181
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 368,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "data/self-emp/Social/README.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 435,
+    "COULD_REACH_T": 181
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 368,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "data/skills/daily_brief.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "data/skills/invoice.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "data/teammates/auditor.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "data/teammates/doctor.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 435,
+    "COULD_REACH_T": 181
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 368,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "data/teammates/oracle.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "data/teammates/sage.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "data/teammates/scout.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 435,
+    "COULD_REACH_T": 181
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 368,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "docs/DEMO.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "docs/ERROR_LOG.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "docs/PHONE_SETUP.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "docs/PROJECT_BACKLOG.md": {
+   "claim": "PROVEN_WRITE_RELATION",
+   "sources": [
+    "scripts/sync_docs.py"
+   ],
+   "buckets": {
+    "REACHES_T": 1,
+    "EXCLUDED_FROM_T": 435,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 368,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "docs/agentic_patterns_spec.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "docs/ara_review_status.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "docs/architecture.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "docs/design_system.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "docs/first_implementation_plan.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "docs/gaps_and_hardening.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "docs/gpu_integration_phase0.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "docs/hmac_rotation_runbook.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "docs/known_issues.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "docs/next_level_roadmap.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "docs/operator-journal/_template.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "docs/personality_and_proactive.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "docs/phase1_patch_set.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "docs/production_hardening_plan.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "docs/sovereign_ai_spec.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "docs/unfair_advantages.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "docs/wake_intent_j2.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/A4_SELF_DIAGNOSIS_EVOLUTION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/BASELINE_RESPONSES_0.5B.md": {
+   "claim": "PROVEN_WRITE_RELATION",
+   "sources": [
+    "scripts/capture_baseline_responses.py"
+   ],
+   "buckets": {
+    "REACHES_T": 1,
+    "EXCLUDED_FROM_T": 435,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 370,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CLEANUP_TODO.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_AGENTIC_API.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_AGENTIC_INTROSPECTION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_AIRQUALITY_SERVICE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_ANALOGY_STUB.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_ARCHITECTURE_INTERACTION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_AUDIO_PERCEPTION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_AUDIO_PERCEPTION_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_AUTONOMOUS_STATE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_AVATAR_SERVICE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_AVATAR_SERVICE_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_BACKUP_SERVICE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_BACKUP_SERVICE_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_BEHAVIOURAL_FEEDBACK_TOOLS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_BOOTSTRAP_CLOSURE_SMOKE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_BROKER_BRIDGE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_BROKER_BRIDGE_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_BROWSER_AGENT.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_BROWSER_AGENT_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_BUSINESS_SAFETY_ADVISORS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_CALENDAR_SERVICE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_CALENDAR_SYNC_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_CAMERA_SERVICE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_CAMERA_SERVICE_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_CHAOS_GONOGO_TEST_BOOTSTRAP.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_CI_BACKUP.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_CI_WORKFLOWS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_CI_WORKFLOW_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_CLIPBOARD_SERVICE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_CLIPBOARD_SERVICE_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_COGNITIVE_FOUNDATIONS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_COGNITIVE_GOVERNANCE_FOUNDATIONS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_COGNITIVE_STATE_STUBS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_COMMON_AUTH.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_COMMON_CONTROL_PLANE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_COMMON_MODEL_RUNTIME.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_COMMON_RESILIENCE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_COMMON_RUNTIME.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_CONVICTION_PLANNING_FORECASTING.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_CORTEX.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_CROSS_SERVICE_ATTACK_CHAINS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_DASHBOARD_FRONTEND.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_DASHBOARD_GATEWAY.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_DOCKER_WATCHER.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_DOCUMENT_PARSER.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_DOCUMENT_PARSER_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_DREAM_EVOLVER_CHECKPOINTS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_EMAIL_READER.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_EMAIL_READER_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_ENVIRONMENTAL_SENSORS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_ENVIRONMENTAL_SENSORS_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_EXECUTOR.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_FEATURE_FLAGS_EPISODES.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_FILES_SERVICE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_FILES_SERVICE_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_FINANCIAL_AUTONOMY_MARKET_INTELLIGENCE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_FINANCIAL_AWARENESS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_FINANCIAL_AWARENESS_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_FUSION_ENGINE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_FUSION_ENGINE_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_GIT_WATCHER.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_GPU_FOUNDATION_STUBS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_GPU_UTILITIES.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_HEARTBEAT.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_HEARTBEAT_SELF_MODEL.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_HMAC_ROTATION_DRILL.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_HOST_SETUP_HARDENING_SHELL.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_HOST_WATCHERS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_HOST_WATCHERS_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_HOUSE_DOCTOR.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_INTROSPECTION_IDENTITY.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_KAI_ADVISOR.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_KAI_ADVISOR_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_KEY_ROTATION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_KEY_ROTATION_MIGRATION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_LEDGER_WORKER.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_LEDGER_WORKER_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_LETTA_AGENT.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_LETTA_AGENT_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_LIVE_SUPERVISOR.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_MEMORY_COMPRESSOR.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_MEMORY_COMPRESSOR_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_MEMORY_GRAPH.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_MEMORY_GRAPH_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_MEMU_CORE_HOT_PATH.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_MEMU_INTROSPECTION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_MEMU_PERSONALITY_AUTONOMY.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_METRICS_GATEWAY.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_METRICS_GATEWAY_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_MODEL_DECISION_CONTROLS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_MONITOR_SERVICE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_MONITOR_SERVICE_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_NEWS_FEED.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_NEWS_FEED_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_NEWS_FEED_INTEGRATION_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_NOTIFY_SERVICE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_NOTIFY_SERVICE_BUILD_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_NOTIFY_SERVICE_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_OPERATIONAL_ASSURANCE_SCRIPTS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_OPERATIONAL_STATE_EPISODE_RECOVERY.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_OPERATOR_CONTROL_DRILLS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_ORCHESTRATION_ARCHITECTURE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_ORCHESTRATION_STUBS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_PERSISTENCE_1.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_QUESTIONER_TEAMMATES_WATCHDOG.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_RECOVERY_OPERATIONAL_SCRIPTS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_RELEASE_BOOTSTRAP_TOOLING.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_REPOSITORY_QUALITY_DOCS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_ROUTING_LLM_DISPATCH.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_SCREEN_CAPTURE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_SCREEN_CAPTURE_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_SCREEN_WATCHER.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_SCREEN_WATCHER_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_SELF_AUDIT_SUPERVISOR.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_SHARED_RUNTIME_CONTROLS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_SHELL_HEALTH_ROTATION_WRAPPERS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_SHELL_SANDBOX.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_SHELL_SANDBOX_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_SKILL_HUNTER.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_SWARM_ORCHESTRATION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_SYSMETRICS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_SYSMETRICS_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_SYSMETRICS_WORLD_ANCHOR.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_TEAMMATES_FSM_POLICY_MEMORY.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_TELEGRAM_BOT.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_TELEGRAM_BOT_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_TELEGRAM_PERCEPTION_BRIDGE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_TEST_HARNESSES_MARKET_CACHE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_TEST_STUBS_EXTERNAL_MODEL_OCR_FUZZ.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_TOOL_GATE_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_TRUST_GOVERNANCE_AUTHORITY.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_TRUST_LEDGER_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_TTS_SERVICE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_TTS_SERVICE_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_VAULT_BRIDGE_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_VAULT_SYNC.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_VERIFIER.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_VISION_SERVICE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_VISION_SERVICE_DEPLOYMENT_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_VISION_SERVICE_EXTENSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_WAKE_SERVICE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_WATCHDOG_RECOVERY.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_WEATHER_SERVICE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_WEB_SCOUT.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_BATCH_WORLD_ANCHOR.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_CONTINUATION_LOG.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_FINAL_REPORT.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_IMPLEMENTATION_SEQUENCE_AND_CLOSURE_MATRIX.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_MASTER.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_P0_CONTAINMENT_PLAN.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_P1_SECURITY_FOUNDATION_PLAN.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_P2_ISOLATION_AND_INTEGRITY_PLAN.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_P3_RELIABILITY_AUDIT_PRIVACY_RECOVERY_PLAN.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_P4_CAPABILITY_REQUALIFICATION_PLAN.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_PLANNING_PACKAGE_QA.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_REGISTER.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_REGISTER_CONTINUED.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_REGISTER_CONTINUED_2.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CODE_AUDIT_REMEDIATION_BACKLOG.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/COMPOSE_DRIFT.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/CONVICTION_SCENARIOS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/D344A_PRIMARY_MISSION_CANON_ALIGNMENT_CHECKPOINT.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/D344_PRIMARY_MISSION_IDENTITY_LINEAGE_CANON_CORRECTION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/D345_KINGSMAN_ARCHITECTURE_V0_1_REVIEW_CHECKPOINT.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/D346_ENGINEERING_ARCHITECTURE_VISUAL_CORRECTION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/D347_MASTER_ARCHITECTURE_CONSOLIDATION_CHECKPOINT.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/D348_EXISTING_KAI_EVOLUTION_CORRECTION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/D349_DEEPSEEK_V0_3_EXISTING_SYSTEM_REVIEW_RECONCILIATION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/D350_MASTER_ARCHITECTURE_PLAN_AND_DRAWING_SET_V0_4.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/D351_EVOLUTION_NOT_REDESIGN_AND_PRESENTATION_BAR_CORRECTION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/D352_WITHDRAW_REJECTED_V0_4_ARCHITECTURE_PACKAGE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/D353_DEEP_RESEARCH_MATURATION_IMPLEMENTATION_REISSUE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/DAINIUS_KINGSMAN_ENGINEERING_STANDARD.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/DECISIONS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D347.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D348.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D349.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D350.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D351.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D352.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/DECISIONS_CANONICAL_APPEND_QUEUE_D344_D353.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/DEEPSEEK_BRIEF_2026-08-07_EMBEDDINGS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/DEEPSEEK_BRIEF_2026-08-07_METHOD.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/DEEPSEEK_BRIEF_2026-08-07_TOPOLOGY.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/DEEPSEEK_REVIEW_PACKET_EXISTING_KAI_EVOLUTION_V0_3.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/DEEPSEEK_REVIEW_PACKET_KINGSMAN_ARCHITECTURE_V0_1.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/DEEPSEEK_REVIEW_PACKET_KINGSMAN_MASTER_CANDIDATE_V0_2.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/DEEPSEEK_REVIEW_PACKET_SUPPLEMENT_D346_ENGINEERING_DRAWINGS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/EMBEDDING_BACKEND_STATE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/ENGINEERING_DOCTRINE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/EQ_BASELINE_SAMPLES.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/EVIDENCE_PLANE_RESEARCH_LINEAGE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/GPU_ARRIVAL_RUNBOOK.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/HOUSE_IN_ORDER_PHASE2_PROFESSIONALISATION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/INSTRUMENTATION_ARCHITECTURE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KAI_KINGSMAN_PUZZLE_MAP_AND_RECONCILIATION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KAI_ORION_CONTINUITY.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KAI_ORION_CONTINUITY_CURRENT_MASTER_POINTER.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KAI_PRIMARY_MISSION_RECOVERY_POINTER.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KAI_RECONCILIATION_DEEPSEEK_EXISTING_KAI_EVOLUTION_V0_3.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KINGSMAN_ARCHITECTURAL_PILLARS_INDEX.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_CURRENT.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_V0_2.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KINGSMAN_ARCHITECTURE_DOCUMENT_AUTHORITY_INDEX_V0_3.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KINGSMAN_CANDIDATE_ARCHITECTURE_V0_1_DEEPSEEK_REVIEW.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KINGSMAN_CANON_SYNCHRONISATION_REGISTER.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KINGSMAN_CANON_SYNCHRONISATION_REGISTER_CURRENT.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KINGSMAN_CANON_SYNCHRONISATION_REGISTER_V0_3.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KINGSMAN_CONTINGENCY_AND_FAILSAFE_LIBRARY_DESIGN.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KINGSMAN_ENGINEERING_ARCHITECTURE_DRAWING_SET_V0_1.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KINGSMAN_ENGINEERING_ARCHITECTURE_VISUAL_STANDARD.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KINGSMAN_EXISTING_KAI_EVOLUTION_MASTER_PLAN_V0_3.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KINGSMAN_EXISTING_KAI_MATURATION_IMPLEMENTATION_RESEARCH_REISSUE_2026-08-24.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KINGSMAN_FINAL_VISION_MASTER_CANON_PLAN.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KINGSMAN_LONG_HORIZON_STEWARDSHIP_AND_SUCCESSION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KINGSMAN_MASTER_ARCHITECTURE_AND_PROFESSIONALISATION_CANDIDATE_V0_2.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KINGSMAN_MASTER_CANON_INPUT_MANIFEST_V0_2.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KINGSMAN_ORGANIC_RESILIENCE_ARCHITECTURE_DOCTRINE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KINGSMAN_PRIMARY_MISSION_CANON_PROPAGATION_MAP.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KINGSMAN_PRIMARY_MISSION_IDENTITY_AND_LINEAGE_DOCTRINE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KINGSMAN_PROACTIVE_ORGANISM_DOCTRINE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KINGSMAN_README_ARCHITECTURE_REFRESH_PLAN.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/KINGSMAN_ROOT_ARCHITECTURE_AND_CANON_ALIGNMENT.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/LETTA_INTEGRATION_PLAN.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/MAKEFILE_AUDIT.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/MAKEFILE_TARGETS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/MEMORY_GRAPH_DESIGN.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/METRICS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/NAVIGATION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/NEXT_STINT_PLAN.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/OPERATOR_VISIBILITY_ENGINEERING_DOCTRINE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/ORION_FIELD_NOTES.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/PHASE1_READINESS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/PHASE2_DOCUMENT_SYNC_AND_DRIFT_CONTROL.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/PHASE_0_5_BACKLOG.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/PLAYBOOKS/dispatch_jewel.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/PLAYBOOKS/parallel_dispatch.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/PLAYBOOKS/post_merge_checklist.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/PLAYBOOKS/resume_session.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/PLAYBOOKS/tech_evaluation.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/POSTMORTEM_2026-08-06_RUNNER_STARVATION.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/REALITY_CHECK_2026-05-10.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/REALITY_CHECK_2026-06-18.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/REPO_HEALTH_AUDIT_2026-05-10.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/RISKS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/RUNTIME_TOPOLOGY_CENSUS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/SEQUENCE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/SERVICE_IDENTITY_MEASUREMENT.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/SERVICE_IDENTITY_STATE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/SERVICE_IDENTITY_TRUST_BOUNDARIES.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/SESSION_BOOTSTRAP.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/SHOPPING_LIST_PLAN.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/STATUS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/STRATEGIC_PLAN.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/STUBS_AND_PLACEHOLDERS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/TECH_DEBT_E402.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/TECH_WATCH.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/TEST_WRITING_REVIEW.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/UH0_EVIDENCE_MANIFEST.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/UH2_INTAKE_REBUILD_ANALYSIS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/UH2_INTAKE_REDESIGN.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/UH2_SENSOR_INGRESS_PLAN.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/UH_PROGRESS_TRACKER.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/VERIFICATION_ARCHITECTURE_REVIEW.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/W1_DASHBOARD_REMEDIATION_PLAN.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/W1_GLOBAL_HYGIENE_SUBPLAN.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/WAYPOINTS.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/census_v11_claim_sensitivity/PRECOMMIT.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/house_in_order_census_v11/README.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 435,
+    "COULD_REACH_T": 181
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 370,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/house_in_order_h2/HOLDOUT_RULE.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/house_in_order_h2/RUN.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/house_in_order_instrument/AUTHORITY_ONTOLOGY.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 371,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "kai-pm/house_in_order_instrument/README.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 435,
+    "COULD_REACH_T": 181
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 370,
+    "FIXED_DIRECTORY_DISJOINT": 35,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "skills/_template.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "skills/cis-deductions.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "skills/ladder-safety.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "skills/mtd-vat.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "vault-sync/templates/daily-note.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "vault-sync/templates/kai-inbox.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "vault-sync/templates/lesson-learned.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  },
+  "vault-sync/templates/soul-mirror.md": {
+   "claim": "NO_PROVEN_WRITER",
+   "sources": null,
+   "buckets": {
+    "REACHES_T": 0,
+    "EXCLUDED_FROM_T": 436,
+    "COULD_REACH_T": 180
+   },
+   "witnesses": {
+    "FIXED_COMPLETE_PATH_DIFFERS": 369,
+    "FIXED_DIRECTORY_DISJOINT": 37,
+    "FIXED_BASENAME_DIFFERS": 30
+   }
+  }
+ },
+ "subject_counts": {
+  "claims.DISPOSITIONS::UNRESOLVED_RELEVANCE": 727,
+  "opscan.OP_MODES::W": 616,
+  "claims.PATH_SYNTAX::SHELL_VARIABLE": 147,
+  "claims.DISPOSITIONS::RESOLVED_NON_DOCUMENT_TARGET": 433,
+  "claims.PATH_SYNTAX::ABSOLUTE": 98,
+  "opscan.OP_MODES::R": 594,
+  "claims.PATH_SYNTAX::REPO_RELATIVE": 467,
+  "claims.PATH_SYNTAX::DYNAMIC_UNKNOWN": 498,
+  "claims.DISPOSITIONS::UNRESOLVED_TARGET": 37,
+  "claims.DISPOSITIONS::RESOLVED_READ": 8,
+  "claims.DISPOSITIONS::RESOLVED_WRITE": 5,
+  "opscan.REJECTION_REASONS::NOT_SHELL_CONTEXT": 26,
+  "opscan.REJECTION_REASONS::COMMENT_CONTEXT": 38,
+  "opscan.REJECTION_REASONS::EXTRACTION_ARTEFACT": 117,
+  "opscan.REJECTION_REASONS::QUOTED_STRING_CONTENT": 87,
+  "opscan.REJECTION_REASONS::ARROW_OPERATOR": 4,
+  "docgraph.KINDS::EXPLICIT_PATH_REFERENCE": 705,
+  "docgraph.EDGE_CONTEXTS::INLINE_CODE": 835,
+  "docgraph.EDGE_CONTEXTS::PROSE_PATH": 89,
+  "docgraph.KINDS::BASENAME_UNIQUE": 629,
+  "docgraph.EDGE_CONTEXTS::TABLE": 268,
+  "docgraph.KINDS::MARKDOWN_LINK": 55,
+  "docgraph.EDGE_CONTEXTS::MARKDOWN_LINK": 55,
+  "docgraph.EDGE_CONTEXTS::QUOTE": 39,
+  "docgraph.EDGE_CONTEXTS::FENCED_CODE": 103,
+  "claims.CLAIMS::NO_PROVEN_WRITER": 325,
+  "claims.TARGET_DISPOSITIONS::REACHES_T": 5,
+  "claims.TARGET_DISPOSITIONS::EXCLUDED_FROM_T": 143855,
+  "claims.TARGET_DISPOSITIONS::COULD_REACH_T": 59420,
+  "claims.EXCLUSION_WITNESSES::FIXED_COMPLETE_PATH_DIFFERS": 122486,
+  "claims.EXCLUSION_WITNESSES::FIXED_DIRECTORY_DISJOINT": 11469,
+  "claims.EXCLUSION_WITNESSES::FIXED_BASENAME_DIFFERS": 9900,
+  "claims.CLAIMS::PROVEN_WRITE_RELATION": 5,
+  "claims.DISPOSITIONS::READ_AND_WRITE": 0,
+  "claims.PATH_SYNTAX::URI_SYNTAX": 0,
+  "claims.CLAIMS::NO_WRITER_WITHIN_ANALYZED_SCOPE": 0,
+  "docgraph.KINDS::BASENAME_AMBIGUOUS": 0,
+  "docgraph.KINDS::BROKEN_LINK": 0,
+  "opscan.OP_MODES::RW": 0
+ },
+ "instrument": "HOUSE-IN-ORDER-CENSUS-INSTRUMENT v1.1",
+ "subject": {
+  "repo": "/home/user/kai-system",
+  "invocation_ref": "0dcd2288d4b724d878bd538da61a78b4fe476d3e",
+  "commit": "0dcd2288d4b724d878bd538da61a78b4fe476d3e",
+  "tree": "89960687a29f738da6a7ffb521a78aabb7dad551",
+  "immutable_ref_as_invoked": true,
+  "tracked_files": 1125,
+  "label": "WORLD-B tree at 0dcd228"
+ },
+ "qualification": {
+  "rows": [
+   {
+    "alphabet": "claims.DISPOSITIONS",
+    "value": "RESOLVED_READ",
+    "L1_emittable": true,
+    "L1_sites": [
+     164
+    ],
+    "L2_fixture_reached": 1,
+    "L3_calibration_asserted": 1,
+    "L4_subject_count": 8
+   },
+   {
+    "alphabet": "claims.DISPOSITIONS",
+    "value": "RESOLVED_WRITE",
+    "L1_emittable": true,
+    "L1_sites": [
+     164,
+     271
+    ],
+    "L2_fixture_reached": 1,
+    "L3_calibration_asserted": 1,
+    "L4_subject_count": 5
+   },
+   {
+    "alphabet": "claims.DISPOSITIONS",
+    "value": "READ_AND_WRITE",
+    "L1_emittable": true,
+    "L1_sites": [
+     165,
+     271
+    ],
+    "L2_fixture_reached": 1,
+    "L3_calibration_asserted": 1,
+    "L4_subject_count": 0
+   },
+   {
+    "alphabet": "claims.DISPOSITIONS",
+    "value": "RESOLVED_NON_DOCUMENT_TARGET",
+    "L1_emittable": true,
+    "L1_sites": [
+     138,
+     141
+    ],
+    "L2_fixture_reached": 1,
+    "L3_calibration_asserted": 1,
+    "L4_subject_count": 433
+   },
+   {
+    "alphabet": "claims.DISPOSITIONS",
+    "value": "UNRESOLVED_TARGET",
+    "L1_emittable": true,
+    "L1_sites": [
+     156,
+     161
+    ],
+    "L2_fixture_reached": 3,
+    "L3_calibration_asserted": 1,
+    "L4_subject_count": 37
+   },
+   {
+    "alphabet": "claims.DISPOSITIONS",
+    "value": "UNRESOLVED_RELEVANCE",
+    "L1_emittable": true,
+    "L1_sites": [
+     117,
+     147
+    ],
+    "L2_fixture_reached": 1,
+    "L3_calibration_asserted": 1,
+    "L4_subject_count": 727
+   },
+   {
+    "alphabet": "claims.PATH_SYNTAX",
+    "value": "REPO_RELATIVE",
+    "L1_emittable": true,
+    "L1_sites": [
+     95
+    ],
+    "L2_fixture_reached": 1,
+    "L3_calibration_asserted": 1,
+    "L4_subject_count": 467
+   },
+   {
+    "alphabet": "claims.PATH_SYNTAX",
+    "value": "ABSOLUTE",
+    "L1_emittable": true,
+    "L1_sites": [
+     94
+    ],
+    "L2_fixture_reached": 1,
+    "L3_calibration_asserted": 1,
+    "L4_subject_count": 98
+   },
+   {
+    "alphabet": "claims.PATH_SYNTAX",
+    "value": "URI_SYNTAX",
+    "L1_emittable": true,
+    "L1_sites": [
+     88
+    ],
+    "L2_fixture_reached": 1,
+    "L3_calibration_asserted": 1,
+    "L4_subject_count": 0
+   },
+   {
+    "alphabet": "claims.PATH_SYNTAX",
+    "value": "SHELL_VARIABLE",
+    "L1_emittable": true,
+    "L1_sites": [
+     90
+    ],
+    "L2_fixture_reached": 1,
+    "L3_calibration_asserted": 1,
+    "L4_subject_count": 147
+   },
+   {
+    "alphabet": "claims.PATH_SYNTAX",
+    "value": "DYNAMIC_UNKNOWN",
+    "L1_emittable": true,
+    "L1_sites": [
+     84,
+     92
+    ],
+    "L2_fixture_reached": 1,
+    "L3_calibration_asserted": 1,
+    "L4_subject_count": 498
+   },
+   {
+    "alphabet": "claims.TARGET_DISPOSITIONS",
+    "value": "REACHES_T",
+    "L1_emittable": true,
+    "L1_sites": [
+     178,
+     284,
+     286
+    ],
+    "L2_fixture_reached": 1,
+    "L3_calibration_asserted": 1,
+    "L4_subject_count": 5
+   },
+   {
+    "alphabet": "claims.TARGET_DISPOSITIONS",
+    "value": "EXCLUDED_FROM_T",
+    "L1_emittable": true,
+    "L1_sites": [
+     207,
+     216,
+     226,
+     230,
+     239
+    ],
+    "L2_fixture_reached": 6,
+    "L3_calibration_asserted": 1,
+    "L4_subject_count": 143855
+   },
+   {
+    "alphabet": "claims.TARGET_DISPOSITIONS",
+    "value": "COULD_REACH_T",
+    "L1_emittable": true,
+    "L1_sites": [
+     182,
+     206,
+     232,
+     245,
+     288
+    ],
+    "L2_fixture_reached": 5,
+    "L3_calibration_asserted": 3,
+    "L4_subject_count": 59420
+   },
+   {
+    "alphabet": "claims.EXCLUSION_WITNESSES",
+    "value": "FIXED_COMPLETE_PATH_DIFFERS",
+    "L1_emittable": true,
+    "L1_sites": [
+     207,
+     216,
+     230
+    ],
+    "L2_fixture_reached": 4,
+    "L3_calibration_asserted": 3,
+    "L4_subject_count": 122486
+   },
+   {
+    "alphabet": "claims.EXCLUSION_WITNESSES",
+    "value": "FIXED_BASENAME_DIFFERS",
+    "L1_emittable": true,
+    "L1_sites": [
+     239
+    ],
+    "L2_fixture_reached": 1,
+    "L3_calibration_asserted": 1,
+    "L4_subject_count": 9900
+   },
+   {
+    "alphabet": "claims.EXCLUSION_WITNESSES",
+    "value": "FIXED_DIRECTORY_DISJOINT",
+    "L1_emittable": true,
+    "L1_sites": [
+     226
+    ],
+    "L2_fixture_reached": 1,
+    "L3_calibration_asserted": 1,
+    "L4_subject_count": 11469
+   },
+   {
+    "alphabet": "claims.CLAIMS",
+    "value": "PROVEN_WRITE_RELATION",
+    "L1_emittable": true,
+    "L1_sites": [
+     285
+    ],
+    "L2_fixture_reached": 1,
+    "L3_calibration_asserted": 1,
+    "L4_subject_count": 5
+   },
+   {
+    "alphabet": "claims.CLAIMS",
+    "value": "NO_PROVEN_WRITER",
+    "L1_emittable": true,
+    "L1_sites": [
+     289
+    ],
+    "L2_fixture_reached": 1,
+    "L3_calibration_asserted": 1,
+    "L4_subject_count": 325
+   },
+   {
+    "alphabet": "claims.CLAIMS",
+    "value": "NO_WRITER_WITHIN_ANALYZED_SCOPE",
+    "L1_emittable": true,
+    "L1_sites": [
+     291
+    ],
+    "L2_fixture_reached": 1,
+    "L3_calibration_asserted": 1,
+    "L4_subject_count": 0
+   },
+   {
+    "alphabet": "docgraph.KINDS",
+    "value": "MARKDOWN_LINK",
+    "L1_emittable": true,
+    "L1_sites": [
+     41,
+     90,
+     141,
+     142,
+     144
+    ],
+    "L2_fixture_reached": 10,
+    "L3_calibration_asserted": 10,
+    "L4_subject_count": 55
+   },
+   {
+    "alphabet": "docgraph.KINDS",
+    "value": "EXPLICIT_PATH_REFERENCE",
+    "L1_emittable": true,
+    "L1_sites": [
+     41,
+     155
+    ],
+    "L2_fixture_reached": 10,
+    "L3_calibration_asserted": 10,
+    "L4_subject_count": 705
+   },
+   {
+    "alphabet": "docgraph.KINDS",
+    "value": "BASENAME_UNIQUE",
+    "L1_emittable": true,
+    "L1_sites": [
+     41,
+     167
+    ],
+    "L2_fixture_reached": 15,
+    "L3_calibration_asserted": 5,
+    "L4_subject_count": 629
+   },
+   {
+    "alphabet": "docgraph.KINDS",
+    "value": "BASENAME_AMBIGUOUS",
+    "L1_emittable": true,
+    "L1_sites": [
+     169
+    ],
+    "L2_fixture_reached": 5,
+    "L3_calibration_asserted": 5,
+    "L4_subject_count": 0
+   },
+   {
+    "alphabet": "docgraph.KINDS",
+    "value": "BROKEN_LINK",
+    "L1_emittable": true,
+    "L1_sites": [
+     144
+    ],
+    "L2_fixture_reached": 10,
+    "L3_calibration_asserted": 10,
+    "L4_subject_count": 0
+   },
+   {
+    "alphabet": "docgraph.EDGE_CONTEXTS",
+    "value": "MARKDOWN_LINK",
+    "L1_emittable": true,
+    "L1_sites": [
+     41,
+     90,
+     141,
+     142,
+     144
+    ],
+    "L2_fixture_reached": 20,
+    "L3_calibration_asserted": 20,
+    "L4_subject_count": 55
+   },
+   {
+    "alphabet": "docgraph.EDGE_CONTEXTS",
+    "value": "PROSE_PATH",
+    "L1_emittable": true,
+    "L1_sites": [
+     99
+    ],
+    "L2_fixture_reached": 6,
+    "L3_calibration_asserted": 4,
+    "L4_subject_count": 89
+   },
+   {
+    "alphabet": "docgraph.EDGE_CONTEXTS",
+    "value": "INLINE_CODE",
+    "L1_emittable": true,
+    "L1_sites": [
+     98
+    ],
+    "L2_fixture_reached": 6,
+    "L3_calibration_asserted": 4,
+    "L4_subject_count": 835
+   },
+   {
+    "alphabet": "docgraph.EDGE_CONTEXTS",
+    "value": "FENCED_CODE",
+    "L1_emittable": true,
+    "L1_sites": [
+     70,
+     73
+    ],
+    "L2_fixture_reached": 6,
+    "L3_calibration_asserted": 4,
+    "L4_subject_count": 103
+   },
+   {
+    "alphabet": "docgraph.EDGE_CONTEXTS",
+    "value": "TABLE",
+    "L1_emittable": true,
+    "L1_sites": [
+     77
+    ],
+    "L2_fixture_reached": 6,
+    "L3_calibration_asserted": 4,
+    "L4_subject_count": 268
+   },
+   {
+    "alphabet": "docgraph.EDGE_CONTEXTS",
+    "value": "QUOTE",
+    "L1_emittable": true,
+    "L1_sites": [
+     75
+    ],
+    "L2_fixture_reached": 6,
+    "L3_calibration_asserted": 4,
+    "L4_subject_count": 39
+   },
+   {
+    "alphabet": "opscan.REJECTION_REASONS",
+    "value": "NOT_SHELL_CONTEXT",
+    "L1_emittable": true,
+    "L1_sites": [
+     308
+    ],
+    "L2_fixture_reached": 1,
+    "L3_calibration_asserted": 1,
+    "L4_subject_count": 26
+   },
+   {
+    "alphabet": "opscan.REJECTION_REASONS",
+    "value": "COMMENT_CONTEXT",
+    "L1_emittable": true,
+    "L1_sites": [
+     315
+    ],
+    "L2_fixture_reached": 1,
+    "L3_calibration_asserted": 1,
+    "L4_subject_count": 38
+   },
+   {
+    "alphabet": "opscan.REJECTION_REASONS",
+    "value": "QUOTED_STRING_CONTENT",
+    "L1_emittable": true,
+    "L1_sites": [
+     318
+    ],
+    "L2_fixture_reached": 1,
+    "L3_calibration_asserted": 1,
+    "L4_subject_count": 87
+   },
+   {
+    "alphabet": "opscan.REJECTION_REASONS",
+    "value": "ARROW_OPERATOR",
+    "L1_emittable": true,
+    "L1_sites": [
+     322
+    ],
+    "L2_fixture_reached": 1,
+    "L3_calibration_asserted": 1,
+    "L4_subject_count": 4
+   },
+   {
+    "alphabet": "opscan.REJECTION_REASONS",
+    "value": "EXTRACTION_ARTEFACT",
+    "L1_emittable": true,
+    "L1_sites": [
+     334
+    ],
+    "L2_fixture_reached": 1,
+    "L3_calibration_asserted": 1,
+    "L4_subject_count": 117
+   },
+   {
+    "alphabet": "opscan.OP_MODES",
+    "value": "R",
+    "L1_emittable": true,
+    "L1_sites": [
+     269,
+     279,
+     303
+    ],
+    "L2_fixture_reached": 1,
+    "L3_calibration_asserted": 1,
+    "L4_subject_count": 594
+   },
+   {
+    "alphabet": "opscan.OP_MODES",
+    "value": "W",
+    "L1_emittable": true,
+    "L1_sites": [
+     266,
+     279,
+     303,
+     320
+    ],
+    "L2_fixture_reached": 2,
+    "L3_calibration_asserted": 1,
+    "L4_subject_count": 616
+   },
+   {
+    "alphabet": "opscan.OP_MODES",
+    "value": "RW",
+    "L1_emittable": true,
+    "L1_sites": [
+     278
+    ],
+    "L2_fixture_reached": 1,
+    "L3_calibration_asserted": 1,
+    "L4_subject_count": 0
+   }
+  ],
+  "findings": [],
+  "calibration": {
+   "passed": 182,
+   "failed": 0,
+   "failures": []
+  }
+ },
+ "applicability": {
+  "artefact": "applicability-worldB.json",
+  "sha256": "ba356abd3a84d32d7b9a86918ea3395dbf80af18dd60b22112b8edd5624e3636",
+  "binding_rule": "A downstream claim about this subject MAY NOT rely on any state whose DOWNSTREAM_USABLE_ON_THIS_SUBJECT is false.",
+  "record": {
+   "record_type": "SUBJECT_APPLICABILITY_RECORD",
+   "instrument_version": "HOUSE-IN-ORDER-CENSUS-INSTRUMENT v1.1",
+   "subject_commit": "0dcd2288d4b724d878bd538da61a78b4fe476d3e",
+   "subject_tree": "89960687a29f738da6a7ffb521a78aabb7dad551",
+   "declared_states": 39,
+   "usable_on_this_subject": 33,
+   "restricted_on_this_subject": 6,
+   "binding_rule": "A downstream claim about this subject MAY NOT rely on any state whose DOWNSTREAM_USABLE_ON_THIS_SUBJECT is false.",
+   "states": [
+    {
+     "alphabet": "claims.DISPOSITIONS",
+     "value": "RESOLVED_READ",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 1,
+     "L3_CALIBRATION_DISCRIMINATING": 1,
+     "L4_SUBJECT_POPULATION_COUNT": 8,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "claims.DISPOSITIONS",
+     "value": "RESOLVED_WRITE",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 1,
+     "L3_CALIBRATION_DISCRIMINATING": 1,
+     "L4_SUBJECT_POPULATION_COUNT": 5,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "claims.DISPOSITIONS",
+     "value": "READ_AND_WRITE",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 1,
+     "L3_CALIBRATION_DISCRIMINATING": 1,
+     "L4_SUBJECT_POPULATION_COUNT": 0,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": false,
+     "DOWNSTREAM_RESTRICTION_REASON": "ZERO_SUBJECT_POPULATION: the state is qualified (emittable, fixture-reachable, calibration-discriminating) but occurred zero times on this exact subject. It is NOT a defect and NOT evidence of absence in the world; it may not support a subject-specific downstream claim about this subject."
+    },
+    {
+     "alphabet": "claims.DISPOSITIONS",
+     "value": "RESOLVED_NON_DOCUMENT_TARGET",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 1,
+     "L3_CALIBRATION_DISCRIMINATING": 1,
+     "L4_SUBJECT_POPULATION_COUNT": 433,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "claims.DISPOSITIONS",
+     "value": "UNRESOLVED_TARGET",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 3,
+     "L3_CALIBRATION_DISCRIMINATING": 1,
+     "L4_SUBJECT_POPULATION_COUNT": 37,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "claims.DISPOSITIONS",
+     "value": "UNRESOLVED_RELEVANCE",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 1,
+     "L3_CALIBRATION_DISCRIMINATING": 1,
+     "L4_SUBJECT_POPULATION_COUNT": 727,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "claims.PATH_SYNTAX",
+     "value": "REPO_RELATIVE",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 1,
+     "L3_CALIBRATION_DISCRIMINATING": 1,
+     "L4_SUBJECT_POPULATION_COUNT": 467,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "claims.PATH_SYNTAX",
+     "value": "ABSOLUTE",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 1,
+     "L3_CALIBRATION_DISCRIMINATING": 1,
+     "L4_SUBJECT_POPULATION_COUNT": 98,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "claims.PATH_SYNTAX",
+     "value": "URI_SYNTAX",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 1,
+     "L3_CALIBRATION_DISCRIMINATING": 1,
+     "L4_SUBJECT_POPULATION_COUNT": 0,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": false,
+     "DOWNSTREAM_RESTRICTION_REASON": "ZERO_SUBJECT_POPULATION: the state is qualified (emittable, fixture-reachable, calibration-discriminating) but occurred zero times on this exact subject. It is NOT a defect and NOT evidence of absence in the world; it may not support a subject-specific downstream claim about this subject."
+    },
+    {
+     "alphabet": "claims.PATH_SYNTAX",
+     "value": "SHELL_VARIABLE",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 1,
+     "L3_CALIBRATION_DISCRIMINATING": 1,
+     "L4_SUBJECT_POPULATION_COUNT": 147,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "claims.PATH_SYNTAX",
+     "value": "DYNAMIC_UNKNOWN",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 1,
+     "L3_CALIBRATION_DISCRIMINATING": 1,
+     "L4_SUBJECT_POPULATION_COUNT": 498,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "claims.TARGET_DISPOSITIONS",
+     "value": "REACHES_T",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 1,
+     "L3_CALIBRATION_DISCRIMINATING": 1,
+     "L4_SUBJECT_POPULATION_COUNT": 5,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "claims.TARGET_DISPOSITIONS",
+     "value": "EXCLUDED_FROM_T",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 6,
+     "L3_CALIBRATION_DISCRIMINATING": 1,
+     "L4_SUBJECT_POPULATION_COUNT": 143855,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "claims.TARGET_DISPOSITIONS",
+     "value": "COULD_REACH_T",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 5,
+     "L3_CALIBRATION_DISCRIMINATING": 3,
+     "L4_SUBJECT_POPULATION_COUNT": 59420,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "claims.EXCLUSION_WITNESSES",
+     "value": "FIXED_COMPLETE_PATH_DIFFERS",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 4,
+     "L3_CALIBRATION_DISCRIMINATING": 3,
+     "L4_SUBJECT_POPULATION_COUNT": 122486,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "claims.EXCLUSION_WITNESSES",
+     "value": "FIXED_BASENAME_DIFFERS",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 1,
+     "L3_CALIBRATION_DISCRIMINATING": 1,
+     "L4_SUBJECT_POPULATION_COUNT": 9900,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "claims.EXCLUSION_WITNESSES",
+     "value": "FIXED_DIRECTORY_DISJOINT",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 1,
+     "L3_CALIBRATION_DISCRIMINATING": 1,
+     "L4_SUBJECT_POPULATION_COUNT": 11469,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "claims.CLAIMS",
+     "value": "PROVEN_WRITE_RELATION",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 1,
+     "L3_CALIBRATION_DISCRIMINATING": 1,
+     "L4_SUBJECT_POPULATION_COUNT": 5,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "claims.CLAIMS",
+     "value": "NO_PROVEN_WRITER",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 1,
+     "L3_CALIBRATION_DISCRIMINATING": 1,
+     "L4_SUBJECT_POPULATION_COUNT": 325,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "claims.CLAIMS",
+     "value": "NO_WRITER_WITHIN_ANALYZED_SCOPE",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 1,
+     "L3_CALIBRATION_DISCRIMINATING": 1,
+     "L4_SUBJECT_POPULATION_COUNT": 0,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": false,
+     "DOWNSTREAM_RESTRICTION_REASON": "ZERO_SUBJECT_POPULATION: the state is qualified (emittable, fixture-reachable, calibration-discriminating) but occurred zero times on this exact subject. It is NOT a defect and NOT evidence of absence in the world; it may not support a subject-specific downstream claim about this subject."
+    },
+    {
+     "alphabet": "docgraph.KINDS",
+     "value": "MARKDOWN_LINK",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 10,
+     "L3_CALIBRATION_DISCRIMINATING": 10,
+     "L4_SUBJECT_POPULATION_COUNT": 55,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "docgraph.KINDS",
+     "value": "EXPLICIT_PATH_REFERENCE",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 10,
+     "L3_CALIBRATION_DISCRIMINATING": 10,
+     "L4_SUBJECT_POPULATION_COUNT": 705,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "docgraph.KINDS",
+     "value": "BASENAME_UNIQUE",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 15,
+     "L3_CALIBRATION_DISCRIMINATING": 5,
+     "L4_SUBJECT_POPULATION_COUNT": 629,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "docgraph.KINDS",
+     "value": "BASENAME_AMBIGUOUS",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 5,
+     "L3_CALIBRATION_DISCRIMINATING": 5,
+     "L4_SUBJECT_POPULATION_COUNT": 0,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": false,
+     "DOWNSTREAM_RESTRICTION_REASON": "ZERO_SUBJECT_POPULATION: the state is qualified (emittable, fixture-reachable, calibration-discriminating) but occurred zero times on this exact subject. It is NOT a defect and NOT evidence of absence in the world; it may not support a subject-specific downstream claim about this subject."
+    },
+    {
+     "alphabet": "docgraph.KINDS",
+     "value": "BROKEN_LINK",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 10,
+     "L3_CALIBRATION_DISCRIMINATING": 10,
+     "L4_SUBJECT_POPULATION_COUNT": 0,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": false,
+     "DOWNSTREAM_RESTRICTION_REASON": "ZERO_SUBJECT_POPULATION: the state is qualified (emittable, fixture-reachable, calibration-discriminating) but occurred zero times on this exact subject. It is NOT a defect and NOT evidence of absence in the world; it may not support a subject-specific downstream claim about this subject."
+    },
+    {
+     "alphabet": "docgraph.EDGE_CONTEXTS",
+     "value": "MARKDOWN_LINK",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 20,
+     "L3_CALIBRATION_DISCRIMINATING": 20,
+     "L4_SUBJECT_POPULATION_COUNT": 55,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "docgraph.EDGE_CONTEXTS",
+     "value": "PROSE_PATH",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 6,
+     "L3_CALIBRATION_DISCRIMINATING": 4,
+     "L4_SUBJECT_POPULATION_COUNT": 89,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "docgraph.EDGE_CONTEXTS",
+     "value": "INLINE_CODE",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 6,
+     "L3_CALIBRATION_DISCRIMINATING": 4,
+     "L4_SUBJECT_POPULATION_COUNT": 835,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "docgraph.EDGE_CONTEXTS",
+     "value": "FENCED_CODE",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 6,
+     "L3_CALIBRATION_DISCRIMINATING": 4,
+     "L4_SUBJECT_POPULATION_COUNT": 103,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "docgraph.EDGE_CONTEXTS",
+     "value": "TABLE",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 6,
+     "L3_CALIBRATION_DISCRIMINATING": 4,
+     "L4_SUBJECT_POPULATION_COUNT": 268,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "docgraph.EDGE_CONTEXTS",
+     "value": "QUOTE",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 6,
+     "L3_CALIBRATION_DISCRIMINATING": 4,
+     "L4_SUBJECT_POPULATION_COUNT": 39,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "opscan.REJECTION_REASONS",
+     "value": "NOT_SHELL_CONTEXT",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 1,
+     "L3_CALIBRATION_DISCRIMINATING": 1,
+     "L4_SUBJECT_POPULATION_COUNT": 26,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "opscan.REJECTION_REASONS",
+     "value": "COMMENT_CONTEXT",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 1,
+     "L3_CALIBRATION_DISCRIMINATING": 1,
+     "L4_SUBJECT_POPULATION_COUNT": 38,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "opscan.REJECTION_REASONS",
+     "value": "QUOTED_STRING_CONTENT",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 1,
+     "L3_CALIBRATION_DISCRIMINATING": 1,
+     "L4_SUBJECT_POPULATION_COUNT": 87,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "opscan.REJECTION_REASONS",
+     "value": "ARROW_OPERATOR",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 1,
+     "L3_CALIBRATION_DISCRIMINATING": 1,
+     "L4_SUBJECT_POPULATION_COUNT": 4,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "opscan.REJECTION_REASONS",
+     "value": "EXTRACTION_ARTEFACT",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 1,
+     "L3_CALIBRATION_DISCRIMINATING": 1,
+     "L4_SUBJECT_POPULATION_COUNT": 117,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "opscan.OP_MODES",
+     "value": "R",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 1,
+     "L3_CALIBRATION_DISCRIMINATING": 1,
+     "L4_SUBJECT_POPULATION_COUNT": 594,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "opscan.OP_MODES",
+     "value": "W",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 2,
+     "L3_CALIBRATION_DISCRIMINATING": 1,
+     "L4_SUBJECT_POPULATION_COUNT": 616,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": true,
+     "DOWNSTREAM_RESTRICTION_REASON": null
+    },
+    {
+     "alphabet": "opscan.OP_MODES",
+     "value": "RW",
+     "L1_IMPLEMENTATION_EMITTABLE": true,
+     "L2_FIXTURE_REACHABLE": 1,
+     "L3_CALIBRATION_DISCRIMINATING": 1,
+     "L4_SUBJECT_POPULATION_COUNT": 0,
+     "DOWNSTREAM_USABLE_ON_THIS_SUBJECT": false,
+     "DOWNSTREAM_RESTRICTION_REASON": "ZERO_SUBJECT_POPULATION: the state is qualified (emittable, fixture-reachable, calibration-discriminating) but occurred zero times on this exact subject. It is NOT a defect and NOT evidence of absence in the world; it may not support a subject-specific downstream claim about this subject."
+    }
+   ],
+   "repair_evidence": {
+    "note": "Repair impact is orthogonal to the analyser's semantic alphabets. No repair introduces an ontology value.",
+    "repairs": [
+     {
+      "rule_id": "URI_SYNTAX_NOT_REMOTE_SEMANTICS",
+      "RULE_STATUS": "CORRECTED_AND_QUALIFIED",
+      "unsound_rule_in_v1_0": "any target containing '://' was EXCLUDED_FROM_T as a 'remote URI, not a repository path'",
+      "corrected_rule_in_v1_1": "URI syntax is a recorded observation only; the literal is reasoned about as the path string it is",
+      "operations_affected_on_this_subject": 0,
+      "CURRENT_SUBJECT_EFFECT": "NONE",
+      "how_measured": "counted operations whose path syntax is URI_SYNTAX and whose literal has a tracked document as a path suffix, i.e. those v1.0 excluded but v1.1 must leave open",
+      "claim_level_effect_established_by": "compare-v10-v11.json",
+      "uri_syntax_operations_on_this_subject": 0
+     },
+     {
+      "rule_id": "ABSOLUTE_PATH_NOT_OUTSIDE_REPOSITORY",
+      "RULE_STATUS": "CORRECTED_AND_QUALIFIED",
+      "unsound_rule_in_v1_0": "any target beginning '/' was EXCLUDED_FROM_T as an 'absolute system path, outside the repository target domain'",
+      "corrected_rule_in_v1_1": "an absolute literal excludes a target only when that target is not a path SUFFIX of it",
+      "operations_affected_on_this_subject": 0,
+      "CURRENT_SUBJECT_EFFECT": "NONE",
+      "how_measured": "counted absolute-syntax operations whose literal has a tracked document as a path suffix, i.e. those v1.0 falsely excluded",
+      "claim_level_effect_established_by": "compare-v10-v11.json",
+      "absolute_operations_on_this_subject": 98
+     },
+     {
+      "rule_id": "READ_TARGET_RECLASSIFIED_CONSERVATIVELY",
+      "RULE_STATUS": "CORRECTED_AND_QUALIFIED",
+      "unsound_rule_in_v1_0": "a dynamic-prefix path whose literal suffix matched a tracked file was RESOLVED to that file",
+      "corrected_rule_in_v1_1": "document relevance is proven by the fixed '.md' component, but the exact tracked target is NOT proven, so the disposition is UNRESOLVED_TARGET",
+      "operations_affected_on_this_subject": 7,
+      "CURRENT_SUBJECT_EFFECT": "OPERATIONS_RECLASSIFIED",
+      "how_measured": "counted operations with proven .md relevance, an unresolvable prefix, and a literal suffix that v1.0's exact-resolution step would have bound to a document",
+      "claim_level_effect_established_by": "compare-v10-v11.json",
+      "reclassified_operations": [
+       {
+        "src": "scripts/security/check_item8_authority.py",
+        "line": 195,
+        "mode": "R",
+        "fragments": [
+         "kai-pm",
+         "DECISIONS.md"
+        ],
+        "v10_would_have_bound_to": "kai-pm/DECISIONS.md",
+        "v11_disposition": "UNRESOLVED_TARGET"
+       },
+       {
+        "src": "scripts/security/report_model_load_denominator.py",
+        "line": 946,
+        "mode": "R",
+        "fragments": [
+         "kai-pm",
+         "DECISIONS.md"
+        ],
+        "v10_would_have_bound_to": "kai-pm/DECISIONS.md",
+        "v11_disposition": "UNRESOLVED_TARGET"
+       },
+       {
+        "src": "scripts/sync_docs.py",
+        "line": 87,
+        "mode": "R",
+        "fragments": [
+         "README.md"
+        ],
+        "v10_would_have_bound_to": "README.md",
+        "v11_disposition": "UNRESOLVED_TARGET"
+       },
+       {
+        "src": "scripts/test_doctrine_integrity.py",
+        "line": 181,
+        "mode": "R",
+        "fragments": [
+         "kai-pm",
+         "ENGINEERING_DOCTRINE.md"
+        ],
+        "v10_would_have_bound_to": "kai-pm/ENGINEERING_DOCTRINE.md",
+        "v11_disposition": "UNRESOLVED_TARGET"
+       },
+       {
+        "src": "scripts/test_item8_instruments.py",
+        "line": 115,
+        "mode": "R",
+        "fragments": [
+         "kai-pm",
+         "DECISIONS.md"
+        ],
+        "v10_would_have_bound_to": "kai-pm/DECISIONS.md",
+        "v11_disposition": "UNRESOLVED_TARGET"
+       },
+       {
+        "src": "scripts/test_kai_intelligence.py",
+        "line": 290,
+        "mode": "R",
+        "fragments": [
+         "kai-pm",
+         "DECISIONS.md"
+        ],
+        "v10_would_have_bound_to": "kai-pm/DECISIONS.md",
+        "v11_disposition": "UNRESOLVED_TARGET"
+       },
+       {
+        "src": "scripts/test_trust_auditor.py",
+        "line": 16,
+        "mode": "R",
+        "fragments": [
+         "data",
+         "teammates",
+         "auditor.md"
+        ],
+        "v10_would_have_bound_to": "data/teammates/auditor.md",
+        "v11_disposition": "UNRESOLVED_TARGET"
+       }
+      ],
+      "semantic_note": "These are NOT read relations that were erased. Each operation is preserved in full; what was withdrawn is the unproven claim about WHICH tracked document it touches. Relevance proven, exact target unproven."
+     }
+    ]
+   }
+  }
+ }
+}

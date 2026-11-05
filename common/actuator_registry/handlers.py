@@ -29,11 +29,11 @@ READ_ONLY_ENDPOINTS: Dict[str, Tuple[str, str, Dict[str, str]]] = {
         },
     ),
     "alpha-signals": (
-        "ALPHA_SIGNALS_URL", "http://agentic:8001",
+        "ALPHA_SIGNALS_URL", "http://agentic:8007",
         {"alpha_signal_read": "/alpha/{symbol}/composite"},
     ),
     "market-data": (
-        "MARKET_DATA_URL", "http://agentic:8001",
+        "MARKET_DATA_URL", "http://agentic:8007",
         {"market_data_read": "/market-data/prices?symbols={symbols}"},
     ),
     "docker-watcher": (
@@ -65,7 +65,7 @@ READ_ONLY_ENDPOINTS: Dict[str, Tuple[str, str, Dict[str, str]]] = {
         {"weather_read": "/summary"},
     ),
     "service-watchdog": (
-        "SERVICE_WATCHDOG_URL", "http://agentic:8001",
+        "SERVICE_WATCHDOG_URL", "http://agentic:8007",
         {"service_health_read": "/watchdog/status"},
     ),
 }

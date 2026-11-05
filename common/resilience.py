@@ -46,6 +46,7 @@ async def resilient_call(
     logger: Any = None,
     idempotent: Optional[bool] = None,
     max_response_bytes: int = 8 * 1024 * 1024,
+    headers: Optional[Dict[str, str]] = None,
 ) -> Any:
     """HTTP call with retry, exponential backoff, and circuit breaker.
 
@@ -89,7 +90,7 @@ async def resilient_call(
     # underneath it (KAI-DASH-074).
     from common.http_hygiene import pooled_client
 
-    async with pooled_client(timeout=timeout) as client:
+    async with pooled_client(timeout=timeout, headers=headers or None) as client:
         for attempt in range(1, attempts + 1):
             try:
                 if method.upper() == "GET":

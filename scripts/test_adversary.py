@@ -295,5 +295,24 @@ assert block_verdict.recommendation == "block"
 
 print("  recommendation logic: PASSED")
 
+# ── Verifier evidence keeps memu-core retrieval scores ───────────────
+
+print("Testing verifier evidence items...")
+_ev = _mod._evidence_item
+# memu-core /memory/retrieve record shape: content.result + rank_score/relevance/importance
+_rec = {"content": {"result": "concrete pour booked Tuesday"}, "rank_score": 0.92,
+        "relevance": 1.0, "importance": 0.8}
+_item = _ev(_rec)
+assert _item["content"] == "concrete pour booked Tuesday", _item
+assert _item["rank_score"] == 0.92, _item           # was always 0.5 before the fix
+assert _item["relevance"] == 1.0 and _item["importance"] == 0.8, _item
+# verifier strong-chunk arithmetic (verifier/app.py): 0.92*0.6 + 0*0.2 + 1.0*0.1 + 0.8*0.1 = 0.732 >= 0.60
+assert _item["rank_score"] * 0.6 + _item["relevance"] * 0.1 + _item["importance"] * 0.1 >= 0.60
+# known-negative: no score available stays neutral, never invented
+assert _ev("plain session string")["rank_score"] == 0.5
+assert _ev({"content": "x"})["rank_score"] == 0.5
+assert _ev({"content": "x", "rank_score": None})["rank_score"] == 0.5
+print("  evidence items: PASSED")
+
 # ── Summary ──────────────────────────────────────────────────────────
 print("\nAll adversary tests passed")

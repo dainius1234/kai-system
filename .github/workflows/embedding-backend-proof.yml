@@ -1,0 +1,295 @@
+# Does Kai's semantic embedding capability actually exist at runtime?
+#
+# Evidence collection only. This workflow changes no production default,
+# no dependency file and no fallback behaviour, and it is deliberately
+# separate from every existing workflow so it cannot alter their
+# behaviour or inherit their environment.
+#
+# TWO CLAIMS, KEPT APART. Collapsing them is the failure this exists to
+# prevent:
+#
+#   A  IMAGE CAPABILITY — the built image contains the library and model
+#      and can execute the real semantic operation.
+#
+#   B  PRODUCTION-DEFAULT SERVICE PATH — memu-core, started normally with
+#      MEMU_ALLOW_FAKE_EMBEDDINGS resolving to its production default,
+#      actually reaches that backend.
+#
+# A passing A with a failing B is a legitimate and informative result:
+# the engine is in the car and the car is not connected to it. A CANNOT
+# SATISFY B.
+#
+# None of these count as proof of semantic execution:
+#   image built · package imported · model files present ·
+#   container healthy · service started · success log alone
+#
+# Vector width decides. Logs corroborate.
+name: Embedding backend proof
+
+# workflow_dispatch ALONE cannot run this. GitHub registers dispatchable
+# workflows only from the DEFAULT branch, and this file exists only on
+# the development branch, so the API answers 404 -- verified: all 13
+# registered workflows report an html_url under /blob/main/ and this one
+# is absent from the list entirely. Merging to main to make it
+# dispatchable would need authorisation this work does not have.
+#
+# A `push` trigger runs from the BRANCH'S OWN copy of the file, so it
+# needs no default-branch registration. The paths filter keeps it to
+# changes in this job or the probe it runs: this builds three images and
+# a compose stack, and firing it on every push would be a standing tax
+# on unrelated work.
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - claude/project-rework-plan-pgvp35
+    paths:
+      - .github/workflows/embedding-backend-proof.yml
+      - scripts/security/probe_embedding_backend.py
+      # The collector was missing here, and commit 924a600 -- which
+      # repaired the resolver that had filed memu-core's image under
+      # fusion-engine's name -- fired NOTHING. A repair that cannot
+      # execute is indistinguishable from no repair, and the branch
+      # looked fixed. The list is the job's inputs; every input belongs
+      # in it.
+      - scripts/security/collect_embedding_evidence.sh
+
+permissions:
+  contents: read
+
+jobs:
+  embedding-backend-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    # NOTE: this job deliberately declares NO env block. The flag must
+    # not appear at workflow, job or step level anywhere in this file —
+    # `unified-hunter.yml` sets it at JOB level, which leaks into every
+    # step of that job, and inheriting that here would mean testing the
+    # override while believing we were testing the default.
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: The environment must not already carry the flag
+        run: |
+          # Claim B is only meaningful if the value is genuinely absent
+          # before compose resolves ${MEMU_ALLOW_FAKE_EMBEDDINGS:-false}.
+          # Proven at the boundary rather than assumed.
+          if [ -n "${MEMU_ALLOW_FAKE_EMBEDDINGS:-}" ]; then
+            echo "REFUSING: MEMU_ALLOW_FAKE_EMBEDDINGS is already set to"
+            echo "'${MEMU_ALLOW_FAKE_EMBEDDINGS}' in this environment."
+            echo "Claim B would test the override, not the default."
+            exit 1
+          fi
+          echo "MEMU_ALLOW_FAKE_EMBEDDINGS is unset. Commit ${GITHUB_SHA}"
+
+      - name: Mint an ephemeral database password for this run
+        run: |
+          # Ephemeral and per-run: nothing here is a production secret,
+          # and none is required. If this verification ever needs a real
+          # one, that is a trust decision to bring back, not to provision
+          # quietly.
+          printf 'DB_PASSWORD=ci-ephemeral-%s\n' \
+            "$(head -c 24 /dev/urandom | base64 | tr -dc 'a-zA-Z0-9' | head -c 20)" \
+            >> "$GITHUB_ENV"
+
+      - name: Build the three images under test
+        run: |
+          set -o pipefail
+          docker compose -f docker-compose.minimal.yml build memu-core agentic
+          docker compose -f docker-compose.full.yml build fusion-engine
+
+      # ── CLAIM A — one INDEPENDENT collector per service ──────────────
+      #
+      # Separate steps, each `if: always()`, because run #2 failed the
+      # single Claim-A step when its evidence was incomplete and GitHub
+      # then SKIPPED Claim B. One measurement suppressed an independent
+      # one. `if: always()` is defensive only; the primary mechanism is
+      # that a collector exits 0 for every defined probe verdict and
+      # non-zero ONLY on instrument malfunction.
+      #
+      # A probe proving the backend absent is a SUCCESSFUL MEASUREMENT of
+      # a FAILED capability.
+      # ci-toleration: documented-skip
+      - name: 'Claim A — memu-core'
+        if: always()
+        run: |
+          bash scripts/security/collect_embedding_evidence.sh \
+            docker-compose.minimal.yml memu-core \
+            "$PWD/scripts/security/probe_embedding_backend.py"
+
+      # ci-toleration: documented-skip
+      - name: 'Claim A — agentic'
+        if: always()
+        run: |
+          bash scripts/security/collect_embedding_evidence.sh \
+            docker-compose.minimal.yml agentic \
+            "$PWD/scripts/security/probe_embedding_backend.py"
+
+      # ci-toleration: documented-skip
+      - name: 'Claim A — fusion-engine'
+        if: always()
+        run: |
+          bash scripts/security/collect_embedding_evidence.sh \
+            docker-compose.full.yml fusion-engine \
+            "$PWD/scripts/security/probe_embedding_backend.py"
+
+      # ── CLAIM B ──────────────────────────────────────────────────────
+      # ci-toleration: documented-skip
+      - name: 'Claim B — does memu-core reach that backend on its production default?'
+        # `always()` for the same reason the collectors carry it: in run
+        # #2 an incomplete Claim A failed its step and GitHub skipped
+        # this one, so an independent measurement was lost to a verdict
+        # about a different claim. If the build above failed, this
+        # records NO_OBSERVATION — which is the vocabulary's word for
+        # "we did not look", and is deliberately not FAKE and not FAIL.
+        # Infrastructure failure is not embedding failure.
+        if: always()
+        # Declared HERE rather than exported inside `run:`. An export in
+        # the script works at runtime but is invisible to
+        # check_compose_env, which reads step `env:` — and a checker that
+        # cannot see a connection cannot vouch for it. The gate caught
+        # this and was right to: the previous version would have run with
+        # a blank DB_PASSWORD, postgres would have refused to start, and
+        # Claim B would have reported NO_OBSERVATION for a reason that
+        # had nothing to do with embeddings.
+        #
+        # NOTE the deliberate absence of MEMU_ALLOW_FAKE_EMBEDDINGS.
+        env:
+          # DB_PASSWORD only. POSTGRES_PASSWORD was here and the gate
+          # removed it: docker-compose.minimal.yml never references that
+          # name, so setting it configures nothing while looking like it
+          # does — the same shape as MEMU_ALLOW_FAKE_EMBEDDINGS being set
+          # by four CI steps for months and reaching no container.
+          DB_PASSWORD: ${{ env.DB_PASSWORD }}
+        run: |
+          # No MEMU_ALLOW_FAKE_EMBEDDINGS anywhere: compose must resolve
+          # ${MEMU_ALLOW_FAKE_EMBEDDINGS:-false} from nothing.
+          if docker compose -f docker-compose.minimal.yml up -d memu-core \
+            > claim-b-bringup.log 2>&1
+          then up_rc=0; else up_rc=$?; fi
+          echo "compose up exit: $up_rc"
+
+          # Corroboration only — a resolved variable is not a vector.
+          echo "::group::resolved container environment (corroboration)"
+          docker compose -f docker-compose.minimal.yml exec -T memu-core \
+            printenv MEMU_ALLOW_FAKE_EMBEDDINGS || echo "(unset in container)"
+          echo "::endgroup::"
+
+          # THE AUTHORITY: the width memu-core's own module produces,
+          # inside the running service container, under the environment
+          # the service actually resolved. Written to a file first so the
+          # exit status belongs to the measurement.
+          producer=application
+          if timeout 300 docker compose -f docker-compose.minimal.yml exec -T memu-core \
+            python -c "import sys; sys.path.insert(0,'/app'); from app import generate_embedding; print(len(generate_embedding('claim B probe')))" \
+            > claim-b-width.log 2>&1
+          then rc=0; else rc=$?; fi
+          if [ "$rc" -eq 124 ]; then producer=timeout-wrapper; fi
+
+          echo "::group::Claim B — memu-core application path (exit $rc)"
+          cat claim-b-width.log
+          echo "::endgroup::"
+
+          width=$(tail -1 claim-b-width.log | tr -dc '0-9')
+          if [ "$producer" != "application" ]; then
+            echo "memu-core claim-B: TIMEOUT_UNKNOWN (producer=$producer) — the wrapper stopped it, so nothing was measured" \
+              | tee -a claim-b-summary.txt
+          elif [ "$rc" -ne 0 ] || [ -z "$width" ]; then
+            echo "memu-core claim-B: NO_OBSERVATION — nothing was produced" \
+              | tee -a claim-b-summary.txt
+          elif [ "$width" = "384" ]; then
+            echo "memu-core claim-B: REAL (384) — production default reaches the real backend" \
+              | tee -a claim-b-summary.txt
+          elif [ "$width" = "8" ]; then
+            echo "memu-core claim-B: FAKE (8) — the service degraded despite the default" \
+              | tee -a claim-b-summary.txt
+          else
+            echo "memu-core claim-B: WRONG_DIMENSION ($width)" \
+              | tee -a claim-b-summary.txt
+          fi
+
+          echo "::group::memu-core startup log (corroboration)"
+          docker compose -f docker-compose.minimal.yml logs memu-core | tail -40
+          echo "::endgroup::"
+          docker compose -f docker-compose.minimal.yml down -v || true
+          exit 0
+
+      # ci-toleration: documented-skip
+      # ── THE AGGREGATOR — the ONLY step that judges completeness ──────
+      - name: Evidence summary
+        if: always()
+        run: |
+          echo "commit ${GITHUB_SHA}"
+          echo
+          echo "CLAIM A — image capability:"
+          cat claim-a-summary.txt 2>/dev/null || echo "  (not executed = UNKNOWN)"
+          echo
+          echo "CLAIM B — production-default service path:"
+          cat claim-b-summary.txt 2>/dev/null || echo "  (not executed = UNKNOWN)"
+          echo
+
+          # `grep -c` EXITS 1 ON ZERO MATCHES and still prints "0", so
+          # `$(grep -c … || echo 0)` yields the two-line string "0\n0"
+          # and every later `[ "$n" -ge 3 ]` dies with a syntax error —
+          # an arithmetic accident deciding a completeness verdict. `||
+          # true` keeps grep's own count and supplies nothing of its own;
+          # the empty case (file absent, exit 2, no stdout) defaults
+          # separately.
+          count() {
+            local n
+            n=$(grep -c "$1" "$2" 2>/dev/null || true)
+            printf '%s' "${n:-0}"
+          }
+          # Two axes, counted separately, because a service that WAS
+          # interrogated and turned out to be FAKE is complete evidence,
+          # while one whose image could not be resolved is not evidence
+          # at all. Collapsing them would let "we could not look" and
+          # "we looked and it was absent" produce the same number.
+          a_rows=$(count 'claim-A: ' claim-a-summary.txt)
+          a_ok=$(count 'measurement=COMPLETE' claim-a-summary.txt)
+          b_ok=$(count 'claim-B:' claim-b-summary.txt)
+
+          # WORKFLOW STATUS IS NOT EVIDENCE STATUS. Run #1 completed
+          # successfully while three intended measurements never ran, and
+          # the green tick said nothing about that. These are reported as
+          # two different things so a tick can never be read as "all
+          # embedding claims passed".
+          echo "steps executed:      all measurement steps ran to completion"
+          echo "Claim A attempted:   $a_rows of 3 services"
+          echo "Claim A measured:    $a_ok of 3 services (the rest are UNKNOWN)"
+          echo "Claim B measured:    $b_ok of 1"
+          echo
+          echo "A cannot satisfy B. B may entail A where B exercises the same"
+          echo "image capability. Probe EXECUTION, not loop iteration, creates"
+          echo "a Claim-A verdict. Missing observation = UNKNOWN. Infrastructure"
+          echo "failure is not embedding failure. Vector width decides; logs"
+          echo "corroborate."
+          echo
+
+          # THE ONLY COMPLETENESS JUDGEMENT IN THE JOB, and it is last on
+          # purpose: everything above has already been collected and
+          # printed, and the artifact upload after it runs `if: always()`,
+          # so failing here suppresses no measurement. This is a verdict
+          # about whether the EVIDENCE SET is complete — never about what
+          # the evidence says. A FAKE verdict passes this check; an
+          # unresolved image does not.
+          if [ "$a_ok" -ge 3 ] && [ "$b_ok" -ge 1 ]; then
+            echo "EVIDENCE SET: COMPLETE — 3 Claim-A measurements + 1 Claim-B"
+            exit 0
+          fi
+          echo "EVIDENCE SET: INCOMPLETE. The unmeasured services are UNKNOWN,"
+          echo "which is neither a pass nor an embedding failure. The failing"
+          echo "resolution stage for each is recorded in claim-a-*.evidence."
+          exit 1
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: embedding-backend-evidence
+          path: |
+            claim-a-*.evidence
+            claim-a-*.log
+            claim-a-summary.txt
+            claim-b-*.log
+            claim-b-summary.txt
+          if-no-files-found: warn

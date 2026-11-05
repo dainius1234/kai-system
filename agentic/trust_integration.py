@@ -115,6 +115,12 @@ def _get_ohana():
 _FAIL_CLOSED_CAPABILITIES = frozenset({
     "paper_trade_open",
     "paper_trade_close",
+    # Proactive observer (handoff entry 387): fail closed when authority
+    # cannot be established.
+    "proactive_observation",
+    "proactive_memory_write",
+    "proactive_notification",
+    "proactive_state_change",
 })
 
 
@@ -185,7 +191,13 @@ def gate_autonomous_action(
     # ── 1. Trust level check ─────────────────────────────────────────────────
     try:
         trust = _get_trust_core()
-        if trust is not None:
+        if trust is None and fail_closed:
+            # A trust core that could not be loaded is unavailable authority,
+            # not permission. (Before 2026-11-05 this path skipped the check
+            # and allowed even fail-closed capabilities.)
+            allowed = False
+            reason = f"trust core unavailable (fail-closed for {capability})"
+        elif trust is not None:
             if not trust.can_do(capability):
                 allowed = False
                 reason = f"trust level {trust.level_name} insufficient for {capability}"

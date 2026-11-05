@@ -27,7 +27,7 @@ def generate_invoice_file(path: str, income: float, vat_applied: bool) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate a simple invoice and check VAT eligibility.")
     parser.add_argument("--income", type=float, help="Total income", default=float(os.getenv("CURRENT_INCOME", "0")))
-    parser.add_argument("--threshold", type=float, help="VAT threshold", default=float(os.getenv("VAT_THRESHOLD", "85000")))
+    parser.add_argument("--threshold", type=float, help="VAT threshold", default=float(os.getenv("VAT_THRESHOLD", "90000")))
     parser.add_argument("--output", help="Output file path", default="invoice.pdf")
     args = parser.parse_args()
 

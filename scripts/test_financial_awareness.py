@@ -267,5 +267,31 @@ class TestFinanceSummary(unittest.TestCase):
         self.assertIn("tax", data)
 
 
+class TestVatThresholdDefault(unittest.TestCase):
+    def test_default_is_current_hmrc_threshold(self):
+        # HMRC VAT registration threshold is £90,000 (checked 2026-11-04).
+        if "VAT_THRESHOLD" in os.environ:
+            self.skipTest("VAT_THRESHOLD set in the environment")
+        self.assertEqual(_app_module.VAT_THRESHOLD, 90000.0)
+
+
+class TestTaxYearStart(unittest.TestCase):
+    """UK tax year starts 6 April. Expected dates come from that rule, not the code."""
+
+    def test_boundaries(self):
+        from datetime import date
+        f = _app_module._tax_year_start
+        cases = [
+            (date(2026, 4, 5), date(2025, 4, 6)),    # day before: previous year
+            (date(2026, 4, 6), date(2026, 4, 6)),    # first day
+            (date(2026, 5, 1), date(2026, 4, 6)),    # the old bug: day < 6 after April
+            (date(2026, 12, 3), date(2026, 4, 6)),
+            (date(2027, 1, 15), date(2026, 4, 6)),   # Jan-Mar: previous year
+            (date(2027, 3, 31), date(2026, 4, 6)),
+        ]
+        for today, expected in cases:
+            self.assertEqual(f(today), expected, today)
+
+
 if __name__ == "__main__":
     unittest.main()

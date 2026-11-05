@@ -10,7 +10,7 @@ import uuid
 from collections import Counter, deque
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Deque, Dict, List, Optional
+from typing import Any, Deque, Dict, List, Optional, Tuple
 
 import httpx
 from fastapi import Depends, FastAPI, HTTPException, Request
@@ -754,7 +754,8 @@ async def introspect_capabilities() -> Dict[str, Any]:
         "sensory_services": list(pings),
         "reachable_count": sum(1 for p in pings if p["reachable"]),
         "unreachable_count": sum(1 for p in pings if not p["reachable"]),
-        "skills": [{"name": s.name} for s in skills],
+        # list_skills() returns dicts (router.py), not Skill objects
+        "skills": [{"name": s["name"]} for s in skills],
         "skill_count": len(skills),
         "feature_flags": {f["flag"]: f["enabled"] for f in get_all_flags()},
         "baselines_tracked": list(_sensor_baselines.keys()),
@@ -1560,9 +1561,13 @@ async def _recall_memories(query: str, top_k: int = 5) -> List[str]:
     memories = []
     for r in records:
         content = r.get("content", {})
-        text = content.get("text", "") or content.get("query", "")
+        if not isinstance(content, dict):
+            content = {"result": str(content)}
+        # memu-core stores the memory text under "result" (memu-core/app.py
+        # memorize); "text"/"query" are kept for older writers.
+        text = content.get("result", "") or content.get("text", "") or content.get("query", "")
         if text:
-            memories.append(text)
+            memories.append(str(text))
     return memories
 
 
@@ -1599,7 +1604,8 @@ async def _sync_letta_memories() -> None:
             for mem in export.json().get("memories", [])[:50]:
                 await client.post(
                     f"{MEMU_URL}/memory/memorize",
-                    json={"content": mem, "category": "letta_archival"},
+                    json={"timestamp": datetime.now(timezone.utc).isoformat(), "event_type": "letta_archival",
+                          "result_raw": str(mem), "category": "letta_archival"},
                 )
     except Exception as _exc:
         record_degradation("letta", "sync_letta_memories", _exc)
@@ -1915,15 +1921,15 @@ def _update_baseline(key: str, value: float) -> Optional[float]:
     return z
 
 
-def _correlate_observations(obs: List[str]) -> List[str]:
-    """D88 M3: reason across multiple simultaneous sensor observations.
+def _correlate_with_edges(obs: List[str]) -> Tuple[List[str], List[tuple]]:
+    """D88 M3: reason across simultaneous observations. PURE — no side effects.
 
-    Correlations are also fed into the D101 CausalGraph as Phase 0 observations —
-    even as stubs, each observed co-occurrence strengthens a causal edge so the
-    graph has calibrated weights when Phase 3 activates.
+    Returns (correlation sentences, causal edges). The edges used to be
+    written into the D101 CausalGraph from here; that write is now a
+    proposed effect applied only in governed mode (_apply_observer_effects).
     """
     if len(obs) < 2:
-        return []
+        return [], []
     correlated: List[str] = []
     has_cpu = any("CPU" in o and "%" in o for o in obs)
     has_docker_bad = any("Docker:" in o and "unhealthy" in o for o in obs)
@@ -1959,21 +1965,12 @@ def _correlate_observations(obs: List[str]) -> List[str]:
             "Correlation: poor air quality + email backlog — suggest outdoor break once clear to avoid cognitive fatigue"
         )
         causal_edges.append(("aq_degraded", "cognitive_fatigue_risk", 0.45, "environmental correlation"))
+    return correlated, causal_edges
 
-    # D101: feed correlations into CausalGraph as Phase 0 observations
-    if causal_edges and is_enabled("CAUSAL_WORLD_MODEL"):
-        try:
-            graph = get_causal_graph()
-            for source, target, strength, note in causal_edges:
-                graph.add_edge(CausalEdge(
-                    source=source, target=target,
-                    strength=strength, source_type="observed",
-                    note=note,
-                ))
-        except Exception as _exc:
-            record_degradation("cognition", "causal_graph_edge", _exc)
 
-    return correlated
+def _correlate_observations(obs: List[str]) -> List[str]:
+    """D88 M3 correlation sentences only (pure; see _correlate_with_edges)."""
+    return _correlate_with_edges(obs)[0]
 
 
 def _classify_obs_type(o: str) -> str:
@@ -1995,7 +1992,11 @@ def _classify_obs_type(o: str) -> str:
 
 
 def _detect_sensor_patterns(current_obs: List[str]) -> List[str]:
-    """D88 M5 / D89 C5: detect recurring sensor types; propose rituals at ≥7/10 cycles."""
+    """D88 M5: detect recurring sensor types across recent cycles. PURE.
+
+    Ritual proposals (D89 C5) are no longer written from here; see
+    _ritual_candidates and the governed effect path.
+    """
     if not is_enabled("SENSORY_LEARNING"):
         return []
 
@@ -2010,11 +2011,22 @@ def _detect_sensor_patterns(current_obs: List[str]) -> List[str]:
             patterns.append(
                 f"Recurring pattern: {obs_type} has appeared in {count}/10 recent observation cycles — this is becoming a persistent issue"
             )
-        # D89 C5: ritual discovery — propose at ≥7/10 cycles
-        if count >= 7 and is_enabled("RITUAL_DISCOVERY") and obs_type not in _proposed_rituals:
-            _proposed_rituals.add(obs_type)
-            _cleanup_mgr.submit(_propose_ritual(obs_type, count))
     return patterns
+
+
+def _ritual_candidates(current_obs: List[str]) -> List[Tuple[str, int]]:
+    """D89 C5: (pattern type, count) pairs that qualify for a ritual proposal. PURE."""
+    if not (is_enabled("SENSORY_LEARNING") and is_enabled("RITUAL_DISCOVERY")):
+        return []
+    out: List[Tuple[str, int]] = []
+    for obs_type in sorted({_classify_obs_type(o) for o in current_obs}):
+        count = sum(
+            1 for hist in _observation_history
+            if any(obs_type == _classify_obs_type(o) for o in hist)
+        )
+        if count >= 7 and obs_type not in _proposed_rituals:
+            out.append((obs_type, count))
+    return out
 
 
 async def _propose_ritual(obs_type: str, count: int) -> None:
@@ -2043,298 +2055,291 @@ async def _propose_ritual(obs_type: str, count: int) -> None:
         logger.debug("Could not write ritual proposal: %s", exc)
 
 
-async def _proactive_observer() -> None:
-    """Proactive awareness loop — D87 + D88 cognitive mechanisms.
+# ── Proactive observer: read-only observation, governed effects ──────────
+# Dainius, 2026-11-05 (handoff entry 387): separate safe observation and
+# analysis from memory writes, notifications and actions. In the default
+# SHADOW mode a cycle only reads sensors and analyses; everything it would
+# change is recorded as a proposed effect. The effect code is preserved in
+# _apply_observer_effects and runs only in KAI_OBSERVER_MODE=governed, each
+# effect behind its own fail-closed capability (no trust level is assigned
+# to those yet, so they default to GUARDIAN).
+OBSERVER_MODE_ENV = "KAI_OBSERVER_MODE"
+OBSERVER_EFFECT_CAPABILITY = {
+    "memory_write": "proactive_memory_write",
+    "house_doctor_diagnose": "proactive_notification",  # house-doctor may notify
+    "ritual_proposal": "proactive_state_change",
+    "causal_edges": "proactive_state_change",
+    "workspace_bids": "proactive_state_change",
+    "curiosity_tick": "proactive_state_change",
+    "service_watchdog": "proactive_state_change",
+    "paper_position_marking": "proactive_state_change",
+}
+_observer_shadow_log: Deque[Dict[str, Any]] = deque(maxlen=20)
 
-    Runs every PROACTIVE_INTERVAL seconds (default 300s). Implements:
-    - D87 Layer 3: baseline anomaly detection, docker/email/AQ/git/system probes
-    - D88 M1: rolling baseline z-score anomaly alerts
-    - D88 M3: cross-service correlation reasoning
-    - D88 M4: structured world_state persistence to memu-core
-    - D88 M5: sensory pattern detection across 10 recent cycles
-    - D88 M7: proactive scheduling (calendar + sensor fusion)
-    Gated by FF_PROACTIVE_AGENT (default True).
-    """
+
+def _observer_mode() -> str:
+    """'governed' only when explicitly set; anything else is shadow."""
+    return "governed" if os.getenv(OBSERVER_MODE_ENV, "shadow").strip().lower() == "governed" else "shadow"
+
+
+async def _observe_world() -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
+    """Read-only sensing: HTTP GETs only. Returns (snapshot, recent diagnoses)."""
+    snapshot: Dict[str, Any] = {}
+    recent_dx: List[Dict[str, Any]] = []
+    if is_enabled("HOUSE_DOCTOR"):
+        try:
+            async with pooled_client(timeout=3.0) as client:
+                hd_resp = await client.get(f"{HOUSE_DOCTOR_URL}/diagnoses/recent", params={"limit": 3})
+                if hd_resp.status_code == 200:
+                    recent_dx = list(hd_resp.json().get("diagnoses", []))
+        except Exception as _exc:
+            record_degradation("house_doctor", "read_recent_diagnoses", _exc)
+
+    async def _probe(key: str, base: str, path: str) -> None:
+        try:
+            async with pooled_client(timeout=3.0) as client:
+                r = await client.get(f"{base}{path}")
+                if r.status_code == 200:
+                    snapshot[key] = r.json()
+        except Exception as _exc:
+            record_degradation(key, "world_snapshot_probe", _exc)
+
+    await asyncio.gather(
+        _probe("docker", DOCKER_WATCHER_URL, "/unhealthy"),
+        _probe("email", EMAIL_READER_URL, "/unread"),
+        _probe("aq", AIRQUALITY_URL, "/current"),
+        _probe("git", GIT_WATCHER_URL, "/dirty"),
+        _probe("sys", SYSMETRICS_URL, "/snapshot"),
+        _probe("cal", CALENDAR_URL, "/summary"),
+    )
+    return snapshot, recent_dx
+
+
+def _analyse_cycle(
+    snapshot: Dict[str, Any],
+    prev_snapshot: Dict[str, Any],
+    recent_dx: List[Dict[str, Any]],
+) -> Dict[str, Any]:
+    """Analyse one observation cycle. Changes only the observer's own
+    in-process analysis memory (rolling baselines); performs no I/O and
+    changes no shared state. Returns the cycle with its proposed effects."""
+    observations: List[str] = []
+    for dx in recent_dx:
+        sev = dx.get("severity", "")
+        diag = dx.get("primary_diagnosis", "")
+        if sev in ("WARNING", "CRITICAL") and diag:
+            observations.append(f"[recent dx/{sev}] {diag}")
+
+    docker = snapshot.get("docker", {}) or {}
+    unhealthy = docker.get("count", 0)
+    if unhealthy > 0:
+        names = [c.get("name", "?") for c in (docker.get("containers") or [])[:3]]
+        observations.append(f"Docker: {unhealthy} unhealthy container(s) — {', '.join(names)}")
+
+    email = snapshot.get("email", {}) or {}
+    unread_now = email.get("count", 0)
+    unread_prev = (prev_snapshot.get("email") or {}).get("count", 0)
+    if unread_now > 0 and unread_now != unread_prev:
+        observations.append(f"Email: {unread_now} unread message(s) (was {unread_prev})")
+
+    aq = snapshot.get("aq", {}) or {}
+    aqi_cat = aq.get("aqi_category", "")
+    if aqi_cat in ("unhealthy", "very unhealthy", "hazardous"):
+        observations.append(f"Air quality: {aqi_cat} (PM2.5 {aq.get('pm2_5_ugm3')} µg/m³)")
+
+    git = snapshot.get("git", {}) or {}
+    dirty = git.get("count", 0)
+    if dirty > 0:
+        observations.append(f"Git: {dirty} repo(s) with uncommitted changes")
+
+    sys_data = snapshot.get("sys", {}) or {}
+    cpu = float(sys_data.get("cpu_percent", 0))
+    ram = float((sys_data.get("memory") or {}).get("percent", 0))
+    if cpu > 85:
+        observations.append(f"System: CPU at {cpu:.0f}% — possible runaway process")
+    if ram > 90:
+        observations.append(f"System: RAM at {ram:.0f}% — memory pressure")
+
+    if is_enabled("ANOMALY_DETECTION"):
+        for metric_key, value in [("cpu", cpu), ("ram", ram), ("email_unread", float(unread_now)), ("docker_unhealthy", float(unhealthy))]:
+            z = _update_baseline(metric_key, value)
+            if z is not None and abs(z) > 2.0:
+                observations.append(
+                    f"Anomaly ({metric_key}): current={value:.1f} deviates {z:+.1f}σ from recent baseline"
+                )
+
+    correlated, causal_edges = _correlate_with_edges(observations)
+    observations.extend(correlated)
+
+    effects: List[Dict[str, Any]] = []
+    ts_now = datetime.now(timezone.utc).isoformat()
+
+    def _memory(event_type: str, text: str) -> None:
+        effects.append({"kind": "memory_write", "payload": {
+            "timestamp": ts_now, "event_type": event_type, "result_raw": text,
+            "category": event_type, "user_id": "keeper"}})
+
+    if is_enabled("PROACTIVE_SCHEDULING"):
+        cal_summary = snapshot.get("cal", {}) or {}
+        minutes_to_next = cal_summary.get("minutes_until_next")
+        next_event = cal_summary.get("next_event", "")
+        if next_event and minutes_to_next is not None and 0 < int(minutes_to_next) <= 30:
+            parts = [f"Event in {minutes_to_next} min: {next_event}"]
+            if aqi_cat in ("unhealthy", "very unhealthy", "hazardous"):
+                parts.append("air quality is poor — consider indoor location")
+            if cpu > 85:
+                parts.append("CPU is high — close heavy apps before starting")
+            if dirty > 0:
+                parts.append("you have uncommitted changes — commit first if possible")
+            _memory("proactive_schedule", "Proactive schedule: " + "; ".join(parts))
+
+    if observations:
+        _memory("proactive_observation", "Proactive observation: " + "; ".join(observations))
+
+    patterns = _detect_sensor_patterns(observations)
+    if patterns:
+        _memory("sensor_pattern", "; ".join(patterns))
+    for obs_type, count in _ritual_candidates(observations):
+        effects.append({"kind": "ritual_proposal", "payload": {"obs_type": obs_type, "count": count}})
+
+    world_model: Optional[Dict[str, Any]] = None
+    if is_enabled("WORLD_MODEL_PERSISTENCE"):
+        def _prov(value: Any, source: str, confidence: float = 1.0) -> Dict[str, Any]:
+            return {"value": value, "source": source, "timestamp": ts_now, "confidence": confidence}
+        world_model = {
+            "timestamp": ts_now,
+            "fsm_state": fsm_state().value,
+            "docker_unhealthy": _prov(unhealthy, "docker-watcher"),
+            "email_unread": _prov(unread_now, "email-reader"),
+            "cpu_percent": _prov(cpu, "sysmetrics"),
+            "ram_percent": _prov(ram, "sysmetrics"),
+            "aqi_category": _prov(aqi_cat or "unknown", "airquality-service", 0.9 if aqi_cat else 0.3),
+            "git_dirty_count": _prov(dirty, "git-watcher"),
+            "calendar_next": _prov((snapshot.get("cal", {}) or {}).get("next_event", ""), "calendar-service", 0.8),
+            "emotional_context": {"indicators": [], "predicted_mood": None,
+                                  "confidence": 0.0, "note": "stub_pending_emotional_memory"},
+        }
+        _memory("world_state", json.dumps(world_model))
+
+    if is_enabled("HOUSE_DOCTOR") and observations:
+        payload: Dict[str, Any] = {"observations": list(observations)}
+        if world_model is not None:
+            payload["world_state"] = world_model
+        effects.append({"kind": "house_doctor_diagnose", "payload": payload})
+    if causal_edges and is_enabled("CAUSAL_WORLD_MODEL"):
+        effects.append({"kind": "causal_edges", "payload": {"edges": causal_edges}})
+    if is_enabled("GLOBAL_WORKSPACE"):
+        effects.append({"kind": "workspace_bids", "payload": {"observations": observations[:3]}})
+    if is_enabled("CURIOSITY"):
+        effects.append({"kind": "curiosity_tick", "payload": {}})
+    if is_enabled("SERVICE_WATCHDOG"):
+        effects.append({"kind": "service_watchdog", "payload": {}})
+    if is_enabled("MARKET_DATA"):
+        effects.append({"kind": "paper_position_marking", "payload": {}})
+
+    return {"timestamp": ts_now, "observations": observations, "correlations": correlated,
+            "patterns": patterns, "proposed_effects": effects}
+
+
+async def _apply_observer_effects(cycle: Dict[str, Any]) -> Dict[str, List[str]]:
+    """GOVERNED mode only: apply proposed effects, each behind its own
+    fail-closed capability. Returns {"applied": [...], "refused": [...]}."""
+    applied: List[str] = []
+    refused: List[str] = []
+    for effect in cycle.get("proposed_effects", []):
+        kind = effect["kind"]
+        capability = OBSERVER_EFFECT_CAPABILITY.get(kind)
+        allowed, reason = (False, "unknown effect") if capability is None else gate_autonomous_action(
+            capability, {"trigger": "proactive_observer", "effect": kind}, conviction=6.0)
+        if not allowed:
+            refused.append(f"{kind}: {reason}")
+            continue
+        payload = effect.get("payload", {})
+        try:
+            if kind == "memory_write":
+                async with pooled_client(timeout=5.0) as client:
+                    await client.post(f"{MEMU_URL}/memory/memorize", json=payload)
+            elif kind == "house_doctor_diagnose":
+                async with pooled_client(timeout=5.0) as client:
+                    await client.post(f"{HOUSE_DOCTOR_URL}/diagnose", json=payload)
+            elif kind == "ritual_proposal":
+                _proposed_rituals.add(payload["obs_type"])
+                _cleanup_mgr.submit(_propose_ritual(payload["obs_type"], payload["count"]))
+            elif kind == "causal_edges":
+                graph = get_causal_graph()
+                for source, target, strength, note in payload["edges"]:
+                    graph.add_edge(CausalEdge(source=source, target=target, strength=strength,
+                                              source_type="observed", note=note))
+            elif kind == "workspace_bids":
+                workspace = get_global_workspace()
+                for obs in payload["observations"]:
+                    workspace.submit_bid(WorkspaceBid(module="proactive_observer", content=obs, urgency=0.4))
+                cortex_bid = get_cortex().bid_to_workspace()
+                if cortex_bid is not None:
+                    workspace.submit_bid(cortex_bid)
+            elif kind == "curiosity_tick":
+                _cleanup_mgr.submit(idle_curiosity_tick(_last_world_snapshot, is_gpu_available=False))
+            elif kind == "service_watchdog":
+                _, fsm_events = await asyncio.to_thread(get_watchdog().check_all)
+                for evt_name in fsm_events:
+                    await fsm_fire(SysEvent(evt_name))
+            elif kind == "paper_position_marking":
+                await asyncio.to_thread(_mark_paper_positions)
+            applied.append(kind)
+        except Exception as exc:
+            record_degradation("observer", f"effect_{kind}", exc)
+            refused.append(f"{kind}: error {exc}")
+    return {"applied": applied, "refused": refused}
+
+
+async def _observer_cycle() -> Optional[Dict[str, Any]]:
+    """One gated cycle. Returns the cycle, or None when the gate refuses."""
     global _last_world_snapshot
+    allowed, reason = gate_autonomous_action(
+        "proactive_observation", {"trigger": "scheduled_loop", "mode": "read_only"}, conviction=6.0
+    )
+    if not allowed:
+        logger.info("Proactive observer suppressed by trust gate: %s", reason)
+        return None
+    snapshot, recent_dx = await _observe_world()
+    cycle = _analyse_cycle(snapshot, _last_world_snapshot, recent_dx)
+
+    # D101 surprise detection reads and logs only.
+    if is_enabled("CAUSAL_SURPRISE") and _last_world_snapshot and is_enabled("CAUSAL_WORLD_MODEL"):
+        try:
+            surprise = get_surprise_detector().check(predicted=_last_world_snapshot, actual=snapshot)
+            if surprise and surprise.get("surprised"):
+                logger.info("D101 surprise detected: %s", surprise.get("reason", ""))
+        except Exception as _exc:
+            record_degradation("cognition", "surprise_detector", _exc)
+
+    mode = _observer_mode()
+    cycle["mode"] = mode
+    if mode == "governed":
+        cycle["effects_result"] = await _apply_observer_effects(cycle)
+    else:
+        cycle["effects_result"] = {"applied": [], "refused": [], "shadow": [
+            e["kind"] for e in cycle["proposed_effects"]]}
+    _observer_shadow_log.append(cycle)
+    _observation_history.append(list(cycle["observations"]))
+    _last_world_snapshot = snapshot
+    logger.info("Proactive observer (%s): %d observation(s), proposed effects: %s",
+                mode, len(cycle["observations"]),
+                [e["kind"] for e in cycle["proposed_effects"]])
+    return cycle
+
+
+async def _proactive_observer() -> None:
+    """Proactive awareness loop (D87/D88). Every PROACTIVE_INTERVAL seconds,
+    gated by FF_PROACTIVE_AGENT. See _observer_cycle for the shadow/governed
+    split (handoff entry 387)."""
     await asyncio.sleep(90)  # let services start up before first probe
     while True:
-        if not is_enabled("PROACTIVE_AGENT"):
-            await asyncio.sleep(PROACTIVE_INTERVAL)
-            continue
-        _allowed, _reason = gate_autonomous_action(
-            "proactive_observation", {"trigger": "scheduled_loop"}, conviction=6.0
-        )
-        if not _allowed:
-            logger.info("Proactive observer suppressed by trust gate: %s", _reason)
-            await asyncio.sleep(PROACTIVE_INTERVAL)
-            continue
-        try:
-            observations: List[str] = []
-            snapshot: Dict[str, Any] = {}
-
-            # Pull recent health history from house-doctor ring buffer so the
-            # observer carries forward diagnoses without re-sending observations.
-            if is_enabled("HOUSE_DOCTOR"):
-                try:
-                    async with pooled_client(timeout=3.0) as client:
-                        hd_resp = await client.get(f"{HOUSE_DOCTOR_URL}/diagnoses/recent", params={"limit": 3})
-                        if hd_resp.status_code == 200:
-                            recent_dx = hd_resp.json().get("diagnoses", [])
-                            for dx in recent_dx:
-                                sev = dx.get("severity", "")
-                                diag = dx.get("primary_diagnosis", "")
-                                if sev in ("WARNING", "CRITICAL") and diag:
-                                    observations.append(f"[recent dx/{sev}] {diag}")
-                except Exception as _exc:
-                    record_degradation("house_doctor", "read_recent_diagnoses", _exc)
-
-            async def _probe(key: str, base: str, path: str) -> None:
-                try:
-                    async with pooled_client(timeout=3.0) as client:
-                        r = await client.get(f"{base}{path}")
-                        if r.status_code == 200:
-                            snapshot[key] = r.json()
-                except Exception as _exc:
-                    record_degradation(key, "world_snapshot_probe", _exc)
-
-            await asyncio.gather(
-                _probe("docker", DOCKER_WATCHER_URL, "/unhealthy"),
-                _probe("email", EMAIL_READER_URL, "/unread"),
-                _probe("aq", AIRQUALITY_URL, "/current"),
-                _probe("git", GIT_WATCHER_URL, "/dirty"),
-                _probe("sys", SYSMETRICS_URL, "/snapshot"),
-                _probe("cal", CALENDAR_URL, "/summary"),
-            )
-
-            # Docker health
-            docker = snapshot.get("docker", {})
-            unhealthy = docker.get("count", 0)
-            if unhealthy > 0:
-                names = [c.get("name", "?") for c in (docker.get("containers") or [])[:3]]
-                observations.append(
-                    f"Docker: {unhealthy} unhealthy container(s) — {', '.join(names)}"
-                )
-
-            # Email delta
-            email = snapshot.get("email", {})
-            unread_now = email.get("count", 0)
-            unread_prev = (_last_world_snapshot.get("email") or {}).get("count", 0)
-            if unread_now > 0 and unread_now != unread_prev:
-                observations.append(f"Email: {unread_now} unread message(s) (was {unread_prev})")
-
-            # Air quality warning
-            aq = snapshot.get("aq", {})
-            aqi_cat = aq.get("aqi_category", "")
-            if aqi_cat in ("unhealthy", "very unhealthy", "hazardous"):
-                pm = aq.get("pm2_5_ugm3")
-                observations.append(f"Air quality: {aqi_cat} (PM2.5 {pm} µg/m³)")
-
-            # Git dirty repos
-            git = snapshot.get("git", {})
-            dirty = git.get("count", 0)
-            if dirty > 0:
-                observations.append(f"Git: {dirty} repo(s) with uncommitted changes")
-
-            # System resources
-            sys_data = snapshot.get("sys", {})
-            cpu = float(sys_data.get("cpu_percent", 0))
-            ram = float((sys_data.get("memory") or {}).get("percent", 0))
-            if cpu > 85:
-                observations.append(f"System: CPU at {cpu:.0f}% — possible runaway process")
-            if ram > 90:
-                observations.append(f"System: RAM at {ram:.0f}% — memory pressure")
-
-            # ── D88 M1: anomaly detection with rolling baselines ─────
-            if is_enabled("ANOMALY_DETECTION"):
-                for metric_key, value in [("cpu", cpu), ("ram", ram), ("email_unread", float(unread_now)), ("docker_unhealthy", float(unhealthy))]:
-                    z = _update_baseline(metric_key, value)
-                    if z is not None and abs(z) > 2.0:
-                        observations.append(
-                            f"Anomaly ({metric_key}): current={value:.1f} deviates {z:+.1f}σ from recent baseline"
-                        )
-
-            # ── D88 M3: cross-service correlation ───────────────────
-            correlated = _correlate_observations(observations)
-            observations.extend(correlated)
-
-            # ── D88 M7: proactive scheduling ─────────────────────────
-            if is_enabled("PROACTIVE_SCHEDULING"):
-                cal_summary = snapshot.get("cal", {})
-                cal_text = str(cal_summary.get("summary", ""))
-                minutes_to_next = cal_summary.get("minutes_until_next")
-                next_event = cal_summary.get("next_event", "")
-                if next_event and minutes_to_next is not None and 0 < int(minutes_to_next) <= 30:
-                    schedule_parts = [f"Event in {minutes_to_next} min: {next_event}"]
-                    if aqi_cat in ("unhealthy", "very unhealthy", "hazardous"):
-                        schedule_parts.append("air quality is poor — consider indoor location")
-                    if cpu > 85:
-                        schedule_parts.append("CPU is high — close heavy apps before starting")
-                    if dirty > 0:
-                        schedule_parts.append("you have uncommitted changes — commit first if possible")
-                    sched_text = "Proactive schedule: " + "; ".join(schedule_parts)
-                    try:
-                        async with pooled_client(timeout=5.0) as client:
-                            await client.post(
-                                f"{MEMU_URL}/memory/memorize",
-                                json={
-                                    "content": sched_text,
-                                    "category": "proactive_schedule",
-                                    "user_id": "keeper",
-                                },
-                            )
-                        logger.info("Proactive schedule: %s", sched_text)
-                    except Exception as _exc:
-                        record_degradation("memu", "observer_write_schedule", _exc)
-
-            # ── Main observation write ────────────────────────────────
-            if observations:
-                obs_text = "Proactive observation: " + "; ".join(observations)
-                try:
-                    async with pooled_client(timeout=5.0) as client:
-                        await client.post(
-                            f"{MEMU_URL}/memory/memorize",
-                            json={
-                                "content": obs_text,
-                                "category": "proactive_observation",
-                                "user_id": "keeper",
-                            },
-                        )
-                    logger.info("Proactive observer wrote: %s", obs_text)
-                except Exception as exc:
-                    logger.warning("Proactive memory write failed: %s", exc)
-
-            # ── D88 M5: update history + detect patterns ─────────────
-            _observation_history.append(list(observations))
-            patterns = _detect_sensor_patterns(observations)
-            if patterns:
-                pattern_text = "; ".join(patterns)
-                try:
-                    async with pooled_client(timeout=5.0) as client:
-                        await client.post(
-                            f"{MEMU_URL}/memory/memorize",
-                            json={
-                                "content": pattern_text,
-                                "category": "sensor_pattern",
-                                "user_id": "keeper",
-                            },
-                        )
-                    logger.info("Sensor pattern detected: %s", pattern_text)
-                except Exception as _exc:
-                    record_degradation("memu", "observer_write_pattern", _exc)
-
-            # ── D88 M4 / D89 C3: world model persistence with provenance ─
-            if is_enabled("WORLD_MODEL_PERSISTENCE"):
-                ts_now = datetime.now(timezone.utc).isoformat()
-
-                def _prov(value: Any, source: str, confidence: float = 1.0) -> Dict[str, Any]:
-                    return {"value": value, "source": source, "timestamp": ts_now, "confidence": confidence}
-                world_model = {
-                    "timestamp": ts_now,
-                    "fsm_state": fsm_state().value,
-                    "docker_unhealthy": _prov(unhealthy, "docker-watcher"),
-                    "email_unread": _prov(unread_now, "email-reader"),
-                    "cpu_percent": _prov(cpu, "sysmetrics"),
-                    "ram_percent": _prov(ram, "sysmetrics"),
-                    "aqi_category": _prov(aqi_cat or "unknown", "airquality-service", 0.9 if aqi_cat else 0.3),
-                    "git_dirty_count": _prov(dirty, "git-watcher"),
-                    "calendar_next": _prov(snapshot.get("cal", {}).get("next_event", ""), "calendar-service", 0.8),
-                    # D89/D: predictive empathy foundation — populated by emotional memory in Phase 1
-                    "emotional_context": {
-                        "indicators": [],
-                        "predicted_mood": None,
-                        "confidence": 0.0,
-                        "note": "stub_pending_emotional_memory",
-                    },
-                }
-                try:
-                    async with pooled_client(timeout=5.0) as client:
-                        await client.post(
-                            f"{MEMU_URL}/memory/memorize",
-                            json={
-                                "content": json.dumps(world_model),
-                                "category": "world_state",
-                                "user_id": "keeper",
-                            },
-                        )
-                except Exception as _exc:
-                    record_degradation("memu", "observer_write_world_state", _exc)
-
-            # ── D89 E: House Doctor — differential diagnosis ──────────
-            if is_enabled("HOUSE_DOCTOR") and observations:
-                try:
-                    async with pooled_client(timeout=5.0) as client:
-                        diag_payload: Dict[str, Any] = {"observations": observations}
-                        # Pass structured world_state so house-doctor can pattern-match
-                        # on real data instead of re-parsing observation strings
-                        if is_enabled("WORLD_MODEL_PERSISTENCE") and "world_model" in locals():
-                            diag_payload["world_state"] = world_model
-                        await client.post(f"{HOUSE_DOCTOR_URL}/diagnose", json=diag_payload)
-                except Exception as _exc:
-                    record_degradation("house_doctor", "request_diagnosis", _exc)
-
-            # ── D101: surprise detection — predicted vs actual world state ──
-            if is_enabled("CAUSAL_SURPRISE") and _last_world_snapshot and is_enabled("CAUSAL_WORLD_MODEL"):
-                try:
-                    detector = get_surprise_detector()
-                    surprise = detector.check(
-                        predicted=_last_world_snapshot,
-                        actual=snapshot,
-                    )
-                    if surprise and surprise.get("surprised"):
-                        logger.info("D101 surprise detected: %s", surprise.get("reason", ""))
-                except Exception as _exc:
-                    record_degradation("cognition", "surprise_detector", _exc)
-
-            # ── D102: submit anomaly bids to GlobalWorkspace ──────────
-            if is_enabled("GLOBAL_WORKSPACE") and observations:
-                try:
-                    workspace = get_global_workspace()
-                    for obs in observations[:3]:  # top 3 observations as bids
-                        workspace.submit_bid(WorkspaceBid(
-                            module="proactive_observer",
-                            content=obs,
-                            urgency=0.4,
-                        ))
-                except Exception as _exc:
-                    record_degradation("cognition", "workspace_bid_observer", _exc)
-
-            # ── D114: Cortex ambient baseline bid ─────────────────────
-            if is_enabled("GLOBAL_WORKSPACE"):
-                try:
-                    cortex_bid = get_cortex().bid_to_workspace()
-                    if cortex_bid is not None:
-                        get_global_workspace().submit_bid(cortex_bid)
-                except Exception as _exc:
-                    record_degradation("cognition", "workspace_bid_observer", _exc)
-
-            # ── D89 F: curiosity idle tick ────────────────────────────
-            if is_enabled("CURIOSITY"):
-                from system_fsm import KaiState
-                _cleanup_mgr.submit(
-                    idle_curiosity_tick(_last_world_snapshot, is_gpu_available=False)
-                )
-
-            # ── D124: Service Watchdog — fire FSM events on critical failures ──
-            if is_enabled("SERVICE_WATCHDOG"):
-                try:
-                    _, fsm_events = await asyncio.to_thread(get_watchdog().check_all)
-                    for evt_name in fsm_events:
-                        try:
-                            await fsm_fire(SysEvent(evt_name))
-                        except Exception as _exc:
-                            record_degradation("cognition", "fsm_fire", _exc)
-                except Exception as exc:
-                    logger.debug("Service watchdog check failed (non-critical): %s", exc)
-
-            if is_enabled("MARKET_DATA"):
-                try:
-                    await asyncio.to_thread(_mark_paper_positions)
-                except Exception as exc:
-                    logger.debug("Paper position marking failed (non-critical): %s", exc)
-
-            _last_world_snapshot = snapshot
-        except Exception as exc:
-            logger.warning("Proactive observer error: %s", exc)
+        if is_enabled("PROACTIVE_AGENT"):
+            try:
+                await _observer_cycle()
+            except Exception as exc:
+                logger.warning("Proactive observer error: %s", exc)
         await asyncio.sleep(PROACTIVE_INTERVAL)
 
 
@@ -2717,27 +2722,30 @@ async def chat_stream(req: ChatRequest):
     # feel the financial ground truth — CIS/VAT/tax, keyword-triggered
     if financial_context:
         fin_parts = []
-        cis = financial_context.get("cis_summary", {})
+        # Keys as returned by financial-awareness /finance/summary
+        # ({"cis", "vat", "tax"}); see financial-awareness/app.py.
+        cis = financial_context.get("cis", {})
         if cis:
             fin_parts.append(
-                f"CIS YTD: gross £{cis.get('total_gross', 0):.2f}, "
-                f"deductions £{cis.get('total_deductions', 0):.2f}, "
-                f"net £{cis.get('total_net', 0):.2f} "
+                f"CIS YTD: gross £{cis.get('gross_income_ytd', 0):.2f}, "
+                f"deductions £{cis.get('cis_deducted_ytd', 0):.2f}, "
+                f"net £{cis.get('net_received_ytd', 0):.2f} "
                 f"({cis.get('record_count', 0)} records)"
             )
-        vat = financial_context.get("vat_position", {})
+        vat = financial_context.get("vat", {})
         if vat:
             fin_parts.append(
-                f"VAT: rolling 12-month £{vat.get('rolling_12m_turnover', 0):.2f} "
-                f"(threshold £{vat.get('threshold', 85000):.0f}, "
-                f"must register: {vat.get('must_register', False)})"
+                f"VAT: rolling 12-month £{vat.get('rolling_12m_income', 0):.2f} "
+                f"(threshold £{vat.get('vat_threshold', 0):.0f}, "
+                f"must register: {not vat.get('below_threshold', True)})"
             )
-        tax = financial_context.get("tax_estimate", {})
+        tax = financial_context.get("tax", {})
         if tax:
             fin_parts.append(
-                f"Tax estimate: income tax £{tax.get('income_tax', 0):.2f}, "
-                f"Class 4 NI £{tax.get('class4_ni', 0):.2f}, "
-                f"total £{tax.get('total_liability', 0):.2f}"
+                f"Tax estimate: income tax £{tax.get('income_tax_estimate', 0):.2f}, "
+                f"Class 4 NI £{tax.get('class4_ni_estimate', 0):.2f}, "
+                f"total £{tax.get('total_tax_ni_estimate', 0):.2f}, "
+                f"balance after CIS £{tax.get('estimated_balance_due', 0):.2f}"
             )
         if fin_parts:
             messages.append({
@@ -2929,27 +2937,48 @@ async def chat_stream(req: ChatRequest):
             ("emotion", "/memory/emotion/record", {"session_id": session, "text": u_msg}),
             ("autobiography", "/memory/autobiography/record", {"text": u_msg, "context": "chat"}),
             ("thought", "/memory/imagine/thought", {"thought": thought, "context": "chat_reflection"}),
-            ("values", "/memory/values/learn", {"experience": u_msg[:300], "outcome": "positive", "context": "chat"}),
         ]:
             try:
                 await _memu_post(path, body, timeout=3.0)
             except Exception as e:
                 failed.append(f"{label}: {e}")
-        # D109: record decision so OhanaCore can learn the operator's situational stances
+        # P1.8 (Dainius, 2026-11-04, handoff entry 378): the chat path no
+        # longer (a) learns every operator message as a "positive" value, or
+        # (b) records Kai's own reply as the operator's decision in OhanaCore.
+        # Assistant text must never become operator truth (Kingsman K17).
+        # Value learning and decision recording from chat stay off until an
+        # operator-confirmed design exists; nothing else replaces them here.
+        # Cortex observe_turn — feeds context bridge and tacit knowledge
+        # accumulator. SIGNED: /observe_turn derives the turn's provenance
+        # from the key that signs this request, so `json=` would be wrong
+        # twice over — it re-serialises with its own separators, and the
+        # receiver hashes the bytes that arrive. signed_json_request
+        # returns the bytes and the headers together so the two halves
+        # cannot drift.
+        #
+        # This call previously carried NO credentials at all, not even the
+        # shared token, so every one of them had been 401'd since
+        # /observe_turn was authenticated — and the failure was swallowed
+        # into record_degradation, which is why nothing said so.
         try:
-            get_ohana_core().record_decision(
-                situation={"query": u_msg[:200], "mode": mode, "session_id": session},
-                decision=response[:300],
-            )
-        except Exception as e:
-            failed.append(f"ohana: {e}")
-        # Cortex observe_turn — feeds context bridge and tacit knowledge accumulator
-        try:
+            from common.service_identity import signed_json_request
+            from urllib.parse import urlparse
+            raw, headers = signed_json_request(
+                # Derived from the URL actually in use, so an override
+                # changes the signed destination with it.
+                destination=urlparse(CORTEX_URL).hostname or "cortex",
+                method="POST", path="/observe_turn",
+                payload={"session_id": session, "user_message": u_msg[:500]})
             async with pooled_client(timeout=1.0) as client:
-                await client.post(
-                    f"{CORTEX_URL}/observe_turn",
-                    json={"session_id": session, "user_message": u_msg[:500]},
-                )
+                resp = await client.post(f"{CORTEX_URL}/observe_turn",
+                                         content=raw, headers=headers)
+            if resp.status_code >= 400:
+                # A refusal is a fact, not a nothing. Recorded so a
+                # misconfigured key does not read as a quiet system.
+                record_degradation(
+                    "cortex", "observe_turn_refused",
+                    RuntimeError(f"HTTP {resp.status_code}: "
+                                 f"{resp.text[:200]}"))
         except Exception as _exc:
             record_degradation("cortex", "learn_from_exchange", _exc)
 

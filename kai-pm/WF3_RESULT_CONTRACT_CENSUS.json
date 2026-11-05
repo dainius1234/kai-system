@@ -1,0 +1,1761 @@
+{
+  "authority_status": "NON_AUTHORITATIVE_CALIBRATION_EVIDENCE",
+  "must_not_be_used_as": "This file is HISTORICAL EVIDENCE. It MUST NOT define population, define result contracts, define floors, be read by the runner, be read by the floor gate, be registered as production configuration, or become a fallback authority if the live execution plan is unavailable. The sole population authority after cutover is scripts/security/uh_execution_plan.json, traversed by the runner. Evidence is not authority; evidence is not closure.",
+  "subject_sha": "b5e1250e5759551b3c68a38bbfec20b8740c0c9b",
+  "frozen_population_witness_sha256": "b93d47768a1d26561c8b1763c7043c442d42f6eb2273ca46e52e7ddab34c0947",
+  "population_provenance": "The 78 targets were taken from the frozen parent witness -- the direct prerequisites of the `test-uh` rule in `git show b5e1250e:Makefile`, source order preserved. POPULATION WAS NOT DISCOVERED FROM OUTPUT. The census only observed what already-known targets printed.",
+  "ordered_population": [
+    "test-contracts",
+    "test-perception-spine",
+    "test-world-state",
+    "test-proposal-workspace",
+    "test-policy-bridge",
+    "test-vertical-slice",
+    "test-actuator-registry",
+    "test-autonomy",
+    "test-payload-bounds",
+    "test-assessment",
+    "test-invariant-guards",
+    "test-concurrency-clock",
+    "test-service-auth",
+    "test-erasure",
+    "test-legacy-bridge",
+    "test-migration",
+    "test-full-migration",
+    "test-flags-enabled",
+    "test-preflight",
+    "test-architecture-rules",
+    "test-dashboard-findings",
+    "test-dashboard-auth",
+    "test-dashboard-ui-auth",
+    "test-degraded",
+    "test-hygiene-gate",
+    "test-assertion-floors",
+    "test-gate-registry",
+    "test-compose-drift",
+    "test-secret-gates",
+    "test-compose-gates",
+    "test-ci-tolerations",
+    "test-test-wiring",
+    "test-test-isolation",
+    "test-live-smoke",
+    "test-compose-probe",
+    "test-workflow-filters",
+    "test-workflow-outputs",
+    "test-dockerfile-flags",
+    "test-dockerfile-coverage",
+    "test-dockerfile-context",
+    "test-service-tokens",
+    "test-compose-env",
+    "test-compose-interpolation",
+    "test-unreachable-bindings",
+    "test-implicit-deps",
+    "test-image-modules",
+    "test-test-identity",
+    "test-execution-coverage",
+    "test-bringup-guards",
+    "test-ci-scripts",
+    "test-post-mortem",
+    "test-summarise-runs",
+    "test-bind-mount-portability",
+    "test-service-reachability",
+    "test-perception-intake",
+    "test-phase0-reducers",
+    "test-service-identity",
+    "test-service-identity-auth",
+    "test-observe-turn-identity",
+    "test-service-identity-wiring",
+    "test-container-proof-harness",
+    "test-embedding-backends",
+    "test-runtime-topology",
+    "test-degradation-tolerance",
+    "test-model-load-denominator",
+    "test-model-startup-classifier",
+    "test-asset-contract",
+    "test-memu-graph-acceptance",
+    "test-graph-stall",
+    "test-ingest-contract",
+    "test-cognify-result",
+    "test-llm-contract",
+    "test-gated-commit",
+    "test-shipped-package-deps",
+    "test-policy-loader",
+    "test-healthcheck-runnable",
+    "test-depends-on-readiness",
+    "test-suite-floor"
+  ],
+  "method": "Each target executed in isolation via `make <target>` from the repository root, stdout and stderr combined, 900s per-target timeout. Incremental write after each target so a crash preserves completed records.",
+  "tally_detection_expression": "^(?P<label>.+?):\\s+(?P<passed>\\d+)\\s+passed,\\s+(?P<failed>\\d+)\\s+failed\\s*$",
+  "tally_detection_note": "DELIBERATELY WIDER than the production regex in check_assertion_floors.py, which anchors the name at [A-Za-z0-9] and excludes parentheses. A census using the production expression would have reproduced the false-exclusion half of WF-3 inside the instrument meant to measure it.",
+  "environment": {
+    "MEMU_ALLOW_FAKE_EMBEDDINGS": "true",
+    "HMAC_ALLOW_DEV_SECRET": "true",
+    "MAKEFLAGS": "cleared from the environment before each target, so no inherited -j/-k/-i could contaminate the measurement",
+    "uid": 0,
+    "setpriv_reuid_65534": "PERMITTED in this container",
+    "docker_cli": "/usr/bin/docker present",
+    "docker_daemon": "DOWN in this container"
+  },
+  "LIMITATION": "LOCAL CALIBRATION ONLY -- DOES NOT ESTABLISH CI SUCCESS OR CI COUNT BEHAVIOUR. It establishes locally observed result-label contracts and nothing more.",
+  "measured_divergence_from_ci": {
+    "target": "test-container-proof-harness",
+    "local": "exit 0, 35 passed, 0 failed, 16.1s, one tally line 'Container proof harness tests'",
+    "ci_at_same_sha": "FAILS -- 13 x 'setpriv: setresuid failed: Operation not permitted', then an uncaught subprocess.TimeoutExpired after 120s at test_container_proof_harness.py:264; the parent's own tally line is never reached. run 34699510366 / job 103568657812",
+    "measured_cause": "RC-7a does not fire locally because setpriv --reuid=65534 is permitted here and refused on the runner. RC-7c does not fire locally because scenario 3 falls through to a real docker whose daemon is DOWN here, so the guard exits 2 quickly instead of escaping into a real BuildKit build as it does on the runner.",
+    "consequences": [
+      "Section 29 execution-semantics evidence MUST come from CI, not from this local run.",
+      "ABSENCE OF THE NESTED CHILD LINE LOCALLY DOES NOT ESTABLISH SECTION 6C. The 'Container proof:' child tally never appeared here because the harness completed and no check() dumped subject output. Its exclusion must be proven by destructive fixture, not by this census.",
+      "Per-target exit codes and pass counts in this file are LOCAL facts. Only the resolved labels are carried into the execution plan."
+    ]
+  },
+  "aggregate_totals": {
+    "targets_censused": 78,
+    "exactly_one_tally_one_label": 78,
+    "multiple_distinct_labels": 0,
+    "repeated_same_label": 0,
+    "zero_tally_lines": 0,
+    "non_zero_exit": 0,
+    "label_collisions_across_targets": 0,
+    "total_wall_seconds": 612.8
+  },
+  "targets": [
+    {
+      "n": 1,
+      "target": "test-contracts",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 4.0,
+      "output_bytes": 166,
+      "tally_lines_observed": [
+        {
+          "label": "UH-1 Contract Tests",
+          "passed": 126,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "UH-1 Contract Tests"
+      ],
+      "resolved_own_label": "UH-1 Contract Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 2,
+      "target": "test-perception-spine",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.8,
+      "output_bytes": 181,
+      "tally_lines_observed": [
+        {
+          "label": "UH-2 Perception Spine Tests",
+          "passed": 166,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "UH-2 Perception Spine Tests"
+      ],
+      "resolved_own_label": "UH-2 Perception Spine Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 3,
+      "target": "test-world-state",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.4,
+      "output_bytes": 170,
+      "tally_lines_observed": [
+        {
+          "label": "UH-3 World State Tests",
+          "passed": 71,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "UH-3 World State Tests"
+      ],
+      "resolved_own_label": "UH-3 World State Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 4,
+      "target": "test-proposal-workspace",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.4,
+      "output_bytes": 184,
+      "tally_lines_observed": [
+        {
+          "label": "UH-4 Proposal Workspace Tests",
+          "passed": 52,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "UH-4 Proposal Workspace Tests"
+      ],
+      "resolved_own_label": "UH-4 Proposal Workspace Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 5,
+      "target": "test-policy-bridge",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 2.8,
+      "output_bytes": 174,
+      "tally_lines_observed": [
+        {
+          "label": "UH-5 Policy Bridge Tests",
+          "passed": 49,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "UH-5 Policy Bridge Tests"
+      ],
+      "resolved_own_label": "UH-5 Policy Bridge Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 6,
+      "target": "test-vertical-slice",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.5,
+      "output_bytes": 176,
+      "tally_lines_observed": [
+        {
+          "label": "UH-6 Vertical Slice Tests",
+          "passed": 86,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "UH-6 Vertical Slice Tests"
+      ],
+      "resolved_own_label": "UH-6 Vertical Slice Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 7,
+      "target": "test-actuator-registry",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.4,
+      "output_bytes": 182,
+      "tally_lines_observed": [
+        {
+          "label": "UH-7 Actuator Registry Tests",
+          "passed": 75,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "UH-7 Actuator Registry Tests"
+      ],
+      "resolved_own_label": "UH-7 Actuator Registry Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 8,
+      "target": "test-autonomy",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 2.9,
+      "output_bytes": 165,
+      "tally_lines_observed": [
+        {
+          "label": "UH-8 Autonomy Tests",
+          "passed": 174,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "UH-8 Autonomy Tests"
+      ],
+      "resolved_own_label": "UH-8 Autonomy Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 9,
+      "target": "test-payload-bounds",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.4,
+      "output_bytes": 171,
+      "tally_lines_observed": [
+        {
+          "label": "Payload Bounds Tests",
+          "passed": 24,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Payload Bounds Tests"
+      ],
+      "resolved_own_label": "Payload Bounds Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 10,
+      "target": "test-assessment",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.3,
+      "output_bytes": 174,
+      "tally_lines_observed": [
+        {
+          "label": "Constraint Assessment Tests",
+          "passed": 56,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Constraint Assessment Tests"
+      ],
+      "resolved_own_label": "Constraint Assessment Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 11,
+      "target": "test-invariant-guards",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.7,
+      "output_bytes": 174,
+      "tally_lines_observed": [
+        {
+          "label": "Invariant Guard Tests",
+          "passed": 26,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Invariant Guard Tests"
+      ],
+      "resolved_own_label": "Invariant Guard Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 12,
+      "target": "test-concurrency-clock",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.7,
+      "output_bytes": 179,
+      "tally_lines_observed": [
+        {
+          "label": "Concurrency & Clock Tests",
+          "passed": 51,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Concurrency & Clock Tests"
+      ],
+      "resolved_own_label": "Concurrency & Clock Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 13,
+      "target": "test-service-auth",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.3,
+      "output_bytes": 902,
+      "tally_lines_observed": [
+        {
+          "label": "Service Auth Tests",
+          "passed": 59,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Service Auth Tests"
+      ],
+      "resolved_own_label": "Service Auth Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 14,
+      "target": "test-erasure",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.6,
+      "output_bytes": 157,
+      "tally_lines_observed": [
+        {
+          "label": "Erasure Tests",
+          "passed": 75,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Erasure Tests"
+      ],
+      "resolved_own_label": "Erasure Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 15,
+      "target": "test-legacy-bridge",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.9,
+      "output_bytes": 305,
+      "tally_lines_observed": [
+        {
+          "label": "Legacy Bridge Tests",
+          "passed": 58,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Legacy Bridge Tests"
+      ],
+      "resolved_own_label": "Legacy Bridge Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 16,
+      "target": "test-migration",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.8,
+      "output_bytes": 223,
+      "tally_lines_observed": [
+        {
+          "label": "Migration & Active Mode Tests",
+          "passed": 136,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Migration & Active Mode Tests"
+      ],
+      "resolved_own_label": "Migration & Active Mode Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 17,
+      "target": "test-full-migration",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 1.3,
+      "output_bytes": 302,
+      "tally_lines_observed": [
+        {
+          "label": "Full Migration Tests",
+          "passed": 75,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Full Migration Tests"
+      ],
+      "resolved_own_label": "Full Migration Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 18,
+      "target": "test-flags-enabled",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.7,
+      "output_bytes": 350,
+      "tally_lines_observed": [
+        {
+          "label": "Flags-Enabled Integration Tests",
+          "passed": 37,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Flags-Enabled Integration Tests"
+      ],
+      "resolved_own_label": "Flags-Enabled Integration Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 19,
+      "target": "test-preflight",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 1.4,
+      "output_bytes": 172,
+      "tally_lines_observed": [
+        {
+          "label": "Deployment Preflight Tests",
+          "passed": 57,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Deployment Preflight Tests"
+      ],
+      "resolved_own_label": "Deployment Preflight Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 20,
+      "target": "test-architecture-rules",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 3.3,
+      "output_bytes": 178,
+      "tally_lines_observed": [
+        {
+          "label": "Architecture Rule Tests",
+          "passed": 68,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Architecture Rule Tests"
+      ],
+      "resolved_own_label": "Architecture Rule Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 21,
+      "target": "test-dashboard-findings",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 12.1,
+      "output_bytes": 187,
+      "tally_lines_observed": [
+        {
+          "label": "Dashboard Finding Tracker Tests",
+          "passed": 217,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Dashboard Finding Tracker Tests"
+      ],
+      "resolved_own_label": "Dashboard Finding Tracker Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 22,
+      "target": "test-dashboard-auth",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 1.0,
+      "output_bytes": 3747,
+      "tally_lines_observed": [
+        {
+          "label": "Dashboard Auth Tests",
+          "passed": 99,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Dashboard Auth Tests"
+      ],
+      "resolved_own_label": "Dashboard Auth Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 23,
+      "target": "test-dashboard-ui-auth",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.6,
+      "output_bytes": 162,
+      "tally_lines_observed": [
+        {
+          "label": "Dashboard UI Auth Tests",
+          "passed": 42,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Dashboard UI Auth Tests"
+      ],
+      "resolved_own_label": "Dashboard UI Auth Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 24,
+      "target": "test-degraded",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.8,
+      "output_bytes": 22297,
+      "tally_lines_observed": [
+        {
+          "label": "Degraded State Tests",
+          "passed": 71,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Degraded State Tests"
+      ],
+      "resolved_own_label": "Degraded State Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 25,
+      "target": "test-hygiene-gate",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 63.1,
+      "output_bytes": 3810,
+      "tally_lines_observed": [
+        {
+          "label": "Hygiene Gate Tests",
+          "passed": 63,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Hygiene Gate Tests"
+      ],
+      "resolved_own_label": "Hygiene Gate Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 26,
+      "target": "test-assertion-floors",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.2,
+      "output_bytes": 174,
+      "tally_lines_observed": [
+        {
+          "label": "Assertion Floor Tests",
+          "passed": 80,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Assertion Floor Tests"
+      ],
+      "resolved_own_label": "Assertion Floor Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 27,
+      "target": "test-gate-registry",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 401.4,
+      "output_bytes": 169,
+      "tally_lines_observed": [
+        {
+          "label": "Gate Registry Tests",
+          "passed": 82,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Gate Registry Tests"
+      ],
+      "resolved_own_label": "Gate Registry Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 28,
+      "target": "test-compose-drift",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.5,
+      "output_bytes": 169,
+      "tally_lines_observed": [
+        {
+          "label": "Compose Drift Tests",
+          "passed": 33,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Compose Drift Tests"
+      ],
+      "resolved_own_label": "Compose Drift Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 29,
+      "target": "test-secret-gates",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.1,
+      "output_bytes": 176,
+      "tally_lines_observed": [
+        {
+          "label": "Secret & Restart Gate Tests",
+          "passed": 46,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Secret & Restart Gate Tests"
+      ],
+      "resolved_own_label": "Secret & Restart Gate Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 30,
+      "target": "test-compose-gates",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.1,
+      "output_bytes": 168,
+      "tally_lines_observed": [
+        {
+          "label": "Compose Gate Tests",
+          "passed": 54,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Compose Gate Tests"
+      ],
+      "resolved_own_label": "Compose Gate Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 31,
+      "target": "test-ci-tolerations",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 1.5,
+      "output_bytes": 170,
+      "tally_lines_observed": [
+        {
+          "label": "CI Toleration Tests",
+          "passed": 30,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "CI Toleration Tests"
+      ],
+      "resolved_own_label": "CI Toleration Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 32,
+      "target": "test-test-wiring",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 2.0,
+      "output_bytes": 165,
+      "tally_lines_observed": [
+        {
+          "label": "Test Wiring Tests",
+          "passed": 19,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Test Wiring Tests"
+      ],
+      "resolved_own_label": "Test Wiring Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 33,
+      "target": "test-test-isolation",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 1.3,
+      "output_bytes": 977,
+      "tally_lines_observed": [
+        {
+          "label": "Test Isolation Tests",
+          "passed": 38,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Test Isolation Tests"
+      ],
+      "resolved_own_label": "Test Isolation Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 34,
+      "target": "test-live-smoke",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.2,
+      "output_bytes": 151,
+      "tally_lines_observed": [
+        {
+          "label": "Live Smoke Tests",
+          "passed": 36,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Live Smoke Tests"
+      ],
+      "resolved_own_label": "Live Smoke Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 35,
+      "target": "test-compose-probe",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.1,
+      "output_bytes": 157,
+      "tally_lines_observed": [
+        {
+          "label": "Compose Probe Tests",
+          "passed": 44,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Compose Probe Tests"
+      ],
+      "resolved_own_label": "Compose Probe Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 36,
+      "target": "test-workflow-filters",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.1,
+      "output_bytes": 162,
+      "tally_lines_observed": [
+        {
+          "label": "Workflow Filter Tests",
+          "passed": 22,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Workflow Filter Tests"
+      ],
+      "resolved_own_label": "Workflow Filter Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 37,
+      "target": "test-workflow-outputs",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.1,
+      "output_bytes": 162,
+      "tally_lines_observed": [
+        {
+          "label": "Workflow Output Tests",
+          "passed": 29,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Workflow Output Tests"
+      ],
+      "resolved_own_label": "Workflow Output Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 38,
+      "target": "test-dockerfile-flags",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.1,
+      "output_bytes": 162,
+      "tally_lines_observed": [
+        {
+          "label": "Dockerfile Flag Tests",
+          "passed": 21,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Dockerfile Flag Tests"
+      ],
+      "resolved_own_label": "Dockerfile Flag Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 39,
+      "target": "test-dockerfile-coverage",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.3,
+      "output_bytes": 169,
+      "tally_lines_observed": [
+        {
+          "label": "Dockerfile Coverage Tests",
+          "passed": 26,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Dockerfile Coverage Tests"
+      ],
+      "resolved_own_label": "Dockerfile Coverage Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 40,
+      "target": "test-dockerfile-context",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.5,
+      "output_bytes": 167,
+      "tally_lines_observed": [
+        {
+          "label": "Dockerfile Context Tests",
+          "passed": 24,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Dockerfile Context Tests"
+      ],
+      "resolved_own_label": "Dockerfile Context Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 41,
+      "target": "test-service-tokens",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.3,
+      "output_bytes": 158,
+      "tally_lines_observed": [
+        {
+          "label": "Service Token Tests",
+          "passed": 24,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Service Token Tests"
+      ],
+      "resolved_own_label": "Service Token Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 42,
+      "target": "test-compose-env",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 2.2,
+      "output_bytes": 153,
+      "tally_lines_observed": [
+        {
+          "label": "Compose Env Tests",
+          "passed": 24,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Compose Env Tests"
+      ],
+      "resolved_own_label": "Compose Env Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 43,
+      "target": "test-compose-interpolation",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.3,
+      "output_bytes": 173,
+      "tally_lines_observed": [
+        {
+          "label": "Compose Interpolation Tests",
+          "passed": 28,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Compose Interpolation Tests"
+      ],
+      "resolved_own_label": "Compose Interpolation Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 44,
+      "target": "test-unreachable-bindings",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 4.1,
+      "output_bytes": 170,
+      "tally_lines_observed": [
+        {
+          "label": "Unreachable Binding Tests",
+          "passed": 25,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Unreachable Binding Tests"
+      ],
+      "resolved_own_label": "Unreachable Binding Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 45,
+      "target": "test-implicit-deps",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.3,
+      "output_bytes": 163,
+      "tally_lines_observed": [
+        {
+          "label": "Implicit Dependency Tests",
+          "passed": 32,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Implicit Dependency Tests"
+      ],
+      "resolved_own_label": "Implicit Dependency Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 46,
+      "target": "test-image-modules",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.9,
+      "output_bytes": 156,
+      "tally_lines_observed": [
+        {
+          "label": "Image Module Tests",
+          "passed": 28,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Image Module Tests"
+      ],
+      "resolved_own_label": "Image Module Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 47,
+      "target": "test-test-identity",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 1.4,
+      "output_bytes": 157,
+      "tally_lines_observed": [
+        {
+          "label": "Test Identity Tests",
+          "passed": 31,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Test Identity Tests"
+      ],
+      "resolved_own_label": "Test Identity Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 48,
+      "target": "test-execution-coverage",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.5,
+      "output_bytes": 167,
+      "tally_lines_observed": [
+        {
+          "label": "Execution Coverage Tests",
+          "passed": 20,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Execution Coverage Tests"
+      ],
+      "resolved_own_label": "Execution Coverage Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 49,
+      "target": "test-bringup-guards",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.3,
+      "output_bytes": 159,
+      "tally_lines_observed": [
+        {
+          "label": "Bring-up Guard Tests",
+          "passed": 23,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Bring-up Guard Tests"
+      ],
+      "resolved_own_label": "Bring-up Guard Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 50,
+      "target": "test-ci-scripts",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.2,
+      "output_bytes": 1307,
+      "tally_lines_observed": [
+        {
+          "label": "CI Script Tests",
+          "passed": 23,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "CI Script Tests"
+      ],
+      "resolved_own_label": "CI Script Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 51,
+      "target": "test-post-mortem",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.1,
+      "output_bytes": 1748,
+      "tally_lines_observed": [
+        {
+          "label": "Post-mortem tests",
+          "passed": 23,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Post-mortem tests"
+      ],
+      "resolved_own_label": "Post-mortem tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 52,
+      "target": "test-summarise-runs",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.1,
+      "output_bytes": 873,
+      "tally_lines_observed": [
+        {
+          "label": "CI summariser tests",
+          "passed": 14,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "CI summariser tests"
+      ],
+      "resolved_own_label": "CI summariser tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 53,
+      "target": "test-bind-mount-portability",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.6,
+      "output_bytes": 1526,
+      "tally_lines_observed": [
+        {
+          "label": "Bind-mount portability tests",
+          "passed": 29,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Bind-mount portability tests"
+      ],
+      "resolved_own_label": "Bind-mount portability tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 54,
+      "target": "test-service-reachability",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.4,
+      "output_bytes": 1996,
+      "tally_lines_observed": [
+        {
+          "label": "Service reachability tests",
+          "passed": 37,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Service reachability tests"
+      ],
+      "resolved_own_label": "Service reachability tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 55,
+      "target": "test-perception-intake",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.9,
+      "output_bytes": 1417,
+      "tally_lines_observed": [
+        {
+          "label": "Perception intake tests",
+          "passed": 23,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Perception intake tests"
+      ],
+      "resolved_own_label": "Perception intake tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 56,
+      "target": "test-phase0-reducers",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.4,
+      "output_bytes": 2636,
+      "tally_lines_observed": [
+        {
+          "label": "Phase 0 reducer tests",
+          "passed": 46,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Phase 0 reducer tests"
+      ],
+      "resolved_own_label": "Phase 0 reducer tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 57,
+      "target": "test-service-identity",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.5,
+      "output_bytes": 1448,
+      "tally_lines_observed": [
+        {
+          "label": "Service identity audit tests",
+          "passed": 25,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Service identity audit tests"
+      ],
+      "resolved_own_label": "Service identity audit tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 58,
+      "target": "test-service-identity-auth",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.4,
+      "output_bytes": 5924,
+      "tally_lines_observed": [
+        {
+          "label": "Service identity (ed25519) tests",
+          "passed": 80,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Service identity (ed25519) tests"
+      ],
+      "resolved_own_label": "Service identity (ed25519) tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 59,
+      "target": "test-observe-turn-identity",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 1.0,
+      "output_bytes": 6066,
+      "tally_lines_observed": [
+        {
+          "label": "/observe_turn identity slice",
+          "passed": 43,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "/observe_turn identity slice"
+      ],
+      "resolved_own_label": "/observe_turn identity slice",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 60,
+      "target": "test-service-identity-wiring",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.4,
+      "output_bytes": 1819,
+      "tally_lines_observed": [
+        {
+          "label": "Identity wiring gate tests",
+          "passed": 28,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Identity wiring gate tests"
+      ],
+      "resolved_own_label": "Identity wiring gate tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 61,
+      "target": "test-container-proof-harness",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 16.1,
+      "output_bytes": 2029,
+      "tally_lines_observed": [
+        {
+          "label": "Container proof harness tests",
+          "passed": 35,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Container proof harness tests"
+      ],
+      "resolved_own_label": "Container proof harness tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 62,
+      "target": "test-embedding-backends",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.8,
+      "output_bytes": 2562,
+      "tally_lines_observed": [
+        {
+          "label": "Embedding backend tests",
+          "passed": 38,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Embedding backend tests"
+      ],
+      "resolved_own_label": "Embedding backend tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 63,
+      "target": "test-runtime-topology",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 2.8,
+      "output_bytes": 163,
+      "tally_lines_observed": [
+        {
+          "label": "Runtime Topology Tests",
+          "passed": 33,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Runtime Topology Tests"
+      ],
+      "resolved_own_label": "Runtime Topology Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 64,
+      "target": "test-degradation-tolerance",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 52.4,
+      "output_bytes": 173,
+      "tally_lines_observed": [
+        {
+          "label": "Degradation Tolerance Tests",
+          "passed": 75,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Degradation Tolerance Tests"
+      ],
+      "resolved_own_label": "Degradation Tolerance Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 65,
+      "target": "test-model-load-denominator",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 7.0,
+      "output_bytes": 182,
+      "tally_lines_observed": [
+        {
+          "label": "Model-Load Denominator Calibration",
+          "passed": 110,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Model-Load Denominator Calibration"
+      ],
+      "resolved_own_label": "Model-Load Denominator Calibration",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 66,
+      "target": "test-model-startup-classifier",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.2,
+      "output_bytes": 185,
+      "tally_lines_observed": [
+        {
+          "label": "Model Startup Classifier Calibration",
+          "passed": 65,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Model Startup Classifier Calibration"
+      ],
+      "resolved_own_label": "Model Startup Classifier Calibration",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 67,
+      "target": "test-asset-contract",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.5,
+      "output_bytes": 176,
+      "tally_lines_observed": [
+        {
+          "label": "Asset Contract Summariser Calibration",
+          "passed": 47,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Asset Contract Summariser Calibration"
+      ],
+      "resolved_own_label": "Asset Contract Summariser Calibration",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 68,
+      "target": "test-memu-graph-acceptance",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.6,
+      "output_bytes": 179,
+      "tally_lines_observed": [
+        {
+          "label": "memu-graph Acceptance Calibration",
+          "passed": 34,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "memu-graph Acceptance Calibration"
+      ],
+      "resolved_own_label": "memu-graph Acceptance Calibration",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 69,
+      "target": "test-graph-stall",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.5,
+      "output_bytes": 247,
+      "tally_lines_observed": [
+        {
+          "label": "Graph Stall Analyser Calibration",
+          "passed": 79,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Graph Stall Analyser Calibration"
+      ],
+      "resolved_own_label": "Graph Stall Analyser Calibration",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 70,
+      "target": "test-ingest-contract",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.3,
+      "output_bytes": 258,
+      "tally_lines_observed": [
+        {
+          "label": "Ingest Contract Analyser Calibration",
+          "passed": 41,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Ingest Contract Analyser Calibration"
+      ],
+      "resolved_own_label": "Ingest Contract Analyser Calibration",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 71,
+      "target": "test-cognify-result",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.0,
+      "output_bytes": 284,
+      "tally_lines_observed": [
+        {
+          "label": "Cognify Result Predicate Calibration",
+          "passed": 29,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Cognify Result Predicate Calibration"
+      ],
+      "resolved_own_label": "Cognify Result Predicate Calibration",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 72,
+      "target": "test-llm-contract",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 3.6,
+      "output_bytes": 470,
+      "tally_lines_observed": [
+        {
+          "label": "LLM Response Contract Calibration",
+          "passed": 276,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "LLM Response Contract Calibration"
+      ],
+      "resolved_own_label": "LLM Response Contract Calibration",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 73,
+      "target": "test-gated-commit",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 2.0,
+      "output_bytes": 978,
+      "tally_lines_observed": [
+        {
+          "label": "Drift guard tests",
+          "passed": 15,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Drift guard tests"
+      ],
+      "resolved_own_label": "Drift guard tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 74,
+      "target": "test-shipped-package-deps",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.1,
+      "output_bytes": 171,
+      "tally_lines_observed": [
+        {
+          "label": "Shipped Package Deps Tests",
+          "passed": 13,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Shipped Package Deps Tests"
+      ],
+      "resolved_own_label": "Shipped Package Deps Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 75,
+      "target": "test-policy-loader",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.1,
+      "output_bytes": 2739,
+      "tally_lines_observed": [
+        {
+          "label": "Policy Loader Tests",
+          "passed": 16,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Policy Loader Tests"
+      ],
+      "resolved_own_label": "Policy Loader Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 76,
+      "target": "test-healthcheck-runnable",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.4,
+      "output_bytes": 171,
+      "tally_lines_observed": [
+        {
+          "label": "Healthcheck Runnable Tests",
+          "passed": 16,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Healthcheck Runnable Tests"
+      ],
+      "resolved_own_label": "Healthcheck Runnable Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 77,
+      "target": "test-depends-on-readiness",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.3,
+      "output_bytes": 171,
+      "tally_lines_observed": [
+        {
+          "label": "Depends-On Readiness Tests",
+          "passed": 24,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Depends-On Readiness Tests"
+      ],
+      "resolved_own_label": "Depends-On Readiness Tests",
+      "ambiguity": "NONE"
+    },
+    {
+      "n": 78,
+      "target": "test-suite-floor",
+      "exit": 0,
+      "timed_out": false,
+      "seconds": 0.1,
+      "output_bytes": 1750,
+      "tally_lines_observed": [
+        {
+          "label": "Suite Floor Tests",
+          "passed": 18,
+          "failed": 0,
+          "indented": false
+        }
+      ],
+      "distinct_labels": [
+        "Suite Floor Tests"
+      ],
+      "resolved_own_label": "Suite Floor Tests",
+      "ambiguity": "NONE"
+    }
+  ]
+}

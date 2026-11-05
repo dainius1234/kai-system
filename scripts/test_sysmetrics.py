@@ -171,6 +171,8 @@ def test_snapshot_cpu(client):
     assert body["cpu"]["count_logical"] == 8
     assert body["cpu"]["count_physical"] == 4
     assert body["cpu"]["freq_mhz"] == 3200.0
+    # consumers (agentic, cortex, perception spine) read top-level cpu_percent
+    assert body["cpu_percent"] == 12.5
 
 
 def test_snapshot_memory(client):

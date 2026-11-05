@@ -80,6 +80,14 @@ DECLARED_NON_SECRETS: Dict[Tuple[str, str], str] = {
         "Ollama runs locally and needs no key, but the OpenAI-compatible "
         "client requires a non-empty string. The value is a sentence "
         "saying so, not a credential.",
+    ("agentic", "KAI_SERVICE_KEY_ID"):
+        "A key IDENTIFIER, not key material. It travels in the "
+        "X-Kai-Signature header of every signed request and is listed in "
+        "the receiver's key map, so it is public by construction — the "
+        "receiver looks the identity up BY it. The secret is the private "
+        "key, which is mounted from a file and never appears here. "
+        "Hiding a public identifier would make rotation unreadable "
+        "without hiding anything.",
 }
 
 BANNED = (

@@ -303,7 +303,10 @@ def build_enriched_plan(context: PlanContext, specialist: str) -> PlanDecision:
     # P5 GEM: inject operator preferences as planning constraints
     if context.preferences:
         for pref in context.preferences[:5]:
-            pref_text = str(pref.get("content", {}).get("text", ""))[:200]
+            # memu-core /memory/preferences returns {"preference": ...};
+            # the nested content shape is kept for older callers.
+            nested = pref.get("content") if isinstance(pref.get("content"), dict) else {}
+            pref_text = str(pref.get("preference") or nested.get("result") or nested.get("text") or "")[:200]
             if pref_text:
                 steps.append({"action": "apply_preference", "preference": pref_text})
 

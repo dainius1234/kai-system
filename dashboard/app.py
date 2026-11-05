@@ -223,6 +223,31 @@ def client_error(exc: Exception, message: str) -> str:
     return message
 
 
+# ── The dashboard's own service key (Dainius, 2026-11-04, entries 381-382) ──
+# Sent ONLY to the three services whose endpoints the dashboard must reach
+# and which are configured to accept it: browser-agent, monitor-service and
+# notify-service. It is never the shared KAI_SERVICE_TOKEN, never sent to any
+# other backend, and never returned to the browser.
+DASHBOARD_TOKEN_ENV = "KAI_DASHBOARD_SERVICE_TOKEN"
+
+
+def _service_headers(url: str) -> Dict[str, str]:
+    """Authorization header for a backend call, or {} if none belongs there.
+
+    The keyed bases are the module's own BROWSER_AGENT_URL, MONITOR_URL and
+    NOTIFY_URL (defined further down; read at call time).
+    """
+    bases = (BROWSER_AGENT_URL, MONITOR_URL, NOTIFY_URL)
+    if not any(url == b or url.startswith(b.rstrip("/") + "/") for b in bases):
+        return {}
+    try:
+        from common.auth import load_secret
+        token = load_secret(DASHBOARD_TOKEN_ENV, "")
+    except Exception:
+        token = os.getenv(DASHBOARD_TOKEN_ENV, "")
+    return {"Authorization": f"Bearer {token}"} if token else {}
+
+
 async def _proxy_get(url: str, params: dict | None = None,
                      fallback: Any = None, timeout: float = 10.0) -> Any:
     """GET from a backend with retry, circuit breaker, and fallback."""
@@ -230,6 +255,7 @@ async def _proxy_get(url: str, params: dict | None = None,
     return await resilient_call(
         "GET", url, params=params, timeout=timeout,
         retries=2, backoff=0.3, fallback=default, logger=logger,
+        headers=_service_headers(url),
     )
 
 
@@ -240,6 +266,7 @@ async def _proxy_post(url: str, body: dict | None = None,
     return await resilient_call(
         "POST", url, json=body or {}, timeout=timeout,
         retries=2, backoff=0.3, fallback=default, logger=logger,
+        headers=_service_headers(url),
     )
 
 
@@ -1355,7 +1382,8 @@ async def api_memory_graph_data(
         mem_id = f"mem:{r.get('id', str(id(r)))}"
         content = r.get("content") or {}
         if isinstance(content, dict):
-            snippet = content.get("text", content.get("result_raw", r.get("event_type", "")))
+            snippet = (content.get("result") or content.get("text")
+                       or content.get("result_raw") or r.get("event_type", ""))
         else:
             snippet = str(content)
 
@@ -1391,9 +1419,9 @@ async def api_finance_summary():
     """Proxy CIS/VAT/tax financial summary from the financial-awareness service (P29)."""
     return await _proxy_get(f"{FINANCIAL_URL}/finance/summary", fallback={
         "status": "unavailable",
-        "cis_summary": {},
-        "vat_position": {},
-        "tax_estimate": {},
+        "cis": {},
+        "vat": {},
+        "tax": {},
         "invoices": [],
     })
 
@@ -2176,7 +2204,7 @@ async def api_audio_transcribe(file: UploadFile = File(...)):
 async def api_browser_navigate(request: Request):
     body = await bounded_json(request)
     try:
-        async with pooled_client(timeout=30.0) as client:
+        async with pooled_client(timeout=30.0, headers=_service_headers(BROWSER_AGENT_URL)) as client:
             resp = await client.post(f"{BROWSER_AGENT_URL}/navigate", json=body)
             resp.raise_for_status()
             return resp.json()
@@ -2194,7 +2222,7 @@ async def api_browser_navigate(request: Request):
 async def api_browser_scrape(request: Request):
     body = await bounded_json(request)
     try:
-        async with pooled_client(timeout=30.0) as client:
+        async with pooled_client(timeout=30.0, headers=_service_headers(BROWSER_AGENT_URL)) as client:
             resp = await client.post(f"{BROWSER_AGENT_URL}/scrape", json=body)
             resp.raise_for_status()
             return resp.json()
@@ -2212,7 +2240,7 @@ async def api_browser_scrape(request: Request):
 async def api_browser_run(request: Request):
     body = await bounded_json(request)
     try:
-        async with pooled_client(timeout=60.0) as client:
+        async with pooled_client(timeout=60.0, headers=_service_headers(BROWSER_AGENT_URL)) as client:
             resp = await client.post(f"{BROWSER_AGENT_URL}/run", json=body)
             resp.raise_for_status()
             return resp.json()
@@ -2230,7 +2258,7 @@ async def api_browser_run(request: Request):
 async def api_browser_screenshot():
     from fastapi.responses import Response as FastAPIResponse
     try:
-        async with pooled_client(timeout=15.0) as client:
+        async with pooled_client(timeout=15.0, headers=_service_headers(BROWSER_AGENT_URL)) as client:
             resp = await client.post(f"{BROWSER_AGENT_URL}/screenshot")
             resp.raise_for_status()
             return FastAPIResponse(
@@ -2370,7 +2398,7 @@ async def api_notify_pending(unread_only: bool = True):
             dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_notify_dismiss(notification_id: int):
     try:
-        async with pooled_client(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0, headers=_service_headers(NOTIFY_URL)) as client:
             resp = await client.delete(f"{NOTIFY_URL}/pending/{notification_id}")
             resp.raise_for_status()
             return resp.json()
@@ -2382,7 +2410,7 @@ async def api_notify_dismiss(notification_id: int):
             dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_notify_dismiss_all():
     try:
-        async with pooled_client(timeout=5.0) as client:
+        async with pooled_client(timeout=5.0, headers=_service_headers(NOTIFY_URL)) as client:
             resp = await client.delete(f"{NOTIFY_URL}/pending")
             resp.raise_for_status()
             return resp.json()
@@ -2409,7 +2437,7 @@ async def api_monitor_add_rule(request: Request):
             dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_monitor_delete_rule(rule_id: str):
     try:
-        async with pooled_client(timeout=10.0) as client:
+        async with pooled_client(timeout=10.0, headers=_service_headers(MONITOR_URL)) as client:
             resp = await client.delete(f"{MONITOR_URL}/rules/{rule_id}")
             resp.raise_for_status()
             return resp.json()
@@ -2445,7 +2473,7 @@ async def api_monitor_alerts(limit: int = Query(50, ge=1, le=500)):
             dependencies=[Depends(require_dashboard_auth(Scope.WRITE_EXTERNAL))])
 async def api_monitor_clear_alerts():
     try:
-        async with pooled_client(timeout=10.0) as client:
+        async with pooled_client(timeout=10.0, headers=_service_headers(MONITOR_URL)) as client:
             resp = await client.delete(f"{MONITOR_URL}/alerts")
             resp.raise_for_status()
             return resp.json()
@@ -2466,7 +2494,7 @@ async def api_monitor_status():
 async def api_browser_search(request: Request):
     body = await bounded_json(request)
     try:
-        async with pooled_client(timeout=30.0) as client:
+        async with pooled_client(timeout=30.0, headers=_service_headers(BROWSER_AGENT_URL)) as client:
             resp = await client.post(f"{BROWSER_AGENT_URL}/search", json=body)
             resp.raise_for_status()
             return resp.json()

@@ -169,6 +169,32 @@ def challenge_history(
     )
 
 
+def _evidence_item(chunk: Any) -> Dict[str, Any]:
+    """Build one verifier evidence item, keeping memu-core's real scores.
+
+    memu-core /memory/retrieve records carry ``rank_score``, ``relevance``
+    and ``importance``; the verifier weighs them (verifier/app.py). A flat
+    0.5 used to be sent for every chunk, which capped each chunk at 0.55,
+    below the 0.60 strong-chunk threshold. Chunks with no score (plain
+    strings from session context) still get the neutral 0.5: no evidence
+    of strength is not evidence of strength.
+    """
+    if not isinstance(chunk, dict):
+        return {"content": str(chunk)[:500], "rank_score": 0.5}
+    content = chunk.get("content", chunk)
+    if isinstance(content, dict):
+        content = content.get("result") or content.get("text") or content
+    item: Dict[str, Any] = {"content": str(content)[:500]}
+    try:
+        item["rank_score"] = float(chunk["rank_score"]) if chunk.get("rank_score") is not None else 0.5
+    except (TypeError, ValueError):
+        item["rank_score"] = 0.5
+    for key in ("relevance", "importance"):
+        if isinstance(chunk.get(key), (int, float)):
+            item[key] = float(chunk[key])
+    return item
+
+
 async def challenge_verifier(
     plan: Dict[str, Any],
     user_input: str,
@@ -185,10 +211,7 @@ async def challenge_verifier(
     """
     verifier_url = os.getenv("VERIFIER_URL", "http://verifier:8052")
     claim = f"{user_input}\n\nPlan summary: {plan.get('summary', 'no summary')}"
-    evidence_pack = [
-        {"content": str(c.get("content", c) if isinstance(c, dict) else c)[:500], "rank_score": 0.5}
-        for c in context_chunks[:10]
-    ]
+    evidence_pack = [_evidence_item(c) for c in context_chunks[:10]]
 
     try:
         async with pooled_client(timeout=8.0) as client:

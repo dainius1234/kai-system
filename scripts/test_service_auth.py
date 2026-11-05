@@ -19,6 +19,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from common.service_auth import (
     ALLOW_UNAUTH_ENV,
+    DASHBOARD_OPERATIONS,
+    DASHBOARD_TOKEN_ENV,
     TOKEN_ENV,
     check_token,
     unauthenticated_allowed,
@@ -175,6 +177,105 @@ def test_prefix_token_rejected():
             check(f"prefix_{attempt[:12]}_denied", not ok)
 
 
+def test_dashboard_key_rejected_where_not_configured():
+    """Known-negative for privilege spread: a service holding only the
+    shared token (e.g. the executor) must reject the dashboard's key."""
+    with _Env(**{TOKEN_ENV: "shared-AAA", DASHBOARD_TOKEN_ENV: None, ALLOW_UNAUTH_ENV: None}):
+        ok, status, _ = check_token("Bearer dash-BBB", "executor_run")
+        check("dashboard_key_denied_at_unkeyed_service", not ok and status == 403, status)
+
+
+def test_dashboard_key_accepted_where_configured():
+    """Known-positive: browser-agent/monitor/notify accept the dashboard key
+    and still accept the shared token; anything else is refused."""
+    with _Env(**{TOKEN_ENV: "shared-AAA", DASHBOARD_TOKEN_ENV: "dash-BBB", ALLOW_UNAUTH_ENV: None}):
+        ok_d, _, _ = check_token("Bearer dash-BBB", "monitor_rule_create")
+        ok_s, _, _ = check_token("Bearer shared-AAA", "monitor_rule_create")
+        ok_x, status_x, _ = check_token("Bearer dash-BB", "monitor_rule_create")
+        check("dashboard_key_accepted", ok_d)
+        check("shared_token_still_accepted", ok_s)
+        check("near_miss_rejected", not ok_x and status_x == 403, status_x)
+
+
+def test_dashboard_key_alone_keeps_fail_closed_semantics():
+    """With no token of either kind and no dev bypass, still 503."""
+    with _Env(**{TOKEN_ENV: None, DASHBOARD_TOKEN_ENV: None, ALLOW_UNAUTH_ENV: None}):
+        ok, status, _ = check_token("Bearer anything", "op")
+        check("no_tokens_fail_closed", not ok and status == 503, status)
+    with _Env(**{TOKEN_ENV: None, DASHBOARD_TOKEN_ENV: "dash-BBB", ALLOW_UNAUTH_ENV: None}):
+        ok, _, _ = check_token("Bearer dash-BBB", "desktop_notify")
+        ok2, status2, _ = check_token(None, "desktop_notify")
+        check("dashboard_only_service_accepts_key", ok)
+        check("dashboard_only_service_requires_header", not ok2 and status2 == 401, status2)
+
+
+_DASHBOARD_SERVICE_FILES = ("browser-agent/app.py", "monitor-service/app.py", "output/notify/app.py")
+_EXCLUDED_FROM_DASHBOARD = {"browser_click", "browser_type", "monitor_rule_update"}
+
+
+def _declared_operations() -> set:
+    """Operation names declared with require_service_auth("...") in the three
+    services that accept the dashboard key — read from their source, so the
+    expected set does not come from the constant under test."""
+    import re
+    ops = set()
+    for rel in _DASHBOARD_SERVICE_FILES:
+        ops |= set(re.findall(r'require_service_auth\("([a-z_]+)"\)', (REPO / rel).read_text()))
+    return ops
+
+
+def test_dashboard_operation_list_matches_the_services():
+    declared = _declared_operations()
+    check("dashboard_services_declare_17_operations", len(declared) == 17, sorted(declared))
+    check("dashboard_ops_all_declared", DASHBOARD_OPERATIONS <= declared,
+          sorted(DASHBOARD_OPERATIONS - declared))
+    check("dashboard_ops_are_declared_minus_excluded",
+          DASHBOARD_OPERATIONS == declared - _EXCLUDED_FROM_DASHBOARD,
+          sorted(DASHBOARD_OPERATIONS ^ (declared - _EXCLUDED_FROM_DASHBOARD)))
+
+
+def test_dashboard_key_only_for_its_14_operations():
+    with _Env(**{TOKEN_ENV: "shared-AAA", DASHBOARD_TOKEN_ENV: "dash-BBB", ALLOW_UNAUTH_ENV: None}):
+        for op in sorted(DASHBOARD_OPERATIONS):
+            ok, _, _ = check_token("Bearer dash-BBB", op)
+            check(f"dashboard_key_allows_{op}", ok)
+        for op in sorted(_EXCLUDED_FROM_DASHBOARD):
+            ok, status, _ = check_token("Bearer dash-BBB", op)
+            check(f"dashboard_key_denies_{op}", not ok and status == 403, status)
+            ok_s, _, _ = check_token("Bearer shared-AAA", op)
+            check(f"shared_key_still_allows_{op}", ok_s)
+        check("count_allowed_is_14", len(DASHBOARD_OPERATIONS) == 14, len(DASHBOARD_OPERATIONS))
+
+
+def test_dashboard_key_denied_at_unkeyed_service_even_for_dashboard_ops():
+    """The executor and agentic are not given the dashboard variable, so the
+    key fails there even for an operation name on the dashboard list."""
+    with _Env(**{TOKEN_ENV: "shared-AAA", DASHBOARD_TOKEN_ENV: None, ALLOW_UNAUTH_ENV: None}):
+        for op in ("executor_run", "browser_run"):
+            ok, status, _ = check_token("Bearer dash-BBB", op)
+            check(f"unkeyed_service_denies_dashboard_key_{op}", not ok and status == 403, status)
+
+
+def test_identical_keys_fail_closed():
+    """If both variables hold the same value, the dashboard key could pass as
+    the shared key and skip the operation list — so refuse everything."""
+    with _Env(**{TOKEN_ENV: "same-CCC", DASHBOARD_TOKEN_ENV: "same-CCC", ALLOW_UNAUTH_ENV: None}):
+        for op in ("browser_click", "browser_run"):
+            ok, status, _ = check_token("Bearer same-CCC", op)
+            check(f"identical_keys_refuse_{op}", not ok and status == 503, status)
+
+
+def test_compose_gives_dashboard_key_only_to_dashboard_and_three_services():
+    import yaml
+    allowed = {"dashboard", "browser-agent", "monitor-service", "notify-service"}
+    for cf in ("docker-compose.full.yml", "docker-compose.minimal.yml", "docker-compose.sovereign.yml"):
+        services = yaml.safe_load((REPO / cf).read_text()).get("services") or {}
+        holders = {n for n, s in services.items()
+                   if isinstance(s.get("environment"), dict) and DASHBOARD_TOKEN_ENV in s["environment"]}
+        check(f"{cf}_dashboard_key_holders_allowed", holders <= allowed, sorted(holders - allowed))
+        check(f"{cf}_executor_agentic_lack_dashboard_key", not holders & {"executor", "agentic"}, sorted(holders))
+
+
 # ═══════════════════════════════════════════════════════════════════
 # 3. Coverage — every audited endpoint is actually protected
 # ═══════════════════════════════════════════════════════════════════
@@ -313,6 +414,14 @@ if __name__ == "__main__":
     test_bearer_scheme_case_insensitive()
     test_token_whitespace_tolerated()
     test_prefix_token_rejected()
+    test_dashboard_key_rejected_where_not_configured()
+    test_dashboard_key_accepted_where_configured()
+    test_dashboard_key_alone_keeps_fail_closed_semantics()
+    test_dashboard_operation_list_matches_the_services()
+    test_dashboard_key_only_for_its_14_operations()
+    test_dashboard_key_denied_at_unkeyed_service_even_for_dashboard_ops()
+    test_identical_keys_fail_closed()
+    test_compose_gives_dashboard_key_only_to_dashboard_and_three_services()
     test_every_audited_endpoint_protected()
     test_protection_count()
     test_services_import_helper()

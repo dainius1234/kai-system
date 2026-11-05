@@ -960,6 +960,26 @@ class TestAsyncHelpers:
         assert "VAT filing query" in result
         assert len(result) == 2
 
+    def test_get_relevant_memories_reads_memu_core_result_field(self):
+        # memu-core /memory/memorize stores the text under content["result"]
+        # (memu-core/app.py memorize_event); recall must read it.
+        records = [{"content": {"result": "site meeting moved to Friday", "user_id": "keeper"}}]
+        mc, _ = _make_http_mock(200, records)
+        with patch("httpx.AsyncClient", return_value=mc):
+            result = _asyncio.run(ag._recall_memories("site meeting"))
+        assert result == ["site meeting moved to Friday"]
+
+    def test_introspect_capabilities_with_loaded_skill(self):
+        # router.list_skills() returns dicts; the endpoint used s.name and
+        # crashed as soon as one skill was loaded (masked here by the [] stub).
+        skill = {"name": "cis-deductions", "triggers": ["cis"], "action": "", "source": "x.md"}
+        mc, _ = _make_http_mock(200, {})
+        with patch.object(ag, "list_skills", return_value=[skill]), \
+             patch("httpx.AsyncClient", return_value=mc):
+            r = client.get("/introspect/capabilities")
+        assert r.status_code == 200
+        assert r.json()["skills"] == [{"name": "cis-deductions"}]
+
     def test_get_relevant_memories_empty_on_non_200(self):
         mc, _ = _make_http_mock(404, {})
         with patch("httpx.AsyncClient", return_value=mc):
@@ -997,12 +1017,13 @@ class TestAsyncHelpers:
         assert result == {}
 
     def test_read_financial_context_fetches_on_vat_keyword(self):
-        fin = {"cis_summary": {"total_gross": 10000, "total_deductions": 200,
-                               "total_net": 9800, "record_count": 5}}
+        # Shape returned by financial-awareness /finance/summary
+        fin = {"cis": {"gross_income_ytd": 10000, "cis_deducted_ytd": 200,
+                       "net_received_ytd": 9800, "record_count": 5}}
         mc, _ = _make_http_mock(200, fin)
         with patch("httpx.AsyncClient", return_value=mc):
             result = _asyncio.run(ag._read_financial_context("my VAT invoice this quarter"))
-        assert result.get("cis_summary") is not None
+        assert result.get("cis") is not None
 
     def test_read_financial_context_empty_on_non_200(self):
         mc, _ = _make_http_mock(503, {})
@@ -1272,6 +1293,146 @@ class TestAsyncHelpers:
 # Patch _get_* helpers to return rich data so the injection blocks run
 # ═════════════════════════════════════════════════════════════════════
 
+class TestObserverShadowSplit:
+    """Handoff entry 387: the proactive observer only reads and analyses in
+    shadow mode; memory writes, notifications and actions are proposed,
+    not performed. Synthetic inputs only."""
+
+    SNAP = {
+        "docker": {"count": 2, "containers": [{"name": "memu-core"}, {"name": "verifier"}]},
+        "email": {"count": 5},
+        "aq": {"aqi_category": "unhealthy", "pm2_5_ugm3": 61},
+        "git": {"count": 1},
+        "sys": {"cpu_percent": 93.0, "memory": {"percent": 95.0}},
+        "cal": {"summary": "x", "next_event": "site meeting", "minutes_until_next": 20},
+    }
+    ALL_FLAGS = {"HOUSE_DOCTOR", "PROACTIVE_SCHEDULING", "WORLD_MODEL_PERSISTENCE",
+                 "CAUSAL_WORLD_MODEL", "GLOBAL_WORKSPACE", "CURIOSITY", "SERVICE_WATCHDOG",
+                 "MARKET_DATA", "SENSORY_LEARNING", "RITUAL_DISCOVERY", "ANOMALY_DETECTION",
+                 "PROACTIVE_AGENT"}
+
+    def _flags(self, name):
+        return name in self.ALL_FLAGS
+
+    def _no_side_effects(self):
+        """Patches that make any write, notification or action loud."""
+        boom = MagicMock(side_effect=AssertionError("network/state call in shadow path"))
+        return [patch.object(ag, "pooled_client", boom),
+                patch.object(ag._cleanup_mgr, "submit", boom),
+                patch.object(ag, "get_causal_graph", boom),
+                patch.object(ag, "get_global_workspace", boom),
+                patch.object(ag, "get_watchdog", boom),
+                patch.object(ag, "_mark_paper_positions", boom)]
+
+    def test_analysis_is_pure_and_proposes_effects(self):
+        from contextlib import ExitStack
+        with ExitStack() as st:
+            st.enter_context(patch.object(ag, "is_enabled", side_effect=self._flags))
+            for p in self._no_side_effects():
+                st.enter_context(p)
+            cycle = ag._analyse_cycle(self.SNAP, {}, [{"severity": "WARNING", "primary_diagnosis": "disk filling"}])
+        obs = " | ".join(cycle["observations"])
+        assert "Docker: 2 unhealthy" in obs and "CPU at 93%" in obs and "[recent dx/WARNING] disk filling" in obs
+        kinds = {e["kind"] for e in cycle["proposed_effects"]}
+        assert {"memory_write", "house_doctor_diagnose", "causal_edges", "workspace_bids",
+                "curiosity_tick", "service_watchdog", "paper_position_marking"} <= kinds
+        mem = [e["payload"] for e in cycle["proposed_effects"] if e["kind"] == "memory_write"]
+        assert all({"timestamp", "event_type", "result_raw"} <= set(m) for m in mem)
+
+    def test_shadow_cycle_reads_but_performs_no_effects(self):
+        from contextlib import ExitStack
+        observe = AsyncMock(return_value=(self.SNAP, []))
+        with ExitStack() as st:
+            st.enter_context(patch.object(ag, "is_enabled", side_effect=self._flags))
+            st.enter_context(patch.object(ag, "gate_autonomous_action", return_value=(True, "allowed")))
+            st.enter_context(patch.object(ag, "_observe_world", observe))
+            st.enter_context(patch.dict(os.environ, {"KAI_OBSERVER_MODE": "shadow"}))
+            for p in self._no_side_effects():
+                st.enter_context(p)
+            cycle = _asyncio.run(ag._observer_cycle())
+        observe.assert_awaited_once()
+        assert cycle["mode"] == "shadow"
+        assert cycle["effects_result"]["applied"] == []
+        assert "memory_write" in cycle["effects_result"]["shadow"]
+        assert ag._observer_shadow_log[-1] is cycle
+
+    def test_gate_refusal_means_no_sensing(self):
+        observe = AsyncMock(return_value=(self.SNAP, []))
+        with patch.object(ag, "gate_autonomous_action", return_value=(False, "trust core unavailable (fail-closed)")), \
+             patch.object(ag, "_observe_world", observe):
+            assert _asyncio.run(ag._observer_cycle()) is None
+        observe.assert_not_awaited()
+
+    def test_observer_mode_defaults_to_shadow(self):
+        for value, expected in ((None, "shadow"), ("shadow", "shadow"), ("true", "shadow"),
+                                ("", "shadow"), ("governed", "governed"), (" GOVERNED ", "governed")):
+            env = {} if value is None else {"KAI_OBSERVER_MODE": value}
+            with patch.dict(os.environ, env, clear=False):
+                if value is None:
+                    os.environ.pop("KAI_OBSERVER_MODE", None)
+                assert ag._observer_mode() == expected, value
+
+    def test_governed_mode_applies_only_permitted_effects(self):
+        """Preservation (known-positive): the memory write still works when its
+        own capability is granted; refused capabilities change nothing."""
+        posts = []
+
+        class _Client:
+            async def __aenter__(self):
+                return self
+
+            async def __aexit__(self, *a):
+                return False
+
+            async def post(self, url, json=None):
+                posts.append((url, json))
+
+        def gate(capability, context, conviction=5.0):
+            return (capability == "proactive_memory_write", "test gate")
+
+        cycle = {"proposed_effects": [
+            {"kind": "memory_write", "payload": {"timestamp": "t", "event_type": "proactive_observation",
+                                                 "result_raw": "x", "category": "proactive_observation",
+                                                 "user_id": "keeper"}},
+            {"kind": "house_doctor_diagnose", "payload": {"observations": ["x"]}},
+            {"kind": "service_watchdog", "payload": {}},
+        ]}
+        with patch.object(ag, "gate_autonomous_action", side_effect=gate), \
+             patch.object(ag, "pooled_client", return_value=_Client()), \
+             patch.object(ag, "get_watchdog", MagicMock(side_effect=AssertionError("refused effect ran"))):
+            result = _asyncio.run(ag._apply_observer_effects(cycle))
+        assert result["applied"] == ["memory_write"]
+        assert len(result["refused"]) == 2
+        assert [u for u, _ in posts] == [f"{ag.MEMU_URL}/memory/memorize"]
+
+
+class TestChatLearningIntegrity:
+    """P1.8 (handoff entry 378): a chat turn must not teach a value from the
+    operator's message, and must not record Kai's reply as the operator's
+    decision. The rest of the learning step must still run."""
+
+    def test_chat_does_not_learn_values_or_record_reply_as_decision(self):
+        captured = []
+        memu = AsyncMock(return_value={})
+        ohana = MagicMock()
+        ohana.inject_into_prompt.side_effect = lambda prompt, **_: prompt
+        with patch.object(ag._cleanup_mgr, "submit", side_effect=captured.append), \
+             patch.object(ag, "_memu_post", memu), \
+             patch.object(ag, "get_ohana_core", return_value=ohana), \
+             patch.object(ag, "_append_session_turn", AsyncMock()), \
+             patch.object(ag, "_auto_memorize", AsyncMock()):
+            r = client.post("/chat", json={"message": "I always pay subbies on time"})
+            assert r.status_code == 200
+            assert captured, "the end-of-turn learning step was not scheduled"
+            for coro in captured:
+                _asyncio.run(coro)
+        paths = [c.args[0] for c in memu.await_args_list]
+        assert "/memory/values/learn" not in paths
+        ohana.record_decision.assert_not_called()
+        # known-negative: the learning step itself still ran
+        assert "/memory/emotion/record" in paths
+
+
 class TestChatContextInjection:
     """These tests patch the async _get_* helper functions to return
     non-empty data so that the context-injection if-blocks in
@@ -1367,12 +1528,13 @@ class TestChatContextInjection:
 
     def test_financial_context_block_executes(self):
         fin = {
-            "cis_summary": {"total_gross": 50000.0, "total_deductions": 1000.0,
-                            "total_net": 49000.0, "record_count": 12},
-            "vat_position": {"rolling_12m_turnover": 80000.0, "threshold": 85000.0,
-                             "must_register": False},
-            "tax_estimate": {"income_tax": 8500.0, "class4_ni": 1800.0,
-                             "total_liability": 10300.0},
+            # Shape returned by financial-awareness /finance/summary
+            "cis": {"gross_income_ytd": 50000.0, "cis_deducted_ytd": 1000.0,
+                    "net_received_ytd": 49000.0, "record_count": 12},
+            "vat": {"rolling_12m_income": 80000.0, "vat_threshold": 85000.0,
+                    "below_threshold": True},
+            "tax": {"income_tax_estimate": 8500.0, "class4_ni_estimate": 1800.0,
+                    "total_tax_ni_estimate": 10300.0, "estimated_balance_due": 9300.0},
         }
         with patch.object(ag, "_read_financial_context", AsyncMock(return_value=fin)):
             r = client.post("/chat", json={"message": "give me my VAT and CIS summary"})

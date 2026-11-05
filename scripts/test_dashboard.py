@@ -398,6 +398,71 @@ def test_valid_query_limits_still_work():
     assert resp.status_code != 422, resp.status_code
 
 
+# ── The dashboard's own service key (handoff entries 381-382) ────────────────
+
+class _EnvPatch:
+    """Scoped env override usable without pytest fixtures (self-run suite)."""
+
+    def __init__(self, **values):
+        self._values, self._saved = values, {}
+
+    def __enter__(self):
+        for k, v in self._values.items():
+            self._saved[k] = os.environ.get(k)
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+        return self
+
+    def __exit__(self, *exc):
+        for k, v in self._saved.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+
+
+def test_dashboard_key_sent_only_to_the_three_keyed_services():
+    with _EnvPatch(KAI_DASHBOARD_SERVICE_TOKEN="dash-key-1", KAI_SERVICE_TOKEN="shared-master-9"):
+        h = mod._service_headers
+        keyed = (mod.BROWSER_AGENT_URL, mod.MONITOR_URL, mod.NOTIFY_URL)
+        for base in keyed:
+            assert h(f"{base}/anything") == {"Authorization": "Bearer dash-key-1"}, base
+        # known-negatives: every other backend gets no key, and the shared
+        # master token is never what the dashboard sends
+        for other in (mod.AGENTIC_URL, mod.MEMU_URL, mod.BROKER_URL, mod.TOOL_GATE_URL):
+            assert h(f"{other}/x") == {}, other
+        assert "shared-master-9" not in str([h(f"{b}/x") for b in keyed])
+        # a host that merely starts with the same text is not the service
+        assert h(mod.MONITOR_URL + "-evil.example/x") == {}
+
+
+def test_dashboard_key_absent_means_no_header():
+    with _EnvPatch(KAI_DASHBOARD_SERVICE_TOKEN=None):
+        assert mod._service_headers(f"{mod.MONITOR_URL}/rules") == {}
+
+
+def test_monitor_proxy_carries_dashboard_key():
+    seen = {}
+
+    async def fake_call(method, url, **kw):
+        seen.update(method=method, url=url, headers=kw.get("headers"))
+        return {"ok": True}
+
+    original = mod.resilient_call
+    mod.resilient_call = fake_call
+    try:
+        with _EnvPatch(KAI_DASHBOARD_SERVICE_TOKEN="dash-key-1"):
+            r = client.post("/api/monitor/rules", json={"name": "x"}, headers=AUTH)
+    finally:
+        mod.resilient_call = original
+    assert r.status_code == 200, r.text
+    assert seen["url"].startswith(mod.MONITOR_URL)
+    assert seen["headers"] == {"Authorization": "Bearer dash-key-1"}
+    assert "dash-key-1" not in r.text  # never echoed to the browser
+
+
 if __name__ == "__main__":
     test_health()
     test_index_minimal()
@@ -427,4 +492,7 @@ if __name__ == "__main__":
     test_upload_too_large()
     test_upload_image_ocr_success()
     test_upload_service_unreachable()
+    test_dashboard_key_sent_only_to_the_three_keyed_services()
+    test_dashboard_key_absent_means_no_header()
+    test_monitor_proxy_carries_dashboard_key()
     print("dashboard tests passed")

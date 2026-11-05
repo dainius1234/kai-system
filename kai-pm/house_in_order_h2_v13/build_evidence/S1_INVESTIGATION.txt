@@ -1,0 +1,352 @@
+S1 — CENSUS / PASS A SOURCE-BINDING INVESTIGATION. MEASUREMENT ONLY.
+PRODUCED BY ORION. ZERO ADJUDICATION WEIGHT. NOT AN ANSWER KEY.
+lineage M3 002e0ab · M1 53791c4 · E2 859e0a0
+
+1. THE ROOT, AND IT IS NOT WHAT THE E2 SUMMARY IMPLIED
+   The census package is NOT internally source-unbound. Its own
+   runner, run_census.py, is rigorously subject-bound:
+     - the ref is resolved to an IMMUTABLE 40-hex commit id ONCE;
+     - materialise() REFUSES anything that is not a 40-hex oid;
+     - `git archive <commit>` extracts the tree into a fresh dest;
+     - dest is re-inited and committed, so HEAD == the subject;
+     - the materialised ls-tree is reconciled against the ORIGINAL
+       repository's ls-tree, and a mismatch is an R11 ABORT;
+     - cal_subject_binding.py exists solely to prove the
+       resolve-once discipline against a moving ref.
+   `tracked_md(repo)` reading HEAD and `(repo/fn).read_text()` are
+   therefore CORRECT INSIDE THAT MATERIALISED SUBJECT. HEAD == the
+   subject and the tree is clean BY CONSTRUCTION. That is the
+   contract those functions were written against.
+
+   THE ROOT IS THAT PASS A BYPASSES THAT HARNESS. passa.build
+   imports the census LIBRARY -- docgraph, opscan, claims -- and
+   calls it against the LIVE repository, outside materialise().
+   The precondition that makes HEAD-and-filesystem correct is
+   neither ESTABLISHED nor CHECKED.
+
+     S1-a  PRECONDITION NOT ESTABLISHED. No materialisation. The
+           subject is never extracted, so nothing makes HEAD equal
+           the subject or the tree clean.
+     S1-b  THE PRECONDITION IS HALF-CHECKED, AND THE HALF THAT IS
+           MISSING IS THE ONE THAT BITES. passa.main() L602-604
+           ASSERTS HEAD == subject and aborts otherwise, and
+           run_h2_v12.main() L321-323 repeats it. NOTHING anywhere
+           checks that the WORKING TREE IS CLEAN. So a moved HEAD
+           is refused loudly, and a dirty tree is not noticed at
+           all -- and it is the dirty tree that silently changes
+           the bytes analysed.
+           THIS CORRECTS THE FIRST DRAFT OF THIS INVESTIGATION,
+           which asserted the precondition was unchecked. It is
+           not. The AST binding-site table below is what surfaced
+           passa.py L602, and the claim was corrected before this
+           report was banked.
+     S1-c  THE GATE IS ON THE ENTRYPOINT, NOT ON THE MEASUREMENT.
+           build() carries no gate of its own, so any future caller
+           importing passa as a library -- which is exactly how
+           Pass A imports the census -- gets no protection. That is
+           the same shape as S1-a one level up.
+
+2. WHERE SUBJECT IDENTITY STOPS PROPAGATING — the exact line
+   passa.build(subject_repo, history_repo, subject, census_pkg)
+   receives `subject` and uses it for HISTORY only:
+     L572  git(history_repo, 'rev-list', '--count', subject, '--', d)
+     L574  git(history_repo, 'log', '-1', ..., subject, '--', d)
+   It is NEVER passed to the enumeration or to any byte read:
+     L536  tracked = G.tracked_md(subject_repo)      <- HEAD
+     L537  edges  = G.build_graph(subject_repo, tracked)  <- fs
+     L541  ops    = O.collect(subject_repo, tracked)      <- HEAD+fs
+     L566  txt    = (pathlib.Path(subject_repo)/d).read_text()  <- fs
+   L536 IS THE FIRST LOSS. Everything downstream inherits it.
+
+3. THREE INDEPENDENT BINDING SOURCES IN ONE ROW
+   enumeration  repository HEAD
+   bytes        the working filesystem
+   history      the requested subject  (correctly bound)
+   They can disagree independently and in any combination, which
+   is exactly Kai's question 4: YES. A row can carry history from
+   one commit, a file list from a second and bytes from a third.
+
+4. EVERY BINDING SITE, walked by AST
+   raw Call nodes matched 45; collapsed to 24 distinct (file, line, kind) sites.
+   TRANSFORMATION NAMED AND RECONCILED (R17): a chained call such
+   as git(...).stdout.strip() is two Call nodes on one line, so the
+   walk sees it twice. Duplicates are collapsed by keeping the
+   longest expression; nothing is dropped.
+   file              line  kind        expression
+   docgraph.py         50  GIT         sorted((p for p in git(repo, 'ls-tree', '-r', '--name-only', 'HEAD').splitlines() if p.endswith('.md')))
+   docgraph.py         55  GIT         git(repo, 'ls-files', '--others', '--exclude-standard').splitlines()
+   docgraph.py         57  GIT         git(repo, 'ls-files', '--others', '--ignored', '--exclude-standard').splitlines()
+   docgraph.py        126  FILESYSTEM  (repo / src).read_text(errors='ignore')
+   opscan.py           71  GIT         git(repo, 'ls-tree', '-r', '--name-only', 'HEAD').splitlines()
+   opscan.py          356  FILESYSTEM  (repo / fn).read_text(errors='ignore')
+   passa.py           443  GIT         git(history_repo, 'cat-file', '-e', f'{tok}^{{commit}}')
+   passa.py           566  FILESYSTEM  (pathlib.Path(subject_repo) / d).read_text(errors='ignore')
+   passa.py           572  GIT         git(history_repo, 'rev-list', '--count', subject, '--', d).stdout.strip()
+   passa.py           574  GIT         git(history_repo, 'log', '-1', '--format=%ad', '--date=short', subject, '--', d).stdout.strip()
+   passa.py           602  GIT         git(sr, 'rev-parse', 'HEAD').stdout.strip()
+   passa.py           606  GIT         git(hr, 'cat-file', '-e', f'{a.subject}^{{commit}}')
+   passa.py           608  GIT         git(hr, 'rev-parse', '--is-shallow-repository').stdout.strip()
+   passa.py           618  GIT         git(sr, 'rev-parse', f'{a.subject}^{{tree}}').stdout.strip()
+   passa.py           621  GIT         git(hr, 'log', '--reverse', '--format=%H').stdout.split('\n')
+   passa.py           623  GIT         git(hr, 'log', '--reverse', '--format=%ad', '--date=short').stdout.split('\n')
+   passa.py           625  GIT         git(hr, 'log', '-1', '--format=%ad', '--date=short').stdout.strip()
+   passa.py           627  GIT         int(git(hr, 'rev-list', '--count', a.subject).stdout.strip() or 0)
+   passa.py           632  FILESYSTEM  cm.read_bytes()
+   run_census.py       91  GIT         sorted((p for p in _run(['git', 'ls-tree', '-r', '--name-only', commit], cwd=repo).stdout.splitlines() if p))
+   run_census.py       99  GIT         subprocess.run(['git', 'archive', '--format=tar', commit], cwd=repo, stdout=subprocess.PIPE)
+   run_census.py      113  GIT         sorted((p for p in _run(['git', 'ls-tree', '-r', '--name-only', 'HEAD'], cwd=dest).stdout.splitlines() if p))
+   run_census.py      204  GIT         _run(['git', 'rev-parse', f'{a.ref}^{{commit}}'], cwd=repo).stdout.strip()
+   run_census.py      210  GIT         _run(['git', 'rev-parse', f'{commit}^{{tree}}'], cwd=repo).stdout.strip()
+
+5. AFFECTED PRODUCTS — the blast radius is ALL of Pass A
+   Every field in a Pass A row that derives from enumeration or
+   from filesystem bytes:
+     path, title, bytes, sha256          document bytes
+     witnesses (all 492)                 document bytes
+     graphA_in, graphA_out               docgraph link scan (fs)
+     exe_ops, writers, readers           opscan (HEAD + fs)
+     reader_ops                          opscan (HEAD + fs)
+     says_supersedes                     document bytes
+   Correctly subject-bound, and only these:
+     commits_in_window, last             history at `subject`
+   SO THE EXPOSURE IS NOT CONFINED TO THE CENSUS PRODUCTS. The
+   WITNESSES are read from the filesystem too, which is a wider
+   radius than the E2 investigation stated, and it is stated here
+   because this investigation looked at passa.build itself.
+
+6. WHICH EVIDENCE FACTS AND VERDICTS CAN INHERIT IT
+   facts    STATIC_REFERENCE_AT_SUBJECT (readers/reader_ops),
+            CITES_COMMIT, CITES_RUN, CARRIES_DATE_STAMP,
+            BINDING_CONTRADICTION, SELF_ASSERTS_*(subjectbind
+            reads the same filesystem text)
+            MAINTENANCE_OBSERVED is history-bound and is NOT
+            exposed on the byte path.
+   verdicts ALL SIX AXES. Every axis consumes witnesses or the
+            document text, both of which are filesystem-derived.
+            Demonstration A below moves a witness value; a moved
+            witness moves M3 scope and therefore M1 VALIDITY.
+   SO THE ANSWER TO KAI'S Q7 AND Q8 IS: NOT ONLY PROVENANCE. The
+   defect can alter the candidate POPULATION (Q8) and the RESULTS,
+   demonstrated below, not inferred.
+
+7. THE DEMONSTRATIONS — real repositories, the real Pass A
+   A  worktree edited after the commit
+     setup            docs/alpha.md edited in the working tree, NOT committed
+     subject          64192a471017   HEAD 64192a471017   dirty=True
+     subject truth    ['docs/alpha.md', 'docs/beta.md']
+     analysed         ['docs/alpha.md', 'docs/beta.md']
+     extra            none
+     missing          none
+     BYTE DRIFT       docs/alpha.md
+       subject sha256 55e0b519138a7367
+       analysed sha25664eb6617212b32a2
+       witnesses emitted under the subject's identity: ['2099-12-31']
+     LIBRARY PATH     SILENT DRIFT
+     PRODUCTION CLI   rc=0  output written=True
+         NO VERDICT ASSIGNED IN PASS A.
+
+   B  subject != HEAD
+     setup            docs/alpha.md edited AND committed; subject stays the first commit
+     subject          886731e56eec   HEAD a50173acdfc0   dirty=False
+     subject truth    ['docs/alpha.md', 'docs/beta.md']
+     analysed         ['docs/alpha.md', 'docs/beta.md']
+     extra            none
+     missing          none
+     BYTE DRIFT       docs/alpha.md
+       subject sha256 55e0b519138a7367
+       analysed sha25664eb6617212b32a2
+       witnesses emitted under the subject's identity: ['2099-12-31']
+     LIBRARY PATH     SILENT DRIFT
+     PRODUCTION CLI   rc=1  output written=False
+       R11 ABORT: subject repo HEAD a50173acdfc0 != subject 886731e56eec
+
+   C  tracked file deleted from the worktree
+     setup            docs/beta.md deleted from the working tree, still in the subject
+     subject          886731e56eec   HEAD 886731e56eec   dirty=True
+     subject truth    ['docs/alpha.md', 'docs/beta.md']
+     LIBRARY PATH     FAILS LOUD
+     error            FileNotFoundError: [Errno 2] No such file or directory: '/tmp/s1_hzi4825o/C  tracked file deleted from the worktree/docs/beta.md'
+     PRODUCTION CLI   rc=1  output written=False
+       Traceback (most recent call last):
+     reason           the file list came from HEAD and the
+                      bytes from the filesystem; the two
+                      disagreed and the read had nowhere to go
+
+   D  new tracked file at HEAD, absent from the subject
+     setup            docs/gamma.md added AFTER the subject commit
+     subject          886731e56eec   HEAD e20ecc5c0cdb   dirty=False
+     subject truth    ['docs/alpha.md', 'docs/beta.md']
+     analysed         ['docs/alpha.md', 'docs/beta.md', 'docs/gamma.md']
+     extra            ['docs/gamma.md']
+     missing          none
+     byte drift       none
+     LIBRARY PATH     SILENT DRIFT
+     PRODUCTION CLI   rc=1  output written=False
+       R11 ABORT: subject repo HEAD e20ecc5c0cdb != subject 886731e56eec
+
+   E  rename after the subject commit
+     setup            docs/beta.md renamed to docs/delta.md AFTER the subject commit
+     subject          ba4dd2ed2e59   HEAD abb7633eaaa5   dirty=False
+     subject truth    ['docs/alpha.md', 'docs/beta.md']
+     analysed         ['docs/alpha.md', 'docs/delta.md']
+     extra            ['docs/delta.md']
+     missing          ['docs/beta.md']
+     byte drift       none
+     LIBRARY PATH     SILENT DRIFT
+     PRODUCTION CLI   rc=1  output written=False
+       R11 ABORT: subject repo HEAD abb7633eaaa5 != subject ba4dd2ed2e59
+
+7b. PRODUCTION REACHABILITY — WHICH OF THESE CAN ACTUALLY HAPPEN
+   produced output, rc=0                : 1 of 5
+     A  worktree edited after the commit
+   REFUSED by the existing HEAD gate    : 3
+     B  subject != HEAD  -- R11 ABORT
+     D  new tracked file at HEAD, absent from the subject  -- R11 ABORT
+     E  rename after the subject commit  -- R11 ABORT
+   STOPPED, but by an unhandled exception rather than a gate: 1
+     C  tracked file deleted from the worktree  -- Traceback (most recent call last):
+   The three buckets are kept apart deliberately: a gate refusing
+   and a program crashing are not the same outcome, and calling
+   both 'refused' would overstate what the code does.
+
+   THIS IS THE FINDING THAT MATTERS, AND IT IS NARROWER AND
+   SHARPER THAN 'THE CENSUS IS SOURCE-UNBOUND'.
+   The subject != HEAD cases (B, D, E) CANNOT occur in production:
+   passa.main() refuses them with an R11 ABORT before measuring.
+   What reaches production is the WORKING-TREE DIRTINESS class,
+   because nothing anywhere checks it:
+     A  dirty tree, HEAD == subject -> SILENT DRIFT, rc=0, a full
+        result file written, witnesses taken from uncommitted bytes
+        and stamped with the subject's identity. THIS IS THE REAL
+        REALISED EXPOSURE.
+     C  a tracked file deleted from the tree -> an UNHANDLED
+        FileNotFoundError. It does stop, but through a traceback
+        rather than an R11 abort naming the unmet prerequisite,
+        so it fails loudly and UNGRACEFULLY (R11's own standard:
+        abort at the prerequisite boundary and say which one).
+
+8. DETACHED HEAD — Kai's question 11
+   subject ba4dd2ed2e59  HEAD now ba4dd2ed2e59  equal=True
+   analysed ['docs/alpha.md', 'docs/beta.md']
+   A detached HEAD is not a separate mechanism. It changes WHERE
+   HEAD points, and the defect is that HEAD is consulted at all.
+   Checking out the subject makes the run correct BY ACCIDENT --
+   the same accident that made the E2 measurement correct.
+
+9. SYMLINKS AND TRAVERSAL — Kai's question 12
+   tracked .md at the subject      ['docs/alpha.md', 'docs/beta.md', 'docs/escape.md', 'docs/link.md']
+   docs/link.md bytes analysed     38
+   docs/escape.md bytes analysed   10
+   git stores a symlink as a blob holding its TARGET PATH, so the
+   subject's own bytes for a link are the path string. Reading it
+   from the filesystem FOLLOWS the link instead, and for a link
+   pointing outside the repository the bytes analysed come from
+   OUTSIDE THE SUBJECT ENTIRELY -- a binding ambiguity that no
+   commit id can describe. A tree-bound read would return the
+   link's own blob and could not leave the repository.
+
+10. IS THE CANONICAL SUBJECT AFFECTED TODAY? — REALISED vs LATENT
+   canonical HEAD                          d8aac4d49e6ba997e3eb38062c0917186ee3f197
+   canonical HEAD tree                     3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+   requested tree                          3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+   HEAD tree == requested tree             True
+   worktree clean                          True
+   LATENT, NOT REALISED, on the canonical subject: HEAD equals the
+   subject commit and the worktree is clean, so the three binding
+   sources agree. The E2 result therefore REMAINS VALID UNDER ITS
+   STATED CLEAN-WORKTREE CONDITIONS -- and it is correct by
+   coincidence of environment, not by construction. Nothing in the
+   code enforces the coincidence and nothing records that it held.
+
+11. AGAINST THE M3 MANIFEST DEFECT — SAME CLASS? NO.
+   The M3 repair at 479596e62b70 addressed a builder that took
+   its path population from git and its bytes from the filesystem,
+   where NO harness anywhere provided the missing guarantee. The
+   repair was to read bytes from the git object.
+   S1 SHARES THE SYMPTOM AND NOT THE MECHANISM. Here the guarantee
+   EXISTS, is implemented carefully, is calibrated by its own
+   fixture, and is BYPASSED by a caller that imports the library
+   directly. That is an UNENFORCED PRECONDITION, not a mixed-source
+   builder. Copying the prior repair -- rewriting opscan and
+   docgraph to read git objects -- would modify a FROZEN package,
+   duplicate a guarantee that already exists, and leave the actual
+   defect (a caller outside the harness) in place.
+   S1 ALSO HAS A SECOND MECHANISM THE M3 DEFECT DID NOT: passa.py
+   reads document bytes itself, so the exposure is not confined to
+   the census products.
+
+12. MANIFEST / AGGREGATE — Kai's question 13
+   The census MANIFEST.sha256 and its aggregate pin the census
+   CODE identity. They say nothing whatever about which bytes that
+   code was pointed at. So YES: code identity is proven, SUBJECT-
+   BYTE identity is not.
+
+13. INTERACTION WITH THE ACCEPTED E2 PROVENANCE STATEMENT
+   E2 established that census_dependency + the trace express the
+   bounded ANALYSIS SCOPE -- which source files were eligible to be
+   scanned. That remains true and is unaffected. S1 is a different
+   question: WHICH BYTES of those files were read. The E2 statement
+   was never a subject-byte claim and does not become one.
+
+14. SMALLEST PLAUSIBLE REPAIR PRINCIPLE (proposal, NOT implemented)
+   Do not rewrite the census. The HEAD half of the precondition is
+   already gated; CLOSE THE HALF THAT IS NOT. Two candidate shapes,
+   and they answer DIFFERENT questions:
+     (i)  MATERIALISE. passa.build extracts the subject with the
+          existing run_census.materialise() and analyses the
+          materialised tree. Reuses the proven, calibrated code
+          path. Cost: an extraction per run.
+     (ii) GATE THE WORKING TREE. passa.main() already asserts
+          HEAD == subject; add the missing clean-tree assertion and
+          worktree, and ABORTS otherwise. Cheap, and it converts
+          silent drift into a loud refusal. It does not let a
+          non-HEAD subject be analysed.
+   KAI'S QUESTION 10, ANSWERED PRECISELY: a non-HEAD frozen subject
+   CANNOT be analysed today -- and the reason is a CORRECT REFUSAL,
+   not a drift. passa.main() aborts. The capability is absent, not
+   broken. Only shape (i) would add it.
+   (ii) CLOSES THE REALISED EXPOSURE -- demonstration A -- at the
+   cost of one assertion. (i) additionally ADDS a capability that
+   does not exist today: analysing a subject that is not HEAD.
+   They are not competing repairs for the same defect; (ii) fixes
+   what is broken and (i) extends what is possible. Demonstration C
+   argues for one more thing under either shape: a clean-tree gate
+   would turn that traceback into a named prerequisite abort.
+   THIS IS A DESIGN CHOICE FOR KAI, NOT SETTLED HERE.
+   FILES THAT WOULD NEED MODIFICATION IF LATER AUTHORISED:
+     passa.py    only, under either shape
+   AND NOTHING ELSE. The census package would be IMPORTED, not
+   edited, under (i); untouched under (ii).
+   MUST REMAIN UNCHANGED, AND BE PROVEN SO: on the canonical
+   subject, where the precondition already holds, every figure --
+   272 rows, 492 witnesses, M3 201/291, VALIDITY 260/7/5, all six
+   axes, every evidence fact, the 5 static-reference identities.
+   MANDATORY CONTROLS BEFORE ANY IMPLEMENTATION:
+     FAIL-OLD  each demonstration below reproduced against the
+               predecessor, showing drift or a crash
+     PASS-NEW  each one either analysed correctly (i) or refused
+               loudly (ii) -- never silently drifting
+     a clean canonical run byte-identical to the accepted result
+     a CAN-FAIL proof that the gate/materialisation can actually
+       fire, not merely that it passes
+     predecessor loaded from the git object and executed
+     implementation banked BEFORE the corpus run
+
+15. INPUT DIGESTS
+   passa.py                    ab2d98d030f61ba12b8280e1639da92b2726bf7b91c12941336dceefb12f5a6e
+   opscan.py                   55dee3aa851a1c582d69a27f89a5eb0c78c48306a935a1c65a6774758ce2abe1
+   docgraph.py                 1ad714e74a344f222effb75d65d68e78c85745a19625fc3efbd3db5d6b0865d2
+   run_census.py               a69f0512efba5de72061fcee3078695dcfb06160d992fed2e465074243d3ee94
+
+16. REPRODUCIBILITY OF THIS REPORT
+   The demonstrations build FRESH git repositories on every run, so
+   their commit ids and temporary paths differ each time and this
+   report is NOT byte-stable. The OUTCOMES are: which cases drift,
+   which are refused, which crash, and every count reported here
+   are properties of the code under test, not of the run. Only the
+   identifiers vary.
+
+17. WHAT THIS IS NOT
+   Not a repair, not an adjudication, not an answer key. No
+   production file was modified. The canonical subject repository
+   was never written to.

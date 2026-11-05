@@ -92,6 +92,9 @@ def snapshot():
     load = list(psutil.getloadavg()) if hasattr(psutil, "getloadavg") else []
     return {
         "cpu": cpu,
+        # Flat alias: every consumer (agentic, cortex, perception spine)
+        # reads top-level "cpu_percent"; without it they all saw 0.
+        "cpu_percent": cpu["percent"],
         "memory": memory,
         "disk": disk_parts,
         "network": network,

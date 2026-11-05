@@ -84,6 +84,248 @@ class Toleration:
 
 
 DECLARED: Tuple[Toleration, ...] = (
+    # #41-B deployed. The dashboard is the SUBJECT here, so the
+    # collector records its self-report last and labelled, and takes
+    # ground truth from a socket probe and `docker inspect` instead.
+    Toleration(
+        workflow="degradation-deployed-proof.yml",
+        step="Deployed degradation evidence",
+        bucket=DOCUMENTED_SKIP,
+        reason="The collector's `stage()` records every command's exit "
+               "status as evidence and continues, because a probe that "
+               "proves a dependency ABSENT is a successful measurement of "
+               "an intended state, not a build to break. Profiles-off is "
+               "the correct posture, so nearly every command here is "
+               "expected to fail in a specific way, and the specific way "
+               "IS the result. It exits 2 only when the measurement "
+               "cannot be trusted at all — a profile leaking in. Retire "
+               "when #53's disposition is decided and this becomes a "
+               "regression gate.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="degradation-deployed-proof.yml",
+        step="Evidence summary",
+        bucket=DOCUMENTED_SKIP,
+        reason="`cat ... || echo (not executed = UNKNOWN)` — a missing "
+               "measurement must read as UNKNOWN, never as silence and "
+               "never as success. It does not judge completeness: the "
+               "caller-logic denominator is already banked, and this job "
+               "deliberately exercises a subset, so a completeness "
+               "verdict here would imply a coverage claim the job does "
+               "not make.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    # KAI-GATE-048's collector. Three suppressions, three different
+    # reasons -- lumping them under one declaration would hide which is
+    # which, and the third is the one that matters.
+    Toleration(
+        workflow="memu-graph-startup-proof.yml",
+        step="Free up runner disk space",
+        bucket=DOCUMENTED_SKIP,
+        reason="`sudo rm -rf ... || true` against the runner's "
+               "preinstalled toolchains. The paths differ between runner "
+               "images and an absent one is not a failure; the build step "
+               "that follows is what fails if the space was genuinely "
+               "not freed. Same treatment core-tests.yml already uses.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="memu-graph-startup-proof.yml",
+        step="Tear down",
+        bucket=DOCUMENTED_SKIP,
+        reason="`compose down -v || true` in an `if: always()` cleanup. A "
+               "teardown that fails the job would replace the "
+               "measurement's verdict with a janitorial one, and the "
+               "runner is discarded either way. It cannot mask a "
+               "measurement failure because it runs after every "
+               "observation is already written to the evidence file.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="memu-graph-startup-proof.yml",
+        step="Evidence summary (printed last so it survives truncation)",
+        bucket=DOCUMENTED_SKIP,
+        reason="`cat ... || echo (not executed = UNKNOWN, not clean)`. "
+               "The absent-evidence branch is the point: a run that "
+               "collected nothing must print UNKNOWN rather than an "
+               "empty section that reads as a clean result. The verdict "
+               "itself is produced inside the collector, which aborts at "
+               "the prerequisite boundary and exits 2; this step only "
+               "reprints it last, where the Actions log byte window can "
+               "still see it.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    # D189's asset-contract definition unit, same workflow, second job.
+    # Its "Free up runner disk space" and "Evidence summary" steps are
+    # already covered by the declarations above -- the match is on
+    # (workflow, step name), and both jobs use identical steps for
+    # identical reasons. A second copy would be a duplicate declaration
+    # of one fact, which is the shape this file exists to prevent.
+    Toleration(
+        workflow="memu-graph-startup-proof.yml",
+        step="Define the model asset contract",
+        bucket=DOCUMENTED_SKIP,
+        reason="`if: always()` on a measurement whose FAILING stages are "
+               "results. Stage C must fail (no asset, offline) and stage "
+               "D must fail (no asset, no flags) -- those are the "
+               "known-negatives the definition rests on. The script "
+               "itself exits 2 only when a PREREQUISITE is unmet (image "
+               "unresolved, or stage A could not fetch), which is the "
+               "one case where nothing below was measured.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="memu-graph-startup-proof.yml",
+        step="Phase 1 acceptance",
+        bucket=DOCUMENTED_SKIP,
+        reason="`if: always()` on the acceptance measurement. Its "
+               "can-fail stage MUST fail (the asset is deliberately "
+               "withheld) and the collector aborts with exit 2 only at a "
+               "prerequisite boundary. The verdict itself is the "
+               "summariser's exit code, printed last so the Actions log "
+               "byte window still carries it; a step-level failure here "
+               "would replace a measured verdict with a shell one.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    # KAI-GATE-049's diagnostic job. Both steps are `if: always()`
+    # because a NON-RETURN is a result here, not a build failure.
+    Toleration(
+        workflow="memu-graph-startup-proof.yml",
+        step="Stage decomposition of the post-chunking silence",
+        bucket=DOCUMENTED_SKIP,
+        reason="`if: always()` on a diagnostic whose interesting outcome "
+               "may be that the request never returned. The collector "
+               "exits 2 only at a prerequisite boundary (bring-up "
+               "failed); everything else it observes -- including a "
+               "non-return -- is evidence to be analysed by the next "
+               "step, not a reason to stop the job.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="memu-graph-startup-proof.yml",
+        step="Which stage owns the silence",
+        bucket=DOCUMENTED_SKIP,
+        reason="`if: always()` so the analysis runs even when collection "
+               "aborted -- an empty stage directory must produce 'NOT "
+               "COLLECTED', which is a different finding from a bad "
+               "measurement. This is a REPORT and exits 0: it names a "
+               "stage and a state and deliberately authorises no remedy, "
+               "because slow work, a blocked wait and a deadlock have "
+               "three different owners.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    # One declaration per service, because the match is on the step name
+    # and there is one INDEPENDENT collector step per service. They
+    # replace two earlier declarations — a separate "Diagnose image
+    # resolution" step, and a single Claim A step that looped over all
+    # three services. The loop was the defect: run #2 failed that one
+    # step when its evidence was incomplete, and GitHub then SKIPPED
+    # Claim B. One measurement suppressed an independent one.
+    Toleration(
+        workflow="embedding-backend-proof.yml",
+        step="Claim A — memu-core",
+        bucket=DOCUMENTED_SKIP,
+        reason="The collector exits 0 for every DEFINED probe verdict and "
+               "non-zero ONLY on instrument malfunction, so this step "
+               "cannot fail on a finding. That is deliberate: a probe "
+               "proving the semantic backend absent is a SUCCESSFUL "
+               "MEASUREMENT of a FAILED capability, and failing here "
+               "would let one service's negative result skip the "
+               "independent measurements after it. Completeness is judged "
+               "once, last, by `Evidence summary`. Retire when the "
+               "class-level remediation lands and this becomes a gate.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="embedding-backend-proof.yml",
+        step="Claim A — agentic",
+        bucket=DOCUMENTED_SKIP,
+        reason="Same collector, same argument as memu-core, declared "
+               "separately because the match is on the step name and each "
+               "differently-named step is its own decision. agentic is "
+               "the service whose Claim A was UNRESOLVED in run #2 with "
+               "the failing stage unknowable, so this row existing at all "
+               "is the point of the restructure.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="embedding-backend-proof.yml",
+        step="Claim A — fusion-engine",
+        bucket=DOCUMENTED_SKIP,
+        reason="Same collector, same argument, declared separately for "
+               "the same reason. fusion-engine built successfully in run "
+               "#2 and `config --images` still exposed no image name for "
+               "it; the cause is NOT yet measured, so nothing here names "
+               "one. The collector records each resolution stage's "
+               "command, stdout, stderr and exit status so the next run "
+               "answers that from evidence.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="embedding-backend-proof.yml",
+        step="Claim B — does memu-core reach that backend on its production default?",
+        bucket=DOCUMENTED_SKIP,
+        reason="Two suppressions. `printenv || echo (unset)` is "
+               "CORROBORATION ONLY — an absent variable is the expected "
+               "and correct state for the production default, so it must "
+               "not fail; the authoritative result is the vector width, "
+               "captured separately with its own exit status. `down -v || "
+               "true` is teardown after the measurement is already "
+               "recorded. Retire with the rest of this job.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="embedding-backend-proof.yml",
+        step="Evidence summary",
+        bucket=DOCUMENTED_SKIP,
+        reason="The declared item is the two `cat ... || echo` fallbacks, "
+               "which print an explicit `(not executed = UNKNOWN)` when a "
+               "result file is absent. That is the I-1 behaviour this "
+               "programme requires: a missing measurement must read as "
+               "UNKNOWN, never as silence and never as success. The step "
+               "itself is NOT tolerant — it is the job's only "
+               "completeness judgement and exits 1 when fewer than three "
+               "Claim-A measurements or no Claim-B measurement exist. It "
+               "can do that safely only because it is last and the "
+               "artifact upload after it runs `if: always()`, so failing "
+               "here suppresses nothing. The verdict is about whether the "
+               "EVIDENCE SET is complete, never about what the evidence "
+               "says: a FAKE result passes it, an unresolved image does "
+               "not.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="core-tests.yml",
+        step="Measured — baked model revision and embedding load time",
+        bucket=DOCUMENTED_SKIP,
+        reason="Pure instrumentation: it reads the model revision baked "
+               "into the image and the measured embedding load time so "
+               "start-period can be tuned from a number rather than a "
+               "guess. It must never fail a build, because a missing "
+               "measurement is not a broken stack — the steps that judge "
+               "the stack are the bring-up and the live smoke either side "
+               "of it. Both fallbacks print a specific reason rather than "
+               "an empty line, so an absent value is visible as an absent "
+               "value. Retire this once the revision is pinned and "
+               "start-period is set from a measured figure.",
+        owner="orion",
+        review_by="2026-09-15",
+    ),
     Toleration(
         workflow="core-tests.yml",
         step="GitHub Models CI backend smoke test",
@@ -257,6 +499,231 @@ DECLARED: Tuple[Toleration, ...] = (
         review_by="2026-11-01",
     ),
     Toleration(
+        workflow="memu-graph-startup-proof.yml",
+        step="Fetch the raw evidence captured by run ${{ env.REANALYSE_RUN_ID }}",
+        bucket=DOCUMENTED_SKIP,
+        reason="Re-analysis reads a PREVIOUS run's artifact. When that "
+               "artifact is missing or expired, download-artifact fails "
+               "inside the action with an opaque message and the job stops "
+               "there. The toleration exists so the NEXT step runs and says "
+               "the true thing: 'RE-ANALYSIS NOT PERFORMED … Q2 remains "
+               "UNMEASURED … an availability failure, NOT a finding about "
+               "the LLM.' No enforcement is skipped — that next step IS the "
+               "enforcement, and it exits 2 when the capture file is "
+               "absent, so a missing subject can never read as a clean "
+               "result (I-1/R11).",
+        owner="orion",
+        review_by="2027-01-01",
+    ),
+    Toleration(
+        workflow="p1-replay-completeness.yml",
+        step="Free up runner disk space",
+        bucket=DOCUMENTED_SKIP,
+        reason="`sudo rm -rf ... || true` against the runner's "
+               "preinstalled toolchains, identical in shape and reason to "
+               "the declaration for memu-graph-startup-proof.yml above. "
+               "Declared separately because the match is on (workflow, "
+               "step) and this is a different file — a wildcard would let "
+               "a future workflow inherit a toleration nobody wrote for "
+               "it.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="stage1-replay.yml",
+        step="Fetch the capture holding the frozen subject",
+        bucket=DOCUMENTED_SKIP,
+        reason="A missing or expired artifact would stop the job inside "
+               "download-artifact with an opaque message. The toleration "
+               "exists so the freeze step runs and refuses out loud: "
+               "'STAGE 1 NOT STARTED: the capture is absent. This is an "
+               "availability failure, not a replay result.' Nothing is "
+               "skipped -- that step exits non-zero, and no request is "
+               "sent to a model without a proven subject.",
+        owner="orion",
+        review_by="2027-01-01",
+    ),
+    Toleration(
+        workflow="stage1-replay.yml",
+        step="Fetch attempt 1's freeze manifest",
+        bucket=DOCUMENTED_SKIP,
+        reason="Same shape as the capture fetch above: a missing or "
+               "expired artifact would stop the job inside "
+               "download-artifact with an opaque message. The toleration "
+               "exists so the NEXT step is the one that speaks -- "
+               "`--verify-request-hash` reports STAGE 1 UNMEASURED and "
+               "names the unmet prerequisite, and exits non-zero. "
+               "Equality that was never established is not a match, so "
+               "nothing reaches a model on this path.",
+        owner="orion",
+        review_by="2027-01-01",
+    ),
+    Toleration(
+        workflow="stage1-replay.yml",
+        step="Record the image identity that will execute",
+        bucket=DOCUMENTED_SKIP,
+        reason="The image-identity collector is EVIDENCE COLLECTION about "
+               "the run, not a prerequisite of it. Doctrine rule 5: "
+               "measurement state and subject verdict are separate, so a "
+               "collector that cannot record an identity must not convert "
+               "itself into an adverse result about the replay. Its exit "
+               "3 means 'no image identity' -- and it still WRITES the "
+               "UNRECORDED row, which is uploaded with the artifacts, so "
+               "the gap is visible in the evidence rather than inferred "
+               "from a workflow that stopped. Nothing is skipped: the "
+               "collector starts nothing, sends nothing to a model, and "
+               "the frozen experiment is unaffected either way. (D278)",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="stage1-replay.yml",
+        step="Prove the container ran the image we recorded",
+        bucket=DOCUMENTED_SKIP,
+        reason="Same reasoning as the collector step, and the same rule 5 "
+               "boundary: this is EVIDENCE ABOUT the run, not a "
+               "prerequisite of it, so a binding it cannot establish must "
+               "not become an adverse verdict about the replay. It exits "
+               "3 on MISMATCH and on UNRECORDED, and WRITES that row -- "
+               "which is uploaded -- so a wrong or unknowable binding is "
+               "visible in the evidence rather than swallowed. It runs "
+               "`if: always()` before the export step removes the "
+               "container, because a removed container cannot be asked "
+               "what it ran. (D280)",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="stage1-replay.yml",
+        step="Free up runner disk space",
+        bucket=DOCUMENTED_SKIP,
+        reason="`sudo rm -rf ... || true` against the runner's "
+               "preinstalled toolchains, identical in shape and reason to "
+               "the declarations for the other workflows. Declared "
+               "separately because the match is on (workflow, step).",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="stage1-replay.yml",
+        step="Tear down",
+        bucket=DOCUMENTED_SKIP,
+        reason="`compose down -v || true` in an `if: always()` cleanup. A "
+               "teardown that failed the job would replace the "
+               "experiment's verdict with a janitorial one, and it runs "
+               "after every reply is already written to disk.",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="p1-replay-completeness.yml",
+        step="Fetch the capture from run ${{ env.P1_CAPTURE_RUN_ID }}",
+        bucket=DOCUMENTED_SKIP,
+        reason="Same shape and reason as the other capture fetches in this "
+               "workflow: a missing or expired artifact would stop the job "
+               "inside download-artifact with an opaque message. The "
+               "toleration exists so the next step runs and says the true "
+               "thing -- 'NO SELECTION: the capture file is absent ... an "
+               "availability failure, NOT a selection verdict' -- and exits "
+               "2. An unavailable subject can never read as a selection "
+               "(I-1/R11).",
+        owner="orion",
+        review_by="2027-01-01",
+    ),
+    Toleration(
+        workflow="p1-replay-completeness.yml",
+        step="Why did the artifact arrive, or not",
+        bucket=DOCUMENTED_SKIP,
+        reason="`HTTP=$(curl … || echo \"\")`. The empty string IS the "
+               "signal: it makes the classifier report NETWORK_FAILURE "
+               "rather than letting an unreachable API be mistaken for a "
+               "run that produced nothing. Swallowing the code here is "
+               "what keeps two causes distinguishable, which is the whole "
+               "point of the step (D251). It suppresses no enforcement: "
+               "the classifier exits non-zero for every state except "
+               "ARTIFACT_PRESENT, and the format step refuses separately "
+               "when the capture file is absent.",
+        owner="orion",
+        review_by="2027-01-01",
+    ),
+    Toleration(
+        workflow="p1-replay-completeness.yml",
+        step="Fetch the capture from run ${{ env.P1_FORMAT_RUN_ID }}",
+        bucket=DOCUMENTED_SKIP,
+        reason="Same shape and reason as the P1 fetch below: format "
+               "validation reads a PREVIOUS run's artifact, so a missing "
+               "or expired one would stop the job inside download-artifact "
+               "with an opaque message. The toleration exists so the next "
+               "step runs and says 'FORMAT VALIDATION NOT PERFORMED … an "
+               "availability failure, NOT a format verdict', and exits 2. "
+               "An unavailable subject can never read as FORMAT VALID "
+               "(I-1/R11).",
+        owner="orion",
+        review_by="2027-01-01",
+    ),
+    Toleration(
+        workflow="p1-replay-completeness.yml",
+        step="Fetch the capture from run ${{ env.P1_CAPTURE_RUN_ID }}",
+        bucket=DOCUMENTED_SKIP,
+        reason="Same shape and same reason as the re-analysis fetch above: "
+               "P1 certifies the completeness of a PREVIOUS run's captured "
+               "request, so a missing or expired artifact would stop the "
+               "job inside download-artifact with an opaque message. The "
+               "toleration exists so the verdict step runs and says the "
+               "true thing: 'P1 NOT PERFORMED … an availability failure, "
+               "NOT a P1 verdict, and Stage 1 stays blocked.' Nothing is "
+               "skipped — that step exits 2 when the capture is absent, so "
+               "an unavailable subject can never read as REQUEST_REPLAYABLE "
+               "(I-1/R11).",
+        owner="orion",
+        review_by="2027-01-01",
+    ),
+    Toleration(
+        workflow="item8-network-contingency.yml",
+        step="Record the toolchain identities this experiment ran under",
+        bucket=DOCUMENTED_SKIP,
+        reason="`|| echo UNRESOLVED` on the base-image digest lookup only. "
+               "Rule 20: the record must distinguish a digest we HAVE from "
+               "one we could not resolve, and writing UNRESOLVED is that "
+               "distinction -- an empty field would read as an answer. The "
+               "other identities on this step (docker, buildx, runner, "
+               "commit, tree, run id, pinned frontend) are not tolerated "
+               "and a failure in them stops the step. Nothing is skipped: "
+               "this records provenance, it does not gate the experiment, "
+               "and the frozen-design check above it is what can stop the "
+               "chain. (D285, D290)",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="item8-network-contingency.yml",
+        step="Free up runner disk space",
+        bucket=DOCUMENTED_SKIP,
+        reason="`sudo rm -rf ... || true` against the runner's preinstalled "
+               "toolchains, identical in shape and reason to the "
+               "declarations for the other workflows. Declared separately "
+               "because the match is on (workflow, step). (D290)",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
+        workflow="item8-preflight.yml",
+        step="Record the toolchain this measurement ran under",
+        bucket=DOCUMENTED_SKIP,
+        reason="`set -uo pipefail` without `-e`, so a failed lookup leaves "
+               "an empty value rather than aborting the job. Same shape and "
+               "reason as the experiment's own toolchain step, declared "
+               "separately because the match is on (workflow, step). "
+               "NOTHING IS GATED BY IT: this record is provenance for a "
+               "MEASUREMENT of the instrument, not for the experiment -- "
+               "this workflow runs no subject build, writes no result row, "
+               "and cannot reach the frozen denominator. The measurement "
+               "itself is the step below, and it exits non-zero when the "
+               "daemon cannot support the evidence model. (D300)",
+        owner="orion",
+        review_by="2026-11-01",
+    ),
+    Toleration(
         workflow="unified-hunter.yml",
         step="Report the surface that was exercised",
         bucket=DOCUMENTED_SKIP,
@@ -371,6 +838,47 @@ def undeclared_warnings() -> List[str]:
     return out
 
 
+def orphan_declarations() -> List[str]:
+    """Declarations naming a step that exists in no workflow.
+
+    The drift check below it compares `(workflow, bucket)` pairs, so a
+    declaration could name a step that had been renamed or deleted and
+    still be counted as matched by some *other* marker in the same file
+    carrying the same bucket. That is R5 in its usual shape: a check
+    whose scope is smaller than its name implies. "The record and the
+    file have drifted apart" is a claim about STEPS, and it was being
+    tested at the granularity of BUCKETS.
+
+    Calibrated when this was written: restructuring
+    `embedding-backend-proof.yml` into one collector per service left
+    exactly two declarations pointing at steps that no longer existed —
+    a deleted `Diagnose image resolution` and a `Claim A` step that had
+    looped over all three services. This function reported those two and
+    none of the other sixteen. Known-positive and known-negative from the
+    same run, and the expected answer came from the workflow files rather
+    than from this list.
+    """
+    import yaml
+    live: dict = {}
+    for path in sorted(WORKFLOWS.glob("*.yml")):
+        try:
+            doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        except Exception:
+            continue            # `unparseable()` owns that finding
+        names = []
+        for job in (doc.get("jobs") or {}).values():
+            for step in ((job or {}).get("steps") or []):
+                names.append((step or {}).get("name") or "")
+        live[path.name] = names
+    out = []
+    for d in DECLARED:
+        if not any(d.step in name for name in live.get(d.workflow, [])):
+            out.append(f"{d.workflow}: '{d.step}' is declared but no step "
+                       f"of that name exists. A toleration for a step that "
+                       f"is gone reads as coverage nobody has.")
+    return out
+
+
 def unparseable() -> List[str]:
     """Workflows a YAML parser rejects.
 
@@ -478,6 +986,7 @@ def main() -> int:
     declared_pairs = {(d.workflow, d.bucket) for d in DECLARED}
     orphan_markers = [f"{w}: {b}" for w, b in marked
                       if (w, b) not in declared_pairs]
+    orphan_steps = orphan_declarations()
     stale = unmarked
 
     print(inspected(scanned, "workflow lines",
@@ -523,6 +1032,16 @@ def main() -> int:
               f"declaration:\n")
         for line in orphan_markers:
             print(f"  - {line}")
+        return 1
+
+    if orphan_steps:
+        print(f"\nFAIL: {len(orphan_steps)} declaration(s) name a step that "
+              f"does not exist:\n")
+        for line in orphan_steps:
+            print(f"  - {line}")
+        print("\n  Drift is a claim about steps. Checking it per bucket "
+              "would let a\n  renamed or deleted step keep its toleration "
+              "alive behind another one.")
         return 1
 
     if stale:

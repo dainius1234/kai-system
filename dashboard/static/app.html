@@ -1532,25 +1532,26 @@ function fmt_gbp(v) {
 async function refreshFinance() {
   try {
     const data = await fetch('/api/finance/summary').then(r => r.json());
-    const cis = data.cis_summary || {};
-    const vat = data.vat_position || {};
-    const tax = data.tax_estimate || {};
+    // Keys as returned by financial-awareness /finance/summary
+    const cis = data.cis || {};
+    const vat = data.vat || {};
+    const tax = data.tax || {};
     const invoices = data.invoices || [];
 
-    document.getElementById('finGross').textContent = fmt_gbp(cis.gross_ytd);
-    document.getElementById('finDeductions').textContent = fmt_gbp(cis.deductions_ytd);
-    document.getElementById('finNet').textContent = fmt_gbp(cis.net_ytd);
-    document.getElementById('finTax').textContent = fmt_gbp(tax.estimated_liability);
+    document.getElementById('finGross').textContent = fmt_gbp(cis.gross_income_ytd);
+    document.getElementById('finDeductions').textContent = fmt_gbp(cis.cis_deducted_ytd);
+    document.getElementById('finNet').textContent = fmt_gbp(cis.net_received_ytd);
+    document.getElementById('finTax').textContent = fmt_gbp(tax.estimated_balance_due);
 
     const vatEl = document.getElementById('finVatContent');
     if (data.status === 'unavailable') {
       vatEl.innerHTML = '<div class="empty">Finance service unavailable</div>';
     } else {
       vatEl.innerHTML = `<table style="width:100%;font-size:13px;border-collapse:collapse;">
-        <tr><td style="padding:4px 8px;color:var(--text3)">Output tax</td><td style="padding:4px 8px;">${fmt_gbp(vat.output_tax)}</td>
-            <td style="padding:4px 8px;color:var(--text3)">Input tax</td><td style="padding:4px 8px;">${fmt_gbp(vat.input_tax)}</td></tr>
-        <tr><td style="padding:4px 8px;color:var(--text3)">Net VAT due</td><td style="padding:4px 8px;font-weight:600;">${fmt_gbp(vat.net_due)}</td>
-            <td style="padding:4px 8px;color:var(--text3)">Period</td><td style="padding:4px 8px;">${vat.period || '—'}</td></tr>
+        <tr><td style="padding:4px 8px;color:var(--text3)">Rolling 12-month income</td><td style="padding:4px 8px;">${fmt_gbp(vat.rolling_12m_income)}</td>
+            <td style="padding:4px 8px;color:var(--text3)">Registration threshold</td><td style="padding:4px 8px;">${fmt_gbp(vat.vat_threshold)}</td></tr>
+        <tr><td style="padding:4px 8px;color:var(--text3)">Distance to threshold</td><td style="padding:4px 8px;font-weight:600;">${fmt_gbp(vat.distance_to_threshold)}</td>
+            <td style="padding:4px 8px;color:var(--text3)">Threshold used</td><td style="padding:4px 8px;">${vat.threshold_used_pct != null ? vat.threshold_used_pct + '%' : '—'}</td></tr>
       </table>`;
     }
 
@@ -1560,9 +1561,9 @@ async function refreshFinance() {
     } else {
       taxEl.innerHTML = `<table style="width:100%;font-size:13px;border-collapse:collapse;">
         <tr><td style="padding:4px 8px;color:var(--text3)">Taxable income</td><td style="padding:4px 8px;">${fmt_gbp(tax.taxable_income)}</td>
-            <td style="padding:4px 8px;color:var(--text3)">CIS deducted</td><td style="padding:4px 8px;">${fmt_gbp(tax.cis_deducted)}</td></tr>
-        <tr><td style="padding:4px 8px;color:var(--text3)">NI estimate</td><td style="padding:4px 8px;">${fmt_gbp(tax.ni_estimate)}</td>
-            <td style="padding:4px 8px;color:var(--text3)">Net liability</td><td style="padding:4px 8px;font-weight:600;">${fmt_gbp(tax.estimated_liability)}</td></tr>
+            <td style="padding:4px 8px;color:var(--text3)">CIS deducted</td><td style="padding:4px 8px;">${fmt_gbp(tax.cis_already_deducted)}</td></tr>
+        <tr><td style="padding:4px 8px;color:var(--text3)">NI estimate</td><td style="padding:4px 8px;">${fmt_gbp(tax.class4_ni_estimate)}</td>
+            <td style="padding:4px 8px;color:var(--text3)">Net liability</td><td style="padding:4px 8px;font-weight:600;">${fmt_gbp(tax.estimated_balance_due)}</td></tr>
       </table>`;
     }
 

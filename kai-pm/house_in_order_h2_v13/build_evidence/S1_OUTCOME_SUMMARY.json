@@ -1,0 +1,119 @@
+{
+ "affected_products": [
+  "bytes",
+  "sha256",
+  "title",
+  "witnesses",
+  "graphA_in",
+  "graphA_out",
+  "exe_ops",
+  "writers",
+  "readers",
+  "reader_ops",
+  "says_supersedes"
+ ],
+ "caller_census": {
+  "by_class": {
+   "HISTORICAL": 14,
+   "INVESTIGATION": 11,
+   "OTHER": 10,
+   "PRODUCTION": 12,
+   "TEST_CALIBRATION": 20
+  },
+  "passa_build_callers": [
+   "HISTORICAL:kai-pm/house_in_order_h2_v11/passa.py",
+   "HISTORICAL:kai-pm/house_in_order_h2_v12/passa.py",
+   "INVESTIGATION:kai-pm/house_in_order_h2_v13/build_evidence/e2_controls.py",
+   "INVESTIGATION:kai-pm/house_in_order_h2_v13/build_evidence/s1_investigation.py",
+   "PRODUCTION:kai-pm/house_in_order_h2_v13/passa.py"
+  ]
+ },
+ "cases": {
+  "A_worktree_edited": {
+   "exit_class": "SILENT_DRIFT_OUTPUT_WRITTEN",
+   "expected": "frozen bytes",
+   "observed": "worktree bytes"
+  },
+  "B_subject_not_head": {
+   "exit_class": "R11_ABORT",
+   "expected": "frozen bytes",
+   "observed": "refused"
+  },
+  "C_tracked_deleted": {
+   "exit_class": "UNHANDLED_EXCEPTION",
+   "expected": "frozen bytes",
+   "observed": "unhandled exception"
+  },
+  "D_new_file_at_head": {
+   "exit_class": "R11_ABORT",
+   "expected": "frozen population",
+   "observed": "refused"
+  },
+  "E_rename_after_subject": {
+   "exit_class": "R11_ABORT",
+   "expected": "frozen population",
+   "observed": "refused"
+  }
+ },
+ "code_under_test": {
+  "census/claims.py": "2119916ee105ad6778945c43ea0f055d148b0613366ad7f75864c7220db4d234",
+  "census/docgraph.py": "1ad714e74a344f222effb75d65d68e78c85745a19625fc3efbd3db5d6b0865d2",
+  "census/opscan.py": "55dee3aa851a1c582d69a27f89a5eb0c78c48306a935a1c65a6774758ce2abe1",
+  "census/run_census.py": "a69f0512efba5de72061fcee3078695dcfb06160d992fed2e465074243d3ee94",
+  "classify.py": "1cd4503361dfdb8b522a31ad92de51989e07b383b5177b1fea1f0cac52b351a2",
+  "ontology.py": "a92e68c7518578e177c6c67d95efdc1e8b4a92c4406aa2778678119babb721bc",
+  "passa.py": "ab2d98d030f61ba12b8280e1639da92b2726bf7b91c12941336dceefb12f5a6e",
+  "run_h2_v12.py": "ab6f54c54c5bdd82c83f9de013311c5771d7eaabad2cec91dd46521d881f7ec7"
+ },
+ "e2_source_binding": {
+  "banked_passa_digest_reproduces": true,
+  "clean_tree_at_pass_a_point": "NOT_PROVEN",
+  "document_set_equals_tree": true,
+  "document_sha_mismatches": 0,
+  "document_source_byte_identity": "PROVEN",
+  "documents_checked": 272,
+  "source_file_byte_identity": "NOT_PROVEN",
+  "source_files_in_reader_scope": 615
+ },
+ "prerequisite_boundary": {
+  "first_census_call_in_build_line": 536,
+  "first_filesystem_read_in_build_line": 566
+ },
+ "root_classification": "UNENFORCED SOURCE-BINDING PRECONDITION AT THE PASS A MEASUREMENT BOUNDARY",
+ "schema": "S1_OUTCOME_SUMMARY/1",
+ "subject_bound_products": [
+  "commits_in_window",
+  "last"
+ ],
+ "submechanisms": {
+  "S1-a": "materialisation guarantee bypassed",
+  "S1-b": "HEAD half enforced, clean-worktree half not enforced",
+  "S1-c": "invariant lives at entrypoint, not measurement boundary"
+ },
+ "symlink": {
+  "A_inside": {
+   "error": null,
+   "extracted_is_symlink": true,
+   "git_mode": "120000",
+   "ingests_bytes_not_in_the_commit": true,
+   "read_text_equals_blob": false,
+   "read_text_ok": true
+  },
+  "B_escape": {
+   "error": null,
+   "extracted_is_symlink": true,
+   "git_mode": "120000",
+   "ingests_bytes_not_in_the_commit": true,
+   "read_text_equals_blob": false,
+   "read_text_ok": true
+  },
+  "C_broken": {
+   "error": "FileNotFoundError",
+   "extracted_is_symlink": true,
+   "git_mode": "120000",
+   "ingests_bytes_not_in_the_commit": false,
+   "read_text_equals_blob": null,
+   "read_text_ok": false
+  }
+ }
+}

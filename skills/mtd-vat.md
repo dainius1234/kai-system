@@ -4,12 +4,12 @@
 
 Making Tax Digital (MTD) and VAT registration are the two major compliance thresholds
 for UK self-employed people. MTD for Income Tax requires digital record-keeping above
-£50,000 annual income. VAT registration is mandatory above £85,000 rolling 12-month
+£50,000 annual income. VAT registration is mandatory above £90,000 rolling 12-month
 turnover. Both have preparation steps you want to start before you cross the threshold.
 
 ## Key rules / facts
 
-- **VAT threshold**: £85,000 rolling 12-month turnover — not tax year, not calendar year
+- **VAT threshold**: £90,000 rolling 12-month turnover (HMRC; checked 2026-11-04) — not tax year, not calendar year
 - Once you cross VAT threshold you must register within 30 days or face a penalty
 - **MTD for Income Tax**: mandated from April 2026 for income >£50,000; from April 2027 for >£30,000
 - MTD requires compatible software that submits quarterly updates to HMRC digitally
@@ -29,7 +29,7 @@ turnover. Both have preparation steps you want to start before you cross the thr
 
 | Item | Value | Notes |
 |------|-------|-------|
-| VAT registration threshold | £85,000 | Rolling 12 months |
+| VAT registration threshold | £90,000 | Rolling 12 months; HMRC, checked 2026-11-04 |
 | MTD threshold (2026) | £50,000 | Annual self-employment income |
 | MTD threshold (2027) | £30,000 | |
 | Registration deadline | 30 days | After crossing threshold |

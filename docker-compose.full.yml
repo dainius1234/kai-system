@@ -224,6 +224,7 @@ services:
       dockerfile: dashboard/Dockerfile
     <<: *defaults
     environment:
+      KAI_DASHBOARD_SERVICE_TOKEN: "${KAI_DASHBOARD_SERVICE_TOKEN:-}"
       TOOL_GATE_URL: http://tool-gate:8000
       MEMU_URL: http://memu-core:8001
       MEMU_INTROSPECT_URL: http://memu-core-introspect:8009
@@ -552,7 +553,7 @@ services:
     environment:
       FINANCE_ROOT: /data/finance
       MTD_START: "${MTD_START:-50000}"
-      VAT_THRESHOLD: "${VAT_THRESHOLD:-85000}"
+      VAT_THRESHOLD: "${VAT_THRESHOLD:-90000}"
       MILEAGE_RATE: "${MILEAGE_RATE:-0.45}"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8063/health')\""]

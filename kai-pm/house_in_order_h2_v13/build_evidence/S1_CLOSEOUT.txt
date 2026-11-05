@@ -1,0 +1,351 @@
+S1 EVIDENCE CLOSE-OUT. PRODUCED BY ORION.
+ZERO ADJUDICATION WEIGHT. NOT AN ANSWER KEY. NO TUNING TARGET.
+EVIDENCE ONLY — no production file is modified by this instrument.
+
+0. FINGERPRINT
+   repository HEAD             864993292e667cd98c9c3bb1b59125378b113ce1
+   O3 implementation           bd1cbb4b76790339c7da59829b4019621c09f17f
+   O3 result                   864993292e667cd98c9c3bb1b59125378b113ce1
+   pre-O3 lineage              ba258b8
+   subject commit              d8aac4d49e6ba997e3eb38062c0917186ee3f197
+   git version                 git version 2.43.0
+   gate command                git status --porcelain=v1 --untracked-files=all
+   symlink policy              P1_REJECT mode 120000
+   digest[passa.py]            a5ae00d0a3410cea56bce77f159cd654e2e77dc62a8e6a4e015f24b94d335372
+   digest[census/docgraph.py]  7b502ca3df416a0916815c3935a41086fc3082cbf918467a74965d42222cc49b
+   digest[census/opscan.py]    1fe609d7d92568df5df2c7f620b7e91f99c2e96992957c6580a8cc348569fb6a
+   digest[this instrument]     38c3088427449f02390fb068b0aec39bd1d24256127ad581030fd607248e6bc9
+
+1. PREDECESSOR CANONICAL-PATH DIGEST  (DeepSeek B1)
+   The one red check in the O3 result. Tested, not asserted.
+
+   lineage        ba258b8 extracted with git archive, no worktree registered
+   layout         kai-pm/house_in_order_h2_v13
+                  kai-pm/house_in_order_census_v11   (historical canonical relative location)
+
+   1a. THE EXTRACTED LINEAGE IS THE HISTORICAL ONE
+   OK  extracted passa.py == the ba258b8 blob                    0384a7627e1126b514dfed10b7049fee16315b9cbd8c
+   OK  extracted docgraph.py == the ba258b8 blob                 1ad714e74a344f222effb75d65d68e78c85745a19625
+   OK  extracted opscan.py == the ba258b8 blob                   55dee3aa851a1c582d69a27f89a5eb0c78c48306a935
+   OK  extracted census aggregate == the historical aggregate    eb7aad7c1a565cb25fcf6a7e250133e95d210f3e8ceb
+   OK  extracted passa.py DIFFERS from production (something is being compared)True
+
+   1b. REAL RUNS OF THE PREDECESSOR FROM THE EXTRACTED LINEAGE
+   Two spellings of the SAME location, both executed for real, so
+   the degrees of freedom are measured rather than assumed.
+   repo-root relative    --census-package kai-pm/house_in_order_census_v11  5504a243705be615
+   package relative      --census-package ../house_in_order_census_v11      aba3d9247acacfb0
+
+   OK  the ONLY field that differs between the two runs          ['census_dependency']
+   OK    and inside it, only `package`                           ['package']
+   OK  both runs carry the historical census aggregate           ('eb7aad7c1a565cb25fcf6a7e250133e95d210f3e8c
+
+   1c. THE SUBSTITUTION METHOD, CALIBRATED BEFORE IT IS USED (I-8)
+   OK  known-positive: substituting the string a real run ACTUALLY used5504a243705be615871384df58ae9538f0a7351586a8
+        so the re-serialisation reproduces passa.py's own bytes exactly
+   OK  known-negative: a different string gives a different digestTrue
+   OK  cross-check: substituting run 1 into run 2's spelling gives run 2aba3d9247acacfb043b86ee9dbb512de5aa81f8d092d
+
+   1d. EVERY CANDIDATE SPELLING, ALL REPORTED
+   target (historical) 24fb1f555560277fd4555087f22ed06ef4a72efee845a339bbc87b925730f51c
+              kai-pm/house_in_order_census_v11                    5504a243705be615871384df58ae9538
+              ./kai-pm/house_in_order_census_v11                  4cd84de101e509a7a998f573dc7bf9b1
+              ../house_in_order_census_v11                        aba3d9247acacfb043b86ee9dbb512de
+              kai-pm/house_in_order_census_v11/                   7baebe97b5575febfb1a36acf90a588a
+   >>> MATCH  /home/user/kai-system/kai-pm/house_in_order_census_v1124fb1f555560277fd4555087f22ed06e
+              /home/user/kai-system/kai-pm/house_in_order_census_v11/ed0efdd72b901afc027d47c3b401eccd
+
+   OK  exactly one candidate spelling reproduces the historical digest1
+        reproducing spelling: /home/user/kai-system/kai-pm/house_in_order_census_v11
+   WHAT IS ESTABLISHED, IN THE EXACT WORDS THE EVIDENCE EARNS
+   The pre-O3 lineage ba258b8, extracted from git objects at the
+   historical canonical relative layout and EXECUTED for real
+   against the frozen subject, produces a payload that is
+   byte-identical to the historical artefact
+   24fb1f555560277fd4555087f22ed06ef4a72efee845a339bbc87b925730f51c
+   when `census_dependency.package` carries `/home/user/kai-system/kai-pm/house_in_order_census_v11`.
+   Every other byte of the payload -- all 272 rows, every
+   witness, the history identity, the census aggregate -- is
+   produced by execution, not by substitution.
+
+   reached by a real end-to-end run: NO
+   HOW THAT ONE FIELD WAS SET, STATED PLAINLY. The matching
+   spelling is the CANONICAL ABSOLUTE path, and that path
+   now holds the O3 census. Running the predecessor with it
+   would read the O3 manifest and record the O3 aggregate,
+   and placing historical content there would mean editing
+   production, which is prohibited. So that single field was
+   set by the substitution method of 1c -- CALIBRATED first
+   against a real run's own string (known-positive), against
+   a wrong string (known-negative), and across the two real
+   runs. 1b MEASURED, by executing the predecessor twice,
+   that this field is the only degree of freedom.
+   CLAIM SCOPE (R17): the predecessor lineage reproduces the
+   historical digest exactly, conditional on that recorded
+   path string. NOT claimed: that a single end-to-end
+   invocation reproduced it with nothing substituted.
+   A sha256 preimage cannot be manufactured, and the
+   candidate set was fixed in this file before the run.
+
+2. THE EXACT FROZEN GIT-OBJECT MECHANISM  (DeepSeek B2)
+   Asserted against the production SOURCE by AST. A docstring
+   claiming git object storage is not evidence that it is used.
+
+   OK  _frozen_blobs invokes `git cat-file --batch`              True
+        argv literals, matched in the call -- not a comment
+   OK  _frozen_blobs enumerates from `git ls-tree -r` at the subjectTrue
+   OK  _frozen_blobs performs NO filesystem read                 []
+        the frozen reference cannot be a live path: there is no read
+   OK  _frozen_blobs references no filesystem path constructor   False
+   OK  the verifier hashes the CONSUMED bytes                    True
+   OK  the verifier hashes the FROZEN BLOB BYTES the same way    True
+   OK  the comparison is hash vs hash                            True
+   OK  no git object id is obtained anywhere in the verifier     []
+        `git cat-file --batch` is called once, in _frozen_blobs, and its BLOB CONTENT is what is compared -- never its object id
+   OK  the reader reads before it verifies, and returns only after["return data.decode(errors='ignore')"]
+        READ -> VERIFY THOSE BYTES -> USE: the object hashed is the object returned, so change-and-restore cannot substitute
+
+   RECORDED, as required:
+     · frozen content comes from GIT OBJECT STORAGE, via
+       `git cat-file --batch` fed from `git ls-tree -r` at the
+       frozen subject commit;
+     · the comparison is SHA-256(consumed bytes) against
+       SHA-256(frozen git blob bytes), both computed by hashlib in
+       the same expression pair;
+     · NO live filesystem path is used as the frozen reference --
+       _frozen_blobs contains no read of any kind;
+     · NO ordinary file SHA-256 is compared against a git object
+       id. Object ids are never obtained in the verifier.
+
+3. READER-GUARD CAN-FAIL  (DeepSeek B3)
+   The guard: every filesystem consumption on the Pass A path must
+   be attributed to `passa`, because that is where the verified
+   reader lives. Any other module is an uncovered bypass.
+   PROBE ONLY -- the bypass reader is added to a TEMPORARY COPY.
+
+   OK  KNOWN-NEGATIVE: production run completes                  None
+        2 rows
+   OK  KNOWN-NEGATIVE: reader set                                ['passa']
+   OK  KNOWN-NEGATIVE: the guard PASSES                          []
+
+   OK  the temporary copy DIFFERS from production                True
+   OK  production passa.py is untouched by this section          a5ae00d0a3410cea56bce77f159cd654e2e77dc62a8e
+   OK  KNOWN-POSITIVE: the bypassing run still completes         None
+        the bypass reads unverified bytes and nothing stops it -- which is exactly why the guard has to detect it
+   OK  KNOWN-POSITIVE: the bypass appears in the reader set      ['bypass_reader', 'passa']
+   OK  KNOWN-POSITIVE: the guard FAILS, naming the bypass        ['bypass_reader']
+        the guard is not vacuous: it detects a future direct reader introduced outside the verified path
+
+4. ENUMERATION BINDING — ARE THE CENSUS POPULATIONS STILL GIT-DERIVED
+   Enumeration is NOT altered by this instrument. It is measured.
+
+   OK  docgraph.tracked_md walks no filesystem                   []
+   OK  docgraph.tracked_md enumerates via git ls-tree -r --name-onlyTrue
+   OK  opscan.tracked walks no filesystem                        []
+   OK  opscan.tracked enumerates via git ls-tree -r --name-only  True
+   OK  opscan.source_population walks no filesystem              []
+
+   4a. THE WHOLE PACKAGE, NOT ONLY THOSE THREE FUNCTIONS
+   MY FIRST PREDICATE HERE WAS WRONG AND THE CORRECTION STAYS
+   VISIBLE. It matched the attribute NAME `walk` and reported the
+   hits as filesystem enumeration. Eleven of them are `ast.walk`
+   and `HERE.glob` -- AST traversal and the package reading its
+   OWN directory. That is R13/doctrine 37 exactly: same name is a
+   routing signature, not the same mechanism. The predicate below
+   classifies by RECEIVER, and every hit is reported whatever its
+   class.
+   raw hits on the name predicate: 11 — ALL of them:
+     AST TRAVERSAL (9)
+       opscan.py:189 ast.walk
+       opscan.py:215 ast.walk
+       opscan.py:231 ast.walk
+       opscan.py:254 ast.walk
+       opscan.py:191 ast.walk
+       opscan.py:205 ast.walk
+       qualify.py:81 ast.walk
+       qualify.py:105 ast.walk
+       qualify.py:87 ast.walk
+     THE PACKAGE'S OWN DIRECTORY (2)
+       qualify.py:65 HERE.glob
+       qualify.py:59 HERE.glob
+     FILESYSTEM, SUBJECT-REACHING (0)
+   OK  call sites that could enumerate SUBJECT filesystem content[]
+        `HERE` is the census package's own directory (qualify.py:46), so its globs derive the CALIBRATION population from the tree (R5) and touch no subject content; qualify.py is not on the Pass A path at all, which imports docgraph, opscan and claims
+
+   4b. THE ONE UNTRACKED-ENUMERATING FUNCTION, AND WHETHER IT RUNS
+   `docgraph.untracked_md` uses `git ls-files --others`. Every
+   occurrence in the repository (2), reported in full:
+     kai-pm/house_in_order_census_v11/docgraph.py:54:def untracked_md(repo):
+     kai-pm/house_in_order_instrument/doccensus2.py:38:def untracked_md(repo):
+   OK  call sites of untracked_md anywhere in the repository     []
+        it is defined and never invoked, so it contributes to no population on any path
+
+   4c. RUNTIME — THE POPULATIONS AT THE SUBJECT ARE INSIDE THE TREE
+   OK  docgraph document population                              272
+   OK  opscan source population                                  615
+   OK  every enumerated path is inside the tracked frozen tree   []
+        887 of 1032 tracked paths
+
+   4d. UNCHANGED FROM THE PRE-O3 LINEAGE
+   OK  docgraph population identical to pre-O3                   ['.github/PULL_REQUEST_TEMPLATE.md', '.githu
+   OK  opscan population identical to pre-O3                     ['.github/ISSUE_TEMPLATE/bug.yml', '.github/
+
+   CONCLUSION: both populations remain GIT-DERIVED from
+   `git ls-tree -r` at the frozen tree. Neither walks arbitrary
+   untracked filesystem content. No STOP condition arises.
+
+5. H2 PRODUCTION CALLER PROOF — THE VERIFIED READER IS SUPPLIED
+   Captured at RUNTIME from the census side. An AST check alone
+   would show a keyword in the text, not that the call executes.
+
+   OK  production Pass A completed                               None
+        2 rows
+   OK  docgraph.build_graph RECEIVED a reader                    True
+   OK    and it is the verifier from passa.py                    make_verified_reader.<locals>.read_source
+   OK  opscan.collect RECEIVED a reader                          True
+   OK    and it is the same verifier                             make_verified_reader.<locals>.read_source
+
+   5a. AND THE SOURCE AGREES — every census call site in the
+       CURRENT H2 PRODUCTION PACKAGE passes read_source
+       (build_evidence instruments are NOT production and are
+        excluded here; they are listed in full in section 6)
+     kai-pm/house_in_order_h2_v13/passa.py:756           read_source=YES
+     kai-pm/house_in_order_h2_v13/passa.py:760           read_source=YES
+   OK  current-production call sites without read_source         []
+
+6. THE STANDALONE `read_source=None` CONTRACT
+   The default is NOT removed. What is proved is that the callers
+   which rely on it operate under their own frozen-subject
+   contract, and that current H2 production is not among them.
+
+   Every build_graph/collect call site under kai-pm/ (27), reported in full:
+       None  kai-pm/census_v11_claim_sensitivity/run_mutations.py:36   O.collect(root, docs)
+       None  kai-pm/house_in_order_census_v11/cal_claims.py:196        O.collect(root, docs)
+       None  kai-pm/house_in_order_census_v11/cal_claims.py:239        O.collect(root, docs)
+       None  kai-pm/house_in_order_census_v11/cal_claims.py:270        O.collect(r2, docs2)
+       None  kai-pm/house_in_order_census_v11/cal_docgraph.py:139      G.build_graph(root, tracked)
+       None  kai-pm/house_in_order_census_v11/cal_docgraph.py:78       G.build_graph(root, tracked)
+       None  kai-pm/house_in_order_census_v11/cal_opscan.py:71         O.collect(root, docs)
+       None  kai-pm/house_in_order_census_v11/compare_v10_v11.py:70    dc.build_graph(subject, d10)
+       None  kai-pm/house_in_order_census_v11/compare_v10_v11.py:81    G.build_graph(subject, d11)
+       None  kai-pm/house_in_order_census_v11/compare_v10_v11.py:82    O.collect(subject, d11)
+       None  kai-pm/house_in_order_census_v11/run_census.py:132        G.build_graph(subject, docs)
+       None  kai-pm/house_in_order_census_v11/run_census.py:133        O.collect(subject, docs)
+       None  kai-pm/house_in_order_h2/pass_a.py:17                     dc.build_graph(R, tracked)
+       None  kai-pm/house_in_order_h2_v11/passa.py:109                 G.build_graph(subject_repo, tracked)
+       None  kai-pm/house_in_order_h2_v11/passa.py:113                 O.collect(subject_repo, tracked)
+       None  kai-pm/house_in_order_h2_v12/passa.py:242                 G.build_graph(subject_repo, tracked)
+       None  kai-pm/house_in_order_h2_v12/passa.py:246                 O.collect(subject_repo, tracked)
+       None  kai-pm/house_in_order_h2_v13/build_evidence/e2_controls.py:159O.collect(work, docs)
+       None  kai-pm/house_in_order_h2_v13/build_evidence/e2_investigation.py:189O.collect(repo, tracked)
+       None  kai-pm/house_in_order_h2_v13/build_evidence/s1_toctou_controls.py:280oldG.build_graph(sr, od)
+       None  kai-pm/house_in_order_h2_v13/build_evidence/s1_toctou_controls.py:281newG.build_graph(sr, nd)
+       None  kai-pm/house_in_order_h2_v13/build_evidence/s1_toctou_controls.py:284oldO.collect(pathlib.Path(sr), od)
+       None  kai-pm/house_in_order_h2_v13/build_evidence/s1_toctou_controls.py:285newO.collect(pathlib.Path(sr), nd)
+     reader  kai-pm/house_in_order_h2_v13/passa.py:756                 G.build_graph(subject_repo, tracked, read_so
+     reader  kai-pm/house_in_order_h2_v13/passa.py:760                 O.collect(subject_repo, tracked, read_source
+       None  kai-pm/house_in_order_instrument/calibrate2.py:137        dc.build_graph(root, tracked)
+       None  kai-pm/house_in_order_instrument/calibrate2.py:86         dc.build_graph(root, tracked)
+
+   OK  call sites in the CURRENT production package              2
+   OK  all of them supply a reader                               []
+   Call sites relying on the None default, named rather than
+   summarised. They fall in three groups: the standalone census
+   runner and its calibrators, the SUPERSEDED v1.1/v1.2 H2
+   lineages, and this programme's own control instruments, which
+   call without a reader deliberately to measure non-interference.
+     kai-pm/census_v11_claim_sensitivity/run_mutations.py:36
+     kai-pm/house_in_order_census_v11/cal_claims.py:196
+     kai-pm/house_in_order_census_v11/cal_claims.py:239
+     kai-pm/house_in_order_census_v11/cal_claims.py:270
+     kai-pm/house_in_order_census_v11/cal_docgraph.py:139
+     kai-pm/house_in_order_census_v11/cal_docgraph.py:78
+     kai-pm/house_in_order_census_v11/cal_opscan.py:71
+     kai-pm/house_in_order_census_v11/compare_v10_v11.py:70
+     kai-pm/house_in_order_census_v11/compare_v10_v11.py:81
+     kai-pm/house_in_order_census_v11/compare_v10_v11.py:82
+     kai-pm/house_in_order_census_v11/run_census.py:132
+     kai-pm/house_in_order_census_v11/run_census.py:133
+     kai-pm/house_in_order_h2/pass_a.py:17
+     kai-pm/house_in_order_h2_v11/passa.py:109
+     kai-pm/house_in_order_h2_v11/passa.py:113
+     kai-pm/house_in_order_h2_v12/passa.py:242
+     kai-pm/house_in_order_h2_v12/passa.py:246
+     kai-pm/house_in_order_h2_v13/build_evidence/e2_controls.py:159
+     kai-pm/house_in_order_h2_v13/build_evidence/e2_investigation.py:189
+     kai-pm/house_in_order_h2_v13/build_evidence/s1_toctou_controls.py:280
+     kai-pm/house_in_order_h2_v13/build_evidence/s1_toctou_controls.py:281
+     kai-pm/house_in_order_h2_v13/build_evidence/s1_toctou_controls.py:284
+     kai-pm/house_in_order_h2_v13/build_evidence/s1_toctou_controls.py:285
+     kai-pm/house_in_order_instrument/calibrate2.py:137
+     kai-pm/house_in_order_instrument/calibrate2.py:86
+
+   6a. THE STANDALONE RUNNER'S OWN CONTRACT
+   OK  run_census materialises the subject with `git archive`    True
+   OK    into a fresh directory, not the working tree            True
+   OK    refusing anything that is not an immutable 40-hex object idTrue
+   OK    and verifying the result against `git ls-tree`          True
+   OK  census() is called on the MATERIALISED path, not on `repo`True
+   So the None default is exercised only against a tree that git
+   itself just wrote from the frozen commit and that was verified
+   before measurement. That is a different -- and older --
+   discharge of the same obligation, not an unguarded read.
+
+   6b. SCOPE OF THIS CLAIM (R17)
+   MEASURED: every build_graph/collect call site under kai-pm/, by
+   AST, plus the runtime capture in section 5.
+   CLAIMED: no CURRENT H2 production path (house_in_order_h2_v13,
+   excluding build_evidence instruments) reaches a census read with
+   read_source=None.
+   NOT CLAIMED: that the superseded v1.1/v1.2 H2 lineages listed
+   above are covered. They are not. They are prior packages that
+   remain in the repository and predate this mechanism entirely.
+
+7. DIGEST LINEAGE — TWO IMMUTABLE ARTEFACTS, TWO CODE STATES
+
+   OK  pre-O3 census aggregate, recomputed from the git objects  eb7aad7c1a565cb25fcf6a7e250133e95d210f3e8ceb
+   OK  O3 census aggregate, recomputed from the working tree     29064d65
+   OK  the two aggregates differ                                 True
+
+   PRE-O3 LINEAGE
+     code            ba258b8 (S1 R4+P1, accepted)
+     census aggregate  eb7aad7c1a565cb25fcf6a7e250133e95d210f3e8ceb8765489046e3d945fa0e
+     Pass A digest   24fb1f555560277fd4555087f22ed06ef4a72efee845a339bbc87b925730f51c
+   O3 LINEAGE
+     code            bd1cbb4 (S1 O3, accepted)
+     census aggregate  29064d650a61296806df3c3bcab3322f7364da7df674ac93e79d0671475d757a
+     Pass A digest   755f8b39a21aa586…
+
+   THE NEW RESULT DOES NOT OVERWRITE, CORRECT OR RETROACTIVELY
+   ALTER THE HISTORICAL ARTEFACT. Each digest is the fingerprint of
+   a payload produced by a different code state against the same
+   frozen subject. Both remain immutable lineage evidence. The
+   historical E2 source-byte proof stands on the pre-O3 artefact
+   and is re-derivable from the git objects, which section 1 does.
+
+8. SYMLINK (P1) + VERIFIED READER REGRESSION
+   P1 must refuse BEFORE the verifier can consume the path.
+   Ordering is proved by observing that the frozen-blob batch never
+   ran and the census was never imported -- not from line numbers.
+
+   OK  the fixture really contains a TRACKED symlink             120000
+   OK  Pass A REFUSED                                            True
+        R11 ABORT [SOURCE BINDING / TRACKED SYMLINK]: 1 tracked symlink(s) in the frozen subject: docs/link.md. git st
+   OK    naming the symlink prerequisite                         True
+   OK    naming the offending path                               True
+   OK  no rows were produced                                     0
+   OK  the frozen-blob batch NEVER RAN                           0
+        so the refusal precedes the verifier, at runtime
+   OK  no verified reader was ever constructed                   0
+   OK  the census was never imported                             False
+
+   KNOWN-NEGATIVE — the same fixture without the symlink
+   OK  completes                                                 None
+        2 rows
+   OK  and THERE the verifier is constructed                     1
+        so section 8's zeros are caused by the refusal, not by the probe
+
+OUTCOME
+   checks 67   failures 0
+   Every close-out check held. No production file was modified,
+   no evaluator was tuned and no figure was used as a target.

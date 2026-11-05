@@ -22,6 +22,8 @@ from typing import Any, Dict, List, Optional
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
+from cognify_result import evaluate as evaluate_cognify_result
+
 from common.degraded import degraded_response
 from common.runtime import setup_json_logger
 
@@ -66,6 +68,16 @@ def _cognee():
 
     return cognee
 
+# ONE named constant, so the external failure representation is a
+# deliberate choice in one place rather than a literal repeated at two
+# call sites. 502 is kept because the endpoint ALREADY declared it for a
+# raised cognify failure, and a caller must not have to distinguish
+# "cognee raised" from "cognee returned a failure" — they are the same
+# event to a client. Whether 502 is the right external contract for
+# /graph/ingest is a separate, deliberate decision; changing it is this
+# line.
+INGEST_FAILURE_STATUS = 502
+
 
 @app.get("/health")
 async def health() -> Dict[str, Any]:
@@ -93,10 +105,28 @@ async def graph_ingest(req: IngestRequest) -> Dict[str, Any]:
             dataset_name=DATASET_NAME,
             node_set=node_set,
         )
-        await cognee.cognify(datasets=[DATASET_NAME])
+        cognify_result = await cognee.cognify(datasets=[DATASET_NAME])
     except Exception as exc:  # noqa: BLE001 — best-effort ingest, caller decides how to treat failure
         logger.warning("graph_ingest failed for source_id=%s: %s", req.source_id, exc)
-        raise HTTPException(status_code=502, detail=f"graph ingest failed: {exc}") from exc
+        raise HTTPException(status_code=INGEST_FAILURE_STATUS,
+                            detail=f"graph ingest failed: {exc}") from exc
+
+    # KAI-GATE-050. The handler above is correct and stays — but it can
+    # only see failures cognee RAISES, and cognee's observed pipeline
+    # failure is RETURNED: it yields PipelineRunErrored and deliberately
+    # does not re-raise. Discarding this return value is what let a
+    # terminally failed cognify be answered with 200 "ingested",
+    # reproduced 2/2 on clean stacks (D201).
+    #
+    # The predicate is "did cognee return a terminal successful pipeline
+    # result?", not "does the result mention the error we happened to
+    # see" — see memu-graph/cognify_result.py.
+    ok, pipeline_states, why = evaluate_cognify_result(cognify_result)
+    if not ok:
+        logger.warning("graph_ingest pipeline did not succeed for "
+                       "source_id=%s: %s", req.source_id, why)
+        raise HTTPException(status_code=INGEST_FAILURE_STATUS,
+                            detail=f"graph ingest failed: {why}")
 
     data_id = None
     dataset_id = None

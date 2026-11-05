@@ -1,0 +1,1317 @@
+STEP 3 / M1 — RESULT. PRODUCED BY ORION. ZERO ADJUDICATION WEIGHT.
+NOT AN ANSWER KEY. NO TARGET COUNT WAS USED.
+subject      d8aac4d49e6ba997e3eb38062c0917186ee3f197
+subject tree 3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+predecessor  b0da564 classify.py, from the git object
+only classify.py differs between the two runs; asserted, not assumed
+
+1. CONSERVATION
+   rows in 272 · predecessor rows 272 · M1 rows 272
+   identical path set                 True
+   Pass A witnesses 492 · accepted M3 scope 201/291   (must read 201/291)
+
+2. FULL VALIDITY DISTRIBUTION
+   predecessor  {'UNKNOWN': 83, 'TIME_BOUND': 184, 'EXACT_SNAPSHOT': 5}
+   M1           {'UNKNOWN': 260, 'TIME_BOUND': 7, 'EXACT_SNAPSHOT': 5}
+
+3. EVERY OTHER AXIS — must be unchanged
+   AUTHORITY   UNCHANGED   {'UNKNOWN': 272}
+   FUNCTION    UNCHANGED   {'UNKNOWN': 267, 'MARKER': 5}
+   GENERATION  UNCHANGED   {'UNKNOWN': 272}
+   LIFECYCLE   UNCHANGED   {'UNKNOWN': 262, 'HISTORICAL': 10}
+   SCOPE       UNCHANGED   {'UNKNOWN': 78, 'WHOLE_FILE': 194}
+
+4. SCOPE COMPARISON, per row
+   SCOPE verdicts changed            0   (must be 0)
+   SCOPE determining witness changed 0   (must be 0)
+
+5. EVIDENCE-FACT COMPARISON
+   BINDING_CONTRADICTION               5 -> 5    
+   CARRIES_DATE_STAMP                206 -> 206  
+   CITES_COMMIT                       21 -> 21   
+   CITES_RUN                           3 -> 3    
+   CONSUMED_AT_SUBJECT                 5 -> 5    
+   MAINTENANCE_OBSERVED               71 -> 71   
+   SELF_ASSERTS_AUTHORITY              4 -> 4    
+   SELF_ASSERTS_NON_AUTHORITY          1 -> 1    
+   NOMINAL_FUNCTION tally unchanged: True
+
+6. CHANGED VALIDITY ROWS: 177
+   RESCUED — verdict held, determining witness moved to a qualified one: 2
+
+7. EVERY RESCUED ROW, with both determining witnesses
+   kai-pm/PHASE1_READINESS.md   TIME_BOUND
+     before  L3 '2026-07-23'   **Created:** 2026-07-23  
+     after   L4 '2026-07-23'   **Last updated:** 2026-07-23  
+     reason  document-state binding: 'last updated' — the document states its own currency point
+   kai-pm/PHASE_0_5_BACKLOG.md   TIME_BOUND
+     before  L6 '2026-07-21'   **Status:** ✅ COMPLETE — all items shipped (2026-07-21)
+     after   L7 '2026-07-21'   **Last updated:** 2026-07-21
+     reason  document-state binding: 'last updated' — the document states its own currency point
+
+8. EVERY CHANGED ROW (177), with its raw source reason
+   docs/gpu_integration_phase0.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L3 '2026-04-21'
+     determining after  : —
+     source predicate   : 'date'
+     raw source line    : **Date:** 2026-04-21
+     new observation    : document-scoped dates present, none state-binding: [('L3', 'date')]
+   kai-pm/ASSURANCE_COUNTERPART_RESEARCH_2026-08-23.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L1 '2026-08-23'
+     determining after  : —
+     source predicate   : None
+     raw source line    : # Assurance counterpart research — 2026-08-23
+     new observation    : document-scoped dates present, none state-binding: [('L1', None)]
+   kai-pm/CLEANUP_TODO.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L3 '2026-06-18'
+     determining after  : —
+     source predicate   : None
+     raw source line    : > ⚠️ **2026-06-18: this tracker describes a plan that did not execute as written.**
+     new observation    : document-scoped dates present, none state-binding: [('L3', None)]
+   kai-pm/CODE_AUDIT_BATCH_AGENTIC_API.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_AGENTIC_INTROSPECTION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_AIRQUALITY_SERVICE.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_ANALOGY_STUB.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_ARCHITECTURE_INTERACTION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_AUDIO_PERCEPTION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '26 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 26 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_AUDIO_PERCEPTION_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_AUTONOMOUS_STATE.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '26 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 26 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_AVATAR_SERVICE.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_AVATAR_SERVICE_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_BACKUP_SERVICE.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_BACKUP_SERVICE_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_BEHAVIOURAL_FEEDBACK_TOOLS.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_BOOTSTRAP_CLOSURE_SMOKE.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_BROKER_BRIDGE.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_BROKER_BRIDGE_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_BROWSER_AGENT.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_BROWSER_AGENT_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_BUSINESS_SAFETY_ADVISORS.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_CALENDAR_SERVICE.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_CALENDAR_SYNC_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_CAMERA_SERVICE.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '26 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 26 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_CAMERA_SERVICE_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_CHAOS_GONOGO_TEST_BOOTSTRAP.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_CI_BACKUP.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '26 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 26 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_CI_WORKFLOWS.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_CI_WORKFLOW_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_CLIPBOARD_SERVICE.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '26 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 26 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_CLIPBOARD_SERVICE_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_COGNITIVE_FOUNDATIONS.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_COGNITIVE_GOVERNANCE_FOUNDATIONS.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_COGNITIVE_STATE_STUBS.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_COMMON_AUTH.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_COMMON_CONTROL_PLANE.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_COMMON_MODEL_RUNTIME.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_COMMON_RESILIENCE.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_COMMON_RUNTIME.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_CONVICTION_PLANNING_FORECASTING.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_CORTEX.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_CROSS_SERVICE_ATTACK_CHAINS.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_DASHBOARD_FRONTEND.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_DASHBOARD_GATEWAY.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_DOCKER_WATCHER.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_DOCUMENT_PARSER.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '26 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 26 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_DOCUMENT_PARSER_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_DREAM_EVOLVER_CHECKPOINTS.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_EMAIL_READER.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_EMAIL_READER_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_ENVIRONMENTAL_SENSORS.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '26 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 26 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_ENVIRONMENTAL_SENSORS_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_EXECUTOR.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_FEATURE_FLAGS_EPISODES.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '26 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 26 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_FILES_SERVICE.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '26 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 26 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_FILES_SERVICE_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_FINANCIAL_AUTONOMY_MARKET_INTELLIGENCE.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_FINANCIAL_AWARENESS.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_FINANCIAL_AWARENESS_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_FUSION_ENGINE.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_FUSION_ENGINE_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_GIT_WATCHER.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_GPU_FOUNDATION_STUBS.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_GPU_UTILITIES.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_HEARTBEAT.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_HEARTBEAT_SELF_MODEL.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '26 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 26 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_HMAC_ROTATION_DRILL.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_HOST_SETUP_HARDENING_SHELL.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_HOST_WATCHERS.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '26 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 26 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_HOST_WATCHERS_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_HOUSE_DOCTOR.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_INTROSPECTION_IDENTITY.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '26 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 26 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_KAI_ADVISOR.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_KAI_ADVISOR_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_KEY_ROTATION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '26 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 26 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_KEY_ROTATION_MIGRATION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_LEDGER_WORKER.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_LEDGER_WORKER_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_LETTA_AGENT.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_LETTA_AGENT_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_LIVE_SUPERVISOR.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_MEMORY_COMPRESSOR.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_MEMORY_COMPRESSOR_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_MEMORY_GRAPH.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '26 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 26 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_MEMORY_GRAPH_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_MEMU_CORE_HOT_PATH.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_MEMU_INTROSPECTION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_MEMU_PERSONALITY_AUTONOMY.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_METRICS_GATEWAY.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_METRICS_GATEWAY_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_MODEL_DECISION_CONTROLS.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_MONITOR_SERVICE.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '26 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 26 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_MONITOR_SERVICE_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_NEWS_FEED.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_NEWS_FEED_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_NEWS_FEED_INTEGRATION_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_NOTIFY_SERVICE.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '26 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 26 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_NOTIFY_SERVICE_BUILD_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_NOTIFY_SERVICE_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_OPERATIONAL_ASSURANCE_SCRIPTS.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_OPERATIONAL_STATE_EPISODE_RECOVERY.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_OPERATOR_CONTROL_DRILLS.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_ORCHESTRATION_ARCHITECTURE.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_ORCHESTRATION_STUBS.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_PERSISTENCE_1.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '26 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 26 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_QUESTIONER_TEAMMATES_WATCHDOG.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_RECOVERY_OPERATIONAL_SCRIPTS.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_RELEASE_BOOTSTRAP_TOOLING.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_REPOSITORY_QUALITY_DOCS.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_ROUTING_LLM_DISPATCH.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_SCREEN_CAPTURE.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_SCREEN_CAPTURE_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_SCREEN_WATCHER.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '26 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 26 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_SCREEN_WATCHER_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_SELF_AUDIT_SUPERVISOR.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '26 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 26 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_SHARED_RUNTIME_CONTROLS.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_SHELL_HEALTH_ROTATION_WRAPPERS.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_SHELL_SANDBOX.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_SHELL_SANDBOX_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_SKILL_HUNTER.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_SWARM_ORCHESTRATION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_SYSMETRICS.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_SYSMETRICS_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_SYSMETRICS_WORLD_ANCHOR.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '26 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 26 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_TEAMMATES_FSM_POLICY_MEMORY.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_TELEGRAM_BOT.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '26 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 26 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_TELEGRAM_BOT_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_TELEGRAM_PERCEPTION_BRIDGE.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_TEST_HARNESSES_MARKET_CACHE.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_TEST_STUBS_EXTERNAL_MODEL_OCR_FUZZ.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_TOOL_GATE_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_TRUST_GOVERNANCE_AUTHORITY.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_TRUST_LEDGER_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_TTS_SERVICE.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '26 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 26 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_TTS_SERVICE_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_VAULT_BRIDGE_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_VAULT_SYNC.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_VERIFIER.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_VISION_SERVICE.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '26 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 26 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_VISION_SERVICE_DEPLOYMENT_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_VISION_SERVICE_EXTENSION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_WAKE_SERVICE.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_WATCHDOG_RECOVERY.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '26 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 26 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_WEATHER_SERVICE.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_WEB_SCOUT.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_BATCH_WORLD_ANCHOR.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'reviewed'
+     raw source line    : Reviewed: 27 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'reviewed')]
+   kai-pm/CODE_AUDIT_CONTINUATION_LOG.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L4 '27 July 2026'
+     determining after  : —
+     source predicate   : 'log started'
+     raw source line    : Log started: 27 July 2026  
+     new observation    : document-scoped dates present, none state-binding: [('L4', 'log started')]
+   kai-pm/CODE_AUDIT_PLANNING_PACKAGE_QA.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L4 '27 July 2026'
+     determining after  : —
+     source predicate   : 'review date'
+     raw source line    : Review date: 27 July 2026  
+     new observation    : document-scoped dates present, none state-binding: [('L4', 'review date')]
+   kai-pm/CODE_AUDIT_REGISTER_CONTINUED.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L6 '26 July 2026'
+     determining after  : —
+     source predicate   : 'started'
+     raw source line    : Started: 26 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L6', 'started')]
+   kai-pm/CODE_AUDIT_REGISTER_CONTINUED_2.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L6 '26 July 2026'
+     determining after  : —
+     source predicate   : 'started'
+     raw source line    : Started: 26 July 2026
+     new observation    : document-scoped dates present, none state-binding: [('L6', 'started')]
+   kai-pm/COMPOSE_DRIFT.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L3 '2026-07-21'
+     determining after  : —
+     source predicate   : 'generated'
+     raw source line    : **Generated:** 2026-07-21
+     new observation    : document-scoped dates present, none state-binding: [('L3', 'generated')]
+   kai-pm/CONVICTION_SCENARIOS.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L3 '2026-07-23'
+     determining after  : —
+     source predicate   : 'created'
+     raw source line    : **Created:** 2026-07-23  
+     new observation    : document-scoped dates present, none state-binding: [('L3', 'created')]
+   kai-pm/DEEPSEEK_BRIEF_2026-08-07_EMBEDDINGS.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L3 '2026-08-07'
+     determining after  : —
+     source predicate   : None
+     raw source line    : Sent 2026-08-07. Their answer drove D167; recorded here so the question
+     new observation    : document-scoped dates present, none state-binding: [('L3', None)]
+   kai-pm/DEEPSEEK_BRIEF_2026-08-07_METHOD.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L3 '2026-08-07'
+     determining after  : —
+     source predicate   : None
+     raw source line    : Sent 2026-08-07. Kept because the answer is worth reading against the
+     new observation    : document-scoped dates present, none state-binding: [('L3', None)]
+   kai-pm/DEEPSEEK_BRIEF_2026-08-07_TOPOLOGY.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L3 '2026-08-07'
+     determining after  : —
+     source predicate   : None
+     raw source line    : 2026-08-07. A decision I have deliberately not taken alone: it changes
+     new observation    : document-scoped dates present, none state-binding: [('L3', None)]
+   kai-pm/EMBEDDING_BACKEND_STATE.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L3 '2026-08-12'
+     determining after  : —
+     source predicate   : None
+     raw source line    : **#47 MEASUREMENT: COMPLETE.** Closed 2026-08-12 by operator decision.
+     new observation    : document-scoped dates present, none state-binding: [('L3', None)]
+   kai-pm/EQ_BASELINE_SAMPLES.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L3 '2026-07-23'
+     determining after  : —
+     source predicate   : 'created'
+     raw source line    : **Created:** 2026-07-23  
+     new observation    : document-scoped dates present, none state-binding: [('L3', 'created')]
+   kai-pm/GPU_ARRIVAL_RUNBOOK.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L3 '2026-07-23'
+     determining after  : —
+     source predicate   : 'created'
+     raw source line    : **Created:** 2026-07-23  
+     new observation    : document-scoped dates present, none state-binding: [('L3', 'created')]
+   kai-pm/KAI_FINAL_PRODUCT_ARCHITECTURE_SPECIFICATION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '27 July 2026'
+     determining after  : —
+     source predicate   : 'prepared'
+     raw source line    : Prepared: 27 July 2026  
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'prepared')]
+   kai-pm/KAI_UNIFIED_HUNTER_ARCHITECTURE_AND_ROADMAP.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L4 '27 July 2026'
+     determining after  : —
+     source predicate   : 'planning date'
+     raw source line    : Planning date: 27 July 2026  
+     new observation    : document-scoped dates present, none state-binding: [('L4', 'planning date')]
+   kai-pm/MAKEFILE_TARGETS.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L3 '2026-07-22'
+     determining after  : —
+     source predicate   : 'generated'
+     raw source line    : **Generated:** 2026-07-22
+     new observation    : document-scoped dates present, none state-binding: [('L3', 'generated')]
+   kai-pm/NEXT_STINT_PLAN.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L3 '2026-08-07'
+     determining after  : —
+     source predicate   : None
+     raw source line    : Written 2026-08-07, after `core-tests.yml` reached 67 of 67 green across
+     new observation    : document-scoped dates present, none state-binding: [('L3', None), ('L6', None)]
+   kai-pm/POSTMORTEM_2026-08-06_RUNNER_STARVATION.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L1 '2026-08-06'
+     determining after  : —
+     source predicate   : None
+     raw source line    : # Post-mortem — GitHub Actions degradation, 2026-08-06
+     new observation    : document-scoped dates present, none state-binding: [('L1', None)]
+   kai-pm/REALITY_CHECK_2026-05-10.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L1 '2026-05-10'
+     determining after  : —
+     source predicate   : None
+     raw source line    : # Reality Check — 2026-05-10 UTC
+     new observation    : document-scoped dates present, none state-binding: [('L1', None)]
+   kai-pm/REALITY_CHECK_2026-06-18.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L1 '2026-06-18'
+     determining after  : —
+     source predicate   : None
+     raw source line    : # Reality Check — 2026-06-18 UTC
+     new observation    : document-scoped dates present, none state-binding: [('L1', None)]
+   kai-pm/REPO_HEALTH_AUDIT_2026-05-10.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L1 '2026-05-10'
+     determining after  : —
+     source predicate   : None
+     raw source line    : # Repo Health Audit — 2026-05-10
+     new observation    : document-scoped dates present, none state-binding: [('L1', None)]
+   kai-pm/RISKS.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L3 '2026-07-21'
+     determining after  : —
+     source predicate   : 'last reviewed'
+     raw source line    : Last reviewed: 2026-07-21
+     new observation    : document-scoped dates present, none state-binding: [('L3', 'last reviewed')]
+   kai-pm/RUNTIME_TOPOLOGY_CENSUS.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L1 '2026-08-12'
+     determining after  : —
+     source predicate   : None
+     raw source line    : # #41 runtime-topology census — measured 2026-08-12
+     new observation    : document-scoped dates present, none state-binding: [('L1', None)]
+   kai-pm/SERVICE_IDENTITY_MEASUREMENT.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L3 '2026-08-07'
+     determining after  : —
+     source predicate   : 'date'
+     raw source line    : **Date:** 2026-08-07 · **Status:** evidence, for review. No implementation.
+     new observation    : document-scoped dates present, none state-binding: [('L3', 'date')]
+   kai-pm/SERVICE_IDENTITY_TRUST_BOUNDARIES.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L3 '2026-08-08'
+     determining after  : —
+     source predicate   : 'date'
+     raw source line    : **Date:** 2026-08-08 · **Status:** analysis, no new mechanism proposed.
+     new observation    : document-scoped dates present, none state-binding: [('L3', 'date')]
+   kai-pm/TECH_DEBT_E402.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L5 '2026-08-06'
+     determining after  : —
+     source predicate   : 'opened'
+     raw source line    : **Opened:** 2026-08-06, during the lint sweep.
+     new observation    : document-scoped dates present, none state-binding: [('L5', 'opened')]
+   kai-pm/UH2_INTAKE_REBUILD_ANALYSIS.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L3 '2026-08-07'
+     determining after  : —
+     source predicate   : None
+     raw source line    : 2026-08-07. **No code written. No trust-boundary change made.**
+     new observation    : document-scoped dates present, none state-binding: [('L3', None)]
+   kai-pm/UH2_INTAKE_REDESIGN.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L3 '2026-08-07'
+     determining after  : —
+     source predicate   : None
+     raw source line    : 2026-08-07. **No implementation. No trust-boundary change.** For
+     new observation    : document-scoped dates present, none state-binding: [('L3', None)]
+   kai-pm/UH2_SENSOR_INGRESS_PLAN.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L3 '2026-08-07'
+     determining after  : —
+     source predicate   : None
+     raw source line    : 2026-08-07. **No code written. No trust-boundary change made.** Written
+     new observation    : document-scoped dates present, none state-binding: [('L3', None)]
+   kai-pm/VERIFICATION_ARCHITECTURE_REVIEW.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L3 '2026-08-12'
+     determining after  : —
+     source predicate   : 'date'
+     raw source line    : **Date:** 2026-08-12 · **Scope:** the proof system, not Kai
+     new observation    : document-scoped dates present, none state-binding: [('L3', 'date')]
+   kai-pm/W1_DASHBOARD_REMEDIATION_PLAN.md
+     TIME_BOUND -> UNKNOWN
+     determining before : L4 '2026-08-02'
+     determining after  : —
+     source predicate   : 'created'
+     raw source line    : **Created:** 2026-08-02
+     new observation    : document-scoped dates present, none state-binding: [('L4', 'created')]
+
+9. CHANGED ROWS BY SOURCE PREDICATE — the mechanism, not a literal
+   'reviewed'                  144
+   None                         15
+   'date'                        4
+   'created'                     4
+   'started'                     2
+   'generated'                   2
+   'log started'                 1
+   'review date'                 1
+   'prepared'                    1
+   'planning date'               1
+   'last reviewed'               1
+   'opened'                      1
+
+10. INPUT DIGESTS
+   passA.json                  24fb1f555560277fd4555087f22ed06ef4a72efee845a339bbc87b925730f51c
+   classify.py (M1)            1cd4503361dfdb8b522a31ad92de51989e07b383b5177b1fea1f0cac52b351a2
+   classify.py (pred)          3b4abef729e6af1ea850050b6335c85534c5f8f193cf8c83d125f241550d1be1
+   passa.py (both)             ab2d98d030f61ba12b8280e1639da92b2726bf7b91c12941336dceefb12f5a6e
+
+11. WHAT THIS IS NOT
+   Not a correctness reference, not an answer key, not an
+   adjudication. A delta is not automatically correct. No delta
+   below has been repaired. No target count was used: neither the
+   historical 10 nor 5, 7, 38 or any other aggregate.

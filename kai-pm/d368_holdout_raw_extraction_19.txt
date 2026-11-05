@@ -1,0 +1,278 @@
+BOUND RAW EXTRACTION — D368 HOLDOUT, Reviewed-family rows
+ADJUDICATION-SUPPORT EVIDENCE ONLY. NOT PART OF THE D368 CANDIDATE.
+Does not regenerate, alter or supersede the frozen holdout.
+No interpretation is added below.
+
+  subject commit    : d8aac4d49e6ba997e3eb38062c0917186ee3f197
+  subject tree      : 3abc9e9d8ca11966a6f996d5f0af68072ee5b117
+  candidate         : D368 9d7877063d9a2579d1370111177b23274fd288ef
+  candidate aggregate: ba2b16d400aafd2b694890149bbaae1d1369d3771c25ce809d2f752d5248de4a
+  source artefact   : kai-pm/house_in_order_h2_v12/h2v12-holdout.json
+  subject checkout  : an exact checkout at the subject commit
+  selection         : holdout rows where VALIDITY == TIME_BOUND and the
+                      witness local_context begins with a label matching
+                      ^\s*[>\-*|]?\s*[*_`]{0,2}\s*(reviewed|last reviewed)\s*[*_`]{0,2}\s*:
+  unit              : holdout ROWS (not literal matches)
+  denominator       : the 40 frozen holdout rows
+  raw_result        : 19 rows
+  order             : holdout order
+  fields per row    : path · subject commit · source selector · verbatim
+                      Reviewed line · 2 lines before · 2 lines after ·
+                      VALIDITY value · VALIDITY witness type/value/scope ·
+                      SCOPE value · SCOPE witness type/value/scope
+  producer          : Orion. Single-producer reproducible evidence; NOT
+                      independent corroboration.
+  limitations       : establishes only what the fields state. Says nothing
+                      about the other four axes, and nothing about whether
+                      any verdict is correct.
+
+--------------------------------------------------------------------
+RAW SOURCE EXTRACTION — 19 Reviewed-family holdout rows, in holdout order
+Requested by Kai. Factual extraction only.
+
+[1] path              : kai-pm/CODE_AUDIT_BATCH_SYSMETRICS_EXTENSION.md
+    subject commit    : d8aac4d49e6ba997e3eb38062c0917186ee3f197
+    source selector   : L5
+    before -2         : Repository: `dainius1234/kai-system`  
+    before -1         : Status: CONFIRMED — pending final consolidation  
+    REVIEWED LINE     : Reviewed: 27 July 2026
+    after +1          : 
+    after +2          : This batch records only findings not already present in `CODE_AUDIT_BATCH_SYSMETRICS_WORLD_ANCHOR.md`.
+    VALIDITY value    : TIME_BOUND
+    VALIDITY witness  : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+    SCOPE value       : WHOLE_FILE
+    SCOPE witness     : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+
+[2] path              : kai-pm/CODE_AUDIT_BATCH_EMAIL_READER_EXTENSION.md
+    subject commit    : d8aac4d49e6ba997e3eb38062c0917186ee3f197
+    source selector   : L5
+    before -2         : Repository: `dainius1234/kai-system`  
+    before -1         : Status: CONFIRMED — pending final consolidation  
+    REVIEWED LINE     : Reviewed: 27 July 2026
+    after +1          : 
+    after +2          : This batch records only findings not already present in `CODE_AUDIT_BATCH_EMAIL_READER.md`. The existing 18 findings are not duplicated.
+    VALIDITY value    : TIME_BOUND
+    VALIDITY witness  : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+    SCOPE value       : WHOLE_FILE
+    SCOPE witness     : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+
+[3] path              : kai-pm/CODE_AUDIT_BATCH_AUTONOMOUS_STATE.md
+    subject commit    : d8aac4d49e6ba997e3eb38062c0917186ee3f197
+    source selector   : L5
+    before -2         : Repository: `dainius1234/kai-system`  
+    before -1         : Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md`  
+    REVIEWED LINE     : Reviewed: 26 July 2026
+    after +1          : 
+    after +2          : ## Consolidated batch index
+    VALIDITY value    : TIME_BOUND
+    VALIDITY witness  : type=DATE_STAMP value='26 July 2026' scope=WHOLE_FILE
+    SCOPE value       : WHOLE_FILE
+    SCOPE witness     : type=DATE_STAMP value='26 July 2026' scope=WHOLE_FILE
+
+[4] path              : kai-pm/CODE_AUDIT_BATCH_OPERATOR_CONTROL_DRILLS.md
+    subject commit    : d8aac4d49e6ba997e3eb38062c0917186ee3f197
+    source selector   : L5
+    before -2         : Repository: `dainius1234/kai-system`  
+    before -1         : Status: CONFIRMED — pending final consolidation  
+    REVIEWED LINE     : Reviewed: 27 July 2026
+    after +1          : 
+    after +2          : This batch covers local operator-control, recovery-drill, self-audit, game-day and chaos scripts. Key-rotation-specific defects remain in the existing key-rotation batches.
+    VALIDITY value    : TIME_BOUND
+    VALIDITY witness  : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+    SCOPE value       : WHOLE_FILE
+    SCOPE witness     : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+
+[5] path              : kai-pm/CODE_AUDIT_BATCH_GIT_WATCHER.md
+    subject commit    : d8aac4d49e6ba997e3eb38062c0917186ee3f197
+    source selector   : L5
+    before -2         : Repository: `dainius1234/kai-system`  
+    before -1         : Status: CONFIRMED — pending consolidation into `CODE_AUDIT_MASTER.md`  
+    REVIEWED LINE     : Reviewed: 27 July 2026
+    after +1          : 
+    after +2          : ## Consolidated batch index
+    VALIDITY value    : TIME_BOUND
+    VALIDITY witness  : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+    SCOPE value       : WHOLE_FILE
+    SCOPE witness     : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+
+[6] path              : kai-pm/CODE_AUDIT_BATCH_SHELL_SANDBOX_EXTENSION.md
+    subject commit    : d8aac4d49e6ba997e3eb38062c0917186ee3f197
+    source selector   : L5
+    before -2         : Repository: `dainius1234/kai-system`  
+    before -1         : Status: CONFIRMED — pending final consolidation  
+    REVIEWED LINE     : Reviewed: 27 July 2026
+    after +1          : 
+    after +2          : This batch records only findings not already present in `CODE_AUDIT_BATCH_SHELL_SANDBOX.md`.
+    VALIDITY value    : TIME_BOUND
+    VALIDITY witness  : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+    SCOPE value       : WHOLE_FILE
+    SCOPE witness     : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+
+[7] path              : kai-pm/CODE_AUDIT_BATCH_MEMU_INTROSPECTION.md
+    subject commit    : d8aac4d49e6ba997e3eb38062c0917186ee3f197
+    source selector   : L5
+    before -2         : Repository: `dainius1234/kai-system`  
+    before -1         : Status: CONFIRMED — pending final consolidation  
+    REVIEWED LINE     : Reviewed: 27 July 2026
+    after +1          : 
+    after +2          : This batch covers `memu-core/introspect_app.py` and the maintenance handlers it re-registers from `memu-core/app.py`. General hot-path memory API findings will be recorded separately.
+    VALIDITY value    : TIME_BOUND
+    VALIDITY witness  : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+    SCOPE value       : WHOLE_FILE
+    SCOPE witness     : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+
+[8] path              : kai-pm/CODE_AUDIT_BATCH_NOTIFY_SERVICE_EXTENSION.md
+    subject commit    : d8aac4d49e6ba997e3eb38062c0917186ee3f197
+    source selector   : L5
+    before -2         : Repository: `dainius1234/kai-system`  
+    before -1         : Status: CONFIRMED — pending final consolidation  
+    REVIEWED LINE     : Reviewed: 27 July 2026
+    after +1          : 
+    after +2          : This batch records only findings not already present in `CODE_AUDIT_BATCH_NOTIFY_SERVICE.md`. The existing 11 findings are not duplicated.
+    VALIDITY value    : TIME_BOUND
+    VALIDITY witness  : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+    SCOPE value       : WHOLE_FILE
+    SCOPE witness     : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+
+[9] path              : kai-pm/CODE_AUDIT_BATCH_CHAOS_GONOGO_TEST_BOOTSTRAP.md
+    subject commit    : d8aac4d49e6ba997e3eb38062c0917186ee3f197
+    source selector   : L5
+    before -2         : Repository: `dainius1234/kai-system`  
+    before -1         : Status: CONFIRMED — pending final consolidation  
+    REVIEWED LINE     : Reviewed: 27 July 2026
+    after +1          : 
+    after +2          : This batch covers previously unlogged findings in `scripts/chaos_ci.py`, `scripts/go_no_go_check.py`, root `conftest.py`, and the directly related `Makefile` go/no-go wiring. Existing service/authentication defects are not duplicated; this batch records assurance-layer failures.
+    VALIDITY value    : TIME_BOUND
+    VALIDITY witness  : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+    SCOPE value       : WHOLE_FILE
+    SCOPE witness     : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+
+[10] path              : kai-pm/CODE_AUDIT_BATCH_KEY_ROTATION_MIGRATION.md
+    subject commit    : d8aac4d49e6ba997e3eb38062c0917186ee3f197
+    source selector   : L5
+    before -2         : Repository: `dainius1234/kai-system`  
+    before -1         : Status: CONFIRMED — pending final consolidation  
+    REVIEWED LINE     : Reviewed: 27 July 2026
+    after +1          : 
+    after +2          : Existing request-signature defects in `common/auth.py` and Tool Gate are not duplicated here.
+    VALIDITY value    : TIME_BOUND
+    VALIDITY witness  : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+    SCOPE value       : WHOLE_FILE
+    SCOPE witness     : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+
+[11] path              : kai-pm/CODE_AUDIT_BATCH_LETTA_AGENT_EXTENSION.md
+    subject commit    : d8aac4d49e6ba997e3eb38062c0917186ee3f197
+    source selector   : L5
+    before -2         : Repository: `dainius1234/kai-system`  
+    before -1         : Status: CONFIRMED — pending final consolidation  
+    REVIEWED LINE     : Reviewed: 27 July 2026
+    after +1          : 
+    after +2          : This batch records only findings not already present in `CODE_AUDIT_BATCH_LETTA_AGENT.md`.
+    VALIDITY value    : TIME_BOUND
+    VALIDITY witness  : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+    SCOPE value       : WHOLE_FILE
+    SCOPE witness     : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+
+[12] path              : kai-pm/CODE_AUDIT_BATCH_VAULT_BRIDGE_EXTENSION.md
+    subject commit    : d8aac4d49e6ba997e3eb38062c0917186ee3f197
+    source selector   : L5
+    before -2         : Repository: `dainius1234/kai-system`  
+    before -1         : Status: CONFIRMED — pending final consolidation  
+    REVIEWED LINE     : Reviewed: 27 July 2026
+    after +1          : 
+    after +2          : This batch records only additional findings not already present in `CODE_AUDIT_BATCH_VAULT_SYNC.md`. The earlier 22 Vault Sync findings are not duplicated.
+    VALIDITY value    : TIME_BOUND
+    VALIDITY witness  : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+    SCOPE value       : WHOLE_FILE
+    SCOPE witness     : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+
+[13] path              : kai-pm/CODE_AUDIT_BATCH_WAKE_SERVICE.md
+    subject commit    : d8aac4d49e6ba997e3eb38062c0917186ee3f197
+    source selector   : L5
+    before -2         : Repository: `dainius1234/kai-system`  
+    before -1         : Status: CONFIRMED — pending final consolidation  
+    REVIEWED LINE     : Reviewed: 27 July 2026
+    after +1          : 
+    after +2          : ## Consolidated batch index
+    VALIDITY value    : TIME_BOUND
+    VALIDITY witness  : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+    SCOPE value       : WHOLE_FILE
+    SCOPE witness     : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+
+[14] path              : kai-pm/CODE_AUDIT_BATCH_ARCHITECTURE_INTERACTION.md
+    subject commit    : d8aac4d49e6ba997e3eb38062c0917186ee3f197
+    source selector   : L5
+    before -2         : Repository: `dainius1234/kai-system`  
+    before -1         : Status: CONFIRMED — pending final consolidation  
+    REVIEWED LINE     : Reviewed: 27 July 2026
+    after +1          : 
+    after +2          : This phase records architectural root causes and missing invariants demonstrated repeatedly across the confirmed source and cross-service findings.
+    VALIDITY value    : TIME_BOUND
+    VALIDITY witness  : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+    SCOPE value       : WHOLE_FILE
+    SCOPE witness     : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+
+[15] path              : kai-pm/CODE_AUDIT_BATCH_EXECUTOR.md
+    subject commit    : d8aac4d49e6ba997e3eb38062c0917186ee3f197
+    source selector   : L5
+    before -2         : Repository: `dainius1234/kai-system`  
+    before -1         : Status: CONFIRMED — pending final consolidation  
+    REVIEWED LINE     : Reviewed: 27 July 2026
+    after +1          : 
+    after +2          : ## Consolidated batch index
+    VALIDITY value    : TIME_BOUND
+    VALIDITY witness  : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+    SCOPE value       : WHOLE_FILE
+    SCOPE witness     : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+
+[16] path              : kai-pm/CODE_AUDIT_BATCH_TEST_STUBS_EXTERNAL_MODEL_OCR_FUZZ.md
+    subject commit    : d8aac4d49e6ba997e3eb38062c0917186ee3f197
+    source selector   : L5
+    before -2         : Repository: `dainius1234/kai-system`  
+    before -1         : Status: CONFIRMED — pending final consolidation  
+    REVIEWED LINE     : Reviewed: 27 July 2026
+    after +1          : 
+    after +2          : This batch covers previously unlogged findings in `scripts/conftest.py`, `scripts/github_models_client.py`, `scripts/ocr_receipt.py` and `scripts/security_fuzz_upload.py`. Underlying Dashboard upload and memU/accounting defects remain in their existing batches and are not duplicated.
+    VALIDITY value    : TIME_BOUND
+    VALIDITY witness  : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+    SCOPE value       : WHOLE_FILE
+    SCOPE witness     : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+
+[17] path              : kai-pm/CODE_AUDIT_BATCH_ENVIRONMENTAL_SENSORS_EXTENSION.md
+    subject commit    : d8aac4d49e6ba997e3eb38062c0917186ee3f197
+    source selector   : L5
+    before -2         : Repository: `dainius1234/kai-system`  
+    before -1         : Status: CONFIRMED — pending final consolidation  
+    REVIEWED LINE     : Reviewed: 27 July 2026
+    after +1          : 
+    after +2          : This batch records only findings not already present in `CODE_AUDIT_BATCH_ENVIRONMENTAL_SENSORS.md`. The existing 10 findings are not duplicated.
+    VALIDITY value    : TIME_BOUND
+    VALIDITY witness  : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+    SCOPE value       : WHOLE_FILE
+    SCOPE witness     : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+
+[18] path              : kai-pm/CODE_AUDIT_BATCH_AVATAR_SERVICE_EXTENSION.md
+    subject commit    : d8aac4d49e6ba997e3eb38062c0917186ee3f197
+    source selector   : L5
+    before -2         : Repository: `dainius1234/kai-system`  
+    before -1         : Status: CONFIRMED — pending final consolidation  
+    REVIEWED LINE     : Reviewed: 27 July 2026
+    after +1          : 
+    after +2          : This batch records only findings not already present in `CODE_AUDIT_BATCH_AVATAR_SERVICE.md`.
+    VALIDITY value    : TIME_BOUND
+    VALIDITY witness  : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+    SCOPE value       : WHOLE_FILE
+    SCOPE witness     : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+
+[19] path              : kai-pm/CODE_AUDIT_BATCH_SHARED_RUNTIME_CONTROLS.md
+    subject commit    : d8aac4d49e6ba997e3eb38062c0917186ee3f197
+    source selector   : L5
+    before -2         : Repository: `dainius1234/kai-system`  
+    before -1         : Status: CONFIRMED — pending final consolidation and duplicate reconciliation  
+    REVIEWED LINE     : Reviewed: 27 July 2026
+    after +1          : 
+    after +2          : ## Consolidated batch index
+    VALIDITY value    : TIME_BOUND
+    VALIDITY witness  : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE
+    SCOPE value       : WHOLE_FILE
+    SCOPE witness     : type=DATE_STAMP value='27 July 2026' scope=WHOLE_FILE

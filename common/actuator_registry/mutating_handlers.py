@@ -15,8 +15,16 @@ reached VERIFIED or ACTIVE.
 """
 from __future__ import annotations
 
+import json
+import logging
 import os
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
+from urllib.parse import urlparse
+
+logger = logging.getLogger("kai.mutating_handlers")
+
+#: One warning per process when outbound requests cannot be signed.
+_WARNED_UNSIGNED: Set[bool] = set()
 
 # actuator → (env var, default URL, {action: (method, path, side_effects)})
 MUTATING_ENDPOINTS: Dict[str, Tuple[str, str, Dict[str, Tuple[str, str, List[str]]]]] = {
@@ -26,7 +34,7 @@ MUTATING_ENDPOINTS: Dict[str, Tuple[str, str, Dict[str, Tuple[str, str, List[str
         {"sandbox_shell_read": ("POST", "/run", ["subprocess"])},
     ),
     "executor-sandbox": (
-        "EXECUTOR_URL", "http://executor:8003",
+        "EXECUTOR_URL", "http://executor:8002",
         {
             "sandbox_python_eval": ("POST", "/execute", ["sandboxed_eval"]),
             "noop": ("POST", "/execute", []),
@@ -34,7 +42,7 @@ MUTATING_ENDPOINTS: Dict[str, Tuple[str, str, Dict[str, Tuple[str, str, List[str
     ),
     # ── Tier 3: document and browser reads ───────────────────────────
     "web-scout": (
-        "AGENTIC_URL", "http://agentic:8001",
+        "AGENTIC_URL", "http://agentic:8007",
         {
             "web_search": ("POST", "/scout/search", ["outbound_http"]),
             "web_fetch": ("POST", "/scout/fetch", ["outbound_http"]),
@@ -52,7 +60,7 @@ MUTATING_ENDPOINTS: Dict[str, Tuple[str, str, Dict[str, Tuple[str, str, List[str
         },
     ),
     "screen-capture": (
-        "SCREEN_CAPTURE_URL", "http://screen-capture:8021",
+        "SCREEN_CAPTURE_URL", "http://screen-capture:8059",
         {
             "screen_capture": ("POST", "/capture", ["disk_write"]),
             "screen_ocr": ("POST", "/ocr", ["disk_write"]),
@@ -87,7 +95,7 @@ MUTATING_ENDPOINTS: Dict[str, Tuple[str, str, Dict[str, Tuple[str, str, List[str
         },
     ),
     "checkpoint-manager": (
-        "AGENTIC_URL", "http://agentic:8001",
+        "AGENTIC_URL", "http://agentic:8007",
         {
             "checkpoint_create": ("POST", "/checkpoint", ["disk_write"]),
             "checkpoint_restore": (
@@ -102,7 +110,7 @@ MUTATING_ENDPOINTS: Dict[str, Tuple[str, str, Dict[str, Tuple[str, str, List[str
     ),
     # ── Tier 6: calendar / external messages ─────────────────────────
     "telegram-bot": (
-        "TELEGRAM_BOT_URL", "http://telegram-bot:8046",
+        "TELEGRAM_BOT_URL", "http://telegram-bot:8025",
         {
             "telegram_send": ("POST", "/alert", ["external_message"]),
             "telegram_alert": ("POST", "/alert", ["external_message"]),
@@ -114,25 +122,25 @@ MUTATING_ENDPOINTS: Dict[str, Tuple[str, str, Dict[str, Tuple[str, str, List[str
     ),
     # ── Tier 7: recovery / admin ─────────────────────────────────────
     "backup-service": (
-        "BACKUP_SERVICE_URL", "http://backup-service:8048",
+        "BACKUP_SERVICE_URL", "http://backup-service:8054",
         {"backup_create": ("POST", "/backup", ["disk_write", "subprocess"])},
     ),
     "ledger-worker": (
-        "LEDGER_WORKER_URL", "http://ledger-worker:8049",
+        "LEDGER_WORKER_URL", "http://ledger-worker:8056",
         {
             "ledger_archive": ("POST", "/archive", ["disk_write"]),
             "ledger_verify": ("POST", "/verify", []),
         },
     ),
     "supervisor": (
-        "SUPERVISOR_URL", "http://supervisor:8050",
+        "SUPERVISOR_URL", "http://supervisor:8051",
         {
             "service_recover": ("POST", "/recover", ["service_restart"]),
             "breaker_reset": ("POST", "/breakers/reset", ["breaker_state_change"]),
         },
     ),
     "heartbeat": (
-        "HEARTBEAT_URL", "http://heartbeat:8004",
+        "HEARTBEAT_URL", "http://heartbeat:8010",
         {
             "auto_sleep": ("POST", "/sleep", ["memory_mutation"]),
             "memory_compress": ("POST", "/compress", ["memory_mutation"]),
@@ -141,14 +149,14 @@ MUTATING_ENDPOINTS: Dict[str, Tuple[str, str, Dict[str, Tuple[str, str, List[str
     ),
     # ── Tier 8: financial / destructive / self-modifying ─────────────
     "paper-trader": (
-        "AGENTIC_URL", "http://agentic:8001",
+        "AGENTIC_URL", "http://agentic:8007",
         {
             "paper_trade_open": ("POST", "/paper/open", ["simulated_position"]),
             "paper_trade_close": ("POST", "/paper/close", ["simulated_position"]),
         },
     ),
     "executor-shell": (
-        "EXECUTOR_URL", "http://executor:8003",
+        "EXECUTOR_URL", "http://executor:8002",
         {
             "shell_exec": ("POST", "/execute", ["subprocess", "irreversible"]),
             "script_exec": ("POST", "/execute", ["subprocess", "irreversible"]),
@@ -162,7 +170,7 @@ MUTATING_ENDPOINTS: Dict[str, Tuple[str, str, Dict[str, Tuple[str, str, List[str
         },
     ),
     "db-restore": (
-        "BACKUP_SERVICE_URL", "http://backup-service:8048",
+        "BACKUP_SERVICE_URL", "http://backup-service:8054",
         {"db_restore": (
             "POST", "/restore/postgres",
             ["database_overwrite", "irreversible"],
@@ -180,14 +188,67 @@ def _base_url(actuator: str) -> str:
     return os.getenv(env_key, default).rstrip("/")
 
 
-def _auth_headers() -> Dict[str, str]:
-    """Bearer header for the now-authenticated downstream endpoints."""
+def _encode_body(body: Dict[str, Any]) -> bytes:
+    """The exact bytes that are both sent and signed.
+
+    Delegates to `common.service_identity.encode_json_body` so there is
+    exactly ONE encoder in the system. Two encoders that agree today
+    drift tomorrow, and the drift presents as a key problem rather than
+    an encoding one. Falls back only if that import fails, and then to
+    byte-identical arguments.
+    """
+    try:
+        from common.service_identity import encode_json_body
+        return encode_json_body(body)
+    except Exception:
+        return json.dumps(body or {}, separators=(",", ":"),
+                          sort_keys=True).encode("utf-8")
+
+
+def _destination(actuator: str) -> str:
+    """The peer's service name, derived from the URL actually in use.
+
+    Taken from the resolved base URL rather than a table beside the code,
+    so an environment override changes the signed destination with it.
+    """
+    return urlparse(_base_url(actuator)).hostname or actuator
+
+
+def _auth_headers(actuator: str, method: str, path: str,
+                  body_bytes: bytes) -> Dict[str, str]:
+    """Credentials for one specific downstream request.
+
+    Signs with this service's own key when one is configured, so the
+    receiver derives *which* service called. Falls back to the shared
+    bearer token during the migration window, where the receiver records
+    the caller as unverified rather than guessing.
+
+    Signing failures fall back rather than raise: a caller that cannot
+    sign should be refused by the *receiver*, which is the side that
+    knows whether identity is required. Failing here would let a local
+    key problem masquerade as an authorisation decision.
+    """
+    headers: Dict[str, str] = {}
+    try:
+        from common.service_identity import signed_headers
+        headers.update(signed_headers(
+            destination=_destination(actuator), method=method, path=path,
+            body=body_bytes))
+    except Exception as exc:
+        if not _WARNED_UNSIGNED:
+            _WARNED_UNSIGNED.add(True)
+            logger.warning(
+                "outbound requests are UNSIGNED (%s: %s) — the receiver will "
+                "record this caller as unverified", type(exc).__name__, exc)
+
     try:
         from common.service_auth import _load_token
         token = _load_token()
     except Exception:
         token = os.getenv("KAI_SERVICE_TOKEN", "")
-    return {"Authorization": f"Bearer {token}"} if token else {}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    return headers
 
 
 def side_effects_for(actuator: str, action_type: str) -> List[str]:
@@ -209,7 +270,13 @@ def build_mutating_handler(
 
     def _default_post(url: str, body: Dict[str, Any], headers: Dict[str, str]) -> Any:
         import httpx
-        response = httpx.post(url, json=body, headers=headers, timeout=timeout)
+        # `content=`, not `json=`: the signature covers a hash of the body
+        # bytes, so the bytes on the wire must be the ones that were
+        # signed. `json=` would re-serialise with its own separators.
+        sent = dict(headers)
+        sent.setdefault("content-type", "application/json")
+        response = httpx.post(url, content=_encode_body(body), headers=sent,
+                              timeout=timeout)
         response.raise_for_status()
         return response.json()
 
@@ -237,7 +304,9 @@ def build_mutating_handler(
         url = f"{_base_url(actuator)}{path}"
 
         try:
-            payload = poster(url, body, _auth_headers())
+            payload = poster(url, body,
+                             _auth_headers(actuator, method, path,
+                                           _encode_body(body)))
         except Exception as exc:
             return {
                 "actuator": actuator,

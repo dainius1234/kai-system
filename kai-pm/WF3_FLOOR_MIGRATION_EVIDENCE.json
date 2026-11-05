@@ -1,0 +1,538 @@
+{
+  "authority_status": "NON_AUTHORITATIVE_CALIBRATION_EVIDENCE",
+  "must_not_be_used_as": "This file is HISTORICAL EVIDENCE. It MUST NOT define population, define result contracts, define floors, be read by the runner, be read by the floor gate, be registered as production configuration, or become a fallback authority if the live execution plan is unavailable. The sole population authority after cutover is scripts/security/uh_execution_plan.json. Evidence is not authority; evidence is not closure. Banking this record does not independently prove its conclusions and does not close WF-3.",
+  "subject_sha": "b5e1250e5759551b3c68a38bbfec20b8740c0c9b",
+  "source_floor_file": {
+    "path": "scripts/security/assertion_floors.json",
+    "sha256_raw_bytes": "2573f0afd7b98208e72f0863c7eef37ec164d314a9633ff17d0891402cc92b77",
+    "entries": 61,
+    "total": 3048
+  },
+  "translation_nature": "ONE-TIME IDENTITY-KEY TRANSLATION from human result label to Make target. This is NOT floor re-recording. `--update-floors` was NOT used and no numeric value was touched. The label->target resolution came from the 78-target execution census, where every target emitted exactly one tally line and no label collided across targets.",
+  "proof": {
+    "input_entries": 61,
+    "output_entries": 61,
+    "input_total": 3048,
+    "output_total": 3048,
+    "values_altered": 0,
+    "values_added": 0,
+    "values_removed": 0,
+    "zero_match_labels": 0,
+    "multi_match_labels": 0,
+    "duplicate_target_mappings": 0,
+    "label_collisions_across_78_targets": 0
+  },
+  "mappings_61": [
+    {
+      "old_label": "UH-7 Actuator Registry Tests",
+      "make_target": "test-actuator-registry",
+      "floor": 75,
+      "unchanged": true
+    },
+    {
+      "old_label": "Architecture Rule Tests",
+      "make_target": "test-architecture-rules",
+      "floor": 68,
+      "unchanged": true
+    },
+    {
+      "old_label": "Assertion Floor Tests",
+      "make_target": "test-assertion-floors",
+      "floor": 40,
+      "unchanged": true
+    },
+    {
+      "old_label": "Constraint Assessment Tests",
+      "make_target": "test-assessment",
+      "floor": 56,
+      "unchanged": true
+    },
+    {
+      "old_label": "UH-8 Autonomy Tests",
+      "make_target": "test-autonomy",
+      "floor": 174,
+      "unchanged": true
+    },
+    {
+      "old_label": "Bind-mount portability tests",
+      "make_target": "test-bind-mount-portability",
+      "floor": 29,
+      "unchanged": true
+    },
+    {
+      "old_label": "Bring-up Guard Tests",
+      "make_target": "test-bringup-guards",
+      "floor": 23,
+      "unchanged": true
+    },
+    {
+      "old_label": "CI Script Tests",
+      "make_target": "test-ci-scripts",
+      "floor": 23,
+      "unchanged": true
+    },
+    {
+      "old_label": "CI Toleration Tests",
+      "make_target": "test-ci-tolerations",
+      "floor": 26,
+      "unchanged": true
+    },
+    {
+      "old_label": "Compose Drift Tests",
+      "make_target": "test-compose-drift",
+      "floor": 33,
+      "unchanged": true
+    },
+    {
+      "old_label": "Compose Env Tests",
+      "make_target": "test-compose-env",
+      "floor": 24,
+      "unchanged": true
+    },
+    {
+      "old_label": "Compose Gate Tests",
+      "make_target": "test-compose-gates",
+      "floor": 54,
+      "unchanged": true
+    },
+    {
+      "old_label": "Compose Interpolation Tests",
+      "make_target": "test-compose-interpolation",
+      "floor": 28,
+      "unchanged": true
+    },
+    {
+      "old_label": "Compose Probe Tests",
+      "make_target": "test-compose-probe",
+      "floor": 44,
+      "unchanged": true
+    },
+    {
+      "old_label": "Concurrency & Clock Tests",
+      "make_target": "test-concurrency-clock",
+      "floor": 51,
+      "unchanged": true
+    },
+    {
+      "old_label": "UH-1 Contract Tests",
+      "make_target": "test-contracts",
+      "floor": 126,
+      "unchanged": true
+    },
+    {
+      "old_label": "Dashboard Auth Tests",
+      "make_target": "test-dashboard-auth",
+      "floor": 99,
+      "unchanged": true
+    },
+    {
+      "old_label": "Dashboard Finding Tracker Tests",
+      "make_target": "test-dashboard-findings",
+      "floor": 217,
+      "unchanged": true
+    },
+    {
+      "old_label": "Dashboard UI Auth Tests",
+      "make_target": "test-dashboard-ui-auth",
+      "floor": 42,
+      "unchanged": true
+    },
+    {
+      "old_label": "Degraded State Tests",
+      "make_target": "test-degraded",
+      "floor": 71,
+      "unchanged": true
+    },
+    {
+      "old_label": "Depends-On Readiness Tests",
+      "make_target": "test-depends-on-readiness",
+      "floor": 24,
+      "unchanged": true
+    },
+    {
+      "old_label": "Dockerfile Context Tests",
+      "make_target": "test-dockerfile-context",
+      "floor": 24,
+      "unchanged": true
+    },
+    {
+      "old_label": "Dockerfile Coverage Tests",
+      "make_target": "test-dockerfile-coverage",
+      "floor": 26,
+      "unchanged": true
+    },
+    {
+      "old_label": "Dockerfile Flag Tests",
+      "make_target": "test-dockerfile-flags",
+      "floor": 21,
+      "unchanged": true
+    },
+    {
+      "old_label": "Erasure Tests",
+      "make_target": "test-erasure",
+      "floor": 75,
+      "unchanged": true
+    },
+    {
+      "old_label": "Execution Coverage Tests",
+      "make_target": "test-execution-coverage",
+      "floor": 20,
+      "unchanged": true
+    },
+    {
+      "old_label": "Flags-Enabled Integration Tests",
+      "make_target": "test-flags-enabled",
+      "floor": 37,
+      "unchanged": true
+    },
+    {
+      "old_label": "Full Migration Tests",
+      "make_target": "test-full-migration",
+      "floor": 75,
+      "unchanged": true
+    },
+    {
+      "old_label": "Gate Registry Tests",
+      "make_target": "test-gate-registry",
+      "floor": 82,
+      "unchanged": true
+    },
+    {
+      "old_label": "Healthcheck Runnable Tests",
+      "make_target": "test-healthcheck-runnable",
+      "floor": 16,
+      "unchanged": true
+    },
+    {
+      "old_label": "Hygiene Gate Tests",
+      "make_target": "test-hygiene-gate",
+      "floor": 63,
+      "unchanged": true
+    },
+    {
+      "old_label": "Image Module Tests",
+      "make_target": "test-image-modules",
+      "floor": 28,
+      "unchanged": true
+    },
+    {
+      "old_label": "Implicit Dependency Tests",
+      "make_target": "test-implicit-deps",
+      "floor": 32,
+      "unchanged": true
+    },
+    {
+      "old_label": "Invariant Guard Tests",
+      "make_target": "test-invariant-guards",
+      "floor": 26,
+      "unchanged": true
+    },
+    {
+      "old_label": "Legacy Bridge Tests",
+      "make_target": "test-legacy-bridge",
+      "floor": 58,
+      "unchanged": true
+    },
+    {
+      "old_label": "Live Smoke Tests",
+      "make_target": "test-live-smoke",
+      "floor": 36,
+      "unchanged": true
+    },
+    {
+      "old_label": "Migration & Active Mode Tests",
+      "make_target": "test-migration",
+      "floor": 136,
+      "unchanged": true
+    },
+    {
+      "old_label": "Payload Bounds Tests",
+      "make_target": "test-payload-bounds",
+      "floor": 24,
+      "unchanged": true
+    },
+    {
+      "old_label": "Perception intake tests",
+      "make_target": "test-perception-intake",
+      "floor": 23,
+      "unchanged": true
+    },
+    {
+      "old_label": "UH-2 Perception Spine Tests",
+      "make_target": "test-perception-spine",
+      "floor": 166,
+      "unchanged": true
+    },
+    {
+      "old_label": "Phase 0 reducer tests",
+      "make_target": "test-phase0-reducers",
+      "floor": 46,
+      "unchanged": true
+    },
+    {
+      "old_label": "UH-5 Policy Bridge Tests",
+      "make_target": "test-policy-bridge",
+      "floor": 49,
+      "unchanged": true
+    },
+    {
+      "old_label": "Policy Loader Tests",
+      "make_target": "test-policy-loader",
+      "floor": 16,
+      "unchanged": true
+    },
+    {
+      "old_label": "Post-mortem tests",
+      "make_target": "test-post-mortem",
+      "floor": 23,
+      "unchanged": true
+    },
+    {
+      "old_label": "Deployment Preflight Tests",
+      "make_target": "test-preflight",
+      "floor": 57,
+      "unchanged": true
+    },
+    {
+      "old_label": "UH-4 Proposal Workspace Tests",
+      "make_target": "test-proposal-workspace",
+      "floor": 52,
+      "unchanged": true
+    },
+    {
+      "old_label": "Secret & Restart Gate Tests",
+      "make_target": "test-secret-gates",
+      "floor": 28,
+      "unchanged": true
+    },
+    {
+      "old_label": "Service Auth Tests",
+      "make_target": "test-service-auth",
+      "floor": 59,
+      "unchanged": true
+    },
+    {
+      "old_label": "Service reachability tests",
+      "make_target": "test-service-reachability",
+      "floor": 37,
+      "unchanged": true
+    },
+    {
+      "old_label": "Service Token Tests",
+      "make_target": "test-service-tokens",
+      "floor": 24,
+      "unchanged": true
+    },
+    {
+      "old_label": "Shipped Package Deps Tests",
+      "make_target": "test-shipped-package-deps",
+      "floor": 13,
+      "unchanged": true
+    },
+    {
+      "old_label": "Suite Floor Tests",
+      "make_target": "test-suite-floor",
+      "floor": 18,
+      "unchanged": true
+    },
+    {
+      "old_label": "CI summariser tests",
+      "make_target": "test-summarise-runs",
+      "floor": 14,
+      "unchanged": true
+    },
+    {
+      "old_label": "Test Identity Tests",
+      "make_target": "test-test-identity",
+      "floor": 31,
+      "unchanged": true
+    },
+    {
+      "old_label": "Test Isolation Tests",
+      "make_target": "test-test-isolation",
+      "floor": 38,
+      "unchanged": true
+    },
+    {
+      "old_label": "Test Wiring Tests",
+      "make_target": "test-test-wiring",
+      "floor": 15,
+      "unchanged": true
+    },
+    {
+      "old_label": "Unreachable Binding Tests",
+      "make_target": "test-unreachable-bindings",
+      "floor": 25,
+      "unchanged": true
+    },
+    {
+      "old_label": "UH-6 Vertical Slice Tests",
+      "make_target": "test-vertical-slice",
+      "floor": 86,
+      "unchanged": true
+    },
+    {
+      "old_label": "Workflow Filter Tests",
+      "make_target": "test-workflow-filters",
+      "floor": 22,
+      "unchanged": true
+    },
+    {
+      "old_label": "Workflow Output Tests",
+      "make_target": "test-workflow-outputs",
+      "floor": 29,
+      "unchanged": true
+    },
+    {
+      "old_label": "UH-3 World State Tests",
+      "make_target": "test-world-state",
+      "floor": 71,
+      "unchanged": true
+    }
+  ],
+  "unfloored_targets_17": {
+    "policy_state": "UNFLOORED_TARGET",
+    "policy_note": "These 17 are explicit population members with NO floor. No synthetic floor, no zero floor, no exemption and no implied PASS has been assigned. Their future floor values are NOT decided by WF-3 implementation and remain pending separate adjudication.",
+    "targets": [
+      {
+        "make_target": "test-asset-contract",
+        "observed_label": "Asset Contract Summariser Calibration"
+      },
+      {
+        "make_target": "test-cognify-result",
+        "observed_label": "Cognify Result Predicate Calibration"
+      },
+      {
+        "make_target": "test-container-proof-harness",
+        "observed_label": "Container proof harness tests"
+      },
+      {
+        "make_target": "test-degradation-tolerance",
+        "observed_label": "Degradation Tolerance Tests"
+      },
+      {
+        "make_target": "test-embedding-backends",
+        "observed_label": "Embedding backend tests"
+      },
+      {
+        "make_target": "test-gated-commit",
+        "observed_label": "Drift guard tests"
+      },
+      {
+        "make_target": "test-graph-stall",
+        "observed_label": "Graph Stall Analyser Calibration"
+      },
+      {
+        "make_target": "test-ingest-contract",
+        "observed_label": "Ingest Contract Analyser Calibration"
+      },
+      {
+        "make_target": "test-llm-contract",
+        "observed_label": "LLM Response Contract Calibration"
+      },
+      {
+        "make_target": "test-memu-graph-acceptance",
+        "observed_label": "memu-graph Acceptance Calibration"
+      },
+      {
+        "make_target": "test-model-load-denominator",
+        "observed_label": "Model-Load Denominator Calibration"
+      },
+      {
+        "make_target": "test-model-startup-classifier",
+        "observed_label": "Model Startup Classifier Calibration"
+      },
+      {
+        "make_target": "test-observe-turn-identity",
+        "observed_label": "/observe_turn identity slice"
+      },
+      {
+        "make_target": "test-runtime-topology",
+        "observed_label": "Runtime Topology Tests"
+      },
+      {
+        "make_target": "test-service-identity",
+        "observed_label": "Service identity audit tests"
+      },
+      {
+        "make_target": "test-service-identity-auth",
+        "observed_label": "Service identity (ed25519) tests"
+      },
+      {
+        "make_target": "test-service-identity-wiring",
+        "observed_label": "Identity wiring gate tests"
+      }
+    ]
+  },
+  "determinism_policy_14": {
+    "note": "Identity migrated from display label to Make target. Scope is UNCHANGED at the 14 targets currently sampled; this is not an expansion to all 61 floored targets, which was rejected.",
+    "mappings": [
+      {
+        "old_label": "Architecture Rule Tests",
+        "make_target": "test-architecture-rules"
+      },
+      {
+        "old_label": "Assertion Floor Tests",
+        "make_target": "test-assertion-floors"
+      },
+      {
+        "old_label": "CI Toleration Tests",
+        "make_target": "test-ci-tolerations"
+      },
+      {
+        "old_label": "Compose Drift Tests",
+        "make_target": "test-compose-drift"
+      },
+      {
+        "old_label": "Compose Gate Tests",
+        "make_target": "test-compose-gates"
+      },
+      {
+        "old_label": "Dashboard Auth Tests",
+        "make_target": "test-dashboard-auth"
+      },
+      {
+        "old_label": "Dashboard Finding Tracker Tests",
+        "make_target": "test-dashboard-findings"
+      },
+      {
+        "old_label": "Dashboard UI Auth Tests",
+        "make_target": "test-dashboard-ui-auth"
+      },
+      {
+        "old_label": "Degraded State Tests",
+        "make_target": "test-degraded"
+      },
+      {
+        "old_label": "Deployment Preflight Tests",
+        "make_target": "test-preflight"
+      },
+      {
+        "old_label": "Gate Registry Tests",
+        "make_target": "test-gate-registry"
+      },
+      {
+        "old_label": "Hygiene Gate Tests",
+        "make_target": "test-hygiene-gate"
+      },
+      {
+        "old_label": "Secret & Restart Gate Tests",
+        "make_target": "test-secret-gates"
+      },
+      {
+        "old_label": "Test Wiring Tests",
+        "make_target": "test-test-wiring"
+      }
+    ]
+  },
+  "set_relations": {
+    "P_population": 78,
+    "F_floored": 61,
+    "D_determinism": 14,
+    "F_subset_of_P": true,
+    "D_subset_of_F": true,
+    "invariant_D_subset_F_subset_P": true,
+    "orphan_floors_F_minus_P": [],
+    "unfloored_P_minus_F_count": 17
+  }
+}
