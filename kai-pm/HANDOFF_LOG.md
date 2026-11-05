@@ -116683,3 +116683,108 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-05T07:16:49Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-05T07:16:49Z  [CMD `date -u +%FT%TZ` → 2026-11-05T07:16:49Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 0cde18a4a693bcbb591417ea599c447afbeb0e21  [CMD `git rev-parse HEAD` → 0cde18a4a693bcbb591417ea599c447afbeb0e21]
+- tree: 56861b65675b1d84f53ee8e4766459c066c8a09b  [CMD `git rev-parse HEAD^{tree}` → 56861b65675b1d84f53ee8e4766459c066c8a09b]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/project-rework-plan-pgvp35: 0cde18a4a693bcbb591417ea599c447afbeb0e21  [CMD `git ls-remote --heads origin` → 0cde18a4a693bcbb591417ea599c447afbeb0e21]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 384  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 384]
+
+### 1. The four states
+
+- physical: no KAI code change yet; banks the approval before acting  [CMD `git status --short` → clean]
+- authorised: restrict KAI_DASHBOARD_SERVICE_TOKEN to the 14 dashboard operations, denying browser_click, browser_type and monitor_rule_update; keep the shared credential and its behaviour; credentials must be distinct; branch only; focused offline tests; no network; no protected data  [CONVERSATION 2026-11-05 Kai-GPT relayed by Dainius, "APPROVE — narrowly scoped dashboard authorization correction."]
+- evidence: message verbatim in section 5 (ruling-capture id e8f7ed4e93d552f5)  [CMD `ruling_capture json text` → as stated]
+- admission: none  [CONVERSATION 2026-11-05 Kai-GPT relayed by Dainius, "Once tested and committed, report the result and close this workstream."]
+
+### 2. Rulings since the last handoff
+
+- Dainius (relaying Kai-GPT's "Send Orion" text in answer to Orion's approve/hold question) · 2026-11-05 · APPROVE the 14-operation restriction of the dashboard key; shared key preserved; both keys distinct; acceptance: 14 accept, 3 reject, executor and agentic inaccessible, credential server-side; then close this workstream; all other holds remain ⚠ UNBANKED  [CONVERSATION 2026-11-05 Kai-GPT relayed by Dainius, "Restrict KAI_DASHBOARD_SERVICE_TOKEN to the 14 identified operations, denying the remaining three."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: the 14-operation restriction and its offline tests. HELD: proactive observation (next, needs its own approval); skill promotion; historical data; live runtime; deployment; merge; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying, reading, searching or processing data/SOUL.md  [CONVERSATION 2026-11-05 Kai-GPT relayed by Dainius, "All other holds remain."]
+
+### 4. Open questions
+
+- None new  [CMD `none` → n/a]
+
+### 5. Incidents and corrections
+
+- Provenance note: the approval text is Kai-GPT's recommendation and "Send Orion" block, delivered by Dainius as his reply to the approve/hold question; recorded as Dainius relaying Kai  [CONVERSATION 2026-11-05 Kai-GPT relayed by Dainius, "My recommendation: APPROVE."]
+- Message banked word for word below  [CMD `sha256sum kai385.txt` → see evidence line]
+- EVIDENCE SCOPE-APPROVAL kai385.txt: 2132 bytes, sha256 1c5f1655178545df762c588750ab2f5aed0b70e9f0207cf9f3e98fedfd8152e5, final LF True (added by Orion)  [CMD `sha256sum kai385.txt` → 1c5f1655178545df…]
+    BEGIN-VERBATIM SCOPE-APPROVAL
+    My recommendation: APPROVE.
+    
+    Orion has correctly identified the excess permissions, and the proposed correction is narrow, necessary and proportionate.
+    
+    The objective is simple: the dashboard credential must authorize only the 14 operations the dashboard legitimately needs—not every protected operation on those services.
+    
+    This is a small security correction, not another project. Keep the existing service authentication, retain all unrelated behavior, and test both allowed and forbidden operations.
+    
+    I also checked the latest GitHub HEAD, 0cde18a, and handoff entry 384. Orion’s corrected inventory is consistent: 17 protected operations, 14 required, 3 unnecessary. No new product-code change was made in that commit.
+    
+    One essential acceptance condition: the dashboard key must remain distinct from the existing shared service key. Otherwise, operation restrictions could be bypassed through the shared-key path.
+    
+    Send Orion
+    
+    APPROVE — narrowly scoped dashboard authorization correction.
+    
+    Restrict KAI_DASHBOARD_SERVICE_TOKEN to the 14 identified operations, denying the remaining three.
+    
+    Preserve the existing shared service credential and its behavior. Ensure both credentials are distinct.
+    
+    Scope: Working branch only, focused offline tests, no network, no protected data, no deployment or merge.
+    
+    Acceptance: All 14 approved operations accept the dashboard key; the three excluded operations reject it; executor and agentic remain inaccessible using that key; the credential remains server-side.
+    
+    Do not expand the authorization system or initiate further review machinery.
+    
+    Once tested and committed, report the result and close this workstream.
+    
+    All other holds remain.
+    
+    Residual risk: A compromised dashboard can still use the 14 permitted operations, including browser automation. This fix reduces unnecessary authority; it does not eliminate all dashboard-compromise risk.
+    
+    Confidence: 0.99 that this is the correct next engineering action.
+    
+    Then we return to building KAI’s proactive intelligence. That is where the next meaningful capability gain lies.
+    
+    OHANA — minimum bureaucracy, maximum real progress.
+    END-VERBATIM SCOPE-APPROVAL
+
+### 6. Next authorised step
+
+- Implement the restriction with tests for all 14 allowed and 3 denied operations, the executor/agentic denial and distinct credentials; offline; commit; close the workstream  [CONVERSATION 2026-11-05 Kai-GPT relayed by Dainius, "Once tested and committed, report the result and close this workstream."]
+
+### 7. What I am unsure of
+
+- None new  [CMD `none` → n/a]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
