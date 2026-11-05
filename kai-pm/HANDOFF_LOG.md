@@ -116517,3 +116517,169 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-05T07:14:26Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-05T07:14:26Z  [CMD `date -u +%FT%TZ` → 2026-11-05T07:14:26Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 01d5761a3b9eb04a11486d9624d58ebab4475ddb  [CMD `git rev-parse HEAD` → 01d5761a3b9eb04a11486d9624d58ebab4475ddb]
+- tree: 2cbb7183ab1429a6550c086b64ee635e12df93a6  [CMD `git rev-parse HEAD^{tree}` → 2cbb7183ab1429a6550c086b64ee635e12df93a6]
+- uncommitted_paths: 0  [CMD `git status --porcelain | count lines` → 0]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/project-rework-plan-pgvp35: 01d5761a3b9eb04a11486d9624d58ebab4475ddb  [CMD `git ls-remote --heads origin` → 01d5761a3b9eb04a11486d9624d58ebab4475ddb]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 383  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 383]
+
+### 1. The four states
+
+- physical: no KAI code change; banks Kai's review of 01d5761 and Orion's corrections  [CMD `git status --short` → clean]
+- authorised: nothing new; Kai recommends an operation-scoped correction, subject to Dainius  [CONVERSATION 2026-11-05 Kai-GPT relayed by Dainius, "Recommended bounded correction, subject to Dainius's authorization"]
+- evidence: Kai's review verbatim in section 5 (ruling-capture id a05ca897c5b1792d); protected-operation list in OPS block  [CMD `grep require_service_auth(" on the 3 services` → 17 operations]
+- admission: 01d5761 retained on branch, not live-qualified  [CONVERSATION 2026-11-05 Kai-GPT relayed by Dainius, "Disposition: RETAIN ON BRANCH. NOT LIVE-QUALIFIED."]
+
+### 2. Rulings since the last handoff
+
+- Kai-GPT · 2026-11-05 · finding: the dashboard credential is service-scoped, not operation-scoped; recommends restricting it to the approved operations, preserving shared-token behaviour; acceptance: approved operations authenticate, unrelated ones reject the dashboard key, executor and agentic stay inaccessible, no secret reaches the browser; then return to separately governed proactive observation ⚠ UNBANKED  [CONVERSATION 2026-11-05 Kai-GPT relayed by Dainius, "The new credential is service-scoped, not operation-scoped."]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED: none new. HELD: the operation-scoping correction until Dainius approves; proactive observation; skill promotion; historical data; live runtime; deployment; merge; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying, reading, searching or processing data/SOUL.md  [CONVERSATION 2026-11-05 Kai-GPT relayed by Dainius, "Live runtime, deployment, merge and other engineering holds remain unchanged."]
+
+### 4. Open questions
+
+- For Dainius: approve restricting the dashboard key to the 14 operations the dashboard calls?  [CONVERSATION 2026-11-05 Kai-GPT relayed by Dainius, "Authorize this one narrowly scoped authentication correction"]
+
+### 5. Incidents and corrections
+
+- Kai's finding confirmed by reading: 17 protected operations on the 3 services; the dashboard calls 14; browser_click, browser_type and monitor_rule_update accept the dashboard key without being used by it  [CMD `grep require_service_auth(" browser-agent, monitor-service, output/notify` → 7 + 7 + 3 = 17]
+- Orion correction (R17): told Dainius "a broken-into dashboard still couldn't run commands"; true only of the executor. The key also authorises browser automation (including browser_run, which the dashboard legitimately uses) and, before scoping, click/type and rule update  [CONVERSATION 2026-11-04 Orion to Dainius, "So if the dashboard were ever broken into, it still couldn't run commands."]
+- Orion correction (instrument): entry 382's "15 protected call sites" matched routes by path without HTTP method; monitor PUT /rules/{id} (monitor_rule_update) was counted but the dashboard makes no PUT or PATCH call; true count 14  [CMD `grep -cE 'client\.(put|patch)\(' dashboard/app.py` → 0]
+- Kai's review banked word for word below  [CMD `sha256sum kai384.txt` → see evidence line]
+- EVIDENCE KAI-REVIEW-01d5761 kai384.txt: 4604 bytes, sha256 751761fd4bec909e27932de82611912f2aaa96c584895d1d68b3b5dd0bb4cf9b, final LF True (added by Orion)  [CMD `sha256sum kai384.txt` → 751761fd4bec909e…]
+    BEGIN-VERBATIM KAI-REVIEW-01d5761
+    KAI — Engineering Review: Dashboard Authentication
+    
+    COLD-START: DEGRADED | Branch verified | No live execution
+    
+    Verified working branch HEAD: 01d5761a3b9eb04a11486d9624d58ebab4475ddb, handoff entry 383, DECISIONS.md through D390, DAI-10 latest retrieved comment 0f92fe24, research pin dd153c1f4ab7c52f34620e07238554453a8912d9, and Miro overview. START HERE is still dated 1 November 2026 and its full content was unavailable.
+    
+    Verdict: Retain the fix on the working branch. Not approved for live operation.
+    
+    Orion has correctly addressed the original integration problem: the dashboard has a separate server-side credential, and the executor does not receive that credential in the checked Compose configuration.
+    
+    I also verified that the shared HTTP client creates separate clients per request, rather than globally retaining the dashboard’s authentication header.
+    
+    One security weakness remains
+    
+    The dashboard key is restricted by service, but not by operation.
+    
+    In common/service_auth.py, the new key is accepted for any operation protected by require_service_auth() on the three configured services.
+    
+    For example, the browser-agent has protected /click and /type endpoints. They also accept the new key, even though those operations were not among the five dashboard browser calls identified for this fix.
+    
+    This means the statement that a compromised dashboard cannot run commands is too broad. The key does not authenticate to the executor, but it can still authorize browser actions and other protected operations on those services.
+    
+    That is a genuine least-privilege gap, not a reason to discard Orion’s work.
+    
+    Technical assessment
+    
+    Control	Finding
+    Separate dashboard credential	Implemented
+    Server-side credential handling	Supported by inspected code
+    Executor credential isolation	Supported by configuration and unit tests
+    Operation-level authorization	Not enforced for the new key
+    Targeted regression tests	Orion reports passing
+    Receiving-service integration	Not independently verified
+    Live operational readiness	Not established
+    
+    I recommend a single targeted correction before any live release: restrict the dashboard credential to the exact authorized operations, using the existing operation identifiers and authentication function. Test that the required dashboard calls succeed and unrelated privileged operations reject the key.
+    
+    No new security framework is justified.
+    
+    What comes next?
+    
+    After that correction, I would prioritize KAI’s proactive observation capability. It directly advances the intended organism: KAI should notice relevant events, remember them, and prepare useful proposals without requiring a prompt for every observation.
+    
+    However, observing must not automatically grant permission to send messages, modify state, use external tools or initiate financial actions.
+    
+    Historical data should remain untouched until we have explicit permission and a defined preservation method.
+    
+    Send Orion
+    
+    KAI-GPT → ORION | COMMIT 01d5761 — ENGINEERING REVIEW
+    
+    Disposition: RETAIN ON BRANCH. NOT LIVE-QUALIFIED.
+    
+    The dashboard’s separate credential, server-side forwarding and configured exclusion from the executor are verified at source level.
+    
+    One material finding: common/service_auth.py accepts the dashboard credential for every require_service_auth operation on the three configured services. The new credential is service-scoped, not operation-scoped.
+    
+    That includes protected browser operations such as /click and /type, whether or not the dashboard currently calls them.
+    
+    Recommended bounded correction, subject to Dainius’s authorization:
+    
+    Restrict the dashboard credential to the exact approved operations already established in the 15-call inventory. Preserve the existing shared-token behavior.
+    
+    Acceptance: approved dashboard operations authenticate; unrelated operations reject the dashboard credential; executor and agentic remain inaccessible through that credential; no secrets reach the browser.
+    
+    Use focused offline tests. Do not create new authentication infrastructure, repeat the broad census or expand the work.
+    
+    Keep the existing commit. Live runtime, deployment, merge and other engineering holds remain unchanged.
+    
+    After closing this issue, return to capability progress—beginning with separately governed proactive observation.
+    
+    OHANA — REAL CAPABILITY, MINIMUM NECESSARY PROCESS.
+    
+    My recommendation: Authorize this one narrowly scoped authentication correction, with offline tests only. Then close the dashboard workstream and move on.
+    
+    Confidence: 0.99 in the operation-level authorization finding; live integration remains unverified.
+    END-VERBATIM KAI-REVIEW-01d5761
+- EVIDENCE OPS ev384_ops.txt: 1748 bytes, sha256 682e4e70d8bd98208ff8644bb78f02b55cedbc7d7dd5b156e809970d7a88447a, final LF True (added by Orion)  [CMD `sha256sum ev384_ops.txt` → 682e4e70d8bd9820…]
+    BEGIN-VERBATIM OPS
+    browser-agent/app.py:123:          dependencies=[Depends(require_service_auth("browser_navigate"))])
+    browser-agent/app.py:142:          dependencies=[Depends(require_service_auth("browser_click"))])
+    browser-agent/app.py:166:          dependencies=[Depends(require_service_auth("browser_type"))])
+    browser-agent/app.py:180:          dependencies=[Depends(require_service_auth("browser_scrape"))])
+    browser-agent/app.py:199:          dependencies=[Depends(require_service_auth("browser_screenshot"))])
+    browser-agent/app.py:218:          dependencies=[Depends(require_service_auth("browser_run"))])
+    browser-agent/app.py:249:          dependencies=[Depends(require_service_auth("browser_search"))])
+    monitor-service/app.py:263:          dependencies=[Depends(require_service_auth("monitor_rule_create"))])
+    monitor-service/app.py:276:         dependencies=[Depends(require_service_auth("monitor_rule_update"))])
+    monitor-service/app.py:286:            dependencies=[Depends(require_service_auth("monitor_rule_delete"))])
+    monitor-service/app.py:299:          dependencies=[Depends(require_service_auth("monitor_rule_enable"))])
+    monitor-service/app.py:309:          dependencies=[Depends(require_service_auth("monitor_rule_disable"))])
+    monitor-service/app.py:319:          dependencies=[Depends(require_service_auth("monitor_rule_check"))])
+    monitor-service/app.py:336:            dependencies=[Depends(require_service_auth("monitor_alerts_clear"))])
+    output/notify/app.py:108:          dependencies=[Depends(require_service_auth("desktop_notify"))])
+    output/notify/app.py:146:            dependencies=[Depends(require_service_auth("notify_dismiss_one"))])
+    output/notify/app.py:156:            dependencies=[Depends(require_service_auth("notify_dismiss_all"))])
+    END-VERBATIM OPS
+
+### 6. Next authorised step
+
+- Put the operation-scoping question to Dainius; no code change until approved  [CONVERSATION 2026-11-05 Kai-GPT relayed by Dainius, "subject to Dainius's authorization"]
+
+### 7. What I am unsure of
+
+- None new  [CMD `none` → n/a]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
