@@ -217,3 +217,62 @@ def test_record_nonblocking_includes_trust_tier_when_available():
         _record_nonblocking("AUTONOMOUS_ACTION", "kai", {"x": 1}, capability="chat")
     call_kwargs = ledger.append.call_args[1]
     assert call_kwargs.get("trust_tier") == "AGENT"
+
+
+# ── Proactive observer authority (handoff entry 387) ──────────────────────────
+
+def test_observation_fails_closed_when_trust_core_unavailable():
+    """Read-only observation is fail-closed: no trust core means no permission."""
+    with patch("trust_integration._get_trust_core", return_value=None), \
+            patch("trust_integration._get_ohana", return_value=None), \
+            patch("trust_integration._record_nonblocking"):
+        allowed, reason = gate_autonomous_action("proactive_observation", {})
+    assert allowed is False
+    assert "fail-closed" in reason
+
+
+@pytest.mark.parametrize("capability", [
+    "proactive_memory_write", "proactive_notification", "proactive_state_change",
+    "paper_trade_open", "paper_trade_close",
+])
+def test_fail_closed_capabilities_denied_when_trust_core_unavailable(capability):
+    with patch("trust_integration._get_trust_core", return_value=None), \
+            patch("trust_integration._get_ohana", return_value=None), \
+            patch("trust_integration._record_nonblocking"):
+        allowed, _ = gate_autonomous_action(capability, {})
+    assert allowed is False
+
+
+def test_observation_is_an_observer_capability_and_effects_have_no_level():
+    from trust_core import CAPABILITY_GATES, TrustLevel
+    assert CAPABILITY_GATES["proactive_observation"] == TrustLevel.OBSERVER
+    for effect in ("proactive_memory_write", "proactive_notification", "proactive_state_change"):
+        assert effect not in CAPABILITY_GATES  # falls back to GUARDIAN in can_do
+
+
+def test_observation_allowed_at_observer_but_effects_refused(tmp_path):
+    """Known-positive and known-negative with a real TrustCore set to OBSERVER
+    (temporary data dir; nothing under data/ is touched)."""
+    from trust_core import TrustCore, TrustLevel
+    core = TrustCore(data_dir=tmp_path)
+    core._record.level = TrustLevel.OBSERVER.value
+    with patch("trust_integration._get_trust_core", return_value=core), \
+            patch("trust_integration._get_ohana", return_value=None), \
+            patch("trust_integration._record_nonblocking"):
+        ok_obs, _ = gate_autonomous_action("proactive_observation", {})
+        ok_mem, _ = gate_autonomous_action("proactive_memory_write", {})
+        ok_note, _ = gate_autonomous_action("proactive_notification", {})
+    assert ok_obs is True
+    assert ok_mem is False and ok_note is False
+
+
+def test_observation_refused_for_a_dormant_trust_record(tmp_path):
+    """A brand-new record is DORMANT: even read-only observation is refused."""
+    from trust_core import TrustCore, TrustLevel
+    core = TrustCore(data_dir=tmp_path)
+    assert core.level == TrustLevel.DORMANT
+    with patch("trust_integration._get_trust_core", return_value=core), \
+            patch("trust_integration._get_ohana", return_value=None), \
+            patch("trust_integration._record_nonblocking"):
+        ok, _ = gate_autonomous_action("proactive_observation", {})
+    assert ok is False

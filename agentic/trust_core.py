@@ -73,6 +73,12 @@ CAPABILITY_GATES: Dict[str, TrustLevel] = {
     "chat": TrustLevel.OBSERVER,
     "advise": TrustLevel.OBSERVER,
     "introspect": TrustLevel.OBSERVER,
+    # Read-only sensing and analysis by the proactive observer (Dainius,
+    # 2026-11-05, handoff entry 387). Its side effects are separate
+    # capabilities (proactive_memory_write, proactive_notification,
+    # proactive_state_change) with NO level assigned here, so they fall
+    # back to GUARDIAN until a level is deliberately granted.
+    "proactive_observation": TrustLevel.OBSERVER,
     # ASSISTANT
     "execute_task": TrustLevel.ASSISTANT,
     "read_web": TrustLevel.ASSISTANT,

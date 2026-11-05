@@ -1293,6 +1293,119 @@ class TestAsyncHelpers:
 # Patch _get_* helpers to return rich data so the injection blocks run
 # ═════════════════════════════════════════════════════════════════════
 
+class TestObserverShadowSplit:
+    """Handoff entry 387: the proactive observer only reads and analyses in
+    shadow mode; memory writes, notifications and actions are proposed,
+    not performed. Synthetic inputs only."""
+
+    SNAP = {
+        "docker": {"count": 2, "containers": [{"name": "memu-core"}, {"name": "verifier"}]},
+        "email": {"count": 5},
+        "aq": {"aqi_category": "unhealthy", "pm2_5_ugm3": 61},
+        "git": {"count": 1},
+        "sys": {"cpu_percent": 93.0, "memory": {"percent": 95.0}},
+        "cal": {"summary": "x", "next_event": "site meeting", "minutes_until_next": 20},
+    }
+    ALL_FLAGS = {"HOUSE_DOCTOR", "PROACTIVE_SCHEDULING", "WORLD_MODEL_PERSISTENCE",
+                 "CAUSAL_WORLD_MODEL", "GLOBAL_WORKSPACE", "CURIOSITY", "SERVICE_WATCHDOG",
+                 "MARKET_DATA", "SENSORY_LEARNING", "RITUAL_DISCOVERY", "ANOMALY_DETECTION",
+                 "PROACTIVE_AGENT"}
+
+    def _flags(self, name):
+        return name in self.ALL_FLAGS
+
+    def _no_side_effects(self):
+        """Patches that make any write, notification or action loud."""
+        boom = MagicMock(side_effect=AssertionError("network/state call in shadow path"))
+        return [patch.object(ag, "pooled_client", boom),
+                patch.object(ag._cleanup_mgr, "submit", boom),
+                patch.object(ag, "get_causal_graph", boom),
+                patch.object(ag, "get_global_workspace", boom),
+                patch.object(ag, "get_watchdog", boom),
+                patch.object(ag, "_mark_paper_positions", boom)]
+
+    def test_analysis_is_pure_and_proposes_effects(self):
+        from contextlib import ExitStack
+        with ExitStack() as st:
+            st.enter_context(patch.object(ag, "is_enabled", side_effect=self._flags))
+            for p in self._no_side_effects():
+                st.enter_context(p)
+            cycle = ag._analyse_cycle(self.SNAP, {}, [{"severity": "WARNING", "primary_diagnosis": "disk filling"}])
+        obs = " | ".join(cycle["observations"])
+        assert "Docker: 2 unhealthy" in obs and "CPU at 93%" in obs and "[recent dx/WARNING] disk filling" in obs
+        kinds = {e["kind"] for e in cycle["proposed_effects"]}
+        assert {"memory_write", "house_doctor_diagnose", "causal_edges", "workspace_bids",
+                "curiosity_tick", "service_watchdog", "paper_position_marking"} <= kinds
+        mem = [e["payload"] for e in cycle["proposed_effects"] if e["kind"] == "memory_write"]
+        assert all({"timestamp", "event_type", "result_raw"} <= set(m) for m in mem)
+
+    def test_shadow_cycle_reads_but_performs_no_effects(self):
+        from contextlib import ExitStack
+        observe = AsyncMock(return_value=(self.SNAP, []))
+        with ExitStack() as st:
+            st.enter_context(patch.object(ag, "is_enabled", side_effect=self._flags))
+            st.enter_context(patch.object(ag, "gate_autonomous_action", return_value=(True, "allowed")))
+            st.enter_context(patch.object(ag, "_observe_world", observe))
+            st.enter_context(patch.dict(os.environ, {"KAI_OBSERVER_MODE": "shadow"}))
+            for p in self._no_side_effects():
+                st.enter_context(p)
+            cycle = _asyncio.run(ag._observer_cycle())
+        observe.assert_awaited_once()
+        assert cycle["mode"] == "shadow"
+        assert cycle["effects_result"]["applied"] == []
+        assert "memory_write" in cycle["effects_result"]["shadow"]
+        assert ag._observer_shadow_log[-1] is cycle
+
+    def test_gate_refusal_means_no_sensing(self):
+        observe = AsyncMock(return_value=(self.SNAP, []))
+        with patch.object(ag, "gate_autonomous_action", return_value=(False, "trust core unavailable (fail-closed)")), \
+             patch.object(ag, "_observe_world", observe):
+            assert _asyncio.run(ag._observer_cycle()) is None
+        observe.assert_not_awaited()
+
+    def test_observer_mode_defaults_to_shadow(self):
+        for value, expected in ((None, "shadow"), ("shadow", "shadow"), ("true", "shadow"),
+                                ("", "shadow"), ("governed", "governed"), (" GOVERNED ", "governed")):
+            env = {} if value is None else {"KAI_OBSERVER_MODE": value}
+            with patch.dict(os.environ, env, clear=False):
+                if value is None:
+                    os.environ.pop("KAI_OBSERVER_MODE", None)
+                assert ag._observer_mode() == expected, value
+
+    def test_governed_mode_applies_only_permitted_effects(self):
+        """Preservation (known-positive): the memory write still works when its
+        own capability is granted; refused capabilities change nothing."""
+        posts = []
+
+        class _Client:
+            async def __aenter__(self):
+                return self
+
+            async def __aexit__(self, *a):
+                return False
+
+            async def post(self, url, json=None):
+                posts.append((url, json))
+
+        def gate(capability, context, conviction=5.0):
+            return (capability == "proactive_memory_write", "test gate")
+
+        cycle = {"proposed_effects": [
+            {"kind": "memory_write", "payload": {"timestamp": "t", "event_type": "proactive_observation",
+                                                 "result_raw": "x", "category": "proactive_observation",
+                                                 "user_id": "keeper"}},
+            {"kind": "house_doctor_diagnose", "payload": {"observations": ["x"]}},
+            {"kind": "service_watchdog", "payload": {}},
+        ]}
+        with patch.object(ag, "gate_autonomous_action", side_effect=gate), \
+             patch.object(ag, "pooled_client", return_value=_Client()), \
+             patch.object(ag, "get_watchdog", MagicMock(side_effect=AssertionError("refused effect ran"))):
+            result = _asyncio.run(ag._apply_observer_effects(cycle))
+        assert result["applied"] == ["memory_write"]
+        assert len(result["refused"]) == 2
+        assert [u for u, _ in posts] == [f"{ag.MEMU_URL}/memory/memorize"]
+
+
 class TestChatLearningIntegrity:
     """P1.8 (handoff entry 378): a chat turn must not teach a value from the
     operator's message, and must not record Kai's reply as the operator's

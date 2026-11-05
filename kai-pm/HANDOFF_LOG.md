@@ -117019,3 +117019,190 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-05T14:57:21Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-05T14:57:21Z  [CMD `date -u +%FT%TZ` → 2026-11-05T14:57:21Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: 9af2f04f4c674b0048b5941126357fd1350d93a1  [CMD `git rev-parse HEAD` → 9af2f04f4c674b0048b5941126357fd1350d93a1]
+- tree: 9816787b7a9bcede637e60d2b47d63faba9eb43e  [CMD `git rev-parse HEAD^{tree}` → 9816787b7a9bcede637e60d2b47d63faba9eb43e]
+- uncommitted_paths: 8  [CMD `git status --porcelain | count lines` → 8]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/project-rework-plan-pgvp35: 9af2f04f4c674b0048b5941126357fd1350d93a1  [CMD `git ls-remote --heads origin` → 9af2f04f4c674b0048b5941126357fd1350d93a1]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 387  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 387]
+
+### 1. The four states
+
+- physical: proactive observer split into read-only sensing/analysis (shadow, default) and preserved governed effects (agentic/app.py); proactive_observation registered at OBSERVER (agentic/trust_core.py); observer capabilities fail-closed and unavailable trust core treated as refusal for fail-closed capabilities (agentic/trust_integration.py); tests; docs counts; capability map  [CMD `git diff --stat` → 8 files changed, 520 insertions(+), 313 deletions(-)]
+- authorised: the bounded observer repair, branch only, offline  [CONVERSATION 2026-11-05 Dainius, "I approve one bounded, branch-only, offline engineering task to repair KAI's existing proactive observer."]
+- evidence: tests before/after and gates below  [CMD `runtests base5/fix5; 45 gates on fix5` → see evidence blocks]
+- admission: none; not live-qualified; task stopped at the bounded result  [CONVERSATION 2026-11-05 Dainius, "Stop when this bounded result is delivered."]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `ruling_capture.py status` → OUTSTANDING=0]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED (used): the observer repair. HELD: trust levels for proactive_memory_write, proactive_notification, proactive_state_change; enabling governed mode anywhere; a read-only shadow-log endpoint; live runtime; deployment; merge; skill promotion; historical data; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying, reading, searching or processing data/SOUL.md  [CONVERSATION 2026-11-05 Dainius, "All existing holds remain."]
+
+### 4. Open questions
+
+- For Dainius: (a) a read-only endpoint so the shadow log can be seen on the dashboard; (b) whether and at what trust level any observer effect may later run; (c) a fresh trust record is DORMANT, so observation stays off until trust reaches OBSERVER  [CMD `pytest test_observation_refused_for_a_dormant_trust_record` → passed]
+
+### 5. Incidents and corrections
+
+- Shadow path proof: with every write, notification, file and state hook patched to raise, an analysis cycle and a full gated shadow cycle complete; proposed effects listed, none applied  [CMD `pytest TestObserverShadowSplit` → 5 passed (fixed), 5 failed (old)]
+- Fail closed: gate refusal means no sensing; trust core None now refuses proactive_* and paper_trade_* (8 trust tests fail on old code, pass on new); a DORMANT record refuses observation on both  [CMD `pytest scripts/test_trust_integration.py` → old 8 failed / 20 passed; new 28 passed]
+- Scope note: the trust-core-None fix is in shared gate code and also tightens paper_trade_open/close, already declared fail-closed (UH-INV-06); reported, not silent  [CMD `Read agentic/trust_integration.py _FAIL_CLOSED_CAPABILITIES` → paper_trade_open, paper_trade_close plus 4 proactive_*]
+- Preservation: governed mode applies an effect only when its own capability passes; tested with memory write allowed and two others refused  [CMD `pytest test_governed_mode_applies_only_permitted_effects` → passed]
+- Behaviour change, stated: if KAI ever ran with the observer passing the gate, it previously wrote memories and asked house-doctor to diagnose each cycle; in default shadow mode it no longer does  [CMD `Read agentic/app.py _observer_cycle` → shadow records proposed effects only]
+- Pre-existing failures unchanged: test_d89_cognitive_depth 7 failed, test_cognitive_mechanisms 34 errors (sandbox pydantic load errors); gates all pass except test_item8_preflight  [CMD `diff sum5 base/fix; g5.txt` → identical failing sets; only line 25 non-zero]
+- Repository files equal tested files; credential scan 0 hits  [CMD `cmp; credscan.py scan388.json` → differing-from-tested=0; TOTAL HITS 0]
+- EVIDENCE TESTS-BEFORE ev388_before.txt: 3123 bytes, sha256 9c7fae7bf4432f898bd5f41181deeec5cd02861533b8c0d494e249949276c295, final LF True (added by Orion)  [CMD `sha256sum ev388_before.txt` → 9c7fae7bf4432f89…]
+    BEGIN-VERBATIM TESTS-BEFORE
+    test_agentic_routes rc=1 5 failed, 179 passed, 9 warnings
+        FAILED scripts/test_agentic_routes.py::TestObserverShadowSplit::test_analysis_is_pure_and_proposes_effects
+        FAILED scripts/test_agentic_routes.py::TestObserverShadowSplit::test_shadow_cycle_reads_but_performs_no_effects
+        FAILED scripts/test_agentic_routes.py::TestObserverShadowSplit::test_gate_refusal_means_no_sensing
+        FAILED scripts/test_agentic_routes.py::TestObserverShadowSplit::test_observer_mode_defaults_to_shadow
+        FAILED scripts/test_agentic_routes.py::TestObserverShadowSplit::test_governed_mode_applies_only_permitted_effects
+    test_trust_integration rc=1 8 failed, 20 passed, 4 warnings
+        FAILED scripts/test_trust_integration.py::test_observation_fails_closed_when_trust_core_unavailable
+        FAILED scripts/test_trust_integration.py::test_fail_closed_capabilities_denied_when_trust_core_unavailable[proactive_memory_write]
+        FAILED scripts/test_trust_integration.py::test_fail_closed_capabilities_denied_when_trust_core_unavailable[proactive_notification]
+        FAILED scripts/test_trust_integration.py::test_fail_closed_capabilities_denied_when_trust_core_unavailable[proactive_state_change]
+        FAILED scripts/test_trust_integration.py::test_fail_closed_capabilities_denied_when_trust_core_unavailable[paper_trade_open]
+        FAILED scripts/test_trust_integration.py::test_fail_closed_capabilities_denied_when_trust_core_unavailable[paper_trade_close]
+        FAILED scripts/test_trust_integration.py::test_observation_is_an_observer_capability_and_effects_have_no_level
+        FAILED scripts/test_trust_integration.py::test_observation_allowed_at_observer_but_effects_refused
+    test_autonomy rc=0 55 passed, 4 warnings
+    test_flags_enabled rc=0 8 passed, 4 warnings
+    test_invariant_guards rc=0 14 passed, 4 warnings
+    test_kai_intelligence rc=0 18 passed, 4 warnings
+    test_legacy_bridge rc=0 21 passed, 4 warnings
+    test_trust_auditor rc=0 11 passed, 9 warnings
+    test_trust_core rc=0 28 passed, 4 warnings
+    test_vertical_slice rc=0 17 passed, 4 warnings
+    test_p21_proactive_agent rc=0 93 passed, 4 warnings
+    test_d89_cognitive_depth rc=1 7 failed, 40 passed, 4 warnings
+        FAILED scripts/test_d89_cognitive_depth.py::TestHouseDoctor::test_health_endpoint
+        FAILED scripts/test_d89_cognitive_depth.py::TestHouseDoctor::test_classify_cpu_high
+        FAILED scripts/test_d89_cognitive_depth.py::TestHouseDoctor::test_classify_docker_unhealthy
+        FAILED scripts/test_d89_cognitive_depth.py::TestHouseDoctor::test_diagnose_cpu_and_docker_matches_d001
+        FAILED scripts/test_d89_cognitive_depth.py::TestHouseDoctor::test_no_tags_no_diagnoses
+        FAILED scripts/test_d89_cognitive_depth.py::TestHouseDoctor::test_severity_ordering_critical_first
+        FAILED scripts/test_d89_cognitive_depth.py::TestHouseDoctor::test_rules_endpoint_returns_all
+    test_d101_causal_world_model rc=0 37 passed, 4 warnings
+    test_d102_global_workspace rc=0 22 passed, 4 warnings
+    test_service_watchdog rc=0 24 passed, 4 warnings
+    test_paper_trader rc=0 35 passed, 4 warnings
+    test_cognitive_mechanisms rc=1 10 passed, 38 warnings, 34 errors
+    test_trust_promotion rc=0 21 passed, 9 warnings
+    END-VERBATIM TESTS-BEFORE
+- EVIDENCE TESTS-AFTER ev388_after.txt: 1563 bytes, sha256 23f3a546eed32f25be0ce0962b2a609167cd4dfbcbd37887a07721f76bf1f7eb, final LF True (added by Orion)  [CMD `sha256sum ev388_after.txt` → 23f3a546eed32f25…]
+    BEGIN-VERBATIM TESTS-AFTER
+    test_agentic_routes rc=0 184 passed, 9 warnings
+    test_trust_integration rc=0 28 passed, 4 warnings
+    test_autonomy rc=0 55 passed, 4 warnings
+    test_flags_enabled rc=0 8 passed, 4 warnings
+    test_invariant_guards rc=0 14 passed, 4 warnings
+    test_kai_intelligence rc=0 18 passed, 4 warnings
+    test_legacy_bridge rc=0 21 passed, 4 warnings
+    test_trust_auditor rc=0 11 passed, 9 warnings
+    test_trust_core rc=0 28 passed, 4 warnings
+    test_vertical_slice rc=0 17 passed, 4 warnings
+    test_p21_proactive_agent rc=0 93 passed, 4 warnings
+    test_d89_cognitive_depth rc=1 7 failed, 40 passed, 4 warnings
+        FAILED scripts/test_d89_cognitive_depth.py::TestHouseDoctor::test_health_endpoint
+        FAILED scripts/test_d89_cognitive_depth.py::TestHouseDoctor::test_classify_cpu_high
+        FAILED scripts/test_d89_cognitive_depth.py::TestHouseDoctor::test_classify_docker_unhealthy
+        FAILED scripts/test_d89_cognitive_depth.py::TestHouseDoctor::test_diagnose_cpu_and_docker_matches_d001
+        FAILED scripts/test_d89_cognitive_depth.py::TestHouseDoctor::test_no_tags_no_diagnoses
+        FAILED scripts/test_d89_cognitive_depth.py::TestHouseDoctor::test_severity_ordering_critical_first
+        FAILED scripts/test_d89_cognitive_depth.py::TestHouseDoctor::test_rules_endpoint_returns_all
+    test_d101_causal_world_model rc=0 37 passed, 4 warnings
+    test_d102_global_workspace rc=0 22 passed, 4 warnings
+    test_service_watchdog rc=0 24 passed, 4 warnings
+    test_paper_trader rc=0 35 passed, 4 warnings
+    test_cognitive_mechanisms rc=1 10 passed, 38 warnings, 34 errors
+    test_trust_promotion rc=0 21 passed, 9 warnings
+    END-VERBATIM TESTS-AFTER
+- EVIDENCE GATES-FINAL ev388_gates.txt: 2793 bytes, sha256 f1d826a6142320ce799350752a135d2a093e87e6f75adf57681366d3c24bbc25, final LF True (added by Orion)  [CMD `sha256sum ev388_gates.txt` → f1d826a6142320ce…]
+    BEGIN-VERBATIM GATES-FINAL
+    1 rc=0 :: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics    --exclude=.venv,_arc
+    2 rc=0 :: python3 scripts/security/check_port_bindings.py
+    3 rc=0 :: python3 scripts/security/check_default_profiles.py
+    4 rc=0 :: python3 scripts/security/check_secret_fallbacks.py
+    5 rc=0 :: python3 scripts/security/check_service_tokens.py
+    6 rc=0 :: python3 scripts/security/check_network_zones.py
+    7 rc=0 :: python3 scripts/security/check_turbovec_writers.py
+    8 rc=0 :: python3 scripts/security/check_restart_recovery.py
+    9 rc=0 :: python3 scripts/security/check_image_tags.py
+    10 rc=0 :: python3 scripts/security/check_compose_drift.py
+    11 rc=0 :: python3 scripts/security/check_architecture_rules.py
+    12 rc=0 :: python3 scripts/security/check_operational_portability.py
+    13 rc=0 :: python3 scripts/security/check_evidence_package_integrity.py
+    14 rc=0 :: python3 scripts/security/hygiene_survey.py --gate
+    15 rc=0 :: python3 scripts/security/check_ci_tolerations.py
+    16 rc=0 :: python3 scripts/security/check_preflight_reachability.py    --expect-reachable scripts/tes
+    17 rc=0 :: python3 scripts/test_capture_trigger_paths.py
+    18 rc=0 :: python3 scripts/test_declared_prerequisites.py
+    19 rc=0 :: python3 scripts/security/check_doctrine_integrity.py
+    20 rc=0 :: python3 scripts/test_doctrine_integrity.py
+    21 rc=0 :: python3 scripts/test_image_identity.py
+    22 rc=0 :: python3 scripts/security/check_item8_design.py
+    23 rc=0 :: python3 scripts/test_item8_instruments.py
+    24 rc=0 :: python3 scripts/test_item8_verdicts.py
+    25 rc=1 :: python3 scripts/test_item8_preflight.py
+    26 rc=0 :: python3 scripts/security/check_workflow_filters.py
+    27 rc=0 :: python3 scripts/security/check_workflow_outputs.py
+    28 rc=0 :: python3 scripts/security/check_dockerfile_flags.py
+    29 rc=0 :: python3 scripts/security/check_dockerfile_coverage.py
+    30 rc=0 :: python3 scripts/security/check_dockerfile_context.py
+    31 rc=0 :: python3 scripts/security/check_compose_env.py
+    32 rc=0 :: python3 scripts/security/check_compose_interpolation.py
+    33 rc=0 :: python3 scripts/security/check_unreachable_bindings.py
+    34 rc=0 :: python3 scripts/security/check_implicit_deps.py
+    35 rc=0 :: python3 scripts/security/check_image_modules.py
+    36 rc=0 :: python3 scripts/security/check_shipped_package_deps.py
+    37 rc=0 :: python3 scripts/security/check_healthcheck_runnable.py
+    38 rc=0 :: python3 scripts/security/check_service_identity_wiring.py
+    39 rc=0 :: python3 scripts/security/check_bind_mount_portability.py
+    40 rc=0 :: python3 scripts/security/check_depends_on_readiness.py
+    41 rc=0 :: python3 scripts/security/check_test_identity.py
+    42 rc=0 :: python3 scripts/security/check_test_wiring.py
+    43 rc=0 :: python3 scripts/security/check_gate_registry.py --gate
+    44 rc=0 :: make --no-print-directory check-docs
+    45 rc=0 :: python3 scripts/sync_docs.py --check
+    END-VERBATIM GATES-FINAL
+
+### 6. Next authorised step
+
+- Report to Dainius and stop  [CONVERSATION 2026-11-05 Dainius, "Report the actual working change, tests and remaining limitations. Stop when this bounded result is delivered."]
+
+### 7. What I am unsure of
+
+- Live behaviour of the observer against running sensor services: not run  [CMD `none` → no live test]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check

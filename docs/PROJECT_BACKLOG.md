@@ -22,7 +22,7 @@ backends are stubs. System is designed so GPU arrival = 3 env vars changed.
 |---|---|
 | Services | 26 (22 build + postgres + redis + ollama + lakeFS) |
 | Test targets | 91 (make test-core) |
-| Individual tests | 4887+ defined (a count of `def test_`, not a pass result; failures seen in Orion's offline runs of a subset include the Item 8 calibration scripts and tests needing sentence-transformers where it is not installed — see kai-pm/HANDOFF_LOG.md entries 376 and 379; no full-suite pass/fail result is recorded here) |
+| Individual tests | 4897+ defined (a count of `def test_`, not a pass result; failures seen in Orion's offline runs of a subset include the Item 8 calibration scripts and tests needing sentence-transformers where it is not installed — see kai-pm/HANDOFF_LOG.md entries 376 and 379; no full-suite pass/fail result is recorded here) |
 | Lines of Python | ~42,000 |
 | Compose files | 3 (minimal/full/sovereign) |
 | Stack actually runs as containers? | **YES — 25/25 ALL GREEN** |

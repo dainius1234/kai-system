@@ -120,6 +120,32 @@ On the old code, 5 new checks fail. On the new code, 100 of 100 pass. The allowe
 
 **Docs.** `docs/PROJECT_BACKLOG.md` no longer says "0 failures". It now says the figure is a count of defined tests, not a pass result (Kai, entry 380). The README's "Failures 0" row is a fixed string owned by `sync_docs.py`, already caveated in the README, and was left alone.
 
+### Update 2026-11-05: proactive observer split, shadow vs governed (entries 387–388)
+
+Dainius approved repairing the existing observer, not replacing it (entry 387).
+
+**Changes in `agentic/app.py`:**
+- `_observe_world` does HTTP GETs only.
+- `_analyse_cycle` turns the readings into observations, correlations, patterns and a list of **proposed effects**. It writes nothing, notifies no one and changes no shared state. Its only state change is the observer's own rolling baselines.
+- **Shadow mode is the default.** A cycle records its result in an in-memory log of the last 20 cycles and in the service log. Nothing else happens.
+- `_apply_observer_effects` keeps all the old side-effect code: memory writes, the house-doctor diagnosis (which can notify), ritual proposals, causal-graph edges, workspace bids, the curiosity tick, the service watchdog and paper-position marking. It runs only when `KAI_OBSERVER_MODE=governed`. Even then, each effect is gated by its own fail-closed capability: `proactive_memory_write`, `proactive_notification` or `proactive_state_change`. None of these has a trust level yet, so they need GUARDIAN.
+
+**Trust changes:**
+- `proactive_observation` is now an OBSERVER capability in `trust_core.CAPABILITY_GATES`. Before, it was unregistered and so needed GUARDIAN.
+- It and the three effect capabilities are fail-closed.
+- `gate_autonomous_action` now refuses fail-closed capabilities when the trust core cannot be loaded. Before, it allowed them. This also tightens the two paper-trade capabilities, which were already declared fail-closed.
+
+**Tests**, synthetic and offline:
+- 5 observer tests and 8 trust tests fail on the old code and pass on the new.
+- Related suites are unchanged.
+- Policy gates pass except `test_item8_preflight`, which failed before this work too.
+
+**What it does not do:**
+- A brand-new trust record is DORMANT. Even read-only observation is refused until trust reaches OBSERVER.
+- Nothing was run live.
+- No endpoint shows the shadow log yet; it is visible in logs only.
+- The governed path's effects have no trust levels assigned, by design. Granting them is a later decision.
+
 **The counts in §1 and §3 are unchanged.** They describe the code at `e32488a`, before these fixes. No feature is re-classified as GENUINE on the strength of a fix that has not been run live.
 
 ---
