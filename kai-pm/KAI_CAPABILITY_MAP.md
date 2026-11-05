@@ -109,6 +109,15 @@ The counter matches route decorators only. A check inside a function body would 
 - the token is not echoed to the browser on the tested route;
 - the browser-agent, monitor and notify test files fail to load in this sandbox both before and after (a pydantic `Optional` annotation error), so the receiving services are covered only through the shared `check_token` tests.
 
+**Follow-up, operation scope (entries 384–386).** Kai found the key was service-scoped, not operation-scoped. Dainius approved restricting it to the 14 operations the dashboard calls:
+- **Denied:** `browser_click`, `browser_type` and `monitor_rule_update`.
+- **Keys must differ:** if the two keys are identical, the services refuse everything (fail closed).
+- **Shared key unchanged.**
+
+On the old code, 5 new checks fail. On the new code, 100 of 100 pass. The allowed list is checked against the operations the services themselves declare: 17 in total.
+
+**What remains:** a compromised dashboard can still do those 14 things, including browser automation.
+
 **Docs.** `docs/PROJECT_BACKLOG.md` no longer says "0 failures". It now says the figure is a count of defined tests, not a pass result (Kai, entry 380). The README's "Failures 0" row is a fixed string owned by `sync_docs.py`, already caveated in the README, and was left alone.
 
 **The counts in §1 and §3 are unchanged.** They describe the code at `e32488a`, before these fixes. No feature is re-classified as GENUINE on the strength of a fix that has not been run live.

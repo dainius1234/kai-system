@@ -38,12 +38,28 @@ logger = logging.getLogger("kai.service_auth")
 
 TOKEN_ENV = "KAI_SERVICE_TOKEN"
 ALLOW_UNAUTH_ENV = "KAI_ALLOW_UNAUTHENTICATED"
-# The dashboard's own key (Dainius, 2026-11-04, handoff entries 381-382).
-# A service accepts it only if this variable is set FOR THAT SERVICE.
-# Compose sets it for browser-agent, monitor-service and notify-service
-# only, so a compromised dashboard cannot reach the executor or any other
-# service that holds the shared KAI_SERVICE_TOKEN.
+# The dashboard's own key (Dainius, 2026-11-04/05, handoff entries 381-385).
+# A service accepts it only if this variable is set FOR THAT SERVICE, and
+# only for the operations in DASHBOARD_OPERATIONS. Compose sets it for
+# browser-agent, monitor-service and notify-service only, so the key never
+# reaches the executor or agentic. A compromised dashboard can still do
+# these 14 things (they are what the dashboard is for), but nothing else.
 DASHBOARD_TOKEN_ENV = "KAI_DASHBOARD_SERVICE_TOKEN"
+
+# The exact operations the dashboard calls (14 of the 17 protected
+# operations on those services; counted in handoff entry 384). Deliberately
+# excluded: browser_click, browser_type, monitor_rule_update. Changing this
+# set is a code change, so it is reviewed.
+DASHBOARD_OPERATIONS = frozenset({
+    # browser-agent
+    "browser_navigate", "browser_run", "browser_scrape",
+    "browser_screenshot", "browser_search",
+    # monitor-service
+    "monitor_rule_create", "monitor_rule_delete", "monitor_rule_enable",
+    "monitor_rule_disable", "monitor_rule_check", "monitor_alerts_clear",
+    # notify-service
+    "desktop_notify", "notify_dismiss_one", "notify_dismiss_all",
+})
 
 _WARNED_UNAUTH: set[str] = set()
 
@@ -102,6 +118,18 @@ def check_token(
             f"configured. This endpoint fails closed by design."
         )
 
+    if expected and dashboard and hmac.compare_digest(expected, dashboard):
+        # The same value in both would let the dashboard key pass the
+        # shared-key path and skip the operation restriction. Fail closed.
+        logger.error(
+            "SECURITY: '%s' refused — %s and %s are identical; they must differ.",
+            operation, TOKEN_ENV, DASHBOARD_TOKEN_ENV,
+        )
+        return False, 503, (
+            f"{operation} is unavailable: service authentication is "
+            f"misconfigured. This endpoint fails closed by design."
+        )
+
     if not authorization:
         return False, 401, "missing Authorization header"
 
@@ -114,6 +142,10 @@ def check_token(
     # an unconfigured token never matches.
     ok_shared = bool(expected) and hmac.compare_digest(supplied, expected)
     ok_dashboard = bool(dashboard) and hmac.compare_digest(supplied, dashboard)
+    if ok_dashboard and not ok_shared and operation not in DASHBOARD_OPERATIONS:
+        logger.warning("SECURITY: dashboard key refused for '%s' (not a dashboard operation)",
+                       operation)
+        return False, 403, "credential not permitted for this operation"
     if not (ok_shared or ok_dashboard):
         logger.warning("SECURITY: rejected bad token for '%s'", operation)
         return False, 403, "invalid service token"

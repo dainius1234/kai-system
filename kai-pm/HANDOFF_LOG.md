@@ -116788,3 +116788,148 @@ python3 -B .claude/skills/kai-handoff/handoff.py check
 
 python3 -B .claude/skills/kai-handoff/handoff.py verify
 python3 -B .claude/skills/kai-handoff/handoff.py check
+## HANDOFF 2026-11-05T09:51:37Z — session_01AuiBo9KTWtrAa9w5xnZHJH — by Orion
+
+### 0. Measured state
+
+- utc: 2026-11-05T09:51:37Z  [CMD `date -u +%FT%TZ` → 2026-11-05T09:51:37Z]
+- branch: claude/project-rework-plan-pgvp35  [CMD `git rev-parse --abbrev-ref HEAD` → claude/project-rework-plan-pgvp35]
+- head: c6621da0ce2ec485c0638db6ba5f46a7e5e91341  [CMD `git rev-parse HEAD` → c6621da0ce2ec485c0638db6ba5f46a7e5e91341]
+- tree: da216de0732a3870c37e10f887e6fed87ce3bb10  [CMD `git rev-parse HEAD^{tree}` → da216de0732a3870c37e10f887e6fed87ce3bb10]
+- uncommitted_paths: 5  [CMD `git status --porcelain | count lines` → 5]
+- remote:claude/handoff-hook-main: 011c29ee545c57a4db50f9f5ac5de5d44bd60528  [CMD `git ls-remote --heads origin` → 011c29ee545c57a4db50f9f5ac5de5d44bd60528]
+- remote:claude/main-baseline-probe: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:main: 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc  [CMD `git ls-remote --heads origin` → 194db0a0c13b4d5b322997fc1ceb33bdd21a77bc]
+- remote:claude/d379-e7-evidence-be946634b89e0602: 2b3c034ca7794455e64de2aa2a09baad2155bf08  [CMD `git ls-remote --heads origin` → 2b3c034ca7794455e64de2aa2a09baad2155bf08]
+- remote:claude/cai-v1-bootstrap: 3f2dad036823ab95f1a469bf0a882316be86ce24  [CMD `git ls-remote --heads origin` → 3f2dad036823ab95f1a469bf0a882316be86ce24]
+- remote:claude/d379-retained-interpreter-1f30fc923df4b4f8: 78a31196402b6f8e1b770a6ca8bde214e4f2db21  [CMD `git ls-remote --heads origin` → 78a31196402b6f8e1b770a6ca8bde214e4f2db21]
+- remote:claude/new-season-g1zxjc: a9b2693546ed4e4a07c6523ad70be713ec384187  [CMD `git ls-remote --heads origin` → a9b2693546ed4e4a07c6523ad70be713ec384187]
+- remote:feat/d87-cognitive-architecture: b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4  [CMD `git ls-remote --heads origin` → b95f0d6bc6f4bd67b2e1a934e9dd05aa487d4fd4]
+- remote:claude/d379-repair-eb52f73: c358798adf4bca392f3f19187d66b3db6008891d  [CMD `git ls-remote --heads origin` → c358798adf4bca392f3f19187d66b3db6008891d]
+- remote:claude/project-rework-plan-pgvp35: c6621da0ce2ec485c0638db6ba5f46a7e5e91341  [CMD `git ls-remote --heads origin` → c6621da0ce2ec485c0638db6ba5f46a7e5e91341]
+- remote:claude/d379-e7a-synthetic-d1e5ccf4ac553594: dc09ad2a6f9b1c141147aae50aa03ead0b5c3660  [CMD `git ls-remote --heads origin` → dc09ad2a6f9b1c141147aae50aa03ead0b5c3660]
+- decisions_headings: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_distinct: 373  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → 373]
+- decisions_duplicates: none  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → none]
+- decisions_highest: D390  [CMD `grep -E '^## D([0-9]+)( +—|$)' kai-pm/DECISIONS.md` → D390]
+- ledger_incident_headings: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_incident_distinct: 38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → 38]
+- ledger_highest: INC-2026-09-19-38  [CMD `grep -E '^### \x60(INC-\d{4}-\d{2}-\d{2}-(\d+))\x60' kai-pm/FAILURE_PATTERN_LEDGER.md` → INC-2026-09-19-38]
+- handoff_entries: 385  [CMD `grep -c '^## HANDOFF ' kai-pm/HANDOFF_LOG.md` → 385]
+
+### 1. The four states
+
+- physical: common/service_auth.py restricts the dashboard key to DASHBOARD_OPERATIONS (14) and fails closed when the two keys are identical; tests in scripts/test_service_auth.py; README/backlog metric lines; capability map note  [CMD `git diff --stat` → 5 files changed, 128 insertions(+), 14 deletions(-)]
+- authorised: the 14-operation restriction; offline tests  [CONVERSATION 2026-11-05 Kai-GPT relayed by Dainius, "Restrict KAI_DASHBOARD_SERVICE_TOKEN to the 14 identified operations, denying the remaining three."]
+- evidence: old-code vs new-code checks and final gates in blocks below  [CMD `python scripts/test_service_auth.py on base4 (constant defined) and fix4` → 95/5 vs 100/0]
+- admission: none; not live-qualified; dashboard workstream closed per instruction  [CONVERSATION 2026-11-05 Kai-GPT relayed by Dainius, "Once tested and committed, report the result and close this workstream."]
+
+### 2. Rulings since the last handoff
+
+- None  [CMD `ruling_capture.py status` → OUTSTANDING=0]
+
+### 3. Authorised / Held / Forbidden
+
+- AUTHORISED (used): the restriction. HELD: proactive observation (next; needs its own approval); skill promotion; historical data; values provenance design; live runtime; deployment; merge; PRE-RAMS; Gold Tier; R11; PR #122 DO NOT MERGE. NOT AUTHORISED: accessing, copying, reading, searching or processing data/SOUL.md  [CONVERSATION 2026-11-05 Kai-GPT relayed by Dainius, "All other holds remain."]
+
+### 4. Open questions
+
+- For Dainius: approve the next task, separately governed proactive observation?  [CONVERSATION 2026-11-05 Kai-GPT relayed by Dainius, "Then we return to building KAI's proactive intelligence."]
+
+### 5. Incidents and corrections
+
+- Acceptance met in offline checks: 14 operations accept the dashboard key; browser_click, browser_type, monitor_rule_update reject it (403) while the shared key still opens them; a service without the dashboard variable (executor, agentic) rejects it even for a dashboard operation name; identical keys → 503 for all; compose holders only dashboard + the 3 services  [CMD `python scripts/test_service_auth.py` → Service Auth Tests: 100 passed, 0 failed]
+- Calibration: the allowed list is compared with operation names read from the 3 services' source (17 declared = 14 allowed + 3 excluded), not with the constant itself  [CMD `re.findall require_service_auth("…") in the 3 files` → 17]
+- Known-positive: on the old code (constant defined so the file loads) exactly 5 checks fail — the 3 denials and 2 identical-key refusals  [CMD `python scripts/test_service_auth.py (base4 patched)` → 95 passed, 5 failed]
+- Gates on the final tree: all pass except test_item8_preflight, failing before this work too; dashboard self-run tests pass  [CMD `45 policy-check commands (fix4)` → only line 25 non-zero]
+- Repository files equal tested files; credential scan 0 hits  [CMD `cmp each; credscan.py scan386.json` → differing-from-tested=0; TOTAL HITS 0]
+- EVIDENCE AUTH-OLD-CODE ev386_oldcode.txt: 1462 bytes, sha256 437be78f642be63dafba31c6e59028da4c510b3467c26c452d458efdd25bdef2, final LF True (added by Orion)  [CMD `sha256sum ev386_oldcode.txt` → 437be78f642be63d…]
+    BEGIN-VERBATIM AUTH-OLD-CODE
+    SECURITY: 'db_restore' refused — KAI_SERVICE_TOKEN is not configured. Set the token, or set KAI_ALLOW_UNAUTHENTICATED=true for local development only.
+    SECURITY: 'db_restore' refused — KAI_SERVICE_TOKEN is not configured. Set the token, or set KAI_ALLOW_UNAUTHENTICATED=true for local development only.
+    SECURITY: 'db_restore' refused — KAI_SERVICE_TOKEN is not configured. Set the token, or set KAI_ALLOW_UNAUTHENTICATED=true for local development only.
+    SECURITY: 'dev_test' is serving UNAUTHENTICATED because KAI_ALLOW_UNAUTHENTICATED=true. Never set this outside local development.
+    SECURITY: rejected bad token for 'op'
+    SECURITY: rejected bad token for 'op'
+    SECURITY: rejected bad token for 'op'
+    SECURITY: rejected bad token for 'op'
+    SECURITY: rejected bad token for 'executor_run'
+    SECURITY: rejected bad token for 'monitor_rule_create'
+    SECURITY: 'op' refused — KAI_SERVICE_TOKEN is not configured. Set the token, or set KAI_ALLOW_UNAUTHENTICATED=true for local development only.
+      FAIL: dashboard_key_denies_browser_click — 200
+      FAIL: dashboard_key_denies_browser_type — 200
+      FAIL: dashboard_key_denies_monitor_rule_update — 200
+    SECURITY: rejected bad token for 'executor_run'
+    SECURITY: rejected bad token for 'browser_run'
+      FAIL: identical_keys_refuse_browser_click — 200
+      FAIL: identical_keys_refuse_browser_run — 200
+    
+    ============================================================
+    Service Auth Tests: 95 passed, 5 failed
+    EXIT GATE: FAIL
+    END-VERBATIM AUTH-OLD-CODE
+- EVIDENCE AUTH-NEW-CODE ev386_newcode.txt: 41 bytes, sha256 5bc3b5e8049c7ca2ef660a9ef6cac53b91b7f403828d1b624fe67a690818ea96, final LF True (added by Orion)  [CMD `sha256sum ev386_newcode.txt` → 5bc3b5e8049c7ca2…]
+    BEGIN-VERBATIM AUTH-NEW-CODE
+    Service Auth Tests: 100 passed, 0 failed
+    END-VERBATIM AUTH-NEW-CODE
+- EVIDENCE GATES-FINAL ev386_gates.txt: 2793 bytes, sha256 f1d826a6142320ce799350752a135d2a093e87e6f75adf57681366d3c24bbc25, final LF True (added by Orion)  [CMD `sha256sum ev386_gates.txt` → f1d826a6142320ce…]
+    BEGIN-VERBATIM GATES-FINAL
+    1 rc=0 :: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics    --exclude=.venv,_arc
+    2 rc=0 :: python3 scripts/security/check_port_bindings.py
+    3 rc=0 :: python3 scripts/security/check_default_profiles.py
+    4 rc=0 :: python3 scripts/security/check_secret_fallbacks.py
+    5 rc=0 :: python3 scripts/security/check_service_tokens.py
+    6 rc=0 :: python3 scripts/security/check_network_zones.py
+    7 rc=0 :: python3 scripts/security/check_turbovec_writers.py
+    8 rc=0 :: python3 scripts/security/check_restart_recovery.py
+    9 rc=0 :: python3 scripts/security/check_image_tags.py
+    10 rc=0 :: python3 scripts/security/check_compose_drift.py
+    11 rc=0 :: python3 scripts/security/check_architecture_rules.py
+    12 rc=0 :: python3 scripts/security/check_operational_portability.py
+    13 rc=0 :: python3 scripts/security/check_evidence_package_integrity.py
+    14 rc=0 :: python3 scripts/security/hygiene_survey.py --gate
+    15 rc=0 :: python3 scripts/security/check_ci_tolerations.py
+    16 rc=0 :: python3 scripts/security/check_preflight_reachability.py    --expect-reachable scripts/tes
+    17 rc=0 :: python3 scripts/test_capture_trigger_paths.py
+    18 rc=0 :: python3 scripts/test_declared_prerequisites.py
+    19 rc=0 :: python3 scripts/security/check_doctrine_integrity.py
+    20 rc=0 :: python3 scripts/test_doctrine_integrity.py
+    21 rc=0 :: python3 scripts/test_image_identity.py
+    22 rc=0 :: python3 scripts/security/check_item8_design.py
+    23 rc=0 :: python3 scripts/test_item8_instruments.py
+    24 rc=0 :: python3 scripts/test_item8_verdicts.py
+    25 rc=1 :: python3 scripts/test_item8_preflight.py
+    26 rc=0 :: python3 scripts/security/check_workflow_filters.py
+    27 rc=0 :: python3 scripts/security/check_workflow_outputs.py
+    28 rc=0 :: python3 scripts/security/check_dockerfile_flags.py
+    29 rc=0 :: python3 scripts/security/check_dockerfile_coverage.py
+    30 rc=0 :: python3 scripts/security/check_dockerfile_context.py
+    31 rc=0 :: python3 scripts/security/check_compose_env.py
+    32 rc=0 :: python3 scripts/security/check_compose_interpolation.py
+    33 rc=0 :: python3 scripts/security/check_unreachable_bindings.py
+    34 rc=0 :: python3 scripts/security/check_implicit_deps.py
+    35 rc=0 :: python3 scripts/security/check_image_modules.py
+    36 rc=0 :: python3 scripts/security/check_shipped_package_deps.py
+    37 rc=0 :: python3 scripts/security/check_healthcheck_runnable.py
+    38 rc=0 :: python3 scripts/security/check_service_identity_wiring.py
+    39 rc=0 :: python3 scripts/security/check_bind_mount_portability.py
+    40 rc=0 :: python3 scripts/security/check_depends_on_readiness.py
+    41 rc=0 :: python3 scripts/security/check_test_identity.py
+    42 rc=0 :: python3 scripts/security/check_test_wiring.py
+    43 rc=0 :: python3 scripts/security/check_gate_registry.py --gate
+    44 rc=0 :: make --no-print-directory check-docs
+    45 rc=0 :: python3 scripts/sync_docs.py --check
+    END-VERBATIM GATES-FINAL
+
+### 6. Next authorised step
+
+- Report to Dainius; dashboard workstream closed; proactive observation awaits its own approval  [CONVERSATION 2026-11-05 Kai-GPT relayed by Dainius, "report the result and close this workstream."]
+
+### 7. What I am unsure of
+
+- Live behaviour with real keys and services: not run  [CMD `none` → no live test]
+
+### 8. Reader's verification
+
+python3 -B .claude/skills/kai-handoff/handoff.py verify
+python3 -B .claude/skills/kai-handoff/handoff.py check
